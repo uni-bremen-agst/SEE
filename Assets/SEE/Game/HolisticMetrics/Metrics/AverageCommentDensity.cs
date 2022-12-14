@@ -32,7 +32,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
                 }
             }
 
-            MetricValueRange metricValueRange = new MetricValueRange()
+            MetricValueRange metricValueRange = new MetricValueRange
             {
                 Name = "Average comment density",
                 Value = totalDensity / totalNodes,

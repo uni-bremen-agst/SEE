@@ -72,7 +72,7 @@ MonoBehaviour:
     m_BestFit: 1
     m_MinSize: 9
     m_MaxSize: 90
-    m_Alignment: 4
+    m_Alignment: 3
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
@@ -170,8 +170,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 785ee535777947d48a742af602a6d954, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  valueText: {fileID: 6431031318870517540}
   titleText: {fileID: 6431031319337247947}
+  valueText: {fileID: 6431031318870517540}
 --- !u!65 &9210060419157775034
 BoxCollider:
   m_ObjectHideFlags: 0

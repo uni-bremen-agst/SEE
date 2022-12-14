@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
+using SEE.Game;
 using SEE.Game.Operator;
 using TinySpline;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using UnityEngine.Rendering;
 
 namespace SEE.GO
 {
@@ -226,6 +228,7 @@ namespace SEE.GO
         {
             // Corresponds to the material of the LineRenderer.
             defaultMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
+            defaultMaterial.renderQueue = (int)(RenderQueue.Transparent + 1);
         }
 
         /// <summary>
@@ -450,6 +453,7 @@ namespace SEE.GO
             if (meshRenderer.sharedMaterial == null)
             {
                 meshRenderer.sharedMaterial = defaultMaterial;
+                Portal.SetPortal(transform.parent.parent.gameObject, gameObject);
             }
             
             if (!gameObject.TryGetComponent(out MeshFilter filter) || meshRenderer == null)

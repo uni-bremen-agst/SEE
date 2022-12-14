@@ -109,16 +109,22 @@ namespace SEE.Utils
 
         /// <summary>
         /// Raycasts the scene from the camera in the direction the mouse is pointing and chooses the
-        /// node that is lowest in the node hierarchy, so in the lowest level of the tree
-        /// (more precisely, the one with the greatest value of the node attribute Level;
-        /// Level counting starts at the root and increases downward into the tree).
+        /// node that is the lowest one in the node hierarchy (more precisely, the one with the
+        /// greatest value of the node attribute Level; where Level counting starts at the root
+        /// and increases downward into the tree) if considered relevant for a hit.
+        ///
+        /// If <paramref name="referenceNode"/> equals <c>null</c>, all nodes are considered relevant.
+        /// Otherwise a node is considered relevant if it is in the same graph as
+        /// <paramref name="referenceNode"/> and neither <paramref name="referenceNode"/> itself nor
+        /// any of its descendants in the node hierarchy in the underlying graph.
         /// </summary>
         /// <param name="raycastHit">hit object of lowest node if true is returned, null otherwise</param>
         /// <param name="hitNode">lowest node if true is returned, null otherwise</param>
         /// <param name="referenceNode">if given, all nodes which are not in the same graph as
         /// <paramref name="referenceNode"/> as well as itself will not be considered when sorting raycast results.
         /// </param>
-        /// <returns>true if the mouse was over at least one node</returns>
+        /// <returns>true if the mouse was over at least one node fulfilling the criteria; only then
+        /// <paramref name="hitNode"/> and <paramref name="raycastHit"/> are defined</returns>
         public static bool RaycastLowestNode(out RaycastHit? raycastHit, out Node hitNode, NodeRef referenceNode = null)
         {
             RaycastHit[] hits = new RaycastHit[RAYCAST_BUFFER_SIZE];
@@ -130,27 +136,33 @@ namespace SEE.Utils
 
             raycastHit = null;
             hitNode = null;
+            // We are using a loop iteration bounded by numberOfHits. A foreach loop would traverse
+            // all elements in hits, where most of them would be null.
             for (int i = 0; i < numberOfHits; i++)
             {
                 RaycastHit hit = hits[i];
+                // referenceNode will be ignored if set
                 if (referenceNode == null || hit.collider.gameObject != referenceNode.gameObject)
                 {
-                    NodeRef nodeRef = hit.transform.GetComponent<NodeRef>();
+                    NodeRef hitNodeRef = hit.transform.GetComponent<NodeRef>();
                     // Is it a node at all and if so, are they in the same graph?
-                    if (nodeRef != null && nodeRef.Value != null
-                        && (referenceNode == null || (referenceNode.Value != null && nodeRef.Value.ItsGraph == referenceNode.Value.ItsGraph)))
+                    if (hitNodeRef != null && hitNodeRef.Value != null
+                        && (referenceNode == null || (referenceNode.Value != null && hitNodeRef.Value.ItsGraph == referenceNode.Value.ItsGraph)))
                     {
-                        // update newParent when we found a node deeper into the tree
-                        if (hitNode == null || nodeRef.Value.Level > hitNode.Level)
+                        // update hitNode when we found a node deeper into the tree
+                        if (hitNode == null || hitNodeRef.Value.Level > hitNode.Level)
                         {
-                            hitNode = nodeRef.Value;
-                            raycastHit = hit;
+                            // check whether descendants are to be ignored and if so, whether the hit node is a descendant
+                            if (referenceNode == null || !hitNodeRef.Value.IsDescendantOf(referenceNode.Value))
+                            {
+                                hitNode = hitNodeRef.Value;
+                                raycastHit = hit;
+                            }
                         }
                     }
                 }
             }
-
-            return numberOfHits > 0;
+            return hitNode != null;
         }
 
         /// <summary>

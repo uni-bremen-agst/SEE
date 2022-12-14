@@ -1,11 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using SEE.DataModel.DG;
 using SEE.GO;
+using SEE.Tools.ReflexionAnalysis;
 using TinySpline;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace SEE.Game.Operator
 {
@@ -169,17 +170,35 @@ namespace SEE.Game.Operator
                 return;
             }
 
+            IEnumerable<Node> GetMappedNodes(Node mappedNode)
+            {
+                if (mappedNode.IsInArchitecture())
+                {
+                    // This node may be mapped to. We need to expand it to include the node we're mapped to.
+                    return mappedNode.Incomings.Where(ReflexionGraphTools.IsInMapping)
+                                     .SelectMany(x => x.Source.PostOrderDescendants()).Append(mappedNode);
+                }
+
+                return new[] { mappedNode };
+            }
+
             // Recalculate edge layout and animate edges due to new node positioning.
-            // TODO: Iterating over all game edges is currently very costly,
-            //       consider adding a cached mapping either here or in SceneQueries.
-            //       Alternatively, we can iterate over game edges instead.
-            foreach (Edge edge in node.Incomings.Union(node.Outgoings).Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
+            // TODO: This is currently a very costly method. We should iterate over game edges instead, that way
+            //       we can use the hierarchy we're actually interested in and don't need to, e.g., look at
+            //       mapped nodes which may be relevant. Before implementing this, measure actual performance, though.
+            IEnumerable<Edge> relevantEdges = node.PostOrderDescendants()
+                                                  .SelectMany(GetMappedNodes)
+                                                  .SelectMany(n => n.Incomings.Union(n.Outgoings))
+                                                  .Where(edge => !edge.HasToggle(GraphElement.IsVirtualToggle))
+                                                  .Distinct();
+            foreach (Edge edge in relevantEdges)
             {
                 // Add new target edge, we'll animate the current edge to it.
                 GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
                 if (gameEdge == null)
                 {
                     // TODO: How is this possible?
+                    Debug.LogWarning($"Edge {edge.ToShortString()} has no associated GameObject!");
                     continue;
                 }
 
@@ -198,8 +217,6 @@ namespace SEE.Game.Operator
                 //       having to use SEESpline as a wrapper.
                 Destroy(newEdge);
                 edgeOperator.MorphTo(targetSpline, duration);
-
-                // FIXME: We need to recurse into the children so that their edges are considered, too.
             }
 
             // Once we're done, we reset the gameObject to its original position.

@@ -9,6 +9,13 @@ namespace SEE.DataModel.DG
     public abstract class GraphElement : Attributable
     {
         /// <summary>
+        /// The name of the toggle attribute that marks "virtual" graph elements, which are
+        /// elements that are not intended to be layouted or drawn in SEE and only
+        /// exist in the underlying graph.
+        /// </summary>
+        public const string IsVirtualToggle = "IsVirtual";
+
+        /// <summary>
         /// The type of the graph element.
         /// </summary>
         private string type;

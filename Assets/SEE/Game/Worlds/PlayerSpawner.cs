@@ -1,4 +1,6 @@
 ﻿using Dissonance;
+using Sirenix.OdinInspector;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -11,14 +13,25 @@ namespace SEE.Game.Worlds
     /// </summary>
     public class PlayerSpawner : MonoBehaviour
     {
-        [Tooltip("The prefab to be used to spawn a player.")]
-        public List<GameObject> PlayerPrefab = new List<GameObject>();
+        /// <summary>
+        /// Information needed to spawn a player avatar.
+        /// </summary>
+        [Serializable]
+        private class SpawnInfo
+        {
+            [Tooltip("Avatar game object used as prefab")]
+            public GameObject PlayerPrefab;
+            [Tooltip("World-space position at which to spawn")]
+            public Vector3 Position;
+            [Tooltip("Rotation in degree along the y axis")]
+            public float Rotation;
+        }
 
-        [Tooltip("Ground position where a player is spawned.")]
-        public Vector3 InitialPosition = Vector3.zero;
-
-        [Tooltip("Initial rotation of a spawned player.")]
-        public Vector3 InitialRotation = Vector3.zero;
+        /// <summary>
+        /// The information needed to spawn player avatars.
+        /// </summary>
+        [Tooltip("The information to be used to spawn players."), ShowInInspector, SerializeField]
+        private List<SpawnInfo> PlayerSpawns = new List<SpawnInfo>();
 
         /// <summary>
         /// The dissonance communication. Its game object holds the remote players as its children.
@@ -80,14 +93,15 @@ namespace SEE.Game.Worlds
         private int numberOfSpawnedPlayers = 0;
 
         /// <summary>
-        /// Spawns a player at <see cref="InitialPosition"/> and <see cref="InitialRotation"/>
-        /// using the <see cref="PlayerPrefab"/>.
+        /// Spawns a player using the <see cref="PlayerSpawns"/>.
         /// </summary>
         /// <param name="owner">the network ID of the owner</param>
         private void Spawn(ulong owner)
         {
-            GameObject player = Instantiate(PlayerPrefab[numberOfSpawnedPlayers % PlayerPrefab.Count],
-                                            InitialPosition, Quaternion.Euler(InitialRotation));
+            int index = numberOfSpawnedPlayers % PlayerSpawns.Count;
+            GameObject player = Instantiate(PlayerSpawns[index].PlayerPrefab,
+                                            PlayerSpawns[index].Position,
+                                            Quaternion.Euler(new Vector3(0, PlayerSpawns[index].Rotation, 0)));
             numberOfSpawnedPlayers++;
             player.name = "Player " + numberOfSpawnedPlayers;
             Debug.Log($"Spawned {player.name} (network id: {owner}, local: {IsLocal(owner)}) at position {player.transform.position}.\n");

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -40,13 +41,13 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
             // First we need to remove all current points
             DestroyChildren(coordinatesAnchor.transform);
             
-            if (metricValue.GetType() == typeof(MetricValueCollection))
+            if (metricValue is MetricValueCollection valueCollection)
             {
                 // Cast the metric value so we can use its collection feature
-                IList<MetricValueRange> metricValues = ((MetricValueCollection)metricValue).MetricValues;
+                IList<MetricValueRange> metricValues = valueCollection.MetricValues;
              
                 // Set the title of the widget
-                titleText.text = metricValues[0].Name;
+                titleText.text = valueCollection.Name;
                 
                 // First we need to get the x axis coordinate. For dividing the length of the axis (900) by the number
                 // of given values (nodes) in the collection, we want to subtract one from the number of values. That is
@@ -58,11 +59,9 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 }
                 
                 // Before we can start, we need to find out the largest and smallest metric value for scaling the
-                // coordinate system. We assume that the Lower and Higher value is the same for all metric values.
-                // If that is not the case, that means that the metric that is being represented was not implemented
-                // correctly.
-                float minimum = metricValues[0].Lower;
-                float maximum = metricValues[0].Higher;
+                // coordinate system.
+                float minimum = metricValues.Min(x => x.Lower);
+                float maximum = metricValues.Max(x => x.Higher);
                 float range = maximum - minimum;
                 
                 // Divide by (number of labels - 1) because the first label will be at "minimum".
@@ -77,10 +76,10 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                     {
                         yValue *= 100;
                     }
-                    string labelText = yValue.ToString("F" + metricValues[0].DecimalPlaces);
+                    string labelText = yValue.ToString("F" + metricValues[i].DecimalPlaces);
                     if (isPercentage)
                     {
-                        labelText = yValue.ToString("F" + (metricValues[0].DecimalPlaces - 2)) + "%";
+                        labelText = $"{yValue.ToString($"F{metricValues[i].DecimalPlaces - 2}")}%";
                     }
                     yLabels[i].text = labelText;
                 }
@@ -90,19 +89,19 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 {
                     Vector3 coordinates = new Vector3(
                         xDistance * i, 
-                        metricValues[i].Value / range * 330f);
+                        metricValues[i].Value / range * 330f);  // FIXME: Magic number
                     GameObject point = Instantiate(pointPrefab, coordinatesAnchor.transform);
                     point.transform.localPosition = coordinates;
                 }
             }
-            else if (metricValue.GetType() == typeof(MetricValueRange))
+            else if (metricValue is MetricValueRange range)
             {
                 // It would be weird to give this widget a single metric value. But in case that is ever done, we still
                 // handle that case by putting that value in a MetricValueCollection so we can recursively call this
                 // method. (Otherwise we would have to add a lot of functionality in this else branch also.
-                MetricValueCollection collection = new MetricValueCollection()
+                MetricValueCollection collection = new MetricValueCollection
                 {
-                    MetricValues = new List<MetricValueRange> { (MetricValueRange)metricValue }
+                    MetricValues = new List<MetricValueRange> { range }
                 };
                 Display(collection);
             }

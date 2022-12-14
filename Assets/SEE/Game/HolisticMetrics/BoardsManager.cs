@@ -41,6 +41,7 @@ namespace SEE.Game.HolisticMetrics
         /// <param name="boardConfig">The board configuration for the new board.</param>
         internal static void Create(BoardConfig boardConfig)
         {
+            widgetsManagers.RemoveAll(x => x == null);  // remove stale managers
             bool nameExists = widgetsManagers.Any(widgetsManager =>
                 widgetsManager.GetTitle().Equals(boardConfig.Title));
             if (nameExists)
@@ -62,7 +63,7 @@ namespace SEE.Game.HolisticMetrics
             // Add the widgets to the new board
             foreach (WidgetConfig widgetConfiguration in boardConfig.WidgetConfigs)
             {
-                    newWidgetsManager.Create(widgetConfiguration);
+                newWidgetsManager.Create(widgetConfiguration);
             }
 
             widgetsManagers.Add(newWidgetsManager);

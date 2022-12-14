@@ -57,7 +57,7 @@ jobs:
           coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;assemblyFilters:+SEE'
       - uses: actions/upload-artifact@v3
         name: Upload test results
-        if: always()
+        if: ${{ !cancelled() }}
         with:
           name: Test results for ${{ matrix.os }}
           path: ${{ steps.tests.outputs.artifactsPath }}

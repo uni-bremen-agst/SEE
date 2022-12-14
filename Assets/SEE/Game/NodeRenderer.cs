@@ -569,6 +569,13 @@ namespace SEE.Game
         /// <param name="gameNodes">game nodes to be decorated</param>
         protected void AddDecorations(ICollection<GameObject> gameNodes)
         {
+            AddLabels(gameNodes);
+
+            foreach (GameObject node in gameNodes)
+            {
+                AddGeneralDecorations(node);
+            }
+
             ICollection<GameObject> leafNodes = FindLeafNodes(gameNodes);
             ICollection<GameObject> innerNodes = FindInnerNodes(gameNodes);
 
@@ -586,13 +593,6 @@ namespace SEE.Game
                 ErosionIssues issueDecorator = new ErosionIssues(Settings.LeafIssueMap(),
                                                                  scaler, Settings.ErosionSettings.ErosionScalingFactor * 5);
                 issueDecorator.Add(leafNodes);
-            }
-
-            AddLabels(innerNodes);
-
-            foreach (GameObject node in leafNodes.Concat(innerNodes))
-            {
-                AddGeneralDecorations(node);
             }
         }
 
@@ -620,10 +620,9 @@ namespace SEE.Game
         /// be too large and is not really neeed anyway).
         /// </summary>
         /// <param name="gameNodes">game nodes whose source name is to be added</param>
-        /// <param name="innerNodeFactory">inner node factory</param>
-        /// <returns>the game objects created for the text labels</returns>
         private void AddLabels(IEnumerable<GameObject> gameNodes)
         {
+            const float RelativeLabelSize = 0.8f;
             GameObject codeCity = null;
             foreach (GameObject node in gameNodes)
             {
@@ -632,10 +631,15 @@ namespace SEE.Game
                 {
                     Vector3 size = node.transform.lossyScale;
                     float length = Mathf.Min(size.x, size.z);
-                    // The text may occupy up to 30% of the length.
-                    GameObject text = TextFactory.GetTextWithWidth(theNode.SourceName,
-                                                                   node.transform.position, length * 0.3f);
+                    // The text may occupy up to RelativeLabelSize of the length.
+                    Vector3 position = node.GetRoofCenter();
+                    GameObject text = TextFactory.GetTextWithWidth(text: theNode.SourceName,
+                                                                   position: position,
+                                                                   width: length * RelativeLabelSize,
+                                                                   lift: true,
+                                                                   textColor: node.GetColor().Invert());
                     text.transform.SetParent(node.transform);
+                    AddLOD(text);
                     codeCity ??= SceneQueries.GetCodeCity(node.transform).gameObject;
                     Portal.SetPortal(codeCity, text);
                 }

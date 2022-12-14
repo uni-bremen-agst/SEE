@@ -26,7 +26,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
 
             foreach (Node node in city.LoadedGraph.Nodes())
             {
-                if (node.TryGetNumeric(attributeName, out var lines))
+                if (node.TryGetNumeric(attributeName, out float lines))
                 {
                     totalLines += lines;
                     totalNodes++;
@@ -37,9 +37,9 @@ namespace SEE.Game.HolisticMetrics.Metrics
             
             if (totalNodes == 0)
             {
-                Debug.LogError("No nodes were found so the average lines of code metric does not make any " +
-                               " sense\n");
-                metricValueRange = new MetricValueRange()
+                Debug.LogError("No nodes were found, so the average lines of code metric does not make any " +
+                               " sense.\n");
+                metricValueRange = new MetricValueRange
                 {
                     Name = "Average lines of code",
                     Value = 0,
@@ -50,7 +50,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
             }
             else
             {
-                metricValueRange = new MetricValueRange()
+                metricValueRange = new MetricValueRange
                 {
                     Name = "Average lines of code",
                     Value = totalLines / totalNodes,

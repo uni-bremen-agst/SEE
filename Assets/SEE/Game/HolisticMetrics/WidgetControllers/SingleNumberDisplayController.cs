@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,16 +16,17 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// <param name="metricValue">The metric value to display</param>
         internal override void Display(MetricValue metricValue)
         {
-            if (metricValue.GetType() == typeof(MetricValueRange))
+            string MetricValueRangeToString(MetricValueRange range) => range.Value.ToString($"F{range.DecimalPlaces}");
+
+            if (metricValue is MetricValueRange metricValueRange)
             {
-                MetricValueRange metricValueRange = (MetricValueRange)metricValue;
-                valueText.text = metricValueRange.Value.ToString("F" + metricValue.DecimalPlaces);
+                valueText.text = MetricValueRangeToString(metricValueRange);
                 titleText.text = metricValueRange.Name;
             } 
-            else if (metricValue.GetType() == typeof(MetricValueCollection))
+            else if (metricValue is MetricValueCollection metricValueCollection)
             {
-                MetricValueCollection metricValueCollection = (MetricValueCollection)metricValue;
-                Display(metricValueCollection.MetricValues[0]);
+                titleText.text = metricValueCollection.Name;
+                valueText.text = string.Join(Environment.NewLine, metricValueCollection.MetricValues.Select(x => $"{x.Name}: {MetricValueRangeToString(x)}"));
             }
             else
             {

@@ -333,16 +333,20 @@ namespace SEE.Controls.Actions
             /// If <see cref="withinReflexionCity"/>, the exact semantics of the re-parenting
             /// is determined by <see cref="ReflexionMapper.SetParent"/>;
             /// otherwise by <see cref="GameNodeMover.SetParent"/>.
+            ///
+            /// The <paramref name="grabbedObject"/> will be an immediate child of <paramref name="target"/> in the
+            /// game-object hierarchy afterwards.
             /// </summary>
-            /// <param name="target">the target node of the re-parenting</param>
+            /// <param name="target">the target node of the re-parenting, i.e., the new parent</param>
             internal void Reparent(GameObject target)
             {
-                PutOnAndFit(grabbedObject, target, originalParent.gameObject, originalLocalScale);
-                UnmarkAsTarget();
-                MarkAsTarget(target.transform);
-
-                if (target != newParent)
+                // target must not be a descendant of grabbedObject
+                if (!IsDescendant(target, grabbedObject))
                 {
+                    PutOnAndFit(grabbedObject, target, originalParent.gameObject, originalLocalScale);
+                    UnmarkAsTarget();
+                    MarkAsTarget(target.transform);
+
                     newParent = target;
                     // The mapping is only possible if we are in a reflexion city
                     // and the mapping target is not the root of the graph.
@@ -354,6 +358,12 @@ namespace SEE.Controls.Actions
                     {
                         GameNodeMoverSetParent(grabbedObject, target);
                     }
+                }
+
+                // True if node is a descendant of root in the underlying graph.
+                static bool IsDescendant(GameObject node, GameObject root)
+                {
+                    return node.GetNode().IsDescendantOf(root.GetNode());
                 }
             }
 
@@ -410,6 +420,9 @@ namespace SEE.Controls.Actions
 
             /// <summary>
             /// Runs <see cref="GameNodeMover.PutOnAndFit"/> and propagates it to all clients.
+            ///
+            /// The <paramref name="child"/> will be an immediate child of <paramref name="newParent"/> in the
+            /// game-object hierarchy afterwards.
             /// </summary>
             /// <param name="child">the child to be put on <paramref name="newParent"/></param>
             /// <param name="newParent">new parent of <paramref name="child"/></param>
@@ -441,6 +454,9 @@ namespace SEE.Controls.Actions
 
             /// <summary>
             /// Runs <see cref="GameNodeMover.SetParent"/> and propagates it to all clients.
+            ///
+            /// <paramref name="child"/> will be an immediate child of <paramref name="parent"/>
+            /// in the game-object hierarchy aftwards.
             /// </summary>
             /// <param name="child">the child to be put on <paramref name="parent"/></param>
             /// <param name="parent">new parent of <paramref name="child"/></param>

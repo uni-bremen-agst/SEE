@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -28,7 +29,7 @@ namespace SEE.DataModel.DG
         /// A toggle marking artificial root nodes as such.
         /// </summary>
         public const string RootToggle = "Root";
-        
+
         /// <summary>
         /// Observer for graph elements. This way, changes in each element (e.g., attribute changes) are also
         /// propagated through the graph's own observable implementation.
@@ -173,7 +174,7 @@ namespace SEE.DataModel.DG
 
             if (nodes.Remove(node.ID))
             {
-                
+
                 // We need to send out this event here, before the node is modified but after it has been removed.
                 Notify(new NodeEvent(version, node, ChangeType.Removal));
 
@@ -196,7 +197,7 @@ namespace SEE.DataModel.DG
                     edges.Remove(incoming.ID);
                     incoming.ItsGraph = null;
                 }
-                
+
                 // Adjust the node hierarchy.
                 if (node.NumberOfChildren() > 0)
                 {
@@ -480,6 +481,15 @@ namespace SEE.DataModel.DG
         public List<Edge> Edges()
         {
             return edges.Values.ToList();
+        }
+
+        /// <summary>
+        /// Returns all nodes and non-hierarchical edges of the graph.
+        /// </summary>
+        /// <returns>all nodes and non-hierarchical edges</returns>
+        public IEnumerable<GraphElement> Elements()
+        {
+            return nodes.Values.Union<GraphElement>(edges.Values);
         }
 
         /// <summary>
@@ -1040,8 +1050,9 @@ namespace SEE.DataModel.DG
         /// For more precise information on what this means, consult the documentation of <see cref="SubgraphBy"/>.
         /// </summary>
         /// <param name="nodeTypes">the node types that should be kept</param>
+        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored</param>
         /// <returns>subgraph containing only nodes with given <paramref name="nodeTypes"/></returns>
-        public Graph SubgraphByNodeType(IEnumerable<string> nodeTypes)
+        public Graph SubgraphByNodeType(IEnumerable<string> nodeTypes, bool ignoreSelfLoops = false)
         {
             HashSet<string> relevantTypes = new HashSet<string>(nodeTypes);
             return SubgraphBy(element =>
@@ -1055,7 +1066,7 @@ namespace SEE.DataModel.DG
                     // Edges (attached to these nodes) shall be included
                     return true;
                 }
-            });
+            }, ignoreSelfLoops);
         }
 
         /// <summary>
@@ -1064,12 +1075,13 @@ namespace SEE.DataModel.DG
         /// For more precise information on what this means, consult the documentation of <see cref="SubgraphBy"/>.
         /// </summary>
         /// <param name="toggleAttributes">Toggle attribute a node or edge must have to be kept</param>
+        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored</param>
         /// <returns>
         /// subgraph containing only nodes and edges which have all the given <paramref name="toggleAttributes"/>
         /// </returns>
         /// <seealso cref="SubgraphBy"/>
-        public Graph SubgraphByToggleAttributes(IEnumerable<string> toggleAttributes) =>
-            SubgraphBy(x => x.ToggleAttributes.Overlaps(toggleAttributes));
+        public Graph SubgraphByToggleAttributes(IEnumerable<string> toggleAttributes, bool ignoreSelfLoops = false) =>
+            SubgraphBy(x => x.ToggleAttributes.Overlaps(toggleAttributes), ignoreSelfLoops);
 
         /// <summary>
         /// Yields a subgraph of given graph that contains only edges for which <paramref name="includeEdge"/> returns
@@ -1077,10 +1089,11 @@ namespace SEE.DataModel.DG
         /// For more on how the subgraph is constructed, consult the documentation of <see cref="SubgraphBy"/>.
         /// </summary>
         /// <param name="includeEdge">function returning true if edge shall be added</param>
+        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored</param>
         /// <returns>Subgraph containing only edges for which <paramref name="includeEdge"/> returns true
         /// and nodes connected to those edges.</returns>
         /// <seealso cref="SubgraphBy"/>
-        public Graph SubgraphByEdges(Func<Edge, bool> includeEdge)
+        public Graph SubgraphByEdges(Func<Edge, bool> includeEdge, bool ignoreSelfLoops = false)
         {
             ISet<Edge> keptEdges = new HashSet<Edge>(edges.Select(x => x.Value).Where(includeEdge));
 
@@ -1088,7 +1101,7 @@ namespace SEE.DataModel.DG
             ISet<Node> keptNodes = new HashSet<Node>(nodes.Select(x => x.Value)
                                                           .Where(x => keptEdges.Overlaps(x.Incomings.Concat(x.Outgoings))));
 
-            return SubgraphBy(x => x is Node && keptNodes.Contains(x) || x is Edge && keptEdges.Contains(x));
+            return SubgraphBy(x => x is Node && keptNodes.Contains(x) || x is Edge && keptEdges.Contains(x), ignoreSelfLoops);
         }
 
         /// <summary>
@@ -1131,14 +1144,15 @@ namespace SEE.DataModel.DG
         /// neglected, we lose information. On the other hand, we reduce the number of edges.
         /// </summary>
         /// <param name="includeElement">function determining whether a given node or edge shall be kept</param>
+        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored</param>
         /// <returns>
         /// subgraph containing only nodes and edges for which <paramref name="includeElement"/> returns true.
         /// </returns>
-        public Graph SubgraphBy(Func<GraphElement, bool> includeElement)
+        public Graph SubgraphBy(Func<GraphElement, bool> includeElement, bool ignoreSelfLoops = false)
         {
-            Graph subgraph = new Graph(BasePath);
+            Graph subgraph = this is ReflexionGraph ? new ReflexionGraph(BasePath) : new Graph(BasePath);
             Dictionary<Node, Node> mapsTo = AddNodesToSubgraph(subgraph, includeElement);
-            AddEdgesToSubgraph(subgraph, mapsTo, includeElement);
+            AddEdgesToSubgraph(subgraph, mapsTo, includeElement, ignoreSelfLoops);
             return subgraph;
         }
 
@@ -1226,27 +1240,43 @@ namespace SEE.DataModel.DG
         /// E'.Source = mapsTo[E.Source] and E'.Target = mapsTo[E.Target] and there is
         /// not already an edge (of any type) from mapsTo[E.Source] to mapsTo[E.Target]
         /// (i.e., not mapsTo[E.Source].HasSuccessor(mapsTo[E.Target]). Every propagated
-        /// edge is marked with the toggle attribute Edge.IsLiftedToggle.
+        /// edge is marked with the toggle attribute <see cref="Edge.IsLiftedToggle"/>.
+        /// If <see cref="IgnoreSelfLoops"/>, lifted edges whose source and target nodes
+        /// are the same (i.e., self loops), will not be propagated.
         /// </summary>
         /// <param name="subgraph">graph to propagate the edges to</param>
         /// <param name="mapsTo">mapping from nodes of this graph onto nodes in <paramref name="subgraph"/></param>
         /// <param name="includeElement">function determining whether a respective edge shall be kept</param>
+        /// <param name="ignoreSelfLoops">If true, lifted edges whose source and target nodes are the same are ignored</param>
         private void AddEdgesToSubgraph(Graph subgraph, IDictionary<Node, Node> mapsTo,
-                                        Func<GraphElement, bool> includeElement)
+                                        Func<GraphElement, bool> includeElement,
+                                        bool ignoreSelfLoops)
         {
             foreach (Edge edge in Edges())
             {
+                // edge is contained in the graph for which we calculate the subgraph
                 Node sourceInSubgraph = mapsTo[edge.Source];
                 Node targetInSubgraph = mapsTo[edge.Target];
 
-                if (sourceInSubgraph != null && targetInSubgraph != null
-                                             && !sourceInSubgraph.HasSuccessor(targetInSubgraph, edge.Type) && includeElement(edge))
+                if (sourceInSubgraph != null && targetInSubgraph != null)
                 {
-                    Edge edgeInSubgraph = (Edge)edge.Clone();
-                    edgeInSubgraph.Source = sourceInSubgraph;
-                    edgeInSubgraph.Target = targetInSubgraph;
-                    edgeInSubgraph.SetToggle(Edge.IsLiftedToggle);
-                    subgraph.AddEdge(edgeInSubgraph);
+                    // Is the propagated edge one that was already in the original graph?
+                    bool isOriginal = edge.Source.ID == sourceInSubgraph.ID && edge.Target.ID == targetInSubgraph.ID;
+                    // Original edges are always added.
+                    // Non-self loops are always added.
+                    // If self loops are not to be ignored, we will add these.
+                    if ((isOriginal || !ignoreSelfLoops || sourceInSubgraph != targetInSubgraph)
+                        && !sourceInSubgraph.HasSuccessor(targetInSubgraph, edge.Type) && includeElement(edge))
+                    {
+                        Edge edgeInSubgraph = (Edge)edge.Clone();
+                        edgeInSubgraph.Source = sourceInSubgraph;
+                        edgeInSubgraph.Target = targetInSubgraph;
+                        if (!isOriginal)
+                        {
+                            edgeInSubgraph.SetToggle(Edge.IsLiftedToggle);
+                        }
+                        subgraph.AddEdge(edgeInSubgraph);
+                    }
                 }
             }
         }
@@ -1528,7 +1558,7 @@ namespace SEE.DataModel.DG
             }
             return result;
         }
-        
+
         /// <summary>
         /// If <paramref name="graph"/> has a single root, nothing is done. Otherwise
         /// an artificial root is created and added to the <paramref name="graph"/>

@@ -15,12 +15,12 @@ namespace SEE.Game.UI.Menu
         /// The title of this entry.
         /// </summary>
         public readonly string Title;
-        
+
         /// <summary>
         /// A description of this entry.
         /// </summary>
         public readonly string Description;
-        
+
         /// <summary>
         /// The color of this entry.
         /// </summary>
@@ -30,12 +30,12 @@ namespace SEE.Game.UI.Menu
         /// An icon for this entry.
         /// </summary>
         public readonly Sprite Icon;
-        
+
         /// <summary>
         /// The action to be taken when the entry is selected.
         /// </summary>
         public readonly UnityAction DoAction;
-        
+
         /// <summary>
         /// Whether this entry is currently enabled (i.e. whether it can be selected.)
         /// Defaults to true.
@@ -57,7 +57,7 @@ namespace SEE.Game.UI.Menu
         /// <param name="enabled">Whether this entry should be enabled on creation.</param>
         /// <param name="icon">The icon which shall be displayed alongside this entry.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="title"/> is <c>null</c>.</exception>
-        public MenuEntry(UnityAction action, string title, string description = null, Color entryColor = default, 
+        public MenuEntry(UnityAction action, string title, string description = null, Color entryColor = default,
                          bool enabled = true, Sprite icon = null)
         {
             DoAction = action;

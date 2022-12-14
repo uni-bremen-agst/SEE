@@ -5,6 +5,10 @@ using UnityEngine;
 
 namespace SEE.Utils
 {
+    /// <summary>
+    /// Allows to retrieve the main camera, that is, the camera attached to the
+    /// local player.
+    /// </summary>
     public static class MainCamera
     {
         /// <summary>
@@ -37,21 +41,25 @@ namespace SEE.Utils
                             NotifyAll();
                             break;
                         default:
-                            Debug.LogWarning($"There are {Camera.allCameras.Length} cameras in the scene. Expect unexpected visual results.\n");
+                            // There is more than one camera, but there should be only one that is tagged as the "MainCamera".
                             foreach (Camera cam in Camera.allCameras)
                             {
                                 // Analogous to Camera.main we are returning the first enabled camera tagged "MainCamera".
-                                if (camera == null && cam.CompareTag(Tags.MainCamera))
+                                if (cam.CompareTag(Tags.MainCamera))
                                 {
-                                    camera = cam;
+                                    if (camera == null)
+                                    {
+                                        camera = cam;
+                                    }
+                                    else
+                                    {
+                                        Debug.LogError($"Multiple cameras tagged by {Tags.MainCamera}: {cam.gameObject.FullName()}\n");
+                                    }
                                 }
-                                Debug.LogWarning($"Camera: {cam.gameObject.FullName()}\n");
                             }
-                            camera = Camera.main;
                             NotifyAll();
                             break;
                     }
-                    // Debug.Log($"Selected main camera {camera.name} in game object {camera.gameObject.FullName()}.\n");
                 }
                 return camera;
             }

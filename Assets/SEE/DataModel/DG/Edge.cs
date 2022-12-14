@@ -47,13 +47,6 @@ namespace SEE.DataModel.DG
         public const string IsLiftedToggle = "IsLifted";
 
         /// <summary>
-        /// The name of the toggle attribute that marks "virtual" edges, which are
-        /// edges that are not intended to be layouted or drawn in SEE and only
-        /// exist in the underlying graph.
-        /// </summary>
-        public const string IsVirtualToggle = "IsVirtual";
-
-        /// <summary>
         /// The name of the toggle attribute that marks hidden edges.
         /// Hidden edges exist in the scene, but have an alpha value set to zero.
         /// The <see cref="ShowEdges"/> action will only display these edges when hovering over them.

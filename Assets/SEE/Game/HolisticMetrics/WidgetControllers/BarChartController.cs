@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -33,20 +34,19 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         
         internal override void Display(MetricValue metricValue)
         {
-            if (metricValue.GetType() == typeof(MetricValueCollection))
+            if (metricValue is MetricValueCollection metrics)
             {
                 // First, remove all old bars 
                 DestroyChildren(barsAnchor.transform);
                 
-                // Cast the collection so it is usable
-                IList<MetricValueRange> metricValues = ((MetricValueCollection)metricValue).MetricValues;
+                IList<MetricValueRange> metricValues = metrics.MetricValues;
                 
                 // Set the name of the widget
-                titleText.text = metricValues[0].Name;
+                titleText.text = metrics.Name;
 
                 // Now set the text of the labels to the correct values
-                float minimum = metricValues[0].Lower;
-                float maximum = metricValues[0].Higher;
+                float minimum = metricValues.Min(x => x.Lower);
+                float maximum = metricValues.Max(x => x.Higher);
                 float range = maximum - minimum;
                 float stepLength = range / 5f;  // Divide by |labels| -1 because first label is at y=0, not range/6
                 if (minimum >= 0 && maximum <= 1)  // It is a percentage in [0, 1]
@@ -54,7 +54,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                     for (int i = 0; i < yLabels.Length; i++)
                     {
                         float yValue = (minimum + stepLength * i) * 100;
-                        yLabels[i].text = yValue.ToString("F" + (metricValues[0].DecimalPlaces - 2)) + "%";
+                        yLabels[i].text = $"{yValue.ToString($"F{metricValues[0].DecimalPlaces - 2}")}%";
                     }
                 }
                 else
@@ -62,7 +62,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                     for (int i = 0; i < yLabels.Length; i++)
                     {
                         float yValue = minimum + stepLength * i;
-                        yLabels[i].text = yValue.ToString("F" + metricValues[0].DecimalPlaces);
+                        yLabels[i].text = yValue.ToString($"F{metricValues[0].DecimalPlaces}");
                     }
                 }
                 
@@ -79,15 +79,17 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                     bar.transform.localPosition = coordinates;
                     bar.GetComponent<Image>().fillAmount = metricValues[i].Value / maximum;
                 }
+                
+                // FIXME: Metric names currently aren't shown on X axis. This makes the chart hard to read.
             }
-            else if (metricValue.GetType() == typeof(MetricValueRange))
+            else if (metricValue is MetricValueRange range)
             {
                 // In case this method gets a single metric value, we put it into a new metric value collection and then
                 // recursively call this method with that collection.
                 
-                MetricValueCollection collection = new MetricValueCollection()
+                MetricValueCollection collection = new MetricValueCollection
                 {
-                    MetricValues = new List<MetricValueRange>() { (MetricValueRange)metricValue }
+                    MetricValues = new List<MetricValueRange> { range }
                 };
                 Display(collection);
             }

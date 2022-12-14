@@ -160,7 +160,7 @@ namespace SEE.Game
         /// <summary>
         /// The shader to be used for drawing the nodes.
         /// </summary>
-        private const Materials.ShaderType ShaderType = Materials.ShaderType.Opaque;
+        private const Materials.ShaderType ShaderType = Materials.ShaderType.OpaqueMetallic;
 
         /// <summary>
         /// The distance between two stacked game objects (parent/child).
@@ -323,7 +323,7 @@ namespace SEE.Game
             Portal.SetPortal(parent);
 
             // Add light to simulate emissive effect
-            AddLight(nodeToGameObject, parent);
+            // AddLight(nodeToGameObject, parent);
 
             if (parent.TryGetComponent(out Plane portalPlane))
             {
@@ -410,7 +410,7 @@ namespace SEE.Game
                     }
                 }
             }
-            
+
             // This is necessary for the holistic metrics boards. They need to be informed when a code city is being
             // drawn because then there will be a new graph loaded. In that case, the metrics boards might
             // need to start listening for change events from that graph.

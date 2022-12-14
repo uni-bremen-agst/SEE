@@ -23,9 +23,8 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// <param name="metricValue">The MetricValue to display</param>
         internal override void Display(MetricValue metricValue)
         {
-            if (metricValue.GetType() == typeof(MetricValueRange))
+            if (metricValue is MetricValueRange metricValueRange)
             {
-                MetricValueRange metricValueRange = (MetricValueRange)metricValue;
                 float maximum = metricValueRange.Higher - metricValueRange.Lower;
                 float actual = metricValueRange.Value - metricValueRange.Lower;
                 float percentage = actual / maximum;
@@ -41,22 +40,21 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 }
                 fade.fillAmount = percentage;
                 percentage *= 100;
-                if (metricValue.DecimalPlaces < 2) 
+                if (metricValueRange.DecimalPlaces < 2) 
                 {
-                    metricValue.DecimalPlaces = 0;
+                    metricValueRange.DecimalPlaces = 0;
                 }
                 else
                 {
-                    metricValue.DecimalPlaces -= 2;
+                    metricValueRange.DecimalPlaces -= 2;
                 }
                 // We subtract 2 from the number of decimal places because we shifted all digits to the left by 2 by
                 // multiplying percentage with 100
-                valueText.text = percentage.ToString("F" + metricValue.DecimalPlaces) + "%";
+                valueText.text = percentage.ToString("F" + metricValueRange.DecimalPlaces) + "%";
                 titleText.text = metricValueRange.Name;
             }
-            else if (metricValue.GetType() == typeof(MetricValueCollection))
+            else if (metricValue is MetricValueCollection metricValueCollection)
             {
-                MetricValueCollection metricValueCollection = (MetricValueCollection)metricValue;
                 Display(metricValueCollection.MetricValues[0]);
             }
             else

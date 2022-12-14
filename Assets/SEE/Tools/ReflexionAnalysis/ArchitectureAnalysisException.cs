@@ -21,7 +21,7 @@ namespace SEE.Tools.ReflexionAnalysis
         {
         }
     }
-    
+
     /// <summary>
     /// Thrown if the hierarchy is not a tree structure, i.e., if it contains cycles.
     /// </summary>
@@ -59,14 +59,14 @@ namespace SEE.Tools.ReflexionAnalysis
         /// First of the two redundant edges.
         /// </summary>
         public readonly Edge FirstEdge;
-        
+
         /// <summary>
         /// Second of the two redundant edges.
         /// <b>Note that this edge isn't necessarily contained in any graph!</b>
         /// </summary>
         public readonly Edge SecondEdge;
 
-        public RedundantSpecifiedEdgeException(Edge firstEdge, Edge secondEdge) 
+        public RedundantSpecifiedEdgeException(Edge firstEdge, Edge secondEdge)
             : base($"Edge '{firstEdge.ToShortString()}' would be redundant to '{secondEdge.ToShortString()}'!")
         {
             FirstEdge = firstEdge;
@@ -83,13 +83,13 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Subgraph the <see cref="Element"/> was expected to be in.
         /// </summary>
         public readonly ReflexionSubgraph ExpectedSubgraph;
-        
+
         /// <summary>
         /// The graph element that was not contained in <see cref="ExpectedSubgraph"/>.
         /// </summary>
         public readonly GraphElement Element;
 
-        public NotInSubgraphException(ReflexionSubgraph expectedSubgraph, GraphElement element) 
+        public NotInSubgraphException(ReflexionSubgraph expectedSubgraph, GraphElement element)
             : base($"Given {element.GetType().Name} '{element.ToShortString()}' must be contained in the {expectedSubgraph} graph!")
         {
             ExpectedSubgraph = expectedSubgraph;
@@ -107,13 +107,13 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         public readonly Edge Edge;
 
-        public ExpectedSpecifiedEdgeException(Edge edge) 
+        public ExpectedSpecifiedEdgeException(Edge edge)
             : base($"Given edge '{edge.ToShortString()}' is not a specified edge!")
         {
             Edge = edge;
         }
     }
-    
+
     /// <summary>
     /// Thrown if a specified edge was given when a propagated edge was expected in an operation.
     /// </summary>
@@ -124,13 +124,13 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         public readonly Edge Edge;
 
-        public ExpectedPropagatedEdgeException(Edge edge) 
+        public ExpectedPropagatedEdgeException(Edge edge)
             : base($"Given edge '{edge.ToShortString()}' is a specified (not propagated) edge!")
         {
             Edge = edge;
         }
     }
-    
+
     /// <summary>
     /// Thrown if a propagated edge can't be created because such a propagated edge already exists.
     /// </summary>
@@ -143,13 +143,13 @@ namespace SEE.Tools.ReflexionAnalysis
 
         /// <summary>
         /// The edge from which <see cref="PropagatedEdge"/> originates from.
-        /// 
+        ///
         /// NOTE: This is the edge that was passed along to the function which is supposed to construct the
         /// propagated edge. As such, it may not necessarily be accurate.
         /// </summary>
         public readonly Edge OriginatingEdge;
 
-        public AlreadyPropagatedException(Edge propagatedEdge, Edge originatingEdge) 
+        public AlreadyPropagatedException(Edge propagatedEdge, Edge originatingEdge)
             : base($"Propagated edge already exists: '{propagatedEdge.ToShortString()}' "
                    + $"(originated from '{originatingEdge.ToShortString()}')!")
         {
@@ -173,7 +173,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         public readonly Node MappedTo;
 
-        public AlreadyExplicitlyMappedException(Node alreadyMapped, Node mappedTo) 
+        public AlreadyExplicitlyMappedException(Node alreadyMapped, Node mappedTo)
             : base($"Node '{alreadyMapped.ToShortString()}' is already explicitly mapped to '{mappedTo.ToShortString()}'.")
         {
             Assert.IsNotNull(mappedTo);
@@ -181,7 +181,7 @@ namespace SEE.Tools.ReflexionAnalysis
             MappedTo = mappedTo;
         }
     }
-    
+
     /// <summary>
     /// Thrown if a node is not explicitly mapped, but was expected to.
     /// </summary>
@@ -192,7 +192,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         public readonly Node UnmappedNode;
 
-        public NotExplicitlyMappedException(Node unmappedNode) 
+        public NotExplicitlyMappedException(Node unmappedNode)
             : base($"Implementation node '{unmappedNode.ToShortString()}' is not explicitly mapped.")
         {
             Assert.IsTrue(unmappedNode.IsInImplementation());
@@ -210,7 +210,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         public readonly GraphElement ExistingElement;
 
-        public AlreadyContainedException(GraphElement existingElement) 
+        public AlreadyContainedException(GraphElement existingElement)
             : base($"'{existingElement.ToShortString()}' is already present in the graph!")
         {
             ExistingElement = existingElement;
@@ -227,13 +227,13 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         public readonly Node Node;
 
-        public NotAnOrphanException(Node node) 
+        public NotAnOrphanException(Node node)
             : base($"Node '{node.ToShortString()}' is already a child of '{node.Parent.ToShortString()}'!")
         {
             Node = node;
         }
     }
-    
+
     /// <summary>
     /// Thrown if a node is an orphan (i.e., has a parent) when it's not expected to be one.
     /// </summary>

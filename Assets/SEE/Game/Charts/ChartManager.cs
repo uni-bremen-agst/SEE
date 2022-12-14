@@ -44,7 +44,7 @@ namespace SEE.Game.Charts
 
         /// <summary>
         /// Returns the unique chart manager component in the scene.
-        /// 
+        ///
         /// Precondition: There must be at least one game object tagged by ChartManagerTag
         /// holding a ChartManager component. If there is more than one such object, an error
         /// will be logged and the first game object will be used. If there is no such object,
@@ -110,7 +110,7 @@ namespace SEE.Game.Charts
         /// The minimum time for a drag to be recognized as a drag and not a click.
         /// </summary>
         [Tooltip("The minimum time for a drag to be recognized as a drag and not a click (in seconds).")]
-        [Range(0.1f, 1f)] 
+        [Range(0.1f, 1f)]
         public float DragDelay = 0.2f;
 
         /// <summary>
@@ -124,7 +124,7 @@ namespace SEE.Game.Charts
         /// The length of the laser pointer attached to the controller.
         /// </summary>
         [Tooltip("The length of the laser pointer attached to the controller.")]
-        [Range(0.01f, 10f)] 
+        [Range(0.01f, 10f)]
         public float PointerLength = 5.0f;
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace SEE.Game.Charts
         /// </summary>
         private void Start()
         {
-            _isVirtualReality = PlayerSettings.GetInputType() == PlayerInputType.VRPlayer;
+            _isVirtualReality = SceneSettings.InputType == PlayerInputType.VRPlayer;
             if (!_isVirtualReality)
             {
                 _chartsOpen = GameObject.Find("ChartCanvas") != null
