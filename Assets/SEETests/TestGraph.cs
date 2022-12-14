@@ -14,6 +14,7 @@ namespace SEE.DataModel.DG
         {
             Node result = new Node
             {
+                SourceName = id,
                 ID = id,
                 Type = type
             };
@@ -21,14 +22,8 @@ namespace SEE.DataModel.DG
             return result;
         }
 
-        /// <summary>
-        /// Unique ID for edges.
-        /// </summary>
-        private static int edgeID = 1;
-
         private static Edge NewEdge(Graph graph, Node from, Node to, string type = "call")
         {
-            edgeID++;
             Edge result = new Edge(from, to, type);
             graph.AddEdge(result);
             return result;
@@ -65,7 +60,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void AddingRemovingGraphElements()
         {
-            Graph g = new Graph("DUMMYBASEPATH");
+            Graph g = NewGraph();
 
             Node n1 = NewNode(g, "n1");
             Node n2 = NewNode(g, "n2");
@@ -121,6 +116,17 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(new HashSet<Edge> { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a }, AsSet(n1.Outgoings));
         }
 
+        /// <summary>
+        /// Creates a new graph with default basepath and graph name.
+        /// </summary>
+        /// <param name="viewName">the name of the graph</param>
+        /// <param name="basePath">the basepath of the graph for looking up the source code files</param>
+        /// <returns>new graph</returns>
+        private static Graph NewGraph(string viewName = "CodeFacts", string basePath = "DUMMYBASEPATH")
+        {
+            return new Graph(basePath, viewName);
+        }
+
         private static HashSet<Edge> AsSet(IEnumerable<Edge> edges)
         {
             return new HashSet<Edge>(edges);
@@ -135,7 +141,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void RemoveNode()
         {
-            Graph g = new Graph("DUMMYBASEPATH");
+            Graph g = NewGraph();
 
             Node n1 = NewNode(g, "n1");
             Node n2 = NewNode(g, "n2");
@@ -255,7 +261,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void RemoveOrphansBecomeChildren()
         {
-            Graph g = new Graph("DUMMYBASEPATH");
+            Graph g = NewGraph();
 
             Node r = NewNode(g, "root");
             Node d = Child(g, r, "toBeDeleted");
@@ -274,7 +280,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void RemoveOrphansBecomeRoots()
         {
-            Graph g = new Graph("DUMMYBASEPATH");
+            Graph g = NewGraph();
 
             Node r = NewNode(g, "root");
             Node d = Child(g, r, "toBeDeleted");
@@ -296,7 +302,7 @@ namespace SEE.DataModel.DG
         {
             string t = "Routine";
 
-            Graph g = new Graph("DUMMYBASEPATH");
+            Graph g = NewGraph();
             Assert.AreEqual(0, g.MaxDepth);
 
             Node a = NewNode(g, "a", t);
@@ -402,11 +408,15 @@ namespace SEE.DataModel.DG
         /// For example, SubGraphByNodeType doesn't care about edges, so isRelevant returns true for all edges,
         /// regardless of whether makeIrrelevant had been applied to the edges.
         /// </summary>
+        /// <param name="makeRelevant">defines what is relevant</param>
+        /// <param name="makeIrrelevant">defines what is irrelevant</param>
+        /// <param name="isRelevant">predicate deciding whether a graph element is relevant</param>
+        /// <param name="makeSubgraph">function to create the subgraph</param>
         private void TestSubGraphBy(Action<GraphElement> makeRelevant, Action<GraphElement> makeIrrelevant,
                                    Func<GraphElement, bool> isRelevant, Func<Graph, Graph> makeSubgraph)
         {
             // Note: This test is rather imperfect and may be improved in the future.
-            Graph g = new Graph("DUMMYBASEPATH");
+            Graph g = NewGraph();
 
             Node a = NewNode(g, "a");
             makeIrrelevant(a);
@@ -518,8 +528,6 @@ namespace SEE.DataModel.DG
             Assert.IsTrue(isRelevant(e13));
             Edge e14 = NewEdge(g, bcba, bd);
             makeIrrelevant(e14);
-            // makeIrrelevant may have no effect, which is why we have to count this way.
-            int relevantEdges = new List<Edge> { e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14 }.Count(isRelevant);
 
             Graph subgraph = makeSubgraph(g);
 
@@ -578,6 +586,8 @@ namespace SEE.DataModel.DG
             AssertHasChild(subgraph, bca, bcab);
             AssertHasChild(subgraph, bd, bdaa);
 
+            // makeIrrelevant may have no effect, which is why we have to count this way.
+            int relevantEdges = new List<Edge> { e0, e1, e2, e3, e4, e5, e6, e7, e8, e9, e10, e11, e12, e13, e14 }.Count(isRelevant);
             // 9 edges are kept.
             // Kept edges: Those for which isRelevant returned true before subgraphing minus four "dangling" ones.
             Assert.AreEqual(relevantEdges - 4, subgraph.EdgeCount);
@@ -599,9 +609,81 @@ namespace SEE.DataModel.DG
             const string i = "irrelevant";
             HashSet<string> relevantNodeTypes = new HashSet<string> { r };
 
-            TestSubGraphBy(x => x.Type = r, x => x.Type = i,
+            TestSubGraphBy(x => x.Type = r,
+                           x => x.Type = i,
                            x => !(x is Node) || relevantNodeTypes.Contains(x.Type),
-                           g => g.SubgraphByNodeType(relevantNodeTypes));
+                           g => g.SubgraphByNodeType(relevantNodeTypes, false));
+        }
+
+        [Test]
+        public void TestSubGraphByNodeTypeLiftedEdges()
+        {
+            const string RootType = "Root";
+            const string ChildType = "Child";
+
+            Graph g = NewGraph();
+
+            Node a = NewNode(g, "a", RootType);
+            Node a1 = Child(g, a, "a1", ChildType);
+            Node a2 = Child(g, a, "a2", ChildType);
+
+            Node b = NewNode(g, "b", RootType);
+            Node b1 = Child(g, b, "b1", ChildType);
+            Node b2 = Child(g, b, "b2", ChildType);
+
+            Node c = NewNode(g, "c", RootType);
+            Node c1 = Child(g, c, "c1", ChildType);
+
+            Node d = NewNode(g, "d", RootType);
+            Node d1 = Child(g, d, "d1", ChildType);
+
+            Node e = NewNode(g, "e", RootType);
+            Node e1 = Child(g, e, "e1", ChildType);
+
+            Edge v1 = NewEdge(g, a, a);   // original self loop; must be present
+            Edge v2 = NewEdge(g, d1, d);  // implies lifted self loop at d
+            Edge v3 = NewEdge(g, e, e1);  // implies lifted self loop at e
+            Edge v4 = NewEdge(g, a1, c1); // implies lifted edge from a to c
+            Edge v5 = NewEdge(g, b1, a2); // implies lifted edge from b to a
+            Edge v6 = NewEdge(g, c1, c1); // implies lifted self loop at c
+            Edge v7 = NewEdge(g, b2, b1); // implies lifted self loop at b
+
+            {
+                // Lifted self loops are not ignored.
+                Graph subgraph = g.SubgraphByNodeType(new List<string> { RootType }, false);
+                Assert.AreEqual(g.Nodes().Where(n => n.Type == RootType).Count(), subgraph.NodeCount);
+
+                Node A = Pendant(subgraph, a);
+                Node B = Pendant(subgraph, b);
+                Node C = Pendant(subgraph, c);
+                Node D = Pendant(subgraph, d);
+                Node E = Pendant(subgraph, e);
+
+                Assert.That(HasEdge(A, A));
+                Assert.That(HasEdge(B, B));
+                Assert.That(HasEdge(C, C));
+                Assert.That(HasEdge(D, D));
+                Assert.That(HasEdge(E, E));
+                Assert.That(HasEdge(A, C));
+                Assert.That(HasEdge(B, A));
+                Assert.AreEqual(7, subgraph.EdgeCount);
+            }
+            {
+                // Lifted self loops are ignored.
+                Graph subgraph = g.SubgraphByNodeType(new List<string> { RootType }, true);
+                Assert.AreEqual(g.Nodes().Where(n => n.Type == RootType).Count(), subgraph.NodeCount);
+
+                Node A = Pendant(subgraph, a);
+                Node B = Pendant(subgraph, b);
+                Node C = Pendant(subgraph, c);
+                Node D = Pendant(subgraph, d);
+                Node E = Pendant(subgraph, e);
+
+                Assert.That(HasEdge(A, A));
+                Assert.That(HasEdge(A, C));
+                Assert.That(HasEdge(B, A));
+                Assert.AreEqual(3, subgraph.EdgeCount);
+            }
         }
 
         [Test]
@@ -639,7 +721,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void TestDeleteTreeSingleNode()
         {
-            Graph g = new Graph("DUMMYBASEPATH");
+            Graph g = NewGraph();
             Node a = NewNode(g, "a");
             SubgraphMemento subgraph = a.DeleteTree();
             Assert.IsNull(a.ItsGraph);
@@ -659,7 +741,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void TestDeleteTreeSingleNodeAndEdge()
         {
-            Graph g = new Graph("DUMMYBASEPATH");
+            Graph g = NewGraph();
             Node a = NewNode(g, "a");
             Edge e = NewEdge(g, a, a);
             SubgraphMemento subgraph = a.DeleteTree();
@@ -683,7 +765,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void TestDeleteTree()
         {
-            Graph g = new Graph("DUMMYBASEPATH");
+            Graph g = NewGraph();
             Node a = NewNode(g, "a"); // root
             Node b = Child(g, a, "b"); // child of a, but not descendant of c
             Node c = Child(g, a, "c"); // root of subtree to be deleted
