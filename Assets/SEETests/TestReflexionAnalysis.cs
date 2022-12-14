@@ -31,6 +31,10 @@ namespace SEE.Tools.Architecture
         /// </summary>
         protected HashSet<string> HierarchicalEdges;
 
+        /// <summary>
+        /// Edge type name for a hierarchical edge. This type will be used
+        /// when saving a graph.
+        /// </summary>
         protected const string Enclosing = "Enclosing";
 
         /// <summary>
