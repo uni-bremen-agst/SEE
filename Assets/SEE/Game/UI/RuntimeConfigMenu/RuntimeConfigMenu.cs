@@ -70,7 +70,6 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 seeSettingsView.SetActive(false);
                 codeCityLoader.SetActive(false);
                 seeTables.SetActive(true);
-
                 runtimeConfigMenu.SetActive(!runtimeConfigMenu.activeSelf);
             }
         }
