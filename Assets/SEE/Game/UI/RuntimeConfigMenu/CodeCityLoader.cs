@@ -19,7 +19,6 @@ public class CodeCityLoader : MonoBehaviour
             () => 
             {
                 // Open file choser dialog
-                string path = EditorUtility.OpenFilePanel("Wählen Sie eine config Datei aus", Application.streamingAssetsPath, "cfg");
 
                 // If a file was selected, open it
                 if(path != null && path != "")
@@ -45,7 +44,7 @@ public class CodeCityLoader : MonoBehaviour
         RuntimeConfigMenuUtilities.AddActionToButton(cityLoader, "ContinueButton",
             () =>
             {
-                RuntimeConfigMenu.InitSettings();
+                RuntimeConfigMenu.InitSettingsAutomatically();
                 cityLoader.SetActive(false);    
                 seeSettingsPanel.SetActive(true);
 
