@@ -26,16 +26,16 @@ namespace SEE.Game.UI.LiveDocumentation
         public GameObject documentationWindow { get; private set; }
 
         
-        public Vector2 Resolution = new Vector2(900, 500);
+        public Vector2 Resolution = new Vector2(1820, 900);
 
         protected override void StartDesktop()
         {
-            documentationWindow = PrefabInstantiator.InstantiatePrefab(PREFAB_PATH, Canvas.transform, true);
-
+            documentationWindow = PrefabInstantiator.InstantiatePrefab(PREFAB_PATH, Canvas.transform, false);
+            
             // Set resolution to preferred values
             if (documentationWindow.TryGetComponentOrLog(out RectTransform rect))
             {
-                rect.sizeDelta = Resolution;
+                //rect.sizeDelta = Resolution;
             }
 
             // Position code window in center of screen
