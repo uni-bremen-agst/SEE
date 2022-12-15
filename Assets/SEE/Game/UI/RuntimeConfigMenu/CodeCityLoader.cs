@@ -19,6 +19,7 @@ public class CodeCityLoader : MonoBehaviour
             () => 
             {
                 // Open file choser dialog
+                string path = EditorUtility.OpenFilePanel("W�hlen Sie eine config Datei aus", Application.streamingAssetsPath, "cfg");
 
                 // If a file was selected, open it
                 if(path != null && path != "")
