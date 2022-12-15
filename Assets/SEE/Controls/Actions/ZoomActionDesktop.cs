@@ -23,8 +23,10 @@ namespace SEE.Controls.Actions
             bool zoomInto = SEEInput.ZoomInto();
             // Alternatively, the user can select the mouse wheel for zooming.
             float zoomStepsDelta = Input.mouseScrollDelta.y;
+            // We need to round to the "next" full integer, otherwise not all scrolling will be counted.
+            int zoomSteps = zoomStepsDelta < 0 ? Mathf.FloorToInt(zoomStepsDelta) : Mathf.CeilToInt(zoomStepsDelta);
             // Whether zooming per mouse wheel was requested.
-            bool zoomTowards = Mathf.Abs(zoomStepsDelta) >= 1.0f;
+            bool zoomTowards = Mathf.Abs(zoomSteps) >= 1;
 
             if (!zoomInto && !zoomTowards)
             {
@@ -72,7 +74,7 @@ namespace SEE.Controls.Actions
                             float optimalTargetZoomSteps = ConvertZoomFactorToZoomSteps(optimalTargetZoomFactor);
                             int actualTargetZoomSteps = Mathf.FloorToInt(optimalTargetZoomSteps);
 
-                            int zoomSteps = actualTargetZoomSteps - (int)zoomState.currentTargetZoomSteps;
+                            zoomSteps = actualTargetZoomSteps - (int)zoomState.currentTargetZoomSteps;
                             if (zoomSteps == 0)
                             {
                                 zoomSteps = -(int)zoomState.currentTargetZoomSteps;
@@ -96,7 +98,6 @@ namespace SEE.Controls.Actions
                     // as requested per mouse wheel.
                     if (zoomTowards)
                     {
-                        int zoomSteps = Mathf.RoundToInt(zoomStepsDelta);
                         zoomSteps = Mathf.Clamp(zoomSteps, -(int)zoomState.currentTargetZoomSteps, (int)ZoomState.ZoomMaxSteps - (int)zoomState.currentTargetZoomSteps);
                         zoomState.PushZoomCommand(hitPointOnPlane.XZ(), zoomSteps, ZoomState.DefaultZoomDuration);
                     }

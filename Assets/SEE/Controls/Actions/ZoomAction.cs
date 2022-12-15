@@ -134,7 +134,7 @@ namespace SEE.Controls.Actions
         /// Because we may have multiple code cities in the scene, there is not only one such
         /// root node.
         /// </summary>
-        private Dictionary<Transform, ZoomState> rootTransformToZoomStates = new Dictionary<Transform, ZoomState>();
+        private readonly Dictionary<Transform, ZoomState> rootTransformToZoomStates = new Dictionary<Transform, ZoomState>();
 
         /// <summary>
         /// Executes every active zoom command. Logic is done in fixed time steps to ensure
@@ -150,7 +150,7 @@ namespace SEE.Controls.Actions
             foreach (KeyValuePair<Transform, ZoomState> pair in rootTransformToZoomStates)
             {
                 // The root node of the current code city to be zoomed.
-                Transform transform = pair.Key;
+                Transform rootTransform = pair.Key;
                 // Its zoom state.
                 ZoomState zoomState = pair.Value;
 
@@ -174,15 +174,14 @@ namespace SEE.Controls.Actions
                             zoomSteps -= zoomState.zoomCommands[i].TargetZoomSteps - zoomState.zoomCommands[i].CurrentDeltaScale();
                         }
                     }
-                    Vector3 averagePosition = new Vector3(positionSum.x / positionCount, transform.position.y, positionSum.y / positionCount);
+                    Vector3 averagePosition = new Vector3(positionSum.x / positionCount, rootTransform.position.y, positionSum.y / positionCount);
 
                     zoomState.currentZoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
-                    Vector3 cityCenterToHitPoint = averagePosition - transform.position;
-                    Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(transform.localScale);
+                    Vector3 cityCenterToHitPoint = averagePosition - rootTransform.position;
+                    Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(rootTransform.localScale);
 
-                    transform.position += cityCenterToHitPoint;
-                    transform.localScale = zoomState.currentZoomFactor * zoomState.originalScale;
-                    transform.position -= Vector3.Scale(cityCenterToHitPointUnscaled, transform.localScale);
+                    rootTransform.localScale = zoomState.currentZoomFactor * zoomState.originalScale;
+                    rootTransform.position += cityCenterToHitPoint - Vector3.Scale(cityCenterToHitPointUnscaled, rootTransform.localScale);
 
                     // TODO(torben): I believe in desktop mode this made sure that zooming
                     // will always happen towards the current mouse position and not the
@@ -192,7 +191,7 @@ namespace SEE.Controls.Actions
                     //moveState.dragStartTransformPosition += moveState.dragStartOffset;
                     //moveState.dragStartOffset = Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
                     //moveState.dragStartTransformPosition -= moveState.dragStartOffset;
-                    new ZoomNetAction(transform.name, transform.position, transform.localScale).Execute();
+                    new ZoomNetAction(rootTransform.name, rootTransform.position, rootTransform.localScale).Execute();
                 }
                 else
                 {
@@ -200,7 +199,7 @@ namespace SEE.Controls.Actions
                     zoomState.currentZoomFactor = ConvertZoomStepsToZoomFactor(zoomState.currentTargetZoomSteps);
                     if (lastZoomFactor != zoomState.currentZoomFactor)
                     {
-                        transform.localScale = zoomState.currentZoomFactor * zoomState.originalScale;
+                        rootTransform.localScale = zoomState.currentZoomFactor * zoomState.originalScale;
                     }
                 }
             }
