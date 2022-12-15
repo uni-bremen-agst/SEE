@@ -920,7 +920,8 @@ namespace SEE.Net
         /// If the configuration file exists already, it will be overridden.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [FoldoutGroup(ConfigurationFoldoutGroup), ButtonGroup(ConfigurationButtonsGroup)]
+        [PropertyTooltip("Saves the network settings in a configuration file.")]
+        [ButtonGroup(ConfigurationButtonsGroup)]
         public void Save()
         {
             Save(ConfigPath.Path);
@@ -932,7 +933,7 @@ namespace SEE.Net
         /// </summary>
         [Button(ButtonSizes.Small)]
         [PropertyTooltip("Loads the network configuration file.")]
-        [FoldoutGroup(ConfigurationFoldoutGroup), ButtonGroup(ConfigurationButtonsGroup)]
+        [ButtonGroup(ConfigurationButtonsGroup)]
         public void Load()
         {
             Load(ConfigPath.Path);
