@@ -24,16 +24,5 @@ namespace SEE.Game
             transform.position = position;
             transform.rotation = Quaternion.Euler(0.0f, yAngle, 0.0f);
         }
-
-        /// <summary>
-        /// Sets the position (world space) of the given <paramref name="transform"/> according
-        /// to <paramref name="position"/>.
-        /// </summary>
-        /// <param name="transform">transform to be set</param>
-        /// <param name="position">new position in world space</param>
-        internal static void Set(Transform transform, Vector3 position)
-        {
-            transform.position = position;
-        }
     }
 }
