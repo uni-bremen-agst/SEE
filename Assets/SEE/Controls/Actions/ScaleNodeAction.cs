@@ -390,7 +390,7 @@ namespace SEE.Controls.Actions
                 MoveToLockAxes(scalingGizmo, false, true, false);
             }
             else if (scalingGizmo == firstCornerSphere || scalingGizmo == secondCornerSphere
-                                                       || scalingGizmo == thirdCornerSphere || scalingGizmo == forthCornerSphere)
+                     || scalingGizmo == thirdCornerSphere || scalingGizmo == forthCornerSphere)
             {
                 MoveToLockAxes(scalingGizmo, true, false, true);
             }
@@ -522,13 +522,13 @@ namespace SEE.Controls.Actions
             // Corner scaling
             float scaleCorner = 0;
             scaleCorner -= firstCornerSphere.transform.position.x - firstCornerOldSpherePos.x
-                           + (firstCornerSphere.transform.position.z - firstCornerOldSpherePos.z);
+                + (firstCornerSphere.transform.position.z - firstCornerOldSpherePos.z);
             scaleCorner += secondCornerSphere.transform.position.x - secondCornerOldSpherePos.x
-                                                                   - (secondCornerSphere.transform.position.z - secondCornerOldSpherePos.z);
+                - (secondCornerSphere.transform.position.z - secondCornerOldSpherePos.z);
             scaleCorner += thirdCornerSphere.transform.position.x - thirdCornerOldSpherePos.x
-                           + (thirdCornerSphere.transform.position.z - thirdCornerOldSpherePos.z);
+                + (thirdCornerSphere.transform.position.z - thirdCornerOldSpherePos.z);
             scaleCorner -= forthCornerSphere.transform.position.x - forthCornerOldSpherePos.x
-                                                                  - (forthCornerSphere.transform.position.z - forthCornerOldSpherePos.z);
+                - (forthCornerSphere.transform.position.z - forthCornerOldSpherePos.z);
 
             scale.x += scaleCorner;
             scale.z += scaleCorner;
