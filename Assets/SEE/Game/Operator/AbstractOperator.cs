@@ -101,10 +101,11 @@ namespace SEE.Game.Operator
             /// </summary>
             /// <param name="newTarget">The new target value.</param>
             /// <param name="duration">The duration of the new animation.</param>
-            protected virtual void ChangeAnimatorTarget(V newTarget, float duration)
+            /// <param name="complete">Whether to complete any existing animations before starting this one.</param>
+            protected virtual void ChangeAnimatorTarget(V newTarget, float duration, bool complete = false)
             {
                 // Usual approach: Kill old animator and replace it with new one
-                KillAnimator();
+                KillAnimator(complete);
                 Animator = AnimateToAction(newTarget, duration);
             }
 
@@ -171,9 +172,9 @@ namespace SEE.Game.Operator
                 base.KillAnimator(complete);
             }
 
-            protected override void ChangeAnimatorTarget(V newTarget, float duration)
+            protected override void ChangeAnimatorTarget(V newTarget, float duration, bool complete = false)
             {
-                base.ChangeAnimatorTarget(newTarget, duration);
+                base.ChangeAnimatorTarget(newTarget, duration, complete);
                 if (duration == 0)
                 {
                     // We execute the first step immediately. This way, callers can expect the change to
