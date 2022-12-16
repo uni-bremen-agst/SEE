@@ -5,6 +5,7 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.Game.Operator;
 using SEE.Utils;
 using UnityEngine;
 using static SEE.Game.Portal.IncludeDescendants;
@@ -299,9 +300,10 @@ namespace SEE.GO
         /// <param name="scale">the new scale in world space</param>
         public static void SetScale(this GameObject node, Vector3 scale)
         {
+            NodeOperator @operator = node.AddOrGetComponent<NodeOperator>();
             Transform parent = node.transform.parent;
             node.transform.parent = null;
-            node.transform.localScale = scale;
+            @operator.ScaleTo(scale, 0f);
             node.transform.parent = parent;
         }
 
