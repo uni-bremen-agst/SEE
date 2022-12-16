@@ -107,7 +107,9 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             GameObject cityGO = GameObject.FindGameObjectWithTag("Code City");
             AbstractSEECity cityComponent = cityGO.GetComponent<AbstractSEECity>();
 
-            Dictionary<string, GameObject> tabs = new Dictionary<string, GameObject>();
+            Dictionary<string, GameObject> tabButtons = new Dictionary<string, GameObject>();
+            Dictionary<string, GameObject> settingsViews = new Dictionary<string, GameObject>();
+            
 
             foreach (FieldInfo fieldInfo in cityComponent.GetType().GetFields())
             {
@@ -116,13 +118,18 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     if (attribute is TabGroupAttribute tabAttribute)
                     {
                         string tabName = tabAttribute.TabName;
-                        if (!tabs.ContainsKey(tabName))
+                        if (!tabButtons.ContainsKey(tabName))
                         {
-                            tabs.Add(tabName, SetupTabButton(tabName));
+                            GameObject tabButton = SetupTabButton(tabName);
+                            tabButtons.Add(tabName, tabButton);
+                            settingsViews.Add(tabName, SetupSettingsView(tabButton));
                         }
                     }
                 }
             }
+            GameObject miscTabButton = SetupTabButton("Misc");
+            tabButtons.Add("Misc", miscTabButton);
+            settingsViews.Add("Misc", SetupSettingsView(miscTabButton));
         }
 
         // Adding the settings to the Menu after a city was loaded
@@ -162,7 +169,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         }
         
         // Views
-        private GameObject SetupSettingsView(GameObject tabButton)
+        private static GameObject SetupSettingsView(GameObject tabButton)
         {
             GameObject settingsView = PrefabInstantiator.InstantiatePrefab(SETTINGS_VIEW_PREFAB_PATH, seeSettingsContentView.transform, false);
             settingsView.name = tabButton.name + "View";
