@@ -498,7 +498,7 @@ namespace SEE.GO
         /// <returns>The existing or newly created component</returns>
         public static T AddOrGetComponent<T>(this GameObject gameObject) where T: Component
         {
-            return gameObject.GetComponent<T>() ?? gameObject.AddComponent<T>();
+            return gameObject.TryGetComponent(out T component) ? component : gameObject.AddComponent<T>();
         }
 
         /// <summary>

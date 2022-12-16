@@ -88,7 +88,7 @@ namespace SEE.Controls.Actions
                                 Vector2 centerOfTableAfterZoom = zoomSteps == -(int)zoomState.currentTargetZoomSteps ? rootTransform.position.XZ() : cursor.E.ComputeCenter().XZ();
                                 Vector2 toCenterOfTable = clippingPlane.CenterXZ - centerOfTableAfterZoom;
                                 Vector2 zoomCenter = clippingPlane.CenterXZ - (toCenterOfTable * (zoomFactor / (zoomFactor - 1.0f)));
-                                float duration = 2.0f * ZoomState.DefaultZoomDuration;
+                                const float duration = 2.0f * ZoomState.DefaultZoomDuration;
                                 zoomState.PushZoomCommand(zoomCenter, zoomSteps, duration);
                             }
                         }
