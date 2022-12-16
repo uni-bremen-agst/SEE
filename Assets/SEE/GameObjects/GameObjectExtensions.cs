@@ -337,11 +337,14 @@ namespace SEE.GO
         /// considered.
         /// </summary>
         /// <param name="gameObject">game object whose height has to be determined</param>
+        /// <param name="filterTransform">Function returning true for descendant transforms that shall be taken into
+        /// account. By default, this is a constant function which always returns true.</param>
         /// <returns>world-space position of the roof of this <paramref name="gameObject"/>
         /// or any of its active descendants</returns>
-        public static float GetMaxY(this GameObject gameObject)
+        public static float GetMaxY(this GameObject gameObject, Func<Transform, bool> filterTransform = null)
         {
             float result = float.NegativeInfinity;
+            filterTransform ??= _ => true;
             Recurse(gameObject, ref result);
             return result;
 
@@ -355,7 +358,7 @@ namespace SEE.GO
 
                 foreach (Transform child in root.transform)
                 {
-                    if (child.gameObject.activeInHierarchy)
+                    if (child.gameObject.activeInHierarchy && filterTransform(child))
                     {
                         Recurse(child.gameObject, ref max);
                     }
@@ -374,12 +377,14 @@ namespace SEE.GO
         /// considered.
         /// </summary>
         /// <param name="gameObject">game object whose center top has to be determined</param>
+        /// <param name="filterTransform">Function returning true for descendant transforms that shall be taken into
+        /// account. By default, this is a constant function which always returns true.</param>
         /// <returns>world-space position of the center top of the hull of this <paramref name="gameObject"/>
         /// </returns>
-        public static Vector3 GetTop(this GameObject gameObject)
+        public static Vector3 GetTop(this GameObject gameObject, Func<Transform, bool> filterTransform = null)
         {
             Vector3 result = gameObject.transform.position;
-            result.y = gameObject.GetMaxY();
+            result.y = gameObject.GetMaxY(filterTransform);
             return result;
         }
 
