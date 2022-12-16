@@ -1,4 +1,7 @@
-﻿using SEE.Game;
+﻿using SEE.Controls.Actions;
+using SEE.Game;
+using SEE.Game.Operator;
+using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -46,7 +49,9 @@ namespace SEE.Net.Actions
                 GameObject gameObject = GraphElementIDMap.Find(GameObjectID);
                 if (gameObject != null)
                 {
-                    Positioner.Set(gameObject.transform, Position, LocalScale);
+                    NodeOperator Operator = gameObject.AddOrGetComponent<NodeOperator>();
+                    Operator.MoveTo(Position, ZoomAction.ANIMATION_DURATION);
+                    Operator.ScaleTo(LocalScale, ZoomAction.ANIMATION_DURATION);
                 }
                 else
                 {
