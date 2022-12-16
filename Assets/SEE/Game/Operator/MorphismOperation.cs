@@ -21,12 +21,10 @@ namespace SEE.Game.Operator
             {
                 if (Animator != null && Animator.IsActive())
                 {
-                    TweenExtensions.Kill(Animator.tween);
+                    Animator.tween.Kill(complete);
                     Destroy(Animator);
                     Animator = null;
                 }
-
-                base.KillAnimator(complete);
             }
 
             protected override void ChangeAnimatorTarget((BSpline targetSpline, GameObject temporaryGameObject) newTarget, float duration, bool complete = false)
