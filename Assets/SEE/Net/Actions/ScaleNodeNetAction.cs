@@ -53,10 +53,7 @@ namespace SEE.Net.Actions
         {
             if (!IsRequester())
             {
-                if (Find(GameObjectID).TryGetComponentOrLog(out NodeOperator nodeOperator))
-                {
-                    nodeOperator.ScaleTo(LocalScale, AnimationDuration);
-                }
+                Find(GameObjectID).AddOrGetComponent<NodeOperator>().ScaleTo(LocalScale, AnimationDuration);
             }
         }
     }

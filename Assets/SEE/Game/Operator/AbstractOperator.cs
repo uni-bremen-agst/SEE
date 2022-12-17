@@ -60,13 +60,6 @@ namespace SEE.Game.Operator
             protected T Animator { get; set; }
 
             /// <summary>
-            /// Any operations that are composited (i.e., running together) with this one.
-            /// Any entries here will be killed when this operation is killed.
-            /// <b>NOTE: This property may not necessarily be kept here.</b>
-            /// </summary>
-            private IList<IOperation> CompositedOperations = new List<IOperation>();
-
-            /// <summary>
             /// The target value that we're animating towards.
             /// </summary>
             public V TargetValue { get; private set; }
@@ -87,24 +80,18 @@ namespace SEE.Game.Operator
             /// </summary>
             /// <param name="complete">Whether to stop at the current value (<c>false</c>)
             /// or at the target (<c>true</c>)</param>
-            public virtual void KillAnimator(bool complete = false)
-            {
-                // Kill all old animators, including those composited with this tween
-                foreach (IOperation operation in CompositedOperations)
-                {
-                    operation.KillAnimator(complete);
-                }
-            }
+            public abstract void KillAnimator(bool complete = false);
 
             /// <summary>
             /// Changes the target of the animation from the current target value to <paramref name="newTarget"/>.
             /// </summary>
             /// <param name="newTarget">The new target value.</param>
             /// <param name="duration">The duration of the new animation.</param>
-            protected virtual void ChangeAnimatorTarget(V newTarget, float duration)
+            /// <param name="complete">Whether to complete any existing animations before starting this one.</param>
+            protected virtual void ChangeAnimatorTarget(V newTarget, float duration, bool complete = false)
             {
                 // Usual approach: Kill old animator and replace it with new one
-                KillAnimator();
+                KillAnimator(complete);
                 Animator = AnimateToAction(newTarget, duration);
             }
 
@@ -115,11 +102,9 @@ namespace SEE.Game.Operator
             /// </summary>
             /// <param name="target">The new target value that shall be animated towards.</param>
             /// <param name="duration">The desired length of the animation.</param>
-            /// <param name="compositedOperations">Any operations running in tandem with this one. They will
-            /// be killed once this operation is killed. Parameter may be removed in the future.</param>
             /// <exception cref="ArgumentOutOfRangeException">If <paramref name="duration"/> is negative.</exception>
             /// <returns>An operation callback for the requested animation</returns>
-            public IOperationCallback<C> AnimateTo(V target, float duration, IList<IOperation> compositedOperations = null)
+            public IOperationCallback<C> AnimateTo(V target, float duration)
             {
                 if (duration < 0)
                 {
@@ -135,7 +120,6 @@ namespace SEE.Game.Operator
 
                 ChangeAnimatorTarget(target, duration);
                 TargetValue = target;
-                CompositedOperations = compositedOperations ?? new List<IOperation>();
                 // If the duration is zero, the change has already been applied, so the callback never triggers.
                 // Hence, we create a dummy callback that triggers its respective methods immediately on registration.
                 return duration == 0 ? new DummyOperationCallback<C>() : AnimatorCallback;
@@ -167,13 +151,11 @@ namespace SEE.Game.Operator
                         }
                     }
                 }
-
-                base.KillAnimator(complete);
             }
 
-            protected override void ChangeAnimatorTarget(V newTarget, float duration)
+            protected override void ChangeAnimatorTarget(V newTarget, float duration, bool complete = false)
             {
-                base.ChangeAnimatorTarget(newTarget, duration);
+                base.ChangeAnimatorTarget(newTarget, duration, complete);
                 if (duration == 0)
                 {
                     // We execute the first step immediately. This way, callers can expect the change to

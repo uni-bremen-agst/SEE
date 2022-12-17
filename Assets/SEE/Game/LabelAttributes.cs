@@ -2,6 +2,7 @@
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Game
 {
@@ -16,23 +17,33 @@ namespace SEE.Game
         /// If true, a label with the node's SourceName will be displayed above each node.
         /// </summary>
         public bool Show = true;
+
         /// <summary>
         /// The distance between the top of the node and its label.
         /// </summary>
         public float Distance = 0.2f;
+
         /// <summary>
         /// The font size of the node's label.
         /// </summary>
         public float FontSize = 0.4f;
+
         /// <summary>
         /// How many seconds the label should take to (dis)appear.
         /// </summary>
         public float AnimationDuration = 0.5f;
 
+        /// <summary>
+        /// The alpha value of the label.
+        /// </summary>
+        [Range(0f, 1f)]
+        public float LabelAlpha = 1f;
+
         private const string ShowLabel = "Show";
         private const string DistanceLabel = "Distance";
         private const string FontSizeLabel = "FontSize";
         private const string AnimationDurationLabel = "AnimationDuration";
+        private const string LabelAlphaLabel = "LabelAlpha";
 
         /// <summary>
         /// Saves these LabelSettings using <paramref name="writer"/> under the given <paramref name="label"/>.
@@ -46,6 +57,7 @@ namespace SEE.Game
             writer.Save(Distance, DistanceLabel);
             writer.Save(FontSize, FontSizeLabel);
             writer.Save(AnimationDuration, AnimationDurationLabel);
+            writer.Save(LabelAlpha, LabelAlphaLabel);
             writer.EndGroup();
         }
 
@@ -66,6 +78,7 @@ namespace SEE.Game
                     ConfigIO.Restore(values, DistanceLabel, ref Distance);
                     ConfigIO.Restore(values, FontSizeLabel, ref FontSize);
                     ConfigIO.Restore(values, AnimationDurationLabel, ref AnimationDuration);
+                    ConfigIO.Restore(values, LabelAlphaLabel, ref LabelAlpha);
                 }
             }
         }
