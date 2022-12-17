@@ -36,7 +36,8 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Amount of glow that should be animated towards.
         /// </summary>
-        private float fullGlow;
+        /// <remarks>Its value must be greater than 0 and not greater than 5.</remarks>
+        private const float fullGlow = 2;
 
         /// <summary>
         /// Whether the glow effect is currently (supposed to be) enabled.
@@ -203,7 +204,7 @@ namespace SEE.Game.Operator
                             {
                                 if (s.temporaryGameObject != null)
                                 {
-                                    Destroyer.DestroyGameObject(s.temporaryGameObject);
+                                    Destroyer.Destroy(s.temporaryGameObject);
                                 }
                             }).Play();
                 }
@@ -252,8 +253,6 @@ namespace SEE.Game.Operator
         /// </summary>
         private void SetupGlow()
         {
-            fullGlow = highlightEffect.glow;
-            Assert.IsTrue(fullGlow > 0, "fullGlow must be bigger than zero!");
             if (!highlightEffect.highlighted)
             {
                 // We control highlighting not by the `highlighted` toggle, but by the amount of `glow`.
@@ -289,17 +288,17 @@ namespace SEE.Game.Operator
 
         /// <summary>
         /// Refreshes the glow effect properties.
-        /// 
+        ///
         /// Needs to be called whenever the material changes. Hierarchy changes are handled automatically
         /// </summary>
         public async UniTaskVoid RefreshGlow(bool fullRefresh = false)
         {
-            if (highlightEffect != null)
+            if (highlightEffect != null && glow != null)
             {
                 if (fullRefresh)
                 {
                     glow.KillAnimator();
-                    Destroyer.DestroyComponent(highlightEffect);
+                    Destroyer.Destroy(highlightEffect);
                     await UniTask.WaitForEndOfFrame();  // component is only destroyed by the end of the frame.
                     highlightEffect = Highlighter.GetHighlightEffect(gameObject);
                     SetupGlow();
@@ -320,7 +319,7 @@ namespace SEE.Game.Operator
                 RefreshGlow().Forget();
             }
         }
-        
+
         public void OnCompleted()
         {
             // Nothing to be done.
