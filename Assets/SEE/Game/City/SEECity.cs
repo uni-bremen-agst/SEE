@@ -89,7 +89,7 @@ namespace SEE.Game.City
                 loadedGraph.BasePath = SourceCodeDirectory.Path;
             }
         }
-        
+
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
         /// containing only nodes with relevant node types or the original LoadedGraph
@@ -132,30 +132,44 @@ namespace SEE.Game.City
         protected override void Awake()
         {
             base.Awake();
-            LoadData();
-            Graph subGraph = VisualizedSubGraph;
-            if (subGraph != null)
+            if (gameObject.IsCodeCityDrawn())
             {
-                foreach (GraphElement graphElement in loadedGraph.Elements().Except(subGraph.Elements()))
+                LoadData();
+                Graph subGraph = VisualizedSubGraph;
+                if (subGraph != null)
                 {
-                    // All other elements are virtual, i.e., should not be drawn.
-                    graphElement.SetToggle(GraphElement.IsVirtualToggle);
+                    foreach (GraphElement graphElement in loadedGraph.Elements().Except(subGraph.Elements()))
+                    {
+                        // All other elements are virtual, i.e., should not be drawn.
+                        graphElement.SetToggle(GraphElement.IsVirtualToggle);
+                    }
+
+                    SetNodeEdgeRefs(subGraph, gameObject);
+                }
+                else
+                {
+                    Debug.LogError($"SEECity.Awake: Could not load city {name}.\n");
                 }
 
-                SetNodeEdgeRefs(subGraph, gameObject);
+                loadedGraph = subGraph;
             }
             else
             {
-                Debug.LogError($"SEECity.Awake: Could not load city {name}.\n");
+                Debug.LogWarning($"There is no code city drawn for {gameObject.FullName()}.\n");
             }
-
-            loadedGraph = subGraph;
         }
 
+        /// <summary>
+        /// Loads the metric board.
+        /// </summary>
         protected override void Start()
         {
+            base.Start();
             // Load the holistic metric board, if one was setup.
-            BoardSettings.LoadBoard();
+            if (gameObject.IsCodeCityDrawn())
+            {
+                BoardSettings.LoadBoard();
+            }
         }
 
         /// <summary>
