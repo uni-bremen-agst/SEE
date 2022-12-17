@@ -2,7 +2,7 @@ using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game.UI.LiveDocumantation
+namespace SEE.Game.UI.LiveDocumentation
 {
     /// <summary>
     /// Part of LiveDocumentationWindow.cs

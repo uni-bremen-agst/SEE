@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using SEE.Game.UI.CodeWindow;
-using SEE.Game.UI.LiveDocumantation;
+using SEE.Game.UI.LiveDocumentation;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;

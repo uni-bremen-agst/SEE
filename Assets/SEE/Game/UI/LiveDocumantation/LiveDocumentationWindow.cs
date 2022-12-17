@@ -1,4 +1,4 @@
-namespace SEE.Game.UI.LiveDocumantation
+namespace SEE.Game.UI.LiveDocumentation
 {
     /// <summary>
     /// This class represents the live documentation windows. <p/>
@@ -12,7 +12,6 @@ namespace SEE.Game.UI.LiveDocumantation
     /// And then the attributes of these class are set, so they can then be applied to the Unity Object (the UI Canvas).
     ///
     /// So something like that:
-
     /// <code>
     /// // I'm in LiveDocumentationAction
     /// docWin = selectedNode.gameObject.AddComponent &lt;LiveDocumentationWindow&gt;();
@@ -34,5 +33,10 @@ namespace SEE.Game.UI.LiveDocumantation
         /// Path to the UI prefab 
         /// </summary>
         private const string PREFAB_PATH = "Prefabs/UI/LiveDocumentation/LiveDocumentation";
+
+        public struct LiveDocumentationWindowValue
+        {
+            public string TypeName { get; private set; }
+        }
     }
 }
