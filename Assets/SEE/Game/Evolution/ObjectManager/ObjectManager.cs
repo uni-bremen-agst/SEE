@@ -235,7 +235,7 @@ namespace SEE.Game.Evolution
                     if (edges.ContainsKey(id))
                     {
                         // Edge object has already been created in previous call.
-                        Destroyer.DestroyGameObject(newGameEdge);
+                        Destroyer.Destroy(newGameEdge);
                     }
                     else
                     {
@@ -395,7 +395,7 @@ namespace SEE.Game.Evolution
         {
             if (currentPlane ?? true)
             {
-                Destroyer.DestroyGameObject(currentPlane);
+                Destroyer.Destroy(currentPlane);
                 currentPlane = null;
             }
         }
@@ -407,7 +407,7 @@ namespace SEE.Game.Evolution
         {
             foreach (GameObject gameObject in nodes.Values)
             {
-                Destroyer.DestroyGameObject(gameObject);
+                Destroyer.Destroy(gameObject);
             }
             nodes.Clear();
         }
@@ -419,7 +419,7 @@ namespace SEE.Game.Evolution
         {
             foreach (GameObject gameObject in edges.Values)
             {
-                Destroyer.DestroyGameObject(gameObject);
+                Destroyer.Destroy(gameObject);
             }
             edges.Clear();
         }

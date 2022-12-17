@@ -143,7 +143,7 @@ namespace SEE.GO.Decorators
                 if (child.name == AntennaGameObjectName && child.CompareTag(Tags.Decoration))
                 {
                     child.transform.SetParent(null);
-                    Destroyer.DestroyGameObject(child.gameObject);
+                    Destroyer.Destroy(child.gameObject);
                 }
             }
         }
