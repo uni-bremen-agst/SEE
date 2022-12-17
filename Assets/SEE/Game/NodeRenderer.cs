@@ -137,7 +137,7 @@ namespace SEE.Game
 
             /// leafNode is no longer needed; we have its mesh that is all we needed.
             /// It can be dismissed.
-            /// We do not use  <see cref="Destroyer.DestroyGameObject"/> because that would also
+            /// We do not use  <see cref="Destroyer.Destroy"/> because that would also
             /// remove the node from <see cref="GraphElementIDMap"/> and would also remove the
             /// incoming and outgoing edges. leafNode was not added <see cref="GraphElementIDMap"/>.
             Object.Destroy(leafNode);

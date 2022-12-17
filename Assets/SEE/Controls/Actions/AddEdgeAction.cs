@@ -178,7 +178,7 @@ namespace SEE.Controls.Actions
             base.Undo();
             GameEdgeAdder.Remove(createdEdge);
             new DeleteNetAction(createdEdge.name).Execute();
-            Destroyer.DestroyGameObject(createdEdge);
+            Destroyer.Destroy(createdEdge);
             createdEdge = null;
         }
 
