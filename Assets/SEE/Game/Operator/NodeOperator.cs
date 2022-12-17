@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.Utils;
 using TinySpline;
 using UnityEngine;
 
@@ -15,7 +17,7 @@ namespace SEE.Game.Operator
     /// Available operations consist of the public methods exported by this class.
     /// Operations can be animated or executed directly, by setting the duration to 0.
     /// </summary>
-    public class NodeOperator : AbstractOperator
+    public partial class NodeOperator : AbstractOperator
     {
         // We split up movement on the three axes because it makes sense in certain situations.
         // For example, when dragging a node along the XZ-axis, if we want to place it on top
@@ -36,6 +38,26 @@ namespace SEE.Game.Operator
         /// Operation handling Z-axis movement.
         /// </summary>
         private TweenOperation<float> PositionZ;
+        
+        /// <summary>
+        /// Operation handling animated label display.
+        /// </summary>
+        private TweenOperation<float> LabelAlpha;
+        
+        /// <summary>
+        /// Operation handling the starting position of the label's line.
+        /// </summary>
+        private TweenOperation<Vector3> LabelStartLinePosition;
+        
+        /// <summary>
+        /// Operation handling the end position of the label's line.
+        /// </summary>
+        private TweenOperation<Vector3> LabelEndLinePosition;
+        
+        /// <summary>
+        /// Operation handling the position of the label's text.
+        /// </summary>
+        private TweenOperation<Vector3> LabelTextPosition;
 
         /// <summary>
         /// Operation handling node scaling (specifically, localScale).
@@ -43,10 +65,29 @@ namespace SEE.Game.Operator
         private TweenOperation<Vector3> Scale;
 
         /// <summary>
-        /// If this isn't null, represents the duration in seconds the edge layout update should take,
-        /// and if this is null, the edge layout shall not be updated.
+        /// The node to which this node operator belongs.
         /// </summary>
-        private float? updateEdgeLayoutDuration;
+        public Node Node
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// The node to which the <see cref="Node"/> belongs.
+        /// </summary>
+        public AbstractSEECity City
+        {
+            get;
+            private set;
+        }
+        
+        /// <summary>
+        /// If this isn't null, represents the duration in seconds the layout update should take,
+        /// and if this is null, the layout shall not be updated.
+        /// Note that the layout includes the edge layout and the positioning of the node label, if it exists.
+        /// </summary>
+        private float? updateLayoutDuration;
 
         /// <summary>
         /// The position this node is supposed to be at.
@@ -71,7 +112,7 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> MoveXTo(float newXPosition, float duration)
         {
-            updateEdgeLayoutDuration = duration;
+            updateLayoutDuration = duration;
             return PositionX.AnimateTo(newXPosition, duration);
         }
 
@@ -84,7 +125,7 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> MoveYTo(float newYPosition, float duration)
         {
-            updateEdgeLayoutDuration = duration;
+            updateLayoutDuration = duration;
             return PositionY.AnimateTo(newYPosition, duration);
         }
 
@@ -97,7 +138,7 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> MoveZTo(float newZPosition, float duration)
         {
-            updateEdgeLayoutDuration = duration;
+            updateLayoutDuration = duration;
             return PositionZ.AnimateTo(newZPosition, duration);
         }
 
@@ -110,7 +151,7 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> MoveTo(Vector3 newPosition, float duration)
         {
-            updateEdgeLayoutDuration = duration;
+            updateLayoutDuration = duration;
             return new AndCombinedOperationCallback<Action>(new[]
             {
                 PositionX.AnimateTo(newPosition.x, duration),
@@ -129,22 +170,54 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> ScaleTo(Vector3 newLocalScale, float duration)
         {
-            updateEdgeLayoutDuration = duration;
+            updateLayoutDuration = duration;
             return Scale.AnimateTo(newLocalScale, duration);
         }
+        
+        /// <summary>
+        /// Shows the label with given <paramref name="alpha"/> value if it is greater than zero.
+        /// Otherwise, hides the label.
+        /// </summary>
+        /// <param name="alpha">the desired target alpha value for the label.</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> FadeLabel(float alpha, float duration) =>
+            new AndCombinedOperationCallback<Action>(new[]
+            {
+                // NOTE: Order is important, because the line's end position target depends on the text position target,
+                //       and the text position target depends on the alpha value's target!
+                LabelAlpha.AnimateTo(alpha, duration),
+                LabelTextPosition.AnimateTo(DesiredLabelTextPosition, duration),
+                LabelStartLinePosition.AnimateTo(DesiredLabelStartLinePosition, duration),
+                LabelEndLinePosition.AnimateTo(DesiredLabelEndLinePosition, duration)
+            });
 
         /// <summary>
-        /// Updates the edges attached to this node during the next <see cref="Update"/> cycle.
-        /// This involves recalculating the edge layout for each attached edge.
+        /// Updates the layout of objects (edges, labels) attached to this node during the next
+        /// <see cref="Update"/> cycle. This involves recalculating the edge layout for each attached edge.
         /// Note that this is already automatically done when the node is moved or scaled.
         /// </summary>
         /// <param name="duration">Time in seconds the animation should take.</param>
-        public void UpdateAttachedEdges(float duration)
+        public void TriggerLayoutUpdate(float duration)
         {
-            updateEdgeLayoutDuration = duration;
+            updateLayoutDuration = duration;
         }
 
         #endregion
+
+        /// <summary>
+        /// Updates the layout of attached objects (edges, labels) immediately.
+        /// </summary>
+        /// <param name="duration">Time in seconds the animation should take.</param>
+        private void UpdateLayout(float duration)
+        {
+            if (!Node.IsRoot())
+            {
+                UpdateEdgeLayout(duration);
+            }
+            UpdateLabelLayout(duration);
+        }
 
         /// <summary>
         /// Updates the edges attached to this node.
@@ -226,7 +299,11 @@ namespace SEE.Game.Operator
 
         private void OnEnable()
         {
+            Node = GetNode(gameObject);
+            City = GetCity(gameObject);
             Vector3 currentPosition = transform.position;
+            Vector3 currentScale = transform.localScale;
+            
             Tween[] AnimateToXAction(float x, float d) => new Tween[] {transform.DOMoveX(x, d).Play()};
             Tween[] AnimateToYAction(float y, float d) => new Tween[] {transform.DOMoveY(y, d).Play()};
             Tween[] AnimateToZAction(float z, float d) => new Tween[] {transform.DOMoveZ(z, d).Play()};
@@ -234,11 +311,41 @@ namespace SEE.Game.Operator
             PositionY = new TweenOperation<float>(AnimateToYAction, currentPosition.y);
             PositionZ = new TweenOperation<float>(AnimateToZAction, currentPosition.z);
 
-            Vector3 currentScale = transform.localScale;
             Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] {transform.DOScale(s, d).Play()};
             Scale = new TweenOperation<Vector3>(AnimateToScaleAction, currentScale);
-        }
+            
+            PrepareLabel();
+            LabelAlpha = new TweenOperation<float>(AnimateLabelAlphaAction, 0f);
+            LabelTextPosition = new TweenOperation<Vector3>(AnimateLabelTextPositionAction, DesiredLabelTextPosition);
+            LabelStartLinePosition = new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction, DesiredLabelStartLinePosition);
+            LabelEndLinePosition = new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction, DesiredLabelEndLinePosition);
 
+            #region Local Methods
+
+            static Node GetNode(GameObject gameObject)
+            {
+                if (!gameObject.TryGetComponent(out NodeRef nodeRef) || nodeRef.Value == null)
+                {
+                    throw new InvalidOperationException("NodeOperator-operated object must have NodeRef attached!");
+                }
+
+                return nodeRef.Value;
+            }
+
+            static AbstractSEECity GetCity(GameObject gameObject)
+            {
+                GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
+                if (codeCityObject == null || !codeCityObject.TryGetComponent(out AbstractSEECity city))
+                {
+                    throw new InvalidOperationException("NodeOperator-operated object must belong to SEECity!");
+                }
+
+                return city;
+            }
+
+            #endregion
+        }
+        
         private void OnDisable()
         {
             PositionX.KillAnimator();
@@ -249,14 +356,24 @@ namespace SEE.Game.Operator
             PositionZ = null;
             Scale.KillAnimator();
             Scale = null;
+            LabelAlpha.KillAnimator();
+            LabelAlpha = null;
+            LabelTextPosition.KillAnimator();
+            LabelTextPosition = null;
+            LabelStartLinePosition.KillAnimator();
+            LabelStartLinePosition = null;
+            LabelEndLinePosition.KillAnimator();
+            LabelEndLinePosition = null;
+            Destroyer.DestroyGameObject(nodeLabel);
+            nodeLabel = null;
         }
 
         private void Update()
         {
-            if (updateEdgeLayoutDuration.HasValue)
+            if (updateLayoutDuration.HasValue)
             {
-                UpdateEdgeLayout(updateEdgeLayoutDuration.Value);
-                updateEdgeLayoutDuration = null;
+                UpdateLayout(updateLayoutDuration.Value);
+                updateLayoutDuration = null;
             }
         }
     }

@@ -5,6 +5,7 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.Game.Operator;
 using SEE.Utils;
 using UnityEngine;
 using static SEE.Game.Portal.IncludeDescendants;
@@ -299,9 +300,10 @@ namespace SEE.GO
         /// <param name="scale">the new scale in world space</param>
         public static void SetScale(this GameObject node, Vector3 scale)
         {
+            NodeOperator @operator = node.AddOrGetComponent<NodeOperator>();
             Transform parent = node.transform.parent;
             node.transform.parent = null;
-            node.transform.localScale = scale;
+            @operator.ScaleTo(scale, 0f);
             node.transform.parent = parent;
         }
 
@@ -337,11 +339,14 @@ namespace SEE.GO
         /// considered.
         /// </summary>
         /// <param name="gameObject">game object whose height has to be determined</param>
+        /// <param name="filterTransform">Function returning true for descendant transforms that shall be taken into
+        /// account. By default, this is a constant function which always returns true.</param>
         /// <returns>world-space position of the roof of this <paramref name="gameObject"/>
         /// or any of its active descendants</returns>
-        public static float GetMaxY(this GameObject gameObject)
+        public static float GetMaxY(this GameObject gameObject, Func<Transform, bool> filterTransform = null)
         {
             float result = float.NegativeInfinity;
+            filterTransform ??= _ => true;
             Recurse(gameObject, ref result);
             return result;
 
@@ -355,7 +360,7 @@ namespace SEE.GO
 
                 foreach (Transform child in root.transform)
                 {
-                    if (child.gameObject.activeInHierarchy)
+                    if (child.gameObject.activeInHierarchy && filterTransform(child))
                     {
                         Recurse(child.gameObject, ref max);
                     }
@@ -374,12 +379,14 @@ namespace SEE.GO
         /// considered.
         /// </summary>
         /// <param name="gameObject">game object whose center top has to be determined</param>
+        /// <param name="filterTransform">Function returning true for descendant transforms that shall be taken into
+        /// account. By default, this is a constant function which always returns true.</param>
         /// <returns>world-space position of the center top of the hull of this <paramref name="gameObject"/>
         /// </returns>
-        public static Vector3 GetTop(this GameObject gameObject)
+        public static Vector3 GetTop(this GameObject gameObject, Func<Transform, bool> filterTransform = null)
         {
             Vector3 result = gameObject.transform.position;
-            result.y = gameObject.GetMaxY();
+            result.y = gameObject.GetMaxY(filterTransform);
             return result;
         }
 
@@ -493,7 +500,7 @@ namespace SEE.GO
         /// <returns>The existing or newly created component</returns>
         public static T AddOrGetComponent<T>(this GameObject gameObject) where T: Component
         {
-            return gameObject.GetComponent<T>() ?? gameObject.AddComponent<T>();
+            return gameObject.TryGetComponent(out T component) ? component : gameObject.AddComponent<T>();
         }
 
         /// <summary>

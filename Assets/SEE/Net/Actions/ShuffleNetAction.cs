@@ -1,4 +1,6 @@
 ﻿using SEE.Game;
+using SEE.Game.Operator;
+using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -39,7 +41,7 @@ namespace SEE.Net.Actions
                 GameObject gameObject = GraphElementIDMap.Find(GameObjectID);
                 if (gameObject != null)
                 {
-                    Positioner.Set(gameObject.transform, Position);
+                    gameObject.AddOrGetComponent<NodeOperator>().MoveTo(Position, 0);
                 }
                 else
                 {

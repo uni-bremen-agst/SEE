@@ -145,6 +145,11 @@ namespace SEE.Controls.Actions
         private GameObject objectToScale;
 
         /// <summary>
+        /// Node operator of <see cref="objectToScale"/>.
+        /// </summary>
+        private NodeOperator Operator;
+
+        /// <summary>
         /// A memento of the position and scale of <see cref="objectToScale"/> before
         /// or after, respectively, it was scaled.
         /// </summary>
@@ -261,12 +266,14 @@ namespace SEE.Controls.Actions
                 {
                     DrawGamingGizmos();
                 }
+
                 if (SEEInput.Scale())
                 {
                     if (draggedSphere == null && Raycasting.RaycastAnything(out RaycastHit raycastHit))
                     {
                         draggedSphere = SelectedScalingGizmo(raycastHit.collider.gameObject);
                     }
+
                     if (draggedSphere != null)
                     {
                         Scaling();
@@ -313,11 +320,14 @@ namespace SEE.Controls.Actions
                                 if (hitGraphElement == HitGraphElement.Node)
                                 {
                                     objectToScale = raycastHit.collider.gameObject;
+                                    Operator = objectToScale.AddOrGetComponent<NodeOperator>();
                                 }
                                 else
                                 {
                                     objectToScale = null;
+                                    Operator = null;
                                 }
+
                                 RemoveSpheres();
                                 draggedSphere = null;
                                 return false;
@@ -329,19 +339,13 @@ namespace SEE.Controls.Actions
                 {
                     // No object to be scaled had been selected yet, but now we have one.
                     objectToScale = raycastHit.collider.gameObject;
+                    Operator = objectToScale.AddOrGetComponent<NodeOperator>();
                     beforeAction = new Memento(objectToScale);
                     return false;
                 }
             }
-            return false;
-        }
 
-        /// <summary>
-        /// Looks at all the incoming and outgoing edges of a node and replaces these edges depending on the new scaling of the node.
-        /// </summary>
-        private void AdjustEdge()
-        {
-            GameEdgeMover.MoveAllConnectingEdgesOfNode(objectToScale);
+            return false;
         }
 
         /// <summary>
@@ -355,7 +359,6 @@ namespace SEE.Controls.Actions
             SetOnRoof();
             SetOnSide();
             AdjustSizeOfScalingGizmos();
-            AdjustEdge();
         }
 
         /// <summary>
@@ -552,18 +555,20 @@ namespace SEE.Controls.Actions
             {
                 scale.x = objectToScale.transform.lossyScale.x;
             }
+
             if (scale.y <= 0)
             {
                 scale.y = objectToScale.transform.lossyScale.y;
                 position.y = objectToScale.transform.position.y;
             }
+
             if (scale.z <= 0)
             {
                 scale.z = objectToScale.transform.lossyScale.z;
             }
 
             // Transform the new position and scale
-            objectToScale.transform.position = position;
+            Operator.MoveTo(position, 0f);
             objectToScale.SetScale(scale);
             MoveAndScale();
             currentState = ReversibleAction.Progress.InProgress;
@@ -613,7 +618,7 @@ namespace SEE.Controls.Actions
                 return result;
             }
 
-            // Calulate the positions of the scaling handles at the four corners of the roof.
+            // Calculate the positions of the scaling handles at the four corners of the roof.
             {
                 // south-west corner
                 {
@@ -641,7 +646,7 @@ namespace SEE.Controls.Actions
                 }
             }
 
-            // Calulate the positions of the scaling handles at the four sides of the roof.
+            // Calculate the positions of the scaling handles at the four sides of the roof.
             {
                 // west side
                 {
@@ -724,14 +729,14 @@ namespace SEE.Controls.Actions
                 return null;
             }
             else if (gameObject == topSphere
-                || gameObject == firstCornerSphere
-                || gameObject == secondCornerSphere
-                || gameObject == thirdCornerSphere
-                || gameObject == forthCornerSphere
-                || gameObject == firstSideSphere
-                || gameObject == secondSideSphere
-                || gameObject == thirdSideSphere
-                || gameObject == forthSideSphere)
+                     || gameObject == firstCornerSphere
+                     || gameObject == secondCornerSphere
+                     || gameObject == thirdCornerSphere
+                     || gameObject == forthCornerSphere
+                     || gameObject == firstSideSphere
+                     || gameObject == secondSideSphere
+                     || gameObject == thirdSideSphere
+                     || gameObject == forthSideSphere)
             {
                 return gameObject;
             }

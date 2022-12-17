@@ -312,7 +312,7 @@ namespace SEE.Game.City
             //implGameNode.transform.SetParent(implNode.Parent.RetrieveGameNode().transform);
 
             // The layout of all attached edges need to be updated as well.
-            //implGameNode.AddOrGetComponent<NodeOperator>().UpdateAttachedEdges(ANIMATION_DURATION);
+            //implGameNode.AddOrGetComponent<NodeOperator>().TriggerLayoutUpdate(ANIMATION_DURATION);
         }
 
         /// <summary>
