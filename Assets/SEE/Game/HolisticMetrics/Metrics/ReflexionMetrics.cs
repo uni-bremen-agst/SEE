@@ -26,6 +26,12 @@ namespace SEE.Game.HolisticMetrics.Metrics
                 return new MetricValueCollection();
             }
 
+            if (graph == null)
+            {
+                // No metrics to report.
+                return new MetricValueCollection();
+            }
+
             // Map from states to number of times they occur within the graph
             Dictionary<State, int> states = graph.Edges().Select(ReflexionGraphTools.State)
                                                  .GroupBy(x => x)
