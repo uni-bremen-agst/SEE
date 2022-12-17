@@ -38,22 +38,22 @@ namespace SEE.Game.Operator
         /// Operation handling Z-axis movement.
         /// </summary>
         private TweenOperation<float> PositionZ;
-        
+
         /// <summary>
         /// Operation handling animated label display.
         /// </summary>
         private TweenOperation<float> LabelAlpha;
-        
+
         /// <summary>
         /// Operation handling the starting position of the label's line.
         /// </summary>
         private TweenOperation<Vector3> LabelStartLinePosition;
-        
+
         /// <summary>
         /// Operation handling the end position of the label's line.
         /// </summary>
         private TweenOperation<Vector3> LabelEndLinePosition;
-        
+
         /// <summary>
         /// Operation handling the position of the label's text.
         /// </summary>
@@ -81,7 +81,7 @@ namespace SEE.Game.Operator
             get;
             private set;
         }
-        
+
         /// <summary>
         /// If this isn't null, represents the duration in seconds the layout update should take,
         /// and if this is null, the layout shall not be updated.
@@ -173,7 +173,7 @@ namespace SEE.Game.Operator
             updateLayoutDuration = duration;
             return Scale.AnimateTo(newLocalScale, duration);
         }
-        
+
         /// <summary>
         /// Shows the label with given <paramref name="alpha"/> value if it is greater than zero.
         /// Otherwise, hides the label.
@@ -303,7 +303,7 @@ namespace SEE.Game.Operator
             City = GetCity(gameObject);
             Vector3 currentPosition = transform.position;
             Vector3 currentScale = transform.localScale;
-            
+
             Tween[] AnimateToXAction(float x, float d) => new Tween[] {transform.DOMoveX(x, d).Play()};
             Tween[] AnimateToYAction(float y, float d) => new Tween[] {transform.DOMoveY(y, d).Play()};
             Tween[] AnimateToZAction(float z, float d) => new Tween[] {transform.DOMoveZ(z, d).Play()};
@@ -313,7 +313,7 @@ namespace SEE.Game.Operator
 
             Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] {transform.DOScale(s, d).Play()};
             Scale = new TweenOperation<Vector3>(AnimateToScaleAction, currentScale);
-            
+
             PrepareLabel();
             LabelAlpha = new TweenOperation<float>(AnimateLabelAlphaAction, 0f);
             LabelTextPosition = new TweenOperation<Vector3>(AnimateLabelTextPositionAction, DesiredLabelTextPosition);
@@ -345,7 +345,7 @@ namespace SEE.Game.Operator
 
             #endregion
         }
-        
+
         private void OnDisable()
         {
             PositionX.KillAnimator();
@@ -364,7 +364,7 @@ namespace SEE.Game.Operator
             LabelStartLinePosition = null;
             LabelEndLinePosition.KillAnimator();
             LabelEndLinePosition = null;
-            Destroyer.DestroyGameObject(nodeLabel);
+            Destroyer.Destroy(nodeLabel);
             nodeLabel = null;
         }
 

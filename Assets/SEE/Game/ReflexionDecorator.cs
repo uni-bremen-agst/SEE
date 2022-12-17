@@ -96,7 +96,7 @@ namespace SEE.Game
             {
                 if (child.CompareTag(Tags.Decoration))
                 {
-                    Destroyer.DestroyGameObject(child.gameObject);
+                    Destroyer.Destroy(child.gameObject);
                 }
             }
         }
