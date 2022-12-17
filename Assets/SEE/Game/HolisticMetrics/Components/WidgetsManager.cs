@@ -27,7 +27,7 @@ namespace SEE.Game.HolisticMetrics.Components
         /// The game object that can be clicked to move the board around.
         /// </summary>
         [SerializeField] private GameObject boardMover;
-        
+
         /// <summary>
         /// This contains references to all widgets on the board each represented by one WidgetController and one
         /// Metric. This list is needed so we can refresh the metrics.
@@ -41,7 +41,7 @@ namespace SEE.Game.HolisticMetrics.Components
 
         /// <summary>
         /// The list of all available metric types. This is shared between all BoardController instances and is not
-        /// expected to change at runtime. 
+        /// expected to change at runtime.
         /// </summary>
         private Type[] metricTypes;
 
@@ -55,10 +55,10 @@ namespace SEE.Game.HolisticMetrics.Components
         /// The array of code cities in the scene. This is needed because the player can select which code city's
         /// metrics will be displayed on each board.
         /// </summary>
-        private static SEECity[] cities; 
-        
+        private static SEECity[] cities;
+
         /// <summary>
-        /// A house icon sprite (instantiated in Awake()). 
+        /// A house icon sprite (instantiated in Awake()).
         /// </summary>
         private static Sprite houseIcon;
 
@@ -66,29 +66,29 @@ namespace SEE.Game.HolisticMetrics.Components
         /// This will be used to unsubscribe from the graph we currently listen to.
         /// </summary>
         private IDisposable graphUnsubscriber;
-        
+
         /// <summary>
         /// Instantiates the metricTypes and widgetPrefabs arrays.
         /// </summary>
         private void Awake()
         {
-            widgetPrefabs = 
+            widgetPrefabs =
                 Resources.LoadAll<GameObject>("Prefabs/HolisticMetrics/Widgets");
-            
+
             metricTypes = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(domainAssembly => domainAssembly.GetTypes())
                 .Where(type => type.IsSubclassOf(typeof(Metric)))
                 .ToArray();
-            
+
             houseIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/Home_Simple_Icons_UI");
-            
+
             citySelection.dropdownEvent.AddListener(Redraw);
             citySelection.dropdownEvent.AddListener(CitySelectionChanged);
             OnCitySelectionClick();
-            
-            graphUnsubscriber = GetSelectedCity().LoadedGraph.Subscribe(this);
+
+            graphUnsubscriber = GetSelectedCity().LoadedGraph?.Subscribe(this);
         }
-        
+
         /// <summary>
         /// Returns the title of this manager's metrics board.
         /// </summary>
@@ -97,7 +97,7 @@ namespace SEE.Game.HolisticMetrics.Components
         {
             return title;
         }
-        
+
         /// <summary>
         /// Sets the title of this manager's metrics board.
         /// </summary>
@@ -107,7 +107,7 @@ namespace SEE.Game.HolisticMetrics.Components
             title = newTitle;
             gameObject.GetComponentInChildren<Text>().text = newTitle;
         }
-        
+
         /// <summary>
         /// Adds the desired widget to the board.
         /// </summary>
@@ -149,13 +149,13 @@ namespace SEE.Game.HolisticMetrics.Components
         /// <param name="position">The position to which the widget should be moved</param>
         internal void Move(Guid widgetID, Vector3 position)
         {
-            WidgetController controller = 
+            WidgetController controller =
                 widgets
                 .Find(widget => widget.Item1.ID.Equals(widgetID))
                 .Item1;
             controller.transform.position = position;
         }
-        
+
         /// <summary>
         /// Adds a WidgetDeleter component to all widgets managed by this manager.
         /// </summary>
@@ -188,9 +188,9 @@ namespace SEE.Game.HolisticMetrics.Components
         public void OnCitySelectionClick()
         {
             cities = FindObjectsOfType<SEECity>();
-            
+
             string oldSelection = citySelection.selectedText.text;
-            
+
             citySelection.dropdownItems.Clear();
 
             foreach (SEECity city in cities)
@@ -206,9 +206,9 @@ namespace SEE.Game.HolisticMetrics.Components
                     citySelection.dropdownItems.IndexOf(
                         citySelection.dropdownItems.Find(item => item.itemName.Equals(oldSelection)));
             }
-            
+
             citySelection.SetupDropdown();
-            
+
             // Refresh the widgets because the selected city could have changed already
             Redraw();
         }
@@ -259,7 +259,7 @@ namespace SEE.Game.HolisticMetrics.Components
             string cityName = selectedCity.name;
             new SwitchCityNetAction(title, cityName).Execute();
             graphUnsubscriber?.Dispose();
-            graphUnsubscriber = selectedCity.LoadedGraph.Subscribe(this);
+            graphUnsubscriber = selectedCity.LoadedGraph?.Subscribe(this);
         }
 
         /// <summary>
@@ -271,7 +271,7 @@ namespace SEE.Game.HolisticMetrics.Components
         {
             // Update the values on the list so they hopefully are synchronous to the list on the requester's machine
             OnCitySelectionClick();
-            
+
             // Try to find the index of the cityName to select
             int indexInDropdown = citySelection
                 .dropdownItems
@@ -282,16 +282,16 @@ namespace SEE.Game.HolisticMetrics.Components
                                " cannot be found here\n");
                 return;
             }
-            
+
             // Select the new city
             citySelection.selectedItemIndex = indexInDropdown;
-            
+
             // Redraw the board
             Redraw();
-            
+
             // Start listening to changes in the newly selected city
             graphUnsubscriber?.Dispose();
-            graphUnsubscriber = GetSelectedCity().LoadedGraph.Subscribe(this);
+            graphUnsubscriber = GetSelectedCity().LoadedGraph?.Subscribe(this);
         }
 
         /// <summary>
@@ -300,10 +300,10 @@ namespace SEE.Game.HolisticMetrics.Components
         internal void OnGraphDraw()
         {
             graphUnsubscriber?.Dispose();
-            graphUnsubscriber = GetSelectedCity().LoadedGraph.Subscribe(this);
+            graphUnsubscriber = GetSelectedCity().LoadedGraph?.Subscribe(this);
             Redraw();
         }
-        
+
         /// <summary>
         /// Whenever a code city changes, this method needs to be called. It will call the Refresh() methods of all
         /// Metrics and display the results on the widgets.
