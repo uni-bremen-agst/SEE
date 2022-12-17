@@ -45,7 +45,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
                 Name = "Convergent and allowed edges",
                 DecimalPlaces = 0,
                 Value = Count(State.Convergent) + Count(State.AllowedAbsent)
-                                                 + Count(State.Allowed) + Count(State.ImplicitlyAllowed),
+                        + Count(State.Allowed) + Count(State.ImplicitlyAllowed),
                 Lower = 0,
                 Higher = maximum
             };
