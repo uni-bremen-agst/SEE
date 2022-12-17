@@ -21,13 +21,6 @@ namespace SEE.Game.City
     [DisallowMultipleComponent]
     public class ReflexionVisualization : MonoBehaviour, IObserver<ChangeEvent>
     {
-        // TODO: Is this assumption (cities' child count > 0 <=> city drawn) alright to make?
-        //       Or perhaps there's a better way to check whether a given city has been drawn?
-        /// <summary>
-        /// Returns true if this city has been drawn in the scene.
-        /// </summary>
-        private bool CityDrawn => gameObject.transform.childCount > 0;
-
         /// <summary>
         /// List of <see cref="ChangeEvent"/>s received from the reflexion <see cref="Analysis"/>.
         /// Note that this list is constructed by using <see cref="ReflexionGraphTools.Incorporate"/>.
@@ -79,26 +72,34 @@ namespace SEE.Game.City
 
         private void Start()
         {
-            // We have to set an initial color for the edges, and we have to convert them to meshes.
-            foreach (Edge edge in CityGraph.Edges().Where(x => !x.HasToggle(GraphElement.IsVirtualToggle)))
+            if (gameObject.IsCodeCityDrawn())
             {
-                GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
-                if (edgeObject != null && edgeObject.TryGetComponent(out SEESpline spline))
+                // We have to set an initial color for the edges, and we have to convert them to meshes.
+                foreach (Edge edge in CityGraph.Edges().Where(x => !x.HasToggle(GraphElement.IsVirtualToggle)))
                 {
-                    spline.CreateMesh();
-                    spline.GradientColors = GetEdgeGradient(edge);
+                    GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
+                    if (edgeObject != null && edgeObject.TryGetComponent(out SEESpline spline))
+                    {
+                        spline.CreateMesh();
+                        spline.GradientColors = GetEdgeGradient(edge);
+                    }
+                    else
+                    {
+                        Debug.LogError($"Edge has no associated game object: {edge}\n");
+                    }
                 }
-                else
-                {
-                    Debug.LogError($"Edge has no associated game object: {edge}\n");
-                }
+            }
+            else
+            {
+                Debug.LogWarning($"There is no code city drawn for {gameObject.FullName()}. This {nameof(ReflexionVisualization)} is disabled.\n");
+                enabled = false;
             }
         }
 
         private void Update()
         {
             // Unhandled events should only be handled once the city is drawn.
-            while (UnhandledEvents.Count > 0 && CityDrawn)
+            while (UnhandledEvents.Count > 0 && gameObject.IsCodeCityDrawn())
             {
                 OnNext(UnhandledEvents.Dequeue());
             }
@@ -168,7 +169,7 @@ namespace SEE.Game.City
         /// <param name="changeEvent">The change event received from the reflexion analysis</param>
         public void OnNext(ChangeEvent changeEvent)
         {
-            if (!CityDrawn)
+            if (!gameObject.IsCodeCityDrawn())
             {
                 UnhandledEvents.Enqueue(changeEvent);
                 return;
