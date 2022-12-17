@@ -1,6 +1,7 @@
 ﻿using System;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.Game.Operator;
 using SEE.GO;
 using UnityEngine;
 
@@ -111,7 +112,7 @@ namespace SEE.Game
 
                     // If parent has incoming/outgoing edges, they need to be adjusted
                     // because quite likely, the height of parent has changed.
-                    GameEdgeMover.MoveAllConnectingEdgesOfNode(parent);
+                    parent.AddOrGetComponent<NodeOperator>().TriggerLayoutUpdate(0f);
                 }
 
                 GameObject result = city.Renderer.DrawNode(node);

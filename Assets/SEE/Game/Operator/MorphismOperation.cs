@@ -21,15 +21,13 @@ namespace SEE.Game.Operator
             {
                 if (Animator != null && Animator.IsActive())
                 {
-                    TweenExtensions.Kill(Animator.tween);
+                    Animator.tween.Kill(complete);
                     Destroy(Animator);
                     Animator = null;
                 }
-
-                base.KillAnimator(complete);
             }
 
-            protected override void ChangeAnimatorTarget((BSpline targetSpline, GameObject temporaryGameObject) newTarget, float duration)
+            protected override void ChangeAnimatorTarget((BSpline targetSpline, GameObject temporaryGameObject) newTarget, float duration, bool complete = false)
             {
                 // No need to kill any old animators, the spline morphism can change its target.
                 Animator = AnimateToAction(newTarget, duration);
@@ -38,7 +36,7 @@ namespace SEE.Game.Operator
                     // We execute the first step immediately. This way, callers can expect the change to
                     // be implemented when control is returned to them, the same way it would work when
                     // setting the target value manually.
-                    TweenExtensions.ManualUpdate(Animator.tween, Time.deltaTime, Time.unscaledDeltaTime);
+                    Animator.tween.ManualUpdate(Time.deltaTime, Time.unscaledDeltaTime);
                 }
             }
 

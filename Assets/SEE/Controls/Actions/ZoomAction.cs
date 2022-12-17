@@ -1,4 +1,7 @@
+using System;
 using System.Collections.Generic;
+using SEE.Game.Operator;
+using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
@@ -134,7 +137,17 @@ namespace SEE.Controls.Actions
         /// Because we may have multiple code cities in the scene, there is not only one such
         /// root node.
         /// </summary>
-        private Dictionary<Transform, ZoomState> rootTransformToZoomStates = new Dictionary<Transform, ZoomState>();
+        private readonly Dictionary<Transform, ZoomState> rootTransformToZoomStates = new Dictionary<Transform, ZoomState>();
+        
+        /// <summary>
+        /// The node operator for every root transform of a city.
+        /// </summary>
+        private readonly Dictionary<Transform, NodeOperator> rootTransformToOperator = new Dictionary<Transform, NodeOperator>();
+
+        /// <summary>
+        /// Duration of the animation.
+        /// </summary>
+        public const float ANIMATION_DURATION = 0.5f;
 
         /// <summary>
         /// Executes every active zoom command. Logic is done in fixed time steps to ensure
@@ -150,9 +163,11 @@ namespace SEE.Controls.Actions
             foreach (KeyValuePair<Transform, ZoomState> pair in rootTransformToZoomStates)
             {
                 // The root node of the current code city to be zoomed.
-                Transform transform = pair.Key;
+                Transform rootTransform = pair.Key;
                 // Its zoom state.
                 ZoomState zoomState = pair.Value;
+                // Its node operator.
+                NodeOperator Operator = rootTransformToOperator[rootTransform];
 
                 if (zoomState.zoomCommands.Count > 0)
                 {
@@ -174,33 +189,24 @@ namespace SEE.Controls.Actions
                             zoomSteps -= zoomState.zoomCommands[i].TargetZoomSteps - zoomState.zoomCommands[i].CurrentDeltaScale();
                         }
                     }
-                    Vector3 averagePosition = new Vector3(positionSum.x / positionCount, transform.position.y, positionSum.y / positionCount);
+                    Vector3 averagePosition = new Vector3(positionSum.x / positionCount, rootTransform.position.y, positionSum.y / positionCount);
 
                     zoomState.currentZoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
-                    Vector3 cityCenterToHitPoint = averagePosition - transform.position;
-                    Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(transform.localScale);
+                    Vector3 cityCenterToHitPoint = averagePosition - rootTransform.position;
+                    Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(rootTransform.localScale);
 
-                    transform.position += cityCenterToHitPoint;
-                    transform.localScale = zoomState.currentZoomFactor * zoomState.originalScale;
-                    transform.position -= Vector3.Scale(cityCenterToHitPointUnscaled, transform.localScale);
+                    Operator.ScaleTo(zoomState.currentZoomFactor * zoomState.originalScale, ANIMATION_DURATION);
+                    Operator.MoveTo(rootTransform.position + cityCenterToHitPoint - Vector3.Scale(cityCenterToHitPointUnscaled, Operator.TargetScale), ANIMATION_DURATION);
 
-                    // TODO(torben): I believe in desktop mode this made sure that zooming
-                    // will always happen towards the current mouse position and not the
-                    // starting position ? not sure... this might actually be an
-                    // uninteresting feature
-
-                    //moveState.dragStartTransformPosition += moveState.dragStartOffset;
-                    //moveState.dragStartOffset = Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
-                    //moveState.dragStartTransformPosition -= moveState.dragStartOffset;
-                    new ZoomNetAction(transform.name, transform.position, transform.localScale).Execute();
+                    new ZoomNetAction(rootTransform.name, Operator.TargetPosition, Operator.TargetScale).Execute();
                 }
                 else
                 {
                     float lastZoomFactor = zoomState.currentZoomFactor;
                     zoomState.currentZoomFactor = ConvertZoomStepsToZoomFactor(zoomState.currentTargetZoomSteps);
-                    if (lastZoomFactor != zoomState.currentZoomFactor)
+                    if (!Mathf.Approximately(lastZoomFactor, zoomState.currentZoomFactor))
                     {
-                        transform.localScale = zoomState.currentZoomFactor * zoomState.originalScale;
+                        Operator.ScaleTo(zoomState.currentZoomFactor * zoomState.originalScale, ANIMATION_DURATION);
                     }
                 }
             }
@@ -237,6 +243,7 @@ namespace SEE.Controls.Actions
         protected void UpdateZoomState(Transform transform, ZoomState zoomState)
         {
             rootTransformToZoomStates[transform] = zoomState;
+            rootTransformToOperator[transform] = transform.gameObject.AddOrGetComponent<NodeOperator>();
         }
 
         /// <summary>
