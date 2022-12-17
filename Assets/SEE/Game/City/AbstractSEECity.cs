@@ -363,7 +363,7 @@ namespace SEE.Game.City
             }
             if (parent.CompareTag(Tags.Node) || parent.CompareTag(Tags.Edge) || parent.CompareTag(Tags.Decoration))
             {
-                Destroyer.DestroyGameObject(parent);
+                Destroyer.Destroy(parent);
             }
         }
 

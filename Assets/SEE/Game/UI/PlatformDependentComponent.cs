@@ -129,7 +129,7 @@ namespace SEE.Game.UI
         {
             Debug.LogError($"Component '{GetType().GetNiceName()}' doesn't support platform '{Platform.ToString()}'."
                            + " Component will now self-destruct.");
-            Destroyer.DestroyComponent(this);
+            Destroyer.Destroy(this);
         }
     }
 }

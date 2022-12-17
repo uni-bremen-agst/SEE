@@ -336,22 +336,22 @@ namespace SEE.Game.Avatars
             {
                 if (gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
                 {
-                    Destroyer.DestroyComponent(aimingSystem);
+                    Destroyer.Destroy(aimingSystem);
                 }
                 if (gameObject.TryGetComponentOrLog(out AimIK aimIK))
                 {
-                    Destroyer.DestroyComponent(aimIK);
+                    Destroyer.Destroy(aimIK);
                 }
                 if (gameObject.TryGetComponentOrLog(out LookAtIK lookAtIK))
                 {
-                    Destroyer.DestroyComponent(lookAtIK);
+                    Destroyer.Destroy(lookAtIK);
                 }
                 // AvatarMovementAnimator is using animation parameters that are defined only
                 // in our own AvatarAimingSystem animation controller. We will remove it
                 // to avoid error messages.
                 if (gameObject.TryGetComponentOrLog(out AvatarMovementAnimator avatarMovement))
                 {
-                    Destroyer.DestroyComponent(avatarMovement);
+                    Destroyer.Destroy(avatarMovement);
                 }
             }
 

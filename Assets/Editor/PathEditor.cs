@@ -244,7 +244,7 @@ namespace SEEEditor
         /// <param name="pathObject">path game object that is to be removed</param>
         private void ClearPath(GameObject pathObject)
         {
-            Destroyer.DestroyGameObject(pathObject);
+            Destroyer.Destroy(pathObject);
         }
     }
 }

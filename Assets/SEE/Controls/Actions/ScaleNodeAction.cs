@@ -704,15 +704,15 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void RemoveSpheres()
         {
-            Destroyer.DestroyGameObject(topSphere);
-            Destroyer.DestroyGameObject(firstCornerSphere);
-            Destroyer.DestroyGameObject(secondCornerSphere);
-            Destroyer.DestroyGameObject(thirdCornerSphere);
-            Destroyer.DestroyGameObject(forthCornerSphere);
-            Destroyer.DestroyGameObject(firstSideSphere);
-            Destroyer.DestroyGameObject(secondSideSphere);
-            Destroyer.DestroyGameObject(thirdSideSphere);
-            Destroyer.DestroyGameObject(forthSideSphere);
+            Destroyer.Destroy(topSphere);
+            Destroyer.Destroy(firstCornerSphere);
+            Destroyer.Destroy(secondCornerSphere);
+            Destroyer.Destroy(thirdCornerSphere);
+            Destroyer.Destroy(forthCornerSphere);
+            Destroyer.Destroy(firstSideSphere);
+            Destroyer.Destroy(secondSideSphere);
+            Destroyer.Destroy(thirdSideSphere);
+            Destroyer.Destroy(forthSideSphere);
             scalingGizmosAreDrawn = false;
         }
 

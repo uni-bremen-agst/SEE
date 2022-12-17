@@ -74,7 +74,7 @@ namespace SEE.Controls.Actions
                 {
                     if (!nodeOrEdge.activeInHierarchy)
                     {
-                        Destroyer.DestroyGameObject(nodeOrEdge);
+                        Destroyer.Destroy(nodeOrEdge);
                     }
                 }
             }

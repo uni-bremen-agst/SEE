@@ -219,7 +219,7 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Mapping);
         }
-        
+
         #endregion
 
         //-----------------------------------------------------
@@ -245,7 +245,7 @@ namespace SEE.Controls
         }
 
         #endregion
-        
+
         //-----------------------------------------------------
         #region Metric charts
         //-----------------------------------------------------
@@ -269,7 +269,7 @@ namespace SEE.Controls
         }
 
         #endregion
-        
+
         //-----------------------------------------------------
         #region Manipulating nodes
         //-----------------------------------------------------
@@ -284,7 +284,7 @@ namespace SEE.Controls
         }
 
         #endregion
-        
+
         //-----------------------------------------------------
         #region Navigation in a code city
         //-----------------------------------------------------
@@ -363,7 +363,7 @@ namespace SEE.Controls
         }
 
         #endregion
-        
+
         //-----------------------------------------------------
         #region Player (camera) movements.
         //-----------------------------------------------------
@@ -460,7 +460,7 @@ namespace SEE.Controls
         }
 
         #endregion
-        
+
         //--------------------------
         #region Evolution
         //--------------------------
@@ -513,13 +513,13 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleEvolutionCanvases);
         }
-        
+
         #endregion
-        
+
         //----------------------------------------------------
         #region Animation speed (shared by Debugging and Evolution)
         //----------------------------------------------------
-        
+
         /// <summary>
         /// Double animation speed.
         /// </summary>
@@ -538,7 +538,7 @@ namespace SEE.Controls
         }
 
         #endregion
-        
+
         //--------------------------
         #region Debugging
         //--------------------------
@@ -593,7 +593,7 @@ namespace SEE.Controls
         }
 
         #endregion
-        
+
         //--------------------
         #region Source-code viewer
         //--------------------
@@ -608,7 +608,7 @@ namespace SEE.Controls
         }
 
         #endregion
-        
+
         //-------------------
         #region Selection
         //-------------------
@@ -633,7 +633,7 @@ namespace SEE.Controls
         }
 
         #endregion
-        
+
         //----------------------------------------------------
         #region Chat
         //----------------------------------------------------
@@ -664,9 +664,9 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleTeam2Channel);
         }
-        
+
         #endregion
-        
+
         //----------------------------------------------------
         #region Notifications
         //----------------------------------------------------
@@ -678,7 +678,7 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.CloseNotifications);
         }
-        
+
         #endregion
 
         public static bool ToggleHolisticMetricsMenu()
