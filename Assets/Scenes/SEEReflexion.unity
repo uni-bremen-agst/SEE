@@ -9549,6 +9549,9 @@ MonoBehaviour:
     - Name: AnimationDuration
       Entry: 4
       Data: 0.5
+    - Name: LabelAlpha
+      Entry: 4
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -9675,6 +9678,9 @@ MonoBehaviour:
     - Name: AnimationDuration
       Entry: 4
       Data: 0.5
+    - Name: LabelAlpha
+      Entry: 4
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
@@ -9801,6 +9807,9 @@ MonoBehaviour:
     - Name: AnimationDuration
       Entry: 4
       Data: 0.5
+    - Name: LabelAlpha
+      Entry: 4
+      Data: 1
     - Name: 
       Entry: 8
       Data: 
