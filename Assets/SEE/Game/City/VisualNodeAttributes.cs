@@ -19,10 +19,12 @@ namespace SEE.Game.City
         /// If true, the node should be rendered. Otherwise the node will be ignored when
         /// the graph is loaded.
         /// </summary>
+        [Tooltip("Whether nodes of this type should be rendered.")]
         public bool IsRelevant = true;
         /// <summary>
         /// How a node should be drawn. Determines the kind of mesh.
         /// </summary>
+        [Tooltip("The shape to be used to render a node of this type.")]
         public NodeShapes Shape = NodeShapes.Blocks;
 
         /// <summary>
@@ -121,34 +123,41 @@ namespace SEE.Game.City
         /// </summary>
         [OdinSerialize]
         [HideReferenceObjectPicker]
+        [Tooltip("How the color of a node of this type should be determined.")]
         public ColorProperty ColorProperty = new ColorProperty();
         /// <summary>
-        /// This parameter determines the minimal width, breadth, and height of each block
+        /// This parameter determines the minimal width, depth, and height of each block
         /// representing a graph node visually. Must not be greater than <see cref="MaximalBlockLength"/>.
         /// </summary>
+        [Tooltip("Minimal width, depth, and height of the shape for nodes of this type.")]
         public float MinimalBlockLength = 0.001f; // serialized by Unity
         /// <summary>
-        /// This parameter determines the maximal width, breadth, and height of each block
+        /// This parameter determines the maximal width, depth, and height of each block
         /// representing a graph node visually. Must not be smaller than <see cref="MinimalBlockLength"/>.
         /// </summary>
+        [Tooltip("Maximal width, depth, and height of the shape for nodes of this type.")]
         public float MaximalBlockLength = 1.0f; // serialized by Unity
         /// <summary>
         /// Describes how metrics are mapped onto the antenna above the blocks.
         /// </summary>
         [OdinSerialize]
+        [Tooltip("The antenna settings.")]
         public AntennaAttributes AntennaSettings = new AntennaAttributes();
         /// <summary>
         /// The settings for the labels appearing when a node is hovered over.
         /// </summary>
         [OdinSerialize]
+        [Tooltip("The settings for labels drawn during hovering.")]
         public LabelAttributes LabelSettings = new LabelAttributes();
         /// <summary>
         /// Width of the outline for leaf and inner nodes.
         /// </summary>
+        [Tooltip("The outline width when a node is hovered.")]
         public float OutlineWidth = Controls.Interactables.Outline.DefaultWidth;
         /// <summary>
         /// If true, persistent text labels will be added to the node representation.
         /// </summary>
+        [Tooltip("Whether text labels will be added to the node representation")]
         public bool ShowNames = false;
 
         /// <summary>
