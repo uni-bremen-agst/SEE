@@ -4,50 +4,114 @@ using UnityEngine;
 
 namespace SEE.Net.Actions
 {
-    
-    
-    
-    
     public class ExpressionPlayerNetAction : AbstractNetAction
     {
-
-
-
+        /// <summary>
+        /// The network object ID of the spawned avatar. Not to be confused
+        /// with a network client ID.
+        /// </summary>
         public ulong NetworkObjectID;
-
-        public ExpressionPlayer ExpressionPlayer;
-
-
-
-        public ExpressionPlayerNetAction(ulong networkObjectID, ExpressionPlayer expressionPlayer)
+        
+        // ExpressionPlayer Jaw
+        public float JawOpenClose;
+        public float JawForwardBackward;
+        public float JawLeftRight;
+        
+        // ExpressionPlayer Mouth
+        public float MouthLeftRight;
+        public float MouthUpDown;
+        public float MouthNarrowPucker;
+        public float LeftMouthSmileFrown;
+        public float RightMouthSmileFrown;
+        public float LeftLowerLipUpDown;
+        public float RightLowerLipUpDown;
+        public float LeftUpperLipUpDown;
+        public float RightUpperLipUpDown;
+        
+        // ExpressionPlayer Cheeks
+        public float LeftCheekPuffSquint;
+        public float RightCheekPuffSquint;
+        
+        // ExpressionPlayer Tongue
+        public float TongueOut;
+        public float TongueCurl;
+        public float TongueUpDown;
+        public float TongueLeftRight;
+        public float TongueWideNarror;
+        
+        public ExpressionPlayerNetAction(UMAExpressionPlayer expressionPlayer, ulong networkObjectID)
         {
             NetworkObjectID = networkObjectID;
-            ExpressionPlayer = expressionPlayer;
+
+            JawOpenClose = expressionPlayer.jawOpen_Close;
+            JawForwardBackward = expressionPlayer.jawForward_Back;
+            JawLeftRight = expressionPlayer.jawLeft_Right;
+
+            MouthLeftRight = expressionPlayer.mouthLeft_Right;
+            MouthUpDown = expressionPlayer.mouthUp_Down;
+            MouthNarrowPucker = expressionPlayer.mouthNarrow_Pucker;
+            LeftMouthSmileFrown = expressionPlayer.leftMouthSmile_Frown;
+            RightMouthSmileFrown = expressionPlayer.rightMouthSmile_Frown;
+            LeftLowerLipUpDown = expressionPlayer.leftLowerLipUp_Down;
+            RightLowerLipUpDown = expressionPlayer.rightLowerLipUp_Down;
+            LeftUpperLipUpDown = expressionPlayer.leftUpperLipUp_Down;
+            RightUpperLipUpDown = expressionPlayer.rightUpperLipUp_Down;
+
+            LeftCheekPuffSquint = expressionPlayer.leftCheekPuff_Squint;
+            RightCheekPuffSquint = expressionPlayer.rightCheekPuff_Squint;
+
+            TongueOut = expressionPlayer.tongueOut;
+            TongueCurl = expressionPlayer.tongueCurl;
+            TongueUpDown = expressionPlayer.tongueUp_Down;
+            TongueLeftRight = expressionPlayer.tongueLeft_Right;
+            TongueWideNarror = expressionPlayer.tongueWide_Narrow;
         }
-        
         
         protected override void ExecuteOnClient()
         {
-            NetworkManager networkManager = NetworkManager.Singleton;
-
-            if (networkManager != null)
+            if (!IsRequester())
             {
-                NetworkSpawnManager networkSpawnManager = networkManager.SpawnManager;
-                if (networkSpawnManager.SpawnedObjects.TryGetValue(NetworkObjectID, out NetworkObject networkObject))
+                NetworkManager networkManager = NetworkManager.Singleton;
+
+                if (networkManager != null)
                 {
-                    if (networkObject.gameObject.TryGetComponent(out ExpressionPlayer expressionPlayer))
+                    NetworkSpawnManager networkSpawnManager = networkManager.SpawnManager;
+                    if (networkSpawnManager.SpawnedObjects.TryGetValue(NetworkObjectID,
+                            out NetworkObject networkObject))
                     {
-                        expressionPlayer = ExpressionPlayer;
+                        if (networkObject.gameObject.TryGetComponent(out UMAExpressionPlayer expressionPlayer))
+                        {
+                            expressionPlayer.jawOpen_Close = JawOpenClose;
+                            expressionPlayer.jawForward_Back = JawForwardBackward;
+                            expressionPlayer.jawLeft_Right = JawLeftRight;
+
+                            expressionPlayer.mouthLeft_Right = MouthLeftRight;
+                            expressionPlayer.mouthUp_Down = MouthUpDown;
+                            expressionPlayer.mouthNarrow_Pucker = MouthNarrowPucker;
+                            expressionPlayer.leftMouthSmile_Frown = LeftMouthSmileFrown;
+                            expressionPlayer.rightMouthSmile_Frown = RightMouthSmileFrown;
+                            expressionPlayer.leftLowerLipUp_Down = LeftLowerLipUpDown;
+                            expressionPlayer.rightLowerLipUp_Down = RightLowerLipUpDown;
+                            expressionPlayer.leftUpperLipUp_Down = LeftUpperLipUpDown;
+                            expressionPlayer.rightUpperLipUp_Down = RightUpperLipUpDown;
+
+                            expressionPlayer.leftCheekPuff_Squint = LeftCheekPuffSquint;
+                            expressionPlayer.rightCheekPuff_Squint = RightCheekPuffSquint;
+
+                            expressionPlayer.tongueOut = TongueOut;
+                            expressionPlayer.tongueCurl = TongueCurl;
+                            expressionPlayer.tongueUp_Down = TongueUpDown;
+                            expressionPlayer.tongueLeft_Right = TongueLeftRight;
+                            expressionPlayer.tongueWide_Narrow = TongueWideNarror;
+                        }
                     }
                 }
-            }
-            else
-            {
-                Debug.LogError($"There is no component {typeof(NetworkManager)} in the scene.\n");
+                else
+                {
+                    Debug.LogError($"There is no component {typeof(NetworkManager)} in the scene.\n");
+                }
             }
         }
-
-        
         
         /// <summary>
         /// Does not do anything.
@@ -56,6 +120,5 @@ namespace SEE.Net.Actions
         {
             // Intentionally left blank.
         }
-        
     }
 }
