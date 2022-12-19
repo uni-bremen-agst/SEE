@@ -28,7 +28,7 @@ namespace SEE.XR
         /// </summary>
         private void Start()
         {
-            StartCoroutine(nameof(StartXRCoroutine));
+            StartCoroutine(StartXRCoroutine());
         }
 
         /// <summary>
@@ -54,11 +54,17 @@ namespace SEE.XR
             if (XRGeneralSettings.Instance.Manager.activeLoader)
             {
                 Debug.LogWarning($"[XR] There is already an active XR loader '{XRGeneralSettings.Instance.Manager.activeLoader.name}'.\n");
-                XRGeneralSettings.Instance.Manager.StopSubsystems();
-                bool deinitialized = XRGeneralSettings.Instance.Manager.activeLoader.Deinitialize();
-                Debug.LogWarning($"[XR] Active XR loader '{XRGeneralSettings.Instance.Manager.activeLoader.name}' was deinitialized: {deinitialized}.\n");
+                // Apparently, XR is already initialized somehow, hence the following
+                // code commented out appears not to be needed anymore.
+                // FIXME: It can be removed eventually.
+                //XRGeneralSettings.Instance.Manager.StopSubsystems();
+                //bool deinitialized = XRGeneralSettings.Instance.Manager.activeLoader.Deinitialize();
+                //Debug.LogWarning($"[XR] Active XR loader '{XRGeneralSettings.Instance.Manager.activeLoader.name}' was deinitialized: {deinitialized}.\n");
             }
-            yield return XRGeneralSettings.Instance.Manager.InitializeLoader();
+            else
+            {
+                yield return XRGeneralSettings.Instance.Manager.InitializeLoader();
+            }
 
             if (XRGeneralSettings.Instance.Manager.activeLoader == null)
             {
