@@ -8,6 +8,7 @@ using SEE.Utils;
 using SEE.XR;
 using System;
 using System.Collections;
+using SEE.Net.Actions;
 using UMA.CharacterSystem;
 using Unity.Netcode;
 using UnityEngine;
@@ -401,6 +402,17 @@ namespace SEE.Game.Avatars
                     aiming.Target = aimIK.solver.target;
                 }
 
+                
+                // Add Lip Framework version 2 for HTC Facialtracker.
+                SRanipal_Lip_Framework lipFramework = gameObject.AddComponent<SRanipal_Lip_Framework>();
+                lipFramework.EnableLip = true;
+                lipFramework.EnableLipVersion = SRanipal_Lip_Framework.SupportedLipVersion.version2;
+                gameObject.AddComponent<AvatarBlendshapeExpressions>();
+                
+                // Multiplayer functionality for UMAExpressionplayer.
+                gameObject.AddComponent<ExpressionPlayerSynchronizer>();
+                
+                
                 //GameObject vrPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRPlayer");
                 //gameObject.transform.position = vrPlayer.transform.position;
                 //gameObject.transform.rotation = vrPlayer.transform.rotation;
