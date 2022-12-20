@@ -17,12 +17,12 @@ namespace SEE.XR
         /// Name of the child of the <see cref="gameObject"/> representing the left
         /// controller to be enabled.
         /// </summary>
-        private const string LeftControllerName = "Controller (left)";
+        internal const string LeftControllerName = "Camera Offset/LeftHand Controller";
         /// <summary>
         /// Name of the child of the <see cref="gameObject"/> representing the right
         /// controller to be enabled.
         /// </summary>
-        private const string RightControllerName = "Controller (right)";
+        internal const string RightControllerName = "Camera Offset/RightHand Controller";
 
         /// <summary>
         /// Enables the two controllers when XR is initialized.

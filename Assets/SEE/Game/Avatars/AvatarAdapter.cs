@@ -12,7 +12,6 @@ using UMA.CharacterSystem;
 using Unity.Netcode;
 using UnityEngine;
 using Valve.VR.InteractionSystem;
-using ViveSR.anipal.Lip;
 
 namespace SEE.Game.Avatars
 {
@@ -215,27 +214,27 @@ namespace SEE.Game.Avatars
         /// is set up for VR. This controller will be assigned to the UMA avatar
         /// as the default race animation controller.
         /// </summary>
-        private const string AnimatorForVRIK = "Prefabs/Players/VRIKAnimatedLocomotion"; // "Prefabs/Players/Locomotion";
+        private const string AnimatorForVRIK = "Prefabs/Players/VRIKAnimatedLocomotion";
 
         /// <summary>
         /// The path of the prefab for the VR camera rig.
         /// </summary>
-        private const string VRPlayerRigPrefab = "Prefabs/Players/VRUMACameraRig"; // "Prefabs/Players/VRPlayerRig";
+        private const string VRPlayerRigPrefab = "Prefabs/Players/XRRig";
         /// <summary>
         /// The composite name of the child within <see cref="VRPlayerRigPrefab"/>
         /// representing the head for VRIK.
         /// </summary>
-        private const string VRPlayerHeadForVRIK = "Camera/Head"; //"SteamVRObjects/VRCamera/HeadForVRIK";
+        private const string VRPlayerHeadForVRIK = "Camera Offset/Main Camera/Head";
         /// <summary>
         /// The composite name of the child within <see cref="VRPlayerRigPrefab"/>
         /// representing the left hand for VRIK.
         /// </summary>
-        private const string VRPLayerLeftHandForVRIK = "Controller (left)/LeftHand"; // "SteamVRObjects/LeftHand/LeftHandForVRIK";
+        private const string VRPLayerLeftHandForVRIK = XRCameraRigManager.LeftControllerName + "/LeftHand";
         /// <summary>
         /// The composite name of the child within <see cref="VRPlayerRigPrefab"/>
         /// representing the right hand for VRIK.
         /// </summary>
-        private const string VRPlayerRightHandForVRIK = "Controller (right)/RightHand";  // "SteamVRObjects/RightHand/RightHandForVRIK";
+        private const string VRPlayerRightHandForVRIK = XRCameraRigManager.RightControllerName + "/RightHand";
 
         public IEnumerator StartXRCoroutine()
         {
@@ -250,7 +249,8 @@ namespace SEE.Game.Avatars
 
             Debug.Log($"[{nameof(AvatarAdapter)}] XR is initialized. Adding the necessary VR components.\n");
 
-            // Now we can instantiate the prefabs for VR that requires that SteamVR is up and running.
+            // Now we can instantiate the prefabs for VR that requires that XR is up and running.
+
             GameObject rig = PrefabInstantiator.InstantiatePrefab(VRPlayerRigPrefab);
             rig.transform.position = gameObject.transform.position;
             // FIXME: Only the server is allowed to spawn objects.
@@ -267,7 +267,6 @@ namespace SEE.Game.Avatars
             TurnOffAvatarAimingSystem();
             ReplaceAnimator();
             SetupVRIK();
-
 
             /// <summary>
             /// Sets up the scene for playing in an VR environment. This means to instantiate the

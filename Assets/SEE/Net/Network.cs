@@ -83,13 +83,7 @@ namespace SEE.Net
         /// <returns>underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/></returns>
         private UNetTransport GetNetworkTransport()
         {
-            // NetworkManager.Singleton is available only during run-time.
-            NetworkManager networkManager = NetworkManager.Singleton;
-            if (networkManager == null)
-            {
-                Debug.LogError("NetworkManager.Singleton is null.\n");
-                return null;
-            }
+            NetworkManager networkManager = GetNetworkManager();
             NetworkConfig networkConfig = networkManager.NetworkConfig;
             if (networkConfig == null)
             {
@@ -97,6 +91,43 @@ namespace SEE.Net
                 return null;
             }
             return networkConfig.NetworkTransport as UNetTransport;
+        }
+
+        /// <summary>
+        /// Returns the <see cref="NetworkManager"/>.
+        /// </summary>
+        /// <returns>the <see cref="NetworkManager"/></returns>
+        /// <remarks>This method works both in the editor and at runtime. In the editor,
+        /// a NetworkManager is retrieved from a game object. It that fails, an exception
+        /// is thrown.</remarks>
+        private static NetworkManager GetNetworkManager()
+        {
+#if UNITY_EDITOR
+            const string NetworkManagerName = "NetworkManager";
+            GameObject networkManagerGO = GameObject.Find(NetworkManagerName);
+            if (networkManagerGO == null)
+            {
+                throw new Exception($"The scene currently opened in the editor does not have a game object {NetworkManagerName}.");
+            }
+            if (networkManagerGO.TryGetComponentOrLog(out NetworkManager result))
+            {
+                return result;
+            }
+            else
+            {
+                throw new Exception($"The game object {NetworkManagerName} in the scene currently opened in the editor does not have a component {nameof(NetworkManager)}.");
+            }
+#else
+            // NetworkManager.Singleton is available only during run-time.
+            if (NetworkManager.Singleton)
+            {
+                return NetworkManager.Singleton;
+            }
+            else
+            {
+                throw new Exception($"{nameof(NetworkManager)} does not exist.");
+            }
+#endif
         }
 
         /// <summary>
@@ -889,7 +920,8 @@ namespace SEE.Net
         /// If the configuration file exists already, it will be overridden.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [FoldoutGroup(ConfigurationFoldoutGroup), ButtonGroup(ConfigurationButtonsGroup)]
+        [PropertyTooltip("Saves the network settings in a configuration file.")]
+        [ButtonGroup(ConfigurationButtonsGroup)]
         public void Save()
         {
             Save(ConfigPath.Path);
@@ -901,13 +933,13 @@ namespace SEE.Net
         /// </summary>
         [Button(ButtonSizes.Small)]
         [PropertyTooltip("Loads the network configuration file.")]
-        [FoldoutGroup(ConfigurationFoldoutGroup), ButtonGroup(ConfigurationButtonsGroup)]
+        [ButtonGroup(ConfigurationButtonsGroup)]
         public void Load()
         {
             Load(ConfigPath.Path);
         }
 
-        #region ConfigIO
+#region ConfigIO
 
         //--------------------------------
         // Configuration file input/output
@@ -1001,9 +1033,9 @@ namespace SEE.Net
             }
         }
 
-        #endregion
+#endregion
 
-        #region Vivox
+#region Vivox
 
         public const string VivoxIssuer = "torben9605-se19-dev";
         public const string VivoxDomain = "vdx5.vivox.com";
@@ -1137,6 +1169,6 @@ namespace SEE.Net
             Util.Logger.Log(channelName + ": " + senderName + ": " + message + "\n");
         }
 
-        #endregion
+#endregion
     }
 }

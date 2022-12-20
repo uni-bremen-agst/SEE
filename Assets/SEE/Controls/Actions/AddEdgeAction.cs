@@ -229,6 +229,7 @@ namespace SEE.Controls.Actions
             catch (Exception e)
             {
                 ShowNotification.Error("New edge", $"An edge could not be created: {e.Message}.");
+                Debug.LogException(e);
                 return null;
             }
         }
