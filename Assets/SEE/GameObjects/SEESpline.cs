@@ -441,6 +441,7 @@ namespace SEE.GO
                              mesh.tangents.Length != tangents.Count ||
                              mesh.uv.Length != uvs.Count ||
                              needsColorUpdate; // Or the color of the mesh has been changed.
+
             if (updateMaterial)
             {
                 mesh.Clear();
