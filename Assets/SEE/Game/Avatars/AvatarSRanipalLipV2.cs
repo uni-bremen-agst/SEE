@@ -29,7 +29,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// In order to use our fake blendshapes from <see cref="AvatarBlendshapeExpressions"/>, we need to create a
         /// lipshape for each blendshape. For this purpose we need a <see cref="LipShapeTable_v2"/>
-        /// which also contatins a <see cref="LipShapeTable_v2"/> to store all Lip Shapes.
+        /// which also contains a <see cref="LipShapeTable_v2"/> to store all Lip Shapes.
         /// </summary>
         private void Start()
         {
