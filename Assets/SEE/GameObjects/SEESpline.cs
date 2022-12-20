@@ -89,10 +89,11 @@ namespace SEE.GO
         public float SubsplineEndT
         {
             get => subsplineEndT;
-            set {
-                    subsplineEndT = value;
-                    needsUpdate = true;
-                }
+            set
+            {
+                subsplineEndT = value;
+                needsUpdate = true;
+            }
         }
 
         /// <summary>
@@ -542,7 +543,7 @@ namespace SEE.GO
             double lowerKnot = chordLengths.TToKnot(subsplineStartT);
             double upperKnot = chordLengths.TToKnot(subsplineEndT);
 
-            bool domainIsEmpty =  BSpline.KnotsEqual(lowerKnot, upperKnot);
+            bool domainIsEmpty = BSpline.KnotsEqual(lowerKnot, upperKnot);
 
             // if domain is empty, then subspline has 0 length,
             // but this subspline cant be calculated
