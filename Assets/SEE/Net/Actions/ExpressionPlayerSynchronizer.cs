@@ -10,7 +10,7 @@ namespace SEE.Net.Actions
     /// of the <see cref="UMAExpressionPlayer"/> on all clients.
     ///
     /// This component is intended to be attached to a gameobject that has a <see cref="UMAExpressionPlayer"/> as
-    /// child.
+    /// component.
     /// </summary>
     public class ExpressionPlayerSynchronizer : MonoBehaviour
     {
