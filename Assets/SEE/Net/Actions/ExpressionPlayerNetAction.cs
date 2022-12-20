@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace SEE.Net.Actions
 {
+    /// <summary>
+    /// Updates values of the <see cref="UMAExpressionPlayer"/> on all clients.
+    /// </summary>
     public class ExpressionPlayerNetAction : AbstractNetAction
     {
         /// <summary>
@@ -12,12 +15,12 @@ namespace SEE.Net.Actions
         /// </summary>
         public ulong NetworkObjectID;
         
-        // ExpressionPlayer Jaw
+        // ExpressionPlayer Jaw variables.
         public float JawOpenClose;
         public float JawForwardBackward;
         public float JawLeftRight;
         
-        // ExpressionPlayer Mouth
+        // ExpressionPlayer Mouth variables.
         public float MouthLeftRight;
         public float MouthUpDown;
         public float MouthNarrowPucker;
@@ -28,25 +31,28 @@ namespace SEE.Net.Actions
         public float LeftUpperLipUpDown;
         public float RightUpperLipUpDown;
         
-        // ExpressionPlayer Cheeks
+        // ExpressionPlayer Cheek variables.
         public float LeftCheekPuffSquint;
         public float RightCheekPuffSquint;
         
-        // ExpressionPlayer Tongue
+        // ExpressionPlayer Tongue variables.
         public float TongueOut;
         public float TongueCurl;
         public float TongueUpDown;
         public float TongueLeftRight;
         public float TongueWideNarror;
         
+        /// <summary>
+        /// Initializes all variables that should be transferred to the remote avatars.
+        /// </summary>
+        /// <param name="expressionPlayer">The ExpressionPlayer to be synchronized</param>
+        /// <param name="networkObjectID">network object ID of the spawned avatar game object</param>
         public ExpressionPlayerNetAction(UMAExpressionPlayer expressionPlayer, ulong networkObjectID)
         {
             NetworkObjectID = networkObjectID;
-
             JawOpenClose = expressionPlayer.jawOpen_Close;
             JawForwardBackward = expressionPlayer.jawForward_Back;
             JawLeftRight = expressionPlayer.jawLeft_Right;
-
             MouthLeftRight = expressionPlayer.mouthLeft_Right;
             MouthUpDown = expressionPlayer.mouthUp_Down;
             MouthNarrowPucker = expressionPlayer.mouthNarrow_Pucker;
@@ -56,10 +62,8 @@ namespace SEE.Net.Actions
             RightLowerLipUpDown = expressionPlayer.rightLowerLipUp_Down;
             LeftUpperLipUpDown = expressionPlayer.leftUpperLipUp_Down;
             RightUpperLipUpDown = expressionPlayer.rightUpperLipUp_Down;
-
             LeftCheekPuffSquint = expressionPlayer.leftCheekPuff_Squint;
             RightCheekPuffSquint = expressionPlayer.rightCheekPuff_Squint;
-
             TongueOut = expressionPlayer.tongueOut;
             TongueCurl = expressionPlayer.tongueCurl;
             TongueUpDown = expressionPlayer.tongueUp_Down;
@@ -67,6 +71,10 @@ namespace SEE.Net.Actions
             TongueWideNarror = expressionPlayer.tongueWide_Narrow;
         }
         
+        /// <summary>
+        /// If executed by the initiating client, nothing happens. Otherwise the values of the
+        /// <see cref="UMAExpressionPlayer"/> are transmitted.
+        /// </summary>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
@@ -84,7 +92,6 @@ namespace SEE.Net.Actions
                             expressionPlayer.jawOpen_Close = JawOpenClose;
                             expressionPlayer.jawForward_Back = JawForwardBackward;
                             expressionPlayer.jawLeft_Right = JawLeftRight;
-
                             expressionPlayer.mouthLeft_Right = MouthLeftRight;
                             expressionPlayer.mouthUp_Down = MouthUpDown;
                             expressionPlayer.mouthNarrow_Pucker = MouthNarrowPucker;
@@ -94,10 +101,8 @@ namespace SEE.Net.Actions
                             expressionPlayer.rightLowerLipUp_Down = RightLowerLipUpDown;
                             expressionPlayer.leftUpperLipUp_Down = LeftUpperLipUpDown;
                             expressionPlayer.rightUpperLipUp_Down = RightUpperLipUpDown;
-
                             expressionPlayer.leftCheekPuff_Squint = LeftCheekPuffSquint;
                             expressionPlayer.rightCheekPuff_Squint = RightCheekPuffSquint;
-
                             expressionPlayer.tongueOut = TongueOut;
                             expressionPlayer.tongueCurl = TongueCurl;
                             expressionPlayer.tongueUp_Down = TongueUpDown;

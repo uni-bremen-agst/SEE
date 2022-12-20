@@ -392,6 +392,33 @@ namespace SEE.Game.Avatars
                 UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.rightArm.target);
             }
 
+            // Coroutine for preparing the Lip Framework. By default the Lip Framework has the status stop.
+            // After initialization the status is either working or error. If the status is working then scripts are
+            // added for the Lip Framework and multiplayer functionality. Otherwise the Lip Framework will be deactivated.
+            IEnumerator PrepareLipFramework()
+            {
+                SRanipal_Lip_Framework lipFramework = gameObject.AddComponent<SRanipal_Lip_Framework>();
+                lipFramework.EnableLipVersion = SRanipal_Lip_Framework.SupportedLipVersion.version2;
+                
+                // Wait for SRanipalLipFramework initialisation and result.
+                Debug.Log("Waiting for SRanipal_Lip_Framework to start.");
+                yield return new WaitUntil(() => SRanipal_Lip_Framework.Status != SRanipal_Lip_Framework.FrameworkStatus.STOP);
+                
+                if (SRanipal_Lip_Framework.Status == SRanipal_Lip_Framework.FrameworkStatus.WORKING)
+                {
+                    Debug.Log("SRanipal_Lip_Framework started.");
+                    gameObject.AddComponent<AvatarBlendshapeExpressions>();
+                    
+                    // Multiplayer functionality for UMAExpressionplayer and Facialtracker.
+                    gameObject.AddComponent<ExpressionPlayerSynchronizer>();
+                }
+                else if (SRanipal_Lip_Framework.Status == SRanipal_Lip_Framework.FrameworkStatus.ERROR)
+                {
+                    Debug.LogWarning("Lip Framework not working, wrong configuration or not supported by your HMD");
+                    lipFramework.enabled = false;
+                }
+            }
+            
             // Adds required components.
             void AddComponents()
             {
@@ -401,17 +428,9 @@ namespace SEE.Game.Avatars
                     aiming.Source = aimIK.solver.transform;
                     aiming.Target = aimIK.solver.target;
                 }
-
                 
-                // Add Lip Framework version 2 for HTC Facialtracker.
-                SRanipal_Lip_Framework lipFramework = gameObject.AddComponent<SRanipal_Lip_Framework>();
-                lipFramework.EnableLip = true;
-                lipFramework.EnableLipVersion = SRanipal_Lip_Framework.SupportedLipVersion.version2;
-                gameObject.AddComponent<AvatarBlendshapeExpressions>();
-                
-                // Multiplayer functionality for UMAExpressionplayer.
-                gameObject.AddComponent<ExpressionPlayerSynchronizer>();
-                
+                // Initialize Lip Framework for HTC Facialtracker.
+                StartCoroutine(PrepareLipFramework());
                 
                 //GameObject vrPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRPlayer");
                 //gameObject.transform.position = vrPlayer.transform.position;
