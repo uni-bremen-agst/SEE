@@ -522,12 +522,18 @@ namespace SEE.DataModel.DG
         /// The same node must not be added more than once.
         /// </summary>
         /// <param name="child">descendant to be added to node</param>
+        /// <remarks>It is safe to call this method with a <paramref name="child"/>
+        /// that is not yet in the graph of this node. Yet, the <paramref name="child"/>
+        /// should be added right after calling this method or otherwise other
+        /// methods will fail. Do not do anything with <see cref="child"/> if you have not
+        /// added it via <see cref="Graph.AddNode(Node)"/>.</remarks>
         public void AddChild(Node child)
         {
             if (child.Parent == null)
             {
                 children.Add(child);
                 child.Parent = this;
+                child.level = level + 1;
                 ItsGraph.NodeHierarchyHasChanged = true;
             }
             else
