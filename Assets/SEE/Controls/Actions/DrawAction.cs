@@ -65,7 +65,7 @@ namespace SEE.Controls.Actions
             // A range of exactly that single random color.
             ColorRange colorRange = new ColorRange(color, color, 1);
             // The materials factory for exactly that single random color.
-            Materials materials = new Materials(Materials.ShaderType.TransparentLine, colorRange);
+            Materials materials = new Materials(Materials.ShaderType.PortalFree, colorRange);
             // The material for exactly that single random color.
             material = materials.Get(0, 0);
         }

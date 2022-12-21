@@ -18,7 +18,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Note that this isn't a root node of the whole graph, it only roots all architecture nodes.
         /// </summary>
         public readonly Node ArchitectureRoot;
-        
+
         /// <summary>
         /// Root node of the implementation.
         /// Note that this isn't a root node of the whole graph, it only roots all implementation nodes.
@@ -36,7 +36,7 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             AllowDependenciesToParents = allowDependenciesToParents;
         }
-        
+
         /// <summary>
         /// Constructor for setting up the reflexion analysis.
         /// NOTE: The three given graphs will be copied and assembled into <see cref="FullGraph"/>.
@@ -50,7 +50,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// This does not really run the reflexion analysis. Use method Run() to start the analysis.
         /// </remarks>
         public ReflexionGraph(Graph implementation, Graph architecture, Graph mapping, string name = null,
-                         bool allowDependenciesToParents = true) : 
+                         bool allowDependenciesToParents = true) :
             base(Assemble(architecture, implementation, mapping, name ?? "Reflexion Graph", out Node aRoot, out Node iRoot))
         {
             // FIXME: This constructor has really bad performance, due to all the copying around in Assemble().
@@ -79,7 +79,7 @@ namespace SEE.Tools.ReflexionAnalysis
             ArchitectureRoot = architecture.GetRoots().FirstOrDefault();
             ImplementationRoot = implementation.GetRoots().FirstOrDefault();
         }
-        
+
         /// <summary>
         /// Generates the full graph from the three sub-graphs <see cref="ImplementationGraph"/>,
         /// <see cref="ArchitectureGraph"/> and <see cref="MappingGraph"/> by combining them into one, returning
@@ -184,9 +184,9 @@ namespace SEE.Tools.ReflexionAnalysis
             Graph MappingGraph = SubgraphBy(ReflexionGraphTools.IsInMapping);
             return (ImplementationGraph, ArchitectureGraph, MappingGraph);
         }
-        
+
         #region Overridden Methods
-        
+
         // NOTE: For all overridden methods below, we check whether the reflexion graph has been initialized yet.
         //       If it hasn't, we simply always call the base method, so that we can act as a simple graph
         //       to callers who may not expect this to be a "special" reflexion graph.
@@ -241,12 +241,14 @@ namespace SEE.Tools.ReflexionAnalysis
             }
             switch (DetermineSubgraph(node))
             {
-                case Architecture: AddToArchitecture(node);
+                case Architecture:
+                    AddToArchitecture(node);
                     break;
-                case Implementation: AddToImplementation(node);
+                case Implementation:
+                    AddToImplementation(node);
                     break;
                 default:
-                    throw new NotSupportedException("Given node must be in architecture or implementation graph!");
+                    throw new NotSupportedException($"Given node {node.ID} must be in architecture or implementation graph!");
             }
         }
 
@@ -302,9 +304,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// and the reflexion data is updated; all observers are informed of the change.
         /// </summary>
         /// <param name="edge">the edge to add to the graph</param>
-        /// <exception cref="NotSupportedException">When <paramref name="edge"/> 
+        /// <exception cref="NotSupportedException">When <paramref name="edge"/>
         /// is not contained in the architecture or implementation graph.</exception>
-        /// <exception cref="RedundantSpecifiedEdgeException">When the <paramref name="edge"/>  
+        /// <exception cref="RedundantSpecifiedEdgeException">When the <paramref name="edge"/>
         /// would be redundant to another specified edge.</exception>
         public override void AddEdge(Edge edge)
         {
@@ -323,7 +325,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 default: throw new NotSupportedException("Given edge must either be in architecture or implementation graph!");
             }
         }
-        
+
         /// <summary>
         /// Adds a new mapping edge from <paramref name="from"/> to <paramref name="to"/>.
         /// Convenience wrapper around <see cref="AddEdge(SEE.DataModel.DG.Node, SEE.DataModel.DG.Node, string)"/>.
@@ -342,7 +344,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// architecture graph, the new edge will be added as a Mapping edge (<paramref name="type"/>
         /// must be <c>null</c> in such a case!).
         /// Any other case will result in a <see cref="NotSupportedException"/>.
-        /// 
+        ///
         /// Preconditions:
         /// <ul>
         /// <li><paramref name="from"/> is contained in the reflexion graph.</li>
@@ -404,7 +406,7 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         #endregion
-        
+
         /// <summary>
         /// Determines the subgraph this <see cref="element"/> was likely intentioned to have.
         /// Not all callers of AddNode/AddEdge are "reflexion-aware", so we need to
@@ -426,7 +428,8 @@ namespace SEE.Tools.ReflexionAnalysis
                 switch (element)
                 {
                     // Node with a parent:
-                    case Node { Parent: {} } node: subgraph = DetermineSubgraph(node.Parent);
+                    case Node { Parent: {} } node:
+                        subgraph = DetermineSubgraph(node.Parent);
                         break;
                     case Edge edge:
                     {
@@ -452,6 +455,6 @@ namespace SEE.Tools.ReflexionAnalysis
             }
             return subgraph;
         }
-        
+
     }
 }

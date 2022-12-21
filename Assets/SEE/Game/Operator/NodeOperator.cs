@@ -337,10 +337,17 @@ namespace SEE.Game.Operator
                 GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
                 if (codeCityObject == null || !codeCityObject.TryGetComponent(out AbstractSEECity city))
                 {
-                    throw new InvalidOperationException("NodeOperator-operated object must belong to SEECity!");
+                    throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()}"
+                        + $" in code city {CodeCityName(codeCityObject)}"
+                        + $" must have an {nameof(AbstractSEECity)} component!");
                 }
 
                 return city;
+
+                static string CodeCityName(GameObject codeCityObject)
+                {
+                    return codeCityObject ? codeCityObject.FullName() : "<null>";
+                }
             }
 
             #endregion

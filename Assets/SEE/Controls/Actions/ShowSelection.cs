@@ -48,8 +48,9 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Registers On() and Off() for the respective selection events.
         /// </summary>
-        protected virtual void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             if (Interactable != null)
             {
                 Interactable.SelectIn += On;

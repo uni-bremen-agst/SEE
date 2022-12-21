@@ -1,5 +1,4 @@
-﻿using DG.Tweening;
-using SEE.Utils;
+﻿using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -69,8 +68,9 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Registers On() and Off() for the respective hovering events.
         /// </summary>
-        protected virtual void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
             if (Interactable != null)
             {
                 Interactable.HoverIn += On;

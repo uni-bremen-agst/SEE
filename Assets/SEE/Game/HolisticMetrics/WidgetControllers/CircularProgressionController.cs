@@ -28,11 +28,14 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 valueText.text = metricValueRange.Value.ToString($"F{metricValueRange.DecimalPlaces}");
                 float maximum = metricValueRange.Higher - metricValueRange.Lower;
                 float actual = metricValueRange.Value - metricValueRange.Lower;
-                circle.fillAmount = actual / maximum;    
+                circle.fillAmount = actual / maximum;
             }
             else if (metricValue is MetricValueCollection metricValueCollection)
             {
-                Display(metricValueCollection.MetricValues[0]);
+                if (metricValueCollection.MetricValues.Count > 0)
+                {
+                    Display(metricValueCollection.MetricValues[0]);
+                }
             }
             else
             {

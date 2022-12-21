@@ -65,7 +65,6 @@ namespace SEE.Game
                 }
                 else
                 {
-                    MorphParentIfNecessary(deletedObject);
                     if (deletedNode.IsInArchitecture())
                     {
                         // We first need to remove any mapping that exists to this architecture node.
@@ -117,35 +116,6 @@ namespace SEE.Game
             else
             {
                 throw new Exception($"Edge {gameEdge.name} to be deleted has no valid edge reference.");
-            }
-        }
-
-        /// <summary>
-        /// In case <paramref name="gameNode"/> is a child of a node with only single child, that is,
-        /// if <paramref name="gameNode"/> is its only child, the parent of <paramref name="gameNode"/>
-        /// will be morphed into a leaf node.
-        /// </summary>
-        /// <param name="gameNode">game node whose parent is possibly to be morphed into a leaf</param>
-        private static void MorphParentIfNecessary(GameObject gameNode)
-        {
-            Node node = gameNode.GetNode();
-            if (node.Parent != null && node.Parent.NumberOfChildren() == 1)
-            {
-                // node is a single child; removing it turns its parent into a leaf
-                Transform parentTransform = gameNode.transform.parent;
-                if (parentTransform != null)
-                {
-                    GameObject parent = parentTransform.gameObject;
-                    SEECity city = parent.ContainingCity() as SEECity;
-                    if (city != null)
-                    {
-                        city.Renderer.RedrawAsLeafNode(parent);
-                    }
-                    else
-                    {
-                        throw new Exception($"Parent node {parent.name} is not contained in a code city.");
-                    }
-                }
             }
         }
 
