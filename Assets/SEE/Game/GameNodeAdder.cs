@@ -71,6 +71,9 @@ namespace SEE.Game
                         node.ID = Guid.NewGuid().ToString();
                     }
                 }
+                // Note: ReflexionGraph.AddNode(node) determines the subgraph where node should be
+                // added via its parent. That means, the parent of node must be set before it can
+                // be called.
                 parent.AddChild(node);
                 graph.AddNode(node);
             }
