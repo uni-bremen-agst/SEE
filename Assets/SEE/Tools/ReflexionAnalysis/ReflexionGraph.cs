@@ -248,7 +248,7 @@ namespace SEE.Tools.ReflexionAnalysis
                     AddToImplementation(node);
                     break;
                 default:
-                    throw new NotSupportedException("Given node must be in architecture or implementation graph!");
+                    throw new NotSupportedException($"Given node {node.ID} must be in architecture or implementation graph!");
             }
         }
 
