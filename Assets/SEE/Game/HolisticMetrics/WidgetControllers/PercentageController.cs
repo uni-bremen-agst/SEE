@@ -9,7 +9,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
     /// </summary>
     internal class PercentageController : WidgetController
     {
-        
+
         /// <summary>
         /// The image that goes around the widget. We will only display a certain percentage of this that correlates to
         /// the percentage of the metric value.
@@ -40,7 +40,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 }
                 fade.fillAmount = percentage;
                 percentage *= 100;
-                if (metricValueRange.DecimalPlaces < 2) 
+                if (metricValueRange.DecimalPlaces < 2)
                 {
                     metricValueRange.DecimalPlaces = 0;
                 }
@@ -55,7 +55,10 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
             }
             else if (metricValue is MetricValueCollection metricValueCollection)
             {
-                Display(metricValueCollection.MetricValues[0]);
+                if (metricValueCollection.MetricValues.Count > 0)
+                {
+                    Display(metricValueCollection.MetricValues[0]);
+                }
             }
             else
             {

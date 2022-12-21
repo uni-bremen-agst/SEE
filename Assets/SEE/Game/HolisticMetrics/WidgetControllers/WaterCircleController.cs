@@ -15,7 +15,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// The circle that will have its color changed.
         /// </summary>
         [SerializeField] private Image circle;
-        
+
         /// <summary>
         /// The water texture that will have its color changed.
         /// </summary>
@@ -38,7 +38,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 water.color = color;
                 titleText.text = metricValueRange.Name;
                 percentage *= 100;
-                if (metricValueRange.DecimalPlaces < 2) 
+                if (metricValueRange.DecimalPlaces < 2)
                 {
                     metricValueRange.DecimalPlaces = 0;
                 }
@@ -50,7 +50,10 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
             }
             else if (metricValue is MetricValueCollection metricValueCollection)
             {
-                Display(metricValueCollection.MetricValues[0]);
+                if (metricValueCollection.MetricValues.Count > 0)
+                {
+                    Display(metricValueCollection.MetricValues[0]);
+                }
             }
             else
             {

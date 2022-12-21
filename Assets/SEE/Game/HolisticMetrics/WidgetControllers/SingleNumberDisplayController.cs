@@ -16,23 +16,24 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// <param name="metricValue">The metric value to display</param>
         internal override void Display(MetricValue metricValue)
         {
-            string MetricValueRangeToString(MetricValueRange range) => range.Value.ToString($"F{range.DecimalPlaces}");
-
             if (metricValue is MetricValueRange metricValueRange)
             {
                 valueText.text = MetricValueRangeToString(metricValueRange);
                 titleText.text = metricValueRange.Name;
-            } 
+            }
             else if (metricValue is MetricValueCollection metricValueCollection)
             {
                 titleText.text = metricValueCollection.Name;
-                valueText.text = string.Join(Environment.NewLine, metricValueCollection.MetricValues.Select(x => $"{x.Name}: {MetricValueRangeToString(x)}"));
+                valueText.text = string.Join(Environment.NewLine,
+                                             metricValueCollection.MetricValues.Select(x => $"{x.Name}: {MetricValueRangeToString(x)}"));
             }
             else
             {
                 throw new ArgumentException($"The type {metricValue.GetType()} cannot be displayed with" +
                                             $"the SingleNumberDisplay widget.");
             }
+
+            static string MetricValueRangeToString(MetricValueRange range) => range.Value.ToString($"F{range.DecimalPlaces}");
         }
     }
 }
