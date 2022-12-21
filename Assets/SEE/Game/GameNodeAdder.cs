@@ -71,8 +71,8 @@ namespace SEE.Game
                         node.ID = Guid.NewGuid().ToString();
                     }
                 }
-                graph.AddNode(node);
                 parent.AddChild(node);
+                graph.AddNode(node);
             }
         }
 
