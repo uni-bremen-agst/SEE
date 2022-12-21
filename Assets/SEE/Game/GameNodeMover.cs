@@ -75,12 +75,15 @@ namespace SEE.Game
         public static void PutOn(Transform child, GameObject parent,
                                  bool scaleDown = false, float topPadding = 0.0001f)
         {
+            // This assignment must take place before we set the parent of child to null
+            // because a newly created node operator attempts to derive its code city.
+            NodeOperator nodeOperator = child.gameObject.AddOrGetComponent<NodeOperator>();
+
             // Release child from its current parent so that local position and scale
             // and world-space position and scale are the same, respectively.
             // The child will receive its new parent at the very end of this method.
             child.SetParent(null);
 
-            NodeOperator nodeOperator = child.gameObject.AddOrGetComponent<NodeOperator>();
             if (scaleDown)
             {
                 // ScaleTo with animation duration = 0 has immediate effect.
