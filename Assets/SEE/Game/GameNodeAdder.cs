@@ -98,7 +98,7 @@ namespace SEE.Game
         public static GameObject AddChild(GameObject parent, Vector3 worldSpacePosition, Vector3 worldSpaceScale, string nodeID = null)
         {
             GameObject result = AddChild(parent, nodeID);
-            // Resetting the parent to null temporarily so that there is not difference between
+            // Resetting the parent to null temporarily so that there is no difference between
             // local scale and world-space scale.
             result.transform.SetParent(null);
             // result is just created, hence, we do not need a NodeOperator to position and scale it.
