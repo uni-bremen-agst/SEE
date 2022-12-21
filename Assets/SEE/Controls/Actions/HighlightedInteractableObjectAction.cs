@@ -30,7 +30,12 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Initializes this component by creating an outline, if necessary.
         /// </summary>
-        protected virtual void Start()
+        /// <remarks>This method is called by Unity only if the Object is active.
+        /// This function is called just after the object is enabled. This happens when
+        /// a MonoBehaviour instance is created, such as when a level is loaded or
+        /// a GameObject with the script component is instantiated.
+        /// It is called after <see cref="Awake"/> and before <see cref="Start"/>.</remarks>
+        protected virtual void OnEnable()
         {
             if (!TryGetComponent(out outline))
             {
