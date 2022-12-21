@@ -339,7 +339,7 @@ namespace SEE.Game.Operator
                 {
                     throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()}"
                         + $" in code city {CodeCityName(codeCityObject)}"
-                        + $" must have a {nameof(AbstractSEECity)} component!");
+                        + $" must have an {nameof(AbstractSEECity)} component!");
                 }
 
                 return city;
