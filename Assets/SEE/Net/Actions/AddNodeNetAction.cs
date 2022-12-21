@@ -68,12 +68,7 @@ namespace SEE.Net.Actions
         {
             if (!IsRequester())
             {
-                GameObject parent = GraphElementIDMap.Find(ParentID);
-                if (parent == null)
-                {
-                    throw new System.Exception($"There is no node with the ID {ParentID}.");
-                }
-                GameNodeAdder.AddChild(parent, Position, Scale, NewNodeID);
+                GameNodeAdder.AddChild(Find(ParentID), Position, Scale, NewNodeID);
             }
         }
     }
