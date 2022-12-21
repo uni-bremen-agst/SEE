@@ -91,7 +91,7 @@ namespace SEE.Audio
         /// </summary>
         enum SoundEffect
         {
-            CLICK_SOUND, DROP_SOUND, MESSAGE_POP_UP, PICKUP_SOUND, SWITCH_SOUND, WALKING_SOUND, WARNING_SOUND, SCRIBBLE
+            CLICK_SOUND, DROP_SOUND, OKAY_SOUND, PICKUP_SOUND, NEW_EDGE_SOUND, NEW_NODE_SOUND, WALKING_SOUND, CANCEL_SOUND, SCRIBBLE, HOVER_SOUND
         }
 
         /// <summary>

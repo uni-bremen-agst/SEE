@@ -136,6 +136,7 @@ namespace SEE.Controls.Actions
                     UnityEngine.Plane plane = new UnityEngine.Plane(Vector3.up, cityRootNode.position);
                     if (!rotating && Raycasting.RaycastPlane(plane, out planeHitPoint)) // start rotation
                     {
+                        AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND);
                         rotating = true;
                         hit.CityRootNode = cityRootNode;
                         hit.Cursor = cityCursor;

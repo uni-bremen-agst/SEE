@@ -348,7 +348,7 @@ namespace SEE.Controls.Actions
                     PutOnAndFit(grabbedObject, target, originalParent.gameObject, originalLocalScale);
                     UnmarkAsTarget();
                     MarkAsTarget(target.transform);
-                    AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.SWITCH_SOUND, originalParent.gameObject);
+                    AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, originalParent.gameObject);
 
                     newParent = target;
                     // The mapping is only possible if we are in a reflexion city

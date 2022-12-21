@@ -129,7 +129,7 @@ namespace SEE.Controls.Actions
                     // The line has been continued so this action has had a visible effect.
                     currentState = ReversibleAction.Progress.Completed;
                 }
-                if (Input.GetMouseButtonUp(0))
+                if (Input.GetMouseButtonDown(0))
                 {
                     AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.SCRIBBLE);
                 }

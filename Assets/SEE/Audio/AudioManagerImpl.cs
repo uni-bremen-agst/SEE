@@ -10,13 +10,15 @@ namespace SEE.Audio
     {
         public AudioClip lobbyMusic;
         public AudioClip clickSoundEffect;
-        public AudioClip dropSoundEffect;
-        public AudioClip footstepSoundEffect;
-        public AudioClip messagePopAlert;
+        public AudioClip dropSoundEffect; 
         public AudioClip pickSoundEffect;
-        public AudioClip switchSoundEffekt;
-        public AudioClip warningSoundEffect;
+        public AudioClip newEdgeSoundEffect;
+        public AudioClip newNodeSoundEffect;
         public AudioClip scribbleSoundEffect;
+        public AudioClip footstepSoundEffect;
+        public AudioClip okayButtonSoundEffect;
+        public AudioClip cancelButtonSoundEffect;
+        public AudioClip hoverSoundEffect;
 
         /// <summary>
         /// Contains a list of Game Objects that had an AudioSource attached to them to play a sound effect.
@@ -413,18 +415,22 @@ namespace SEE.Audio
                     return this.clickSoundEffect;
                 case SoundEffect.DROP_SOUND:
                     return this.dropSoundEffect;
-                case SoundEffect.MESSAGE_POP_UP:
-                    return this.messagePopAlert;
+                case SoundEffect.OKAY_SOUND:
+                    return this.okayButtonSoundEffect;
                 case SoundEffect.PICKUP_SOUND:
                     return this.pickSoundEffect;
-                case SoundEffect.SWITCH_SOUND:
-                    return this.switchSoundEffekt;
+                case SoundEffect.NEW_EDGE_SOUND:
+                    return this.newEdgeSoundEffect;
+                case SoundEffect.NEW_NODE_SOUND:
+                    return this.newNodeSoundEffect;
                 case SoundEffect.WALKING_SOUND:
                     return this.footstepSoundEffect;
-                case SoundEffect.WARNING_SOUND:
-                   return this.warningSoundEffect;
+                case SoundEffect.CANCEL_SOUND:
+                   return this.cancelButtonSoundEffect;
                 case SoundEffect.SCRIBBLE:
                     return this.scribbleSoundEffect;
+                case SoundEffect.HOVER_SOUND:
+                    return this.hoverSoundEffect;
                 default:
                     return this.clickSoundEffect;
             }
