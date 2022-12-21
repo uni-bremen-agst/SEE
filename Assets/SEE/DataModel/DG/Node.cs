@@ -525,7 +525,7 @@ namespace SEE.DataModel.DG
         /// <remarks>It is safe to call this method with a <paramref name="child"/>
         /// that is not yet in the graph of this node. Yet, the <paramref name="child"/>
         /// should be added right after calling this method or otherwise other
-        /// methods will fail. Do not do anything with <see cref="child"/> if you have not
+        /// methods will fail. Do not do anything with <paramref name="child"/> if you have not
         /// added it via <see cref="Graph.AddNode(Node)"/>.</remarks>
         public void AddChild(Node child)
         {
