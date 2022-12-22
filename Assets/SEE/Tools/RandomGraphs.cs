@@ -295,7 +295,7 @@ namespace SEE.Tools
             IList<Node> innerNodes = new List<Node>(innerNodeConstraint.NodeNumber);
             for (int i = 1; i <= innerNodeConstraint.NodeNumber; i++)
             {
-                innerNodes.Add(CreateNode(graph, Guid.NewGuid().ToString(), innerNodeConstraint.NodeType));
+                innerNodes.Add(CreateNode(graph, "Inner~" + i, innerNodeConstraint.NodeType));
             }
             // Create the tree.
             int[] parent = RandomTrees.Random(innerNodeConstraint.NodeNumber, out int _);
@@ -356,7 +356,7 @@ namespace SEE.Tools
             ICollection<Node> nodes = new List<Node>();
             for (int i = 1; i <= numberOfNodes; i++)
             {
-                nodes.Add(CreateNode(graph, Guid.NewGuid().ToString(), nodeType));
+                nodes.Add(CreateNode(graph, linkPrefix + i, nodeType));
             }
             return nodes;
         }
