@@ -105,8 +105,19 @@ namespace SEE.Game.City
         /// If true, lifted edges whose source and target nodes are the same are ignored.
         /// </summary>
         [Tooltip("If true, lifted edges whose source and target nodes are the same are ignored.")]
-        [SerializeField]
         public bool IgnoreSelfLoopsInLifting = false;
+
+        /// <summary>
+        /// The maximal height of a single antenna segment.
+        /// </summary>
+        [LabelText("Antenna Segment Height"), Tooltip("The maximal height of a single antenna segment.")]
+        public float MaximalAntennaSegmentHeight = 0.5f;
+
+        /// <summary>
+        /// The width of an antenna.
+        /// </summary>
+        [Tooltip("The width of an antenna.")]
+        public float AntennaWidth = 0.1f;
 
         /// <summary>
         /// A mapping of node metric names onto colors.
