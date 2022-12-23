@@ -60,7 +60,7 @@ namespace SEE.Game.UI.CodeWindow
         /// </exception>
         private void UpdateActiveTab()
         {
-            if (Panel != null && ActiveCodeWindow != null && ActiveCodeWindow.codeWindow != null)
+            if (Panel != null && ActiveCodeWindow != null && ActiveCodeWindow.window != null)
             {
                 if (!codeWindows.Contains(ActiveCodeWindow))
                 {
@@ -83,7 +83,7 @@ namespace SEE.Game.UI.CodeWindow
                     UpdateActiveTab();
                     return;
                 }
-                Panel.ActiveTab = Panel.GetTabIndex((RectTransform) ActiveCodeWindow.codeWindow.transform);
+                Panel.ActiveTab = Panel.GetTabIndex((RectTransform) ActiveCodeWindow.window.transform);
             }
         }
 
@@ -94,7 +94,7 @@ namespace SEE.Game.UI.CodeWindow
                 // We need to destroy the panel now
                 Destroy(Panel);
             } 
-            else if (!Panel && codeWindows.Any(x => x.codeWindow))
+            else if (!Panel && codeWindows.Any(x => x.window))
             {
                 InitializePanel();
             } 
@@ -121,16 +121,16 @@ namespace SEE.Game.UI.CodeWindow
             // First, close old windows that are not open anymore
             foreach (CodeWindow codeWindow in currentCodeWindows.Except(codeWindows).ToList())
             {
-                Panel.RemoveTab(Panel.GetTab((RectTransform) codeWindow.codeWindow.transform));
+                Panel.RemoveTab(Panel.GetTab((RectTransform) codeWindow.window.transform));
                 currentCodeWindows.Remove(codeWindow);
                 Destroy(codeWindow);
             }
             
             // Then, add new tabs 
             // We need to skip code windows who weren't initialized yet
-            foreach (CodeWindow codeWindow in codeWindows.Except(currentCodeWindows).Where(x => x.codeWindow != null).ToList())
+            foreach (CodeWindow codeWindow in codeWindows.Except(currentCodeWindows).Where(x => x.window != null).ToList())
             {
-                RectTransform rectTransform = (RectTransform) codeWindow.codeWindow.transform;
+                RectTransform rectTransform = (RectTransform) codeWindow.window.transform;
                 // Add the new window as a tab to our panel
                 PanelTab tab = Panel.AddTab(rectTransform);
                 tab.Label = codeWindow.Title;
@@ -153,7 +153,7 @@ namespace SEE.Game.UI.CodeWindow
             {
                 if (panelTab.Panel == Panel)
                 {
-                    CloseCodeWindow(codeWindows.First(x => x.codeWindow.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID()));
+                    CloseCodeWindow(codeWindows.First(x => x.window.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID()));
                     if (panelTab.Panel.NumberOfTabs <= 1)
                     {
                         // All tabs were closed, so we send out an event 
@@ -181,7 +181,7 @@ namespace SEE.Game.UI.CodeWindow
                 codeWindows.Clear();
                 return;
             }
-            Panel = PanelUtils.CreatePanelFor((RectTransform) codeWindows[0].codeWindow.transform, PanelsCanvas);
+            Panel = PanelUtils.CreatePanelFor((RectTransform) codeWindows[0].window.transform, PanelsCanvas);
             // When the active tab *on this panel* is changed, we invoke the corresponding event
             PanelNotificationCenter.OnActiveTabChanged += ChangeActiveTab;
             PanelNotificationCenter.OnPanelClosed += ClosePanel;
@@ -190,7 +190,7 @@ namespace SEE.Game.UI.CodeWindow
             {
                 if (Panel == tab.Panel)
                 {
-                    ActiveCodeWindow = CodeWindows.First(x => x.codeWindow.GetInstanceID() == tab.Content.gameObject.GetInstanceID());
+                    ActiveCodeWindow = CodeWindows.First(x => x.window.GetInstanceID() == tab.Content.gameObject.GetInstanceID());
                     OnActiveCodeWindowChanged.Invoke();
                 }
             }
@@ -202,7 +202,7 @@ namespace SEE.Game.UI.CodeWindow
                     // Close each tab
                     foreach (CodeWindow codeWindow in codeWindows)
                     {
-                        Panel.RemoveTab(Panel.GetTab((RectTransform) codeWindow.codeWindow.transform));
+                        Panel.RemoveTab(Panel.GetTab((RectTransform) codeWindow.window.transform));
                         Destroy(codeWindow);
                     }
 

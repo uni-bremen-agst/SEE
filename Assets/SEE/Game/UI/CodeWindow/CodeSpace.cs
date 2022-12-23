@@ -11,18 +11,18 @@ namespace SEE.Game.UI.CodeWindow
     /// The user will be able to choose which of the currently active code windows will be shown.
     /// This component is responsible for arranging, displaying, and hiding the code windows.
     /// </summary>
-    public partial class CodeSpace: PlatformDependentComponent
+    public partial class CodeSpace : PlatformDependentComponent
     {
         /// <summary>
         /// Returns a <b>read-only wrapper</b> around the list of active code windows.
         /// </summary>
         public IList<CodeWindow> CodeWindows => codeWindows.AsReadOnly();
-        
+
         /// <summary>
         /// Path to the code space prefab, in which all code windows will be contained.
         /// </summary>
         private const string CODE_SPACE_PREFAB = "Prefabs/UI/CodeWindowSpace";
-        
+
         /// <summary>
         /// Name of the game object containing the code windows.
         /// Can only be changed before <see cref="Start"/> has been called.
@@ -34,16 +34,16 @@ namespace SEE.Game.UI.CodeWindow
         /// Changing this value will only have an effect when doing so before <see cref="Start"/> has been called.
         /// </summary>
         public bool CanClose = true;
-        
+
         /// <summary>
         /// A list of all nominal active code windows. May be empty.
         /// </summary>
-        private readonly List<CodeWindow> codeWindows = new List<CodeWindow>();
+        private readonly List<CodeWindow> codeWindows = new();
 
         /// <summary>
         /// A list of all actual active code windows. May be empty.
         /// </summary>
-        private readonly List<CodeWindow> currentCodeWindows = new List<CodeWindow>();
+        private readonly List<CodeWindow> currentCodeWindows = new();
 
         /// <summary>
         /// The game object on the UI canvas. This object will contain all UI code windows.
@@ -61,11 +61,11 @@ namespace SEE.Game.UI.CodeWindow
             if (window == null)
             {
                 throw new ArgumentNullException(nameof(window));
-            } 
+            }
             else if (codeWindows.Contains(window))
             {
                 throw new ArgumentException("Given window is already open.");
-            } 
+            }
             else if (codeWindows.Find(x => x.Title == window.Title))
             {
                 Debug.LogError("Warning: Multiple code windows with the same title are in the same space. "
@@ -87,11 +87,12 @@ namespace SEE.Game.UI.CodeWindow
             if (window == null)
             {
                 throw new ArgumentNullException(nameof(window));
-            } 
+            }
             else if (!codeWindows.Contains(window))
             {
                 throw new ArgumentException("Given window is already closed.");
             }
+
             codeWindows.Remove(window);
         }
 
@@ -143,8 +144,8 @@ namespace SEE.Game.UI.CodeWindow
         /// This event will be invoked whenever the active code window is changed.
         /// This includes changing the active code window to nothing (i.e. closing all of them.)
         /// </summary>
-        public UnityEvent OnActiveCodeWindowChanged = new UnityEvent();
-        
+        public UnityEvent OnActiveCodeWindowChanged = new();
+
         #region Value Object
 
         /// <summary>
@@ -157,16 +158,16 @@ namespace SEE.Game.UI.CodeWindow
         /// be attached to <see cref="attachTo"/> as well, instead of the GameObject that might be defined
         /// in them.</param>
         /// <returns>The newly re-created <see cref="CodeSpace"/>.</returns>
-        public static CodeSpace FromValueObject(CodeSpaceValues valueObject, GameObject attachTo, 
-                                                      bool attachWindows = false)
+        public static CodeSpace FromValueObject(CodeSpaceValues valueObject, GameObject attachTo,
+                                                bool attachWindows = false)
         {
             if (attachTo == null)
             {
                 throw new ArgumentNullException(nameof(attachTo));
             }
+
             CodeSpace space = attachTo.AddComponent<CodeSpace>();
-            space.codeWindows.AddRange(valueObject.CodeWindows.Select(
-                                           x => CodeWindow.FromValueObject(x, attachWindows ? attachTo : null)));
+            space.codeWindows.AddRange(valueObject.CodeWindows.Select(x => CodeWindow.FromValueObject(x, attachWindows ? attachTo : null)));
             space.ActiveCodeWindow = space.codeWindows.First(x => valueObject.ActiveCodeWindow.Title == x.Title);
             return space;
         }
@@ -181,7 +182,7 @@ namespace SEE.Game.UI.CodeWindow
         {
             return new CodeSpaceValues(CodeWindows, ActiveCodeWindow, fulltext);
         }
-        
+
         /// <summary>
         /// Represents the values of a code space necessary to re-create its content.
         /// Used for serialization when sending a <see cref="CodeSpace"/> over the network.
@@ -194,7 +195,7 @@ namespace SEE.Game.UI.CodeWindow
             /// </summary>
             [field: SerializeField]
             public CodeWindow.CodeWindowValues ActiveCodeWindow { get; private set; }
-            
+
             /// <summary>
             /// A list of generated value objects for each code window in this space.
             /// </summary>
@@ -215,7 +216,7 @@ namespace SEE.Game.UI.CodeWindow
                 CodeWindows = codeWindows.Select(x => x.ToValueObject(fulltext)).ToList();
             }
         }
-        
+
         #endregion
     }
 }

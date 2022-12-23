@@ -20,12 +20,12 @@ namespace SEE.Game.UI.CodeWindow
         /// <summary>
         /// The needed padding for the line numbers.
         /// </summary>
-        private int neededPadding = 0;
+        private int neededPadding;
 
         /// <summary>
         /// A dictionary mapping each link ID to its issues.
         /// </summary>
-        private readonly Dictionary<char, List<Issue>> issueDictionary = new Dictionary<char, List<Issue>>();
+        private readonly Dictionary<char, List<Issue>> issueDictionary = new();
 
         /// <summary>
         /// Counter which represents the lowest unfilled position in the <see cref="issueDictionary"/>.
@@ -74,14 +74,14 @@ namespace SEE.Game.UI.CodeWindow
             // However, we need to also add "hidden" newlines contained in other tokens, e.g. block comments.
             int assumedLines = TokenList.Count(x => x.TokenType.Equals(SEEToken.Type.Newline))
                                + TokenList.Where(x => !x.TokenType.Equals(SEEToken.Type.Newline))
-                                          .Aggregate(0, (l, token) => token.Text.Count(x => x == '\n'));
+                                          .Aggregate(0, (_, token) => token.Text.Count(x => x == '\n'));
             // Needed padding is the number of lines, because the line number will be at most this long.
              neededPadding = assumedLines.ToString().Length;
 
             Text = $"<color=#CCCCCC>{string.Join("", Enumerable.Repeat(" ", neededPadding - 1))}1</color> ";
             int lineNumber = 2; // Line number we'll write down next
             bool currentlyMarking = false;
-            Dictionary<SEEToken, ISet<Issue>> issueTokens = new Dictionary<SEEToken, ISet<Issue>>();
+            Dictionary<SEEToken, ISet<Issue>> issueTokens = new();
             //TODO: Handle these issues
 
             foreach (SEEToken token in TokenList)

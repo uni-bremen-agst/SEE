@@ -16,7 +16,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// The value object of the code space which shall be transmitted over the network.
         /// </summary>
-        public CodeSpace.CodeSpaceValues Space;
+        private CodeSpace.CodeSpaceValues Space;
 
         /// <summary>
         /// For the given <paramref name="space"/>, create a value object, and depending on <paramref name="execute"/>,

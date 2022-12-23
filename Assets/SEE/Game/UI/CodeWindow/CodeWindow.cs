@@ -12,7 +12,7 @@ namespace SEE.Game.UI.CodeWindow
     /// Represents a movable, scrollable window containing source code.
     /// The source code may either be entered manually or read from a file.
     /// </summary>
-    public partial class CodeWindow : PlatformDependentComponent
+    public partial class CodeWindow : BaseWindow
     {
         /// <summary>
         /// The text displayed in the code window.
@@ -33,7 +33,7 @@ namespace SEE.Game.UI.CodeWindow
         /// <summary>
         /// Whether code issues should be downloaded and added to the shown code.
         /// </summary>
-        public bool ShowIssues = false;
+        public bool ShowIssues;
 
         /// <summary>
         /// The line that was marked (1-indexed). Unlike <see cref="VisibleLine"/>,
@@ -47,30 +47,15 @@ namespace SEE.Game.UI.CodeWindow
         public string SolutionPath;
 
         /// <summary>
-        /// The title (e.g. filename) for the code window.
-        /// </summary>
-        public string Title;
-
-        /// <summary>
         /// Size of the font used in the code window.
         /// </summary>
         public float FontSize = 20f;
 
         /// <summary>
-        /// Resolution of the code window. By default, this is set to a resolution of 900x500.
-        /// </summary>
-        public Vector2 Resolution = new Vector2(900, 500);
-
-        /// <summary>
         /// An event which gets called whenever the scrollbar is used to scroll to a different line.
         /// Will be called after the scroll is completed.
         /// </summary>
-        public readonly UnityEvent ScrollEvent = new UnityEvent();
-
-        /// <summary>
-        /// GameObject containing the actual UI for the code window.
-        /// </summary>
-        public GameObject codeWindow { get; private set; }
+        public readonly UnityEvent ScrollEvent = new();
 
         /// <summary>
         /// Number of lines within the file.
@@ -78,9 +63,9 @@ namespace SEE.Game.UI.CodeWindow
         private int lines;
 
         /// <summary>
-        /// Path to the code canvas prefab.
+        /// Path to the code window content prefab.
         /// </summary>
-        private const string CODE_WINDOW_PREFAB = "Prefabs/UI/CodeWindow";
+        private const string CODE_WINDOW_PREFAB = "Prefabs/UI/CodeWindowContent";
 
         /// <summary>
         /// Visually marks the line at the given <paramref name="lineNumber"/> and scrolls to it.
@@ -90,60 +75,11 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="line">The line number of the line to mark and scroll to (1-indexed)</param>
         private void MarkLine(int lineNumber)
         {
-            this.markedLine = lineNumber;
+            markedLine = lineNumber;
             string[] allLines = TextMesh.text.Split('\n').Select(x => x.EndsWith("</mark>") ? x.Substring(16, x.Length - 16 - 7) : x).ToArray();
-            string markedLine = $"<mark=#ff000044>{allLines[lineNumber - 1]}</mark>\n";
-            TextMesh.text = string.Join("", allLines.Select(x => x + "\n").Take(lineNumber - 1).Append(markedLine)
+            string markLine = $"<mark=#ff000044>{allLines[lineNumber - 1]}</mark>\n";
+            TextMesh.text = string.Join("", allLines.Select(x => x + "\n").Take(lineNumber - 1).Append(markLine)
                                                     .Concat(allLines.Select(x => x + "\n").Skip(lineNumber).Take(lines - lineNumber - 2)));
-        }
-
-        /// <summary>
-        /// Shows or hides the code window, depending on the <see cref="show"/> parameter.
-        /// </summary>
-        /// <param name="show">Whether the code window should be shown.</param>
-        /// <remarks>If this window is used in a <see cref="CodeSpace"/>, this method
-        /// needn't (and shouldn't) be used.</remarks>
-        public void Show(bool show)
-        {
-            switch (Platform)
-            {
-                case PlayerInputType.DesktopPlayer:
-                    ShowDesktop(show);
-                    break;
-                case PlayerInputType.TouchGamepadPlayer:
-                    ShowDesktop(show);
-                    break;
-                case PlayerInputType.VRPlayer:
-                    PlatformUnsupported();
-                    break;
-                case PlayerInputType.None: // nothing needs to be done
-                    break;
-                default:
-                    Debug.LogError($"Platform {Platform} not handled in switch case.\n");
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// When disabling the code window, its controlled UI objects will also be disabled.
-        /// </summary>
-        public void OnDisable()
-        {
-            if (codeWindow)
-            {
-                codeWindow.SetActive(false);
-            }
-        }
-
-        /// <summary>
-        /// When enabling the code window, its controlled UI objects will also be enabled.
-        /// </summary>
-        public void OnEnable()
-        {
-            if (codeWindow)
-            {
-                codeWindow.SetActive(true);
-            }
         }
 
         #region Visible Line Calculation
