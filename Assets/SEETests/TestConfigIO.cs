@@ -354,7 +354,6 @@ namespace SEE.Utils
             AntennaAttributes saved = new AntennaAttributes();
             saved.AntennaSections.Add("metricA");
             saved.AntennaSections.Add("metricB");
-            saved.AntennaWidth = 2.0f;
 
             const string filename = "antenna.cfg";
             const string label = "Antenna";
@@ -957,13 +956,11 @@ namespace SEE.Utils
 
         private static void WipeOutAntennaSettings(ref AntennaAttributes antennaAttributes)
         {
-            antennaAttributes.AntennaWidth = 999;
             antennaAttributes.AntennaSections.Clear();
         }
 
         private static void AreEqualAntennaSettings(AntennaAttributes expected, AntennaAttributes actual)
         {
-            Assert.AreEqual(expected.AntennaWidth, actual.AntennaWidth);
             Assert.AreEqual(expected.AntennaSections.Count, actual.AntennaSections.Count);
             for (int i = 0; i < expected.AntennaSections.Count; i++)
             {

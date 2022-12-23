@@ -21,11 +21,6 @@ namespace SEE.Game.City
         public IList<string> AntennaSections = new List<string>();
 
         /// <summary>
-        /// The width of an antenna.
-        /// </summary>
-        public float AntennaWidth = 0.1f;
-
-        /// <summary>
         /// Saves the settings in the configuration file.
         ///
         /// Implements <see cref="ConfigIO.PersistentConfigItem.Save(ConfigWriter, string)"/>.
@@ -35,7 +30,6 @@ namespace SEE.Game.City
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(AntennaWidth, AntennaWidthLabel);
             writer.Save(AntennaSections, AntennaSectionsLabel);
             writer.EndGroup();
         }
@@ -56,7 +50,6 @@ namespace SEE.Game.City
             {
                 bool result = false;
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-                ConfigIO.Restore(values, AntennaWidthLabel, ref AntennaWidth);
                 ConfigIO.RestoreStringList(values, AntennaSectionsLabel, ref AntennaSections);
                 return result;
             }
@@ -65,11 +58,6 @@ namespace SEE.Game.City
                 return false;
             }
         }
-
-        /// <summary>
-        /// Label in the configuration file for the antenna width.
-        /// </summary>
-        private const string AntennaWidthLabel = "Width";
 
         /// <summary>
         /// Label in the configuration file for the antenna sections.

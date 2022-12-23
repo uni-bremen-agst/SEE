@@ -21,10 +21,19 @@ namespace SEE.GO.Decorators
         /// </summary>
         /// <param name="scaler">the scaler to be used to normalize the metric values</param>
         /// <param name="antennaAttributes">the visual attributes to be considered for the antenna segments</param>
-        public AntennaDecorator(IScale scaler, AntennaAttributes antennaAttributes, ColorMap metricToColor)
+        /// <param name="antennaWidth">the width of every antenna segment</param>
+        /// <param name="maximalAntennaSegmentHeight">the maximal height of an individual antenna segment</param>
+        /// <param name="metricToColor">a mapping of metric names onto colors</param>
+        public AntennaDecorator(IScale scaler,
+                                AntennaAttributes antennaAttributes,
+                                float antennaWidth,
+                                float maximalAntennaSegmentHeight,
+                                ColorMap metricToColor)
         {
             this.scaler = scaler;
             this.antennaAttributes = antennaAttributes;
+            this.antennaWidth = antennaWidth;
+            this.maximalAntennaSegmentHeight = maximalAntennaSegmentHeight;
             metricToFactory = CreateSegmentFactories(antennaAttributes, metricToColor);
         }
 
@@ -43,6 +52,15 @@ namespace SEE.GO.Decorators
         /// The visual attributes to be considered for the antenna segments.
         /// </summary>
         private readonly AntennaAttributes antennaAttributes;
+
+        /// <summary>
+        /// The width of an antenna segment.
+        /// </summary>
+        private readonly float antennaWidth;
+        /// <summary>
+        /// The maximal height of an individual antenna segment.
+        /// </summary>
+        private readonly float maximalAntennaSegmentHeight;
 
         /// <summary>
         /// The name of the game object representing the antenna as a whole. It
@@ -93,7 +111,7 @@ namespace SEE.GO.Decorators
                     segment.name = metricName + ": " + sectionMetric;
                     segment.tag = Tags.Decoration;
 
-                    float height = scaler.GetNormalizedValue(metricName, sectionMetric);
+                    float height = Mathf.Clamp(scaler.GetNormalizedValue(metricName, sectionMetric), 0, maximalAntennaSegmentHeight);
                     segmentScale.y = height;
                     segment.transform.localScale = segmentScale;
 
@@ -123,7 +141,7 @@ namespace SEE.GO.Decorators
             Vector3 GetSegmentScale(GameObject gameNode)
             {
                 Vector3 scale = gameNode.transform.lossyScale;
-                float width = Mathf.Min(antennaAttributes.AntennaWidth,
+                float width = Mathf.Min(antennaWidth,
                                         Mathf.Min(scale.x, scale.z));
                 return new Vector3(width, 0, width);
             }
@@ -156,6 +174,7 @@ namespace SEE.GO.Decorators
         /// </summary>
         /// <param name="antennaAttributes">a specification of the antenna segments for which to create
         /// the cylinder factories</param>
+        /// <param name="metricToColor">a mapping of metric names onto colors</param>
         /// <returns>mapping of metrics onto factories</returns>
         private static Dictionary<string, CylinderFactory> CreateSegmentFactories(AntennaAttributes antennaAttributes, ColorMap metricToColor)
         {

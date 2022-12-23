@@ -153,7 +153,10 @@ namespace SEE.Game
 
             AntennaDecorator GetAntennaDecorator(VisualNodeAttributes value)
             {
-                return new AntennaDecorator(scaler, value.AntennaSettings, Settings.MetricToColor);
+                return new AntennaDecorator
+                             (scaler,
+                              value.AntennaSettings, Settings.AntennaWidth, Settings.MaximalAntennaSegmentHeight,
+                              Settings.MetricToColor);
             }
         }
 
