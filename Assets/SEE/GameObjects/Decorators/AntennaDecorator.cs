@@ -57,6 +57,7 @@ namespace SEE.GO.Decorators
         /// The width of an antenna segment.
         /// </summary>
         private readonly float antennaWidth;
+
         /// <summary>
         /// The maximal height of an individual antenna segment.
         /// </summary>
