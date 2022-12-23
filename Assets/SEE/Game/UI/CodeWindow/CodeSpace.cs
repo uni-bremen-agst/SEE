@@ -167,7 +167,7 @@ namespace SEE.Game.UI.CodeWindow
             }
 
             CodeSpace space = attachTo.AddComponent<CodeSpace>();
-            space.codeWindows.AddRange(valueObject.CodeWindows.Select(x => CodeWindow.FromValueObject(x, attachWindows ? attachTo : null)));
+            space.codeWindows.AddRange(valueObject.CodeWindows.Select(x => CodeWindow.FromValueObject<CodeWindow>(x, attachWindows ? attachTo : null)));
             space.ActiveCodeWindow = space.codeWindows.First(x => valueObject.ActiveCodeWindow.Title == x.Title);
             return space;
         }
@@ -178,9 +178,9 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="fulltext">Whether the whole text should be included. Iff false, the filename will be saved
         /// instead of the text. This applies to each code window contained in this space.</param>
         /// <returns>The newly created <see cref="CodeSpaceValues"/>, matching this class</returns>
-        public CodeSpaceValues ToValueObject(bool fulltext)
+        public CodeSpaceValues ToValueObject()
         {
-            return new CodeSpaceValues(CodeWindows, ActiveCodeWindow, fulltext);
+            return new CodeSpaceValues(CodeWindows, ActiveCodeWindow);
         }
 
         /// <summary>
@@ -208,12 +208,10 @@ namespace SEE.Game.UI.CodeWindow
             /// </summary>
             /// <param name="codeWindows">List of code windows in the space.</param>
             /// <param name="activeCodeWindow">Currently active code window in the space.</param>
-            /// <param name="fulltext">Whether the text inside each code window should be saved.
-            /// Iff false, the path to each file will be saved instead.</param>
-            internal CodeSpaceValues(IEnumerable<CodeWindow> codeWindows, CodeWindow activeCodeWindow, bool fulltext)
+            internal CodeSpaceValues(IEnumerable<CodeWindow> codeWindows, CodeWindow activeCodeWindow)
             {
-                ActiveCodeWindow = activeCodeWindow.ToValueObject(fulltext);
-                CodeWindows = codeWindows.Select(x => x.ToValueObject(fulltext)).ToList();
+                ActiveCodeWindow = activeCodeWindow.ToValueObject();
+                CodeWindows = codeWindows.Select(x => x.ToValueObject()).ToList();
             }
         }
 

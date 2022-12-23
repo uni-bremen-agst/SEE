@@ -35,6 +35,7 @@ namespace SEE.Game.UI.CodeWindow
         /// <summary>
         /// Constant defining whether code window manipulation (i.e., editing source code) should be enabled.
         /// TODO: Let the user set this, e.g., within the code city menu.
+        /// FIXME: My Unity editor crashes whenever I set this to true and open a code window.
         /// </summary>
         private const bool INPUT_ENABLED = false;
 

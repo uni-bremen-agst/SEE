@@ -105,7 +105,7 @@ namespace SEE.Controls
                     if (CodeSpaces[playerName].CodeWindows.All(x => windowValue.Title != x.Title))
                     {
                         // Window is new and has to be re-created
-                        CodeWindow window = CodeWindow.FromValueObject(windowValue);
+                        CodeWindow window = CodeWindow.FromValueObject<CodeWindow>(windowValue);
                         CodeSpaces[playerName].AddCodeWindow(window);
                         // Only enable window if code space is enabled as well
                         window.enabled = CodeSpaces[playerName].enabled;

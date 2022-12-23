@@ -31,7 +31,7 @@ namespace SEE.Net.Actions
                 return;
             }
 
-            Space = space.ToValueObject(SYNC_FULL_TEXT);
+            Space = space.ToValueObject();
 
             if (execute)
             {

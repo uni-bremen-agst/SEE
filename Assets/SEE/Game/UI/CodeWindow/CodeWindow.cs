@@ -12,7 +12,7 @@ namespace SEE.Game.UI.CodeWindow
     /// Represents a movable, scrollable window containing source code.
     /// The source code may either be entered manually or read from a file.
     /// </summary>
-    public partial class CodeWindow : BaseWindow
+    public partial class CodeWindow : BaseWindow<CodeWindow.CodeWindowValues>
     {
         /// <summary>
         /// The text displayed in the code window.
@@ -66,6 +66,11 @@ namespace SEE.Game.UI.CodeWindow
         /// Path to the code window content prefab.
         /// </summary>
         private const string CODE_WINDOW_PREFAB = "Prefabs/UI/CodeWindowContent";
+
+        /// <summary>
+        /// Whether the full text of the code window should be transmitted instead of just the filename.
+        /// </summary>
+        private const bool SYNC_FULL_TEXT = false;
 
         /// <summary>
         /// Visually marks the line at the given <paramref name="lineNumber"/> and scrolls to it.
@@ -182,46 +187,21 @@ namespace SEE.Game.UI.CodeWindow
 
         #region Value Object
 
-        /// <summary>
-        /// Recreates a <see cref="CodeWindow"/> from the given <paramref name="valueObject"/> and attaches it to
-        /// the GameObject <paramref name="attachTo"/>.
-        /// </summary>
-        /// <param name="valueObject">The value object from which the code window should be constructed</param>
-        /// <param name="attachTo">The game object the code window should be attached to. If <c>null</c>,
-        /// the game object will be attached to the game object with the name specified in the value object.</param>
-        /// <returns>The newly re-constructed code window</returns>
-        /// <exception cref="ArgumentException">When both Text and Path in the <paramref name="valueObject"/>
-        /// are <c>null</c>.</exception>
-        /// <exception cref="InvalidOperationException">If both <paramref name="attachTo"/> is <c>null</c>
-        /// and the game object specified in <paramref name="valueObject"/> can't be found.</exception>
-        public static CodeWindow FromValueObject(CodeWindowValues valueObject, GameObject attachTo = null)
+        protected override void InitializeFromValueObject(CodeWindowValues valueObject)
         {
-            if (attachTo == null)
-            {
-                attachTo = GraphElementIDMap.Find(valueObject.AttachedTo);
-                if (attachTo == null)
-                {
-                    throw new InvalidOperationException($"GameObject with name {valueObject} could not be found.\n");
-                }
-            }
-
-            CodeWindow window = attachTo.AddComponent<CodeWindow>();
             if (valueObject.Path != null)
             {
-                window.EnterFromFile(valueObject.Path);
+                EnterFromFile(valueObject.Path);
             }
             else if (valueObject.Text != null)
             {
-                window.EnterFromText(valueObject.Text.Split('\n'));
+                EnterFromText(valueObject.Text.Split('\n'));
             }
             else
             {
                 throw new ArgumentException("Invalid value object. Either FilePath or Text must not be null.");
             }
-
-            window.Title = valueObject.Title;
-            window.VisibleLine = valueObject.VisibleLine;
-            return window;
+            VisibleLine = valueObject.VisibleLine;
         }
 
         /// <summary>
@@ -230,10 +210,10 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="fulltext">Whether the whole text should be included. Iff false, the filename will be saved
         /// instead of the text.</param>
         /// <returns>The newly created <see cref="CodeWindowValues"/>, matching this class</returns>
-        public CodeWindowValues ToValueObject(bool fulltext)
+        public override CodeWindowValues ToValueObject()
         {
             string attachedTo = gameObject.name;
-            return fulltext
+            return SYNC_FULL_TEXT
                 ? new CodeWindowValues(Title, VisibleLine, attachedTo, Text)
                 : new CodeWindowValues(Title, VisibleLine, attachedTo, path: FilePath);
         }
@@ -243,7 +223,7 @@ namespace SEE.Game.UI.CodeWindow
         /// Used for serialization when sending a <see cref="CodeWindow"/> over the network.
         /// </summary>
         [Serializable]
-        public struct CodeWindowValues
+        public class CodeWindowValues: WindowValues
         {
             /// <summary>
             /// Text of the code window. May be <c>null</c>, in which case <see cref="Path"/> is not <c>null</c>.
@@ -259,22 +239,10 @@ namespace SEE.Game.UI.CodeWindow
             public string Path { get; private set; }
 
             /// <summary>
-            /// Title of the code window.
-            /// </summary>
-            [field: SerializeField]
-            public string Title { get; private set; }
-
-            /// <summary>
             /// The line number which is currently visible in / at the top of the code window.
             /// </summary>
             [field: SerializeField]
             public int VisibleLine { get; private set; }
-
-            [field: SerializeField]
-            /// <summary>
-            /// Name of the game object this code window was attached to.
-            /// </summary>
-            public string AttachedTo { get; private set; }
 
             /// <summary>
             /// Creates a new CodeWindowValues object from the given parameters.
@@ -289,7 +257,7 @@ namespace SEE.Game.UI.CodeWindow
             /// May be <c>null</c>, in which case <paramref name="text"/> may not.</param>
             /// <exception cref="ArgumentException">Thrown when both <paramref name="path"/> and
             /// <paramref name="text"/> are <c>null</c>.</exception>
-            internal CodeWindowValues(string title, int visibleLine, string attachedTo = null, string text = null, string path = null)
+            internal CodeWindowValues(string title, int visibleLine, string attachedTo = null, string text = null, string path = null) : base(title, attachedTo)
             {
                 if (text == null && path == null)
                 {
@@ -298,8 +266,6 @@ namespace SEE.Game.UI.CodeWindow
 
                 Text = text;
                 Path = path;
-                AttachedTo = attachedTo;
-                Title = title;
                 VisibleLine = visibleLine;
             }
         }
