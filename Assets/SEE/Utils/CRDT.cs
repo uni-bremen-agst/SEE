@@ -4,9 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using SEE.Game.UI.Window.CodeWindow;
 using UnityEngine;
 using UnityEngine.Events;
-using static SEE.Game.UI.CodeWindow.CodeWindow;
 
 namespace SEE.Utils
 
@@ -934,7 +934,7 @@ namespace SEE.Utils
         /// <summary>
         /// Undoes the last edit operation.
         /// </summary>
-        /// <exception cref="UndoNotPossibleExcpetion">Throws an exception when the undo could not be perfomrt like the undo stack is empty or the operation can´t be undone</exception>
+        /// <exception cref="UndoNotPossibleExcpetion">Throws an exception when the undo could not be perfomrt like the undo stack is empty or the operation canï¿½t be undone</exception>
         public void Undo()
         {
             if (undoStack.Count < 1)

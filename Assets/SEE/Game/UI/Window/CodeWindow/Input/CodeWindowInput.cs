@@ -10,7 +10,7 @@ using SEE.Net.Dashboard.Model.Issues;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace SEE.Game.UI.CodeWindow
+namespace SEE.Game.UI.Window.CodeWindow
 {
     /// <summary>
     /// Partial class containing methods related to processing input for the code windows.

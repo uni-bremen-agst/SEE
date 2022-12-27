@@ -1,22 +1,17 @@
 ﻿using SEE.Controls;
-using SEE.Game.UI.CodeWindow;
+using SEE.Game.UI.Window;
 
 namespace SEE.Net.Actions
 {
     /// <summary>
-    /// Synchronizes the code spaces across all clients.
+    /// Synchronizes the window spaces across all clients.
     /// </summary>
-    public class SyncCodeSpaceAction: AbstractNetAction
+    public class SyncWindowSpaceAction: AbstractNetAction
     {
         /// <summary>
-        /// Whether the full text of the code windows should be transmitted instead of just the filename.
+        /// The value object of the window space which shall be transmitted over the network.
         /// </summary>
-        private const bool SYNC_FULL_TEXT = false;
-
-        /// <summary>
-        /// The value object of the code space which shall be transmitted over the network.
-        /// </summary>
-        private CodeSpace.CodeSpaceValues Space;
+        private WindowSpace.WindowSpaceValues Space;
 
         /// <summary>
         /// For the given <paramref name="space"/>, create a value object, and depending on <paramref name="execute"/>,
@@ -24,7 +19,7 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="space">The space which shall be serialized (and sent across the network).</param>
         /// <param name="execute">Whether the <paramref name="space"/> should be sent across the network.</param>
-        public void UpdateSpace(CodeSpace space, bool execute = true)
+        public void UpdateSpace(WindowSpace space, bool execute = true)
         {
             if (space == null)
             {
@@ -48,13 +43,13 @@ namespace SEE.Net.Actions
         {
             if (!IsRequester())
             {
-                if (!CodeSpaceManager.ManagerInstance)
+                if (!WindowSpaceManager.ManagerInstance)
                 {
-                    // If no code space manager exists, there is nothing we can (or should) do.
+                    // If no space manager exists, there is nothing we can (or should) do.
                     return;
                 }
 
-                CodeSpaceManager.ManagerInstance.UpdateCodeSpaceFromValueObject(RequesterIPAddress, Space);
+                WindowSpaceManager.ManagerInstance.UpdateSpaceFromValueObject(RequesterIPAddress, Space);
             }
         }
     }

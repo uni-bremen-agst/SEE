@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Antlr4.Runtime;
 
-namespace SEE.Game.UI.CodeWindow
+namespace SEE.Game.UI.Window.CodeWindow
 {
     /// <summary>
     /// Represents a token from a source code file, including <see cref="Text"/> and a <see cref="Type"/>.

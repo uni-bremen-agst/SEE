@@ -599,12 +599,12 @@ namespace SEE.Controls
         //--------------------
 
         /// <summary>
-        /// Toggles the menu of the source-code viewer.
+        /// Toggles the menu of the open windows.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ShowCodeWindowMenu()
+        public static bool ShowWindowMenu()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ShowCodeWindowMenu);
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ShowWindowMenu);
         }
 
         #endregion

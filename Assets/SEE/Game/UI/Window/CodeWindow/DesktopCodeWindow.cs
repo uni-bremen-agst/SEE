@@ -14,7 +14,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static SEE.Utils.CRDT;
 
-namespace SEE.Game.UI.CodeWindow
+namespace SEE.Game.UI.Window.CodeWindow
 {
     /// <summary>
     /// This part of the <see cref="CodeWindow"/> class contains the desktop specific UI code.
@@ -451,7 +451,7 @@ namespace SEE.Game.UI.CodeWindow
         /// This method should be called every time the window height or the line height changes.
         /// For more information, see the documentation of <see cref="excessLines"/>.
         /// </summary>
-        public void RecalculateExcessLines()
+        private void RecalculateExcessLines()
         {
             try
             {

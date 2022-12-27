@@ -1,18 +1,17 @@
 using System;
 using System.Linq;
 using DG.Tweening;
-using SEE.GO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.Game.UI.CodeWindow
+namespace SEE.Game.UI.Window.CodeWindow
 {
     /// <summary>
     /// Represents a movable, scrollable window containing source code.
     /// The source code may either be entered manually or read from a file.
     /// </summary>
-    public partial class CodeWindow : BaseWindow<CodeWindow.CodeWindowValues>
+    public partial class CodeWindow : BaseWindow
     {
         /// <summary>
         /// The text displayed in the code window.
@@ -183,25 +182,45 @@ namespace SEE.Game.UI.CodeWindow
             }
         }
 
+        public override void RebuildLayout()
+        {
+            RecalculateExcessLines();
+        }
+
         #endregion
 
         #region Value Object
 
-        protected override void InitializeFromValueObject(CodeWindowValues valueObject)
+        protected override void InitializeFromValueObject(WindowValues valueObject)
         {
-            if (valueObject.Path != null)
+            if (valueObject is not CodeWindowValues codeValues)
             {
-                EnterFromFile(valueObject.Path);
+                throw new UnsupportedTypeException(typeof(CodeWindowValues), valueObject.GetType());
             }
-            else if (valueObject.Text != null)
+            
+            if (codeValues.Path != null)
             {
-                EnterFromText(valueObject.Text.Split('\n'));
+                EnterFromFile(codeValues.Path);
+            }
+            else if (codeValues.Text != null)
+            {
+                EnterFromText(codeValues.Text.Split('\n'));
             }
             else
             {
                 throw new ArgumentException("Invalid value object. Either FilePath or Text must not be null.");
             }
-            VisibleLine = valueObject.VisibleLine;
+            VisibleLine = codeValues.VisibleLine;
+        }
+
+        public override void UpdateFromNetworkValueObject(WindowValues valueObject)
+        {
+            if (valueObject is not CodeWindowValues codeValues)
+            {
+                throw new UnsupportedTypeException(typeof(CodeWindowValues), valueObject.GetType());
+            }
+            VisibleLine = codeValues.VisibleLine;
+            //TODO: Text merge between windowValue.Text and window.Text
         }
 
         /// <summary>
@@ -210,7 +229,7 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="fulltext">Whether the whole text should be included. Iff false, the filename will be saved
         /// instead of the text.</param>
         /// <returns>The newly created <see cref="CodeWindowValues"/>, matching this class</returns>
-        public override CodeWindowValues ToValueObject()
+        public override WindowValues ToValueObject()
         {
             string attachedTo = gameObject.name;
             return SYNC_FULL_TEXT

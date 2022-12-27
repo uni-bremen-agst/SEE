@@ -3,12 +3,12 @@ using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game.UI.CodeWindow
+namespace SEE.Game.UI.Window
 {
     /// <summary>
     /// Represents a movable window.
     /// </summary>
-    public abstract class BaseWindow<V> : PlatformDependentComponent where V: WindowValues
+    public abstract class BaseWindow : PlatformDependentComponent
     {
         /// <summary>
         /// The title (e.g. filename) for the window.
@@ -54,7 +54,7 @@ namespace SEE.Game.UI.CodeWindow
         /// Shows or hides the window, depending on the <see cref="show"/> parameter.
         /// </summary>
         /// <param name="show">Whether the window should be shown.</param>
-        /// <remarks>If this window is used in a <see cref="CodeSpace"/>, this method
+        /// <remarks>If this window is used in a <see cref="WindowSpace"/>, this method
         /// needn't (and shouldn't) be used.</remarks>
         public void Show(bool show)
         {
@@ -112,6 +112,12 @@ namespace SEE.Game.UI.CodeWindow
         }
 
         /// <summary>
+        /// This method will be called whenever the layout of the window changes in any way, for example, if its
+        /// size is changed.
+        /// </summary>
+        public abstract void RebuildLayout();
+
+        /// <summary>
         /// Sets up this newly created window from the values given in the <paramref name="valueObject"/>.
         /// 
         /// Note that the <see cref="Title"/> and <c>AttachedTo</c> attributes needn't be handled, only newly added
@@ -122,8 +128,25 @@ namespace SEE.Game.UI.CodeWindow
         /// <remarks>
         /// <see cref="Start"/> has not been called at this point.
         /// </remarks>
-        protected abstract void InitializeFromValueObject(V valueObject);
-        
+        protected abstract void InitializeFromValueObject(WindowValues valueObject);
+
+        /// <summary>
+        /// Updates this window from the values given in the <paramref name="valueObject"/>, which is a value object
+        /// received over the network from another player.
+        ///
+        /// Note that this method will be called often, hence, do not simply use every new value if that negatively
+        /// impedes performance! See below for an example.
+        /// 
+        /// </summary>
+        /// <param name="valueObject">The window value object whose updated values shall be used.</param>
+        /// <example>
+        /// For example, the code windows only take into account the visible line here, which changes when another
+        /// player scrolls through the code window and which must always be updated.
+        /// It does not take into account things like the title or the path to the source code file, as these cannot
+        /// change and would use unnecessary resource to update to (e.g., having to re-read the file).
+        /// </example>
+        public abstract void UpdateFromNetworkValueObject(WindowValues valueObject);
+
         /// <summary>
         /// Recreates a window from the given <paramref name="valueObject"/> and attaches it to
         /// the GameObject <paramref name="attachTo"/>.
@@ -134,7 +157,8 @@ namespace SEE.Game.UI.CodeWindow
         /// <returns>The newly re-constructed window</returns>
         /// <exception cref="InvalidOperationException">If both <paramref name="attachTo"/> is <c>null</c>
         /// and the game object specified in <paramref name="valueObject"/> can't be found.</exception>
-        public static T FromValueObject<T>(V valueObject, GameObject attachTo = null) where T: BaseWindow<V>
+        public static BaseWindow FromValueObject<T>(WindowValues valueObject, GameObject attachTo = null)
+            where T : BaseWindow
         {
             if (attachTo == null)
             {
@@ -155,9 +179,9 @@ namespace SEE.Game.UI.CodeWindow
         /// Generates and returns a value object for this window.
         /// </summary>
         /// <returns>The newly created window value object, matching this class</returns>
-        public abstract V ToValueObject();
+        public abstract WindowValues ToValueObject();
     }
-        
+
     /// <summary>
     /// Represents the values of a window needed to re-create its content.
     /// Used for serialization when sending a window over the network.
@@ -170,7 +194,7 @@ namespace SEE.Game.UI.CodeWindow
         /// </summary>
         [field: SerializeField]
         public string Title { get; private set; }
-        
+
         [field: SerializeField]
         /// <summary>
         /// Name of the game object this window was attached to.

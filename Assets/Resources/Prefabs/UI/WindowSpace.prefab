@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6490069938454469366}
   - component: {fileID: 3705904485147930010}
   m_Layer: 5
-  m_Name: CodeWindowSpace
+  m_Name: WindowSpace
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -28,6 +28,7 @@ RectTransform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -52,6 +53,7 @@ MonoBehaviour:
   m_id: e2b2cccc-04a6-4f57-a6b9-d55eb8b6e74e
   m_leaveFreeSpace: 0
   minimumFreeSpace: {x: 50, y: 50}
+  freeSpaceTargetTransform: {fileID: 0}
   PreventDetachingLastDockedPanel: 0
   m_panelResizableAreaLength: 12
   m_canvasAnchorZoneLength: 20
