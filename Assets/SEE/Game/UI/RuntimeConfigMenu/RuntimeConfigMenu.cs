@@ -1,13 +1,9 @@
-using System;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
-using System.Reflection;
-using SEE.Game.UI.ConfigMenu;
-using Sirenix.OdinInspector;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -30,13 +26,13 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         private SteamVR_Action_Boolean openAction = SteamVR_Actions._default?.OpenSettingsMenu;
         private GameObject runtimeConfigMenu;
 
-        private static GameObject seeTables;
+        private GameObject seeTables;
 
-        private static GameObject codeCityLoader;
+        private GameObject codeCityLoader;
 
-        private static GameObject seeSettingsView;
+        private GameObject seeSettingsView;
         
-        private static GameObject seeSettingsTabs;
+        private GameObject seeSettingsTabs;
         
         private static GameObject seeSettingsContentView;
 
@@ -60,7 +56,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             codeCityLoader = runtimeConfigMenu.transform.Find("CodeCityLoader").gameObject;
 
-            // InitMenu();
+            InitMenu();
         }
         
         void Update()
@@ -100,37 +96,6 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             GameObject settingsViewLayout= SetupSettingsView(tabButtonLayout);
 
         }
-        
-        
-        public static void InitSettingsAutomatically()
-        {
-            GameObject cityGO = GameObject.FindGameObjectWithTag("Code City");
-            AbstractSEECity cityComponent = cityGO.GetComponent<AbstractSEECity>();
-
-            Dictionary<string, GameObject> tabButtons = new Dictionary<string, GameObject>();
-            Dictionary<string, GameObject> settingsViews = new Dictionary<string, GameObject>();
-            
-
-            foreach (FieldInfo fieldInfo in cityComponent.GetType().GetFields())
-            {
-                foreach (Attribute attribute in fieldInfo.GetCustomAttributes())
-                {
-                    if (attribute is TabGroupAttribute tabAttribute)
-                    {
-                        string tabName = tabAttribute.TabName;
-                        if (!tabButtons.ContainsKey(tabName))
-                        {
-                            GameObject tabButton = SetupTabButton(tabName);
-                            tabButtons.Add(tabName, tabButton);
-                            settingsViews.Add(tabName, SetupSettingsView(tabButton));
-                        }
-                    }
-                }
-            }
-            GameObject miscTabButton = SetupTabButton("Misc");
-            tabButtons.Add("Misc", miscTabButton);
-            settingsViews.Add("Misc", SetupSettingsView(miscTabButton));
-        }
 
         // Adding the settings to the Menu after a city was loaded
         public static void InitSettings()
@@ -160,7 +125,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         }
 
         // Tabs
-        private static GameObject SetupTabButton(string tabName)
+        private GameObject SetupTabButton(string tabName)
         {
             GameObject tabButton = PrefabInstantiator.InstantiatePrefab(TAB_BUTTON_PREFAB_PATH, seeSettingsTabs.transform.Find("TabObjects"), false);
             tabButton.name = tabName;
@@ -169,7 +134,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         }
         
         // Views
-        private static GameObject SetupSettingsView(GameObject tabButton)
+        private GameObject SetupSettingsView(GameObject tabButton)
         {
             GameObject settingsView = PrefabInstantiator.InstantiatePrefab(SETTINGS_VIEW_PREFAB_PATH, seeSettingsContentView.transform, false);
             settingsView.name = tabButton.name + "View";
