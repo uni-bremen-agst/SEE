@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using SEE.Game;
+using SEE.Utils;
 using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Net.Dashboard.Model.Metric;
@@ -26,10 +26,10 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="graph">The graph whose nodes' metrics shall be set</param>
         /// <param name="override">Whether any existing metrics present in the graph's nodes shall be updated</param>
-        public static async UniTaskVoid LoadDashboard(Graph graph, bool @override = true, string addedFrom = "")
+        public static async UniTask LoadDashboard(Graph graph, bool @override = true, string addedFrom = "")
         {
             IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRows();
-            IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(addedFrom.IsNullOrWhitespace() ? null : addedFrom);
+            IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(addedFrom.IsNullOrWhitespace() ? null : addedFrom, null);
             string projectFolder = DataPath.ProjectFolder();
 
             await UniTask.SwitchToThreadPool();
@@ -52,30 +52,38 @@ namespace SEE.DataModel.DG.IO
                         }
                     }
                 }
-                
+
                 if (issues.TryGetValue(nodePath, out List<Issue> issueList))
                 {
                     int? line = node.SourceLine();
+                    IEnumerable<Issue> relevantIssues;
                     if (!line.HasValue)
                     {
-                        continue;
+                        // Relevant issues are those which are contained in this file, so all issues
+                        relevantIssues = issueList;
                     }
-                    int? length = node.SourceLength();
-                    HashSet<int> lineRange = Enumerable.Range(line.Value, length ?? 1).ToHashSet();
-                    // Relevant issues are those which are entirely contained by the source region of this node
-                    IEnumerable<Issue> relevantIssues = issueList.Where(
-                        x => x.Entities.Any(e => lineRange.Contains(e.line) && 
-                                                 (!e.endLine.HasValue || lineRange.Contains(e.endLine.Value))));
+                    else
+                    {
+                        int? length = node.SourceLength();
+                        // Note: In .NET 7 there is a Enumerable.ToHashSet() which could be used instead of the constructor.
+                        HashSet<int> lineRange = new HashSet<int>(Enumerable.Range(line.Value, length ?? 1), null);
+                        // Relevant issues are those which are entirely contained by the source region of this node
+                        relevantIssues = issueList.Where(
+                            x => x.Entities.Any(e => lineRange.Contains(e.line) &&
+                                                     (!e.endLine.HasValue || lineRange.Contains(e.endLine.Value))));
+                    }
+
                     foreach (Issue issue in relevantIssues)
                     {
-                        if (node.TryGetFloat(issue.AttributeName.Name(), out float value)) {
+                        if (node.TryGetFloat(issue.AttributeName.Name(), out float value))
+                        {
                             if (!encounteredIssueNodes.Contains(node))
                             {
                                 // If the value already exists and it was set from somewhere else,
                                 // we override it if the caller wishes to do so.
                                 if (@override)
                                 {
-                                    node.SetFloat(issue.AttributeName.Name(), 0);
+                                    node.SetFloat(issue.AttributeName.Name(), 1);
                                     encounteredIssueNodes.Add(node);
                                 }
                             }
@@ -85,33 +93,35 @@ namespace SEE.DataModel.DG.IO
                                 node.SetFloat(issue.AttributeName.Name(), value+1);
                             }
                         }
-                        else 
+                        else
                         {
-                            node.SetFloat(issue.AttributeName.Name(), 0);
+                            node.SetFloat(issue.AttributeName.Name(), 1);
                             encounteredIssueNodes.Add(node);
                         }
                     }
                 }
             }
-            
+
             // Aggregate metrics
             NumericAttributeNames[] issueNames =
             {
                 NumericAttributeNames.Clone, NumericAttributeNames.Complexity, NumericAttributeNames.Cycle,
-                NumericAttributeNames.Metric, NumericAttributeNames.Style, 
+                NumericAttributeNames.Metric, NumericAttributeNames.Style,
                 NumericAttributeNames.Architecture_Violations, NumericAttributeNames.Dead_Code
             };
+            //FIXME: Aggregation from lower levels to classes doesn't work due to issues spanning multiple lines
+            // Maybe simply ignore aggregated value when a non-aggregated value is present (which it would be)
             MetricAggregator.AggregateSum(graph, issueNames.Select(x => x.Name()));
 
             await UniTask.SwitchToMainThread();
-            Debug.Log($"Updated {updatedMetrics} metric values and {encounteredIssueNodes.Count} issues " 
+            Debug.Log($"Updated {updatedMetrics} metric values and {encounteredIssueNodes.Count} issues "
                       + "using the Axivion dashboard.\n");
 
-            
-            static async UniTask<IDictionary<string, List<Issue>>> LoadIssueMetrics(string start)
+
+            static async UniTask<IDictionary<string, List<Issue>>> LoadIssueMetrics(string start, string end = null)
             {
                 IDictionary<string, List<Issue>> issues = new Dictionary<string, List<Issue>>();
-                IList<Issue> allIssues = await DashboardRetriever.Instance.GetConfiguredIssues(start, state: Issue.IssueState.added);
+                IList<Issue> allIssues = await DashboardRetriever.Instance.GetConfiguredIssues(start, end, Issue.IssueState.added);
                 foreach (Issue issue in allIssues)
                 {
                     foreach (SourceCodeEntity entity in issue.Entities)
@@ -127,15 +137,15 @@ namespace SEE.DataModel.DG.IO
                 return issues;
             }
         }
-        
+
         /// <summary>
         /// Loads node metric values from given CSV file with given separator.
         /// The file must contain a header with the column names. The first column
         /// name must be the Node.ID. Values must be either integers or
         /// floats. All numerics will be added as float attributes to the node.
-        /// Floats must use . to separate the digits. The ID is used to 
-        /// identify a node. 
-        /// 
+        /// Floats must use . to separate the digits. The ID is used to
+        /// identify a node.
+        ///
         /// The following errors may occur:
         /// ) The file cannot be read => default Exception
         /// ) The file is empty => IOException
@@ -143,7 +153,7 @@ namespace SEE.DataModel.DG.IO
         /// ) There is a row that has either too many or to few entries (the length of header and data rows do not match)
         /// ) A node with given ID does not exist in the graph
         /// ) The data entry in a column cannot be parsed as float
-        /// 
+        ///
         /// In the latter three situations, an error message is emitted and the error counter
         /// in increased.
         /// </summary>
@@ -155,7 +165,7 @@ namespace SEE.DataModel.DG.IO
         {
             if (!File.Exists(filename))
             {
-                Debug.LogWarningFormat("Metric file {0} does not exist. Metrics will not be available.\n", filename);
+                Debug.LogWarning($"Metric file {filename} does not exist. CSV Metrics will not be available.\n");
                 return 0;
             }
             int numberOfErrors = 0;
@@ -164,7 +174,7 @@ namespace SEE.DataModel.DG.IO
                 using StreamReader reader = new StreamReader(filename);
                 if (reader.EndOfStream)
                 {
-                    Debug.LogErrorFormat("Empty file: {0}", filename);
+                    Debug.LogError($"Empty file: {filename}.\n");
                 }
                 else
                 {
@@ -181,8 +191,9 @@ namespace SEE.DataModel.DG.IO
                         // The first column must be the ID
                         if (columnNames[0] != IDColumnName)
                         {
-                            Debug.LogErrorFormat("First header column in file {0} is not {1}.\n", filename, IDColumnName);
-                            throw new IOException("First header column does not contain the expected attribute " + IDColumnName);
+                            string errorMessage = $"First header column in file {filename} is not {IDColumnName}.";
+                            Debug.LogError(errorMessage + "\n");
+                            throw new IOException(errorMessage);
                         }
                         // Process each data row
                         while (!reader.EndOfStream)
@@ -194,7 +205,7 @@ namespace SEE.DataModel.DG.IO
                             // Number of named columns and data entries must correspond
                             if (columnNames.Length != values.Length)
                             {
-                                Debug.LogErrorFormat("Unexpected number of entries in file {0} at line {1}.\n", filename, lineCount);
+                                Debug.LogError($"Unexpected number of entries in file {filename} at line {lineCount}.\n");
                                 numberOfErrors++;
                             }
                             // ID is expected to be in the first column. Try to
@@ -209,7 +220,7 @@ namespace SEE.DataModel.DG.IO
                                         if (values[i].Contains("."))
                                         {
                                             float value = float.Parse(values[i], CultureInfo.InvariantCulture);
-                                            node.SetFloat(columnNames[i], value);                                               
+                                            node.SetFloat(columnNames[i], value);
                                         }
                                         else
                                         {
@@ -219,24 +230,24 @@ namespace SEE.DataModel.DG.IO
                                     }
                                     catch (ArgumentNullException)
                                     {
-                                        Debug.LogErrorFormat("Missing value in file {0} at line {1}.\n", filename, lineCount);
+                                        Debug.LogError($"Missing value in file {filename} at line {lineCount}.\n");
                                         numberOfErrors++;
                                     }
                                     catch (FormatException)
                                     {
-                                        Debug.LogErrorFormat("Value {0} does not represent a number in a valid format in file {1} at line {2}.\n", values[i], filename, lineCount);
+                                        Debug.LogError($"Value {values[i]} does not represent a number in a valid format in file {filename} at line {lineCount}.\n");
                                         numberOfErrors++;
                                     }
                                     catch (OverflowException)
                                     {
-                                        Debug.LogErrorFormat("Value {0} represents a number less than minimum or greater than maximum in file {1} at line {2}.\n", values[i], filename, lineCount);
+                                        Debug.LogError($"Value {values[i]} represents a number less than minimum or greater than maximum in file {filename} at line {lineCount}.\n");
                                         numberOfErrors++;
                                     }
                                 }
                             }
                             else
                             {
-                                Debug.LogWarningFormat("Unknown node {0} in file {1} at line {2}.\n", values[0], filename, lineCount);
+                                Debug.LogWarning($"Unknown node {values[0]} in file {filename} at line {lineCount}.\n");
                                 numberOfErrors++;
                             }
                             lineCount++;
@@ -244,14 +255,15 @@ namespace SEE.DataModel.DG.IO
                     }
                     else
                     {
-                        Debug.LogErrorFormat("Not enough columns in file {0}\n", filename);
-                        throw new IOException("Not enough columns.");
+                        string errorMessage = $"Not enough columns in file {filename}.";
+                        Debug.LogError(errorMessage + "\n");
+                        throw new IOException(errorMessage);
                     }
                 }
             }
             catch (Exception e)
             {
-                Debug.LogErrorFormat("Exception {0} while loading data from CSV file {1}.\n", e.Message, filename);
+                Debug.LogError($"Exception {e.Message} while loading data from CSV file {filename}.\n");
                 throw;
             }
             return numberOfErrors;

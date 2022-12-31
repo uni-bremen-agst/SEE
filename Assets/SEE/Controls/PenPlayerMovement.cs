@@ -2,6 +2,7 @@
 using DG.Tweening;
 using SEE.Controls.Actions;
 using SEE.Game;
+using SEE.Game.City;
 using SEE.Utils;
 using UnityEngine;
 using Plane = SEE.GO.Plane;
@@ -16,7 +17,7 @@ namespace SEE.Controls
     /// </summary>
     public class PenPlayerMovement : MonoBehaviour
     {
-       
+
         [Tooltip("The city which the player is focusing on.")]
         public Plane focusedObject;
 
@@ -65,7 +66,7 @@ namespace SEE.Controls
                 Tweens.Rotate(MainCamera.Camera.transform.gameObject, new Vector3(90f, 0f, 0f), 5f);
             };
         }
-        
+
         private void Update()
         {
             // Allow repositioning of the camera within the architecture action. Therefore skipping the update logic.

@@ -18,7 +18,7 @@ namespace SEE.Game.UI.Menu
         /// Whether this entry is currently active (i.e., toggled).
         /// </summary>
         private bool active;
-        
+
         /// <summary>
         /// Whether this entry is currently active (i.e. toggled).
         /// Setting this value will automatically call <see cref="DoExitAction"/> on deactivation.
@@ -34,7 +34,7 @@ namespace SEE.Game.UI.Menu
                     DoExitAction();
                 }
                 active = value;
-                
+
             }
             get => active;
         }
@@ -50,9 +50,9 @@ namespace SEE.Game.UI.Menu
         /// <param name="entryColor">The color with which this entry shall be displayed.</param>
         /// <param name="icon">The icon which will be displayed alongside this entry.</param>
         /// <param name="enabled">Whether this entry should be enabled on creation.</param>
-        public ToggleMenuEntry(bool active, UnityAction entryAction, UnityAction exitAction, string title, 
+        public ToggleMenuEntry(bool active, UnityAction entryAction, UnityAction exitAction, string title,
                                string description = null, Color entryColor = default, Sprite icon = null,
-                               bool enabled = true) 
+                               bool enabled = true)
             : base(entryAction, title, description, entryColor, enabled, icon)
         {
             this.active = active;

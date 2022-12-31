@@ -174,7 +174,7 @@ namespace SEE.CameraPaths
                 };
                 enabled = false;
             }
-            MovedObject.transform.position = ListToVectors(spline.ControlPointAt(0))[0];
+            MovedObject.transform.position = ListToVectors(spline.ControlPoints)[0];
             MovedObject.transform.rotation = path[0].rotation;
         }
 

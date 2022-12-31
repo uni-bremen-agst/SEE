@@ -3,14 +3,14 @@
 namespace SEE.DataModel.DG
 {
     /// <summary>
-    /// Allows one to determine whether there is any difference between two 
+    /// Allows one to determine whether there is any difference between two
     /// graph elements in terms of selected numeric attributes.
     /// </summary>
     public class NumericAttributeDiff : GraphElementDiff
     {
         /// <summary>
         /// Constructor.
-        /// 
+        ///
         /// Precondition: every attribute in <paramref name="attributes"/> must denote
         /// a numeric attribute (float or int).
         /// </summary>
@@ -52,8 +52,12 @@ namespace SEE.DataModel.DG
                         // left has attribute
                         if (right.TryGetNumeric(attribute, out float rightValue))
                         {
-                            // and right has attribute; they must be different
-                            return leftValue != rightValue;
+                            // and right has attribute; if they are different, we have found one difference
+                            if (leftValue != rightValue)
+                            {
+                                return true;
+                            }
+                            // the two attribute values are the same => we need to continue
                         }
                         else
                         {
@@ -66,7 +70,11 @@ namespace SEE.DataModel.DG
                         // left does not have the attribute => right must neither have it;
                         // if right has the attribute, we must return true because there
                         // is a difference
-                        return right.TryGetNumeric(attribute, out float _);
+                        if (right.TryGetNumeric(attribute, out float _))
+                        {
+                            return true;
+                        }
+                        // Neither of the two nodes have the attribute => we need to continue
                     }
                 }
                 return false;

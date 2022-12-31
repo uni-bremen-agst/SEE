@@ -37,6 +37,11 @@ namespace SEE.Game.Evolution
         public Text RevisionNumberText; // serialized by Unity
 
         /// <summary>
+        /// TextField for the shown commit in game.
+        /// </summary>
+        public Text CommitInformationText; // serialized by Unity
+
+        /// <summary>
         /// Slider to show the progress of the animation.
         /// </summary>
         public Slider Slider; // serialized by Unity
@@ -97,6 +102,7 @@ namespace SEE.Game.Evolution
         private void Start()
         {
             RevisionNumberText.AssertNotNull("RevisionNumberText");
+            CommitInformationText.AssertNotNull("CommitInformationText");
             Slider.AssertNotNull("Slider");
             PlayButton.AssertNotNull("PlayButton");
             FastForwardButton.AssertNotNull("FastForwardButton");

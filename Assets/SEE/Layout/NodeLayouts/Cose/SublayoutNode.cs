@@ -16,7 +16,7 @@
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.DataModel.DG;
-using SEE.Game;
+using SEE.Game.City;
 
 namespace SEE.Layout.NodeLayouts.Cose
 {
@@ -31,7 +31,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <param name="node">the root node</param>
         /// <param name="innerNodeKinds">to inner node kind</param>
         /// <param name="nodeLayouts">the nodelayout of this sublayout</param>
-        public SublayoutNode(Node node, InnerNodeKinds innerNodeKinds, NodeLayoutKind nodeLayouts) : base(node, innerNodeKinds, nodeLayouts)
+        public SublayoutNode(Node node, NodeShapes innerNodeKinds, NodeLayoutKind nodeLayouts) : base(node, innerNodeKinds, nodeLayouts)
         {
         }
     }

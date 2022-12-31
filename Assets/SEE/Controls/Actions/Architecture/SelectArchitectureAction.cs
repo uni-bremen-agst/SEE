@@ -1,10 +1,7 @@
-﻿using Microsoft.MixedReality.Toolkit;
-using SEE.Controls.Architecture;
+﻿using SEE.Controls.Architecture;
 using SEE.DataModel.DG;
 using SEE.GO;
-using SEE.Utils;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace SEE.Controls.Actions.Architecture
 {
@@ -24,7 +21,7 @@ namespace SEE.Controls.Actions.Architecture
             return new SelectArchitectureAction();
         }
 
-        
+
         /// <summary>
         /// The selected object. It has a <see cref="InteractableObject"/> component attached.
         /// </summary>
@@ -33,11 +30,11 @@ namespace SEE.Controls.Actions.Architecture
         public delegate void SpawnContextMenu(GameObject graphElement);
 
         public delegate void HideContextMenu();
-        
-        
+
+
         public static event SpawnContextMenu OnSpawnContextMenu;
         public static event HideContextMenu OnHideContextMenu;
-        
+
         public override void Start()
         {
             PenInteractionController.ObjectPrimaryClicked += ObjectPriamryClicked;

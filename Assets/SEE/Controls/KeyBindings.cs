@@ -15,7 +15,7 @@ namespace SEE.Controls
         // (2) Ctrl-Z and Ctrl-Y are reserved for Undo and Redo.
         // (3) The digits 0-9 are reserved for shortcuts for the player menu.
 
-        /// <summary>        
+        /// <summary>
         /// The registered keyboard shortcuts. The value is a help message on the shortcut.
         /// </summary>
         private static readonly Dictionary<KeyCode, string> bindings = new Dictionary<KeyCode, string>();
@@ -30,6 +30,7 @@ namespace SEE.Controls
             Architecture,  // use case architecture; related to architecture mapping and analysis
             Browsing,      // browsing a code city (panning, zooming, etc.)
             CameraPaths,   // recording a camera (player) path
+            Chat,          // text chatting with other remote players
             CodeViewer,    // source-code viewer
             Debugging,     // use case debugging
             Evolution,     // use case evolution; observing the series of revisions of a city
@@ -38,7 +39,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Registers the given <paramref name="keyCode"/> for the given <paramref name="scope"/> 
+        /// Registers the given <paramref name="keyCode"/> for the given <paramref name="scope"/>
         /// and the <paramref name="helpMessage"/>. If a <paramref name="keyCode"/> is already registered,
         /// an error message will be emitted.
         /// </summary>
@@ -75,7 +76,7 @@ namespace SEE.Controls
         }
 
         //-----------------------------------------------------
-        // General key bindings
+        #region General key bindings
         //-----------------------------------------------------
 
         /// <summary>
@@ -83,8 +84,10 @@ namespace SEE.Controls
         /// </summary>
         internal static readonly KeyCode Help = Register(KeyCode.H, Scope.Always, "Prints help on the key bindings.");
 
+        #endregion
+
         //-----------------------------------------------------------------
-        // Menu
+        #region Menu
         // Note: The digits 0-9 are used as short cuts for the menu entries
         //-----------------------------------------------------------------
 
@@ -108,22 +111,26 @@ namespace SEE.Controls
         /// </summary>
         internal static readonly KeyCode Redo = Register(KeyCode.Y, Scope.Always, "Re-does the last action.");
 
+        #endregion
+
         //-----------------------------------------------------
-        // Camera path recording and playing
+        #region Camera path recording and playing
         //-----------------------------------------------------
 
         /// <summary>
         /// Saves the current position when recording paths.
         /// </summary>
-        internal static readonly KeyCode SavePathPosition = Register(KeyCode.P, Scope.CameraPaths, "Saves the current position when recording paths.");
+        internal static readonly KeyCode SavePathPosition = Register(KeyCode.F11, Scope.CameraPaths, "Saves the current position when recording paths.");
 
         /// <summary>
         /// Starts/stops the automated path replay.
         /// </summary>
-        internal static readonly KeyCode TogglePathPlaying = Register(KeyCode.F3, Scope.CameraPaths, "Starts/stops the automated camera movement along a path.");
+        internal static readonly KeyCode TogglePathPlaying = Register(KeyCode.F12, Scope.CameraPaths, "Starts/stops the automated camera movement along a path.");
+
+        #endregion
 
         //-----------------------------------------------------
-        // Metric charts
+        #region Metric charts
         //-----------------------------------------------------
 
         /// <summary>
@@ -136,8 +143,10 @@ namespace SEE.Controls
         /// </summary>
         internal static readonly KeyCode ToggleMetricHoveringSelection = Register(KeyCode.N, Scope.MetricCharts, "Toggles hovering/selection for markers in metric charts.");
 
+        #endregion
+
         //----------------------------------------------------
-        // Architecture mapping and analysis
+        #region Architecture mapping and analysis
         //----------------------------------------------------
 
         /// <summary>
@@ -165,8 +174,10 @@ namespace SEE.Controls
         /// </summary>
         //internal static KeyCode ClearClipboard = Register(KeyCode.X, Scope.Architecture, "Architecture mapping: clears clipboard.");
 
+        #endregion
+
         //-----------------------------------------------------
-        // Navigation in a code city
+        #region Navigation in a code city
         //-----------------------------------------------------
 
         /// <summary>
@@ -180,7 +191,7 @@ namespace SEE.Controls
         /// <summary>
         /// To reset a NavigationAction: resets position/rotation to the original position/rotation.
         /// </summary>
-        internal static readonly KeyCode Reset = Register(KeyCode.R, Scope.Browsing, "Cancels an action.");
+        internal static readonly KeyCode Reset = Register(KeyCode.R, Scope.Browsing, "Resets a code city to its original position and scale.");
         /// <summary>
         /// Zooms into a city.
         /// </summary>
@@ -193,19 +204,26 @@ namespace SEE.Controls
         /// <summary>
         /// The user drags the city as a whole on the plane.
         /// </summary>
-        internal static KeyCode DragHovered = Register(KeyCode.LeftControl, Scope.Browsing, "Drag city element.");
+        internal static KeyCode DragHovered = Register(KeyCode.LeftControl, Scope.Browsing, "Drag code city.");
         /// <summary>
         /// Toggles between the locked and free camera mode.
         /// </summary>
         internal static readonly KeyCode ToggleCameraLock = Register(KeyCode.L, Scope.Browsing, "Toggles between the locked and free camera mode.");
+        /// <summary>
+        /// Toggles between pointing.
+        /// </summary>
+        internal static readonly KeyCode Pointing = Register(KeyCode.P, Scope.Browsing, "Toggles between Pointing.");
+
+        #endregion
 
         //-----------------------------------------------------
-        // Player (camera) movements.
+        #region Player (camera) movements.
         //-----------------------------------------------------
+
         /// <summary>
         /// Boosts the speed of the player movement. While pressed, movement is faster.
-        /// </summary>        
-        internal static readonly KeyCode BoostCameraSpeed = Register(KeyCode.LeftShift, Scope.Browsing, "Boosts the speed of the player movement. While pressed, movement is faster.");
+        /// </summary>
+        internal static readonly KeyCode BoostCameraSpeed = Register(KeyCode.LeftShift, Scope.Movement, "Boosts the speed of the player movement. While pressed, movement is faster.");
         /// <summary>
         /// Move camera (player) forward.
         /// </summary>
@@ -231,8 +249,10 @@ namespace SEE.Controls
         /// </summary>
         internal static readonly KeyCode MoveDown = Register(KeyCode.E, Scope.Movement, "Move down.");
 
+        #endregion
+
         //--------------------------
-        // Evolution 
+        #region Evolution
         //--------------------------
 
         /// <summary>
@@ -260,9 +280,12 @@ namespace SEE.Controls
         /// </summary>
         internal static readonly KeyCode ToggleEvolutionCanvases = Register(KeyCode.T, Scope.Evolution, "Toggles between between the two canvases for the animation and selection of a revision.");
 
+        #endregion
+
         //----------------------------------------------------
-        // Animation speed (shared by Debugging and Evolution)
+        #region Animation speed (shared by Debugging and Evolution)
         //----------------------------------------------------
+
         /// <summary>
         /// Double animation speed.
         /// </summary>
@@ -272,8 +295,10 @@ namespace SEE.Controls
         /// </summary>
         internal static readonly KeyCode DecreaseAnimationSpeed = Register(KeyCode.DownArrow, Scope.Animation, "Halves animation speed.");
 
+        #endregion
+
         //--------------------------
-        // Debugging 
+        #region Debugging
         //--------------------------
 
         /// <summary>
@@ -301,8 +326,10 @@ namespace SEE.Controls
         /// </summary>
         internal static readonly KeyCode FirstStatement = Register(KeyCode.Home, Scope.Debugging, "Execution is back to very first statement.");
 
+        #endregion
+
         //--------------------
-        // Source-code viewer
+        #region Source-code viewer
         //--------------------
 
         /// <summary>
@@ -311,9 +338,66 @@ namespace SEE.Controls
         internal static readonly KeyCode ShowCodeWindowMenu = Register(KeyCode.F1, Scope.CodeViewer, "Toggles the menu of the source-code viewer.");
 
         /// <summary>
-        /// Toggles the source-code viewer.
+        /// Undoes an edit in the source-code viewer.
         /// </summary>
-        [Obsolete("This keybinding is needed only for the video trailer and will soon disappear again.")]
-        internal static readonly KeyCode ShowCodeWindow = Register(KeyCode.F2, Scope.CodeViewer, "Toggles the source-code viewer.");
+        internal static readonly KeyCode CodeWindowUndo = Register(KeyCode.F5, Scope.CodeViewer, "Undoes an edit in the source-code viewer.");
+
+        /// <summary>
+        /// Redoes an undone edit in the source-code viewer.
+        /// </summary>
+        internal static readonly KeyCode CodeWindowRedo = Register(KeyCode.F6, Scope.CodeViewer, "Redoes an undone edit in the source-code viewer.");
+
+        /// <summary>
+        /// Saves the content of the source-code viewer.
+        /// </summary>
+        internal static readonly KeyCode CodeWindowSave = Register(KeyCode.F7, Scope.CodeViewer, "Saves the content of the source-code viewer.");
+
+        /// <summary>
+        /// Refreshes syntax highlighting in the source-code viewer.
+        /// </summary>
+        internal static readonly KeyCode RefreshSyntaxHighlighting = Register(KeyCode.F8, Scope.CodeViewer, "Refreshes syntax highlighting in the source-code viewer.");
+
+        #endregion
+
+        //-----------------------------------------------------
+        #region Text chat to communicate with other remote players
+        //-----------------------------------------------------
+
+        /// <summary>
+        /// Toggles the global chat room.
+        /// </summary>
+        internal static readonly KeyCode ToggleGlobalChat = Register(KeyCode.F2, Scope.Chat, "Toggles the global chat room.");
+
+        /// <summary>
+        /// Toggles the chat room for team 1.
+        /// </summary>
+        internal static readonly KeyCode ToggleTeam1Channel = Register(KeyCode.F3, Scope.Chat, "Toggles the chat room for team 1.");
+
+        /// <summary>
+        /// Toggles the chat room for team 2.
+        /// </summary>
+        internal static readonly KeyCode ToggleTeam2Channel = Register(KeyCode.F4, Scope.Chat, "Toggles the chat room for team 2.");
+
+        #endregion
+
+        //-----------------------------------------------------
+        #region Notifications
+        //-----------------------------------------------------
+
+        /// <summary>
+        /// Closes all open notifications.
+        /// </summary>
+        internal static readonly KeyCode CloseNotifications = Register(KeyCode.X, Scope.Always, "Clears all notifications.");
+
+        #endregion
+        
+        //-----------------------------------------------------
+        // Holistic metrics menu
+        //-----------------------------------------------------
+
+        /// <summary>
+        /// Toggles the menu for holistic code metrics.
+        /// </summary>
+        internal static readonly KeyCode ToggleHolisticMetricsMenu = Register(KeyCode.C, Scope.Always, "Toggles the menu for holistic code metrics");
     }
 }

@@ -7,7 +7,7 @@ namespace SEE.Net
     /// This script is attached to the <b>SEENetViveControllerLeft</b> and the
     /// <b>SEENetViveControllerRight</b> prefabs. Those prefabs can be instantiated on start-up via
     /// <see cref="InstantiatePrefabAction"/>.
-    /// 
+    ///
     /// If an object with the name <see cref="NameL"/> for <see cref="ViveControllerHand.Left"/> or
     /// the name <see cref="NameR"/> for <see cref="ViveControllerHand.Right"/> exists in the
     /// scene, this script copies the transform from that object into itself. Then, the copied
@@ -51,13 +51,6 @@ namespace SEE.Net
         /// </summary>
         private void Start()
         {
-            ViewContainer viewContainer = GetComponent<ViewContainer>();
-            if (viewContainer == null || !viewContainer.IsOwner())
-            {
-                Destroy(this);
-                return;
-            }
-
             string name = hand == ViveControllerHand.Left ? NameL : NameR;
             GameObject controller = GameObject.Find(name);
             Assert.IsNotNull(controller, "Controller could not be found! Is it enabled? Name: " + name);

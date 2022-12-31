@@ -15,11 +15,11 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.DataModel.DG;
-using SEE.Game;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.DataModel.DG;
+using SEE.Game.City;
 using UnityEngine;
 
 namespace SEE.Layout.NodeLayouts.Cose
@@ -122,7 +122,7 @@ namespace SEE.Layout.NodeLayouts.Cose
             name = "Compound Spring Embedder Layout";
             nodeToCoseNode = new Dictionary<ILayoutNode, CoseNode>();
             this.settings = settings;
-            SetupGraphSettings(settings.coseGraphSettings);
+            SetupGraphSettings(settings.CoseGraphSettings);
         }
 
         /// <summary>
@@ -168,9 +168,9 @@ namespace SEE.Layout.NodeLayouts.Cose
             return layout_result;
         }
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> gameNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> gameNodes)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -224,7 +224,7 @@ namespace SEE.Layout.NodeLayouts.Cose
                 if (graph.GraphObject != null)
                 {
                     float rotation = applyRotation ? graph.GraphObject.Rotation : 0.0f;
-                    layout_result[graph.GraphObject] = new NodeTransform(position, new Vector3(width, innerNodeHeight, height), rotation);
+                    layout_result[graph.GraphObject] = new NodeTransform(position, new Vector3(width, graph.GraphObject.LocalScale.y, height), rotation);
                 }
 
             }
@@ -243,7 +243,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// calculates edgeLength and repulsionStrength 
+        /// calculates edgeLength and repulsionStrength
         /// </summary>
         public void GetGoodParameter()
         {
@@ -257,8 +257,8 @@ namespace SEE.Layout.NodeLayouts.Cose
             int edgeLength = CoseHelper.GetGoodEgdeLength(countNode, countMax, leafNodesCount, edgesCount);
             int repulsionStrength = CoseHelper.GetGoodRepulsionRange(countMax, countNode, edgesCount);
 
-            settings.coseGraphSettings.RepulsionStrength = repulsionStrength;
-            settings.coseGraphSettings.EdgeLength = edgeLength;
+            settings.CoseGraphSettings.RepulsionStrength = repulsionStrength;
+            settings.CoseGraphSettings.EdgeLength = edgeLength;
 
             CoseLayoutSettings.Edge_Length = edgeLength;
             CoseLayoutSettings.Repulsion_Strength = repulsionStrength;
@@ -334,15 +334,15 @@ namespace SEE.Layout.NodeLayouts.Cose
         {
             CoseLayoutSettings.Edge_Length = edgeLength;
             CoseLayoutSettings.Repulsion_Strength = repulsionStrength;
-            settings.coseGraphSettings.EdgeLength = edgeLength;
-            settings.coseGraphSettings.RepulsionStrength = repulsionStrength;
+            settings.CoseGraphSettings.EdgeLength = edgeLength;
+            settings.CoseGraphSettings.RepulsionStrength = repulsionStrength;
 
             StartLayoutProzess();
             SetCalculatedLayoutPositionToNodes();
         }
 
         /// <summary>
-        /// Calculates the maximal depth of a node 
+        /// Calculates the maximal depth of a node
         /// </summary>
         /// <param name="layoutNodes">the layout nodes</param>
         /// <returns></returns>
@@ -368,7 +368,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// Values for Graph Layout Settings and Setup for Layouts
         /// </summary>
         /// <param name="settings">Graph Settings, choosed by user</param>
-        private void SetupGraphSettings(CoseGraphSettings settings)
+        private void SetupGraphSettings(CoseGraphAttributes settings)
         {
             CoseLayoutSettings.Edge_Length = settings.EdgeLength;
             CoseLayoutSettings.Use_Smart_Ideal_Edge_Calculation = settings.UseSmartIdealEdgeCalculation;
@@ -426,7 +426,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Places the Nodes 
+        /// Places the Nodes
         /// </summary>
         /// <param name="root">Root Node</param>
         private void PlaceNodes(ILayoutNode root)
@@ -445,7 +445,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Starts the layout process 
+        /// Starts the layout process
         /// </summary>
         private void StartLayoutProzess()
         {
@@ -477,7 +477,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Calculates the number of children of every node 
+        /// Calculates the number of children of every node
         /// </summary>
         private void CalcNoOfChildrenForAllNodes()
         {
@@ -503,7 +503,7 @@ namespace SEE.Layout.NodeLayouts.Cose
 
                 edgeLengths.Add(0, originalEdgeLength);
 
-                // we dont have to look at the original graph 
+                // we dont have to look at the original graph
                 for (int i = 1; i < gmList.Count; i++)
                 {
                     int k = edgeLengths[i - 1];
@@ -603,7 +603,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Runs the spring embedder 
+        /// Runs the spring embedder
         /// </summary>
         private void RunSpringEmbedder()
         {
@@ -1013,7 +1013,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Move all nodes 
+        /// Move all nodes
         /// </summary>
         private void MoveNodes()
         {
@@ -1128,13 +1128,13 @@ namespace SEE.Layout.NodeLayouts.Cose
 
         /// <summary>
         /// Indicates whether the edge is allowed in coselayout or not.
-        /// All Edge between predecessors and successors in the same hierarchie (inclusion branch) are not allowed in the cose layout 
+        /// All Edge between predecessors and successors in the same hierarchie (inclusion branch) are not allowed in the cose layout
         /// </summary>
         /// <param name="edge">the edge to check</param>
         /// <returns>is Allowed in layout</returns>
         private bool ExcludeEdgesInSameHierarchie(Edge edge)
         {
-            // Kanten zwischen Vorgängern und Nachfolgern in der gleichen Hierarchie werden vom Layout ausgeschlossen 
+            // Kanten zwischen Vorgängern und Nachfolgern in der gleichen Hierarchie werden vom Layout ausgeschlossen
 
             ILayoutNode sourceNode = layoutNodes.Where(node => node.ID == edge.Source.ID).First();
             ILayoutNode targetNode = layoutNodes.Where(node => node.ID == edge.Target.ID).First();
@@ -1263,7 +1263,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Creates a new cose edge 
+        /// Creates a new cose edge
         /// </summary>
         /// <param name="edge">the new edge </param>
         private void CreateEdge(Edge edge)

@@ -60,7 +60,7 @@ namespace SEE.Game.UI.PropertyDialog
 
         /// <summary>
         /// The parent of the Button. Because <see cref="SetParent(GameObject)"/>
-        /// may be called before <see cref="StartDesktop"/>, the parameter passed to 
+        /// may be called before <see cref="StartDesktop"/>, the parameter passed to
         /// <see cref="SetParent(GameObject)"/> will be buffered in this attribute.
         /// </summary>
         private GameObject parent;
@@ -92,7 +92,7 @@ namespace SEE.Game.UI.PropertyDialog
                 button.name = Name;
                 GameObject text = button.transform.Find("Text").gameObject;
                 GameObject icon = button.transform.Find("Icon").gameObject;
-                
+
                 if (!button.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager)
                      || !button.TryGetComponentOrLog(out Image buttonImage)
                      || !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro)
@@ -111,6 +111,7 @@ namespace SEE.Game.UI.PropertyDialog
                 buttonManager.buttonText = Name;
                 buttonManager.clickEvent.AddListener(Clicked);
                 pointerHelper.EnterEvent.AddListener(() => tooltip.Show(Description));
+                pointerHelper.ExitEvent.AddListener(() => tooltip.Hide());
             }
 
             void Clicked()

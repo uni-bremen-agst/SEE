@@ -29,7 +29,7 @@ namespace SEE.Utils
                 scanner.NextToken();
                 if (scanner.CurrentToken() == TokenType.EndToken)
                 {
-                    // No attribute                
+                    // No attribute
                 }
                 else
                 {
@@ -118,7 +118,7 @@ namespace SEE.Utils
                     case TokenType.OpenList:
                         return ParseList();
                     default:
-                        Error($"true, false, integer, float or {{ expected. Current token is {scanner.CurrentToken()}.\n");
+                        Error($"true, false, integer, float (including infinity and -infinity) or {{ expected. Current token is {scanner.CurrentToken()}.\n");
                         return null;
                 }
             }
@@ -167,7 +167,7 @@ namespace SEE.Utils
                 ExpectToken(TokenType.AttributeSeparator);
                 // the list is ended by ']'
                 while (scanner.CurrentToken() != TokenType.CloseList)
-                {                    
+                {
                     result.Add(ParseValue());
                     ExpectToken(TokenType.AttributeSeparator);
                 }

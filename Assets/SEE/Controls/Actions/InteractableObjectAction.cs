@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.GO;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
@@ -11,18 +12,15 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The interactable component attached to the same object as a sibling of this action.
         /// </summary>
-        protected InteractableObject interactable;
+        protected InteractableObject Interactable;
 
         /// <summary>
-        /// Sets <see cref="interactable"/>. In case of failure, this action will be disabled.
+        /// Sets <see cref="Interactable"/>. In case of failure, this action will be disabled.
         /// </summary>
         protected virtual void Awake()
         {
-            if (!gameObject.TryGetComponent<InteractableObject>(out interactable))
+            if (!gameObject.TryGetComponentOrLog(out Interactable))
             {
-                Debug.LogWarningFormat
-                    ("The game object {0} this InteractableObjectAction is attached to has no InteractableObject component.\n",
-                      name);
                 enabled = false;
             }
         }

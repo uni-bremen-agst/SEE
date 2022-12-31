@@ -18,46 +18,6 @@ namespace SEE.DataModel.DG
         // Neither will its incoming and outgoing edges be copied.
 
         /// <summary>
-        /// The domain of a node regarding the architecture analysis, that is,
-        /// whether it belongs to the architecture, implementation, or
-        /// mapping between the two.
-        /// </summary>
-        public enum NodeDomain : byte
-        {
-            /// <summary>
-            /// Does not belong to any domain.
-            /// </summary>
-            Unspecified,
-            /// <summary>
-            /// Represents a fact retrieved from the implementation,
-            /// typically created by a static analysis.
-            /// </summary>
-            Implementation,
-            /// <summary>
-            /// Represents a concept in the architecture and was created
-            /// by the software architecture. It is part of the architecture
-            /// model.
-            /// </summary>
-            Architecture,
-            /// <summary>
-            /// Is part of the mapping from the implementation domain
-            /// onto the architecture domain.
-            /// </summary>
-            Mapping,
-            /// <summary>
-            /// The number of possible <see cref="NodeDomain"/>s. As more values are added above
-            /// this element, the integer value of this element will represent the number of
-            /// elements in this enum.
-            /// </summary>
-            Count
-        }
-
-        /// <summary>
-        /// The domain of the node.
-        /// </summary>
-        public NodeDomain Domain = NodeDomain.Unspecified;
-
-        /// <summary>
         /// The attribute name for unique identifiers (within a graph).
         /// </summary>
         public const string LinknameAttribute = "Linkage.Name";
@@ -71,14 +31,17 @@ namespace SEE.DataModel.DG
         /// This will only set the id attribute, but does not alter the
         /// hashed ids of the underlying graph. If the node was already
         /// added to a graph, you cannot change the ID anymore.
-        /// Otherwise expect inconsistencies. If the node has not been added
-        /// to a graph, however, setting this property is safe.
+        /// If the node has not been added to a graph, however, setting this property is safe.
         /// </summary>
         public override string ID
         {
             get => id;
             set
             {
+                if (ItsGraph != null)
+                {
+                    throw new InvalidOperationException("ID must not be changed once added to graph.");
+                }
                 id = value;
                 SetString(LinknameAttribute, id);
             }
@@ -99,7 +62,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         public string SourceName
         {
-            get => GetString(SourceNameAttribute);
+            get => TryGetString(SourceNameAttribute, out string sourceName) ? sourceName : null;
             set => SetString(SourceNameAttribute, value);
         }
 
@@ -142,7 +105,6 @@ namespace SEE.DataModel.DG
                 }
                 return level;
             }
-            set => level = value;
         }
 
         /// <summary>
@@ -151,12 +113,12 @@ namespace SEE.DataModel.DG
         ///
         /// Note: This method should be called only by <see cref="Graph"/>.
         /// </summary>
-        internal void SetLevel(int level)
+        internal void SetLevel(int newLevel)
         {
-            this.level = level;
+            level = newLevel;
             foreach (Node child in children)
             {
-                child.SetLevel(level + 1);
+                child.SetLevel(newLevel + 1);
             }
         }
 
@@ -169,14 +131,36 @@ namespace SEE.DataModel.DG
         public int Depth()
         {
             int maxDepth = children.Select(child => child.Depth()).Prepend(0).Max();
-
             return maxDepth + 1;
         }
 
         /// <summary>
         /// The ancestor of the node in the hierarchy. May be null if the node is a root.
         /// </summary>
-        public Node Parent { get; set; }
+        private Node parent;
+
+        /// <summary>
+        /// The ancestor of the node in the hierarchy. May be null if the node is a root.
+        /// </summary>
+        public Node Parent {
+            get => parent;
+            private set
+            {
+                Node oldParent = parent;
+                parent = value;
+                switch (value)
+                {
+                    case null when oldParent == null: // Nothing to be done.
+                        break;
+                    case null: // value is null while parent is not, so the parent has been removed.
+                        Notify(new HierarchyEvent(version, oldParent, this, ChangeType.Removal));
+                        break;
+                    default: // value != null, so the parent has been added or changed
+                        Notify(new HierarchyEvent(version, value, this, ChangeType.Addition));
+                        break;
+                }
+            }
+        }
 
         /// <summary>
         /// True iff node has no parent.
@@ -192,7 +176,7 @@ namespace SEE.DataModel.DG
         /// including the node itself.
         /// </summary>
         /// <returns>ascendants of this node in the hierarchy including the node itself</returns>
-        public List<Node> Ascendants()
+        public IList<Node> Ascendants()
         {
             List<Node> result = new List<Node>();
             Node cursor = this;
@@ -202,6 +186,29 @@ namespace SEE.DataModel.DG
                 cursor = cursor.Parent;
             }
             return result;
+        }
+
+        /// <summary>
+        /// Returns all transitive descendants of this node in a post-order traversal of the
+        /// node hierarchy rooted by this node, including this node itself (will be the last node
+        /// in the returned ordered list).
+        /// </summary>
+        /// <returns>transitive descendants of this node in post order</returns>
+        public IList<Node> PostOrderDescendants()
+        {
+            // FIXME: Check for cycles in the graph, aborting with an appropriate exception (maybe in a separate method)
+            IList<Node> result = new List<Node>();
+            PostOrderDescendants(this);
+            return result;
+
+            void PostOrderDescendants(Node parent)
+            {
+                foreach (Node child in parent.Children())
+                {
+                    PostOrderDescendants(child);
+                }
+                result.Add(parent);
+            }
         }
 
         /// <summary>
@@ -260,8 +267,8 @@ namespace SEE.DataModel.DG
                     Report(ID + ": The outgoing edges are different.");
                     return false;
                 }
-                else if (incomings.Count != otherNode.incomings.Count
-                         || !GetIDs(incomings).SetEquals(GetIDs(otherNode.incomings)))
+                else if (Incomings.Count != otherNode.Incomings.Count
+                         || !GetIDs(Incomings).SetEquals(GetIDs(otherNode.Incomings)))
                 {
                     Report(ID + ": The incoming edges are different.");
                     return false;
@@ -295,7 +302,7 @@ namespace SEE.DataModel.DG
         /// <returns>hash code</returns>
         public override int GetHashCode()
         {
-            // we are using the ID which is intended to be unique
+            // we are using the ID, which is intended to be unique
             return ID.GetHashCode();
         }
 
@@ -308,15 +315,15 @@ namespace SEE.DataModel.DG
             return result;
         }
 
-        /// <summary>
-        /// The incoming edges of this node.
-        /// </summary>
-        private List<Edge> incomings = new List<Edge>();
+        public override string ToShortString()
+        {
+            return $"{SourceName} [{Type}]";
+        }
 
         /// <summary>
         /// The incoming edges of this node.
         /// </summary>
-        public List<Edge> Incomings => incomings;
+        public ISet<Edge> Incomings { get; private set; } = new HashSet<Edge>();
 
         /// <summary>
         /// Adds given edge to the list of incoming edges of this node.
@@ -339,7 +346,7 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                incomings.Add(edge);
+                Incomings.Add(edge);
             }
         }
 
@@ -364,7 +371,7 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                if (!incomings.Remove(edge))
+                if (!Incomings.Remove(edge))
                 {
                     throw new Exception($"edge {edge} is no incoming edge of {ToString()}");
                 }
@@ -374,18 +381,33 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The outgoing edges of this node.
         /// </summary>
-        public List<Edge> Outgoings { get; private set; } = new List<Edge>();
+        public ISet<Edge> Outgoings { get; private set; } = new HashSet<Edge>();
 
         /// <summary>
-        /// Removes all incoming and outgoing edges from this node.
+        /// Returns all outgoing edges of given node that have exactly the given <paramref name="edgeType"/>.
+        /// If <paramref name="edgeType"/> is <c>null</c> or empty, all outgoing edges are returned.
+        /// </summary>
+        /// <param name="edgeType">the requested exact edge type (may be null or empty)</param>
+        /// <returns>all outgoing edges of <paramref name="edgeType"/></returns>
+        public IEnumerable<Edge> OutgoingsOfType(string edgeType)
+        {
+            return Outgoings.Where(edge => string.IsNullOrEmpty(edgeType) || edge.Type == edgeType);
+        }
+
+        /// <summary>
+        /// Resets this node, i.e., removes all incoming and outgoing edges
+        /// and children from this node. Resets its graph and parent to null.
         ///
         /// IMPORTANT NOTE: This method is reserved for Graph and should not
         /// be used by any other client.
         /// </summary>
-        public void RemoveAllEdges()
+        public void Reset()
         {
             Outgoings.Clear();
-            incomings.Clear();
+            Incomings.Clear();
+            children.Clear();
+            Reparent(null);
+            ItsGraph = null;
         }
 
         /// <summary>
@@ -411,6 +433,36 @@ namespace SEE.DataModel.DG
             {
                 Outgoings.Add(edge);
             }
+        }
+
+        /// <summary>
+        /// Returns true if this node is a descendant of <paramref name="node"/> in the
+        /// node hierarchy.
+        /// </summary>
+        /// <param name="node">a potential ascendant of this node</param>
+        /// <returns>true if this node is a descendant of <paramref name="node"/></returns>
+        /// <remarks>For clarity: A node is considered its own descendant, i.e.,
+        /// <c>n.IsDescendantOf(n)</c> is always <c>true</c>.</remarks>
+        internal bool IsDescendantOf(Node node)
+        {
+            if (node == null)
+            {
+                throw new ArgumentException("Node must not be null");
+            }
+            if (ItsGraph != node.ItsGraph)
+            {
+                throw new ArgumentException("Nodes are in different graphs.");
+            }
+            Node cursor = this;
+            while (cursor != null)
+            {
+                if (cursor == node)
+                {
+                    return true;
+                }
+                cursor = cursor.parent;
+            }
+            return false;
         }
 
         /// <summary>
@@ -457,12 +509,12 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// The descendants of the node.
-        /// Note: This is not a copy. Do not modify the result.
+        /// Note: This is not a copy. The result can't be modified.
         /// </summary>
         /// <returns>descendants of the node</returns>
-        public List<Node> Children()
+        public IList<Node> Children()
         {
-            return children;
+            return children.AsReadOnly();
         }
 
         /// <summary>
@@ -470,12 +522,18 @@ namespace SEE.DataModel.DG
         /// The same node must not be added more than once.
         /// </summary>
         /// <param name="child">descendant to be added to node</param>
+        /// <remarks>It is safe to call this method with a <paramref name="child"/>
+        /// that is not yet in the graph of this node. Yet, the <paramref name="child"/>
+        /// should be added right after calling this method or otherwise other
+        /// methods will fail. Do not do anything with <paramref name="child"/> if you have not
+        /// added it via <see cref="Graph.AddNode(Node)"/>.</remarks>
         public void AddChild(Node child)
         {
             if (child.Parent == null)
             {
                 children.Add(child);
                 child.Parent = this;
+                child.level = level + 1;
                 ItsGraph.NodeHierarchyHasChanged = true;
             }
             else
@@ -488,6 +546,7 @@ namespace SEE.DataModel.DG
         /// Re-assigns the node to a different <paramref name="newParent"/>.
         /// </summary>
         /// <param name="newParent">the new parent of this node</param>
+        /// <remarks><paramref name="newParent"/> may be <c>null</c> in which case the given node becomes a root</remarks>
         public void Reparent(Node newParent)
         {
             if (this == newParent)
@@ -626,20 +685,21 @@ namespace SEE.DataModel.DG
             target.Parent = null;
             target.level = 0;
             target.children = new List<Node>();
-            target.Outgoings = new List<Edge>();
-            target.incomings = new List<Edge>();
+            target.Outgoings = new HashSet<Edge>();
+            target.Incomings = new HashSet<Edge>();
         }
 
         /// <summary>
         /// Returns the list of outgoing edges from this node to the given
         /// target node that have exactly the given edge type.
+        /// If the given edge type is null, it will not be taken into account.
         ///
         /// Precondition: target must not be null
         /// </summary>
         /// <param name="target">target node</param>
-        /// <param name="its_type">requested edge type</param>
+        /// <param name="itsType">requested edge type</param>
         /// <returns>all edges from this node to target node with exactly the given edge type</returns>
-        public List<Edge> From_To(Node target, string its_type)
+        public List<Edge> FromTo(Node target, string itsType = null)
         {
             if (ReferenceEquals(target, null))
             {
@@ -647,7 +707,7 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                return Outgoings.Where(edge => edge.Target == target && edge.Type == its_type).ToList();
+                return Outgoings.Where(edge => edge.Target == target && (itsType == null || edge.Type == itsType)).ToList();
             }
         }
 
@@ -664,9 +724,39 @@ namespace SEE.DataModel.DG
             return Outgoings.Any(outgoing => outgoing.Target == other && (string.IsNullOrEmpty(edgeType) || outgoing.Type == edgeType));
         }
 
+        /// <summary>
+        /// Returns true if <paramref name="node"/> is not null.
+        /// </summary>
+        /// <param name="node">node to be compared</param>
         public static implicit operator bool(Node node)
         {
             return node != null;
+        }
+
+        /// <summary>
+        /// Removes this node and all its descendants in the node hierarchy
+        /// including their incoming and outgoing edges from the graph.
+        /// All deleted nodes and edges are returned in the result.
+        /// </summary>
+        /// <returns>all deleted nodes and edges including this node</returns>
+        public SubgraphMemento DeleteTree()
+        {
+            SubgraphMemento result = new SubgraphMemento(ItsGraph);
+            foreach (Node node in PostOrderDescendants())
+            {
+                result.Parents[node] = node.Parent;
+                foreach (Edge edge in node.Outgoings)
+                {
+                    result.Edges.Add(edge);
+                }
+                foreach (Edge edge in node.Incomings)
+                {
+                    result.Edges.Add(edge);
+                }
+                // Removing a node will also remove all its incoming and outgoing edges.
+                ItsGraph.RemoveNode(node);
+            }
+            return result;
         }
     }
 }

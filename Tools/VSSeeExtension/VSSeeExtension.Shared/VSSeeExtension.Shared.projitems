@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>0158d248-645b-4659-b768-2d778a2b681a</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>VSSeeExtension.Shared</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\AboutCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\Elements\HighlightClassesCommand .cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\References\HighlightElementReferencesCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\Elements\HighlightElementsCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\Element\HighlightElementCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\References\HighlightMethodReferencesCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\Element\HighlightMethodCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SEE\RemoteProcedureCalls.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SEE\SeeIntegration.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)SEE\SeeCalls.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\Command.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\ConnectToSeeCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\DisconnectFromSeeCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Commands\Element\HighlightClassCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Options\VSSeeExtensionOptions.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\Helpers\DteHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\Helpers\WindowHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\Helpers\SolutionHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\PackageInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\IPC\JsonRpcClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\IPC\JsonRpcSocketClient.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\Logger.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)UI\Dialogs\AboutDialog.xaml.cs">
+      <DependentUpon>AboutDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Utils\Helpers\DocumentHelper.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)VSSeeExtensionPackage.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="$(MSBuildThisFileDirectory)UI\Dialogs\AboutDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Commands\Element\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Commands\Elements\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Commands\References\" />
+    <Folder Include="$(MSBuildThisFileDirectory)Utils\IPC\" />
+  </ItemGroup>
+</Project>

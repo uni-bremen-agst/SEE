@@ -5,6 +5,7 @@ using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions.Architecture;
 using SEE.Controls.Architecture;
 using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.UI.Architecture;
 using SEE.Utils;
 using Sirenix.Utilities;
@@ -12,14 +13,14 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
-    
-   
+
+
     /// <summary>
     /// Action to model the architecture for the reflexion analysis
     /// </summary>
     public class ArchitectureAction : AbstractPlayerAction
     {
-        
+
         #region Delegates
 
         public delegate void ArchitectureActionEnabled();
@@ -27,26 +28,26 @@ namespace SEE.Controls.Actions
         public delegate void ArchitectureActionDisabled();
 
         #endregion
-        
+
         #region Static Events
-        
+
         /// <summary>
         /// Notifies the subscriber about the activation of this <see cref="AbstractPlayerAction"/> action.
         /// </summary>
         public static event ArchitectureActionEnabled OnArchitectureActionEnabled;
-        
+
         /// <summary>
         /// Notifies the subscriber about the deactivation of this <see cref="AbstractPlayerAction"/> action.
         /// </summary>
         public static event ArchitectureActionDisabled OnArchitectureActionDisabled;
 
         #endregion
-        
+
         /// <summary>
         /// The currently selected action.
         /// </summary>
         private IArchitectureAction activeAction;
-        
+
         /// <summary>
         /// Maps the <see cref="AbstractArchitectureAction"/> name to their respective instance.
         /// </summary>
@@ -78,7 +79,7 @@ namespace SEE.Controls.Actions
         /// <see cref="DeleteElementDialog"/>
         /// </summary>
         private GameObject DeleteElementDialog;
-        
+
         /// <summary>
         /// UI Context menu for node selection. Contains context action such as delete or edit for nodes.
         /// Prefab instantiated from Prefabs/Architecture/UI/NodeContextMenuHolder
@@ -94,7 +95,7 @@ namespace SEE.Controls.Actions
         /// <see cref="EdgeContextMenu"/>
         /// </summary>
         private GameObject EdgeContextMenu;
-        
+
         /// <summary>
         /// UI element that holds the graph element tooltip for displaying the names.
         /// Prefab instantiated from Prefabs/Architecture/UI/ObjectTooltip.
@@ -119,12 +120,12 @@ namespace SEE.Controls.Actions
             internal float currentZoomFactor;
             internal GameObject CityObject;
         }
-        
+
         /// <summary>
         /// The zoomstate instance.
         /// </summary>
         private ZoomState zoomState;
-        
+
         /// <summary>
         /// UI element that holds the slider for zooming into the architecture.
         /// </summary>
@@ -164,7 +165,7 @@ namespace SEE.Controls.Actions
                 GameObject city = SceneQueries.FindArchitecture().gameObject;
                 if (city != null)
                 {
-                    
+
                     zoomState.CityObject = city;
                     zoomState.originalScale = zoomState.WhiteboardTransform.localScale;
                     zoomState.currentZoomFactor = 1.0f;
@@ -177,7 +178,6 @@ namespace SEE.Controls.Actions
 
         public override void Start()
         {
-            Debug.Log("Start");
             OnArchitectureActionEnabled?.Invoke();
             // Find the UI Canvas to place the AbstractArchitectureAction buttons on.
             if (UICanvas == null)
@@ -206,28 +206,28 @@ namespace SEE.Controls.Actions
             activeAction.Stop();
             CleanUpAction();
         }
-        
+
         /// <summary>
         /// Clean up the ui elements after stopping the ArchitectureAction
         /// </summary>
         private void CleanUpAction()
         {
             //Destroy all ui instances as they are newly generated on next action start
-            Destroyer.DestroyGameObject(ModeIndicator);
-            Destroyer.DestroyGameObject(DeleteElementDialog);
-            Destroyer.DestroyGameObject(NodeContextMenu);
-            Destroyer.DestroyGameObject(EdgeContextMenu);
-            Destroyer.DestroyGameObject(ZoomSlider);
-            Destroyer.DestroyGameObject(ToolTipDisplay);
-            Destroyer.DestroyGameObject(SaveActionButton);
-            
+            Destroyer.Destroy(ModeIndicator);
+            Destroyer.Destroy(DeleteElementDialog);
+            Destroyer.Destroy(NodeContextMenu);
+            Destroyer.Destroy(EdgeContextMenu);
+            Destroyer.Destroy(ZoomSlider);
+            Destroyer.Destroy(ToolTipDisplay);
+            Destroyer.Destroy(SaveActionButton);
+
             //Clear mappings
-            nameToUI.ForEach(e => Destroyer.DestroyGameObject(e.Value));
+            nameToUI.ForEach(e => Destroyer.Destroy(e.Value));
             nameToUI.Clear();
             nameToAction.Clear();
-            
+
         }
-        
+
 
         /// <summary>
         /// Instantiates the UI elements for the <see cref="ArchitectureAction"/>.
@@ -245,7 +245,7 @@ namespace SEE.Controls.Actions
             ToolTipDisplay.GetComponent<TooltipHolder>().Controller = penInteractionController;
         }
 
-        
+
         /// <summary>
         /// Prepares the global actions that do not need a AbstractArchitectureAction.
         /// </summary>
@@ -260,7 +260,7 @@ namespace SEE.Controls.Actions
                 saveArchitectureDialog.OnConfirm.AddListener(OnSaveConfirm);
                 saveArchitectureDialog.Open();
             });
-            
+
             ZoomSlider = PrefabInstantiator.InstantiatePrefab("Prefabs/Architecture/UI/ZoomSlider", UICanvas.transform, false);
             SliderManager manager = ZoomSlider.GetComponent<SliderManager>();
             manager.mainSlider.onValueChanged.AddListener(ChangeZoom);
@@ -287,7 +287,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void InitializeActions(PenInteractionController penInteractionController)
         {
-           
+
             foreach (ArchitectureActionType type in ArchitectureActionType.AllTypes)
             {
                 AbstractArchitectureAction action = type.CreateAbstractArchitectureAction();
@@ -301,7 +301,7 @@ namespace SEE.Controls.Actions
             nameToAction.Values.ForEach(a => a.Awake());
             activeAction = nameToAction.Values.First();
         }
-        
+
         /// <summary>
         /// Handling the zoom action that the user can trigger by using the on screen slider.
         /// </summary>
@@ -315,7 +315,7 @@ namespace SEE.Controls.Actions
                     zoomState.originalScale.z * zoomState.currentZoomFactor);
                 Portal.SetPortal(zoomState.CityObject);
             }
-            
+
         }
 
 

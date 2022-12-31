@@ -11,27 +11,28 @@ namespace SEE.DataModel.DG.IO
     public class GraphReader : GXLParser
     {
         /// <summary>
-        /// Constructor. If <paramref name="rootName"/> is neither null nor the empty string and if
+        /// Constructor. If <paramref name="rootID"/> is neither null nor the empty string and if
         /// the loaded graph has multiple roots, a single artificial root with that name will be added
-        /// that becomes the parent of all other original roots. The <paramref name="rootName"/>
+        /// that becomes the parent of all other original roots. The <paramref name="rootID"/>
         /// determines both Source.Name, Linkage.Name, and Type of that artificial root. If
-        /// <paramref name="rootName"/> is null or the empty string or has a single root, the graph
+        /// <paramref name="rootID"/> is null or the empty string or has a single root, the graph
         /// will be loaded as stored in the GXL file.
         ///
         /// When the graph is loaded, the node levels are calculated.
         ///
-        /// Precondition: <paramref name="rootName"/> must be unique.
+        /// Precondition: <paramref name="rootID"/> must be unique.
         /// </summary>
         /// <param name="filename">the name of the GXL file</param>
-        /// <param name="graph">the graph to which the entities found in the GXL are to be added</param>
         /// <param name="hierarchicalEdgeTypes">the set of edge-type names for edges considered to represent nesting</param>
-        /// <param name="rootName">name of the artifical root node if required</param>
+        /// <param name="basePath">the base path of the graph</param>
+        /// <param name="rootID">unique ID of the artificial root node if required</param>
         /// <param name="logger">the logger used for messages; if null, no messages are emitted</param>
-        public GraphReader(string filename, HashSet<string> hierarchicalEdgeTypes, string rootName = "", SEE.Utils.ILogger logger = null)
+        public GraphReader(string filename, HashSet<string> hierarchicalEdgeTypes, string basePath, string rootID = "", Utils.ILogger logger = null)
             : base(filename, logger)
         {
             this.hierarchicalEdgeTypes = hierarchicalEdgeTypes;
-            this.rootName = string.IsNullOrEmpty(rootName) ? "" : rootName;
+            this.rootName = string.IsNullOrEmpty(rootID) ? "" : rootID;
+            this.basePath = basePath;
         }
 
         /// <summary>
@@ -41,13 +42,19 @@ namespace SEE.DataModel.DG.IO
         private readonly string rootName;
 
         /// <summary>
-        /// Loads the graph from the GXL file and adds an artifical root node if requested
+        /// The base path of the graph to be loaded.
+        /// </summary>
+        private readonly string basePath;
+
+        /// <summary>
+        /// Loads the graph from the GXL file and adds an artificial root node if requested
         /// (see constructor). The node levels will be calculated, too.
         /// </summary>
         public override void Load()
         {
             base.Load();
-            if (rootName.Length > 0)
+            graph.BasePath = basePath;
+            if (!string.IsNullOrWhiteSpace(rootName))
             {
                 List<Node> roots = graph.GetRoots();
                 if (roots.Count == 0)
@@ -61,7 +68,7 @@ namespace SEE.DataModel.DG.IO
                     {
                         Type = Graph.UnknownType,
                         ID = rootName,
-                        SourceName = rootName
+                        SourceName = ""
                     };
                     graph.AddNode(singleRoot);
                     foreach (Node root in roots)
@@ -129,7 +136,8 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         protected override void StartGraph()
         {
-            graph = new Graph();
+            // We don't know the base path yet, hence, we use the empty string.
+            graph = new Graph("");
             graph.Path = filename;
             if (reader.HasAttributes)
             {
@@ -311,7 +319,7 @@ namespace SEE.DataModel.DG.IO
 
                 // Note that we do not know yet whether this edge is a hierarchical
                 // or non-hierarchical edge until we see the edge type.
-                Edge thisEdge = new Edge(id);
+                Edge thisEdge = new Edge();
                 // set source of the edge
                 if (nodes.TryGetValue(fromNode, out Node sourceNode))
                 {
@@ -352,7 +360,7 @@ namespace SEE.DataModel.DG.IO
                 else
                 {
                     Edge edge = current as Edge;
-                    if (hierarchicalEdgeTypes.Contains(edge.Type))
+                    if (hierarchicalEdgeTypes.Contains(edge.Type) && edge.Target != null && edge.Source != null)
                     {
                         // hierarchial edges are turned into children
                         // Note: a hierarchical edge starts at the child and ends at the parent
@@ -421,43 +429,45 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         protected override void StartAttr()
         {
-            if (ReferenceEquals(current, null))
+            if (reader.HasAttributes)
             {
-                LogError("Found attribute declaration outside of a node/edge declaration");
+                while (reader.MoveToNextAttribute())
+                {
+                    if (reader.Name == "name")
+                    {
+                        // save for later when we know the attribute type
+                        currentAttributeName = reader.Value;
+                        break;
+                    }
+                }
             }
             else
             {
-                if (reader.HasAttributes)
-                {
-                    while (reader.MoveToNextAttribute())
-                    {
-                        if (reader.Name == "name")
-                        {
-                            // save for later when we know the attribute type
-                            currentAttributeName = reader.Value;
-                            break;
-                        }
-                    }
-                }
-                else
-                {
-                    LogError("Attribute declaration without name.");
-                }
+                LogError("Attribute declaration without name.");
             }
         }
 
         /// <summary>
-        /// Sets toggle attribute value of attribute currentAttributeName of current graph element.
+        /// Sets toggle attribute of attribute currentAttributeName of current graph element.
         /// </summary>
         protected override void StartEnum()
         {
-            if (ReferenceEquals(current, null))
+            if (currentAttributeName == "")
             {
-                LogError("Found toggle attribute (enum) outside of a node/edge declaration.");
+                LogError("There is no attribute name for this enum.");
             }
-            else if (currentAttributeName == "")
+            else if (ReferenceEquals(current, null))
             {
-                LogError("There is not attribute name for this enum.");
+                // current does not refer to a node or edge, hence, we should
+                // be in the context of a graph.
+                if (graph != null)
+                {
+                    graph.SetToggle(currentAttributeName);
+                }
+                else
+                {
+                    LogError("Found toggle attribute (enum) outside of a graph/node/edge declaration.");
+                }
             }
             else
             {
@@ -471,13 +481,22 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         protected override void EndString(string value)
         {
-            if (ReferenceEquals(current, null))
-            {
-                LogError("Found string attribute outside of a node/edge declaration.");
-            }
-            else if (currentAttributeName == "")
+            if (currentAttributeName == "")
             {
                 LogError("There is not attribute name for this string.");
+            }
+            else if (ReferenceEquals(current, null))
+            {
+                // current does not refer to a node or edge, hence, we should
+                // be in the context of a graph.
+                if (graph != null)
+                {
+                    graph.SetString(currentAttributeName, value);
+                }
+                else
+                {
+                    LogError("Found string attribute outside of a graph/node/edge declaration.");
+                }
             }
             else
             {
@@ -490,13 +509,22 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         protected override void EndFloat(float value)
         {
-            if (ReferenceEquals(current, null))
-            {
-                LogError("Found float attribute outside of a node/edge declaration.");
-            }
-            else if (currentAttributeName == "")
+            if (currentAttributeName == "")
             {
                 LogError("There is not attribute name for this float.");
+            }
+            else if (ReferenceEquals(current, null))
+            {
+                // current does not refer to a node or edge, hence, we should
+                // be in the context of a graph.
+                if (graph != null)
+                {
+                    graph.SetFloat(currentAttributeName, value);
+                }
+                else
+                {
+                    LogError("Found float attribute outside of a graph/node/edge declaration.");
+                }
             }
             else
             {
@@ -509,13 +537,22 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         protected override void EndInt(int value)
         {
-            if (ReferenceEquals(current, null))
-            {
-                LogError("Found int attribute outside of a node/edge declaration.");
-            }
-            else if (currentAttributeName == "")
+            if (currentAttributeName == "")
             {
                 LogError("There is not attribute name for this int.");
+            }
+            else if (ReferenceEquals(current, null))
+            {
+                // current does not refer to a node or edge, hence, we should
+                // be in the context of a graph.
+                if (graph != null)
+                {
+                    graph.SetInt(currentAttributeName, value);
+                }
+                else
+                {
+                    LogError("Found int attribute outside of a graph/node/edge declaration.");
+                }
             }
             else
             {

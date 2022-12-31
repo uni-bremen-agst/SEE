@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using SEE.Game;
+﻿using System.Collections.Generic;
+using SEE.Utils;
 
 namespace SEE.DataModel.DG
 {
@@ -10,6 +9,13 @@ namespace SEE.DataModel.DG
     public abstract class GraphElement : Attributable
     {
         /// <summary>
+        /// The name of the toggle attribute that marks "virtual" graph elements, which are
+        /// elements that are not intended to be layouted or drawn in SEE and only
+        /// exist in the underlying graph.
+        /// </summary>
+        public const string IsVirtualToggle = "IsVirtual";
+
+        /// <summary>
         /// The type of the graph element.
         /// </summary>
         private string type;
@@ -17,7 +23,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The graph this graph element is contained in. May be null if
         /// the element is currently not in a graph.
-        /// 
+        ///
         /// IMPORTANT NOTE: This attribute will not be serialized. It may
         /// be null at run-time or in the editor inspection view.
         /// </summary>
@@ -26,9 +32,9 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The graph this graph element is contained in. May be null if
         /// the element is currently not in a graph.
-        /// 
+        ///
         /// Note: The set operation is intended only for Graph.
-        /// 
+        ///
         /// IMPORTANT NOTE: This attribute will not be serialized. It may
         /// be null at run-time or in the editor inspection view.
         /// </summary>
@@ -44,19 +50,24 @@ namespace SEE.DataModel.DG
         public virtual string Type
         {
             get => type;
-            set => type = !string.IsNullOrEmpty(value) ? value : Graph.UnknownType;
+            set
+            {
+                string oldType = type;
+                type = !string.IsNullOrEmpty(value) ? value : Graph.UnknownType;
+                Notify(new GraphElementTypeEvent(version, oldType, type, this));
+            }
         }
 
         /// <summary>
         /// True if the type of this graph element is a super type of given type or equal to
         /// given type. In other words, type --extends*--> this.Type.
-        /// 
+        ///
         /// IMPORTANT NOTE: Currently, we do not have a type hierarchy of the underlying
         /// graph, hence, we only test whether both types are equal.
         /// </summary>
         /// <param name="type"></param>
         /// <returns>true iff type --extends*--> this.Type</returns>
-        public bool Has_Supertype_Of(string type)
+        public bool HasSupertypeOf(string type)
         {
             // FIXME: We currently do not have the type hierarchy, so we cannot know
             // which type subsumes which other type. For the time being, we insist that
@@ -65,17 +76,17 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns true if <paramref name="other"/> meets all of the following conditions: 
+        /// Returns true if <paramref name="other"/> meets all of the following conditions:
         /// (1) is not null
         /// (2) has exactly the same C# type
         /// (3) has exactly the same attributes with exactly the same values as this graph element
         /// (4) has the same type name
-        /// 
+        ///
         /// Note: This graph element and the other graph element may or may not be in the same graph.
         /// </summary>
         /// <param name="other">to be compared to</param>
         /// <returns>true if equal</returns>
-        public override bool Equals(Object other)
+        public override bool Equals(object other)
         {
             if (!base.Equals(other))
             {
@@ -116,7 +127,7 @@ namespace SEE.DataModel.DG
         public string Path()
         {
             TryGetString("Source.Path", out string result);
-            // If this attribute cannot be found, result will have the standard value 
+            // If this attribute cannot be found, result will have the standard value
             // for strings, which is null.
             return result;
         }
@@ -132,6 +143,7 @@ namespace SEE.DataModel.DG
         /// <returns>relative path of source file or null</returns>
         public string RelativePath(string projectFolder = null)
         {
+            // FIXME: The data model (graph) should be independent of Unity (here: DataPath.ProjectFolder()).
             return Path()?.Replace(projectFolder ?? DataPath.ProjectFolder(), string.Empty).TrimStart('/');
         }
 
@@ -144,9 +156,25 @@ namespace SEE.DataModel.DG
         public string Filename()
         {
             TryGetString("Source.File", out string result);
-            // If this attribute cannot be found, result will have the standard value 
+            // If this attribute cannot be found, result will have the standard value
             // for strings, which is null.
             return result;
+        }
+
+        /// <summary>
+        /// Returns the absolute path of the file declaring this graph element
+        /// by concatenating the <see cref="Graph.BasePath"/> of the graph containing
+        /// this graph element and the path and filename attributes of this graph
+        /// element.
+        ///
+        /// The result will be in the platform-specific syntax for filenames.
+        /// </summary>
+        /// <returns>platform-specific absolute path</returns>
+        public string AbsolutePlatformPath()
+        {
+            return System.IO.Path.Combine(ItsGraph.BasePath,
+                                          Filenames.OnCurrentPlatform(Path()),
+                                          Filenames.OnCurrentPlatform(Filename()));
         }
 
         /// <summary>
@@ -173,7 +201,7 @@ namespace SEE.DataModel.DG
         /// <returns>number of lines of the element in source file or null</returns>
         public int? SourceLength()
         {
-            if (TryGetInt("Source.Region_Start", out int result))
+            if (TryGetInt("Source.Region_Length", out int result))
             {
                 return result;
             }
@@ -208,10 +236,16 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Returns a short string representation of this graph element, intended for user-facing output.
+        /// </summary>
+        /// <returns>short string representation of graph element</returns>
+        public abstract string ToShortString();
+
+        /// <summary>
         /// Creates deep copies of attributes where necessary. Is called by
-        /// Clone() once the copy is created. Must be extended by every 
+        /// Clone() once the copy is created. Must be extended by every
         /// subclass that adds fields that should be cloned, too.
-        /// 
+        ///
         /// The clone will have all attributes and also the type of this graph element,
         /// but will not be contained in any graph.
         /// </summary>

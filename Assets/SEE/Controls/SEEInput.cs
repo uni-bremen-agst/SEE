@@ -6,21 +6,21 @@ namespace SEE.Controls
     /// <summary>
     /// Provides a logical abstraction of raw Unity inputs by the user.
     /// </summary>
-    public static class SEEInput
+    internal static class SEEInput
     {
         /// <summary>
         /// If true, all logical inputs that require keyboard interactions are enabled.
-        /// If false, we will not listen to keyboard inputs for any of the logical 
-        /// input queries. This flag is provided to disable the keyboard shortcuts 
+        /// If false, we will not listen to keyboard inputs for any of the logical
+        /// input queries. This flag is provided to disable the keyboard shortcuts
         /// when there are dialogs asking the user for keybord inputs. If the shortcuts
         /// were enabled, they would interfere with the user's input for the dialog.
         /// For instance, pressing W would enter the text "W" and move the player
         /// forward.
         /// </summary>
-        public static bool KeyboardShortcutsEnabled = true;
+        public static bool KeyboardShortcutsEnabled { set; get; } = true;
 
         //-----------------------------------------------------
-        // General key bindings
+        #region General key bindings
         //-----------------------------------------------------
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace SEE.Controls
         /// <summary>
         /// True if KeyboardShortcutsEnabled and the key for the given <paramref name="digit"/>
         /// was pressed. Used as shortcuts for the menu entries.
-        /// 
+        ///
         /// Precondition: 0 &lt;= <paramref name="digit"/> &lt;= 9.
         /// </summary>
         /// <param name="digit">the checked digit</param>
@@ -69,15 +69,15 @@ namespace SEE.Controls
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Undo()
-        {            
+        {
 #if UNITY_EDITOR == false
             // Ctrl keys are not available when running the game in the editor
-            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
 #endif
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Undo);
 #if UNITY_EDITOR == false
-            } 
+            }
             else
             {
                 return false;
@@ -93,17 +93,122 @@ namespace SEE.Controls
         {
 #if UNITY_EDITOR == false
             // Ctrl keys are not available when running the game in the editor
-            if (Input.GetKeyDown(KeyCode.LeftControl) || Input.GetKeyDown(KeyCode.RightControl))
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
 #endif
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Redo);
 #if UNITY_EDITOR == false
-            } 
+            }
             else
             {
                 return false;
             }
 #endif
+        }
+
+        /// <summary>
+        /// Un-does the last change in the CodeWindow
+        /// </summary>
+        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool CodeWindowUndo()
+        {
+#if UNITY_EDITOR == false
+            // Ctrl keys are not available when running the game in the editor
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+            {
+               return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Undo);
+            }
+            else
+            {
+                return false;
+            }
+#else
+            // Ctrl keys replaced with KeyBindings.CodeWindowUndo in the editor
+            return Input.GetKeyDown(KeyBindings.CodeWindowUndo) && !KeyboardShortcutsEnabled;
+#endif
+        }
+
+        /// <summary>
+        /// Re-does the last change in the CodeWindow
+        /// </summary>
+        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool CodeWindowRedo()
+        {
+#if UNITY_EDITOR == false
+            // Ctrl keys are not available when running the game in the editor
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+            {
+                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Redo);
+            }
+            return false;
+#else
+            //ctrl keys replaced with KeyBindings.CodeWindowUndo in the editor
+            return Input.GetKeyDown(KeyBindings.CodeWindowRedo) && !KeyboardShortcutsEnabled;
+#endif
+        }
+
+        /// <summary>
+        /// Saves the changes made in an active code window
+        /// </summary>
+        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool SaveCodeWindow()
+        {
+#if UNITY_EDITOR == false
+            // Ctrl keys are not available when running the game in the editor
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+            {
+                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.S);
+            }
+            else
+            {
+                return false;
+            }
+#else
+            // ctrl keys replaced with KeyBindings.CodeWindowSave in the editor
+            return Input.GetKeyDown(KeyBindings.CodeWindowSave) && !KeyboardShortcutsEnabled;
+#endif
+        }
+
+        /// <summary>
+        /// Recalculates the Syntaxhighliting
+        /// </summary>
+        /// <returns>true if the user requests this action and not <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ReCalculateSyntaxHighlighting()
+        {
+#if UNITY_EDITOR == false
+           // Ctrl keys are not available when running the game in the editor
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+            {
+                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.R);
+            }
+            return false;
+#else
+            // ctrl keys replaced with KeyBindings.RefreshSyntaxHighlighting in the editor
+            return Input.GetKeyDown(KeyBindings.RefreshSyntaxHighlighting) && !KeyboardShortcutsEnabled;
+#endif
+        }
+
+        /// <summary>
+        /// Whether the left or right shift key was pressed down (and not again released).
+        /// </summary>
+        private static bool isModPressed = false;
+
+        /// <summary>
+        /// Returns true if the user wants to toggle the run-time configuration
+        /// menu allowing him/her to define the settings for code cities.
+        /// </summary>
+        /// <returns>true if the user wants to toggle the run-time configuration menu</returns>
+        internal static bool ToggleConfigMenu()
+        {
+            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
+            {
+                isModPressed = true;
+            }
+            if (Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift))
+            {
+                isModPressed = false;
+            }
+            return isModPressed && Input.GetKeyUp(KeyCode.Escape);
         }
 
         /// <summary>
@@ -115,8 +220,10 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Mapping);
         }
 
+        #endregion
+
         //-----------------------------------------------------
-        // Camera path recording and playing
+        #region Camera path recording and playing
         //-----------------------------------------------------
 
         /// <summary>
@@ -137,8 +244,10 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.TogglePathPlaying);
         }
 
+        #endregion
+
         //-----------------------------------------------------
-        // Metric charts
+        #region Metric charts
         //-----------------------------------------------------
 
         /// <summary>
@@ -159,8 +268,10 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleMetricHoveringSelection);
         }
 
+        #endregion
+
         //-----------------------------------------------------
-        // Manipulating nodes
+        #region Manipulating nodes
         //-----------------------------------------------------
 
         /// <summary>
@@ -172,8 +283,10 @@ namespace SEE.Controls
             return Input.GetMouseButton(0);
         }
 
+        #endregion
+
         //-----------------------------------------------------
-        // Navigation in a code city
+        #region Navigation in a code city
         //-----------------------------------------------------
 
         /// <summary>
@@ -241,25 +354,18 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// The user wants to start dragging the city in its entirety or parts of it.
-        /// </summary>
-        /// <returns>true if the user requests this action</returns>
-        internal static bool StartDrag()
-        {
-            return Input.GetMouseButtonDown(2);
-        }
-
-        /// <summary>
-        /// The user wants to drag the city in it's entirety or parts of it.
+        /// The user wants to drag the city in its entirety or parts of it.
         /// </summary>
         /// <returns>true if the user requests this action</returns>
         internal static bool Drag()
         {
-            return Input.GetMouseButton(2);
+            return Input.GetMouseButton(MiddleMouseButton);
         }
 
+        #endregion
+
         //-----------------------------------------------------
-        // Player (camera) movements.
+        #region Player (camera) movements.
         //-----------------------------------------------------
 
         /// <summary>
@@ -330,17 +436,33 @@ namespace SEE.Controls
         private const int RightMouseButton = 1;
 
         /// <summary>
+        /// Index of the middle mouse button.
+        /// </summary>
+        private const int MiddleMouseButton = 2;
+
+        /// <summary>
         /// Rotates the camera.
         /// </summary>
         /// <returns>true if the user requests this action</returns>
         public static bool RotateCamera()
         {
-            return Input.GetMouseButton(RightMouseButton) 
+            return Input.GetMouseButton(RightMouseButton)
                 || (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButton(LeftMouseButton));
         }
 
+        /// <summary>
+        /// True if the user wishes to point.
+        /// </summary>
+        /// <returns>true if the user wishes to point</returns>
+        public static bool TogglePointing()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Pointing);
+        }
+
+        #endregion
+
         //--------------------------
-        // Evolution 
+        #region Evolution
         //--------------------------
 
         /// <summary>
@@ -391,9 +513,13 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleEvolutionCanvases);
         }
+
+        #endregion
+
         //----------------------------------------------------
-        // Animation speed (shared by Debugging and Evolution)
+        #region Animation speed (shared by Debugging and Evolution)
         //----------------------------------------------------
+
         /// <summary>
         /// Double animation speed.
         /// </summary>
@@ -411,8 +537,10 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.DecreaseAnimationSpeed);
         }
 
+        #endregion
+
         //--------------------------
-        // Debugging 
+        #region Debugging
         //--------------------------
 
         /// <summary>
@@ -464,8 +592,10 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.FirstStatement);
         }
 
+        #endregion
+
         //--------------------
-        // Source-code viewer
+        #region Source-code viewer
         //--------------------
 
         /// <summary>
@@ -477,12 +607,14 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ShowCodeWindowMenu);
         }
 
+        #endregion
+
         //-------------------
-        // Selection
+        #region Selection
         //-------------------
 
         /// <summary>
-        /// If true, selection is enabled. Selection can be disabled by action directly 
+        /// If true, selection is enabled. Selection can be disabled by action directly
         /// determining whether anything is selected; for instance, the <see cref="DeleteAction"/>
         /// listens to a selection interaction to determine the graph element to be deleted.
         /// This selection interaction should not interfere with the general <see cref="SelectAction"/>.
@@ -498,6 +630,60 @@ namespace SEE.Controls
         public static bool Select()
         {
             return SelectionEnabled && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI();
+        }
+
+        #endregion
+
+        //----------------------------------------------------
+        #region Chat
+        //----------------------------------------------------
+
+        /// <summary>
+        /// True if the user wants to toggle the global text chat.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleGlobalChat()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleGlobalChat);
+        }
+
+        /// <summary>
+        /// True if the user wants to toggle the text chat for team 1.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleTeam1Channel()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleTeam1Channel);
+        }
+
+        /// <summary>
+        /// True if the user wants to toggle the text chat for team 2.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleTeam2Channel()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleTeam2Channel);
+        }
+
+        #endregion
+
+        //----------------------------------------------------
+        #region Notifications
+        //----------------------------------------------------
+
+        /// <summary>
+        /// True if the user wants to close all notifications.
+        /// </summary>
+        public static bool CloseAllNotifications()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.CloseNotifications);
+        }
+
+        #endregion
+
+        public static bool ToggleHolisticMetricsMenu()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleHolisticMetricsMenu);
         }
     }
 }

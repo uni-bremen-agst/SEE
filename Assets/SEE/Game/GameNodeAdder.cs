@@ -1,7 +1,7 @@
-﻿using SEE.DataModel.DG;
+﻿using System;
+using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.GO;
-using SEE.Utils;
-using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -49,11 +49,12 @@ namespace SEE.Game
         /// </summary>
         /// <param name="parent">The node that should be the parent of <paramref name="node"/></param>
         /// <param name="node">The node to add to the graph</param>
-        private static void AddNodeToGraph(Node parent, Node node, Graph parentGraph)
+        private static void AddNodeToGraph(Node parent, Node node)
         {
             //TODO could be done way easier
             if (parent == null)
             {
+                Graph parentGraph = parent.ItsGraph;
                 if (parentGraph == null)
                 {
                     throw new Exception("Parent must be in a graph.");
@@ -89,42 +90,80 @@ namespace SEE.Game
                         node.ID = Guid.NewGuid().ToString();
                     }
                 }
-                graph.AddNode(node);
+                // Note: ReflexionGraph.AddNode(node) determines the subgraph where node should be
+                // added via its parent. That means, the parent of node must be set before it can
+                // be called.
                 parent.AddChild(node);
+                graph.AddNode(node);
             }
         }
 
         /// <summary>
-        /// Creates and returns a new game node as a child of <paramref name="parent"/> having
-        /// a nodeRef referencing <paramref name="node"/> at the given <paramref name="position"/>
-        /// with the given <paramref name="worldSpaceScale"/>.
+        /// Creates and returns a new game node as a child of <paramref name="parent"/> at the
+        /// given <paramref name="worldSpacePosition"/> with the given <paramref name="worldSpaceScale"/>.
         ///
-        /// Precondition: <paramref name="parent"/> must have a valid node reference.
+        /// Precondition: <paramref name="parent"/> must have a valid node reference
+        /// and must be contained in a code city.
+        ///
+        /// Postcondition: The returned child is an immediate child of <paramref name="parent"/> in the
+        /// game object hierarchy and in the underlying graph.
         /// </summary>
         /// <param name="parent">parent of the new node</param>
-        /// <param name="position">the position in world space for the center point of the new game node</param>
+        /// <param name="worldSpacePosition">the position in world space for the center point of the new game node</param>
         /// <param name="worldSpaceScale">the scale in world space of the new game node</param>
         /// <param name="nodeID">the unique ID of the new node; if null or empty, a random ID will be used</param>
-        /// <returns>new child game node or null if none could be created</returns>
-        public static GameObject Add(GameObject parent, Vector3 position, Vector3 worldSpaceScale, string nodeID = null)
+        /// <returns>new child game node>/returns>
+        /// <exception cref="Exception">thrown if <paramref name="parent"/> has no valid node reference
+        /// or is not contained in a code city</exception>
+        public static GameObject AddChild(GameObject parent, Vector3 worldSpacePosition, Vector3 worldSpaceScale, string nodeID = null)
         {
-            SEECity city = parent.ContainingCity();
+            GameObject result = AddChild(parent, nodeID);
+            // Resetting the parent to null temporarily so that there is no difference between
+            // local scale and world-space scale.
+            result.transform.SetParent(null);
+            // result is just created, hence, we do not need a NodeOperator to position and scale it.
+            result.transform.position = worldSpacePosition;
+            result.transform.localScale = worldSpaceScale;
+            result.transform.SetParent(parent.transform);
+            return result;
+        }
+
+        /// <summary>
+        /// Creates and returns a new game node as a child of <paramref name="parent"/>.
+        /// The world-space position and scale of the result will be the world-space
+        /// position and scale of <paramref name="parent"/>.
+        ///
+        /// Precondition: <paramref name="parent"/> must have a valid node reference
+        /// and must be contained in a code city.
+        ///
+        /// Postcondition: The returned child is an immediate child of <paramref name="parent"/> in the
+        /// game object hierarchy and in the underlying graph.
+        /// </summary>
+        /// <param name="parent">parent of the new node</param>
+        /// <param name="nodeID">the unique ID of the new node; if null or empty, a random ID will be used</param>
+        /// <returns>new child game node>/returns>
+        /// <exception cref="Exception">thrown if <paramref name="parent"/> has no valid node reference
+        /// or is not contained in a code city</exception>
+        public static GameObject AddChild(GameObject parent, string nodeID = null)
+        {
+            SEECity city = parent.ContainingCity() as SEECity;
             if (city != null)
             {
                 Node node = NewGraphNode(nodeID);
-                AddNodeToGraph(parent.GetNode(), node, city.LoadedGraph);
-                GameObject result = city.Renderer.DrawLeafNode(node);
-                result.transform.localScale = worldSpaceScale;
-                result.transform.position = position;
+                AddNodeToGraph(parent.GetNode(), node);
+                GameObject result = city.Renderer.DrawNode(node);
+                result.transform.position = parent.transform.position;
+                result.transform.localScale = parent.transform.lossyScale;
                 result.transform.SetParent(parent.transform);
+                Portal.SetPortal(city.gameObject, gameObject: result);
                 return result;
             }
             else
             {
-                return null;
+                throw new Exception($"Parent node {parent.FullName()} is not contained in a code city.");
             }
         }
-        
+
         /// <summary>
         /// Creates and returns a new game node as a child of <paramref name="parent"/> having a <see cref="NodeRef"/>
         /// component referencing <see cref="Node"/> at the given <paramref name="position"/>
@@ -148,7 +187,7 @@ namespace SEE.Game
                 //Generate the default source name for this new architecture node.
                 string sourceName = "arch_" + nodeType + "_" + city.NODE_COUNTER++;
                 Node node = NewGraphNode(nodeID, nodeType, sourceName);
-                AddNodeToGraph(parentNode, node, city.LoadedGraph);
+                AddNodeToGraph(parentNode, node);
                 GameObject result = city.Renderer.DrawNode(node);
                 result.transform.localScale = worldScale;
                 result.transform.position = position;
@@ -157,7 +196,7 @@ namespace SEE.Game
                 return result;
             }
             return null;
-            
+
         }
 
         /// <summary>

@@ -55,22 +55,22 @@ namespace SEE.Game.Charts
         /// The <see cref="GameObject"/> making the marker look highlighted when active.
         /// </summary>
         [SerializeField] private GameObject markerHighlight;
-        
+
         /// <summary>
         /// The ids of the handled <see cref="InteractableObject"/>.
         /// </summary>
-        public readonly List<uint> ids = new List<uint>();
+        public readonly List<string> ids = new List<string>();
 
         /// <summary>
         /// The ids of the hovered or selected handled <see cref="InteractableObject"/>.
         /// </summary>
-        public readonly HashSet<uint> hoveredOrSelectedIds = new HashSet<uint>();
+        public readonly HashSet<string> hoveredOrSelectedIds = new HashSet<string>();
 
         /// <summary>
-        /// Dictionary converts between <see cref="InteractableObject.ID"/> and the
-        /// corresponding info-texts.
+        /// Dictionary converts between <see cref="InteractableObject.name"/> and the
+        /// corresponding info texts.
         /// </summary>
-        private readonly Dictionary<uint, string> id2TextDict = new Dictionary<uint, string>();
+        private readonly Dictionary<string, string> id2TextDict = new Dictionary<string, string>();
 
         /// <summary>
         /// The number of handled selected objects.
@@ -97,7 +97,7 @@ namespace SEE.Game.Charts
 
         internal void OnDestroy()
         {
-            foreach (uint id in ids)
+            foreach (string id in ids)
             {
                 InteractableObject o = InteractableObject.Get(id);
                 chartContent.DetachShowInChartCallbackFn(o, OnShowInChartEvent);
@@ -120,14 +120,14 @@ namespace SEE.Game.Charts
         /// <param name="infoText">The text to be displayed for the given object.</param>
         public void PushInteractableObject(InteractableObject o, string infoText)
         {
-            Assert.IsTrue(!ids.Contains(o.ID));
+            Assert.IsTrue(!ids.Contains(o.name));
 
-            ids.Add(o.ID);
+            ids.Add(o.name);
             if (o.IsHovered || o.IsSelected)
             {
-                hoveredOrSelectedIds.Add(o.ID);
+                hoveredOrSelectedIds.Add(o.name);
             }
-            id2TextDict.Add(o.ID, infoText);
+            id2TextDict.Add(o.name, infoText);
             if (chartContent.ShowInChart(o))
             {
                 showInChartCount++;
@@ -168,7 +168,7 @@ namespace SEE.Game.Charts
                 sharedStringBuilder.Clear();
                 int count = 0;
                 const int maxLines = 3;
-                foreach (uint id in hoveredOrSelectedIds)
+                foreach (string id in hoveredOrSelectedIds)
                 {
                     InteractableObject o = InteractableObject.Get(id);
                     bool showInChart = chartContent.ShowInChart(o);
@@ -202,7 +202,7 @@ namespace SEE.Game.Charts
 
         /// <summary>
         /// Called by Unity, if this marker is clicked.
-        /// 
+        ///
         /// Selects/Toggles the linked interactable objects of this marker.
         /// </summary>
         public void ButtonClicked()
@@ -215,7 +215,7 @@ namespace SEE.Game.Charts
                     InteractableObject.UnselectAll(true);
                 }
 
-                foreach (uint id in ids)
+                foreach (string id in ids)
                 {
                     InteractableObject o = InteractableObject.Get(id);
                     if (chartContent.ShowInChart(o))
@@ -228,13 +228,13 @@ namespace SEE.Game.Charts
 
         /// <summary>
         /// Called by Unity, if the mouse hovers over this marker.
-        /// 
+        ///
         /// Hoveres every linked interactable object of this marker.
         /// </summary>
         /// <param name="eventData">Ignored.</param>
         public void OnPointerEnter(PointerEventData eventData)
         {
-            foreach (uint id in ids)
+            foreach (string id in ids)
             {
                 InteractableObject o = InteractableObject.Get(id);
                 o.SetHoverFlag(HoverFlag.ChartMarker, true, true);
@@ -243,13 +243,13 @@ namespace SEE.Game.Charts
 
         /// <summary>
         /// Called by Unity, if the mouse stops hovering over this marker.
-        /// 
+        ///
         /// Unhoveres every linked interactable object of this marker.
         /// </summary>
         /// <param name="eventData">Ignored.</param>
         public void OnPointerExit(PointerEventData eventData)
         {
-            foreach (uint id in ids)
+            foreach (string id in ids)
             {
                 InteractableObject o = InteractableObject.Get(id);
                 o.SetHoverFlag(HoverFlag.ChartMarker, false, true);
@@ -262,7 +262,7 @@ namespace SEE.Game.Charts
 
         /// <summary>
         /// Called through event <see cref="InteractableObject.HoverIn"/>.
-        /// 
+        ///
         /// Updates the info text.
         /// </summary>
         /// <param name="interactableObject">the object being hovered over</param>
@@ -271,14 +271,14 @@ namespace SEE.Game.Charts
         {
             if (!interactableObject.IsSelected)
             {
-                hoveredOrSelectedIds.Add(interactableObject.ID);
+                hoveredOrSelectedIds.Add(interactableObject.name);
             }
             UpdateInfoText();
         }
 
         /// <summary>
         /// Called through event <see cref="InteractableObject.HoverOut"/>.
-        /// 
+        ///
         /// Updates the info text.
         /// </summary>
         /// <param name="interactableObject">the object being hovered over</param>
@@ -287,14 +287,14 @@ namespace SEE.Game.Charts
         {
             if (!interactableObject.IsSelected)
             {
-                hoveredOrSelectedIds.Remove(interactableObject.ID);
+                hoveredOrSelectedIds.Remove(interactableObject.name);
             }
             UpdateInfoText();
         }
 
         /// <summary>
         /// Called through event <see cref="InteractableObject.SelectIn"/>.
-        /// 
+        ///
         /// Updates the info text and highlights this marker.
         /// </summary>
         /// <param name="interactableObject">the object being selected</param>
@@ -304,7 +304,7 @@ namespace SEE.Game.Charts
             selectedCount++;
             if (!interactableObject.IsHovered)
             {
-                hoveredOrSelectedIds.Add(interactableObject.ID);
+                hoveredOrSelectedIds.Add(interactableObject.name);
             }
             UpdateInfoText();
             markerHighlight.SetActive(true);
@@ -312,7 +312,7 @@ namespace SEE.Game.Charts
 
         /// <summary>
         /// Called through event <see cref="InteractableObject.SelectOut"/>.
-        /// 
+        ///
         /// Updates the info text and stops highlighting this marker, if no other linked
         /// interactable object is still selected.
         /// </summary>
@@ -323,7 +323,7 @@ namespace SEE.Game.Charts
             selectedCount--;
             if (!interactableObject.IsHovered)
             {
-                hoveredOrSelectedIds.Remove(interactableObject.ID);
+                hoveredOrSelectedIds.Remove(interactableObject.name);
             }
             UpdateInfoText();
             markerHighlight.SetActive(selectedCount > 0);

@@ -9,7 +9,7 @@ namespace SEE.Controls.Actions.Architecture
 
     public delegate AbstractArchitectureAction CreateAbstractArchitectureAction();
     /// <summary>
-    /// An abstract superclass of all ArchitectureActions. 
+    /// An abstract superclass of all ArchitectureActions.
     /// </summary>
     public abstract class AbstractArchitectureAction : IArchitectureAction
     {
@@ -32,7 +32,7 @@ namespace SEE.Controls.Actions.Architecture
         {
             // Empty on purpose. Can be implemented by subclasses
         }
-        
+
         /// <summary>
         /// Returns the <see cref="ArchitectureActionType"/> of this implementation.
         /// </summary>
@@ -55,17 +55,16 @@ namespace SEE.Controls.Actions.Architecture
         /// <returns>True if the raycast target is a node graph element.</returns>
         protected bool TryRaycast(out RaycastHit raycastHit, Vector2 position)
         {
-            if (Raycasting.RaycastGraphElement(out var raycast, out GraphElementRef _, position) ==
-                HitGraphElement.Node)
-            {
-                raycastHit = raycast;
-                return true;
-            }
+            throw new System.NotImplementedException();
+            //if (Raycasting.RaycastGraphElement(out var raycast, out GraphElementRef _, position) ==
+            //    HitGraphElement.Node)
+            //{
+            //    raycastHit = raycast;
+            //    return true;
+            //}
 
-            raycastHit = default(RaycastHit);
-            return false;
+            //raycastHit = default(RaycastHit);
+            //return false;
         }
-
-        
     }
 }

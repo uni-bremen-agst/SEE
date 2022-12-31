@@ -304,6 +304,41 @@ namespace SEE.Game.UI.CodeWindow
 
         #endregion
 
+        #region Plain Text "Language"
+
+        /// <summary>
+        /// Name of the antlr grammar lexer.
+        /// </summary>
+        private const string plainFileName = "PlainTextLexer.g4";
+
+        /// <summary>
+        /// Set of plain text file extensions.
+        /// Note that this is a special case, since this is the lexer we'll use when nothing else is available.
+        /// </summary>
+        private static readonly HashSet<string> plainExtensions = new HashSet<string>();
+
+        /// <summary> Set of antlr type names for keywords. There are none here. </summary>
+        private static readonly HashSet<string> plainKeywords = new HashSet<string>();
+        /// <summary> Set of antlr type names for numbers. </summary>
+        private static readonly HashSet<string> plainNumbers = new HashSet<string>();
+        /// <summary>Set of antlr type names for character and string literals. There are none here.
+        private static readonly HashSet<string> plainStrings = new HashSet<string>();
+        /// <summary>Set of antlr type names for punctuation.</summary>
+        private static readonly HashSet<string> plainPunctuation = new HashSet<string>();
+        /// <summary>Set of antlr type names for identifiers, which in this case is for normal words.</summary>
+        private static readonly HashSet<string> plainIdentifiers = new HashSet<string>
+        {
+            "WORD", "PSEUDOWORD", "LETTERS", "SIGNS", "SPECIAL", "NUMBERS"
+        };
+        /// <summary>Set of antlr type names for whitespace.</summary>
+        private static readonly HashSet<string> plainWhitespace = new HashSet<string> { "WHITESPACES" };
+        /// <summary> Set of antlr type names for newlines. </summary>
+        private static readonly HashSet<string> plainNewlines = new HashSet<string> { "NEWLINES" };
+        /// <summary> Set of antlr type names for comments. There are none here.</summary>
+        private static readonly HashSet<string> plainComments = new HashSet<string>();       
+
+        #endregion
+
         #region Static Types
 
         /// <summary>
@@ -329,6 +364,11 @@ namespace SEE.Game.UI.CodeWindow
         public static readonly TokenLanguage CPP = new TokenLanguage(cppFileName, cppExtensions, cppKeywords, cppNumbers,
             cppStrings, cppPunctuation, cppIdentifiers, cppWhitespace, cppNewlines, cppComments);
 
+        /// <summary>
+        /// Token language for plain text.
+        /// </summary>
+        public static readonly TokenLanguage Plain = new TokenLanguage(plainFileName, plainExtensions, plainKeywords, plainNumbers,
+           plainStrings, plainPunctuation, plainIdentifiers, plainWhitespace, plainNewlines, plainComments);
 
         #endregion
 
@@ -352,6 +392,7 @@ namespace SEE.Game.UI.CodeWindow
                               ISet<string> identifiers, ISet<string> whitespace, ISet<string> newline,
                               ISet<string> comments, int tabWidth = DEFAULT_TAB_WIDTH)
         {
+            #if DEVELOPMENT_BUILD || UNITY_EDITOR
             if (AllTokenLanguages.Any(x => x.LexerFileName.Equals(lexerFileName) || x.FileExtensions.Overlaps(fileExtensions)))
             {
                 throw new ArgumentException("Lexer file name and file extensions must be unique per language!");
@@ -360,6 +401,7 @@ namespace SEE.Game.UI.CodeWindow
             {
                 throw new ArgumentException("Symbolic names may not appear in more than one set each!");
             }
+            #endif
             LexerFileName = lexerFileName;
             FileExtensions = fileExtensions;
             Keywords = keywords;
@@ -399,16 +441,33 @@ namespace SEE.Game.UI.CodeWindow
 
         /// <summary>
         /// Returns the matching token language for the given <paramref name="extension"/>.
-        /// If no matching token language is found, an exception will be thrown.
+        /// If no matching token language is found, the <see cref="PlainTextLexer"/> will be used, unless
+        /// <paramref name="throwOnUnkown"/> is true.
         /// </summary>
         /// <param name="extension">File extension for the language.</param>
+        /// <param name="throwOnUnknown">
+        /// Whether to throw an exception when an unknown file extension is encountered.
+        /// If this is false, the <see cref="PlainTextLexer"/> will be used instead in such a case.
+        /// </param>
         /// <returns>The matching token language.</returns>
-        /// <exception cref="ArgumentException">If the given <paramref name="extension"/> is not supported.</exception>
-        public static TokenLanguage fromFileExtension(string extension)
+        /// <exception cref="ArgumentException">
+        /// If the given <paramref name="extension"/> is not supported and <paramref name="throwOnUnknown"/> is true.
+        /// </exception>
+        public static TokenLanguage fromFileExtension(string extension, bool throwOnUnknown = false)
         {
-            return AllTokenLanguages.SingleOrDefault(x => x.FileExtensions.Contains(extension))
-                   ?? throw new ArgumentException("The given filetype is not supported. Supported filetypes are "
-                                                  + string.Join(", ", AllTokenLanguages.SelectMany(x => x.FileExtensions)));
+            TokenLanguage target = AllTokenLanguages.SingleOrDefault(x => x.FileExtensions.Contains(extension));
+            if (target == null)
+            {
+                if (throwOnUnknown)
+                {
+                    throw new ArgumentException("The given filetype is not supported. Supported filetypes are "
+                                                + string.Join(", ", AllTokenLanguages.SelectMany(x => x.FileExtensions)));
+                }
+                
+                target = Plain;
+            }
+
+            return target;
         }
 
         /// <summary>
@@ -425,6 +484,7 @@ namespace SEE.Game.UI.CodeWindow
                 javaFileName => new Java9Lexer(input),
                 cSharpFileName => new CSharpLexer(input),
                 cppFileName => new CPP14Lexer(input),
+                plainFileName => new PlainTextLexer(input),
                 _ => throw new InvalidOperationException("No lexer defined for this language yet.")
             };
         }

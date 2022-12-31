@@ -12,7 +12,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The history of actions.
         /// </summary>
-        private static ActionHistory history = new ActionHistory();
+        private static readonly ActionHistory history = new ActionHistory();
 
         /// <summary>
         /// Executes the currently active action (if there is any).
@@ -86,7 +86,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns the <see cref="ActionStateType"/> of the currently executed 
+        /// Returns the <see cref="ActionStateType"/> of the currently executed
         /// action. If no such action is currently executed, null is returned.
         /// </summary>
         /// <returns><see cref="ActionStateType"/> of the currently executed action or null</returns>

@@ -8,7 +8,7 @@ using UnityEngine.InputSystem;
 
 namespace SEE.Controls.Actions.Architecture
 {
-    
+
     /// <summary>
     /// Implementation of <see cref="AbstractArchitectureAction"/>.
     /// Allows the scaling of node elements.
@@ -44,12 +44,12 @@ namespace SEE.Controls.Actions.Architecture
             internal GameObject topLeftAnchor;
             internal Vector3 topLeftOld;
         }
-        
+
         /// <summary>
         /// The gizmo instance.
         /// </summary>
         private Gizmo _gizmo;
-        
+
         /// <summary>
         /// The size of the scaling spheres will be relative to the game object to be scaled.
         /// This factor determines that scale. It will be multiplied by the x or z scale of
@@ -58,7 +58,7 @@ namespace SEE.Controls.Actions.Architecture
         /// be used instead.
         /// </summary>
         private const float relativeSphereScale = 0.1f;
-        
+
         /// <summary>
         /// The minimal scale a scaling sphere may have in world space.
         /// </summary>
@@ -74,19 +74,19 @@ namespace SEE.Controls.Actions.Architecture
         /// are drawn.
         /// </summary>
         private bool gizmoDrawn;
-        
+
         /// <summary>
         /// The scaling gizmo selected by the user to scale <see cref="objectToScale"/>.
         /// Will be null if none was selected yet.
         /// </summary>
         private GameObject draggedAnchor;
 
-        
+
         public static AbstractArchitectureAction NewInstance()
         {
             return new ScaleArchitectureAction();
         }
-        
+
         public override void Start()
         {
             PenInteractionController.ObjectPrimaryClicked += OnObjectSelected;
@@ -99,16 +99,16 @@ namespace SEE.Controls.Actions.Architecture
             PenInteractionController.ObjectPrimaryClicked -= OnObjectSelected;
             RemoveSpheres();
         }
-        
+
         private void OnObjectSelected(ObjectPrimaryClicked data)
         {
-            
+
             if (target != data.Object && data.Object.HasNodeRef())
             {
                 RemoveSpheres();
                 target = data.Object;
             }
-            
+
         }
 
 
@@ -165,7 +165,7 @@ namespace SEE.Controls.Actions.Architecture
                                 {
                                     target = null;
                                 }
-                                
+
                             }
                             else
                             {
@@ -180,22 +180,22 @@ namespace SEE.Controls.Actions.Architecture
                     }
                 }
             }
-            
-            
+
+
         }
         private void RemoveSpheres()
         {
-            Destroyer.DestroyGameObject(_gizmo.topAnchor);
-            Destroyer.DestroyGameObject(_gizmo.topRightAnchor);
-            Destroyer.DestroyGameObject(_gizmo.rightAnchor);
-            Destroyer.DestroyGameObject(_gizmo.bottomRightAnchor);
-            Destroyer.DestroyGameObject(_gizmo.bottomAnchor);
-            Destroyer.DestroyGameObject(_gizmo.bottomLeftAnchor);
-            Destroyer.DestroyGameObject(_gizmo.leftAnchor);
-            Destroyer.DestroyGameObject(_gizmo.topLeftAnchor);
+            Destroyer.Destroy(_gizmo.topAnchor);
+            Destroyer.Destroy(_gizmo.topRightAnchor);
+            Destroyer.Destroy(_gizmo.rightAnchor);
+            Destroyer.Destroy(_gizmo.bottomRightAnchor);
+            Destroyer.Destroy(_gizmo.bottomAnchor);
+            Destroyer.Destroy(_gizmo.bottomLeftAnchor);
+            Destroyer.Destroy(_gizmo.leftAnchor);
+            Destroyer.Destroy(_gizmo.topLeftAnchor);
             gizmoDrawn = false;
         }
-            
+
         private GameObject SelectedGizmo(GameObject anchor)
         {
             if (!gizmoDrawn) return null;
@@ -204,9 +204,9 @@ namespace SEE.Controls.Actions.Architecture
                 anchor == _gizmo.leftAnchor || anchor == _gizmo.topLeftAnchor) return anchor;
             return null;
         }
-        
+
         /// <summary>
-        /// Scales <see cref="objectToScale"/> and drags and re-draws the scaling gizmos. 
+        /// Scales <see cref="objectToScale"/> and drags and re-draws the scaling gizmos.
         /// </summary>
         private void Scaling()
         {
@@ -216,7 +216,7 @@ namespace SEE.Controls.Actions.Architecture
             AdjustSizeOfScalingAnchors();
 
         }
-        
+
         /// <summary>
         /// Adjusts the size of the scaling elements according to the size of <see cref="objectToScale"/>.
         /// </summary>
@@ -232,24 +232,25 @@ namespace SEE.Controls.Actions.Architecture
             ApplyAnchorScale(_gizmo.topLeftAnchor);
             GameElementUpdater.UpdateEdgePoints(target, true);
         }
-        
+
         /// <summary>
         /// Drags the given <paramref name="scalingGizmo"/> along its axis.
         /// </summary>
         /// <param name="anchor">scaling gizmo to be dragged</param>
         private void DragAnchor(GameObject anchor)
         {
-            if (anchor == _gizmo.topLeftAnchor || anchor == _gizmo.topRightAnchor ||
-                anchor == _gizmo.bottomLeftAnchor || anchor == _gizmo.bottomRightAnchor)
-            {
-                GameNodeMover.MoveToLockAxes(anchor,true, false, true);
-            } else if (anchor == _gizmo.topAnchor || anchor == _gizmo.bottomAnchor)
-            {
-                GameNodeMover.MoveToLockAxes(anchor, false, false, true);
-            }else if (anchor == _gizmo.leftAnchor || anchor == _gizmo.rightAnchor)
-            {
-                GameNodeMover.MoveToLockAxes(anchor, true, false , false);
-            }
+            throw new System.NotImplementedException();
+            //if (anchor == _gizmo.topLeftAnchor || anchor == _gizmo.topRightAnchor ||
+            //    anchor == _gizmo.bottomLeftAnchor || anchor == _gizmo.bottomRightAnchor)
+            //{
+            //    GameNodeMover.MoveToLockAxes(anchor,true, false, true);
+            //} else if (anchor == _gizmo.topAnchor || anchor == _gizmo.bottomAnchor)
+            //{
+            //    GameNodeMover.MoveToLockAxes(anchor, false, false, true);
+            //}else if (anchor == _gizmo.leftAnchor || anchor == _gizmo.rightAnchor)
+            //{
+            //    GameNodeMover.MoveToLockAxes(anchor, true, false , false);
+            //}
         }
         /// <summary>
         /// Draws the gizmos that allow a user to scale the object in all three dimensions.
@@ -267,7 +268,7 @@ namespace SEE.Controls.Actions.Architecture
             SetOnSide();
             gizmoDrawn = true;
         }
-        
+
         /// <summary>
         /// Sets the side spheres.
         /// </summary>
@@ -343,7 +344,7 @@ namespace SEE.Controls.Actions.Architecture
             }
         }
 
-        
+
         /// <summary>
         /// Sets the new scale of <see cref="target"/> based on the scaling gizmos.
         /// </summary>
@@ -355,7 +356,7 @@ namespace SEE.Controls.Actions.Architecture
             scale.x += _gizmo.rightAnchor.transform.position.x - _gizmo.rightOld.x;
             scale.z -= _gizmo.bottomAnchor.transform.position.z - _gizmo.bottomOld.z;
             scale.z += _gizmo.topAnchor.transform.position.z - _gizmo.topOld.z;
-            
+
             //Corner
             float sclaeCorner = 0;
             sclaeCorner -= _gizmo.bottomLeftAnchor.transform.position.x - _gizmo.bottomLeftOld.x +
@@ -400,7 +401,7 @@ namespace SEE.Controls.Actions.Architecture
 
             target.transform.position = position;
             target.SetScale(scale);
-            
+
         }
 
         private GameObject InstantiateAndScaleAnchor()
@@ -415,8 +416,8 @@ namespace SEE.Controls.Actions.Architecture
             Vector3 targetScale = target.transform.lossyScale;
             anchor.transform.localScale = Vector3.one * Mathf.Max(Mathf.Min(targetScale.x, targetScale.z) * relativeSphereScale, minimalSphereScale);
         }
-        
-        
+
+
         /// <summary>
         /// Returns the radius of the sphere used to visualize the gizmo to scale the object.
         /// </summary>

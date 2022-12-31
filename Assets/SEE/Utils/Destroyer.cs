@@ -1,101 +1,72 @@
-﻿using SEE.DataModel;
-using SEE.DataModel.DG;
+﻿using SEE.Game;
 using SEE.GO;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Utils
 {
     /// <summary>
     /// Functions to destroy game objects in game or editor mode.
+    /// They will also maintain the consistency of <see cref="GraphElementIDMap"/>.
     /// </summary>
     public static class Destroyer
     {
         /// <summary>
-        /// Destroys given game object using UnityEngine.Object when in
-        /// game mode or UnityEngine.Object.DestroyImmediate when in editor mode.
+        /// Destroys given <paramref name="gameObject"/> using <see cref="UnityEngine.Object.Destroy(Object)"/>
+        /// when in play mode (effective only after the current Update loop of Unity) or
+        /// <see cref="UnityEngine.Object.DestroyImmediate(Object)"/> when in editor mode
+        /// (with immediate effect).
+        ///
+        /// Note: This method will recurse into the children of <paramref name="gameObject"/>.
+        /// The <paramref name="gameObject"/> is removed from <see cref="GraphElementIDMap"/>
+        /// if it represents a node or edge.
         /// </summary>
-        /// <param name="gameObject">game object to be destroyed</param>
-        public static void DestroyGameObject(GameObject gameObject)
+        /// <param name="gameObject">game object to be destroyed (generally, but not necessarily
+        /// representing a node or edge)</param>
+        public static void Destroy(GameObject gameObject)
         {
-            // We must use DestroyImmediate when we are in the editor mode.
-            if (Application.isPlaying)
+            if (gameObject != null)
             {
-                // playing either in a built player or in the player of the editor
-                UnityEngine.Object.Destroy(gameObject);
-            }
-            else
-            {
-                // game is not played; we are in the editor mode
-                UnityEngine.Object.DestroyImmediate(gameObject);
-            }
-        }
-
-        /// <summary>
-        /// Destroys given <paramref name="component"/> using UnityEngine.Object when in
-        /// game mode or UnityEngine.Object.DestroyImmediate when in editor mode.
-        /// </summary>
-        /// <param name="component">component to be destroyed</param>
-        public static void DestroyComponent(Component component)
-        {
-            // We must use DestroyImmediate when we are in the editor mode.
-            if (Application.isPlaying)
-            {
-                // playing either in a built player or in the player of the editor
-                UnityEngine.Object.Destroy(component);
-            }
-            else
-            {
-                // game is not played; we are in the editor mode
-                UnityEngine.Object.DestroyImmediate(component);
-            }
-        }
-
-        /// <summary>
-        /// Destroys given <paramref name="gameObject"/> with all its incoming and outgoing 
-        /// edges and recursively all its ancestors. This method is intended to be used for
-        /// game objects representing graph nodes having a component 
-        /// <see cref=">SEE.DataModel.NodeRef"/>. If the <paramref name="gameObject"/> 
-        /// does not have a <see cref=">SEE.DataModel.NodeRef"/> component, nothing
-        /// happens.
-        /// </summary>
-        /// <param name="gameObject">game object to be destroyed</param>
-        public static void DestroyGameObjectWithChildren(GameObject gameObject)
-        {
-            if (gameObject.TryGetComponent(out NodeRef _))
-            {
+                if (gameObject.IsNode() || gameObject.IsEdge())
+                {
+                    GraphElementIDMap.Remove(gameObject);
+                }
                 foreach (Transform child in gameObject.transform)
                 {
-                    DestroyGameObjectWithChildren(child.gameObject);
+                    Destroy(child.gameObject);
                 }
-                DestroyEdges(gameObject);
-                DestroyGameObject(gameObject);
+                // We must use DestroyImmediate when we are in the editor mode.
+                if (Application.isPlaying)
+                {
+                    // playing either in a built player or in the player of the editor
+                    Object.Destroy(gameObject);
+                }
+                else
+                {
+                    // game is not played; we are in the editor mode
+                    Object.DestroyImmediate(gameObject);
+                }
             }
         }
 
         /// <summary>
-        /// Searches through all children of given <paramref name="gameObject"/>
-        /// and deletes all edges attached to given childs.
-        /// 
-        /// This method is intended to be used for game objects representing graph nodes
-        /// having a component <see cref=">SEE.DataModel.NodeRef"/>. If the 
-        /// <paramref name="gameObject"/> does not have a <see cref=">SEE.DataModel.NodeRef"/>
-        /// component, nothing happens.
+        /// Destroys given <paramref name="component"/> using <see cref="UnityEngine.Object.Destroy(Object)"/>
+        /// when in play mode or <see cref="UnityEngine.Object.DestroyImmediate(Object)"/> when in editor mode.
         /// </summary>
-        /// <param name="gameObject">game node whose incoming and outgoing edges are to be destroyed</param>
-        private static void DestroyEdges(GameObject gameObject)
+        /// <param name="component">component to be destroyed</param>
+        public static void Destroy(Component component)
         {
-            if (gameObject.TryGetComponent(out NodeRef nodeRef))
+            if (component != null)
             {
-                ISet<string> edgeIDs = nodeRef.GetEdgeIds();
-
-                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge))
+                // We must use DestroyImmediate when we are in the editor mode.
+                if (Application.isPlaying)
                 {
-                    if (edge.activeInHierarchy && edgeIDs.Contains(edge.name))
-                    {
-                        Destroyer.DestroyGameObject(edge);
-                    }
+                    // playing either in a built player or in the player of the editor
+                    Object.Destroy(component);
+                }
+                else
+                {
+                    // game is not played; we are in the editor mode
+                    Object.DestroyImmediate(component);
                 }
             }
         }

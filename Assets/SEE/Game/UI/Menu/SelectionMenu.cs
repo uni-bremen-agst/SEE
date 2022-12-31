@@ -21,8 +21,8 @@ namespace SEE.Game.UI.Menu
         /// If no entry is active, <c>null</c> will be returned.
         /// If this value is changed, all other entries will be set inactive.
         /// </summary>
-        public ToggleMenuEntry ActiveEntry 
-        { 
+        public ToggleMenuEntry ActiveEntry
+        {
             get => entries.SingleOrDefault(entry => entry.Active);
             set => entries.ForEach(entry => entry.Active = entry == value);
         }

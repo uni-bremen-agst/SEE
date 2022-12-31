@@ -1,21 +1,28 @@
-﻿using UnityEngine;
+﻿using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Draws an outline around a game object being hovered over.
+    /// Draws or modifies, respectively, an outline around a game object being hovered over and makes it opaque.
     /// </summary>
-    public class ShowHovering : InteractableObjectHoveringAction
+    internal class ShowHovering : HighlightedInteractableObjectAction
     {
         /// <summary>
-        /// The local hovering color of the outline.
+        /// Initializes the local and remote outline color.
         /// </summary>
-        protected static readonly Color LocalHoverColor = Utils.ColorPalette.Viridis(0.0f);
+        protected static readonly Color LocalHoverColor;
 
         /// <summary>
         /// The remote hovering color of the outline.
         /// </summary>
-        protected static readonly Color RemoteHoverColor = Utils.ColorPalette.Viridis(0.2f);
+        protected static readonly Color RemoteHoverColor;
+
+        static ShowHovering()
+        {
+            LocalOutlineColor = ColorPalette.Viridis(0.4f);
+            RemoteOutlineColor = ColorPalette.Viridis(0.2f);
+        }
 
         /// <summary>
         /// If the object is neither selected nor grabbed, a hovering outline will be
@@ -27,16 +34,9 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">true if a local user initiated this call</param>
         protected override void On(InteractableObject interactableObject, bool isInitiator)
         {
-            if (!interactable.IsSelected && !interactable.IsGrabbed)
+            if (!Interactable.IsSelected && !Interactable.IsGrabbed)
             {
-                if (TryGetComponent(out Outline outline))
-                {
-                    outline.SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
-                }
-                else
-                {
-                    Outline.Create(gameObject, isInitiator ? LocalHoverColor : RemoteHoverColor);
-                }
+                SetInitialAndNewOutlineColor(isInitiator);
             }
         }
 
@@ -49,25 +49,63 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">true if a local user initiated this call</param>
         protected override void Off(InteractableObject interactableObject, bool isInitiator)
         {
-            if (!interactable.IsSelected && !interactable.IsGrabbed && TryGetComponent(out Outline outline))
+            //FIXME: Outline color is not correctly set if we hover off while a node is selected
+            if (!Interactable.IsSelected && !Interactable.IsGrabbed)
             {
-                DestroyImmediate(outline);
+                ResetOutlineColor();
             }
         }
 
-        protected override void SelectOff(InteractableObject interactableObject, bool isInitiator)
+        protected void SelectOff(InteractableObject interactableObject, bool isInitiator)
         {
-            if (interactable.IsHovered && !interactable.IsGrabbed)
+            if (Interactable.IsHovered && !Interactable.IsGrabbed)
             {
-                GetComponent<Outline>().SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
+                SetOutlineColor(isInitiator);
             }
         }
 
-        protected override void GrabOff(InteractableObject interactableObject, bool isInitiator)
+        protected void GrabOff(InteractableObject interactableObject, bool isInitiator)
         {
-            if (interactable.IsHovered && !interactable.IsSelected)
+            if (Interactable.IsHovered && !Interactable.IsSelected)
             {
-                GetComponent<Outline>().SetColor(isInitiator ? LocalHoverColor : RemoteHoverColor);
+                SetOutlineColor(isInitiator);
+            }
+        }
+
+        /// <summary>
+        /// Registers On() and Off() for the respective hovering events.
+        /// </summary>
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            if (Interactable != null)
+            {
+                Interactable.HoverIn += On;
+                Interactable.HoverOut += Off;
+                Interactable.SelectOut += SelectOff;
+                Interactable.GrabOut += GrabOff;
+            }
+            else
+            {
+                Debug.LogErrorFormat("ShowHovering.OnEnable for {0} has NO interactable.\n", name);
+            }
+        }
+
+        /// <summary>
+        /// Unregisters On() and Off() from the respective hovering events.
+        /// </summary>
+        protected virtual void OnDisable()
+        {
+            if (Interactable != null)
+            {
+                Interactable.HoverIn -= On;
+                Interactable.HoverOut -= Off;
+                Interactable.SelectOut -= SelectOff;
+                Interactable.GrabOut -= GrabOff;
+            }
+            else
+            {
+                Debug.LogErrorFormat("ShowHovering.OnDisable for {0} has NO interactable.\n", name);
             }
         }
     }

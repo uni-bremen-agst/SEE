@@ -15,7 +15,7 @@
 // IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR
 // THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.Game;
+using SEE.Game.City;
 
 namespace SEE.Layout.NodeLayouts.Cose
 {
@@ -30,7 +30,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <param name="node">the root node</param>
         /// <param name="innerNodeKinds">to inner node kind</param>
         /// <param name="nodeLayouts">the nodelayout of this sublayout</param>
-        public SublayoutLayoutNode(ILayoutNode node, InnerNodeKinds innerNodeKinds, NodeLayoutKind nodeLayouts) : base(node, innerNodeKinds, nodeLayouts)
+        public SublayoutLayoutNode(ILayoutNode node, NodeShapes innerNodeKinds, NodeLayoutKind nodeLayouts) : base(node, innerNodeKinds, nodeLayouts)
         {
             node.IsSublayoutRoot = true;
         }

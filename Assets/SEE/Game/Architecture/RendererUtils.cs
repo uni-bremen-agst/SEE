@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.GO;
+using SEE.Layout;
 using Sirenix.Utilities;
 using UnityEngine;
 
@@ -13,8 +15,8 @@ namespace SEE.Game.Architecture
     /// </summary>
     public static class RendererUtils
     {
-        
-        
+
+
         /// <summary>
         /// Adds all <paramref name="children"/> as a child to <paramref name="parent"/>.
         /// </summary>
@@ -27,7 +29,7 @@ namespace SEE.Game.Architecture
                 AddToParent(child, parent);
             }
         }
-        
+
         /// <summary>
         /// Adds <paramref name="child"/> as a child to <paramref name="parent"/>,
         /// maintaining the world position of <paramref name="child"/>.
@@ -54,8 +56,8 @@ namespace SEE.Game.Architecture
                 element = element.transform.parent.gameObject;
             }
         }
-        
-        
+
+
         /// <summary>
         /// Creates the same nesting of all game objects in <paramref name="nodeMap"/> as in
         /// the graph node hierarchy. Every root node in the graph node hierarchy will become
@@ -89,7 +91,7 @@ namespace SEE.Game.Architecture
                 }
             }
         }
-        
+
         /// <summary>
         /// Adds a LOD group to <paramref name="gameObject"/> with only a single LOD.
         /// This is used to cull the object if it gets too small. The percentage
@@ -106,8 +108,8 @@ namespace SEE.Game.Architecture
             lodGroup.SetLODs(lods);
             lodGroup.RecalculateBounds();
         }
-        
-        
+
+
         /// <summary>
         /// Adds a LOD group to each element in the passed list.
         /// </summary>
@@ -116,39 +118,48 @@ namespace SEE.Game.Architecture
         {
             gameObjects.ForEach(AddLOD);
         }
-        
+
         /// <summary>
         /// Returns the list of layout edges for all edges in between <paramref name="gameNodes"/>.
+        /// Note that this will skip "virtual" edges, i.e., edges which exist in the underlying graph
+        /// but which shall not be layouted or drawn.
         /// </summary>
         /// <param name="gameNodes">set of game nodes whose connecting edges are requested</param>
-        /// <returns>list of layout edges/returns>
-        public static ICollection<LayoutEdge> ConnectingEdges(ICollection<GameNode> gameNodes)
+        /// <returns>list of layout edges</returns>
+        /// <remarks>This method is a clone of <see cref="GraphRenderer.ConnectingEdges{T}(ICollection{T})"/. FIXME: Remove it.></remarks>
+        private static ICollection<LayoutGraphEdge<T>> ConnectingEdges<T>(ICollection<T> gameNodes)
+            where T : AbstractLayoutNode
         {
-            ICollection<LayoutEdge> edges = new List<LayoutEdge>();
-            Dictionary<Node, GameNode> map = NodeToGameNodeMap(gameNodes);
-            foreach (GameNode source in gameNodes)
+            // FIXME: Avoid this clone.
+            ICollection<LayoutGraphEdge<T>> edges = new List<LayoutGraphEdge<T>>();
+            Dictionary<Node, T> map = NodeToGameNodeMap(gameNodes);
+
+            foreach (T source in gameNodes)
             {
                 Node sourceNode = source.ItsNode;
 
-                foreach (Edge edge in sourceNode.Outgoings)
+                foreach (Edge edge in sourceNode.Outgoings.Where(x => !x.HasToggle(Edge.IsVirtualToggle)))
                 {
                     Node target = edge.Target;
-                    edges.Add(new LayoutEdge(source, map[target], edge));
+                    edges.Add(new LayoutGraphEdge<T>(source, map[target], edge));
                 }
             }
+
             return edges;
         }
-        
+
         /// <summary>
         /// Returns a mapping of each graph Node onto its containing GameNode for every
         /// element in <paramref name="gameNodes"/>.
         /// </summary>
         /// <param name="gameNodes"></param>
         /// <returns>mapping of graph node onto its corresponding game node</returns>
-        public static Dictionary<Node, GameNode> NodeToGameNodeMap(ICollection<GameNode> gameNodes)
+        /// <remarks>This method is a clone of <see cref="GraphRenderer.NodeToGameNodeMap{T}(IEnumerable{T})"/>. FIXME: Remove it.</remarks>
+        private static Dictionary<Node, T> NodeToGameNodeMap<T>(IEnumerable<T> gameNodes) where T : AbstractLayoutNode
         {
-            Dictionary<Node, GameNode> map = new Dictionary<Node, GameNode>();
-            foreach (GameNode node in gameNodes)
+            // FIXME: Avoid this clone.
+            Dictionary<Node, T> map = new Dictionary<Node, T>();
+            foreach (T node in gameNodes)
             {
                 map[node.ItsNode] = node;
             }

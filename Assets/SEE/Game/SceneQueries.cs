@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.GO;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -10,7 +10,7 @@ using UnityEngine.Assertions;
 namespace SEE.Game
 {
     /// <summary>
-    /// Provides queries on game objects in the current scence at run-time.
+    /// Provides queries on game objects in the current scene at run-time.
     /// </summary>
     internal static class SceneQueries
     {
@@ -36,12 +36,12 @@ namespace SEE.Game
                     }
                     else
                     {
-                        Debug.LogWarningFormat("Game node {0} has a null node reference.\n", go.name);
+                        Debug.LogWarning($"Game node {go.name} has a null node reference.\n");
                     }
                 }
                 else
                 {
-                    Debug.LogWarningFormat("Game node {0} without node reference.\n", go.name);
+                    Debug.LogWarning($"Game node {go.name} without node reference.\n");
                 }
             }
             return result;
@@ -160,14 +160,22 @@ namespace SEE.Game
             return null;
         }
 
+        /// <summary>
+        /// Returns the farthest ancestor in the game-object hierarchy that is tagged by
+        /// <see cref="Tags.Node"/>.
+        /// </summary>
         /// <param name="cityChildTransform">The child transform, to find the root for.</param>
         /// <returns>The root transform of given child, so the highest transform with the tag
-        /// <see cref="Tags.Node"/> or <see cref="Tags.Whiteboard"/>
-        /// if its <see cref="SEECityArchitecture"/></returns>
+        /// <see cref="Tags.Node"/> or <see cref="Tags.Whiteboard"/></returns>
+        /// <exception cref="ArgumentNullException">thrown if <paramref name="cityChildTransform"/> is <c>null</c></exception>
         public static Transform GetCityRootTransformUpwards(Transform cityChildTransform)
         {
+            if (cityChildTransform == null)
+            {
+                throw new ArgumentNullException();
+            }
             Transform result = cityChildTransform;
-            while (result.parent.CompareTag(Tags.Node) && !result.parent.CompareTag(Tags.Whiteboard))
+            while (result.parent != null && result.parent.CompareTag(Tags.Node) && !result.parent.CompareTag(Tags.Whiteboard))
             {
                 result = result.parent;
             }
@@ -175,43 +183,26 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the root game object that represents a code city as a whole
-        /// along with the settings (layout information etc.). In other words,
-        /// we simply return the top-most transform in the game-object hierarchy.
-        /// That top-most object must be tagged by Tags.CodeCity. If it is,
-        /// it will be returned. If not, null will be returned.
+        /// Returns the closest ancestor of <paramref name="transform"/> that
+        /// represents a code city, that is, is tagged by <see cref="Tags.CodeCity"/>.
+        /// This ancestor is assumed to carry the settings (layout information etc.).
+        /// If none can be found, null will be returned.
         /// </summary>
         /// <param name="transform">transform at which to start the search</param>
-        /// <returns>top-most transform in the game-object hierarchy tagged by
+        /// <returns>closest ancestor transform in the game-object hierarchy tagged by
         /// Tags.CodeCity or null</returns>
         public static Transform GetCodeCity(Transform transform)
         {
             Transform result = transform;
-            if (PlayerSettings.GetInputType() == PlayerInputType.HoloLensPlayer)
+            while (result != null)
             {
-                // If the MRTK is enabled, the cities will be part of a CityCollection, so we can't simply use the root.
-                // In this case, we actually have to traverse the tree up until the Tags match.
-
-                while (result != null)
+                if (result.CompareTag(Tags.CodeCity))
                 {
-                    if (result.CompareTag(Tags.CodeCity))
-                    {
-                        return result;
-                    }
-                    result = result.parent;
+                    return result;
                 }
-                return result;
+                result = result.parent;
             }
-            result = transform.root;
-
-            if (result.CompareTag(Tags.CodeCity))
-            {
-                return result;
-            }
-            else
-            {
-                return null;
-            }
+            return result;
         }
 
         /// <summary>
@@ -251,10 +242,6 @@ namespace SEE.Game
         /// <summary>
         /// Retrieves the game object representing a node with the given <paramref name="nodeID"/>.
         ///
-        /// Note: This is an expensive operation as it traverses all objects in the scene.
-        /// FIXME: We may need to cache all this information in look up tables for better
-        /// performance.
-        ///
         /// Precondition: Such a game object actually exists.
         /// </summary>
         /// <param name="nodeID">the unique ID of the node to be retrieved</param>
@@ -262,22 +249,17 @@ namespace SEE.Game
         /// <exception cref="Exception">thrown if there is no such object</exception>
         public static GameObject RetrieveGameNode(string nodeID)
         {
-            foreach (GameObject gameNode in AllGameNodesInScene(true, true))
+            GameObject gameObject = GraphElementIDMap.Find(nodeID);
+            if (gameObject == null)
             {
-                if (gameNode.name == nodeID)
-                {
-                    return gameNode;
-                }
+                throw new Exception($"Node named {nodeID} not found.");
             }
-            throw new Exception($"Node named {nodeID} not found.");
+
+            return gameObject;
         }
 
         /// <summary>
         /// Retrieves the game object representing the given <paramref name="node"/>.
-        ///
-        /// Note: This is an expensive operation as it traverses all objects in the scene.
-        /// FIXME: We may need to cache all this information in look up tables for better
-        /// performance.
         ///
         /// Preconditions:
         ///   (1) <paramref name="node"/> is not null.
@@ -286,17 +268,13 @@ namespace SEE.Game
         /// <param name="node">the node to be retrieved</param>
         /// <returns>the game object representing the given <paramref name="node"/></returns>
         /// <exception cref="Exception">thrown if there is no such object</exception>
-        public static GameObject RetrieveGameNode(Node node)
+        public static GameObject RetrieveGameNode(this Node node)
         {
             return RetrieveGameNode(node.ID);
         }
 
         /// <summary>
         /// Retrieves the game object representing the node referenced by the given <paramref name="nodeRef"/>.
-        ///
-        /// Note: This is an expensive operation as it traverses all objects in the scene.
-        /// FIXME: We may need to cache all this information in look up tables for better
-        /// performance.
         ///
         /// Preconditions:
         /// (1) <paramref name="nodeRef"/> must reference a valid node.
@@ -311,43 +289,40 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the first game object in the current scene with the given <paramref name="id"/>.
+        /// Returns the first game object in the current scene with the given <paramref name="name"/>.
         /// Will also return inactive game objects. If no such object exists, null will be returned.
         ///
-        /// Note: This method will descend only in the root nodes tagged by <see cref="Tags.CodeCity"/>.
-        /// Those roots themselves will not be considered.
+        /// Note: This method is expensive because it will iterate over all game objects in the
+        /// scene. Use it wisely.
         /// </summary>
-        /// <param name="id">id of the game object to be found</param>
+        /// <param name="name">name of the game object to be found</param>
         /// <returns>found game object or null</returns>
-        public static GameObject Find(string id)
+        public static GameObject Find(string name)
         {
             UnityEngine.SceneManagement.Scene activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
 
             // GetRootGameObjects() yields also inactive game objects
             foreach (GameObject root in activeScene.GetRootGameObjects())
             {
-                if (root.CompareTag(Tags.CodeCity))
+                GameObject ancestor = root.Descendant(name);
+                if (ancestor != null)
                 {
-                    GameObject ancestor = root.Ancestor(id);
-                    if (ancestor != null)
-                    {
-                        return ancestor;
-                    }
+                    return ancestor;
                 }
             }
             return null;
         }
 
         /// <summary>
-        /// Returns all game objects in the current scene having a name contained in <paramref name="gameObjectIDs"/>.
+        /// Returns all game objects in the current scene having a name contained in <paramref name="gameObjectNames"/>.
         /// Will also return inactive game objects.
         ///
-        /// Note: This method will descend only in the root nodes tagged by <see cref="Tags.CodeCity"/>.
-        /// Those roots themselves will not be included.
+        /// Note: This method is expensive because it will iterate over all game objects in the
+        /// scene. Use it wisely.
         /// </summary>
-        /// <param name="gameObjectIDs">list of names any of the game objects to be retrieved should have</param>
+        /// <param name="gameObjectNames">list of names any of the game objects to be retrieved should have</param>
         /// <returns>found game objects</returns>
-        public static ISet<GameObject> Find(ISet<string> gameObjectIDs)
+        public static ISet<GameObject> Find(ISet<string> gameObjectNames)
         {
             ISet<GameObject> result = new HashSet<GameObject>();
             UnityEngine.SceneManagement.Scene activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
@@ -355,10 +330,7 @@ namespace SEE.Game
             // GetRootGameObjects() yields also inactive game objects
             foreach (GameObject root in activeScene.GetRootGameObjects())
             {
-                if (root.CompareTag(Tags.CodeCity))
-                {
-                    result.UnionWith(root.Ancestors(gameObjectIDs));
-                }
+                result.UnionWith(root.Descendants(gameObjectNames));
             }
             return result;
         }
@@ -412,7 +384,7 @@ namespace SEE.Game
             }
             return cachedArchitecture;
         }
-        
+
         /// <summary>
         /// Finds the <see cref="SEECityArchitecture"/> in the secne. The city may be cached.
         /// </summary>
@@ -426,7 +398,7 @@ namespace SEE.Game
 
             return cachedArchitectureCity;
         }
-        
+
         /// <summary>
         /// Finds the Whiteboard GameObject witht the Tag Whiteboard.
         /// </summary>
@@ -504,7 +476,7 @@ namespace SEE.Game
             }
             return result;
         }
-        
+
         /// <summary>
         /// Recursively collects all node ids of <paramref name="node"/> and its descendants.
         /// </summary>
@@ -518,7 +490,7 @@ namespace SEE.Game
                 fetchNodeIds(child, ids);
             }
         }
-        
+
         /// <summary>
         /// Find all edges that are connected to <paramref name="node"/>.
         /// </summary>

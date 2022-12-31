@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using SEE.Controls.Interactables;
+using UnityEngine;
 
 namespace SEE.Controls.Architecture
 {
@@ -31,7 +32,7 @@ namespace SEE.Controls.Architecture
 
         private void OnDeselected(GameObject initiator)
         {
-            
+
             if (TryGetComponent(out Outline outline))
             {
                 DestroyImmediate(outline);
@@ -40,7 +41,7 @@ namespace SEE.Controls.Architecture
 
         private void OnExit(GameObject initiator)
         {
-            
+
             if (TryGetComponent(out Outline outline))
             {
                 DestroyImmediate(outline);
@@ -51,7 +52,7 @@ namespace SEE.Controls.Architecture
         {
             if (TryGetComponent(out Outline outline))
             {
-                outline.SetColor(Color.black);
+                outline.OutlineColor = Color.black;
             }
             else
             {
@@ -63,7 +64,7 @@ namespace SEE.Controls.Architecture
         {
             if (TryGetComponent(out Outline outline))
             {
-                outline.SetColor(Color.black);
+                outline.OutlineColor = Color.black;
             }
             else
             {

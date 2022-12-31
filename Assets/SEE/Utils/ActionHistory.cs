@@ -1,4 +1,4 @@
-﻿using SEE.Net;
+﻿using SEE.Net.Actions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,10 +45,10 @@ namespace SEE.Utils
         // If a player executes an action that changes the same GameObject as an action
         // of another player, the player that has done the action first
         // cannot perform an undo or redo on that because of a conflict.
-        // If the second player undoes the newer change of the object, 
+        // If the second player undoes the newer change of the object,
         // the undo of the older change is still not possible because
         // the change is still on the redoHistory of the other player.
-        // If the player who executed the newer action undoes the action 
+        // If the player who executed the newer action undoes the action
         // and clears his redoHistory by performing another action,
         // the other player can undo his action.
 
@@ -62,7 +62,7 @@ namespace SEE.Utils
         // <see cref="ReversibleAction.Progress.InProgress"/>, it has already had
         // some effect that needs to be undone.
         //
-        // See also the test cases in <seealso cref="SEETests.TestActionHistory"/> for 
+        // See also the test cases in <seealso cref="SEETests.TestActionHistory"/> for
         // additional information.
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// The actionHistory, which is synchronised through the network on each client.
-        /// 
+        ///
         /// FIXME: This list should be forgetting, that is, it should not grow
         /// without limit. Otherwise we will run into performance problems if
         /// the history is large and the actions have changed many objects.
@@ -144,6 +144,20 @@ namespace SEE.Utils
         private Stack<ReversibleAction> RedoHistory { get; } = new Stack<ReversibleAction>();
 
         /// <summary>
+        /// Whether to synchronize the action history over the network.
+        /// </summary>
+        private readonly bool SyncOverNetwork;
+
+        /// <summary>
+        /// Creates a new <see cref="ActionHistory"/> instance.
+        /// </summary>
+        /// <param name="syncOverNetwork">whether to synchronize the action history over the network</param>
+        public ActionHistory(bool syncOverNetwork = true)
+        {
+            SyncOverNetwork = syncOverNetwork;
+        }
+
+        /// <summary>
         /// Checks the invariant that the <see cref="UndoHistory"/> has at most
         /// one action with progress state <see cref="ReversibleAction.Progress.NoEffect"/>
         /// and this action is at the top of <see cref="UndoHistory"/>.
@@ -160,16 +174,16 @@ namespace SEE.Utils
         public ReversibleAction CurrentAction => UndoHistory.Count > 0 ? UndoHistory.Peek() : null;
 
         /// <summary>
-        /// Let C be the currently executed action (if there is any) in this action history. 
-        /// Then <see cref="ReversibleAction.Stop"/> will be called for C. After that 
+        /// Let C be the currently executed action (if there is any) in this action history.
+        /// Then <see cref="ReversibleAction.Stop"/> will be called for C. After that
         /// <see cref="ReversibleAction.Awake()"/> and then <see cref="ReversibleAction.Start"/>
-        /// will be called for <paramref name="action"/> and <paramref name="action"/> is added to 
-        /// the action history and becomes the currently executed action for which 
+        /// will be called for <paramref name="action"/> and <paramref name="action"/> is added to
+        /// the action history and becomes the currently executed action for which
         /// <see cref="ReversibleAction.Update"/> will be called whenever a client
         /// of this action history calls the action history's <see cref="Update"/> method.
-        /// 
+        ///
         /// No action previously undone can be redone anymore.
-        /// 
+        ///
         /// Precondition: <paramref name="action"/> is not already present in the action history.
         /// </summary>
         /// <param name="action">the action to be executed</param>
@@ -178,7 +192,7 @@ namespace SEE.Utils
             AssertAtMostOneActionWithNoEffect();
             CurrentAction?.Stop();
             LastActionWithEffect();
-            UndoHistory.Push(action);            
+            UndoHistory.Push(action);
             action.Awake();
             action.Start();
             // Whenever a new action is excuted, we consider the redo history lost.
@@ -190,7 +204,7 @@ namespace SEE.Utils
         /// <see cref="ReversibleAction.Update"/>), a new instance of the same kind as this
         /// action will be created, added to the action history and become the new currently
         /// executed action. The Update is propagated to all clients in the network.
-        /// 
+        ///
         /// If there is no currently executed action, nothing happens.
         /// </summary>
         public void Update()
@@ -209,7 +223,7 @@ namespace SEE.Utils
         /// <summary>
         /// Adds <paramref name="action"/> to the global history, that is,
         /// to <see cref="globalHistory"/> and also via the network on all clients.
-        /// 
+        ///
         /// This is the counterpart of <see cref="RemoveFromGlobalHistory(GlobalHistoryEntry)"/>.
         /// </summary>
         /// <param name="action">action to be added</param>
@@ -218,20 +232,26 @@ namespace SEE.Utils
             string actionID = action.GetId();
             HashSet<string> changedObjects = action.GetChangedObjects();
             Push(new GlobalHistoryEntry(true, HistoryType.Action, actionID, changedObjects));
-            new NetActionHistory().Push(HistoryType.Action, actionID, changedObjects);
+            if (SyncOverNetwork)
+            {
+                new NetActionHistory().Push(HistoryType.Action, actionID, changedObjects);
+            }
         }
 
         /// <summary>
         /// Removes <paramref name="action"/> from the global history, that is,
         /// from <see cref="globalHistory"/> and also via the network on all clients.
-        /// 
+        ///
         /// This is the counterpart of <see cref="AddToGlobalHistory(ReversibleAction)"/>.
         /// </summary>
         /// <param name="action">action to be added</param>
         private void RemoveFromGlobalHistory(GlobalHistoryEntry action)
         {
             RemoveAction(action.ActionID);
-            new NetActionHistory().Delete(action.ActionID);
+            if (SyncOverNetwork)
+            {
+                new NetActionHistory().Delete(action.ActionID);
+            }
         }
 
         /// <summary>
@@ -245,7 +265,10 @@ namespace SEE.Utils
             {
                 if (globalHistory[i].IsOwner && globalHistory[i].ActionType == HistoryType.UndoneAction)
                 {
-                    new NetActionHistory().Delete(globalHistory[i].ActionID);
+                    if (SyncOverNetwork)
+                    {
+                        new NetActionHistory().Delete(globalHistory[i].ActionID);
+                    }
                     globalHistory.RemoveAt(i);
                     i--;
                 }
@@ -283,7 +306,7 @@ namespace SEE.Utils
         public void Replace(GlobalHistoryEntry oldItem, GlobalHistoryEntry newItem, bool isNetwork)
         {
             globalHistory[GetIndexOfAction(oldItem.ActionID)] = newItem;
-            if (!isNetwork)
+            if (!isNetwork && SyncOverNetwork)
             {
                 new NetActionHistory().Replace(oldItem.ActionID, oldItem.ActionType, oldItem.ChangedObjects,
                                                newItem.ActionType, newItem.ChangedObjects);
@@ -389,13 +412,13 @@ namespace SEE.Utils
                 throw new UndoImpossible("Undo not possible. Someone else has made a change on the same object.");
             }
             else
-            {                
+            {
                 current.Undo();
                 RedoHistory.Push(current);
                 UndoHistory.Pop();
 
                 /// The global action history contains only those actions whose
-                /// execution is completed. The current action could be still
+                /// execution is completed. The current action could still
                 /// be running (we know that it has already had an effect,
                 /// that is, its current progress cannot be <see cref="ReversibleAction.Progress.NoEffect"/>,
                 /// otherwise we would not have arrived here). If it is still
@@ -408,7 +431,10 @@ namespace SEE.Utils
 
                     GlobalHistoryEntry undoneAction = new GlobalHistoryEntry(true, HistoryType.UndoneAction, lastAction.ActionID, lastAction.ChangedObjects);
                     Push(undoneAction);
-                    new NetActionHistory().Push(undoneAction.ActionType, undoneAction.ActionID, undoneAction.ChangedObjects);
+                    if (SyncOverNetwork)
+                    {
+                        new NetActionHistory().Push(undoneAction.ActionType, undoneAction.ActionID, undoneAction.ChangedObjects);
+                    }
                 }
                 // current has been undone and moved on the RedoStack.
                 // We will resume with the next top-element of the stack that
@@ -426,7 +452,7 @@ namespace SEE.Utils
         /// </summary>
         /// <exception cref="RedoImpossible">thrown in there is no action that could be re-done</exception>
         public void Redo()
-        {            
+        {
             if (RedoHistory.Count == 0)
             {
                 throw new RedoImpossible("Redo not possible, no action left to be redone!");
@@ -437,7 +463,7 @@ namespace SEE.Utils
                 // If the action to be redone has not been executed completely,
                 // it will not be contained in the global history, in which case
                 // lastUndoneAction.ActionID will be null.
-                GlobalHistoryEntry lastUndoneAction = FindLastActionOfPlayer(HistoryType.UndoneAction);                
+                GlobalHistoryEntry lastUndoneAction = FindLastActionOfPlayer(HistoryType.UndoneAction);
                 if (lastUndoneAction.ActionID != null && ActionHasConflicts(lastUndoneAction.ChangedObjects, lastUndoneAction.ActionID))
                 {
                     RedoHistory.Pop();
@@ -462,19 +488,25 @@ namespace SEE.Utils
                 {
                     GlobalHistoryEntry redoneAction = new GlobalHistoryEntry(true, HistoryType.Action, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects);
                     RemoveAction(lastUndoneAction.ActionID);
-                    new NetActionHistory().Delete(lastUndoneAction.ActionID);
+                    if (SyncOverNetwork)
+                    {
+                        new NetActionHistory().Delete(lastUndoneAction.ActionID);
+                    }
                     Push(redoneAction);
-                    new NetActionHistory().Push(redoneAction.ActionType, redoneAction.ActionID, redoneAction.ChangedObjects);
+                    if (SyncOverNetwork)
+                    {
+                        new NetActionHistory().Push(redoneAction.ActionType, redoneAction.ActionID, redoneAction.ChangedObjects);
+                    }
                 }
             }
         }
 
         /// <summary>
-        /// Resumes the execution with a fresh instance of the given <paramref name="action"/> 
+        /// Resumes the execution with a fresh instance of the given <paramref name="action"/>
         /// if its current progress is <see cref="ReversibleAction.Progress.Completed"/>
         /// or otherwise with <paramref name="action"/> if the current progress
         /// is <see cref="ReversibleAction.Progress.InProgress"/>.
-        /// 
+        ///
         /// Precondition: the current progress of <paramref name="action"/>
         /// is different from <see cref="ReversibleAction.Progress.NoEffect"/>.
         /// </summary>
@@ -496,9 +528,9 @@ namespace SEE.Utils
         /// <summary>
         /// Returns the last action on the <see cref="UndoHistory"/> that
         /// has had any effect (preliminary or complete) or null if there is
-        /// no such action. 
-        /// 
-        /// Side effect: All actions at the top of the <see cref="UndoHistory"/> 
+        /// no such action.
+        ///
+        /// Side effect: All actions at the top of the <see cref="UndoHistory"/>
         /// are popped off.
         /// </summary>
         /// <returns>the last action on the <see cref="UndoHistory"/> that

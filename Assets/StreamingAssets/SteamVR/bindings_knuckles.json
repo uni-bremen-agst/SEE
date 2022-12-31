@@ -157,6 +157,9 @@
                "inputs" : {
                   "click" : {
                      "output" : "/actions/default/in/select"
+                  },
+                  "held" : {
+                     "output" : "/actions/default/in/opensettingsmenu"
                   }
                },
                "mode" : "button",

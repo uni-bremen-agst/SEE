@@ -4,8 +4,7 @@ using System.Linq;
 using System.Net;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
-using UnityEngine;
-using SEE.Net.Util;
+using SEE.Net.Actions;
 
 namespace SEE.Net
 {
@@ -81,15 +80,16 @@ namespace SEE.Net
                 incomingPacketSequenceIDs = new Dictionary<Connection, ulong>();
                 outgoingPacketSequenceIDs = new Dictionary<Connection, ulong>();
 
-                NetworkComms.AppendGlobalConnectionEstablishHandler((Connection c) => pendingEstablishedConnections.Push(c));
-                NetworkComms.AppendGlobalConnectionCloseHandler((Connection c) => pendingClosedConnections.Push(c));
+                NetworkComms.AppendGlobalConnectionEstablishHandler((Connection c) => { if (c != null) pendingEstablishedConnections.Push(c); });
+                NetworkComms.AppendGlobalConnectionCloseHandler((Connection c) => { if (c != null) pendingClosedConnections.Push(c); });
 
                 void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => packetHandler.Push(packetHeader, connection, data);
                 NetworkComms.AppendGlobalIncomingPacketHandler<string>(PacketType, OnIncomingPacket);
 
                 try
                 {
-                    ConnectionListeners.AddRange(Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, Network.LocalServerPort), false));
+                    ConnectionListeners.AddRange
+                        (Connection.StartListening(ConnectionType.TCP, new IPEndPoint(IPAddress.Any, Network.Instance.ServerActionPort), false));
 #if UNITY_EDITOR
                     string message = "Server listening on end-points:";
                     foreach (ConnectionListenerBase connectionListener in ConnectionListeners)
@@ -164,9 +164,18 @@ namespace SEE.Net
         /// <param name="connection">The established connection.</param>
         private static void OnConnectionEstablished(Connection connection)
         {
+            if (connection == null)
+            {
+                // Connection can be null under certain circumstances,
+                // in which case no network connection actually exists.
+                return;
+            }
+            UnityEngine.Assertions.Assert.IsNotNull(connection.ConnectionInfo);
+            UnityEngine.Assertions.Assert.IsNotNull(connection.ConnectionInfo.LocalEndPoint);
             bool connectionListenerInitialized = false;
             foreach (ConnectionListenerBase connectionListener in ConnectionListeners)
             {
+                UnityEngine.Assertions.Assert.IsNotNull(connectionListener);
                 if (connectionListener.LocalListenEndPoint.Equals(connection.ConnectionInfo.LocalEndPoint))
                 {
                     connectionListenerInitialized = true;
@@ -178,39 +187,31 @@ namespace SEE.Net
             {
                 if (!Connections.Contains(connection))
                 {
-                    Util.Logger.Log("Connection with client established: " + connection);
+                    Util.Logger.Log($"Connection with client established: {connection}");
 
                     // synchronize current state with new client
                     if (!connection.ConnectionInfo.RemoteEndPoint.Equals(Client.LocalEndPoint))
                     {
                         IPEndPoint[] recipient = new IPEndPoint[] { (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint };
-                        List<InstantiatePrefabAction> actions = PrefabAction.GetAllActions();
-                        foreach (InstantiatePrefabAction action in actions)
-                        {
-                            action.Execute(recipient);
-                        }
                         if (Network.LoadCityOnStart)
                         {
-                            foreach (Game.AbstractSEECity city in UnityEngine.Object.FindObjectsOfType<Game.AbstractSEECity>())
-                            {
-                                new LoadCityAction(city).Execute(recipient);
-                            }
-                        }
-                        foreach (Controls.Actions.NavigationAction navigationAction in UnityEngine.Object.FindObjectsOfType<Controls.Actions.NavigationAction>())
-                        {
-                            new SyncCitiesAction(navigationAction).Execute(recipient);
+                            // TODO: Here we would tranfer all local cities to the connecting client.
+                            //foreach (AbstractSEECity city in UnityEngine.Object.FindObjectsOfType<AbstractSEECity>())
+                            //{
+                            //    new LoadCityAction(city).Execute(recipient);
+                            //}
                         }
                         foreach (Controls.InteractableObject interactableObject in Controls.InteractableObject.GrabbedObjects)
                         {
-                            new SetGrabAction(interactableObject, true).Execute(recipient);
+                            new SetGrabNetAction(interactableObject, true).Execute(recipient);
                         }
                         foreach (Controls.InteractableObject interactableObject in Controls.InteractableObject.SelectedObjects)
                         {
-                            new SetSelectAction(interactableObject, true).Execute(recipient);
+                            new SetSelectNetAction(interactableObject, true).Execute(recipient);
                         }
                         foreach (Controls.InteractableObject interactableObject in Controls.InteractableObject.HoveredObjects)
                         {
-                            new SetHoverAction(interactableObject, interactableObject.HoverFlags).Execute(recipient);
+                            new SetHoverNetAction(interactableObject, interactableObject.HoverFlags).Execute(recipient);
                         }
                     }
 
@@ -218,15 +219,6 @@ namespace SEE.Net
                     Connections.Add(connection);
                     incomingPacketSequenceIDs.Add(connection, 0);
                     outgoingPacketSequenceIDs.Add(connection, 0);
-
-                    // create new player head for every client
-                    new InstantiatePrefabAction(
-                        (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint,
-                        "PlayerHead",
-                        Vector3.zero,
-                        Quaternion.identity,
-                        new Vector3(0.02f, 0.015f, 0.015f)
-                    ).Execute();
                 }
                 else
                 {
@@ -236,10 +228,9 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Handles closing of given connection. Destroys the player prefab of given
-        /// connection.
+        /// Handles closing of given <paramref name="connection"/>.
         /// </summary>
-        /// <param name="connection"></param>
+        /// <param name="connection">connection to be closed</param>
         private static void OnConnectionClosed(Connection connection)
         {
             bool connectionListenerInitialized = ConnectionListeners.Any(listener => listener.LocalListenEndPoint.Equals(connection.ConnectionInfo.LocalEndPoint));
@@ -254,35 +245,29 @@ namespace SEE.Net
 
                     IPEndPoint remoteEndPoint = (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint;
 
-                    ViewContainer[] viewContainers = ViewContainer.GetViewContainersByOwner(remoteEndPoint);
-                    foreach (ViewContainer viewContainer in viewContainers)
-                    {
-                        new DestroyPrefabAction(viewContainer).Execute();
-                    }
-
-                    if (SetGrabAction.GrabbedObjects.TryGetValue(remoteEndPoint, out HashSet<Controls.InteractableObject> grabbedInteractables))
+                    if (SetGrabNetAction.GrabbedObjects.TryGetValue(remoteEndPoint, out HashSet<Controls.InteractableObject> grabbedInteractables))
                     {
                         foreach (Controls.InteractableObject grabbedInteractable in grabbedInteractables)
                         {
-                            SetGrabAction action = new SetGrabAction(grabbedInteractable, false);
+                            SetGrabNetAction action = new SetGrabNetAction(grabbedInteractable, false);
                             action.SetRequester(remoteEndPoint);
                             action.Execute();
                         }
                     }
-                    if (SetSelectAction.SelectedObjects.TryGetValue(remoteEndPoint, out HashSet<Controls.InteractableObject> selectedInteractables))
+                    if (SetSelectNetAction.SelectedObjects.TryGetValue(remoteEndPoint, out HashSet<Controls.InteractableObject> selectedInteractables))
                     {
                         foreach (Controls.InteractableObject selectedInteractable in selectedInteractables)
                         {
-                            SetSelectAction action = new SetSelectAction(selectedInteractable, false);
+                            SetSelectNetAction action = new SetSelectNetAction(selectedInteractable, false);
                             action.SetRequester(remoteEndPoint);
                             action.Execute();
                         }
                     }
-                    if (SetHoverAction.HoveredObjects.TryGetValue(remoteEndPoint, out HashSet<Controls.InteractableObject> hoveredInteractables))
+                    if (SetHoverNetAction.HoveredObjects.TryGetValue(remoteEndPoint, out HashSet<Controls.InteractableObject> hoveredInteractables))
                     {
                         foreach (Controls.InteractableObject hoveredInteractable in hoveredInteractables)
                         {
-                            SetHoverAction action = new SetHoverAction(hoveredInteractable, 0);
+                            SetHoverNetAction action = new SetHoverNetAction(hoveredInteractable, 0);
                             action.SetRequester(remoteEndPoint);
                             action.Execute();
                         }

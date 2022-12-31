@@ -1,16 +1,16 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.UI.Architecture
 {
-    
     /// <summary>
     /// Component that handles the modal dialog for the delete action approval.
     /// Used by Prefabs/Architecture/UI/DeleteElementDialog
-    /// 
+    ///
     /// </summary>
     public class DeleteElementDialog : MonoBehaviour
     {
@@ -49,7 +49,7 @@ namespace SEE.Game.UI.Architecture
             graphElement = null;
             ModalWindowManager.CloseWindow();
         }
-        
+
         /// <summary>
         /// OnClick listener for the confirm button.
         /// </summary>
@@ -57,20 +57,20 @@ namespace SEE.Game.UI.Architecture
         {
             SEECityArchitecture city = SceneQueries.FindArchitectureCity();
             if (graphElement.TryGetNode(out Node node))
-            { 
+            {
                 //Deletes the selected node and their children
-                Destroyer.DestroyGameObjectWithChildren(graphElement);
+                Destroyer.Destroy(graphElement);
                 city.LoadedGraph.RemoveNode(node);
-                
+
             }
             else if (graphElement.TryGetEdge(out Edge edge))
             {
                 city.LoadedGraph.RemoveEdge(edge);
-                Destroyer.DestroyGameObject(graphElement);
+                Destroyer.Destroy(graphElement);
             }
             ModalWindowManager.CloseWindow();
         }
-        
+
         /// <summary>
         /// Prepares and opens the dialog.
         /// </summary>

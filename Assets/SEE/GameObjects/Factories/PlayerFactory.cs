@@ -22,7 +22,7 @@ namespace SEE.GO
             GameObject player = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/DesktopPlayer");
             player.name = PlayerInputType.DesktopPlayer.ToString();
             player.tag = Tags.MainCamera;
-            player.GetComponent<DesktopPlayerMovement>().focusedObject = plane;
+            player.GetComponent<DesktopPlayerMovement>().FocusedObject = plane;
             return player;
         }
 
@@ -37,7 +37,7 @@ namespace SEE.GO
             player.name = PlayerInputType.VRPlayer.ToString();
             return player;
         }
-        
+
         /// <summary>
         /// Creates and returns a pen player instantiated from prefab Resources/Prefabs/Players/PenPlayer
         /// with all required components attached to it.
@@ -50,18 +50,6 @@ namespace SEE.GO
             player.name = PlayerInputType.PenPlayer.ToString();
             player.tag = Tags.MainCamera;
             player.GetComponent<PenPlayerMovement>().focusedObject = plane;
-            return player;
-        }
-
-        /// <summary>
-        /// Creates and returns a HoloLens player instantiated from prefab Resources/Prefabs/Players/HoloLensPlayer
-        /// with all required components attached to it.
-        /// </summary>
-        /// <returns>a player for the AR environment of HoloLens</returns>
-        public static GameObject CreateHololensPlayer()
-        {
-            GameObject player = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/HoloLensPlayer");
-            player.name = PlayerInputType.HoloLensPlayer.ToString();
             return player;
         }
 

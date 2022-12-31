@@ -89,7 +89,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Checks whether <paramref name="obj"/> is null and throws a System.Exception
+        /// Checks whether <paramref name="obj"/> is null and throws an <see cref="ArgumentNullException"/>
         /// containing the <paramref name="paramName"/> if so.
         /// </summary>
         /// <typeparam name="T">type of the given object</typeparam>
@@ -100,13 +100,13 @@ namespace SEE.Utils
         {
             if (obj == null)
             {
-                throw new Exception(paramName + " must not be null");
+                throw new ArgumentNullException(paramName);
             }
             return obj;
         }
 
         /// <summary>
-        /// Checks whether <paramref name="obj"/> is null or empty and throws a System.Exception
+        /// Checks whether <paramref name="obj"/> is null or empty and throws an <see cref="ArgumentException"/>
         /// containing <paramref name="paramName"/> if so.
         /// </summary>
         /// <param name="obj">string to be checked</param>
@@ -117,7 +117,7 @@ namespace SEE.Utils
             obj.AssertNotNull(paramName);
             if (obj.Length == 0)
             {
-                throw new Exception(paramName + " must not be empty");
+                throw new ArgumentException(paramName + " must not be empty", paramName);
             }
             return obj;
         }

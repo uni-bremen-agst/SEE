@@ -3,7 +3,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Net
+namespace SEE.Net.Actions
 {
     /// <summary>
     /// This class propagates an undo of <see cref="DeleteAction"/> to all clients
@@ -12,7 +12,7 @@ namespace SEE.Net
     ///
     /// Precondition: The objects to be revived were in fact previously deleted.
     /// </summary>
-    public class ReviveNetAction : AbstractAction
+    public class ReviveNetAction : AbstractNetAction
     {
         // Note: All attributes are made public so that they will be serialized
         // for the network transfer.

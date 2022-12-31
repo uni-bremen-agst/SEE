@@ -2,5 +2,10 @@
 @ECHO OFF
 for %%f in (*.g4) do (
     java -jar antlr.jar -Dlanguage=CSharp %%~nf.g4
-    ECHO Lexer generated for %%f%.
+    IF %ERRORLEVEL% NEQ 0 GOTO ERROR
+    IF %ERRORLEVEL% EQU 0 ECHO Lexer generated for %%f%.
 )
+EXIT 0
+
+ERROR:
+ECHO Error occured while generating lexer for %%f%.

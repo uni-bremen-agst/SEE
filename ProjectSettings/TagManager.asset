@@ -4,9 +4,6 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - CCAnimation
-  - Chart
-  - ChartContainer
   - ChartManager
   - VREventSystem
   - Pointer
@@ -14,16 +11,14 @@ TagManager:
   - Node
   - Text
   - Edge
-  - FxTemporaire
-  - projectile
   - CullingPlane
   - Code City
-  - PowerBeam
-  - MRTK
   - UI
   - JLG Visualization
   - Function Call
   - Runtime
+  - VRPointer
+  - FileBrowser
   - Path
   - Erosion
   - Whiteboard

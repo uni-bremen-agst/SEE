@@ -11,7 +11,7 @@
             True,               // true
             False,              // false
             Integer,            // [-+][0-9]+
-            Float,              // float number according to syntax specified by FloatStyle and CultureInfo.InvariantCulture
+            Float,              // float number according to syntax specified by FloatStyle and CultureInfo.InvariantCulture, includes Infinity and NegativeInfinity
             String,             // '"' <any character> '"' where a double quote " within the string must be escaped by a preceeding double quote "
             Open,               // Open = '{'
             Close,              // Close = '}'

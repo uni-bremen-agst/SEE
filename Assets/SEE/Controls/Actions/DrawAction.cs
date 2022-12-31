@@ -12,7 +12,7 @@ namespace SEE.Controls.Actions
     /// It serves as an example for a continuous action that modifies the
     /// scene while active.
     /// </summary>
-    class DrawAction : AbstractPlayerAction
+    internal class DrawAction : AbstractPlayerAction
     {
         /// <summary>
         /// A new instance of <see cref="DrawAction"/>.
@@ -65,7 +65,7 @@ namespace SEE.Controls.Actions
             // A range of exactly that single random color.
             ColorRange colorRange = new ColorRange(color, color, 1);
             // The materials factory for exactly that single random color.
-            Materials materials = new Materials(Materials.ShaderType.TransparentLine, colorRange);
+            Materials materials = new Materials(Materials.ShaderType.PortalFree, colorRange);
             // The material for exactly that single random color.
             material = materials.Get(0, 0);
         }
@@ -150,13 +150,13 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            Destroyer.DestroyGameObject(line);
+            Destroyer.Destroy(line);
             line = null;
             renderer = null;
         }
 
         /// <summary>
-        /// Redraws the drawn line (setting up <see cref="line"/> and adds <see cref="renderer"/> 
+        /// Redraws the drawn line (setting up <see cref="line"/> and adds <see cref="renderer"/>
         /// before that).
         /// See <see cref="ReversibleAction.Undo()"/>.
         /// </summary>
@@ -179,7 +179,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
-        /// Because this action does not actually change any game object, 
+        /// Because this action does not actually change any game object,
         /// an empty set is always returned.
         /// </summary>
         /// <returns>an empty set</returns>

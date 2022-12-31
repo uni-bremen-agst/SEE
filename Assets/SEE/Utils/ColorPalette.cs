@@ -12,7 +12,7 @@ namespace SEE.Utils
         /// The Viridis color palette as computed by an R script.
         /// See: https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html
         /// </summary>
-        private static readonly Color[] ViridisColorPalette = new Color[] {
+        private static readonly Color[] ViridisColorPalette = {
             new Color(0.267f, 0.004f, 0.333f, 1.0f),
             new Color(0.275f, 0.125f, 0.024f, 1.0f),
             new Color(0.259f, 0.235f, 0.506f, 1.0f),

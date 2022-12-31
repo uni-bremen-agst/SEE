@@ -1,9 +1,7 @@
-﻿using System;
-using Lean.Common;
+﻿using Lean.Common;
 using SEE.DataModel;
 using SEE.Game.UI.Architecture;
 using SEE.Utils;
-using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,8 +12,6 @@ namespace SEE.Game.GestureRecognition
     /// </summary>
     public class GestureRecorder : MonoBehaviour
     {
-
-
         public LeanPlane leanPlane;
         /// <summary>
         /// The input action definiton for the pen.
@@ -29,7 +25,7 @@ namespace SEE.Game.GestureRecognition
         /// The gesture path instance.
         /// </summary>
         private GameObject pathGO;
-        
+
         /// <summary>
         /// Whether the input should be sampled or tested against the existing gesture template.
         /// </summary>
@@ -38,7 +34,7 @@ namespace SEE.Game.GestureRecognition
         public string gestureName;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public GestureResultUI ResultUI;
 
@@ -65,7 +61,7 @@ namespace SEE.Game.GestureRecognition
             positionAction = InputActions.Drawing.Position;
             InputActions.Enable();
         }
-        
+
         /// <summary>
         /// Event handler method for the DrawEnd mapping from <see cref="ArchitectureInputActions.DrawingActions"/>
         /// </summary>
@@ -82,13 +78,13 @@ namespace SEE.Game.GestureRecognition
             {
                 Recognize();
             }
-            
+
             Destroy(pathGO);
 
         }
-        
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private void Sample()
         {
@@ -97,16 +93,16 @@ namespace SEE.Game.GestureRecognition
             GestureIO.SaveDataSetToDisk(gesturePath, gestureName);
             ResultUI.ShowResult(default(DollarPGestureRecognizer.RecognizerResult), rawPoints.Length, sample, gestureName);
         }
-        
+
         /// <summary>
-        /// 
+        ///
         /// </summary>
         private void Recognize()
         {
             if (DollarPGestureRecognizer.TryRecognizeGesture(pathGO,
                 out DollarPGestureRecognizer.RecognizerResult result, out Vector3[] rawPoints))
             {
-                
+
                 ResultUI.ShowResult(result, rawPoints.Length, sample, gestureName);
             }
             else
@@ -114,8 +110,8 @@ namespace SEE.Game.GestureRecognition
                 ResultUI.ShowResult(result, rawPoints.Length, sample, gestureName, true);
             }
         }
-        
-       
+
+
         /// <summary>
         /// Event handler method for the DrawBegin mapping from <see cref="ArchitectureInputActions.DrawingActions"/>.
         /// If the raycast target is the whiteboard instantiate the gesture path prefab.
@@ -151,8 +147,8 @@ namespace SEE.Game.GestureRecognition
             Vector2 pointerPosition = positionAction.ReadValue<Vector2>();
             var ray = MainCamera.Camera.ScreenPointToRay(pointerPosition);
             return leanPlane.TryRaycast(ray, ref hit);
-            
-            
+
+
         }
     }
 }

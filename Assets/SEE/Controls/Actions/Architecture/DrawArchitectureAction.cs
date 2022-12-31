@@ -26,8 +26,8 @@ namespace SEE.Controls.Actions.Architecture
         /// The relative resources path to the gesture prefab object.
         /// </summary>
         private const string GESTURE_PATH_PREFAB_PATH = "Prefabs/Architecture/StrokeGesture";
-        
-        
+
+
         /// <summary>
         /// Struct that holds the state of this action.
         /// </summary>
@@ -79,7 +79,7 @@ namespace SEE.Controls.Actions.Architecture
         {
             pathPrefab = Resources.Load<GameObject>(GESTURE_PATH_PREFAB_PATH);
             actions = new ArchitectureInputActions();
-            
+
             actions.Drawing.DrawBegin.performed += OnDrawBegin;
             actions.Drawing.Draw.performed += OnDraw;
             positionAction = actions.Drawing.Position;
@@ -116,12 +116,12 @@ namespace SEE.Controls.Actions.Architecture
                     }
                 }
             }
-            Destroyer.DestroyGameObject(actionState.pathInstance);
+            Destroyer.Destroy(actionState.pathInstance);
             actionState = new ActionState();
         }
 
-        
-        
+
+
         /// <summary>
         /// Event handler method for the DrawBegin mapping from <see cref="ArchitectureInputActions.DrawingActions"/>.
         /// If the raycast target is a node instantiate the gesture path prefab and assign parentObject and sourceNode.
@@ -137,7 +137,7 @@ namespace SEE.Controls.Actions.Architecture
                 actionState.sourceNode = hit.transform.gameObject;
             }
         }
-        
+
         /// <summary>
         /// Event handler method for the Draw mapping from <see cref="ArchitectureInputActions.DrawingActions"/>,
         /// </summary>
@@ -181,7 +181,7 @@ namespace SEE.Controls.Actions.Architecture
         /// <param name="hit">the hit struct</param>
         /// <returns>True if the target is a node or the whiteboard object, false otherwise.</returns>
         private bool TryRaycastWhiteboard(out RaycastHit hit)
-        { 
+        {
             hit = default(RaycastHit);
             Vector2 pointerPosition = positionAction.ReadValue<Vector2>();
             if(Raycasting.RaycastAnything(out hit, pointerPosition))

@@ -16,18 +16,19 @@ namespace SEE.Controls
     /// a microphone to talk. The recognized input is shown on the console
     /// for inspection and will also be compared to the expected result.
     /// </summary>
-    class TestKeywordInput
+    [Category("NonDeterministic")]
+    internal class TestKeywordInput
     {
         /// <summary>
         /// The keywords to be recognized.
         /// </summary>
-        private readonly string[] keywords = new string[]
-               {
-                "move up",
-                "hi SEE",
-                "move down",
-                "stop talking"
-               };
+        private readonly string[] keywords =
+        {
+            "move up",
+            "hi SEE",
+            "move down",
+            "stop talking"
+        };
 
         [UnityTest]
         public IEnumerator TestDialog()
@@ -41,7 +42,7 @@ namespace SEE.Controls
             for (int i = 10; i > 0; i--)
             {
                 Debug.Log($"Say one of the keywords {ToString(keywords)} and watch the console output. I am listening for "
-                    + "another {i} seconds and report what I understood to the console.\n");
+                          + "another {i} seconds and report what I understood to the console.\n");
                 yield return new WaitForSeconds(1);
             }
 

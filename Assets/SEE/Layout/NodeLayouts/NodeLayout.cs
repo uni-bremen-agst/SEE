@@ -1,6 +1,7 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Layout.NodeLayouts.Cose;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Layout.NodeLayouts
@@ -38,22 +39,13 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         protected readonly float groundLevel;
 
-        public float Groundlevel { get => groundLevel; }
-
-        public float InnerNodeHeight { get => innerNodeHeight; }
-
-        /// <summary>
-        /// The height of inner nodes (y co-ordinate).
-        /// </summary>
-        protected const float innerNodeHeight = 0.01f;
-
         /// <summary>
         /// If inner nodes are represented as visible objects covering their total area
         /// and the visualizations of those inner nodes are stacked in a hierarchical layout,
         /// their visualizations should not be on the same level; otherwise they will hide
-        /// each other. For this reason, every inner node will be slightly lifted along the 
-        /// y axis according to its tree depth so that inner nodes are stacked visually 
-        /// (level 0 is at the bottom). The value levelIncreaseForInnerNodes is the 
+        /// each other. For this reason, every inner node will be slightly lifted along the
+        /// y axis according to its tree depth so that inner nodes are stacked visually
+        /// (level 0 is at the bottom). The value levelIncreaseForInnerNodes is the
         /// height factor for each level. It will be multiplied by the level to obtain
         /// an inner node's y co-ordinate.
         /// </summary>
@@ -63,7 +55,7 @@ namespace SEE.Layout.NodeLayouts
         /// Returns the lift for an innner node as a product of its tree level
         /// and levelIncreaseForInnerNodes. This value is intended to be added
         /// to the ground level to define the y co-ordindate of an inner node
-        /// where visualizations of inner nodes can be stacked and would possibly 
+        /// where visualizations of inner nodes can be stacked and would possibly
         /// hide each other if they were all at the same height.
         /// </summary>
         /// <param name="node">an inner node to be lifted</param>
@@ -77,22 +69,22 @@ namespace SEE.Layout.NodeLayouts
         /// Yields the layout for all given <paramref name="layoutNodes"/>.
         /// For every node n in <paramref name="layoutNodes"/>: result[n] is the node transform,
         /// i.e., the game object's position, scale, and rotation.
-        /// 
-        /// IMPORTANT NOTE: The y co-ordinate of the position in NodeTransform will 
-        /// be interpreted as the ground position of the game object (unlike in Unity 
+        ///
+        /// IMPORTANT NOTE: The y co-ordinate of the position in NodeTransform will
+        /// be interpreted as the ground position of the game object (unlike in Unity
         /// where it is the center height).
         /// </summary>
         /// <param name="layoutNodes">set of layout nodes for which to compute the layout</param>
         /// <returns>node layout</returns>
-        /// 
-        public abstract Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes);
+        ///
+        public abstract Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes);
 
         /// <summary>
         /// Yields the layout for all given <paramref name="layoutNodes"/>.
         /// For every node n in <paramref name="layoutNodes"/>: result[n] is the node transform,
         /// i.e., the game object's position, scale, and rotation.
-        /// 
-        /// <paramref name="edges"/> contains all edges of the overlying graph and <paramref name="sublayouts"/> contains all sublayouts 
+        ///
+        /// <paramref name="edges"/> contains all edges of the overlying graph and <paramref name="sublayouts"/> contains all sublayouts
         /// </summary>
         /// <param name="layoutNodes"></param>
         /// <param name="edges"></param>
@@ -123,34 +115,41 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="layoutNodes">layout nodes to be adjusted</param>
         /// <param name="target">offset to be added</param>
-        public static void MoveTo(ICollection<ILayoutNode> layoutNodes, Vector3 target)
+        public static void MoveTo(IEnumerable<ILayoutNode> layoutNodes, Vector3 target)
         {
-            Bounding3DBox(layoutNodes, out Vector3 left, out Vector3 right);
+            IList<ILayoutNode> layoutList = layoutNodes.ToList();
+            Bounding3DBox(layoutList.ToList(), out Vector3 left, out Vector3 right);
             // The center of the bounding 3D box enclosing all layoutNodes
             Vector3 centerPosition = (right + left) / 2.0f;
             Vector3 offset = target - centerPosition;
             // It is assumed that target.y is the lowest point of the city.
             offset.y = target.y;
-            foreach (ILayoutNode layoutNode in layoutNodes)
+            foreach (ILayoutNode layoutNode in layoutList)
             {
                 layoutNode.CenterPosition += offset;
             }
         }
 
         /// <summary>
-        /// Scales all nodes in <paramref name="layoutNodes"/> so that the total width
-        /// of the layout (along the x axis) equals <paramref name="width"/>.
+        /// Scales all nodes in <paramref name="layoutNodes"/> so that they fit into
+        /// a rectangled defined by <paramref name="width"/> and <paramref name="depth"/>.
         /// The aspect ratio of every node is maintained.
         /// </summary>
         /// <param name="layoutNodes">layout nodes to be scaled</param>
         /// <param name="width">the absolute width (x axis) the required space for the laid out nodes must have</param>
+        /// <param name="depth">the absolute depth (z axis) the required space for the laid out nodes must have</param>
         /// <returns>the factor by which the scale of edge node was multiplied</returns>
-        public static float Scale(ICollection<ILayoutNode> layoutNodes, float width)
+        public static float Scale(IEnumerable<ILayoutNode> layoutNodes, float width, float depth)
         {
-            Bounding3DBox(layoutNodes, out Vector3 left, out Vector3 right);
-            float currentWidth = right.x - left.x;
-            float scaleFactor = width / currentWidth;
-            foreach (ILayoutNode layoutNode in layoutNodes)
+            IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
+            Bounding3DBox(layoutNodeList, out Vector3 leftFrontCorner, out Vector3 rightBackCorner);
+            // The actual occupied space is a rectangle defined by leftFrontCorner and rightBackCorner.
+
+            float actualWidth = rightBackCorner.x - leftFrontCorner.x;
+            float actualDepth = rightBackCorner.z - leftFrontCorner.z;
+
+            float scaleFactor = Mathf.Min(width / actualWidth, depth / actualDepth);
+            foreach (ILayoutNode layoutNode in layoutNodeList)
             {
                 layoutNode.ScaleBy(scaleFactor);
                 // The x/z co-ordinates must be adjusted after scaling
@@ -188,15 +187,15 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Stacks all <paramref name="layoutNodes"/> onto each other with <paramref name="levelDelta"/> 
-        /// in between parent and children (children are on top of their parent) where the initial 
+        /// Stacks all <paramref name="layoutNodes"/> onto each other with <paramref name="levelDelta"/>
+        /// in between parent and children (children are on top of their parent) where the initial
         /// y co-ordinate ground position of the roof nodes is specified by <paramref name="groundLevel"/>.
         /// The x and z co-ordinates of the <paramref name="layoutNodes"/> are not changed.
         /// </summary>
         /// <param name="layoutNodes">the nodes to be stacked onto each other</param>
         /// <param name="groundLevel">target y co-ordinate ground position of the layout nodes</param>
         /// <param name="levelDelta">the y distance between parents and their children</param>
-        public static void Stack(ICollection<ILayoutNode> layoutNodes, float groundLevel, float levelDelta = 0.001f)
+        public static void Stack(IEnumerable<ILayoutNode> layoutNodes, float groundLevel, float levelDelta = 0.001f)
         {
             // position all root nodes at groundLevel
             foreach (ILayoutNode layoutNode in layoutNodes)
@@ -336,11 +335,9 @@ namespace SEE.Layout.NodeLayouts
         /// Calculates and applies the layout to the given <paramref name="layoutNodes"/>.
         /// </summary>
         /// <param name="layoutNodes">nodes for which to apply the layout</param>
-        public void Apply(ICollection<ILayoutNode> layoutNodes)
+        public void Apply(IEnumerable<ILayoutNode> layoutNodes)
         {
-            Dictionary<ILayoutNode, NodeTransform> layout = Layout(layoutNodes);
-
-            ApplyLayoutNodeTransform(layout);
+            ApplyLayoutNodeTransform(Layout(layoutNodes));
         }
 
         /// <summary>
@@ -351,20 +348,18 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="sublayouts">the sublayouts for the layout</param>
         public void Apply(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
         {
-            Dictionary<ILayoutNode, NodeTransform> layout = Layout(layoutNodes, edges, sublayouts);
-
-            ApplyLayoutNodeTransform(layout);
+            ApplyLayoutNodeTransform(Layout(layoutNodes, edges, sublayouts));
         }
 
         /// <summary>
-        /// Applys the Nodetransfrom values to its corresponding layoutNode
+        /// Applies the <see cref="NodeTransform"/> values to its corresponding <see cref="ILayoutNode"/>.
         /// </summary>
-        /// <param name="layout">the calculated layout</param>
-        private void ApplyLayoutNodeTransform(Dictionary<ILayoutNode, NodeTransform> layout)
+        /// <param name="layout">the calculated layout to be applied</param>
+        private void ApplyLayoutNodeTransform<T>(Dictionary<T, NodeTransform> layout) where T : ILayoutNode
         {
-            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
+            foreach (KeyValuePair<T, NodeTransform> entry in layout)
             {
-                ILayoutNode node = entry.Key;
+                T node = entry.Key;
                 NodeTransform transform = entry.Value;
                 // y co-ordinate of transform.position refers to the ground
                 Vector3 position = transform.position;

@@ -4,13 +4,16 @@ using SEE.Utils;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using SEE.Net.Actions;
+using static SEE.Utils.Raycasting;
+using SEE.Game.Operator;
 
 namespace SEE.Controls.Actions
 {
     /// <summary>
     /// Action to scale a node.
     /// </summary>
-    public class ScaleNodeAction : AbstractPlayerAction
+    internal class ScaleNodeAction : AbstractPlayerAction
     {
         /// <summary>
         /// Returns a new instance of <see cref="ScaleNodeAction"/>.
@@ -142,6 +145,11 @@ namespace SEE.Controls.Actions
         private GameObject objectToScale;
 
         /// <summary>
+        /// Node operator of <see cref="objectToScale"/>.
+        /// </summary>
+        private NodeOperator Operator;
+
+        /// <summary>
         /// A memento of the position and scale of <see cref="objectToScale"/> before
         /// or after, respectively, it was scaled.
         /// </summary>
@@ -174,8 +182,9 @@ namespace SEE.Controls.Actions
             /// <param name="gameObject">object whose position and scale are to be restored</param>
             public void Revert(GameObject gameObject)
             {
-                gameObject.SetScale(Scale);
-                gameObject.transform.position = Position;
+                NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+                nodeOperator.ScaleTo(Scale, 0);
+                nodeOperator.MoveTo(Position, 0);
             }
         }
 
@@ -207,7 +216,16 @@ namespace SEE.Controls.Actions
         {
             base.Undo();
             beforeAction.Revert(objectToScale);
-            new ScaleNodeNetAction(objectToScale.name, objectToScale.transform.lossyScale, objectToScale.transform.position).Execute();
+            MoveAndScale();
+        }
+
+        /// <summary>
+        /// Scales and moves <see cref="objectToScale"/> in all clients to its current localScale and position.
+        /// </summary>
+        private void MoveAndScale()
+        {
+            new ScaleNodeNetAction(objectToScale.name, objectToScale.transform.localScale, 0).Execute();
+            new MoveNetAction(objectToScale.name, objectToScale.transform.position, 0).Execute();
         }
 
         /// <summary>
@@ -222,7 +240,7 @@ namespace SEE.Controls.Actions
                 // we need to re-do the action.
                 base.Redo();
                 afterAction.Revert(objectToScale);
-                new ScaleNodeNetAction(objectToScale.name, objectToScale.transform.lossyScale, objectToScale.transform.position).Execute();
+                MoveAndScale();
             }
         }
 
@@ -233,9 +251,9 @@ namespace SEE.Controls.Actions
         private bool scalingGizmosAreDrawn = false;
 
         /// <summary
-        /// See <see cref="ReversibleAction.Update"/>. 
-        /// 
-        /// Note: The action is finalized only if the user selects anything except the 
+        /// See <see cref="ReversibleAction.Update"/>.
+        ///
+        /// Note: The action is finalized only if the user selects anything except the
         /// <see cref="objectToScale"/> or any of the scaling gizmos.
         /// </summary>
         /// <returns>true if completed</returns>
@@ -248,12 +266,14 @@ namespace SEE.Controls.Actions
                 {
                     DrawGamingGizmos();
                 }
+
                 if (SEEInput.Scale())
                 {
                     if (draggedSphere == null && Raycasting.RaycastAnything(out RaycastHit raycastHit))
                     {
                         draggedSphere = SelectedScalingGizmo(raycastHit.collider.gameObject);
                     }
+
                     if (draggedSphere != null)
                     {
                         Scaling();
@@ -300,11 +320,14 @@ namespace SEE.Controls.Actions
                                 if (hitGraphElement == HitGraphElement.Node)
                                 {
                                     objectToScale = raycastHit.collider.gameObject;
+                                    Operator = objectToScale.AddOrGetComponent<NodeOperator>();
                                 }
                                 else
                                 {
                                     objectToScale = null;
+                                    Operator = null;
                                 }
+
                                 RemoveSpheres();
                                 draggedSphere = null;
                                 return false;
@@ -316,23 +339,17 @@ namespace SEE.Controls.Actions
                 {
                     // No object to be scaled had been selected yet, but now we have one.
                     objectToScale = raycastHit.collider.gameObject;
+                    Operator = objectToScale.AddOrGetComponent<NodeOperator>();
                     beforeAction = new Memento(objectToScale);
                     return false;
                 }
             }
+
             return false;
         }
 
         /// <summary>
-        /// Looks at all the incoming and outgoing edges of a node and replaces these edges depending on the new scaling of the node. 
-        /// </summary>
-        private void AdjustEdge()
-        {
-            GameEdgeMover.MoveAllConnectingEdgesOfNode(objectToScale);
-        }
-
-        /// <summary>
-        /// Scales <see cref="objectToScale"/> and drags and re-draws the scaling gizmos. 
+        /// Scales <see cref="objectToScale"/> and drags and re-draws the scaling gizmos.
         /// </summary>
         private void Scaling()
         {
@@ -342,7 +359,6 @@ namespace SEE.Controls.Actions
             SetOnRoof();
             SetOnSide();
             AdjustSizeOfScalingGizmos();
-            AdjustEdge();
         }
 
         /// <summary>
@@ -371,24 +387,82 @@ namespace SEE.Controls.Actions
             // Each gizmo is locked to one particular axis.
             if (scalingGizmo == topSphere)
             {
-                GameNodeMover.MoveToLockAxes(scalingGizmo, false, true, false);
+                MoveToLockAxes(scalingGizmo, false, true, false);
             }
             else if (scalingGizmo == firstCornerSphere || scalingGizmo == secondCornerSphere
                      || scalingGizmo == thirdCornerSphere || scalingGizmo == forthCornerSphere)
             {
-                GameNodeMover.MoveToLockAxes(scalingGizmo, true, false, true);
+                MoveToLockAxes(scalingGizmo, true, false, true);
             }
             else if (scalingGizmo == firstSideSphere || scalingGizmo == secondSideSphere)
             {
-                GameNodeMover.MoveToLockAxes(scalingGizmo, true, false, false);
+                MoveToLockAxes(scalingGizmo, true, false, false);
             }
             else if (scalingGizmo == thirdSideSphere || scalingGizmo == forthSideSphere)
             {
-                GameNodeMover.MoveToLockAxes(scalingGizmo, false, false, true);
+                MoveToLockAxes(scalingGizmo, false, false, true);
             }
             else
             {
                 throw new ArgumentException($"Unexpected scaling gizmo {scalingGizmo.name}.");
+            }
+        }
+
+        /// <summary>
+        /// Moves the given <paramref name="movingObject"/> on a sphere around the
+        /// camera. The radius of this sphere is the original distance
+        /// from the <paramref name="movingObject"/> to the camera. The point
+        /// on that sphere is determined by a ray driven by the user hitting
+        /// this sphere. The speed of travel is defined by <see cref="MOVING_SPEED"/>.
+        ///
+        /// This method is expected to be called at every Update().
+        ///
+        /// You can lock any of the three axes.
+        /// </summary>
+        /// <param name="movingObject">the object to be moved</param>
+        /// <param name="lockX">whether the movement should be locked on this axis</param>
+        /// <param name="lockY">whether the movement should be locked on this axis</param>
+        /// <param name="lockZ">whether the movement should be locked on this axis</param>
+        private static void MoveToLockAxes(GameObject movingObject, bool lockX, bool lockY, bool lockZ)
+        {
+            // The speed by which to move a selected object.
+            const float MOVING_SPEED = 1.0f;
+
+            float step = MOVING_SPEED * Time.deltaTime;
+            Vector3 target = TipOfRayPosition(movingObject);
+            Vector3 movingObjectPos = movingObject.transform.position;
+
+            if (!lockX)
+            {
+                target.x = movingObjectPos.x;
+            }
+
+            if (!lockY)
+            {
+                target.y = movingObjectPos.y;
+            }
+
+            if (!lockZ)
+            {
+                target.z = movingObjectPos.z;
+            }
+
+            movingObject.transform.position = Vector3.MoveTowards(movingObject.transform.position, target, step);
+
+            /// <summary>
+            /// Returns the position of the tip of the ray drawn from the camera towards
+            /// the position the user is currently pointing to. The distance of that
+            /// point along this ray is the distance between the camera from which the
+            /// ray originated and the position of the given <paramref name="selectedObject"/>.
+            ///
+            /// That means, the selected object moves on a sphere around the camera
+            /// at the distance of the selected object.
+            /// </summary>
+            /// <param name="selectedObject">the selected object currently moved around</param>
+            /// <returns>tip of the ray</returns>
+            static Vector3 TipOfRayPosition(GameObject selectedObject)
+            {
+                return UserPointsTo().GetPoint(Vector3.Distance(UserPointsTo().origin, selectedObject.transform.position));
             }
         }
 
@@ -481,22 +555,23 @@ namespace SEE.Controls.Actions
             {
                 scale.x = objectToScale.transform.lossyScale.x;
             }
+
             if (scale.y <= 0)
             {
                 scale.y = objectToScale.transform.lossyScale.y;
                 position.y = objectToScale.transform.position.y;
             }
+
             if (scale.z <= 0)
             {
                 scale.z = objectToScale.transform.lossyScale.z;
             }
 
             // Transform the new position and scale
-            objectToScale.transform.position = position;
+            Operator.MoveTo(position, 0f);
             objectToScale.SetScale(scale);
+            MoveAndScale();
             currentState = ReversibleAction.Progress.InProgress;
-
-            new ScaleNodeNetAction(objectToScale.name, scale, position).Execute();
         }
 
         /// <summary>
@@ -543,7 +618,7 @@ namespace SEE.Controls.Actions
                 return result;
             }
 
-            // Calulate the positions of the scaling handles at the four corners of the roof.
+            // Calculate the positions of the scaling handles at the four corners of the roof.
             {
                 // south-west corner
                 {
@@ -551,7 +626,7 @@ namespace SEE.Controls.Actions
                     firstCornerSphere.transform.position = pos;
                     firstCornerOldSpherePos = pos;
                 }
-                // south-east corner 
+                // south-east corner
                 {
                     Vector3 pos = Corner(xOffset, -zOffset);
                     secondCornerSphere.transform.position = pos;
@@ -571,7 +646,7 @@ namespace SEE.Controls.Actions
                 }
             }
 
-            // Calulate the positions of the scaling handles at the four sides of the roof.
+            // Calculate the positions of the scaling handles at the four sides of the roof.
             {
                 // west side
                 {
@@ -629,20 +704,20 @@ namespace SEE.Controls.Actions
         /// </summary>
         public void RemoveSpheres()
         {
-            Destroyer.DestroyGameObject(topSphere);
-            Destroyer.DestroyGameObject(firstCornerSphere);
-            Destroyer.DestroyGameObject(secondCornerSphere);
-            Destroyer.DestroyGameObject(thirdCornerSphere);
-            Destroyer.DestroyGameObject(forthCornerSphere);
-            Destroyer.DestroyGameObject(firstSideSphere);
-            Destroyer.DestroyGameObject(secondSideSphere);
-            Destroyer.DestroyGameObject(thirdSideSphere);
-            Destroyer.DestroyGameObject(forthSideSphere);
+            Destroyer.Destroy(topSphere);
+            Destroyer.Destroy(firstCornerSphere);
+            Destroyer.Destroy(secondCornerSphere);
+            Destroyer.Destroy(thirdCornerSphere);
+            Destroyer.Destroy(forthCornerSphere);
+            Destroyer.Destroy(firstSideSphere);
+            Destroyer.Destroy(secondSideSphere);
+            Destroyer.Destroy(thirdSideSphere);
+            Destroyer.Destroy(forthSideSphere);
             scalingGizmosAreDrawn = false;
         }
 
         /// <summary>
-        /// If <paramref name="gameObject"/> is any of our scaling gizmos, 
+        /// If <paramref name="gameObject"/> is any of our scaling gizmos,
         /// this gizmo will be returned; otherwise null
         /// </summary>
         /// <param name="gameObject">the hit game object</param>
@@ -654,14 +729,14 @@ namespace SEE.Controls.Actions
                 return null;
             }
             else if (gameObject == topSphere
-                || gameObject == firstCornerSphere
-                || gameObject == secondCornerSphere
-                || gameObject == thirdCornerSphere
-                || gameObject == forthCornerSphere
-                || gameObject == firstSideSphere
-                || gameObject == secondSideSphere
-                || gameObject == thirdSideSphere
-                || gameObject == forthSideSphere)
+                     || gameObject == firstCornerSphere
+                     || gameObject == secondCornerSphere
+                     || gameObject == thirdCornerSphere
+                     || gameObject == forthCornerSphere
+                     || gameObject == firstSideSphere
+                     || gameObject == secondSideSphere
+                     || gameObject == thirdSideSphere
+                     || gameObject == forthSideSphere)
             {
                 return gameObject;
             }

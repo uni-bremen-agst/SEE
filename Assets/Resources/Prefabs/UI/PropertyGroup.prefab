@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7119315626146256051}
   - component: {fileID: 6245122437757644238}
   m_Layer: 0
-  m_Name: ConfigurationGroup
+  m_Name: PropertyGroup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -53,8 +53,8 @@ MonoBehaviour:
   m_Padding:
     m_Left: 0
     m_Right: 0
-    m_Top: 0
-    m_Bottom: 0
+    m_Top: 16
+    m_Bottom: 16
   m_ChildAlignment: 0
   m_StartCorner: 0
   m_StartAxis: 0

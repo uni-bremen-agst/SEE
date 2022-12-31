@@ -367,6 +367,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
+  webglMode: 0
   background: {fileID: 3029257925441772025}
   text: {fileID: 8435845624526155984}
 --- !u!1 &3918185506530856587
@@ -504,7 +505,7 @@ GameObject:
   - component: {fileID: 3026825166369401102}
   m_Layer: 0
   m_Name: Tooltip
-  m_TagString: Untagged
+  m_TagString: Tooltip
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

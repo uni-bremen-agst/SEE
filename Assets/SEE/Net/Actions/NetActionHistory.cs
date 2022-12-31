@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using static SEE.Utils.ActionHistory;
 using System.Linq;
 
-namespace SEE.Net
+namespace SEE.Net.Actions
 {
     /// <summary>
     /// Syncs the action history through the network on each client.
     /// </summary>
-    public class NetActionHistory : AbstractAction
+    public class NetActionHistory : AbstractNetAction
     {
         /// <summary>
         /// The state that determines which action should be performed.
@@ -155,7 +155,7 @@ namespace SEE.Net
             NewItemType = newType;
             ID = id;
             OldChangedObjects = oldChangedObjects.ToList();
-            NewChangedObjects = newChangedObjects.ToList();            
+            NewChangedObjects = newChangedObjects.ToList();
             Mode = ModeKind.Replace;
             Execute(null);
         }

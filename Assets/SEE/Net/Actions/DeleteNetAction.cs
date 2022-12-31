@@ -1,12 +1,12 @@
 using SEE.Game;
 using UnityEngine;
 
-namespace SEE.Net
+namespace SEE.Net.Actions
 {
     /// <summary>
     /// This class propagates a <see cref="DeleteAction"/> to all clients in the network.
     /// </summary>
-    public class DeleteNetAction : AbstractAction
+    public class DeleteNetAction : AbstractNetAction
     {
         // Note: All attributes are made public so that they will be serialized
         // for the network transfer.
@@ -23,7 +23,7 @@ namespace SEE.Net
         /// that has to be deleted</param>
         public DeleteNetAction(string gameObjectID) : base()
         {
-            this.GameObjectID = gameObjectID;
+            GameObjectID = gameObjectID;
         }
 
         /// <summary>
@@ -42,14 +42,14 @@ namespace SEE.Net
         {
             if (!IsRequester())
             {
-                GameObject gameObject = GameObject.Find(GameObjectID);
+                GameObject gameObject = GraphElementIDMap.Find(GameObjectID);
                 if (gameObject != null)
                 {
                     GameElementDeleter.Delete(gameObject);
                 }
                 else
                 {
-                    throw new System.Exception($"There is no game object with the ID {GameObjectID}");
+                    throw new System.Exception($"There is no game object with the ID {GameObjectID}.");
                 }
             }
         }

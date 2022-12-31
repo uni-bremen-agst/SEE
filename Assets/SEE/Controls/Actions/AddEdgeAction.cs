@@ -2,7 +2,7 @@
 ﻿using SEE.Game;
 using SEE.Game.UI.Notification;
 using SEE.GO;
-using SEE.Net;
+using SEE.Net.Actions;
 using SEE.Utils;
 using System;
 using UnityEngine;
@@ -12,7 +12,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Action to create an edge between two selected nodes.
     /// </summary>
-    public class AddEdgeAction : AbstractPlayerAction
+    internal class AddEdgeAction : AbstractPlayerAction
     {
         /// <summary>
         /// Returns a new instance of <see cref="AddEdgeAction"/>.
@@ -66,21 +66,22 @@ namespace SEE.Controls.Actions
             /// </summary>
             public readonly string toID;
             /// <summary>
-            /// The unique ID of the edge.
+            /// The type of the edge.
             /// </summary>
-            public string edgeID;
+            public string edgeType;
             /// <summary>
             /// Constructor.
             /// </summary>
             /// <param name="from">the source of the edge</param>
             /// <param name="to">the target of the edge</param>
-            public Memento(GameObject from, GameObject to)
+            /// <param name="edgeType">the edge type</param>
+            public Memento(GameObject from, GameObject to, string edgeType)
             {
                 this.from = from;
                 this.fromID = from.name;
                 this.to = to;
                 this.toID = to.name;
-                this.edgeID = null;
+                this.edgeType = edgeType;
             }
         }
 
@@ -117,6 +118,11 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// The default type of an added edge.
+        /// </summary>
+        private const string DefaultEdgeType = "Source_Dependency";
+
+        /// <summary>
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
@@ -144,20 +150,16 @@ namespace SEE.Controls.Actions
             // Note: from == to may be possible.
             if (from != null && to != null)
             {
-                // We do not have an edge ID yet, so we let the graph renderer create a unique ID.
-                memento = new Memento(from, to);
+                // We have both source and target of the edge.
+                // FIXME: In the future, we need to query the edge type from the user.
+                memento = new Memento(from, to, DefaultEdgeType);
                 createdEdge = CreateEdge(memento);
 
-                if (createdEdge != null)
-                {
-                    // The edge ID was created by the graph renderer.
-                    memento.edgeID = createdEdge.ID();
-                    // action is completed (successfully or not; it does not matter)
-                    from = null;
-                    to = null;
-                    result = true;
-                    currentState = ReversibleAction.Progress.Completed;
-                }
+                // action is completed (successfully or not; it does not matter)
+                from = null;
+                to = null;
+                result = createdEdge != null;
+                currentState = result ? ReversibleAction.Progress.Completed : ReversibleAction.Progress.NoEffect;
             }
             // Forget from and to upon user request.
             if (SEEInput.Unselect())
@@ -176,7 +178,7 @@ namespace SEE.Controls.Actions
             base.Undo();
             GameEdgeAdder.Remove(createdEdge);
             new DeleteNetAction(createdEdge.name).Execute();
-            Destroyer.DestroyGameObject(createdEdge);
+            Destroyer.Destroy(createdEdge);
             createdEdge = null;
         }
 
@@ -205,11 +207,11 @@ namespace SEE.Controls.Actions
             // game objects for these from the scene using their IDs.
             if (memento.from == null)
             {
-                memento.from = GameObject.Find(memento.fromID);
+                memento.from = GraphElementIDMap.Find(memento.fromID);
             }
             if (memento.to == null)
             {
-                memento.to = GameObject.Find(memento.toID);
+                memento.to = GraphElementIDMap.Find(memento.toID);
             }
             try
             {
@@ -219,17 +221,15 @@ namespace SEE.Controls.Actions
                 /// will create a new unique id for the edge. If <see cref="CreateEdge(Memento)"/>
                 /// is called from <see cref="Redo"/>, <see cref="memento.edgeID"/> has
                 /// a valid edge id (set by the previous call to <see cref="CreateEdge(Memento)"/>.
-                GameObject result = GameEdgeAdder.Add(memento.from, memento.to, memento.edgeID);
+                GameObject result = GameEdgeAdder.Add(memento.from, memento.to, memento.edgeType);
                 UnityEngine.Assertions.Assert.IsNotNull(result);
-                /// Note that we need to use <see cref="result.name"/ as edge ID because
-                /// <see cref="memento.edgeID"/ will be null if <see cref="CreateEdge(Memento)"/> was
-                /// called from Update.
-                new AddEdgeNetAction(memento.from.name, memento.to.name, result.name).Execute();
+                new AddEdgeNetAction(memento.from.name, memento.to.name, memento.edgeType).Execute();
                 return result;
             }
             catch (Exception e)
             {
                 ShowNotification.Error("New edge", $"An edge could not be created: {e.Message}.");
+                Debug.LogException(e);
                 return null;
             }
         }

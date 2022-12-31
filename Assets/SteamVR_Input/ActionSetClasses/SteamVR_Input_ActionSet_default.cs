@@ -177,6 +177,14 @@ namespace Valve.VR
             }
         }
         
+        public virtual SteamVR_Action_Boolean OpenSettingsMenu
+        {
+            get
+            {
+                return SteamVR_Actions.default_OpenSettingsMenu;
+            }
+        }
+        
         public virtual SteamVR_Action_Vibration Haptic
         {
             get

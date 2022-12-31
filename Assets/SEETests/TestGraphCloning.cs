@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using System.Collections.Generic;
 
 namespace SEE.DataModel.DG
 {
@@ -12,7 +11,6 @@ namespace SEE.DataModel.DG
         {
             Node node = new Node();
             node.Type = "Routine";
-            node.Domain = Node.NodeDomain.Implementation;
             node.ID = linkname;
             node.SourceName = "Source_" + linkname;
             node.SetFloat("float", 1.0f);
@@ -26,19 +24,18 @@ namespace SEE.DataModel.DG
         public void TestCloneNode()
         {
             Node original = NewNode("node1");
-            Graph graph = new Graph();
+            Graph graph = new Graph("DUMMYBASEPATH");
             graph.AddNode(original);
 
             Node clone = (Node)original.Clone();
             Assert.That(clone.Type == original.Type);
-            Assert.That(clone.Domain == original.Domain);
             Assert.That(clone.ID == original.ID);
             Assert.That(clone.SourceName == original.SourceName);
             Assert.That(clone.GetFloat("float") == original.GetFloat("float"));
             Assert.That(clone.GetInt("int") == original.GetInt("int"));
             Assert.That(clone.GetString("string") == original.GetString("string"));
             Assert.That(clone.HasToggle("toggle"));
-            // Note: Hierarchy information (parent, children, level) is cloned only when a 
+            // Note: Hierarchy information (parent, children, level) is cloned only when a
             // graph is cloned.
             Assert.That(clone.Level == 0);
             Assert.That(clone.Parent, Is.Null);
@@ -52,13 +49,10 @@ namespace SEE.DataModel.DG
         /// </summary>
         private int edgeID = 1;
 
-        private Edge NewEdge(Node source, Node target)
-        {            
-            Edge edge = new Edge(edgeID.ToString());
+        private Edge NewEdge(Node source, Node target, string edgeType = "Call")
+        {
+            Edge edge = new Edge(source, target, edgeType);
             edgeID++;
-            edge.Source = source;
-            edge.Target = target;
-            edge.Type = "Call";
             edge.SetFloat("float", 1.0f);
             edge.SetInt("int", 2);
             edge.SetString("string", "hello");
@@ -69,7 +63,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void TestCloneEdge()
         {
-            Graph graph = new Graph();
+            Graph graph = new Graph("DUMMYBASEPATH");
             Node source = NewNode("source");
             graph.AddNode(source);
             Node target = NewNode("target");
@@ -93,7 +87,7 @@ namespace SEE.DataModel.DG
         [Test]
         public void TestCloneGraph()
         {
-            Graph original = new Graph();
+            Graph original = new Graph("DUMMYBASEPATH");
             original.Path = "path";
             original.Name = "name";
 
@@ -106,8 +100,8 @@ namespace SEE.DataModel.DG
             original.AddNode(n3);
 
             Edge e1 = NewEdge(n1, n2);
-            Edge e2 = NewEdge(n2, n3);
-            Edge e3 = NewEdge(n2, n3);
+            Edge e2 = NewEdge(n2, n3, "DynamicCall");
+            Edge e3 = NewEdge(n2, n3, "StaticCall");
             original.AddEdge(e1);
             original.AddEdge(e2);
             original.AddEdge(e3);
@@ -186,8 +180,8 @@ namespace SEE.DataModel.DG
             else
             {
                 Assert.That(!clonedNode.IsRoot(),
-                            clonedNode.ToString() + " should not be a root. Corresponding node in original graph: "
-                            + node.ToString());
+                            clonedNode + " should not be a root. Corresponding node in original graph: "
+                                       + node);
                 Assert.That(node.Parent.ID == clonedNode.Parent.ID);
             }
 

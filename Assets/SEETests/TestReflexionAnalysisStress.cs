@@ -1,11 +1,15 @@
 ﻿using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
+using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Tools.Architecture
 {
+    /// <summary>
+    /// Stress tests for the reflexion analysis, using the minilax graph as a basis.
+    /// </summary>
     internal class TestReflexionAnalysisStress : TestReflexionAnalysis
     {
         /// <summary>
@@ -22,9 +26,9 @@ namespace SEE.Tools.Architecture
         {
             LoadAll(folderName, out Graph impl, out Graph arch, out Graph mapping);
             Performance p = Performance.Begin("Running non-incremental reflexion analysis");
-            reflexion = new Reflexion(impl, arch, mapping);
-            reflexion.Register(this);
-            reflexion.Run();
+            graph = new ReflexionGraph(impl, arch, mapping);
+            graph.Subscribe(this);
+            graph.RunAnalysis();
             p.End();
         }
 
@@ -43,17 +47,19 @@ namespace SEE.Tools.Architecture
             LoadAll(folderName, out Graph impl, out Graph arch, out Graph mapping);
             Performance p = Performance.Begin("Running incremental reflexion analysis");
             // Passing the empty graph as mapping argument to reflexion.
-            reflexion = new Reflexion(impl, arch, new Graph());
-            reflexion.Register(this);
-            reflexion.Run(); // from scratch
+            graph = new ReflexionGraph(impl, arch, new Graph("DUMMYBASEPATH"));
+            graph.Subscribe(this);
+            graph.RunAnalysis(); // from scratch
             // Now add the mappings incrementally.
             foreach (Edge map in mapping.Edges())
             {
-                Node source = impl.GetNode(map.Source.ID);
-                Node target = arch.GetNode(map.Target.ID);
+                Node source = graph.GetNode(map.Source.ID);
+                Assert.IsTrue(source.IsInImplementation());
+                Node target = graph.GetNode(map.Target.ID);
+                Assert.IsTrue(target.IsInArchitecture());
                 Assert.NotNull(source);
                 Assert.NotNull(target);
-                reflexion.Add_To_Mapping(source, target);
+                graph.AddToMapping(source, target);
             }
             p.End();
         }
@@ -64,21 +70,21 @@ namespace SEE.Tools.Architecture
         [Test]
         public void TestMinilaxComparison()
         {
-            string folderName = "minilax";
+            const string folderName = "minilax";
             NonIncrementally(folderName);
-            int[] incrementally = reflexion.Summary();
+            int[] incrementally = graph.Summary();
             Teardown();
             Setup();
             Incrementally(folderName);
-            int[] nonincrementally = reflexion.Summary();
-            Assert.AreEqual(incrementally, nonincrementally);
+            int[] nonIncrementally = graph.Summary();
+            Assert.AreEqual(incrementally, nonIncrementally);
         }
 
         private Graph Load(string path)
         {
             string platformPath = Filenames.OnCurrentPlatform(path);
             Debug.LogFormat("Loading graph from {0}...\n", platformPath);
-            GraphReader graphCreator = new GraphReader(platformPath, HierarchicalEdges, "", logger);
+            GraphReader graphCreator = new GraphReader(platformPath, HierarchicalEdges, basePath: "", rootID: "", logger);
             graphCreator.Load();
             Graph result = graphCreator.GetGraph();
             Assert.That(result, !Is.Null);
@@ -89,7 +95,7 @@ namespace SEE.Tools.Architecture
 
         private void LoadAll(string folderName, out Graph impl, out Graph arch, out Graph mapping)
         {
-            string path = Application.dataPath + "/../Data/GXL/reflexion/" + folderName + "/";
+            string path = Application.streamingAssetsPath + "/reflexion/" + folderName + "/";
             Performance p = Performance.Begin("Loading graphs");
             impl = Load(path + "CodeFacts.gxl");
             arch = Load(path + "Architecture.gxl");

@@ -1,4 +1,8 @@
+using System;
 using System.Collections.Generic;
+using SEE.Game.Operator;
+using SEE.GO;
+using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
 
@@ -7,6 +11,9 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Implements zooming into or out of a code city.
     /// </summary>
+    /// <remarks>This component is attached to a player. It is used in the prefab for
+    /// players. This class has subclasses specialized to the environment (desktop,
+    /// VR, etc.).</remarks>
     public class ZoomAction : MonoBehaviour
     {
         /// <summary>
@@ -40,7 +47,8 @@ namespace SEE.Controls.Actions
             }
 
             /// <summary>
-            /// Returns true if the command has finished zooming.
+            /// Returns true if the command has finished zooming, more precisely,
+            /// if the specified duration of the zooming is reached.
             /// </summary>
             /// <returns>Whether the command has finished zooming.</returns>
             internal bool IsFinished()
@@ -67,10 +75,17 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected struct ZoomState
         {
+            /// <summary>
+            /// The default time to reach the requested zoom degree in seconds.
+            /// </summary>
             internal const float DefaultZoomDuration = 0.1f;
+
+            /// <summary>
+            /// The maximal number of zooming steps.
+            /// </summary>
             internal const uint ZoomMaxSteps = 32;
             /// <summary>
-            /// Handles the speed in which is zoomed into the city.
+            /// Handles the speed in which we zoom into the city.
             /// </summary>
             internal const float ZoomFactor = 0.5f;
 
@@ -78,6 +93,10 @@ namespace SEE.Controls.Actions
             /// Original scale of city for reset.
             /// </summary>
             internal Vector3 originalScale;
+
+            /// <summary>
+            /// The list of active zoom commands, that is, those that are still to be executed.
+            /// </summary>
             internal List<ZoomCommand> zoomCommands;
             /// <summary>
             /// The desired amount of zoom steps.
@@ -110,8 +129,25 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The zoom states for every root transform of a city. Once the first zoom is initiated,
         /// the zoom state will be inserted here.
+        ///
+        /// The key of this mapping is the root game node (tagged by <see cref="Tags.Node"/>)
+        /// of the game-object hierarchy. It is the game object that will be zoomed;
+        /// all its descendants are scaled along with it.
+        ///
+        /// Because we may have multiple code cities in the scene, there is not only one such
+        /// root node.
         /// </summary>
-        private Dictionary<Transform, ZoomState> rootTransformToZoomStates = new Dictionary<Transform, ZoomState>();
+        private readonly Dictionary<Transform, ZoomState> rootTransformToZoomStates = new Dictionary<Transform, ZoomState>();
+        
+        /// <summary>
+        /// The node operator for every root transform of a city.
+        /// </summary>
+        private readonly Dictionary<Transform, NodeOperator> rootTransformToOperator = new Dictionary<Transform, NodeOperator>();
+
+        /// <summary>
+        /// Duration of the animation.
+        /// </summary>
+        public const float ANIMATION_DURATION = 0.5f;
 
         /// <summary>
         /// Executes every active zoom command. Logic is done in fixed time steps to ensure
@@ -120,69 +156,68 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void FixedUpdate()
         {
-            Dictionary<Transform, ZoomState> newDict = new Dictionary<Transform, ZoomState>(rootTransformToZoomStates.Count);
+            // This loop iterates over all code cities. Because there will be only a few
+            // code cities in a scene, the number of iterations per fixed update is low.
+            // We will never remove a code city from rootTransformToZoomStates because
+            // a user might want to reset its scale to the original one.
             foreach (KeyValuePair<Transform, ZoomState> pair in rootTransformToZoomStates)
             {
-                Transform t = pair.Key;
-                ZoomState s = pair.Value;
+                // The root node of the current code city to be zoomed.
+                Transform rootTransform = pair.Key;
+                // Its zoom state.
+                ZoomState zoomState = pair.Value;
+                // Its node operator.
+                NodeOperator Operator = rootTransformToOperator[rootTransform];
 
-                if (s.zoomCommands.Count != 0)
+                if (zoomState.zoomCommands.Count > 0)
                 {
-                    float zoomSteps = s.currentTargetZoomSteps;
+                    // If there is any zoom command, execute it.
+                    float zoomSteps = zoomState.currentTargetZoomSteps;
                     int positionCount = 0;
                     Vector2 positionSum = Vector3.zero;
 
-                    for (int i = 0; i < s.zoomCommands.Count; i++)
+                    for (int i = 0; i < zoomState.zoomCommands.Count; i++)
                     {
                         positionCount++;
-                        positionSum += s.zoomCommands[i].ZoomCenter;
-                        if (s.zoomCommands[i].IsFinished())
+                        positionSum += zoomState.zoomCommands[i].ZoomCenter;
+                        if (zoomState.zoomCommands[i].IsFinished())
                         {
-                            s.zoomCommands.RemoveAt(i--);
+                            zoomState.zoomCommands.RemoveAt(i--);
                         }
                         else
                         {
-                            zoomSteps -= s.zoomCommands[i].TargetZoomSteps - s.zoomCommands[i].CurrentDeltaScale();
+                            zoomSteps -= zoomState.zoomCommands[i].TargetZoomSteps - zoomState.zoomCommands[i].CurrentDeltaScale();
                         }
                     }
-                    Vector3 averagePosition = new Vector3(positionSum.x / positionCount, t.position.y, positionSum.y / positionCount);
+                    Vector3 averagePosition = new Vector3(positionSum.x / positionCount, rootTransform.position.y, positionSum.y / positionCount);
 
-                    s.currentZoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
-                    Vector3 cityCenterToHitPoint = averagePosition - t.position;
-                    Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(t.localScale);
+                    zoomState.currentZoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
+                    Vector3 cityCenterToHitPoint = averagePosition - rootTransform.position;
+                    Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(rootTransform.localScale);
 
-                    t.position += cityCenterToHitPoint;
-                    t.localScale = s.currentZoomFactor * s.originalScale;
-                    t.position -= Vector3.Scale(cityCenterToHitPointUnscaled, t.localScale);
+                    Operator.ScaleTo(zoomState.currentZoomFactor * zoomState.originalScale, ANIMATION_DURATION);
+                    Operator.MoveTo(rootTransform.position + cityCenterToHitPoint - Vector3.Scale(cityCenterToHitPointUnscaled, Operator.TargetScale), ANIMATION_DURATION);
 
-                    // TODO(torben): i believe in desktop mode this made sure that zooming
-                    // will always happen towards the current mouse position and not the
-                    // starting position ? not sure... this might actually be an
-                    // uninteresting feature
-
-                    //moveState.dragStartTransformPosition += moveState.dragStartOffset;
-                    //moveState.dragStartOffset = Vector3.Scale(moveState.dragCanonicalOffset, cityTransform.localScale);
-                    //moveState.dragStartTransformPosition -= moveState.dragStartOffset;
-
-                    // TODO(torben): synchronize here
+                    new ZoomNetAction(rootTransform.name, Operator.TargetPosition, Operator.TargetScale).Execute();
                 }
                 else
                 {
-                    float lastZoomFactor = s.currentZoomFactor;
-                    s.currentZoomFactor = ConvertZoomStepsToZoomFactor(s.currentTargetZoomSteps);
-                    if (lastZoomFactor != s.currentZoomFactor)
+                    float lastZoomFactor = zoomState.currentZoomFactor;
+                    zoomState.currentZoomFactor = ConvertZoomStepsToZoomFactor(zoomState.currentTargetZoomSteps);
+                    if (!Mathf.Approximately(lastZoomFactor, zoomState.currentZoomFactor))
                     {
-                        t.localScale = s.currentZoomFactor * s.originalScale;
+                        Operator.ScaleTo(zoomState.currentZoomFactor * zoomState.originalScale, ANIMATION_DURATION);
                     }
                 }
-
-                newDict[t] = s;
             }
-            rootTransformToZoomStates = newDict;
         }
 
+        /// <summary>
+        /// Returns the zoom state of <paramref name="transform"/> if one exists or a new
+        /// one if none exists.
+        /// </summary>
         /// <param name="transform">The transform to get the copy of its zoom state for.</param>
-        /// <returns>A copy of the current zoom state of given transform or a new instance, if no
+        /// <returns>The current zoom state of given <paramref name="transform"/> or a new instance, if no
         /// such zoom state exists yet.</returns>
         protected ZoomState GetZoomStateCopy(Transform transform)
         {
@@ -200,18 +235,22 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Updates the zoom state of the given transform with a copy of the given zoom state.
+        /// Updates the zoom state of the given <paramref name="transform"/> with
+        /// the given <paramref name="zoomState"/>.
         /// </summary>
         /// <param name="transform">The transform to update the zoom state for.</param>
         /// <param name="zoomState">The zoom state to use a copy of for given transform.</param>
         protected void UpdateZoomState(Transform transform, ZoomState zoomState)
         {
             rootTransformToZoomStates[transform] = zoomState;
+            rootTransformToOperator[transform] = transform.gameObject.AddOrGetComponent<NodeOperator>();
         }
 
         /// <summary>
         /// Converts zoom steps to an actual zoom factor (scale factor).
+        /// The result is 2^(<paramref name="zoomSteps"/> * <see cref="ZoomState.ZoomFactor"/>).
         /// </summary>
+        /// <remarks>Returns 1 only if <paramref name="zoomSteps"/> equals 0.</remarks>
         /// <param name="zoomSteps">The amount of zoom steps.</param>
         /// <returns>The zoom factor.</returns>
         protected static float ConvertZoomStepsToZoomFactor(float zoomSteps)

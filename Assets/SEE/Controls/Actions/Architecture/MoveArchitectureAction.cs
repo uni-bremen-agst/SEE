@@ -11,7 +11,7 @@ using Plane = UnityEngine.Plane;
 
 namespace SEE.Controls.Actions.Architecture
 {
-    
+
     /// <summary>
     /// Action to move architecture graph elements. Implementation of <see cref="AbstractArchitectureAction"/>.
     /// </summary>
@@ -21,7 +21,7 @@ namespace SEE.Controls.Actions.Architecture
         {
             return ArchitectureActionType.Move;
         }
-        
+
         /// <summary>
         /// Struct that holds the information about the dragged game node.
         /// </summary>
@@ -38,7 +38,7 @@ namespace SEE.Controls.Actions.Architecture
             internal readonly Transform transform;
             internal readonly Plane plane;
         }
-        
+
         /// <summary>
         /// <see cref="MoveGizmo"/> to visualize the dragged distance.
         /// </summary>
@@ -76,9 +76,9 @@ namespace SEE.Controls.Actions.Architecture
         /// Input action for polling the pen position.
         /// </summary>
         private InputAction positionAction;
-        
-        
-        
+
+
+
         /// <summary>
         /// Creates a new <see cref="AbstractArchitectureAction"/> for this type of action.
         /// </summary>
@@ -110,78 +110,82 @@ namespace SEE.Controls.Actions.Architecture
             positionAction = actions.Moving.Position;
 
         }
-        
-        
+
+
         /// <summary>
         /// Event handler method for the ButtonRelease mapping from <see cref="ArchitectureInputActions.Moving"/>
         /// </summary>
         private void OnButtonRelease(InputAction.CallbackContext _)
         {
-            actionState.moving = false;
-            gizomo.gameObject.SetActive(false);
-            // Only update node and edge relevant data if the dragged object is not the whiteboard
-            if (!actionState.isWhiteboard && actionState.hit.transform != actionState.hit.root && actionState.rootTransform != null &&
-                Raycasting.RaycastPlane(actionState.hit.plane, out Vector3 _, positionAction.ReadValue<Vector2>()))
-            {
-                GameNodeMover.FinalizePosition(actionState.hit.transform.gameObject, actionState.startPosition - actionState.mouseOffset);
-                GameElementUpdater.UpdateEdgePoints(actionState.hit.transform.gameObject, true);
-                GameElementUpdater.UpdateNodeStyles();
-            }
-            actionState.hit = new Hit();
+            throw new System.NotImplementedException();
+            //actionState.moving = false;
+            //gizomo.gameObject.SetActive(false);
+            //// Only update node and edge relevant data if the dragged object is not the whiteboard
+            //if (!actionState.isWhiteboard && actionState.hit.transform != actionState.hit.root && actionState.rootTransform != null &&
+            //    Raycasting.RaycastPlane(actionState.hit.plane, out Vector3 _, positionAction.ReadValue<Vector2>()))
+            //{
+            //    GameNodeMover.FinalizePosition(actionState.hit.transform.gameObject, actionState.startPosition - actionState.mouseOffset);
+            //    GameElementUpdater.UpdateEdgePoints(actionState.hit.transform.gameObject, true);
+            //    GameElementUpdater.UpdateNodeStyles();
+            //}
+            //actionState.hit = new Hit();
         }
-        
-        
+
+
         /// <summary>
         /// Event handler method for the ButtonPress mapping from <see cref="ArchitectureInputActions.Moving"/>
         /// </summary>
         private void OnButtonPress(InputAction.CallbackContext _)
         {
-            bool isTouching = pressureAction.ReadValue<float>() > 0f;
-            actionState.isWhiteboard = false;
-            GameObject obj = PenInteractionController.PrimaryHoveredObject;
-            if (obj.TryGetEdge(out Edge edge)) return;
-            //Check whether the currently hovered object is the whiteboard
-            if (obj.CompareTag(Tags.Whiteboard))
-            {
-                actionState.isWhiteboard = true;
-            }
-            
-            if (obj && isTouching)
-            {
-                actionState.rootTransform = SceneQueries.GetCityRootTransformUpwards(obj.transform);
-                Assert.IsNotNull(actionState.rootTransform);
-            }
+            throw new System.NotImplementedException();
 
-            if (actionState.rootTransform && Raycasting.RaycastPlane(new Plane(Vector3.up, actionState.rootTransform.position),
-                out Vector3 hitPoint, positionAction.ReadValue<Vector2>()))
-            {
-                actionState.moving = true;
-                actionState.hit = new Hit(obj.transform);
-                actionState.mouseOffset = actionState.hit.transform.position - hitPoint;
-                actionState.startPosition = actionState.hit.transform.position;
-                actionState.yLevel = obj.transform.position.y;
-                gizomo.gameObject.SetActive(true);
-            }
+            //bool isTouching = pressureAction.ReadValue<float>() > 0f;
+            //actionState.isWhiteboard = false;
+            //GameObject obj = PenInteractionController.PrimaryHoveredObject;
+            //if (obj.TryGetEdge(out Edge edge)) return;
+            ////Check whether the currently hovered object is the whiteboard
+            //if (obj.CompareTag(Tags.Whiteboard))
+            //{
+            //    actionState.isWhiteboard = true;
+            //}
+
+            //if (obj && isTouching)
+            //{
+            //    actionState.rootTransform = SceneQueries.GetCityRootTransformUpwards(obj.transform);
+            //    Assert.IsNotNull(actionState.rootTransform);
+            //}
+
+            //if (actionState.rootTransform && Raycasting.RaycastPlane(new Plane(Vector3.up, actionState.rootTransform.position),
+            //    out Vector3 hitPoint, positionAction.ReadValue<Vector2>()))
+            //{
+            //    actionState.moving = true;
+            //    actionState.hit = new Hit(obj.transform);
+            //    actionState.mouseOffset = actionState.hit.transform.position - hitPoint;
+            //    actionState.startPosition = actionState.hit.transform.position;
+            //    actionState.yLevel = obj.transform.position.y;
+            //    gizomo.gameObject.SetActive(true);
+            //}
         }
 
         public override void Update()
         {
-            bool isTouching = pressureAction.ReadValue<float>() > 0f;
-            if (actionState.moving && isTouching &&
-                Raycasting.RaycastPlane(actionState.hit.plane, out Vector3 point, positionAction.ReadValue<Vector2>()))
-            {
-                
-                actionState.hit.transform.position = new Vector3(point.x + actionState.mouseOffset.x,
-                    actionState.yLevel, point.z + actionState.mouseOffset.z);
-                gizomo.SetPositions(actionState.startPosition - actionState.mouseOffset, actionState.hit.transform.position);
-                //Do not try to update the edge points for the whiteboard object
-                if (!actionState.isWhiteboard)
-                {
-                    GameElementUpdater.UpdateEdgePoints(actionState.hit.transform.gameObject);
-                }
-            }
+            throw new System.NotImplementedException();
+            //bool isTouching = pressureAction.ReadValue<float>() > 0f;
+            //if (actionState.moving && isTouching &&
+            //    Raycasting.RaycastPlane(actionState.hit.plane, out Vector3 point, positionAction.ReadValue<Vector2>()))
+            //{
+
+            //    actionState.hit.transform.position = new Vector3(point.x + actionState.mouseOffset.x,
+            //        actionState.yLevel, point.z + actionState.mouseOffset.z);
+            //    gizomo.SetPositions(actionState.startPosition - actionState.mouseOffset, actionState.hit.transform.position);
+            //    //Do not try to update the edge points for the whiteboard object
+            //    if (!actionState.isWhiteboard)
+            //    {
+            //        GameElementUpdater.UpdateEdgePoints(actionState.hit.transform.gameObject);
+            //    }
+            //}
         }
-        
-        
+
+
     }
 }

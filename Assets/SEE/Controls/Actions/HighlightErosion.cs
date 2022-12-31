@@ -2,6 +2,7 @@
 using DG.Tweening;
 using SEE.DataModel.DG;
 using SEE.Game;
+using SEE.Game.City;
 using SEE.GO;
 using TMPro;
 using UnityEngine;
@@ -30,11 +31,6 @@ namespace SEE.Controls.Actions
         private bool isSelected;
 
         /// <summary>
-        /// The node reference this component is attached to.
-        /// </summary>
-        private NodeRef nodeRef;
-
-        /// <summary>
         /// All currently active tweens, collected in a sequence.
         /// </summary>
         private Sequence sequence;
@@ -44,16 +40,17 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected void OnEnable()
         {
-            if (interactable != null && (nodeRef != null || gameObject.TryGetComponent(out nodeRef)) && nodeRef.Value != null)
+            if (Interactable == null)
             {
-                interactable.SelectIn += SelectionOn;
-                interactable.SelectOut += SelectionOff;
-                interactable.HoverIn += HoverOn;
-                interactable.HoverOut += HoverOff;
+                Debug.LogError($"HighlightErosion.OnEnable for {name} has no interactable.\n");
+                enabled = false;
             }
             else
             {
-                Debug.LogError($"ShowLabel.OnEnable for {name} has NO interactable.\n");
+                Interactable.SelectIn += SelectionOn;
+                Interactable.SelectOut += SelectionOff;
+                Interactable.HoverIn += HoverOn;
+                Interactable.HoverOut += HoverOff;
             }
         }
 
@@ -62,16 +59,17 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected void OnDisable()
         {
-            if (interactable != null)
+            if (Interactable != null)
             {
-                interactable.SelectIn -= SelectionOn;
-                interactable.SelectOut -= SelectionOff;
-                interactable.HoverIn -= HoverOn;
-                interactable.HoverOut -= HoverOff;
+                Interactable.SelectIn -= SelectionOn;
+                Interactable.SelectOut -= SelectionOff;
+                Interactable.HoverIn -= HoverOn;
+                Interactable.HoverOut -= HoverOff;
             }
             else
             {
-                Debug.LogError($"ShowLabel.OnDisable for {name} has NO interactable.\n");
+                Debug.LogError($"HighlightErosion.OnDisable for {name} has no interactable.\n");
+                enabled = false;
             }
         }
 
@@ -135,7 +133,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Called when the object is no longer hovered over. If <paramref name="isInitiator"/> 
+        /// Called when the object is no longer hovered over. If <paramref name="isInitiator"/>
         /// is false, a remote player has triggered this event and, hence, nothing will be done.
         /// Otherwise the highlight is disabled unless the object is still selected.
         /// </summary>
@@ -169,6 +167,12 @@ namespace SEE.Controls.Actions
             return city;
         }
 
+        /// <summary>
+        /// The default animation duration in case we cannot derive a city for the
+        /// interactable object.
+        /// </summary>
+        private const float DefaultAnimationDuration = 1.0f;
+
         /**
          * Returns the animation duration using values defined in AbstractSEECity.
          * <param name="node">The node.</param>
@@ -178,7 +182,7 @@ namespace SEE.Controls.Actions
         private float AnimationDuration(Node node, AbstractSEECity city = null)
         {
             city ??= City();
-            return (node.IsLeaf() ? city.leafNodeAttributesPerKind[(int) node.Domain].labelSettings : city.innerNodeAttributesPerKind[(int) node.Domain].labelSettings).AnimationDuration;
+            return city == null ? DefaultAnimationDuration : city.NodeTypes[node.Type].LabelSettings.AnimationDuration;
         }
 
         private void On()
@@ -192,24 +196,28 @@ namespace SEE.Controls.Actions
                 sequence = DOTween.Sequence();
                 sequence.SetAutoKill(false);
                 sequence.SetRecyclable(true);
-                float duration = AnimationDuration(nodeRef.Value);
-                const float SCALING_FACTOR = 1.3f;
-                ForEachErosion((sprite, textMesh, layoutGroup) =>
+
+                if (gameObject.TryGetComponent(out NodeRef nodeRef) && nodeRef.Value != null)
                 {
-                    // We have to delete the text first to animate it more nicely, so we save it here before that
-                    string metricText = textMesh.text;
-                    // This will enlarge the sprite, make it more opaque, and fade in the text
-                    sequence.Insert(0, DOTween.To(() => textMesh.text, t => textMesh.text = t, string.Empty, 0.01f))
-                            .InsertCallback(0.02f, () => textMesh.gameObject.SetActive(!sequence.isBackwards))
-                                               .Insert(0.03f, DOTween.To(() => sprite.transform.localScale,
-                                                                     s => sprite.transform.localScale = s,
-                                                                     sprite.transform.localScale * SCALING_FACTOR, duration))
-                                               .Insert(0.03f, DOTween.ToAlpha(() => sprite.color, color => sprite.color = color,
-                                                                          1f, duration))
-                                               .Insert(0.03f, DOTween.To(() => textMesh.text, t => textMesh.text = t,
-                                                                     metricText, duration));
-                });
-                sequence.PlayForward();
+                    float duration = AnimationDuration(nodeRef.Value);
+                    const float SCALING_FACTOR = 1.3f;
+                    ForEachErosion((sprite, textMesh, layoutGroup) =>
+                    {
+                        // We have to delete the text first to animate it more nicely, so we save it here before that.
+                        string metricText = textMesh.text;
+                        // This will enlarge the sprite, make it more opaque, and fade in the text.
+                        sequence.Insert(0, DOTween.To(() => textMesh.text, t => textMesh.text = t, string.Empty, 0.01f))
+                                    .InsertCallback(0.02f, () => textMesh.gameObject.SetActive(!sequence.isBackwards))
+                                                       .Insert(0.03f, DOTween.To(() => sprite.transform.localScale,
+                                                                             s => sprite.transform.localScale = s,
+                                                                             sprite.transform.localScale * SCALING_FACTOR, duration))
+                                                       .Insert(0.03f, DOTween.ToAlpha(() => sprite.color, color => sprite.color = color,
+                                                                                  1f, duration))
+                                                       .Insert(0.03f, DOTween.To(() => textMesh.text, t => textMesh.text = t,
+                                                                             metricText, duration));
+                    });
+                    sequence.PlayForward();
+                }
             }
         }
 
@@ -230,7 +238,7 @@ namespace SEE.Controls.Actions
                 throw new ArgumentNullException(nameof(spriteAction));
             }
 
-            foreach (Transform childTransform in nodeRef.transform)
+            foreach (Transform childTransform in gameObject.transform)
             {
                 if (childTransform.name.StartsWith(ErosionIssues.EROSION_SPRITE_PREFIX))
                 {

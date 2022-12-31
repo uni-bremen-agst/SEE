@@ -11,20 +11,18 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel.DG;
-using SEE.Game;
 using SEE.GO;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace SEE.Controls
+namespace SEE.Controls.Interactables
 {
     [DisallowMultipleComponent]
     public class Outline : MonoBehaviour
     {
         private static readonly HashSet<Mesh> registeredMeshes = new HashSet<Mesh>();
 
-        public enum Mode
+        private enum Mode
         {
             OutlineAll,
             OutlineVisible,
@@ -33,9 +31,8 @@ namespace SEE.Controls
             SilhouetteOnly
         }
 
-        public Mode OutlineMode
+        private Mode OutlineMode
         {
-            get => outlineMode;
             set
             {
                 outlineMode = value;
@@ -50,12 +47,15 @@ namespace SEE.Controls
             {
                 outlineColor = value;
                 needsUpdate = true;
+                UpdateMaterialProperties();
             }
         }
 
-        public float OutlineWidth
+        [SerializeField, Range(0f, 10f)]
+        private float outlineWidth = 1f;
+
+        private float OutlineWidth
         {
-            get => outlineWidth;
             set
             {
                 outlineWidth = value;
@@ -69,88 +69,92 @@ namespace SEE.Controls
             public List<Vector3> data;
         }
 
-        [SerializeField]
-        private Mode outlineMode;
+        [SerializeField] private Mode outlineMode;
 
-        [SerializeField]
-        private Color outlineColor = Color.white;
-
-        [SerializeField, Range(0f, 10f)]
-        private float outlineWidth = 2f;
+        [SerializeField] private Color outlineColor = Color.white;
 
         [Header("Optional")]
-
         [SerializeField, Tooltip("Precompute enabled: Per-vertex calculations are performed in the editor and serialized with the object. "
-        + "Precompute disabled: Per-vertex calculations are performed at runtime in Awake(). This may cause a pause for large meshes.")]
+                                 + "Precompute disabled: Per-vertex calculations are performed at runtime in Awake(). "
+                                 + "This may cause a pause for large meshes.")]
         private bool precomputeOutline;
 
-        [SerializeField, HideInInspector]
         private readonly List<Mesh> bakeKeys = new List<Mesh>();
 
-        [SerializeField, HideInInspector]
         private readonly List<ListVector3> bakeValues = new List<ListVector3>();
 
         private Renderer[] renderers;
-        private Material outlineMaskMaterial;
-        private Material outlineFillMaterial;
+        private Material outlineMaterial;
 
-        private bool needsUpdate;
-        
         /// <summary>
-        /// Creates and attaches an outline component to the passed game object
+        /// Whether the material properties must be updated, i.e., whether
+        /// <see cref="UpdateMaterialProperties"/> must be called.
+        /// </summary>
+        private bool needsUpdate;
+
+        // Cached shader property IDs for improved lookup.
+        private static readonly int OutlineColor1 = Shader.PropertyToID("_OutlineColor");
+        private static readonly int ZTestMask = Shader.PropertyToID("_ZTestMask");
+        private static readonly int ZTestFill = Shader.PropertyToID("_ZTestFill");
+        private static readonly int Width = Shader.PropertyToID("_OutlineWidth");
+
+        /// <summary>
+        /// The default width of outline.
+        /// </summary>
+        public const float DefaultWidth = 1.0f;
+
+        /// <summary>
+        /// Creates and attaches an <see cref="Outline"/> component to the passed <paramref name="go"/>.
         /// </summary>
         /// <param name="go">The game object to attach the outline to</param>
         /// <param name="color">The color of the outline</param>
-        /// <param name="width">The width of the outline. If null the default value 4 is used.</param>
-        /// <returns></returns>
-        public static Outline Create(GameObject go, Color color, float width = 4.0f)
+        /// <param name="outlineWidth">The width of the outline. If null the default value 4 is used.</param>
+        /// <returns>the added <see cref="Outline"/> component </returns>
+        public static Outline Create(GameObject go, Color color, float outlineWidth = DefaultWidth)
         {
             Outline result = null;
 
             if (go)
             {
-                Transform codeCityTransform = SceneQueries.GetCodeCity(go.transform);
-                if (codeCityTransform == null)
-                {
-                    return null;
-                }
-                GameObject root = codeCityTransform.gameObject;
- 
                 result = go.AddComponent<Outline>();
-                result.OutlineMode = Mode.OutlineAll;
-                result.OutlineColor = color;
-                result.OutlineWidth = width;
-
-                // FIXME: This code needs documentation.
-                NodeRef nodeRef = go.GetComponent<NodeRef>();
-                if (nodeRef != null && nodeRef.Value != null)
+                if (go.HasEdgeRef())
                 {
-                    Node node = nodeRef.Value;
-                    Graph graph = node.ItsGraph;
-                    int maxDepth = graph != null ? graph.MaxDepth : 1;
-
-                    int inverseRenderQueueOffset = node.Level;
-                    if (nodeRef.Value.IsInnerNode())
-                    {
-                        inverseRenderQueueOffset += maxDepth;
-                    }
-                    int renderQueueOffset = 2 * maxDepth - inverseRenderQueueOffset;
-
-                    result.outlineMaskMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + 2 * renderQueueOffset;
-                    result.outlineFillMaterial.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + 2 * renderQueueOffset + 1;
+                    result.enabled = false;
                 }
-// Note: go could be an edge, which does not have a NodeRef.
-//#if UNITY_EDITOR
-//                else
-//                {
-//                    Debug.LogWarningFormat("Outline could not be created for '{0}'! The NodeRef seems to not be set.\n", go.name);
-//                }
-//#endif
-
-                Portal.SetPortal(root, go);
-                result.UpdateMaterialProperties();
+                else
+                {
+                    result.OutlineMode = Mode.OutlineVisible;
+                }
+                result.OutlineColor = color;
+                result.OutlineWidth = outlineWidth;
             }
+
             return result;
+        }
+
+        /// <summary>
+        /// Updates the render queue by setting it to the value of the first material's render queue which isn't
+        /// an outline material.
+        /// </summary>
+        /// <param name="fetchMaterial">
+        /// If true, we will also fetch the materials again, in case they've been changed.
+        /// </param>
+        public void UpdateRenderQueue(bool fetchMaterial = false)
+        {
+            IEnumerable<Material> materials = fetchMaterial
+                ? renderers.Select(x => x.materials.First(y => y.shader.name.Contains("Outline")))
+                : new[] { outlineMaterial };
+            int renderQueue = GetRenderQueue();
+
+            foreach (Material material in materials)
+            {
+                material.renderQueue = renderQueue;
+            }
+
+            // Returns render queue setting of game object's first material
+            int GetRenderQueue() => renderers
+                                    .Select(x => x.materials.First(y => y != outlineMaterial).renderQueue)
+                                    .First();
         }
 
         private void Awake()
@@ -158,12 +162,11 @@ namespace SEE.Controls
             // Cache renderers
             renderers = GetComponents<Renderer>();
 
-            // Instantiate outline materials
-            outlineMaskMaterial = Instantiate(Resources.Load<Material>(@"Materials/OutlineMask"));
-            outlineFillMaterial = Instantiate(Resources.Load<Material>(@"Materials/OutlineFill"));
+            // Instantiate outline material
+            outlineMaterial = Instantiate(Resources.Load<Material>(@"Materials/Outline"));
 
-            outlineMaskMaterial.name = "OutlineMask (Instance)";
-            outlineFillMaterial.name = "OutlineFill (Instance)";
+            outlineMaterial.name = "Outline (Instance)";
+            //UpdateRenderQueue();
 
             // Retrieve or generate smooth normals
             LoadSmoothNormals();
@@ -181,8 +184,7 @@ namespace SEE.Controls
                     // Append outline shaders
                     List<Material> materials = renderer.sharedMaterials.ToList();
 
-                    materials.Add(outlineMaskMaterial);
-                    materials.Add(outlineFillMaterial);
+                    materials.Add(outlineMaterial);
 
                     renderer.materials = materials.ToArray();
                 }
@@ -190,13 +192,20 @@ namespace SEE.Controls
                 {
                     renderer.enabled = true;
 
-                    Material[] materials = {
-                        outlineMaskMaterial,
-                        outlineFillMaterial
+                    Material[] materials =
+                    {
+                        outlineMaterial,
                     };
 
                     renderer.materials = materials;
                 }
+            }
+
+            // The portal depends upon the code-city object. This object can be retrieved only
+            // if the gameObject is a descendant of it.
+            if (gameObject.transform.parent != null)
+            {
+                gameObject.UpdatePortal(true);
             }
         }
 
@@ -231,13 +240,13 @@ namespace SEE.Controls
 
         private void OnDisable()
         {
+            renderers = renderers.Where(x => x != null).ToArray();
             foreach (Renderer renderer in renderers)
             {
                 // Remove outline shaders
                 List<Material> materials = renderer.sharedMaterials.ToList();
 
-                materials.Remove(outlineMaskMaterial);
-                materials.Remove(outlineFillMaterial);
+                materials.Remove(outlineMaterial);
 
                 renderer.materials = materials.ToArray();
             }
@@ -246,14 +255,7 @@ namespace SEE.Controls
         private void OnDestroy()
         {
             // Destroy material instances
-            Destroy(outlineMaskMaterial);
-            Destroy(outlineFillMaterial);
-        }
-
-        public void SetColor(Color color)
-        {
-            OutlineColor = color;
-            UpdateMaterialProperties();
+            Destroy(outlineMaterial);
         }
 
         private void Bake()
@@ -283,26 +285,42 @@ namespace SEE.Controls
             foreach (MeshFilter meshFilter in GetComponentsInChildren<MeshFilter>())
             {
                 // Skip if smooth normals have already been adopted
-                if (meshFilter.sharedMesh == null ||!registeredMeshes.Add(meshFilter.sharedMesh))
+                if (meshFilter.sharedMesh == null || !registeredMeshes.Add(meshFilter.sharedMesh))
                 {
                     continue;
                 }
 
                 // Retrieve or generate smooth normals
                 int index = bakeKeys.IndexOf(meshFilter.sharedMesh);
-                List<Vector3> smoothNormals = (index >= 0) ? bakeValues[index].data : SmoothNormals(meshFilter.sharedMesh);
+                List<Vector3> smoothNormals =
+                    (index >= 0) ? bakeValues[index].data : SmoothNormals(meshFilter.sharedMesh);
 
                 // Store smooth normals in UV3
                 meshFilter.sharedMesh.SetUVs(3, smoothNormals);
+
+                // Combine submeshes
+                Renderer renderer = meshFilter.GetComponent<Renderer>();
+
+                if (renderer != null)
+                {
+                    CombineSubmeshes(meshFilter.sharedMesh, renderer.sharedMaterials);
+                }
             }
 
             // Clear UV3 on skinned mesh renderers
             foreach (SkinnedMeshRenderer skinnedMeshRenderer in GetComponentsInChildren<SkinnedMeshRenderer>())
             {
-                if (registeredMeshes.Add(skinnedMeshRenderer.sharedMesh))
+                // Skip if UV3 has already been reset
+                if (!registeredMeshes.Add(skinnedMeshRenderer.sharedMesh))
                 {
-                    skinnedMeshRenderer.sharedMesh.uv4 = new Vector2[skinnedMeshRenderer.sharedMesh.vertexCount];
+                    continue;
                 }
+
+                // Clear UV3
+                skinnedMeshRenderer.sharedMesh.uv4 = new Vector2[skinnedMeshRenderer.sharedMesh.vertexCount];
+
+                // Combine submeshes
+                CombineSubmeshes(skinnedMeshRenderer.sharedMesh, skinnedMeshRenderer.sharedMaterials);
             }
         }
 
@@ -311,14 +329,15 @@ namespace SEE.Controls
             // Group vertices by location
             Assert.IsNotNull(mesh);
             Assert.IsNotNull(mesh.vertices);
-            IEnumerable<IGrouping<Vector3, KeyValuePair<Vector3, int>>> groups 
-                = mesh.vertices.Select((vertex, index) => new KeyValuePair<Vector3, int>(vertex, index)).GroupBy(pair => pair.Key);
+            IEnumerable<IGrouping<Vector3, KeyValuePair<Vector3, int>>> groups
+                = mesh.vertices.Select((vertex, index) => new KeyValuePair<Vector3, int>(vertex, index))
+                      .GroupBy(pair => pair.Key);
 
             // Copy normals to a new list
             List<Vector3> smoothNormals = new List<Vector3>(mesh.normals);
 
             // Average normals for grouped vertices
-            foreach (IGrouping<Vector3, KeyValuePair<Vector3, int>> group in groups)
+            foreach (var group in groups)
             {
                 // Skip single vertices
                 if (group.Count() == 1)
@@ -327,55 +346,71 @@ namespace SEE.Controls
                 }
 
                 // Calculate the average normal
-                Vector3 smoothNormal = group.Aggregate(Vector3.zero, (current, pair) => current + mesh.normals[pair.Value]);
+                Vector3 smoothNormal = group.Aggregate(Vector3.zero, (current, pair) => current + smoothNormals[pair.Value]);
 
                 smoothNormal.Normalize();
-
-                // Assign smooth normal to each vertex
-                foreach (KeyValuePair<Vector3, int> pair in group)
-                {
-                    smoothNormals[pair.Value] = smoothNormal;
-                }
             }
 
             return smoothNormals;
         }
 
+        void CombineSubmeshes(Mesh mesh, IReadOnlyCollection<Material> materials) {
+
+            // Skip meshes with a single submesh
+            if (mesh.subMeshCount == 1) {
+                return;
+            }
+
+            // Skip if submesh count exceeds material count
+            if (mesh.subMeshCount > materials.Count) {
+                return;
+            }
+
+            // Append combined submesh
+            mesh.subMeshCount++;
+            mesh.SetTriangles(mesh.triangles, mesh.subMeshCount - 1);
+        }
+
         private void UpdateMaterialProperties()
         {
+            if (outlineMaterial == null)
+            {
+                return;
+            }
+
             // Apply properties according to mode
-            outlineFillMaterial.SetColor("_OutlineColor", outlineColor);
+            outlineMaterial.SetColor(OutlineColor1, outlineColor);
 
             switch (outlineMode)
             {
                 case Mode.OutlineAll:
-                    outlineMaskMaterial.SetFloat("_ZTest", (float)UnityEngine.Rendering.CompareFunction.Always);
-                    outlineFillMaterial.SetFloat("_ZTest", (float)UnityEngine.Rendering.CompareFunction.Always);
-                    outlineFillMaterial.SetFloat("_OutlineWidth", outlineWidth);
+                    outlineMaterial.SetFloat(ZTestMask, (float)UnityEngine.Rendering.CompareFunction.Always);
+                    outlineMaterial.SetFloat(ZTestFill, (float)UnityEngine.Rendering.CompareFunction.Always);
+                    outlineMaterial.SetFloat(Width, outlineWidth);
                     break;
 
                 case Mode.OutlineVisible:
-                    outlineMaskMaterial.SetFloat("_ZTest", (float)UnityEngine.Rendering.CompareFunction.Always);
-                    outlineFillMaterial.SetFloat("_ZTest", (float)UnityEngine.Rendering.CompareFunction.LessEqual);
-                    outlineFillMaterial.SetFloat("_OutlineWidth", outlineWidth);
+                    outlineMaterial.SetFloat(ZTestMask, (float)UnityEngine.Rendering.CompareFunction.Always);
+                    outlineMaterial.SetFloat(ZTestFill, (float)UnityEngine.Rendering.CompareFunction.LessEqual);
+                    outlineMaterial.SetFloat(Width, outlineWidth);
                     break;
 
                 case Mode.OutlineHidden:
-                    outlineMaskMaterial.SetFloat("_ZTest", (float)UnityEngine.Rendering.CompareFunction.Always);
-                    outlineFillMaterial.SetFloat("_ZTest", (float)UnityEngine.Rendering.CompareFunction.Greater);
-                    outlineFillMaterial.SetFloat("_OutlineWidth", outlineWidth);
+                    outlineMaterial.SetFloat(ZTestMask, (float)UnityEngine.Rendering.CompareFunction.Always);
+                    outlineMaterial.SetFloat(ZTestFill, (float)UnityEngine.Rendering.CompareFunction.Greater);
+                    outlineMaterial.SetFloat(Width, outlineWidth);
                     break;
 
                 case Mode.OutlineAndSilhouette:
-                    outlineMaskMaterial.SetFloat("_ZTest", (float)UnityEngine.Rendering.CompareFunction.LessEqual);
-                    outlineFillMaterial.SetFloat("_ZTest", (float)UnityEngine.Rendering.CompareFunction.Always);
-                    outlineFillMaterial.SetFloat("_OutlineWidth", outlineWidth);
+                    outlineMaterial.SetFloat(ZTestMask, (float)UnityEngine.Rendering.CompareFunction.LessEqual);
+                    outlineMaterial.SetFloat(ZTestFill, (float)UnityEngine.Rendering.CompareFunction.Always);
+                    outlineMaterial.SetFloat(Width, outlineWidth);
                     break;
 
                 case Mode.SilhouetteOnly:
-                    outlineMaskMaterial.SetFloat("_ZTest", (float)UnityEngine.Rendering.CompareFunction.LessEqual);
-                    outlineFillMaterial.SetFloat("_ZTest", (float)UnityEngine.Rendering.CompareFunction.Greater);
-                    outlineFillMaterial.SetFloat("_OutlineWidth", 0);
+                    outlineMaterial.SetFloat(ZTestMask, (float)UnityEngine.Rendering.CompareFunction.LessEqual);
+                    outlineMaterial.SetFloat(ZTestFill, (float)UnityEngine.Rendering.CompareFunction.Greater);
+                    outlineMaterial.SetFloat(Width, 0);
                     break;
             }
         }

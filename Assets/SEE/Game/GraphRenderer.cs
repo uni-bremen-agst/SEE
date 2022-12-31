@@ -1,17 +1,18 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
+using SEE.Game.City;
+using SEE.Game.HolisticMetrics;
 using SEE.GO;
+using SEE.GO.Decorators;
+using SEE.GO.NodeFactories;
 using SEE.Layout;
-using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
 using UnityEngine;
-using UnityEngine.Assertions;
 using Plane = SEE.GO.Plane;
 
 namespace SEE.Game
@@ -20,58 +21,149 @@ namespace SEE.Game
     /// A renderer for graphs. Encapsulates handling of block types, node and edge layouts,
     /// decorations and other visual attributes.
     /// </summary>
-    public class GraphRenderer
+    public partial class GraphRenderer
     {
         /// <summary>
-        /// Constructor. If the <paramref name="graph"/> is null, you need to call
-        /// SetScaler() before you can call Draw().
+        /// Constructor.
         /// </summary>
-        /// <param name="graph">the graph to be rendered</param>
         /// <param name="settings">the settings for the visualization</param>
+        /// <param name="graph">the graph to be rendered</param>
+        /// <exception cref="ArgumentNullException">thrown in case <paramref name="graph"/> is null</exception>
         public GraphRenderer(AbstractSEECity settings, Graph graph)
         {
-            this.settings = settings;
-            for (int i = 0; i < (int)Node.NodeDomain.Count; i++)
+            if (graph == null)
             {
-                ColorRange leafColorRange = this.settings.leafNodeAttributesPerKind[i].colorRange;
-                leafNodeFactories[i] = this.settings.leafNodeAttributesPerKind[i].kind switch
-                {
-                    LeafNodeKinds.Blocks => new CubeFactory(ShaderType, leafColorRange),
-                    _ => throw new Exception("Unhandled GraphSettings.LeafNodeKinds")
-                };
+                throw new ArgumentNullException("Graph must not be null");
+            }
+            SetGraph(settings, new List<Graph> { graph });
+        }
 
-                ColorRange innerColorRange = this.settings.innerNodeAttributesPerKind[i].colorRange;
-                switch (this.settings.innerNodeAttributesPerKind[i].kind)
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="settings">the settings for the visualization</param>
+        /// <param name="graphs">the graphs to be rendered</param>
+        /// <exception cref="ArgumentNullException">thrown in case <paramref name="graphs"/> is null or empty</exception>
+        public GraphRenderer(AbstractSEECity settings, IList<Graph> graphs)
+        {
+            if (graphs == null || graphs.Count == 0)
+            {
+                throw new ArgumentNullException("No graph given");
+            }
+            SetGraph(settings, graphs);
+        }
+
+        /// <summary>
+        /// Initializes the rendering of the <paramref name="graph"/>. Must be used
+        /// if the constructor of <see cref="GraphRenderer"/> was used without a graph.
+        /// </summary>
+        /// <param name="graph">the graph to be rendered; must not be null</param>
+        private void SetGraph(AbstractSEECity settings, IList<Graph> graphs)
+        {
+            this.Settings = settings;
+            this.graphs = graphs;
+            SetScaler(graphs);
+            foreach (Graph graph in graphs)
+            {
+                graph.SortHierarchyByName();
+            }
+            SetNodeFactories();
+        }
+
+        /// <summary>
+        /// Returns the name of the node types for all <see cref="graphs"/>.
+        /// </summary>
+        /// <returns>node types for all <see cref="graphs"/></returns>
+        private ISet<string> AllNodeTypes()
+        {
+            ISet<string> nodeTypes = new HashSet<string>();
+            foreach (Graph graph in graphs)
+            {
+                nodeTypes.UnionWith(graph.AllNodeTypes());
+            }
+            return nodeTypes;
+        }
+
+        /// <summary>
+        /// Sets the node factories for <see cref="nodeTypeToFactory"/> for all node types in <see cref="graphs"/>.
+        /// </summary>
+        private void SetNodeFactories()
+        {
+            foreach (string nodeType in AllNodeTypes())
+            {
+                if (Settings.NodeTypes.TryGetValue(nodeType, out VisualNodeAttributes value))
                 {
-                    case InnerNodeKinds.Empty:
-                    case InnerNodeKinds.Donuts:
-                        innerNodeFactories[i] = new VanillaFactory(ShaderType, innerColorRange);
-                        break;
-                    case InnerNodeKinds.Circles:
-                        innerNodeFactories[i] = new CircleFactory(innerColorRange);
-                        break;
-                    case InnerNodeKinds.Cylinders:
-                        innerNodeFactories[i] = new CylinderFactory(ShaderType, innerColorRange);
-                        break;
-                    case InnerNodeKinds.Rectangles:
-                        innerNodeFactories[i] = new RectangleFactory(innerColorRange);
-                        break;
-                    case InnerNodeKinds.Blocks:
-                        innerNodeFactories[i] = new CubeFactory(ShaderType, innerColorRange);
-                        break;
-                    default:
-                        throw new Exception("Unhandled GraphSettings.InnerNodeKinds");
+                    nodeTypeToFactory[nodeType] = GetNodeFactory(value);
+                    nodeTypeToAntennaDectorator[nodeType] = GetAntennaDecorator(value);
+                }
+                else
+                {
+                    Debug.LogWarning($"No specification of visual attributes for node type {nodeType}. Using a default.\n");
+                    nodeTypeToFactory[nodeType] = GetDefaultNodeFactory();
+                    nodeTypeToAntennaDectorator[nodeType] = null;
                 }
             }
-            this.graph = graph;
-            if (this.graph != null)
+
+            // The default node factory that we use if the we cannot find a setting for a given node type.
+            NodeFactory GetDefaultNodeFactory()
             {
-                SetScaler(graph);
-                graph.SortHierarchyByName();
+                return new CubeFactory(ShaderType, ColorRange.Default());
+            }
+
+            // The appropriate node factory for value.Shape.
+            NodeFactory GetNodeFactory(VisualNodeAttributes value)
+            {
+                ColorRange colorRange = GetColorRange(value.ColorProperty);
+
+                return value.Shape switch
+                {
+                    NodeShapes.Blocks => new CubeFactory(ShaderType, colorRange),
+                    NodeShapes.Cylinders => new CylinderFactory(ShaderType, colorRange),
+                    NodeShapes.Spiders => new SpiderFactory(ShaderType, colorRange),
+                    NodeShapes.Polygons => new PolygonFactory(ShaderType, colorRange),
+                    NodeShapes.Bars => new BarsFactory(ShaderType, colorRange),
+                    _ => throw new NotImplementedException($"Missing handling of {value.Shape}.")
+                };
+            }
+
+            // The color range for the given colorProperty depending upon whether the property
+            // used to determine the color range is PropertyKind.Type or PropertyKind.Metric.
+            ColorRange GetColorRange(ColorProperty colorProperty)
+            {
+                switch (colorProperty.Property)
+                {
+                    case PropertyKind.Type:
+                        return GetColorRangeForNodeType(colorProperty.TypeColor);
+                    case PropertyKind.Metric:
+                        return Settings.GetColorForMetric(colorProperty.ColorMetric);
+                    default:
+                        throw new NotImplementedException($"Missing handling of {colorProperty.Property}.");
+                }
+            }
+
+            // Returns a color range where the given color is the upper color and
+            // the lower color is the given color lightened by 50 %. The number of colors
+            // in this color range is the maximal node hierarchy level of all graphs.
+            ColorRange GetColorRangeForNodeType(Color color)
+            {
+                uint maxLevel = (uint)graphs.Max(x => x.MaxDepth);
+
+                return new ColorRange(color.Lighter(), color, maxLevel + 1);
+            }
+
+            AntennaDecorator GetAntennaDecorator(VisualNodeAttributes value)
+            {
+                return new AntennaDecorator
+                             (scaler,
+                              value.AntennaSettings, Settings.AntennaWidth, Settings.MaximalAntennaSegmentHeight,
+                              Settings.MetricToColor);
             }
         }
 
-        private const Materials.ShaderType ShaderType = Materials.ShaderType.Transparent;
+        /// <summary>
+        /// The shader to be used for drawing the nodes.
+        /// </summary>
+        private const Materials.ShaderType ShaderType = Materials.ShaderType.OpaqueMetallic;
 
         /// <summary>
         /// The distance between two stacked game objects (parent/child).
@@ -84,294 +176,64 @@ namespace SEE.Game
         private const float GroundLevel = 0.0f;
 
         /// <summary>
-        /// The graph to be rendered.
+        /// The graphs to be rendered.
         /// </summary>
-        private readonly Graph graph;
+        private IList<Graph> graphs;
 
         /// <summary>
         /// Settings for the visualization.
         /// </summary>
-        public readonly AbstractSEECity settings;
+        public AbstractSEECity Settings;
 
         /// <summary>
-        /// The factory used to create blocks for leaves.
+        /// A mapping of the name of node types of <see cref="graphs"/> onto the factories creating those nodes.
         /// </summary>
-        private readonly NodeFactory[] leafNodeFactories = new NodeFactory[(int)Node.NodeDomain.Count];
+        private readonly Dictionary<string, NodeFactory> nodeTypeToFactory = new Dictionary<string, NodeFactory>();
 
         /// <summary>
-        /// The factory used to create game nodes for inner graph nodes.
+        /// A mapping of the name of node types of <see cref="graphs"/> onto the
+        /// <see cref="AntennaDecorator"/>s creating the antennas of those nodes.
         /// </summary>
-        private readonly InnerNodeFactory[] innerNodeFactories = new InnerNodeFactory[(int)Node.NodeDomain.Count];
+        private readonly Dictionary<string, AntennaDecorator> nodeTypeToAntennaDectorator = new Dictionary<string, AntennaDecorator>();
 
         /// <summary>
         /// The scale used to normalize the metrics determining the lengths of the blocks.
         /// </summary>
         private IScale scaler;
-        
-        /// <summary>
-        /// The scale used to normalize the erosion metrics determining the color and size of the erosion icons.
-        /// This is different from <see cref="scaler"/> insofar that 
-        /// </summary>
-        private IScale erosionScaler;
 
         /// <summary>
         /// A mapping from Node to ILayoutNode.
         /// </summary>
-        private readonly Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
+        private readonly Dictionary<Node, ILayoutNode> toLayoutNode = new Dictionary<Node, ILayoutNode>();
+
+        /// <summary>
+        /// True if edges are to be actually drawn, that is, if the user has selected an
+        /// edge layout different from <see cref="EdgeLayoutKind.None"/>.
+        /// </summary>
+        /// <returns>True if edges are to be actually drawn.</returns>
+        public bool AreEdgesDrawn()
+        {
+            return Settings.EdgeLayoutSettings.Kind != EdgeLayoutKind.None;
+        }
 
         /// <summary>
         /// Sets the scaler to be used to map metric values onto graphical attributes
-        /// (e.g., width, height, depth, style) across all given <paramref name="graphs"/>
+        /// (e.g., width, height, depth, color) across all given <paramref name="graphs"/>
         /// based on the user's choice (settings).
         /// </summary>
         /// <param name="graphs">set of graphs whose node metrics are to be scaled</param>
         public void SetScaler(ICollection<Graph> graphs)
         {
-            List<string> nodeMetrics = settings.AllMetricAttributes();
+            HashSet<string> nodeMetrics = Graph.AllMetrics(graphs);
 
-            if (settings.nodeLayoutSettings.zScoreScale)
+            if (Settings.ZScoreScale)
             {
-                scaler = new ZScoreScale(graphs, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics, false);
+                scaler = new ZScoreScale(graphs, nodeMetrics, Settings.ScaleOnlyLeafMetrics);
             }
             else
             {
-                scaler = new LinearScale(graphs, settings.MinimalBlockLength, settings.MaximalBlockLength, nodeMetrics, false);
+                scaler = new LinearScale(graphs, nodeMetrics, Settings.ScaleOnlyLeafMetrics);
             }
-        }
-
-        /// <summary>
-        /// Sets the scaler to be used to map metric values onto graphical attributes
-        /// (e.g., width, height, depth, style) for given <paramref name="graph"/>
-        /// based on the user's choice (settings).
-        /// </summary>
-        /// <param name="graph">graph whose node metrics are to be scaled</param>
-        public void SetScaler(Graph graph)
-        {
-            SetScaler(new List<Graph> { graph });
-        }
-
-        /// <summary>
-        /// Creates and returns a new edge between <paramref name="from"/> and <paramref name="to"/>
-        /// based on the current settings. A new edge will be added to the underlying graph, too.
-        ///
-        /// Note: A default edge layout will be used if no edge layout was chosen.
-        ///
-        /// Precondition: <paramref name="from"/> and <paramref name="to"/> must have a valid
-        /// node reference. The corresponding graph nodes must be in the same graph.
-        /// </summary>
-        /// <param name="from">source of the new edge</param>
-        /// <param name="to">target of the new edge</param>
-        /// <param name="id">id of the new edge. If it is null or empty, a new id will be generated</param>
-        /// <returns>the new edge</returns>
-        /// <exception cref="Exception">thrown if <paramref name="from"/> or <paramref name="to"/>
-        /// are not contained in any graph or contained in different graphs</exception>
-        public GameObject DrawEdge(GameObject from, GameObject to, string id)
-        {
-            Node fromNode = from.GetNode();
-            if (fromNode == null)
-            {
-                throw new Exception($"The source {from.name} of the edge is not contained in any graph.");
-            }
-            Node toNode = to.GetNode();
-            if (toNode == null)
-            {
-                throw new Exception($"The target {to.name} of the edge is not contained in any graph.");
-            }
-            if (fromNode.ItsGraph != toNode.ItsGraph)
-            {
-                throw new Exception($"The source {from.name} and target {to.name} of the edge are in different graphs.");
-            }
-
-            // Creating the edge in the underlying graph
-            Edge edge = string.IsNullOrEmpty(id) ? new Edge() : new Edge(id);
-            edge.Source = fromNode;
-            edge.Target = toNode;
-            edge.Type = Graph.UnknownType; // FIXME: We need to set the type of the edge.
-
-            Graph graph = fromNode.ItsGraph;
-            graph.AddEdge(edge);
-            // Save edge layout so that we can restore it if we need to select a default layout.
-            EdgeLayoutKind savedEdgeLayout = settings.edgeLayoutSettings.kind;
-            if (savedEdgeLayout == EdgeLayoutKind.None)
-            {
-                Debug.LogWarning($"An edge {edge.ID} from {fromNode.ID} to {toNode.ID} was added to the graph, but no edge layout was chosen.\n");
-                // Select default layout
-                settings.edgeLayoutSettings.kind = EdgeLayoutKind.Spline;
-            }
-
-            // Creating the game object representing the edge.
-            // The edge layout will be calculated for the following gameNodes. This list will
-            // contain the source and target of the edge but also all their ascendants. The
-            // ascendants are needed for hierarchical layouts.
-            HashSet<GameObject> gameNodes = new HashSet<GameObject>();
-            // We add the descendants of the source and target nodes in case the edge layout is hierarchical.
-            AddAscendants(from, gameNodes);
-            AddAscendants(to, gameNodes);
-            Dictionary<Node, ILayoutNode> to_layout_node = new Dictionary<Node, ILayoutNode>();
-            // The layout nodes corresponding to those game nodes.
-            ICollection<GameNode> layoutNodes = ToLayoutNodes(gameNodes, leafNodeFactories, innerNodeFactories, to_layout_node);
-
-            GameNode fromLayoutNode = null; // layout node in layoutNodes corresponding to source node
-            GameNode toLayoutNode = null;   // layout node in layoutNodes corresponding to target node
-            // We need fromLayoutNode and toLayoutNode to create a single layout edge to be passed
-            // to the edge layouter.
-            foreach (GameNode layoutNode in layoutNodes)
-            {
-                //TODO: Should this be a ReferenceEquals() or Equals() comparison?
-                if (layoutNode.ItsNode == fromNode)
-                {
-                    fromLayoutNode = layoutNode;
-                }
-                // note: fromNode = toNode is possible, hence, there is no 'else' here.
-                if (layoutNode.ItsNode == toNode)
-                {
-                    toLayoutNode = layoutNode;
-                }
-            }
-            Assert.IsNotNull(fromLayoutNode, $"source node {fromNode.ID} does not have a layout node.\n");
-            Assert.IsNotNull(toLayoutNode, $"target node {toNode.ID} does not have a layout node.\n");
-            // The single layout edge between source and target. We want the layout only for this edge.
-            ICollection<LayoutEdge> layoutEdges = new List<LayoutEdge> { new LayoutEdge(fromLayoutNode, toLayoutNode, edge) };
-            // Calculate the edge layout (for the single edge only).
-            ICollection<GameObject> edges = EdgeLayout(layoutNodes, layoutEdges);
-            GameObject resultingEdge = edges.FirstOrDefault();
-            InteractionDecorator.PrepareForInteraction(resultingEdge);
-            // The edge becomes a child of the root node of the game-node hierarchy
-            GameObject codeCity = SceneQueries.GetCodeCity(from.transform).gameObject;
-            GameObject rootNode = SceneQueries.GetCityRootNode(codeCity).gameObject;
-            resultingEdge.transform.SetParent(rootNode.transform);
-            // The portal of the new edge is inherited from the codeCity.
-            Portal.SetPortal(root: codeCity, gameObject: resultingEdge);
-            // Reset original edge layout.
-            settings.edgeLayoutSettings.kind = savedEdgeLayout;
-            return resultingEdge;
-        }
-
-        /// <summary>
-        /// Adds <paramref name="node"/> and all its transitive parent game objects tagged by
-        /// Tags.Node to <paramref name="gameNodes"/>.
-        /// </summary>
-        /// <param name="node">the game objects whose ascendant game nodes are to be added to <paramref name="gameNodes"/></param>
-        /// <param name="gameNodes">where to add the ascendants</param>
-        private void AddAscendants(GameObject node, HashSet<GameObject> gameNodes)
-        {
-            GameObject cursor = node;
-            while (cursor != null && cursor.CompareTag(Tags.Node))
-            {
-                gameNodes.Add(cursor);
-                cursor = cursor.transform.parent.gameObject;
-            }
-        }
-
-        /// <summary>
-        /// Applies the edge layout according to the user's choice (settings) for
-        /// all edges in between nodes in <paramref name="gameNodes"/>.
-        /// </summary>
-        /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
-        /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
-        /// <returns>all game objects created to represent the edges; may be empty</returns>
-        public ICollection<GameObject> EdgeLayout(ICollection<GameObject> gameNodes, bool draw = true)
-        {
-            return EdgeLayout(ToLayoutNodes(gameNodes), draw);
-        }
-
-        /// <summary>
-        /// Applies the edge layout according to the the user's choice (settings) for
-        /// all edges in between nodes in <paramref name="gameNodes"/>.
-        /// </summary>
-        /// <param name="gameNodes">the subset of nodes for which to draw the edges</param>
-        /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
-        /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes, bool draw = true)
-        {
-            return EdgeLayout(gameNodes, ConnectingEdges(gameNodes), draw);
-        }
-
-        /// <summary>
-        /// Applies the edge layout according to the the user's choice (settings).
-        /// </summary>
-        /// <param name="gameNodes">the set of layout nodes for which to create game edges</param>
-        /// <param name="layoutEdges">the edges to be laid out</param>
-        /// <param name="draw">Decides whether the edges should only be calculated, or whether they should also be drawn.</param>
-        /// <returns>all game objects created to represent the edges; may be empty</returns>
-        private ICollection<GameObject> EdgeLayout(ICollection<GameNode> gameNodes, ICollection<LayoutEdge> layoutEdges, bool draw = true)
-        {
-            float minimalEdgeLevelDistance = 2.5f * settings.edgeLayoutSettings.edgeWidth;
-            bool edgesAboveBlocks = settings.edgeLayoutSettings.edgesAboveBlocks;
-            float rdp = settings.edgeLayoutSettings.rdp;
-            IEdgeLayout layout;
-            switch (settings.edgeLayoutSettings.kind)
-            {
-                case EdgeLayoutKind.Straight:
-                    layout = new StraightEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance);
-                    break;
-                case EdgeLayoutKind.Spline:
-                    layout = new SplineEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance, rdp);
-                    break;
-                case EdgeLayoutKind.Bundling:
-                    layout = new BundledEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance, settings.edgeLayoutSettings.tension, rdp);
-                    break;
-                case EdgeLayoutKind.None:
-                    // nothing to be done
-                    return new List<GameObject>();
-                default:
-                    throw new Exception("Unhandled edge layout " + settings.edgeLayoutSettings.kind);
-            }
-#if UNITY_EDITOR
-            Performance p = Performance.Begin("edge layout " + layout.Name);
-#endif
-            EdgeFactory edgeFactory = new EdgeFactory(
-                layout,
-                settings.edgeLayoutSettings.edgeWidth,
-                settings.edgeLayoutSettings.tubularSegments,
-                settings.edgeLayoutSettings.radius,
-                settings.edgeLayoutSettings.radialSegments,
-                settings.edgeLayoutSettings.isEdgeSelectable);
-            // The resulting game objects representing the edges.
-            ICollection<GameObject> result;
-            // Calculate only
-            if (!draw)
-            {
-                result = edgeFactory.CalculateNewEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
-            }
-            // Calculate and draw edges
-            else
-            {
-                result = edgeFactory.DrawEdges(gameNodes.Cast<ILayoutNode>().ToList(), layoutEdges);
-                InteractionDecorator.PrepareForInteraction(result);
-                AddLOD(result);
-            }
-
-
-#if UNITY_EDITOR
-            p.End();
-            Debug.Log($"Calculated \"  {settings.edgeLayoutSettings.kind} \" edge layout for {gameNodes.Count}"
-                      + $" nodes and {result.Count} edges in {p.GetElapsedTime()} [h:m:s:ms].\n");
-#endif
-            return result;
-        }
-
-        /// <summary>
-        /// Returns the list of layout edges for all edges in between <paramref name="gameNodes"/>.
-        /// </summary>
-        /// <param name="gameNodes">set of game nodes whose connecting edges are requested</param>
-        /// <returns>list of layout edges/returns>
-        private static ICollection<LayoutEdge> ConnectingEdges(ICollection<GameNode> gameNodes)
-        {
-            ICollection<LayoutEdge> edges = new List<LayoutEdge>();
-            Dictionary<Node, GameNode> map = NodeToGameNodeMap(gameNodes);
-
-            foreach (GameNode source in gameNodes)
-            {
-                Node sourceNode = source.ItsNode;
-
-                foreach (Edge edge in sourceNode.Outgoings)
-                {
-                    Node target = edge.Target;
-                    edges.Add(new LayoutEdge(source, map[target], edge));
-                }
-            }
-            return edges;
         }
 
         /// <summary>
@@ -380,10 +242,10 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes"></param>
         /// <returns>mapping of graph node onto its corresponding game node</returns>
-        private static Dictionary<Node, GameNode> NodeToGameNodeMap(ICollection<GameNode> gameNodes)
+        private static Dictionary<Node, T> NodeToGameNodeMap<T>(IEnumerable<T> gameNodes) where T : AbstractLayoutNode
         {
-            Dictionary<Node, GameNode> map = new Dictionary<Node, GameNode>();
-            foreach (GameNode node in gameNodes)
+            Dictionary<Node, T> map = new Dictionary<Node, T>();
+            foreach (T node in gameNodes)
             {
                 map[node.ItsNode] = node;
             }
@@ -391,11 +253,19 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Draws the nodes and edges of the graph and their decorations by applying the layouts according
-        ///  to the user's choice in the settings.
+        /// To turn on the extension hack for our VISSOFT paper. Will be
+        /// removed soon.
         /// </summary>
+        [Obsolete]
+        private const bool VISSOFT = false;
+
+        /// <summary>
+        /// Draws the nodes and edges of the graph and their decorations by applying the layouts according
+        /// to the user's choice in the settings.
+        /// </summary>
+        /// <param name="graph">the graph to be drawn; it should be one initially passed to the constructor</param>
         /// <param name="parent">every game object drawn for this graph will be added to this parent</param>
-        public void Draw(GameObject parent)
+        public void DrawGraph(Graph graph, GameObject parent)
         {
             // all nodes of the graph
             List<Node> nodes = graph.Nodes();
@@ -404,235 +274,185 @@ namespace SEE.Game
                 Debug.LogWarning("The graph has no nodes.\n");
                 return;
             }
-            // game objects for the leaves
+            // FIXME: The two following calls DrawLeafNodes and DrawInnerNodes can be merged into one.
             Dictionary<Node, GameObject> nodeMap = DrawLeafNodes(nodes);
-            AdjustScaleBetweenNodeKinds(nodeMap);
+
+            // FIXME-IWSC: Remove this call after the publication.
+            if (VISSOFT)
+            {
+                GenerateAndVisualizeCloneClasses(nodes, nodeMap);
+            }
+
+            DrawInnerNodes(nodeMap, nodes);
+
             // the layout to be applied
-            NodeLayout nodeLayout = GetLayout();
+            NodeLayout nodeLayout = GetLayout(parent);
+
+            // If we have multiple roots, we need to add a unique one.
+            AddGameRootNodeIfNecessary(graph, nodeMap);
+
+            // The representation of the nodes for the layout.
+            ICollection<LayoutGameNode> gameNodes = ToLayoutNodes(nodeMap.Values);
+
+            // 1) Calculate the layout.
+            Performance p = Performance.Begin($"Node layout {Settings.NodeLayoutSettings.Kind} for {gameNodes.Count} nodes");
+            // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
+            // (GameNode implements ILayoutNode).
+            ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
+            // 2) Apply the calculated layout to the game objects.
+            nodeLayout.Apply(layoutNodes);
+            p.End();
+            Debug.Log($"Built \"{Settings.NodeLayoutSettings.Kind}\" node layout for {gameNodes.Count} nodes in {p.GetElapsedTime()} [h:m:s:ms].\n");
+
+            // Fit layoutNodes into parent.
+            Fit(parent, layoutNodes);
+            Stack(parent, layoutNodes);
 
             // a mapping of graph nodes onto the game objects by which they are represented
-            Dictionary<Node, GameObject>.ValueCollection nodeToGameObject;
-            ICollection<GameNode> gameNodes = new List<GameNode>();
-            // the artificial unique graph root we add if the graph has more than one root
-            Node artificalRoot = null;
-            // the plane upon which the game objects will be placed
-            GameObject plane;
+            Dictionary<Node, GameObject>.ValueCollection nodeToGameObject = nodeMap.Values;
 
-            Performance p;
-            if (settings.nodeLayoutSettings.kind.GetModel().CanApplySublayouts && nodeLayout.IsHierarchical())
-            {
-                try
-                {
-                    ICollection<SublayoutNode> sublayoutNodes = AddInnerNodesForSublayouts(nodeMap, nodes);
-                    artificalRoot = AddRootIfNecessary(graph, nodeMap);
-                    gameNodes = ToLayoutNodes(nodeMap, sublayoutNodes);
-                    RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, gameNodes);
+            CreateGameNodeHierarchy(nodeMap, parent);
 
-                    List<SublayoutLayoutNode> sublayoutLayoutNodes = ConvertSublayoutToLayoutNodes(sublayoutNodes.ToList());
-                    foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
-                    {
-                        Sublayout sublayout = new Sublayout(layoutNode, GroundLevel, graph, settings);
-                        sublayout.Layout();
-                    }
-
-                    p = Performance.Begin("node layout " + settings.nodeLayoutSettings.kind + " (with sublayouts)");
-                    // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
-                    // (GameNode implements ILayoutNode).
-                    ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
-                    if (nodeLayout.UsesEdgesAndSublayoutNodes())
-                    {
-                        // FIXME: Could graph.ConnectingEdges(nodes) be replaced by graph.Edges()?
-                        // The input graph is already a subset graph if not all data of the GXL file
-                        // are to be drawn.
-                        nodeLayout.Apply(layoutNodes, graph.ConnectingEdges(nodes), sublayoutLayoutNodes);
-                    }
-                    p.End();
-
-                    Fit(parent, layoutNodes);
-
-                    nodeToGameObject = nodeMap.Values;
-
-                    // add the plane surrounding all game objects for nodes
-                    ComputeBoundingBox(layoutNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
-                    plane = DrawPlane(leftFrontCorner, rightBackCorner, parent.transform.position.y + parent.transform.lossyScale.y / 2.0f + LevelDistance);
-                    AddToParent(plane, parent);
-
-                    // The layoutNodes are put just above the plane w.r.t. the y axis.
-                    NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
-
-                    CreateObjectHierarchy(nodeMap, parent);
-                    InteractionDecorator.PrepareForInteraction(nodeToGameObject);
-
-                    // add the decorations, too
-                    if (sublayoutLayoutNodes.Count <= 0)
-                    {
-                        AddDecorations(nodeToGameObject);
-                    }
-                    else
-                    {
-                        AddDecorationsForSublayouts(layoutNodes, sublayoutLayoutNodes, parent);
-                    }
-                }
-                finally
-                {
-                    // If we added an artificial root node to the graph, we must remove it again
-                    // from the graph when we are done.
-                    RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, gameNodes);
-                }
-            }
-            else
-            {
-                try
-                {
-                    if (nodeLayout.IsHierarchical())
-                    {
-                        // for a hierarchical layout, we need to add the game objects for inner nodes
-                        DrawInnerNodes(nodeMap, nodes);
-                        artificalRoot = AddRootIfNecessary(graph, nodeMap);
-                        if (artificalRoot != null)
-                        {
-                            Debug.Log("Artificial unique root was added.\n");
-                        }
-                    }
-
-                    // calculate and apply the node layout
-                    gameNodes = ToLayoutNodes(nodeMap.Values);
-                    RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, gameNodes);
-
-                    // 1) Calculate the layout
-                    p = Performance.Begin("node layout " + settings.nodeLayoutSettings.kind + " for " + gameNodes.Count + " nodes");
-                    // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
-                    // (GameNode implements ILayoutNode).
-                    ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
-                    nodeLayout.Apply(layoutNodes);
-                    p.End();
-                    Debug.LogFormat("Built \"" + settings.nodeLayoutSettings.kind + "\" node layout for " + gameNodes.Count + " nodes in {0} [h:m:s:ms].\n", p.GetElapsedTime());
-
-                    // 2) Apply the calculated layout to the game objects
-
-                    // fit layoutNodes into parent
-                    Fit(parent, layoutNodes);
-
-                    nodeToGameObject = nodeMap.Values;
-
-                    // add the plane surrounding all game objects for nodes
-                    plane = DrawPlane(nodeToGameObject, parent.transform.position.y + parent.transform.lossyScale.y / 2.0f + LevelDistance);
-                    AddToParent(plane, parent);
-
-                    // The layouNodes are put just above the plane w.r.t. the y axis.
-                    NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
-
-                    CreateObjectHierarchy(nodeMap, parent);
-
-                    // Decorations must be applied after the blocks have been placed, so that
-                    // we also know their positions.
-                    AddDecorations(nodeToGameObject);
-                }
-                finally
-                {
-                    // If we added an artifical root node to the graph, we must remove it again
-                    // from the graph when we are done.
-                    RemoveRootIfNecessary(ref artificalRoot, graph, nodeMap, gameNodes);
-                }
-            }
+            // Decorations must be applied after the blocks have been placed, so that
+            // we also know their positions.
+            AddDecorations(nodeToGameObject);
 
             // Create the laid out edges; they will be children of the unique root game node
             // representing the node hierarchy. This way the edges can be moved along with
             // the nodes.
             GameObject rootGameNode = RootGameNode(parent);
-            AddToParent(EdgeLayout(gameNodes), rootGameNode);
+            EdgeLayout(gameNodes, rootGameNode, true);
 
             Portal.SetPortal(parent);
 
             // Add light to simulate emissive effect
-            AddLight(nodeToGameObject, rootGameNode);
+            // AddLight(nodeToGameObject, parent);
 
             if (parent.TryGetComponent(out Plane portalPlane))
             {
                 portalPlane.HeightOffset = rootGameNode.transform.position.y - parent.transform.position.y;
             }
+
+            GameObject AddGameRootNodeIfNecessary(Graph graph, Dictionary<Node, GameObject> nodeMap)
+            {
+                Node artificialRoot = graph.AddRootNodeIfNecessary();
+                if (artificialRoot != null)
+                {
+                    nodeMap[artificialRoot] = DrawNode(artificialRoot);
+                    Debug.Log("Artificial unique root was added.\n");
+                    return nodeMap[artificialRoot];
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            // FIXME-IWSC
+            // This method exists only to create the texture-based visualization of clones for the IWSC paper.
+            // It will be either become well integrated or removed later.
+            //[Obsolete]
+            void GenerateAndVisualizeCloneClasses(List<Node> nodes, Dictionary<Node, GameObject> nodeMap)
+            {
+                // Generate clone classes.
+                HashSet<HashSet<Node>> cloneClasses = new HashSet<HashSet<Node>>();
+                HashSet<Node> alreadyAssignedToCloneClass = new HashSet<Node>();
+                foreach (var item in nodeMap)
+                {
+                    // Skip node if it already assigned.
+                    if (alreadyAssignedToCloneClass.Contains(item.Key)) continue;
+
+                    // Find all nodes of the clone class of `item'.
+                    HashSet<Node> cloneClass = new HashSet<Node>();
+                    cloneClass.Add(item.Key);
+                    alreadyAssignedToCloneClass.Add(item.Key);
+                    CollectOutgoings(item.Key.Outgoings);
+                    CollectIncommings(item.Key.Incomings);
+                    cloneClasses.Add(cloneClass);
+
+                    void CollectOutgoings(ISet<Edge> outgoings)
+                    {
+                        foreach (var e in outgoings)
+                        {
+                            if (!cloneClass.Contains(e.Target))
+                            {
+                                cloneClass.Add(e.Target);
+                                alreadyAssignedToCloneClass.Add(e.Target);
+                                CollectOutgoings(e.Target.Outgoings);
+                                CollectIncommings(e.Target.Incomings);
+                            }
+                        }
+                    }
+                    void CollectIncommings(ISet<Edge> incommings)
+                    {
+                        foreach (var e in incommings)
+                        {
+                            if (!cloneClass.Contains(e.Source))
+                            {
+                                cloneClass.Add(e.Source);
+                                alreadyAssignedToCloneClass.Add(e.Source);
+                                CollectIncommings(e.Source.Incomings);
+                                CollectOutgoings(e.Source.Outgoings);
+                            }
+                        }
+                    }
+                }
+
+                // Set materials of clone classes.
+                // NOTE: This is a very dirty hack!!!
+                if (nodes.Count > 0 && nodeTypeToFactory[nodes.First().Type] is CubeFactory)
+                {
+                    int matIdx = 1;
+                    foreach (var cc in cloneClasses)
+                    {
+                        Material material = Resources.Load("Materials/LSHMetal/" + matIdx++, typeof(Material)) as Material;
+                        foreach (Node node in cc)
+                        {
+                            nodeMap[node].GetComponent<Renderer>().material = material;
+                        }
+                    }
+                }
+            }
+
+            // This is necessary for the holistic metrics boards. They need to be informed when a code city is being
+            // drawn because then there will be a new graph loaded. In that case, the metrics boards might
+            // need to start listening for change events from that graph.
+            BoardsManager.OnGraphDraw();
         }
 
         /// <summary>
-        /// Applies the given <paramref name="layout"/> to the given <paramref name="gameNode"/>,
-        /// i.e., sets its size and position according to the <paramref name="layout"/> and
-        /// possibly rotates it. The game node can represent a leaf or inner node of the node
-        /// hierarchy.
-        ///
-        /// Precondition: <paramref name="gameNode"/> must have NodeRef component referencing a
-        /// graph node.
+        /// The <paramref name="layoutNodes"/> are put just above the <paramref name="plane"/> w.r.t. the y axis.
         /// </summary>
-        /// <param name="gameNode">the game node the layout should be applied to</param>
-        /// <param name="layout">layout to be applied to the game node</param>
-        public void Apply(GameObject gameNode, GameObject itsParent, ILayoutNode layout)
+        /// <param name="plane">plane upon which <paramref name="layoutNodes"/> should be stacked</param>
+        /// <param name="layoutNodes">the layout nodes to be stacked</param>
+        public static void Stack(GameObject plane, IEnumerable<ILayoutNode> layoutNodes)
         {
-            Node node = gameNode.GetComponent<NodeRef>().Value;
-
-            if (node.IsLeaf())
-            {
-                NodeFactory leafNodeFactory = leafNodeFactories[(int)node.Domain];
-                // Leaf nodes were created as blocks by leaveNodeFactory.
-                // We need to first scale the game node and only afterwards set its
-                // position because transform.scale refers to the center position.
-                leafNodeFactory.SetSize(gameNode, layout.LocalScale);
-                // FIXME: Must adjust layout.CenterPosition.y
-                leafNodeFactory.SetGroundPosition(gameNode, layout.CenterPosition);
-            }
-            else
-            {
-                // Inner nodes were created by innerNodeFactory.
-                innerNodeFactories[(int)node.Domain].SetSize(gameNode, layout.LocalScale);
-                // FIXME: Must adjust layout.CenterPosition.y
-                innerNodeFactories[(int)node.Domain].SetGroundPosition(gameNode, layout.CenterPosition);
-            }
-            // Rotate the game object.
-            if (node.IsLeaf())
-            {
-                leafNodeFactories[(int)node.Domain].Rotate(gameNode, layout.Rotation);
-            }
-            else
-            {
-                innerNodeFactories[(int)node.Domain].Rotate(gameNode, layout.Rotation);
-            }
-
-            // fit layoutNodes into parent
-            //Fit(itsParent, layoutNodes); // FIXME
-
-            // Stack the node onto its parent (maintaining its x and z co-ordinates)
-            Vector3 levelIncrease = gameNode.transform.position;
-            levelIncrease.y = itsParent.transform.position.y + itsParent.transform.lossyScale.y / 2.0f + LevelDistance;
-            gameNode.transform.position = levelIncrease;
-
-            // Add the node to the node hierarchy
-            gameNode.transform.SetParent(itsParent.transform);
-
-            // Prepare the node for interactions
-            InteractionDecorator.PrepareForInteraction(gameNode);
-
-            // Decorations must be applied after the blocks have been placed, so that
-            // we also know their positions.
-            AddDecorations(gameNode);
+            NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
         }
 
         /// <summary>
-        /// Adds light to simulate an emissive effect.
+        /// Adds light to simulate an emissive effect. The new light object will be added to
+        /// <paramref name="parent"/> above its center such that it covers all <paramref name="gameObjects"/>.
         /// </summary>
-        /// <param name="gameObjects"></param>
-        /// <param name="rootGameNode"></param>
-        private void AddLight(ICollection<GameObject> gameObjects, GameObject rootGameNode)
+        /// <param name="gameObjects">the game object to be covered by the light</param>
+        /// <param name="parent">parent of the new light</param>
+        private void AddLight(ICollection<GameObject> gameObjects, GameObject parent)
         {
-            GameObject lightGameObject = new GameObject("Light");
-            lightGameObject.transform.parent = rootGameNode.transform;
+            GameObject lightGameObject = new GameObject("Light")
+            {
+                tag = Tags.Decoration
+            };
+            lightGameObject.transform.parent = parent.transform;
 
             Light light = lightGameObject.AddComponent<Light>();
 
             ComputeBoundingBox(gameObjects, out Vector2 minCorner, out Vector2 maxCorner);
-            float bbw = maxCorner.x - minCorner.x;
-            float bbh = maxCorner.y - minCorner.y;
+            float boundingBoxWidth = maxCorner.x - minCorner.x;
+            float boundingBoxDepth = maxCorner.y - minCorner.y;
 
-            lightGameObject.transform.position = rootGameNode.transform.position + new Vector3(0.0f, 0.25f * (bbw + bbh), 0.0f);
+            lightGameObject.transform.position = parent.transform.position + new Vector3(0.0f, 0.25f * (boundingBoxWidth + boundingBoxDepth), 0.0f);
 
-            light.range = 3.0f * Mathf.Sqrt(bbw * bbw + bbh * bbh);
+            light.range = 3.0f * Mathf.Sqrt(boundingBoxWidth * boundingBoxWidth + boundingBoxDepth * boundingBoxDepth);
             light.type = LightType.Point;
             light.intensity = 1.0f;
         }
@@ -642,43 +462,36 @@ namespace SEE.Game
         /// </summary>
         /// <param name="parent">the parent in which to fit the <paramref name="layoutNodes"/></param>
         /// <param name="layoutNodes">the nodes to be fitted into the <paramref name="parent"/></param>
-        public static void Fit(GameObject parent, ICollection<ILayoutNode> layoutNodes)
+        public static void Fit(GameObject parent, IEnumerable<ILayoutNode> layoutNodes)
         {
-            NodeLayout.Scale(layoutNodes, parent.transform.lossyScale.x);
+            NodeLayout.Scale(layoutNodes, parent.transform.lossyScale.x, parent.transform.lossyScale.z);
             NodeLayout.MoveTo(layoutNodes, parent.transform.position);
         }
 
         /// <summary>
-        /// Creates the same nesting of all game objects in <paramref name="nodeMap"/> as in
+        /// Creates the same nesting of all game nodes in <paramref name="nodeMap"/> as in
         /// the graph node hierarchy. Every root node in the graph node hierarchy will become
         /// a child of the given <paramref name="root"/>.
         /// </summary>
-        /// <param name="nodeMap">mapping of graph nodes onto their representing game objects</param>
-        /// <param name="root">the parent of every game object not nested in any other game object</param>
-        private void CreateObjectHierarchy(Dictionary<Node, GameObject> nodeMap, GameObject root)
+        /// <param name="nodeMap">mapping of graph nodes onto their representing game object</param>
+        /// <param name="root">the parent of every game object not nested in any other game object
+        /// (must not be null)</param>
+        /// <exception cref="ArgumentNullException">thrown if <paramref name="root"/> is null</exception>
+        public static void CreateGameNodeHierarchy(Dictionary<Node, GameObject> nodeMap, GameObject root)
         {
+            if (root == null)
+            {
+                throw new ArgumentNullException(nameof(root));
+            }
             foreach (KeyValuePair<Node, GameObject> entry in nodeMap)
             {
                 Node node = entry.Key;
                 Node parent = node.Parent;
 
-                if (parent == null)
-                {
-                    // node is a root => it will be added to parent as a child
-                    AddToParent(entry.Value, root);
-                }
-                else
-                {
-                    // node is a child of another game node
-                    try
-                    {
-                        AddToParent(entry.Value, nodeMap[parent]);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogErrorFormat("Exception raised while adding the game object corresponding to {0} to the parent {1}: {2}\n", node.ID, parent.ID, e);
-                    }
-                }
+                // If node is a root, it will be added to parent as a child.
+                // Otherwise, node is a child of another game node.
+                AddToParent(entry.Value, parent == null ? root : nodeMap[parent]);
+                Portal.SetPortal(root, entry.Value);
             }
         }
 
@@ -687,19 +500,17 @@ namespace SEE.Game
         /// </summary>
         /// <param name="layoutNodes">the layoutnodes</param>
         /// <param name="sublayoutLayoutNodes">the sublayout nodes</param>
-        /// <param name="parent">the parent gameobject</param>
-        private void AddDecorationsForSublayouts(IEnumerable<ILayoutNode> layoutNodes, IEnumerable<SublayoutLayoutNode> sublayoutLayoutNodes, GameObject parent)
+        private void AddDecorationsForSublayouts(IEnumerable<ILayoutNode> layoutNodes, IEnumerable<SublayoutLayoutNode> sublayoutLayoutNodes)
         {
             List<ILayoutNode> remainingLayoutNodes = layoutNodes.ToList();
             foreach (SublayoutLayoutNode layoutNode in sublayoutLayoutNodes)
             {
-                ICollection<GameObject> gameObjects = (from GameNode gameNode in layoutNode.Nodes select gameNode.GetGameObject()).ToList();
-                AddDecorations(gameObjects, layoutNode.InnerNodeKind, layoutNode.NodeLayout);
+                ICollection<GameObject> gameObjects = (from LayoutGameNode gameNode in layoutNode.Nodes select gameNode.GetGameObject()).ToList();
+                AddDecorations(gameObjects);
                 remainingLayoutNodes.RemoveAll(node => layoutNode.Nodes.Contains(node));
             }
 
-            ICollection<GameObject> remainingGameObjects = (from GameNode gameNode in remainingLayoutNodes select gameNode.GetGameObject()).ToList();
-
+            ICollection<GameObject> remainingGameObjects = (from LayoutGameNode gameNode in remainingLayoutNodes select gameNode.GetGameObject()).ToList();
             AddDecorations(remainingGameObjects);
         }
 
@@ -731,7 +542,6 @@ namespace SEE.Game
             {
                 DrawInnerNodes(nodeMap, nodes);
             }
-
             return coseSublayoutNodes;
         }
 
@@ -741,21 +551,21 @@ namespace SEE.Game
         /// <param name="nodes">the nodes, which should be layouted as sublayouts</param>
         /// <returns>a list with sublayout nodes</returns>
         private List<SublayoutNode> CreateSublayoutNodes(IReadOnlyCollection<Node> nodes) =>
-            (from dir in settings.coseGraphSettings.ListInnerNodeToggle
+            (from dir in Settings.CoseGraphSettings.ListInnerNodeToggle
              where dir.Value
              select dir.Key into name
-             where settings.coseGraphSettings.InnerNodeLayout.ContainsKey(name)
-                   && settings.coseGraphSettings.InnerNodeShape.ContainsKey(name)
+             where Settings.CoseGraphSettings.InnerNodeLayout.ContainsKey(name)
+                   && Settings.CoseGraphSettings.InnerNodeShape.ContainsKey(name)
              let matches = nodes.Where(i => i.ID.Equals(name))
              where matches.Any()
-             select new SublayoutNode(matches.First(), settings.coseGraphSettings.InnerNodeShape[name],
-                                      settings.coseGraphSettings.InnerNodeLayout[name])).ToList();
+             select new SublayoutNode(matches.First(), Settings.CoseGraphSettings.InnerNodeShape[name],
+                                      Settings.CoseGraphSettings.InnerNodeLayout[name])).ToList();
 
         /// <summary>
         /// Calculate the child/ removed nodes for each sublayout
         /// </summary>
         /// <param name="sublayoutNodes">the sublayout nodes</param>
-        private void CalculateNodesSublayout(ICollection<SublayoutNode> sublayoutNodes)
+        private static void CalculateNodesSublayout(ICollection<SublayoutNode> sublayoutNodes)
         {
             foreach (SublayoutNode sublayoutNode in sublayoutNodes)
             {
@@ -783,9 +593,9 @@ namespace SEE.Game
             List<SublayoutLayoutNode> sublayoutLayoutNodes = new List<SublayoutLayoutNode>();
             sublayouts.ForEach(sublayoutNode =>
             {
-                SublayoutLayoutNode sublayout = new SublayoutLayoutNode(to_layout_node[sublayoutNode.Node], sublayoutNode.InnerNodeKind, sublayoutNode.NodeLayout);
-                sublayoutNode.Nodes.ForEach(n => sublayout.Nodes.Add(to_layout_node[n]));
-                sublayoutNode.RemovedChildren.ForEach(n => sublayout.RemovedChildren.Add(to_layout_node[n]));
+                SublayoutLayoutNode sublayout = new SublayoutLayoutNode(toLayoutNode[sublayoutNode.Node], sublayoutNode.InnerNodeKind, sublayoutNode.NodeLayout);
+                sublayoutNode.Nodes.ForEach(n => sublayout.Nodes.Add(toLayoutNode[n]));
+                sublayoutNode.RemovedChildren.ForEach(n => sublayout.RemovedChildren.Add(toLayoutNode[n]));
                 sublayoutLayoutNodes.Add(sublayout);
             });
             return sublayoutLayoutNodes;
@@ -803,95 +613,7 @@ namespace SEE.Game
             {
                 allNodes.AddRange(WithAllChildren(node));
             }
-
             return allNodes;
-        }
-
-        /// <summary>
-        /// If <paramref name="graph"/> has a single root, nothing is done. Otherwise
-        /// an artifical root is created and added to both the <paramref name="graph"/>
-        /// and <paramref name="nodeMap"/> (and there mapped onto a newly created game
-        /// object for inner nodes). All true roots of <paramref name="graph"/> will
-        /// become children of this artificial root.
-        /// Note: This method is the counterpart to RemoveRootIfNecessary.
-        /// </summary>
-        /// <param name="graph">graph where a unique root node should be added</param>
-        /// <param name="nodeMap">mapping of nodes onto game objects, which will be updated
-        /// when a new artifical root is added</param>
-        /// <returns>the new artifical root or null if <paramref name="graph"/> has
-        /// already a single root</returns>
-        private Node AddRootIfNecessary(Graph graph, IDictionary<Node, GameObject> nodeMap)
-        {
-            // Note: Because this method is called only when a hierarchical layout is to
-            // be applied (and then both leaves and inner nodes were added to nodeMap), we
-            // could traverse through graph.GetRoots() or nodeMaps.Keys. It would not make
-            // a difference. If -- for any reason --, we decide not to create a game object
-            // for some inner nodes, we should rather iterate on nodeMaps.Keys.
-            ICollection<Node> roots = graph.GetRoots();
-
-            if (roots.Count > 1)
-            {
-                Node artificalRoot = new Node
-                {
-                    ID = graph.Name + "#ROOT",
-                    SourceName = graph.Name + "#ROOT",
-                    Type = "ROOTTYPE"
-                };
-                graph.AddNode(artificalRoot);
-                foreach (Node root in roots)
-                {
-                    artificalRoot.AddChild(root);
-                }
-                nodeMap[artificalRoot] = DrawInnerNode(artificalRoot);
-                return artificalRoot;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// If <paramref name="root"/> is null, nothing happens. Otherwise <paramref name="root"/> will
-        /// be removed from <paramref name="graph"/> and <paramref name="nodeMap"/>. The value of
-        /// <paramref name="root"/> will be null afterward.
-        /// Note: This method is the counterpart to AddRootIfNecessary.
-        /// </summary>
-        /// <param name="root">artifical root node to be removed (created by AddRootIfNecessary) or null;
-        /// will be null afterward</param>
-        /// <param name="graph">graph where <paramref name="root"/> should be removed/param>
-        /// <param name="nodeMap">mapping of nodes onto game objects from which to remove
-        /// <paramref name="root"/></param>
-        private void RemoveRootIfNecessary(ref Node root, Graph graph, Dictionary<Node, GameObject> nodeMap, ICollection<GameNode> layoutNodes)
-        {
-            return;
-            // FIXME: temporarily disabled because the current implementation of the
-            // custom shader for culling all city objects falling off the plane assumes
-            // that there is exactly one root node of the graph.
-
-            //if (root is object)
-            //{
-            //    if (layoutNodes != null)
-            //    {
-            //        // Remove from layout
-            //        GameNode toBeRemoved = null;
-            //        foreach (GameNode layoutNode in layoutNodes)
-            //        {
-            //            if (layoutNode.ID.Equals(root.ID))
-            //            {
-            //                toBeRemoved = layoutNode;
-            //                break;
-            //            }
-            //        }
-            //        if (toBeRemoved != null)
-            //        {
-            //            layoutNodes.Remove(toBeRemoved);
-            //        }
-            //    }
-            //    GameObject go = nodeMap[root];
-            //    nodeMap.Remove(root);
-            //    graph.RemoveNode(root);
-            //    Destroyer.DestroyGameObject(go);
-            //    root = null;
-            //}
         }
 
         /// <summary>
@@ -899,19 +621,20 @@ namespace SEE.Game
         /// place the nodes at ground level 0. This method just returns the layouter,
         /// it does not actually calculate the layout.
         /// </summary>
+        /// <param name="parent">the parent in which to fit the nodes</param>
         /// <returns>node layout selected</returns>
-        public NodeLayout GetLayout() =>
-            settings.nodeLayoutSettings.kind switch
+        public NodeLayout GetLayout(GameObject parent) =>
+            Settings.NodeLayoutSettings.Kind switch
             {
-                NodeLayoutKind.Manhattan => new ManhattanLayout(GroundLevel, NodeFactory.Unit),
-                NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(GroundLevel, NodeFactory.Unit),
-                NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(GroundLevel, NodeFactory.Unit),
-                NodeLayoutKind.Treemap => new TreemapLayout(GroundLevel, 1000.0f * NodeFactory.Unit, 1000.0f * NodeFactory.Unit),
+                NodeLayoutKind.Manhattan => new ManhattanLayout(GroundLevel),
+                NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(GroundLevel),
+                NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(GroundLevel),
+                NodeLayoutKind.Treemap => new TreemapLayout(GroundLevel, parent.transform.lossyScale.x, parent.transform.lossyScale.z),
                 NodeLayoutKind.Balloon => new BalloonNodeLayout(GroundLevel),
                 NodeLayoutKind.CirclePacking => new CirclePackingNodeLayout(GroundLevel),
-                NodeLayoutKind.CompoundSpringEmbedder => new CoseLayout(GroundLevel, settings),
-                NodeLayoutKind.FromFile => new LoadedNodeLayout(GroundLevel, settings.globalCityAttributes.layoutPath.Path),
-                _ => throw new Exception("Unhandled node layout " + settings.nodeLayoutSettings.kind)
+                NodeLayoutKind.CompoundSpringEmbedder => new CoseLayout(GroundLevel, Settings),
+                NodeLayoutKind.FromFile => new LoadedNodeLayout(GroundLevel, Settings.NodeLayoutSettings.LayoutPath.Path),
+                _ => throw new Exception("Unhandled node layout " + Settings.NodeLayoutSettings.Kind)
             };
 
         /// <summary>
@@ -933,7 +656,7 @@ namespace SEE.Game
         /// <returns>a new plane</returns>
         public GameObject DrawPlane(Vector2 leftFrontCorner, Vector2 rightBackCorner, float yLevel)
         {
-            return PlaneFactory.NewPlane(ShaderType, leftFrontCorner, rightBackCorner, yLevel, Color.gray, LevelDistance);
+            return PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, yLevel, LevelDistance);
         }
 
         /// <summary>
@@ -971,7 +694,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="child">child to be added</param>
         /// <param name="parent">new parent of child</param>
-        protected static void AddToParent(GameObject child, GameObject parent)
+        private static void AddToParent(GameObject child, GameObject parent)
         {
             child.transform.SetParent(parent.transform, true);
         }
@@ -981,7 +704,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="children">children to be added</param>
         /// <param name="parent">new parent of children</param>
-        protected static void AddToParent(ICollection<GameObject> children, GameObject parent)
+        private static void AddToParent(ICollection<GameObject> children, GameObject parent)
         {
             foreach (GameObject child in children)
             {
@@ -990,113 +713,14 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Adds decoration for the given <paramref name="gameNode"/> with the global settings
-        /// for inner node kinds and nodelayout.
-        /// </summary>
-        /// <param name="gameNode"></param>
-        protected void AddDecorations(GameObject gameNode)
-        {
-            AddDecorations(new List<GameObject> { gameNode });
-        }
-
-        /// <summary>
-        /// Adds decoration for the given list of <paramref name="gameNodes"/> with the global settings
-        /// for inner node kinds and nodelayout.
-        /// </summary>
-        /// <param name="gameNodes">a list with gamenode objects</param>
-        protected void AddDecorations(ICollection<GameObject> gameNodes)
-        {
-            // FIXME the decorations must be added for every kind separately. currently, the kind
-            // at index '0' is used, which is not correct
-            AddDecorations(gameNodes, settings.innerNodeAttributesPerKind[0].kind, settings.nodeLayoutSettings.kind);
-        }
-
-        /// <summary>
-        /// Draws the decorations of the given game nodes.
-        /// </summary>
-        /// <param name="gameNodes">game nodes to be decorated</param>
-        /// <param name="innerNodeKinds">the inner node kinds for the gameobject</param>
-        /// <param name="nodeLayout">the nodeLayout used for this gameobject</param>
-        /// <returns>the game objects added for the decorations; may be an empty collection</returns>
-        private void AddDecorations(ICollection<GameObject> gameNodes, InnerNodeKinds innerNodeKinds, 
-                                    NodeLayoutKind nodeLayout)
-        {
-            InnerNodeFactory innerNodeFactory = innerNodeFactories[0];
-            NodeFactory leafNodeFactory = leafNodeFactories[0];
-            ICollection<GameObject> leafNodes = FindLeafNodes(gameNodes);
-            ICollection<GameObject> innerNodes = FindInnerNodes(gameNodes);
-
-            // Add software erosion decorators for all nodes if requested.
-            if (settings.nodeLayoutSettings.showInnerErosions)
-            {
-                ErosionIssues issueDecorator = new ErosionIssues(settings.InnerIssueMap(), innerNodeFactory, 
-                                                                 scaler, settings.nodeLayoutSettings.erosionScalingFactor);
-                issueDecorator.Add(innerNodes);
-            }
-            if (settings.nodeLayoutSettings.showLeafErosions)
-            {
-                ErosionIssues issueDecorator = new ErosionIssues(settings.LeafIssueMap(), leafNodeFactory,
-                                                                 scaler, settings.nodeLayoutSettings.erosionScalingFactor);
-                issueDecorator.Add(leafNodes);
-            }
-
-            // Add text labels for all inner nodes
-            if (nodeLayout == NodeLayoutKind.Balloon || nodeLayout == NodeLayoutKind.EvoStreets)
-            {
-                AddLabels(innerNodes, innerNodeFactory);
-            }
-
-            // Add decorators specific to the shape of inner nodes (circle decorators for circles
-            // and donut decorators for donuts).
-
-            switch (innerNodeKinds)
-            {
-                case InnerNodeKinds.Empty:
-                    // do nothing
-                    break;
-                case InnerNodeKinds.Circles:
-                    {
-                        // We want to adjust the size and the line width of the circle line created by the CircleFactory.
-                        CircleDecorator decorator = new CircleDecorator(innerNodeFactory, Color.white);
-                        decorator.Add(innerNodes);
-                    }
-                    break;
-                case InnerNodeKinds.Rectangles:
-                    {
-                        // We want to adjust the line width of the rectangle line created by the RectangleFactory.
-                        RectangleDecorator decorator = new RectangleDecorator(innerNodeFactory, Color.white);
-                        decorator.Add(innerNodes);
-                    }
-                    break;
-                case InnerNodeKinds.Donuts:
-                    {
-                        DonutDecorator decorator = new DonutDecorator(innerNodeFactory, scaler, settings.InnerDonutMetric,
-                                                                      settings.AllInnerNodeIssues().ToArray());
-                        // the circle segments and the inner circle for the donut are added as children by Add();
-                        // that is why we do not add the result to decorations.
-                        decorator.Add(innerNodes);
-                    }
-                    break;
-                case InnerNodeKinds.Cylinders:
-                    break;
-                case InnerNodeKinds.Blocks:
-                    // TODO
-                    break;
-                default:
-                    throw new InvalidOperationException("Unhandled GraphSettings.InnerNodeKinds "
-                                                        + $"{settings.innerNodeAttributesPerKind[0].kind}");
-            }
-        }
-
-        /// <summary>
         /// Transforms the given <paramref name="gameNodes"/> to a collection of LayoutNodes.
         /// Sets the node levels of all <paramref name="gameNodes"/>.
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        public ICollection<GameNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
+        public ICollection<LayoutGameNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
         {
-            return ToLayoutNodes(gameObjects, leafNodeFactories, innerNodeFactories, to_layout_node);
+            return ToLayoutNodes(gameObjects, toLayoutNode);
         }
 
         /// <summary>
@@ -1105,20 +729,20 @@ namespace SEE.Game
         /// <param name="nodeMap">mapping between nodes and gameobjects</param>
         /// <param name="sublayoutNodes">a collection with sublayoutNodes</param>
         /// <returns></returns>
-        private ICollection<GameNode> ToLayoutNodes(Dictionary<Node, GameObject> nodeMap, IEnumerable<SublayoutNode> sublayoutNodes)
+        private ICollection<LayoutGameNode> ToLayoutNodes(Dictionary<Node, GameObject> nodeMap, IEnumerable<SublayoutNode> sublayoutNodes)
         {
-            List<GameNode> layoutNodes = new List<GameNode>();
+            List<LayoutGameNode> layoutNodes = new List<LayoutGameNode>();
             List<GameObject> remainingGameobjects = nodeMap.Values.ToList();
 
             foreach (SublayoutNode sublayoutNode in sublayoutNodes)
             {
                 ICollection<GameObject> gameObjects = new List<GameObject>();
                 sublayoutNode.Nodes.ForEach(node => gameObjects.Add(nodeMap[node]));
-                layoutNodes.AddRange(ToLayoutNodes(gameObjects, leafNodeFactories, innerNodeFactories, to_layout_node));
+                layoutNodes.AddRange(ToLayoutNodes(gameObjects, toLayoutNode));
                 remainingGameobjects.RemoveAll(gameObject => gameObjects.Contains(gameObject));
             }
 
-            layoutNodes.AddRange(ToLayoutNodes(remainingGameobjects, leafNodeFactories, innerNodeFactories, to_layout_node));
+            layoutNodes.AddRange(ToLayoutNodes(remainingGameobjects, toLayoutNode));
 
             return layoutNodes;
         }
@@ -1126,46 +750,29 @@ namespace SEE.Game
         /// <summary>
         /// Transforms the given <paramref name="gameNodes"/> to a collection of LayoutNodes.
         /// Sets the node levels of all <paramref name="gameNodes"/>.
+        /// Any game objects in <paramref name="gameNodes"/> with an invalid node reference will be skipped.
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
-        /// <param name="leafNodeFactory">the leaf node factory that created the leaf nodes in <paramref name="gameNodes"/></param>
-        /// <param name="innerNodeFactory">the inner node factory that created the inner nodes in <paramref name="gameNodes"/></param>
-        /// <param name="to_layout_node">a mapping from graph nodes onto their corresponding layout node</param>
+        /// <param name="toLayoutNode">a mapping from graph nodes onto their corresponding layout node</param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        private static ICollection<GameNode> ToLayoutNodes
-            (ICollection<GameObject> gameNodes, IReadOnlyList<NodeFactory> leafNodeFactories,
-            IReadOnlyList<NodeFactory> innerNodeFactories, Dictionary<Node, ILayoutNode> to_layout_node)
+        private ICollection<LayoutGameNode> ToLayoutNodes
+            (ICollection<GameObject> gameNodes,
+             Dictionary<Node, ILayoutNode> toLayoutNode)
         {
-            IList<GameNode> result = new List<GameNode>(gameNodes.Count);
+            IList<LayoutGameNode> result = new List<LayoutGameNode>(gameNodes.Count);
 
             foreach (GameObject gameObject in gameNodes)
             {
                 Node node = gameObject.GetComponent<NodeRef>().Value;
-                NodeFactory factory = (node.IsLeaf() ? leafNodeFactories : innerNodeFactories)[(int) node.Domain];
-                result.Add(new GameNode(to_layout_node, gameObject, factory));
+                if (node == null)
+                {
+                    Debug.LogWarning($"Node {gameObject} has an invalid node reference and will be skipped!\n");
+                    continue;
+                }
+                result.Add(new LayoutGameNode(toLayoutNode, gameObject, nodeTypeToFactory[node.Type]));
             }
             LayoutNodes.SetLevels(result.Cast<ILayoutNode>().ToList());
             return result;
-        }
-
-        /// <summary>
-        /// Adds the source name as a label to the center of the given game nodes as a child.
-        /// </summary>
-        /// <param name="gameNodes">game nodes whose source name is to be added</param>
-        /// <param name="innerNodeFactory">inner node factory</param>
-        /// <returns>the game objects created for the text labels</returns>
-        /// <returns>the game objects created for the text labels</returns>
-        private static void AddLabels(IEnumerable<GameObject> gameNodes, NodeFactory innerNodeFactory)
-        {
-            foreach (GameObject node in gameNodes)
-            {
-                Vector3 size = innerNodeFactory.GetSize(node);
-                float length = Mathf.Min(size.x, size.z);
-                // The text may occupy up to 30% of the length.
-                GameObject text = TextFactory.GetTextWithWidth(node.GetComponent<NodeRef>().Value.SourceName,
-                                                      node.transform.position, length * 0.3f);
-                text.transform.SetParent(node.transform);
-            }
         }
 
         /// <summary>
@@ -1197,338 +804,15 @@ namespace SEE.Game
         {
             Dictionary<Node, GameObject> result = new Dictionary<Node, GameObject>(nodes.Count);
 
-            for (int i = 0; i < nodes.Count; i++)
+            foreach (Node node in nodes)
             {
                 // We add only leaves.
-                if (nodes[i].IsLeaf())
+                if (node.IsLeaf())
                 {
-                    result[nodes[i]] = DrawLeafNode(nodes[i]);
+                    result[node] = DrawNode(node);
                 }
             }
             return result;
-        }
-
-        /// <summary>
-        /// Create and returns a new game object for representing the given <paramref name="node"/>.
-        /// The exact kind of representation depends upon the leaf-node factory. The node is
-        /// scaled according to the WidthMetric, HeightMetric, and DepthMetric of the current settings.
-        /// Its style is determined by LeafNodeStyleMetric (linerar interpolation of a color gradient).
-        /// The <paramref name="node"/> is attached to that new game object via a NodeRef component.
-        ///
-        /// Precondition: <paramref name="node"/> must be a leaf node in the node hierarchy.
-        /// </summary>
-        /// <param name="node">leaf node</param>
-        /// <returns>game object representing given <paramref name="node"/></returns>
-        public GameObject DrawLeafNode(Node node)
-        {
-            Assert.IsTrue(node.ItsGraph.MaxDepth >= 0, "Graph of node " + node.ID + " has negative depth");
-
-            // The deeper the node in the node hierarchy (quantified by a node's level), the
-            // later it should be drawn, or in other words, the higher its offset in the
-            // render queue should be. We are assuming that the nodes are stacked on each
-            // other according to the node hierarchy. Leaves are on top of all other nodes.
-            // That is why we put them at the highest necessary rendering queue offset.
-
-            int style = SelectStyle(node);
-            GameObject result = leafNodeFactories[(int)node.Domain].NewBlock(style, node.ItsGraph.MaxDepth);
-            result.name = node.ID;
-            result.tag = Tags.Node;
-            result.AddComponent<NodeRef>().Value = node;
-            AdjustScaleOfLeaf(result);
-            AddLOD(result);
-            InteractionDecorator.PrepareForInteraction(result);
-            return result;
-        }
-
-        /// <summary>
-        /// Adds a LOD group to <paramref name="gameObject"/> with only a single LOD.
-        /// This is used to cull the object if it gets too small. The percentage
-        /// by which to cull is retrieved from <see cref="settings.LODCulling"/>
-        /// </summary>
-        /// <param name="gameObject">object where to add the LOD group</param>
-        private void AddLOD(GameObject gameObject)
-        {
-            LODGroup lodGroup = gameObject.AddComponent<LODGroup>();
-            // Only a single LOD: we either or cull.
-            LOD[] lods = new LOD[1];
-            Renderer[] renderers = new Renderer[1];
-            renderers[0] = gameObject.GetComponent<Renderer>();
-            lods[0] = new LOD(settings.globalCityAttributes.lodCulling, renderers);
-            lodGroup.SetLODs(lods);
-            lodGroup.RecalculateBounds();
-        }
-
-        /// <summary>
-        /// Applies AddLOD to every game object in <paramref name="gameObjects"/>.
-        /// </summary>
-        /// <param name="gameObjects">the list of game objects where AddLOD is to be applied</param>
-        private void AddLOD(ICollection<GameObject> gameObjects)
-        {
-            foreach (GameObject go in gameObjects)
-            {
-                AddLOD(go);
-            }
-        }
-
-        /// <summary>
-        /// Returns a style index as a linear interpolation of X for range [0..M-1]
-        /// where M is the number of available styles of the leafNodeFactory (if
-        /// the node is a leaf) or innerNodeFactory (if it is an inner node)
-        /// and X = C / metricMaximum and C is as follows:
-        /// Let M be the metric selected for the style metric (the style metric
-        /// for leaves if <paramref name="node"/> is a leaf or for an inner node
-        /// otherwise). M can be either the name of a node metric or a number.
-        /// If M is the name of a node metric, C is the normalized metric value of
-        /// <paramref name="node"/> for the attribute chosen for the style
-        /// and metricMaximum is the maximal value of the style metric. If M is
-        /// instead a number, C is that value -- clamped into [0, S] where S is
-        /// the maximal number of styles available) and metricMaximum is S.
-        /// </summary>
-        /// <param name="node">node for which to determine the style index</param>
-        /// <returns>style index</returns>
-        private int SelectStyle(Node node)
-        {
-            bool isLeaf = node.IsLeaf();
-            NodeFactory nodeFactory = isLeaf ? leafNodeFactories[(int)node.Domain]
-                                             : innerNodeFactories[(int)node.Domain];
-            uint numberOfStyles = nodeFactory.NumberOfStyles();
-            string styleMetric = isLeaf ? settings.leafNodeAttributesPerKind[(int)node.Domain].styleMetric
-                                        : settings.innerNodeAttributesPerKind[(int)node.Domain].styleMetric;
-
-            float metricMaximum;
-            if (TryGetFloat(styleMetric, out float value))
-            {
-                // The styleMetric name is actually a constant number.
-                metricMaximum = numberOfStyles;
-                value = Mathf.Clamp(value, 0.0f, metricMaximum);
-            }
-            else
-            {
-                metricMaximum = scaler.GetNormalizedMaximum(styleMetric);
-                value = scaler.GetNormalizedValue(styleMetric, node);
-                Assert.IsTrue(value <= metricMaximum);
-            }
-            return Mathf.RoundToInt(Mathf.Lerp(0.0f, numberOfStyles - 1, value / metricMaximum));
-        }
-
-        /// <summary>
-        /// Tries to parse <paramref name="floatString"/> as a floating point number.
-        /// Upon success, its value is return in <paramref name="value"/> and true
-        /// is returned. Otherwise false is returned and <paramref name="value"/>
-        /// is undefined.
-        /// </summary>
-        /// <param name="floatString">string to be parsed for a floating point number</param>
-        /// <param name="value">parsed floating point value; defined only if this method returns true</param>
-        /// <returns>true if a floating point number could be parsed successfully</returns>
-        private bool TryGetFloat(string floatString, out float value)
-        {
-            try
-            {
-                value = float.Parse(floatString, CultureInfo.InvariantCulture.NumberFormat);
-                return true;
-            }
-            catch (FormatException)
-            {
-                value = 0.0f;
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Returns the center of the roof of the given <paramref name="gameNode"/>.
-        ///
-        /// Precondition: <paramref name="gameNode"/> must have been created by this graph renderer.
-        /// </summary>
-        /// <param name="gameNode">game node for which to determine the roof position</param>
-        /// <returns>roof position</returns>
-        internal Vector3 GetRoof(GameObject gameNode)
-        {
-            NodeRef noderef = gameNode.GetComponent<NodeRef>();
-            if (noderef == null)
-            {
-                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
-            }
-
-            Node node = noderef.Value;
-            if (node.IsLeaf())
-            {
-                return leafNodeFactories[(int)node.Domain].Roof(gameNode);
-            }
-            else
-            {
-                return innerNodeFactories[(int)node.Domain].Roof(gameNode);
-            }
-        }
-
-        /// <summary>
-        /// Returns the scale of the given <paramref name="gameNode"/>.
-        ///
-        /// Precondition: <paramref name="gameNode"/> must have been created by this graph renderer.
-        /// </summary>
-        /// <param name="gameNode"></param>
-        /// <returns>scale of <paramref name="gameNode"/></returns>
-        internal Vector3 GetSize(GameObject gameNode)
-        {
-            NodeRef noderef = gameNode.GetComponent<NodeRef>();
-            if (noderef == null)
-            {
-                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
-            }
-            Node node = noderef.Value;
-            if (node.IsLeaf())
-            {
-                return leafNodeFactories[(int)node.Domain].GetSize(gameNode);
-            }
-            else
-            {
-                return innerNodeFactories[(int)node.Domain].GetSize(gameNode);
-            }
-        }
-
-        /// <summary>
-        /// Adjusts the height (y axis) of the given <paramref name="gameNode"/> according
-        /// to the InnerNodeHeightMetric.
-        ///
-        /// Precondition: <paramref name="gameNode"/> must denote an inner node created
-        /// by innerNodeFactory.
-        /// </summary>
-        /// <param name="gameNode">inner node whose height is to be set</param>
-        private void AdjustHeightOfInnerNode(GameObject gameNode)
-        {
-            NodeRef noderef = gameNode.GetComponent<NodeRef>();
-            if (noderef == null)
-            {
-                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
-            }
-            else
-            {
-                Node node = noderef.Value;
-                float value = GetMetricValue(noderef.Value, settings.innerNodeAttributesPerKind[(int)node.Domain].heightMetric);
-                innerNodeFactories[(int)node.Domain].SetHeight(gameNode, value);
-            }
-        }
-
-        /// <summary>
-        /// Adjusts the style of the given <paramref name="gameNode"/> according
-        /// to the metric value of the graph node attached to <paramref name="gameNode"/>
-        /// chosen to determine style.
-        /// </summary>
-        /// <param name="gameNode">a game node representing a leaf or inner graph node</param>
-        public void AdjustStyle(GameObject gameNode)
-        {
-            NodeRef noderef = gameNode.GetComponent<NodeRef>();
-            if (noderef == null)
-            {
-                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
-            }
-
-            Node node = noderef.Value;
-            int style = SelectStyle(node);
-            if (node.IsLeaf())
-            {
-                leafNodeFactories[(int)node.Domain].SetStyle(gameNode, style);
-            }
-            else
-            {
-                innerNodeFactories[(int)node.Domain].SetStyle(gameNode, style); // TODO: for some reason, the material is selected twice. once here and once somewhere earlier (i believe in NewBlock somewhere).
-            }
-        }
-
-        /// <summary>
-        /// Adjusts the scale of the given leaf <paramref name="gameNode"/> according
-        /// to the metric values of the <paramref name="node"/> attached to
-        /// <paramref name="gameNode"/>.
-        /// The scale of a leaf is determined by the node's width, height, and depth
-        /// metrics (which are determined by the settings).
-        /// Precondition: A graph node is attached to <paramref name="gameNode"/>
-        /// and has the width, height, and depth metrics set and is a leaf.
-        /// </summary>
-        /// <param name="gameNode">the game object whose visual attributes are to be adjusted</param>
-        public void AdjustScaleOfLeaf(GameObject gameNode)
-        {
-            NodeRef nodeRef = gameNode.GetComponent<NodeRef>();
-            if (nodeRef == null)
-            {
-                throw new Exception("Game object " + gameNode.name + " does not have a graph node attached to it.");
-            }
-
-            Node node = nodeRef.Value;
-            if (node.IsLeaf())
-            {
-                // Scaled metric values for the three dimensions.
-                Vector3 scale = GetScale(node);
-
-                // Scale according to the metrics.
-                if (settings.nodeLayoutSettings.kind == NodeLayoutKind.Treemap)
-                {
-                    // FIXME: This is ugly. The graph renderer should not need to care what
-                    // kind of layout was applied.
-                    // In case of treemaps, the width metric is mapped on the ground area.
-                    float widthOfSquare = Mathf.Sqrt(scale.x);
-                    leafNodeFactories[(int)node.Domain].SetWidth(gameNode, NodeFactory.Unit * widthOfSquare);
-                    leafNodeFactories[(int)node.Domain].SetDepth(gameNode, NodeFactory.Unit * widthOfSquare);
-                    leafNodeFactories[(int)node.Domain].SetHeight(gameNode, NodeFactory.Unit * scale.y);
-                }
-                else
-                {
-                    gameNode.transform.localScale = NodeFactory.Unit * scale;
-                }
-            }
-            else
-            {
-                throw new Exception("Game object " + gameNode.name + " is not a leaf.");
-            }
-        }
-
-        /// <summary>
-        /// Returns the scale of the given <paramref name="node"/> as requested by the user's
-        /// settings, i.e., what the use specified for the width, height, and depth of nodes.
-        /// </summary>
-        /// <param name="node"></param>
-        /// <returns>requested absolute scale in world space</returns>
-        private Vector3 GetScale(Node node)
-        {
-            int index = (int)node.Domain;
-            LeafNodeAttributes attribs = settings.leafNodeAttributesPerKind[index];
-            return new Vector3(GetMetricValue(node, attribs.widthMetric),
-                               GetMetricValue(node, attribs.heightMetric),
-                               GetMetricValue(node, attribs.depthMetric));
-        }
-
-        /// <summary>
-        /// If <paramref name="metricName"/> is the name of a metric, the corresponding
-        /// normalized value for <paramref name="node"/> is returned. If <paramref name="metricName"/>
-        /// can be parsed as a number instead, the parsed number is returned.
-        /// </summary>
-        /// <param name="node">node whose metric is to be returned</param>
-        /// <param name="metricName">the name of a node metric or a number</param>
-        /// <returns>the value of <paramref name="node"/>'s metric <paramref name="metricName"/></returns>
-        private float GetMetricValue(Node node, string metricName)
-        {
-            if (TryGetFloat(metricName, out float value))
-            {
-                return value;
-            }
-            return scaler.GetNormalizedValue(metricName, node);
-        }
-
-        /// <summary>
-        /// Adjusts the scale of every node of every kind of node, such that the maximal extent
-        /// of each node is one.
-        /// </summary>
-        /// <param name="nodeMap">The nodes to scale.</param>
-        private static void AdjustScaleBetweenNodeKinds(Dictionary<Node, GameObject> nodeMap)
-        {
-            for (int i = 0; i < (int)Node.NodeDomain.Count; i++)
-            {
-                Vector3 denominator = Vector3.negativeInfinity;
-                IList<KeyValuePair<Node, GameObject>> nodeMapMatchingDomain = nodeMap.Where(x => (int)x.Key.Domain == i).ToList();
-                denominator = nodeMapMatchingDomain.Aggregate(denominator, (current, pair) => Vector3.Max(current, pair.Value.transform.localScale));
-                foreach (KeyValuePair<Node, GameObject> pair in nodeMapMatchingDomain)
-                {
-                    pair.Value.transform.localScale = pair.Value.transform.localScale.DividePairwise(denominator);
-                }
-            }
         }
 
         /// <summary>
@@ -1544,41 +828,9 @@ namespace SEE.Game
                 // We add only inner nodes.
                 if (!node.IsLeaf())
                 {
-                    GameObject innerGameObject = DrawInnerNode(node);
-                    nodeMap[node] = innerGameObject;
+                    nodeMap[node] = DrawNode(node);
                 }
             }
-        }
-
-        /// <summary>
-        /// Creates a new game object for an inner node using innerNodeFactory.
-        /// The inner <paramref name="node"/> is attached to that new game object
-        /// via a NodeRef component. The style and height of the resulting game
-        /// object are adjusted according to the selected InnerNodeStyleMetric
-        /// and InnerNodeHeightMetric, respectively. The other scale dimensions
-        /// are not changed.
-        ///
-        /// Precondition: <paramref name="node"/> must be an inner node of the node
-        /// hierarchy.
-        /// </summary>
-        /// <param name="node">graph node for which to create the game node</param>
-        /// <returns>new game object for the inner node</returns>
-        public GameObject DrawInnerNode(Node node)
-        {
-            // The deeper the node in the node hierarchy (quantified by a node's level), the
-            // later it should be drawn, or in other words, the higher its offset in the
-            // render queue should be. We are assuming that the nodes are stacked on each
-            // other according to the node hierarchy. Leaves are on top of all other nodes.
-
-            int style = SelectStyle(node);
-            GameObject result = innerNodeFactories[(int)node.Domain].NewBlock(style, node.Level);
-            result.name = node.ID;
-            result.tag = Tags.Node;
-            result.AddComponent<NodeRef>().Value = node;
-            AdjustHeightOfInnerNode(result);
-            AddLOD(result);
-            InteractionDecorator.PrepareForInteraction(result);
-            return result;
         }
 
         /// <summary>
@@ -1601,11 +853,9 @@ namespace SEE.Game
 
                 foreach (GameObject go in gameNodes)
                 {
-                    Node node = go.GetComponent<NodeRef>().Value;
-
-                    Vector3 extent = node.IsLeaf() ? leafNodeFactories[(int)node.Domain].GetSize(go) / 2.0f : innerNodeFactories[(int)node.Domain].GetSize(go) / 2.0f;
-                    // Note: position denotes the center of the object
-                    Vector3 position = node.IsLeaf() ? leafNodeFactories[(int)node.Domain].GetCenterPosition(go) : innerNodeFactories[(int)node.Domain].GetCenterPosition(go);
+                    Vector3 extent = go.transform.lossyScale / 2.0f;
+                    // Note: position denotes the center of the object in world space
+                    Vector3 position = go.transform.position;
                     {
                         // x co-ordinate of lower left corner
                         float x = position.x - extent.x;
@@ -1719,16 +969,15 @@ namespace SEE.Game
                     }
                     else
                     {
-                        throw new Exception("Code city " + codeCity.name + " has multiple children tagged by " + Tags.Node
-                            + ": " + result.name + " and " + child.name);
+                        throw new Exception($"Code city {codeCity.name} has multiple children tagged by {Tags.Node}"
+                            + $": {result.name} and {child.name}");
                     }
                 }
             }
             if (result == null)
             {
-                throw new Exception("Code city " + codeCity.name + " has no child tagged by " + Tags.Node);
+                throw new Exception($"Code city {codeCity.name} has no child tagged by {Tags.Node}");
             }
-
             return result;
         }
     }

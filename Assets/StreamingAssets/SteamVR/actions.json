@@ -85,6 +85,11 @@
       "type": "boolean"
     },
     {
+      "name": "/actions/default/in/OpenSettingsMenu",
+      "type": "boolean",
+      "requirement": "suggested"
+    },
+    {
       "name": "/actions/default/out/Haptic",
       "type": "vibration"
     }
@@ -155,7 +160,8 @@
       "/actions/default/in/CreateChart": "Create Chart",
       "/actions/default/in/RGrip": "RGrip",
       "/actions/default/in/LGrip": "LGrip",
-      "/actions/default/in/GrabGrip": "Grab Grip"
+      "/actions/default/in/GrabGrip": "Grab Grip",
+      "/actions/default/in/OpenSettingsMenu": "Open Settings Menu"
     }
   ]
 }

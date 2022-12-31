@@ -1,22 +1,31 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
+using Dissonance;
 using NetworkCommsDotNet;
 using NetworkCommsDotNet.Connections;
-using SEE.Game;
+using SEE.Game.City;
+using SEE.GO;
 using SEE.Net.Util;
+using SEE.Utils;
+using Sirenix.OdinInspector;
+using Unity.Netcode;
+using Unity.Netcode.Transports.UNET;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.SceneManagement;
 
 namespace SEE.Net
 {
     /// <summary>
     /// Handles the most general parts of networking.
     /// </summary>
+    [Serializable]
     public class Network : MonoBehaviour
     {
         /// <summary>
@@ -25,99 +34,196 @@ namespace SEE.Net
         private const NetworkCommsLogger.Severity DefaultSeverity = NetworkCommsLogger.Severity.High;
 
         /// <summary>
-        /// The instance of the network.
+        /// The single unique instance of the network.
         /// </summary>
-        private static Network instance;
+        public static Network Instance { get; private set; }
 
         /// <summary>
-        /// Whether the game is used in offline mode.
+        /// The maximal port number.
         /// </summary>
-        [SerializeField] private bool useInOfflineMode = true;
+        private const int MaxServerPort = 65535;
 
         /// <summary>
-        /// Whether this clients hosts the server. Is ignored in offline mode.
+        /// The port of the server where the server listens to SEE action requests.
+        /// Note: This field is accessed in NetworkEditor, hence, the name must not change.
         /// </summary>
-        [SerializeField] private bool hostServer = false;
+        [Range(0, MaxServerPort), Tooltip("The TCP port of the server where it listens to SEE actions.")]
+        public int ServerActionPort = 12345;
 
         /// <summary>
-        /// The remote IP-address of the server. Is empty, if this client hosts the
-        /// server.
+        /// The UDP port where the server listens to NetCode and Dissonance traffic.
+        /// Valid range is [0, 65535].
         /// </summary>
-        [SerializeField] private string remoteServerIPAddress = string.Empty;
+        public int ServerPort
+        {
+            set
+            {
+                if (value < 0 || value > MaxServerPort)
+                {
+                    throw new ArgumentOutOfRangeException($"A port must be in [0..{MaxServerPort}. Received: {value}.");
+                }
+                UNetTransport netTransport = GetNetworkTransport();
+                netTransport.ConnectPort = value;
+                netTransport.ServerListenPort = value;
+
+            }
+            get
+            {
+                UNetTransport netTransport = GetNetworkTransport();
+                return netTransport.ServerListenPort;
+            }
+        }
 
         /// <summary>
-        /// The port of the server. Is ignored, if this host does not host the server.
+        /// Returns the underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/>.
+        /// This information is retrieved differently depending upon whether we are running
+        /// in the editor or in game play because <see cref="NetworkManager.Singleton"/> is
+        /// available only during run-time.
         /// </summary>
-        [SerializeField] private int localServerPort = 55555;
+        /// <returns>underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/></returns>
+        private UNetTransport GetNetworkTransport()
+        {
+            NetworkManager networkManager = GetNetworkManager();
+            NetworkConfig networkConfig = networkManager.NetworkConfig;
+            if (networkConfig == null)
+            {
+                Debug.LogError("NetworkManager.Singleton has no valid NetworkConfig.\n");
+                return null;
+            }
+            return networkConfig.NetworkTransport as UNetTransport;
+        }
 
         /// <summary>
-        /// The port of the remote server. Is ignored, if this client hosts the server.
+        /// Returns the <see cref="NetworkManager"/>.
         /// </summary>
-        [SerializeField] private int remoteServerPort = 0;
+        /// <returns>the <see cref="NetworkManager"/></returns>
+        /// <remarks>This method works both in the editor and at runtime. In the editor,
+        /// a NetworkManager is retrieved from a game object. It that fails, an exception
+        /// is thrown.</remarks>
+        private static NetworkManager GetNetworkManager()
+        {
+#if UNITY_EDITOR
+            const string NetworkManagerName = "NetworkManager";
+            GameObject networkManagerGO = GameObject.Find(NetworkManagerName);
+            if (networkManagerGO == null)
+            {
+                throw new Exception($"The scene currently opened in the editor does not have a game object {NetworkManagerName}.");
+            }
+            if (networkManagerGO.TryGetComponentOrLog(out NetworkManager result))
+            {
+                return result;
+            }
+            else
+            {
+                throw new Exception($"The game object {NetworkManagerName} in the scene currently opened in the editor does not have a component {nameof(NetworkManager)}.");
+            }
+#else
+            // NetworkManager.Singleton is available only during run-time.
+            if (NetworkManager.Singleton)
+            {
+                return NetworkManager.Singleton;
+            }
+            else
+            {
+                throw new Exception($"{nameof(NetworkManager)} does not exist.");
+            }
+#endif
+        }
+
+        /// <summary>
+        /// The IP4 address of the server.
+        /// </summary>
+        public string ServerIP4Address
+        {
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentOutOfRangeException($"Invalid server IP address: {value}.");
+                }
+                UNetTransport netTransport = GetNetworkTransport();
+                netTransport.ConnectAddress = value;
+            }
+
+            get
+            {
+                UNetTransport netTransport = GetNetworkTransport();
+                return netTransport.ConnectAddress;
+            }
+        }
+
+        /// <summary>
+        /// The name of the scene to be loaded when the game starts.
+        /// </summary>
+        [Tooltip("The name of the game scene.")]
+        public string GameScene = "SEEWorld";
 
         /// <summary>
         /// Whether the city should be loaded on start up. Is ignored, if this client
         /// does not host the server.
+        ///
+        /// FIXME: This is currently not supported. That is why we hide it in the Inspector.
         /// </summary>
-        [SerializeField] private bool loadCityOnStart = false;
+        [SerializeField, HideInInspector] private bool loadCityOnStart = false;
 
 #if UNITY_EDITOR
+
         /// <summary>
-        /// Whether the logging of NetworkComms should be enabled.
+        /// Name of the Inspector foldout group for the logging setttings.
         /// </summary>
-        [SerializeField] private bool networkCommsLoggingEnabled = false;
+        private const string LoggingFoldoutGroup = "Logging";
 
         /// <summary>
         /// Whether the internal logging should be enabled.
         /// </summary>
-        [SerializeField] private bool internalLoggingEnabled = true;
+        [SerializeField, FoldoutGroup(LoggingFoldoutGroup)]
+        [PropertyTooltip("Whether the network logging should be enabled.")]
+        private bool internalLoggingEnabled = true;
 
         /// <summary>
         /// The minimal logged severity.
         /// </summary>
-        [SerializeField] private NetworkCommsLogger.Severity minimalSeverity = DefaultSeverity;
+        [SerializeField, FoldoutGroup(LoggingFoldoutGroup)]
+        [PropertyTooltip("The minimal logged severity.")]
+        private NetworkCommsLogger.Severity minimalSeverity = DefaultSeverity;
+
+        /// <summary>
+        /// Whether the logging of NetworkComms should be enabled.
+        /// </summary>
+        [SerializeField, FoldoutGroup(LoggingFoldoutGroup), LabelText("NetworkComms Logging")]
+        [PropertyTooltip("Whether the NetworkComms logging should be enabled. NetworkComms is the third-party network component used by SEE.")]
+        private bool networkCommsLoggingEnabled = false;
+
 #endif
 
         /// <summary>
         /// Submitted packets, that will be sent in the next <see cref="LateUpdate"/>.
         /// </summary>
-        private readonly Dictionary<Connection, List<string>> submittedSerializedPackets = new Dictionary<Connection, List<string>>();
+        private readonly Dictionary<Connection, List<string>> submittedSerializedPackets
+            = new Dictionary<Connection, List<string>>();
 
         /// <summary>
-        /// <see cref="useInOfflineMode"/>
+        /// True if we are running a host or server.
         /// </summary>
-        public static bool UseInOfflineMode => instance ? instance.useInOfflineMode : true;
+        public static bool HostServer => NetworkManager.Singleton != null
+            && (NetworkManager.Singleton.IsHost || NetworkManager.Singleton.IsServer);
 
         /// <summary>
-        /// <see cref="hostServer"/>
+        /// The IP address of the host or server, respectively; the empty string
+        /// if none is set.
         /// </summary>
-        public static bool HostServer => instance ? instance.hostServer : false;
-
-        /// <summary>
-        /// <see cref="remoteServerIPAddress"/>
-        /// </summary>
-        public static string RemoteServerIPAddress => instance ? instance.remoteServerIPAddress : string.Empty;
-
-        /// <summary>
-        /// <see cref="localServerPort"/>
-        /// </summary>
-        public static int LocalServerPort => instance ? instance.localServerPort : -1;
-
-        /// <summary>
-        /// <see cref="remoteServerPort"/>
-        /// </summary>
-        public static int RemoteServerPort => instance ? instance.remoteServerPort : -1;
+        public static string RemoteServerIPAddress => NetworkManager.Singleton.GetComponent<UNetTransport>().ConnectAddress;
 
         /// <summary>
         /// <see cref="loadCityOnStart"/>
         /// </summary>
-        public static bool LoadCityOnStart => instance && instance.loadCityOnStart;
+        public static bool LoadCityOnStart => Instance && Instance.loadCityOnStart;
 
 #if UNITY_EDITOR
         /// <summary>
         /// <see cref="internalLoggingEnabled"/>
         /// </summary>
-        public static bool InternalLoggingEnabled => instance && instance.internalLoggingEnabled;
+        public static bool InternalLoggingEnabled => Instance && Instance.internalLoggingEnabled;
 #endif
 
         /// <summary>
@@ -139,70 +245,118 @@ namespace SEE.Net
             }
             private set
             {
-                Assert.IsNull(mainThread, "The main Unity thread has already been determined!");
                 Assert.IsNotNull(value, "The main Unity thread must not be null!");
-                mainThread = value;
+                if (mainThread != value)
+                {
+                    Assert.IsNull(mainThread, "The main Unity thread has already been determined!");
+                    mainThread = value;
+                }
             }
         }
 
         /// <summary>
-        /// List of dead connections. Is packets can not be sent, this list is searched
+        /// List of dead connections. If packets cannot be sent, this list is searched
         /// to reduce the frequency of warning messages.
         /// </summary>
         private static readonly List<Connection> deadConnections = new List<Connection>();
 
-        /// <summary>
-        /// Initializes the server, client and game.
-        /// </summary>
         private void Awake()
         {
-            if (instance)
-            {
-                Util.Logger.LogError("There must not be more than one Network component! This component will be destroyed!");
-                Destroy(this);
-                return;
-            }
-
-            instance = this;
-
             /// The field <see cref="MainThread"/> is supposed to denote Unity's main thread.
             /// The <see cref="Awake"/> function is guaranteed to be executed by Unity's main
-            /// thread, that is, <see cref="Thread.CurrentThread"/> represents Unity's 
+            /// thread, that is, <see cref="Thread.CurrentThread"/> represents Unity's
             /// main thread here.
             MainThread = Thread.CurrentThread;
 
-            if (!useInOfflineMode)
+            Load();
+        }
+
+        /// <summary>
+        /// Makes sure that we have only one <see cref="Instance"/>.
+        /// </summary>
+        private void Start()
+        {
+            if (Instance)
             {
+                if (Instance != this)
+                {
+                    Util.Logger.LogWarning("There must not be more than one Network component! "
+                        + $"The component {typeof(Network)} in {Instance.gameObject.FullName()} will be destroyed!\n");
+                }
+            }
+            Instance = this;
+
+            NetworkManager.Singleton.OnServerStarted += OnServerStarted;
+        }
+
+        /// <summary>
+        /// Initializes the server, client and game.
+        /// </summary>
+        private void StartUp()
+        {
 #if UNITY_EDITOR
-                if (networkCommsLoggingEnabled)
-                {
-                    NetworkComms.EnableLogging(new NetworkCommsLogger(minimalSeverity));
-                }
-                else
-                {
-                    NetworkComms.DisableLogging();
-                }
+            if (networkCommsLoggingEnabled)
+            {
+                NetworkComms.EnableLogging(new NetworkCommsLogger(minimalSeverity));
+            }
+            else
+            {
+                NetworkComms.DisableLogging();
+            }
 #else
                 NetworkComms.DisableLogging();
 #endif
 
-                try
-                {
-                    if (hostServer)
-                    {
-                        Server.Initialize();
-                    }
-                    Client.Initialize();
-                    VivoxInitialize();
-                }
-                catch (Exception e)
-                {
-                    Util.Logger.LogError("Some network-error happened! Continuing in offline mode...\nException: " + e);
-                    useInOfflineMode = true;
-                }
+            if (HostServer)
+            {
+                Server.Initialize();
             }
+            Client.Initialize();
 
             InitializeGame();
+        }
+
+        /// <summary>
+        /// Starts the selected voice chat system according to <see cref="VoiceChat"/>.
+        /// </summary>
+        private void StartVoiceChat()
+        {
+            switch (VoiceChat)
+            {
+                case VoiceChatSystems.Vivox:
+                    EnableDissonance(false);
+                    VivoxInitialize();
+                    break;
+                case VoiceChatSystems.Dissonance:
+                    EnableDissonance(true);
+                    break;
+                case VoiceChatSystems.None:
+                    EnableDissonance(false);
+                    break;
+                default:
+                    EnableDissonance(false);
+                    throw new NotImplementedException($"Unhanded voice chat option {VoiceChat}.");
+            }
+        }
+
+        /// <summary>
+        /// Enables/disables Dissonance as the voice chat system.
+        /// </summary>
+        /// <param name="enable">whether to enable Dissonance</param>
+        private void EnableDissonance(bool enable)
+        {
+            // The DissonanceComms is initially active and the local player is not muted and not deafened.
+            DissonanceComms dissonanceComms = FindObjectOfType<DissonanceComms>(includeInactive: true);
+            if (dissonanceComms != null)
+            {
+                dissonanceComms.IsMuted = !enable;
+                dissonanceComms.IsDeafened = !enable;
+                dissonanceComms.enabled = enable;
+            }
+            else
+            {
+                Debug.LogError($"There is no {typeof(DissonanceComms)} in the current scene.\n");
+            }
         }
 
         /// <summary>
@@ -210,7 +364,7 @@ namespace SEE.Net
         /// </summary>
         private void InitializeGame()
         {
-            if ((useInOfflineMode || hostServer) && loadCityOnStart)
+            if (HostServer && loadCityOnStart)
             {
                 foreach (AbstractSEECity city in FindObjectsOfType<AbstractSEECity>())
                 {
@@ -262,38 +416,34 @@ namespace SEE.Net
         /// </summary>
         private void LateUpdate()
         {
-            bool updateServer = hostServer && !useInOfflineMode;
-            if (updateServer)
+            if (HostServer)
             {
                 Server.Update();
             }
             Client.Update();
 
-            if (!useInOfflineMode)
+            if (submittedSerializedPackets.Count != 0)
             {
-                if (submittedSerializedPackets.Count != 0)
+                foreach (Connection connection in submittedSerializedPackets.Keys)
                 {
-                    foreach (Connection connection in submittedSerializedPackets.Keys)
+                    List<string> serializedObjects = submittedSerializedPackets[connection];
+
+                    if (serializedObjects.Count != 0)
                     {
-                        List<string> serializedObjects = submittedSerializedPackets[connection];
-
-                        if (serializedObjects.Count != 0)
+                        ulong id = ulong.MaxValue;
+                        if (HostServer && Server.Connections.Contains(connection))
                         {
-                            ulong id = ulong.MaxValue;
-                            if (updateServer && Server.Connections.Contains(connection))
-                            {
-                                id = Server.outgoingPacketSequenceIDs[connection]++;
-                            }
-                            else if (Client.Connection.Equals(connection))
-                            {
-                                id = Client.outgoingPacketID++;
-                            }
-                            Assert.IsTrue(id != ulong.MaxValue);
-
-                            PacketSequencePacket packet = new PacketSequencePacket(id, serializedObjects.ToArray());
-                            Send(connection, PacketSerializer.Serialize(packet));
-                            serializedObjects.Clear();
+                            id = Server.outgoingPacketSequenceIDs[connection]++;
                         }
+                        else if (Client.Connection.Equals(connection))
+                        {
+                            id = Client.outgoingPacketID++;
+                        }
+                        Assert.IsTrue(id != ulong.MaxValue);
+
+                        PacketSequencePacket packet = new PacketSequencePacket(id, serializedObjects.ToArray());
+                        Send(connection, PacketSerializer.Serialize(packet));
+                        serializedObjects.Clear();
                     }
                 }
             }
@@ -301,17 +451,18 @@ namespace SEE.Net
 
         /// <summary>
         /// Shuts down the server and the client.
+        /// This method is called only when this component is destroyed, which
+        /// may be at the very end of the game.
         /// </summary>
         private void OnDestroy()
         {
-            if (!useInOfflineMode)
-            {
-                if (hostServer)
-                {
-                    Server.Shutdown();
-                }
-                Client.Shutdown();
-            }
+            ShutdownNetwork();
+        }
+
+        private void ShutdownNetwork()
+        {
+            Server.Shutdown();
+            Client.Shutdown();
 
             // FIXME there must be a better way to stop the logging spam!
             string currentDirectory = Directory.GetCurrentDirectory();
@@ -338,54 +489,14 @@ namespace SEE.Net
                     }
                 }
             }
-        }
-
-
-
-        /// <summary>
-        /// Switches to offline mode.
-        /// </summary>
-        internal static void SwitchToOfflineMode()
-        {
-            if (instance)
-            {
-                foreach (ViewContainer viewContainer in FindObjectsOfType<ViewContainer>())
-                {
-                    if (!viewContainer.IsOwner())
-                    {
-                        Destroy(viewContainer.gameObject);
-                    }
-                }
-
-                instance.useInOfflineMode = true;
-
-                if (instance.hostServer)
-                {
-                    try
-                    {
-                        Server.Shutdown();
-                    }
-                    catch (Exception e)
-                    {
-                        Util.Logger.LogException(e);
-                    }
-                }
-
-                try
-                {
-                    Client.Shutdown();
-                }
-                catch (Exception e)
-                {
-                    Util.Logger.LogException(e);
-                }
-            }
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            Debug.Log("Network is shut down.\n");
         }
 
         /// <summary>
         /// Submits a packet for dispatch.
         /// </summary>
-        /// <param name="connection">The connecting, the packet should be sent through.
+        /// <param name="connection">The connection the packet should be sent through.
         /// </param>
         /// <param name="packet">The packet to be sent.</param>
         internal static void SubmitPacket(Connection connection, AbstractPacket packet)
@@ -404,11 +515,11 @@ namespace SEE.Net
         /// <param name="packet">The serialized packet to be sent.</param>
         internal static void SubmitPacket(Connection connection, string serializedPacket)
         {
-            bool result = instance.submittedSerializedPackets.TryGetValue(connection, out List<string> serializedPackets);
+            bool result = Instance.submittedSerializedPackets.TryGetValue(connection, out List<string> serializedPackets);
             if (!result)
             {
                 serializedPackets = new List<string>();
-                instance.submittedSerializedPackets.Add(connection, serializedPackets);
+                Instance.submittedSerializedPackets.Add(connection, serializedPackets);
             }
             serializedPackets.Add(serializedPacket);
         }
@@ -439,34 +550,13 @@ namespace SEE.Net
                             connection.ConnectionInfo.RemoteEndPoint.ToString() +
                             "'! Destination may not be listening or connection timed out. Closing connection!"
                         );
-                        if (hostServer)
+                        if (HostServer)
                         {
                             connection.CloseConnection(true);
-                        }
-                        else
-                        {
-                            SwitchToOfflineMode();
                         }
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Checks, whether the given IP-address is local.
-        /// </summary>
-        /// <param name="ipAddress">The IP-address.</param>
-        /// <returns><code>true</code> if given IP-address is local, <code>false</code> otherwise.</returns>
-        public static bool IsLocalIPAddress(IPAddress ipAddress)
-        {
-            if (ipAddress == null)
-            {
-                return false;
-            }
-
-            IPAddress[] localIPAddresses = LookupLocalIPAddresses();
-            bool result = Array.Exists(localIPAddresses, e => e.Equals(ipAddress));
-            return result;
         }
 
         /// <summary>
@@ -480,7 +570,472 @@ namespace SEE.Net
             return hostEntry.AddressList;
         }
 
-        #region Vivox
+        /// <summary>
+        /// Loads the <see cref="GameScene"/>. Will be called when the server was started.
+        /// Registers <see cref="OnSceneLoaded(Scene, LoadSceneMode)"/> to be called when
+        /// the scene is fully loaded.
+        /// </summary>
+        private void OnServerStarted()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.sceneUnloaded -= OnSceneUnloaded;
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
+            NetworkManager.Singleton.SceneManager.LoadScene(GameScene, LoadSceneMode.Single);
+        }
+
+        /// <summary>
+        /// Starts the voice-chat system selected. Unregisters itself from
+        /// <see cref="SceneManager.sceneLoaded"/>.
+        /// Note: This method is assumed to be called when the new scene is fully loaded.
+        /// </summary>
+        /// <param name="scene">scene that was loaded</param>
+        /// <param name="mode">the mode in which the scene was loaded</param>
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            // Now we have loaded the scene that is supposed to contain settings for the voice chat
+            // system. We can now turn on the voice chat system.
+            Debug.Log($"Loaded scene {scene.name} in mode {mode}.\n");
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            StartVoiceChat();
+        }
+
+        /// <summary>
+        /// Unregisters itself from <see cref="SceneManager.sceneLoaded"/>.
+        /// Note: This method is assumed to be called when the new scene is fully loaded.
+        /// </summary>
+        /// <param name="scene">scene that was loaded</param>
+        private void OnSceneUnloaded(Scene scene)
+        {
+            Debug.Log($"Unloaded scene {scene.name}.\n");
+            if (scene.name == GameScene)
+            {
+                SceneManager.sceneUnloaded -= OnSceneUnloaded;
+                ShutdownNetwork();
+                Destroy(Instance);
+            }
+        }
+
+        /// <summary>
+        /// Callback delegate used by <see cref="StartHost(CallBack)"/>, <see cref="StartClient(CallBack)"/>,
+        /// and <see cref="StartServer(CallBack)"/> after they have been finished (they are using
+        /// co-routines).
+        /// </summary>
+        /// <param name="success">if true, the operation was successful</param>
+        /// <param name="message">a description of what happened</param>
+        public delegate void CallBack(bool success, string message);
+
+        /// <summary>
+        /// Starts a host process, i.e., a server and a local client.
+        ///
+        /// Note: This method starts a co-routine and then returns to the caller immediately.
+        /// The <paramref name="callBack"/> tells the caller that the co-routine has come to
+        /// an end.
+        /// </summary>
+        /// <param name="callBack">a callback to be called when done; its parameter will be true
+        /// in case of success or otherwise false</param>
+        public void StartHost(CallBack callBack)
+        {
+            StartCoroutine(ShutdownNetwork(InternalStartHost));
+
+            void InternalStartHost()
+            {
+                Debug.Log($"Server is starting to listen at {ServerIP4Address}:{ServerPort}...\n");
+                Debug.Log($"Local client is trying to connect to server {ServerIP4Address}:{ServerPort}...\n");
+                try
+                {
+                    if (NetworkManager.Singleton.StartHost())
+                    {
+                        StartUp();
+                    }
+                    else
+                    {
+                        throw new CannotStartServer($"Could not start host {ServerIP4Address}:{ServerPort}");
+                    }
+                }
+                catch (Exception exception)
+                {
+                    callBack(false, exception.Message);
+                    throw;
+                }
+                callBack(true, $"Host started at {ServerIP4Address}:{ServerPort}.");
+            }
+        }
+
+        /// <summary>
+        /// Starts a client.
+        ///
+        /// Note: This method starts a co-routine and then returns to the caller immediately.
+        /// The <paramref name="callBack"/> tells the caller that the co-routine has come to
+        /// an end.
+        /// </summary>
+        /// <param name="callBack">a callback to be called when done; its parameter will be true
+        /// in case of success or otherwise false</param>
+        public void StartClient(CallBack callBack)
+        {
+            StartCoroutine(ShutdownNetwork(InternalStartClient));
+
+            void InternalStartClient()
+            {
+                Debug.Log($"Client is trying to connect to server {ServerIP4Address}:{ServerPort}...\n");
+                try
+                {
+                    if (NetworkManager.Singleton.StartClient())
+                    {
+                        StartUp();
+                    }
+                    else
+                    {
+                        throw new NoServerConnection($"Could not connect to server {ServerIP4Address}:{ServerPort}");
+                    }
+                }
+                catch (Exception exception)
+                {
+                    callBack(false, exception.Message);
+                    throw;
+                }
+
+                StartCoroutine(WaitUntilConnected());
+            }
+
+            IEnumerator WaitUntilConnected()
+            {
+                float waitingTime = 0;
+                float waitingTimePerIteration = 0.5f;
+
+                while (!NetworkManager.Singleton.IsConnectedClient)
+                {
+                    Debug.Log($"Client is waiting for connection {waitingTime}/{MaxWaitingTime}...\n");
+                    yield return new WaitForSeconds(waitingTimePerIteration);
+                    waitingTime += waitingTimePerIteration;
+                    if (waitingTime > MaxWaitingTime)
+                    {
+                        break;
+                    }
+                }
+                if (NetworkManager.Singleton.IsConnectedClient)
+                {
+                    callBack(true, $"Client is connected to server {ServerIP4Address}:{ServerPort}.");
+                }
+                else
+                {
+                    callBack(false, $"Could not connect to server {ServerIP4Address}:{ServerPort}.");
+                    throw new NoServerConnection($"Could not connect to server {ServerIP4Address}:{ServerPort}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// The maximal waiting time in seconds a client is willing to wait until a connection
+        /// can be established.
+        /// </summary>
+        private const float MaxWaitingTime = 5 * 60;
+
+        /// <summary>
+        /// Starts a dedicated server without client.
+        ///
+        /// Note: This method starts a co-routine and then returns to the caller immediately.
+        /// The <paramref name="callBack"/> tells the caller that the co-routine has come to
+        /// an end.
+        /// </summary>
+        /// <param name="callBack">a callback to be called when done; its parameter will be true
+        /// in case of success or otherwise false</param>
+        public void StartServer(CallBack callBack)
+        {
+            StartCoroutine(ShutdownNetwork(InternalStartServer));
+
+            void InternalStartServer()
+            {
+                Debug.Log($"Server is starting to listening at {ServerIP4Address}:{ServerPort}...\n");
+                try
+                {
+                    if (NetworkManager.Singleton.StartServer())
+                    {
+                        StartUp();
+                    }
+                    else
+                    {
+                        throw new CannotStartServer($"Could not start server {ServerIP4Address}:{ServerPort}");
+                    }
+                }
+                catch (Exception exception)
+                {
+                    callBack(false, exception.Message);
+                    throw;
+                }
+                callBack(true, $"Server is listening at {ServerIP4Address}:{ServerPort}.");
+            }
+        }
+
+        /// <summary>
+        /// A delegate that will be called in <see cref="ShutdownNetwork(OnShutdownFinished)"/> when
+        /// the network has been shut down (if needed at all), for instance, to (re-)start the network.
+        /// </summary>
+        delegate void OnShutdownFinished();
+
+        /// <summary>
+        /// If the network is already running, it will be shut down. Finally, <paramref name="onShutdownFinished"/>
+        /// will be called.
+        ///
+        /// This method is used as a co-routine started in <see cref="StartHost(CallBack)"/>,
+        /// <see cref="StartServer(CallBack)"/>, and <see cref="StartClient(CallBack)"/>.
+        /// </summary>
+        /// <param name="onShutdownFinished">function to be called at the end of the shutdown</param>
+        /// <returns>whether to continue this co-routine</returns>
+        private IEnumerator ShutdownNetwork(OnShutdownFinished onShutdownFinished)
+        {
+            // In case we are connected, we will first disconnect.
+            if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsServer)
+            {
+                Debug.Log("Network is shutting down...\n");
+
+                // NetworkManager.Singleton.Shutdown() can be called by clients, server, and host.
+                // It will take of the necessary shutdown actions required for these respective
+                // roles.
+                NetworkManager.Singleton.Shutdown();
+
+                // The shutdown is not immediate. We will need to wait until this process has
+                // finished, i.e., until NetworkManager.Singleton.ShutdownInProgress becomes false.
+                while (NetworkManager.Singleton.ShutdownInProgress)
+                {
+                    yield return null;
+                }
+            }
+
+            ShutdownNetwork();
+
+            onShutdownFinished();
+        }
+
+        /// <summary>
+        /// The kinds of voice-chats system we support. None means no voice
+        /// chat whatsoever.
+        /// </summary>
+        public enum VoiceChatSystems
+        {
+            None = 0,       // no voice chat
+            Dissonance = 1, // Dissonance voice chat
+            Vivox = 2       // Vivox voice chat
+        }
+
+        /// <summary>
+        /// Name of the Inspector foldout group for the logging setttings.
+        /// </summary>
+        private const string VoiceChatFoldoutGroup = "Voice Chat";
+
+        /// <summary>
+        /// The voice chat system as selected by the user. Note: This attribute
+        /// can be changed in the editor via <see cref="NetworkEditor"/> as well
+        /// as at the start up in the <see cref="OpeningDialog"/>.
+        /// </summary>
+        [Tooltip("The voice chat system to be used. 'None' for no voice chat."), FoldoutGroup(VoiceChatFoldoutGroup)]
+        public VoiceChatSystems VoiceChat = VoiceChatSystems.None;
+
+        /// <summary>
+        /// Shuts down the voice-chat system.
+        /// </summary>
+        private void OnApplicationQuit()
+        {
+            switch (VoiceChat)
+            {
+                case VoiceChatSystems.None:
+                    // nothing to be done
+                    break;
+                case VoiceChatSystems.Dissonance:
+                    // nothing to be done
+                    break;
+                case VoiceChatSystems.Vivox:
+                    VivoxClient?.Uninitialize();
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        /// <summary>
+        /// Represents an IP address along with its IP address family.
+        /// This is used only for informational purposes in <see cref="AddressesInfo"/>.
+        /// </summary>
+        [Serializable]
+        private struct AddressInfo
+        {
+            /// <summary>
+            /// The address family of the TCP/IP protocol, e.g., InterNetworkV6
+            /// or InterNetwork.
+            /// </summary>
+            public readonly string AddressFamily;
+            /// <summary>
+            /// The IP address.
+            /// </summary>
+            public readonly string IPAddress;
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="addressFamiliy">address family of the TCP/IP protocol</param>
+            /// <param name="ipAddress">IP address</param>
+            public AddressInfo(string addressFamiliy, string ipAddress)
+            {
+                AddressFamily = addressFamiliy;
+                IPAddress = ipAddress;
+            }
+        }
+
+        /// <summary>
+        /// The IP addresses and the address families they belong to for the local machine.
+        /// This will be used in the Inspector for informational purposes only.
+        /// </summary>
+        [ShowInInspector]
+        [PropertyTooltip("IP addresses of this machine.")]
+        [TableList(IsReadOnly = true)]
+        private IList<AddressInfo> AddressesInfo
+        {
+            get
+            {
+                return Network.LookupLocalIPAddresses()
+                              .Select(ip => new AddressInfo(ip.AddressFamily.ToString(), ip.ToString()))
+                              .ToList();
+            }
+        }
+
+        /// <summary>
+        /// The name of the group for the fold-out group of the configuration file.
+        /// </summary>
+        private const string ConfigurationFoldoutGroup = "Configuration File";
+
+        /// <summary>
+        /// The name of the group for the Inspector buttons loading and saving the configuration file.
+        /// </summary>
+        private const string ConfigurationButtonsGroup = "ConfigurationButtonsGroup";
+
+        /// <summary>
+        /// Default path of the configuration file (path and filename).
+        /// </summary>
+        [SerializeField]
+        [PropertyTooltip("Path of the file containing the network configuration.")]
+        [HideReferenceObjectPicker, FoldoutGroup(ConfigurationFoldoutGroup)]
+        public FilePath ConfigPath = new FilePath();
+
+        /// <summary>
+        /// Saves the settings of this network configuration to <see cref="ConfigPath()"/>.
+        /// If the configuration file exists already, it will be overridden.
+        /// </summary>
+        [Button(ButtonSizes.Small)]
+        [PropertyTooltip("Saves the network settings in a configuration file.")]
+        [ButtonGroup(ConfigurationButtonsGroup)]
+        public void Save()
+        {
+            Save(ConfigPath.Path);
+        }
+
+        /// <summary>
+        /// Loads the settings of this network configuration from <see cref="ConfigPath()"/>
+        /// if it exists. If it does not exist, nothing happens.
+        /// </summary>
+        [Button(ButtonSizes.Small)]
+        [PropertyTooltip("Loads the network configuration file.")]
+        [ButtonGroup(ConfigurationButtonsGroup)]
+        public void Load()
+        {
+            Load(ConfigPath.Path);
+        }
+
+#region ConfigIO
+
+        //--------------------------------
+        // Configuration file input/output
+        //--------------------------------
+
+        /// <summary>
+        /// Label of attribute <see cref="ServerActionPort"/> in the configuration file.
+        /// </summary>
+        private const string ServerActionPortLabel = "serverActionPort";
+        /// <summary>
+        /// Label of attribute <see cref="loadCityOnStart"/> in the configuration file.
+        /// </summary>
+        private const string LoadCityOnStartLabel = "loadCityOnStart";
+        /// <summary>
+        /// Label of attribute <see cref="GameScene"/> in the configuration file.
+        /// </summary>
+        private const string GameSceneLabel = "gameScene";
+        /// <summary>
+        /// Label of attribute <see cref="VoiceChat"/> in the configuration file.
+        /// </summary>
+        private const string VoiceChatLabel = "voiceChat";
+        /// <summary>
+        /// Label of attribute <see cref="ServerPort"/> in the configuration file.
+        /// </summary>
+        private const string ServerPortLabel = "serverPort";
+        /// <summary>
+        /// Label of attribute <see cref="ServerIP4Address"/> in the configuration file.
+        /// </summary>
+        private const string ServerIP4AddressLabel = "serverIP4Address";
+
+        /// <summary>
+        /// Saves the settings of this network configuration to <paramref name="filename"/>.
+        /// </summary>
+        /// <param name="filename">name of the file in which the settings are stored</param>
+        public void Save(string filename)
+        {
+            using ConfigWriter writer = new ConfigWriter(filename);
+            Save(writer);
+        }
+
+        /// <summary>
+        /// Reads the settings of this network configuration from <paramref name="filename"/>.
+        /// </summary>
+        /// <param name="filename">name of the file from which the settings are restored</param>
+        public void Load(string filename)
+        {
+            if (File.Exists(filename))
+            {
+                using ConfigReader stream = new ConfigReader(filename);
+                Restore(stream.Read());
+            }
+            else
+            {
+                Debug.LogError($"Configuration file {filename} does not exist.\n");
+            }
+        }
+
+        /// <summary>
+        /// Saves the settings of this network configuration using <paramref name="writer"/>.
+        /// </summary>
+        /// <param name="writer">the writer to be used to save the settings</param>
+        protected virtual void Save(ConfigWriter writer)
+        {
+            writer.Save(ServerActionPort, ServerActionPortLabel);
+            writer.Save(loadCityOnStart, LoadCityOnStartLabel);
+            writer.Save(GameScene, GameSceneLabel);
+            writer.Save(VoiceChat.ToString(), VoiceChatLabel);
+            writer.Save(ServerPort, ServerPortLabel);
+            writer.Save(ServerIP4Address, ServerIP4AddressLabel);
+        }
+
+        /// <summary>
+        /// Restores the settings from <paramref name="attributes"/>.
+        /// </summary>
+        /// <param name="attributes">the attributes from which to restore the settings</param>
+        protected virtual void Restore(Dictionary<string, object> attributes)
+        {
+            ConfigIO.Restore(attributes, ServerActionPortLabel, ref ServerActionPort);
+            ConfigIO.Restore(attributes, LoadCityOnStartLabel, ref loadCityOnStart);
+            ConfigIO.Restore(attributes, GameSceneLabel, ref GameScene);
+            ConfigIO.RestoreEnum(attributes, VoiceChatLabel, ref VoiceChat);
+            {
+                int value = ServerPort;
+                ConfigIO.Restore(attributes, ServerPortLabel, ref value);
+                ServerPort = value;
+            }
+            {
+                string value = ServerIP4Address;
+                ConfigIO.Restore(attributes, ServerIP4AddressLabel, ref value);
+                ServerIP4Address = value;
+            }
+        }
+
+#endregion
+
+#region Vivox
 
         public const string VivoxIssuer = "torben9605-se19-dev";
         public const string VivoxDomain = "vdx5.vivox.com";
@@ -492,8 +1047,11 @@ namespace SEE.Net
         public static VivoxUnity.ILoginSession VivoxLoginSession { get; private set; } = null;
         public static VivoxUnity.IChannelSession VivoxChannelSession { get; private set; } = null;
 
-        [SerializeField] private string vivoxChannelName = string.Empty;
-        public static string VivoxChannelName { get => instance ? instance.vivoxChannelName : string.Empty; }
+        [SerializeField]
+        [Tooltip("The channel name for Vivox."), FoldoutGroup(VoiceChatFoldoutGroup)]
+        [ShowIf("VoiceChat", VoiceChatSystems.Vivox)]
+        private string vivoxChannelName = string.Empty;
+        public static string VivoxChannelName { get => Instance ? Instance.vivoxChannelName : string.Empty; }
 
         private static void VivoxInitialize()
         {
@@ -611,15 +1169,6 @@ namespace SEE.Net
             Util.Logger.Log(channelName + ": " + senderName + ": " + message + "\n");
         }
 
-        private void OnApplicationQuit()
-        {
-            if (VivoxClient != null)
-            {
-                VivoxClient.Uninitialize();
-            }
-        }
-
-        #endregion
+#endregion
     }
-
 }

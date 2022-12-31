@@ -13,6 +13,11 @@ namespace SEE.Controls
     /// 
     /// As an example on how to use this class, take a look at the test class
     /// TestDictationInput.
+    /// 
+    /// IMPORTANT NOTE.
+    /// Dictation (DictationInput) and phrase recognition (KeywordInput or GrammarInput) cannot be 
+    /// handled at the same time. If a GrammarInput or KeywordInput is active, a DictationInput 
+    /// cannot be active and vice versa.
     /// </summary>
     public class DictationInput : SpeechInput
     {

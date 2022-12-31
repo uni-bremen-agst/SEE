@@ -1,7 +1,8 @@
-﻿using DG.Tweening;
+﻿using System;
+using System.Collections;
+using DG.Tweening;
 using SEE.GO;
 using SEE.Utils;
-using System.Collections;
 using UnityEngine;
 
 namespace SEE.Game
@@ -16,7 +17,7 @@ namespace SEE.Game
     /// create an instance of this class and attach this as a component to the game object to
     /// be animated. When the animation has finished that instance self destructs.
     /// </summary>
-    public class GameObjectFader : MonoBehaviour
+    public class GameObjectFader : MonoBehaviour  // TODO: Class should be converted to operations (Operator classes).
     {
         /// <summary>
         /// The amount of time a color should be kept until the next one is
@@ -60,10 +61,10 @@ namespace SEE.Game
         {
             for (int i = 1; i <= 2 * NumberOfColorCycles; i++)
             {
-                InvertColor(gameObject, BlinkTime);
+                InvertColor(gameObject);
                 yield return new WaitForSeconds(BlinkTime);
             }
-            GameObjectFader.FadeOut(gameObject, FadeTime);
+            FadeOut(gameObject, FadeTime);
             yield return new WaitForSeconds(FadeTime);
             callBack?.Invoke(gameObject);
         }
@@ -82,12 +83,12 @@ namespace SEE.Game
         /// <returns>when to continue the execution of this coroutine</returns>
         public static IEnumerator FadeIn(GameObject gameObject, Callback callBack = null)
         {
-            GameObjectFader.FadeIn(gameObject, FadeTime);
+            FadeIn(gameObject, FadeTime);
             yield return new WaitForSeconds(FadeTime);
 
             for (int i = 1; i <= 2 * NumberOfColorCycles; i++)
             {
-                InvertColor(gameObject, BlinkTime);
+                InvertColor(gameObject);
                 yield return new WaitForSeconds(BlinkTime);
             }
             callBack?.Invoke(gameObject);
@@ -181,7 +182,7 @@ namespace SEE.Game
                     StartCoroutine(FadeOut(gameObject, SelfDestruct));
                     break;
                 default:
-                    throw new System.NotImplementedException($"Unexpected case {fading} for type {nameof(Fading)}.");
+                    throw new NotImplementedException($"Unexpected case {fading} for type {nameof(Fading)}.");
             }
         }
 

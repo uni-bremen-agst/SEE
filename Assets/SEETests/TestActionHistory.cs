@@ -155,7 +155,7 @@ namespace SEETests
         [SetUp]
         public void SetUp()
         {
-            hist = new ActionHistory();
+            hist = new ActionHistory(syncOverNetwork: false);
             Counter.Reset();
         }
 
@@ -508,7 +508,7 @@ namespace SEETests
                 { }
             }
 
-            private static ActionStateType actionStateType = new IncrementActionStateType();
+            private static readonly ActionStateType actionStateType = new IncrementActionStateType();
 
             private static ReversibleAction CreateReversibleAction()
             {
