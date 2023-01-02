@@ -7,7 +7,7 @@ namespace SEE.Game.Avatars
     /// <summary>
     /// This script should be attached to a gameobject that has an UmaRenderer and <see cref="UMAExpressionPlayer"/>.
     /// The function of the script is to set up a series of fake Blendshapes for the UMARenderer, which then can be
-    /// adressed by the facial tracker. The values of the Blendshapes will be converted by <see cref="ValueConverter"/>
+    /// addressed by the facial tracker. The values of the Blendshapes will be converted by <see cref="ValueConverter"/>
     /// and transferred to the <see cref="UMAExpressionPlayer"/>.
     /// </summary>
     internal class AvatarBlendshapeExpressions : MonoBehaviour
