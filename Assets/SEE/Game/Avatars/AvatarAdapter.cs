@@ -394,7 +394,7 @@ namespace SEE.Game.Avatars
                 vrIK.solver.rightArm.target = rig.transform.Find(VRPlayerRightHandForVRIK);
                 UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.rightArm.target);
             }
-            
+
             // Adds required components.
             void AddComponents()
             {
@@ -415,7 +415,7 @@ namespace SEE.Game.Avatars
                 //movement.characterController = gameObject.GetComponentInChildren<CharacterController>();
             }
 
-            // Prepare HTC Facial Tracker 
+            // Prepare HTC Facial Tracker
             void PrepareLipTracker()
             {
                 Debug.Log("[HTC Facial Tracker] Initialize HTC Facial Tracker...\n");
@@ -426,7 +426,7 @@ namespace SEE.Game.Avatars
                     Debug.LogWarning("[HTC Facial Tracker] Did you start sr_runtime before?\n");
                     Debug.LogWarning("[HTC Facial Tracker] Trying to start sr_runtime... This may take some time and can freeze your game!\n");
                     StartCoroutine(PrepareLipFramework());
-                    
+
                 }
                 // SR_runtime Status is IDLE or WORKING
                 else
@@ -435,7 +435,7 @@ namespace SEE.Game.Avatars
                     AddComponentsForFacialTracker();
                 }
             }
-            
+
             // Coroutine for starting the sr_runtime and preparing the Lip Framework. By default the Lip Framework has the status stop.
             // After initialization the status is either working or error. If the status is working then scripts are
             // added for the Lip Framework and multiplayer functionality. Otherwise the Lip Framework will be deactivated.
@@ -444,7 +444,7 @@ namespace SEE.Game.Avatars
                 // Waiting for sr_runtime and lip_framework initialisation.
                 gameObject.AddComponent<SRanipal_Lip_Framework>().EnableLipVersion = SRanipal_Lip_Framework.SupportedLipVersion.version2;
                 yield return new WaitUntil(() => SRanipal_Lip_Framework.Status != SRanipal_Lip_Framework.FrameworkStatus.STOP);
-                
+
                 if (SRanipal_Lip_Framework.Status == SRanipal_Lip_Framework.FrameworkStatus.WORKING)
                 {
                     AddComponentsForFacialTracker();
@@ -461,7 +461,7 @@ namespace SEE.Game.Avatars
             {
                 Debug.Log("[HTC Facial Tracker] SR_Runtime found. Adding components...\n");
                 gameObject.AddComponent<AvatarBlendshapeExpressions>();
-                    
+
                 // Multiplayer functionality for UMAExpressionplayer and Facialtracker.
                 gameObject.AddComponent<ExpressionPlayerSynchronizer>();
                 Debug.Log("[HTC Facial Tracker] Initialisation complete.\n");
