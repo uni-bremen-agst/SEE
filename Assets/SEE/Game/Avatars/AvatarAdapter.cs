@@ -426,7 +426,6 @@ namespace SEE.Game.Avatars
                     Debug.LogWarning("[HTC Facial Tracker] Did you start sr_runtime before?\n");
                     Debug.LogWarning("[HTC Facial Tracker] Trying to start sr_runtime... This may take some time and can freeze your game!\n");
                     StartCoroutine(PrepareLipFramework());
-
                 }
                 // SR_runtime Status is IDLE or WORKING
                 else
@@ -437,7 +436,7 @@ namespace SEE.Game.Avatars
             }
 
             // Coroutine for starting the sr_runtime and preparing the Lip Framework. By default the Lip Framework has the status stop.
-            // After initialization the status is either working or error. If the status is working then scripts are
+            // After initialization the status is either working or error. If the status is working, then scripts are
             // added for the Lip Framework and multiplayer functionality. Otherwise the Lip Framework will be deactivated.
             IEnumerator PrepareLipFramework()
             {
