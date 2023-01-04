@@ -10,7 +10,6 @@ namespace SEE.Game.Avatars
     /// </summary>
     public class AvatarSRanipalLipV2 : MonoBehaviour
     {
-
         /// <summary>
         /// taken from <see cref="SRanipal_AvatarLipSample_v2"/>
         /// </summary>
