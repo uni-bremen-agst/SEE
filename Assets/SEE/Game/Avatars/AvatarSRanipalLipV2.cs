@@ -10,7 +10,7 @@ namespace SEE.Game.Avatars
     /// </summary>
     public class AvatarSRanipalLipV2 : MonoBehaviour
     {
-        
+
         /// <summary>
         /// taken from <see cref="SRanipal_AvatarLipSample_v2"/>
         /// </summary>
@@ -20,12 +20,12 @@ namespace SEE.Game.Avatars
         /// taken from <see cref="SRanipal_AvatarLipSample_v2"/>
         /// </summary>
         public bool NeededToGetData = true;
-        
+
         /// <summary>
         /// Lip Weightings
         /// </summary>
         private Dictionary<LipShape_v2, float> LipWeightings;
-        
+
         /// <summary>
         /// In order to use our fake blendshapes from <see cref="AvatarBlendshapeExpressions"/>, we need to create a
         /// lipshape for each blendshape. For this purpose we need a <see cref="LipShapeTable_v2"/>
@@ -41,7 +41,7 @@ namespace SEE.Game.Avatars
 
             // Create new LipShapeTable
             LipShapeTables = new List<LipShapeTable_v2>(new LipShapeTable_v2[1]);
-            
+
             // add empty LipShapeTable to list of LipShapeTables.
             LipShapeTables[0] = new LipShapeTable_v2();
 
@@ -53,7 +53,7 @@ namespace SEE.Game.Avatars
                 int lipShapeTableSize = skinnedMeshRenderer.sharedMesh.blendShapeCount;
 
                 LipShapeTables[0].lipShapes = new LipShape_v2[lipShapeTableSize];
-                
+
                 for (int i = 0; i < skinnedMeshRenderer.sharedMesh.blendShapeCount; ++i)
                 {
                     string elementName = skinnedMeshRenderer.sharedMesh.GetBlendShapeName(i);
@@ -131,7 +131,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         public void UpdateLipShapes(Dictionary<LipShape_v2, float> lipWeightings)
         {
-            foreach (var table in LipShapeTables)
+            foreach (LipShapeTable_v2 table in LipShapeTables)
             {
                 RenderModelLipShape(table, lipWeightings);
             }

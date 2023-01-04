@@ -5,7 +5,7 @@ using UMA.PoseTools;
 namespace SEE.Game.Avatars
 {
     /// <summary>
-    /// This script should be attached to a gameobject that has an UmaRenderer and <see cref="UMAExpressionPlayer"/>.
+    /// This component should be attached to a game object that has a UMARenderer and <see cref="UMAExpressionPlayer"/>.
     /// The function of the script is to set up a series of fake Blendshapes for the UMARenderer, which then can be
     /// addressed by the facial tracker. The values of the Blendshapes will be converted by <see cref="ValueConverter"/>
     /// and transferred to the <see cref="UMAExpressionPlayer"/>.
@@ -16,12 +16,12 @@ namespace SEE.Game.Avatars
         /// The SkinnedMeshRenderer of the UMARenderer.
         /// </summary>
         private SkinnedMeshRenderer TargetSkinnedRenderer;
-        
+
         /// <summary>
         /// Mesh for baking.
         /// </summary>
         private Mesh BakedMesh;
-        
+
         /// <summary>
         /// This UMA ExpressionPlayer is controlled by the fake Blendshapes.
         /// </summary>
@@ -31,7 +31,7 @@ namespace SEE.Game.Avatars
         /// UMA Renderer.
         /// </summary>
         private Transform UmaRenderer;
-        
+
         /// <summary>
         /// Starts a coroutine that waits for components to be generated at runtime.
         /// </summary>
@@ -43,37 +43,37 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Waits for UMARenderer and UMAExpressionPlayer to be created.
         /// </summary>
-        IEnumerator WaitForComponents()
+        private IEnumerator WaitForComponents()
         {
-            yield return new WaitUntil(() => gameObject.transform.Find("UMARenderer") != null && 
+            yield return new WaitUntil(() => gameObject.transform.Find("UMARenderer") != null &&
                                              gameObject.GetComponent<UMAExpressionPlayer>() != null);
             UmaRenderer = gameObject.transform.Find("UMARenderer");
             UmaRenderer.gameObject.AddComponent<AvatarSRanipalLipV2>();
-            
+
             InitializeBlendshapes();
         }
-        
+
         /// <summary>
         /// This function creates the fake Blendshapes necessary for the HTC Facial Tracker.
         /// </summary>
         private void InitializeBlendshapes()
         {
             ExpressionPlayer = gameObject.GetComponent<UMAExpressionPlayer>();
-            
+
             // Assure that Jaw can be used by UMAExpressionPlayer
             ExpressionPlayer.overrideMecanimJaw = true;
-            TargetSkinnedRenderer = UmaRenderer.GetComponent<SkinnedMeshRenderer>(); 
+            TargetSkinnedRenderer = UmaRenderer.GetComponent<SkinnedMeshRenderer>();
             BakedMesh = new Mesh();
             TargetSkinnedRenderer.BakeMesh(BakedMesh);
 
             Vector3[] junkData = new Vector3[BakedMesh.vertices.Length];
-            
+
             // Setup fake Blendshapes
             // Jaw Blendshapes
             TargetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Jaw_Left", 100, junkData, junkData, junkData); // Jaw_Left_Right - range (-1 - 0)
             TargetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Jaw_Right", 100, junkData, junkData, junkData); // Jaw_Left_Right - range (0 - 1)
             TargetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Jaw_Forward", 100, junkData, junkData, junkData); //  Jaw_Forward_Back - range (0 - 1)
-            TargetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Jaw_Open", 100, junkData, junkData, junkData); // Jaw_Open_Close - range (0 - 1) 
+            TargetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Jaw_Open", 100, junkData, junkData, junkData); // Jaw_Open_Close - range (0 - 1)
 
             // Mouth Blendshapes
             TargetSkinnedRenderer.sharedMesh.AddBlendShapeFrame("Mouth_Ape_Shape", 100, junkData, junkData, junkData); // Drag whole mouth down FIXME
@@ -148,7 +148,7 @@ namespace SEE.Game.Avatars
                 {
                     ExpressionPlayer.jawForward_Back = ValueConverter(mouthOverlay, false); //FIXME: maybe not representable with UMA.
                 }
-                
+
                 // Mouth
                 float mouthApeShape = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Mouth_Ape_Shape"));
                 ExpressionPlayer.mouthUp_Down = ValueConverter(mouthApeShape, false);
@@ -182,7 +182,7 @@ namespace SEE.Game.Avatars
 
                 float mouthPout = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Mouth_Pout"));
                 ExpressionPlayer.mouthNarrow_Pucker = ValueConverter(mouthPout, true);
-                
+
                 float mouthSmileLeft = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Mouth_Smile_Left"));
                 float mouthSadLeft = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Mouth_Sad_Left"));
                 if (mouthSmileLeft >= mouthSadLeft)
@@ -193,7 +193,7 @@ namespace SEE.Game.Avatars
                 {
                     ExpressionPlayer.leftMouthSmile_Frown = ValueConverter(mouthSadLeft - mouthSmileLeft, false);
                 }
-                
+
                 float mouthSmileRight = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Mouth_Smile_Right"));
                 float mouthSadRight = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Mouth_Sad_Right"));
                 if (mouthSmileRight >= mouthSadRight)
@@ -204,7 +204,7 @@ namespace SEE.Game.Avatars
                 {
                     ExpressionPlayer.rightMouthSmile_Frown = ValueConverter(mouthSadRight - mouthSmileRight, false);
                 }
-                
+
                 float mouthUpperUpLeft = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Mouth_Upper_UpLeft"));
                 ExpressionPlayer.leftUpperLipUp_Down = ValueConverter(mouthUpperUpLeft, true);
 
@@ -216,11 +216,11 @@ namespace SEE.Game.Avatars
 
                 float mouthLowerDownRight = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Mouth_Lower_DownRight"));
                 ExpressionPlayer.rightLowerLipUp_Down = ValueConverter(mouthLowerDownRight, false);
-                
+
                 // FIXME: maybe not representable with UMA.
                 //float mouthUpperInside = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Mouth_Upper_Inside"));
                 //float mouthLowerInside = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Mouth_Lower_Inside"));
-                
+
                 // Tongue
                 float tongueLongStep1 = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Tongue_LongStep1"));
                 float tongueLongStep2 = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Tongue_LongStep2"));
@@ -232,7 +232,7 @@ namespace SEE.Game.Avatars
                 {
                     ExpressionPlayer.tongueOut = ValueConverter(tongueLongStep2, true);
                 }
-                
+
                 float tongueLeft = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Tongue_Left"));
                 float tongueRight = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Tongue_Right"));
                 if (tongueLeft >= tongueRight)
@@ -243,7 +243,7 @@ namespace SEE.Game.Avatars
                 {
                     ExpressionPlayer.tongueLeft_Right = ValueConverter(tongueRight - tongueLeft, false);
                 }
-                
+
                 float tongueUp = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Tongue_Up"));
                 float tongueDown = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Tongue_Down"));
                 if (tongueUp >= tongueDown)
@@ -254,16 +254,16 @@ namespace SEE.Game.Avatars
                 {
                     ExpressionPlayer.tongueUp_Down = ValueConverter(tongueDown - tongueUp, false);
                 }
-                
+
                 float tongueRoll = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Tongue_Roll"));
                 ExpressionPlayer.tongueCurl = ValueConverter(tongueRoll, true);
-                
+
                 // FIXME: maybe not representable with UMA.
                 //float tongueUpLeftMorph = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Tongue_UpLeft_Morph"));
                 //float tongueUpRightMorph = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Tongue_UpRight_Morph"));
                 //float tongueDownLeftMorph = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Tongue_DownLeft_Morph"));
                 //float tongueDownRightMorph = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Tongue_DownRight_Morph"));
-                
+
                 // Cheeks
                 float cheekPuffLeft = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Cheek_Puff_Left"));
                 float cheekPuffRight = TargetSkinnedRenderer.GetBlendShapeWeight(BlendShapeByString("Cheek_Puff_Right"));
@@ -280,7 +280,7 @@ namespace SEE.Game.Avatars
                 }
             }
         }
-        
+
         /// <summary>
         /// Converts a number to a different range. Either positive or negative.
         /// Blendshapes have usually a range from [0 - 100] and need to be converted to match the range of the
@@ -294,7 +294,7 @@ namespace SEE.Game.Avatars
             const float conversion = 0.01f;
             return negOrPos ? param * conversion : -param * conversion;
         }
-        
+
         /// <summary>
         /// Searches for a blendshape by name and returns the index of it.
         /// </summary>
