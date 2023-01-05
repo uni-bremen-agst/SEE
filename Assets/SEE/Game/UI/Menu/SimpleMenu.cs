@@ -99,6 +99,7 @@ namespace SEE.Game.UI.Menu
         {
             // instantiates the menu
             Menu = PrefabInstantiator.InstantiatePrefab(MenuPrefab, Canvas.transform, false);
+            Menu.name = Title;
             MenuManager = Menu.GetComponent<ModalWindowManager>();
             
             // stores specific parts of the menu
