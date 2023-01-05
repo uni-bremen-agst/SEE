@@ -4,6 +4,7 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
+using SEE.Game.UI.Menu;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -38,37 +39,33 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
         private static SEECity city;
 
-        void Awake()
+        private RuntimeTabMenu Menu;
+        
+        void Start()
         {
-            Debug.Log("Awake Runtime Config Menu");
+            Menu = gameObject.AddComponent<RuntimeTabMenu>();
+            Menu.Title = "Tab Menu Titel";
+            Menu.Description = "Ich bin die Beschreibung.";
+            Menu.HideAfterSelection = false;
+
+            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Ferdinand", "Ich bin der Ferdinand.", Color.blue));
+            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Mahmoud", "Ich bin der Mahmoud.", Color.cyan));
+            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Thilo", "Ich bin der Thilo.", Color.yellow));
             
-            runtimeConfigMenu = PrefabInstantiator.InstantiatePrefab(MENU_PREFAB_PATH);
-            runtimeConfigMenu.name = "RuntimeConfigMenu";
-            runtimeConfigMenu.SetActive(false);
-
-            seeSettingsView = runtimeConfigMenu.transform.Find("SeeSettingsPanel").gameObject;
-
-            seeSettingsTabs = seeSettingsView.transform.Find("Tabs").gameObject;
+            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Ferdinand1", "Ich bin der Ferdinand.", Color.blue));
+            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Mahmoud1", "Ich bin der Mahmoud.", Color.cyan));
+            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Thilo1", "Ich bin der Thilo.", Color.yellow));
             
-            seeSettingsContentView = seeSettingsView.transform.Find("ContentView").gameObject;
-
-            seeTables = runtimeConfigMenu.transform.Find("SeeTables").gameObject;
-
-            codeCityLoader = runtimeConfigMenu.transform.Find("CodeCityLoader").gameObject;
-
-            InitMenu();
+            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Ferdinand2", "Ich bin der Ferdinand.", Color.blue));
+            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Mahmoud2", "Ich bin der Mahmoud.", Color.cyan));
+            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Thilo2", "Ich bin der Thilo.", Color.yellow));
         }
         
         void Update()
         {
             if (SEEInput.ToggleConfigMenu())
             {
-                // Menu is always displayed from the top
-                // Should be changed as soon as backwards navigation has been added to each individual menu
-                seeSettingsView.SetActive(false);
-                codeCityLoader.SetActive(false);
-                seeTables.SetActive(true);
-                runtimeConfigMenu.SetActive(!runtimeConfigMenu.activeSelf);
+                Menu.ToggleMenu();
             }
         }
 

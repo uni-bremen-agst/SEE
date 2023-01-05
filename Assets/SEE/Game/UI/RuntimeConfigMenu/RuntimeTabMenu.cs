@@ -5,10 +5,10 @@ using UnityEngine;
 
 public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 {
-    protected const string RUNTIME_CONFIG_PREFAB_FOLDER = UI_PREFAB_FOLDER + "RuntimeCOnfigMenu/";
+    protected const string RUNTIME_CONFIG_PREFAB_FOLDER = UI_PREFAB_FOLDER + "RuntimeConfigMenu/";
     
-    protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenu";
-    protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsObject";
+    protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenuRework";
+    protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsView";
     protected override string EntryPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeTabButton";
     
     // is already part of the MenuPrefab
@@ -20,11 +20,11 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     // which sprite should be used as the icon
     protected override string IconSprite => base.IconSprite;
     // TODO: where can be specific parts of the menu be found
-    protected override string ViewListPath => base.ViewListPath;
-    protected override string IconTitlePath => base.IconTitlePath;
-    protected override string CloseButtonPath => base.CloseButtonPath;
-    protected override string ContentPath => base.ContentPath;
-    protected override string EntryListPath => base.EntryListPath;
+    protected override string ViewListPath => "SettingsContentView";
+    protected override string IconTitlePath => "SeeSettingsPanel/MainContent/Icon Title Mask/Content";
+    protected override string CloseButtonPath => "SeeSettingsPanel/MainContent/Buttons/Content";
+    protected override string ContentPath => "SeeSettingsPanel/MainContent";
+    protected override string EntryListPath => "Tabs/TabObjects";
     
     // TODO: Add Setting to View
 }
