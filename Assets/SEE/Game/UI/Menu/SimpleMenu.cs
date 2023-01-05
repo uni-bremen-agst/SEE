@@ -210,7 +210,6 @@ namespace SEE.Game.UI.Menu
         /// <param name="entry">The added menu entry.</param>
         protected virtual void AddButton(T entry)
         {
-            Debug.Log($"Add Button {entry.Title}");
             GameObject button =
                 PrefabInstantiator.InstantiatePrefab(EntryPrefab, EntryList.transform, false);
 
