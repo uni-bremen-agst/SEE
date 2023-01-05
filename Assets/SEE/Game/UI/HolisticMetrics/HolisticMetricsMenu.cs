@@ -7,6 +7,7 @@ using SEE.Game.UI.Menu;
 using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
+using Sirenix.Utilities;
 using UnityEngine;
 
 namespace SEE.Game.UI.HolisticMetrics
@@ -53,11 +54,11 @@ namespace SEE.Game.UI.HolisticMetrics
             GameObject actionMenuGO = new GameObject { name = "Holistic metrics menu" };
             IList<MenuEntry> entries = SelectionEntries();
             SimpleMenu actionMenu = actionMenuGO.AddComponent<SimpleMenu>();
-            actionMenu.AllowNoSelection(true);
+            actionMenu.AllowNoSelection = true;
             actionMenu.Title = "Holistic metrics menu";
             actionMenu.Description = "Add / change the metrics board(s).";
-            actionMenu.AddEntries(entries);
-            actionMenu.HideAfterSelection(true);
+            entries.ForEach(actionMenu.AddEntry);
+            actionMenu.HideAfterSelection = true;
             return actionMenu;
         }
 

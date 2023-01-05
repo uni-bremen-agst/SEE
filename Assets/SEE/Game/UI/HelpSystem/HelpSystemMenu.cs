@@ -49,9 +49,9 @@ namespace SEE.Game.UI.HelpSystem
             if (SEEInput.Help())
             {
                 KeyBindings.PrintBindings();
-                if (!mainMenu.MenuShown)
+                if (!mainMenu.ShowMenu)
                 {
-                    mainMenu.ShowMenu(true);
+                    mainMenu.ShowMenu = true;
                 }
             }
         }

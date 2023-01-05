@@ -19,6 +19,11 @@ namespace SEE.Game.UI
     public abstract class PlatformDependentComponent: MonoBehaviour
     {
         /// <summary>
+        /// The folder where to find UI Prefabs.
+        /// </summary>
+        protected const string UI_PREFAB_FOLDER = "Prefabs/UI/";
+
+        /// <summary>
         /// Name of the canvas on which UI elements are placed.
         /// </summary>
         private const string UI_CANVAS_NAME = "UI Canvas";
@@ -28,66 +33,38 @@ namespace SEE.Game.UI
         /// This prefab should contain all components necessary for the UI canvas, such as an event system,
         /// a graphic raycaster, etc.
         /// </summary>
-        private const string UI_CANVAS_PREFAB = "Prefabs/UI/UICanvas";
+        private const string UI_CANVAS_PREFAB = UI_PREFAB_FOLDER + "UICanvas";
 
         /// <summary>
         /// The canvas on which UI elements are placed.
-        /// This GameObject must be named <see cref="UI_CANVAS_NAME"/>.
-        /// If it doesn't exist yet, it will be created from a prefab.
         /// </summary>
-        protected GameObject Canvas;
+        protected static GameObject Canvas { get; private set; }
 
         /// <summary>
         /// The current platform.
         /// </summary>
-        protected PlayerInputType Platform { get; private set; }
+        protected readonly PlayerInputType Platform = SceneSettings.InputType;
 
         /// <summary>
-        /// Whether the <see cref="Start"/> method of this component has already been called.
+        /// Whether the component is initialized.
         /// </summary>
-        protected bool HasStarted { get; private set; } = false;
+        /// <see cref="Start"/>
+        protected bool HasStarted { get; private set; }
 
         /// <summary>
-        /// Called when the <see cref="Start()"/> method of this component is executed on the Desktop platform.
+        /// Initializes the component for the current platform.
         /// </summary>
-        protected virtual void StartDesktop() => PlatformUnsupported();
-        /// <summary>
-        /// Called when the <see cref="Start()"/> method of this component is executed on the TouchGamepad platform.
-        /// </summary>
-        protected virtual void StartTouchGamepad() => PlatformUnsupported();
-        /// <summary>
-        /// Called when the <see cref="Start()"/> method of this component is executed on the VR platform.
-        /// </summary>
-        protected virtual void StartVR() => PlatformUnsupported();
-
-        /// <summary>
-        /// Called when the <see cref="Update()"/> method of this component is executed on the Desktop platform.
-        /// </summary>
-        protected virtual void UpdateDesktop() { }
-        /// <summary>
-        /// Called when the <see cref="Update()"/> method of this component is executed on the TouchGamepad platform.
-        /// </summary>
-        protected virtual void UpdateTouchGamepad() { }
-
-        /// <summary>
-        /// Called when the <see cref="Update()"/> method of this component is executed on the VR platform.
-        /// </summary>
-        protected virtual void UpdateVR() { }
-
         protected void Start()
         {
-            Canvas = GameObject.Find(UI_CANVAS_NAME);
+            // initializes the Canvas if necessary
             if (Canvas == null)
             {
-                // Create Canvas from prefab if it doesn't exist yet
-                Canvas = PrefabInstantiator.InstantiatePrefab(UI_CANVAS_PREFAB);
+                // TODO: Is it needed to search for the UI canvas?
+                // The canvas is now static and nobody else should instantiate the canvas...
+                Canvas = GameObject.Find(UI_CANVAS_NAME) ?? PrefabInstantiator.InstantiatePrefab(UI_CANVAS_PREFAB);
                 Canvas.name = UI_CANVAS_NAME;
             }
-
-            HasStarted = true;
-
-            // Execute platform dependent code
-            Platform = SceneSettings.InputType;
+            // calls the start method for the current platform
             switch (Platform)
             {
                 case PlayerInputType.DesktopPlayer: StartDesktop();
@@ -103,9 +80,15 @@ namespace SEE.Game.UI
                     break;
             }
 
+            // initialization finished
+            HasStarted = true;
+            OnStartFinished();
         }
 
-        protected void Update()
+        /// <summary>
+        /// Updates the component for the current platform.
+        /// </summary>
+        protected virtual void Update()
         {
             switch (Platform)
             {
@@ -131,5 +114,41 @@ namespace SEE.Game.UI
                            + " Component will now self-destruct.");
             Destroyer.Destroy(this);
         }
+
+        /// <summary>
+        /// Start method for the Desktop platform.
+        /// </summary>
+        protected virtual void StartDesktop() => PlatformUnsupported();
+
+        /// <summary>
+        /// Start method for the VR platform.
+        /// </summary>
+        protected virtual void StartVR() => PlatformUnsupported();
+
+        /// <summary>
+        /// Start method for the TouchGamepad platform.
+        /// </summary>
+        protected virtual void StartTouchGamepad() => PlatformUnsupported();
+
+        /// <summary>
+        /// Update method for the Desktop platform.
+        /// </summary>
+        protected virtual void UpdateDesktop() { }
+
+        /// <summary>
+        /// Update method for the VR platform.
+        /// </summary>
+        protected virtual void UpdateVR() { }
+
+        /// <summary>
+        /// Update method for the TouchGamepad platform.
+        /// </summary>
+        protected virtual void UpdateTouchGamepad() { }
+
+        /// <summary>
+        /// Triggered when the component was started. (<see cref="Start"/>)
+        /// Can be used add listeners and update UI after initialization.
+        /// </summary>
+        protected virtual void OnStartFinished() { }
     }
 }
