@@ -162,13 +162,13 @@ namespace SEE.GO.Menu
             resultMenuEntries.AddRange(results.Select(x => new MenuEntry(() => MenuEntryAction(x.Item3, x.Item2),
                                                                          x.Item2, entryColor: ScoreColor(x.Item1))));
             resultMenuEntries.ForEach(resultMenu.AddEntry);
-            resultMenu.ShowMenu(true);
+            resultMenu.ShowMenu = true;
 
             // Highlight node and close menu when entry was chosen.
             void MenuEntryAction(GameObject chosen, string chosenName)
             {
                 HighlightNode(chosen, chosenName);
-                resultMenu.ShowMenu(false);
+                resultMenu.ShowMenu = false;
             }
         }
 

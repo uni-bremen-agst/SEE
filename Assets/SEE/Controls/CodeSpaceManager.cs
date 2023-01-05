@@ -87,7 +87,7 @@ namespace SEE.Controls
             if (!CodeSpaces.ContainsKey(playerName))
             {
                 CodeSpaces[playerName] = CodeSpace.FromValueObject(valueObject, gameObject);
-                CodeWindowMenu.AddEntry(new ToggleMenuEntry(false, () => ActivateSpace(playerName),
+                CodeWindowMenu.AddEntry(new ToggleMenuEntry( () => ActivateSpace(playerName),
                                                   DeactivateCurrentSpace, playerName,
                                                   $"Code window from player with IP address '{playerName}'.", Color.white));
                 CodeSpaces[playerName].CodeSpaceName += $" ({playerName})";
@@ -184,16 +184,17 @@ namespace SEE.Controls
         {
             //TODO: Icons
             CodeWindowMenu = gameObject.AddComponent<SelectionMenu>();
-            ToggleMenuEntry localEntry = new ToggleMenuEntry(true, () => ActivateSpace(LOCAL_PLAYER),
+            ToggleMenuEntry localEntry = new ToggleMenuEntry( () => ActivateSpace(LOCAL_PLAYER),
                                                              DeactivateCurrentSpace, LOCAL_PLAYER,
                                                              "Code windows for the local player (you).", Color.black);
-            ToggleMenuEntry noneEntry = new ToggleMenuEntry(false, () => CurrentPlayer = NO_PLAYER, () => { }, NO_PLAYER,
+            ToggleMenuEntry noneEntry = new ToggleMenuEntry( () => CurrentPlayer = NO_PLAYER, () => { }, NO_PLAYER,
                                                             "This option hides all code windows.", Color.grey);
             CodeWindowMenu.AddEntry(noneEntry);
             CodeWindowMenu.AddEntry(localEntry);
+            CodeWindowMenu.ActiveEntry = localEntry;
             foreach (KeyValuePair<string, CodeSpace> space in CodeSpaces.Where(space => space.Key != LOCAL_PLAYER))
             {
-                CodeWindowMenu.AddEntry(new ToggleMenuEntry(false, () => ActivateSpace(space.Key),
+                CodeWindowMenu.AddEntry(new ToggleMenuEntry( () => ActivateSpace(space.Key),
                                                   DeactivateCurrentSpace, space.Key,
                                                   $"Code window from player with IP address '{space.Key}'.", Color.white));
             }
