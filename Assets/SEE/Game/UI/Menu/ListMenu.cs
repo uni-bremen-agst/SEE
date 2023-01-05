@@ -106,18 +106,10 @@ namespace SEE.Game.UI.Menu
         }
 
         /// <summary>
-        /// Toggles the menu.
-        /// </summary>
-        /// <see cref="ShowMenu"/>
-        public void ToggleMenu()
-        {
-            ShowMenu = !ShowMenu;
-        }
-
-        /// <summary>
         /// Whether the menu can be closed by not making any selection.
         /// </summary>
         private bool allowNoSelection = true;
+
         /// <summary>
         /// Whether the menu can be closed by not making any selection.
         /// </summary>
@@ -163,12 +155,12 @@ namespace SEE.Game.UI.Menu
         /// The keyword listener.
         /// </summary>
         protected KeywordInput KeywordListener;
-        
+
         /// <summary>
         /// The menu game object.
         /// </summary>
         public GameObject Menu { get; protected set; }
-        
+
         /// <summary>
         /// Returns the game object corresponding to a menu entry.
         /// Assumes that the menu contains the entry.
@@ -176,6 +168,15 @@ namespace SEE.Game.UI.Menu
         /// <param name="entry">The menu entry.</param>
         /// <returns>The game object of the entry.</returns>
         public abstract GameObject EntryGameObject(T entry);
+
+        /// <summary>
+        /// Toggles the menu.
+        /// </summary>
+        /// <see cref="ShowMenu"/>
+        public void ToggleMenu()
+        {
+            ShowMenu = !ShowMenu;
+        }
 
         /// <summary>
         /// Updates the keyword listener.
