@@ -11,15 +11,10 @@ namespace SEE.Game.Avatars
     public class AvatarSRanipalLipV2 : MonoBehaviour
     {
         /// <summary>
-        /// taken from <see cref="SRanipal_AvatarLipSample_v2"/>
+        /// Stored LipShapeTables
         /// </summary>
         [SerializeField] private List<LipShapeTable_v2> LipShapeTables;
-
-        /// <summary>
-        /// taken from <see cref="SRanipal_AvatarLipSample_v2"/>
-        /// </summary>
-        public bool NeededToGetData = true;
-
+        
         /// <summary>
         /// Lip Weightings
         /// </summary>
@@ -41,7 +36,7 @@ namespace SEE.Game.Avatars
             // Create new LipShapeTable
             LipShapeTables = new List<LipShapeTable_v2>(new LipShapeTable_v2[1]);
 
-            // add empty LipShapeTable to list of LipShapeTables.
+            // Add empty LipShapeTable to list of LipShapeTables.
             LipShapeTables[0] = new LipShapeTable_v2();
 
             SkinnedMeshRenderer skinnedMeshRenderer = gameObject.GetComponent<SkinnedMeshRenderer>();
@@ -73,7 +68,8 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// taken from <see cref="SRanipal_AvatarLipSample_v2"/>
+        /// If the Lip Framework has the status WORKING, we will set the values of the Facial Tracker to
+        /// the Blendshapes (<see cref="UpdateLipShapes"/>).
         /// </summary>
         private void Update()
         {
@@ -81,16 +77,13 @@ namespace SEE.Game.Avatars
             {
                 return;
             }
-
-            if (NeededToGetData)
-            {
-                SRanipal_Lip_v2.GetLipWeightings(out LipWeightings);
-                UpdateLipShapes(LipWeightings);
-            }
+            
+            SRanipal_Lip_v2.GetLipWeightings(out LipWeightings);
+            UpdateLipShapes(LipWeightings);
         }
 
         /// <summary>
-        /// taken from <see cref="SRanipal_AvatarLipSample_v2"/>
+        /// Checks and sets the LipShapeTables.
         /// </summary>
         public void SetLipShapeTables(List<LipShapeTable_v2> lipShapeTables)
         {
@@ -126,7 +119,8 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// taken from <see cref="SRanipal_AvatarLipSample_v2"/>
+        /// Updates all Lip Shapes and sets the BlendShapeWeights (<see cref="RenderModelLipShape"/>) of each
+        /// Blendshape to match the Lip Shape Values from the Face Tracker.
         /// </summary>
         public void UpdateLipShapes(Dictionary<LipShape_v2, float> lipWeightings)
         {
@@ -137,7 +131,7 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// taken from <see cref="SRanipal_AvatarLipSample_v2"/>
+        /// Sets Blendshape Weights. 
         /// </summary>
         private void RenderModelLipShape(LipShapeTable_v2 lipShapeTable, Dictionary<LipShape_v2, float> weighting)
         {

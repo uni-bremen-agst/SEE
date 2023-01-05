@@ -33,7 +33,7 @@ namespace SEE.Net.Actions
         /// Initializes <see cref="ExpressionPlayer"/> and <see cref="NetworkObject"/>. The periodic call of
         /// <see cref="Synchronize"/> is triggered.
         /// </summary>
-        IEnumerator WaitForExpressionPlayer()
+        private IEnumerator WaitForExpressionPlayer()
         {
             // Waits for UMAExpressionPlayer to be created
             yield return new WaitUntil(() => gameObject.GetComponent<UMAExpressionPlayer>() != null);
