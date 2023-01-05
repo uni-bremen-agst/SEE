@@ -45,7 +45,7 @@ public class CodeCityLoader : MonoBehaviour
         RuntimeConfigMenuUtilities.AddActionToButton(cityLoader, "ContinueButton",
             () =>
             {
-                RuntimeConfigMenu.InitSettingsAutomatically();
+                RuntimeConfigMenu.InitSettings();
                 cityLoader.SetActive(false);    
                 seeSettingsPanel.SetActive(true);
 

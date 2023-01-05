@@ -61,9 +61,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         
         void Update()
         {
-            if ((PlayerSettings.GetInputType() == PlayerInputType.DesktopPlayer && SEEInput.ToggleConfigMenu()) ||
-                (PlayerSettings.GetInputType() == PlayerInputType.VRPlayer 
-                 && openAction != null && openAction.GetStateDown(SteamVR_Input_Sources.Any)))
+            if (SEEInput.ToggleConfigMenu())
             {
                 // Menu is always displayed from the top
                 // Should be changed as soon as backwards navigation has been added to each individual menu
