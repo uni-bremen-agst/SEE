@@ -144,11 +144,11 @@ namespace SEE.Game.UI.Menu
         {
             base.OnStartFinished();
             // updates the menu
-            if (Title != null) UpdateTitle();
-            if (Description != null) UpdateDescription();
-            if (Icon != null) UpdateIcon();
-            if (ShowMenu) UpdateShowMenu();
-            if (!AllowNoSelection) UpdateCloseButton();
+            UpdateTitle();
+            UpdateDescription();
+            UpdateIcon();
+            UpdateShowMenu();
+            UpdateCloseButton();
             Entries.ForEach(AddButton);
             // adds listeners for updating the menu
             OnTitleChanged += UpdateTitle;
