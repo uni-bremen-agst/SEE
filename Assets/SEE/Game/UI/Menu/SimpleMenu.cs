@@ -148,12 +148,14 @@ namespace SEE.Game.UI.Menu
             if (Description != null) UpdateDescription();
             if (Icon != null) UpdateIcon();
             if (ShowMenu) UpdateShowMenu();
+            if (!AllowNoSelection) UpdateCloseButton();
             Entries.ForEach(AddButton);
             // adds listeners for updating the menu
             OnTitleChanged += UpdateTitle;
             OnDescriptionChanged += UpdateDescription;
             OnIconChanged += UpdateIcon;
             OnShowMenuChanged += UpdateShowMenu;
+            OnAllowNoSelectionChanged += UpdateCloseButton;
             OnEntryAdded += AddButton;
             OnEntryRemoved += DestroyButton;
         }
@@ -202,6 +204,16 @@ namespace SEE.Game.UI.Menu
                 MenuManager.CloseWindow();
                 MenuTooltip.enabled = false;
             }
+        }
+
+
+        /// <summary>
+        /// Updates whether the close button is active.
+        /// Only visible if <see cref="AllowNoSelection"/> is true.
+        /// </summary>
+        protected virtual void UpdateCloseButton()
+        {
+            CloseButton.SetActive(AllowNoSelection);
         }
 
         /// <summary>
