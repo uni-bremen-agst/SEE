@@ -109,7 +109,7 @@ namespace SEE.Game
         /// <param name="to">the game node representing the target of <paramref name="edge"/></param>
         /// <param name="addToGraphElementIDMap">whether the returned edge should be added to <see cref="GraphElementIDMap"/></param>
         /// <returns></returns>
-        private GameObject DrawEdge(Edge edge, GameObject from, GameObject to, bool addToGraphElementIDMap = true)
+        private GameObject DrawEdge(Edge edge, GameObject from, GameObject to, bool addToGraphElementIDMap)
         {
             Assert.IsNotNull(from);
             Assert.IsNotNull(to);
@@ -178,6 +178,7 @@ namespace SEE.Game
         /// <summary>
         /// Creates and returns a new game edge between <paramref name="source"/> and <paramref name="target"/>
         /// based on the current settings. A new graph edge will be added to the underlying graph, too.
+        /// The resulting game edge will be added to <see cref="GraphElementIDMap"/>.
         ///
         /// Note: A default edge layout will be used if no edge layout was chosen.
         ///
@@ -212,7 +213,7 @@ namespace SEE.Game
             Edge edge = new Edge(fromNode, toNode, edgeType);
             fromNode.ItsGraph.AddEdge(edge);
 
-            return DrawEdge(edge, source, target);
+            return DrawEdge(edge, source, target, true);
         }
 
         /// <summary>
