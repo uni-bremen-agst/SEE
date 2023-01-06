@@ -11,7 +11,7 @@ namespace SEE.Game
     public interface IGraphRenderer
     {
         /// <summary>
-        /// Creates and returns a new game edge between <paramref name="from"/> and <paramref name="to"/>
+        /// Creates and returns a new game edge between <paramref name="source"/> and <paramref name="target"/>
         /// based on the current settings. A new graph edge will be added to the underlying graph, too.
         ///
         /// Note: A default edge layout will be used if no edge layout was chosen.
@@ -22,11 +22,9 @@ namespace SEE.Game
         /// <param name="source">source of the new edge</param>
         /// <param name="target">target of the new edge</param>
         /// <param name="edgeType">the type of the edge to be created</param>
-        /// <param name="existingEdge">If non-null, we'll use this as the edge in the underlying graph
-        /// instead of creating a new one</param>
-        /// <exception cref="Exception">thrown if <paramref name="from"/> or <paramref name="to"/>
+        /// <exception cref="System.Exception">thrown if <paramref name="from"/> or <paramref name="to"/>
         /// are not contained in any graph or contained in different graphs</exception>
-        GameObject DrawEdge(GameObject source, GameObject target, string edgeType, Edge existingEdge);
+        GameObject DrawEdge(GameObject source, GameObject target, string edgeType);
 
         /// <summary>
         /// Returns an edge layout for the given <paramref name="gameEdges"/>.

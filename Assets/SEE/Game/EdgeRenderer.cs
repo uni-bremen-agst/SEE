@@ -176,49 +176,43 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Creates and returns a new game edge between <paramref name="from"/> and <paramref name="to"/>
+        /// Creates and returns a new game edge between <paramref name="source"/> and <paramref name="target"/>
         /// based on the current settings. A new graph edge will be added to the underlying graph, too.
         ///
         /// Note: A default edge layout will be used if no edge layout was chosen.
         ///
-        /// Precondition: <paramref name="from"/> and <paramref name="to"/> must have a valid
+        /// Precondition: <paramref name="source"/> and <paramref name="target"/> must have a valid
         /// node reference. The corresponding graph nodes must be in the same graph.
         /// </summary>
-        /// <param name="from">source of the new edge</param>
-        /// <param name="to">target of the new edge</param>
+        /// <param name="source">source of the new edge</param>
+        /// <param name="target">target of the new edge</param>
         /// <param name="edgeType">the type of the edge to be created</param>
-        /// <param name="existingEdge">If non-null, we'll use this as the edge in the underlying graph
-        /// instead of creating a new one</param>
-        /// <exception cref="Exception">thrown if <paramref name="from"/> or <paramref name="to"/>
+        /// <exception cref="Exception">thrown if <paramref name="source"/> or <paramref name="target"/>
         /// are not contained in any graph or contained in different graphs</exception>
-        public GameObject DrawEdge(GameObject from, GameObject to, string edgeType, Edge existingEdge = null)
+        public GameObject DrawEdge(GameObject source, GameObject target, string edgeType)
         {
-            Node fromNode = from.GetNode();
+            Node fromNode = source.GetNode();
             if (fromNode == null)
             {
-                throw new Exception($"The source {from.name} of the edge is not contained in any graph.");
+                throw new Exception($"The source {source.name} of the edge is not contained in any graph.");
             }
 
-            Node toNode = to.GetNode();
+            Node toNode = target.GetNode();
             if (toNode == null)
             {
-                throw new Exception($"The target {to.name} of the edge is not contained in any graph.");
+                throw new Exception($"The target {target.name} of the edge is not contained in any graph.");
             }
 
             if (fromNode.ItsGraph != toNode.ItsGraph)
             {
-                throw new Exception($"The source {from.name} and target {to.name} of the edge are in different graphs.");
+                throw new Exception($"The source {source.name} and target {target.name} of the edge are in different graphs.");
             }
 
-            Edge edge = existingEdge;
-            if (edge == null)
-            {
-                // Creating the edge in the underlying graph
-                edge = new Edge(fromNode, toNode, edgeType);
-                fromNode.ItsGraph.AddEdge(edge);
-            }
+            // Creating the edge in the underlying graph
+            Edge edge = new Edge(fromNode, toNode, edgeType);
+            fromNode.ItsGraph.AddEdge(edge);
 
-            return DrawEdge(edge, from, to, existingEdge == null);
+            return DrawEdge(edge, source, target);
         }
 
         /// <summary>

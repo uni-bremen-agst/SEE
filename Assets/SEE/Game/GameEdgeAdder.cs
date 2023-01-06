@@ -29,12 +29,10 @@ namespace SEE.Game
         /// <param name="source">source of the edge</param>
         /// <param name="target">target of the edge</param>
         /// <param name="edgeType">the type of the edge to be added</param>
-        /// <param name="existingEdge">If non-null, we'll use this as the edge in the underlying graph
-        /// instead of creating a new one</param>
         /// <returns>the new game object representing the edge</returns>
         /// <exception cref="Exception">thrown if the edge could not be created; the message of the exception
         /// provides more details why</exception>
-        public static GameObject Add(GameObject source, GameObject target, string edgeType, Edge existingEdge = null)
+        public static GameObject Add(GameObject source, GameObject target, string edgeType)
         {
             Transform cityObject = SceneQueries.GetCodeCity(source.transform);
             GameObject result;
@@ -42,7 +40,7 @@ namespace SEE.Game
             {
                 if (cityObject.TryGetComponent(out AbstractSEECity city))
                 {
-                    result = city.Renderer.DrawEdge(source, target, edgeType, existingEdge);
+                    result = city.Renderer.DrawEdge(source, target, edgeType);
                 }
                 else
                 {
