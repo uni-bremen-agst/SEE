@@ -39,14 +39,6 @@ namespace SEE.Game.UI.Menu
         protected virtual string IconSprite => "Materials/ModernUIPack/Settings";
 
         /// <summary>
-        /// The path to the game object containing the icon and the title.
-        /// </summary>
-        protected virtual string IconTitlePath => "Main Content/Icon Title Mask/Content";
-        /// <summary>
-        /// Path to the close button game object.
-        /// </summary>
-        protected virtual string CloseButtonPath => "Main Content/Buttons";
-        /// <summary>
         /// Path to the content game object.
         /// Contains the entry list.
         /// </summary>
@@ -61,14 +53,6 @@ namespace SEE.Game.UI.Menu
         /// The menu manager.
         /// </summary>
         protected ModalWindowManager MenuManager { get; private set; }
-        /// <summary>
-        /// The game object containing the icon and the title.
-        /// </summary>
-        protected GameObject IconTitle { get; private set; }
-        /// <summary>
-        /// The close button game object.
-        /// </summary>
-        protected GameObject CloseButton { get; private set; }
         /// <summary>
         /// The content game object.
         /// </summary>
@@ -103,8 +87,6 @@ namespace SEE.Game.UI.Menu
             MenuManager = Menu.GetComponent<ModalWindowManager>();
             
             // stores specific parts of the menu
-            IconTitle = Menu.transform.Find(IconTitlePath).gameObject;
-            CloseButton = Menu.transform.Find(CloseButtonPath).gameObject;
             Content = Menu.transform.Find(ContentPath).gameObject;
             // instantiates the entry list if necessary
             if (!Content.transform.Find(EntryListPath))
@@ -213,7 +195,7 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         protected virtual void UpdateCloseButton()
         {
-            CloseButton.SetActive(AllowNoSelection);
+            MenuManager.confirmButton.gameObject.SetActive(AllowNoSelection);
         }
 
         /// <summary>
@@ -247,8 +229,8 @@ namespace SEE.Game.UI.Menu
             Color color = entry.Enabled ? entry.EntryColor : entry.DisabledColor;
             button.GetComponent<Image>().color = color;
             Color textColor = color.IdealTextColor();
-            button.transform.Find("Text").gameObject.GetComponent<TextMeshProUGUI>().color = textColor;
-            button.transform.Find("Icon").gameObject.GetComponent<Image>().color = textColor;
+            manager.normalText.color = textColor;
+            manager.normalImage.color = textColor;
         }
 
         /// <summary>
@@ -267,7 +249,7 @@ namespace SEE.Game.UI.Menu
         protected virtual void UpdateLayout()
         {
             MenuManager.UpdateUI();
-            LayoutRebuilder.ForceRebuildLayoutImmediate(IconTitle.transform as RectTransform);
+            LayoutRebuilder.ForceRebuildLayoutImmediate(Menu.transform as RectTransform);
         }
     }
 }
