@@ -50,6 +50,7 @@ namespace SEE.Game.UI.Menu
         {
             GameObject view = PrefabInstantiator.InstantiatePrefab(ViewPrefab, ViewList.transform, false);
             view.name = entry.Title;
+            view.SetActive(false);
         }
 
         protected virtual void RemoveView(T entry)
