@@ -196,7 +196,8 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         protected virtual void UpdateCloseButton()
         {
-            MenuManager.confirmButton.gameObject.SetActive(AllowNoSelection);
+            if (MenuManager.confirmButton != null)
+                MenuManager.confirmButton.gameObject.SetActive(AllowNoSelection);
         }
 
         /// <summary>
