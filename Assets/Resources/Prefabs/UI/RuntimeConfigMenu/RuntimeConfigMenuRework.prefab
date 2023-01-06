@@ -1212,8 +1212,8 @@ MonoBehaviour:
   windowIcon: {fileID: 7532082840377106743}
   windowTitle: {fileID: 6858195498952399003}
   windowDescription: {fileID: 6598862683781582154}
-  confirmButton: {fileID: 0}
-  cancelButton: {fileID: 5578592442726008526}
+  confirmButton: {fileID: 5578592442726008526}
+  cancelButton: {fileID: 0}
   mwAnimator: {fileID: 5782401636765229652}
   icon: {fileID: 0}
   titleText: Title
@@ -2004,7 +2004,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -2613,7 +2613,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &3826825770691924671
 RectTransform:
   m_ObjectHideFlags: 0

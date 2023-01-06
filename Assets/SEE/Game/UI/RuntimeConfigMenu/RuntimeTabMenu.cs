@@ -21,8 +21,6 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     protected override string IconSprite => base.IconSprite;
     // TODO: where can be specific parts of the menu be found
     protected override string ViewListPath => "SettingsContentView";
-    protected override string IconTitlePath => "SeeSettingsPanel/MainContent/Icon Title Mask/Content";
-    protected override string CloseButtonPath => "SeeSettingsPanel/MainContent/Buttons/Content";
     protected override string ContentPath => "SeeSettingsPanel/MainContent";
     protected override string EntryListPath => "Tabs/TabObjects";
     
