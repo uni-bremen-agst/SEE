@@ -37,8 +37,8 @@ namespace SEE.Game
         protected AbstractLayoutNode(Node node, IDictionary<Node, ILayoutNode> toLayoutNode)
         {
             this.node = node;
-            this.to_layout_node = toLayoutNode;
-            this.to_layout_node[node] = this;
+            this.toLayoutNode = toLayoutNode;
+            this.toLayoutNode[node] = this;
         }
 
         /// <summary>
@@ -60,10 +60,10 @@ namespace SEE.Game
         /// <summary>
         /// The mapping from graph nodes onto layout nodes. Every layout node created by any of the
         /// constructors of this class or one of its subclasses will be added to it. All layout nodes
-        /// given to the layout will refer to the same mapping, i.e., to_layout_node is the same for all.
-        /// The mapping will be given by the constructor.
+        /// given to the layout will refer to the same mapping, i.e., <see cref="toLayoutNode"/> is the
+        /// same for all. The mapping will be gathered by the constructor.
         /// </summary>
-        protected readonly IDictionary<Node, ILayoutNode> to_layout_node;
+        protected readonly IDictionary<Node, ILayoutNode> toLayoutNode;
 
         /// <summary>
         /// Whether this node represents a leaf.
@@ -95,7 +95,7 @@ namespace SEE.Game
                     // The node does not have a parent in the original graph.
                     return null;
                 }
-                else if (to_layout_node.TryGetValue(node.Parent, out ILayoutNode result))
+                else if (toLayoutNode.TryGetValue(node.Parent, out ILayoutNode result))
                 {
                     // The node has a parent in the original graph and that parent was passed to the layout.
                     return result;
@@ -113,7 +113,7 @@ namespace SEE.Game
         /// is true, the empty list will be returned.
         ///
         /// Note: If a child of the node in the underlying graph, has no
-        /// corresponding layout node (<see cref="to_layout_node"/>), it will be ignored silently.
+        /// corresponding layout node (<see cref="toLayoutNode"/>), it will be ignored silently.
         /// This is useful in situation where only a subset of nodes is to be considered for a layout.
         /// </summary>
         /// <returns>children of this node</returns>
@@ -126,7 +126,7 @@ namespace SEE.Game
                 result = new List<ILayoutNode>(children.Count);
                 foreach (Node node in children)
                 {
-                    if (to_layout_node.TryGetValue(node, out ILayoutNode layoutNode))
+                    if (toLayoutNode.TryGetValue(node, out ILayoutNode layoutNode))
                     {
                         result.Add(layoutNode);
                     }
@@ -162,7 +162,7 @@ namespace SEE.Game
                 ICollection<ILayoutNode> successors = new List<ILayoutNode>();
                 foreach (Edge edge in node.Outgoings)
                 {
-                    successors.Add(to_layout_node[edge.Target]);
+                    successors.Add(toLayoutNode[edge.Target]);
                 }
                 return successors;
             }
