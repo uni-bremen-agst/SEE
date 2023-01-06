@@ -184,6 +184,7 @@ namespace SEE.Game.UI.Menu
             else
             {
                 MenuManager.CloseWindow();
+                MenuTooltip.Hide();
                 MenuTooltip.enabled = false;
             }
         }
