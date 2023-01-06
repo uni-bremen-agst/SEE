@@ -70,7 +70,7 @@ namespace SEE.Game
             // One layout game node for each game node.
             ICollection<LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes, (go) => new LayoutGameNode(toLayoutNode, go));
 
-            // Now we have all nodes (game nodes and layout nodes). Next we gather the layout edges
+            // Now we have all nodes (game nodes and layout nodes). Next we gather the layout edges.
 
             // The layout edges for all gameEdges.
             ICollection<LayoutGraphEdge<ILayoutNode>> layoutEdges = new List<LayoutGraphEdge<ILayoutNode>>(gameEdges.Count);
