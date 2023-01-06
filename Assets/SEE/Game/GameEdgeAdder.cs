@@ -40,8 +40,7 @@ namespace SEE.Game
             GameObject result;
             if (cityObject != null)
             {
-                // FIXME: This will work only for SEECity but not other subclasses of AbstractSEECity.
-                if (cityObject.TryGetComponent(out SEECity city))
+                if (cityObject.TryGetComponent(out AbstractSEECity city))
                 {
                     result = city.Renderer.DrawEdge(source, target, edgeType, existingEdge);
                 }
