@@ -17,7 +17,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     protected const string RUNTIME_CONFIG_PREFAB_FOLDER = UI_PREFAB_FOLDER + "RuntimeConfigMenu/";
     public const string SETTINGS_OBJECT_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsObject";
     public const string SWITCH_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsSwitch";
-
+    public const string FILEPICKER_PREFAB = UI_PREFAB_FOLDER + "Input Group - File Picker";
 
     protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenuRework";
     protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsView";
@@ -99,5 +99,18 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         setting.name = memberInfo.Name;
         setting.GetComponentInChildren<Text>().text = memberInfo.Name;
 
+        CreateSettingObject(memberInfo, setting);
+    }
+
+    private void CreateSettingObject(MemberInfo memberInfo, GameObject setting)
+    {
+        if (memberInfo is FieldInfo fieldInfo)
+        {
+            if (fieldInfo.FieldType == typeof(SEE.Utils.FilePath))
+            {
+                GameObject filePathGameObject = PrefabInstantiator.InstantiatePrefab(FILEPICKER_PREFAB, setting.transform, false);
+            }
+        }
+        //TODO add other settings
     }
 }
