@@ -4,7 +4,10 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
+using System.Reflection;
+using SEE.DataModel;
 using SEE.Game.UI.Menu;
+using Sirenix.Utilities;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -44,21 +47,12 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         void Start()
         {
             Menu = gameObject.AddComponent<RuntimeTabMenu>();
-            Menu.Title = "Tab Menu Titel";
-            Menu.Description = "Ich bin die Beschreibung.";
+            Menu.Title = "City Configuration";
+            Menu.Description = "Configure the city however you like.";
             Menu.HideAfterSelection = false;
 
-            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Ferdinand", "Ich bin der Ferdinand.", Color.blue));
-            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Mahmoud", "Ich bin der Mahmoud.", Color.cyan));
-            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Thilo", "Ich bin der Thilo.", Color.yellow));
-            
-            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Ferdinand1", "Ich bin der Ferdinand.", Color.blue));
-            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Mahmoud1", "Ich bin der Mahmoud.", Color.cyan));
-            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Thilo1", "Ich bin der Thilo.", Color.yellow));
-            
-            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Ferdinand2", "Ich bin der Ferdinand.", Color.blue));
-            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Mahmoud2", "Ich bin der Mahmoud.", Color.cyan));
-            Menu.AddEntry(new ToggleMenuEntry(() => { },()=>{},  "Thilo2", "Ich bin der Thilo.", Color.yellow));
+            AbstractSEECity city = GameObject.FindGameObjectWithTag(Tags.CodeCity).GetComponent<AbstractSEECity>();
+            city.GetType().GetFields().ForEach(Menu.AddSetting);
         }
         
         void Update()
