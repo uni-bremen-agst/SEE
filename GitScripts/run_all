@@ -1,6 +1,13 @@
 #!/bin/sh
-set -eu
+set -e
+
+if [ -n "$CI" ]; then
+    echo "Running all pre-commit hook scripts..."
+fi
 
 for file in ./GitScripts/*.sh; do
+    if [ -n "$CI" ]; then
+        echo "Running $file..."
+    fi
     $file
 done
