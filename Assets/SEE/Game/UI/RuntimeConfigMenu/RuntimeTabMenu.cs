@@ -1,16 +1,12 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using SEE.Game.UI.ConfigMenu;
+using SEE.Game.City;
 using SEE.Game.UI.Menu;
 using SEE.Utils;
 using Sirenix.OdinInspector;
+using Sirenix.Utilities;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.UI;
-using Random = UnityEngine.Random;
 
 public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 {
@@ -18,6 +14,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     public const string SETTINGS_OBJECT_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsObject";
     public const string SWITCH_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsSwitch";
     public const string FILEPICKER_PREFAB = UI_PREFAB_FOLDER + "Input Group - File Picker";
+    public const string SLIDER_PREFAB = UI_PREFAB_FOLDER + "Input Group - Slider";
 
     protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenuRework";
     protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsView";
@@ -37,24 +34,9 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     protected override string EntryListPath => "Tabs/TabObjects";
 
     /// <summary>
-    /// The city settings.
+    /// The SEE-city.
     /// </summary>
-    private readonly List<MemberInfo> settings = new();
-
-    /// <summary>
-    /// Adds a setting to the menu.
-    /// </summary>
-    /// <param name="memberInfo"></param>
-    public void AddSetting(MemberInfo memberInfo)
-    {
-        settings.Add(memberInfo);
-        OnSettingAdded?.Invoke(memberInfo);
-    }
-
-    /// <summary>
-    /// Triggers when a setting was added.
-    /// </summary>
-    public event UnityAction<MemberInfo> OnSettingAdded;
+    public AbstractSEECity City { private get; set; }
 
     /// <summary>
     /// Updates the menu and adds listeners.
@@ -62,8 +44,10 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     protected override void OnStartFinished()
     {
         base.OnStartFinished();
-        settings.ForEach(CreateSetting);
-        OnSettingAdded += CreateSetting;
+        OnEntryAdded += _ => SetMiscAsLastTab();
+        // TODO: Auch Properties und Methoden umsetzen:
+        // City.GetType().GetMembers()
+        City.GetType().GetFields().ForEach(CreateSetting);
     }
 
     /// <summary>
@@ -71,6 +55,26 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     /// </summary>
     /// <param name="memberInfo"></param>
     protected virtual void CreateSetting(MemberInfo memberInfo)
+    {
+        // gets the view game object
+        GameObject view = GetViewGameObjectHelper(memberInfo);
+        Transform viewContent = view.transform.Find("Content");
+
+        // TODO: Instantiate and setup prefabs based on member info
+
+        GameObject setting = PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, viewContent, false);
+        setting.name = memberInfo.Name;
+        setting.GetComponentInChildren<Text>().text = memberInfo.Name;
+        CreateSettingObject(memberInfo, setting);
+    }
+
+    /// <summary>
+    /// Returns the view game object.
+    /// Adds an entry if necessary.
+    /// </summary>
+    /// <param name="memberInfo"></param>
+    /// <returns></returns>
+    private GameObject GetViewGameObjectHelper(MemberInfo memberInfo)
     {
         string tabName = memberInfo.GetCustomAttributes().OfType<TabGroupAttribute>().FirstOrDefault()?.TabName ??
                          "Misc";
@@ -89,28 +93,43 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             );
             AddEntry(entry);
         }
-        // gets the view game object
-        GameObject view = ViewGameObject(entry);
-        Transform viewContent = view.transform.Find("Content");
-        
-        // TODO: Instantiate and setup prefabs based on member info
-        
-        GameObject setting = PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, viewContent, false);
-        setting.name = memberInfo.Name;
-        setting.GetComponentInChildren<Text>().text = memberInfo.Name;
 
-        CreateSettingObject(memberInfo, setting);
+        return ViewGameObject(entry);
     }
 
     private void CreateSettingObject(MemberInfo memberInfo, GameObject setting)
     {
+        /*
+         * TODO: MembersTypes
+         * Relevant: Field, Method, Property
+         * Irrelevant: All, Constructor, Custom, Event, NestedType, TypeInfo
+         */
         if (memberInfo is FieldInfo fieldInfo)
         {
-            if (fieldInfo.FieldType == typeof(SEE.Utils.FilePath))
+            object value = fieldInfo.GetValue(City);
+            // This is how to set the value:
+            // fieldInfo.SetValue(City, value);
+            if (value is FilePath)
             {
-                GameObject filePathGameObject = PrefabInstantiator.InstantiatePrefab(FILEPICKER_PREFAB, setting.transform, false);
+                GameObject filePickerGameObject =
+                    PrefabInstantiator.InstantiatePrefab(FILEPICKER_PREFAB, setting.transform, false);
+            }
+            else if (value is int or float or double)
+            {
+                GameObject sliderGameObject =
+                    PrefabInstantiator.InstantiatePrefab(SLIDER_PREFAB, setting.transform, false);
+                Slider sliderManager = sliderGameObject.GetComponentInChildren<Slider>();
+                sliderManager.value = 5.0f;
             }
         }
-        //TODO add other settings
+    }
+    
+    /// <summary>
+    /// Sets the misc button as the last in the tab list.
+    /// </summary>
+    protected virtual void SetMiscAsLastTab()
+    {
+        ToggleMenuEntry miscEntry = Entries.FirstOrDefault(entry => entry.Title == "Misc");
+        if (miscEntry != null) EntryGameObject(miscEntry).transform.SetAsLastSibling();
     }
 }

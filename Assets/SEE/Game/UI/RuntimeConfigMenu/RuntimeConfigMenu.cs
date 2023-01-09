@@ -50,9 +50,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             Menu.Title = "City Configuration";
             Menu.Description = "Configure the city however you like.";
             Menu.HideAfterSelection = false;
+            Menu.City = GameObject.FindGameObjectWithTag(Tags.CodeCity).GetComponent<AbstractSEECity>();
 
-            AbstractSEECity city = GameObject.FindGameObjectWithTag(Tags.CodeCity).GetComponent<AbstractSEECity>();
-            city.GetType().GetFields().ForEach(Menu.AddSetting);
         }
         
         void Update()
