@@ -30,6 +30,8 @@ Assets/AmplifyShaderEditor.meta filter=lfs diff=lfs merge=lfs -text
 Assets/AmplifyShaderEditor/** filter=lfs diff=lfs merge=lfs -text
 Assets/ANGRY[[:space:]]MESH/** filter=lfs diff=lfs merge=lfs -text
 Assets/Antlr4.Runtime.Standard.dll filter=lfs diff=lfs merge=lfs -text
+Assets/AutoHand/** filter=lfs diff=lfs merge=lfs -text
+Assets/AutoHand.meta filter=lfs diff=lfs merge=lfs -text
 Assets/BigFurniturePack/** filter=lfs diff=lfs merge=lfs -text
 Assets/BlockDecorationsPSD/** filter=lfs diff=lfs merge=lfs -text
 Assets/Cartoon_Texture_Pack/** filter=lfs diff=lfs merge=lfs -text
@@ -85,3 +87,4 @@ Assets/StreamingAssets/Videos/** filter=lfs diff=lfs merge=lfs -text
 Assets/SteamVR/** filter=lfs diff=lfs merge=lfs -text
 Assets/StreamingAssets/Videos.meta filter=lfs diff=lfs merge=lfs -text
 Assets/SteamVR.meta filter=lfs diff=lfs merge=lfs -text
+
