@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using SEE.Game.City;
 using UnityEngine;
 
@@ -20,5 +22,19 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// <param name="city">The SEECity for which the metric should be calculated.</param>
         /// <returns>The calculated metric value</returns>
         internal abstract MetricValue Refresh(SEECity city);
+
+        /// <summary>
+        /// Method for getting an <see cref="Array"/> of all available <see cref="Metric"/> implementations.
+        /// </summary>
+        /// <returns>The types of all available <see cref="Metric"/> implementations.</returns>
+        internal static Type[] GetTypes()
+        {
+            return AppDomain
+                .CurrentDomain
+                .GetAssemblies()
+                .SelectMany(domainAssembly => domainAssembly.GetTypes())
+                .Where(type => type.IsSubclassOf(typeof(Metric)))
+                .ToArray();
+        }
     }
 }
