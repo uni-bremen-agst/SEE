@@ -47,7 +47,7 @@ namespace SEE.Game
     /// Assumption: This EvolutionRenderer is attached to a game object representing a code
     /// city that has another component of type SEECityEvolution.
     /// </summary>
-    public partial class EvolutionRenderer : MonoBehaviour
+    public partial class EvolutionRenderer : MonoBehaviour, IGraphRenderer
     {
         /// <summary>
         /// Sets the evolving series of <paramref name="graphs"/> to be visualized.
@@ -1507,6 +1507,66 @@ namespace SEE.Game
             {
                 return currentCity.Graph.AllNumericNodeAttributes();
             }
+        }
+
+        /// <summary>
+        /// Yields a graph renderer that can draw this city.
+        /// </summary>
+        /// <remarks>Implements <see cref="AbstractSEECity.Renderer"/>.</remarks>
+        public GraphRenderer Renderer => graphRenderer;
+
+        /// <summary>
+        /// Creates and returns a new game edge between <paramref name="source"/> and <paramref name="target"/>
+        /// based on the current settings. A new graph edge will be added to the underlying graph, too.
+        ///
+        /// Note: The default edge layout <see cref="IGraphRenderer.EdgeLayoutDefault"/> will be used if no edge layout,
+        /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
+        ///
+        /// Precondition: <paramref name="source"/> and <paramref name="target"/> must have a valid
+        /// node reference. The corresponding graph nodes must be in the same graph.
+        /// </summary>
+        /// <param name="source">source of the new edge</param>
+        /// <param name="target">target of the new edge</param>
+        /// <param name="edgeType">the type of the edge to be created</param>
+        /// <returns>The new game object representing the new edge from <paramref name="source"/> to <paramref name="target"/>.</returns>
+        /// <exception cref="System.Exception">thrown if <paramref name="source"/> or <paramref name="target"/>
+        /// are not contained in any graph or contained in different graphs</exception>
+        /// <remarks>Implements <see cref="IGraphRenderer.DrawEdge(GameObject, GameObject, string, Edge)"/>.</remarks>
+        public GameObject DrawEdge(GameObject source, GameObject target, string edgeType)
+        {
+            return graphRenderer.DrawEdge(source, target, edgeType);
+        }
+
+        /// <summary>
+        /// Creates and returns a new game object for representing the given <paramref name="node"/>.
+        /// The <paramref name="node"/> is attached to that new game object via a NodeRef component.
+        /// LOD is added and the resulting node is prepared for interaction.
+        /// </summary>
+        /// <param name="node">graph node to be represented</param>
+        /// <param name="city">the game object representing the city in which to draw this node;
+        /// it has the information about how to draw the node and portal of the city</param>
+        /// <returns>game object representing given <paramref name="node"/></returns>
+        /// <remarks>Implements <see cref="IGraphRenderer.DrawNode(Node, GameObject)"/>.</remarks>
+        public GameObject DrawNode(Node node, GameObject city = null)
+        {
+            return graphRenderer.DrawNode(node, city);
+        }
+
+        /// <summary>
+        /// Returns an edge layout for the given <paramref name="gameEdges"/>.
+        ///
+        /// The result is a mapping of the names of the game objects in <paramref name="gameEdges"/>
+        /// onto the layout for those edges.
+        ///
+        /// Precondition: The game objects in <paramref name="gameEdges"/> represent graph edges.
+        /// </summary>
+        /// <param name="gameEdges">the edges for which to create a layout</param>
+        /// <returns>mapping of the names of the game objects in <paramref name="gameEdges"/> onto
+        /// their layout information</returns>
+        /// <remarks>Implements <see cref="IGraphRenderer.LayoutEdges(ICollection{GameObject})"/>.</remarks>
+        public IDictionary<string, ILayoutEdge<ILayoutNode>> LayoutEdges(ICollection<GameObject> gameEdges)
+        {
+            return graphRenderer.LayoutEdges(gameEdges);
         }
 
         /// <summary>

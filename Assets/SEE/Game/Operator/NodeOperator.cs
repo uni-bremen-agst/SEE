@@ -5,6 +5,8 @@ using DG.Tweening;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.Layout;
+using SEE.Layout.EdgeLayouts;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using TinySpline;
@@ -214,6 +216,8 @@ namespace SEE.Game.Operator
         {
             if (!Node.IsRoot())
             {
+                // If we are moving the root node, the whole graph will be moved,
+                // hence, the layout of the edges does not need to be updated.
                 UpdateEdgeLayout(duration);
             }
             UpdateLabelLayout(duration);
@@ -264,37 +268,45 @@ namespace SEE.Game.Operator
                                                   .SelectMany(n => n.Incomings.Union(n.Outgoings))
                                                   .Where(edge => !edge.HasToggle(GraphElement.IsVirtualToggle))
                                                   .Distinct();
-            foreach (Edge edge in relevantEdges)
-            {
-                // Add new target edge, we'll animate the current edge to it.
-                GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
-                if (gameEdge == null)
-                {
-                    // TODO: How is this possible?
-                    Debug.LogWarning($"Edge {edge.ToShortString()} has no associated GameObject!");
-                    continue;
-                }
-
-                GameObject source = edge.Source == node ? gameObject : edge.Source.RetrieveGameNode();
-                GameObject target = edge.Target == node ? gameObject : edge.Target.RetrieveGameNode();
-                // NOTE: newEdge will not be added to the GraphElementIDMap.
-                GameObject newEdge = GameEdgeAdder.Add(source, target, edge.Type, edge);
-
-                EdgeOperator edgeOperator = gameEdge.AddOrGetComponent<EdgeOperator>();
-                newEdge.MustGetComponent(out SEESpline newSpline);
-                BSpline targetSpline = newSpline.Spline;
-
-                // NOTE: We *must not* use the Destroyer class here. newEdge hasn't been added to the GraphElementIDMap,
-                //       and newEdge.name == gameEdge.name, so it would delete the original gameEdge from the map.
-                // TODO: Instead of this work around, there should be a way to work on BSpline's alone, without
-                //       having to use SEESpline as a wrapper.
-                Destroy(newEdge);
-                edgeOperator.MorphTo(targetSpline, duration);
-            }
+            MorphEdges(relevantEdges, duration);
 
             // Once we're done, we reset the gameObject to its original position.
             transform.position = oldPosition;
             transform.localScale = oldScale;
+        }
+
+        /// <summary>
+        /// Morphs all <paramref name="edges"/> while the node is moving.
+        /// </summary>
+        /// <param name="edges">edges to be morphed</param>
+        /// <param name="duration">the duration of the animation in seconds</param>
+        private void MorphEdges(IEnumerable<Edge> edges, float duration)
+        {
+            // All game edges corresponding to the graph edges.
+            IList<GameObject> gameEdges = new List<GameObject>(edges.Count());
+
+            // Gather all gameEdges.
+            foreach (Edge edge in edges)
+            {
+                GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
+                if (gameEdge == null)
+                {
+                    // TODO: How is this possible?
+                    Debug.LogWarning($"Edge {edge.ToShortString()} has no associated GameObject!\n");
+                    continue;
+                }
+                gameEdges.Add(gameEdge);
+            }
+
+            // Calculate the layout for all gameEdges.
+            IDictionary<string, ILayoutEdge<ILayoutNode>> layoutEdges = City.Renderer.LayoutEdges(gameEdges);
+
+            // Let each game edge morph to the splines according to the layout.
+            foreach (GameObject gameEdge in gameEdges)
+            {
+                EdgeOperator edgeOperator = gameEdge.AddOrGetComponent<EdgeOperator>();
+                edgeOperator.MorphTo(layoutEdges[gameEdge.name].Spline, duration);
+            }
         }
 
         private void OnEnable()

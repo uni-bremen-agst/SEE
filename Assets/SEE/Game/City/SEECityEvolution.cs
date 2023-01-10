@@ -106,6 +106,12 @@ namespace SEE.Game.City
         public Color DeletionBeamColor = Color.black;
 
         /// <summary>
+        /// Yields the graph renderer that draws this city.
+        /// </summary>
+        /// <remarks>Implements <see cref="AbstractSEECity.Renderer"/>.</remarks>
+        public override IGraphRenderer Renderer => evolutionRenderer.Renderer;
+
+        /// <summary>
         /// Factory method to create the used EvolutionRenderer.
         /// </summary>
         /// <returns>the current or new evolution renderer attached to this city</returns>
