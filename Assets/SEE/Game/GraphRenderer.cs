@@ -720,7 +720,7 @@ namespace SEE.Game
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
         private ICollection<LayoutGameNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
         {
-            return ToLayoutNodes(gameObjects, (go) => new LayoutGameNode(toLayoutNode, go));
+            return ToLayoutNodes(gameObjects, go => new LayoutGameNode(toLayoutNode, go));
         }
 
         /// <summary>
