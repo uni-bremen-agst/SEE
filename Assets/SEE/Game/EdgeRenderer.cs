@@ -132,7 +132,7 @@ namespace SEE.Game
             AddAscendants(to, gameNodes);
             Dictionary<Node, ILayoutNode> nodeToLayoutNode = new Dictionary<Node, ILayoutNode>();
             // The layout nodes corresponding to those game nodes.
-            ICollection<LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes, (go) => new LayoutGameNode(nodeToLayoutNode, go));
+            ICollection<LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes, go => new LayoutGameNode(nodeToLayoutNode, go));
 
             LayoutGameNode fromLayoutNode = null; // layout node in layoutNodes corresponding to source node
             LayoutGameNode toLayoutNode = null; // layout node in layoutNodes corresponding to target node
