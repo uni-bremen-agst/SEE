@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Reflection;
+using Michsky.UI.ModernUIPack;
 using SEE.Game.City;
 using SEE.Game.UI.Menu;
 using SEE.Utils;
@@ -114,12 +115,20 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 GameObject filePickerGameObject =
                     PrefabInstantiator.InstantiatePrefab(FILEPICKER_PREFAB, setting.transform, false);
             }
-            else if (value is int or float or double)
+            else if (value is float f)
             {
                 GameObject sliderGameObject =
                     PrefabInstantiator.InstantiatePrefab(SLIDER_PREFAB, setting.transform, false);
-                Slider sliderManager = sliderGameObject.GetComponentInChildren<Slider>();
-                sliderManager.value = 5.0f;
+                SliderManager sliderManager = sliderGameObject.GetComponentInChildren<SliderManager>();
+                Slider slider = sliderGameObject.GetComponentInChildren<Slider>();
+                
+                sliderManager.usePercent = false;
+                sliderManager.useRoundValue = false;
+                slider.minValue = 0;
+                slider.maxValue = 1;
+                
+                slider.value = f;
+                slider.onValueChanged.AddListener(changedValue=> fieldInfo.SetValue(City, changedValue));
             }
         }
     }
