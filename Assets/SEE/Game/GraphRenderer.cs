@@ -724,29 +724,17 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Specifies a method that returns a layout node of a game node.
-        /// </summary>
-        /// <typeparam name="T">type parameter for the kind of layout node</typeparam>
-        /// <param name="gameNode">game node for which to create a layout node</param>
-        /// <returns>a new layout node</returns>
-        private delegate T NewLayoutNode<T>(GameObject gameNode);
-
-        /// <summary>
         /// Transforms the given <paramref name="gameNodes"/> to a collection of <see cref="LayoutGameNode"/>s.
         /// Sets the node levels of all <paramref name="gameNodes"/>.
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
+        /// <param name="newLayoutNode">delegate that returns a new layout node <see cref="T"/> for each <see cref="GameObject"/></param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
         private static ICollection<T> ToLayoutNodes<T>
             (ICollection<GameObject> gameNodes,
-             NewLayoutNode<T> newLayoutNode) where T : class, ILayoutNode
+             Func<GameObject, T> newLayoutNode) where T : class, ILayoutNode
         {
-            ICollection<T> result = new List<T>(gameNodes.Count);
-
-            foreach (GameObject gameObject in gameNodes)
-            {
-                result.Add(newLayoutNode(gameObject));
-            }
+            ICollection<T> result = gameNodes.Select(newLayoutNode).ToList();
             LayoutNodes.SetLevels(result);
             return result;
         }

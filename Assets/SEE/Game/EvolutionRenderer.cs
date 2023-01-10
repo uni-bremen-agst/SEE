@@ -1519,15 +1519,17 @@ namespace SEE.Game
         /// Creates and returns a new game edge between <paramref name="source"/> and <paramref name="target"/>
         /// based on the current settings. A new graph edge will be added to the underlying graph, too.
         ///
-        /// Note: A default edge layout will be used if no edge layout was chosen.
+        /// Note: The default edge layout <see cref="IGraphRenderer.EdgeLayoutDefault"/> will be used if no edge layout,
+        /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
         ///
-        /// Precondition: <paramref name="from"/> and <paramref name="to"/> must have a valid
+        /// Precondition: <paramref name="source"/> and <paramref name="target"/> must have a valid
         /// node reference. The corresponding graph nodes must be in the same graph.
         /// </summary>
         /// <param name="source">source of the new edge</param>
         /// <param name="target">target of the new edge</param>
         /// <param name="edgeType">the type of the edge to be created</param>
-        /// <exception cref="Exception">thrown if <paramref name="from"/> or <paramref name="to"/>
+        /// <returns>The new game object representing the new edge from <paramref name="source"/> to <paramref name="target"/>.</returns>
+        /// <exception cref="System.Exception">thrown if <paramref name="source"/> or <paramref name="target"/>
         /// are not contained in any graph or contained in different graphs</exception>
         /// <remarks>Implements <see cref="IGraphRenderer.DrawEdge(GameObject, GameObject, string, Edge)"/>.</remarks>
         public GameObject DrawEdge(GameObject source, GameObject target, string edgeType)

@@ -35,9 +35,9 @@ namespace SEE.Game
             EdgeLayoutKind savedEdgeLayout = Settings.EdgeLayoutSettings.Kind;
             if (savedEdgeLayout == EdgeLayoutKind.None)
             {
-                Debug.LogWarning($"Edges should be laid out, but no edge layout was chosen. Using default {EdgeLayoutKind.Spline}.\n");
+                Debug.LogWarning($"Edges should be laid out, but no edge layout was chosen. Using default {IGraphRenderer.EdgeLayoutDefault}.\n");
                 // Select default layout
-                Settings.EdgeLayoutSettings.Kind = EdgeLayoutKind.Spline;
+                Settings.EdgeLayoutSettings.Kind = IGraphRenderer.EdgeLayoutDefault;
             }
 
             // All source and target game nodes of the edges.
@@ -108,7 +108,7 @@ namespace SEE.Game
         /// <param name="from">the game node representing the source of <paramref name="edge"/></param>
         /// <param name="to">the game node representing the target of <paramref name="edge"/></param>
         /// <param name="addToGraphElementIDMap">whether the returned edge should be added to <see cref="GraphElementIDMap"/></param>
-        /// <returns></returns>
+        /// <returns>The new game object representing the new edge from <paramref name="source"/> to <paramref name="target"/>.</returns>
         private GameObject DrawEdge(Edge edge, GameObject from, GameObject to, bool addToGraphElementIDMap)
         {
             Assert.IsNotNull(from);
@@ -119,18 +119,18 @@ namespace SEE.Game
             {
                 Debug.LogWarning($"An edge {edge.ID} from {edge.Source.ID} to {edge.Target.ID} was added to the graph, but no edge layout was chosen.\n");
                 // Select default layout
-                Settings.EdgeLayoutSettings.Kind = EdgeLayoutKind.Spline;
+                Settings.EdgeLayoutSettings.Kind = IGraphRenderer.EdgeLayoutDefault;
             }
 
             // Creating the game object representing the edge.
             // The edge layout will be calculated for the following gameNodes. This list will
             // contain the source and target of the edge but also all their ascendants. The
             // ascendants are needed for hierarchical layouts.
-            HashSet<GameObject> gameNodes = new HashSet<GameObject>();
+            HashSet<GameObject> gameNodes = new();
             // We add the ascendants of the source and target nodes in case the edge layout is hierarchical.
             AddAscendants(from, gameNodes);
             AddAscendants(to, gameNodes);
-            Dictionary<Node, ILayoutNode> nodeToLayoutNode = new Dictionary<Node, ILayoutNode>();
+            Dictionary<Node, ILayoutNode> nodeToLayoutNode = new();
             // The layout nodes corresponding to those game nodes.
             ICollection<LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes, go => new LayoutGameNode(nodeToLayoutNode, go));
 
@@ -178,9 +178,9 @@ namespace SEE.Game
         /// <summary>
         /// Creates and returns a new game edge between <paramref name="source"/> and <paramref name="target"/>
         /// based on the current settings. A new graph edge will be added to the underlying graph, too.
-        /// The resulting game edge will be added to <see cref="GraphElementIDMap"/>.
         ///
-        /// Note: A default edge layout will be used if no edge layout was chosen.
+        /// Note: The default edge layout <see cref="IGraphRenderer.EdgeLayoutDefault"/> will be used if no edge layout,
+        /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
         ///
         /// Precondition: <paramref name="source"/> and <paramref name="target"/> must have a valid
         /// node reference. The corresponding graph nodes must be in the same graph.
@@ -188,7 +188,8 @@ namespace SEE.Game
         /// <param name="source">source of the new edge</param>
         /// <param name="target">target of the new edge</param>
         /// <param name="edgeType">the type of the edge to be created</param>
-        /// <exception cref="Exception">thrown if <paramref name="source"/> or <paramref name="target"/>
+        /// <returns>The new game object representing the new edge from <paramref name="source"/> to <paramref name="target"/>.</returns>
+        /// <exception cref="System.Exception">thrown if <paramref name="source"/> or <paramref name="target"/>
         /// are not contained in any graph or contained in different graphs</exception>
         public GameObject DrawEdge(GameObject source, GameObject target, string edgeType)
         {
@@ -210,7 +211,7 @@ namespace SEE.Game
             }
 
             // Creating the edge in the underlying graph
-            Edge edge = new Edge(fromNode, toNode, edgeType);
+            Edge edge = new(fromNode, toNode, edgeType);
             fromNode.ItsGraph.AddEdge(edge);
 
             return DrawEdge(edge, source, target, true);
@@ -319,7 +320,7 @@ namespace SEE.Game
 #if UNITY_EDITOR
             //Performance p = Performance.Begin("edge layout " + layout.Name);
 #endif
-            EdgeFactory edgeFactory = new EdgeFactory(layout, Settings.EdgeLayoutSettings.EdgeWidth);
+            EdgeFactory edgeFactory = new(layout, Settings.EdgeLayoutSettings.EdgeWidth);
             // The resulting game objects representing the edges.
             ICollection<GameObject> result;
             // Calculate and draw edges

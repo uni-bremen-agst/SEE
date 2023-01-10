@@ -1,4 +1,5 @@
 ﻿using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.Layout;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,18 +12,25 @@ namespace SEE.Game
     public interface IGraphRenderer
     {
         /// <summary>
+        /// The default edge layout if none was specified.
+        /// </summary>
+        const EdgeLayoutKind EdgeLayoutDefault = EdgeLayoutKind.Spline;
+
+        /// <summary>
         /// Creates and returns a new game edge between <paramref name="source"/> and <paramref name="target"/>
         /// based on the current settings. A new graph edge will be added to the underlying graph, too.
         ///
-        /// Note: A default edge layout will be used if no edge layout was chosen.
+        /// Note: The default edge layout <see cref="EdgeLayoutDefault"/> will be used if no edge layout,
+        /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
         ///
-        /// Precondition: <paramref name="from"/> and <paramref name="to"/> must have a valid
+        /// Precondition: <paramref name="source"/> and <paramref name="target"/> must have a valid
         /// node reference. The corresponding graph nodes must be in the same graph.
         /// </summary>
         /// <param name="source">source of the new edge</param>
         /// <param name="target">target of the new edge</param>
         /// <param name="edgeType">the type of the edge to be created</param>
-        /// <exception cref="System.Exception">thrown if <paramref name="from"/> or <paramref name="to"/>
+        /// <returns>The new game object representing the new edge from <paramref name="source"/> to <paramref name="target"/>.</returns>
+        /// <exception cref="System.Exception">thrown if <paramref name="source"/> or <paramref name="target"/>
         /// are not contained in any graph or contained in different graphs</exception>
         GameObject DrawEdge(GameObject source, GameObject target, string edgeType);
 
@@ -33,11 +41,14 @@ namespace SEE.Game
         /// onto the layout for those edges.
         ///
         /// Precondition: The game objects in <paramref name="gameEdges"/> represent graph edges.
+        ///
+        /// Note: The default edge layout <see cref="EdgeLayoutDefault"/> will be used if no edge layout,
+        /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
         /// </summary>
         /// <param name="gameEdges">the edges for which to create a layout</param>
         /// <returns>mapping of the names of the game objects in <paramref name="gameEdges"/> onto
         /// their layout information</returns>
-        public IDictionary<string, ILayoutEdge<ILayoutNode>> LayoutEdges(ICollection<GameObject> gameEdges);
+        IDictionary<string, ILayoutEdge<ILayoutNode>> LayoutEdges(ICollection<GameObject> gameEdges);
 
         /// <summary>
         /// Creates and returns a new game object for representing the given <paramref name="node"/>.
