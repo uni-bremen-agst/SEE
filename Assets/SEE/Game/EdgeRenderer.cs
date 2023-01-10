@@ -68,7 +68,7 @@ namespace SEE.Game
             IDictionary<Node, ILayoutNode> toLayoutNode = new Dictionary<Node, ILayoutNode>();
 
             // One layout game node for each game node.
-            ICollection<LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes, (go) => new LayoutGameNode(toLayoutNode, go));
+            ICollection<LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes, go => new LayoutGameNode(toLayoutNode, go));
 
             // Now we have all nodes (game nodes and layout nodes). Next we gather the layout edges.
 
