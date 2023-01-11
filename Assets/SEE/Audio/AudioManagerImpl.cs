@@ -226,7 +226,6 @@ namespace SEE.Audio
             if (currentSceneName != previousSceneName)
             {
                 previousSceneName = currentSceneName;
-                Debug.Log("[Audio Debug] Switched to new scene " + currentSceneName);
                 return true;
             }
             return false;
@@ -326,7 +325,6 @@ namespace SEE.Audio
 
         public void QueueMusic(GameState gameState)
         {
-            Debug.Log("[Audio Debug] Switched game state " + gameState.ToString());
             switch (gameState)
             {
                 case GameState.LOBBY:

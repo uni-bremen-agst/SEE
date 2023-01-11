@@ -9,34 +9,31 @@ namespace SEE.Audio
         /// <summary>
         /// Sound effect to play
         /// </summary>
-        private SoundEffect soundEffect;
+        public string SoundEffectName;
 
         /// <summary>
         /// GameObject Id of the Game Object the sound effect should eminate from
         /// </summary>
-        private string targetGameObjectName;
+        public string TargetGameObjectName;
 
-        public SoundEffectNetAction(
-            SoundEffect soundEffect,
-            string gameObjectName
-            ) : base()
+        public SoundEffectNetAction(SoundEffect soundEffect, string gameObjectName) 
         {
-            
-            this.soundEffect = soundEffect;
-            this.targetGameObjectName = gameObjectName;
+            this.SoundEffectName = soundEffect.ToString();
+            this.TargetGameObjectName = gameObjectName;
         }
 
         protected override void ExecuteOnClient()
         {
             if (IsRequester()) return;
             IAudioManager audioManager = AudioManagerImpl.GetAudioManager();
-            GameObject targetGameObject = GameObject.Find(this.targetGameObjectName);
+            GameObject targetGameObject = GameObject.Find(this.TargetGameObjectName);
+            SoundEffect soundEffect = (SoundEffect) System.Enum.Parse(typeof(SoundEffect), this.SoundEffectName);
             if (targetGameObject == null)
             {
-                audioManager.QueueSoundEffect(this.soundEffect);
+                audioManager.QueueSoundEffect(soundEffect);
                 return;
             }
-            audioManager.QueueSoundEffect(this.soundEffect, targetGameObject, true);
+            audioManager.QueueSoundEffect(soundEffect, targetGameObject, true);
         }
 
         protected override void ExecuteOnServer()
