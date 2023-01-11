@@ -7,36 +7,36 @@ namespace SEE.Audio
     public class SoundEffectNetAction : AbstractNetAction
     {
         /// <summary>
-        /// Global AudioManager singleton instance
-        /// </summary>
-        readonly IAudioManager audioManager;
-
-        /// <summary>
         /// Sound effect to play
         /// </summary>
-        SoundEffect soundEffect;
+        private SoundEffect soundEffect;
 
         /// <summary>
-        /// GameObject the sound effect should be played from
+        /// GameObject Id of the Game Object the sound effect should eminate from
         /// </summary>
-        GameObject targetGameObject;
+        private string targetGameObjectName;
 
         public SoundEffectNetAction(
             SoundEffect soundEffect,
             string gameObjectName
             ) : base()
         {
-            this.audioManager = AudioManagerImpl.GetAudioManager();
+            
             this.soundEffect = soundEffect;
-            this.targetGameObject = GameObject.Find(gameObjectName);
+            this.targetGameObjectName = gameObjectName;
         }
 
         protected override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            if (IsRequester()) return;
+            IAudioManager audioManager = AudioManagerImpl.GetAudioManager();
+            GameObject targetGameObject = GameObject.Find(this.targetGameObjectName);
+            if (targetGameObject == null)
             {
-                this.audioManager.QueueSoundEffect(this.soundEffect, this.targetGameObject, true);
+                audioManager.QueueSoundEffect(this.soundEffect);
+                return;
             }
+            audioManager.QueueSoundEffect(this.soundEffect, targetGameObject, true);
         }
 
         protected override void ExecuteOnServer()

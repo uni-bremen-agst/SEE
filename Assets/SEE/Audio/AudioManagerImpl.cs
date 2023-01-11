@@ -132,13 +132,18 @@ namespace SEE.Audio
             instance = audioManagerImpl;
         }
 
-        void Start()
+        private void AttachAudioPlayer()
         {
             this.playerObject.AddComponent<AudioSource>();
             this.musicPlayer = this.playerObject.GetComponent<AudioSource>();
             this.musicVolume = this.defaultMusicVolume;
             this.soundEffectVolume = this.defaultSoundEffectVolume;
             this.musicPlayer.volume = this.musicVolume;
+        }
+
+        void Start()
+        {
+            AttachAudioPlayer();
             InitializeSoundEffectPlayer();
             SetAudioManager(this);
             previousSceneName = SceneManager.GetActiveScene().name;
@@ -197,6 +202,10 @@ namespace SEE.Audio
         /// </summary>
         private void HandleSceneMusic()
         {
+            if (this.musicPlayer == null || this.soundEffectPlayer == null)
+            {
+                AttachAudioPlayer();
+            }
             if (this.musicPlayer.isPlaying || this.musicPaused) return;
             if (this.musicPlayer.clip == null)
             {
@@ -217,6 +226,7 @@ namespace SEE.Audio
             if (currentSceneName != previousSceneName)
             {
                 previousSceneName = currentSceneName;
+                Debug.Log("[Audio Debug] Switched to new scene " + currentSceneName);
                 return true;
             }
             return false;
@@ -316,6 +326,7 @@ namespace SEE.Audio
 
         public void QueueMusic(GameState gameState)
         {
+            Debug.Log("[Audio Debug] Switched game state " + gameState.ToString());
             switch (gameState)
             {
                 case GameState.LOBBY:
@@ -335,6 +346,11 @@ namespace SEE.Audio
         }
 
         public void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject) {
+            if (sourceObject == null)
+            {
+                QueueSoundEffect(soundEffect);
+                return;
+            }
             QueueSoundEffect(soundEffect, sourceObject, false);
         }
 
@@ -355,9 +371,9 @@ namespace SEE.Audio
                 soundEffectGameObjects.Add(controlObject);
             }
             controlObject.EnqueueSoundEffect(GetAudioClipFromSoundEffectName(soundEffect));
-            if (!networkAction)
+            if (!networkAction && !"SEEStart".Equals(previousSceneName))
             {
-                new SoundEffectNetAction(soundEffect, sourceObject.gameObject.name);
+                new SoundEffectNetAction(soundEffect, sourceObject.gameObject.name).Execute();
             }
         }
 
