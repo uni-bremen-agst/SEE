@@ -396,9 +396,10 @@ namespace SEE.Game.City
         private GraphRenderer graphRenderer;
 
         /// <summary>
-        /// Yields a graph renderer that can draw this city.
+        /// Yields the graph renderer that draws this city.
         /// </summary>
-        public GraphRenderer Renderer => graphRenderer ??= new GraphRenderer(this, VisualizedSubGraph);
+        /// <remarks>Implements <see cref="AbstractSEECity.Renderer"/>.</remarks>
+        public override IGraphRenderer Renderer => graphRenderer ??= new GraphRenderer(this, VisualizedSubGraph);
 
         /// <summary>
         /// Saves the current layout of the city in a file named <see cref="LayoutPath"/>.

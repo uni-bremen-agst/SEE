@@ -271,7 +271,7 @@ namespace SEE.Layout.NodeLayouts.TreeMap
         /// <param name="padding">the absolute padding to be added in between 
         /// neighboring rectangles so that they can be distinguished</param>
         /// <returns>list of rectangles in the treemap; the order corresponds to the input order of the sizes.</returns>
-        internal static List<Rectangle> Squarified_Layout_With_Padding(List<NodeSize> sizes, float x, float z, float width, float depth, float padding)
+        internal static List<Rectangle> SquarifiedLayoutWithPadding(List<NodeSize> sizes, float x, float z, float width, float depth, float padding)
         {
             List<Rectangle> result = Squarified_Layout(sizes, x, z, width, depth);
             result.ForEach(rect => Add_Padding(ref rect, padding));
