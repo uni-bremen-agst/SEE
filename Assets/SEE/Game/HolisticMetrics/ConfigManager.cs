@@ -23,7 +23,7 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// The file name extension for all metrics board config files.
         /// </summary>
-        private const string FileNameExtension = ".json";
+        private const string FileNameExtension = ".cfg";
 
         /// <summary>
         /// This method checks whether the directory for the saved metrics boards exists. If not, then it creates
@@ -50,7 +50,7 @@ namespace SEE.Game.HolisticMetrics
             for (int i = 0; i < fileInfos.Length; i++)
             {
                 string fileName = fileInfos[i].Name;
-                // Last 4 characters should be ".json". We do not want these.
+                // Last 3 characters should be ".cfg". We do not want these.
                 fileNames[i] = fileName.Substring(0, fileName.Length - FileNameExtension.Length);
             }
 
