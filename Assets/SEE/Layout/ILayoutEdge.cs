@@ -1,4 +1,3 @@
-using SEE.Utils;
 using TinySpline;
 
 namespace SEE.Layout

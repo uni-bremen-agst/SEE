@@ -90,6 +90,7 @@ namespace SEE.Game
         /// <param name="city">the game object representing the city in which to draw this node;
         /// it has the information about how to draw the node and portal of the city</param>
         /// <returns>game object representing given <paramref name="node"/></returns>
+        /// <remarks>Implements <see cref="IGraphRenderer.DrawNode(Node, GameObject)"/>.</remarks>
         public GameObject DrawNode(Node node, GameObject city = null)
         {
             Assert.IsTrue(node.ItsGraph.MaxDepth >= 0, $"Graph of node {node.ID} has negative depth");
