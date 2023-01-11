@@ -7,7 +7,6 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
-using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -18,31 +17,122 @@ namespace SEE.Game
     /// </summary>
     public partial class GraphRenderer
     {
-        public GameObject DrawEdge(Edge edge, GameObject from = null, GameObject to = null, bool addToGraphElementIDMap = true)
+        /// <summary>
+        /// Returns an edge layout for the given <paramref name="gameEdges"/>.
+        ///
+        /// The result is a mapping of the names of the game objects in <paramref name="gameEdges"/>
+        /// onto the layout for those edges.
+        ///
+        /// Precondition: The game objects in <paramref name="gameEdges"/> represent graph edges.
+        /// </summary>
+        /// <param name="gameEdges">the edges for which to create a layout</param>
+        /// <returns>mapping of the names of the game objects in <paramref name="gameEdges"/> onto
+        /// their layout information</returns>
+        /// <remarks>Implements <see cref="IGraphRenderer.LayoutEdges(ICollection{GameObject})"/></remarks>
+        public IDictionary<string, ILayoutEdge<ILayoutNode>> LayoutEdges(ICollection<GameObject> gameEdges)
         {
-            from ??= edge.Source.RetrieveGameNode();
-            to ??= edge.Target.RetrieveGameNode();
+            // Save edge layout so that we can restore it if we need to select a default layout.
+            EdgeLayoutKind savedEdgeLayout = Settings.EdgeLayoutSettings.Kind;
+            if (savedEdgeLayout == EdgeLayoutKind.None)
+            {
+                Debug.LogWarning($"Edges should be laid out, but no edge layout was chosen. Using default {IGraphRenderer.EdgeLayoutDefault}.\n");
+                // Select default layout
+                Settings.EdgeLayoutSettings.Kind = IGraphRenderer.EdgeLayoutDefault;
+            }
 
+            // All source and target game nodes of the edges.
+            ISet<GameObject> gameNodes = new HashSet<GameObject>();
+
+            // Gather all sources and targets of all gameEdges.
+            foreach (GameObject gameEdge in gameEdges)
+            {
+                if (gameEdge.TryGetEdge(out Edge edge))
+                {
+                    gameNodes.Add(edge.Source.RetrieveGameNode());
+                    gameNodes.Add(edge.Target.RetrieveGameNode());
+                }
+            }
+
+            // In case of a hierarchical edge layout, we need to add the ascendants of all gameNodes.
+            if (Settings.EdgeLayoutSettings.Kind == EdgeLayoutKind.Bundling)
+            {
+                ISet<GameObject> ascendants = new HashSet<GameObject>();
+                foreach (GameObject gameNode in gameNodes)
+                {
+                    AddAscendants(gameNode, ascendants);
+                }
+                gameNodes.UnionWith(ascendants);
+            }
+
+            // Mapping of graph nodes onto layout nodes.
+            IDictionary<Node, ILayoutNode> toLayoutNode = new Dictionary<Node, ILayoutNode>();
+
+            // One layout game node for each game node.
+            ICollection<LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes, go => new LayoutGameNode(toLayoutNode, go));
+
+            // Now we have all nodes (game nodes and layout nodes). Next we gather the layout edges.
+
+            // The layout edges for all gameEdges.
+            ICollection<LayoutGraphEdge<ILayoutNode>> layoutEdges = new List<LayoutGraphEdge<ILayoutNode>>(gameEdges.Count);
+            foreach (GameObject gameEdge in gameEdges)
+            {
+                if (gameEdge.TryGetEdge(out Edge edge))
+                {
+                    layoutEdges.Add(new LayoutGraphEdge<ILayoutNode>(toLayoutNode[edge.Source], toLayoutNode[edge.Target], edge));
+                }
+            }
+
+            // All (graph/layout) nodes and edges are known.
+            // We can now calculate the edge layout.
+            GetEdgeLayout().Create(layoutNodes, layoutEdges);
+
+            // Finally, we can prepare the result.
+            IDictionary<string, ILayoutEdge<ILayoutNode>> result = new Dictionary<string, ILayoutEdge<ILayoutNode>>(layoutEdges.Count);
+            foreach (LayoutGraphEdge<ILayoutNode> layoutEdge in layoutEdges)
+            {
+                result[layoutEdge.ItsEdge.ID] = layoutEdge;
+            }
+
+            // Reset original edge layout.
+            Settings.EdgeLayoutSettings.Kind = savedEdgeLayout;
+
+            return result;
+        }
+
+        /// <summary>
+        /// Creates and returns a game object representing the given graph <paramref name="edge"/>
+        /// from <paramref name="from"/> to <paramref name="to"/>. If <paramref name="addToGraphElementIDMap"/>
+        /// is true, the returned edge will be added to <see cref="GraphElementIDMap"/>.
+        /// </summary>
+        /// <param name="edge">graph edge to be presented by the resulting game object</param>
+        /// <param name="from">the game node representing the source of <paramref name="edge"/></param>
+        /// <param name="to">the game node representing the target of <paramref name="edge"/></param>
+        /// <param name="addToGraphElementIDMap">whether the returned edge should be added to <see cref="GraphElementIDMap"/></param>
+        /// <returns>The new game object representing the new edge from <paramref name="source"/> to <paramref name="target"/>.</returns>
+        private GameObject DrawEdge(Edge edge, GameObject from, GameObject to, bool addToGraphElementIDMap)
+        {
+            Assert.IsNotNull(from);
+            Assert.IsNotNull(to);
             // Save edge layout so that we can restore it if we need to select a default layout.
             EdgeLayoutKind savedEdgeLayout = Settings.EdgeLayoutSettings.Kind;
             if (savedEdgeLayout == EdgeLayoutKind.None)
             {
                 Debug.LogWarning($"An edge {edge.ID} from {edge.Source.ID} to {edge.Target.ID} was added to the graph, but no edge layout was chosen.\n");
                 // Select default layout
-                Settings.EdgeLayoutSettings.Kind = EdgeLayoutKind.Spline;
+                Settings.EdgeLayoutSettings.Kind = IGraphRenderer.EdgeLayoutDefault;
             }
 
             // Creating the game object representing the edge.
             // The edge layout will be calculated for the following gameNodes. This list will
             // contain the source and target of the edge but also all their ascendants. The
             // ascendants are needed for hierarchical layouts.
-            HashSet<GameObject> gameNodes = new HashSet<GameObject>();
+            HashSet<GameObject> gameNodes = new();
             // We add the ascendants of the source and target nodes in case the edge layout is hierarchical.
             AddAscendants(from, gameNodes);
             AddAscendants(to, gameNodes);
-            Dictionary<Node, ILayoutNode> nodeToLayoutNode = new Dictionary<Node, ILayoutNode>();
+            Dictionary<Node, ILayoutNode> nodeToLayoutNode = new();
             // The layout nodes corresponding to those game nodes.
-            ICollection<LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes, nodeToLayoutNode);
+            ICollection<LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes, go => new LayoutGameNode(nodeToLayoutNode, go));
 
             LayoutGameNode fromLayoutNode = null; // layout node in layoutNodes corresponding to source node
             LayoutGameNode toLayoutNode = null; // layout node in layoutNodes corresponding to target node
@@ -67,8 +157,11 @@ namespace SEE.Game
             // The single layout edge between source and target. We want the layout only for this edge.
             ICollection<LayoutGraphEdge<LayoutGameNode>> layoutEdges = new List<LayoutGraphEdge<LayoutGameNode>>
                 { new LayoutGraphEdge<LayoutGameNode>(fromLayoutNode, toLayoutNode, edge) };
+
+
             // Calculate the edge layout (for the single edge only).
             ICollection<GameObject> edges = EdgeLayout(layoutNodes, layoutEdges, addToGraphElementIDMap);
+
             GameObject resultingEdge = edges.First();
             InteractionDecorator.PrepareForInteraction(resultingEdge);
             // The edge becomes a child of the root node of the game-node hierarchy
@@ -83,49 +176,45 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Creates and returns a new edge between <paramref name="from"/> and <paramref name="to"/>
-        /// based on the current settings. A new edge will be added to the underlying graph, too.
+        /// Creates and returns a new game edge between <paramref name="source"/> and <paramref name="target"/>
+        /// based on the current settings. A new graph edge will be added to the underlying graph, too.
         ///
-        /// Note: A default edge layout will be used if no edge layout was chosen.
+        /// Note: The default edge layout <see cref="IGraphRenderer.EdgeLayoutDefault"/> will be used if no edge layout,
+        /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
         ///
-        /// Precondition: <paramref name="from"/> and <paramref name="to"/> must have a valid
+        /// Precondition: <paramref name="source"/> and <paramref name="target"/> must have a valid
         /// node reference. The corresponding graph nodes must be in the same graph.
         /// </summary>
-        /// <param name="from">source of the new edge</param>
-        /// <param name="to">target of the new edge</param>
+        /// <param name="source">source of the new edge</param>
+        /// <param name="target">target of the new edge</param>
         /// <param name="edgeType">the type of the edge to be created</param>
-        /// <param name="existingEdge">If non-null, we'll use this as the edge in the underlying graph
-        /// instead of creating a new one</param>
-        /// <exception cref="Exception">thrown if <paramref name="from"/> or <paramref name="to"/>
+        /// <returns>The new game object representing the new edge from <paramref name="source"/> to <paramref name="target"/>.</returns>
+        /// <exception cref="System.Exception">thrown if <paramref name="source"/> or <paramref name="target"/>
         /// are not contained in any graph or contained in different graphs</exception>
-        public GameObject DrawEdge(GameObject from, GameObject to, string edgeType, Edge existingEdge = null)
+        public GameObject DrawEdge(GameObject source, GameObject target, string edgeType)
         {
-            Node fromNode = from.GetNode();
+            Node fromNode = source.GetNode();
             if (fromNode == null)
             {
-                throw new Exception($"The source {from.name} of the edge is not contained in any graph.");
+                throw new Exception($"The source {source.name} of the edge is not contained in any graph.");
             }
 
-            Node toNode = to.GetNode();
+            Node toNode = target.GetNode();
             if (toNode == null)
             {
-                throw new Exception($"The target {to.name} of the edge is not contained in any graph.");
+                throw new Exception($"The target {target.name} of the edge is not contained in any graph.");
             }
 
             if (fromNode.ItsGraph != toNode.ItsGraph)
             {
-                throw new Exception($"The source {from.name} and target {to.name} of the edge are in different graphs.");
+                throw new Exception($"The source {source.name} and target {target.name} of the edge are in different graphs.");
             }
 
-            Edge edge = existingEdge;
-            if (edge == null)
-            {
-                // Creating the edge in the underlying graph
-                edge = new Edge(fromNode, toNode, edgeType);
-                fromNode.ItsGraph.AddEdge(edge);
-            }
+            // Creating the edge in the underlying graph
+            Edge edge = new(fromNode, toNode, edgeType);
+            fromNode.ItsGraph.AddEdge(edge);
 
-            return DrawEdge(edge, from, to, existingEdge == null);
+            return DrawEdge(edge, source, target, true);
         }
 
         /// <summary>
@@ -231,7 +320,7 @@ namespace SEE.Game
 #if UNITY_EDITOR
             //Performance p = Performance.Begin("edge layout " + layout.Name);
 #endif
-            EdgeFactory edgeFactory = new EdgeFactory(layout, Settings.EdgeLayoutSettings.EdgeWidth);
+            EdgeFactory edgeFactory = new(layout, Settings.EdgeLayoutSettings.EdgeWidth);
             // The resulting game objects representing the edges.
             ICollection<GameObject> result;
             // Calculate and draw edges
