@@ -21,7 +21,7 @@ namespace SEE.Game
     /// A renderer for graphs. Encapsulates handling of block types, node and edge layouts,
     /// decorations and other visual attributes.
     /// </summary>
-    public partial class GraphRenderer
+    public partial class GraphRenderer : IGraphRenderer
     {
         /// <summary>
         /// Constructor.
@@ -718,60 +718,24 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        public ICollection<LayoutGameNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
+        private ICollection<LayoutGameNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
         {
-            return ToLayoutNodes(gameObjects, toLayoutNode);
+            return ToLayoutNodes(gameObjects, go => new LayoutGameNode(toLayoutNode, go));
         }
 
         /// <summary>
-        /// Converts the given nodes and sublayoutsnodes to a List with ILayoutNodes
-        /// </summary>
-        /// <param name="nodeMap">mapping between nodes and gameobjects</param>
-        /// <param name="sublayoutNodes">a collection with sublayoutNodes</param>
-        /// <returns></returns>
-        private ICollection<LayoutGameNode> ToLayoutNodes(Dictionary<Node, GameObject> nodeMap, IEnumerable<SublayoutNode> sublayoutNodes)
-        {
-            List<LayoutGameNode> layoutNodes = new List<LayoutGameNode>();
-            List<GameObject> remainingGameobjects = nodeMap.Values.ToList();
-
-            foreach (SublayoutNode sublayoutNode in sublayoutNodes)
-            {
-                ICollection<GameObject> gameObjects = new List<GameObject>();
-                sublayoutNode.Nodes.ForEach(node => gameObjects.Add(nodeMap[node]));
-                layoutNodes.AddRange(ToLayoutNodes(gameObjects, toLayoutNode));
-                remainingGameobjects.RemoveAll(gameObject => gameObjects.Contains(gameObject));
-            }
-
-            layoutNodes.AddRange(ToLayoutNodes(remainingGameobjects, toLayoutNode));
-
-            return layoutNodes;
-        }
-
-        /// <summary>
-        /// Transforms the given <paramref name="gameNodes"/> to a collection of LayoutNodes.
+        /// Transforms the given <paramref name="gameNodes"/> to a collection of <see cref="LayoutGameNode"/>s.
         /// Sets the node levels of all <paramref name="gameNodes"/>.
-        /// Any game objects in <paramref name="gameNodes"/> with an invalid node reference will be skipped.
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
-        /// <param name="toLayoutNode">a mapping from graph nodes onto their corresponding layout node</param>
+        /// <param name="newLayoutNode">delegate that returns a new layout node <see cref="T"/> for each <see cref="GameObject"/></param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        private ICollection<LayoutGameNode> ToLayoutNodes
+        private static ICollection<T> ToLayoutNodes<T>
             (ICollection<GameObject> gameNodes,
-             Dictionary<Node, ILayoutNode> toLayoutNode)
+             Func<GameObject, T> newLayoutNode) where T : class, ILayoutNode
         {
-            IList<LayoutGameNode> result = new List<LayoutGameNode>(gameNodes.Count);
-
-            foreach (GameObject gameObject in gameNodes)
-            {
-                Node node = gameObject.GetComponent<NodeRef>().Value;
-                if (node == null)
-                {
-                    Debug.LogWarning($"Node {gameObject} has an invalid node reference and will be skipped!\n");
-                    continue;
-                }
-                result.Add(new LayoutGameNode(toLayoutNode, gameObject, nodeTypeToFactory[node.Type]));
-            }
-            LayoutNodes.SetLevels(result.Cast<ILayoutNode>().ToList());
+            ICollection<T> result = gameNodes.Select(newLayoutNode).ToList();
+            LayoutNodes.SetLevels(result);
             return result;
         }
 

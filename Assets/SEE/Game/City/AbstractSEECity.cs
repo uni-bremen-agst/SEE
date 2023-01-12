@@ -127,6 +127,14 @@ namespace SEE.Game.City
         public ColorMap MetricToColor = new ColorMap();
 
         /// <summary>
+        /// Yields a graph renderer that can draw this city.
+        /// </summary>
+        public abstract IGraphRenderer Renderer
+        {
+            get;
+        }
+
+        /// <summary>
         /// Returns the <see cref="ColorRange"/> for <paramref name="metricName"/> in <see cref="MetricToColor"/>
         /// if one exists; otherwise <see cref="ColorRange.Default()"/> is returned.
         /// </summary>

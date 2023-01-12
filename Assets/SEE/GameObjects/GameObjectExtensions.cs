@@ -353,6 +353,18 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Returns the world-space center position of the ground of this <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">game object whose ground has to be determined</param>
+        /// <returns>world-space center position of the ground of this <paramref name="gameObject"/></returns>
+        public static Vector3 GetGroundCenter(this GameObject gameObject)
+        {
+            Vector3 result = gameObject.transform.position;
+            result.y -= gameObject.WorldSpaceScale().y / 2.0f;
+            return result;
+        }
+
+        /// <summary>
         /// Returns the maximal world-space position (y co-ordinate) of the roof of
         /// this <paramref name="gameObject"/> or any of its active descendants.
         /// Unlike <see cref="GetRoof(GameObject)"/>, this method recurses into

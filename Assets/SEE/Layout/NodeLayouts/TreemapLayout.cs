@@ -135,8 +135,8 @@ namespace SEE.Layout.NodeLayouts
         {
             List<RectangleTiling.NodeSize> sizes = GetSizes(siblings);
             float padding = Padding(width, depth);
-            List<RectangleTiling.Rectangle> rects = RectangleTiling.Squarified_Layout_With_Padding(sizes, x, z, width, depth, padding);
-            Add_To_Layout(sizes, rects);
+            List<RectangleTiling.Rectangle> rects = RectangleTiling.SquarifiedLayoutWithPadding(sizes, x, z, width, depth, padding);
+            AddToLayout(sizes, rects);
 
             foreach (ILayoutNode node in siblings)
             {
@@ -145,7 +145,7 @@ namespace SEE.Layout.NodeLayouts
                 {
                     // Note: nodeTransform.position is the center position, while
                     // CalculateLayout assumes co-ordinates x and z as the left front corner
-                    UnityEngine.Assertions.Assert.AreEqual(node.AbsoluteScale, node.LocalScale);
+                    Assert.AreEqual(node.AbsoluteScale, node.LocalScale);
                     NodeTransform nodeTransform = layout_result[node];
                     CalculateLayout(children,
                                     nodeTransform.position.x - nodeTransform.scale.x / 2.0f,
@@ -270,7 +270,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="nodes">the game nodes</param>
         /// <param name="rects">their corresponding rectangle</param>
-        private void Add_To_Layout
+        private void AddToLayout
            (List<RectangleTiling.NodeSize> nodes,
             List<RectangleTiling.Rectangle> rects)
         {
