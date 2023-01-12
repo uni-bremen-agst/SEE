@@ -538,7 +538,7 @@ namespace SEE.GO
         {
             if (chordLengths == null)
             {
-                chordLengths = spline.ChordLenghts();
+                chordLengths = spline.ChordLengths();
             }
 
             double lowerKnot = chordLengths.TToKnot(subsplineStartT);
