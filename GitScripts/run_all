@@ -1,4 +1,9 @@
 #!/bin/sh
+
+# Runs all shell scripts in current directory, stopping if any script fails.
+# Note that by 'shell scripts', only files with extension '.sh' is included.
+# Scripts with any other filetype will not be run.
+
 set -e
 
 if [ -n "$CI" ]; then
