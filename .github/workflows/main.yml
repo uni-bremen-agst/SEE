@@ -11,8 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: Static Analysis and Tests
+  setup:
+    name: Setup Repository
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -36,8 +36,28 @@ jobs:
           lfs: true
       - name: Confirm LFS pull
         run: git lfs pull
+
+  static:
+    name: Run static checks
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [self-hosted]
+    needs: setup
+    steps:
       - name: Run GitScripts checks
         run: ./GitScripts/run_all
+
+  test:
+    name: Run editmode tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [self-hosted]
+    needs: setup
+    steps:
       - uses: actions/cache@v3
         name: Cache Library
         with:
@@ -47,6 +67,7 @@ jobs:
             Library-SEE-Tests
             Library-SEE
       - uses: game-ci/unity-test-runner@v2
+        timeout-minutes: 45
         name: Run Tests
         id: tests
         env:
@@ -69,6 +90,17 @@ jobs:
         with:
           name: Coverage results
           path: ${{ steps.tests.outputs.coveragePath }}
+
+  cleanup:
+    name: Cleanup
+    runs-on: ${{ matrix.os }}
+    if: ${{ always() }}
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [self-hosted]
+    steps:
       - name: Kill Unity
         if: always()
         shell: bash
