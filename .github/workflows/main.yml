@@ -18,6 +18,8 @@ jobs:
       fail-fast: false
       matrix:
         os: [self-hosted]
+    outputs:
+      runner: ${{ steps.remember.outputs.runner }}
     steps:
       - name: Fix permissions
         shell: bash
@@ -36,10 +38,13 @@ jobs:
           lfs: true
       - name: Confirm LFS pull
         run: git lfs pull
-
+      - name: Remember runner
+        id: remember
+        # We remember this to make sure all jobs are run on the same machine.
+        run: echo "runner=${{ runner.name }}" >> $GITHUB_OUTPUT
   static:
     name: Run static checks
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ needs.setup.outputs.runner }}
     strategy:
       fail-fast: false
       matrix:
@@ -48,10 +53,11 @@ jobs:
     steps:
       - name: Run GitScripts checks
         run: ./GitScripts/run_all
+      #- name: Check for bad patterns
 
   test:
     name: Run editmode tests
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ needs.setup.outputs.runner }}
     strategy:
       fail-fast: false
       matrix:
@@ -93,9 +99,9 @@ jobs:
 
   cleanup:
     name: Cleanup
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ needs.setup.outputs.runner }}
     if: ${{ always() }}
-    needs: test
+    needs: [setup, static, test]
     strategy:
       fail-fast: false
       matrix:
