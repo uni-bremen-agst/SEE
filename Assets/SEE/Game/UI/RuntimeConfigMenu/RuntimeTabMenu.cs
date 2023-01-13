@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Michsky.UI.ModernUIPack;
@@ -9,9 +11,13 @@ using Sirenix.Utilities;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 {
+    
+    public int MeineZahl { get; set; }
+    
     protected const string RUNTIME_CONFIG_PREFAB_FOLDER = UI_PREFAB_FOLDER + "RuntimeConfigMenu/";
     public const string SETTINGS_OBJECT_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsObject";
     public const string SWITCH_PREFAB = UI_PREFAB_FOLDER + "Input Group - Switch";
@@ -67,7 +73,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         GameObject setting = PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, viewContent, false);
         setting.name = memberInfo.Name;
         setting.GetComponentInChildren<Text>().text = memberInfo.Name;
-        CreateSettingObject(memberInfo, setting);
+        CreateSettingObject(memberInfo, setting, City);
     }
 
     /// <summary>
@@ -99,7 +105,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         return ViewGameObject(entry);
     }
 
-    private void CreateSettingObject(MemberInfo memberInfo, GameObject setting)
+    private void CreateSettingObject(MemberInfo memberInfo, GameObject parent, object obj)
     {
         /*
          * TODO: MembersTypes
@@ -108,56 +114,97 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
          */
         if (memberInfo is FieldInfo fieldInfo)
         {
-            object value = fieldInfo.GetValue(City);
+            object value = fieldInfo.GetValue(obj);
             // This is how to set the value:
             // fieldInfo.SetValue(City, value);
             if (value is FilePath)
             {
-                GameObject filePickerGameObject =
-                    PrefabInstantiator.InstantiatePrefab(FILEPICKER_PREFAB, setting.transform, false);
+                CreateFilePicker(fieldInfo, parent);
             }
-            else if (value is float or int)
+            else if (value is int i)
             {
-                GameObject sliderGameObject =
-                    PrefabInstantiator.InstantiatePrefab(SLIDER_PREFAB, setting.transform, false);
-                RangeAttribute range = fieldInfo.GetAttributes().OfType<RangeAttribute>().ElementAtOrDefault(0) 
-                                       ?? new RangeAttribute(0, 2);
-                SliderManager sliderManager = sliderGameObject.GetComponentInChildren<SliderManager>();
-                Slider slider = sliderGameObject.GetComponentInChildren<Slider>();
-                
-                sliderManager.usePercent = false;
-                sliderManager.useRoundValue = value is int;
-                slider.minValue = range.min;
-                slider.maxValue = range.max;
-                
-                slider.value = (float) value;
-                slider.onValueChanged.AddListener(changedValue=>
-                {
-                    fieldInfo.SetValue(City, changedValue);
-                    if (City is SEECity seeCity) seeCity.ReDrawGraph();
-                });
+                CreateSlider(memberInfo, changedValue => fieldInfo.SetValue(obj, (int) changedValue), i, true, parent);
+            }
+            else if (value is float f)
+            {
+                CreateSlider(memberInfo, changedValue => fieldInfo.SetValue(obj, changedValue), f, false, parent);
             }
             else if (value is bool b)
             {
-                GameObject switchGameObject =
-                    PrefabInstantiator.InstantiatePrefab(SWITCH_PREFAB, setting.transform, false);
-                SwitchManager switchManager = switchGameObject.GetComponentInChildren<SwitchManager>();
-                TextMeshProUGUI text = switchGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
-                text.text = fieldInfo.Name;
-
-                switchManager.isOn = b;
-                switchManager.OnEvents.AddListener(() =>
-                {
-                    fieldInfo.SetValue(City, true);
-                    if (City is SEECity seeCity) seeCity.ReDrawGraph();
-                });
-                switchManager.OffEvents.AddListener(() =>
-                {
-                    fieldInfo.SetValue(City, false);
-                    if (City is SEECity seeCity) seeCity.ReDrawGraph();
-                });
+                CreateSwitch(memberInfo, changedValue => fieldInfo.SetValue(obj, changedValue), b, parent);
             }
+            else if (value is string s)
+            {
+                CreateStringField(memberInfo, parent);
+            } 
+            else if (value is NodeTypeVisualsMap nodeTypeVisualsMap)
+            {
+                nodeTypeVisualsMap.Values.ForEach(nodeType =>
+                    nodeType.GetType().GetMembers().ForEach(nestedMember => CreateSettingObject(nestedMember, parent, nodeType)));
+            }
+        } else if (memberInfo is MethodInfo methodInfo)
+        {
+            // TODO: Buttons für Methoden
         }
+    }
+
+    private void CreateSlider(MemberInfo memberInfo, Action<float> setter, float value, bool useRoundValue, GameObject parent)
+    {
+        GameObject sliderGameObject =
+            PrefabInstantiator.InstantiatePrefab(SLIDER_PREFAB, parent.transform, false);
+        RangeAttribute range = memberInfo.GetAttributes().OfType<RangeAttribute>().ElementAtOrDefault(0) 
+                               ?? new RangeAttribute(0, 2);
+        SliderManager sliderManager = sliderGameObject.GetComponentInChildren<SliderManager>();
+        Slider slider = sliderGameObject.GetComponentInChildren<Slider>();
+        TextMeshProUGUI text = sliderGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
+        text.text = memberInfo.Name;
+                
+        sliderManager.usePercent = false;
+        sliderManager.useRoundValue = useRoundValue;
+        slider.minValue = range.min;
+        slider.maxValue = range.max;
+                
+        slider.value = value;
+        slider.onValueChanged.AddListener(changedValue=>
+        {
+            setter(changedValue);
+            if (City is SEECity seeCity) seeCity.ReDrawGraph();
+        });
+    }
+
+    private void CreateSwitch(MemberInfo memberInfo, Action<bool> setter, bool value, GameObject parent)
+    {
+        GameObject switchGameObject =
+            PrefabInstantiator.InstantiatePrefab(SWITCH_PREFAB, parent.transform, false);
+        SwitchManager switchManager = switchGameObject.GetComponentInChildren<SwitchManager>();
+        TextMeshProUGUI text = switchGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
+        text.text = memberInfo.Name;
+
+        switchManager.isOn = value;
+        switchManager.OnEvents.AddListener(() =>
+        {
+            setter(true);
+            if (City is SEECity seeCity) seeCity.ReDrawGraph();
+        });
+        switchManager.OffEvents.AddListener(() =>
+        {
+            setter(false);
+            if (City is SEECity seeCity) seeCity.ReDrawGraph();
+        });
+    }
+
+    private void CreateFilePicker(MemberInfo memberInfo, GameObject parent)
+    {
+        GameObject filePickerGameObject =
+            PrefabInstantiator.InstantiatePrefab(FILEPICKER_PREFAB, parent.transform, false);
+    }
+
+    private void CreateStringField(MemberInfo memberInfo, GameObject parent)
+    {
+        GameObject switchGameObject =
+            PrefabInstantiator.InstantiatePrefab(SWITCH_PREFAB, parent.transform, false);
+        TextMeshProUGUI text = switchGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
+        text.text = memberInfo.Name;
     }
     
     /// <summary>
