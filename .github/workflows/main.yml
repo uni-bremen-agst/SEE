@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   test:
-    name: Editmode tests
+    name: Static Analysis and Tests
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -36,6 +36,8 @@ jobs:
           lfs: true
       - name: Confirm LFS pull
         run: git lfs pull
+      - name: Run GitScripts checks
+        run: ./GitScripts/run_all
       - uses: actions/cache@v3
         name: Cache Library
         with:
