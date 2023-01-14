@@ -21,11 +21,6 @@ namespace SEE.Game.HolisticMetrics
         private static readonly string metricsBoardsPath = Application.persistentDataPath + "/MetricsBoards/";
 
         /// <summary>
-        /// The file name extension for all metrics board config files.
-        /// </summary>
-        private const string FileNameExtension = ".cfg";
-
-        /// <summary>
         /// This method checks whether the directory for the saved metrics boards exists. If not, then it creates
         /// that directory.
         /// </summary>
@@ -50,8 +45,8 @@ namespace SEE.Game.HolisticMetrics
             for (int i = 0; i < fileInfos.Length; i++)
             {
                 string fileName = fileInfos[i].Name;
-                // Last 3 characters should be ".cfg". We do not want these.
-                fileNames[i] = fileName.Substring(0, fileName.Length - FileNameExtension.Length);
+                // The basename of fileName, i.e, the name without the fileNameExtension
+                fileNames[i] = fileName.Substring(0, fileName.Length - Filenames.ConfigExtension.Length);
             }
 
             return fileNames;
@@ -84,7 +79,7 @@ namespace SEE.Game.HolisticMetrics
         internal static BoardConfig LoadBoard(string fileName)
         {
             EnsureBoardsDirectoryExists();
-            return LoadBoard(new FilePath(metricsBoardsPath + fileName + FileNameExtension));
+            return LoadBoard(new FilePath(metricsBoardsPath + fileName + Filenames.ConfigExtension));
         }
         
         /// <summary>
@@ -95,7 +90,7 @@ namespace SEE.Game.HolisticMetrics
         internal static void SaveBoard(WidgetsManager widgetsManager, string fileName)
         {
             EnsureBoardsDirectoryExists();
-            string filePath = metricsBoardsPath + fileName + FileNameExtension;
+            string filePath = metricsBoardsPath + fileName + Filenames.ConfigExtension;
             using ConfigWriter writer = new ConfigWriter(filePath);
             BoardConfig config = GetBoardConfig(widgetsManager);
             config.Save(writer);
