@@ -5,12 +5,14 @@ using System.Reflection;
 using Michsky.UI.ModernUIPack;
 using SEE.Game.City;
 using SEE.Game.UI.Menu;
+using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using Sirenix.Utilities;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static TreeEditor.TreeEditorHelper;
 using Random = UnityEngine.Random;
 
 public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
@@ -137,11 +139,59 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             else if (value is string s)
             {
                 CreateStringField(memberInfo, parent);
-            } 
+            }
+
+            // TODO: enum (byte)
+
+            // TODO: colorPicker
+
+
             else if (value is NodeTypeVisualsMap nodeTypeVisualsMap)
             {
-                nodeTypeVisualsMap.Values.ForEach(nodeType =>
-                    nodeType.GetType().GetMembers().ForEach(nestedMember => CreateSettingObject(nestedMember, parent, nodeType)));
+                /*nodeTypeVisualsMap.Values.ForEach(nodeType =>
+                    nodeType.GetType().GetMembers().ForEach(nestedMember => CreateSettingObject(nestedMember, parent, nodeType)));*/
+                var enumerator = nodeTypeVisualsMap.GetEnumerator();
+                while (enumerator.MoveNext())
+                {
+                    GameObject nodeType = PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, parent.transform, false);
+                    nodeType.name = enumerator.Current.Key;
+                    nodeType.GetComponentInChildren<Text>().text = enumerator.Current.Key;
+                    enumerator.Current.Value.GetType().GetMembers().ForEach(nestedMember => CreateSettingObject(nestedMember, parent, enumerator.Current.Value));
+                }
+            }
+        
+            else if (value is NodeLayoutAttributes nodeLayoutAttributes)
+            {
+                nodeLayoutAttributes.GetType().GetMembers().ForEach(attribute => CreateSettingObject(attribute, parent, nodeLayoutAttributes));
+            }
+            else if (value is EdgeLayoutAttributes edgeLayoutAttributes)
+            {
+                edgeLayoutAttributes.GetType().GetMembers().ForEach(attribute => CreateSettingObject(attribute, parent, edgeLayoutAttributes));
+            }
+            else if (value is CoseGraphAttributes coseGraphAttributes)
+            {
+                coseGraphAttributes.GetType().GetMembers().ForEach(attribute => CreateSettingObject(attribute, parent, coseGraphAttributes));
+            }
+            else if (value is EdgeSelectionAttributes edgeSelectionAttributes)
+            {
+                edgeSelectionAttributes.GetType().GetMembers().ForEach(attribute => CreateSettingObject(attribute, parent, edgeSelectionAttributes));
+            }
+            else if (value is ErosionAttributes erosionAttributes)
+            {
+                erosionAttributes.GetType().GetMembers().ForEach(attribute => CreateSettingObject(attribute, parent, erosionAttributes));
+            }
+            else if (value is BoardAttributes boardAttributes)
+            {
+                boardAttributes.GetType().GetMembers().ForEach(attribute => CreateSettingObject(attribute, parent, boardAttributes));
+            }
+
+            // TODO: HashSet
+
+            // TODO: ColorMap
+
+            else
+            {
+                Debug.Log("Unknown Setting Type: " + memberInfo.ToString());
             }
         } else if (memberInfo is MethodInfo methodInfo)
         {
@@ -207,6 +257,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         TextMeshProUGUI text = switchGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = memberInfo.Name;
     }
+
+    // TODO: colorpicker
     
     /// <summary>
     /// Sets the misc button as the last in the tab list.
