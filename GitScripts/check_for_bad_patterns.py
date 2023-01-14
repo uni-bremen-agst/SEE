@@ -5,6 +5,7 @@
 # and outputs any bad pattern matches. See documentation of
 # BadPattern.to_comment() for details of output format.
 
+import sys
 import re
 import fileinput
 from enum import Enum
@@ -92,31 +93,34 @@ BAD_PATTERNS = [
 # *** MODIFY ABOVE TO ADD NEW BAD PATTERNS ***
 
 
-def handle_chunk(open_diff, start_line, filename, lines):
+def handle_chunk(open_diff, start_line, filename, lines) -> int:
     """
     Handles a single chunk of a unified diff and checks it against
     any bad patterns, printing comments for any matches it finds.
     """
     extension = filename.rsplit(".", 1)[1] if "." in filename else ""
+    occurrences = 0
     for i in range(lines):
         chunk_line = open_diff.readline().rstrip()
         for pattern in BAD_PATTERNS:
-            if 're.compile(r"^\\s*re' in chunk_line:
-                print("*** HERE: " + chunk_line)
             if extension in pattern.extensions and pattern.regex.match(
                 # The first character in chunk_line is +. We skip it.
                 chunk_line[1:]
             ):
                 # We found a bad pattern.
+                occurrences += 1
                 # Try getting suggestion, if one exists.
                 if pattern.suggestion:
                     suggestion = pattern.regex.sub(pattern.suggestion, chunk_line[1:])
                 else:
                     suggestion = ""
                 print(pattern.to_comment(filename, start_line + i, suggestion))
+    return occurrences
 
 
 def main():
+    print("Checking for bad patterns by reading the diff from stdin...")
+    occurrences = 0
     with fileinput.input(encoding="utf-8") as diff:
         current_file = None
         chunk_indicator = re.compile(r"^@@ -[0-9,]* \+(\d*)(?:,(\d*))? @@.*$")
@@ -128,12 +132,13 @@ def main():
                 # Start of a new chunk.
                 start_line, line_count = chunk_indicator.match(line).group(1, 2)
                 # We pass the diff object so that `handle_chunk` can advance lines.
-                handle_chunk(
+                occurrences += handle_chunk(
                     diff,
                     int(start_line),
                     current_file,
                     1 if line_count is None else int(line_count),
                 )
+    sys.exit(min(occurrences, 255))
 
 
 if __name__ == "__main__":
