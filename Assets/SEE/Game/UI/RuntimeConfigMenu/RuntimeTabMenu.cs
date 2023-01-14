@@ -155,8 +155,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 {
                     GameObject nodeType = PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, parent.transform, false);
                     nodeType.name = enumerator.Current.Key;
-                    nodeType.GetComponentInChildren<Text>().text = enumerator.Current.Key;
-                    enumerator.Current.Value.GetType().GetMembers().ForEach(nestedMember => CreateSettingObject(nestedMember, parent, enumerator.Current.Value));
+                    nodeType.GetComponentInChildren<TextMeshProUGUI>().text = enumerator.Current.Key;
+                    enumerator.Current.Value.GetType().GetMembers().ForEach(nestedMember => CreateSettingObject(nestedMember, nodeType.transform.Find("Content").gameObject, enumerator.Current.Value));
                 }
             }
         
