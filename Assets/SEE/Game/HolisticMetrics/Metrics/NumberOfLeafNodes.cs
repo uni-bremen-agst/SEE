@@ -10,18 +10,18 @@ namespace SEE.Game.HolisticMetrics.Metrics
     internal class NumberOfLeafNodes : Metric
     {
         /// <summary>
-        /// Counts the number of leaves of a given <see cref="SEECity"/> and returns it.
+        /// Counts the number of leaves of a given <paramref name="city"/> and returns it.
         /// </summary>
-        /// <param name="city">The <see cref="SEECity"/> of which to get the leaf count</param>
-        /// <returns>The leaf count of the given <see cref="SEECity"/></returns>
-        internal override MetricValue Refresh(SEECity city)
+        /// <param name="city">The code city of which to get the leaf count</param>
+        /// <returns>The leaf count of the given <paramref name="city"/></returns>
+        internal override MetricValue Refresh(AbstractSEECity city)
         {
             Graph graph = city.LoadedGraph;
             int leafCount = graph.Nodes().Count(node => node.IsLeaf());
             return new MetricValueRange
             {
                 DecimalPlaces = 0,
-                Higher = 1000f,
+                Higher = 1000f, // FIXME: There can be more than 1000 leaves.
                 Lower = 1f,
                 Name = "Number of leaf nodes",
                 Value = leafCount
