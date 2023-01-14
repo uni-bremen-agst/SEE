@@ -11,7 +11,8 @@ public class TabButtonSwitcher : MonoBehaviour, IPointerClickHandler
     private string debug = "";
     private void OnGUI()
     {
-        GUI.TextField(new Rect(0, 0, 300, 50), debug);
+        /*GUI.TextField(new Rect(0, 0, 300, 50), debug);*/
+        
     }
 
     public void OnPointerClick(PointerEventData eventData)

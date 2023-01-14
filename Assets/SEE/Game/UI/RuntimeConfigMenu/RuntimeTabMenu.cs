@@ -72,8 +72,9 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
         GameObject setting = PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, viewContent, false);
         setting.name = memberInfo.Name;
-        setting.GetComponentInChildren<Text>().text = memberInfo.Name;
-        CreateSettingObject(memberInfo, setting, City);
+        setting.GetComponentInChildren<TextMeshProUGUI>().text = memberInfo.Name;
+        GameObject settingContent = setting.transform.Find("Content").gameObject;
+        CreateSettingObject(memberInfo, settingContent, City);
     }
 
     /// <summary>
