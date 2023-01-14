@@ -34,6 +34,16 @@ namespace SEE.Game.City
         /// extend the test cases in TestConfigIO.
 
         /// <summary>
+        /// The graph underlying this code city that was loaded from disk. May be null.
+        /// Neither serialized nor saved to the config file.
+        /// </summary>
+        public abstract Graph LoadedGraph
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
         /// The screen relative height to use for culling a game node [0-1].
         /// If the game node uses less than this percentage it will be culled.
         /// </summary>
