@@ -4,6 +4,8 @@
 # git diff -U0 | grep '^[+@]'
 # and outputs any bad pattern matches. See documentation of
 # BadPattern.to_comment() for details of output format.
+# Note that this script is only run on CI, not as part of the Git hooks,
+# due to it being written in Python rather than as a shell script.
 
 import sys
 import re
@@ -11,14 +13,14 @@ import fileinput
 from enum import Enum
 
 
-class Level(Enum):
+class Level(str, Enum):
     """
-    Severity level of a bad pattern.
+    Severity level of a bad pattern, associated to a GitHub emoji.
     """
 
-    INFO = 1
-    WARN = 2
-    ERROR = 3
+    INFO = ":information_source:"
+    WARN = ":warning:"
+    ERROR = ":x:"
 
 
 # Extensions that a pattern will be applied to by default.
@@ -56,12 +58,12 @@ class BadPattern:
         Turns this bad pattern match into a string containing the following
         components, separated by newlines:
         Filename of matched file, line number where match occurred,
-        set message, set level, set regular expression, substituted
-        suggestion (may be empty)
+        set level, set message, substituted suggestion (may be empty),
+        set regular expression,
         """
         return (
-            f"{filename}\n{line_number}\n{self.message}\n{self.level}\n{self.regex.pattern}\n"
-            + suggestion
+            f"{filename}\n{line_number}\n{self.level.value}\n{self.message}\n"
+            + f"{suggestion}\n{self.regex.pattern}"
         )
 
 
@@ -119,7 +121,6 @@ def handle_chunk(open_diff, start_line, filename, lines) -> int:
 
 
 def main():
-    print("Checking for bad patterns by reading the diff from stdin...")
     occurrences = 0
     with fileinput.input(encoding="utf-8") as diff:
         current_file = None

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # This checks for invalid git LFS pointers, which can make a local copy
 # of the repository unusable, so it should be avoided.
@@ -16,12 +16,13 @@ fi
 output=$($GIT_FSCK)
 if [ "$output" != 'Git LFS fsck OK' ]; then
     if [ -n "$CI" ]; then
-        echo "!!! DO NOT MERGE INTO MASTER !!!"
-        echo "This branch contains a bad LFS pointer or object, as described below:"
+        echo -n "::error title=Bad LFS pointer::!!! DO NOT MERGE INTO MASTER !!!%0A"
+        echo -n "This branch contains a bad LFS pointer or object.%0A"
+        echo -n "If it is a pointer error, it can be fixed by running \`git add --renormalize <bad-file>\`,%0A"
+        echo -n "then committing the changes. Check locally by running \`git lfs fsck\`.%0A"
+        echo -n "If this does not work, please contact @koschke or @falko1 on Mattermost.%0A"
+        echo -n "The original error message will be shown below:%0A"
         echo "$output"
-        echo "If it is a pointer error, it can be fixed by running \`git add --renormalize <bad-file>\`,"
-        echo "then committing the changes. Check locally by running \`git lfs fsck\`."
-        echo "If this does not work, please contact @koschke or @falko1 on Mattermost."
     else
         echo "You have an invalid Git LFS reference!"
         echo "Fix this before committing anything."

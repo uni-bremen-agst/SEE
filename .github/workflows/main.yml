@@ -53,7 +53,47 @@ jobs:
     steps:
       - name: Run GitScripts checks
         run: ./GitScripts/run_all
-      #- name: Check for bad patterns
+      - name: Fetch commits (for diff)
+        run: git fetch --depth="$(( ${{ github.event.pull_request.commits }} + 1 ))"
+      - name: Collect bad patterns
+        run: |
+          if ! PATTERNS=$(git diff origin/master -U0 | grep '^[+@]' | ./GitScripts/check_for_bad_patterns.py); then
+            DELIMITER=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13 ; echo '')
+            echo "PATTERNS<<$DELIMITER" >> $GITHUB_ENV
+            echo "$PATTERNS" >> $GITHUB_ENV
+            echo "$DELIMITER" >> $GITHUB_ENV
+          else
+            echo "PATTERNS=none" >> $GITHUB_ENV
+          fi
+      - uses: actions/github-script@v6
+        name: Check for bad patterns
+        with:
+          script: |
+            const { PATTERNS } = process.env;
+            const helper = require('./GitScripts/review_helper.js');
+            if (PATTERNS === "none") {
+              console.log("Found no bad patterns in changed files.");
+            } else {
+              let bad_patterns = PATTERNS.split('\n');
+              bad_patterns.pop();  // Last element is empty due to final newline
+              console.log("::warning::Found " + Math.floor(bad_patterns.length/6) + " bad patterns!");
+              if (context.ref === 'refs/heads/master') {
+                console.log("However, we are on master, so we ignore them.");
+              } else {
+                console.log("Creating PR review...");
+                // But first, we'll dismiss the old review, if there is one.
+                helper.dismiss_old_reviews(github, context);
+                github.rest.pulls.createReview({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  pull_number: context.issue.number,
+                  event: 'REQUEST_CHANGES',
+                  body: 'There are a few bad patterns I found which you should check.',
+                  comments: helper.to_comments(bad_patterns)
+                });
+              }
+            }
+
 
   test:
     name: Run editmode tests
@@ -62,7 +102,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [self-hosted]
-    needs: setup
+    needs: [setup, static]
     steps:
       - uses: actions/cache@v3
         name: Cache Library
