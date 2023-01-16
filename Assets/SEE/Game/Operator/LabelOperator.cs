@@ -2,9 +2,9 @@ using System.Linq;
 using DG.Tweening;
 using SEE.Controls.Actions;
 using SEE.GO;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
-using Valve.VR.InteractionSystem;
 
 namespace SEE.Game.Operator
 {
@@ -70,7 +70,7 @@ namespace SEE.Game.Operator
                                                         startLabelPosition,
                                                         City.NodeTypes[Node.Type].LabelSettings.FontSize,
                                                         lift: true,
-                                                        textColor: Color.black.ColorWithAlpha(0f));
+                                                        textColor: Color.black.WithAlpha(0f));
                 nodeLabel.name = LABEL_PREFIX + shownText;
                 nodeLabel.transform.SetParent(gameObject.transform);
 
@@ -92,8 +92,8 @@ namespace SEE.Game.Operator
                 if (nodeLabel.TryGetComponentOrLog(out labelText) && line.TryGetComponentOrLog(out labelLineRenderer))
                 {
                     labelText.alpha = 0f;
-                    labelLineRenderer.startColor = labelLineRenderer.startColor.ColorWithAlpha(0f);
-                    labelLineRenderer.endColor = labelLineRenderer.endColor.ColorWithAlpha(0f);
+                    labelLineRenderer.startColor = labelLineRenderer.startColor.WithAlpha(0f);
+                    labelLineRenderer.endColor = labelLineRenderer.endColor.WithAlpha(0f);
                 }
             }
         }
