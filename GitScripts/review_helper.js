@@ -22,7 +22,7 @@ module.exports = {
                     comment['body'] = patterns[i];
                     break;
                 case 3: // review comment itself
-                    comment['body'] += patterns[i];
+                    comment['body'] += " " + patterns[i];
                     break;
                 case 4: // suggestion, if there is one.
                     if (patterns[i] !== '') {
@@ -30,7 +30,7 @@ module.exports = {
                     }
                     break;
                 case 5: // regex triggering this bad pattern
-                    comment['body'] += `\n---\n> This bad pattern was triggered by the regular expression \`${patterns[i]}\``;
+                    comment['body'] += `\n> This bad pattern was triggered by the regular expression \`${patterns[i]}\``;
                     // We are also now done with this comment.
                     comments.push(comment);
                     comment = {};
@@ -42,19 +42,20 @@ module.exports = {
         }
         return comments;
     },
-    dismiss_old_reviews: (github, context) => {
-        // First, find out who we are.
-        let user_id = github.rest.users.getAuthenticated()['id'];
-
-        // Then, we find our reviews for this pull request.
-        let review_ids = github.rest.pulls.listReviews({
+    dismiss_old_reviews: async (github, context) => {
+        // We find our reviews for this pull request.
+        const response = await github.rest.pulls.listReviews({
             owner: context.repo.owner,
             repo: context.repo.repo,
             pull_number: context.issue.number
-        }).filter(x => x['user']['id'] === user_id).map(x => x['id']);
+        });
+        const reviews = await github.paginate(response);
+        const review_ids = reviews.filter(x => x['user']['login'] === "github-actions[bot]").map(x => x['id']);
 
-        for (let review_id of review_ids) {
-            github.rest.pulls.dismissReview({
+        console.log("review_ids: " + review_ids);
+
+        for (const review_id of review_ids) {
+            await github.rest.pulls.dismissReview({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 pull_number: context.issue.number,

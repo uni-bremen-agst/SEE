@@ -122,7 +122,7 @@ def handle_chunk(open_diff, start_line, filename, lines) -> int:
 
 def main():
     occurrences = 0
-    with fileinput.input(encoding="utf-8") as diff:
+    with fileinput.input() as diff:
         current_file = None
         chunk_indicator = re.compile(r"^@@ -[0-9,]* \+(\d*)(?:,(\d*))? @@.*$")
         while line := diff.readline().rstrip():

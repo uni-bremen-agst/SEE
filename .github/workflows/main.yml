@@ -53,12 +53,10 @@ jobs:
     steps:
       - name: Run GitScripts checks
         run: ./GitScripts/run_all
-      - name: Fetch commits (for diff)
-        run: git fetch --depth="$(( ${{ github.event.pull_request.commits }} + 1 ))"
       - name: Collect bad patterns
         run: |
-          if ! PATTERNS=$(git diff origin/master -U0 | grep '^[+@]' | ./GitScripts/check_for_bad_patterns.py); then
-            DELIMITER=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 13 ; echo '')
+          if [ -n $GITHUB_BASE_REF ] && ! PATTERNS=$(curl -H 'Accept: application/vnd.github.v3.diff' -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -f 'https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}' | grep '^[+@]' | ./GitScripts/check_for_bad_patterns.py); then
+            DELIMITER=7MApgggGyx6C0
             echo "PATTERNS<<$DELIMITER" >> $GITHUB_ENV
             echo "$PATTERNS" >> $GITHUB_ENV
             echo "$DELIMITER" >> $GITHUB_ENV
@@ -69,7 +67,8 @@ jobs:
         name: Check for bad patterns
         with:
           script: |
-            const { PATTERNS } = process.env;
+            const PATTERNS = process.env.PATTERNS;
+            console.log("PATTERNS: " + PATTERNS);
             const helper = require('./GitScripts/review_helper.js');
             if (PATTERNS === "none") {
               console.log("Found no bad patterns in changed files.");
@@ -82,7 +81,7 @@ jobs:
               } else {
                 console.log("Creating PR review...");
                 // But first, we'll dismiss the old review, if there is one.
-                helper.dismiss_old_reviews(github, context);
+                await helper.dismiss_old_reviews(github, context);
                 github.rest.pulls.createReview({
                   owner: context.repo.owner,
                   repo: context.repo.repo,
