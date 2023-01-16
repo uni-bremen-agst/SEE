@@ -1,5 +1,5 @@
 ﻿using System;
-using Valve.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model
 {
@@ -16,26 +16,26 @@ namespace SEE.Net.Dashboard.Model
         /// <remarks>This can be parsed using <see cref="DashboardVersion"/>.</remarks>
         [JsonProperty(Required = Required.Always)]
         public readonly string dashboardVersionNumber;
-        
+
         /// <summary>
         /// The name of the error kind.
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public readonly string type;
-        
+
         /// <summary>
         /// A human readable english message describing the error.
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public readonly string message;
-        
+
         /// <summary>
         /// Use this instead of message in order to display a message translated according to your language preferences.
         /// Will contain exactly the same contents as message in case no translation is available.
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public readonly string localizedMessage;
-        
+
         /// <summary>
         /// Optional field containing additional error information meant for automatic processing.
         /// This data is meant for helping software that uses the API to better
@@ -66,14 +66,14 @@ namespace SEE.Net.Dashboard.Model
             /// </summary>
             [JsonProperty(Required = Required.Default)]
             public readonly string column;
-            
+
             /// <summary>
             /// Provides an ASCII-encoded URL pointing to human-readable help that might help a user understand
             /// and resolve the error. If the URL is relative, then it is meant relative to the Dashboard the error originated from.
             /// </summary>
             [JsonProperty(Required = Required.Default)]
             public readonly string help;
-            
+
             /// <summary>
             /// Indicates that the provided password may be used as API token with the respective API.
             /// E.g. use 'Authorization: AxToken …' header instead of HTTP basic auth.

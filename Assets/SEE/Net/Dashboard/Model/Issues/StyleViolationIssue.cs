@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Utils;
-using Valve.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
 {
@@ -80,7 +80,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         }
 
         public override string IssueKind => "SV";
-        
+
         public override NumericAttributeNames AttributeName => NumericAttributeNames.Style;
 
         public override IEnumerable<SourceCodeEntity> Entities => new[]
