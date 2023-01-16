@@ -4,6 +4,7 @@ on:
   push:
     branches: master
   pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
     branches: master
 
 concurrency:
@@ -38,21 +39,21 @@ jobs:
           lfs: true
       - name: Confirm LFS pull
         run: git lfs pull
+      - name: Run GitScripts checks
+        run: ./GitScripts/run_all
       - name: Remember runner
         id: remember
         # We remember this to make sure all jobs are run on the same machine.
         run: echo "runner=${{ runner.name }}" >> $GITHUB_OUTPUT
   static:
     name: Run static checks
-    runs-on: ${{ needs.setup.outputs.runner }}
+    runs-on: ${{ matrix.os }}
+    if: '! github.event.pull_request.draft'
     strategy:
       fail-fast: false
       matrix:
         os: [self-hosted]
-    needs: setup
     steps:
-      - name: Run GitScripts checks
-        run: ./GitScripts/run_all
       - name: Collect bad patterns
         run: |
           if [ -n $GITHUB_BASE_REF ] && ! PATTERNS=$(curl -H 'Accept: application/vnd.github.v3.diff' -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -f 'https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}' | grep '^[+@]' | ./GitScripts/check_for_bad_patterns.py); then
@@ -68,31 +69,34 @@ jobs:
         with:
           script: |
             const PATTERNS = process.env.PATTERNS;
-            console.log("PATTERNS: " + PATTERNS);
             const helper = require('./GitScripts/review_helper.js');
             if (PATTERNS === "none") {
               console.log("Found no bad patterns in changed files.");
+              await helper.approve(github, context, false);
             } else {
               let bad_patterns = PATTERNS.split('\n');
-              bad_patterns.pop();  // Last element is empty due to final newline
               console.log("::warning::Found " + Math.floor(bad_patterns.length/6) + " bad patterns!");
               if (context.ref === 'refs/heads/master') {
                 console.log("However, we are on master, so we ignore them.");
               } else {
-                console.log("Creating PR review...");
-                // But first, we'll dismiss the old review, if there is one.
-                await helper.dismiss_old_reviews(github, context);
-                github.rest.pulls.createReview({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  pull_number: context.issue.number,
-                  event: 'REQUEST_CHANGES',
-                  body: 'There are a few bad patterns I found which you should check.',
-                  comments: helper.to_comments(bad_patterns)
-                });
+                let comments = helper.to_comments(bad_patterns);
+                await helper.filter_out_existing_comments(github, context, comments);
+                if (comments.length > 0) {
+                  console.log("Submitting PR review...");
+                  github.rest.pulls.createReview({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: context.issue.number,
+                    event: 'REQUEST_CHANGES',
+                    body: 'There are a few bad patterns I found which you should check.',
+                    comments: comments
+                  });
+                } else {
+                  console.log("After filtering, no new comments are left. Not submitting a review.");
+                  await helper.approve(github, context, true);
+                }
               }
             }
-
 
   test:
     name: Run editmode tests

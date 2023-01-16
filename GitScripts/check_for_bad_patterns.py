@@ -76,20 +76,6 @@ BAD_PATTERNS = [
         suggestion=r"\1.Execute()\2",
         level=Level.ERROR,
     ),
-    # FIXME: Remove the ones below, they are just for testing purposes.
-    BadPattern(
-        re.compile(r"^BAD([_A-Z]*\s*=\s*\[.*)$"),
-        "So long, and thanks for all the fish.",
-        suggestion=r"RAD\1",
-        extensions=["py"],
-        level=Level.WARN,
-    ),
-    BadPattern(
-        re.compile(r"^\s*re\.compile\(r\"\^\\s\*re\\\.compile.*$"),
-        "A recursive check for this testing example, why not.",
-        extensions=["py"],
-        level=Level.INFO,
-    ),
 ]
 
 # *** MODIFY ABOVE TO ADD NEW BAD PATTERNS ***
