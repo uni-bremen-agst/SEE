@@ -3,7 +3,7 @@ using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.GO;
 using UnityEngine;
-using Valve.VR.InteractionSystem;
+//using Valve.VR.InteractionSystem;
 
 namespace SEE.Game
 {
@@ -18,8 +18,7 @@ namespace SEE.Game
         /// <see cref="ShowHovering"/>, <see cref="ShowSelection"/>, <see cref="ShowGrabbing"/>.
         /// If <paramref name="gameObject"/> has a <see cref="NodeRef"/>, then the following
         /// components are added in addition to the ones above:
-        /// <see cref="GameNodeScaler"/>, <see cref="ShowLabel"/>, <see cref="EyeGazeHandler"/>,
-        /// <see cref="HighlightErosion"/>.
+        /// <see cref="GameNodeScaler"/>, <see cref="ShowLabel"/>, <see cref="HighlightErosion"/>.
         ///
         /// Note: The <paramref name="gameObject"/> is assumed to represent a graph node
         /// or edge.
@@ -28,8 +27,10 @@ namespace SEE.Game
         public static void PrepareForInteraction(GameObject gameObject)
         {
             gameObject.isStatic = false; // we want to move the object during the game
+#if false // FIXME STEAMVR
             Interactable interactable = gameObject.AddComponentIfNecessary<Interactable>();
             interactable.highlightOnHover = false;
+#endif
             gameObject.AddComponentIfNecessary<InteractableObject>();
             // The following additions of components must come after the addition of InteractableObject
             // because they require the presence of an InteractableObject.

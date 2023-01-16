@@ -20,12 +20,13 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Game.Charts;
-using Valve.VR;
+//using Valve.VR;
 
 namespace SEE.Controls.Actions
 {
     public class XRChartAction : ChartAction
     {
+#if false // FIXME STEAMVR
         private readonly SteamVR_Action_Vector2 moveAction =
             SteamVR_Input.GetVector2Action(XRInput.DefaultActionSetName, XRInput.MoveActionName);
 
@@ -68,5 +69,6 @@ namespace SEE.Controls.Actions
             }
             _lastClick = clickAction.state;
         }
+#endif
     }
 }
