@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
-using SEE.Game.UI;
 using SEE.Game.UI.Menu;
 using UnityEngine;
 using UnityEngine.Events;
@@ -15,7 +14,7 @@ namespace SEETests.UI
     [TestFixture]
     internal class TestToggleMenuEntry: TestMenuEntry
     {
-        protected override MenuEntry CreateMenuEntry(UnityAction action, string title, string description = null, 
+        protected override MenuEntry CreateMenuEntry(UnityAction action, string title, string description = null,
                                                      Color entryColor = default, bool enabled = true,
                                                      Sprite icon = null)
         {
