@@ -1,13 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls;
-using SEE.Controls.Actions;
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics;
 using SEE.Game.UI.Menu;
 using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog.HolisticMetrics;
-using SEE.GO.Menu;
 using SEE.Utils;
 using UnityEngine;
 
@@ -36,20 +34,13 @@ namespace SEE.Game.UI.HolisticMetrics
         
         /// <summary>
         /// In every Update step, we want to check whether the player has pressed the key for toggling the holistic
-        /// metrics menu. In that case, we toggle the menu - but only if the <see cref="ActionStateType.MetricBoard"/>
-        /// mode is selected from the <see cref="PlayerMenu"/>. Also, when the player left the
-        /// <see cref="ActionStateType.MetricBoard"/> mode without closing the menu, we close the menu.
+        /// metrics menu. In that case, we toggle the menu.
         /// </summary>
         private void Update()
         {
-            if (SEEInput.ToggleHolisticMetricsMenu() 
-                && GlobalActionHistory.Current().Equals(ActionStateType.MetricBoard))
+            if (SEEInput.ToggleHolisticMetricsMenu())
             {
                 menu.ToggleMenu();
-            }
-            else if (menu.MenuShown && GlobalActionHistory.Current().Equals(ActionStateType.MetricBoard))
-            {
-                menu.ShowMenu(false);
             }
         }
 

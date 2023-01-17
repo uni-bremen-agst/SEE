@@ -62,10 +62,6 @@ namespace SEE.Controls.Actions
             new ActionStateType(9, "Draw", "Draw a line",
                         Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                         DrawAction.CreateReversibleAction);
-        public static ActionStateType MetricBoard { get; } =
-            new ActionStateType(10, "Metric Board", "Configure Metric Boards",
-                                Color.cyan, "Materials/40+ Simple Icons - Free/Mixer_Simple_Icons_UI.png",
-                                MetricBoardAction.CreateReversibleAction);
         #endregion
 
         /// <summary>
