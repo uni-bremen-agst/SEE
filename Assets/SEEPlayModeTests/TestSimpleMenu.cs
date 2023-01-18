@@ -4,16 +4,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.EventSystems;
 using UnityEngine.TestTools;
-using UnityEngine.UI;
 
 namespace SEE.Game.UI.Menu
 {
     /// <summary>
     /// Test cases for <see cref="SimpleMenu"/>.
     /// </summary>
-    internal class TestSimpleMenu : TestUI
+    internal class TestSimpleMenu : TestMenu
     {
         /// <summary>
         /// Title of option 1 in the menu.
@@ -154,55 +152,6 @@ namespace SEE.Game.UI.Menu
 
             menu.AddEntries(menuEntries);
             menu.ShowMenu(true);
-        }
-
-
-        /// <summary>
-        /// Simulates pressing the button representing the option <paramref name="optionTitle"/>.
-        /// </summary>
-        /// <param name="menuTitle">title of the selection menu</param>
-        /// <param name="optionTitle">relative name of game object holding a <see cref="Button"/> component
-        /// and representing a selection option</param>
-        private static void PressButton(string menuTitle, string optionTitle)
-        {
-            PressButton($"/UI Canvas/{menuTitle}/Main Content/Content Mask/Content/Menu Entries/Scroll Area/List/{optionTitle}");
-        }
-
-        /// <summary>
-        /// Simulates pressing the Close button.
-        /// </summary>
-        /// <param name="menuTitle">title of the selection menu</param>
-        private static void PressCloseButton(string menuTitle)
-        {
-            PressButton($"/UI Canvas/{menuTitle}/Main Content/Buttons/Content/Close");
-        }
-        /// <summary>
-        /// Simulates that a user presses the button identified by <paramref name="buttonPath"/>.
-        /// </summary>
-        /// <param name="buttonPath">the path name of the game object holding a <see cref="Button"/> component</param>
-        private static void PressButton(string buttonPath)
-        {
-            // Retrieve the button
-            GameObject buttonObject = GameObject.Find(buttonPath);
-            Assert.NotNull(buttonObject);
-            // Make sure the object is really holding a button.
-            Assert.That(buttonObject.TryGetComponent(out Button _));
-            // Press the button.
-            ExecuteEvents.Execute(buttonObject, new BaseEventData(EventSystem.current), ExecuteEvents.submitHandler);
-        }
-
-        /// <summary>
-        /// Path to a sprite we can use for testing.
-        /// </summary>
-        private const string PathOfIcon = "Materials/Charts/MoveIcon";
-
-        /// <summary>
-        /// The icon loaded from <see cref="PathOfIcon"/>.
-        /// </summary>
-        /// <returns>icon loaded from <see cref="PathOfIcon"/></returns>
-        private static Sprite GetIcon()
-        {
-            return Resources.Load<Sprite>(PathOfIcon);
         }
     }
 }
