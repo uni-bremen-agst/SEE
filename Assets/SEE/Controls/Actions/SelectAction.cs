@@ -31,7 +31,7 @@ namespace SEE.Controls.Actions
             if (SEEInput.Unselect())
             {
                 InteractableObject.UnselectAll(true);
-                AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
+                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
             }
             else if (SEEInput.Select())
             {

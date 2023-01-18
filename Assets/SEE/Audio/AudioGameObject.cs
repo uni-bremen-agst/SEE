@@ -4,27 +4,37 @@ using UnityEngine;
 namespace SEE.Audio
 {
     /// <summary>
-    /// An Object that contains a SEE game object and an audio queue and makes the sounds originate from the game object in 3D space.
+    /// An Object that contains a SEE game object
+    /// and an audio queue and makes the sounds originate
+    /// from the game object in 3D space.
     /// </summary>
     public class AudioGameObject
     {
         /// <summary>
-        /// Queue of sound effects that this object should play
+        /// Queue of sound effects that this object should play.
         /// </summary>
         private Queue<AudioClip> effectsQueue = new Queue<AudioClip>();
 
         /// <summary>
-        /// The game object that this audio management object is attached to.
+        /// The game object that this audio management object is attached to
+        /// and plays music for.
         /// </summary>
-        private GameObject parentObject;
-
-        public GameObject ParentObject
+        public GameObject AttachedObject
         {
-            get
-            {
-                return parentObject;
-            }
-        } 
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Default Constructor
+        /// </summary>
+        /// <param name="attachedObject">The game object this audio management object is attached to.</param>
+        public AudioGameObject(GameObject attachedObject, float defaultVolume = 1.0f)
+        {
+            AttachedObject = attachedObject;
+            AttachedObject.AddComponent<AudioSource>();
+            AttachedObject.GetComponent<AudioSource>().volume = defaultVolume;
+        }
 
         /// <summary>
         /// Adds a new sound effect to this game object's audio queue.
@@ -36,9 +46,14 @@ namespace SEE.Audio
             CheckMusicPlayer();
         }
 
+        /// <summary>
+        /// Checks if there are sound effects left in the audio queue
+        /// and plays the next sound effect from the queue if no sound effect
+        /// is currently playing.
+        /// </summary>
         private void CheckMusicPlayer()
         {
-            AudioSource audioSource = this.parentObject.GetComponent<AudioSource>();
+            AudioSource audioSource = AttachedObject.GetComponent<AudioSource>();
             if (!audioSource.isPlaying && effectsQueue.Count == 1)
             {
                 audioSource.clip = effectsQueue.Dequeue();
@@ -46,44 +61,51 @@ namespace SEE.Audio
             }
         }
 
+        /// <summary>
+        /// Changes the audio player's volume to the supplied volume.
+        /// </summary>
+        /// <param name="volume">The volume the audio player should be set to.</param>
         public void ChangeVolume(float volume){
-            this.parentObject.GetComponent<AudioSource>().volume = volume;
+            AttachedObject.GetComponent<AudioSource>().volume = volume;
         }
 
         /// <summary>
-        /// Check if sound is playing or play next sound
+        /// Checks if sound is playing or play next sound, thís method is called 
+        /// by the global audio manager.
         /// </summary>
         public void Update()
         {
-            AudioSource audioSource = this.parentObject.GetComponent<AudioSource>();
-            if (audioSource.isPlaying && effectsQueue.Count <= 0) return;
-            audioSource.Stop();
-            audioSource.clip = effectsQueue.Dequeue();
-            audioSource.Play();
-        }
-
-        public bool EqualsGameObject(GameObject gameObject)
-        {
-            return this.parentObject.GetInstanceID() == gameObject.GetInstanceID();
+            AudioSource audioSource = AttachedObject.GetComponent<AudioSource>();
+            if (!audioSource.isPlaying || effectsQueue.Count > 0)
+            {
+                audioSource.Stop();
+                audioSource.clip = effectsQueue.Dequeue();
+                audioSource.Play();
+            }
         }
 
         /// <summary>
-        /// Default Constructor
+        /// Checks if a game object has an audio game object (and thus
+        /// an audio listener) attached.
         /// </summary>
-        /// <param name="parentObject">The game object this audio management object is attached to.</param>
-        public AudioGameObject(GameObject parentObject, float defaultVolume = 1.0f)
+        /// <param name="gameObject">The game object to check.</param>
+        /// <returns></returns>
+        public bool CheckHasAudioListenerAttached(GameObject gameObject)
         {
-            this.parentObject = parentObject;
-            this.parentObject.AddComponent<AudioSource>();
-            this.parentObject.GetComponent<AudioSource>().volume = defaultVolume;
+            return AttachedObject.GetInstanceID() == gameObject.GetInstanceID();
         }
 
+        /// <summary>
+        /// Checks if the audio queue of an attached game object is empty.
+        /// If the queue is empty, delete this audio game object.
+        /// </summary>
+        /// <returns>True, if the queue is empty, else false.</returns>
         public bool EmptyQueue()
         {
-            bool emptyQueue = this.effectsQueue.Count == 0 && !this.parentObject.GetComponent<AudioSource>().isPlaying;
+            bool emptyQueue = this.effectsQueue.Count == 0 && !AttachedObject.GetComponent<AudioSource>().isPlaying;
             if (emptyQueue)
             {
-                GameObject.Destroy(this.parentObject.GetComponent<AudioSource>());
+                GameObject.Destroy(AttachedObject.GetComponent<AudioSource>());
             }
             return emptyQueue;
         }

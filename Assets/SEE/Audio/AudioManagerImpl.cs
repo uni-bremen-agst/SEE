@@ -6,88 +6,112 @@ using static SEE.Audio.GameStateManager;
 
 namespace SEE.Audio
 {
+    /// <summary>
+    /// Implements the IAudioManager interface.
+    /// </summary>
     public class AudioManagerImpl : MonoBehaviour, IAudioManager
     {
-        public AudioClip lobbyMusic;
-        public AudioClip clickSoundEffect;
-        public AudioClip dropSoundEffect; 
-        public AudioClip pickSoundEffect;
-        public AudioClip newEdgeSoundEffect;
-        public AudioClip newNodeSoundEffect;
-        public AudioClip scribbleSoundEffect;
-        public AudioClip footstepSoundEffect;
-        public AudioClip okayButtonSoundEffect;
-        public AudioClip cancelButtonSoundEffect;
-        public AudioClip hoverSoundEffect;
+        /// <summary>
+        /// The music played in the lobby scene.
+        /// </summary>
+        public AudioClip LobbyMusic;
+
+        /// <summary>
+        /// The sound effect played when clicking objects.
+        /// </summary>
+        public AudioClip ClickSoundEffect;
+
+        /// <summary>
+        /// The sound effect played when dropping objects.
+        /// </summary>
+        public AudioClip DropSoundEffect;
+
+        /// <summary>
+        /// The sound effect played when picking up objects.
+        /// </summary>
+        public AudioClip PickSoundEffect;
+
+        /// <summary>
+        /// The sound effect played when creating new edges.
+        /// </summary>
+        public AudioClip NewEdgeSoundEffect;
+
+        /// <summary>
+        /// The sound effect played when creating new nodes.
+        /// </summary>
+        public AudioClip NewNodeSoundEffect;
+
+        /// <summary>
+        /// The sound effect played when drawing.
+        /// </summary>
+        public AudioClip ScribbleSoundEffect;
+
+        /// <summary>
+        /// The sound effect played when players are walking.
+        /// </summary>
+        public AudioClip FootstepSoundEffect;
+
+        /// <summary>
+        /// The sound effect played when clicking the okay button.
+        /// </summary>
+        public AudioClip OkayButtonSoundEffect;
+
+        /// <summary>
+        /// The sound effect played when clicking the cancel button.
+        /// </summary>
+        public AudioClip CancelButtonSoundEffect;
+
+        /// <summary>
+        /// The sound effect played when hovering over objects.
+        /// </summary>
+        public AudioClip HoverSoundEffect;
 
         /// <summary>
         /// Contains a list of Game Objects that had an AudioSource attached to them to play a sound effect.
         /// </summary>
-        private readonly HashSet<AudioGameObject> soundEffectGameObjects = new HashSet<AudioGameObject>();
+        private readonly ISet<AudioGameObject> soundEffectGameObjects = new HashSet<AudioGameObject>();
 
         /// <summary>
         /// The player's GameObject, used to play music (which is in an ambient environment, rather than being directional).
         /// </summary>
-        public GameObject playerObject;
+        public GameObject PlayerObject;
 
         /// <summary>
         /// Publicly accessible default for music volume. Can be set by Unity properties.
         /// </summary>
         [Range(0,1)]
-        public float defaultMusicVolume;
+        public float DefaultMusicVolume;
 
         /// <summary>
         /// Publicly accessible default for sound effect volume. Can be set by Unity properties.
         /// </summary>
         [Range(0, 1)]
-        public float defaultSoundEffectVolume;
+        public float DefaultSoundEffectVolume;
 
         /// <summary>
         /// Memento that stores the music volume before the music was muted.
         /// </summary>
-        private float musicVolumeBeforeMute = 0;
+        private float musicVolumeBeforeMute;
 
         /// <summary>
         /// Memento that stores the sound effects volume before sound effects were muted.
         /// </summary>
-        private float soundEffectVolumeBeforeMute = 0;
+        private float soundEffectVolumeBeforeMute;
 
         /// <summary>
         /// Current music volume.
         /// </summary>
-        private float musicVolume;
+        public float MusicVolume;
 
         /// <summary>
         /// Current sound effects volume.
         /// </summary>
-        private float soundEffectVolume;
+        public float SoundEffectVolume;
 
         /// <summary>
         /// Stores the previous scene name.
         /// </summary>
-        private string previousSceneName;
-
-        /// <summary>
-        /// Get the current music volume.
-        /// </summary>
-        public virtual float MusicVolume
-        {
-            get
-            {
-                return musicVolume;
-            }
-        }
-
-        /// <summary>
-        /// Get the current sound effects volume.
-        /// </summary>
-        public virtual float SoundEffectVolume
-        {
-            get
-            {
-                return soundEffectVolume;
-            }
-        }
+        private GameState previousGameState;
 
         /// <summary>
         /// Queue of music tracks to be played by the audio manager.
@@ -105,7 +129,7 @@ namespace SEE.Audio
         private static AudioManagerImpl instance = null;
         
         /// <summary>
-        /// Store the current state of the music player.
+        /// Stores the current state of the music player.
         /// </summary>
         private bool musicPaused = false;
 
@@ -118,56 +142,62 @@ namespace SEE.Audio
         /// Get the singleton instance.
         /// </summary>
         /// <returns>The AudioManager singleton instance.</returns>
-        public static AudioManagerImpl GetAudioManager()
+        public static AudioManagerImpl Instance()
         {
             return instance;
         }
 
         /// <summary>
-        /// Set the AudioManager singleton instance.
+        /// Attaches an audio player for music to the player's game object.
         /// </summary>
-        /// <param name="audioManagerImpl">The AudioManager instance.</param>
-        public static void SetAudioManager(AudioManagerImpl audioManagerImpl)
-        {
-            instance = audioManagerImpl;
-        }
-
         private void AttachAudioPlayer()
         {
-            this.playerObject.AddComponent<AudioSource>();
-            this.musicPlayer = this.playerObject.GetComponent<AudioSource>();
-            this.musicVolume = this.defaultMusicVolume;
-            this.soundEffectVolume = this.defaultSoundEffectVolume;
-            this.musicPlayer.volume = this.musicVolume;
+            this.PlayerObject.AddComponent<AudioSource>();
+            this.musicPlayer = this.PlayerObject.GetComponent<AudioSource>();
+            this.MusicVolume = this.DefaultMusicVolume;
+            this.SoundEffectVolume = this.DefaultSoundEffectVolume;
+            this.musicPlayer.volume = this.MusicVolume;
         }
 
+        /// <summary>
+        /// Executed when this object is created.
+        /// </summary>
         void Start()
         {
+            instance = this; // required since a mono behaviour object cannot be instantiated.
             AttachAudioPlayer();
             InitializeSoundEffectPlayer();
-            SetAudioManager(this);
-            previousSceneName = SceneManager.GetActiveScene().name;
+            previousGameState = GameStateManager.GetBySceneName(SceneManager.GetActiveScene());
             QueueMusic();
         }
 
+        /// <summary>
+        /// Attaches an audio player for sound effects to the player's game object.
+        /// </summary>
         private void InitializeSoundEffectPlayer()
         {
-            this.soundEffectPlayer = this.playerObject.AddComponent<AudioSource>();
-            this.soundEffectPlayer.volume = this.soundEffectVolume;
+            soundEffectPlayer = PlayerObject.AddComponent<AudioSource>();
+            soundEffectPlayer.volume = SoundEffectVolume;
         }
 
+        /// <summary>
+        /// Called every frame.
+        /// </summary>
         void Update()
         {
-            if (CheckSceneChanged()) GameStateChanged();
+            if (CheckSceneChanged())
+            {
+                GameStateChanged();
+            }
             HandleSceneMusic();
             DeleteRemovedAudioObjects(GetRemovedAudioObjects());
         }
 
         /// <summary>
-        /// Removed removed AudioObjects from the AudioManager's AudioObject collection.
+        /// Removes removed <see cref="AudioGameObject">s from the AudioManager's AudioObject collection.
         /// </summary>
-        /// <param name="removedElements">A list of AudioObjects that were removed in the current frame.</param>
-        private void DeleteRemovedAudioObjects(HashSet<AudioGameObject> removedElements)
+        /// <param name="removedElements">A list of <see cref="AudioGameObject">s that were removed in the current frame.</param>
+        private void DeleteRemovedAudioObjects(ISet<AudioGameObject> removedElements)
         {
             foreach (AudioGameObject removedElement in removedElements)
             {
@@ -180,95 +210,117 @@ namespace SEE.Audio
         /// Additionally calls the update method of any object that was not removed.
         /// </summary>
         /// <returns>A HashSet of removed AudiObjects.</returns>
-        private HashSet<AudioGameObject> GetRemovedAudioObjects()
+        private ISet<AudioGameObject> GetRemovedAudioObjects()
         {
-            HashSet<AudioGameObject> removedElements = new HashSet<AudioGameObject>();
+            ISet<AudioGameObject> removedElements = new HashSet<AudioGameObject>();
             foreach (AudioGameObject audioGameObject in soundEffectGameObjects)
             {
-                if (audioGameObject.ParentObject == null || audioGameObject.EmptyQueue())
+                if (audioGameObject.AttachedObject == null || audioGameObject.EmptyQueue())
                 {
                     removedElements.Add(audioGameObject);
                 }
                 else
                 {
-                    audioGameObject.Update();
+                    try
+                    {
+                        audioGameObject.Update();
+                    } 
+                    catch
+                    {
+                        // Block executed when referenced element no longer exists in scene.
+                        removedElements.Add(audioGameObject);
+                    }
                 }
             }
             return removedElements;
         }
 
         /// <summary>
-        /// Handles the music player in a loaded scene.
+        /// Checks if there is still music playing, if not queues another music track.
         /// </summary>
         private void HandleSceneMusic()
         {
-            if (this.musicPlayer == null || this.soundEffectPlayer == null)
+            if (musicPlayer == null || soundEffectPlayer == null)
             {
                 AttachAudioPlayer();
             }
-            if (this.musicPlayer.isPlaying || this.musicPaused) return;
-            if (this.musicPlayer.clip == null)
+            if (!musicPlayer.isPlaying && !musicPaused)
             {
-                if (this.musicQueue.Count == 0) QueueMusic();
-                this.musicPlayer.clip = musicQueue.Dequeue();
+                if (musicPlayer.clip == null)
+                {
+                    if (musicQueue.Count == 0) QueueMusic();
+                    musicPlayer.clip = musicQueue.Dequeue();
+                }
+                musicPlayer.loop = true;
+                musicPlayer.Play();
             }
-            this.musicPlayer.loop = true;
-            this.musicPlayer.Play();
         }
 
         /// <summary>
-        /// Check if the loaded scene was changed.
+        /// Check if the loaded scene was changed, by comparing the current scene's name
+        /// with the scene name from the last frame.
         /// </summary>
         /// <returns>True if the scene was changed, false otherwise.</returns>
         private bool CheckSceneChanged()
         {
-            string currentSceneName = SceneManager.GetActiveScene().name;
-            if (currentSceneName != previousSceneName)
+            GameState currentScene = GameStateManager.GetBySceneName(SceneManager.GetActiveScene());
+            if (currentScene != previousGameState)
             {
-                previousSceneName = currentSceneName;
+                previousGameState = currentScene;
                 return true;
             }
             return false;
         }
 
         /// <summary>
-        /// Applies the volume changes from the music/sound effects integer to actual game volume changes.
+        /// Applies the volume changes.
         /// </summary>
         private void TriggerVolumeChanges()
         {
-            this.musicPlayer.volume = this.musicVolume;
-            this.soundEffectPlayer.volume = this.soundEffectVolume;
+            this.musicPlayer.volume = this.MusicVolume;
+            this.soundEffectPlayer.volume = this.SoundEffectVolume;
             foreach (AudioGameObject audioGameObject in soundEffectGameObjects)
             {
-                audioGameObject.ChangeVolume(soundEffectVolume);
+                audioGameObject.ChangeVolume(SoundEffectVolume);
             }
         }
 
+        /// <summary>
+        /// Decreases music volume by 10%.
+        /// </summary>
         public void DecreaseMusicVolume()
         {
-            if (musicVolume > 0.1f)
+            if (MusicVolume > 0.1f)
             {
-                musicVolume -= 0.1f;
+                MusicVolume -= 0.1f;
                 TriggerVolumeChanges();
             }
         }
 
+        /// <summary>
+        /// Decreases sound effect volume by 10%.
+        /// </summary>
         public void DecreaseSoundEffectVolume()
         {
-            if (soundEffectVolume > 0.1f)
+            if (SoundEffectVolume > 0.1f)
             {
-                soundEffectVolume-= 0.1f;
+                SoundEffectVolume -= 0.1f;
                 TriggerVolumeChanges();
-
             }
-           
         }
 
+        /// <summary>
+        /// Changes playing music when switching scenes.
+        /// </summary>
         public void GameStateChanged()
         {
+            soundEffectGameObjects.Clear();
             QueueMusic();
-            if (!this.musicPaused) this.musicPlayer.Stop();
-            this.musicPlayer.clip = musicQueue.Dequeue();
+            if (!musicPaused)
+            {
+                musicPlayer.Stop();
+            }
+            musicPlayer.clip = musicQueue.Dequeue();
         }
 
         /// <summary>
@@ -276,44 +328,57 @@ namespace SEE.Audio
         /// </summary>
         private void QueueMusic()
         {
-            this.QueueMusic(GameStateManager.GetBySceneName(this.previousSceneName));
+            this.QueueMusic(previousGameState);
         }
 
+        /// <summary>
+        /// Increase music volume by 10%.
+        /// </summary>
         public void IncreaseMusicVolume()
         {
-            if (musicVolume <= 0.9f)
+            if (MusicVolume <= 0.9f)
             {
-                musicVolume+= 0.1f;
+                MusicVolume += 0.1f;
                 TriggerVolumeChanges();
             }
-            
         }
 
+        /// <summary>
+        /// Increase sound effect volume by 10%.
+        /// </summary>
         public void IncreaseSoundEffectVolume()
         {
-            if (this.soundEffectVolume <= 0.9f)
+            if (this.SoundEffectVolume <= 0.9f)
             {
-                this.soundEffectVolume+= 0.1f;
+                this.SoundEffectVolume += 0.1f;
                 TriggerVolumeChanges();
             }
-            
         }
 
+        /// <summary>
+        /// Mutes the music.
+        /// </summary>
         public void MuteMusic()
         {
             this.musicVolumeBeforeMute = MusicVolume;
-            musicVolume = 0;
+            MusicVolume = 0;
             TriggerVolumeChanges();
             PauseMusic();
         }
 
+        /// <summary>
+        /// Mutes sound effects.
+        /// </summary>
         public void MuteSoundEffects()
         {
-            this.soundEffectVolumeBeforeMute = soundEffectVolume;
-            this.soundEffectVolume = 0;
+            this.soundEffectVolumeBeforeMute = SoundEffectVolume;
+            this.SoundEffectVolume = 0;
             TriggerVolumeChanges();
         }
 
+        /// <summary>
+        /// Pauses the music player.
+        /// </summary>
         public void PauseMusic()
         {
             if (this.musicPlayer.isPlaying)
@@ -323,19 +388,68 @@ namespace SEE.Audio
             }
         }
 
+        /// <summary>
+        /// Adds a new music track to the music queue.
+        /// </summary>
+        /// <param name="gameState">The current game state.</param>
         public void QueueMusic(GameState gameState)
         {
-            switch (gameState)
+            musicQueue.Enqueue(GetAudioClipFromMusicName(gameState == GameState.LOBBY ? Music.LOBBY_MUSIC : Music.LOBBY_MUSIC));
+        }
+
+        /// <summary>
+        /// Public API method for playing sound effects.
+        /// </summary>
+        /// <param name="soundEffect">The sound effect to play.</param>
+        public static void EnqueueSoundEffect(SoundEffect soundEffect)
+        {
+            if (instance != null)
             {
-                case GameState.LOBBY:
-                    musicQueue.Enqueue(GetAudioClipFromMusicName(Music.LOBBY_MUSIC));
-                    break;
-                case GameState.IN_GAME:
-                    musicQueue.Enqueue(GetAudioClipFromMusicName(Music.LOBBY_MUSIC));
-                    break;
+                AudioManagerImpl.Instance().QueueSoundEffect(soundEffect);
             }
         }
 
+        /// <summary>
+        /// Public API method for playing sound effects.
+        /// </summary>
+        /// <param name="soundEffect">The sound effect to play.</param>
+        /// <param name="sourceObject">The object the sound should eminate from.</param>
+        public static void EnqueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject)
+        {
+            if (instance != null)
+            {
+                if (sourceObject == null)
+                {
+                    EnqueueSoundEffect(soundEffect);
+                    return;
+                }
+                AudioManagerImpl.Instance().QueueSoundEffect(soundEffect, sourceObject);
+            }
+        }
+
+        /// <summary>
+        /// Public API method for playing sound effects.
+        /// </summary>
+        /// <param name="soundEffect">The sound effect to play.</param>
+        /// <param name="sourceObject">The object the sound should eminate from.</param>
+        /// <param name="networkAction">Whether the sound effect should be propagated to other players.</param>
+        public static void EnqueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject, bool networkAction)
+        {
+            if (instance != null)
+            {
+                if (sourceObject == null)
+                {
+                    EnqueueSoundEffect(soundEffect);
+                    return;
+                }
+                AudioManagerImpl.Instance().QueueSoundEffect(soundEffect, sourceObject, networkAction);
+            }
+        }
+
+        /// <summary>
+        /// Plays a new sound effect.
+        /// </summary>
+        /// <param name="soundEffect">The sound effect to play.</param>
         public void QueueSoundEffect(SoundEffect soundEffect)
         {
             this.soundEffectPlayer.Stop();
@@ -343,21 +457,32 @@ namespace SEE.Audio
             this.soundEffectPlayer.Play();
         }
 
+        /// <summary>
+        /// Plays a new sound effect.
+        /// </summary>
+        /// <param name="soundEffect">The sound effect to play.</param>
+        /// <param name="sourceObject">The object the sound should eminate from.</param>
         public void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject) {
             if (sourceObject == null)
             {
-                QueueSoundEffect(soundEffect);
+                EnqueueSoundEffect(soundEffect);
                 return;
             }
             QueueSoundEffect(soundEffect, sourceObject, false);
         }
 
+        /// <summary>
+        /// Plays a new sound effect.
+        /// </summary>
+        /// <param name="soundEffect">The sound effect to play.</param>
+        /// <param name="sourceObject">The object the sound should eminate from.</param>
+        /// <param name="networkAction">Whether the sound effect should be propagated to other players.</param>
         public void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject, bool networkAction)
         {
             AudioGameObject controlObject = null;
             foreach (AudioGameObject audioGameObject in soundEffectGameObjects)
             {
-                if (audioGameObject.EqualsGameObject(sourceObject))
+                if (audioGameObject.CheckHasAudioListenerAttached(sourceObject))
                 {
                     controlObject = audioGameObject;
                     break;
@@ -365,16 +490,19 @@ namespace SEE.Audio
             }
             if (controlObject == null)
             {
-                controlObject = new AudioGameObject(sourceObject, soundEffectVolume);
+                controlObject = new AudioGameObject(sourceObject, SoundEffectVolume);
                 soundEffectGameObjects.Add(controlObject);
             }
             controlObject.EnqueueSoundEffect(GetAudioClipFromSoundEffectName(soundEffect));
-            if (!networkAction && !"SEEStart".Equals(previousSceneName))
+            if (!networkAction && !GameState.LOBBY.Equals(previousGameState))
             {
                 new SoundEffectNetAction(soundEffect, sourceObject.gameObject.name).Execute();
             }
         }
 
+        /// <summary>
+        /// Resumes music after it was paused.
+        /// </summary>
         public void ResumeMusic()
         {
             if (!musicPlayer.isPlaying)
@@ -384,17 +512,23 @@ namespace SEE.Audio
             }
         }
 
+        /// <summary>
+        /// Unmutes music.
+        /// </summary>
         public void UnmuteMusic()
         {
-            musicVolume = musicVolumeBeforeMute;
+            MusicVolume = musicVolumeBeforeMute;
             musicVolumeBeforeMute = 0;
             TriggerVolumeChanges();
             ResumeMusic();
         }
 
+        /// <summary>
+        /// Unmutes sound effects.
+        /// </summary>
         public void UnmuteSoundEffects()
         {
-            soundEffectVolume = soundEffectVolumeBeforeMute;
+            SoundEffectVolume = soundEffectVolumeBeforeMute;
             soundEffectVolumeBeforeMute = 0;
             TriggerVolumeChanges();
         }
@@ -402,52 +536,37 @@ namespace SEE.Audio
         /// <summary>
         /// Get the AudioClip of the music that should be played.
         /// </summary>
-        /// <param name="music">The enum referencing the music track that should be played.</param>
+        /// <param name="music">The music track that should be played.</param>
         /// <returns>An AudioSource matching the given enum music name.</returns>
         private AudioClip GetAudioClipFromMusicName(Music music)
         {
             switch (music)
             {
                 case Music.LOBBY_MUSIC:
-                    return lobbyMusic;
+                    return LobbyMusic;
                 default:
-                    return lobbyMusic;
-
+                    return LobbyMusic;
             }
         }
 
         /// <summary>
         /// Get the AudioClip of the sound effect that should be played.
         /// </summary>
-        /// <param name="soundEffect">The enum referencing the sound effect that should be played.</param>
+        /// <param name="soundEffect">The sound effect that should be played.</param>
         /// <returns>An AudioSource matching the given enum sound effect name.</returns>
-        private AudioClip GetAudioClipFromSoundEffectName(SoundEffect soundEffect)
+        private AudioClip GetAudioClipFromSoundEffectName(SoundEffect soundEffect) => soundEffect switch
         {
-            switch (soundEffect)
-            {
-                case SoundEffect.CLICK_SOUND:
-                    return this.clickSoundEffect;
-                case SoundEffect.DROP_SOUND:
-                    return this.dropSoundEffect;
-                case SoundEffect.OKAY_SOUND:
-                    return this.okayButtonSoundEffect;
-                case SoundEffect.PICKUP_SOUND:
-                    return this.pickSoundEffect;
-                case SoundEffect.NEW_EDGE_SOUND:
-                    return this.newEdgeSoundEffect;
-                case SoundEffect.NEW_NODE_SOUND:
-                    return this.newNodeSoundEffect;
-                case SoundEffect.WALKING_SOUND:
-                    return this.footstepSoundEffect;
-                case SoundEffect.CANCEL_SOUND:
-                   return this.cancelButtonSoundEffect;
-                case SoundEffect.SCRIBBLE:
-                    return this.scribbleSoundEffect;
-                case SoundEffect.HOVER_SOUND:
-                    return this.hoverSoundEffect;
-                default:
-                    return this.clickSoundEffect;
-            }
-        }
+            SoundEffect.CLICK_SOUND => this.ClickSoundEffect,
+            SoundEffect.DROP_SOUND => this.DropSoundEffect,
+            SoundEffect.OKAY_SOUND => this.OkayButtonSoundEffect,
+            SoundEffect.PICKUP_SOUND => this.PickSoundEffect,
+            SoundEffect.NEW_EDGE_SOUND => this.NewEdgeSoundEffect,
+            SoundEffect.NEW_NODE_SOUND => this.NewNodeSoundEffect,
+            SoundEffect.WALKING_SOUND => this.FootstepSoundEffect,
+            SoundEffect.CANCEL_SOUND => this.CancelButtonSoundEffect,
+            SoundEffect.SCRIBBLE => this.ScribbleSoundEffect,
+            SoundEffect.HOVER_SOUND => this.HoverSoundEffect,
+            _ => this.ClickSoundEffect,
+        };
     }
 }

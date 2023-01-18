@@ -271,7 +271,7 @@ namespace SEE.Controls.Actions
                 {
                     if (draggedSphere == null && Raycasting.RaycastAnything(out RaycastHit raycastHit))
                     {
-                        AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, objectToScale);
+                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, objectToScale);
                         draggedSphere = SelectedScalingGizmo(raycastHit.collider.gameObject);
                     }
 
@@ -308,7 +308,7 @@ namespace SEE.Controls.Actions
                             if (objectToScale.transform.position != beforeAction.Position
                                 || objectToScale.transform.lossyScale != beforeAction.Scale)
                             {
-                                AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, objectToScale);
+                                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, objectToScale);
                                 currentState = ReversibleAction.Progress.Completed;
                                 // Scaling action is finalized.
                                 afterAction = new Memento(objectToScale);
@@ -317,7 +317,7 @@ namespace SEE.Controls.Actions
                             }
                             else
                             {
-                                AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, objectToScale);
+                                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, objectToScale);
                                 // Nothing has changed. We will continue with the action.
                                 // We continue with the newly selected node if a node was selected.
                                 if (hitGraphElement == HitGraphElement.Node)
@@ -340,7 +340,7 @@ namespace SEE.Controls.Actions
                 }
                 else if (hitGraphElement == HitGraphElement.Node)
                 {
-                    AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, raycastHit.collider.gameObject);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, raycastHit.collider.gameObject);
                     // No object to be scaled had been selected yet, but now we have one.
                     objectToScale = raycastHit.collider.gameObject;
                     Operator = objectToScale.AddOrGetComponent<NodeOperator>();

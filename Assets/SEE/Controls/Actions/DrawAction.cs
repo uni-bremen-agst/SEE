@@ -131,7 +131,7 @@ namespace SEE.Controls.Actions
                 }
                 if (Input.GetMouseButtonDown(0))
                 {
-                    AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.SCRIBBLE);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.SCRIBBLE);
                 }
                 // The action is considered complete if the mouse button is no longer pressed.
                 return Input.GetMouseButtonUp(0);

@@ -7,7 +7,6 @@ namespace SEE.Audio
     /// </summary>
     public interface IAudioManager
     {
-
         /// <summary>
         /// Mutes all music.
         /// </summary>
@@ -16,7 +15,7 @@ namespace SEE.Audio
         /// <summary>
         /// Increases the music volume.
         /// </summary>
-        abstract void IncreaseMusicVolume();
+        void IncreaseMusicVolume();
 
         /// <summary>
         /// Decreases the music volume.
@@ -68,22 +67,23 @@ namespace SEE.Audio
         /// The GameObject used is the player object itself (ambient sound rather than directional sound is used).
         /// </summary>
         /// <param name="soundEffect">The sound effect that should be played.</param>
-        void QueueSoundEffect(SoundEffect soundEffect);
+        public void QueueSoundEffect(SoundEffect soundEffect);
 
         /// <summary>
         /// Adds a sound effect to the sound effect queue.
         /// </summary>
-        /// <param name="soundEffect">Name of the sound effect that should be added to the sound effect queue.</param>
-        /// <param name="sourceObject">The GameObject where the sound originated from.</param>
-        void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject);
+        /// <param name="soundEffect">The sound effect that should be added to the sound effect queue.</param>
+        /// <param name="sourceObject">The GameObject where the sound originates from.</param>
+        public void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject);
 
         /// <summary>
-        /// Adds a sound effect to the sound effect queue while checking if the sound effect was passed from a multiplayer connected player,
+        /// Adds a sound effect to the sound effect queue while checking,
+        /// if the sound effect was passed from a multiplayer connected player,
         /// or from the local game instance (to prevent endless sound effect loops).
         /// </summary>
-        /// <param name="soundEffect">Name of the sound effect that should be added to the sound effect queue.</param>
+        /// <param name="soundEffect">The sound effect that should be added to the sound effect queue.</param>
         /// <param name="sourceObject">The GameObject where the sound originated from.</param>
-        /// <param name="networkAction">False if the sound effect originated from the local unity instance, else true.</param>
+        /// <param name="networkAction">Whether the sound effect originated from the local unity instance.</param>
         public void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject, bool networkAction);
 
         /// <summary>
@@ -91,7 +91,46 @@ namespace SEE.Audio
         /// </summary>
         enum SoundEffect
         {
-            CLICK_SOUND, DROP_SOUND, OKAY_SOUND, PICKUP_SOUND, NEW_EDGE_SOUND, NEW_NODE_SOUND, WALKING_SOUND, CANCEL_SOUND, SCRIBBLE, HOVER_SOUND
+            /// <summary>
+            /// A simple click sound. 
+            /// </summary>
+            CLICK_SOUND,
+            /// <summary>
+            /// Sound for dropping objects.
+            /// </summary>
+            DROP_SOUND,
+            /// <summary>
+            /// Confirmation click sound.
+            /// </summary>
+            OKAY_SOUND,
+            /// <summary>
+            /// Sound for picking up objects.
+            /// </summary>
+            PICKUP_SOUND,
+            /// <summary>
+            /// Sound for creating a new edge.
+            /// </summary>
+            NEW_EDGE_SOUND,
+            /// <summary>
+            /// Sound for creating a new node.
+            /// </summary>
+            NEW_NODE_SOUND,
+            /// <summary>
+            /// Player walking sound.
+            /// </summary>
+            WALKING_SOUND,
+            /// <summary>
+            /// Declined click sound.
+            /// </summary>
+            CANCEL_SOUND,
+            /// <summary>
+            /// Drawing sound.
+            /// </summary>
+            SCRIBBLE,
+            /// <summary>
+            /// Sound for hovering over objects.
+            /// </summary>
+            HOVER_SOUND
         }
 
         /// <summary>
@@ -99,7 +138,10 @@ namespace SEE.Audio
         /// </summary>
         enum Music
         {
-            LOBBY_MUSIC
+            /// <summary>
+            /// The lobby music.
+            /// </summary>
+            LOBBY_MUSIC 
         }
     }
 }

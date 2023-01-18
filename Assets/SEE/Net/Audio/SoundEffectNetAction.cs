@@ -4,38 +4,53 @@ using SEE.Net.Actions;
 
 namespace SEE.Audio
 {
+    /// <summary>
+    /// Propagates sound effects across network to connected clients.
+    /// </summary>
     public class SoundEffectNetAction : AbstractNetAction
     {
         /// <summary>
-        /// Sound effect to play
+        /// Sound effect to play.
         /// </summary>
         public string SoundEffectName;
 
         /// <summary>
-        /// GameObject Id of the Game Object the sound effect should eminate from
+        /// GameObject Id of the Game Object the sound effect should eminate from.
         /// </summary>
         public string TargetGameObjectName;
 
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        /// <param name="soundEffect">The sound effect to play.</param>
+        /// <param name="gameObjectName">The name of the game object that the sound should eminate from.</param>
         public SoundEffectNetAction(SoundEffect soundEffect, string gameObjectName) 
         {
             this.SoundEffectName = soundEffect.ToString();
             this.TargetGameObjectName = gameObjectName;
         }
 
+        /// <summary>
+        /// Action executed on clients.
+        /// </summary>
         protected override void ExecuteOnClient()
         {
-            if (IsRequester()) return;
-            IAudioManager audioManager = AudioManagerImpl.GetAudioManager();
-            GameObject targetGameObject = GameObject.Find(this.TargetGameObjectName);
-            SoundEffect soundEffect = (SoundEffect) System.Enum.Parse(typeof(SoundEffect), this.SoundEffectName);
-            if (targetGameObject == null)
+            if (!IsRequester())
             {
-                audioManager.QueueSoundEffect(soundEffect);
-                return;
+                GameObject targetGameObject = Find(this.TargetGameObjectName);
+                SoundEffect soundEffect = (SoundEffect)System.Enum.Parse(typeof(SoundEffect), this.SoundEffectName);
+                if (targetGameObject == null)
+                {
+                    AudioManagerImpl.EnqueueSoundEffect(soundEffect);
+                    return;
+                }
+                AudioManagerImpl.EnqueueSoundEffect(soundEffect, targetGameObject, true);
             }
-            audioManager.QueueSoundEffect(soundEffect, targetGameObject, true);
         }
 
+        /// <summary>
+        /// Action executed on server.
+        /// </summary>
         protected override void ExecuteOnServer()
         {
             // Intentionally left empty

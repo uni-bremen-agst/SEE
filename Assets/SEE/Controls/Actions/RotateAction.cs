@@ -118,7 +118,7 @@ namespace SEE.Controls.Actions
                         }
                     }
                     gizmo.gameObject.SetActive(false);
-                    AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
                     rotating = false;
                     synchronize = true;
                 }
@@ -136,7 +136,7 @@ namespace SEE.Controls.Actions
                     UnityEngine.Plane plane = new UnityEngine.Plane(Vector3.up, cityRootNode.position);
                     if (!rotating && Raycasting.RaycastPlane(plane, out planeHitPoint)) // start rotation
                     {
-                        AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND);
+                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND);
                         rotating = true;
                         hit.CityRootNode = cityRootNode;
                         hit.Cursor = cityCursor;
@@ -219,9 +219,8 @@ namespace SEE.Controls.Actions
                 {
                     interactable.SetGrab(false, true);
                 }
-                AudioManagerImpl.GetAudioManager().QueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
+                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
                 gizmo.gameObject.SetActive(false);
-                
                 currentState = ReversibleAction.Progress.Completed;
             }
 

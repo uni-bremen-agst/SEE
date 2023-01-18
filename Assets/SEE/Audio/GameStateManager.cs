@@ -1,3 +1,5 @@
+using UnityEngine.SceneManagement;
+
 namespace SEE.Audio
 {
     /// <summary>
@@ -5,23 +7,22 @@ namespace SEE.Audio
     /// </summary>
     public static class GameStateManager
     {
-        public static GameState GetBySceneName(string sceneName)
+        /// <summary>
+        /// Returns the game state enum for a given scene.
+        /// </summary>
+        /// <param name="scene">The currently loaded scene.</param>
+        /// <returns>A game state enum for the given scene.</returns>
+        public static GameState GetBySceneName(Scene scene) => scene.name switch
         {
-            switch (sceneName)
-            {
-                case "SEEStart":
-                    return GameState.LOBBY;
-                case "SEEWorld":
-                    return GameState.IN_GAME;
-                default:
-                    return GameState.IN_GAME;
-            }
-        }
+            _ => GameState.IN_GAME,
+        };
 
-        public enum GameState {
+        /// <summary>
+        /// Avaible game states.
+        /// </summary>
+        public enum GameState 
+        {
             LOBBY, IN_GAME
         }
-        
     }
-
 }
