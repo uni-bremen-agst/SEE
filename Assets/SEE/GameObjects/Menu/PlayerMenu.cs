@@ -5,8 +5,6 @@ using SEE.Controls.Actions;
 using SEE.Game.UI.Menu;
 using SEE.Game.UI.StateIndicator;
 using UnityEngine;
-using UnityEngine.Assertions;
-using UnityEngine.Events;
 
 namespace SEE.GO.Menu
 {
