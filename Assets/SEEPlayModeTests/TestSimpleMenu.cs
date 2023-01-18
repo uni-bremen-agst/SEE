@@ -136,13 +136,13 @@ namespace SEE.Game.UI.Menu
 
             IEnumerable<MenuEntry> menuEntries = new List<MenuEntry>
             {
-                new MenuEntry(action: new UnityAction(() => { Debug.Log("Selection 1\n");  selection = 1; }),
+                new MenuEntry(action: new UnityAction(() => { selection = 1; }),
                               title: OptionOne,
                               description: "Select option 1",
                               entryColor: Color.red,
                               enabled: true,
                               icon: GetIcon()),
-                new MenuEntry(action: new UnityAction(() => { Debug.Log("Selection 2\n");  selection = 2; }),
+                new MenuEntry(action: new UnityAction(() => { selection = 2; }),
                               title: OptionTwo,
                               description: "Select option 2",
                               entryColor: Color.green,
