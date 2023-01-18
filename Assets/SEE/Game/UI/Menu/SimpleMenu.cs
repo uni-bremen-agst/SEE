@@ -386,6 +386,15 @@ namespace SEE.Game.UI.Menu
             icon = Resources.Load<Sprite>("Materials/ModernUIPack/Settings");
         }
 
+        /// <summary>
+        /// Let's <see cref="keywordInput"/> stop listening.
+        /// </summary>
+        /// <remarks>Called by Unity when this object is destroyed.</remarks>
+        private void OnDestroy()
+        {
+            StopListening();
+        }
+
         protected override void StartTouchGamepad() => StartDesktop();
 
         protected override void StartVR() => StartDesktop();
