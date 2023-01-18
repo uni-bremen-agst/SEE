@@ -12,14 +12,25 @@ using UnityEngine.Windows.Speech;
 namespace SEE.Game.UI.Menu
 {
     /// <summary>
-    /// A menu similar to the <see cref="SimpleMenu"/> with buttons which can open other menus.
+    /// A nested menu containing a list of <see cref="MenuEntry"/> items.
+    /// The difference between this and the generic menu class <see cref="NestedMenu{T}"/>
+    /// is that the type parameter doesn't have to be specified here.
     /// </summary>
-    public class NestedMenu : SimpleMenu<MenuEntry>
+    public class NestedMenu : NestedMenu<MenuEntry>
+    {
+        // Intentionally empty, see class documentation.
+    }
+
+    /// <summary>
+    /// A menu similar to the <see cref="SimpleMenu"/> with buttons which can
+    /// open other menus, in other words, a container for other menus.
+    /// </summary>
+    public class NestedMenu<T> : SimpleMenu<T> where T : MenuEntry
     {
         /// <summary>
         /// The menu levels we have ascended through.
         /// </summary>
-        private readonly Stack<MenuLevel> Levels = new Stack<MenuLevel>();
+        private readonly Stack<MenuLevel> Levels = new();
 
         /// <summary>
         /// Path to the NestedMenu prefab.
@@ -30,7 +41,7 @@ namespace SEE.Game.UI.Menu
         /// The keyword to be used to step back in the menu verbally.
         /// </summary>
         private const string BackMenuCommand = "go back";
-        
+
         /// <summary>
         /// The input-field for the fuzzy-search of the nestedMenu.
         /// </summary>
@@ -45,16 +56,16 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// All leaf-entries of the nestedMenu.
         /// </summary>
-        private IDictionary<string, MenuEntry> AllEntries;
+        private IDictionary<string, T> AllEntries;
 
         /// <summary>
         /// True, if the fuzzy-search is active, else false.
         /// </summary>
         private bool searchActive;
 
-        protected override void OnEntrySelected(MenuEntry entry)
+        protected override void OnEntrySelected(T entry)
         {
-            if (entry is NestedMenuEntry nestedEntry)
+            if (entry is NestedMenuEntry<T> nestedEntry)
             {
                 // If this contains another menu level, repopulate list with new level after saving the current one
                 AscendLevel(nestedEntry);
@@ -70,7 +81,7 @@ namespace SEE.Game.UI.Menu
         /// Returns the titles of all <see cref="entries"/> plus
         /// <see cref="CloseMenuCommand"/> appended at the end.
         /// </summary>
-        /// <returns>titles of all <see cref="entries"/> appended by 
+        /// <returns>titles of all <see cref="entries"/> appended by
         /// <see cref="CloseMenuCommand"/></returns>
         protected override string[] GetMenuEntryTitles()
         {
@@ -80,9 +91,9 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// Callback registered in <see cref="Listen(bool)"/> to be called when
         /// one of the menu entry titles was recognized (spoken by the user).
-        /// Triggers the corresponding action of the selected entry if the 
-        /// corresponding entry title was recognized and then closes the menu 
-        /// again. If only <see cref="CloseMenuCommand"/> was recognized, no 
+        /// Triggers the corresponding action of the selected entry if the
+        /// corresponding entry title was recognized and then closes the menu
+        /// again. If only <see cref="CloseMenuCommand"/> was recognized, no
         /// action will be triggered, yet the menu will be closed, too.
         /// </summary>
         /// <param name="args">the phrase recognized</param>
@@ -115,7 +126,7 @@ namespace SEE.Game.UI.Menu
         /// Ascends up in the menu hierarchy by creating a new level from the given <paramref name="nestedEntry"/>.
         /// </summary>
         /// <param name="nestedEntry">The entry from which to construct the new level</param>
-        private void AscendLevel(NestedMenuEntry nestedEntry)
+        private void AscendLevel(NestedMenuEntry<T> nestedEntry)
         {
             Levels.Push(new MenuLevel(Title, Description, Icon, entries));
             while (entries.Count != 0)
@@ -140,7 +151,7 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <returns>breadcrumb for the current level</returns>
         private string GetBreadcrumb() => string.Join(" / ", Levels.Reverse().Select(x => x.Title));
-        
+
         /// <summary>
         /// Descends down a level in the menu hierarchy and removes the entry from the <see cref="Levels"/>.
         /// </summary>
@@ -183,7 +194,7 @@ namespace SEE.Game.UI.Menu
             base.StartDesktop();
 
             MenuContent.transform.Find("Search Field").gameObject.TryGetComponentOrLog(out searchInput);
-            
+
             searchInput.onValueChanged.AddListener(SearchTextEntered);
             Manager.onCancel.AddListener(DescendLevel); // Go one level higher when clicking "back"
             Manager.onCancel.AddListener(() =>
@@ -195,7 +206,7 @@ namespace SEE.Game.UI.Menu
             {
                 Manager.onConfirm.AddListener(ResetToBase); // When closing the menu, its level will be reset to the top
             }
-            
+
             OnMenuToggle.AddListener(shown => SEEInput.KeyboardShortcutsEnabled = !shown);
         }
 
@@ -203,9 +214,9 @@ namespace SEE.Game.UI.Menu
         /// Gets all leaf-entries - or rather menuEntries (no nestedMenuEntries) of the nestedMenu.
         /// </summary>
         /// <returns>All leaf-entries of the nestedMenu.</returns>
-        private IEnumerable<MenuEntry> GetAllEntries()
+        private IEnumerable<T> GetAllEntries()
         {
-            IList<MenuEntry> allEntries = Levels.LastOrDefault()?.Entries ?? Entries;
+            IList<T> allEntries = Levels.LastOrDefault()?.Entries ?? Entries;
             return GetAllEntries(allEntries);
         }
 
@@ -214,12 +225,12 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <param name="startingEntries">the entries to research.</param>
         /// <returns>All leafEntries of the nestedMenu.</returns>
-        private static IEnumerable<MenuEntry> GetAllEntries(IEnumerable<MenuEntry> startingEntries)
+        private static IEnumerable<T> GetAllEntries(IEnumerable<MenuEntry> startingEntries)
         {
-            List<MenuEntry> leafEntries = new List<MenuEntry>();
-            foreach (MenuEntry startingEntry in startingEntries)
+            List<T> leafEntries = new();
+            foreach (T startingEntry in startingEntries)
             {
-                if (startingEntry is NestedMenuEntry nestedMenuEntry)
+                if (startingEntry is NestedMenuEntry<T> nestedMenuEntry)
                 {
                     leafEntries.AddRange(GetAllEntries(nestedMenuEntry.InnerEntries));
                 }
@@ -249,17 +260,17 @@ namespace SEE.Game.UI.Menu
             {
                 return;
             }
-            
+
             AllEntries ??= GetAllEntries().ToDictionary(x => x.Title, x => x);
-            IEnumerable<MenuEntry> results =
+            IEnumerable<T> results =
                 Process.ExtractTop(SearchMenu.FilterString(text), AllEntries.Keys, cutoff: 10)
                        .OrderByDescending(x => x.Score)
                        .Select(x => AllEntries[x.Value])
                        .ToList();
 
-            NestedMenuEntry resultEntry = new NestedMenuEntry(
-                 results, "Results", $"Found {results.Count()} help pages.",default,default, Resources.Load<Sprite>("Materials/Notification/info")
-            ) ;
+            NestedMenuEntry<T> resultEntry
+                = new(results, "Results", $"Found {results.Count()} help pages.",
+                      default, default, Resources.Load<Sprite>("Materials/Notification/info")) ;
             AscendLevel(resultEntry);
         }
 
@@ -272,14 +283,14 @@ namespace SEE.Game.UI.Menu
             public readonly string Title;
             public readonly string Description;
             public readonly Sprite Icon;
-            public readonly List<MenuEntry> Entries;
+            public readonly List<T> Entries;
 
-            public MenuLevel(string title, string description, Sprite icon, IList<MenuEntry> entries)
+            public MenuLevel(string title, string description, Sprite icon, IList<T> entries)
             {
                 Title = title ?? throw new ArgumentNullException(nameof(title));
                 Description = description ?? throw new ArgumentNullException(nameof(description));
                 Icon = icon;
-                Entries = entries != null ? new List<MenuEntry>(entries) : throw new ArgumentNullException(nameof(entries));
+                Entries = entries != null ? new List<T>(entries) : throw new ArgumentNullException(nameof(entries));
             }
         }
     }
