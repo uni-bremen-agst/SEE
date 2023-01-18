@@ -98,11 +98,11 @@ namespace SEE.Game.UI.Window.CodeWindow
 
             base.StartDesktop();
 
-            GameObject scrollable = PrefabInstantiator.InstantiatePrefab(CODE_WINDOW_PREFAB, window.transform.Find("Content"), false);
+            GameObject scrollable = PrefabInstantiator.InstantiatePrefab(CODE_WINDOW_PREFAB, Window.transform.Find("Content"), false);
             scrollable.name = "Scrollable";
 
             // Set title, text and preferred font size
-            window.transform.Find("Dragger/Title").gameObject.GetComponent<TextMeshProUGUI>().text = Title;
+            Window.transform.Find("Dragger/Title").gameObject.GetComponent<TextMeshProUGUI>().text = Title;
             GameObject code = scrollable.transform.Find("Code").gameObject;
             if (code.TryGetComponentOrLog(out TextMesh) && code.TryGetComponentOrLog(out TextMeshInputField))
             {
@@ -170,7 +170,7 @@ namespace SEE.Game.UI.Window.CodeWindow
             }
 
             // Get button for IDE interaction and register events.
-            window.transform.Find("Dragger/IDEButton").gameObject.GetComponent<Button>()
+            Window.transform.Find("Dragger/IDEButton").gameObject.GetComponent<Button>()
                   .onClick.AddListener(() =>
                   {
                       IDEIntegration.Instance?.OpenFile(FilePath, SolutionPath, markedLine).Forget();
@@ -463,7 +463,7 @@ namespace SEE.Game.UI.Window.CodeWindow
                 ShowNotification.Error("File too big", "This file is too large to be displayed correctly.");
             }
 
-            if (lines > 0 && window.transform.Find("Content/Scrollable").gameObject.TryGetComponentOrLog(out RectTransform rect))
+            if (lines > 0 && Window.transform.Find("Content/Scrollable").gameObject.TryGetComponentOrLog(out RectTransform rect))
             {
                 excessLines = Mathf.CeilToInt(rect.rect.height / TextMesh.textInfo.lineInfo[0].lineHeight) - 2;
             }

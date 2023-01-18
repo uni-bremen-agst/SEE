@@ -23,7 +23,7 @@ namespace SEE.Game.UI.Window
         /// <summary>
         /// GameObject containing the actual UI for the window.
         /// </summary>
-        public GameObject window { get; protected set; }
+        public GameObject Window { get; protected set; }
 
         /// <summary>
         /// Path to the window canvas prefab.
@@ -38,13 +38,13 @@ namespace SEE.Game.UI.Window
                 return;
             }
 
-            window = PrefabInstantiator.InstantiatePrefab(WINDOW_PREFAB, Canvas.transform, false);
+            Window = PrefabInstantiator.InstantiatePrefab(WINDOW_PREFAB, Canvas.transform, false);
 
             // Position code window in center of screen
-            window.transform.localPosition = Vector3.zero;
+            Window.transform.localPosition = Vector3.zero;
 
             // Set resolution to preferred values
-            if (window.TryGetComponentOrLog(out RectTransform rect))
+            if (Window.TryGetComponentOrLog(out RectTransform rect))
             {
                 rect.sizeDelta = Resolution;
             }
@@ -82,9 +82,9 @@ namespace SEE.Game.UI.Window
         /// </summary>
         public void OnDisable()
         {
-            if (window)
+            if (Window)
             {
-                window.SetActive(false);
+                Window.SetActive(false);
             }
         }
 
@@ -93,9 +93,9 @@ namespace SEE.Game.UI.Window
         /// </summary>
         public void OnEnable()
         {
-            if (window)
+            if (Window)
             {
-                window.SetActive(true);
+                Window.SetActive(true);
             }
         }
 
@@ -105,9 +105,9 @@ namespace SEE.Game.UI.Window
         /// <param name="show">Whether the window should be shown.</param>
         private void ShowDesktop(bool show)
         {
-            if (window)
+            if (Window)
             {
-                window.SetActive(show);
+                Window.SetActive(show);
             }
         }
 

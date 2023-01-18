@@ -60,7 +60,7 @@ namespace SEE.Game.UI.Window
         /// </exception>
         private void UpdateActiveTab()
         {
-            if (Panel != null && ActiveWindow != null && ActiveWindow.window != null)
+            if (Panel != null && ActiveWindow != null && ActiveWindow.Window != null)
             {
                 if (!windows.Contains(ActiveWindow))
                 {
@@ -84,7 +84,7 @@ namespace SEE.Game.UI.Window
                     UpdateActiveTab();
                     return;
                 }
-                Panel.ActiveTab = Panel.GetTabIndex((RectTransform) ActiveWindow.window.transform);
+                Panel.ActiveTab = Panel.GetTabIndex((RectTransform) ActiveWindow.Window.transform);
             }
         }
 
@@ -95,7 +95,7 @@ namespace SEE.Game.UI.Window
                 // We need to destroy the panel now
                 Destroy(Panel);
             } 
-            else if (!Panel && windows.Any(x => x.window))
+            else if (!Panel && windows.Any(x => x.Window))
             {
                 InitializePanel();
             } 
@@ -122,16 +122,16 @@ namespace SEE.Game.UI.Window
             // First, close old windows that are not open anymore
             foreach (BaseWindow window in currentWindows.Except(windows).ToList())
             {
-                Panel.RemoveTab(Panel.GetTab((RectTransform) window.window.transform));
+                Panel.RemoveTab(Panel.GetTab((RectTransform) window.Window.transform));
                 currentWindows.Remove(window);
                 Destroy(window);
             }
             
             // Then, add new tabs 
             // We need to skip windows which weren't initialized yet
-            foreach (BaseWindow window in windows.Except(currentWindows).Where(x => x.window != null).ToList())
+            foreach (BaseWindow window in windows.Except(currentWindows).Where(x => x.Window != null).ToList())
             {
-                RectTransform rectTransform = (RectTransform) window.window.transform;
+                RectTransform rectTransform = (RectTransform) window.Window.transform;
                 // Add the new window as a tab to our panel
                 PanelTab tab = Panel.AddTab(rectTransform);
                 tab.Label = window.Title;
@@ -154,7 +154,7 @@ namespace SEE.Game.UI.Window
             {
                 if (panelTab.Panel == Panel)
                 {
-                    CloseWindow(windows.First(x => x.window.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID()));
+                    CloseWindow(windows.First(x => x.Window.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID()));
                     if (panelTab.Panel.NumberOfTabs <= 1)
                     {
                         // All tabs were closed, so we send out an event 
@@ -182,7 +182,7 @@ namespace SEE.Game.UI.Window
                 windows.Clear();
                 return;
             }
-            Panel = PanelUtils.CreatePanelFor((RectTransform) windows[0].window.transform, PanelsCanvas);
+            Panel = PanelUtils.CreatePanelFor((RectTransform) windows[0].Window.transform, PanelsCanvas);
             // When the active tab *on this panel* is changed, we invoke the corresponding event
             PanelNotificationCenter.OnActiveTabChanged += ChangeActiveTab;
             PanelNotificationCenter.OnPanelClosed += ClosePanel;
@@ -191,7 +191,7 @@ namespace SEE.Game.UI.Window
             {
                 if (Panel == tab.Panel)
                 {
-                    ActiveWindow = Windows.First(x => x.window.GetInstanceID() == tab.Content.gameObject.GetInstanceID());
+                    ActiveWindow = Windows.First(x => x.Window.GetInstanceID() == tab.Content.gameObject.GetInstanceID());
                     OnActiveWindowChanged.Invoke();
                 }
             }
@@ -203,7 +203,7 @@ namespace SEE.Game.UI.Window
                     // Close each tab
                     foreach (BaseWindow window in windows)
                     {
-                        Panel.RemoveTab(Panel.GetTab((RectTransform) window.window.transform));
+                        Panel.RemoveTab(Panel.GetTab((RectTransform) window.Window.transform));
                         Destroy(window);
                     }
 
