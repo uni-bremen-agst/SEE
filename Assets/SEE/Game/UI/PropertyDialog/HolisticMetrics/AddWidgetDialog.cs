@@ -47,10 +47,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         internal AddWidgetDialog()
         {
             // Load the metric types
-            metricTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(domainAssembly => domainAssembly.GetTypes())
-                .Where(type => type.IsSubclassOf(typeof(Metric)))
-                .ToArray();
+            metricTypes = Metric.GetTypes();
 
             // Load the widget prefabs
             const string widgetPrefabsPath = "Prefabs/HolisticMetrics/Widgets";

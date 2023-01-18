@@ -67,7 +67,7 @@ namespace SEE.Game.City
         ///
         /// Neither serialized nor saved to the config file.
         /// </summary>
-        public Graph LoadedGraph
+        public override Graph LoadedGraph
         {
             get => loadedGraph;
             protected set

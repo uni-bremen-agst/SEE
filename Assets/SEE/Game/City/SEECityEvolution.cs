@@ -112,6 +112,15 @@ namespace SEE.Game.City
         public override IGraphRenderer Renderer => evolutionRenderer.Renderer;
 
         /// <summary>
+        /// Returns the currently drawn graph.
+        /// </summary>
+        public override Graph LoadedGraph
+        {
+            get => evolutionRenderer?.GraphCurrent;
+            protected set => throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Factory method to create the used EvolutionRenderer.
         /// </summary>
         /// <returns>the current or new evolution renderer attached to this city</returns>
@@ -240,7 +249,7 @@ namespace SEE.Game.City
         /// file system containing at least one GXL file.
         /// </summary>
         /// <returns>the loaded graph or null if none could be found</returns>
-        public Graph LoadFirstGraph()
+        private Graph LoadFirstGraph()
         {
             GraphsReader reader = new GraphsReader();
             reader.Load(GXLDirectory.Path, HierarchicalEdges, basePath: SourceCodeDirectory.Path, rootName: GXLDirectory.Path, 1);
