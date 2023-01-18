@@ -112,6 +112,7 @@ namespace SEE.Game.UI.Window
         }
 
         /// <summary>
+        /// Rebuilds any parts of the window which are dependent on its size.
         /// This method will be called whenever the layout of the window changes in any way, for example, if its
         /// size is changed.
         /// </summary>

@@ -72,13 +72,6 @@ namespace SEE.Controls
             set => WindowSpaces[playerName] = value;
         }
 
-        /// <summary>
-        /// Updates the space of the player specified by <paramref name="playerName"/> using the values
-        /// from <paramref name="valueObject"/>.
-        /// </summary>
-        /// <param name="playerName">The name of the player whose space shall be updated.</param>
-        /// <param name="valueObject">The value object which represents the new space of the player.</param>
-        /// <summary>
         /// Updates the space of the player specified by <paramref name="playerName"/> using the values
         /// from <paramref name="valueObject"/>.
         /// </summary>
