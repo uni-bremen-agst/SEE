@@ -17,9 +17,6 @@ using Random = UnityEngine.Random;
 
 public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 {
-    
-    public int MeineZahl { get; set; }
-    
     protected const string RUNTIME_CONFIG_PREFAB_FOLDER = UI_PREFAB_FOLDER + "RuntimeConfigMenu/";
     public const string SETTINGS_OBJECT_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsObject";
     public const string SWITCH_PREFAB = UI_PREFAB_FOLDER + "Input Group - Switch";
@@ -159,32 +156,17 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                     enumerator.Current.Value.GetType().GetMembers().ForEach(nestedMember => CreateSettingObject(nestedMember, nodeType.transform.Find("Content").gameObject, enumerator.Current.Value));
                 }
             }
-        
-            else if (value is NodeLayoutAttributes nodeLayoutAttributes)
+            // list values with nested settings
+            else if (value is 
+                     NodeLayoutAttributes or 
+                     EdgeLayoutAttributes or 
+                     CoseGraphAttributes or 
+                     EdgeSelectionAttributes or 
+                     ErosionAttributes or 
+                     BoardAttributes)
             {
-                nodeLayoutAttributes.GetType().GetMembers().ForEach(attribute => CreateSettingObject(attribute, parent, nodeLayoutAttributes));
+                value.GetType().GetMembers().ForEach(attribute => CreateSettingObject(attribute, parent, value));
             }
-            else if (value is EdgeLayoutAttributes edgeLayoutAttributes)
-            {
-                edgeLayoutAttributes.GetType().GetMembers().ForEach(attribute => CreateSettingObject(attribute, parent, edgeLayoutAttributes));
-            }
-            else if (value is CoseGraphAttributes coseGraphAttributes)
-            {
-                coseGraphAttributes.GetType().GetMembers().ForEach(attribute => CreateSettingObject(attribute, parent, coseGraphAttributes));
-            }
-            else if (value is EdgeSelectionAttributes edgeSelectionAttributes)
-            {
-                edgeSelectionAttributes.GetType().GetMembers().ForEach(attribute => CreateSettingObject(attribute, parent, edgeSelectionAttributes));
-            }
-            else if (value is ErosionAttributes erosionAttributes)
-            {
-                erosionAttributes.GetType().GetMembers().ForEach(attribute => CreateSettingObject(attribute, parent, erosionAttributes));
-            }
-            else if (value is BoardAttributes boardAttributes)
-            {
-                boardAttributes.GetType().GetMembers().ForEach(attribute => CreateSettingObject(attribute, parent, boardAttributes));
-            }
-
             // TODO: HashSet
 
             // TODO: ColorMap
