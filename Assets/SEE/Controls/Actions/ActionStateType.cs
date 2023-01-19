@@ -64,12 +64,16 @@ namespace SEE.Controls.Actions
             new ActionStateType(9, "Draw", "Draw a line",
                         Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                         DrawAction.CreateReversibleAction);
+        public static ActionStateType MoveBoard { get; } =
+            new ActionStateType(10, "Move Board", "Move a board",
+                Color.yellow.Darker(), "Materials/40+ Simple Icons - Free/Scale_Simple_Icons_UI.png",
+                MoveBoardAction.CreateReversibleAction);
         public static ActionStateType MoveWidget { get; } =
-            new ActionStateType(10, "Move Widget", "Move a widget",
+            new ActionStateType(11, "Move Widget", "Move a widget",
                 Color.yellow.Darker(), "Materials/40+ Simple Icons - Free/Scale_Simple_Icons_UI.png",
                 MoveWidgetAction.CreateReversibleAction);
         public static ActionStateType DeleteBoard { get; } =
-            new ActionStateType(11, "Delete Metrics Board", "Delete a metrics board",
+            new ActionStateType(12, "Delete Metrics Board", "Delete a metrics board",
                 Color.red.Darker(), "Materials/ModernUIPack/Trash",
                 DeleteBoardAction.CreateReversibleAction);
         #endregion

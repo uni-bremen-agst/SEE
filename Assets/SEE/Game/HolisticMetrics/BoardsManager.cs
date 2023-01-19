@@ -121,6 +121,27 @@ namespace SEE.Game.HolisticMetrics
             return movingEnabled;
         }
 
+        internal static bool GetMovement(out string boardName, out Vector3 oldPosition, out Vector3 newPosition,
+            out Quaternion oldRotation, out Quaternion newRotation)
+        {
+            foreach (WidgetsManager widgetsManager in widgetsManagers)
+            {
+                if (widgetsManager.GetMovement(out oldPosition, out newPosition, out oldRotation,
+                        out newRotation))
+                {
+                    boardName = widgetsManager.GetTitle();
+                    return true;
+                }
+            }
+
+            boardName = null;
+            oldPosition = Vector3.zero;
+            newPosition = Vector3.zero;
+            oldRotation = Quaternion.identity;
+            newRotation = Quaternion.identity;
+            return false;
+        }
+
         /// <summary>
         /// Finds a board (its <see cref="WidgetsManager"/>, actually) by its name.
         /// </summary>

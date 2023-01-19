@@ -10,6 +10,8 @@ namespace SEE.Game.HolisticMetrics.Components
     /// </summary>
     public class BoardMover : MonoBehaviour
     {
+        private bool hasMovement;
+        
         /// <summary>
         /// The position of the board when the player initially clicks the move button underneath it. This is needed
         /// so we can revert the move action.
@@ -76,12 +78,27 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         private void OnMouseUp()
         {
-            new MoveBoardAction(
-                parentTransform.GetComponent<WidgetsManager>().GetTitle(),
-                oldPosition,
-                parentTransform.position,
-                oldRotation,
-                parentTransform.rotation);
+            hasMovement = true;
+        }
+
+        internal bool GetMovement(out Vector3 originalPosition, out Vector3 newPosition, 
+            out Quaternion originalRotation, out Quaternion newRotation)
+        {
+            if (hasMovement)
+            {
+                originalPosition = oldPosition;
+                newPosition = parentTransform.position;
+                originalRotation = oldRotation;
+                newRotation = parentTransform.rotation;
+                hasMovement = false;
+                return true;
+            }
+
+            originalPosition = Vector3.zero;
+            newPosition = Vector3.zero;
+            originalRotation = Quaternion.identity;
+            newRotation = Quaternion.identity;
+            return false;
         }
     }
 }

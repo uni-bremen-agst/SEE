@@ -236,6 +236,13 @@ namespace SEE.Game.HolisticMetrics.Components
             boardMover.SetActive(enable);
         }
 
+        internal bool GetMovement(out Vector3 oldPosition, out Vector3 newPosition, out Quaternion oldRotation,
+            out Quaternion newRotation)
+        {
+            return boardMover.GetComponent<BoardMover>()
+                .GetMovement(out oldPosition, out newPosition, out oldRotation, out newRotation);
+        }
+
         /// <summary>
         /// This method can be invoked to toggle the move-ability of the widgets.
         /// </summary>
