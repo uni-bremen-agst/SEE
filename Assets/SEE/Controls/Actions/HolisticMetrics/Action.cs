@@ -13,7 +13,6 @@ namespace SEE.Controls.Actions.HolisticMetrics
         internal void Execute()
         {
             Do();
-            HolisticMetricsActionHistory.Add(this);
         }
 
         /// <summary>

@@ -138,7 +138,6 @@ namespace SEE.Game.UI.HolisticMetrics
         private void Redo()
         {
             menu.ToggleMenu();
-            HolisticMetricsActionHistory.Redo();
         }
         
         /// <summary>
@@ -147,7 +146,6 @@ namespace SEE.Game.UI.HolisticMetrics
         private void Undo()
         {
             menu.ToggleMenu();
-            HolisticMetricsActionHistory.Undo();
         }
         
         /// <summary>

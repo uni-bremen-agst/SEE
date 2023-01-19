@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Controls.Actions.HolisticMetrics;
+using SEE.Game.UI.StateIndicator;
 using SEE.Utils;
 using UnityEngine;
 
@@ -62,6 +64,10 @@ namespace SEE.Controls.Actions
             new ActionStateType(9, "Draw", "Draw a line",
                         Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                         DrawAction.CreateReversibleAction);
+        public static ActionStateType DeleteBoard { get; } =
+            new ActionStateType(10, "Delete Metrics Board", "Delete a metrics board",
+                Color.red.Darker(), "Materials/ModernUIPack/Trash",
+                DeleteBoardAction.CreateReversibleAction);
         #endregion
 
         /// <summary>

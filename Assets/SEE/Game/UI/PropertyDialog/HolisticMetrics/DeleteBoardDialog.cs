@@ -55,9 +55,6 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         private void DeleteBoard()
         {
-            // Delete the board
-            new DeleteBoardAction(selectedBoardName.Value).Execute();
-            
             EnableKeyboardShortcuts();
         }
     }
