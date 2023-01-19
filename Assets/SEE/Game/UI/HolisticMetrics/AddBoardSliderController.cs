@@ -1,7 +1,5 @@
 using Michsky.UI.ModernUIPack;
-using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics;
-using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
 
 namespace SEE.Game.UI.HolisticMetrics
@@ -27,13 +25,15 @@ namespace SEE.Game.UI.HolisticMetrics
         /// The board configuration of the board to be created. So far it should already have a title and a position. In
         /// this component, we will add the rotation to it and then create it.
         /// </summary>
-        private BoardConfig boardConfiguration;
+        private static BoardConfig boardConfiguration;
 
         /// <summary>
         /// The dummy board GameObject that we will instantiate from this component. Its rotation will determine the
         /// rotation of the new board.
         /// </summary>
         private GameObject dummyBoard;
+
+        private static bool done;
         
         /// <summary>
         /// Sets up this component with the board configuration of the new board and a reference to the boards manager.
@@ -71,11 +71,20 @@ namespace SEE.Game.UI.HolisticMetrics
         public void CreateBoard()
         {
             boardConfiguration.Rotation = dummyBoard.transform.rotation;
+            done = true;
             Destroy(dummyBoard);
-            
-            new CreateBoardAction(boardConfiguration).Execute();
-            
             Destroy(gameObject);
+        }
+
+        internal static bool GetRotation(out Quaternion rotation)
+        {
+            if (done)
+            {
+                rotation = boardConfiguration.Rotation;
+                return true;
+            }
+            rotation = new Quaternion();
+            return false;
         }
     }
 }
