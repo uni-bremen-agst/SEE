@@ -4,7 +4,7 @@ namespace SEE.Game.UI.Window
 {
     
     /// Exception that is thrown whenever a value of a particular type was expected,
-    /// but a value of type was supplied instead.
+    /// but a value of an unexpected type was supplied instead.
     public class UnsupportedTypeException : Exception
     {
         /// <summary>
