@@ -4,12 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using SEE.Game.UI.Window.CodeWindow;
 using UnityEngine;
 using UnityEngine.Events;
-using static SEE.Game.UI.CodeWindow.CodeWindow;
 
 namespace SEE.Utils
-
 {
     /// <summary>
     /// A Conflict-Free Replicated Data Type (CRDT) for collaboratively edited text.
@@ -18,14 +17,20 @@ namespace SEE.Utils
     /// </summary>
     public class CRDT
     {
+        // FIXME: This class needs some major refactoring. There are several unused or wholly unnecessary
+        //        methods, and many inefficiencies (e.g. too often enumerating IEnumerables into arrays when
+        //        it isn't necessary to do so.)
+
         /// <summary>
         /// An exception that will be thrown when a failure with the <see cref="crdt"/> happens.
         /// </summary>
         public class CRDTFailureException : Exception
         {
             public CRDTFailureException(string v) : base(v)
-            { }
+            {
+            }
         }
+
         /// <summary>
         /// An exception that will be thrown when a remoteDelete operation is not possible
         /// because the character that should be deleted could not be found in the <see cref="CRDT"/>.
@@ -33,7 +38,8 @@ namespace SEE.Utils
         public class RemoteDeleteNotPossibleException : Exception
         {
             public RemoteDeleteNotPossibleException(string v) : base(v)
-            { }
+            {
+            }
         }
 
         /// <summary>
@@ -44,7 +50,8 @@ namespace SEE.Utils
         public class DeleteNotPossibleException : Exception
         {
             public DeleteNotPossibleException(string v) : base(v)
-            { }
+            {
+            }
         }
 
         /// <summary>
@@ -54,7 +61,8 @@ namespace SEE.Utils
         public class PositionAlreadyExistsException : Exception
         {
             public PositionAlreadyExistsException(string v) : base(v)
-            { }
+            {
+            }
         }
 
         /// <summary>
@@ -63,7 +71,8 @@ namespace SEE.Utils
         public class RemoteAddCharNotPossibleException : Exception
         {
             public RemoteAddCharNotPossibleException(string v) : base(v)
-            { }
+            {
+            }
         }
 
         /// <summary>
@@ -72,7 +81,8 @@ namespace SEE.Utils
         public class UndoNotPossibleExcpetion : Exception
         {
             public UndoNotPossibleExcpetion(string v) : base(v)
-            { }
+            {
+            }
         }
 
         /// <summary>
@@ -81,7 +91,8 @@ namespace SEE.Utils
         public class RedoNotPossibleException : Exception
         {
             public RedoNotPossibleException(string v) : base(v)
-            { }
+            {
+            }
         }
 
         /// <summary>
@@ -212,11 +223,13 @@ namespace SEE.Utils
                     {
                         firstIteration = false;
                     }
+
                     if (index != null)
                     {
                         result += index.ToString();
                     }
                 }
+
                 return result + "] ";
             }
         }
@@ -225,11 +238,12 @@ namespace SEE.Utils
         /// The crdt history contains all local operations adding or deleting a character.
         /// It contains a CharObj[] (char + position) and a operationType (add or delete).
         /// </summary>
-        private Stack<(CharObj[], OperationType)> undoStack = new Stack<(CharObj[], OperationType)>();
+        private Stack<(CharObj[], CodeWindow.OperationType)> undoStack = new();
+
         /// <summary>
         /// Undone operations that can be redone.
         /// </summary>
-        private Stack<(CharObj[], OperationType)> redoStack = new Stack<(CharObj[], OperationType)>();
+        private Stack<(CharObj[], CodeWindow.OperationType)> redoStack = new();
 
         /// <summary>
         /// A buffer to reduce the initial network traffic when oppening a file.
@@ -249,7 +263,7 @@ namespace SEE.Utils
         /// <summary>
         /// Broadcasts if there is a change in the CRDT via the network.
         /// </summary>
-        public UnityEvent<char, int, OperationType> changeEvent = new UnityEvent<char, int, OperationType>();
+        public UnityEvent<char, int, CodeWindow.OperationType> changeEvent = new();
 
         /// <summary>
         /// Constructs a CRDT.
@@ -283,7 +297,7 @@ namespace SEE.Utils
         /// <summary>
         /// The characters of the CRDT with their positions.
         /// </summary>
-        private readonly List<CharObj> crdt = new List<CharObj>(capacity: 5000);
+        private readonly List<CharObj> crdt = new(capacity: 5000);
 
         /// <summary>
         /// Returns the CRDT.
@@ -323,6 +337,7 @@ namespace SEE.Utils
                         CharSet = false;
                         continue;
                     }
+
                     tmpPos += c;
                 }
             }
@@ -355,22 +370,25 @@ namespace SEE.Utils
                 if (crdt.Count == 0)
                 {
                     crdt.Add(new CharObj(c, position));
-                    changeEvent.Invoke(c, crdt.Count - 1, OperationType.Add);
+                    changeEvent.Invoke(c, crdt.Count - 1, CodeWindow.OperationType.Add);
                     return;
                 }
+
                 int insertIdx = FindFittingIndex(position);
                 if (insertIdx == -1)
                 {
                     throw new RemoteAddCharNotPossibleException("A requested remote change could not be inserted, because no fitting position was found!");
                 }
+
                 if (insertIdx >= crdt.Count)
                 {
                     crdt.Add(new CharObj(c, position));
-                    changeEvent.Invoke(c, insertIdx, OperationType.Add);
+                    changeEvent.Invoke(c, insertIdx, CodeWindow.OperationType.Add);
                     return;
                 }
+
                 crdt.Insert(insertIdx, new CharObj(c, position));
-                changeEvent.Invoke(c, insertIdx, OperationType.Add);
+                changeEvent.Invoke(c, insertIdx, CodeWindow.OperationType.Add);
             }
             else
             {
@@ -388,7 +406,7 @@ namespace SEE.Utils
             (int, CharObj) found = Find(position);
             if (-1 < found.Item1)
             {
-                changeEvent.Invoke(' ', found.Item1, OperationType.Delete);
+                changeEvent.Invoke(' ', found.Item1, CodeWindow.OperationType.Delete);
                 crdt.RemoveAt(found.Item1);
             }
             else
@@ -404,13 +422,14 @@ namespace SEE.Utils
         /// <param name="endIdx">The end index</param>
         public void DeleteString(int startIdx, int endIdx)
         {
-            List<CharObj> charObjs = new List<CharObj>();
+            List<CharObj> charObjs = new();
             for (int i = endIdx; i >= startIdx; i--)
             {
                 charObjs.Add(crdt[i]);
                 DeleteChar(i);
             }
-            undoStack.Push((charObjs.ToArray(), OperationType.Delete));
+
+            undoStack.Push((charObjs.ToArray(), CodeWindow.OperationType.Delete));
             redoStack.Clear();
         }
 
@@ -441,16 +460,17 @@ namespace SEE.Utils
         /// <param name="disableUndo">At the start up we do not want to be able of using undo so we should disable it</param>
         public void AddString(string s, int startIdx, bool disableUndo = false)
         {
-            List<CharObj> charObjs = new List<CharObj>(s.Length);
+            List<CharObj> charObjs = new(s.Length);
             for (int i = 0; i < s.Length; i++)
             {
                 AddChar(s[i], i + startIdx);
                 charObjs.Add(crdt[i + startIdx]);
             }
+
             if (!disableUndo)
             {
                 CharObj[] charArr = charObjs.ToArray();
-                undoStack.Push((charArr, OperationType.Add));
+                undoStack.Push((charArr, CodeWindow.OperationType.Add));
                 redoStack.Clear();
             }
         }
@@ -465,7 +485,7 @@ namespace SEE.Utils
         public async UniTask AsyncAddString(string addedString, int startIdx, bool startUp = false)
         {
             await UniTask.SwitchToThreadPool();
-            List<CharObj> charObjs = new List<CharObj>(addedString.Length);
+            List<CharObj> charObjs = new(addedString.Length);
             if (!startUp)
             {
                 for (int i = 0; i < addedString.Length; i++)
@@ -481,16 +501,17 @@ namespace SEE.Utils
                     AddChar(addedString[i], i + startIdx, startUp);
                 }
             }
+
             await UniTask.SwitchToMainThread();
             if (!startUp)
             {
                 CharObj[] charArr = charObjs.ToArray();
-                undoStack.Push((charArr, OperationType.Add));
+                undoStack.Push((charArr, CodeWindow.OperationType.Add));
                 redoStack.Clear();
             }
             else
             {
-                new NetCRDT().AddString(networkbuffer, filename); ;
+                new NetCRDT().AddString(networkbuffer, filename);
             }
         }
 
@@ -568,6 +589,7 @@ namespace SEE.Utils
                     return cmp;
                 }
             }
+
             if (first.Length < second.Length)
             {
                 return -1;
@@ -602,11 +624,11 @@ namespace SEE.Utils
             }
             else
             {
-                if (String.Compare(first.GetSite(), second.GetSite()) < 0)
+                if (string.CompareOrdinal(first.GetSite(), second.GetSite()) < 0)
                 {
                     return -1;
                 }
-                else if (String.Compare(first.GetSite(), second.GetSite()) > 0)
+                else if (string.CompareOrdinal(first.GetSite(), second.GetSite()) > 0)
                 {
                     return 1;
                 }
@@ -642,6 +664,7 @@ namespace SEE.Utils
                 before = new Identifier[1];
                 before[0] = headP1;
             }
+
             if (after != null && after.Any())
             {
                 headP2 = after[0];
@@ -663,24 +686,24 @@ namespace SEE.Utils
                 {
                     digitP1[i] = before[i].GetDigit();
                 }
+
                 for (int i = 0; i < pos2Length; i++)
                 {
                     digitP2[i] = after[i].GetDigit();
                 }
+
                 int[] delta = CalcDelta(digitP1, digitP2);
                 return ToIdentifierList(Increment(digitP1, delta), before, after, site);
             }
-            else if (String.Compare(headP1.GetSite(), headP2.GetSite()) < 0)
+            else if (string.CompareOrdinal(headP1.GetSite(), headP2.GetSite()) < 0)
             {
                 Identifier[] tmp = { headP1 };
-                return FromIEnumToIdentifier(tmp.Concat(GeneratePositionBetween(FromIEnumToIdentifier(before.Skip(1)), null, site)));
+                return tmp.Concat(GeneratePositionBetween(before.Skip(1).ToArray(), null, site)).ToArray();
             }
             else if (headP1.GetSite() == headP2.GetSite())
             {
                 Identifier[] tmp = { headP1 };
-                return FromIEnumToIdentifier(tmp.Concat(GeneratePositionBetween(FromIEnumToIdentifier(before.Skip(1)),
-                                                                                FromIEnumToIdentifier(after.Skip(1)),
-                                                                                site)));
+                return tmp.Concat(GeneratePositionBetween(before.Skip(1).ToArray(), after.Skip(1).ToArray(), site)).ToArray();
             }
             else
             {
@@ -701,6 +724,7 @@ namespace SEE.Utils
             {
                 return (find, crdt[find]);
             }
+
             return (-1, null);
         }
 
@@ -735,21 +759,6 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Converts an IEnumerable to an Identifier[].
-        /// </summary>
-        /// <param name="ienum">The enum that should be converted</param>
-        /// <returns>The Identifier[]</returns>
-        private Identifier[] FromIEnumToIdentifier(IEnumerable<Identifier> ienum)
-        {
-            Identifier[] ret = new Identifier[ienum.Count()];
-            for (int i = 0; i < ienum.Count(); i++)
-            {
-                ret[i] = ienum.ElementAt(i);
-            }
-            return ret;
-        }
-
-        /// <summary>
         /// Increments the value a little less than the delta size.
         /// </summary>
         /// <param name="value">The value that should be incremented</param>
@@ -766,6 +775,7 @@ namespace SEE.Utils
                 inc[i] = elm;
                 i = i--;
             }
+
             int[] incValue = Add(value, inc);
             return incValue[incValue.Length - 1] == 0 ? Add(incValue, inc) : incValue;
         }
@@ -778,27 +788,27 @@ namespace SEE.Utils
         /// <param name="after">The position after the new one</param>
         /// <param name="site">The site id from the user</param>
         /// <returns>A list of identifiers representing a position</returns>
-        private Identifier[] ToIdentifierList(int[] newPos, Identifier[] before, Identifier[] after, string site)
+        private static Identifier[] ToIdentifierList(IReadOnlyCollection<int> newPos, IReadOnlyList<Identifier> before, IReadOnlyList<Identifier> after, string site)
         {
-            return FromIEnumToIdentifier(newPos.Select((digit, index) =>
-           {
-               if (index == newPos.Length - 1)
-               {
-                   return new Identifier(digit, site);
-               }
-               else if (index < before.Length && digit == before[index].GetDigit())
-               {
-                   return new Identifier(digit, before[index].GetSite());
-               }
-               else if (index < after.Length && digit == after[index].GetDigit())
-               {
-                   return new Identifier(digit, after[index].GetSite());
-               }
-               else
-               {
-                   return new Identifier(digit, site);
-               }
-           }));
+            return newPos.Select((digit, index) =>
+            {
+                if (index == newPos.Count - 1)
+                {
+                    return new Identifier(digit, site);
+                }
+                else if (index < before.Count && digit == before[index].GetDigit())
+                {
+                    return new Identifier(digit, before[index].GetSite());
+                }
+                else if (index < after.Count && digit == after[index].GetDigit())
+                {
+                    return new Identifier(digit, after[index].GetSite());
+                }
+                else
+                {
+                    return new Identifier(digit, site);
+                }
+            }).ToArray();
         }
 
         /// <summary>
@@ -807,16 +817,16 @@ namespace SEE.Utils
         /// <param name="first">The first array</param>
         /// <param name="second">The second array</param>
         /// <returns>The array that contains the sum of <paramref name="first"/> and <paramref name="second"/></returns>
-        private int[] Add(int[] first, int[] second)
+        private static int[] Add(IReadOnlyList<int> first, IReadOnlyList<int> second)
         {
-            int[] result = new int[(Math.Max(first.Length, second.Length))];
+            int[] result = new int[Math.Max(first.Count, second.Count)];
             for (int i = 0; i < result.Length; i++)
             {
-                if (i >= first.Length)
+                if (i >= first.Count)
                 {
                     result[i] = second[i];
                 }
-                else if (i >= second.Length)
+                else if (i >= second.Count)
                 {
                     result[i] = first[i];
                 }
@@ -825,6 +835,7 @@ namespace SEE.Utils
                     result[i] = first[i] + second[i];
                 }
             }
+
             return result;
         }
 
@@ -834,24 +845,25 @@ namespace SEE.Utils
         /// <param name="first">The first array</param>
         /// <param name="second">The second array</param>
         /// <returns>An array with the delta values</returns>
-        private int[] CalcDelta(int[] first, int[] second)
+        private static int[] CalcDelta(IReadOnlyList<int> first, IReadOnlyList<int> second)
         {
-            int[] delta = new int[(Mathf.Max(first.Length, second.Length))];
+            int[] delta = new int[Mathf.Max(first.Count, second.Count)];
             for (int i = 0; i < delta.Length; i++)
             {
-                if (first.Length <= i)
+                if (first.Count <= i)
                 {
                     delta[i] = second[i];
                 }
-                else if (second.Length <= i)
+                else if (second.Count <= i)
                 {
-                    delta[i] = first.Length;
+                    delta[i] = first.Count;
                 }
                 else
                 {
                     delta[i] = Mathf.Abs(first[i] - second[i]);
                 }
             }
+
             return delta;
         }
 
@@ -882,6 +894,7 @@ namespace SEE.Utils
                     throw new PositionAlreadyExistsException("The searched position exists in the CRDT already!");
                 }
             }
+
             if (end < crdt.Count && ComparePosition(crdt[end].GetIdentifier(), position) == 0)
             {
                 throw new PositionAlreadyExistsException("The searched position exists in the CRDT already!");
@@ -894,6 +907,7 @@ namespace SEE.Utils
             {
                 return end + 1;
             }
+
             return -1;
         }
 
@@ -924,33 +938,36 @@ namespace SEE.Utils
                     return BinarySearch(position, mid + 1, end);
                 }
             }
+
             if (start < crdt.Count && ComparePosition(crdt[start].GetIdentifier(), position) == 0)
             {
                 return start;
             }
+
             return -1;
         }
 
         /// <summary>
         /// Undoes the last edit operation.
         /// </summary>
-        /// <exception cref="UndoNotPossibleExcpetion">Throws an exception when the undo could not be perfomrt like the undo stack is empty or the operation can´t be undone</exception>
+        /// <exception cref="UndoNotPossibleExcpetion">Throws an exception when the undo could not be perfomrt like the undo stack is empty or the operation canï¿½t be undone</exception>
         public void Undo()
         {
             if (undoStack.Count < 1)
             {
                 throw new UndoNotPossibleExcpetion("Undo Stack is empty!");
             }
-            (CharObj[], OperationType) lastOperation = undoStack.Pop();
+
+            (CharObj[], CodeWindow.OperationType) lastOperation = undoStack.Pop();
             switch (lastOperation.Item2)
             {
-                case OperationType.Add:
+                case CodeWindow.OperationType.Add:
                     foreach (CharObj c in lastOperation.Item1)
                     {
                         int idx = GetIndexByPosition(c.GetIdentifier());
                         if (idx > -1)
                         {
-                            changeEvent.Invoke(' ', idx, OperationType.Delete);
+                            changeEvent.Invoke(' ', idx, CodeWindow.OperationType.Delete);
                             DeleteChar(idx);
                         }
                         else
@@ -958,14 +975,16 @@ namespace SEE.Utils
                             throw new UndoNotPossibleExcpetion("Undo not possible, Char is already deleted!");
                         }
                     }
-                    redoStack.Push((lastOperation.Item1, OperationType.Delete));
+
+                    redoStack.Push((lastOperation.Item1, CodeWindow.OperationType.Delete));
                     break;
-                case OperationType.Delete:
+                case CodeWindow.OperationType.Delete:
                     foreach (CharObj c in lastOperation.Item1)
                     {
                         InternalAddCharObj(c);
                     }
-                    redoStack.Push((lastOperation.Item1, OperationType.Add));
+
+                    redoStack.Push((lastOperation.Item1, CodeWindow.OperationType.Add));
                     break;
             }
         }
@@ -980,16 +999,17 @@ namespace SEE.Utils
             {
                 throw new RedoNotPossibleException("Redo Stack is empty!");
             }
-            (CharObj[], OperationType) lastOperation = redoStack.Pop();
+
+            (CharObj[], CodeWindow.OperationType) lastOperation = redoStack.Pop();
             switch (lastOperation.Item2)
             {
-                case OperationType.Add:
+                case CodeWindow.OperationType.Add:
                     foreach (CharObj c in lastOperation.Item1)
                     {
                         int idx = GetIndexByPosition(c.GetIdentifier());
                         if (idx > -1)
                         {
-                            changeEvent.Invoke(' ', idx, OperationType.Delete);
+                            changeEvent.Invoke(' ', idx, CodeWindow.OperationType.Delete);
                             DeleteChar(idx);
                         }
                         else
@@ -997,14 +1017,16 @@ namespace SEE.Utils
                             throw new RedoNotPossibleException("Redo not possible, Char is already deleted!");
                         }
                     }
-                    undoStack.Push((lastOperation.Item1, OperationType.Delete));
+
+                    undoStack.Push((lastOperation.Item1, CodeWindow.OperationType.Delete));
                     break;
-                case OperationType.Delete:
+                case CodeWindow.OperationType.Delete:
                     foreach (CharObj c in lastOperation.Item1)
                     {
                         InternalAddCharObj(c);
                     }
-                    undoStack.Push((lastOperation.Item1, OperationType.Add));
+
+                    undoStack.Push((lastOperation.Item1, CodeWindow.OperationType.Add));
                     break;
             }
         }
@@ -1026,7 +1048,7 @@ namespace SEE.Utils
             }
 
             new NetCRDT().AddChar(c.GetValue(), c.GetIdentifier(), filename);
-            changeEvent.Invoke(c.GetValue(), index, OperationType.Add);
+            changeEvent.Invoke(c.GetValue(), index, CodeWindow.OperationType.Add);
         }
 
         /// <summary>
@@ -1046,6 +1068,7 @@ namespace SEE.Utils
                 {
                     new NetCRDT().SingleAddChar(c.GetValue(), c.GetIdentifier(), filename, recipient);
                 }
+
                 idx++;
             }
         }
@@ -1061,7 +1084,8 @@ namespace SEE.Utils
             {
                 return null;
             }
-            List<Identifier> ret = new List<Identifier>();
+
+            List<Identifier> ret = new();
             string digit = "";
             string siteID = "";
             bool isDigit = false;
@@ -1106,6 +1130,7 @@ namespace SEE.Utils
                     }
                 }
             }
+
             // The last element in the string hasn't a comma behind it so we need to insert it here!
             if (digit != "" && siteID != "")
             {
@@ -1126,6 +1151,7 @@ namespace SEE.Utils
             {
                 return null;
             }
+
             string result = "";
             bool first = true;
             foreach (Identifier identifier in position)
@@ -1138,8 +1164,10 @@ namespace SEE.Utils
                 {
                     first = false;
                 }
+
                 result += identifier.ToString();
             }
+
             return result;
         }
 
@@ -1154,6 +1182,7 @@ namespace SEE.Utils
             {
                 result += element.GetValue();
             }
+
             return result;
         }
 
@@ -1167,6 +1196,7 @@ namespace SEE.Utils
             {
                 return "CRDT EMPTY!";
             }
+
             string result = "";
             foreach (CharObj element in crdt)
             {
@@ -1175,6 +1205,7 @@ namespace SEE.Utils
                     result += element.ToString();
                 }
             }
+
             return result;
         }
 
