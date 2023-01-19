@@ -48,7 +48,7 @@ namespace SEE.Game.HolisticMetrics.Components
                     widgetConfiguration.Position = localPoint;
                     string boardName = GetComponent<WidgetsManager>().GetTitle();
 
-                    new CreateWidgetAction(boardName, widgetConfiguration).Execute();
+                    new CreateWidgetAction(boardName, widgetConfiguration);
                     
                     positioningDone = true;
                 }

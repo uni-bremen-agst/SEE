@@ -6,7 +6,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
     /// <summary>
     /// This action manages the creation of a specific metrics board.
     /// </summary>
-    internal class CreateBoardAction : Action
+    internal class CreateBoardAction
     {
         /// <summary>
         /// The configuration of the board to create/that has been created.
@@ -25,7 +25,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// This method (re-)executes the action, i.e. creates the board from the given configuration.
         /// </summary>
-        internal override void Do()
+        internal void Do()
         {
             BoardsManager.Create(boardConfig);
             new CreateBoardNetAction(boardConfig).Execute();
@@ -34,7 +34,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Deletes the board that was created.
         /// </summary>
-        internal override void Undo()
+        internal void Undo()
         {
             BoardsManager.Delete(boardConfig.Title);
             new DeleteBoardNetAction(boardConfig.Title).Execute();

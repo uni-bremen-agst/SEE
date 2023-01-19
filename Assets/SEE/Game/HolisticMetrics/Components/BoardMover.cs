@@ -81,8 +81,7 @@ namespace SEE.Game.HolisticMetrics.Components
                 oldPosition,
                 parentTransform.position,
                 oldRotation,
-                parentTransform.rotation)
-                .Execute();
+                parentTransform.rotation);
         }
     }
 }

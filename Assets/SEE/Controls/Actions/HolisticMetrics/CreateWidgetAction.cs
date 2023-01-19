@@ -8,7 +8,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
     /// <summary>
     /// This class manages the creation of a holistic metrics widget. It is needed so we can also revert the deletion.
     /// </summary>
-    internal class CreateWidgetAction : Action
+    internal class CreateWidgetAction
     {
         /// <summary>
         /// The name of the board on which to create the widget.
@@ -35,7 +35,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Creates the new widget as configured, on all clients.
         /// </summary>
-        internal override void Do()
+        internal void Do()
         {
             WidgetsManager widgetsManager = BoardsManager.Find(boardName);
             if (widgetsManager != null)
@@ -52,7 +52,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// Deletes the widget from the board on all clients.
         /// </summary>
-        internal override void Undo()
+        internal void Undo()
         {
             WidgetsManager widgetsManager = BoardsManager.Find(boardName);
             if (widgetsManager != null)

@@ -45,9 +45,8 @@ namespace SEE.Game.HolisticMetrics.Components
                     GetComponent<Metric>());
 
                 new DeleteWidgetAction(
-                        parentTransform.GetComponent<WidgetsManager>().GetTitle(),
-                        config)
-                    .Execute();
+                    parentTransform.GetComponent<WidgetsManager>().GetTitle(),
+                    config);
             }
         }
 

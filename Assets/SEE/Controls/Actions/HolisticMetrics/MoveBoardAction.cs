@@ -8,7 +8,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
     /// Each instance of this class manages one concrete move action of a metrics board from an old position and
     /// rotation to a new position and rotation. This should be used when moving a board.
     /// </summary>
-    internal class MoveBoardAction : Action
+    internal class MoveBoardAction
     {
         /// <summary>
         /// The name of the board that will be moved.
@@ -62,7 +62,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// clients. This method should only be called from the history and is also called from the base class of this
         /// class.
         /// </summary>
-        internal override void Do()
+        internal void Do()
         {
             BoardsManager.Move(boardName, newPosition, newRotation);
             new MoveBoardNetAction(boardName, newPosition, newRotation).Execute();
@@ -72,7 +72,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Here we revert the moving action by moving the board to the old position on this client and all other
         /// clients. This method should only be called from the history.
         /// </summary>
-        internal override void Undo()
+        internal void Undo()
         {
             BoardsManager.Move(boardName, oldPosition, oldRotation);
             new MoveBoardNetAction(boardName, oldPosition, oldRotation).Execute();

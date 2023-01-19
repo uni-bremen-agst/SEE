@@ -72,8 +72,8 @@ namespace SEE.Game.UI.HolisticMetrics
         {
             boardConfiguration.Rotation = dummyBoard.transform.rotation;
             Destroy(dummyBoard);
-            
-            new CreateBoardAction(boardConfiguration).Execute();
+
+            new CreateBoardAction(boardConfiguration);
             
             Destroy(gameObject);
         }

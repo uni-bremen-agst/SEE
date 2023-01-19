@@ -8,7 +8,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
     /// <summary>
     /// This class is responsible for executing or reverting widget deletions. (holistic metric widgets)
     /// </summary>
-    internal class DeleteWidgetAction : Action
+    internal class DeleteWidgetAction
     {
         /// <summary>
         /// The name of the board from which to delete the widget.
@@ -34,7 +34,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// This method executes the action (deletes the widget from the board on all clients).
         /// </summary>
-        internal override void Do()
+        internal void Do()
         {
             // The widgets manager that manages the widget we want to delete
             WidgetsManager widgetsManager = BoardsManager.Find(boardName);
@@ -57,7 +57,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// This method creates the widget again from the saved configuration (on all clients).
         /// </summary>
-        internal override void Undo()
+        internal void Undo()
         {
             WidgetsManager widgetsManager = BoardsManager.Find(boardName);
 
