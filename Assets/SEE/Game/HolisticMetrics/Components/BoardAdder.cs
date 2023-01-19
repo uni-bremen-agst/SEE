@@ -1,3 +1,4 @@
+using SEE.Game.UI.HolisticMetrics;
 using SEE.Game.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
@@ -37,11 +38,11 @@ namespace SEE.Game.HolisticMetrics.Components
         /// <summary>
         /// This sets up all BoardAdders when they are added to the scene to position a new metrics board.
         /// </summary>
-        /// <param name="boardConfig">The configuration of the board to be created, should only be the
+        /// <param name="boardConfigurationReference">The configuration of the board to be created, should only be the
         /// name of the board at this point</param>
-        internal static void Setup(BoardConfig boardConfig)
+        internal static void Setup(BoardConfig boardConfigurationReference)
         {
-            boardConfiguration = boardConfig;
+            boardConfiguration = boardConfigurationReference;
             boardPrefab = Resources.Load<GameObject>("Prefabs/HolisticMetrics/SceneComponents/MetricsBoard");
             addingDone = false;
         }
@@ -56,22 +57,28 @@ namespace SEE.Game.HolisticMetrics.Components
             {
                 Vector3 newPosition = hit.point;
                 newPosition.y += boardPrefab.transform.position.y;
+
                 boardConfiguration.Position = newPosition;
+
+                PrefabInstantiator.InstantiatePrefab(
+                        "Prefabs/UI/MetricsBoardRotation",
+                        GameObject.Find("UI Canvas").transform,
+                        instantiateInWorldSpace: false)
+                    .GetComponent<AddBoardSliderController>()
+                    .Setup(boardConfiguration);
                 addingDone = true;
-                Destroy(gameObject);
             }
         }
 
-        internal static bool GetBoardConfig(out BoardConfig boardConfig)
+        /// <summary>
+        /// This component deletes itself once a left click has been registered by any BoardAdder instance.
+        /// </summary>
+        private void Update()
         {
             if (addingDone)
             {
-                boardConfig = boardConfiguration;
-                return true;
+                Destroy(this);
             }
-
-            boardConfig = null;
-            return false;
         }
     }
 }
