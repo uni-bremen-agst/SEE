@@ -5,15 +5,15 @@ using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game.UI.CodeWindow
+namespace SEE.Game.UI.Window
 {
     /// <summary>
-    /// This part of the class contains the Desktop UI for a code space.
+    /// This part of the class contains the Desktop UI for a space.
     /// </summary>
-    public partial class CodeSpace
+    public partial class WindowSpace
     {
         /// <summary>
-        /// The <see cref="Panel"/> containing the code windows.
+        /// The <see cref="Panel"/> containing the windows.
         /// </summary>
         private Panel Panel;
 
@@ -25,21 +25,21 @@ namespace SEE.Game.UI.CodeWindow
 
         protected override void StartDesktop()
         {
-            // Add CodeSpace component if it doesn't exist yet
-            space = Canvas.transform.Find(CodeSpaceName)?.gameObject;
+            // Add space game object if it doesn't exist yet
+            space = Canvas.transform.Find(WindowSpaceName)?.gameObject;
             if (!space)
             {
-                space = PrefabInstantiator.InstantiatePrefab(CODE_SPACE_PREFAB, Canvas.transform, false);
-                space.name = CodeSpaceName;
+                space = PrefabInstantiator.InstantiatePrefab(WINDOW_SPACE_PREFAB, Canvas.transform, false);
+                space.name = WindowSpaceName;
             }
             space.SetActive(true);
         }
 
         /// <summary>
         /// <p>
-        /// Sets the active tab of the panel to the <see cref="ActiveCodeWindow"/>.
-        /// If <see cref="ActiveCodeWindow"/> is not part of open <see cref="codeWindows"/>, the previous active
-        /// code window will be restored and a warning will be logged. If the previous active code window is not part
+        /// Sets the active tab of the panel to the <see cref="ActiveWindow"/>.
+        /// If <see cref="ActiveWindow"/> is not part of open <see cref="windows"/>, the previous active
+        /// window will be restored and a warning will be logged. If the previous active window is not part
         /// of that list as well, this component will be destroyed and a <see cref="InvalidOperationException"/>
         /// may be thrown.
         /// </p>
@@ -48,94 +48,95 @@ namespace SEE.Game.UI.CodeWindow
         /// If any of the following are <c>null</c>, calling the method will have no effect:
         /// <ul>
         /// <li><see cref="Panel"/></li>
-        /// <li><see cref="ActiveCodeWindow"/></li>
-        /// <li><c>ActiveCodeWindow.codeWindow</c></li>
+        /// <li><see cref="ActiveWindow"/></li>
+        /// <li><c>ActiveWindow.window</c></li>
         /// </ul>
         /// </p>
         /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown if <see cref="ActiveCodeWindow"/> is not
-        /// part of the open code windows, and the previous active code window (<see cref="currentActiveCodeWindow"/>)
-        /// isn't part of the open code windows either. Note that this may not be thrown at all, because
+        /// <exception cref="InvalidOperationException">Thrown if <see cref="ActiveWindow"/> is not
+        /// part of the open windows, and the previous active window (<see cref="currentActiveWindow"/>)
+        /// isn't part of the open windows either. Note that this may not be thrown at all, because
         /// <see cref="Destroy"/> is called beforehand.
         /// </exception>
         private void UpdateActiveTab()
         {
-            if (Panel != null && ActiveCodeWindow != null && ActiveCodeWindow.codeWindow != null)
+            if (Panel != null && ActiveWindow != null && ActiveWindow.Window != null)
             {
-                if (!codeWindows.Contains(ActiveCodeWindow))
+                if (!windows.Contains(ActiveWindow))
                 {
-                    Debug.LogWarning("Active code window is not part of available code windows. Resetting to previous entry.\n");
-                    if (ActiveCodeWindow == currentActiveCodeWindow)
+                    Debug.LogWarning("Active window is not part of available windows. Resetting to previous entry.\n");
+                    if (ActiveWindow == currentActiveWindow)
                     {
-                        Debug.LogError("Neither active code window, nor previous active code window is "
-                                       + "part of available code windows. This component will now self-destruct.");
+                        Debug.LogError("Neither active window, nor previous active window is "
+                                       + "part of available windows. This component will now self-destruct.");
                         Destroy(this);
                         throw new InvalidOperationException();
                     }
-                    ActiveCodeWindow = currentActiveCodeWindow;
+                    ActiveWindow = currentActiveWindow;
                     
                     // Note: This is a tail-recursion, which would be great if C# had tail call optimization, 
-                    // which it doesn't. Your IDE may recommend to then use an iterative construct instead of the 
+                    // but it doesn't. Your IDE may recommend to then use an iterative construct instead of the 
                     // recursive one to be more efficient, but this will just "improve" an O(1) space complexity to
                     // O(1) space complexity, because the recursion will at most happen once per call.
                     // Additionally, the readability of the iterative version is (in my opinion) much worse, this is
-                    // why I have left it the way it is.
+                    // why I have left it the way it is. The following disables this recommendation in some IDEs.
+                    // ReSharper disable once TailRecursiveCall
                     UpdateActiveTab();
                     return;
                 }
-                Panel.ActiveTab = Panel.GetTabIndex((RectTransform) ActiveCodeWindow.codeWindow.transform);
+                Panel.ActiveTab = Panel.GetTabIndex((RectTransform) ActiveWindow.Window.transform);
             }
         }
 
         protected override void UpdateDesktop()
         {
-            if (Panel && !codeWindows.Any())
+            if (Panel && !windows.Any())
             {
                 // We need to destroy the panel now
                 Destroy(Panel);
             } 
-            else if (!Panel && codeWindows.Any(x => x.codeWindow))
+            else if (!Panel && windows.Any(x => x.Window))
             {
                 InitializePanel();
             } 
             else if (!Panel)
             {
-                // If no code window is initialized yet, there's nothing we can do
+                // If no window is initialized yet, there's nothing we can do
                 return;
             }
             
-            if (currentActiveCodeWindow != ActiveCodeWindow)
+            if (currentActiveWindow != ActiveWindow)
             {
-                // Nominal active code window has been changed, so we change the actual active code window as well.
+                // Nominal active window has been changed, so we change the actual active window as well.
                 UpdateActiveTab();
 
                 // The window will only be actually changed when UpdateActiveTab() didn't throw an exception,
-                // so currentActiveCodeWindow is guaranteed to be part of codeWindows.
-                currentActiveCodeWindow = ActiveCodeWindow;
+                // so currentActiveWindow is guaranteed to be part of windows.
+                currentActiveWindow = ActiveWindow;
             }
             
-            // Now we need to detect changes in the open code windows.
+            // Now we need to detect changes in the open windows.
             // Unfortunately this adds an O(m+n) call to each frame, but considering how small m and n are likely to be,
             // this shouldn't be a problem.
             
             // First, close old windows that are not open anymore
-            foreach (CodeWindow codeWindow in currentCodeWindows.Except(codeWindows).ToList())
+            foreach (BaseWindow window in currentWindows.Except(windows).ToList())
             {
-                Panel.RemoveTab(Panel.GetTab((RectTransform) codeWindow.codeWindow.transform));
-                currentCodeWindows.Remove(codeWindow);
-                Destroy(codeWindow);
+                Panel.RemoveTab(Panel.GetTab((RectTransform) window.Window.transform));
+                currentWindows.Remove(window);
+                Destroy(window);
             }
             
             // Then, add new tabs 
-            // We need to skip code windows who weren't initialized yet
-            foreach (CodeWindow codeWindow in codeWindows.Except(currentCodeWindows).Where(x => x.codeWindow != null).ToList())
+            // We need to skip windows which weren't initialized yet
+            foreach (BaseWindow window in windows.Except(currentWindows).Where(x => x.Window != null).ToList())
             {
-                RectTransform rectTransform = (RectTransform) codeWindow.codeWindow.transform;
+                RectTransform rectTransform = (RectTransform) window.Window.transform;
                 // Add the new window as a tab to our panel
                 PanelTab tab = Panel.AddTab(rectTransform);
-                tab.Label = codeWindow.Title;
+                tab.Label = window.Title;
                 tab.Icon = null;
-                currentCodeWindows.Add(codeWindow);
+                currentWindows.Add(window);
                 
                 // Allow closing the tab
                 if (CanClose)
@@ -146,19 +147,19 @@ namespace SEE.Game.UI.CodeWindow
 
                 // Rebuild layout
                 PanelsCanvas.ForceRebuildLayoutImmediate();
-                codeWindow.RecalculateExcessLines();
+                window.RebuildLayout();
             }
 
             void CloseTab(PanelTab panelTab)
             {
                 if (panelTab.Panel == Panel)
                 {
-                    CloseCodeWindow(codeWindows.First(x => x.codeWindow.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID()));
+                    CloseWindow(windows.First(x => x.Window.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID()));
                     if (panelTab.Panel.NumberOfTabs <= 1)
                     {
                         // All tabs were closed, so we send out an event 
                         // (The PanelNotificationCenter won't trigger in this case)
-                        OnActiveCodeWindowChanged.Invoke();
+                        OnActiveWindowChanged.Invoke();
                     }
                 }
             }
@@ -174,14 +175,14 @@ namespace SEE.Game.UI.CodeWindow
                 Destroy(this);
             }
 
-            codeWindows.RemoveAll(x => x == null);
-            if (codeWindows.Count == 0)
+            windows.RemoveAll(x => x == null);
+            if (windows.Count == 0)
             {
                 Destroy(this);
-                codeWindows.Clear();
+                windows.Clear();
                 return;
             }
-            Panel = PanelUtils.CreatePanelFor((RectTransform) codeWindows[0].codeWindow.transform, PanelsCanvas);
+            Panel = PanelUtils.CreatePanelFor((RectTransform) windows[0].Window.transform, PanelsCanvas);
             // When the active tab *on this panel* is changed, we invoke the corresponding event
             PanelNotificationCenter.OnActiveTabChanged += ChangeActiveTab;
             PanelNotificationCenter.OnPanelClosed += ClosePanel;
@@ -190,8 +191,8 @@ namespace SEE.Game.UI.CodeWindow
             {
                 if (Panel == tab.Panel)
                 {
-                    ActiveCodeWindow = CodeWindows.First(x => x.codeWindow.GetInstanceID() == tab.Content.gameObject.GetInstanceID());
-                    OnActiveCodeWindowChanged.Invoke();
+                    ActiveWindow = Windows.First(x => x.Window.GetInstanceID() == tab.Content.gameObject.GetInstanceID());
+                    OnActiveWindowChanged.Invoke();
                 }
             }
 
@@ -200,14 +201,14 @@ namespace SEE.Game.UI.CodeWindow
                 if (panel == Panel)
                 {
                     // Close each tab
-                    foreach (CodeWindow codeWindow in codeWindows)
+                    foreach (BaseWindow window in windows)
                     {
-                        Panel.RemoveTab(Panel.GetTab((RectTransform) codeWindow.codeWindow.transform));
-                        Destroy(codeWindow);
+                        Panel.RemoveTab(Panel.GetTab((RectTransform) window.Window.transform));
+                        Destroy(window);
                     }
 
-                    codeWindows.Clear();
-                    OnActiveCodeWindowChanged.Invoke();
+                    windows.Clear();
+                    OnActiveWindowChanged.Invoke();
                     Destroy(Panel);
                 }
             }
