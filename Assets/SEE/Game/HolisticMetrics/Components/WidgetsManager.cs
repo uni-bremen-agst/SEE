@@ -248,6 +248,34 @@ namespace SEE.Game.HolisticMetrics.Components
             }
         }
 
+        internal bool GetWidgetMovement(
+            out Vector3 originalPosition,
+            out Vector3 newPosition,
+            out string containingBoardName,
+            out Guid widgetID)
+        {
+            foreach ((WidgetController, Metric) widget in widgets)
+            {
+                if (widget
+                    .Item1
+                    .GetComponent<WidgetMover>()
+                    .GetMovement(
+                        out originalPosition,
+                        out newPosition,
+                        out containingBoardName,
+                        out widgetID))
+                {
+                    return true;
+                }
+            }
+
+            originalPosition = Vector3.zero;
+            newPosition = Vector3.zero;
+            containingBoardName = null;
+            widgetID = Guid.NewGuid();
+            return false;
+        }
+
         /// <summary>
         /// This method will be called when the player selects a different city in the dropdown. In that case, we want
         /// to send a message to all other clients so the selection changes on their boards too.

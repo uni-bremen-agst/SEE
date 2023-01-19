@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Game.UI.Notification;
 using UnityEngine;
 using SEE.Game.HolisticMetrics.Components;
+using Object = UnityEngine.Object;
 
 namespace SEE.Game.HolisticMetrics
 {
@@ -181,6 +183,31 @@ namespace SEE.Game.HolisticMetrics
                 manager.ToggleWidgetsMoving(widgetsMovingEnabled);
             }
             return widgetsMovingEnabled;
+        }
+
+        internal static bool GetWidgetMovement(
+            out Vector3 originalPosition,
+            out Vector3 newPosition,
+            out string containingBoardName,
+            out Guid widgetID)
+        {
+            foreach (WidgetsManager widgetsManager in widgetsManagers)
+            {
+                if (widgetsManager.GetWidgetMovement(
+                        out originalPosition, 
+                        out newPosition, 
+                        out containingBoardName, 
+                        out widgetID))
+                {
+                    return true;
+                }
+            }
+
+            originalPosition = Vector3.zero;
+            newPosition = Vector3.zero;
+            containingBoardName = null;
+            widgetID = Guid.NewGuid();
+            return false;
         }
 
         /// <summary>

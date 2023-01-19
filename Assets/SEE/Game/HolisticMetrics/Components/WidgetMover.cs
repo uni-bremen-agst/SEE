@@ -1,3 +1,4 @@
+using System;
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
 using SEE.Utils;
@@ -11,9 +12,8 @@ namespace SEE.Game.HolisticMetrics.Components
     /// </summary>
     internal class WidgetMover : MonoBehaviour
     {
-        /// <summary>
-        /// The old position of the widget, so we can potentially restore it later.
-        /// </summary>
+        private bool hasMovement;
+        
         private Vector3 oldPosition;
 
         /// <summary>
@@ -32,6 +32,7 @@ namespace SEE.Game.HolisticMetrics.Components
         private void Start()
         {
             boardName = transform.parent.GetComponent<WidgetsManager>().GetTitle();
+            hasMovement = false;
         }
         
         /// <summary>
@@ -67,12 +68,30 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         private void OnMouseUp()
         {
-            new MoveWidgetAction(
-                boardName, 
-                GetComponent<WidgetController>().ID, 
-                oldPosition, 
-                transform.position)
-                .Execute();
+            hasMovement = true;
+        }
+
+        internal bool GetMovement(
+            out Vector3 originalPosition,
+            out Vector3 newPosition,
+            out string containingBoardName,
+            out Guid widgetID)
+        {
+            if (hasMovement)
+            {
+                originalPosition = oldPosition;
+                newPosition = transform.position;
+                containingBoardName = boardName;
+                widgetID = transform.parent.GetComponent<WidgetController>().ID;
+                hasMovement = false;
+                return true;
+            }
+
+            originalPosition = Vector3.zero;
+            newPosition = Vector3.zero;
+            containingBoardName = null;
+            widgetID = Guid.NewGuid();
+            return false;
         }
     }
 }

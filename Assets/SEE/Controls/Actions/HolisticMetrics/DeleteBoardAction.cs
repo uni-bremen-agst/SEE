@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using SEE.Game.HolisticMetrics;
 using SEE.Game.HolisticMetrics.Components;
 using SEE.Net.Actions.HolisticMetrics;
@@ -33,19 +34,12 @@ namespace SEE.Controls.Actions.HolisticMetrics
             if (Input.GetMouseButtonDown(0) && Raycasting.RaycastAnything(out RaycastHit raycastHit))
             {
                 WidgetsManager widgetsManager = raycastHit.transform.GetComponent<WidgetsManager>();
-                if (widgetsManager == null)
+                if (widgetsManager != null
+                    && BoardsManager.GetNames().Any(name => widgetsManager.name.Equals(name)))
                 {
-                    return false;
-                }
-
-                foreach (string name in BoardsManager.GetNames())
-                {
-                    if (widgetsManager.name.Equals(name)) // TODO: Might need to attach collider to board prefab
-                    {
-                        memento = new Memento(ConfigManager.GetBoardConfig(widgetsManager));
-                        Redo();
-                        return true;
-                    }
+                    memento = new Memento(ConfigManager.GetBoardConfig(widgetsManager));
+                    Redo();
+                    return true;
                 }
             }
 
