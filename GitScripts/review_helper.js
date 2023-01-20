@@ -66,6 +66,10 @@ module.exports = {
             repo: context.repo.repo,
             pull_number: context.issue.number
         });
+        if (response['data'].length == 0) {
+            // No reviews present, no need to approve.
+            return;
+        }
         let reviews = await github.paginate(response);
         reviews = reviews.filter(x => x['user']['login'] === "github-actions[bot]");
         const comments = await get_reviews(github, context);
