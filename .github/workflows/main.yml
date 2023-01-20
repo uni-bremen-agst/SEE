@@ -4,6 +4,7 @@ on:
   push:
     branches: master
   pull_request:
+    types: [opened, reopened, synchronize, ready_for_review]
     branches: master
 
 concurrency:
@@ -11,13 +12,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: Editmode tests
+  setup:
+    name: Setup Repository
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [self-hosted]
+    outputs:
+      runner: ${{ steps.remember.outputs.runner }}
     steps:
       - name: Fix permissions
         shell: bash
@@ -36,6 +39,74 @@ jobs:
           lfs: true
       - name: Confirm LFS pull
         run: git lfs pull
+      - name: Run GitScripts checks
+        run: ./GitScripts/run_all
+      - name: Remember runner
+        id: remember
+        # We remember this to make sure all jobs are run on the same machine.
+        run: echo "runner=${{ runner.name }}" >> $GITHUB_OUTPUT
+  static:
+    name: Run static checks
+    runs-on: ${{ matrix.os }}
+    if: '! github.event.pull_request.draft'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [self-hosted]
+    steps:
+      - name: Collect bad patterns
+        run: |
+          if [ -n $GITHUB_BASE_REF ] && ! PATTERNS=$(curl -H 'Accept: application/vnd.github.v3.diff' -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -f 'https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}' | grep '^[+@]' | ./GitScripts/check_for_bad_patterns.py); then
+            DELIMITER=7MApgggGyx6C0
+            echo "PATTERNS<<$DELIMITER" >> $GITHUB_ENV
+            echo "$PATTERNS" >> $GITHUB_ENV
+            echo "$DELIMITER" >> $GITHUB_ENV
+          else
+            echo "PATTERNS=none" >> $GITHUB_ENV
+          fi
+      - uses: actions/github-script@v6
+        name: Check for bad patterns
+        with:
+          script: |
+            const PATTERNS = process.env.PATTERNS;
+            const helper = require('./GitScripts/review_helper.js');
+            if (PATTERNS === "none") {
+              console.log("Found no bad patterns in changed files.");
+              await helper.approve(github, context, false);
+            } else {
+              let bad_patterns = PATTERNS.split('\n');
+              console.log("::warning::Found " + Math.floor(bad_patterns.length/6) + " bad patterns!");
+              if (context.ref === 'refs/heads/master') {
+                console.log("However, we are on master, so we ignore them.");
+              } else {
+                let comments = helper.to_comments(bad_patterns);
+                await helper.filter_out_existing_comments(github, context, comments);
+                if (comments.length > 0) {
+                  console.log("Submitting PR review...");
+                  github.rest.pulls.createReview({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    pull_number: context.issue.number,
+                    event: 'REQUEST_CHANGES',
+                    body: 'There are a few bad patterns I found which you should check.',
+                    comments: comments
+                  });
+                } else {
+                  console.log("After filtering, no new comments are left. Not submitting a review.");
+                  await helper.approve(github, context, true);
+                }
+              }
+            }
+
+  test:
+    name: Run editmode tests
+    runs-on: ${{ needs.setup.outputs.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [self-hosted]
+    needs: [setup, static]
+    steps:
       - uses: actions/cache@v3
         name: Cache Library
         with:
@@ -45,6 +116,7 @@ jobs:
             Library-SEE-Tests
             Library-SEE
       - uses: game-ci/unity-test-runner@v2
+        timeout-minutes: 45
         name: Run Tests
         id: tests
         env:
@@ -67,6 +139,17 @@ jobs:
         with:
           name: Coverage results
           path: ${{ steps.tests.outputs.coveragePath }}
+
+  cleanup:
+    name: Cleanup
+    runs-on: ${{ needs.setup.outputs.runner }}
+    if: ${{ always() }}
+    needs: [setup, static, test]
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [self-hosted]
+    steps:
       - name: Kill Unity
         if: always()
         shell: bash
