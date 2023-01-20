@@ -61,11 +61,18 @@ module.exports = {
     // all of which have been resolved (checked by :-1: reaction
     // because resolve status is not queryable via REST API).
     approve: async (github, context, only_if_resolved) => {
-        const reviews = await get_reviews(github, context);
+        const response = await github.rest.pulls.listReviews({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            pull_number: context.issue.number
+        });
+        let reviews = await github.paginate(response);
+        reviews = reviews.filter(x => x['user']['login'] === "github-actions[bot]");
+        const comments = await get_reviews(github, context);
         // There must be existing reviews, otherwise we don't need to approve.
         // If `only_if_resolved` is true, we only approve if every thread has
         // been "resolved", otherwise we approve in any case.
-        if (reviews.length > 0 && reviews.every(x => !only_if_resolved || x['reactions']['-1'] > 0)) {
+        if (reviews.length > 0 && reviews[reviews.length-1]['state'] !== 'APPROVED' && comments.every(x => !only_if_resolved || x['reactions']['-1'] > 0)) {
             console.log("PR looks good now, approving it.");
             await github.rest.pulls.createReview({
                 owner: context.repo.owner,
