@@ -18,14 +18,21 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         private const string OptionOne = "Option 1";
         /// <summary>
-        /// Title of option 2 in the menu.
+        /// Title of the first option in the sub menu.
         /// </summary>
-        private const string OptionTwo = "Option 2";
+        private const string NestedOptionOne = "Option 2";
+        /// <summary>
+        /// Title of the second option in the submenu.
+        /// </summary>
+        private const string NestedOptionTwo = "Option 2";
         /// <summary>
         /// Title of the menu.
         /// </summary>
         private const string MenuTitle = "Test Menu";
-
+        /// <summary>
+        /// Title of the submenu.
+        /// </summary>
+        private const string SubMenuTitle = "Submenu";
         /// <summary>
         /// The index of the selected option.
         /// </summary>
@@ -93,15 +100,32 @@ namespace SEE.Game.UI.Menu
         }
 
         /// <summary>
-        /// Test for selecting option 2.
+        /// Test for selecting the first option of the submenu.
         /// </summary>
         /// <returns><see cref="WaitForEndOfFrame"/></returns>
         [UnityTest]
         public IEnumerator TestSimpleMenuOption2()
         {
-            PressButton(menu.Title, OptionTwo);
+            PressButton(menu.Title, SubMenuTitle);
+            yield return new WaitForEndOfFrame();
+            PressButton(menu.Title, NestedOptionOne);
             yield return new WaitForEndOfFrame();
             Assert.AreEqual(2, selection);
+            yield return new WaitForEndOfFrame();
+        }
+
+        /// <summary>
+        /// Test for selecting the second option of the submenu.
+        /// </summary>
+        /// <returns><see cref="WaitForEndOfFrame"/></returns>
+        [UnityTest]
+        public IEnumerator TestSimpleMenuOption3()
+        {
+            PressButton(menu.Title, SubMenuTitle);
+            yield return new WaitForEndOfFrame();
+            PressButton(menu.Title, NestedOptionTwo);
+            yield return new WaitForEndOfFrame();
+            Assert.AreEqual(3, selection);
             yield return new WaitForEndOfFrame();
         }
 
@@ -120,7 +144,8 @@ namespace SEE.Game.UI.Menu
 
         /// <summary>
         /// Creates a new <paramref name="menuGO"/> game object holding a new <paramref name="menu"/>.
-        /// The <paramref name="menu"/> has two options (<see cref="OptionOne"/> and <see cref="OptionTwo"/>.
+        /// The <paramref name="menu"/> has one options (<see cref="OptionOne"/> and  a nested
+        /// menu offering two more options <see cref="NestedOptionOne"/> and <see cref="NestedOptionTwo"/>.
         /// </summary>
         /// <param name="menuGO">new game object holding <paramref name="menu"/></param>
         /// <param name="menu">a new menu that can be tested</param>
@@ -142,12 +167,26 @@ namespace SEE.Game.UI.Menu
                               entryColor: Color.red,
                               enabled: true,
                               icon: GetIcon()),
-                new MenuEntry(action: new UnityAction(() => { selection = 2; }),
-                              title: OptionTwo,
-                              description: "Select option 2",
-                              entryColor: Color.green,
-                              enabled: true,
-                              icon: GetIcon()),
+                new NestedMenuEntry<MenuEntry>(innerEntries: new List<MenuEntry>()
+                                                      { 
+                                                         new MenuEntry(action: new UnityAction(() => { selection = 2; }),
+                                                                       title: NestedOptionOne,
+                                                                       description: "Select option 2a",
+                                                                       entryColor: Color.green,
+                                                                       enabled: true,
+                                                                       icon: GetIcon()),
+                                                         new MenuEntry(action: new UnityAction(() => { selection = 3; }),
+                                                                       title: NestedOptionTwo,
+                                                                       description: "Select option 2b",
+                                                                       entryColor: Color.green,
+                                                                       enabled: true,
+                                                                       icon: GetIcon())
+                                                      },
+                                    title: SubMenuTitle,
+                                    description: "open subselection 2",
+                                    entryColor: Color.red,
+                                    enabled: true,
+                                    icon: GetIcon())
             };
 
             menu.AddEntries(menuEntries);
