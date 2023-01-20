@@ -1,8 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Michsky.UI.ModernUIPack;
+using SEE.DataModel;
 using SEE.Game.City;
 using SEE.Game.UI.Menu;
 using SEE.Layout.NodeLayouts.Cose;
@@ -12,7 +12,6 @@ using Sirenix.Utilities;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using static TreeEditor.TreeEditorHelper;
 using Random = UnityEngine.Random;
 
 public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
@@ -54,7 +53,10 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         OnEntryAdded += _ => SetMiscAsLastTab();
         // TODO: Auch Properties und Methoden umsetzen:
         // City.GetType().GetMembers()
+        LoadCity(0);
         City.GetType().GetFields().ForEach(CreateSetting);
+
+
     }
 
     /// <summary>
@@ -75,6 +77,18 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         GameObject settingContent = setting.transform.Find("Content").gameObject;
         CreateSettingObject(memberInfo, settingContent, City);
     }
+
+    protected void ClearCity()
+    {
+        Entries.ForEach(RemoveEntry);
+    }
+
+
+    public void LoadCity(int i)
+    {
+        City = GameObject.FindGameObjectsWithTag(Tags.CodeCity)[i].GetComponent<AbstractSEECity>();
+        City.GetType().GetFields().ForEach(CreateSetting);
+    } 
 
     /// <summary>
     /// Returns the view game object.
