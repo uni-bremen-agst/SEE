@@ -16,6 +16,11 @@ namespace SEE.Audio
         private Queue<AudioClip> effectsQueue = new Queue<AudioClip>();
 
         /// <summary>
+        /// Audio source of the game object that this object is attached to.
+        /// </summary>
+        private AudioSource audioSource;
+
+        /// <summary>
         /// The game object that this audio management object is attached to
         /// and plays music for.
         /// </summary>
@@ -75,7 +80,10 @@ namespace SEE.Audio
         /// </summary>
         public void Update()
         {
-            AudioSource audioSource = AttachedObject.GetComponent<AudioSource>();
+            if (audioSource == null)
+            {
+                audioSource = AttachedObject.GetComponent<AudioSource>();
+            }
             if (!audioSource.isPlaying || effectsQueue.Count > 0)
             {
                 audioSource.Stop();
@@ -89,8 +97,8 @@ namespace SEE.Audio
         /// an audio listener) attached.
         /// </summary>
         /// <param name="gameObject">The game object to check.</param>
-        /// <returns></returns>
-        public bool CheckHasAudioListenerAttached(GameObject gameObject)
+        /// <returns>Whether the object given object has an audio game object.</returns>
+        public bool HasAudioListenerAttached(GameObject gameObject)
         {
             return AttachedObject.GetInstanceID() == gameObject.GetInstanceID();
         }

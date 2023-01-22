@@ -160,9 +160,10 @@ namespace SEE.Audio
         }
 
         /// <summary>
-        /// Executed when this object is created.
+        /// Default MonoBehaviour method, executed when the object is created.
+        /// Initializes a global audio player and starts the lobby music.
         /// </summary>
-        void Start()
+        public void Start()
         {
             instance = this; // required since a mono behaviour object cannot be instantiated.
             AttachAudioPlayer();
@@ -181,9 +182,12 @@ namespace SEE.Audio
         }
 
         /// <summary>
-        /// Called every frame.
+        /// Default MonoBehaviour method, called every frame,
+        /// Checks if the current scene has changed since the last frame, and
+        /// plays music according to the loaded scene.
+        /// Also ensures that sound effects that should be played are played.
         /// </summary>
-        void Update()
+        public void Update()
         {
             if (CheckSceneChanged())
             {
@@ -199,10 +203,7 @@ namespace SEE.Audio
         /// <param name="removedElements">A list of <see cref="AudioGameObject">s that were removed in the current frame.</param>
         private void DeleteRemovedAudioObjects(ISet<AudioGameObject> removedElements)
         {
-            foreach (AudioGameObject removedElement in removedElements)
-            {
-                soundEffectGameObjects.Remove(removedElement);
-            }
+            soundEffectGameObjects.ExceptWith(removedElements);
         }
 
         /// <summary>
@@ -432,8 +433,8 @@ namespace SEE.Audio
         /// </summary>
         /// <param name="soundEffect">The sound effect to play.</param>
         /// <param name="sourceObject">The object the sound should eminate from.</param>
-        /// <param name="networkAction">Whether the sound effect should be propagated to other players.</param>
-        public static void EnqueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject, bool networkAction)
+        /// <param name="sentToClients">Whether the sound effect should be propagated to other players.</param>
+        public static void EnqueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject, bool sentToClients)
         {
             if (instance != null)
             {
@@ -442,7 +443,7 @@ namespace SEE.Audio
                     EnqueueSoundEffect(soundEffect);
                     return;
                 }
-                AudioManagerImpl.Instance().QueueSoundEffect(soundEffect, sourceObject, networkAction);
+                AudioManagerImpl.Instance().QueueSoundEffect(soundEffect, sourceObject, sentToClients);
             }
         }
 
@@ -476,13 +477,13 @@ namespace SEE.Audio
         /// </summary>
         /// <param name="soundEffect">The sound effect to play.</param>
         /// <param name="sourceObject">The object the sound should eminate from.</param>
-        /// <param name="networkAction">Whether the sound effect should be propagated to other players.</param>
-        public void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject, bool networkAction)
+        /// <param name="sendToClients">Whether the sound effect should be propagated to other players.</param>
+        public void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject, bool sendToClients)
         {
             AudioGameObject controlObject = null;
             foreach (AudioGameObject audioGameObject in soundEffectGameObjects)
             {
-                if (audioGameObject.CheckHasAudioListenerAttached(sourceObject))
+                if (audioGameObject.HasAudioListenerAttached(sourceObject))
                 {
                     controlObject = audioGameObject;
                     break;
@@ -494,7 +495,7 @@ namespace SEE.Audio
                 soundEffectGameObjects.Add(controlObject);
             }
             controlObject.EnqueueSoundEffect(GetAudioClipFromSoundEffectName(soundEffect));
-            if (!networkAction && !GameState.LOBBY.Equals(previousGameState))
+            if (!sendToClients && !GameState.LOBBY.Equals(previousGameState))
             {
                 new SoundEffectNetAction(soundEffect, sourceObject.gameObject.name).Execute();
             }
@@ -538,16 +539,11 @@ namespace SEE.Audio
         /// </summary>
         /// <param name="music">The music track that should be played.</param>
         /// <returns>An AudioSource matching the given enum music name.</returns>
-        private AudioClip GetAudioClipFromMusicName(Music music)
+        private AudioClip GetAudioClipFromMusicName(Music music) => music switch
         {
-            switch (music)
-            {
-                case Music.LOBBY_MUSIC:
-                    return LobbyMusic;
-                default:
-                    return LobbyMusic;
-            }
-        }
+            Music.LOBBY_MUSIC => LobbyMusic,
+            _ => LobbyMusic,
+        };
 
         /// <summary>
         /// Get the AudioClip of the sound effect that should be played.

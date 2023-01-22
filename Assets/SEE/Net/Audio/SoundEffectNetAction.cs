@@ -39,11 +39,6 @@ namespace SEE.Audio
             {
                 GameObject targetGameObject = Find(this.TargetGameObjectName);
                 SoundEffect soundEffect = (SoundEffect)System.Enum.Parse(typeof(SoundEffect), this.SoundEffectName);
-                if (targetGameObject == null)
-                {
-                    AudioManagerImpl.EnqueueSoundEffect(soundEffect);
-                    return;
-                }
                 AudioManagerImpl.EnqueueSoundEffect(soundEffect, targetGameObject, true);
             }
         }
