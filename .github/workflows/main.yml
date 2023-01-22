@@ -67,12 +67,16 @@ jobs:
       - uses: actions/github-script@v6
         name: Check for bad patterns
         with:
+          retries: 3
           script: |
             const PATTERNS = process.env.PATTERNS;
             const helper = require('./GitScripts/review_helper.js');
             if (PATTERNS === "none") {
               console.log("Found no bad patterns in changed files.");
-              await helper.approve(github, context, false);
+              if (context.ref !== 'refs/heads/master') {
+                // Not on master, but on PR: approve if necessary
+                await helper.approve(github, context, false);
+              }
             } else {
               let bad_patterns = PATTERNS.split('\n');
               console.log("::warning::Found " + Math.floor(bad_patterns.length/6) + " bad patterns!");
