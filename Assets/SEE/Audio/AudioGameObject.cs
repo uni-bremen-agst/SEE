@@ -75,7 +75,7 @@ namespace SEE.Audio
         }
 
         /// <summary>
-        /// Checks if sound is playing or play next sound, thís method is called 
+        /// If no sound is playing, the next sound is played. This method is called 
         /// by the global audio manager.
         /// </summary>
         public void Update()
