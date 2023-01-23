@@ -10,6 +10,12 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     /// </summary>
     internal class SaveBoardConfigurationDialog : HolisticMetricsDialog
     {
+        private static bool gotUserInput;
+
+        private static string filename;
+
+        private static WidgetsManager widgetsManager;
+        
         /// <summary>
         /// The property dialog.
         /// </summary>
@@ -63,13 +69,29 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
 
         /// <summary>
         /// This method gets called when the player confirms the dialog. It will save the selected board under the given
-        /// name and then closes the dialog and reenables the keyboard shortcuts.
+        /// name and then closes the dialog and re-enables the keyboard shortcuts.
         /// </summary>
         private void SaveBoardConfiguration()
         {
-            WidgetsManager boardsManager = BoardsManager.Find(selectedBoard.Value);
-            ConfigManager.SaveBoard(boardsManager, fileName.Value);
+            gotUserInput = true;
+            filename = fileName.Value;
+            widgetsManager = BoardsManager.Find(selectedBoard.Value);
             EnableKeyboardShortcuts();
+        }
+
+        internal static bool GetUserInput(out string filenameOut, out WidgetsManager widgetsManagerOut)
+        {
+            if (gotUserInput)
+            {
+                gotUserInput = false;
+                filenameOut = filename;
+                widgetsManagerOut = widgetsManager;
+                return true;
+            }
+
+            filenameOut = null;
+            widgetsManagerOut = null;
+            return false;
         }
     }
 }

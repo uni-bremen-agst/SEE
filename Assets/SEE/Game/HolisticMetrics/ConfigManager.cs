@@ -96,6 +96,13 @@ namespace SEE.Game.HolisticMetrics
             config.Save(writer);
         }
 
+        internal static void DeleteBoard(string filename)
+        {
+            EnsureBoardsDirectoryExists();
+            string filePath = metricsBoardsPath + filename + Filenames.ConfigExtension;
+            File.Delete(filePath);
+        }
+
         /// <summary>
         /// Creates a new board config instance from the given board (the given widgets manager, actually).
         /// </summary>

@@ -68,7 +68,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             Object.Destroy(dialog);
         }
 
-        internal static bool GetConfig(out string nameOfFile)
+        internal static bool GetFilename(out string nameOfFile)
         {
             if (gotFilename)
             {

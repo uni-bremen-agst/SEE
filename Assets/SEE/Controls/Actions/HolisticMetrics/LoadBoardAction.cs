@@ -36,6 +36,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             button = PrefabInstantiator.InstantiatePrefab(buttonPath, GameObject.Find("UI Canvas").transform,
                 false);
+            buttonController = button.GetComponent<LoadBoardButtonController>();
         }
         
         public override bool Update()
@@ -47,7 +48,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                 return false;
             }
 
-            if (buttonClicked && LoadBoardConfigurationDialog.GetConfig(out string filename))
+            if (buttonClicked && LoadBoardConfigurationDialog.GetFilename(out string filename))
             {
                 try
                 {
