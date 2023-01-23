@@ -78,7 +78,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             Object.Destroy(dialog);
             
             // Create a new board from the loaded configuration
-            new CreateBoardAction(boardConfiguration);
+            //new CreateBoardAction(boardConfiguration);
         }
     }
 }

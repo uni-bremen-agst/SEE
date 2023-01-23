@@ -23,11 +23,14 @@ namespace SEE.Game.UI.HolisticMetrics
         /// </summary>
         [SerializeField] private WindowDragger windowDragger;
 
+        private static bool gotRotation;
         /// <summary>
         /// The board configuration of the board to be created. So far it should already have a title and a position. In
         /// this component, we will add the rotation to it and then create it.
         /// </summary>
-        private BoardConfig boardConfiguration;
+        private Vector3 boardPosition;
+
+        private static Quaternion boardRotation;
 
         /// <summary>
         /// The dummy board GameObject that we will instantiate from this component. Its rotation will determine the
@@ -39,17 +42,16 @@ namespace SEE.Game.UI.HolisticMetrics
         /// Sets up this component with the board configuration of the new board and a reference to the boards manager.
         /// Also sets up the slider, the window dragger and instantiates the dummy board.
         /// </summary>
-        /// <param name="boardConfigurationReference">The BoardConfiguration for the board to be created</param>
-        internal void Setup(BoardConfig boardConfigurationReference)
+        internal void Setup(Vector3 position)
         {
-            boardConfiguration = boardConfigurationReference;
+            boardPosition = position;
 
             windowDragger.dragArea = transform.parent.GetComponent<RectTransform>();
             
             slider.mainSlider.onValueChanged.AddListener(Rotate);
             const string pathToBoard = "Prefabs/HolisticMetrics/SceneComponents/MetricsBoard";
             GameObject boardPrefab = Resources.Load<GameObject>(pathToBoard);
-            dummyBoard = Instantiate(boardPrefab, boardConfiguration.Position, Quaternion.identity);
+            dummyBoard = Instantiate(boardPrefab, position, Quaternion.identity);
         }
         
         /// <summary>
@@ -70,12 +72,23 @@ namespace SEE.Game.UI.HolisticMetrics
         /// </summary>
         public void CreateBoard()
         {
-            boardConfiguration.Rotation = dummyBoard.transform.rotation;
+            boardRotation = dummyBoard.transform.rotation;
+            gotRotation = true;
             Destroy(dummyBoard);
-
-            new CreateBoardAction(boardConfiguration);
-            
             Destroy(gameObject);
+        }
+
+        internal static bool GetRotation(out Quaternion rotation)
+        {
+            if (gotRotation)
+            {
+                rotation = boardRotation;
+                gotRotation = false;
+                return true;
+            }
+
+            rotation = Quaternion.identity;
+            return false;
         }
     }
 }

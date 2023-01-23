@@ -1,7 +1,4 @@
 using SEE.Controls;
-using SEE.Game.HolisticMetrics;
-using SEE.Game.UI.Notification;
-using SEE.Game.HolisticMetrics.Components;
 using UnityEngine;
 
 namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
@@ -11,6 +8,8 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     /// </summary>
     internal class AddBoardDialog : HolisticMetricsDialog
     {
+        private static bool gotName;
+        
         /// <summary>
         /// The property dialog.
         /// </summary>
@@ -19,13 +18,15 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// <summary>
         /// The input field where the player can enter a name for the new board.
         /// </summary>
-        private StringProperty boardName;
+        private static StringProperty boardName;
 
         /// <summary>
         /// This method instantiates and then displays the dialog to the player.
         /// </summary>
         internal void Open()
         {
+            gotName = false;
+            
             dialog = new GameObject("Add board dialog");
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
             group.Name = "Add board dialog";
@@ -34,6 +35,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             boardName.Name = "Enter name (unique)";
             boardName.Description = "Enter the title of the board. This has to be unique.";
             group.AddProperty(boardName);
+            group.GetReady();
             
             propertyDialog = dialog.AddComponent<PropertyDialog>();
             propertyDialog.Title = "Add board";
@@ -56,17 +58,20 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         private void AddBoard()
         {
-            BoardConfig boardConfiguration = new BoardConfig()
-            {
-                Title = boardName.Value
-            };
+            gotName = true;
             EnableKeyboardShortcuts();
-            GameObject.Find("/DemoWorld/Plane").AddComponent<BoardAdder>();
-            BoardAdder.Setup(boardConfiguration);
+        }
 
-            ShowNotification.Info(
-                "Position the board",
-                "Left click on the ground where you want to add the board");
+        internal static bool GetName(out string name)
+        {
+            if (gotName)
+            {
+                name = boardName.Value;
+                return true;
+            }
+
+            name = null;
+            return false;
         }
     }
 }
