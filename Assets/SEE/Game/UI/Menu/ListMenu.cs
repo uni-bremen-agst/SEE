@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.PlayerLoop;
 using UnityEngine.Windows.Speech;
 
 namespace SEE.Game.UI.Menu
@@ -15,101 +13,13 @@ namespace SEE.Game.UI.Menu
     /// </summary>
     /// <typeparam name="T">The type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
     /// <seealso cref="MenuEntry"/>
-    /// <seealso cref="SimpleMenu"/>
-    public abstract class ListMenu<T> : PlatformDependentComponent where T : MenuEntry
+    /// <seealso cref="SimpleListMenu"/>
+    public abstract class ListMenu<T> : SimpleMenu where T : MenuEntry
     {
-        /// <summary>
-        /// The title of this menu.
-        /// </summary>
-        private string title;
-        /// <summary>
-        /// The title of this menu.
-        /// </summary>
-        public string Title
-        {
-            get => title;
-            set
-            {
-                title = value;
-                OnTitleChanged?.Invoke();
-            }
-        }
-
-        /// <summary>
-        /// The description of this menu.
-        /// </summary>
-        private string description;
-        /// <summary>
-        /// The description of this menu.
-        /// </summary>
-        public string Description
-        {
-            get => description;
-            set
-            {
-                description = value;
-                OnDescriptionChanged?.Invoke();
-            }
-        }
-
-        /// <summary>
-        /// The icon of this menu.
-        /// </summary>
-        private Sprite icon;
-
-        /// <summary>
-        /// The icon of this menu.
-        /// </summary>
-        public Sprite Icon
-        {
-            get => icon;
-            set
-            {
-                icon = value;
-                OnIconChanged?.Invoke();
-            }
-        }
-        
-        /// <summary>
-        /// The keyword to close the menu.
-        /// </summary>
-        private string closeMenuKeyword = "close menu";
-
-        /// <summary>
-        /// The keyword to close the menu.
-        /// </summary>
-        public string CloseMenuKeyword
-        {
-            get => closeMenuKeyword;
-            set
-            {
-                closeMenuKeyword = value;
-                OnCloseMenuCommandChanged?.Invoke();
-            }
-        }
-
-        /// <summary>
-        /// Whether the menu is shown.
-        /// </summary>
-        private bool showMenu;
-        /// <summary>
-        /// Whether the menu is shown.
-        /// </summary>
-        public bool ShowMenu
-        {
-            get => showMenu;
-            set
-            {
-                showMenu = value;
-                OnShowMenuChanged?.Invoke();
-            }
-        }
-
         /// <summary>
         /// Whether the menu can be closed by not making any selection.
         /// </summary>
         private bool allowNoSelection = true;
-
         /// <summary>
         /// Whether the menu can be closed by not making any selection.
         /// </summary>
@@ -144,22 +54,11 @@ namespace SEE.Game.UI.Menu
         /// The menu entries.
         /// </summary>
         private readonly List<T> entries = new();
-
         /// <summary>
         /// A read-only wrapper around the menu entries.
         /// </summary>
         /// <see cref="entries"/>
         public IList<T> Entries => entries.AsReadOnly();
-
-        /// <summary>
-        /// The keyword listener.
-        /// </summary>
-        protected KeywordInput KeywordListener;
-
-        /// <summary>
-        /// The menu game object.
-        /// </summary>
-        public GameObject Menu { get; protected set; }
 
         /// <summary>
         /// Returns the game object corresponding to a menu entry.
@@ -168,46 +67,6 @@ namespace SEE.Game.UI.Menu
         /// <param name="entry">The menu entry.</param>
         /// <returns>The game object of the entry.</returns>
         public abstract GameObject EntryGameObject(T entry);
-
-        /// <summary>
-        /// Toggles the menu.
-        /// </summary>
-        /// <see cref="ShowMenu"/>
-        public void ToggleMenu()
-        {
-            ShowMenu = !ShowMenu;
-        }
-
-        /// <summary>
-        /// Updates the keyword listener.
-        /// </summary>
-        protected void UpdateKeywordListener()
-        {
-            // stops if already listening
-            if (KeywordListener != null)
-            {
-                KeywordListener.Unregister(HandleKeyword);
-                KeywordListener.Dispose();
-                KeywordListener = null;
-            }
-            if (!ShowMenu) return;
-            // starts listening
-            KeywordListener = new KeywordInput(GetKeywords().ToArray());
-            KeywordListener.Register(HandleKeyword);
-            KeywordListener.Start();
-        }
-    
-        /// <summary>
-        /// The keywords the menu should listen to.
-        /// Appends <see cref="CloseMenuKeyword"/> if <see cref="AllowNoSelection"/> is <code>true</code>.
-        /// </summary>
-        /// <returns>titles the menu should listen to</returns>
-        protected virtual IEnumerable<string> GetKeywords()
-        {
-            IEnumerable<string> keywords = Entries.Select(entry => entry.Title);
-            if (AllowNoSelection) keywords = keywords.Append(CloseMenuKeyword);
-            return keywords;
-        }
 
         /// <summary>
         /// Adds a menu entry.
@@ -241,82 +100,45 @@ namespace SEE.Game.UI.Menu
             OnEntrySelected?.Invoke(entry);
             if (HideAfterSelection) ShowMenu = false;
         }
-    
-        /// <summary>
-        /// Triggers when a keyword was recognized.
-        /// Selects the corresponding entry or executes a special action (e.g. <see cref="CloseMenuKeyword"/>).
-        /// </summary>
-        /// <param name="args">The phrase recognized.</param>
-        /// <see cref="GetKeywords"/>
-        protected virtual void HandleKeyword(PhraseRecognizedEventArgs args)
-        {
-            if (args.text == CloseMenuKeyword)
-            {
-                ShowMenu = false;
-            }
-            else
-            {
-                T entry = entries.Find(entry => entry.Title == args.text);
-                SelectEntry(entry);
-            }
-            OnKeywordRecognized?.Invoke(args.text);
-        }
 
         /// <summary>
-        /// Adds listeners for updating the keyword listener.
+        /// Updates the menu and adds listeners to events.
         /// </summary>
         protected override void OnStartFinished()
         {
             base.OnStartFinished();
-            // updating the keyword listener
-            UpdateKeywordListener();
-            // events for the keyword listener
-            OnShowMenuChanged += UpdateKeywordListener;
+            // add listeners
             OnAllowNoSelectionChanged += UpdateKeywordListener;
-            OnCloseMenuCommandChanged += UpdateKeywordListener;
             OnEntryAdded += _ => UpdateKeywordListener();
             OnEntryRemoved += _ => UpdateKeywordListener();
         }
 
         /// <summary>
-        /// Updates the component for the current platform.
-        /// Destroys the component if the corresponding menu has been destroyed.
+        /// The keywords the menu should listen to.
+        /// Adds the titles of the menu entries.
+        /// Removes the CloseMenuKeyword if <see cref="AllowNoSelection"/> isn't true.
         /// </summary>
-        protected override void Update()
+        /// <returns></returns>
+        protected override IEnumerable<string> GetKeywords()
         {
-            if (Menu == null) 
-                Destroy(this);
-            else 
-                base.Update();
+            IEnumerable<string> keywords = base.GetKeywords();
+            // adds the entry titles as keywords
+            keywords = keywords.Concat(Entries.Select(entry => entry.Title));
+            // removes the CloseMenuKeyword if no selection isn't allowed.
+            if (!AllowNoSelection) keywords = keywords.Where(keyword => keyword != CloseMenuKeyword);
+            return keywords;
         }
 
         /// <summary>
-        /// Destroys the menu when the component has been destroyed.
+        /// Selects an entry if the keyword is the entry title.
         /// </summary>
-        private void OnDestroy()
+        /// <param name="args">The phrase recognized.</param>
+        protected override void HandleKeyword(PhraseRecognizedEventArgs args)
         {
-            if (Menu!= null) Destroy(Menu);
+            T entry = entries.FirstOrDefault(entry => entry.Title == args.text);
+            if (entry != null) SelectEntry(entry);
+            base.HandleKeyword(args);
         }
-
-        /// <summary>
-        /// Triggers when <see cref="Title"/> was changed.
-        /// </summary>
-        public event UnityAction OnTitleChanged;
-
-        /// <summary>
-        /// Triggers when <see cref="Description"/> was changed.
-        /// </summary>
-        public event UnityAction OnDescriptionChanged;
-        
-        /// <summary>
-        /// Triggers when <see cref="Icon"/> was changed.
-        /// </summary>
-        public event UnityAction OnIconChanged;
-
-        /// <summary>
-        /// Triggers when <see cref="ShowMenu"/> was changed.
-        /// </summary>
-        public event UnityAction OnShowMenuChanged;
 
         /// <summary>
         /// Triggers when <see cref="AllowNoSelection"/> was changed.
@@ -327,11 +149,6 @@ namespace SEE.Game.UI.Menu
         /// Triggers when <see cref="HideAfterSelection"/> was changed.
         /// </summary>
         public event UnityAction OnHideAfterSelectionChanged;
-
-        /// <summary>
-        /// Triggers when <see cref="CloseMenuKeyword"/> was changed
-        /// </summary>
-        public event UnityAction OnCloseMenuCommandChanged;
 
         /// <summary>
         /// Triggers when an entry was added. (<see cref="AddEntry"/>)
@@ -347,10 +164,5 @@ namespace SEE.Game.UI.Menu
         /// Triggers when an entry was selected. (<see cref="SelectEntry"/>)
         /// </summary>
         public event UnityAction<T> OnEntrySelected;
-
-        /// <summary>
-        /// Triggers when a keyword was recognized by the listener. (<see cref="HandleKeyword"/>)
-        /// </summary>
-        public event UnityAction<string> OnKeywordRecognized;
     }
 }

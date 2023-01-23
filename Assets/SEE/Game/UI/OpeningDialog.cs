@@ -20,18 +20,18 @@ namespace SEE.UI
         /// <summary>
         /// The UI object representing the menu the user chooses the action from.
         /// </summary>
-        private SimpleMenu menu;
+        private SimpleListMenu menu;
 
         /// <summary>
         /// This creates and returns the action menu, with which a user can configure the
         /// networking.
         /// </summary>
         /// <returns>the newly created action menu component.</returns>
-        private SimpleMenu CreateMenu()
+        private SimpleListMenu CreateMenu()
         {
             GameObject actionMenuGO = new GameObject { name = "Network Menu" };
             IList<ToggleMenuEntry> entries = SelectionEntries();
-            SimpleMenu actionMenu = actionMenuGO.AddComponent<SimpleMenu>();
+            SimpleListMenu actionMenu = actionMenuGO.AddComponent<SimpleListMenu>();
             actionMenu.AllowNoSelection = false; // the menu cannot be closed; user must make a decision
             actionMenu.Title = "Network Configuration";
             actionMenu.Description = "Please select the network configuration you want to activate.";

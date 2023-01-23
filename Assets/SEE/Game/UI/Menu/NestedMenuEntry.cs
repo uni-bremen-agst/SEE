@@ -7,7 +7,7 @@ namespace SEE.Game.UI.Menu
 {
     /// <summary>
     /// A button which opens another menu when clicking on it.
-    /// Must be used inside a <see cref="NestedMenu"/>.
+    /// Must be used inside a <see cref="NestedListMenu"/>.
     /// </summary>
     public class NestedMenuEntry: MenuEntry
     {

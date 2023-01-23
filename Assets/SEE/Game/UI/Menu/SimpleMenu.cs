@@ -1,147 +1,202 @@
-﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Michsky.UI.ModernUIPack;
+using SEE.Controls;
 using SEE.Utils;
-using Sirenix.Utilities;
-using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
+using UnityEngine.Windows.Speech;
 
 namespace SEE.Game.UI.Menu
 {
-    /// <summary>
-    /// A simple list menu containing <see cref="MenuEntry"/> items.
-    /// </summary>
-    public class SimpleMenu : SimpleMenu<MenuEntry> { }
-
-    /// <summary>
-    /// A simple list menu which instantiates prefabs for each menu entry.
-    /// The hierarchy of the prefabs and which prefabs are used are customizable.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class SimpleMenu<T> : ListMenu<T> where T : MenuEntry
+    public class SimpleMenu : PlatformDependentComponent
     {
         /// <summary>
         /// Prefab for the menu.
         /// </summary>
         protected virtual string MenuPrefab => UI_PREFAB_FOLDER + "Menu";
         /// <summary>
-        /// Prefab for the list containing the menu entries.
-        /// Only used if nothing is found at <see cref="EntryListPath"/>.
-        /// </summary>
-        protected virtual string EntryListPrefab => UI_PREFAB_FOLDER + "MenuEntries";
-        /// <summary>
-        /// Prefab for each menu entry.
-        /// </summary>
-        protected virtual string EntryPrefab => UI_PREFAB_FOLDER + "Button";
-        /// <summary>
         /// Sprite for the icon.
         /// </summary>
         protected virtual string IconSprite => "Materials/ModernUIPack/Settings";
 
         /// <summary>
-        /// Path to the content game object.
-        /// Contains the entry list.
+        /// The title of this menu.
         /// </summary>
-        protected virtual string ContentPath => "Main Content/Content Mask/Content";
+        private string title;
         /// <summary>
-        /// Path to the entry list game object.
-        /// Is child of the content game object.
+        /// The title of this menu.
         /// </summary>
-        protected virtual string EntryListPath => "Menu Entries/Scroll Area/List";
+        public string Title
+        {
+            get => title;
+            set
+            {
+                title = value;
+                OnTitleChanged?.Invoke();
+            }
+        }
+    
+        /// <summary>
+        /// The description of this menu.
+        /// </summary>
+        private string description;
+        /// <summary>
+        /// The description of this menu.
+        /// </summary>
+        public string Description
+        {
+            get => description;
+            set
+            {
+                description = value;
+                OnDescriptionChanged?.Invoke();
+            }
+        }
+    
+        /// <summary>
+        /// The icon of this menu.
+        /// </summary>
+        private Sprite icon;
+        /// <summary>
+        /// The icon of this menu.
+        /// </summary>
+        public Sprite Icon
+        {
+            get => icon;
+            set
+            {
+                icon = value;
+                OnIconChanged?.Invoke();
+            }
+        }
+    
+        /// <summary>
+        /// The keyword listener.
+        /// </summary>
+        protected KeywordInput KeywordListener;
         
+        /// <summary>
+        /// The keyword to close the menu.
+        /// </summary>
+        private string closeMenuKeyword = "close menu";
+        /// <summary>
+        /// The keyword to close the menu.
+        /// </summary>
+        public string CloseMenuKeyword
+        {
+            get => closeMenuKeyword;
+            set
+            {
+                closeMenuKeyword = value;
+                OnCloseMenuCommandChanged?.Invoke();
+            }
+        }
+
+        /// <summary>
+        /// Whether the menu is shown.
+        /// </summary>
+        private bool showMenu;
+        /// <summary>
+        /// Whether the menu is shown.
+        /// </summary>
+        public bool ShowMenu
+        {
+            get => showMenu;
+            set
+            {
+                showMenu = value;
+                OnShowMenuChanged?.Invoke();
+            }
+        }
+
+        /// <summary>
+        /// The parent of the menu.
+        /// Uses <see cref="Canvas"/> by default.
+        /// </summary>
+        private Transform parent;
+
+        /// <summary>
+        /// The parent of the menu.
+        /// Uses <see cref="Canvas"/> by default.
+        /// </summary>
+        protected Transform Parent
+        {
+            get => parent != null ? parent : Canvas.transform;
+            set
+            {
+                parent = value;
+                OnParentChanged?.Invoke();
+            }
+        }
+    
+        /// <summary>
+        /// Toggles the menu.
+        /// </summary>
+        /// <see cref="ShowMenu"/>
+        public void ToggleMenu()
+        {
+            ShowMenu = !ShowMenu;
+        }
+
+        /// <summary>
+        /// The menu game object.
+        /// </summary>
+        protected GameObject Menu { get; private set; }
         /// <summary>
         /// The menu manager.
         /// </summary>
         protected ModalWindowManager MenuManager { get; private set; }
         /// <summary>
-        /// The content game object.
-        /// </summary>
-        protected GameObject Content { get; private set; }
-        /// <summary>
-        /// The entry list game object.
-        /// </summary>
-        protected GameObject EntryList { get; private set; }
-        
-        /// <summary>
-        /// Returns the game object corresponding to a menu entry.
-        /// Assumes that the menu contains the entry.
-        /// </summary>
-        /// <param name="entry">The menu entry.</param>
-        /// <returns>The game object of the entry.</returns>
-        public override GameObject EntryGameObject(T entry) => EntryList.transform.Find(entry.Title).gameObject;
-        
-        /// <summary>
         /// The menu tooltip.
         /// </summary>
         protected Tooltip.Tooltip MenuTooltip { get; private set; }
-
+    
         /// <summary>
-        /// Initializes the menu and stores specific parts of the menu.
-        /// Creates the entry list if necessary.
+        /// Updates the keyword listener.
         /// </summary>
-        protected override void StartDesktop()
+        protected virtual void UpdateKeywordListener()
         {
-            // instantiates the menu
-            Menu = PrefabInstantiator.InstantiatePrefab(MenuPrefab, Canvas.transform, false);
-            Menu.name = Title;
-            MenuManager = Menu.GetComponent<ModalWindowManager>();
-            
-            // stores specific parts of the menu
-            Content = Menu.transform.Find(ContentPath).gameObject;
-            // instantiates the entry list if necessary
-            if (!Content.transform.Find(EntryListPath))
+            // stops if already listening
+            if (KeywordListener != null)
             {
-                GameObject go = PrefabInstantiator.InstantiatePrefab(EntryListPrefab, Content.transform, false);
-                // uses the start of EntryListPath as the name
-                go.name = EntryListPath.Split('/')[0];
+                KeywordListener.Unregister(HandleKeyword);
+                KeywordListener.Dispose();
+                KeywordListener = null;
             }
-            EntryList = Content.transform.Find(EntryListPath).gameObject;
-
-            // creates the tooltip
-            MenuTooltip = Menu.AddComponent<Tooltip.Tooltip>();
+            if (!ShowMenu) return;
+            // starts listening
+            KeywordListener = new KeywordInput(GetKeywords().ToArray());
+            KeywordListener.Register(HandleKeyword);
+            KeywordListener.Start();
         }
-
+    
         /// <summary>
-        /// <see cref="StartDesktop"/>
+        /// The keywords the menu should listen to.
         /// </summary>
-        protected override void StartVR() => StartDesktop();
-        
-        /// <summary>
-        /// <see cref="StartDesktop"/>
-        /// </summary>
-        protected override void StartTouchGamepad() => StartDesktop();
-
-        /// <summary>
-        /// Loads the sprite.
-        /// </summary>
-        private void Awake()
+        /// <returns>titles the menu should listen to</returns>
+        protected virtual IEnumerable<string> GetKeywords()
         {
-            Icon = Resources.Load<Sprite>(IconSprite);
+            return Enumerable.Empty<string>().Append(CloseMenuKeyword);
         }
-
+    
         /// <summary>
-        /// Updates the menu and adds listeners for updating the menu.
+        /// Triggers when a keyword was recognized.
+        /// Executes a special action depending on the keyword.
         /// </summary>
-        protected override void OnStartFinished()
+        /// <param name="args">The phrase recognized.</param>
+        /// <see cref="GetKeywords"/>
+        /// <see cref="CloseMenuKeyword"/>
+        protected virtual void HandleKeyword(PhraseRecognizedEventArgs args)
         {
-            base.OnStartFinished();
-            // updates the menu
-            UpdateTitle();
-            UpdateDescription();
-            UpdateIcon();
-            UpdateShowMenu();
-            UpdateCloseButton();
-            Entries.ForEach(AddButton);
-            // adds listeners for updating the menu
-            OnTitleChanged += UpdateTitle;
-            OnDescriptionChanged += UpdateDescription;
-            OnIconChanged += UpdateIcon;
-            OnShowMenuChanged += UpdateShowMenu;
-            OnAllowNoSelectionChanged += UpdateCloseButton;
-            OnEntryAdded += AddButton;
-            OnEntryRemoved += DestroyButton;
+            if (args.text == CloseMenuKeyword)
+            {
+                ShowMenu = false;
+            }
+            OnKeywordRecognized?.Invoke(args.text);
         }
-
+    
         /// <summary>
         /// Updates the title.
         /// </summary>
@@ -179,72 +234,21 @@ namespace SEE.Game.UI.Menu
             {
                 Menu.transform.SetAsLastSibling();
                 MenuManager.OpenWindow();
-                MenuTooltip.enabled = true;
             }
             else
             {
                 MenuManager.CloseWindow();
-                MenuTooltip.Hide();
-                MenuTooltip.enabled = false;
             }
         }
 
-
         /// <summary>
-        /// Updates whether the close button is active.
-        /// Only visible if <see cref="AllowNoSelection"/> is true.
+        /// Updates whether the tooltip is shown.
         /// </summary>
-        protected virtual void UpdateCloseButton()
+        protected virtual void UpdateShowTooltip()
         {
-            if (MenuManager.confirmButton != null)
-                MenuManager.confirmButton.gameObject.SetActive(AllowNoSelection);
+            if (!ShowMenu) MenuTooltip.Hide();
         }
-
-        /// <summary>
-        /// Instantiates the button for a menu entry.
-        /// It is assumed that the menu contains the entry.
-        /// </summary>
-        /// <param name="entry">The added menu entry.</param>
-        protected virtual void AddButton(T entry)
-        {
-            GameObject button =
-                PrefabInstantiator.InstantiatePrefab(EntryPrefab, EntryList.transform, false);
-
-            // title and icon
-            button.name = entry.Title;
-            ButtonManagerBasicWithIcon manager = button.GetComponent<ButtonManagerBasicWithIcon>();
-            manager.buttonText = entry.Title;
-            manager.buttonIcon = entry.Icon;
-            
-            // hover listeners
-            PointerHelper pointerHelper = button.GetComponent<PointerHelper>();
-            pointerHelper.EnterEvent.AddListener(() => MenuTooltip.Show(entry.Description));
-            pointerHelper.ExitEvent.AddListener(MenuTooltip.Hide);
-
-            // select listener or show that button is disabled
-            if (entry.Enabled) 
-                manager.clickEvent.AddListener(() => SelectEntry(entry));
-            else 
-                manager.useRipple = false;
-            
-            // colors
-            Color color = entry.Enabled ? entry.EntryColor : entry.DisabledColor;
-            button.GetComponent<Image>().color = color;
-            Color textColor = color.IdealTextColor();
-            manager.normalText.color = textColor;
-            manager.normalImage.color = textColor;
-        }
-
-        /// <summary>
-        /// Destroys the button for a removed menu entry.
-        /// It is assumed that the menu contained the entry.
-        /// </summary>
-        /// <param name="entry">The menu entry.</param>
-        protected virtual void DestroyButton(T entry)
-        {
-            Destroy(EntryGameObject(entry));
-        }
-
+    
         /// <summary>
         /// Updates the menu layout.
         /// </summary>
@@ -253,5 +257,109 @@ namespace SEE.Game.UI.Menu
             MenuManager.UpdateUI();
             LayoutRebuilder.ForceRebuildLayoutImmediate(Menu.transform as RectTransform);
         }
+
+        /// <summary>
+        /// Initializes the menu.
+        /// </summary>
+        protected override void StartDesktop()
+        {
+            // instantiates the menu
+            Menu = PrefabInstantiator.InstantiatePrefab(MenuPrefab, parent, false);
+            Menu.name = Title;
+            MenuManager = Menu.GetComponent<ModalWindowManager>();
+        
+            // creates the tooltip
+            MenuTooltip = Menu.AddComponent<Tooltip.Tooltip>();
+        }
+    
+        /// <summary>
+        /// <see cref="StartDesktop"/>
+        /// </summary>
+        protected override void StartVR() => StartDesktop();
+        
+        /// <summary>
+        /// <see cref="StartDesktop"/>
+        /// </summary>
+        protected override void StartTouchGamepad() => StartDesktop();
+
+        /// <summary>
+        /// Updates the menu and adds listeners to events.
+        /// </summary>
+        protected override void OnStartFinished()
+        {
+            base.OnStartFinished();
+            // updates the menu
+            UpdateKeywordListener();
+            UpdateTitle();
+            UpdateDescription();
+            UpdateIcon();
+            UpdateShowMenu();
+            // adds listeners for updating the menu
+            OnTitleChanged += UpdateTitle;
+            OnDescriptionChanged += UpdateDescription;
+            OnIconChanged += UpdateIcon;
+            OnShowMenuChanged += UpdateShowMenu;
+            OnShowMenuChanged += UpdateKeywordListener;
+            OnCloseMenuCommandChanged += UpdateKeywordListener; ;
+        }
+
+        /// <summary>
+        /// Updates the component for the current platform.
+        /// Destroys the component if the corresponding menu has been destroyed or was not properly initialized.
+        /// </summary>
+        protected override void Update()
+
+        {
+            // destroys the component without a menu
+            if (Menu == null)
+            {
+                Destroy(this);
+                return;
+            }
+            base.Update();
+        }
+
+        /// <summary>
+        /// Destroying the component also destroys the menu.
+        /// </summary>
+        private void OnDestroy()
+        {
+            if (Menu!= null) Destroy(Menu);
+        }
+    
+        /// <summary>
+        /// Triggers when <see cref="Title"/> was changed.
+        /// </summary>
+        public event UnityAction OnTitleChanged;
+
+        /// <summary>
+        /// Triggers when <see cref="Description"/> was changed.
+        /// </summary>
+        public event UnityAction OnDescriptionChanged;
+        
+        /// <summary>
+        /// Triggers when <see cref="Icon"/> was changed.
+        /// </summary>
+        public event UnityAction OnIconChanged;
+
+        /// <summary>
+        /// Triggers when <see cref="ShowMenu"/> was changed.
+        /// </summary>
+        public event UnityAction OnShowMenuChanged;
+    
+        /// <summary>
+        /// Triggers when <see cref="CloseMenuKeyword"/> was changed
+        /// </summary>
+        public event UnityAction OnCloseMenuCommandChanged;
+    
+        /// <summary>
+        /// Triggers when <see cref="Parent"/> was changed.
+        /// </summary>
+        public event UnityAction OnParentChanged;
+    
+        /// <summary>
+        /// Triggers when a keyword was recognized by the listener. (<see cref="HandleKeyword"/>)
+        /// </summary>
+        public event UnityAction<string> OnKeywordRecognized;
     }
 }

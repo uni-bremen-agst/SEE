@@ -23,7 +23,7 @@ namespace SEE.Game.UI.HolisticMetrics
         /// <summary>
         /// The menu instance that represents the holistic metrics menu
         /// </summary>
-        private SimpleMenu menu;
+        private SimpleListMenu menu;
 
         /// <summary>
         /// When this component starts, it will instantiate the menu with all the menu entries and everything.
@@ -49,11 +49,11 @@ namespace SEE.Game.UI.HolisticMetrics
         /// This method returns a new holistic metrics menu with all the menu entries and everything.
         /// </summary>
         /// <returns>A new holistic metrics menu</returns>
-        private SimpleMenu CreateMenu()
+        private SimpleListMenu CreateMenu()
         {
             GameObject actionMenuGO = new GameObject { name = "Holistic metrics menu" };
             IList<MenuEntry> entries = SelectionEntries();
-            SimpleMenu actionMenu = actionMenuGO.AddComponent<SimpleMenu>();
+            SimpleListMenu actionMenu = actionMenuGO.AddComponent<SimpleListMenu>();
             actionMenu.AllowNoSelection = true;
             actionMenu.Title = "Holistic metrics menu";
             actionMenu.Description = "Add / change the metrics board(s).";

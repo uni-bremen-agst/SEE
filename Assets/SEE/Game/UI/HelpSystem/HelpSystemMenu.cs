@@ -31,7 +31,7 @@ namespace SEE.Game.UI.HelpSystem
         /// The NestedMenu of the HelpSystem - responsible for the navigation
         /// inside of the use cases.
         /// </summary>
-        private NestedMenu mainMenu;
+        private NestedListMenu mainMenu;
 
         /// <summary>
         /// Creates the menu.
@@ -62,7 +62,7 @@ namespace SEE.Game.UI.HelpSystem
         /// </summary>
         /// <param name="menuHolder">the game object holding the <see cref="HelpSystemEntry"/> which is the root of the help menu</param>
         /// <returns>the created help menu</returns>
-        private static NestedMenu CreateStartMenu()
+        private static NestedListMenu CreateStartMenu()
         {
             HelpSystemEntry entry = HelpSystemBuilder.GetHelpMenuRootEntry();
 

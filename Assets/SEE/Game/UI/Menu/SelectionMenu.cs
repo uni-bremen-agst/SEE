@@ -17,7 +17,7 @@ namespace SEE.Game.UI.Menu
     /// A menu in which the user can choose one active selection out of a menu.
     /// It is assumed that only one selection can be active at a time.
     /// </summary>
-    public class SelectionMenu<T>: SimpleMenu<T> where T : ToggleMenuEntry
+    public class SelectionMenu<T>: SimpleListMenu<T> where T : ToggleMenuEntry
     {
         /// <summary>
         /// The active entry.
