@@ -64,19 +64,22 @@ namespace SEE.Controls.Actions
             new ActionStateType(9, "Draw", "Draw a line",
                         Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                         DrawAction.CreateReversibleAction);
+        public static ActionStateType AddWidget { get; } =
+            new ActionStateType(10, "Add Widget", "Add a widget", Color.green.Darker(), 
+                "Materials/ModernUIPack/Plus", AddWidgetAction.CreateReversibleAction);
         public static ActionStateType MoveBoard { get; } =
-            new ActionStateType(10, "Move Board", "Move a board", Color.yellow.Darker(), 
+            new ActionStateType(11, "Move Board", "Move a board", Color.yellow.Darker(), 
                 "Materials/40+ Simple Icons - Free/Scale_Simple_Icons_UI", 
                 MoveBoardAction.CreateReversibleAction);
         public static ActionStateType MoveWidget { get; } =
-            new ActionStateType(11, "Move Widget", "Move a widget", Color.yellow.Darker(), 
+            new ActionStateType(12, "Move Widget", "Move a widget", Color.yellow.Darker(), 
                 "Materials/40+ Simple Icons - Free/Scale_Simple_Icons_UI",
                 MoveWidgetAction.CreateReversibleAction);
         public static ActionStateType DeleteBoard { get; } =
-            new ActionStateType(12, "Delete Board", "Delete a board", Color.red.Darker(), 
+            new ActionStateType(13, "Delete Board", "Delete a board", Color.red.Darker(), 
                 "Materials/ModernUIPack/Trash", DeleteBoardAction.CreateReversibleAction);
         public static ActionStateType DeleteWidget { get; } =
-            new ActionStateType(13, "Delete Widget", "Delete a widget", Color.red.Darker(), 
+            new ActionStateType(14, "Delete Widget", "Delete a widget", Color.red.Darker(), 
                 "Materials/ModernUIPack/Trash", DeleteWidgetAction.CreateReversibleAction);
         #endregion
 

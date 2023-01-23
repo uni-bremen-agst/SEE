@@ -1,4 +1,3 @@
-using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 
@@ -14,7 +13,7 @@ namespace SEE.Game.HolisticMetrics.Components
         /// <summary>
         /// The configuration of the widget to add. We get this from the AddWidgetDialog.
         /// </summary>
-        private static WidgetConfig widgetConfiguration;
+        private Vector3 position;
 
         /// <summary>
         /// Whether or not this class has just added a widget. If this is true, all instances of this class should
@@ -26,11 +25,14 @@ namespace SEE.Game.HolisticMetrics.Components
         /// This method does the setup for all WidgetAdder instances, meaning it sets the positioningDone field to false
         /// and sets the widgetConfiguration field to the parameter value.
         /// </summary>
-        /// <param name="widgetConfigurationParam"></param>
-        internal static void Setup(WidgetConfig widgetConfigurationParam)
+        internal static void Setup()
         {
-            widgetConfiguration = widgetConfigurationParam;
             positioningDone = false;
+        }
+
+        internal static void Stop()
+        {
+            positioningDone = true;
         }
         
         /// <summary>
@@ -43,16 +45,16 @@ namespace SEE.Game.HolisticMetrics.Components
             {
                 if (Raycasting.RaycastAnything(out RaycastHit hit))
                 {
-                    // Create the widget
-                    Vector3 localPoint = transform.InverseTransformPoint(hit.point);
-                    widgetConfiguration.Position = localPoint;
-                    string boardName = GetComponent<WidgetsManager>().GetTitle();
-
-                    new CreateWidgetAction(boardName, widgetConfiguration);
-                    
+                    position = transform.InverseTransformPoint(hit.point);
                     positioningDone = true;
                 }
             }
+        }
+
+        internal bool GetPosition(out Vector3 clickPosition)
+        {
+            clickPosition = position;
+            return positioningDone;
         }
 
         /// <summary>

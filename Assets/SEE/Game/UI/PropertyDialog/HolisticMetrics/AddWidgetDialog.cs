@@ -14,6 +14,12 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     /// </summary>
     internal class AddWidgetDialog : HolisticMetricsDialog
     {
+        private static bool gotConfig;
+        
+        private static string metricType;
+
+        private static string widgetName;
+        
         /// <summary>
         /// The property dialog of this dialog.
         /// </summary>
@@ -59,6 +65,8 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         internal void Open()
         {
+            gotConfig = false;
+            
             dialog = new GameObject("Add widget dialog");
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
             group.Name = "Add widget dialog";
@@ -100,26 +108,20 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         private void AddWidget()
         {
-            // Create a widget configuration
-            WidgetConfig widgetConfiguration = new WidgetConfig()
-            {
-                ID = Guid.NewGuid(),
-                MetricType = selectedMetric.Value,
-                WidgetName = selectedWidget.Value
-            };
-            
-            // Add WidgetPositionGetters to all boards
-            BoardsManager.AddWidgetAdders(widgetConfiguration);
+            gotConfig = true;
+            metricType = selectedMetric.Value;
+            widgetName = selectedWidget.Value;
 
-            // Ensure they all get deleted once one of them gets a click (that should probably not be done here)
-            
             // Close the dialog
             Object.Destroy(dialog);
             SEEInput.KeyboardShortcutsEnabled = true;
+        }
 
-            ShowNotification.Info(
-                "Position the widget",
-                "Click on a metrics board where you want to position the widget.");
+        internal static bool GetConfig(out string metric, out string widget)
+        {
+            metric = metricType;
+            widget = widgetName;
+            return gotConfig;
         }
     }
 }

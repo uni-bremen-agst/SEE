@@ -182,14 +182,29 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// This method can be invoked when you wish to let the user click on a board to add a widget.
         /// </summary>
-        /// <param name="widgetConfiguration">Information on how the widget to add should be configured</param>
-        internal static void AddWidgetAdders(WidgetConfig widgetConfiguration)
+        internal static void AddWidgetAdders()
         {
-            WidgetAdder.Setup(widgetConfiguration);
+            WidgetAdder.Setup();
             foreach (WidgetsManager controller in widgetsManagers)
             {
                 controller.gameObject.AddComponent<WidgetAdder>();
             }
+        }
+
+        internal static bool GetWidgetAdditionPosition(out string boardName, out Vector3 position)
+        {
+            foreach (WidgetsManager widgetsManager in widgetsManagers)
+            {
+                if (widgetsManager.gameObject.GetComponent<WidgetAdder>().GetPosition(out position))
+                {
+                    boardName = widgetsManager.GetTitle();
+                    return true;
+                }
+            }
+
+            boardName = null;
+            position = Vector3.zero;
+            return false;
         }
 
         /// <summary>
