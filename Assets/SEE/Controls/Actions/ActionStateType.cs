@@ -84,6 +84,12 @@ namespace SEE.Controls.Actions
         public static ActionStateType DeleteWidget { get; } =
             new ActionStateType(15, "Delete Widget", "Delete a widget", Color.red.Darker(), 
                 "Materials/ModernUIPack/Trash", DeleteWidgetAction.CreateReversibleAction);
+        public static ActionStateType LoadBoard { get; } =
+            new ActionStateType(16, "Load Board", "Load a board", Color.blue.Darker(), 
+                "Materials/ModernUIPack/Document", LoadBoardAction.CreateReversibleAction);
+        public static ActionStateType SaveBoard { get; } =
+            new ActionStateType(17, "Save Board", "Save a board", Color.blue.Darker(), 
+                "Materials/ModernUIPack/Document", SaveBoardAction.CreateReversibleAction);
         #endregion
 
         /// <summary>

@@ -13,6 +13,10 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     /// </summary>
     internal class LoadBoardConfigurationDialog : HolisticMetricsDialog
     {
+        private static bool gotFilename;
+
+        private static string filename;
+        
         /// <summary>
         /// The property dialog.
         /// </summary>
@@ -45,7 +49,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
             propertyDialog.AddGroup(group);
 
-            propertyDialog.OnConfirm.AddListener(LoadBoardConfiguration);
+            propertyDialog.OnConfirm.AddListener(OnConfirm);
             propertyDialog.OnCancel.AddListener(EnableKeyboardShortcuts);
 
             SEEInput.KeyboardShortcutsEnabled = false;
@@ -53,32 +57,28 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         }
 
         /// <summary>
-        /// This method gets called when the player confirms the dialog. It will load the selected board and create it
-        /// in the scene.
+        /// This method gets called when the player confirms the dialog. It will save the selected filename in a
+        /// variable and set <see cref="gotFilename"/> to true.
         /// </summary>
-        private void LoadBoardConfiguration()
+        private void OnConfirm()
         {
             SEEInput.KeyboardShortcutsEnabled = true;
-            
-            // Load the board configuration from the file
-            BoardConfig boardConfiguration;
-            try
-            {
-                boardConfiguration = ConfigManager.LoadBoard(selectedFile.Value);
-            }
-            catch (Exception exception)
-            {
-                ShowNotification.Error(
-                    "Problem loading the metrics board configuration, reason:", 
-                    exception.Message);
-                return;
-            }
-            
-            // Destroy the dialog GameObject
+            filename = selectedFile.Value;
+            gotFilename = true;
             Object.Destroy(dialog);
-            
-            // Create a new board from the loaded configuration
-            //new CreateBoardAction(boardConfiguration);
+        }
+
+        internal static bool GetConfig(out string nameOfFile)
+        {
+            if (gotFilename)
+            {
+                nameOfFile = filename;
+                gotFilename = false;
+                return true;
+            }
+
+            nameOfFile = null;
+            return false;
         }
     }
 }

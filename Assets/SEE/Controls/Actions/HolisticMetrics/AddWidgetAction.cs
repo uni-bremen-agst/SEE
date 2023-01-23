@@ -67,6 +67,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             {
                 memento.config.MetricType = metric;
                 memento.config.WidgetName = widget;
+                // TODO: When you add a widget, it adds that widget multiple ("infinite"?) times
                 Redo();
                 return true;
             }

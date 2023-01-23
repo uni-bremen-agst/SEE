@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using SEE.Controls;
-using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics;
 using SEE.Game.UI.Menu;
 using SEE.Game.UI.Notification;
@@ -30,18 +28,6 @@ namespace SEE.Game.UI.HolisticMetrics
         private void Start()
         {
             menu = CreateMenu();
-        }
-        
-        /// <summary>
-        /// In every Update step, we want to check whether the player has pressed the key for toggling the holistic
-        /// metrics menu. In that case, we toggle the menu.
-        /// </summary>
-        private void Update()
-        {
-            if (SEEInput.ToggleHolisticMetricsMenu())
-            {
-                menu.ToggleMenu();
-            }
         }
 
         /// <summary>
