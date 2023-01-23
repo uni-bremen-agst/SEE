@@ -168,6 +168,17 @@ namespace SEE.Game.HolisticMetrics.Components
             }
         }
 
+        internal bool GetWidgetDeletion(out WidgetConfig widgetConfig)
+        {
+            foreach ((WidgetController, Metric) widget in widgets)
+            {
+                return widget.Item1.GetComponent<WidgetDeleter>().GetDeletion(out widgetConfig);
+            }
+
+            widgetConfig = null;
+            return false;
+        }
+
         /// <summary>
         /// Deletes the widget with the given ID if it is managed by this manager.
         /// </summary>

@@ -19,6 +19,8 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         private static bool deletionDone;
 
+        private bool hasDeletion;
+
         /// <summary>
         /// Sets the deletionDone field to false so the WidgetDeleter instances won't delete themselves at the next
         /// Update() step.
@@ -26,6 +28,11 @@ namespace SEE.Game.HolisticMetrics.Components
         internal static void Setup()
         {
             deletionDone = false;
+        }
+
+        internal static void Stop()
+        {
+            deletionDone = true;
         }
         
         /// <summary>
@@ -38,15 +45,7 @@ namespace SEE.Game.HolisticMetrics.Components
             {
                 Transform parentTransform = transform.parent;
                 deletionDone = true;
-
-                // A config instance of the widget to delete, so it can be restored if needed
-                WidgetConfig config = ConfigManager.GetWidgetConfig(
-                    GetComponent<WidgetController>(),
-                    GetComponent<Metric>());
-
-                new DeleteWidgetAction(
-                    parentTransform.GetComponent<WidgetsManager>().GetTitle(),
-                    config);
+                hasDeletion = true;
             }
         }
 
@@ -55,10 +54,16 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         private void Update()
         {
-            if (deletionDone)
+            if (deletionDone && !hasDeletion)
             {
                 Destroy(this);
             }
+        }
+
+        internal bool GetDeletion(out WidgetConfig config)
+        {
+            config = ConfigManager.GetWidgetConfig(GetComponent<WidgetController>(), GetComponent<Metric>());
+            return hasDeletion;
         }
     }
 }

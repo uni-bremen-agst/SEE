@@ -241,5 +241,21 @@ namespace SEE.Game.HolisticMetrics
                 widgetsManager.AddWidgetDeleters();
             }
         }
+
+        internal static bool GetWidgetDeletion(out string boardName, out WidgetConfig widgetConfig)
+        {
+            foreach (WidgetsManager widgetsManager in widgetsManagers)
+            {
+                if (widgetsManager.GetWidgetDeletion(out widgetConfig))
+                {
+                    boardName = widgetsManager.GetTitle();
+                    return true;
+                }
+            }
+
+            boardName = null;
+            widgetConfig = null;
+            return false;
+        }
     }
 }
