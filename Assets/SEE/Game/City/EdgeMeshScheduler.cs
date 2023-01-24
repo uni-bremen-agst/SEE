@@ -38,7 +38,7 @@ namespace SEE.Game.City
         /// Edges to be processed. New edges can be registered with
         /// <see cref="Add(GameObject)"/>.
         /// </summary>
-        private readonly Queue<GameObject> edges = new Queue<GameObject>();
+        private readonly Queue<GameObject> edges = new();
 
         /// <summary>
         /// Layout settings.
