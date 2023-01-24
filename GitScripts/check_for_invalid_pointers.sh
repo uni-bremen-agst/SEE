@@ -16,6 +16,7 @@ fi
 output=$($GIT_FSCK)
 if [ "$output" != 'Git LFS fsck OK' ]; then
     if [ -n "$CI" ]; then
+        echo ""
         echo -n "::error title=Bad LFS pointer::!!! DO NOT MERGE INTO MASTER !!!%0A"
         echo -n "This branch contains a bad LFS pointer or object.%0A"
         echo -n "If it is a pointer error, it can be fixed by running \`git add --renormalize <bad-file>\`,%0A"

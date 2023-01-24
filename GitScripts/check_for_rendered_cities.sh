@@ -27,6 +27,7 @@ if [ -n "$output" ]; then
         printf "Please delete all drawn CodeCities before committing.\n%s" "$output"
         if [ -n "$CI" ]; then
             first_line=$(echo "$output" | head -n 1)
+            echo ""
             echo -n "::error file=$first_line,title=Drawn code cities detected::Please delete all drawn CodeCities before committing.%0A"
             echo -n "%0A"
             echo -n "** NOTE **%0A"
