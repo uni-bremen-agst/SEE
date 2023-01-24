@@ -72,64 +72,14 @@ namespace SEE.Game.Avatars
             else if (!IsLocalPlayer && SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
                 gameObject.name = "Remote " + gameObject.name;
+                
+                if (gameObject.TryGetComponentOrLog(out VRIK vrIK))
+                {
+                    vrIK.enabled = true;
+                }
+                
                 // Remote players need to be set up for Dissonance and SALSA lip sync.
                 StartCoroutine(SetUpSALSA());
-                
-                GameObject rig = PrefabInstantiator.InstantiatePrefab(VRPlayerRigPrefab);
-                rig.transform.position = gameObject.transform.position;
-                
-                VRAvatarAimingSystem aiming = gameObject.AddOrGetComponent<VRAvatarAimingSystem>();
-                
-                if (gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
-                {
-                    Destroyer.Destroy(aimingSystem);
-                }
-                if (gameObject.TryGetComponentOrLog(out AimIK aimIK))
-                {
-                    aiming.Source = aimIK.solver.transform;
-                    aiming.Target = aimIK.solver.target;
-                    Destroyer.Destroy(aimIK);
-                }
-                if (gameObject.TryGetComponentOrLog(out LookAtIK lookAtIK))
-                {
-                    Destroyer.Destroy(lookAtIK);
-                }
-                // AvatarMovementAnimator is using animation parameters that are defined only
-                // in our own AvatarAimingSystem animation controller. We will remove it
-                // to avoid error messages.
-                if (gameObject.TryGetComponentOrLog(out AvatarMovementAnimator avatarMovement))
-                {
-                    Destroyer.Destroy(avatarMovement);
-                }
-
-                if (gameObject.TryGetComponentOrLog(out DynamicCharacterAvatar avatar))
-                {
-                    RuntimeAnimatorController animationController = Resources.Load<RuntimeAnimatorController>(AnimatorForVRIK);
-                    Debug.Log($"Loaded animation controller: {animationController != null}\n");
-                    if (animationController != null)
-                    {
-                        avatar.raceAnimationControllers.defaultAnimationController = animationController;
-
-                        if (gameObject.TryGetComponentOrLog(out Animator animator))
-                        {
-                            animator.runtimeAnimatorController = animationController;
-                            Debug.Log($"Loaded animation controller {animator.name} is human: {animator.isHuman}\n");
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError($"Could not load the animation controller at '{AnimatorForVRIK}.'\n");
-                    }
-                }
-                
-                VRIK vrIK = gameObject.AddOrGetComponent<VRIK>();
-                vrIK.solver.spine.headTarget = rig.transform.Find(VRPlayerHeadForVRIK);
-                UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.spine.headTarget);
-                vrIK.solver.leftArm.target = rig.transform.Find(VRPLayerLeftHandForVRIK);
-                UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.leftArm.target);
-                vrIK.solver.rightArm.target = rig.transform.Find(VRPlayerRightHandForVRIK);
-                UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.rightArm.target);
-
             }
             else
             {
