@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Michsky.UI.ModernUIPack;
@@ -38,6 +39,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     protected override string ViewListPath => "SettingsContentView";
     protected override string ContentPath => "SeeSettingsPanel/MainContent";
     protected override string EntryListPath => "Tabs/TabObjects";
+    
+    private HorizontalSelector citySwitcher;
 
     /// <summary>
     /// The SEE-city.
@@ -54,9 +57,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         // TODO: Auch Properties und Methoden umsetzen:
         // City.GetType().GetMembers()
         LoadCity(0);
-        City.GetType().GetFields().ForEach(CreateSetting);
-
-
+        // City.GetType().GetFields().ForEach(CreateSetting);
+        SetupCitySwitcher();
     }
 
     /// <summary>
@@ -68,7 +70,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         // gets the view game object
         GameObject view = GetViewGameObjectHelper(memberInfo);
         Transform viewContent = view.transform.Find("Content");
-
+        Debug.Log("\t"+"CreateSetting____ "+ memberInfo.Name);
         // TODO: Instantiate and setup prefabs based on member info
 
         GameObject setting = PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, viewContent, false);
@@ -80,15 +82,40 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
     protected void ClearCity()
     {
-        Entries.ForEach(RemoveEntry);
+        Entries.Reverse().ForEach(RemoveEntry);
     }
-
-
+    
     public void LoadCity(int i)
     {
         City = GameObject.FindGameObjectsWithTag(Tags.CodeCity)[i].GetComponent<AbstractSEECity>();
         City.GetType().GetFields().ForEach(CreateSetting);
     } 
+    
+    public List<GameObject> GetAllCities()
+    {
+        List<GameObject> seeCities = GameObject.FindGameObjectsWithTag(Tags.CodeCity).ToList();
+        return seeCities;
+    } 
+    
+    private void SetupCitySwitcher()
+    {
+        citySwitcher =  GameObject.Find("Horizontal Selector").GetComponent<HorizontalSelector>();
+        citySwitcher.name = "CitySwitcher";
+        citySwitcher.itemList.Clear();
+        List<GameObject> seeCities = GetAllCities();
+        foreach (GameObject city in seeCities)
+        {
+            citySwitcher.CreateNewItem(city.GetComponent<AbstractSEECity>().name);
+        }
+        citySwitcher.defaultIndex = 0;
+        citySwitcher.SetupSelector();
+        citySwitcher.selectorEvent.AddListener(index =>
+        {
+            // Title = citySwitcher.itemList[index].itemTitle;
+            ClearCity();
+            LoadCity(index);
+        });
+    }
 
     /// <summary>
     /// Returns the view game object.
@@ -264,4 +291,6 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         ToggleMenuEntry miscEntry = Entries.FirstOrDefault(entry => entry.Title == "Misc");
         if (miscEntry != null) EntryGameObject(miscEntry).transform.SetAsLastSibling();
     }
+    
+
 }

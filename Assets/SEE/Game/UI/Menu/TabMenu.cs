@@ -95,6 +95,7 @@ namespace SEE.Game.UI.Menu
             OnEntryAdded += AddView;
             OnEntrySelected += ActivateView;
             OnEntryUnselected += DeactivateView;
+            OnEntryRemoved += RemoveView;
         }
 
         /// <summary>
