@@ -581,10 +581,6 @@ namespace SEE.Game
                         spline.Spline = next.EdgeLayout[edge.ID].Spline;
                     }
                     edgeObject.SetActive(true); // Make visible
-                    if (gameObject.TryGetComponent(out EdgeMeshScheduler scheduler))
-                    {
-                        scheduler.Add(edgeObject); // Register for mesh creation
-                    }
                 }
                 if (currentCity != null)
                 {

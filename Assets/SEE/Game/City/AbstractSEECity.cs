@@ -227,10 +227,10 @@ namespace SEE.Game.City
         /// </summary>
         protected virtual void Start()
         {
-            if (!gameObject.TryGetComponent(out EdgeMeshScheduler _))
+            if (LoadedGraph != null && !gameObject.TryGetComponent(out EdgeMeshScheduler _))
             {
                 gameObject.AddComponent<EdgeMeshScheduler>()
-                    .Init(EdgeLayoutSettings, EdgeSelectionSettings);
+                          .Init(EdgeLayoutSettings, EdgeSelectionSettings, LoadedGraph);
             }
         }
 
