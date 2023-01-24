@@ -84,8 +84,6 @@ namespace SEE.Game.UI
                 Canvas.name = UI_CANVAS_NAME;
             }
 
-            HasStarted = true;
-
             // Execute platform dependent code
             Platform = SceneSettings.InputType;
             switch (Platform)
@@ -103,6 +101,7 @@ namespace SEE.Game.UI
                     break;
             }
 
+            HasStarted = true;
         }
 
         protected void Update()

@@ -1,18 +1,17 @@
 using System;
 using System.Linq;
 using DG.Tweening;
-using SEE.GO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace SEE.Game.UI.CodeWindow
+namespace SEE.Game.UI.Window.CodeWindow
 {
     /// <summary>
     /// Represents a movable, scrollable window containing source code.
     /// The source code may either be entered manually or read from a file.
     /// </summary>
-    public partial class CodeWindow : PlatformDependentComponent
+    public partial class CodeWindow : BaseWindow
     {
         /// <summary>
         /// The text displayed in the code window.
@@ -33,7 +32,7 @@ namespace SEE.Game.UI.CodeWindow
         /// <summary>
         /// Whether code issues should be downloaded and added to the shown code.
         /// </summary>
-        public bool ShowIssues = false;
+        public bool ShowIssues;
 
         /// <summary>
         /// The line that was marked (1-indexed). Unlike <see cref="VisibleLine"/>,
@@ -47,30 +46,15 @@ namespace SEE.Game.UI.CodeWindow
         public string SolutionPath;
 
         /// <summary>
-        /// The title (e.g. filename) for the code window.
-        /// </summary>
-        public string Title;
-
-        /// <summary>
         /// Size of the font used in the code window.
         /// </summary>
         public float FontSize = 20f;
 
         /// <summary>
-        /// Resolution of the code window. By default, this is set to a resolution of 900x500.
-        /// </summary>
-        public Vector2 Resolution = new Vector2(900, 500);
-
-        /// <summary>
         /// An event which gets called whenever the scrollbar is used to scroll to a different line.
         /// Will be called after the scroll is completed.
         /// </summary>
-        public readonly UnityEvent ScrollEvent = new UnityEvent();
-
-        /// <summary>
-        /// GameObject containing the actual UI for the code window.
-        /// </summary>
-        public GameObject codeWindow { get; private set; }
+        public readonly UnityEvent ScrollEvent = new();
 
         /// <summary>
         /// Number of lines within the file.
@@ -78,9 +62,14 @@ namespace SEE.Game.UI.CodeWindow
         private int lines;
 
         /// <summary>
-        /// Path to the code canvas prefab.
+        /// Path to the code window content prefab.
         /// </summary>
-        private const string CODE_WINDOW_PREFAB = "Prefabs/UI/CodeWindow";
+        private const string CODE_WINDOW_PREFAB = "Prefabs/UI/CodeWindowContent";
+
+        /// <summary>
+        /// Whether the full text of the code window should be transmitted instead of just the filename.
+        /// </summary>
+        private const bool SYNC_FULL_TEXT = false;
 
         /// <summary>
         /// Visually marks the line at the given <paramref name="lineNumber"/> and scrolls to it.
@@ -90,60 +79,11 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="line">The line number of the line to mark and scroll to (1-indexed)</param>
         private void MarkLine(int lineNumber)
         {
-            this.markedLine = lineNumber;
+            markedLine = lineNumber;
             string[] allLines = TextMesh.text.Split('\n').Select(x => x.EndsWith("</mark>") ? x.Substring(16, x.Length - 16 - 7) : x).ToArray();
-            string markedLine = $"<mark=#ff000044>{allLines[lineNumber - 1]}</mark>\n";
-            TextMesh.text = string.Join("", allLines.Select(x => x + "\n").Take(lineNumber - 1).Append(markedLine)
+            string markLine = $"<mark=#ff000044>{allLines[lineNumber - 1]}</mark>\n";
+            TextMesh.text = string.Join("", allLines.Select(x => x + "\n").Take(lineNumber - 1).Append(markLine)
                                                     .Concat(allLines.Select(x => x + "\n").Skip(lineNumber).Take(lines - lineNumber - 2)));
-        }
-
-        /// <summary>
-        /// Shows or hides the code window, depending on the <see cref="show"/> parameter.
-        /// </summary>
-        /// <param name="show">Whether the code window should be shown.</param>
-        /// <remarks>If this window is used in a <see cref="CodeSpace"/>, this method
-        /// needn't (and shouldn't) be used.</remarks>
-        public void Show(bool show)
-        {
-            switch (Platform)
-            {
-                case PlayerInputType.DesktopPlayer:
-                    ShowDesktop(show);
-                    break;
-                case PlayerInputType.TouchGamepadPlayer:
-                    ShowDesktop(show);
-                    break;
-                case PlayerInputType.VRPlayer:
-                    PlatformUnsupported();
-                    break;
-                case PlayerInputType.None: // nothing needs to be done
-                    break;
-                default:
-                    Debug.LogError($"Platform {Platform} not handled in switch case.\n");
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// When disabling the code window, its controlled UI objects will also be disabled.
-        /// </summary>
-        public void OnDisable()
-        {
-            if (codeWindow)
-            {
-                codeWindow.SetActive(false);
-            }
-        }
-
-        /// <summary>
-        /// When enabling the code window, its controlled UI objects will also be enabled.
-        /// </summary>
-        public void OnEnable()
-        {
-            if (codeWindow)
-            {
-                codeWindow.SetActive(true);
-            }
         }
 
         #region Visible Line Calculation
@@ -242,50 +182,45 @@ namespace SEE.Game.UI.CodeWindow
             }
         }
 
+        public override void RebuildLayout()
+        {
+            RecalculateExcessLines();
+        }
+
         #endregion
 
         #region Value Object
 
-        /// <summary>
-        /// Recreates a <see cref="CodeWindow"/> from the given <paramref name="valueObject"/> and attaches it to
-        /// the GameObject <paramref name="attachTo"/>.
-        /// </summary>
-        /// <param name="valueObject">The value object from which the code window should be constructed</param>
-        /// <param name="attachTo">The game object the code window should be attached to. If <c>null</c>,
-        /// the game object will be attached to the game object with the name specified in the value object.</param>
-        /// <returns>The newly re-constructed code window</returns>
-        /// <exception cref="ArgumentException">When both Text and Path in the <paramref name="valueObject"/>
-        /// are <c>null</c>.</exception>
-        /// <exception cref="InvalidOperationException">If both <paramref name="attachTo"/> is <c>null</c>
-        /// and the game object specified in <paramref name="valueObject"/> can't be found.</exception>
-        public static CodeWindow FromValueObject(CodeWindowValues valueObject, GameObject attachTo = null)
+        protected override void InitializeFromValueObject(WindowValues valueObject)
         {
-            if (attachTo == null)
+            if (valueObject is not CodeWindowValues codeValues)
             {
-                attachTo = GraphElementIDMap.Find(valueObject.AttachedTo);
-                if (attachTo == null)
-                {
-                    throw new InvalidOperationException($"GameObject with name {valueObject} could not be found.\n");
-                }
+                throw new UnsupportedTypeException(typeof(CodeWindowValues), valueObject.GetType());
             }
-
-            CodeWindow window = attachTo.AddComponent<CodeWindow>();
-            if (valueObject.Path != null)
+            
+            if (codeValues.Path != null)
             {
-                window.EnterFromFile(valueObject.Path);
+                EnterFromFile(codeValues.Path);
             }
-            else if (valueObject.Text != null)
+            else if (codeValues.Text != null)
             {
-                window.EnterFromText(valueObject.Text.Split('\n'));
+                EnterFromText(codeValues.Text.Split('\n'));
             }
             else
             {
                 throw new ArgumentException("Invalid value object. Either FilePath or Text must not be null.");
             }
+            VisibleLine = codeValues.VisibleLine;
+        }
 
-            window.Title = valueObject.Title;
-            window.VisibleLine = valueObject.VisibleLine;
-            return window;
+        public override void UpdateFromNetworkValueObject(WindowValues valueObject)
+        {
+            if (valueObject is not CodeWindowValues codeValues)
+            {
+                throw new UnsupportedTypeException(typeof(CodeWindowValues), valueObject.GetType());
+            }
+            VisibleLine = codeValues.VisibleLine;
+            //TODO: Text merge between windowValue.Text and window.Text
         }
 
         /// <summary>
@@ -294,10 +229,10 @@ namespace SEE.Game.UI.CodeWindow
         /// <param name="fulltext">Whether the whole text should be included. Iff false, the filename will be saved
         /// instead of the text.</param>
         /// <returns>The newly created <see cref="CodeWindowValues"/>, matching this class</returns>
-        public CodeWindowValues ToValueObject(bool fulltext)
+        public override WindowValues ToValueObject()
         {
             string attachedTo = gameObject.name;
-            return fulltext
+            return SYNC_FULL_TEXT
                 ? new CodeWindowValues(Title, VisibleLine, attachedTo, Text)
                 : new CodeWindowValues(Title, VisibleLine, attachedTo, path: FilePath);
         }
@@ -307,7 +242,7 @@ namespace SEE.Game.UI.CodeWindow
         /// Used for serialization when sending a <see cref="CodeWindow"/> over the network.
         /// </summary>
         [Serializable]
-        public struct CodeWindowValues
+        public class CodeWindowValues: WindowValues
         {
             /// <summary>
             /// Text of the code window. May be <c>null</c>, in which case <see cref="Path"/> is not <c>null</c>.
@@ -323,22 +258,10 @@ namespace SEE.Game.UI.CodeWindow
             public string Path { get; private set; }
 
             /// <summary>
-            /// Title of the code window.
-            /// </summary>
-            [field: SerializeField]
-            public string Title { get; private set; }
-
-            /// <summary>
             /// The line number which is currently visible in / at the top of the code window.
             /// </summary>
             [field: SerializeField]
             public int VisibleLine { get; private set; }
-
-            [field: SerializeField]
-            /// <summary>
-            /// Name of the game object this code window was attached to.
-            /// </summary>
-            public string AttachedTo { get; private set; }
 
             /// <summary>
             /// Creates a new CodeWindowValues object from the given parameters.
@@ -353,7 +276,7 @@ namespace SEE.Game.UI.CodeWindow
             /// May be <c>null</c>, in which case <paramref name="text"/> may not.</param>
             /// <exception cref="ArgumentException">Thrown when both <paramref name="path"/> and
             /// <paramref name="text"/> are <c>null</c>.</exception>
-            internal CodeWindowValues(string title, int visibleLine, string attachedTo = null, string text = null, string path = null)
+            internal CodeWindowValues(string title, int visibleLine, string attachedTo = null, string text = null, string path = null) : base(title, attachedTo)
             {
                 if (text == null && path == null)
                 {
@@ -362,8 +285,6 @@ namespace SEE.Game.UI.CodeWindow
 
                 Text = text;
                 Path = path;
-                AttachedTo = attachedTo;
-                Title = title;
                 VisibleLine = visibleLine;
             }
         }
