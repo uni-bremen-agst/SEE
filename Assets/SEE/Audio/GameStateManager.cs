@@ -3,26 +3,43 @@ using UnityEngine.SceneManagement;
 namespace SEE.Audio
 {
     /// <summary>
-    /// Defines the different game states that music can be played for.
+    /// Determines the different types of scenes that music can be played for.
     /// </summary>
     public static class GameStateManager
     {
         /// <summary>
-        /// Returns the game state enum for a given scene.
+        /// The name of the scene to start the game, i.e., the one in which the
+        /// user can configure the network configuration and enter the game.
+        /// </summary>
+        const string StartScene = "SEEStart";
+
+        /// <summary>
+        /// Returns <see cref="SceneType.LOBBY"/> if <paramref name="scene"/>
+        /// is the <see cref="StartScene"/> or otherwise <see cref="SceneType.IN_GAME"/>.
         /// </summary>
         /// <param name="scene">The currently loaded scene.</param>
         /// <returns>A game state enum for the given scene.</returns>
-        public static GameState GetBySceneName(Scene scene) => scene.name switch
+        public static SceneType GetBySceneName(Scene scene) => scene.name switch
         {
-            _ => GameState.IN_GAME,
+            StartScene => SceneType.LOBBY,
+            _          => SceneType.IN_GAME,
         };
 
         /// <summary>
-        /// Avaible game states.
+        /// Available types of scenes.
         /// </summary>
-        public enum GameState 
+        public enum SceneType
         {
-            LOBBY, IN_GAME
+            /// <summary>
+            /// Whether a player is currently in the "lobby", i.e, the scene in
+            /// which the user can select the network configuration.
+            /// </summary>
+            LOBBY,
+            /// <summary>
+            /// Whether a player is in a scene in which he/she can interact
+            /// with code cities and other players.
+            /// </summary>
+            IN_GAME
         }
     }
 }

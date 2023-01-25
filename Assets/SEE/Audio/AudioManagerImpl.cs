@@ -111,7 +111,7 @@ namespace SEE.Audio
         /// <summary>
         /// Stores the previous scene name.
         /// </summary>
-        private GameState previousGameState;
+        private SceneType previousGameState;
 
         /// <summary>
         /// Queue of music tracks to be played by the audio manager.
@@ -127,7 +127,7 @@ namespace SEE.Audio
         /// Singleton instance
         /// </summary>
         private static AudioManagerImpl instance = null;
-        
+
         /// <summary>
         /// Stores the current state of the music player.
         /// </summary>
@@ -225,7 +225,7 @@ namespace SEE.Audio
                     try
                     {
                         audioGameObject.Update();
-                    } 
+                    }
                     catch
                     {
                         // Block executed when referenced element no longer exists in scene.
@@ -264,7 +264,7 @@ namespace SEE.Audio
         /// <returns>True if the scene was changed, false otherwise.</returns>
         private bool CheckSceneChanged()
         {
-            GameState currentScene = GameStateManager.GetBySceneName(SceneManager.GetActiveScene());
+            SceneType currentScene = GameStateManager.GetBySceneName(SceneManager.GetActiveScene());
             if (currentScene != previousGameState)
             {
                 previousGameState = currentScene;
@@ -393,9 +393,9 @@ namespace SEE.Audio
         /// Adds a new music track to the music queue.
         /// </summary>
         /// <param name="gameState">The current game state.</param>
-        public void QueueMusic(GameState gameState)
+        public void QueueMusic(SceneType gameState)
         {
-            musicQueue.Enqueue(GetAudioClipFromMusicName(gameState == GameState.LOBBY ? Music.LOBBY_MUSIC : Music.LOBBY_MUSIC));
+            musicQueue.Enqueue(GetAudioClipFromMusicName(gameState == SceneType.LOBBY ? Music.LOBBY_MUSIC : Music.LOBBY_MUSIC));
         }
 
         /// <summary>
@@ -495,7 +495,7 @@ namespace SEE.Audio
                 soundEffectGameObjects.Add(controlObject);
             }
             controlObject.EnqueueSoundEffect(GetAudioClipFromSoundEffectName(soundEffect));
-            if (!sendToClients && !GameState.LOBBY.Equals(previousGameState))
+            if (!sendToClients && !SceneType.LOBBY.Equals(previousGameState))
             {
                 new SoundEffectNetAction(soundEffect, sourceObject.gameObject.name).Execute();
             }
