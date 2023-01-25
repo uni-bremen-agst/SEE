@@ -271,7 +271,7 @@ namespace SEE.Game.Avatars
             ReplaceAnimator();
             SetupVRIK();
             PrepareLipTracker();
-            InitializeVRIkRemote();
+            InitializeVrikRemote();
 
             /// <summary>
             /// Sets up the scene for playing in an VR environment. This means to instantiate the
@@ -384,7 +384,7 @@ namespace SEE.Game.Avatars
                 }
             }
 
-            void InitializeVRIkRemote()
+            void InitializeVrikRemote()
             {
                 gameObject.AddComponent<VRIKSynchronizer>();
             }

@@ -27,7 +27,7 @@ namespace SEE.Net.Actions
         
         private void Synchronize()
         {
-            new VRIkNetAction(NetworkObject.NetworkObjectId).Execute();
+            new VRIKNetAction(NetworkObject.NetworkObjectId).Execute();
         }
         
     }

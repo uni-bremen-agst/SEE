@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace SEE.Net.Actions
 {
-    public class VRIkNetAction : AbstractNetAction
+    public class VRIKNetAction : AbstractNetAction
     {
         /// <summary>
         /// The network object ID of the spawned avatar. Not to be confused
@@ -17,14 +17,13 @@ namespace SEE.Net.Actions
         /// </summary>
         public ulong NetworkObjectID;
         
-        public VRIkNetAction(ulong networkObjectID)
+        public VRIKNetAction(ulong networkObjectID)
         {
             NetworkObjectID = networkObjectID;
         }
         
         /// <summary>
-        /// If executed by the initiating client, nothing happens. Otherwise the values of the
-        /// <see cref="UMAExpressionPlayer"/> are transmitted.
+        /// If executed by the initiating client, nothing happens.
         /// </summary>
         protected override void ExecuteOnClient()
         {
