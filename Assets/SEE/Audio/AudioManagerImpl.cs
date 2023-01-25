@@ -17,6 +17,11 @@ namespace SEE.Audio
         public AudioClip LobbyMusic;
 
         /// <summary>
+        /// The music played in all scenes other than the lobby scene.
+        /// </summary>
+        public AudioClip GameMusic;        
+
+        /// <summary>
         /// The sound effect played when clicking objects.
         /// </summary>
         public AudioClip ClickSoundEffect;
@@ -395,10 +400,7 @@ namespace SEE.Audio
         /// <param name="sceneType">The current type of scene.</param>
         public void QueueMusic(SceneType sceneType)
         {
-            // TODO: Currently we have only one kind of music. If the ambient music
-            // of the start scene and the game scene differs, we need to update this
-            // expression.
-            musicQueue.Enqueue(GetAudioClipFromMusicName(sceneType == SceneType.LOBBY ? Music.LOBBY_MUSIC : Music.LOBBY_MUSIC));
+            musicQueue.Enqueue(GetAudioClipFromMusicName(sceneType == SceneType.LOBBY ? Music.LOBBY_MUSIC : Music.WORLD_MUSIC));
         }
 
         /// <summary>
@@ -498,9 +500,9 @@ namespace SEE.Audio
                 soundEffectGameObjects.Add(controlObject);
             }
             controlObject.EnqueueSoundEffect(GetAudioClipFromSoundEffectName(soundEffect));
-            if (!sendToClients && !SceneType.LOBBY.Equals(previousGameState))
+            if (!sendToClients && previousGameState != SceneType.LOBBY)
             {
-                new SoundEffectNetAction(soundEffect, sourceObject.gameObject.name).Execute();
+                new SoundEffectNetAction(soundEffect, sourceObject.name).Execute();
             }
         }
 
@@ -544,10 +546,9 @@ namespace SEE.Audio
         /// <returns>An AudioSource matching the given enum music name.</returns>
         private AudioClip GetAudioClipFromMusicName(Music music) => music switch
         {
-            // TODO: If we have two different types of music for the two
-            // different types of scene, we need to update this expression.
             Music.LOBBY_MUSIC => LobbyMusic,
-            _ => LobbyMusic,
+            Music.WORLD_MUSIC => GameMusic,
+            _ => throw new System.Exception($"Unhandled {music}."),
         };
 
         /// <summary>

@@ -141,7 +141,11 @@ namespace SEE.Audio
             /// <summary>
             /// The lobby music.
             /// </summary>
-            LOBBY_MUSIC 
+            LOBBY_MUSIC,
+            /// <summary>
+            /// The music played during the actual game.
+            /// </summary>
+            WORLD_MUSIC
         }
     }
 }

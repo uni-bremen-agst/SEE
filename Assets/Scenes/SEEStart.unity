@@ -381,6 +381,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LobbyMusic: {fileID: 8300000, guid: eef5dbc87c6cbf6449787ad35af840b1, type: 3}
+  GameMusic: {fileID: 8300000, guid: 1c87e6a7c7d35ca4ea295d8531c98b42, type: 3}
   ClickSoundEffect: {fileID: 8300000, guid: a092ab5087ce67749ab5121218736ace, type: 3}
   DropSoundEffect: {fileID: 8300000, guid: 4ab55c9906a8ca24d9a845a535f56fac, type: 3}
   PickSoundEffect: {fileID: 8300000, guid: 20b92014b4d721e4887d2d3ce57031a7, type: 3}
