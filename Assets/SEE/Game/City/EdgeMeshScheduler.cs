@@ -1,8 +1,10 @@
-﻿using Sirenix.OdinInspector;
+﻿using System;
+using Sirenix.OdinInspector;
 using SEE.GO;
 using SEE.Utils;
-using System.Collections;
 using System.Collections.Generic;
+using SEE.DataModel;
+using SEE.DataModel.DG;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -13,18 +15,18 @@ namespace SEE.Game.City
     /// lead to massive performance issues (see <see cref="SEESpline"/> for
     /// more details on spline meshes). It is therefore necessary to
     /// coordinate the creation of the meshes centrally. This class serves as
-    /// some sort of "scheduler" (or "driver") that takes on this task. It
-    /// stores a queue of edges whose mesh needs to be created. Each frame, a
+    /// some sort of "scheduler" (or "driver") that takes on this task per city.
+    /// It stores a queue of edges whose mesh needs to be created. Each frame, a
     /// fixed number of edges (<see cref="EdgesPerFrame"/>) is taken from the
     /// queue and processed (using <see cref="SEESpline.CreateMesh"/>; note
     /// that this also removes the <see cref="LineRenderer"/> of the edge).
-    /// New edges can be registered from anywhere at any time via
-    /// <see cref="Add(GameObject)"/>.
+    /// New edges are registered automatically whenever a new edge is added
+    /// to the graph assigned to this scheduler.
     ///
     /// Note: This component needs to be initialized via
-    /// <see cref="Init(EdgeLayoutAttributes, EdgeSelectionAttributes)"/>.
+    /// <see cref="Init(EdgeLayoutAttributes, EdgeSelectionAttributes, Graph)"/>.
     /// </summary>
-    internal class EdgeMeshScheduler : SerializedMonoBehaviour
+    internal class EdgeMeshScheduler : SerializedMonoBehaviour, IObserver<ChangeEvent>
     {
         /// <summary>
         /// Number of edges to be processed in each frame (i.e., when
@@ -38,7 +40,7 @@ namespace SEE.Game.City
         /// Edges to be processed. New edges can be registered with
         /// <see cref="Add(GameObject)"/>.
         /// </summary>
-        private readonly Queue<GameObject> edges = new Queue<GameObject>();
+        private readonly Queue<Edge> edges = new();
 
         /// <summary>
         /// Layout settings.
@@ -57,58 +59,64 @@ namespace SEE.Game.City
         /// </summary>
         /// <param name="layoutSettings">Layout settings</param>
         /// <param name="selectionSettings">Selection settings</param>
+        /// <param name="graph">Graph on which to listen for new edges</param>
         public void Init(
             EdgeLayoutAttributes layoutSettings,
-            EdgeSelectionAttributes selectionSettings)
+            EdgeSelectionAttributes selectionSettings,
+            Graph cityGraph)
         {
             layout = layoutSettings.AssertNotNull("layoutSettings");
             selection = selectionSettings.AssertNotNull("selectionSettings");
+            Graph graph = cityGraph.AssertNotNull("City Graph");
+            graph.Subscribe(this);
+            
+            // When we're initialized, we also convert all existing edges into meshes first.
+            graph.Edges().ForEach(edges.Enqueue);
         }
 
         /// <summary>
-        /// Registers the given edge object for mesh creation. If
-        /// <paramref name="edge"/> already has a mesh (i.e., a
-        /// <see cref="MeshFilter"/> is attached to it), it is ignored.
-        /// Likewise, if <paramref name="edge"/> is null, nothing happens.
+        /// Returns the corresponding GameObject for the given <paramref name="edge"/>.
+        /// If <paramref name="edge"/> already has a mesh (i.e., a
+        /// <see cref="MeshFilter"/> is attached to it), null is returned.
+        /// Likewise, if <paramref name="edge"/> is not associated with any
+        /// game object, null is returned.
         /// </summary>
         /// <param name="edge">Edge to be registered</param>
-        public void Add(GameObject edge)
+        /// <returns>Corresponding GameObject or null if edge can be ignored</returns>
+        private static GameObject GetGameEdge(Edge edge)
         {
-            if (edge != null && !edge.TryGetComponent(out MeshFilter _))
+            GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
+            if (gameEdge == null)
             {
-                edges.Enqueue(edge);
+                Debug.LogWarning($"No GameObject for Spline {edge.ToShortString()}. Ignoring.\n");
             }
-        }
-
-        /// <summary>
-        /// Called once per frame. Starts <see cref="CreateMeshes"/> as
-        /// coroutine (<see cref="MonoBehaviour.StartCoroutine(IEnumerator)"/>).
-        /// </summary>
-        private void Update()
-        {
-            StartCoroutine(CreateMeshes());
-        }
-
-        /// <summary>
-        /// Processes the next (up to) <see cref="EdgesPerFrame"/> edges. This
-        /// method is started as coroutine by <see cref="Update"/>. For more
-        /// details on coroutines, please have a look at:
-        ///
-        ///     https://docs.unity3d.com/Manual/Coroutines.html
-        /// </summary>
-        /// <returns>enumerate as to whether to continue</returns>
-        private IEnumerator CreateMeshes()
-        {
-            for (int i = 0; i < EdgesPerFrame; i++)
+            else if (!gameEdge.TryGetComponent(out MeshFilter _))
             {
-                if (edges.Count == 0)
+                return gameEdge;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Processes the next (up to) <see cref="EdgesPerFrame"/> edges.
+        private void LateUpdate()
+        {
+            // We will loop until either we converted `EdgesPerFrame` many edges,
+            // or until there are no further edges to convert to meshes.
+            int remaining = Mathf.Min(edges.Count, EdgesPerFrame);
+            for (int i = 0; i < remaining; i++)
+            {
+                Edge edge = edges.Dequeue();
+                GameObject gameEdge = GetGameEdge(edge);
+                if (gameEdge == null)
                 {
-                    break;
+                    // Edge doesn't exist or is already a mesh. See `GetGameEdge`.
+                    continue;
                 }
-                GameObject edge = edges.Dequeue();
 
                 // fail-safe
-                if (!edge.TryGetComponent(out SEESpline spline))
+                if (!gameEdge.TryGetComponent(out SEESpline spline))
                 {
                     Debug.LogWarning("Game object without SEESpline component. Ignoring.\n");
                     continue;
@@ -136,8 +144,28 @@ namespace SEE.Game.City
                 }
 
                 spline.CreateMesh();
-                yield return null;
             }
+        }
+
+        public void OnCompleted()
+        {
+            Destroyer.Destroy(this);
+        }
+
+        public void OnError(Exception error)
+        {
+            // We don't care. Someone else should handle the error.
+        }
+
+        public void OnNext(ChangeEvent value)
+        {
+            if (value is EdgeEvent { Change: ChangeType.Addition } edgeEvent)
+            {
+                // If this is an added edge, we are going to need to turn it into a mesh.
+                edges.Enqueue(edgeEvent.Edge);
+            }
+            
+            // We don't care about other event types.
         }
     }
 }
