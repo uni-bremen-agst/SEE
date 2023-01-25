@@ -1,3 +1,4 @@
+using SEE.GO;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -34,11 +35,11 @@ namespace SEE.Audio
         /// Default Constructor
         /// </summary>
         /// <param name="attachedObject">The game object this audio management object is attached to.</param>
+        /// <param name="defaultVolume">The default audio volume</param>
         public AudioGameObject(GameObject attachedObject, float defaultVolume = 1.0f)
         {
             AttachedObject = attachedObject;
-            AttachedObject.AddComponent<AudioSource>();
-            AttachedObject.GetComponent<AudioSource>().volume = defaultVolume;
+            AttachedObject.AddOrGetComponent<AudioSource>().volume = defaultVolume;
         }
 
         /// <summary>
@@ -75,7 +76,7 @@ namespace SEE.Audio
         }
 
         /// <summary>
-        /// If no sound is playing, the next sound is played. This method is called 
+        /// If no sound is playing, the next sound is played. This method is called
         /// by the global audio manager.
         /// </summary>
         public void Update()
