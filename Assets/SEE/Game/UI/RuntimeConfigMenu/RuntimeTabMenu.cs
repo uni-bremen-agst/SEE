@@ -1,9 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Michsky.UI.ModernUIPack;
 using SEE.DataModel;
+using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.UI.Menu;
 using SEE.Layout.NodeLayouts.Cose;
@@ -22,7 +24,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     public const string SWITCH_PREFAB = UI_PREFAB_FOLDER + "Input Group - Switch";
     public const string FILEPICKER_PREFAB = UI_PREFAB_FOLDER + "Input Group - File Picker";
     public const string SLIDER_PREFAB = UI_PREFAB_FOLDER + "Input Group - Slider";
-
+    public const string DROPDOWN_PREFAB = UI_PREFAB_FOLDER + "Input Group - Dropdown";
+    public const string COLORPICKER_PREFAB = UI_PREFAB_FOLDER + "Input Group - Color Picker";
     protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenuRework";
     protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsView";
     protected override string EntryPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeTabButton";
@@ -158,6 +161,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             object value = fieldInfo.GetValue(obj);
             // This is how to set the value:
             // fieldInfo.SetValue(City, value);
+
+            // TODO: Add action
             if (value is FilePath)
             {
                 CreateFilePicker(fieldInfo, parent);
@@ -174,16 +179,30 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             {
                 CreateSwitch(memberInfo, changedValue => fieldInfo.SetValue(obj, changedValue), b, parent);
             }
+            // TODO: Add action
             else if (value is string s)
             {
                 CreateStringField(memberInfo, parent);
             }
-
-            // TODO: enum (byte)
-
-            // TODO: colorPicker
-
-
+            // TODO: Add action
+            else if (value is Color c)
+            {
+                CreateColorPicker(memberInfo, parent);
+            }
+            // TODO: Add action
+            else if (value is UInt32 ui)
+            {
+                CreateSlider(memberInfo, changedValue => fieldInfo.SetValue(obj, (int)changedValue), ((int) ui), true, parent);
+            }
+            // TODO: Add action
+            else if (value is   
+                    NodeShapes or
+                    NodeLayoutKind or
+                    EdgeLayoutKind or
+                    PropertyKind)
+            {
+                CreateDropDown(memberInfo, parent);
+            }
             else if (value is NodeTypeVisualsMap nodeTypeVisualsMap)
             {
                 /*nodeTypeVisualsMap.Values.ForEach(nodeType =>
@@ -204,14 +223,59 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                      CoseGraphAttributes or 
                      EdgeSelectionAttributes or 
                      ErosionAttributes or 
-                     BoardAttributes)
+                     BoardAttributes or
+                     AntennaAttributes or
+                     LabelAttributes or
+                     ColorProperty)
             {
                 value.GetType().GetMembers().ForEach(attribute => CreateSettingObject(attribute, parent, value));
             }
-            // TODO: HashSet
-
-            // TODO: ColorMap
-
+            else if (value is HashSet<string> hs)
+            {
+                foreach(string str in hs)
+                {
+                    str.GetType().GetMembers().ForEach(stringvalue => CreateSettingObject(stringvalue, parent, value));   
+                }
+            }
+            else if (value is List<string> l)
+            {
+                foreach (string str in l)
+                {
+                    str.GetType().GetMembers().ForEach(stringvalue => CreateSettingObject(stringvalue, parent, value));
+                }
+            }
+            else if (value is Dictionary<string, NodeShapes> dictshapes)
+            {
+                foreach (string key in dictshapes.Keys)
+                {
+                    dictshapes[key].GetType().GetMembers().ForEach(nodeshape => CreateSettingObject(nodeshape, parent, value));
+                }
+            }
+            else if (value is Dictionary<string, NodeLayoutKind> dictkind)
+            {
+                foreach (string key in dictkind.Keys)
+                {
+                    dictkind[key].GetType().GetMembers().ForEach(kind => CreateSettingObject(kind, parent, value));
+                }
+            }
+            else if (value is Dictionary<string, Boolean> dictbool)
+            {
+                foreach (string key in dictbool.Keys)
+                {
+                    dictbool[key].GetType().GetMembers().ForEach(boolean => CreateSettingObject(boolean, parent, value));
+                }
+            }
+            else if (value is ColorMap cm)
+            {
+                var enumerator = cm.GetEnumerator();
+                while (enumerator.MoveNext())
+                {
+                    GameObject colorRange = PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, parent.transform, false);
+                    colorRange.name = enumerator.Current.Key;
+                    colorRange.GetComponentInChildren<TextMeshProUGUI>().text = enumerator.Current.Key;
+                    enumerator.Current.Value.GetType().GetMembers().ForEach(nestedMember => CreateSettingObject(nestedMember, colorRange.transform.Find("Content").gameObject, enumerator.Current.Value));
+                }
+            }
             else
             {
                 Debug.Log("Unknown Setting Type: " + memberInfo.ToString());
@@ -267,12 +331,17 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         });
     }
 
+    // TODO: Add action
     private void CreateFilePicker(MemberInfo memberInfo, GameObject parent)
     {
         GameObject filePickerGameObject =
             PrefabInstantiator.InstantiatePrefab(FILEPICKER_PREFAB, parent.transform, false);
+        TextMeshProUGUI text = filePickerGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
+        text.text = memberInfo.Name;
     }
 
+    // TODO: Replace with actual string field prefab
+    // TODO: Add action
     private void CreateStringField(MemberInfo memberInfo, GameObject parent)
     {
         GameObject switchGameObject =
@@ -281,7 +350,23 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         text.text = memberInfo.Name;
     }
 
-    // TODO: colorpicker
+    // TODO: Add action
+    private void CreateDropDown(MemberInfo memberInfo, GameObject parent)
+    {
+        GameObject dropDownGameObject =
+            PrefabInstantiator.InstantiatePrefab(DROPDOWN_PREFAB, parent.transform, false);
+        TextMeshProUGUI text = dropDownGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
+        text.text = memberInfo.Name;
+    }
+
+    // TODO: Add action
+    private void CreateColorPicker(MemberInfo  memberInfo, GameObject parent)
+    {
+        GameObject colorPickerGameObject =
+            PrefabInstantiator.InstantiatePrefab(COLORPICKER_PREFAB, parent.transform, false);
+        TextMeshProUGUI text = colorPickerGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
+        text.text = memberInfo.Name;
+    }
     
     /// <summary>
     /// Sets the misc button as the last in the tab list.
