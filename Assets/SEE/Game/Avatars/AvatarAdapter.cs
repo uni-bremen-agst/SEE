@@ -69,18 +69,6 @@ namespace SEE.Game.Avatars
 
                 gameObject.name = "Local " + gameObject.name;
             }
-            else if (!IsLocalPlayer && SceneSettings.InputType == PlayerInputType.VRPlayer)
-            {
-                gameObject.name = "Remote " + gameObject.name;
-                
-                if (gameObject.TryGetComponentOrLog(out VRIK vrIK))
-                {
-                    vrIK.enabled = true;
-                }
-                
-                // Remote players need to be set up for Dissonance and SALSA lip sync.
-                StartCoroutine(SetUpSALSA());
-            }
             else
             {
                 gameObject.name = "Remote " + gameObject.name;
@@ -89,7 +77,7 @@ namespace SEE.Game.Avatars
             }
             EnableLocalControl(IsLocalPlayer);
         }
-
+        
         /// <summary>
         /// Enables/disables local control of the aiming system of the avatar.
         /// </summary>
@@ -283,6 +271,7 @@ namespace SEE.Game.Avatars
             ReplaceAnimator();
             SetupVRIK();
             PrepareLipTracker();
+            InitializeVRIkRemote();
 
             /// <summary>
             /// Sets up the scene for playing in an VR environment. This means to instantiate the
@@ -393,6 +382,11 @@ namespace SEE.Game.Avatars
                         Debug.LogError($"Could not load the animation controller at '{AnimatorForVRIK}.'\n");
                     }
                 }
+            }
+
+            void InitializeVRIkRemote()
+            {
+                gameObject.AddComponent<VRIKSynchronizer>();
             }
 
             // Set up FinalIK's VR IK on the avatar.
