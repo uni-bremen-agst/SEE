@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static SEE.Audio.IAudioManager;
-using static SEE.Audio.GameStateManager;
+using static SEE.Audio.SceneContext;
 
 namespace SEE.Audio
 {
@@ -168,7 +168,7 @@ namespace SEE.Audio
             instance = this; // required since a mono behaviour object cannot be instantiated.
             AttachAudioPlayer();
             InitializeSoundEffectPlayer();
-            previousGameState = GameStateManager.GetBySceneName(SceneManager.GetActiveScene());
+            previousGameState = SceneContext.GetSceneType(SceneManager.GetActiveScene());
             QueueMusic();
         }
 
@@ -264,7 +264,7 @@ namespace SEE.Audio
         /// <returns>True if the scene was changed, false otherwise.</returns>
         private bool CheckSceneChanged()
         {
-            SceneType currentScene = GameStateManager.GetBySceneName(SceneManager.GetActiveScene());
+            SceneType currentScene = SceneContext.GetSceneType(SceneManager.GetActiveScene());
             if (currentScene != previousGameState)
             {
                 previousGameState = currentScene;

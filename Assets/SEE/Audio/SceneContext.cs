@@ -5,7 +5,7 @@ namespace SEE.Audio
     /// <summary>
     /// Determines the different types of scenes that music can be played for.
     /// </summary>
-    public static class GameStateManager
+    public static class SceneContext
     {
         /// <summary>
         /// The name of the scene to start the game, i.e., the one in which the
@@ -19,7 +19,7 @@ namespace SEE.Audio
         /// </summary>
         /// <param name="scene">The currently loaded scene.</param>
         /// <returns>A game state enum for the given scene.</returns>
-        public static SceneType GetBySceneName(Scene scene) => scene.name switch
+        public static SceneType GetSceneType(Scene scene) => scene.name switch
         {
             StartScene => SceneType.LOBBY,
             _          => SceneType.IN_GAME,
