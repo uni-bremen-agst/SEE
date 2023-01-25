@@ -152,11 +152,11 @@ namespace SEE.Audio
         /// </summary>
         private void AttachAudioPlayer()
         {
-            this.PlayerObject.AddComponent<AudioSource>();
-            this.musicPlayer = this.PlayerObject.GetComponent<AudioSource>();
-            this.MusicVolume = this.DefaultMusicVolume;
-            this.SoundEffectVolume = this.DefaultSoundEffectVolume;
-            this.musicPlayer.volume = this.MusicVolume;
+            PlayerObject.AddComponent<AudioSource>();
+            musicPlayer = PlayerObject.GetComponent<AudioSource>();
+            MusicVolume = DefaultMusicVolume;
+            SoundEffectVolume = DefaultSoundEffectVolume;
+            musicPlayer.volume = MusicVolume;
         }
 
         /// <summary>
@@ -278,8 +278,8 @@ namespace SEE.Audio
         /// </summary>
         private void TriggerVolumeChanges()
         {
-            this.musicPlayer.volume = this.MusicVolume;
-            this.soundEffectPlayer.volume = this.SoundEffectVolume;
+            musicPlayer.volume = MusicVolume;
+            soundEffectPlayer.volume = SoundEffectVolume;
             foreach (AudioGameObject audioGameObject in soundEffectGameObjects)
             {
                 audioGameObject.ChangeVolume(SoundEffectVolume);
@@ -329,7 +329,7 @@ namespace SEE.Audio
         /// </summary>
         private void QueueMusic()
         {
-            this.QueueMusic(previousGameState);
+            QueueMusic(previousGameState);
         }
 
         /// <summary>
@@ -349,9 +349,9 @@ namespace SEE.Audio
         /// </summary>
         public void IncreaseSoundEffectVolume()
         {
-            if (this.SoundEffectVolume <= 0.9f)
+            if (SoundEffectVolume <= 0.9f)
             {
-                this.SoundEffectVolume += 0.1f;
+                SoundEffectVolume += 0.1f;
                 TriggerVolumeChanges();
             }
         }
@@ -361,7 +361,7 @@ namespace SEE.Audio
         /// </summary>
         public void MuteMusic()
         {
-            this.musicVolumeBeforeMute = MusicVolume;
+            musicVolumeBeforeMute = MusicVolume;
             MusicVolume = 0;
             TriggerVolumeChanges();
             PauseMusic();
@@ -372,8 +372,8 @@ namespace SEE.Audio
         /// </summary>
         public void MuteSoundEffects()
         {
-            this.soundEffectVolumeBeforeMute = SoundEffectVolume;
-            this.SoundEffectVolume = 0;
+            soundEffectVolumeBeforeMute = SoundEffectVolume;
+            SoundEffectVolume = 0;
             TriggerVolumeChanges();
         }
 
@@ -382,20 +382,23 @@ namespace SEE.Audio
         /// </summary>
         public void PauseMusic()
         {
-            if (this.musicPlayer.isPlaying)
+            if (musicPlayer.isPlaying)
             {
-                this.musicPlayer.Pause();
-                this.musicPaused = true;
+                musicPlayer.Pause();
+                musicPaused = true;
             }
         }
 
         /// <summary>
         /// Adds a new music track to the music queue.
         /// </summary>
-        /// <param name="gameState">The current game state.</param>
-        public void QueueMusic(SceneType gameState)
+        /// <param name="sceneType">The current type of scene.</param>
+        public void QueueMusic(SceneType sceneType)
         {
-            musicQueue.Enqueue(GetAudioClipFromMusicName(gameState == SceneType.LOBBY ? Music.LOBBY_MUSIC : Music.LOBBY_MUSIC));
+            // TODO: Currently we have only one kind of music. If the ambient music
+            // of the start scene and the game scene differs, we need to update this
+            // expression.
+            musicQueue.Enqueue(GetAudioClipFromMusicName(sceneType == SceneType.LOBBY ? Music.LOBBY_MUSIC : Music.LOBBY_MUSIC));
         }
 
         /// <summary>
@@ -453,9 +456,9 @@ namespace SEE.Audio
         /// <param name="soundEffect">The sound effect to play.</param>
         public void QueueSoundEffect(SoundEffect soundEffect)
         {
-            this.soundEffectPlayer.Stop();
-            this.soundEffectPlayer.clip = GetAudioClipFromSoundEffectName(soundEffect);
-            this.soundEffectPlayer.Play();
+            soundEffectPlayer.Stop();
+            soundEffectPlayer.clip = GetAudioClipFromSoundEffectName(soundEffect);
+            soundEffectPlayer.Play();
         }
 
         /// <summary>
@@ -541,6 +544,8 @@ namespace SEE.Audio
         /// <returns>An AudioSource matching the given enum music name.</returns>
         private AudioClip GetAudioClipFromMusicName(Music music) => music switch
         {
+            // TODO: If we have two different types of music for the two
+            // different types of scene, we need to update this expression.
             Music.LOBBY_MUSIC => LobbyMusic,
             _ => LobbyMusic,
         };
@@ -552,17 +557,17 @@ namespace SEE.Audio
         /// <returns>An AudioSource matching the given enum sound effect name.</returns>
         private AudioClip GetAudioClipFromSoundEffectName(SoundEffect soundEffect) => soundEffect switch
         {
-            SoundEffect.CLICK_SOUND => this.ClickSoundEffect,
-            SoundEffect.DROP_SOUND => this.DropSoundEffect,
-            SoundEffect.OKAY_SOUND => this.OkayButtonSoundEffect,
-            SoundEffect.PICKUP_SOUND => this.PickSoundEffect,
-            SoundEffect.NEW_EDGE_SOUND => this.NewEdgeSoundEffect,
-            SoundEffect.NEW_NODE_SOUND => this.NewNodeSoundEffect,
-            SoundEffect.WALKING_SOUND => this.FootstepSoundEffect,
-            SoundEffect.CANCEL_SOUND => this.CancelButtonSoundEffect,
-            SoundEffect.SCRIBBLE => this.ScribbleSoundEffect,
-            SoundEffect.HOVER_SOUND => this.HoverSoundEffect,
-            _ => this.ClickSoundEffect,
+            SoundEffect.CLICK_SOUND => ClickSoundEffect,
+            SoundEffect.DROP_SOUND => DropSoundEffect,
+            SoundEffect.OKAY_SOUND => OkayButtonSoundEffect,
+            SoundEffect.PICKUP_SOUND => PickSoundEffect,
+            SoundEffect.NEW_EDGE_SOUND => NewEdgeSoundEffect,
+            SoundEffect.NEW_NODE_SOUND => NewNodeSoundEffect,
+            SoundEffect.WALKING_SOUND => FootstepSoundEffect,
+            SoundEffect.CANCEL_SOUND => CancelButtonSoundEffect,
+            SoundEffect.SCRIBBLE => ScribbleSoundEffect,
+            SoundEffect.HOVER_SOUND => HoverSoundEffect,
+            _ => ClickSoundEffect,
         };
     }
 }
