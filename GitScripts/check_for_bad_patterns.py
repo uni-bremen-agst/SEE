@@ -76,6 +76,15 @@ BAD_PATTERNS = [
         suggestion=r"\1.Execute()\2",
         level=Level.ERROR,
     ),
+    BadPattern(
+        re.compile(r"(^\s*ActionManifestFileRelativeFilePath: StreamingAssets)\/SteamVR\/actions\.json(\s*)$"),
+        """Slashes were unnecessarily changed to forward slashes.
+This happens on Linux systems automatically, but Windows systems will change this back.
+We should just leave it as a backslash.""",
+        suggestion=r"\1\SteamVR\actions.json\2",
+        extensions=["asset"],
+        level=Level.WARN
+    )
 ]
 
 # *** MODIFY ABOVE TO ADD NEW BAD PATTERNS ***
