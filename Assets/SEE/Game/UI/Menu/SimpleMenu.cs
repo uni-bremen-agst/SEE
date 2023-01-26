@@ -6,6 +6,7 @@ using SEE.GO;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Windows.Speech;
+using SEE.Audio;
 
 namespace SEE.Game.UI.Menu
 {
@@ -372,6 +373,7 @@ namespace SEE.Game.UI.Menu
         /// <param name="entry">The entry which was selected.</param>
         protected virtual void OnEntrySelected(T entry)
         {
+            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.CLICK_SOUND);
             entry.DoAction?.Invoke();
             OnMenuEntrySelected.Invoke(entry);
         }
