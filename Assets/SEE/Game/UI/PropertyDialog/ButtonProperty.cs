@@ -22,7 +22,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// <summary>
         /// EventFunction that is triggered when the button is pressed.
         /// </summary>
-        public readonly UnityEvent OnSelected = new UnityEvent();
+        public readonly UnityEvent OnSelected = new();
 
         /// <summary>
         /// Instantiation of the prefab <see cref="ButtonPrefab"/>.

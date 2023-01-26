@@ -14,12 +14,12 @@ namespace SEE.Game.UI.PropertyDialog
     public class SelectionProperty : Property<string>
     {
 
-        public void AddOptions(ICollection<string> options)
+        public void AddOptions(IEnumerable<string> options)
         {
             this.options.AddRange(options);
         }
 
-        private readonly List<string> options = new List<string>();
+        private readonly List<string> options = new();
 
         /// <summary>
         /// The prefab for a string input field.
