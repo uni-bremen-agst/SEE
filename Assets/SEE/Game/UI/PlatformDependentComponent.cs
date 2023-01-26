@@ -45,7 +45,9 @@ namespace SEE.Game.UI
         /// <summary>
         /// Whether the <see cref="Start"/> method of this component has already been called.
         /// </summary>
-        protected bool HasStarted { get; private set; } = false;
+        /// <remarks>Note that this will only be set to true <em>after</em> the Start method has been called.
+        /// If you check this property from within your component's start method, it will still be false.</remarks>
+        protected bool HasStarted { get; private set; }
 
         /// <summary>
         /// Called when the <see cref="Start()"/> method of this component is executed on the Desktop platform.

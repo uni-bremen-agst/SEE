@@ -141,7 +141,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// <param name="parent">new parent of <see cref="inputField"/></param>
         public override void SetParent(GameObject parent)
         {
-            if (HasStarted)
+            if (button != null)
             {
                 button.transform.SetParent(parent.transform);
             }
