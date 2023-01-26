@@ -1,4 +1,5 @@
 ﻿using System;
+using RootMotion.FinalIK;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -17,6 +18,7 @@ namespace SEE.Net.Actions
         /// The network object.
         /// </summary>
         private NetworkObject NetworkObject;
+        public VRIK Vrik;
         
         
         private void Start()
@@ -27,7 +29,7 @@ namespace SEE.Net.Actions
         
         private void Synchronize()
         {
-            new VRIKNetAction(NetworkObject.NetworkObjectId).Execute();
+            new VRIKNetAction(NetworkObject.NetworkObjectId,Vrik).Execute();
         }
         
     }

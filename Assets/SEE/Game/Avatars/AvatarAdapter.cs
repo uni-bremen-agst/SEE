@@ -1,17 +1,18 @@
-﻿using CrazyMinnow.SALSA;
+﻿using System;
+using System.Collections;
+using CrazyMinnow.SALSA;
 using Dissonance;
 using Dissonance.Audio.Playback;
 using RootMotion.FinalIK;
 using SEE.Controls;
 using SEE.GO;
+using SEE.Net.Actions;
 using SEE.Utils;
 using SEE.XR;
-using System;
-using System.Collections;
-using SEE.Net.Actions;
 using UMA.CharacterSystem;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Valve.VR.InteractionSystem;
 using ViveSR.anipal;
 using ViveSR.anipal.Lip;
@@ -393,12 +394,13 @@ namespace SEE.Game.Avatars
             void SetupVRIK()
             {
                 VRIK vrIK = gameObject.AddOrGetComponent<VRIK>();
+
                 vrIK.solver.spine.headTarget = rig.transform.Find(VRPlayerHeadForVRIK);
-                UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.spine.headTarget);
+                Assert.IsNotNull(vrIK.solver.spine.headTarget);
                 vrIK.solver.leftArm.target = rig.transform.Find(VRPLayerLeftHandForVRIK);
-                UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.leftArm.target);
+                Assert.IsNotNull(vrIK.solver.leftArm.target);
                 vrIK.solver.rightArm.target = rig.transform.Find(VRPlayerRightHandForVRIK);
-                UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.rightArm.target);
+                Assert.IsNotNull(vrIK.solver.rightArm.target);
             }
 
             // Adds required components.
