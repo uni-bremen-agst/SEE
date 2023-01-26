@@ -92,6 +92,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     {
         City = GameObject.FindGameObjectsWithTag(Tags.CodeCity)[i].GetComponent<AbstractSEECity>();
         City.GetType().GetFields().ForEach(CreateSetting);
+        SelectEntry(Entries.First(entry => entry.Title != "Misc"));
     } 
     
     public List<GameObject> GetAllCities()
@@ -114,10 +115,21 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         citySwitcher.SetupSelector();
         citySwitcher.selectorEvent.AddListener(index =>
         {
-            // Title = citySwitcher.itemList[index].itemTitle;
-            ClearCity();
-            LoadCity(index);
+            StartCoroutine(ClearAndLoadCity(index));
         });
+    }
+    
+    /// <summary>
+    /// Clear and load city.
+    /// Delays the loading of a city by one frame since destroying GameObject is not immediate.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <returns></returns>
+    IEnumerator ClearAndLoadCity(int index)
+    {
+        ClearCity();
+        yield return 0;
+        LoadCity(index);
     }
 
     /// <summary>
