@@ -1,4 +1,6 @@
-﻿using SEE.GO;
+﻿using RootMotion.FinalIK;
+using SEE.GO;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.XR;
 
@@ -14,11 +16,15 @@ namespace SEE.Game.Avatars
     {
         [Tooltip("The laser beam for pointing. If null, one will be created at run-time.")]
         public LaserPointer laser;
+        
+        [Tooltip("If true, local interactions control where the avatar is pointing to.")]
+        public bool IsLocallyControlled = true;
 
         /// <summary>
         /// The source from which to start the laser beam. Assigning
         /// a value to this Source will always turn the laser on.
         /// </summary>
+        [ShowInInspector]
         public Transform Source
         {
             set
@@ -29,6 +35,10 @@ namespace SEE.Game.Avatars
                 }
                 laser.Source = value;
                 laser.On = true;
+            }
+            get
+            {
+                return laser.Source;
             }
         }
 
@@ -55,17 +65,32 @@ namespace SEE.Game.Avatars
         /// Retrieves the direction from the pointing device and aims the laser beam
         /// towards this direction. The position of <see cref="Target"/> is set to
         /// the end of the laser beam.
+        /// TODO unterscheidung zur doku hinzufuegen
         /// </summary>
         private void Update()
         {
-            // Draw a line from the AimTransform of the avatar into the direction
-            // where the pointing device is pointing to.
-            UnityEngine.XR.InputDevice handR = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
-            if (handR.TryGetFeatureValue(UnityEngine.XR.CommonUsages.deviceRotation, out Quaternion rotR))
+            if (IsLocallyControlled)
             {
+                // Draw a line from the AimTransform of the avatar into the direction
+                // where the pointing device is pointing to.
+                UnityEngine.XR.InputDevice handR = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+                if (handR.TryGetFeatureValue(UnityEngine.XR.CommonUsages.deviceRotation, out Quaternion rotR))
+                {
+                    Vector3 direction = rotR * Vector3.forward;
+                    // Move the aim target to the tip of the laser beam.
+                    Target.position = laser.PointTowards(direction);
+                }
+            }
+            else
+            {
+                /*
+                Quaternion rotR = gameObject.GetComponent<VRIK>().solver.rightArm.target.gameObject.transform.rotation;
+                
                 Vector3 direction = rotR * Vector3.forward;
                 // Move the aim target to the tip of the laser beam.
                 Target.position = laser.PointTowards(direction);
+                */
+                laser.Draw(Target.position);
             }
         }
     }
