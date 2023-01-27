@@ -26,6 +26,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     public const string SLIDER_PREFAB = UI_PREFAB_FOLDER + "Input Group - Slider";
     public const string DROPDOWN_PREFAB = UI_PREFAB_FOLDER + "Input Group - Dropdown";
     public const string COLORPICKER_PREFAB = UI_PREFAB_FOLDER + "Input Group - Color Picker";
+    public const string STRINGFIELD_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "Input Group - StringInputField";
     protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenuRework";
     protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsView";
     protected override string EntryPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeTabButton";
@@ -356,9 +357,9 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     // TODO: Add action
     private void CreateStringField(MemberInfo memberInfo, GameObject parent)
     {
-        GameObject switchGameObject =
-            PrefabInstantiator.InstantiatePrefab(SWITCH_PREFAB, parent.transform, false);
-        TextMeshProUGUI text = switchGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
+        GameObject stringGameObject =
+            PrefabInstantiator.InstantiatePrefab(STRINGFIELD_PREFAB, parent.transform, false);
+        TextMeshProUGUI text = stringGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = memberInfo.Name;
     }
 
