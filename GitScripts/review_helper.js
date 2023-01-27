@@ -12,6 +12,10 @@ async function get_reviews(github, context) {
         repo: context.repo.repo,
         pull_number: context.issue.number
     });
+    if (response['data'].length == 0) {
+        // No reviews present.
+        return [];
+    }
     const reviews = await github.paginate(response);
     return reviews.filter(x => x['user']['login'] === "github-actions[bot]");
 }
