@@ -6,6 +6,7 @@ using SEE.GO;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Windows.Speech;
+using SEE.Audio;
 
 namespace SEE.Game.UI.Menu
 {
@@ -122,18 +123,18 @@ namespace SEE.Game.UI.Menu
         /// This event will be called whenever an entry in the menu is chosen.
         /// Its parameter will be the chosen <see cref="MenuEntry"/> with type <typeparamref name="T"/>.
         /// </summary>
-        public readonly MenuEntrySelectedEvent OnMenuEntrySelected = new MenuEntrySelectedEvent();
+        public readonly MenuEntrySelectedEvent OnMenuEntrySelected = new();
 
         /// <summary>
         /// Event raised whenever <see cref="MenuShown"/> is set (no matter to what value).
         /// </summary>
-        protected readonly UnityEvent<bool> OnMenuToggle = new UnityEvent<bool>();
+        protected readonly UnityEvent<bool> OnMenuToggle = new();
 
         /// <summary>
         /// A list of menu entries for this menu.
         /// </summary>
         /// <seealso cref="MenuEntry"/>
-        protected readonly List<T> entries = new List<T>();
+        protected readonly List<T> entries = new();
 
         /// <summary>
         /// A read-only wrapper around the list of menu entries for this menu.
@@ -372,6 +373,7 @@ namespace SEE.Game.UI.Menu
         /// <param name="entry">The entry which was selected.</param>
         protected virtual void OnEntrySelected(T entry)
         {
+            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.CLICK_SOUND);
             entry.DoAction?.Invoke();
             OnMenuEntrySelected.Invoke(entry);
         }

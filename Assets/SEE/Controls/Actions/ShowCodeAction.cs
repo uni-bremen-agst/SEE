@@ -3,10 +3,9 @@ using System.IO;
 using System.Linq;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.UI.CodeWindow;
+using SEE.Game.UI.Window.CodeWindow;
 using SEE.Game.UI.Notification;
 using SEE.GO;
-using SEE.Net;
 using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
@@ -19,18 +18,18 @@ namespace SEE.Controls.Actions
     internal class ShowCodeAction : AbstractPlayerAction
     {
         /// <summary>
-        /// Manager object which takes care of the player selection menu and code space dictionary for us.
+        /// Manager object which takes care of the player selection menu and window space dictionary for us.
         /// </summary>
-        private CodeSpaceManager spaceManager;
+        private WindowSpaceManager spaceManager;
 
         /// <summary>
-        /// Action responsible for synchronizing the code spaces across the network.
+        /// Action responsible for synchronizing the window spaces across the network.
         /// </summary>
-        private SyncCodeSpaceAction syncAction;
+        private SyncWindowSpaceAction syncAction;
 
         public override HashSet<string> GetChangedObjects()
         {
-            // Changes to the code space are handled and synced by us separately, so we won't include them here.
+            // Changes to the window space are handled and synced by us separately, so we won't include them here.
             return new HashSet<string>();
         }
         public override ActionStateType GetActionStateType() => ActionStateType.ShowCode;
@@ -50,18 +49,18 @@ namespace SEE.Controls.Actions
             {
                 new NetCRDT().RequestID();
             }
-            spaceManager = CodeSpaceManager.ManagerInstance;
+            spaceManager = WindowSpaceManager.ManagerInstance;
         }
         public override void Start()
         {
-            syncAction = new SyncCodeSpaceAction();
-            spaceManager.OnActiveCodeWindowChanged.AddListener(() => syncAction.UpdateSpace(spaceManager[CodeSpaceManager.LOCAL_PLAYER]));
+            syncAction = new SyncWindowSpaceAction();
+            spaceManager.OnActiveWindowChanged.AddListener(() => syncAction.UpdateSpace(spaceManager[WindowSpaceManager.LOCAL_PLAYER]));
         }
 
         public override bool Update()
         {
             // Only allow local player to open new code windows
-            if (spaceManager.CurrentPlayer == CodeSpaceManager.LOCAL_PLAYER
+            if (spaceManager.CurrentPlayer == WindowSpaceManager.LOCAL_PLAYER
                 && Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef _) == HitGraphElement.Node)
             {
@@ -90,7 +89,7 @@ namespace SEE.Controls.Actions
                     return false;
                 }
 
-                // Create new code window for active selection, or use existing one
+                // Create new window for active selection, or use existing one
                 if (!selectedNode.TryGetComponent(out CodeWindow codeWindow))
                 {
                     codeWindow = selectedNode.gameObject.AddComponent<CodeWindow>();
@@ -125,12 +124,12 @@ namespace SEE.Controls.Actions
                 codeWindow.SolutionPath = city.SolutionPath.Path;
 
                 // Add code window to our space of code window, if it isn't in there yet
-                if (!spaceManager[CodeSpaceManager.LOCAL_PLAYER].CodeWindows.Contains(codeWindow))
+                if (!spaceManager[WindowSpaceManager.LOCAL_PLAYER].Windows.Contains(codeWindow))
                 {
-                    spaceManager[CodeSpaceManager.LOCAL_PLAYER].AddCodeWindow(codeWindow);
-                    codeWindow.ScrollEvent.AddListener(() => syncAction.UpdateSpace(spaceManager[CodeSpaceManager.LOCAL_PLAYER]));
+                    spaceManager[WindowSpaceManager.LOCAL_PLAYER].AddWindow(codeWindow);
+                    codeWindow.ScrollEvent.AddListener(() => syncAction.UpdateSpace(spaceManager[WindowSpaceManager.LOCAL_PLAYER]));
                 }
-                spaceManager[CodeSpaceManager.LOCAL_PLAYER].ActiveCodeWindow = codeWindow;
+                spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = codeWindow;
                 // TODO: Set font size etc in settings (maybe, or maybe that's too much)
             }
 

@@ -101,7 +101,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         private void AddWidget()
         {
             // Create a widget configuration
-            WidgetConfig widgetConfiguration = new WidgetConfig()
+            WidgetConfig widgetConfiguration = new()
             {
                 ID = Guid.NewGuid(),
                 MetricType = selectedMetric.Value,
