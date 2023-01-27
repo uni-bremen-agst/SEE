@@ -7,6 +7,7 @@ using SEE.Game.UI.PropertyDialog;
 using System;
 using SEE.Game.UI.Notification;
 using SEE.Controls;
+using Sirenix.Utilities;
 
 namespace SEE.UI
 {
