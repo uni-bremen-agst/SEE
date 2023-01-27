@@ -76,7 +76,7 @@ namespace SEE.Net.Actions
                         if (networkObject.gameObject.TryGetComponent(out VRIK vrik))
                         {
                             // daten übertragen
-
+                            
                             vrik.solver.spine.headTarget.gameObject.transform.position = RemoteHeadPosition;
                             vrik.solver.rightArm.target.gameObject.transform.position = RemoteRightHandPosition;
                             vrik.solver.leftArm.target.gameObject.transform.position = RemoteLeftHandPosition;
@@ -84,6 +84,7 @@ namespace SEE.Net.Actions
                             vrik.solver.spine.headTarget.gameObject.transform.rotation = RemoteHeadRotation;
                             vrik.solver.leftArm.target.gameObject.transform.rotation = RemoteLeftHandRotation;
                             vrik.solver.rightArm.target.gameObject.transform.rotation = RemoteRightHandRotation;
+                            
                             
                         }
                         else
@@ -102,12 +103,10 @@ namespace SEE.Net.Actions
 
         private void SetupRemotePlayer(NetworkObject networkObject)
         {
-
             
-
             VRIK vrIK = networkObject.gameObject.AddOrGetComponent<VRIK>();
 
-            
+            AddComponents(networkObject);
             TurnOffAvatarAimingSystem(networkObject);
             ReplaceAnimator(networkObject);
 
@@ -144,17 +143,15 @@ namespace SEE.Net.Actions
             vrIK.solver.rightArm.target = remoteRightHand.transform;
             Assert.IsNotNull(vrIK.solver.rightArm.target);
             
-            AddComponents(networkObject, remoteRightHand.transform);
-            
         }
 
-        private void AddComponents(NetworkObject networkObject, Transform remoteRightHand)
+        private void AddComponents(NetworkObject networkObject)
         {
             VRAvatarAimingSystem aiming = networkObject.gameObject.AddOrGetComponent<VRAvatarAimingSystem>();
             aiming.IsLocallyControlled = false;
             if (networkObject.gameObject.TryGetComponentOrLog(out AimIK aimIK))
             {
-                aiming.Source = remoteRightHand;
+                aiming.Source = aimIK.solver.transform;
                 //aiming.Source = aimIK.solver.transform;
                 aiming.Target = aimIK.solver.target;
             }
