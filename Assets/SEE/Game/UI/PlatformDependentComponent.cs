@@ -43,7 +43,7 @@ namespace SEE.Game.UI
         /// <summary>
         /// The current platform.
         /// </summary>
-        protected readonly PlayerInputType Platform = SceneSettings.InputType;
+        protected PlayerInputType Platform { get; private set; }
 
         /// <summary>
         /// Whether the component is initialized.
@@ -64,10 +64,9 @@ namespace SEE.Game.UI
                 Canvas = GameObject.Find(UI_CANVAS_NAME) ?? PrefabInstantiator.InstantiatePrefab(UI_CANVAS_PREFAB);
                 Canvas.name = UI_CANVAS_NAME;
             }
-            // initialization has started
-            HasStarted = true;
-            
-            // calls the start method for the current platform
+
+            // Execute platform dependent code
+            Platform = SceneSettings.InputType;
             switch (Platform)
             {
                 case PlayerInputType.DesktopPlayer: StartDesktop();
@@ -85,6 +84,7 @@ namespace SEE.Game.UI
 
             // initialization finished
             OnStartFinished();
+            HasStarted = true;
         }
 
         /// <summary>

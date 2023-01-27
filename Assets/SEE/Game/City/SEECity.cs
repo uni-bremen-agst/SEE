@@ -28,13 +28,13 @@ namespace SEE.Game.City
         /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
         /// </summary>
         [SerializeField, ShowInInspector, Tooltip("Path of GXL file"), TabGroup(DataFoldoutGroup)]
-        public FilePath GXLPath = new FilePath();
+        public FilePath GXLPath = new();
 
         /// <summary>
         /// The path to the CSV file containing the additional metric values.
         /// </summary>
         [SerializeField, ShowInInspector, Tooltip("Path of metric CSV file"), TabGroup(DataFoldoutGroup)]
-        public FilePath CSVPath = new FilePath();
+        public FilePath CSVPath = new();
 
         /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are
@@ -67,7 +67,7 @@ namespace SEE.Game.City
         ///
         /// Neither serialized nor saved to the config file.
         /// </summary>
-        public Graph LoadedGraph
+        public override Graph LoadedGraph
         {
             get => loadedGraph;
             protected set
