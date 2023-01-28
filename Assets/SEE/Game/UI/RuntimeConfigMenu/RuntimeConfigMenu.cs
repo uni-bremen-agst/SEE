@@ -58,6 +58,12 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             {
                 Menu.ToggleMenu();
             }
+            else if (Input.GetKeyDown(KeyCode.R))
+            {
+                StartCoroutine(
+                    Menu.ClearAndLoadCity(Random.Range(0, GameObject.FindGameObjectsWithTag(Tags.CodeCity).Length))
+                    );
+            }
         }
 
         // Creating the Menu without the individual settings at Awake
