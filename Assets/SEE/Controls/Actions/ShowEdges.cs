@@ -28,7 +28,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private bool isSelected = false;
 
-        private const float EDGE_FADE_DURATION = 1f;
+        private const float OPERATION_DURATION = 1f;
 
         /// <summary>
         /// Registers On() and Off() for the respective hovering and selection events.
@@ -187,8 +187,9 @@ namespace SEE.Controls.Actions
                 return;
             }
 
+            // TODO: include a switch for the different operator methods
             EdgeOperator @operator = edgeObject.AddOrGetComponent<EdgeOperator>();
-            @operator.Destruct(EDGE_FADE_DURATION);
+            @operator.Destruct(OPERATION_DURATION);
         }
 
         /// <summary>
@@ -204,8 +205,9 @@ namespace SEE.Controls.Actions
                 return;
             }
 
+            // TODO: include a switch for the different operator methods
             EdgeOperator @operator = edgeObject.AddOrGetComponent<EdgeOperator>();
-            @operator.Construct(EDGE_FADE_DURATION);
+            @operator.Construct(OPERATION_DURATION);
         }
 
         private void On()
