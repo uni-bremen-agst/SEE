@@ -305,6 +305,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             PrefabInstantiator.InstantiatePrefab(SLIDER_PREFAB, parent.transform, false);
         RangeAttribute range = memberInfo.GetAttributes().OfType<RangeAttribute>().ElementAtOrDefault(0) 
                                ?? new RangeAttribute(0, 2);
+        AddLayoutElement(sliderGameObject);
         SliderManager sliderManager = sliderGameObject.GetComponentInChildren<SliderManager>();
         Slider slider = sliderGameObject.GetComponentInChildren<Slider>();
         TextMeshProUGUI text = sliderGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
@@ -327,6 +328,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     {
         GameObject switchGameObject =
             PrefabInstantiator.InstantiatePrefab(SWITCH_PREFAB, parent.transform, false);
+        AddLayoutElement(switchGameObject);
         SwitchManager switchManager = switchGameObject.GetComponentInChildren<SwitchManager>();
         TextMeshProUGUI text = switchGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = memberInfo.Name;
@@ -349,6 +351,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     {
         GameObject filePickerGameObject =
             PrefabInstantiator.InstantiatePrefab(FILEPICKER_PREFAB, parent.transform, false);
+        AddLayoutElement(filePickerGameObject);
         TextMeshProUGUI text = filePickerGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = memberInfo.Name;
     }
@@ -359,6 +362,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     {
         GameObject stringGameObject =
             PrefabInstantiator.InstantiatePrefab(STRINGFIELD_PREFAB, parent.transform, false);
+        AddLayoutElement(stringGameObject);
         TextMeshProUGUI text = stringGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = memberInfo.Name;
     }
@@ -368,6 +372,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     {
         GameObject dropDownGameObject =
             PrefabInstantiator.InstantiatePrefab(DROPDOWN_PREFAB, parent.transform, false);
+        AddLayoutElement(dropDownGameObject);
         TextMeshProUGUI text = dropDownGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = memberInfo.Name;
     }
@@ -377,6 +382,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     {
         GameObject colorPickerGameObject =
             PrefabInstantiator.InstantiatePrefab(COLORPICKER_PREFAB, parent.transform, false);
+        AddLayoutElement(colorPickerGameObject);
         TextMeshProUGUI text = colorPickerGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = memberInfo.Name;
     }
@@ -388,6 +394,13 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     {
         ToggleMenuEntry miscEntry = Entries.FirstOrDefault(entry => entry.Title == "Misc");
         if (miscEntry != null) EntryGameObject(miscEntry).transform.SetAsLastSibling();
+    }
+
+    private void AddLayoutElement(GameObject go)
+    {
+        LayoutElement le = go.AddComponent<LayoutElement>();
+        le.minHeight = ((RectTransform) go.transform).rect.height;
+        le.minWidth = ((RectTransform) go.transform).rect.width;
     }
     
 
