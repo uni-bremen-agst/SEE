@@ -14,7 +14,9 @@ using Sirenix.OdinInspector;
 using Sirenix.Utilities;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 using Random = UnityEngine.Random;
 
 public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
@@ -27,6 +29,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     public const string DROPDOWN_PREFAB = UI_PREFAB_FOLDER + "Input Group - Dropdown";
     public const string COLORPICKER_PREFAB = UI_PREFAB_FOLDER + "Input Group - Color Picker";
     public const string STRINGFIELD_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "Input Group - StringInputField";
+    public const string BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "Button";
     protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenuRework";
     protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsView";
     protected override string EntryPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeTabButton";
@@ -74,7 +77,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         // gets the view game object
         GameObject view = GetViewGameObjectHelper(memberInfo);
         Transform viewContent = view.transform.Find("Content");
-        Debug.Log("\t"+"CreateSetting____ "+ memberInfo.Name);
+        // Debug.Log("\t"+"CreateSetting____ "+ memberInfo.Name);
         // TODO: Instantiate and setup prefabs based on member info
 
         GameObject setting = PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, viewContent, false);
@@ -83,6 +86,24 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         GameObject settingContent = setting.transform.Find("Content").gameObject;
         CreateSettingObject(memberInfo, settingContent, City);
     }
+
+    protected virtual void CreateButton(MemberInfo memberInfo)
+    {
+        if (memberInfo.CustomAttributes.Where(attribute => attribute.AttributeType == typeof(ButtonGroupAttribute)).Count() > 0)
+        {
+            Transform buttonContent = Menu.transform.Find("SeeSettingsPanel").Find("MainContent").Find("Buttons").Find("ButtonContent").transform;
+            GameObject button = PrefabInstantiator.InstantiatePrefab(BUTTON_PREFAB, buttonContent, false);
+            button.name = memberInfo.Name;
+            ButtonManagerWithIcon buttonManager = button.GetComponent<ButtonManagerWithIcon>();
+            buttonManager.buttonText = memberInfo.Name;
+            UnityEvent buttonEvent = new UnityEvent();
+            buttonEvent.AddListener(() => City.Invoke(memberInfo.Name, 0));
+            buttonManager.clickEvent =  buttonEvent;
+
+            Debug.Log("\t"+"CreateButton____ "+ memberInfo.Name);
+        }
+    }
+        
 
     protected void ClearCity()
     {
@@ -93,6 +114,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     {
         City = GameObject.FindGameObjectsWithTag(Tags.CodeCity)[i].GetComponent<AbstractSEECity>();
         City.GetType().GetFields().ForEach(CreateSetting);
+        City.GetType().GetMethods().ForEach(CreateButton);
         SelectEntry(Entries.First(entry => entry.Title != "Misc"));
     } 
     
@@ -307,7 +329,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                                ?? new RangeAttribute(0, 2);
         AddLayoutElement(sliderGameObject);
         SliderManager sliderManager = sliderGameObject.GetComponentInChildren<SliderManager>();
-        Slider slider = sliderGameObject.GetComponentInChildren<Slider>();
+        UnityEngine.UI.Slider slider = sliderGameObject.GetComponentInChildren<UnityEngine.UI.Slider>();
         TextMeshProUGUI text = sliderGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = memberInfo.Name;
                 
