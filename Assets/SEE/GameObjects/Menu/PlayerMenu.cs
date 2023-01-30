@@ -4,6 +4,7 @@ using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.Game.UI.Menu;
 using SEE.Game.UI.StateIndicator;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.GO.Menu
@@ -134,7 +135,7 @@ namespace SEE.GO.Menu
 
             void SetIndicatorStateToEntry(ToggleMenuEntry entry)
             {
-                Indicator.ChangeActionState(ActionStateType.FromID(ModeMenu.Entries.IndexOf(entry)));
+                Indicator.ChangeState(entry.Title, entry.EntryColor.WithAlpha(0.5f));
             }
         }
 
