@@ -365,7 +365,8 @@ namespace SEE.Controls.Actions
                 if (childGameObject.CompareTag(Tags.Edge))
                 {
                     HideEdge(childGameObject);
-                } else if (childGameObject.CompareTag(Tags.Node))
+                } 
+                else if (childGameObject.CompareTag(Tags.Node))
                 {
                     HideNodeIncludingConnectedEdges(childGameObject);
                 }
