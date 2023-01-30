@@ -6,6 +6,12 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
+    public enum Level
+    {
+        Root,
+        Hide
+    }
+
     /// <summary>
     /// The type of a state-based action.
     /// Implemented using the "Enumeration" (not enum) or "type safe enum" pattern.
@@ -25,46 +31,51 @@ namespace SEE.Controls.Actions
         #region Static Types
         public static ActionStateType Move { get; } =
             new ActionStateType("Move", "Move a node within a graph",
-                                Color.red.Darker(), "Materials/Charts/MoveIcon",
+                                Level.Root, Color.red.Darker(), "Materials/Charts/MoveIcon",
                                 MoveAction.CreateReversibleAction);
         public static ActionStateType Rotate { get; } =
             new ActionStateType("Rotate", "Rotate everything around the selected node within a graph",
-                                Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
+                                Level.Root, Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
                                 RotateAction.CreateReversibleAction);
         public static ActionStateType Hide { get; } =
             new ActionStateType("Hide", "Hides nodes or edges",
-                       Color.yellow.Darker(), "Materials/ModernUIPack/Eye", HideAction.CreateReversibleAction);
-
+                                Level.Root, Color.yellow.Darker(), "Materials/ModernUIPack/Eye", 
+                                HideAction.CreateReversibleAction);
+        public static ActionStateType HideConnectedEdges { get; } =
+            new ActionStateType("Hide Connected Edges", "Hides connected edges",
+                                Level.Hide, Color.yellow.Darker(), "Materials/ModernUIPack/Eye",
+                                HideConnectedEdgesAction.CreateReversibleAction);
         public static ActionStateType NewEdge { get; } =
             new ActionStateType("New Edge", "Draw a new edge between two nodes",
-                                Color.green.Darker(), "Materials/ModernUIPack/Minus",
+                                Level.Root, Color.green.Darker(), "Materials/ModernUIPack/Minus",
                                 AddEdgeAction.CreateReversibleAction);
         public static ActionStateType NewNode { get; } =
             new ActionStateType("New Node", "Create a new node",
-                                Color.green.Darker(), "Materials/ModernUIPack/Plus",
+                                Level.Root, Color.green.Darker(), "Materials/ModernUIPack/Plus",
                                 AddNodeAction.CreateReversibleAction);
         public static ActionStateType EditNode { get; } =
             new ActionStateType("Edit Node", "Edit a node",
-                                Color.green.Darker(), "Materials/ModernUIPack/Settings",
+                                Level.Root, Color.green.Darker(), "Materials/ModernUIPack/Settings",
                                 EditNodeAction.CreateReversibleAction);
         public static ActionStateType ScaleNode { get; } =
             new ActionStateType("Scale Node", "Scale a node",
-                                Color.green.Darker(), "Materials/ModernUIPack/Crop",
+                                Level.Root, Color.green.Darker(), "Materials/ModernUIPack/Crop",
                                 ScaleNodeAction.CreateReversibleAction);
         public static ActionStateType Delete { get; } =
             new ActionStateType("Delete", "Delete a node or an edge",
-                                Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
+                                Level.Root, Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
                                 DeleteAction.CreateReversibleAction);
         public static ActionStateType ShowCode { get; } =
             new ActionStateType("Show Code", "Display the source code of a node.",
-                                Color.black, "Materials/ModernUIPack/Document", ShowCodeAction.CreateReversibleAction);
+                                Level.Root, Color.black, "Materials/ModernUIPack/Document", 
+                                ShowCodeAction.CreateReversibleAction);
         public static ActionStateType Draw { get; } =
             new ActionStateType("Draw", "Draw a line",
-                        Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
-                        DrawAction.CreateReversibleAction);
+                                Level.Root, Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                                DrawAction.CreateReversibleAction);
         public static ActionStateType MetricBoard { get; } =
             new ActionStateType("Metric Board", "Configure Metric Boards",
-                                Color.cyan, "Materials/40+ Simple Icons - Free/Mixer_Simple_Icons_UI.png",
+                                Level.Root, Color.cyan, "Materials/40+ Simple Icons - Free/Mixer_Simple_Icons_UI.png",
                                 MetricBoardAction.CreateReversibleAction);
         #endregion
 
@@ -78,6 +89,8 @@ namespace SEE.Controls.Actions
         /// Description for this action.
         /// </summary>
         public string Description { get; }
+
+        public Level Level { get;  }
 
         /// <summary>
         /// Color for this action.
@@ -119,14 +132,18 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="name">The Name of this ActionStateType. Must be unique.</param>
         /// <param name="description">Description for this ActionStateType.</param>
+        /// <param name="level">The nesting level of the action in the menu.</param>
         /// <param name="color">Color for this ActionStateType.</param>
         /// <param name="iconPath">Path to the material of the icon for this ActionStateType.</param>
+        /// <param name="createReversible">The delegate to be called when the action has finished
+        /// and a new instance needs to be created to continue.</param>
         /// <exception cref="ArgumentException">When the given <paramref name="name"/> or <paramref name="value"/>
         /// is not unique, or when the <paramref name="value"/> doesn't fulfill the "must increase by one" criterion.
         /// </exception>
-        private ActionStateType(string name, string description, 
+        private ActionStateType(string name, string description, Level level,
                                 Color color, string iconPath, CreateReversibleAction createReversible)
         {
+            Level = level;
             Name = name;
             Description = description;
             Color = color;
