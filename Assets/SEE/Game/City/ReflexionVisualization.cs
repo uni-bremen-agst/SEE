@@ -83,10 +83,11 @@ namespace SEE.Game.City
                         spline.CreateMesh();
                         spline.GradientColors = GetEdgeGradient(edge);
 
-                        // if (edge.HasToggle(Edge.IsHiddenToggle))
-                        // {
-                        //     spline.SubsplineEndT = 0;
-                        // }
+                        //FIXME: conflict when not using fade-in animation kind
+                        if (edge.HasToggle(Edge.IsHiddenToggle))
+                        {
+                            spline.SubsplineEndT = 0;
+                        }
                     }
                     else
                     {
@@ -146,15 +147,16 @@ namespace SEE.Game.City
             };
 
             // FIXME: conflict when not using fade-in animation kind
-            if (edge.HasToggle(Edge.IsHiddenToggle))
-            {
-                // If the edge is supposed to be hidden, its alpha value must be zero.
-                return (gradient.Item1.WithAlpha(0f), gradient.Item2.WithAlpha(0f));
-            }
-            else
-            {
-                return gradient;
-            }
+            // if (edge.HasToggle(Edge.IsHiddenToggle))
+            // {
+            //     // If the edge is supposed to be hidden, its alpha value must be zero.
+            //     return (gradient.Item1.WithAlpha(0f), gradient.Item2.WithAlpha(0f));
+            // }
+            // else
+            // {
+            //     return gradient;
+            // }
+            return gradient;
         }
 
         public void OnCompleted()
