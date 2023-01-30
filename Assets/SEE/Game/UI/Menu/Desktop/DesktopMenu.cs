@@ -13,7 +13,7 @@ namespace SEE.Game.UI.Menu
     /// Responsible for the desktop UI for menus.
     /// </summary>
     /// <typeparam name="T">the type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
-    public partial class SimpleMenu<T>
+    public abstract partial class AbstractMenu<T>
     {
         /// <summary>
         /// The path to the prefab for the menu game object.

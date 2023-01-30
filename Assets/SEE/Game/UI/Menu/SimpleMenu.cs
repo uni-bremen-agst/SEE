@@ -20,6 +20,11 @@ namespace SEE.Game.UI.Menu
         // Intentionally empty, see class documentation.
     }
 
+    public class SimpleMenu<T> : AbstractMenu<T> where T : MenuEntry
+    {
+        // Intentionally empty, see class documentation.
+    }
+
     /// <summary>
     /// Represents a menu of various actions the user can choose from.
     /// The Menu consists of multiple MenuEntries of the type <typeparamref name="T"/>
@@ -27,7 +32,7 @@ namespace SEE.Game.UI.Menu
     /// </summary>
     /// <typeparam name="T">the type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
     /// <seealso cref="MenuEntry"/>
-    public partial class SimpleMenu<T> : PlatformDependentComponent where T : MenuEntry
+    public abstract partial class AbstractMenu<T> : PlatformDependentComponent where T : MenuEntry
     {
         /// <summary>
         /// Event type which is used for the <see cref="OnMenuEntrySelected"/> event.

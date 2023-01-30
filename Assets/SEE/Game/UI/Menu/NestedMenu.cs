@@ -25,7 +25,7 @@ namespace SEE.Game.UI.Menu
     /// A menu similar to the <see cref="SimpleMenu"/> with buttons which can
     /// open other menus, in other words, a container for other menus.
     /// </summary>
-    public class NestedMenu<T> : SimpleMenu<T> where T : MenuEntry
+    public class NestedMenu<T> : AbstractMenu<T> where T : MenuEntry
     {
         /// <summary>
         /// The menu levels we have ascended through.
