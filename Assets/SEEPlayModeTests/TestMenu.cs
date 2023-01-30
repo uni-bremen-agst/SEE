@@ -1,6 +1,9 @@
 ﻿using NUnit.Framework;
+using SEE.Utils;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.TestTools;
 using UnityEngine.UI;
 
 namespace SEE.Game.UI.Menu
@@ -10,6 +13,72 @@ namespace SEE.Game.UI.Menu
     /// </summary>
     internal abstract class TestMenu : TestUI
     {
+        /// <summary>
+        /// The index of the selected option.
+        /// </summary>
+        protected int selection = 0;
+
+        /// <summary>
+        /// The game object holding the <see cref="menu"/>.
+        /// </summary>
+        protected GameObject menuGO;
+
+        /// <summary>
+        /// The menu to be tested.
+        /// </summary>
+        protected AbstractMenu<MenuEntry> menu;
+
+        /// <summary>
+        /// Set up for every test.
+        /// Resets <see cref="selection"/>.
+        /// Sets up <see cref="menuGO"/> and <see cref="menu"/>.
+        /// </summary>
+        /// <returns>waiting <see cref="TimeUntilMenuIsSetup"/></returns>
+        /// <remarks>
+        /// Will be called after <see cref="TestUI.Setup"/>.
+        /// Method must be public. Otherwise it will not be called by the test framework.
+        /// </remarks>
+        [UnitySetUp]
+        public new IEnumerator SetUp()
+        {
+            UnityEngine.Debug.Log("TestMenu.SetUp\n");
+            selection = 0;
+            CreateMenu(out menuGO, out menu);
+            yield return new WaitForSeconds(TimeUntilMenuIsSetup);
+            UnityEngine.Debug.Log("TestMenu.SetUp finished\n");
+        }
+
+        /// <summary>
+        /// Creates a new <paramref name="menuGO"/> game object holding a 
+        /// new <paramref name="menu"/>, which is the menu to be tested.
+        /// </summary>
+        /// <param name="menuGO">new game object holding <paramref name="menu"/></param>
+        /// <param name="menu">a new menu that can be tested</param>
+        protected abstract void CreateMenu(out GameObject menuGO, out AbstractMenu<MenuEntry> menu);
+
+        /// <summary>
+        /// Tear down after every test.
+        /// Destroys <see cref="menuGO"/> and <see cref="menu"/>.
+        /// </summary>
+        /// <returns>waiting <see cref="TimeUntilMenuIsSetup"/></returns>
+        /// <remarks>
+        /// Will be called before <see cref="TestUI.TearDown"/>.
+        /// Method must be public. Otherwise it will not be called by the test framework.
+        /// </remarks>
+        [UnityTearDown]
+        public new IEnumerator TearDown()
+        {
+            UnityEngine.Debug.Log("TestMenu.TearDown\n");
+            Destroyer.Destroy(menuGO);
+            yield return new WaitForSeconds(TimeUntilMenuIsSetup);
+            UnityEngine.Debug.Log("TestMenu.SetUp finished\n");
+        }
+
+        /// <summary>
+        /// The time it takes until the menu is up and running in seconds.
+        /// </summary>
+        protected const float TimeUntilMenuIsSetup = 1f;
+
         /// <summary>
         /// Path to a sprite we can use for testing.
         /// </summary>
@@ -34,6 +103,7 @@ namespace SEE.Game.UI.Menu
         {
             PressButton($"/UI Canvas/{menuTitle}/Main Content/Content Mask/Content/Menu Entries/Scroll Area/List/{optionTitle}");
         }
+
         /// <summary>
         /// Simulates that a user presses the button identified by <paramref name="buttonPath"/>.
         /// </summary>
