@@ -19,11 +19,11 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// Title of the first option in the sub menu.
         /// </summary>
-        private const string NestedOptionOne = "Option 2";
+        private const string NestedOptionOne = "Option 2a";
         /// <summary>
         /// Title of the second option in the submenu.
         /// </summary>
-        private const string NestedOptionTwo = "Option 2";
+        private const string NestedOptionTwo = "Option 2b";
         /// <summary>
         /// Title of the menu.
         /// </summary>
@@ -38,10 +38,11 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <returns><see cref="WaitForEndOfFrame"/></returns>
         [UnityTest]
-        public IEnumerator TestSimpleMenuOption1()
+        [LoadScene()]
+        public IEnumerator TestMenuOption1()
         {
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
-            PressButton(menu.Title, OptionOne);
+            PressButton(MenuTitle, OptionOne);
             yield return new WaitForEndOfFrame();
             Assert.AreEqual(1, selection);
             yield return new WaitForEndOfFrame();
@@ -52,13 +53,14 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <returns><see cref="WaitForEndOfFrame"/></returns>
         [UnityTest]
-        public IEnumerator TestSimpleMenuOption2()
+        [LoadScene()]
+        public IEnumerator TestMenuNestedOptionOne()
         {
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
-            PressButton(menu.Title, SubMenuTitle);
-            yield return new WaitForEndOfFrame();
-            PressButton(menu.Title, NestedOptionOne);
-            yield return new WaitForEndOfFrame();
+            PressButton(MenuTitle, SubMenuTitle);
+            yield return new WaitForSeconds(TimeUntilMenuIsSetup);
+            PressButton(MenuTitle, NestedOptionOne);
+            yield return new WaitForSeconds(TimeUntilMenuIsSetup);
             Assert.AreEqual(2, selection);
             yield return new WaitForEndOfFrame();
         }
@@ -68,13 +70,14 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <returns><see cref="WaitForEndOfFrame"/></returns>
         [UnityTest]
-        public IEnumerator TestSimpleMenuOption3()
+        [LoadScene()]
+        public IEnumerator TestMenuNestedOptionTwo()
         {
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
-            PressButton(menu.Title, SubMenuTitle);
-            yield return new WaitForEndOfFrame();
-            PressButton(menu.Title, NestedOptionTwo);
-            yield return new WaitForEndOfFrame();
+            PressButton(MenuTitle, SubMenuTitle);
+            yield return new WaitForSeconds(TimeUntilMenuIsSetup);
+            PressButton(MenuTitle, NestedOptionTwo);
+            yield return new WaitForSeconds(TimeUntilMenuIsSetup);
             Assert.AreEqual(3, selection);
             yield return new WaitForEndOfFrame();
         }
@@ -84,10 +87,11 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <returns><see cref="WaitForEndOfFrame"/></returns>
         [UnityTest]
-        public IEnumerator TestSimpleMenuNoOption()
+        [LoadScene()]
+        public IEnumerator TestMenuNoOption()
         {
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
-            PressCloseButton(menu.Title);
+            PressCloseButton(MenuTitle);
             yield return new WaitForEndOfFrame();
             Assert.AreEqual(0, selection);
             yield return new WaitForEndOfFrame();

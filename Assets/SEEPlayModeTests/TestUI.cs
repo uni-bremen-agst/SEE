@@ -1,6 +1,11 @@
 ﻿using SEE.Controls;
 using System.Collections;
 using UnityEngine.TestTools;
+using UnityEditor.SceneManagement;
+using UnityEngine.SceneManagement;
+using NUnit.Framework.Interfaces;
+using NUnit.Framework;
+using UnityEngine;
 
 namespace SEE.Game.UI
 {
@@ -26,10 +31,10 @@ namespace SEE.Game.UI
         /// Method must be public. Otherwise it will not be called by the test framework.
         /// </remarks>
         [UnitySetUp]
-        public IEnumerator Setup()
+        public IEnumerator SetUp()
         {
             LogAssert.ignoreFailingMessages = true;
-            SceneSettings.InputType = SEE.GO.PlayerInputType.DesktopPlayer;
+            SceneSettings.InputType = GO.PlayerInputType.DesktopPlayer;
             yield return new EnterPlayMode();
         }
 
@@ -50,6 +55,59 @@ namespace SEE.Game.UI
         public IEnumerator TearDown()
         {
             yield return new ExitPlayMode();
+        }
+
+        /// <summary>
+        /// An attribute (annotation) that can be specified for a test method
+        /// to load a scene before the test is run.
+        /// </summary>
+        protected class LoadSceneAttribute : NUnitAttribute, IOuterUnityTestAction
+        {
+            /// <summary>
+            /// Folder containing the test scene.
+            /// </summary>
+            private const string SceneFolder = "Assets/Scenes/";
+            /// <summary>
+            /// Unity's file extension for scene files.
+            /// </summary>
+            private const string SceneFileExtension = ".unity";
+            /// <summary>
+            /// The name of the scene given by the constructor.
+            /// </summary>
+            private readonly string scene;
+
+            /// <summary>
+            /// Makes sure that the given <paramref name="scene"/> is loaded before
+            /// the test is run. The actual scene is loaded from the path 
+            /// <see cref="SceneFolder"/> + <paramref name="scene"/> + <see cref="SceneFileExtension"/>.
+            /// 
+            /// Assumptions: <paramref name="scene"/> is contained in folder
+            /// <see cref="SceneFolder"/> and does not have the <see cref="SceneFileExtension"/>
+            /// (that extension will be added automatically). 
+            /// </summary>
+            /// <param name="scene">name of the test scene to be loaded</param>
+            public LoadSceneAttribute(string scene = "Empty") => this.scene = SceneFolder + scene + SceneFileExtension;
+
+            /// <summary>
+            /// Run before the <paramref name="test"/> to load the scene.
+            /// </summary>
+            /// <param name="test">test to be run</param>
+            /// <returns>An <see cref="AsyncOperation"/> determining whether the
+            /// scene was loaded</returns>
+            IEnumerator IOuterUnityTestAction.BeforeTest(ITest test)
+            {
+                yield return EditorSceneManager.LoadSceneAsyncInPlayMode(scene, new LoadSceneParameters(LoadSceneMode.Single));
+            }
+
+            /// <summary>
+            /// Run before the <paramref name="test"/>. Does not do anything.
+            /// </summary>
+            /// <param name="test">test to be run</param>
+            /// <returns>alway <c>null</c></returns>
+            IEnumerator IOuterUnityTestAction.AfterTest(ITest test)
+            {
+                yield return null;
+            }
         }
     }
 }

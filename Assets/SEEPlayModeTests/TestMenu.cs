@@ -38,14 +38,11 @@ namespace SEE.Game.UI.Menu
         /// Will be called after <see cref="TestUI.Setup"/>.
         /// Method must be public. Otherwise it will not be called by the test framework.
         /// </remarks>
-        [UnitySetUp]
-        public new IEnumerator SetUp()
+        [SetUp]
+        public new void SetUp()
         {
-            UnityEngine.Debug.Log("TestMenu.SetUp\n");
             selection = 0;
             CreateMenu(out menuGO, out menu);
-            yield return new WaitForSeconds(TimeUntilMenuIsSetup);
-            UnityEngine.Debug.Log("TestMenu.SetUp finished\n");
         }
 
         /// <summary>
@@ -65,13 +62,10 @@ namespace SEE.Game.UI.Menu
         /// Will be called before <see cref="TestUI.TearDown"/>.
         /// Method must be public. Otherwise it will not be called by the test framework.
         /// </remarks>
-        [UnityTearDown]
-        public new IEnumerator TearDown()
+        [TearDown]
+        public new void TearDown()
         {
-            UnityEngine.Debug.Log("TestMenu.TearDown\n");
             Destroyer.Destroy(menuGO);
-            yield return new WaitForSeconds(TimeUntilMenuIsSetup);
-            UnityEngine.Debug.Log("TestMenu.SetUp finished\n");
         }
 
         /// <summary>
@@ -112,7 +106,7 @@ namespace SEE.Game.UI.Menu
         {
             // Retrieve the button
             GameObject buttonObject = GameObject.Find(buttonPath);
-            Assert.NotNull(buttonObject);
+            Assert.NotNull(buttonObject, $"Button path {buttonPath} not found.");
             // Make sure the object is really holding a button.
             Assert.That(buttonObject.TryGetComponent(out Button _));
             // Press the button.
