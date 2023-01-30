@@ -1,5 +1,4 @@
-﻿using RootMotion.FinalIK;
-using SEE.GO;
+﻿using SEE.GO;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.XR;
@@ -16,7 +15,7 @@ namespace SEE.Game.Avatars
     {
         [Tooltip("The laser beam for pointing. If null, one will be created at run-time.")]
         public LaserPointer laser;
-        
+
         [Tooltip("If true, local interactions control where the avatar is pointing to.")]
         public bool IsLocallyControlled = true;
 
@@ -33,13 +32,11 @@ namespace SEE.Game.Avatars
                 {
                     laser = gameObject.AddOrGetComponent<LaserPointer>();
                 }
+
                 laser.Source = value;
                 laser.On = true;
             }
-            get
-            {
-                return laser.Source;
-            }
+            get { return laser.Source; }
         }
 
         /// <summary>
@@ -65,7 +62,8 @@ namespace SEE.Game.Avatars
         /// Retrieves the direction from the pointing device and aims the laser beam
         /// towards this direction. The position of <see cref="Target"/> is set to
         /// the end of the laser beam.
-        /// TODO unterscheidung zur doku hinzufuegen
+        /// Also distinguishs between local controlled player and remote player.
+        /// If it's the remote player, draw method is directly called.
         /// </summary>
         private void Update()
         {
@@ -73,8 +71,8 @@ namespace SEE.Game.Avatars
             {
                 // Draw a line from the AimTransform of the avatar into the direction
                 // where the pointing device is pointing to.
-                UnityEngine.XR.InputDevice handR = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
-                if (handR.TryGetFeatureValue(UnityEngine.XR.CommonUsages.deviceRotation, out Quaternion rotR))
+                InputDevice handR = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+                if (handR.TryGetFeatureValue(CommonUsages.deviceRotation, out Quaternion rotR))
                 {
                     Vector3 direction = rotR * Vector3.forward;
                     // Move the aim target to the tip of the laser beam.
@@ -83,13 +81,6 @@ namespace SEE.Game.Avatars
             }
             else
             {
-                /*
-                Quaternion rotR = gameObject.GetComponent<VRIK>().solver.rightArm.target.gameObject.transform.rotation;
-                
-                Vector3 direction = rotR * Vector3.forward;
-                // Move the aim target to the tip of the laser beam.
-                Target.position = laser.PointTowards(direction);
-                */
                 laser.Draw(Target.position);
             }
         }
