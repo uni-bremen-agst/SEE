@@ -17,6 +17,11 @@ namespace SEE.Game.City
         public EdgeLayoutKind Kind = EdgeLayoutKind.Bundling;
 
         /// <summary>
+        /// Layout for drawing edges.
+        /// </summary>
+        public EdgeAnimationKind AnimationKind = EdgeAnimationKind.None;
+
+        /// <summary>
         /// The width of an edge (drawn as line).
         /// </summary>
         [Range(0.0f, float.MaxValue)]
@@ -50,6 +55,7 @@ namespace SEE.Game.City
         {
             writer.BeginGroup(label);
             writer.Save(Kind.ToString(), EdgeLayoutLabel);
+            writer.Save(AnimationKind.ToString(), AnimationKindLabel);
             writer.Save(EdgeWidth, EdgeWidthLabel);
             writer.Save(EdgesAboveBlocks, EdgesAboveBlocksLabel);
             writer.Save(Tension, TensionLabel);
@@ -64,6 +70,7 @@ namespace SEE.Game.City
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
                 ConfigIO.RestoreEnum(values, EdgeLayoutLabel, ref Kind);
+                ConfigIO.RestoreEnum(values, AnimationKindLabel, ref AnimationKind);
                 ConfigIO.Restore(values, EdgeWidthLabel, ref EdgeWidth);
                 ConfigIO.Restore(values, EdgesAboveBlocksLabel, ref EdgesAboveBlocks);
                 ConfigIO.Restore(values, TensionLabel, ref Tension);
@@ -76,5 +83,6 @@ namespace SEE.Game.City
         private const string EdgesAboveBlocksLabel = "EdgesAboveBlocks";
         private const string TensionLabel = "Tension";
         private const string RDPLabel = "RDP";
+        private const string AnimationKindLabel = "AnimationKind";
     }
 }
