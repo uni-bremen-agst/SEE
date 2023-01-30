@@ -82,6 +82,11 @@ namespace SEE.Game.City
                     {
                         spline.CreateMesh();
                         spline.GradientColors = GetEdgeGradient(edge);
+
+                        // if (edge.HasToggle(Edge.IsHiddenToggle))
+                        // {
+                        //     spline.SubsplineEndT = 0;
+                        // }
                     }
                     else
                     {
@@ -139,6 +144,8 @@ namespace SEE.Game.City
                 State.Convergent => (Color.green, Color.Lerp(Color.green, Color.black, EDGE_GRADIENT_FACTOR)),
                 _ => throw new ArgumentOutOfRangeException(nameof(edge), edge.State(), "Unknown state of given edge!")
             };
+
+            // FIXME: conflict when not using fade-in animation kind
             if (edge.HasToggle(Edge.IsHiddenToggle))
             {
                 // If the edge is supposed to be hidden, its alpha value must be zero.
