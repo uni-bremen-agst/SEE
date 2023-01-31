@@ -6,7 +6,6 @@ namespace SEE.Net.Actions
 {
     /// <summary>
     /// Responsible to synchronize the vrik model on all clients.
-    ///
     /// </summary>
     public class VRIKSynchronizer : MonoBehaviour
     {
@@ -20,10 +19,14 @@ namespace SEE.Net.Actions
         /// </summary>
         private NetworkObject NetworkObject;
 
+        /// <summary>
+        /// VRIK Component.
+        /// </summary>
         private VRIK Vrik;
 
         /// <summary>
-        /// Initializes the network object and vrik model.
+        /// Initializes the network object and vrik model. The periodic call of
+        /// <see cref="Synchronize"/> is triggered.
         /// </summary>
         private void Start()
         {
