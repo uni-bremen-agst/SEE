@@ -97,7 +97,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// used to calculate upper and lower knots from <see cref="subsplineEndT"/> and  <see cref="subsplineStartT"/>.
+        /// Used to calculate upper and lower knots from <see cref="subsplineEndT"/> and  <see cref="subsplineStartT"/>.
         /// chordLengths is set in Property <see cref="Spline"/>.
         /// </summary>
         private ChordLengths chordLengths = null;
@@ -532,9 +532,10 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// create the subspline for the build-up animation
+        /// Create the subspline for the build-up animation.
         /// </summary>
-        private BSpline CalculateSubSpline()
+        /// <returns>The spline to be rendered.</returns>
+        private BSpline CreateSubSpline()
         {
             if (chordLengths == null)
             {
@@ -546,9 +547,9 @@ namespace SEE.GO
 
             bool domainIsEmpty = BSpline.KnotsEqual(lowerKnot, upperKnot);
 
-            // if domain is empty, then subspline has 0 length,
-            // but this subspline cant be calculated
-            // so we just disable the lineRenderer and meshRenderer
+            // If the domain is empty, then the subspline has a length
+            // of 0, but this subspline cannot be calculated so we
+            // just disable the LineRenderer and MeshRenderer
             if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
             {
                 lineRenderer.enabled = !domainIsEmpty;
@@ -558,7 +559,8 @@ namespace SEE.GO
                 meshRenderer.enabled = !domainIsEmpty;
             }
 
-            // empty domain or full 0 to 1 domain
+            // The domain of the spline to be drawn is either
+            // completely empty or complete.
             if (domainIsEmpty ||
                 (BSpline.KnotsEqual(0.0f, lowerKnot) &&
                  BSpline.KnotsEqual(upperKnot, 1.0f)))

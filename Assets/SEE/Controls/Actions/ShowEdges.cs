@@ -29,11 +29,11 @@ namespace SEE.Controls.Actions
         private bool isSelected = false;
 
         /// <summary>
-        /// True if the object is currently selected.
+        /// The city object this edge is rendered in.
         /// </summary>
         private AbstractSEECity codeCity;
 
-        private const float OPERATION_DURATION = 1f;
+        private const float ANIMATION_DURATION = 1f;
 
         /// <summary>
         /// Registers On() and Off() for the respective hovering and selection events.
@@ -185,6 +185,7 @@ namespace SEE.Controls.Actions
         /// Hides the given <paramref name="edge"/> by fading its alpha value to zero.
         /// </summary>
         /// <param name="edge">the edge to hide</param>
+        /// <param name="animationKind">the way to animate edge appearance</param>
         private static void HideEdge(Edge edge, EdgeAnimationKind animationKind)
         {
             GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
@@ -194,7 +195,6 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            // TODO: include a switch for the different operator methods
             EdgeOperator @operator = edgeObject.AddOrGetComponent<EdgeOperator>();
 
             switch (animationKind)
@@ -202,10 +202,10 @@ namespace SEE.Controls.Actions
                 case EdgeAnimationKind.None:
                     break;
                 case EdgeAnimationKind.Fading:
-                    @operator.FadeTo(0.0f, OPERATION_DURATION);
+                    @operator.FadeTo(0.0f, ANIMATION_DURATION);
                     break;
                 case EdgeAnimationKind.Buildup:
-                    @operator.Destruct(OPERATION_DURATION);
+                    @operator.Destruct(ANIMATION_DURATION);
                     break;
                 default:
                     throw new System.ArgumentOutOfRangeException("Unknown edge animation layout supplied.");
@@ -233,10 +233,10 @@ namespace SEE.Controls.Actions
                 case EdgeAnimationKind.None:
                     break;
                 case EdgeAnimationKind.Fading:
-                    @operator.FadeTo(1.0f, OPERATION_DURATION);
+                    @operator.FadeTo(1.0f, ANIMATION_DURATION);
                     break;
                 case EdgeAnimationKind.Buildup:
-                    @operator.Construct(OPERATION_DURATION);
+                    @operator.Construct(ANIMATION_DURATION);
                     break;
                 default:
                     throw new System.ArgumentOutOfRangeException("Unknown edge animation layout supplied.");

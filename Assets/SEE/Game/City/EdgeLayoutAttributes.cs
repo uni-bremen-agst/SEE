@@ -17,7 +17,7 @@ namespace SEE.Game.City
         public EdgeLayoutKind Kind = EdgeLayoutKind.Bundling;
 
         /// <summary>
-        /// Layout for drawing edges.
+        /// Kind of animation used to draw edges.
         /// </summary>
         public EdgeAnimationKind AnimationKind = EdgeAnimationKind.None;
 

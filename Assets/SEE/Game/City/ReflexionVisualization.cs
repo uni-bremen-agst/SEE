@@ -83,7 +83,7 @@ namespace SEE.Game.City
                         spline.CreateMesh();
                         spline.GradientColors = GetEdgeGradient(edge);
 
-                        //FIXME: conflict when not using fade-in animation kind
+                        //FIXME: hiding edges via buildup conflicts with alpha value setting in GetEdgeGradient()
                         if (edge.HasToggle(Edge.IsHiddenToggle))
                         {
                             spline.SubsplineEndT = 0;

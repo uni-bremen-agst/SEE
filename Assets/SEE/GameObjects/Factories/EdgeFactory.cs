@@ -122,7 +122,7 @@ namespace SEE.GO
             // rendered around world origin.
             line.useWorldSpace = false;
 
-            // Draw spline as poly line.
+            // Draw spline as concatenation of subsplines (polyline).
             SEESpline spline = gameEdge.GetComponent<SEESpline>();
             Vector3[] positions = TinySplineInterop.ListToVectors(spline.Spline.Sample());
             line.positionCount = positions.Length; // number of vertices
