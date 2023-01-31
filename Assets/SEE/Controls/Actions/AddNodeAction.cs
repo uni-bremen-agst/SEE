@@ -4,6 +4,7 @@ using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
+using SEE.Audio;
 
 namespace SEE.Controls.Actions
 {
@@ -39,6 +40,7 @@ namespace SEE.Controls.Actions
                 new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
                 result = true;
                 currentState = ReversibleAction.Progress.Completed;
+                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NEW_NODE_SOUND, parent);
             }
             return result;
         }

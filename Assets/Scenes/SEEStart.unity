@@ -220,6 +220,7 @@ GameObject:
   - component: {fileID: 831127265}
   - component: {fileID: 831127268}
   - component: {fileID: 831127264}
+  - component: {fileID: 831127269}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -367,6 +368,37 @@ MonoBehaviour:
     relativePath: /network.cfg
     absolutePath: 
   vivoxChannelName: 
+--- !u!114 &831127269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 831127263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 112189549b190ce449afbe88b4fdeb19, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  LobbyMusic: {fileID: 8300000, guid: eef5dbc87c6cbf6449787ad35af840b1, type: 3}
+  GameMusic: {fileID: 8300000, guid: 1c87e6a7c7d35ca4ea295d8531c98b42, type: 3}
+  ClickSoundEffect: {fileID: 8300000, guid: a092ab5087ce67749ab5121218736ace, type: 3}
+  DropSoundEffect: {fileID: 8300000, guid: 4ab55c9906a8ca24d9a845a535f56fac, type: 3}
+  PickSoundEffect: {fileID: 8300000, guid: 20b92014b4d721e4887d2d3ce57031a7, type: 3}
+  NewEdgeSoundEffect: {fileID: 8300000, guid: 5359fb3fe73504846834bc06afe916ef, type: 3}
+  NewNodeSoundEffect: {fileID: 8300000, guid: 26cd9ed2686d0fb439e6f685591dde5c, type: 3}
+  ScribbleSoundEffect: {fileID: 8300000, guid: 5ac10f48daad51940a2c310c1dd3e314, type: 3}
+  FootstepSoundEffect: {fileID: 8300000, guid: 7060313100aec8d44a39d914807a1b6b, type: 3}
+  OkayButtonSoundEffect: {fileID: 8300000, guid: 8ccf8e67ca7f69e499ed8e98cad52802,
+    type: 3}
+  CancelButtonSoundEffect: {fileID: 8300000, guid: a04e62d5271b26e488b3fc10137cb8ba,
+    type: 3}
+  HoverSoundEffect: {fileID: 8300000, guid: fbca3b733b1a185428e80440e005d872, type: 3}
+  PlayerObject: {fileID: 831127263}
+  DefaultMusicVolume: 0.4
+  DefaultSoundEffectVolume: 1
+  MusicVolume: 0
+  SoundEffectVolume: 0
 --- !u!1 &1909299425
 GameObject:
   m_ObjectHideFlags: 0

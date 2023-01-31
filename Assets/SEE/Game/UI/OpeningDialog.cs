@@ -28,7 +28,7 @@ namespace SEE.UI
         /// <returns>the newly created action menu component.</returns>
         private SimpleMenu CreateMenu()
         {
-            GameObject actionMenuGO = new GameObject { name = "Network Menu" };
+            GameObject actionMenuGO = new() { name = "Network Menu" };
             IList<ToggleMenuEntry> entries = SelectionEntries();
             SimpleMenu actionMenu = actionMenuGO.AddComponent<SimpleMenu>();
             actionMenu.AllowNoSelection(false); // the menu cannot be closed; user must make a decision
@@ -50,27 +50,27 @@ namespace SEE.UI
             Color color = Color.blue;
 
             return new List<ToggleMenuEntry>
-                    { new ToggleMenuEntry(active: false,
-                                          entryAction: this.StartHost,
-                                          exitAction: null,
-                                          title: "Host",
-                                          description: "Starts a server and local client process.",
-                                          entryColor: NextColor(),
-                                          icon: Resources.Load<Sprite>("Icons/Host")),
-                      new ToggleMenuEntry(active: false,
-                                          entryAction: this.StartClient,
-                                          exitAction: null,
-                                          title: "Client",
-                                          description: "Starts a local client connection to a server.",
-                                          entryColor: NextColor(),
-                                          icon: Resources.Load<Sprite>("Icons/Client")),
-                      new ToggleMenuEntry(active: false,
-                                          entryAction: this.ToggleEnvironment,
-                                          exitAction: null,
-                                          title: "Toggle Desktop/VR",
-                                          description: "Toggles between desktop and VR hardware.",
-                                          entryColor: NextColor(),
-                                          icon: Resources.Load<Sprite>("Icons/Client")),
+                    { new(active: false,
+                          entryAction: StartHost,
+                          exitAction: null,
+                          title: "Host",
+                          description: "Starts a server and local client process.",
+                          entryColor: NextColor(),
+                          icon: Resources.Load<Sprite>("Icons/Host")),
+                      new(active: false,
+                          entryAction: StartClient,
+                          exitAction: null,
+                          title: "Client",
+                          description: "Starts a local client connection to a server.",
+                          entryColor: NextColor(),
+                          icon: Resources.Load<Sprite>("Icons/Client")),
+                      new(active: false,
+                          entryAction: ToggleEnvironment,
+                          exitAction: null,
+                          title: "Toggle Desktop/VR",
+                          description: "Toggles between desktop and VR hardware.",
+                          entryColor: NextColor(),
+                          icon: Resources.Load<Sprite>("Icons/Client")),
 
                       // FIXME: Running only a server is currently not working.
                       //new ToggleMenuEntry(active: false,
@@ -80,13 +80,13 @@ namespace SEE.UI
                       //                    description: "Starts a dedicated server without local client.",
                       //                    entryColor: NextColor(),
                       //                    icon: Resources.Load<Sprite>("Icons/Server")),
-                      new ToggleMenuEntry(active: false,
-                                          entryAction: this.Settings,
-                                          exitAction: null,
-                                          title: "Settings",
-                                          description: "Allows to set additional network settings.",
-                                          entryColor: Color.gray,
-                                          icon: Resources.Load<Sprite>("Icons/Settings")),
+                      new(active: false,
+                          entryAction: Settings,
+                          exitAction: null,
+                          title: "Settings",
+                          description: "Allows to set additional network settings.",
+                          entryColor: Color.gray,
+                          icon: Resources.Load<Sprite>("Icons/Settings")),
             };
 
             Color NextColor()
@@ -194,7 +194,7 @@ namespace SEE.UI
             /// menu, which - in turn - will call menu.ShowMenu(false). Thus
             /// at this time, menu is no longer visible. When the following dialog
             /// is finished, <see cref="Reactivate"/> will be called to turn the menu on again.
-            NetworkPropertyDialog dialog = new NetworkPropertyDialog(network, Reactivate);
+            NetworkPropertyDialog dialog = new(network, Reactivate);
             dialog.Open();
         }
 
