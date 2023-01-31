@@ -8,24 +8,58 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions.HolisticMetrics
 {
+    /// <summary>
+    /// Saves a metrics board's configuration to a file.
+    /// </summary>
     public class SaveBoardAction : AbstractPlayerAction
     {
+        /// <summary>
+        /// The path to the <see cref="button"/> prefab.
+        /// </summary>
         private const string buttonPath = "Prefabs/HolisticMetrics/SceneComponents/SaveBoardButton";
 
+        /// <summary>
+        /// The button GameObject. This is a button that will appear on the player's UI and when the player clicks it,
+        /// he will see a dialog that lets him save a metrics board.
+        /// </summary>
         private GameObject button;
 
+        /// <summary>
+        /// The controller of the button, in the <see cref="Update"/> method we will "ask" this if the button has been
+        /// clicked.
+        /// </summary>
         private LoadBoardButtonController buttonController;
 
+        /// <summary>
+        /// Whether or not the <see cref="button"/> has been clicked (if so, the player should see a dialog).
+        /// </summary>
         private bool buttonClicked;
 
+        /// <summary>
+        /// Saves all the information needed to revert or repeat this action.
+        /// </summary>
         private Memento memento;
 
+        /// <summary>
+        /// This struct can store all the information needed to revert or repeat a <see cref="SaveBoardAction"/>.
+        /// </summary>
         private struct Memento
         {
+            /// <summary>
+            /// The name of the file in which the board's config has been written.
+            /// </summary>
             internal readonly string filename; 
                 
+            /// <summary>
+            /// The WidgetsManager of the board of which the configuration was saved here.
+            /// </summary>
             internal readonly WidgetsManager widgetsManager;
 
+            /// <summary>
+            /// The constructor of this struct.
+            /// </summary>
+            /// <param name="filename">The filename to save into this Memento</param>
+            /// <param name="widgetsManager">The WidgetsManager to save into this file</param>
             internal Memento(string filename, WidgetsManager widgetsManager)
             {
                 this.filename = filename;
@@ -33,6 +67,10 @@ namespace SEE.Controls.Actions.HolisticMetrics
             }
         }
         
+        /// <summary>
+        /// Adds a button to the player's UI. That button opens a dialog that lets the player select a metrics board to
+        /// save.
+        /// </summary>
         public override void Start()
         {
             button = PrefabInstantiator.InstantiatePrefab(buttonPath, GameObject.Find("UI Canvas").transform,
@@ -40,6 +78,10 @@ namespace SEE.Controls.Actions.HolisticMetrics
             buttonController = button.GetComponent<LoadBoardButtonController>();
         }
         
+        /// <summary>
+        /// This method manages the player's interaction with the mode <see cref="ActionStateType.SaveBoard"/>.
+        /// </summary>
+        /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
             if (!buttonClicked && buttonController.GetClick())
@@ -59,36 +101,62 @@ namespace SEE.Controls.Actions.HolisticMetrics
             return false;
         }
 
+        /// <summary>
+        /// Removes the button (that needs to be clicked to save a metrics board into a file) from the player's UI.
+        /// </summary>
         public override void Stop()
         {
             Destroyer.Destroy(button);
         }
 
+        /// <summary>
+        /// Reverts this action, i.e., deletes the file in which the board configuration was saved.
+        /// </summary>
         public override void Undo()
         {
             ConfigManager.DeleteBoard(memento.filename);
         }
         
+        /// <summary>
+        /// Repeats this action, i.e., saves this board again with the same filename that was given by the player
+        /// initially.
+        /// </summary>
         public override void Redo()
         {
             ConfigManager.SaveBoard(memento.widgetsManager, memento.filename);
         }
 
+        /// <summary>
+        /// Returns a new instance of <see cref="SaveBoardAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new SaveBoardAction();
         }
         
+        /// <summary>
+        /// Returns a new instance of <see cref="SaveBoardAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
         public override ReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }
         
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this class.
+        /// </summary>
+        /// <returns><see cref="ActionStateType.SaveBoard"/></returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.SaveBoard;
         }
         
+        /// <summary>
+        /// Returns (in a HashSet) the name of the file into which the config was written.
+        /// </summary>
+        /// <returns>A HashSet with one entry which is the name of the file into which the config was written.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string> { memento.filename };

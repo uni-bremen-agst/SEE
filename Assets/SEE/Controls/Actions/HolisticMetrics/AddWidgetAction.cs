@@ -14,10 +14,19 @@ namespace SEE.Controls.Actions.HolisticMetrics
     /// </summary>
     internal class AddWidgetAction : AbstractPlayerAction
     {
+        /// <summary>
+        /// Indicates how far this instance has progressed in adding a widget.
+        /// </summary>
         private ProgressState progress = ProgressState.GetPosition;
         
+        /// <summary>
+        /// Saves all the information needed to revert or repeat this action.
+        /// </summary>
         private Memento memento;
 
+        /// <summary>
+        /// Represents the different stages of progress of this action.
+        /// </summary>
         private enum ProgressState
         {
             GetPosition,
@@ -25,6 +34,9 @@ namespace SEE.Controls.Actions.HolisticMetrics
             Finished
         }
         
+        /// <summary>
+        /// This struct can store all the information needed to revert or repeat an <see cref="AddWidgetAction"/>.
+        /// </summary>
         private struct Memento
         {
             /// <summary>
@@ -50,14 +62,16 @@ namespace SEE.Controls.Actions.HolisticMetrics
             }
         }
 
+        /// <summary>
+        /// Adds WidgetAdder components to all widgets so they can be deleted by clicking them.
+        /// </summary>
         public override void Start()
         {
             BoardsManager.AddWidgetAdders();
-            Debug.LogWarning("start method called");
         }
 
         /// <summary>
-        /// This method manages the player's input while in the mode <see cref="ActionStateType.AddWidget"/>.
+        /// This method manages the player's interaction with the mode <see cref="ActionStateType.AddWidget"/>.
         /// </summary>
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
@@ -71,35 +85,33 @@ namespace SEE.Controls.Actions.HolisticMetrics
                         memento = new Memento(boardName, config);
                         new AddWidgetDialog().Open();
                         progress = ProgressState.GetConfig;
-                        Debug.LogWarning("Currently got a click");
                     }
 
                     return false;
                 case ProgressState.GetConfig:
                     if (AddWidgetDialog.GetConfig(out string metric, out string widget))
                     {
-                        Debug.LogWarning("got a config");
                         memento.config.MetricType = metric;
                         memento.config.WidgetName = widget;
-                        Redo();
                         progress = ProgressState.Finished;
+                        Redo();
                         return true;
                     }
 
                     return false;
                 case ProgressState.Finished:
-                    Debug.LogWarning("in switch statement finished");
                     return true;
                 default:
-                    Debug.LogWarning("in switch stamenet default");
                     return false;
             }
         }
 
+        /// <summary>
+        /// Marks the WidgetAdder components as "to be deleted".
+        /// </summary>
         public override void Stop()
         {
             WidgetAdder.Stop();
-            Debug.LogWarning("Stop method called");
         }
 
         /// <summary>
@@ -145,16 +157,29 @@ namespace SEE.Controls.Actions.HolisticMetrics
             return new AddWidgetAction();
         }
         
+        /// <summary>
+        /// Returns a new instance of <see cref="AddWidgetAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
         public override ReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }
 
+        /// <summary>
+        /// Returns the ID of the new widget and the name of the board which it was added onto.
+        /// </summary>
+        /// <returns>A HashSet of two items: The ID of the added widget and the name of the board it was added onto
+        /// </returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string> { memento.boardName, memento.config.ID.ToString() };
         }
 
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this class.
+        /// </summary>
+        /// <returns><see cref="ActionStateType.AddWidget"/></returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.AddWidget;

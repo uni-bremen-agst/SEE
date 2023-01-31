@@ -1,4 +1,3 @@
-using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
 using SEE.Utils;
@@ -43,7 +42,6 @@ namespace SEE.Game.HolisticMetrics.Components
         {
             if (!Raycasting.IsMouseOverGUI())
             {
-                Transform parentTransform = transform.parent;
                 deletionDone = true;
                 hasDeletion = true;
             }

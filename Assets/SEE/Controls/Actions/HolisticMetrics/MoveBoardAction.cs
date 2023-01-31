@@ -12,8 +12,14 @@ namespace SEE.Controls.Actions.HolisticMetrics
     /// </summary>
     internal class MoveBoardAction : AbstractPlayerAction
     {
+        /// <summary>
+        /// Saves all the information needed to revert or repeat this action.
+        /// </summary>
         private Memento memento;
 
+        /// <summary>
+        /// This struct can store all the information needed to revert or repeat a <see cref="MoveBoardAction"/>.
+        /// </summary>
         private struct Memento
         {
             /// <summary>
@@ -60,11 +66,19 @@ namespace SEE.Controls.Actions.HolisticMetrics
             }
         }
 
+        /// <summary>
+        /// Makes the metrics boards movable by activating a little button underneath each board that can be dragged
+        /// around.
+        /// </summary>
         public override void Start()
         {
             BoardsManager.ToggleMoving();
         }
         
+        /// <summary>
+        /// This method manages the player's interaction with the mode <see cref="ActionStateType.MoveBoard"/>.
+        /// </summary>
+        /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
             if (BoardsManager.GetMovement(out string boardName, out Vector3 oldPosition, out Vector3 newPosition, 
@@ -78,6 +92,9 @@ namespace SEE.Controls.Actions.HolisticMetrics
             return false;
         }
 
+        /// <summary>
+        /// Deactivates the little buttons underneath the metrics boards that let the player move the boards around.
+        /// </summary>
         public override void Stop()
         {
             BoardsManager.ToggleMoving();
@@ -105,7 +122,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         }
 
         /// <summary>
-        /// Returns a new instance of <see cref="DeleteBoardAction"/>.
+        /// Returns a new instance of <see cref="MoveBoardAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
         public static ReversibleAction CreateReversibleAction()
@@ -113,16 +130,28 @@ namespace SEE.Controls.Actions.HolisticMetrics
             return new MoveBoardAction();
         }
         
+        /// <summary>
+        /// Returns a new instance of <see cref="MoveBoardAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
         public override ReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }
 
+        /// <summary>
+        /// Returns a HashSet with one item which is the name of the board that was moved in this action.
+        /// </summary>
+        /// <returns>A HashSet with one item which is the name of the board that was moved in this action</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string> { memento.boardName };
         }
 
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this class.
+        /// </summary>
+        /// <returns><see cref="ActionStateType.MoveBoard"/></returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.MoveBoard;

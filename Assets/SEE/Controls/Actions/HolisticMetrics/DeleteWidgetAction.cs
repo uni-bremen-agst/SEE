@@ -12,8 +12,14 @@ namespace SEE.Controls.Actions.HolisticMetrics
     /// </summary>
     internal class DeleteWidgetAction : AbstractPlayerAction
     {
+        /// <summary>
+        /// Saves all the information needed to revert or repeat this action.
+        /// </summary>
         private Memento memento;
 
+        /// <summary>
+        /// This struct can store all the information needed to revert or repeat a <see cref="DeleteWidgetAction"/>.
+        /// </summary>
         private struct Memento
         {
             /// <summary>
@@ -38,11 +44,19 @@ namespace SEE.Controls.Actions.HolisticMetrics
             }
         }
 
+        /// <summary>
+        /// Add components to the widgets that will listen for mouse clicks. When the player clicks a widget then, it
+        /// will be deleted in the method <see cref="Update"/>.
+        /// </summary>
         public override void Start()
         {
             BoardsManager.AddWidgetDeleters();
         }
         
+        /// <summary>
+        /// This method manages the player's interaction with the mode <see cref="ActionStateType.DeleteWidget"/>.
+        /// </summary>
+        /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
             if (BoardsManager.GetWidgetDeletion(out string boardName, out WidgetConfig widgetConfig))
@@ -54,23 +68,13 @@ namespace SEE.Controls.Actions.HolisticMetrics
             return false;
         }
 
+        /// <summary>
+        /// Marks the WidgetDeleter components as "to be deleted". When they are deleted, it will no longer be possible
+        /// to delete a widget by clicking on it.
+        /// </summary>
         public override void Stop()
         {
             WidgetDeleter.Stop();
-        }
-
-        /// <summary>
-        /// Returns a new instance of <see cref="DeleteBoardAction"/>.
-        /// </summary>
-        /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
-        {
-            return new DeleteWidgetAction();
-        }
-        
-        public override ReversibleAction NewInstance()
-        {
-            return CreateReversibleAction();
         }
 
         /// <summary>
@@ -115,11 +119,37 @@ namespace SEE.Controls.Actions.HolisticMetrics
             }
         }
 
+        /// <summary>
+        /// Returns a new instance of <see cref="DeleteWidgetAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public static ReversibleAction CreateReversibleAction()
+        {
+            return new DeleteWidgetAction();
+        }
+        
+        /// <summary>
+        /// Returns a new instance of <see cref="DeleteWidgetAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
+        
+        /// <summary>
+        /// Returns the ID of the widget that was deleted in this action.
+        /// </summary>
+        /// <returns>A HashSet of strings containing one item which is the ID of the widget that was moved</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string> { memento.widgetConfig.ID.ToString() };
         }
 
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this class.
+        /// </summary>
+        /// <returns><see cref="ActionStateType.DeleteWidget"/></returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.DeleteWidget;

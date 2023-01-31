@@ -14,12 +14,26 @@ namespace SEE.Controls.Actions.HolisticMetrics
     /// </summary>
     internal class AddBoardAction : AbstractPlayerAction
     {
+        /// <summary>
+        /// Path to the prefab that lets the player rotate the dummy metrics board he sees at one stage of adding a new
+        /// board to the scene. This is a little window with a slider (the slider controls the rotation) and a button to
+        /// confirm the rotation.
+        /// </summary>
         private const string boardRotatorPath = "Prefabs/UI/MetricsBoardRotation";
         
-        private ProgressState progress;
+        /// <summary>
+        /// Indicates how far this instance has progressed in adding a new metrics board to the scene.
+        /// </summary>
+        private ProgressState progress = ProgressState.GettingPosition;
         
+        /// <summary>
+        /// Saves all the information needed to revert or repeat this action.
+        /// </summary>
         private Memento memento;
         
+        /// <summary>
+        /// Represents the different stages of progress of this action.
+        /// </summary>
         private enum ProgressState
         {
             GettingPosition,
@@ -27,6 +41,9 @@ namespace SEE.Controls.Actions.HolisticMetrics
             GettingName
         }
         
+        /// <summary>
+        /// This struct can store all the information needed to revert or repeat an <see cref="AddBoardAction"/>.
+        /// </summary>
         private struct Memento
         {
             /// <summary>
@@ -44,12 +61,18 @@ namespace SEE.Controls.Actions.HolisticMetrics
             }    
         }
         
+        /// <summary>
+        /// Sets up the scene to listen for a mouse click on the floor.
+        /// </summary>
         public override void Start()
         {
             BoardAdder.Init();
-            
         }
 
+        /// <summary>
+        /// This method manages the player's interaction with the mode <see cref="ActionStateType.AddBoard"/>.
+        /// </summary>
+        /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
             switch (progress)
@@ -87,24 +110,13 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     return false;
             }
         }
-
+        
+        /// <summary>
+        /// Marks the BoardAdder component as "to be deleted".
+        /// </summary>
         public override void Stop()
         {
             BoardAdder.Stop();
-        }
-
-        /// <summary>
-        /// Returns a new instance of <see cref="AddBoardAction"/>.
-        /// </summary>
-        /// <returns>The new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
-        {
-            return new AddBoardAction();
-        }
-        
-        public override ReversibleAction NewInstance()
-        {
-            return CreateReversibleAction();
         }
 
         /// <summary>
@@ -125,11 +137,37 @@ namespace SEE.Controls.Actions.HolisticMetrics
             new CreateBoardNetAction(memento.boardConfig).Execute();
         }
         
+        /// <summary>
+        /// Returns a new instance of <see cref="AddBoardAction"/>.
+        /// </summary>
+        /// <returns>The new instance</returns>
+        public static ReversibleAction CreateReversibleAction()
+        {
+            return new AddBoardAction();
+        }
+        
+        /// <summary>
+        /// Returns a new instance of <see cref="AddBoardAction"/>.
+        /// </summary>
+        /// <returns>The new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
+        
+        /// <summary>
+        /// The name of the new board.
+        /// </summary>
+        /// <returns>A HashSet with one string in it which is the name of the new board.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string> { memento.boardConfig.Title };
         }
 
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this class.
+        /// </summary>
+        /// <returns><see cref="ActionStateType.AddBoard"/></returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.AddBoard;

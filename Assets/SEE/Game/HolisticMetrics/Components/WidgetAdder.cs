@@ -43,7 +43,7 @@ namespace SEE.Game.HolisticMetrics.Components
         {
             if (MainCamera.Camera != null)
             {
-                if (Raycasting.RaycastAnything(out RaycastHit hit))
+                if (!Raycasting.IsMouseOverGUI() && Raycasting.RaycastAnything(out RaycastHit hit))
                 {
                     position = transform.InverseTransformPoint(hit.point);
                     positioningDone = true;

@@ -14,8 +14,14 @@ namespace SEE.Controls.Actions.HolisticMetrics
     /// </summary>
     internal class DeleteBoardAction : AbstractPlayerAction
     {
+        /// <summary>
+        /// Saves all the information needed to revert or repeat this action.
+        /// </summary>
         private Memento memento;
         
+        /// <summary>
+        /// This struct can store all the information needed to revert or repeat a <see cref="DeleteBoardAction"/>.
+        /// </summary>
         private struct Memento
         {
             /// <summary>
@@ -29,6 +35,10 @@ namespace SEE.Controls.Actions.HolisticMetrics
             }
         }
 
+        /// <summary>
+        /// This method manages the player's interaction with the mode <see cref="ActionStateType.DeleteBoard"/>.
+        /// </summary>
+        /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
             if (Input.GetMouseButtonDown(0) && Raycasting.RaycastAnything(out RaycastHit raycastHit))
@@ -73,6 +83,10 @@ namespace SEE.Controls.Actions.HolisticMetrics
             return new DeleteBoardAction();
         }
         
+        /// <summary>
+        /// Returns a new instance of <see cref="DeleteBoardAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
         public override ReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -87,6 +101,10 @@ namespace SEE.Controls.Actions.HolisticMetrics
             return new HashSet<string> { memento.boardConfig.Title };
         }
 
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this class.
+        /// </summary>
+        /// <returns><see cref="ActionStateType.DeleteBoard"/></returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.DeleteBoard;

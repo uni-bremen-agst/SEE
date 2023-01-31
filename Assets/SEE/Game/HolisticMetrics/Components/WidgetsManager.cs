@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Michsky.UI.ModernUIPack;
+using SEE.Controls.Actions.HolisticMetrics;
 using SEE.DataModel;
 using SEE.Game.City;
 using SEE.Game.HolisticMetrics.Metrics;
@@ -138,7 +139,15 @@ namespace SEE.Game.HolisticMetrics.Components
                 Metric metricInstance = (Metric)widgetInstance.AddComponent(metricType);
                 widgetController.ID = widgetConfiguration.ID;
                 widgets.Add((widgetController, metricInstance));
-                widgetController.Display(metricInstance.Refresh(GetSelectedCity()));
+                try
+                {
+                    widgetController.Display(metricInstance.Refresh(GetSelectedCity()));    
+                }
+                catch(Exception exception)
+                {
+                    Debug.LogError($"There was an error when displaying the metric on the newly created " +
+                                   $"widget, this is the exception: {exception}");
+                }
             }
         }
 
@@ -168,6 +177,12 @@ namespace SEE.Game.HolisticMetrics.Components
             }
         }
 
+        /// <summary>
+        /// Determines whether one of the widgets that this manager manages is marked as "to be deleted".
+        /// </summary>
+        /// <param name="widgetConfig">If there is a widget that is to be deleted, that widget's configuration will be
+        /// assigned to this parameter.</param>
+        /// <returns>Whether one of the widgets that this manager manages is marked as "to be deleted".</returns>
         internal bool GetWidgetDeletion(out WidgetConfig widgetConfig)
         {
             foreach ((WidgetController, Metric) widget in widgets)
@@ -247,6 +262,16 @@ namespace SEE.Game.HolisticMetrics.Components
             boardMover.SetActive(enable);
         }
 
+        /// <summary>
+        /// Determines whether the board managed by this manager has a movement that has not yet been fetched
+        /// by <see cref="MoveBoardAction"/>
+        /// </summary>
+        /// <param name="oldPosition">The position of the board before the movement</param>
+        /// <param name="newPosition">The new position of the board</param>
+        /// <param name="oldRotation">The rotation of the board before the movement</param>
+        /// <param name="newRotation">The new rotation of the board</param>
+        /// <returns>Whether the board managed by this manager has a movement that has not yet been fetched by
+        /// <see cref="MoveBoardAction"/></returns>
         internal bool GetMovement(out Vector3 oldPosition, out Vector3 newPosition, out Quaternion oldRotation,
             out Quaternion newRotation)
         {
@@ -266,10 +291,16 @@ namespace SEE.Game.HolisticMetrics.Components
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="originalPosition"></param>
+        /// <param name="newPosition"></param>
+        /// <param name="widgetID"></param>
+        /// <returns></returns>
         internal bool GetWidgetMovement(
             out Vector3 originalPosition,
             out Vector3 newPosition,
-            out string containingBoardName,
             out Guid widgetID)
         {
             foreach ((WidgetController, Metric) widget in widgets)
@@ -279,17 +310,15 @@ namespace SEE.Game.HolisticMetrics.Components
                     .GetComponent<WidgetMover>()
                     .GetMovement(
                         out originalPosition,
-                        out newPosition,
-                        out containingBoardName,
-                        out widgetID))
+                        out newPosition))
                 {
+                    widgetID = widget.Item1.ID;
                     return true;
                 }
             }
 
             originalPosition = Vector3.zero;
             newPosition = Vector3.zero;
-            containingBoardName = null;
             widgetID = Guid.NewGuid();
             return false;
         }

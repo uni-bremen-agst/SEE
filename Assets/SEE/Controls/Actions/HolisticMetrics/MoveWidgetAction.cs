@@ -14,8 +14,14 @@ namespace SEE.Controls.Actions.HolisticMetrics
     /// </summary>
     internal class MoveWidgetAction : AbstractPlayerAction
     {
+        /// <summary>
+        /// Saves all the information needed to revert or repeat this action.
+        /// </summary>
         private Memento memento;
 
+        /// <summary>
+        /// This struct can store all the information needed to revert or repeat a <see cref="MoveWidgetAction"/>.
+        /// </summary>
         private struct Memento
         {
             /// <summary>
@@ -38,6 +44,13 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// </summary>
             public readonly Vector3 newPosition;
 
+            /// <summary>
+            /// The constructor of this struct; this just assigns its parameters to this classes' fields.
+            /// </summary>
+            /// <param name="boardName">The name of the board on which the widget was moved</param>
+            /// <param name="widgetID">The ID of the widget that was moved</param>
+            /// <param name="oldPosition">The old position of the widget that was moved</param>
+            /// <param name="newPosition">The position to which the widget was moved in this action</param>
             public Memento(string boardName, Guid widgetID, Vector3 oldPosition, Vector3 newPosition)
             {
                 this.boardName = boardName;
@@ -47,11 +60,18 @@ namespace SEE.Controls.Actions.HolisticMetrics
             }
         }
 
+        /// <summary>
+        /// Makes the widgets movable.
+        /// </summary>
         public override void Start()
         {
             BoardsManager.ToggleWidgetsMoving();
         }
 
+        /// <summary>
+        /// This method manages the player's interaction with the mode <see cref="ActionStateType.MoveWidget"/>.
+        /// </summary>
+        /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
             if (BoardsManager.GetWidgetMovement(
@@ -68,23 +88,12 @@ namespace SEE.Controls.Actions.HolisticMetrics
             return false;
         }
 
+        /// <summary>
+        /// Disables the move-ability of the widgets.
+        /// </summary>
         public override void Stop()
         {
             BoardsManager.ToggleWidgetsMoving();
-        }
-
-        /// <summary>
-        /// Returns a new instance of <see cref="DeleteBoardAction"/>.
-        /// </summary>
-        /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
-        {
-            return new MoveWidgetAction();
-        }
-        
-        public override ReversibleAction NewInstance()
-        {
-            return CreateReversibleAction();
         }
 
         /// <summary>
@@ -121,11 +130,37 @@ namespace SEE.Controls.Actions.HolisticMetrics
             }
         }
         
+        /// <summary>
+        /// Returns a new instance of <see cref="MoveWidgetAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public static ReversibleAction CreateReversibleAction()
+        {
+            return new MoveWidgetAction();
+        }
+        
+        /// <summary>
+        /// Returns a new instance of <see cref="MoveWidgetAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
+        
+        /// <summary>
+        /// Returns a HashSet with one item which is the ID of the widget that was moved in this action.
+        /// </summary>
+        /// <returns>A HashSet with one item which is the ID of the widget that was moved in this action</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string> { memento.widgetID.ToString() };
         }
 
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this class.
+        /// </summary>
+        /// <returns><see cref="ActionStateType.MoveWidget"/></returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateType.MoveWidget;

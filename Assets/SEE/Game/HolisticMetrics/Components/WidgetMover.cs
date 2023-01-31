@@ -1,6 +1,4 @@
-using System;
 using SEE.Controls.Actions.HolisticMetrics;
-using SEE.Game.HolisticMetrics.WidgetControllers;
 using SEE.Utils;
 using UnityEngine;
 
@@ -12,14 +10,16 @@ namespace SEE.Game.HolisticMetrics.Components
     /// </summary>
     internal class WidgetMover : MonoBehaviour
     {
+        /// <summary>
+        /// Whether this WidgetMover has registered a movement that has not yet been fetched by the
+        /// <see cref="MoveWidgetAction"/>.
+        /// </summary>
         private bool hasMovement;
         
-        private Vector3 oldPosition;
-
         /// <summary>
-        /// The name of the board which the widget to be moved is attached to.
+        /// The old position of the widget, this might be needed later if the movement needs to be reverted.
         /// </summary>
-        private string boardName;
+        private Vector3 oldPosition;
 
         /// <summary>
         /// The plane in which the canvas lies (the canvas that contains the widget that contains this component).
@@ -31,7 +31,6 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         private void Start()
         {
-            boardName = transform.parent.GetComponent<WidgetsManager>().GetTitle();
             hasMovement = false;
         }
         
@@ -71,26 +70,25 @@ namespace SEE.Game.HolisticMetrics.Components
             hasMovement = true;
         }
 
-        internal bool GetMovement(
-            out Vector3 originalPosition,
-            out Vector3 newPosition,
-            out string containingBoardName,
-            out Guid widgetID)
+        /// <summary>
+        /// Can be used to try to get a widget movement that has not yet been fetched.
+        /// </summary>
+        /// <param name="originalPosition">The position of the widget before the movement, in case the player wants to
+        /// restore it later on.</param>
+        /// <param name="newPosition">The <see cref="Vector3"/> of where the widget has been moved to</param>
+        /// <returns>The value of <see cref="hasMovement"/> at the time this method is called</returns>
+        internal bool GetMovement(out Vector3 originalPosition, out Vector3 newPosition)
         {
             if (hasMovement)
             {
                 originalPosition = oldPosition;
                 newPosition = transform.position;
-                containingBoardName = boardName;
-                widgetID = transform.parent.GetComponent<WidgetController>().ID;
                 hasMovement = false;
                 return true;
             }
 
             originalPosition = Vector3.zero;
             newPosition = Vector3.zero;
-            containingBoardName = null;
-            widgetID = Guid.NewGuid();
             return false;
         }
     }

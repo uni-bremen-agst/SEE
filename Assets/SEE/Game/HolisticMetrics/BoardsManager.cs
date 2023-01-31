@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.UI.Notification;
 using UnityEngine;
 using SEE.Game.HolisticMetrics.Components;
@@ -220,7 +221,17 @@ namespace SEE.Game.HolisticMetrics
             }
             return widgetsMovingEnabled;
         }
-
+        
+        /// <summary>
+        /// Check whether one of the widgets on one of the boards managed by this class has a movement that hasn't yet
+        /// been fetched by the <see cref="MoveWidgetAction"/>.
+        /// </summary>
+        /// <param name="originalPosition">The position of the widget before the movement</param>
+        /// <param name="newPosition">The position of the widget after the movement</param>
+        /// <param name="containingBoardName">The title of the board that contains the widget</param>
+        /// <param name="widgetID">The ID of the widget</param>
+        /// <returns>whether one of the widgets on one of the boards managed by this class has a movement that hasn't yet
+        /// been fetched by the <see cref="MoveWidgetAction"/></returns>
         internal static bool GetWidgetMovement(
             out Vector3 originalPosition,
             out Vector3 newPosition,
@@ -232,9 +243,9 @@ namespace SEE.Game.HolisticMetrics
                 if (widgetsManager.GetWidgetMovement(
                         out originalPosition, 
                         out newPosition, 
-                        out containingBoardName, 
                         out widgetID))
                 {
+                    containingBoardName = widgetsManager.GetTitle();
                     return true;
                 }
             }
@@ -257,6 +268,12 @@ namespace SEE.Game.HolisticMetrics
             }
         }
 
+        /// <summary>
+        /// Tries to get a pending deletion of a widget from any of the boards managed by this manager.
+        /// </summary>
+        /// <param name="boardName">The name of the board that contains the widget that's to be deleted</param>
+        /// <param name="widgetConfig">The configuration of the widget that's to be deleted</param>
+        /// <returns>Whether a pending deletion was found</returns>
         internal static bool GetWidgetDeletion(out string boardName, out WidgetConfig widgetConfig)
         {
             foreach (WidgetsManager widgetsManager in widgetsManagers)
