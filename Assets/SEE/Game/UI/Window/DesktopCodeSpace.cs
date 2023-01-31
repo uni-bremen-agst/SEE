@@ -69,7 +69,7 @@ namespace SEE.Game.UI.Window
                     {
                         Debug.LogError("Neither active window, nor previous active window is "
                                        + "part of available windows. This component will now self-destruct.");
-                        Destroy(this);
+                        Destroyer.Destroy(this);
                         throw new InvalidOperationException();
                     }
                     ActiveWindow = currentActiveWindow;
@@ -93,7 +93,7 @@ namespace SEE.Game.UI.Window
             if (Panel && !windows.Any())
             {
                 // We need to destroy the panel now
-                Destroy(Panel);
+                Destroyer.Destroy(Panel);
             } 
             else if (!Panel && windows.Any(x => x.Window))
             {
@@ -124,7 +124,7 @@ namespace SEE.Game.UI.Window
             {
                 Panel.RemoveTab(Panel.GetTab((RectTransform) window.Window.transform));
                 currentWindows.Remove(window);
-                Destroy(window);
+                Destroyer.Destroy(window);
             }
             
             // Then, add new tabs 
@@ -172,13 +172,13 @@ namespace SEE.Game.UI.Window
         {
             if (!space.TryGetComponentOrLog(out PanelsCanvas))
             {
-                Destroy(this);
+                Destroyer.Destroy(this);
             }
 
             windows.RemoveAll(x => x == null);
             if (windows.Count == 0)
             {
-                Destroy(this);
+                Destroyer.Destroy(this);
                 windows.Clear();
                 return;
             }
@@ -204,12 +204,12 @@ namespace SEE.Game.UI.Window
                     foreach (BaseWindow window in windows)
                     {
                         Panel.RemoveTab(Panel.GetTab((RectTransform) window.Window.transform));
-                        Destroy(window);
+                        Destroyer.Destroy(window);
                     }
 
                     windows.Clear();
                     OnActiveWindowChanged.Invoke();
-                    Destroy(Panel);
+                    Destroyer.Destroy(Panel);
                 }
             }
 

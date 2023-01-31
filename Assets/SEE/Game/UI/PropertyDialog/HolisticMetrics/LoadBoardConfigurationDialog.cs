@@ -3,6 +3,7 @@ using SEE.Controls;
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics;
 using SEE.Game.UI.Notification;
+using SEE.Utils;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -75,7 +76,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             }
             
             // Destroy the dialog GameObject
-            Object.Destroy(dialog);
+            Destroyer.Destroy(dialog);
             
             // Create a new board from the loaded configuration
             new CreateBoardAction(boardConfiguration).Execute();

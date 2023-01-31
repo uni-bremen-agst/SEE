@@ -141,7 +141,7 @@ namespace SEE.Game.UI.Notification
         {
             if (manager != null)
             {
-                Destroy(manager.gameObject);
+                Destroyer.Destroy(manager.gameObject);
             }
         }
 
@@ -241,7 +241,7 @@ namespace SEE.Game.UI.Notification
             {
                 OnFinished?.Invoke();
                 // We finally destroy ourselves once we're done
-                Destroy(gameObject);
+                Destroyer.Destroy(gameObject);
             }
         }
     }

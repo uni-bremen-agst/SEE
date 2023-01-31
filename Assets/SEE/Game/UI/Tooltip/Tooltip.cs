@@ -175,7 +175,7 @@ namespace SEE.Game.UI.Tooltip
         private void OnDestroy()
         {
             fadeIn.Kill();
-            Destroy(tooltipGameObject);
+            Destroyer.Destroy(tooltipGameObject);
         }
 
         private void OnDisable()

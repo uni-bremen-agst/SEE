@@ -20,7 +20,7 @@ namespace SEE.Controls.Interactables
     [DisallowMultipleComponent]
     public class Outline : MonoBehaviour
     {
-        private static readonly HashSet<Mesh> registeredMeshes = new HashSet<Mesh>();
+        private static readonly HashSet<Mesh> registeredMeshes = new();
 
         private enum Mode
         {
@@ -79,9 +79,9 @@ namespace SEE.Controls.Interactables
                                  + "This may cause a pause for large meshes.")]
         private bool precomputeOutline;
 
-        private readonly List<Mesh> bakeKeys = new List<Mesh>();
+        private readonly List<Mesh> bakeKeys = new();
 
-        private readonly List<ListVector3> bakeValues = new List<ListVector3>();
+        private readonly List<ListVector3> bakeValues = new();
 
         private Renderer[] renderers;
         private Material outlineMaterial;
@@ -254,7 +254,7 @@ namespace SEE.Controls.Interactables
         private void Bake()
         {
             // Generate smooth normals for each mesh
-            HashSet<Mesh> bakedMeshes = new HashSet<Mesh>();
+            HashSet<Mesh> bakedMeshes = new();
 
             foreach (MeshFilter meshFilter in GetComponentsInChildren<MeshFilter>())
             {
@@ -327,7 +327,7 @@ namespace SEE.Controls.Interactables
                       .GroupBy(pair => pair.Key);
 
             // Copy normals to a new list
-            List<Vector3> smoothNormals = new List<Vector3>(mesh.normals);
+            List<Vector3> smoothNormals = new(mesh.normals);
 
             // Average normals for grouped vertices
             foreach (var group in groups)

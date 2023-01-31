@@ -1,5 +1,6 @@
 ﻿using SEE.Controls;
 using SEE.DataModel.DG;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -118,7 +119,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         private void Close()
         {
-            Object.Destroy(dialog);
+            Destroyer.Destroy(dialog);
             dialog = null;
         }
     }

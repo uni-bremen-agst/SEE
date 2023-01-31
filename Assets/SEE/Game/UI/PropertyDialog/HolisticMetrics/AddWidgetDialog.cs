@@ -4,6 +4,7 @@ using SEE.Controls;
 using SEE.Game.HolisticMetrics;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.UI.Notification;
+using SEE.Utils;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -114,7 +115,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             // Ensure they all get deleted once one of them gets a click (that should probably not be done here)
             
             // Close the dialog
-            Object.Destroy(dialog);
+            Destroyer.Destroy(dialog);
             SEEInput.KeyboardShortcutsEnabled = true;
 
             ShowNotification.Info(
