@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SEE.Net.Actions
 {
     /// <summary>
-    /// Responsible to synchronize the vrik model on all clients.
+    /// Responsible for synchronizing the VRIK model on all clients.
     /// </summary>
     public class VRIKSynchronizer : MonoBehaviour
     {
@@ -25,22 +25,39 @@ namespace SEE.Net.Actions
         private VRIK Vrik;
 
         /// <summary>
-        /// Initializes the network object and vrik model. The periodic call of
+        /// Timer to count elapsed time.
+        /// </summary>
+        private float Timer;
+
+        /// <summary>
+        /// Initializes the network object and VRIK model. The periodic call of
         /// <see cref="Synchronize"/> is triggered.
         /// </summary>
         private void Start()
         {
             NetworkObject = gameObject.GetComponent<NetworkObject>();
             Vrik = gameObject.GetComponent<VRIK>();
-            InvokeRepeating(nameof(Synchronize), RepeatCycle, RepeatCycle);
+            Timer = 0f;
         }
 
         /// <summary>
-        /// If an change should be sent the update is sent to all clients with
+        /// Executes <see cref="Synchronize"/> every 0.5 seconds.
+        /// </summary>
+        private void Update()
+        {
+            Debug.Log(Timer);
+            Timer += Time.deltaTime;
+            while (Timer >= RepeatCycle)
+            {
+                Synchronize();
+                Timer -= RepeatCycle;
+                Debug.Log(Timer);
+            }
+        }
+        
+        /// <summary>
+        /// If a change should be sent, the update is sent to all clients with
         /// the <see cref="NetworkObjectId"/> and <see cref="Vrik"/> as parameters.
-        ///
-        /// This method is invoked periodically while this component is active.
-        /// It is registered in <see cref="Start"/>.
         /// </summary>
         private void Synchronize()
         {
