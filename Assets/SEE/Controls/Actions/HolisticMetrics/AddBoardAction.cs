@@ -47,6 +47,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Start()
         {
             BoardAdder.Init();
+            
         }
 
         public override bool Update()

@@ -1,4 +1,3 @@
-using SEE.Game.UI.HolisticMetrics;
 using SEE.Game.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
@@ -21,6 +20,10 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         private static bool positioningDone;
 
+        /// <summary>
+        /// Whether there is a click position saved in this class that has not yet been fetched. This is also reset to
+        /// false when this class is set up again using the <see cref="Init"/> method.
+        /// </summary>
         private static bool gotPosition;
 
         /// <summary>
@@ -43,18 +46,23 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         private void OnMouseUp()
         {
-            if (MainCamera.Camera != null && Raycasting.RaycastAnything(out RaycastHit hit))
+            if (MainCamera.Camera != null && !Raycasting.IsMouseOverGUI() &&
+                Raycasting.RaycastAnything(out RaycastHit hit))
             {
                 position = hit.point;
-                position .y += boardPrefab.transform.position.y;
+                position.y += boardPrefab.transform.position.y;
                 gotPosition = true;
             }
         }
 
+        /// <summary>
+        /// Sets up this class to get a new mouse click on the floor.
+        /// </summary>
         internal static void Init()
         {
             boardPrefab = Resources.Load<GameObject>("Prefabs/HolisticMetrics/SceneComponents/MetricsBoard");
             positioningDone = false;
+            gotPosition = false;
             GameObject.Find("/DemoWorld/Plane").AddComponent<BoardAdder>();
         }
         
@@ -69,6 +77,13 @@ namespace SEE.Game.HolisticMetrics.Components
             }
         }
 
+        /// <summary>
+        /// Use this method to fetch the click position currently stored in this class.
+        /// </summary>
+        /// <param name="clickPosition">If there currently is a position stored in this class,
+        /// <paramref name="clickPosition"/> will be set to that. Otherwise, it will be set to
+        /// <see cref="Vector3.zero"/>.</param>
+        /// <returns>The value of <see cref="gotPosition"/> at the time this method is called</returns>
         internal static bool GetPosition(out Vector3 clickPosition)
         {
             if (gotPosition)
@@ -82,6 +97,10 @@ namespace SEE.Game.HolisticMetrics.Components
             return false;
         }
         
+        /// <summary>
+        /// Can be used to mark this class as "to be deleted". That means all instances of this class will destroy
+        /// themselves in the next <see cref="Update"/> step.
+        /// </summary>
         internal static void Stop()
         {
             positioningDone = true;

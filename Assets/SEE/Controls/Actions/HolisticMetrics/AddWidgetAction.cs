@@ -14,10 +14,17 @@ namespace SEE.Controls.Actions.HolisticMetrics
     /// </summary>
     internal class AddWidgetAction : AbstractPlayerAction
     {
-        private bool gotPosition;
+        private ProgressState progress = ProgressState.GetPosition;
         
         private Memento memento;
 
+        private enum ProgressState
+        {
+            GetPosition,
+            GetConfig,
+            Finished
+        }
+        
         private struct Memento
         {
             /// <summary>
@@ -46,38 +53,53 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Start()
         {
             BoardsManager.AddWidgetAdders();
+            Debug.LogWarning("start method called");
         }
 
+        /// <summary>
+        /// This method manages the player's input while in the mode <see cref="ActionStateType.AddWidget"/>.
+        /// </summary>
+        /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
-            if (!gotPosition)
+            switch (progress)
             {
-                if (BoardsManager.GetWidgetAdditionPosition(out string boardName, out Vector3 position))
-                {
-                    WidgetConfig config = new WidgetConfig { Position = position, ID = Guid.NewGuid() };
-                    memento = new Memento(boardName, config);
-                    new AddWidgetDialog().Open();
-                    gotPosition = true;
-                }
+                case ProgressState.GetPosition:
+                    if (BoardsManager.GetWidgetAdditionPosition(out string boardName, out Vector3 position))
+                    {
+                        WidgetConfig config = new WidgetConfig { Position = position, ID = Guid.NewGuid() };
+                        memento = new Memento(boardName, config);
+                        new AddWidgetDialog().Open();
+                        progress = ProgressState.GetConfig;
+                        Debug.LogWarning("Currently got a click");
+                    }
 
-                return false;
+                    return false;
+                case ProgressState.GetConfig:
+                    if (AddWidgetDialog.GetConfig(out string metric, out string widget))
+                    {
+                        Debug.LogWarning("got a config");
+                        memento.config.MetricType = metric;
+                        memento.config.WidgetName = widget;
+                        Redo();
+                        progress = ProgressState.Finished;
+                        return true;
+                    }
+
+                    return false;
+                case ProgressState.Finished:
+                    Debug.LogWarning("in switch statement finished");
+                    return true;
+                default:
+                    Debug.LogWarning("in switch stamenet default");
+                    return false;
             }
-
-            if (AddWidgetDialog.GetConfig(out string metric, out string widget))
-            {
-                memento.config.MetricType = metric;
-                memento.config.WidgetName = widget;
-                // TODO: When you add a widget, it adds that widget multiple ("infinite"?) times
-                Redo();
-                return true;
-            }
-
-            return false;
         }
 
         public override void Stop()
         {
             WidgetAdder.Stop();
+            Debug.LogWarning("Stop method called");
         }
 
         /// <summary>

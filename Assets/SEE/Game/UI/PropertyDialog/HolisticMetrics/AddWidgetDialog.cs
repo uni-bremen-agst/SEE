@@ -1,9 +1,7 @@
 using System;
 using System.Linq;
 using SEE.Controls;
-using SEE.Game.HolisticMetrics;
 using SEE.Game.HolisticMetrics.Metrics;
-using SEE.Game.UI.Notification;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -119,9 +117,17 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
 
         internal static bool GetConfig(out string metric, out string widget)
         {
-            metric = metricType;
-            widget = widgetName;
-            return gotConfig;
+            if (gotConfig)
+            {
+                metric = metricType;
+                widget = widgetName;
+                gotConfig = false;
+                return true;
+            }
+
+            metric = null;
+            widget = null;
+            return false;
         }
     }
 }
