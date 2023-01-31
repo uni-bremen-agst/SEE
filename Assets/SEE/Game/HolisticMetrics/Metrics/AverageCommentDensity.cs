@@ -12,13 +12,13 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// We will try to get this attribute for each node. Should be the comment density for each node.
         /// </summary>
         private const string attributeName = "Metric.Comment.Density";
-        
+
         /// <summary>
-        /// Calculates the average comment density for the nodes of the given SEECity.
+        /// Calculates the average comment density for the nodes of the given <paramref name="city"/>.
         /// </summary>
         /// <param name="city">The city for which to calculate the average comment density</param>
-        /// <returns>The average comment density of the nodes of the given city</returns>
-        internal override MetricValue Refresh(SEECity city)
+        /// <returns>The average comment density of the nodes of the given <paramref name="city"/></returns>
+        internal override MetricValue Refresh(AbstractSEECity city)
         {
             float totalDensity = 0f;
             int totalNodes = 0;

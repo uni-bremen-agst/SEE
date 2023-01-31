@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using SEE.DataModel.DG;
+using SEE.Audio;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Operator;
@@ -10,6 +10,7 @@ using SEE.Net.Actions;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
+using Node = SEE.DataModel.DG.Node;
 
 namespace SEE.Controls.Actions
 {
@@ -274,6 +275,7 @@ namespace SEE.Controls.Actions
                 {
                     Highlighter.SetHighlight(markedGameObject, false);
                     new HighlightNetAction(markedGameObject.name, false).Execute();
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, this.originalParent.gameObject);
                 }
             }
 
@@ -346,6 +348,7 @@ namespace SEE.Controls.Actions
                     PutOnAndFit(grabbedObject, target, originalParent.gameObject, originalLocalScale);
                     UnmarkAsTarget();
                     MarkAsTarget(target.transform);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, originalParent.gameObject);
 
                     newParent = target;
                     // The mapping is only possible if we are in a reflexion city
@@ -444,6 +447,7 @@ namespace SEE.Controls.Actions
                 try
                 {
                     ReflexionMapper.SetParent(child, parent);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, parent.gameObject);
                     new SetParentNetAction(child.name, parent.name, true).Execute();
                 }
                 catch (ArchitectureAnalysisException e)

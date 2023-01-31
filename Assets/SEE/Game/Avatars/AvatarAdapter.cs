@@ -50,9 +50,9 @@ namespace SEE.Game.Avatars
             if (IsLocalPlayer)
             {
                 // I am the avatar of the local player.
-                if (!gameObject.TryGetComponent(out CodeSpaceManager _))
+                if (!gameObject.TryGetComponent(out WindowSpaceManager _))
                 {
-                    gameObject.AddComponent<CodeSpaceManager>();
+                    gameObject.AddComponent<WindowSpaceManager>();
                 }
 
                 switch (SceneSettings.InputType)

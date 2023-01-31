@@ -22,7 +22,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// <summary>
         /// EventFunction that is triggered when the button is pressed.
         /// </summary>
-        public readonly UnityEvent OnSelected = new UnityEvent();
+        public readonly UnityEvent OnSelected = new();
 
         /// <summary>
         /// Instantiation of the prefab <see cref="ButtonPrefab"/>.
@@ -141,7 +141,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// <param name="parent">new parent of <see cref="inputField"/></param>
         public override void SetParent(GameObject parent)
         {
-            if (HasStarted)
+            if (button != null)
             {
                 button.transform.SetParent(parent.transform);
             }

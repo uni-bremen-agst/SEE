@@ -1,8 +1,8 @@
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net;
+using SEE.Game.UI.Window.CodeWindow;
 using UnityEngine.Events;
-using static SEE.Game.UI.CodeWindow.CodeWindow;
 using static SEE.Utils.CRDT;
 
 namespace SEE.Utils
@@ -15,12 +15,12 @@ namespace SEE.Utils
         /// <summary>
         /// A dictionary for the CRDTs with the filename as key.
         /// </summary>
-        private static readonly Dictionary<string, CRDT> crdts = new Dictionary<string, CRDT>();
+        private static readonly Dictionary<string, CRDT> crdts = new();
 
         /// <summary>
         /// Manages the player ids.
         /// </summary>
-        private static readonly PlayerIdManager playerIdManager = new PlayerIdManager();
+        private static readonly PlayerIdManager playerIdManager = new();
 
         /// <summary>
         /// Finds or creates a CRDT instance by the name of the file.
@@ -130,11 +130,11 @@ namespace SEE.Utils
             {
                 crdt.SetId(GetLocalID().ToString());
             }
-             crdt.AddString(s, startIdx);
+            crdt.AddString(s, startIdx);
         }
 
         /// <summary>
-        /// Asynchroniously adds <paramref name="s"/> to the crdt, formerly used for transmitting huge datastreams,
+        /// Asynchronously adds <paramref name="s"/> to the crdt, formerly used for transmitting huge datastreams,
         /// e.g., during the start-up of a code window.
         /// During the adding process no changes should be made in the crdt or code window.
         /// </summary>
@@ -214,7 +214,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="file">The filename in the crdt</param>
         /// <returns>A change event that notifies the user when the content of the crdt changes.</returns>
-        public static UnityEvent<char, int, OperationType> GetChangeEvent(string file)
+        public static UnityEvent<char, int, CodeWindow.OperationType> GetChangeEvent(string file)
         {
             return GetInstanceByName(file).changeEvent;
         }
