@@ -185,7 +185,7 @@ namespace SEE.Controls.Actions
         /// Hides the given <paramref name="edge"/> by fading its alpha value to zero.
         /// </summary>
         /// <param name="edge">the edge to hide</param>
-        /// <param name="animationKind">the way to animate edge appearance</param>
+        /// <param name="animationKind">the kind of edge animation to use</param>
         private static void HideEdge(Edge edge, EdgeAnimationKind animationKind)
         {
             GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
