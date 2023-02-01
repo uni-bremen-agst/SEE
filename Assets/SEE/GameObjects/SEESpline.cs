@@ -283,7 +283,6 @@ namespace SEE.GO
             {
                 UpdateLineRenderer();
                 UpdateMesh();
-
                 needsUpdate = false;
             }
         }

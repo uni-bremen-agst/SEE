@@ -190,7 +190,7 @@ namespace SEE.Game.Operator
         private float GetTargetGlow(float glowTarget, float alphaTarget)
         {
             // Normalized glow (i.e., glow expressed as value in [0,1]) must not be higher than alpha.
-            return Mathf.Min(glowTarget/fullGlow, alphaTarget) * fullGlow;
+            return Mathf.Min(glowTarget / fullGlow, alphaTarget) * fullGlow;
         }
 
         private void OnEnable()
@@ -239,6 +239,26 @@ namespace SEE.Game.Operator
 
             color = new TweenOperation<(Color start, Color end)>(AnimateToColorAction, spline.GradientColors);
 
+
+            if (TryGetComponent(out highlightEffect))
+            {
+                // If the component already exists, we need to rebuild it to be sure it fits our material.
+                RefreshGlow(true).Forget();
+            }
+            else
+            {
+                highlightEffect = Highlighter.GetHighlightEffect(go);
+                highlightEffect.Refresh();
+            }
+
+            SetupGlow();
+
+            if (go.TryGetComponentOrLog(out EdgeRef edge) && edge.Value != null)
+            {
+                // When the hierarchy changes, we need to refresh the glow effect properties.
+                edge.Value.Subscribe(this);
+            }
+
             Tween[] ConstructAction(bool extending, float duration)
             {
                 return new[] { DOTween.To(() => spline.SubsplineEndT,
@@ -246,7 +266,38 @@ namespace SEE.Game.Operator
                                           extending ? 1.0f : 0.0f,
                                           duration).SetEase(Ease.InOutExpo).Play() };
             }
+
             construction = new TweenOperation<bool>(ConstructAction, spline.SubsplineEndT >= 1);
+
+        }
+
+        /// <summary>
+        /// Sets up the <see cref="highlightEffect"/>, assuming it has been assigned
+        /// a new instance of <see cref="HighlightEffect"/>.
+        /// </summary>
+        private void SetupGlow()
+        {
+            if (!highlightEffect.highlighted)
+            {
+                // We control highlighting not by the `highlighted` toggle, but by the amount of `glow`.
+                highlightEffect.glow = 0;
+                highlightEffect.highlighted = true;
+            }
+
+            highlightEffect.outline = 0;
+            Tween[] AnimateToGlowAction(float endGlow, float duration) => new Tween[]
+            {
+                DOTween.To(() => highlightEffect.glow, g =>
+                {
+                    highlightEffect.glow = g;
+                    highlightEffect.UpdateMaterialProperties();
+                }, endGlow, duration).OnPlay(() =>
+                {
+                    highlightEffect.Refresh();
+                }).Play()
+            };
+
+            glow = new TweenOperation<float>(AnimateToGlowAction, highlightEffect.glow);
         }
 
         private void OnDisable()
