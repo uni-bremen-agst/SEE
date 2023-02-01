@@ -44,6 +44,9 @@ namespace SEE.Game.Operator
         /// </summary>
         private bool glowEnabled;
 
+        /// <summary>
+        /// Operation handling the construction of edges from subsplines.
+        /// </summary>
         private TweenOperation<bool> construction;
 
         /// <summary>
