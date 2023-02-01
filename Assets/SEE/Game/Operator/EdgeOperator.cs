@@ -170,15 +170,28 @@ namespace SEE.Game.Operator
             highlightEffect.HitFX();
         }
 
+        /// <summary>
+        /// Construct the edge from subsplines.
+        /// </summary>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> Construct(float duration)
         {
             return construction.AnimateTo(true, duration);
         }
 
+        /// <summary>
+        /// Destruct the edge from subsplines.
+        /// </summary>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> Destruct(float duration)
         {
             return construction.AnimateTo(false, duration);
         }
+
         #endregion
 
         /// <summary>
@@ -241,7 +254,6 @@ namespace SEE.Game.Operator
             }
 
             color = new TweenOperation<(Color start, Color end)>(AnimateToColorAction, spline.GradientColors);
-
 
             if (TryGetComponent(out highlightEffect))
             {
