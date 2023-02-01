@@ -78,8 +78,11 @@ namespace SEE.GO.Menu
             //    }
             //}
 
-            ActionStateType firstType = ActionStateType.AllTypes.First();
-            List<ToggleMenuEntry> entries = ActionStateType.AllTypes.Select(ToModeMenuEntry).ToList();
+            // Debug.Log($"{ActionStateType.Move.Name}\n");
+            ActionStateType firstType = ActionStateTypes.FirstActionStateType();
+            IEnumerable<ToggleMenuEntry> entries = MenuEntries(ActionStateTypes.AllTypes);
+
+            //.Select(ToModeMenuEntry).ToList();
 
             // Initial state will be the first action state type
             GlobalActionHistory.Execute(firstType);
@@ -87,11 +90,6 @@ namespace SEE.GO.Menu
             SelectionMenu modeMenu = modeMenuGO.AddComponent<SelectionMenu>();
             modeMenu.Title = "Mode Selection";
             modeMenu.Description = "Please select the mode you want to activate.";
-
-            //foreach (ToggleMenuEntry entry in entries)
-            //{
-            //    modeMenu.AddEntry(entry);
-            //}
             modeMenu.AddEntries(entries);
 
             return modeMenu;
@@ -99,12 +97,64 @@ namespace SEE.GO.Menu
             #region Local Functions
 
             // Constructs a toggle menu entry for the mode menu from the given action state type.
-            ToggleMenuEntry ToModeMenuEntry(ActionStateType type) =>
-                new ToggleMenuEntry(active: Equals(type, firstType),
+            ToggleMenuEntry ToModeMenuEntry(ActionStateType type)
+            {
+                return new ToggleMenuEntry(active: Equals(type, firstType),
                                     entryAction: () => GlobalActionHistory.Execute(type), exitAction: null,
                                     title: type.Name, description: type.Description, entryColor: type.Color,
                                     icon: Resources.Load<Sprite>(type.IconPath));
+            }
 
+            IEnumerable<ToggleMenuEntry> MenuEntries(List<AbstractActionStateType> allTypes)
+            {
+                List<ToggleMenuEntry> result = new();
+                foreach (AbstractActionStateType action in allTypes)
+                {
+                    if (action.Parent == null)
+                    {
+                        Debug.Log($"Root: {action.Name}\n");
+                        // Root action
+                        if (action is ActionStateType type)
+                        {
+                            Debug.Log($"Added as toggle: {action.Name}\n");
+                            result.Add(new ToggleMenuEntry(active: Equals(type, firstType),
+                                                           entryAction: () => GlobalActionHistory.Execute(type), exitAction: null,
+                                                           title: type.Name, description: type.Description, entryColor: type.Color,
+                                                           icon: Resources.Load<Sprite>(type.IconPath)));
+                        }
+                    }
+                }
+                return result;
+            //      {
+            //         new MenuEntry(action: () => Debug.Log("Option 1"),
+            //                  title: "Option 1",
+            //                  description: "Select option 1",
+            //                  entryColor: Color.red,
+            //                  enabled: true,
+            //                  icon: null),
+            //         new NestedMenuEntry<MenuEntry>(innerEntries: new List<MenuEntry>()
+            //                                          {
+            //                                             new MenuEntry(action: () => Debug.Log("Option 2a"),
+            //                                                           title: "Option 2a",
+            //                                                           description: "Select option 2a",
+            //                                                           entryColor: Color.green,
+            //                                                           enabled: true,
+            //                                                           icon: null),
+            //                                             new MenuEntry(action: () => Debug.Log("Option 2b"),
+            //                                                           title: "Option 2b",
+            //                                                           description: "Select option 2b",
+            //                                                           entryColor: Color.green,
+            //                                                           enabled: true,
+            //                                                           icon: null)
+            //                                          },
+            //                        title: "Sub menu",
+            //                        description: "open subselection 2",
+            //                        entryColor: Color.red,
+            //                        enabled: true,
+            //                        icon: null)
+            //};
+
+            }
             #endregion
         }
 
@@ -168,7 +218,7 @@ namespace SEE.GO.Menu
                 {
                     // We always want to have an action running.
                     // The default action will be the first action state type.
-                    GlobalActionHistory.Execute(ActionStateType.AllTypes.First());
+                    GlobalActionHistory.Execute(ActionStateTypes.FirstActionStateType());
                 }
                 ActionStateType currentAction = GlobalActionHistory.Current();
                 SetPlayerMenu(currentAction.Name);
