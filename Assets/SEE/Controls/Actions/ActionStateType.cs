@@ -6,79 +6,51 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
-    public enum Level
-    {
-        Root,
-        Hide
-    }
-
     /// <summary>
-    /// The type of a state-based action.
-    /// Implemented using the "Enumeration" (not enum) or "type safe enum" pattern.
-    /// The following two pages have been used for reference:
-    /// <ul>
-    /// <li>https://docs.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/enumeration-classes-over-enum-types#implement-an-enumeration-base-class</li>
-    /// <li>https://ardalis.com/enum-alternatives-in-c/</li>
-    /// </ul>
+    /// Provides all available <see cref="AbstractActionStateType"/>s.
     /// </summary>
-    public class ActionStateType
+    public static class ActionStateTypes
     {
         /// <summary>
         /// A list of all available ActionStateTypes.
+        ///
+        /// Note: This list contains all action state types, not only the roots.
         /// </summary>
-        public static List<ActionStateType> AllTypes { get; } = new List<ActionStateType>();
+        public static List<AbstractActionStateType> AllTypes { get; } = new List<AbstractActionStateType>();
 
-        #region Static Types
-        public static ActionStateType Move { get; } =
-            new ActionStateType("Move", "Move a node within a graph",
-                                Level.Root, Color.red.Darker(), "Materials/Charts/MoveIcon",
-                                MoveAction.CreateReversibleAction);
-        public static ActionStateType Rotate { get; } =
-            new ActionStateType("Rotate", "Rotate everything around the selected node within a graph",
-                                Level.Root, Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
-                                RotateAction.CreateReversibleAction);
-        public static ActionStateType Hide { get; } =
-            new ActionStateType("Hide", "Hides nodes or edges",
-                                Level.Root, Color.yellow.Darker(), "Materials/ModernUIPack/Eye", 
-                                HideAction.CreateReversibleAction);
-        public static ActionStateType HideConnectedEdges { get; } =
-            new ActionStateType("Hide Connected Edges", "Hides connected edges",
-                                Level.Hide, Color.yellow.Darker(), "Materials/ModernUIPack/Eye",
-                                HideConnectedEdgesAction.CreateReversibleAction);
-        public static ActionStateType NewEdge { get; } =
-            new ActionStateType("New Edge", "Draw a new edge between two nodes",
-                                Level.Root, Color.green.Darker(), "Materials/ModernUIPack/Minus",
-                                AddEdgeAction.CreateReversibleAction);
-        public static ActionStateType NewNode { get; } =
-            new ActionStateType("New Node", "Create a new node",
-                                Level.Root, Color.green.Darker(), "Materials/ModernUIPack/Plus",
-                                AddNodeAction.CreateReversibleAction);
-        public static ActionStateType EditNode { get; } =
-            new ActionStateType("Edit Node", "Edit a node",
-                                Level.Root, Color.green.Darker(), "Materials/ModernUIPack/Settings",
-                                EditNodeAction.CreateReversibleAction);
-        public static ActionStateType ScaleNode { get; } =
-            new ActionStateType("Scale Node", "Scale a node",
-                                Level.Root, Color.green.Darker(), "Materials/ModernUIPack/Crop",
-                                ScaleNodeAction.CreateReversibleAction);
-        public static ActionStateType Delete { get; } =
-            new ActionStateType("Delete", "Delete a node or an edge",
-                                Level.Root, Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
-                                DeleteAction.CreateReversibleAction);
-        public static ActionStateType ShowCode { get; } =
-            new ActionStateType("Show Code", "Display the source code of a node.",
-                                Level.Root, Color.black, "Materials/ModernUIPack/Document", 
-                                ShowCodeAction.CreateReversibleAction);
-        public static ActionStateType Draw { get; } =
-            new ActionStateType("Draw", "Draw a line",
-                                Level.Root, Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
-                                DrawAction.CreateReversibleAction);
-        public static ActionStateType MetricBoard { get; } =
-            new ActionStateType("Metric Board", "Configure Metric Boards",
-                                Level.Root, Color.cyan, "Materials/40+ Simple Icons - Free/Mixer_Simple_Icons_UI.png",
-                                MetricBoardAction.CreateReversibleAction);
-        #endregion
+        /// <summary>
+        /// Adds <paramref name="actionStateType"/> to the list of all action state types <see cref="AllTypes"/>.
+        /// </summary>
+        /// <param name="actionStateType">to be added</param>
+        public static void Add(AbstractActionStateType actionStateType)
+        {
+            // Check for duplicates
+            if (AllTypes.Any(x => x.Name == actionStateType.Name))
+            {
+                throw new ArgumentException($"Duplicate ActionStateTypes {actionStateType.Name} must not exist!");
+            }
+            Debug.Log($"Added {actionStateType.Name}.\n");
+            AllTypes.Add(actionStateType);
+        }
 
+        /// <summary>
+        /// Returns the first root <see cref="ActionStateType"/> at top level (root)
+        /// of <see cref="AllTypes"/>, i.e. one that does not have a parent.
+        /// </summary>
+        /// <returns>first root <see cref="ActionStateType"/> at top level</returns>
+        /// <exception cref="InvalidOperationException">thrown if there is no such element</exception>
+        internal static ActionStateType FirstActionStateType()
+        {
+            return ActionStateType.Move;
+            //return (ActionStateType)AllTypes.First(a => a is ActionStateType && a.Parent == null);
+        }
+    }
+
+    /// <summary>
+    /// Super class of <see cref="ActionStateType"/> and <see cref="ActionStateTypeGroup"/>.
+    /// </summary>
+    public class AbstractActionStateType
+    {
         /// <summary>
         /// The name of this action.
         /// Must be unique across all types.
@@ -89,8 +61,6 @@ namespace SEE.Controls.Actions
         /// Description for this action.
         /// </summary>
         public string Description { get; }
-
-        public Level Level { get;  }
 
         /// <summary>
         /// Color for this action.
@@ -106,24 +76,160 @@ namespace SEE.Controls.Actions
         public string IconPath { get; }
 
         /// <summary>
+        /// The parent of this action state type, i.e., the <see cref="ActionStateTypeGroup"/>
+        /// this action state type belongs to. May be null if this action state type is not
+        /// nested in a <see cref="ActionStateTypeGroup"/>.
+        /// </summary>
+        /// <remarks>Do not use "set". It is public here only because of C# restrictions.
+        /// It must be used only within <see cref="ActionStateTypeGroup.Add(AbstractActionStateType)"/>.
+        /// </remarks>
+        public ActionStateTypeGroup Parent { get; set; }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="name">The Name of this ActionStateType. Must be unique.</param>
+        /// <param name="description">Description for this ActionStateType.</param>
+        /// <param name="color">Color for this ActionStateType.</param>
+        /// <param name="iconPath">Path to the material of the icon for this ActionStateType.</param>
+        /// <exception cref="ArgumentException">When the given <paramref name="name"/> is not unique.
+        /// </exception>
+        protected AbstractActionStateType(string name, string description, Color color, string iconPath)
+        {
+            Name = name;
+            Description = description;
+            Color = color;
+            IconPath = iconPath;
+            ActionStateTypes.Add(this);
+        }
+    }
+
+    /// <summary>
+    /// A group of other <see cref="AbstractActionStateType"/>s. It is not itself executable but
+    /// just serves as a container for <see cref="AbstractActionStateType"/>s. In terms of menu,
+    /// it represents a submenu.
+    /// </summary>
+    public class ActionStateTypeGroup : AbstractActionStateType
+    {
+        private ActionStateTypeGroup(string name, string description, Color color, string iconPath)
+            : base(name, description, color, iconPath)
+        {
+        }
+
+        public static ActionStateTypeGroup Hide { get; }
+           = new ActionStateTypeGroup("Hide", "Hides nodes or edges",
+                                      Color.yellow.Darker(), "Materials/ModernUIPack/Eye");
+
+        /// <summary>
+        /// Ordered list of child action state types.
+        /// </summary>
+        public IList<AbstractActionStateType> Children = new List<AbstractActionStateType>();
+
+        /// <summary>
+        /// Adds <paramref name="actionStateType"/> as a member of this group.
+        /// </summary>
+        /// <param name="actionStateType">child to be added</param>
+        public void Add(AbstractActionStateType actionStateType)
+        {
+            actionStateType.Parent = this;
+            Children.Add(actionStateType);
+        }
+
+        #region Equality & Comparators
+
+        public override bool Equals(object obj)
+        {
+            // FIXME
+            throw new NotImplementedException();
+
+            if (ReferenceEquals(null, obj))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
+
+            // return obj.GetType() == GetType() && ((ActionStateType)obj).CreateReversible == CreateReversible;
+        }
+
+        public override int GetHashCode()
+        {
+            // FIXME
+            throw new NotImplementedException();
+            //return CreateReversible.GetHashCode();
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// The type of a state-based action.
+    /// Implemented using the "Enumeration" (not enum) or "type safe enum" pattern.
+    /// The following two pages have been used for reference:
+    /// <ul>
+    /// <li>https://docs.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/enumeration-classes-over-enum-types#implement-an-enumeration-base-class</li>
+    /// <li>https://ardalis.com/enum-alternatives-in-c/</li>
+    /// </ul>
+    /// </summary>
+    public class ActionStateType : AbstractActionStateType
+    {
+        #region Static Types
+        public static ActionStateType Move { get; } =
+            new ActionStateType("Move", "Move a node within a graph",
+                                Color.red.Darker(), "Materials/Charts/MoveIcon",
+                                MoveAction.CreateReversibleAction);
+        public static ActionStateType Rotate { get; } =
+            new ActionStateType("Rotate", "Rotate everything around the selected node within a graph",
+                                Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
+                                RotateAction.CreateReversibleAction);
+        public static ActionStateType HideConnectedEdges { get; } =
+            new ActionStateType("Hide Connected Edges", "Hides connected edges",
+                                Color.yellow.Darker(), "Materials/ModernUIPack/Eye",
+                                HideConnectedEdgesAction.CreateReversibleAction,
+                                ActionStateTypeGroup.Hide);
+        public static ActionStateType NewEdge { get; } =
+            new ActionStateType("New Edge", "Draw a new edge between two nodes",
+                                Color.green.Darker(), "Materials/ModernUIPack/Minus",
+                                AddEdgeAction.CreateReversibleAction);
+        public static ActionStateType NewNode { get; } =
+            new ActionStateType("New Node", "Create a new node",
+                                Color.green.Darker(), "Materials/ModernUIPack/Plus",
+                                AddNodeAction.CreateReversibleAction);
+        public static ActionStateType EditNode { get; } =
+            new ActionStateType("Edit Node", "Edit a node",
+                                Color.green.Darker(), "Materials/ModernUIPack/Settings",
+                                EditNodeAction.CreateReversibleAction);
+        public static ActionStateType ScaleNode { get; } =
+            new ActionStateType("Scale Node", "Scale a node",
+                                Color.green.Darker(), "Materials/ModernUIPack/Crop",
+                                ScaleNodeAction.CreateReversibleAction);
+        public static ActionStateType Delete { get; } =
+            new ActionStateType("Delete", "Delete a node or an edge",
+                                Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
+                                DeleteAction.CreateReversibleAction);
+        public static ActionStateType ShowCode { get; } =
+            new ActionStateType("Show Code", "Display the source code of a node.",
+                                Color.black, "Materials/ModernUIPack/Document",
+                                ShowCodeAction.CreateReversibleAction);
+        public static ActionStateType Draw { get; } =
+            new ActionStateType("Draw", "Draw a line",
+                                Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                                DrawAction.CreateReversibleAction);
+        public static ActionStateType MetricBoard { get; } =
+            new ActionStateType("Metric Board", "Configure Metric Boards",
+                                Color.cyan, "Materials/40+ Simple Icons - Free/Mixer_Simple_Icons_UI.png",
+                                MetricBoardAction.CreateReversibleAction);
+
+        #endregion
+
+        /// <summary>
         /// Delegate to be called to create a new instance of this kind of action.
         /// May be null if none needs to be created (in which case this delegate will not be called).
         /// </summary>
         public CreateReversibleAction CreateReversible { get; }
-
-        /// <summary>
-        /// Constructor allowing to set <see cref="CreateReversible"/>.
-        ///
-        /// This constructor is needed for the test cases which implement
-        /// their own variants of <see cref="ReversibleAction"/> and
-        /// which need to provide an <see cref="ActionStateType"/> of
-        /// their own.
-        /// </summary>
-        /// <param name="createReversible">value for <see cref="CreateReversible"/></param>
-        protected ActionStateType(CreateReversibleAction createReversible)
-        {
-            CreateReversible = createReversible;
-        }
 
         /// <summary>
         /// Constructor for ActionStateType.
@@ -132,32 +238,19 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="name">The Name of this ActionStateType. Must be unique.</param>
         /// <param name="description">Description for this ActionStateType.</param>
-        /// <param name="level">The nesting level of the action in the menu.</param>
+        /// <param name="parent">The parent of this action in the nesting hierarchy in the menu.</param>
         /// <param name="color">Color for this ActionStateType.</param>
         /// <param name="iconPath">Path to the material of the icon for this ActionStateType.</param>
         /// <param name="createReversible">The delegate to be called when the action has finished
         /// and a new instance needs to be created to continue.</param>
-        /// <exception cref="ArgumentException">When the given <paramref name="name"/> or <paramref name="value"/>
-        /// is not unique, or when the <paramref name="value"/> doesn't fulfill the "must increase by one" criterion.
+        /// <exception cref="ArgumentException">When the given <paramref name="name"/> is not unique.
         /// </exception>
-        private ActionStateType(string name, string description, Level level,
-                                Color color, string iconPath, CreateReversibleAction createReversible)
+        protected ActionStateType(string name, string description,
+                                  Color color, string iconPath, CreateReversibleAction createReversible, ActionStateTypeGroup parent = null)
+            : base(name, description, color, iconPath)
         {
-            Level = level;
-            Name = name;
-            Description = description;
-            Color = color;
-            IconPath = iconPath;
+            parent?.Add(this);
             CreateReversible = createReversible;
-
-            // Check for duplicates
-            if (AllTypes.Any(x => x.Name == name))
-            {
-                throw new ArgumentException("Duplicate ActionStateTypes may not exist!\n");
-            }
-
-            // Add new value to list of all types
-            AllTypes.Add(this);
         }
 
         #region Equality & Comparators
