@@ -343,18 +343,18 @@ namespace SEE.GO
         /// <returns>The created or updated mesh</returns>
         private Mesh CreateOrUpdateMesh()
         {
-            List<Vector3> vertices = new List<Vector3>();
-            List<Vector3> normals = new List<Vector3>();
-            List<Vector4> tangents = new List<Vector4>();
-            List<Vector2> uvs = new List<Vector2>();
-            List<int> indices = new List<int>();
+            List<Vector3> vertices = new();
+            List<Vector3> normals = new();
+            List<Vector4> tangents = new();
+            List<Vector2> uvs = new();
+            List<int> indices = new();
 
             // It is much more efficient to generate uniform knots than
             // equidistant knots. Besides, you can't see the difference
             // anyway. For the curious among you: With uniform knots, the
             // distance between neighboring frames along the spline is not
             // equal.
-            BSpline subSpline = CalculateSubSpline();
+            BSpline subSpline = CreateSubSpline();
             IList<double> rv = subSpline.UniformKnotSeq((uint)tubularSegments + 1);
             FrameSeq frames = subSpline.ComputeRMF(rv);
 
