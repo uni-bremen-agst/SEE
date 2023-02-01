@@ -12,12 +12,12 @@ namespace SEETests
     /// </summary>
     internal class TestActionStateType
     {
-        private IList<ActionStateType> allTypes;
+        private IList<AbstractActionStateType> allTypes;
 
         [SetUp]
         public void SetUp()
         {
-            allTypes = ActionStateType.AllTypes;
+            allTypes = ActionStateTypes.AllTypes;
         }
 
         [Test]
@@ -47,7 +47,7 @@ namespace SEETests
 
         public static IEnumerable<TestCaseData> AllTypeSupplier()
         {
-            return ActionStateType.AllTypes.Select(type => new TestCaseData(type));
+            return ActionStateTypes.AllTypes.Select(type => new TestCaseData(type));
         }
 
         [Test, TestCaseSource(nameof(AllTypeSupplier))]
