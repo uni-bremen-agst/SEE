@@ -62,7 +62,7 @@ namespace SEE.Game.Avatars
         /// Retrieves the direction from the pointing device and aims the laser beam
         /// towards this direction. The position of <see cref="Target"/> is set to
         /// the end of the laser beam.
-        /// Also distinguishs between local controlled player and remote player.
+        /// Also distinguishes between local controlled player and remote player.
         /// If it's the remote player, draw method is directly called.
         /// </summary>
         private void Update()

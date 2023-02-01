@@ -385,6 +385,7 @@ namespace SEE.Game.Avatars
                 }
             }
 
+            // Adds component to VR-Player to sent data from VRIK to all remote clients.
             void InitializeVrikRemote()
             {
                 gameObject.AddComponent<VRIKSynchronizer>();

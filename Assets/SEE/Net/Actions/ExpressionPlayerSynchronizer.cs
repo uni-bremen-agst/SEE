@@ -22,12 +22,17 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Time in between two update cycles for the synchronization in seconds.
         /// </summary>
-        private const float RepeatCycle = 0.1f;
+        private const float RepeatCycle = 0.05f;
         
         /// <summary>
         /// The network object.
         /// </summary>
         private NetworkObject NetworkObject;
+        
+        /// <summary>
+        /// Timer to count elapsed time.
+        /// </summary>
+        private float Timer;
         
         /// <summary>
         /// Initializes <see cref="ExpressionPlayer"/> and <see cref="NetworkObject"/>. The periodic call of
@@ -39,7 +44,7 @@ namespace SEE.Net.Actions
             yield return new WaitUntil(() => gameObject.GetComponent<UMAExpressionPlayer>() != null);
             ExpressionPlayer = gameObject.GetComponent<UMAExpressionPlayer>();
             NetworkObject = gameObject.GetComponent<NetworkObject>();
-            InvokeRepeating(nameof(Synchronize), RepeatCycle, RepeatCycle);
+            Timer = 0f;
         }
 
         /// <summary>
@@ -48,6 +53,19 @@ namespace SEE.Net.Actions
         private void Start()
         {
             StartCoroutine(WaitForExpressionPlayer());
+        }
+        
+        /// <summary>
+        /// Executes <see cref="Synchronize"/> every 0.5 seconds.
+        /// </summary>
+        private void Update()
+        {
+            Timer += Time.deltaTime;
+            while (Timer >= RepeatCycle)
+            {
+                Synchronize();
+                Timer -= RepeatCycle;
+            }
         }
         
         /// <summary>

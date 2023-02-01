@@ -10,7 +10,7 @@ using UnityEngine.Assertions;
 namespace SEE.Net.Actions
 {
     /// <summary>
-    /// 
+    /// Updates values of <see cref="VRIK"/> on all remote clients.
     /// </summary>
     public class VRIKNetAction : AbstractNetAction
     {
@@ -21,21 +21,33 @@ namespace SEE.Net.Actions
         public ulong NetworkObjectID;
 
         /// <summary>
-        /// The remote positions.
+        /// The remote position of the head.
         /// </summary>
         public Vector3 RemoteHeadPosition;
-
+        
+        /// <summary>
+        /// The remote position of the left hand.
+        /// </summary>
         public Vector3 RemoteLeftHandPosition;
 
+        /// <summary>
+        /// The remote position of the right hand.
+        /// </summary>
         public Vector3 RemoteRightHandPosition;
 
         /// <summary>
-        /// The remote rotations.
+        /// The remote rotation of the head.
         /// </summary>
         public Quaternion RemoteHeadRotation;
 
+        /// <summary>
+        /// The remote rotation of the left hand.
+        /// </summary>
         public Quaternion RemoteLeftHandRotation;
 
+        /// <summary>
+        /// The remote rotation of the right hand.
+        /// </summary>
         public Quaternion RemoteRightHandRotation;
 
         /// <summary>
@@ -46,10 +58,10 @@ namespace SEE.Net.Actions
         private const string AnimatorForVrik = "Prefabs/Players/VRIKAnimatedLocomotion";
         
         /// <summary>
-        /// 
+        /// Initializes all variables that should be transferred to the remote avatars.
         /// </summary>
-        /// <param name="networkObjectID"></param>
-        /// <param name="vrik"></param>
+        /// <param name="networkObjectID">NetworkObject ID of the spawned avatar game object.</param>
+        /// <param name="vrik">VRIK component to be synchronised.</param>
         public VRIKNetAction(ulong networkObjectID, VRIK vrik)
         {
             GameObject remoteHeadTarget = vrik.solver.spine.headTarget.gameObject;
@@ -66,8 +78,7 @@ namespace SEE.Net.Actions
             RemoteLeftHandRotation = remoteLeftArm.transform.rotation;
             RemoteRightHandRotation = remoteRightArm.transform.rotation;
         }
-
-
+        
         /// <summary>
         /// If executed by the initiating client, nothing happens.
         /// If executed by the remote avatar, the usual positional and rotational model connection are
@@ -114,7 +125,7 @@ namespace SEE.Net.Actions
         }
 
         /// <summary>
-        /// Setup for the remote player vrik model.
+        /// Setup for the remote player VRIK model.
         /// </summary>
         /// <param name="networkObject">The existing network object</param>
         private void SetupRemotePlayer(NetworkObject networkObject)
@@ -127,31 +138,49 @@ namespace SEE.Net.Actions
             TurnOffAvatarAimingSystem(networkObject);
             ReplaceAnimator(networkObject);
             
-            GameObject remoteRig = new GameObject();
-            GameObject remoteHead = new GameObject();
-            GameObject remoteLeftHand = new GameObject();
-            GameObject remoteRightHand = new GameObject();
-
-            remoteRig.name = "RemoteRig";
-            remoteHead.name = "RemoteHead";
-            remoteLeftHand.name = "RemoteLeftHand";
-            remoteRightHand.name = "RemoteRightHand";
-
-            remoteRig.transform.SetParent(networkObject.gameObject.transform);
-            remoteHead.transform.SetParent(remoteRig.transform);
-            remoteLeftHand.transform.SetParent(remoteRig.transform);
-            remoteRightHand.transform.SetParent(remoteRig.transform);
-
-            //Setup usual positional and rotational model connections.
-            remoteRig.transform.position = RemoteHeadPosition;
-            remoteHead.transform.position = RemoteHeadPosition;
-            remoteLeftHand.transform.position = RemoteLeftHandPosition;
-            remoteRightHand.transform.position = RemoteRightHandPosition;
-
-            remoteHead.transform.rotation = RemoteHeadRotation;
-            remoteLeftHand.transform.rotation = RemoteLeftHandRotation;
-            remoteRightHand.transform.rotation = RemoteRightHandRotation;
-
+            GameObject remoteRig = new()
+            {
+                name = "RemoteRig",
+                transform =
+                {
+                    position = RemoteHeadPosition,
+                    parent = networkObject.gameObject.transform
+                }
+            };
+            
+            GameObject remoteHead = new()
+            {
+                name = "RemoteHead",
+                transform =
+                {
+                    position = RemoteHeadPosition,
+                    rotation = RemoteHeadRotation,
+                    parent = remoteRig.transform
+                }
+            };
+            
+            GameObject remoteLeftHand = new()
+            {
+                name = "RemoteLeftHand",
+                transform =
+                {
+                    position = RemoteLeftHandPosition,
+                    rotation = RemoteLeftHandRotation,
+                    parent = remoteRig.transform
+                }
+            };
+            
+            GameObject remoteRightHand = new()
+            {
+                name = "RemoteRightHand",
+                transform =
+                {
+                    position = RemoteRightHandPosition,
+                    rotation = RemoteRightHandRotation,
+                    parent = remoteRig.transform
+                }
+            };
+            
             vrIK.solver.spine.headTarget = remoteHead.transform;
             Assert.IsNotNull(vrIK.solver.spine.headTarget);
             vrIK.solver.leftArm.target = remoteLeftHand.transform;
@@ -164,7 +193,7 @@ namespace SEE.Net.Actions
         /// Adds required components.
         /// </summary>
         /// <param name="networkObject">The existing network object</param>
-        private void AddComponents(NetworkObject networkObject)
+        private static void AddComponents(NetworkObject networkObject)
         {
             VRAvatarAimingSystem aiming = networkObject.gameObject.AddOrGetComponent<VRAvatarAimingSystem>();
             aiming.IsLocallyControlled = false;
@@ -183,7 +212,7 @@ namespace SEE.Net.Actions
         /// in our own AvatarAimingSystem animation controller.
         /// </summary>
         /// <param name="networkObject">The existing network object</param>
-        private void TurnOffAvatarAimingSystem(NetworkObject networkObject)
+        private static void TurnOffAvatarAimingSystem(NetworkObject networkObject)
         {
             if (networkObject.gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
             {
@@ -208,14 +237,13 @@ namespace SEE.Net.Actions
                 Destroyer.Destroy(avatarMovement);
             }
         }
-
         
         /// <summary>
         /// We need to replace the animator of the avatar.
         /// The prefab has an aiming animation. We just want locomotion.
         /// </summary>
         /// <param name="networkObject">The existing network object</param>
-        private void ReplaceAnimator(NetworkObject networkObject)
+        private static void ReplaceAnimator(NetworkObject networkObject)
         {
             if (networkObject.gameObject.TryGetComponentOrLog(out DynamicCharacterAvatar avatar))
             {

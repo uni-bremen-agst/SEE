@@ -45,13 +45,11 @@ namespace SEE.Net.Actions
         /// </summary>
         private void Update()
         {
-            Debug.Log(Timer);
             Timer += Time.deltaTime;
             while (Timer >= RepeatCycle)
             {
                 Synchronize();
                 Timer -= RepeatCycle;
-                Debug.Log(Timer);
             }
         }
         
