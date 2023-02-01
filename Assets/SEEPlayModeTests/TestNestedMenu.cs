@@ -110,27 +110,33 @@ namespace SEE.Game.UI.Menu
             menu = menuGO.AddComponent<NestedMenu>();
             menu.AllowNoSelection(true);
             menu.Title = MenuTitle;
-            menu.Description = "Tests the menu";
+            menu.Description = "Tests the nested toggle menu";
             menu.HideAfterSelection(true);
             menu.Icon = GetIcon();
 
             IEnumerable<MenuEntry> menuEntries = new List<MenuEntry>
             {
-                new MenuEntry(action: new UnityAction(() => { selection = 1; }),
-                              title: OptionOne,
-                              description: "Select option 1",
-                              entryColor: Color.red,
-                              enabled: true,
-                              icon: GetIcon()),
+                new ToggleMenuEntry(active: true,
+                                    entryAction: () => { selection = 1; },
+                                    exitAction: null,
+                                    title: OptionOne,
+                                    description: "Select option 1",
+                                    entryColor: Color.red,
+                                    enabled: true,
+                                    icon: GetIcon()),
                 new NestedMenuEntry<MenuEntry>(innerEntries: new List<MenuEntry>()
-                                                      { 
-                                                         new MenuEntry(action: new UnityAction(() => { selection = 2; }),
+                                                      {
+                                                         new ToggleMenuEntry(active: true,
+                                                                       entryAction: () => { selection = 2; },
+                                                                       exitAction: null,
                                                                        title: NestedOptionOne,
                                                                        description: "Select option 2a",
                                                                        entryColor: Color.green,
                                                                        enabled: true,
                                                                        icon: GetIcon()),
-                                                         new MenuEntry(action: new UnityAction(() => { selection = 3; }),
+                                                         new ToggleMenuEntry(active: false,
+                                                                       entryAction: () => { selection = 3; },
+                                                                       exitAction: null,
                                                                        title: NestedOptionTwo,
                                                                        description: "Select option 2b",
                                                                        entryColor: Color.green,
