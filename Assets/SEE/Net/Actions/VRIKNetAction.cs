@@ -61,7 +61,7 @@ namespace SEE.Net.Actions
         /// Initializes all variables that should be transferred to the remote avatars.
         /// </summary>
         /// <param name="networkObjectID">NetworkObject ID of the spawned avatar game object.</param>
-        /// <param name="vrik">VRIK component to be synchronised.</param>
+        /// <param name="vrik">VRIK component to be synchronized.</param>
         public VRIKNetAction(ulong networkObjectID, VRIK vrik)
         {
             GameObject remoteHeadTarget = vrik.solver.spine.headTarget.gameObject;

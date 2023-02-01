@@ -35,7 +35,7 @@ namespace SEE.Net.Actions
         private float Timer;
         
         /// <summary>
-        /// Waits till <see cref="UMAExpressionPlayer"/> is available and initializes <see cref="ExpressionPlayer"/> 
+        /// Waits until <see cref="UMAExpressionPlayer"/> is available and initializes <see cref="ExpressionPlayer"/> 
         /// and <see cref="NetworkObject"/>. 
         /// </summary>
         private IEnumerator WaitForExpressionPlayer()
@@ -56,15 +56,15 @@ namespace SEE.Net.Actions
         }
         
         /// <summary>
-        /// Executes <see cref="Synchronize"/> every 0.5 seconds.
+        /// Executes <see cref="Synchronize"/> every <see cref="RepeatCycle"/> seconds.
         /// </summary>
         private void Update()
         {
             Timer += Time.deltaTime;
-            while (Timer >= RepeatCycle)
+            if (Timer >= RepeatCycle)
             {
                 Synchronize();
-                Timer -= RepeatCycle;
+                Timer = 0f;
             }
         }
         
