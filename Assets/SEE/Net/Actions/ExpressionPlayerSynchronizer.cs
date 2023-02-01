@@ -35,8 +35,8 @@ namespace SEE.Net.Actions
         private float Timer;
         
         /// <summary>
-        /// Initializes <see cref="ExpressionPlayer"/> and <see cref="NetworkObject"/>. The periodic call of
-        /// <see cref="Synchronize"/> is triggered.
+        /// Waits till <see cref="UMAExpressionPlayer"/> is available and initializes <see cref="ExpressionPlayer"/> 
+        /// and <see cref="NetworkObject"/>. 
         /// </summary>
         private IEnumerator WaitForExpressionPlayer()
         {
@@ -70,7 +70,6 @@ namespace SEE.Net.Actions
         
         /// <summary>
         /// This method is invoked periodically while this component is active.
-        /// It is registered in <see cref="Start"/>.
         /// </summary>
         private void Synchronize()
         {
