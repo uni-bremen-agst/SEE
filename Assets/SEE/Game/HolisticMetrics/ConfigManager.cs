@@ -6,6 +6,7 @@ using SEE.Game.HolisticMetrics.Components;
 using SEE.Game.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
+using System;
 
 namespace SEE.Game.HolisticMetrics
 {
@@ -59,14 +60,23 @@ namespace SEE.Game.HolisticMetrics
         /// <returns>The GameObject that represents the metrics displays</returns>
         internal static BoardConfig LoadBoard(FilePath path)
         {
-            using ConfigReader stream = new ConfigReader(path.Path);
-            Dictionary<string, object> attributes = stream.Read();
             BoardConfig config = new BoardConfig();
-            if (!config.Restore(attributes))
+            try
             {
-                ShowNotification.Warn(
-                    "Error loading board", 
-                    "Not all board attributes were loaded correctly");
+                using ConfigReader stream = new ConfigReader(path.Path);
+                Dictionary<string, object> attributes = stream.Read();
+                if (!config.Restore(attributes))
+                {
+                    ShowNotification.Warn(
+                        "Error loading board",
+                        "Not all board attributes were loaded correctly");
+                }
+            }
+            catch (Exception e)
+            {
+                string description = $"Could not load settings from {path.Path}: {e.Message}";
+                ShowNotification.Error("Error loading board", description);
+                Debug.LogError(description);
             }
             return config;
         }
@@ -81,7 +91,7 @@ namespace SEE.Game.HolisticMetrics
             EnsureBoardsDirectoryExists();
             return LoadBoard(new FilePath(metricsBoardsPath + fileName + Filenames.ConfigExtension));
         }
-        
+
         /// <summary>
         /// Persist a metrics board to a file.
         /// </summary>
