@@ -33,6 +33,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         private AbstractSEECity codeCity;
 
+        /// <summary>
+        /// The duration that the edge appearance/disappearance
+        /// animation takes from start to end if not interrupted.
+        /// </summary>
         private const float ANIMATION_DURATION = 1f;
 
         /// <summary>
@@ -216,6 +220,7 @@ namespace SEE.Controls.Actions
         /// Shows the given <paramref name="edge"/> by fading its alpha value to one.
         /// </summary>
         /// <param name="edge">the edge to show</param>
+        /// <param name="animationKind">the kind of edge animation to use</param>
         private static void ShowEdge(Edge edge, EdgeAnimationKind animationKind)
         {
             GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
@@ -225,7 +230,6 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            // TODO: include a switch for the different operator methods
             EdgeOperator @operator = edgeObject.AddOrGetComponent<EdgeOperator>();
 
             switch (animationKind)
