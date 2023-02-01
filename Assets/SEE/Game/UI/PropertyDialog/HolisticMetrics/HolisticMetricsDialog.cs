@@ -17,7 +17,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// This method needs to be called when the dialog should be closed. It will close the dialog and reenable the
         /// keyboard shortcuts.
         /// </summary>
-        internal void EnableKeyboardShortcuts()
+        internal virtual void EnableKeyboardShortcuts()
         {
             // Destroy the dialog GameObject
             Object.Destroy(dialog);

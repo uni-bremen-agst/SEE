@@ -1,3 +1,4 @@
+using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 
@@ -11,29 +12,15 @@ namespace SEE.Game.HolisticMetrics.Components
     public class WidgetAdder : MonoBehaviour
     {
         /// <summary>
-        /// The configuration of the widget to add. We get this from the AddWidgetDialog.
+        /// The position at which to add the widget.
         /// </summary>
         private Vector3 position;
 
         /// <summary>
-        /// Whether or not this class has just added a widget. If this is true, all instances of this class should
-        /// delete themselves in the next Update step.
+        /// Whether or not this class has a position in store that could be fetched by the
+        /// <see cref="AddWidgetAction"/>.
         /// </summary>
-        private static bool positioningDone;
-        
-        /// <summary>
-        /// This method does the setup for all WidgetAdder instances, meaning it sets the positioningDone field to false
-        /// and sets the widgetConfiguration field to the parameter value.
-        /// </summary>
-        internal static void Setup()
-        {
-            positioningDone = false;
-        }
-
-        internal static void Stop()
-        {
-            positioningDone = true;
-        }
+        private bool positionInStore;
         
         /// <summary>
         /// When the mouse is lifted up after clicking on the metrics board, we get the position of the mouse and then
@@ -46,28 +33,28 @@ namespace SEE.Game.HolisticMetrics.Components
                 if (!Raycasting.IsMouseOverGUI() && Raycasting.RaycastAnything(out RaycastHit hit))
                 {
                     position = transform.InverseTransformPoint(hit.point);
-                    positioningDone = true;
+                    positionInStore = true;
                 }
             }
         }
 
+        /// <summary>
+        /// If there is a position in store, this method returns that position in the <paramref name="clickPosition"/>
+        /// parameter.
+        /// </summary>
+        /// <param name="clickPosition">The position where the player clicked</param>
+        /// <returns>Whether there is a position in store</returns>
         internal bool GetPosition(out Vector3 clickPosition)
         {
-            clickPosition = position;
-            return positioningDone;
-        }
-
-        /// <summary>
-        /// This method checks whether or not the positioning is done. If so, it will delete this instance. Doing it
-        /// this way allows us to add WidgetAdders to all metrics boards and they will take care of deleting themselves
-        /// afterwards automatically.
-        /// </summary>
-        private void Update()
-        {
-            if (positioningDone)
+            if (positionInStore)
             {
-                Destroy(this);    
+                positionInStore = false;
+                clickPosition = position;
+                return true;
             }
+
+            clickPosition = Vector3.zero;
+            return false;
         }
     }
 }

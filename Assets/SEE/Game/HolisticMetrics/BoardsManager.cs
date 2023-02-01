@@ -30,7 +30,7 @@ namespace SEE.Game.HolisticMetrics
         /// List of all the <see cref="WidgetsManager"/>s that this manager manages (there should not be any
         /// <see cref="WidgetsManager"/>s in the scene that are not in this list).
         /// </summary>
-        private static readonly List<WidgetsManager> widgetsManagers = new List<WidgetsManager>();
+        private static readonly List<WidgetsManager> widgetsManagers = new();
 
         /// <summary>
         /// Creates a new metrics board and puts its <see cref="WidgetsManager"/> into the list of
@@ -176,15 +176,27 @@ namespace SEE.Game.HolisticMetrics
         }
 
         /// <summary>
-        /// This method can be invoked when you wish to let the user click on a board to add a widget.
+        /// Depending on the value of <paramref name="enable"/>, <see cref="WidgetAdder"/>s will be added or removed on
+        /// all boards.
         /// </summary>
-        internal static void AddWidgetAdders()
+        /// <param name="enable">Whether there should be WidgetAdders on all boards</param>
+        internal static void ToggleWidgetAdders(bool enable)
         {
-            WidgetAdder.Setup();
-            foreach (WidgetsManager controller in widgetsManagers)
+            if (enable)
             {
-                controller.gameObject.AddComponent<WidgetAdder>();
+                foreach (WidgetsManager controller in widgetsManagers)
+                {
+                    controller.gameObject.AddComponent<WidgetAdder>();
+                }
             }
+            else
+            {
+                foreach (WidgetsManager widgetsManager in widgetsManagers)
+                {
+                    Object.Destroy(widgetsManager.gameObject.GetComponent<WidgetAdder>());
+                }
+            }
+            
         }
 
         internal static bool GetWidgetAdditionPosition(out string boardName, out Vector3 position)

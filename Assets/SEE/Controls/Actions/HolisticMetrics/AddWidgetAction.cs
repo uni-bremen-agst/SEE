@@ -50,8 +50,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
             internal readonly WidgetConfig config;
 
             /// <summary>
-            /// Assigns the configuration of the widget to create and the name of the board on which to create it to fields
-            /// of this class.
+            /// Assigns the configuration of the widget to create and the name of the board on which to create it to
+            /// fields of this class.
             /// </summary>
             /// <param name="boardName">The name of the board on which to create the widget</param>
             /// <param name="config">The configuration; this is how the widget will be configured</param>
@@ -63,11 +63,11 @@ namespace SEE.Controls.Actions.HolisticMetrics
         }
 
         /// <summary>
-        /// Adds WidgetAdder components to all widgets so they can be deleted by clicking them.
+        /// Adds WidgetAdder components to all boards.
         /// </summary>
         public override void Start()
         {
-            BoardsManager.AddWidgetAdders();
+            BoardsManager.ToggleWidgetAdders(true);
         }
 
         /// <summary>
@@ -89,6 +89,12 @@ namespace SEE.Controls.Actions.HolisticMetrics
 
                     return false;
                 case ProgressState.GetConfig:
+                    if (AddWidgetDialog.WasCanceled())
+                    {
+                        // In case the player cancels the dialog
+                        progress = ProgressState.GetPosition;
+                        return false;
+                    }
                     if (AddWidgetDialog.GetConfig(out string metric, out string widget))
                     {
                         memento.config.MetricType = metric;
@@ -107,11 +113,11 @@ namespace SEE.Controls.Actions.HolisticMetrics
         }
 
         /// <summary>
-        /// Marks the WidgetAdder components as "to be deleted".
+        /// Removes the <see cref="WidgetAdder"/>s from the metrics boards.
         /// </summary>
         public override void Stop()
         {
-            WidgetAdder.Stop();
+            BoardsManager.ToggleWidgetAdders(false);
         }
 
         /// <summary>

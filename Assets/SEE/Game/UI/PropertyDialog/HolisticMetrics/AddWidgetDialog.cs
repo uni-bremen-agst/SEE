@@ -13,6 +13,8 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     internal class AddWidgetDialog : HolisticMetricsDialog
     {
         private static bool gotConfig;
+
+        private static bool wasCanceled;
         
         private static string metricType;
 
@@ -115,6 +117,16 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             SEEInput.KeyboardShortcutsEnabled = true;
         }
 
+        /// <summary>
+        /// When the dialog is canceled, we destroy the dialog <see cref="GameObject"/> and enable the keyboard
+        /// shortcuts again. We also mark this dialog as canceled.
+        /// </summary>
+        internal override void EnableKeyboardShortcuts()
+        {
+            base.EnableKeyboardShortcuts();
+            wasCanceled = true;
+        }
+
         internal static bool GetConfig(out string metric, out string widget)
         {
             if (gotConfig)
@@ -127,6 +139,17 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
 
             metric = null;
             widget = null;
+            return false;
+        }
+
+        internal static bool WasCanceled()
+        {
+            if (wasCanceled)
+            {
+                wasCanceled = false;
+                return true;
+            }
+
             return false;
         }
     }
