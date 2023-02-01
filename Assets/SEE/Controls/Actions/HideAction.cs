@@ -365,7 +365,7 @@ namespace SEE.Controls.Actions
                 if (childGameObject.CompareTag(Tags.Edge))
                 {
                     HideEdge(childGameObject);
-                } 
+                }
                 else if (childGameObject.CompareTag(Tags.Node))
                 {
                     HideNodeIncludingConnectedEdges(childGameObject);
@@ -787,7 +787,9 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.Hide"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.Hide;
+            // FIXME
+            throw new System.NotImplementedException();
+            //return ActionStateType.Hide;
         }
 
         /// <summary>
