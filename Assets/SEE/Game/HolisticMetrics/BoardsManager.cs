@@ -27,11 +27,6 @@ namespace SEE.Game.HolisticMetrics
         private static bool movingEnabled;
 
         /// <summary>
-        /// This field remembers whether or not the widgets can be moved currently.
-        /// </summary>
-        private static bool widgetsMovingEnabled;
-
-        /// <summary>
         /// List of all the <see cref="WidgetsManager"/>s that this manager manages (there should not be any
         /// <see cref="WidgetsManager"/>s in the scene that are not in this list).
         /// </summary>
@@ -211,15 +206,13 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Toggles the move-ability of all widgets.
         /// </summary>
-        /// <returns>Whether or not moving is activated now</returns>
-        internal static bool ToggleWidgetsMoving()
+        /// <param name="enable">Whether the widgets should be movable</param>
+        internal static void ToggleWidgetsMoving(bool enable)
         {
-            widgetsMovingEnabled = !widgetsMovingEnabled;
             foreach (WidgetsManager manager in widgetsManagers)
             {
-                manager.ToggleWidgetsMoving(widgetsMovingEnabled);
+                manager.ToggleWidgetsMoving(enable);
             }
-            return widgetsMovingEnabled;
         }
         
         /// <summary>

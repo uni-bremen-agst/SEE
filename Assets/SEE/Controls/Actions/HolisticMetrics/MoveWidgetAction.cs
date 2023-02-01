@@ -65,7 +65,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Start()
         {
-            BoardsManager.ToggleWidgetsMoving();
+            BoardsManager.ToggleWidgetsMoving(true);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Stop()
         {
-            BoardsManager.ToggleWidgetsMoving();
+            BoardsManager.ToggleWidgetsMoving(false);
         }
 
         /// <summary>

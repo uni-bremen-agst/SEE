@@ -22,6 +22,11 @@ namespace SEE.Game.HolisticMetrics.Components
         private Vector3 oldPosition;
 
         /// <summary>
+        /// The distance of the widget to the board.
+        /// </summary>
+        private float boardDistance;
+
+        /// <summary>
         /// The plane in which the canvas lies (the canvas that contains the widget that contains this component).
         /// </summary>
         private Plane plane;
@@ -41,6 +46,7 @@ namespace SEE.Game.HolisticMetrics.Components
         private void OnMouseDown()
         {
             oldPosition = transform.position;
+            boardDistance = transform.localPosition.z;
             plane = new Plane(transform.parent.forward, transform.parent.position);
         }
 
@@ -56,7 +62,7 @@ namespace SEE.Game.HolisticMetrics.Components
                 Vector3 enterPoint = ray.GetPoint(enter);
                 transform.position = enterPoint;
                 Vector3 localPositionTemp = transform.localPosition;
-                localPositionTemp.z = oldPosition.z;
+                localPositionTemp.z = boardDistance;
                 transform.localPosition = localPositionTemp;
             }
         }
