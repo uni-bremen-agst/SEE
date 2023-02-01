@@ -324,7 +324,7 @@ namespace SEE.GO
         {
             if (gameObject.TryGetComponent(out LineRenderer lr))
             {
-                BSpline subSpline = CalculateSubSpline();
+                BSpline subSpline = CreateSubSpline();
                 Vector3[] polyLine = TinySplineInterop.ListToVectors(subSpline.Sample());
 
                 lr.positionCount = polyLine.Length;
