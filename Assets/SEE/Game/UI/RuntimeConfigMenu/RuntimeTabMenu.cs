@@ -91,7 +91,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     {
         if (memberInfo.CustomAttributes.Where(attribute => attribute.AttributeType == typeof(ButtonGroupAttribute)).Count() > 0)
         {
-            Transform buttonContent = Content.transform.Find("ConfigButtons").Find("Content").transform;
+            Transform buttonContent = Content.transform.Find("ConfigButtons/Content");
             GameObject button = PrefabInstantiator.InstantiatePrefab(BUTTON_PREFAB, buttonContent, false);
             button.name = memberInfo.Name;
             ButtonManagerWithIcon buttonManager = button.GetComponent<ButtonManagerWithIcon>();
@@ -108,6 +108,10 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     protected void ClearCity()
     {
         Entries.Reverse().ForEach(RemoveEntry);
+        foreach (Transform button in Content.transform.Find("ConfigButtons/Content"))
+        {
+            Destroy(button.gameObject);
+        }
         //TODO Remove Buttons as well: Listener und Buttons muessen zu TabMenu.cs hinzugeuegt werden
     }
     
