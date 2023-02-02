@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using HighlightPlus;
 using SEE.DataModel;
+using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
 using TinySpline;
@@ -192,7 +193,52 @@ namespace SEE.Game.Operator
             return construction.AnimateTo(false, duration);
         }
 
+        /// <summary>
+        /// Show the edge, revealing it as specified in the <see cref="animationKind"/>.
+        /// </summary>
+        /// <param name="animationKind">In which way to reveal the edge.</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> Show(EdgeAnimationKind animationKind, float duration)
+        {
+            return ShowOrHide(true, animationKind, duration);
+        }
+        
+        /// <summary>
+        /// Hide the edge, animating it as specified in the <see cref="animationKind"/>.
+        /// </summary>
+        /// <param name="animationKind">In which way to hide the edge.</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> Hide(EdgeAnimationKind animationKind, float duration)
+        {
+            return ShowOrHide(false, animationKind, duration);
+        }
+
         #endregion
+
+        /// <summary>
+        /// Show or hide the edge, animating it as specified in the <see cref="animationKind"/>.
+        /// </summary>
+        /// <param name="show">Whether to show or hide the edge.</param>
+        /// <param name="animationKind">In which way to animate the edge.</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        /// <exception cref="ArgumentOutOfRangeException">If the given <paramref name="animationKind"/>
+        /// is unknown.</exception>
+        private IOperationCallback<Action> ShowOrHide(bool show, EdgeAnimationKind animationKind, float duration)
+        {
+            return animationKind switch
+            {
+                EdgeAnimationKind.None => new DummyOperationCallback<Action>(),
+                EdgeAnimationKind.Fading => FadeTo(show ? 1.0f : 0.0f, duration),
+                EdgeAnimationKind.Buildup => show ? Construct(duration) : Destruct(duration),
+                _ => throw new ArgumentOutOfRangeException(nameof(animationKind), "Unknown edge animation kind supplied.")
+            };
+        }
 
         /// <summary>
         /// Calculates a value for the <see cref="glow"/> operation according to the following formula:

@@ -4,6 +4,7 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -185,46 +186,6 @@ namespace SEE.Controls.Actions
             return nodeRef.Value;
         }
 
-        /// <summary>
-        /// Shows or hides the given <paramref name="edge"/> (depending on <paramref name="show"/>)
-        /// by applying the animation specified by <paramref name="animationKind"/>.
-        /// </summary>
-        /// <param name="show">Whether to show (true) or hide (false) the edge.</param>
-        /// <param name="edge">the edge to show</param>
-        /// <param name="animationKind">the kind of edge animation to use</param>
-        private static void ShowEdge(bool show, Edge edge, EdgeAnimationKind animationKind)
-        {
-            GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
-            if (edgeObject == null)
-            {
-                Debug.LogError($"Could not find edge {edge.ToShortString()}!");
-                return;
-            }
-
-            EdgeOperator @operator = edgeObject.AddOrGetComponent<EdgeOperator>();
-
-            switch (animationKind)
-            {
-                case EdgeAnimationKind.None:
-                    break;
-                case EdgeAnimationKind.Fading:
-                    @operator.FadeTo(show ? 1.0f : 0.0f, ANIMATION_DURATION);
-                    break;
-                case EdgeAnimationKind.Buildup:
-                    if (show)
-                    {
-                        @operator.Construct(ANIMATION_DURATION);
-                    }
-                    else
-                    {
-                        @operator.Destruct(ANIMATION_DURATION);
-                    }
-                    break;
-                default:
-                    throw new System.ArgumentOutOfRangeException("Unknown edge animation layout supplied.");
-            }
-        }
-
         private void On()
         {
             Node node = Node();
@@ -238,7 +199,7 @@ namespace SEE.Controls.Actions
             // TODO: Perhaps the node along with its edges should be cached?
             foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
             {
-                ShowEdge(true, edge, animationKind);
+                edge.Operator().Show(animationKind, ANIMATION_DURATION);
             }
         }
 
@@ -254,7 +215,7 @@ namespace SEE.Controls.Actions
 
             foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
             {
-                ShowEdge(false, edge, animationKind);
+                edge.Operator().Hide(animationKind, ANIMATION_DURATION);
             }
         }
     }
