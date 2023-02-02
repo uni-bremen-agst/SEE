@@ -13,7 +13,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// <summary>
         /// The name of the file which the player selected.
         /// </summary>
-        private string filename;
+        private static string filename;
 
         /// <summary>
         /// This input field lets the player pick a file from which to load the board configuration.
@@ -61,12 +61,6 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             Object.Destroy(dialog);
         }
 
-        /// <summary>
-        /// Fetches the name of the file which was loaded.
-        /// </summary>
-        /// <param name="nameOfFile">This will be assigned the filename, if that is present and wasn't already fetched.
-        /// Otherwise this will be assigned null.</param>
-        /// <returns>Whether there was a filename present that wasn't already fetched</returns>
         internal bool GetFilename(out string nameOfFile)
         {
             if (gotInput)

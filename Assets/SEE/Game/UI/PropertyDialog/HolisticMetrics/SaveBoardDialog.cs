@@ -10,15 +10,9 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     /// </summary>
     internal class SaveBoardDialog : HolisticMetricsDialog
     {
-        /// <summary>
-        /// The filename the user entered for the file in which the <see cref="BoardConfig"/> will be saved.
-        /// </summary>
-        private string filename;
+        private static string filename;
 
-        /// <summary>
-        /// The <see cref="widgetsManager"/> of the widget to save to disk.
-        /// </summary>
-        private WidgetsManager widgetsManager;
+        private static WidgetsManager widgetsManager;
 
         /// <summary>
         /// The input field that lets the player select a board from the scene to be saved.
@@ -78,14 +72,6 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             Close();
         }
         
-        /// <summary>
-        /// Fetches the user input of this dialog.
-        /// </summary>
-        /// <param name="filenameOut">If the return value is true, this gets assigned the filename the player entered
-        /// </param>
-        /// <param name="widgetsManagerOut">If the return value is true, this gets assigned the WidgetsManager that the
-        /// player selected</param>
-        /// <returns>Whether there is a user input present that wasn't already fetched</returns>
         internal bool GetUserInput(out string filenameOut, out WidgetsManager widgetsManagerOut)
         {
             if (gotInput)

@@ -19,11 +19,6 @@ namespace SEE.Game.HolisticMetrics.Components
     internal class WidgetsManager : MonoBehaviour, IObserver<ChangeEvent>
     {
         /// <summary>
-        /// Path to the widget prefabs.
-        /// </summary>
-        private const string widgetPrefabsPath = "Prefabs/HolisticMetrics/Widgets";
-        
-        /// <summary>
         /// The dropdown UI element that allows the player to select a code city for which the metrics should be
         /// displayed.
         /// </summary>
@@ -38,7 +33,7 @@ namespace SEE.Game.HolisticMetrics.Components
         /// This contains references to all widgets on the board each represented by one WidgetController and one
         /// Metric. This list is needed so we can refresh the metrics.
         /// </summary>
-        internal readonly List<(WidgetController, Metric)> widgets = new();
+        internal readonly List<(WidgetController, Metric)> widgets = new List<(WidgetController, Metric)>();
 
         /// <summary>
         /// The title of the board that this controller controls.
@@ -46,14 +41,14 @@ namespace SEE.Game.HolisticMetrics.Components
         private string title;
 
         /// <summary>
-        /// The list of all available metric types. This is shared between all <see cref="WidgetsManager"/> instances
-        /// and is not expected to change at runtime.
+        /// The list of all available metric types. This is shared between all BoardController instances and is not
+        /// expected to change at runtime.
         /// </summary>
         private Type[] metricTypes;
 
         /// <summary>
-        /// The array of all available widget prefabs. This is shared by all <see cref="WidgetsManager"/> instances and
-        /// is not expected to change at runtime.
+        /// The array of all available widget prefabs. This is shared by all BoardController instances and is not
+        /// expected to change at runtime.
         /// </summary>
         private GameObject[] widgetPrefabs;
 
@@ -78,12 +73,20 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         private void Awake()
         {
-            WidgetPrefabs = Resources.LoadAll<GameObject>(widgetPrefabsPath);
-            MetricTypes = Metric.GetTypes();
+            widgetPrefabs =
+                Resources.LoadAll<GameObject>("Prefabs/HolisticMetrics/Widgets");
+
+            metricTypes = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(domainAssembly => domainAssembly.GetTypes())
+                .Where(type => type.IsSubclassOf(typeof(Metric)))
+                .ToArray();
+
             houseIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/Home_Simple_Icons_UI");
+
             citySelection.dropdownEvent.AddListener(Redraw);
             citySelection.dropdownEvent.AddListener(CitySelectionChanged);
             OnCitySelectionClick();
+
             graphUnsubscriber = GetSelectedCity().LoadedGraph?.Subscribe(this);
         }
 
@@ -112,9 +115,9 @@ namespace SEE.Game.HolisticMetrics.Components
         /// <param name="widgetConfiguration">The configuration of the new widget.</param>
         internal void Create(WidgetConfig widgetConfiguration)
         {
-            GameObject widget = Array.Find(WidgetPrefabs,
+            GameObject widget = Array.Find(widgetPrefabs,
                 element => element.name.Equals(widgetConfiguration.WidgetName));
-            Type metricType = Array.Find(MetricTypes,
+            Type metricType = Array.Find(metricTypes,
                 type => type.Name.Equals(widgetConfiguration.MetricType));
             if (widget is null)
             {

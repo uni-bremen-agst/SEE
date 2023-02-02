@@ -28,11 +28,6 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// </summary>
             public readonly BoardConfig boardConfig;
 
-            /// <summary>
-            /// The constructor of this struct which simply assigns the parameters to the fields of this struct.
-            /// </summary>
-            /// <param name="boardConfig">The configuration of the board, from which the board can be completely
-            /// restored.</param>
             public Memento(BoardConfig boardConfig)
             {
                 this.boardConfig = boardConfig;

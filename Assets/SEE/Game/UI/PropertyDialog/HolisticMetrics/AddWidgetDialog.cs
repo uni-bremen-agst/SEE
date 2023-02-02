@@ -1,6 +1,7 @@
+using System;
 using System.Linq;
 using SEE.Controls;
-using SEE.Game.HolisticMetrics;
+using SEE.Game.HolisticMetrics.Metrics;
 using UnityEngine;
 
 namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
@@ -10,15 +11,9 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     /// </summary>
     internal class AddWidgetDialog : HolisticMetricsDialog
     {
-        /// <summary>
-        /// This gets assigned the metric type the player selected when the player confirms his input.
-        /// </summary>
-        private string metricType;
+        private static string metricType;
 
-        /// <summary>
-        /// This gets assigned the widget type the player selected when the player confirms his input.
-        /// </summary>
-        private string widgetName;
+        private static string widgetName;
 
         /// <summary>
         /// The selection allowing the player to select the metric that should be displayed by the new widget.
@@ -29,6 +24,31 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// The selection allowing the player to select the widget that should be used to display the selected metric.
         /// </summary>
         private SelectionProperty selectedWidget;
+
+        /// <summary>
+        /// When this class is constructed, this will be filled with the types of all classes that inherit from class
+        /// "Metric".
+        /// </summary>
+        private readonly Type[] metricTypes;
+
+        /// <summary>
+        /// When this class is constructed, this will be filled with all widget prefabs from
+        /// Assets/Resources/Prefabs/HolisticMetrics.
+        /// </summary>
+        private readonly GameObject[] widgetPrefabs;
+
+        /// <summary>
+        /// The constructor. This will fill the metricTypes and widgetPrefabs arrays.
+        /// </summary>
+        internal AddWidgetDialog()
+        {
+            // Load the metric types
+            metricTypes = Metric.GetTypes();
+
+            // Load the widget prefabs
+            const string widgetPrefabsPath = "Prefabs/HolisticMetrics/Widgets";
+            widgetPrefabs = Resources.LoadAll<GameObject>(widgetPrefabsPath);
+        }
         
         /// <summary>
         /// This method will display this dialog to the player.
@@ -44,7 +64,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             selectedMetric = dialog.AddComponent<SelectionProperty>();
             selectedMetric.Name = "Select metric";
             selectedMetric.Description = "Select the metric you want to display";
-            string[] metricOptions = WidgetsManager.MetricTypes.Select(type => type.Name).ToArray();
+            string[] metricOptions = metricTypes.Select(type => type.Name).ToArray();
             selectedMetric.AddOptions(metricOptions);
             selectedMetric.Value = metricOptions[0];
             group.AddProperty(selectedMetric);
@@ -52,7 +72,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             selectedWidget = dialog.AddComponent<SelectionProperty>();
             selectedWidget.Name = "Select widget";
             selectedWidget.Description = "Select the widget that is supposed to display the metric";
-            string[] widgetOptions = WidgetsManager.WidgetPrefabs.Select(prefab => prefab.name).ToArray();
+            string[] widgetOptions = widgetPrefabs.Select(prefab => prefab.name).ToArray();
             selectedWidget.AddOptions(widgetOptions);
             selectedWidget.Value = widgetOptions[0];
             group.AddProperty(selectedWidget);
@@ -84,12 +104,6 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             Close();
         }
 
-        /// <summary>
-        /// Fetches the widget configuration.
-        /// </summary>
-        /// <param name="metric">This gets assigned the metric type, if it exists and wasn't already fetched</param>
-        /// <param name="widget">This gets assigned the widget type, if it exists and wasn't already fetched</param>
-        /// <returns>Whether there is a widget configuration present that wasn't fetched already</returns>
         internal bool GetConfig(out string metric, out string widget)
         {
             if (gotInput)
