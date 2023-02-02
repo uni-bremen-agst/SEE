@@ -56,13 +56,13 @@ namespace SEE.Game.City
         /// A queue of <see cref="ChangeEvent"/>s which were received from the analysis, but not yet handled.
         /// More specifically, these are intended to be handled after the city has been drawn.
         /// </summary>
-        private readonly Queue<ChangeEvent> UnhandledEvents = new Queue<ChangeEvent>();
+        private readonly Queue<ChangeEvent> UnhandledEvents = new();
 
         /// <summary>
         /// A queue of <see cref="EdgeOperator"/>s associated with edges which are currently highlighted, that is,
         /// edges which have changed compared to the <see cref="PreviousVersion"/>.
         /// </summary>
-        private readonly Queue<EdgeOperator> HighlightedEdgeOperators = new Queue<EdgeOperator>();
+        private readonly Queue<EdgeOperator> HighlightedEdgeOperators = new();
 
         /// <summary>
         /// Mapping from Edge IDs to the state they had in the previous version.
