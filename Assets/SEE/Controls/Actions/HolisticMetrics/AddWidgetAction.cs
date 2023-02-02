@@ -99,8 +99,21 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     {
                         memento.config.MetricType = metric;
                         memento.config.WidgetName = widget;
+                        
+                        WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
+                        if (widgetsManager != null)
+                        {
+                            widgetsManager.Create(memento.config);
+                            new CreateWidgetNetAction(memento.boardName, memento.config).Execute();
+                        }
+                        else
+                        {
+                            Debug.LogError(
+                                $"No board found with the name {memento.boardName} for adding the widget.\n");
+                        }
+                        
                         progress = ProgressState.Finished;
-                        Redo();
+                        currentState = ReversibleAction.Progress.Completed;
                         return true;
                     }
 
@@ -125,6 +138,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Undo()
         {
+            base.Undo();
             WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
             if (widgetsManager != null)
             {
@@ -142,6 +156,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Redo()
         {
+            base.Redo();
             WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
             if (widgetsManager != null)
             {

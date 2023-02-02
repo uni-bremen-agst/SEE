@@ -115,7 +115,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
                             out WidgetsManager widgetsManager))
                     {
                         memento = new Memento(filename, widgetsManager);
-                        Redo();
+                        ConfigManager.SaveBoard(memento.widgetsManager, memento.filename);
+                        currentState = ReversibleAction.Progress.Completed;
                         progress = ProgressState.Finished;
                         return true;
                     }
@@ -146,6 +147,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Undo()
         {
+            base.Undo();
             ConfigManager.DeleteBoard(memento.filename);
         }
         
@@ -155,6 +157,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Redo()
         {
+            base.Redo();
             ConfigManager.SaveBoard(memento.widgetsManager, memento.filename);
         }
 

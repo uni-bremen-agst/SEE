@@ -103,7 +103,9 @@ namespace SEE.Controls.Actions.HolisticMetrics
                         {
                             BoardConfig config = ConfigManager.LoadBoard(filename);
                             memento = new Memento(config);
-                            Redo();
+                            BoardsManager.Create(memento.config);
+                            new CreateBoardNetAction(memento.config).Execute();
+                            currentState = ReversibleAction.Progress.Completed;
                             return true;
                         }
                         catch (Exception exception)
@@ -137,6 +139,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Undo()
         {
+            base.Undo();
             BoardsManager.Delete(memento.config.Title);
             new DeleteBoardNetAction(memento.config.Title).Execute();
         }
@@ -146,6 +149,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Redo()
         {
+            base.Redo();
             BoardsManager.Create(memento.config);
             new CreateBoardNetAction(memento.config).Execute();
         }

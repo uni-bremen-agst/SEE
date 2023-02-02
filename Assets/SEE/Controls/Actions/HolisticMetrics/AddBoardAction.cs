@@ -101,7 +101,10 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     if (AddBoardDialog.GetName(out string name))
                     {
                         memento.boardConfig.Title = name;
-                        Redo();
+                        BoardsManager.Create(memento.boardConfig);
+                        new CreateBoardNetAction(memento.boardConfig).Execute();
+                        currentState = ReversibleAction.Progress.Completed;
+                        // TODO: Account for when a player cancels the dialog
                         return true;
                     }
 
@@ -124,6 +127,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Undo()
         {
+            base.Undo();
             BoardsManager.Delete(memento.boardConfig.Title);
             new DeleteBoardNetAction(memento.boardConfig.Title).Execute();
         }
@@ -133,6 +137,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Redo()
         {
+            base.Redo();
             BoardsManager.Create(memento.boardConfig);
             new CreateBoardNetAction(memento.boardConfig).Execute();
         }

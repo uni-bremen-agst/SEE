@@ -52,7 +52,9 @@ namespace SEE.Controls.Actions.HolisticMetrics
                 if (widgetsManager != null)
                 {
                     memento = new Memento(ConfigManager.GetBoardConfig(widgetsManager));
-                    Redo();
+                    BoardsManager.Delete(memento.boardConfig.Title);
+                    new DeleteBoardNetAction(memento.boardConfig.Title).Execute();
+                    currentState = ReversibleAction.Progress.Completed;
                     return true;
                 }
             }
@@ -65,6 +67,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Undo()
         {
+            base.Undo();
             BoardsManager.Create(memento.boardConfig);
             new CreateBoardNetAction(memento.boardConfig).Execute();
         }
@@ -74,6 +77,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Redo()
         {
+            base.Redo();
             BoardsManager.Delete(memento.boardConfig.Title);
             new DeleteBoardNetAction(memento.boardConfig.Title).Execute();
         }

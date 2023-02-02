@@ -85,7 +85,9 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     out Quaternion oldRotation, out Quaternion newRotation))
             {
                 memento = new Memento(boardName, oldPosition, newPosition, oldRotation, newRotation);
-                Redo();
+                BoardsManager.Move(memento.boardName, memento.newPosition, memento.newRotation);
+                new MoveBoardNetAction(memento.boardName, memento.newPosition, memento.newRotation).Execute();
+                currentState = ReversibleAction.Progress.Completed;
                 return true;
             }
 
@@ -106,6 +108,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Undo()
         {
+            base.Undo();
             BoardsManager.Move(memento.boardName, memento.oldPosition, memento.oldRotation);
             new MoveBoardNetAction(memento.boardName, memento.oldPosition, memento.oldRotation).Execute();
         }
@@ -117,6 +120,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Redo()
         {
+            base.Redo();
             BoardsManager.Move(memento.boardName, memento.newPosition, memento.newRotation);
             new MoveBoardNetAction(memento.boardName, memento.newPosition, memento.newRotation).Execute();
         }

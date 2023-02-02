@@ -61,7 +61,20 @@ namespace SEE.Controls.Actions.HolisticMetrics
             if (BoardsManager.GetWidgetDeletion(out string boardName, out WidgetConfig widgetConfig))
             {
                 memento = new Memento(boardName, widgetConfig);
-                Redo();
+                WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
+
+                if (widgetsManager != null)
+                {
+                    widgetsManager.Delete(memento.widgetConfig.ID);
+                    new DeleteWidgetNetAction(memento.boardName, memento.widgetConfig.ID).Execute();   
+                }
+                else
+                {
+                    Debug.LogError($"Tried to delete a widget from a board named {memento.boardName} that " +
+                                   $"could not be found.\n");
+                }
+
+                currentState = ReversibleAction.Progress.Completed;
                 return true;
             }
             return false;
@@ -80,6 +93,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Redo()
         {
+            base.Redo();
             WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
 
             if (widgetsManager != null)
@@ -99,6 +113,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Undo()
         {
+            base.Undo();
             WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
 
             if (widgetsManager != null)

@@ -81,7 +81,18 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     out Guid widgetID))
             {
                 memento = new Memento(boardName, widgetID, oldPosition, newPosition);
-                Redo();
+                WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
+                if (widgetsManager != null)
+                {
+                    widgetsManager.Move(memento.widgetID, memento.newPosition);
+                    new MoveWidgetNetAction(memento.boardName, memento.widgetID, memento.newPosition).Execute();
+                }
+                else
+                {
+                    Debug.LogError($"Could not find the board {memento.boardName} for moving a widget on it.\n");
+                }
+
+                currentState = ReversibleAction.Progress.Completed;
                 return true;
             }
 
@@ -101,6 +112,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Undo()
         {
+            base.Undo();
             WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
             if (widgetsManager != null)
             {
@@ -118,6 +130,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Redo()
         {
+            base.Redo();
             WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
             if (widgetsManager != null)
             {
