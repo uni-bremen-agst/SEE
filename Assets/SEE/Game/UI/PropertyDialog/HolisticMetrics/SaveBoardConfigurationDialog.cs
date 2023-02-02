@@ -27,6 +27,11 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         private SelectionProperty selectedBoard;
 
         /// <summary>
+        /// Whether this dialog was canceled.
+        /// </summary>
+        private static bool wasCanceled;
+        
+        /// <summary>
         /// The input field that lets the player enter a name for the file in which to save the board configuration.
         /// </summary>
         private StringProperty fileName;
@@ -61,7 +66,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             propertyDialog.AddGroup(group);
             
             propertyDialog.OnConfirm.AddListener(SaveBoardConfiguration);
-            propertyDialog.OnCancel.AddListener(EnableKeyboardShortcuts);
+            propertyDialog.OnCancel.AddListener(Cancel);
             
             SEEInput.KeyboardShortcutsEnabled = false;
             propertyDialog.DialogShouldBeShown = true;
@@ -79,6 +84,15 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             EnableKeyboardShortcuts();
         }
 
+        /// <summary>
+        /// Gets called when the dialog is canceled.
+        /// </summary>
+        private void Cancel()
+        {
+            wasCanceled = true;
+            EnableKeyboardShortcuts();
+        }
+
         internal static bool GetUserInput(out string filenameOut, out WidgetsManager widgetsManagerOut)
         {
             if (gotUserInput)
@@ -91,6 +105,21 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
 
             filenameOut = null;
             widgetsManagerOut = null;
+            return false;
+        }
+        
+        /// <summary>
+        /// Whether this dialog was canceled.
+        /// </summary>
+        /// <returns>Whether this dialog was canceled</returns>
+        internal static bool WasCanceled()
+        {
+            if (wasCanceled)
+            {
+                wasCanceled = false;
+                return true;
+            }
+
             return false;
         }
     }

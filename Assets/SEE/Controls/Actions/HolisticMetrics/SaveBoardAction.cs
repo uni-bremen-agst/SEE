@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using SEE.Game.HolisticMetrics;
 using SEE.Game.HolisticMetrics.Components;
 using SEE.Game.UI.HolisticMetrics;
+using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
@@ -14,15 +15,9 @@ namespace SEE.Controls.Actions.HolisticMetrics
     public class SaveBoardAction : AbstractPlayerAction
     {
         /// <summary>
-        /// The path to the <see cref="button"/> prefab.
+        /// The path to the prefab.
         /// </summary>
         private const string buttonPath = "Prefabs/HolisticMetrics/SceneComponents/SaveBoardButton";
-
-        /// <summary>
-        /// The button GameObject. This is a button that will appear on the player's UI and when the player clicks it,
-        /// he will see a dialog that lets him save a metrics board.
-        /// </summary>
-        private GameObject button;
 
         /// <summary>
         /// The controller of the button, in the <see cref="Update"/> method we will "ask" this if the button has been
@@ -31,15 +26,30 @@ namespace SEE.Controls.Actions.HolisticMetrics
         private LoadBoardButtonController buttonController;
 
         /// <summary>
-        /// Whether or not the <see cref="button"/> has been clicked (if so, the player should see a dialog).
+        /// Whether or not the button has been clicked (if so, the player should see a dialog).
         /// </summary>
         private bool buttonClicked;
 
+        /// <summary>
+        /// Stores the current progress of this action.
+        /// </summary>
+        private ProgressState progress = ProgressState.WaitingForClick;
+        
         /// <summary>
         /// Saves all the information needed to revert or repeat this action.
         /// </summary>
         private Memento memento;
 
+        /// <summary>
+        /// Represents the progress that this action has made.
+        /// </summary>
+        private enum ProgressState
+        {
+            WaitingForClick,
+            WaitingForInput,
+            Finished
+        }        
+        
         /// <summary>
         /// This struct can store all the information needed to revert or repeat a <see cref="SaveBoardAction"/>.
         /// </summary>
@@ -73,9 +83,9 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Start()
         {
-            button = PrefabInstantiator.InstantiatePrefab(buttonPath, GameObject.Find("UI Canvas").transform,
-                false);
-            buttonController = button.GetComponent<LoadBoardButtonController>();
+            buttonController = PrefabInstantiator
+                .InstantiatePrefab(buttonPath, GameObject.Find("UI Canvas").transform, false)
+                .GetComponent<LoadBoardButtonController>();
         }
         
         /// <summary>
@@ -84,21 +94,43 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
-            if (!buttonClicked && buttonController.GetClick())
+            switch (progress)
             {
-                new SaveBoardConfigurationDialog().Open();
-                buttonClicked = true;
-                return false;
-            }
+                case ProgressState.WaitingForClick:
+                    if (buttonController.GetClick())
+                    {
+                        if (BoardsManager.GetNames().Length == 0)
+                        {
+                            ShowNotification.Info("No boards in the scene", 
+                                "There are no boards in the scene that could be saved");
+                            return false;
+                        }
+                        new SaveBoardConfigurationDialog().Open();
+                        progress = ProgressState.WaitingForInput;
+                    }
 
-            if (buttonClicked && SaveBoardConfigurationDialog.GetUserInput(out string filename, out WidgetsManager widgetsManager))
-            {
-                memento = new Memento(filename, widgetsManager);
-                Redo();
-                return true;
+                    return false;
+                case ProgressState.WaitingForInput:
+                    if (SaveBoardConfigurationDialog.GetUserInput(out string filename,
+                            out WidgetsManager widgetsManager))
+                    {
+                        memento = new Memento(filename, widgetsManager);
+                        Redo();
+                        progress = ProgressState.Finished;
+                        return true;
+                    }
+                    
+                    if (SaveBoardConfigurationDialog.WasCanceled())
+                    {
+                        progress = ProgressState.WaitingForClick;
+                    }
+                    
+                    return false;
+                case ProgressState.Finished:
+                    return true;
+                default:
+                    return false;
             }
-
-            return false;
         }
 
         /// <summary>
@@ -106,7 +138,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Stop()
         {
-            Destroyer.Destroy(button);
+            Destroyer.Destroy(buttonController.gameObject);
         }
 
         /// <summary>

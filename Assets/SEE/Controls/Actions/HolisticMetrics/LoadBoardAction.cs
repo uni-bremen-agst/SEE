@@ -31,16 +31,25 @@ namespace SEE.Controls.Actions.HolisticMetrics
         private LoadBoardButtonController buttonController;
 
         /// <summary>
-        /// Whether the button has been clicked already, in which case we will display a dialog to the player that lets
-        /// him save a metrics board.
+        /// Stores the current progress of this action.
         /// </summary>
-        private bool buttonClicked;
-
+        private ProgressState progress = ProgressState.WaitingForClick;
+        
         /// <summary>
         /// Saves all the information needed to revert or repeat this action.
         /// </summary>
         private Memento memento;
 
+        /// <summary>
+        /// Represents the progress that this action has made.
+        /// </summary>
+        private enum ProgressState
+        {
+            WaitingForClick,
+            WaitingForInput,
+            Finished
+        }
+        
         /// <summary>
         /// This struct can store all the information needed to revert or repeat a <see cref="LoadBoardAction"/>.
         /// </summary>
@@ -77,31 +86,42 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
-            if (!buttonClicked && buttonController.GetClick())
+            switch (progress)
             {
-                new LoadBoardConfigurationDialog().Open();
-                buttonClicked = true;
-                return false;
-            }
+                case ProgressState.WaitingForClick:
+                    if (buttonController.GetClick())
+                    {
+                        new LoadBoardConfigurationDialog().Open();
+                        progress = ProgressState.WaitingForInput;
+                    }         
+                    
+                    return false;
+                case ProgressState.WaitingForInput:
+                    if (LoadBoardConfigurationDialog.GetFilename(out string filename))
+                    {
+                        try
+                        {
+                            BoardConfig config = ConfigManager.LoadBoard(filename);
+                            memento = new Memento(config);
+                            Redo();
+                            return true;
+                        }
+                        catch (Exception exception)
+                        {
+                            Debug.LogError(exception);
+                        }
+                    }
+                    else if (LoadBoardConfigurationDialog.WasCanceled())
+                    {
+                        progress = ProgressState.WaitingForClick;
+                    }
 
-            if (buttonClicked && LoadBoardConfigurationDialog.GetFilename(out string filename))
-            {
-                try
-                {
-                    BoardConfig config = ConfigManager.LoadBoard(filename);
-                    memento = new Memento(config);
-                    Redo();
+                    return false;
+                case ProgressState.Finished:
                     return true;
-                }
-                catch (Exception exception)
-                {
-                    Debug.LogError(exception);
-                }
-
-                buttonClicked = false;
+                default:
+                    return false;
             }
-
-            return false;
         }
 
         /// <summary>

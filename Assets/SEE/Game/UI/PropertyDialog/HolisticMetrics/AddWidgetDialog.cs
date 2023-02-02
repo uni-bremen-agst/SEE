@@ -142,6 +142,10 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             return false;
         }
 
+        /// <summary>
+        /// Whether this dialog was canceled.
+        /// </summary>
+        /// <returns>Whether this dialog was canceled</returns>
         internal static bool WasCanceled()
         {
             if (wasCanceled)

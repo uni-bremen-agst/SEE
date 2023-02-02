@@ -1,8 +1,5 @@
-using System;
 using SEE.Controls;
-using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics;
-using SEE.Game.UI.Notification;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -13,9 +10,20 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     /// </summary>
     internal class LoadBoardConfigurationDialog : HolisticMetricsDialog
     {
+        /// <summary>
+        /// Whether this dialog has a filename in store that hasn't yet been fetched.
+        /// </summary>
         private static bool gotFilename;
 
+        /// <summary>
+        /// The name of the file which the player selected.
+        /// </summary>
         private static string filename;
+
+        /// <summary>
+        /// Whether this dialog was canceled.
+        /// </summary>
+        private static bool wasCanceled;
         
         /// <summary>
         /// The property dialog.
@@ -50,7 +58,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             propertyDialog.AddGroup(group);
 
             propertyDialog.OnConfirm.AddListener(OnConfirm);
-            propertyDialog.OnCancel.AddListener(EnableKeyboardShortcuts);
+            propertyDialog.OnCancel.AddListener(Cancel);
 
             SEEInput.KeyboardShortcutsEnabled = false;
             propertyDialog.DialogShouldBeShown = true;
@@ -68,6 +76,15 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             Object.Destroy(dialog);
         }
 
+        /// <summary>
+        /// Gets called when the dialog is canceled.
+        /// </summary>
+        private void Cancel()
+        {
+            base.EnableKeyboardShortcuts();
+            wasCanceled = true;
+        }
+
         internal static bool GetFilename(out string nameOfFile)
         {
             if (gotFilename)
@@ -78,6 +95,21 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             }
 
             nameOfFile = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Whether this dialog was canceled.
+        /// </summary>
+        /// <returns>Whether this dialog was canceled</returns>
+        internal static bool WasCanceled()
+        {
+            if (wasCanceled)
+            {
+                wasCanceled = false;
+                return true;
+            }
+
             return false;
         }
     }

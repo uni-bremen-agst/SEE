@@ -1,4 +1,3 @@
-using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 
@@ -10,6 +9,9 @@ namespace SEE.Game.HolisticMetrics.Components
     /// </summary>
     public class BoardMover : MonoBehaviour
     {
+        /// <summary>
+        /// Whether this instance has a movement in store that hasn't yet been fetched.
+        /// </summary>
         private bool hasMovement;
         
         /// <summary>
@@ -28,7 +30,7 @@ namespace SEE.Game.HolisticMetrics.Components
         /// This plane represents the floor when calculating the intersection between a ray from the cursor into the
         /// scene and the floor.
         /// </summary>
-        private static Plane floor = new Plane(Vector3.up, Vector3.zero);
+        private static Plane floor = new(Vector3.up, Vector3.zero);
 
         /// <summary>
         /// The parent transform of this game object, i.e., the metrics board transform. This will have its position
