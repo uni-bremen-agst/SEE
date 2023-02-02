@@ -186,42 +186,13 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Hides the given <paramref name="edge"/> by fading its alpha value to zero.
+        /// Shows or hides the given <paramref name="edge"/> (depending on <paramref name="show"/>)
+        /// by applying the animation specified by <paramref name="animationKind"/>.
         /// </summary>
-        /// <param name="edge">the edge to hide</param>
-        /// <param name="animationKind">the kind of edge animation to use</param>
-        private static void HideEdge(Edge edge, EdgeAnimationKind animationKind)
-        {
-            GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
-            if (edgeObject == null)
-            {
-                Debug.LogError($"Could not find edge {edge.ToShortString()}!");
-                return;
-            }
-
-            EdgeOperator @operator = edgeObject.AddOrGetComponent<EdgeOperator>();
-
-            switch (animationKind)
-            {
-                case EdgeAnimationKind.None:
-                    break;
-                case EdgeAnimationKind.Fading:
-                    @operator.FadeTo(0.0f, ANIMATION_DURATION);
-                    break;
-                case EdgeAnimationKind.Buildup:
-                    @operator.Destruct(ANIMATION_DURATION);
-                    break;
-                default:
-                    throw new System.ArgumentOutOfRangeException("Unknown edge animation layout supplied.");
-            }
-        }
-
-        /// <summary>
-        /// Shows the given <paramref name="edge"/> by fading its alpha value to one.
-        /// </summary>
+        /// <param name="show">Whether to show (true) or hide (false) the edge.</param>
         /// <param name="edge">the edge to show</param>
         /// <param name="animationKind">the kind of edge animation to use</param>
-        private static void ShowEdge(Edge edge, EdgeAnimationKind animationKind)
+        private static void ShowEdge(bool show, Edge edge, EdgeAnimationKind animationKind)
         {
             GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
             if (edgeObject == null)
@@ -237,10 +208,17 @@ namespace SEE.Controls.Actions
                 case EdgeAnimationKind.None:
                     break;
                 case EdgeAnimationKind.Fading:
-                    @operator.FadeTo(1.0f, ANIMATION_DURATION);
+                    @operator.FadeTo(show ? 1.0f : 0.0f, ANIMATION_DURATION);
                     break;
                 case EdgeAnimationKind.Buildup:
-                    @operator.Construct(ANIMATION_DURATION);
+                    if (show)
+                    {
+                        @operator.Construct(ANIMATION_DURATION);
+                    }
+                    else
+                    {
+                        @operator.Destruct(ANIMATION_DURATION);
+                    }
                     break;
                 default:
                     throw new System.ArgumentOutOfRangeException("Unknown edge animation layout supplied.");
@@ -260,7 +238,7 @@ namespace SEE.Controls.Actions
             // TODO: Perhaps the node along with its edges should be cached?
             foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
             {
-                ShowEdge(edge, animationKind);
+                ShowEdge(true, edge, animationKind);
             }
         }
 
@@ -276,7 +254,7 @@ namespace SEE.Controls.Actions
 
             foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
             {
-                HideEdge(edge, animationKind);
+                ShowEdge(false, edge, animationKind);
             }
         }
     }
