@@ -263,13 +263,14 @@ namespace SEE.Game.HolisticMetrics
         }
 
         /// <summary>
-        /// Adds <see cref="WidgetDeleter"/> components to all widgets on all boards.
+        /// Adds / removes all <see cref="WidgetDeleter"/> components to / from all widgets on all boards.
         /// </summary>
-        internal static void AddWidgetDeleters()
+        /// <param name="enable">Whether we want to listen for clicks on widgets for deletion</param>
+        internal static void ToggleWidgetDeleting(bool enable)
         {
             foreach (WidgetsManager widgetsManager in widgetsManagers)
             {
-                widgetsManager.AddWidgetDeleters();
+                widgetsManager.ToggleWidgetDeleting(enable);
             }
         }
 

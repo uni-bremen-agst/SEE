@@ -45,12 +45,11 @@ namespace SEE.Controls.Actions.HolisticMetrics
         }
 
         /// <summary>
-        /// Add components to the widgets that will listen for mouse clicks. When the player clicks a widget then, it
-        /// will be deleted in the method <see cref="Update"/>.
+        /// Add components to the widgets that will listen for mouse clicks. 
         /// </summary>
         public override void Start()
         {
-            BoardsManager.AddWidgetDeleters();
+            BoardsManager.ToggleWidgetDeleting(true);
         }
         
         /// <summary>
@@ -69,12 +68,11 @@ namespace SEE.Controls.Actions.HolisticMetrics
         }
 
         /// <summary>
-        /// Marks the WidgetDeleter components as "to be deleted". When they are deleted, it will no longer be possible
-        /// to delete a widget by clicking on it.
+        /// Removes components from widgets that would listen for mouse clicks on the widgets.
         /// </summary>
         public override void Stop()
         {
-            WidgetDeleter.Stop();
+            BoardsManager.ToggleWidgetDeleting(false);
         }
 
         /// <summary>
@@ -82,15 +80,11 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Redo()
         {
-            // The widgets manager that manages the widget we want to delete
             WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
 
             if (widgetsManager != null)
             {
-                // Delete the widget locally
                 widgetsManager.Delete(memento.widgetConfig.ID);
-            
-                // Delete the widget on the other clients
                 new DeleteWidgetNetAction(memento.boardName, memento.widgetConfig.ID).Execute();   
             }
             else

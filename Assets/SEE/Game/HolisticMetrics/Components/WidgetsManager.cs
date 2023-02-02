@@ -166,14 +166,24 @@ namespace SEE.Game.HolisticMetrics.Components
         }
 
         /// <summary>
-        /// Adds a WidgetDeleter component to all widgets managed by this manager.
+        /// Adds / removes a WidgetDeleter component to / from all widgets managed by this manager.
         /// </summary>
-        internal void AddWidgetDeleters()
+        /// <param name="enable">Whether we want to listen for clicks on the widgets for deletion</param>
+        internal void ToggleWidgetDeleting(bool enable)
         {
-            WidgetDeleter.Setup();
-            foreach ((WidgetController, Metric) tuple in widgets)
+            if (enable)
             {
-                tuple.Item1.gameObject.AddComponent<WidgetDeleter>();
+                foreach ((WidgetController, Metric) tuple in widgets)
+                {
+                    tuple.Item1.gameObject.AddComponent<WidgetDeleter>();
+                }     
+            }
+            else
+            {
+                foreach ((WidgetController, Metric) tuple in widgets)
+                {
+                    Destroy(tuple.Item1.gameObject.GetComponent<WidgetDeleter>());
+                }
             }
         }
 
@@ -187,7 +197,10 @@ namespace SEE.Game.HolisticMetrics.Components
         {
             foreach ((WidgetController, Metric) widget in widgets)
             {
-                return widget.Item1.GetComponent<WidgetDeleter>().GetDeletion(out widgetConfig);
+                if (widget.Item1.GetComponent<WidgetDeleter>().GetDeletion(out widgetConfig))
+                {
+                    return true;
+                }
             }
 
             widgetConfig = null;

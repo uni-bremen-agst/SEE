@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using SEE.Game.HolisticMetrics;
 using SEE.Game.HolisticMetrics.Components;
 using SEE.Net.Actions.HolisticMetrics;
@@ -43,9 +42,12 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             if (Input.GetMouseButtonDown(0) && Raycasting.RaycastAnything(out RaycastHit raycastHit))
             {
+                // TODO: Also delete the board when a widget on the board was clicked. that could be achieved, for
+                // example, by checking, if the widgetsManager is null, whether the object that was hit has a
+                // WidgetController component and in that case getting the parent GameObject and then its
+                // WidgetsManager.
                 WidgetsManager widgetsManager = raycastHit.transform.GetComponent<WidgetsManager>();
-                if (widgetsManager != null
-                    && BoardsManager.GetNames().Any(name => widgetsManager.name.Equals(name)))
+                if (widgetsManager != null)
                 {
                     memento = new Memento(ConfigManager.GetBoardConfig(widgetsManager));
                     Redo();
