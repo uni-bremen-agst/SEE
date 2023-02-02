@@ -26,6 +26,12 @@ namespace SEE.Controls.Actions.HolisticMetrics
         private GameObject button;
 
         /// <summary>
+        /// This field can hold a reference to the dialog that the player will see in the process of executing this
+        /// action.
+        /// </summary>
+        private LoadBoardDialog loadBoardDialog;
+        
+        /// <summary>
         /// The controller of the <see cref="button"/>. We will "ask" this whether the player has clicked the button.
         /// </summary>
         private LoadBoardButtonController buttonController;
@@ -91,13 +97,14 @@ namespace SEE.Controls.Actions.HolisticMetrics
                 case ProgressState.WaitingForClick:
                     if (buttonController.GetClick())
                     {
-                        new LoadBoardConfigurationDialog().Open();
+                        loadBoardDialog = new LoadBoardDialog();
+                        loadBoardDialog.Open();
                         progress = ProgressState.WaitingForInput;
                     }         
                     
                     return false;
                 case ProgressState.WaitingForInput:
-                    if (LoadBoardConfigurationDialog.GetFilename(out string filename))
+                    if (loadBoardDialog.GetFilename(out string filename))
                     {
                         try
                         {
@@ -113,7 +120,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                             Debug.LogError(exception);
                         }
                     }
-                    else if (LoadBoardConfigurationDialog.WasCanceled())
+                    else if (loadBoardDialog.WasCanceled())
                     {
                         progress = ProgressState.WaitingForClick;
                     }

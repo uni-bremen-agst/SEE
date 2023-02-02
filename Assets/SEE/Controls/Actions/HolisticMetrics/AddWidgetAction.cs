@@ -15,6 +15,12 @@ namespace SEE.Controls.Actions.HolisticMetrics
     internal class AddWidgetAction : AbstractPlayerAction
     {
         /// <summary>
+        /// This field can hold a reference to the dialog that the player will see in the process of executing this
+        /// action.
+        /// </summary>
+        private AddWidgetDialog addWidgetDialog;
+        
+        /// <summary>
         /// Indicates how far this instance has progressed in adding a widget.
         /// </summary>
         private ProgressState progress = ProgressState.GetPosition;
@@ -83,19 +89,20 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     {
                         WidgetConfig config = new WidgetConfig { Position = position, ID = Guid.NewGuid() };
                         memento = new Memento(boardName, config);
-                        new AddWidgetDialog().Open();
+                        addWidgetDialog = new AddWidgetDialog();
+                        addWidgetDialog.Open();
                         progress = ProgressState.GetConfig;
                     }
 
                     return false;
                 case ProgressState.GetConfig:
-                    if (AddWidgetDialog.WasCanceled())
+                    if (addWidgetDialog.WasCanceled())
                     {
                         // In case the player cancels the dialog
                         progress = ProgressState.GetPosition;
                         return false;
                     }
-                    if (AddWidgetDialog.GetConfig(out string metric, out string widget))
+                    if (addWidgetDialog.GetConfig(out string metric, out string widget))
                     {
                         memento.config.MetricType = metric;
                         memento.config.WidgetName = widget;

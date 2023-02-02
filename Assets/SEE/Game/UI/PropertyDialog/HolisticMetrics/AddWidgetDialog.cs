@@ -3,7 +3,6 @@ using System.Linq;
 using SEE.Controls;
 using SEE.Game.HolisticMetrics.Metrics;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
 {
@@ -12,18 +11,9 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     /// </summary>
     internal class AddWidgetDialog : HolisticMetricsDialog
     {
-        private static bool gotConfig;
-
-        private static bool wasCanceled;
-        
         private static string metricType;
 
         private static string widgetName;
-        
-        /// <summary>
-        /// The property dialog of this dialog.
-        /// </summary>
-        private PropertyDialog propertyDialog;
 
         /// <summary>
         /// The selection allowing the player to select the metric that should be displayed by the new widget.
@@ -65,7 +55,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         internal void Open()
         {
-            gotConfig = false;
+            gotInput = false;
             
             dialog = new GameObject("Add widget dialog");
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
@@ -95,7 +85,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             propertyDialog.AddGroup(group);
             
             propertyDialog.OnConfirm.AddListener(AddWidget);
-            propertyDialog.OnCancel.AddListener(EnableKeyboardShortcuts);
+            propertyDialog.OnCancel.AddListener(Cancel);
             
             SEEInput.KeyboardShortcutsEnabled = false;
             propertyDialog.DialogShouldBeShown = true;
@@ -108,52 +98,24 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         private void AddWidget()
         {
-            gotConfig = true;
+            gotInput = true;
             metricType = selectedMetric.Value;
             widgetName = selectedWidget.Value;
-
-            // Close the dialog
-            Object.Destroy(dialog);
-            SEEInput.KeyboardShortcutsEnabled = true;
+            Close();
         }
 
-        /// <summary>
-        /// When the dialog is canceled, we destroy the dialog <see cref="GameObject"/> and enable the keyboard
-        /// shortcuts again. We also mark this dialog as canceled.
-        /// </summary>
-        internal override void EnableKeyboardShortcuts()
+        internal bool GetConfig(out string metric, out string widget)
         {
-            base.EnableKeyboardShortcuts();
-            wasCanceled = true;
-        }
-
-        internal static bool GetConfig(out string metric, out string widget)
-        {
-            if (gotConfig)
+            if (gotInput)
             {
                 metric = metricType;
                 widget = widgetName;
-                gotConfig = false;
+                gotInput = false;
                 return true;
             }
 
             metric = null;
             widget = null;
-            return false;
-        }
-
-        /// <summary>
-        /// Whether this dialog was canceled.
-        /// </summary>
-        /// <returns>Whether this dialog was canceled</returns>
-        internal static bool WasCanceled()
-        {
-            if (wasCanceled)
-            {
-                wasCanceled = false;
-                return true;
-            }
-
             return false;
         }
     }

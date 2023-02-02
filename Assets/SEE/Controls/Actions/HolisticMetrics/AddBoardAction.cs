@@ -20,6 +20,12 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// confirm the rotation.
         /// </summary>
         private const string boardRotatorPath = "Prefabs/UI/MetricsBoardRotation";
+
+        /// <summary>
+        /// This field can hold a reference to the dialog that the player will see in the process of executing this
+        /// action.
+        /// </summary>
+        private AddBoardDialog addBoardDialog;
         
         /// <summary>
         /// Indicates how far this instance has progressed in adding a new metrics board to the scene.
@@ -92,20 +98,27 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     if (AddBoardSliderController.GetRotation(out Quaternion rotation))
                     {
                         memento.boardConfig.Rotation = rotation;
+                        BoardAdder.Stop();
                         progress = ProgressState.GettingName;
-                        new AddBoardDialog().Open();
+                        addBoardDialog = new AddBoardDialog();
+                        addBoardDialog.Open();
                     }
-                    
+
                     return false;
                 case ProgressState.GettingName:
-                    if (AddBoardDialog.GetName(out string name))
+                    if (addBoardDialog.GetName(out string name))
                     {
                         memento.boardConfig.Title = name;
                         BoardsManager.Create(memento.boardConfig);
                         new CreateBoardNetAction(memento.boardConfig).Execute();
                         currentState = ReversibleAction.Progress.Completed;
-                        // TODO: Account for when a player cancels the dialog
                         return true;
+                    }
+
+                    if (addBoardDialog.WasCanceled())
+                    {
+                        progress = ProgressState.GettingPosition;
+                        BoardAdder.Init();
                     }
 
                     return false;

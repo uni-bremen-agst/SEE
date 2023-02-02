@@ -20,6 +20,12 @@ namespace SEE.Controls.Actions.HolisticMetrics
         private const string buttonPath = "Prefabs/HolisticMetrics/SceneComponents/SaveBoardButton";
 
         /// <summary>
+        /// This field can hold a reference to the dialog that the player will see in the process of executing this
+        /// action.
+        /// </summary>
+        private SaveBoardDialog saveBoardDialog;
+        
+        /// <summary>
         /// The controller of the button, in the <see cref="Update"/> method we will "ask" this if the button has been
         /// clicked.
         /// </summary>
@@ -105,13 +111,14 @@ namespace SEE.Controls.Actions.HolisticMetrics
                                 "There are no boards in the scene that could be saved");
                             return false;
                         }
-                        new SaveBoardConfigurationDialog().Open();
+                        saveBoardDialog = new SaveBoardDialog();
+                        saveBoardDialog.Open();
                         progress = ProgressState.WaitingForInput;
                     }
 
                     return false;
                 case ProgressState.WaitingForInput:
-                    if (SaveBoardConfigurationDialog.GetUserInput(out string filename,
+                    if (saveBoardDialog.GetUserInput(out string filename,
                             out WidgetsManager widgetsManager))
                     {
                         memento = new Memento(filename, widgetsManager);
@@ -121,7 +128,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                         return true;
                     }
                     
-                    if (SaveBoardConfigurationDialog.WasCanceled())
+                    if (saveBoardDialog.WasCanceled())
                     {
                         progress = ProgressState.WaitingForClick;
                     }

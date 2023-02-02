@@ -8,28 +8,16 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     /// <summary>
     /// This class manages the dialog for saving a board from the scene to a configuration file.
     /// </summary>
-    internal class SaveBoardConfigurationDialog : HolisticMetricsDialog
+    internal class SaveBoardDialog : HolisticMetricsDialog
     {
-        private static bool gotUserInput;
-
         private static string filename;
 
         private static WidgetsManager widgetsManager;
-        
-        /// <summary>
-        /// The property dialog.
-        /// </summary>
-        private PropertyDialog propertyDialog;
 
         /// <summary>
         /// The input field that lets the player select a board from the scene to be saved.
         /// </summary>
         private SelectionProperty selectedBoard;
-
-        /// <summary>
-        /// Whether this dialog was canceled.
-        /// </summary>
-        private static bool wasCanceled;
         
         /// <summary>
         /// The input field that lets the player enter a name for the file in which to save the board configuration.
@@ -78,26 +66,17 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         private void SaveBoardConfiguration()
         {
-            gotUserInput = true;
+            gotInput = true;
             filename = fileName.Value;
             widgetsManager = BoardsManager.Find(selectedBoard.Value);
-            EnableKeyboardShortcuts();
+            Close();
         }
-
-        /// <summary>
-        /// Gets called when the dialog is canceled.
-        /// </summary>
-        private void Cancel()
+        
+        internal bool GetUserInput(out string filenameOut, out WidgetsManager widgetsManagerOut)
         {
-            wasCanceled = true;
-            EnableKeyboardShortcuts();
-        }
-
-        internal static bool GetUserInput(out string filenameOut, out WidgetsManager widgetsManagerOut)
-        {
-            if (gotUserInput)
+            if (gotInput)
             {
-                gotUserInput = false;
+                gotInput = false;
                 filenameOut = filename;
                 widgetsManagerOut = widgetsManager;
                 return true;
@@ -105,21 +84,6 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
 
             filenameOut = null;
             widgetsManagerOut = null;
-            return false;
-        }
-        
-        /// <summary>
-        /// Whether this dialog was canceled.
-        /// </summary>
-        /// <returns>Whether this dialog was canceled</returns>
-        internal static bool WasCanceled()
-        {
-            if (wasCanceled)
-            {
-                wasCanceled = false;
-                return true;
-            }
-
             return false;
         }
     }

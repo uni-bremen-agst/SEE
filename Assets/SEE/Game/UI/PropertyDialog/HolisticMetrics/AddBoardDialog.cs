@@ -8,24 +8,17 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     /// </summary>
     internal class AddBoardDialog : HolisticMetricsDialog
     {
-        private static bool gotName;
-        
-        /// <summary>
-        /// The property dialog.
-        /// </summary>
-        private PropertyDialog propertyDialog;
-
         /// <summary>
         /// The input field where the player can enter a name for the new board.
         /// </summary>
-        private static StringProperty boardName;
+        private StringProperty boardName;
 
         /// <summary>
         /// This method instantiates and then displays the dialog to the player.
         /// </summary>
         internal void Open()
         {
-            gotName = false;
+            gotInput = false;
             
             dialog = new GameObject("Add board dialog");
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
@@ -44,7 +37,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             propertyDialog.AddGroup(group);
 
             propertyDialog.OnConfirm.AddListener(AddBoard);
-            propertyDialog.OnCancel.AddListener(EnableKeyboardShortcuts);
+            propertyDialog.OnCancel.AddListener(Cancel);
 
             SEEInput.KeyboardShortcutsEnabled = false;
             propertyDialog.DialogShouldBeShown = true;
@@ -58,13 +51,13 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         private void AddBoard()
         {
-            gotName = true;
-            EnableKeyboardShortcuts();
+            gotInput = true;
+            Close();
         }
 
-        internal static bool GetName(out string name)
+        internal bool GetName(out string name)
         {
-            if (gotName)
+            if (gotInput)
             {
                 name = boardName.Value;
                 return true;
