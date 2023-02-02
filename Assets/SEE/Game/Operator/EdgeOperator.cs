@@ -95,12 +95,21 @@ namespace SEE.Game.Operator
         /// Change the color gradient of the edge to a new gradient from <paramref name="newStartColor"/> to
         /// <paramref name="newEndColor"/>.
         /// </summary>
-        /// <param name="target">The spline this edge should animate towards</param>
+        /// <param name="newStartColor">The starting color of the gradient this edge should animate towards.</param>
+        /// <param name="newEndColor">The ending color of the gradient this edge should animate towards.</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> ChangeColorsTo(Color newStartColor, Color newEndColor, float duration)
+        /// <param name="useAlpha">Whether to incorporate the alpha values from the given colors.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> ChangeColorsTo(Color newStartColor, Color newEndColor, 
+                                                         float duration, bool useAlpha = true)
         {
+            if (!useAlpha)
+            {
+                newStartColor.a = color.TargetValue.start.a;
+                newEndColor.a = color.TargetValue.end.a;
+            }
             return color.AnimateTo((newStartColor, newEndColor), duration);
         }
 
@@ -116,7 +125,7 @@ namespace SEE.Game.Operator
         /// range of [0; 1].</exception>
         public IOperationCallback<Action> FadeTo(float alpha, float duration)
         {
-            if (alpha < 0 || alpha > 1)
+            if (alpha is < 0 or > 1)
             {
                 throw new ArgumentException("Given alpha value must be greater than zero and not more than one!");
             }

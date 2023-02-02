@@ -17,6 +17,7 @@ namespace SEE.Game.City
     /// Component responsible for implementing the results reported by the <see cref="ReflexionAnalysis"/>
     /// in the scene.
     /// Must be attached to a <see cref="SEECity"/>.
+    /// <em><see cref="StartFromScratch"/> must be called when adding this component to a city!</em>
     /// </summary>
     [DisallowMultipleComponent]
     public class ReflexionVisualization : MonoBehaviour, IObserver<ChangeEvent>
@@ -31,6 +32,11 @@ namespace SEE.Game.City
         /// The graph used for the reflexion analysis.
         /// </summary>
         private ReflexionGraph CityGraph;
+
+        /// <summary>
+        /// The city this component is attached to.
+        /// </summary>
+        private SEEReflexionCity City;
 
         /// <summary>
         /// Duration of any animation (edge movement, color change...) in seconds.
@@ -74,19 +80,20 @@ namespace SEE.Game.City
         {
             if (gameObject.IsCodeCityDrawn())
             {
+                EdgeAnimationKind animationKind = City.EdgeLayoutSettings.AnimationKind;
                 // We have to set an initial color for the edges, and we have to convert them to meshes.
                 foreach (Edge edge in CityGraph.Edges().Where(x => !x.HasToggle(GraphElement.IsVirtualToggle)))
                 {
-                    GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
+                    GameObject edgeObject = edge.GameObject();
                     if (edgeObject != null && edgeObject.TryGetComponent(out SEESpline spline))
                     {
                         spline.CreateMesh();
                         spline.GradientColors = GetEdgeGradient(edge);
 
-                        //FIXME: hiding edges via buildup conflicts with alpha value setting in GetEdgeGradient()
                         if (edge.HasToggle(Edge.IsHiddenToggle))
                         {
-                            spline.SubsplineEndT = 0;
+                            // We will instantly hide this edge. It should not show up yet.
+                            edgeObject.AddOrGetComponent<EdgeOperator>().Hide(animationKind, 0f);
                         }
                     }
                     else
@@ -113,10 +120,12 @@ namespace SEE.Game.City
 
         /// <summary>
         /// Starts the reflexion analysis from scratch, clearing any existing events.
+        /// Note that this must be called after adding this component to a game object!
         /// </summary>
         /// <param name="graph">The graph on which the reflexion analysis shall run</param>
-        public void StartFromScratch(ReflexionGraph graph)
+        public void StartFromScratch(ReflexionGraph graph, SEEReflexionCity city)
         {
+            City = city;
             CityGraph = graph;
             Events.Clear();
             graph.Subscribe(this);
@@ -146,16 +155,6 @@ namespace SEE.Game.City
                 _ => throw new ArgumentOutOfRangeException(nameof(edge), edge.State(), "Unknown state of given edge!")
             };
 
-            // FIXME: conflict when not using fade-in animation kind
-            // if (edge.HasToggle(Edge.IsHiddenToggle))
-            // {
-            //     // If the edge is supposed to be hidden, its alpha value must be zero.
-            //     return (gradient.Item1.WithAlpha(0f), gradient.Item2.WithAlpha(0f));
-            // }
-            // else
-            // {
-            //     return gradient;
-            // }
             return gradient;
         }
 
@@ -270,7 +269,7 @@ namespace SEE.Game.City
             {
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge);
                 EdgeOperator edgeOperator = edge.AddOrGetComponent<EdgeOperator>();
-                edgeOperator.ChangeColorsTo(newColors.start, newColors.end, ANIMATION_DURATION);
+                edgeOperator.ChangeColorsTo(newColors.start, newColors.end, ANIMATION_DURATION, false);
 
                 if (!PreviousEdgeStates.TryGetValue(edgeChange.Edge.ID, out State previous) || previous != edgeChange.NewState)
                 {
@@ -332,7 +331,7 @@ namespace SEE.Game.City
         private static void HandleNewMapping(Edge mapsToEdge)
         {
             // Maps-To edges must not be drawn, as we will visualize mappings differently.
-            mapsToEdge.SetToggle(Edge.IsVirtualToggle);
+            mapsToEdge.SetToggle(GraphElement.IsVirtualToggle);
 
             // FIXME: This code is currently commented out. If we are confident that it is really
             // not needed, we need to remove it.
@@ -343,7 +342,6 @@ namespace SEE.Game.City
 
             //Vector3 oldPosition = implGameNode.transform.position;
 
-            // TODO: Rather than returning the old scale from PutOn, lossyScale should be used.
             //Vector3 oldScale = GameNodeMover.PutOn(implGameNode.transform, archGameNode, scaleDown: true, topPadding: 0.3f);
             //Vector3 newPosition = implGameNode.transform.position;
             //Vector3 newScale = implGameNode.transform.localScale;
