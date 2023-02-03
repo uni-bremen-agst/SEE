@@ -11,7 +11,7 @@ namespace SEE.Game.City
         /// </summary>
         Fading,
         /// <summary>
-        /// Edges are continually build from subsplines
+        /// Edges are continually built from subsplines
         /// starting at the sending node and ending at the receiving
         /// node.
         /// </summary>
