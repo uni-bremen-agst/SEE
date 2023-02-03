@@ -1,4 +1,5 @@
-﻿using Sirenix.OdinInspector;
+﻿using SEE.Utils;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -142,9 +143,9 @@ namespace SEE.Game.Runtime
             dst.transform.localScale = targetOriginalScale;
             src.GetComponentInChildren<MeshRenderer>().material.color = sourceOriginalColor;
             dst.GetComponentInChildren<MeshRenderer>().material.color = targetOriginalColor;
-            for (int i = 0; i < spheres.Length; i++)
+            foreach (GameObject sphere in spheres)
             {
-                Destroy(spheres[i]);
+                Destroyer.Destroy(sphere);
             }
         }
 

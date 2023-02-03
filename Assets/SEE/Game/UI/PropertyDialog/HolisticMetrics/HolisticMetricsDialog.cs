@@ -1,4 +1,5 @@
 using SEE.Controls;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
@@ -20,7 +21,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         internal void EnableKeyboardShortcuts()
         {
             // Destroy the dialog GameObject
-            Object.Destroy(dialog);
+            Destroyer.Destroy(dialog);
             
             SEEInput.KeyboardShortcutsEnabled = true;
         }

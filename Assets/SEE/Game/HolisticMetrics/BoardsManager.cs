@@ -3,6 +3,7 @@ using System.Linq;
 using SEE.Game.UI.Notification;
 using UnityEngine;
 using SEE.Game.HolisticMetrics.Components;
+using SEE.Utils;
 
 namespace SEE.Game.HolisticMetrics
 {
@@ -81,9 +82,9 @@ namespace SEE.Game.HolisticMetrics
                 Debug.LogError($"Tried to delete a board named {boardName} that does not seem to exist\n");
                 return;
             }
-            Object.Destroy(widgetsManager.gameObject);
+            Destroyer.Destroy(widgetsManager.gameObject);
             widgetsManagers.Remove(widgetsManager);
-            Object.Destroy(widgetsManager);
+            Destroyer.Destroy(widgetsManager);
         }
 
         /// <summary>

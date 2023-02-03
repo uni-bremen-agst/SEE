@@ -84,6 +84,11 @@ We should just leave it as a backslash.""",
         suggestion=r"\1\SteamVR\actions.json\2",
         extensions=["asset"],
         level=Level.WARN
+    ),
+    BadPattern(
+        re.compile(r"^\s*(\s|Object\.)Destroy\(.*$"),
+        "Make sure to use `Destroyer.Destroy` (`Destroyer` class is in `SEE.Utils`) instead of `Object.Destroy`!",
+        level=Level.WARN
     )
 ]
 
