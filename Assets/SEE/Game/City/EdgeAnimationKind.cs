@@ -17,8 +17,7 @@ namespace SEE.Game.City
         /// </summary>
         Buildup,
         /// <summary>
-        /// No animation supplied. Will throw a
-        /// <exception cref="ArgumentOutOfRangeException"> when used.
+        /// No animation supplied.
         ///</summary>
         None
     }
