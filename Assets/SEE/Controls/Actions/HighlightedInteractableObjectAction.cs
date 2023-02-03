@@ -66,7 +66,10 @@ namespace SEE.Controls.Actions
         /// through the network to other connected clients</param>
         protected void SetOutlineColor(bool isInitiator)
         {
-            outline.OutlineColor = isInitiator ? LocalOutlineColor : RemoteOutlineColor;
+            if (outline)
+            {
+                outline.OutlineColor = isInitiator ? LocalOutlineColor : RemoteOutlineColor;
+            }
         }
 
         /// <summary>

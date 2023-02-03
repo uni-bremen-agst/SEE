@@ -213,9 +213,10 @@ namespace SEE.Game.City
         /// <see cref="statementCounter"/>, <see cref="nodesGOs"/>, and <see cref="currentGO"/>.
         /// In case of any error, this components disables itself.
         /// </summary>
-        private void Start()
+        protected override void Start()
         {
-            JLGParser jlgParser = new JLGParser(JLGPath.Path);
+            base.Start();
+            JLGParser jlgParser = new(JLGPath.Path);
             parsedJLG = jlgParser.Parse();
 
             if (parsedJLG == null)

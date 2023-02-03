@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine.Windows.Speech;
+using SEE.Audio;
 
 namespace SEE.Game.UI.Menu
 {

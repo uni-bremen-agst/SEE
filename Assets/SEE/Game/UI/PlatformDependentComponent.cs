@@ -43,7 +43,7 @@ namespace SEE.Game.UI
         /// <summary>
         /// The current platform.
         /// </summary>
-        protected readonly PlayerInputType Platform = SceneSettings.InputType;
+        protected PlayerInputType Platform { get; private set; }
 
         /// <summary>
         /// Whether the component is initialized.
@@ -66,6 +66,7 @@ namespace SEE.Game.UI
             }
 
             // calls the start method for the current platform
+            Platform = SceneSettings.InputType;
             switch (Platform)
             {
                 case PlayerInputType.DesktopPlayer: StartDesktop();
@@ -81,9 +82,8 @@ namespace SEE.Game.UI
                     break;
             }
 
-            // initialization has started
-            HasStarted = true;
             // initialization finished
+            HasStarted = true;
             OnStartFinished();
         }
 
