@@ -64,9 +64,7 @@ namespace SEE.Game.UI
                 Canvas = GameObject.Find(UI_CANVAS_NAME) ?? PrefabInstantiator.InstantiatePrefab(UI_CANVAS_PREFAB);
                 Canvas.name = UI_CANVAS_NAME;
             }
-            // initialization has started
-            HasStarted = true;
-            
+
             // calls the start method for the current platform
             switch (Platform)
             {
@@ -83,6 +81,8 @@ namespace SEE.Game.UI
                     break;
             }
 
+            // initialization has started
+            HasStarted = true;
             // initialization finished
             OnStartFinished();
         }

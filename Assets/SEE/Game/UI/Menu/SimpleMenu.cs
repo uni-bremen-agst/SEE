@@ -264,7 +264,7 @@ namespace SEE.Game.UI.Menu
         protected override void StartDesktop()
         {
             // instantiates the menu
-            Menu = PrefabInstantiator.InstantiatePrefab(MenuPrefab, parent, false);
+            Menu = PrefabInstantiator.InstantiatePrefab(MenuPrefab, Parent, false);
             Menu.name = Title;
             MenuManager = Menu.GetComponent<ModalWindowManager>();
         
