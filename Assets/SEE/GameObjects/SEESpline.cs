@@ -462,7 +462,7 @@ namespace SEE.GO
             // Remove line meshRenderer.
             if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
             {
-                Destroy(lineRenderer);
+                Destroyer.Destroy(lineRenderer);
             }
 
             return mesh;

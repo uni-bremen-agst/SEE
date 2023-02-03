@@ -302,12 +302,12 @@ namespace SEE.Game.UI.PropertyDialog
         {
             if (dialog != null)
             {
-                Object.Destroy(dialog);
+                Destroyer.Destroy(dialog);
                 dialog = null;
             }
             if (selectionDialog != null)
             {
-                Object.Destroy(selectionDialog);
+                Destroyer.Destroy(selectionDialog);
                 selectionDialog = null;
             }
         }

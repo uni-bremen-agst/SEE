@@ -7,6 +7,7 @@ using SEE.Game.City;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
 using SEE.Net.Actions.HolisticMetrics;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -178,7 +179,7 @@ namespace SEE.Game.HolisticMetrics.Components
                 widgets.Find(widget => widget.Item1.ID.Equals(widgetID));
             WidgetController widgetController = widget.Item1;
             widgets.Remove(widget);
-            Destroy(widgetController.gameObject);
+            Destroyer.Destroy(widgetController.gameObject);
         }
 
         /// <summary>
