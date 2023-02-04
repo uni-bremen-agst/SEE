@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 namespace SEE.Game.UI.Menu
 {
+    /// <summary>
+    /// Desktop implementation of SimpleMenu.
+    /// </summary>
     public partial class SimpleMenu
     {
         /// <summary>

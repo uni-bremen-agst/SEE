@@ -7,6 +7,10 @@ using UnityEngine.Windows.Speech;
 
 namespace SEE.Game.UI.Menu
 {
+    /// <summary>
+    /// A platform dependent menu.
+    /// Contains a title, description, icon and listens to specific keywords.
+    /// </summary>
     public partial class SimpleMenu : PlatformDependentComponent
     {
         /// <summary>
