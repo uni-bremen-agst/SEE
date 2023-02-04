@@ -7,7 +7,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using UnityEngine.Windows.Speech;
-using SEE.Audio;
 
 namespace SEE.Game.UI.Menu
 {
@@ -239,17 +238,10 @@ namespace SEE.Game.UI.Menu
             else
             {
                 MenuManager.CloseWindow();
+                MenuTooltip.Hide();
             }
         }
 
-        /// <summary>
-        /// Updates whether the tooltip is shown.
-        /// </summary>
-        protected virtual void UpdateShowTooltip()
-        {
-            if (!ShowMenu) MenuTooltip.Hide();
-        }
-    
         /// <summary>
         /// Updates the menu layout.
         /// </summary>
@@ -328,7 +320,7 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         private void OnDestroy()
         {
-            if (Menu!= null) Destroy(Menu);
+            if (Menu != null) Destroy(Menu);
         }
     
         /// <summary>
