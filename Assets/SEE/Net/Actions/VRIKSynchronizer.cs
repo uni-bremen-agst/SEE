@@ -17,17 +17,17 @@ namespace SEE.Net.Actions
         /// <summary>
         /// The network object.
         /// </summary>
-        private NetworkObject NetworkObject;
+        private NetworkObject networkObject;
 
         /// <summary>
         /// VRIK Component.
         /// </summary>
-        private VRIK Vrik;
+        private VRIK vrik;
 
         /// <summary>
         /// Timer to count elapsed time.
         /// </summary>
-        private float Timer;
+        private float timer;
 
         /// <summary>
         /// Initializes the network object and VRIK model. The periodic call of
@@ -35,9 +35,9 @@ namespace SEE.Net.Actions
         /// </summary>
         private void Start()
         {
-            NetworkObject = gameObject.GetComponent<NetworkObject>();
-            Vrik = gameObject.GetComponent<VRIK>();
-            Timer = 0f;
+            networkObject = gameObject.GetComponent<NetworkObject>();
+            vrik = gameObject.GetComponent<VRIK>();
+            timer = 0f;
         }
 
         /// <summary>
@@ -45,21 +45,21 @@ namespace SEE.Net.Actions
         /// </summary>
         private void Update()
         {
-            Timer += Time.deltaTime;
-            if (Timer >= RepeatCycle)
+            timer += Time.deltaTime;
+            if (timer >= RepeatCycle)
             {
                 Synchronize();
-                Timer = 0f;
+                timer = 0f;
             }
         }
-        
+
         /// <summary>
         /// If a change should be sent, the update is sent to all clients with
-        /// the <see cref="NetworkObjectId"/> and <see cref="Vrik"/> as parameters.
+        /// the <see cref="NetworkObjectId"/> and <see cref="vrik"/> as parameters.
         /// </summary>
         private void Synchronize()
         {
-            new VRIKNetAction(NetworkObject.NetworkObjectId, Vrik).Execute();
+            new VRIKNetAction(networkObject.NetworkObjectId, vrik).Execute();
         }
     }
 }
