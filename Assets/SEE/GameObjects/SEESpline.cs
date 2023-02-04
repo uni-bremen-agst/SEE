@@ -58,7 +58,7 @@ namespace SEE.GO
         /// updated (as a result of setting one of the public properties).
         /// </summary>
         private bool needsUpdate = false;
-        
+
         /// <summary>
         /// Indicates whether the color of <see cref="spline"/> must be updated.
         /// Will not cause an update on its own, use <see cref="needsUpdate"/> for that.
@@ -72,6 +72,37 @@ namespace SEE.GO
         private BSpline spline;
 
         /// <summary>
+        /// The start position of the subspline for the build-up animation, element of [0,1]
+        /// </summary>
+        [SerializeField]
+        private float subsplineStartT = 0.0f;
+
+        /// <summary>
+        /// The end position of the subspline for the build-up animation, element of [0,1]
+        /// </summary>
+        [SerializeField]
+        private float subsplineEndT = 1.0f;
+
+        /// <summary>
+        /// Property of <see cref="subsplineEndT"/>.
+        /// </summary>
+        public float SubsplineEndT
+        {
+            get => subsplineEndT;
+            set
+            {
+                subsplineEndT = value;
+                needsUpdate = true;
+            }
+        }
+
+        /// <summary>
+        /// Used to calculate upper and lower knots from <see cref="subsplineEndT"/> and  <see cref="subsplineStartT"/>.
+        /// chordLengths is set in Property <see cref="Spline"/>.
+        /// </summary>
+        private ChordLengths chordLengths = null;
+
+        /// <summary>
         /// Property of <see cref="spline"/>. The returned instance is NOT a
         /// copy of <see cref="spline"/>. Hence, treat it well and don't
         /// forget to set this property after modifying the returned instance.
@@ -82,6 +113,7 @@ namespace SEE.GO
             set
             {
                 spline = value;
+                chordLengths = null;
                 needsUpdate = true;
             }
         }
@@ -279,18 +311,6 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Approximates <see cref="Spline"/> as poly line. The greater
-        /// <paramref name="num"/>, the more accurate the approximation.
-        /// The poly line can be visualized with a <see cref="LineRenderer"/>.
-        /// </summary>
-        /// <param name="num">Number of vertices in the poly line</param>
-        /// <returns>A poly line approximating <see cref="Spline"/></returns>
-        public Vector3[] PolyLine(int num = 100)
-        {
-            return TinySplineInterop.ListToVectors(Spline.Sample((uint)num));
-        }
-
-        /// <summary>
         /// Updates the <see cref="LineRenderer"/> of the
         /// <see cref="GameObject"/> this component is attached to
         /// (<see cref="Component.gameObject"/>) and marks the internal state
@@ -304,7 +324,9 @@ namespace SEE.GO
         {
             if (gameObject.TryGetComponent(out LineRenderer lr))
             {
-                Vector3[] polyLine = PolyLine(lr.positionCount);
+                BSpline subSpline = CreateSubSpline();
+                Vector3[] polyLine = TinySplineInterop.ListToVectors(subSpline.Sample());
+
                 lr.positionCount = polyLine.Length;
                 lr.SetPositions(polyLine);
                 lr.startColor = gradientColors.start;
@@ -321,19 +343,20 @@ namespace SEE.GO
         /// <returns>The created or updated mesh</returns>
         private Mesh CreateOrUpdateMesh()
         {
-            List<Vector3> vertices = new List<Vector3>();
-            List<Vector3> normals = new List<Vector3>();
-            List<Vector4> tangents = new List<Vector4>();
-            List<Vector2> uvs = new List<Vector2>();
-            List<int> indices = new List<int>();
+            List<Vector3> vertices = new();
+            List<Vector3> normals = new();
+            List<Vector4> tangents = new();
+            List<Vector2> uvs = new();
+            List<int> indices = new();
 
             // It is much more efficient to generate uniform knots than
             // equidistant knots. Besides, you can't see the difference
             // anyway. For the curious among you: With uniform knots, the
             // distance between neighboring frames along the spline is not
             // equal.
-            IList<double> rv = Spline.UniformKnotSeq((uint)tubularSegments + 1);
-            FrameSeq frames = Spline.ComputeRMF(rv);
+            BSpline subSpline = CreateSubSpline();
+            IList<double> rv = subSpline.UniformKnotSeq((uint)tubularSegments + 1);
+            FrameSeq frames = subSpline.ComputeRMF(rv);
 
             // Helper function. Creates a radial polygon for frame `i'.
             void GenerateSegment(int i)
@@ -417,15 +440,15 @@ namespace SEE.GO
                              mesh.tangents.Length != tangents.Count ||
                              mesh.uv.Length != uvs.Count ||
                              needsColorUpdate; // Or the color of the mesh has been changed.
-            
+
             if (updateMaterial)
             {
                 mesh.Clear();
             }
             mesh.vertices = vertices.ToArray();
-            mesh.normals  = normals.ToArray();
+            mesh.normals = normals.ToArray();
             mesh.tangents = tangents.ToArray();
-            mesh.uv       = uvs.ToArray();
+            mesh.uv = uvs.ToArray();
             mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
             if (!gameObject.TryGetComponent(out meshRenderer))
             {
@@ -455,12 +478,12 @@ namespace SEE.GO
                 meshRenderer.sharedMaterial = defaultMaterial;
                 Portal.SetPortal(transform.parent.parent.gameObject, gameObject);
             }
-            
+
             if (!gameObject.TryGetComponent(out MeshFilter filter) || meshRenderer == null)
             {
                 return;
             }
-            
+
             if (meshRenderer.sharedMaterial.shader == defaultMaterial.shader)
             {
                 // Don't re-color non-default material.
@@ -496,6 +519,7 @@ namespace SEE.GO
             {
                 return filter.mesh;
             }
+
             Mesh mesh = CreateOrUpdateMesh();
             if (gameObject.TryGetComponent(out EdgeOperator edgeOperator))
             {
@@ -504,6 +528,48 @@ namespace SEE.GO
             }
             needsUpdate = false; // apparently
             return mesh;
+        }
+
+        /// <summary>
+        /// Create the subspline for the build-up animation.
+        /// </summary>
+        /// <returns>The spline to be rendered.</returns>
+        private BSpline CreateSubSpline()
+        {
+            if (chordLengths == null)
+            {
+                chordLengths = spline.ChordLengths();
+            }
+
+            double lowerKnot = chordLengths.TToKnot(subsplineStartT);
+            double upperKnot = chordLengths.TToKnot(subsplineEndT);
+
+            bool domainIsEmpty = BSpline.KnotsEqual(lowerKnot, upperKnot);
+
+            // If the domain is empty, then the subspline has a length
+            // of 0, but this subspline cannot be calculated so we
+            // just disable the LineRenderer and MeshRenderer
+            if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
+            {
+                lineRenderer.enabled = !domainIsEmpty;
+            }
+            if (gameObject.TryGetComponent(out MeshRenderer meshRenderer))
+            {
+                meshRenderer.enabled = !domainIsEmpty;
+            }
+
+            // The domain of the spline to be drawn is either
+            // completely empty or complete.
+            if (domainIsEmpty ||
+                (BSpline.KnotsEqual(0.0f, lowerKnot) &&
+                 BSpline.KnotsEqual(upperKnot, 1.0f)))
+            {
+                return spline;
+            }
+            else
+            {
+                return spline.SubSpline(lowerKnot, upperKnot);
+            }
         }
 
         /// <summary>
