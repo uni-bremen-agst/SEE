@@ -14,7 +14,7 @@ namespace SEE.Game.Avatars
     internal class VRAvatarAimingSystem : MonoBehaviour
     {
         [Tooltip("The laser beam for pointing. If null, one will be created at run-time.")]
-        public LaserPointer laser;
+        public LaserPointer Laser;
 
         [Tooltip("If true, local interactions control where the avatar is pointing to.")]
         public bool IsLocallyControlled = true;
@@ -28,15 +28,15 @@ namespace SEE.Game.Avatars
         {
             set
             {
-                if (laser == null)
+                if (Laser == null)
                 {
-                    laser = gameObject.AddOrGetComponent<LaserPointer>();
+                    Laser = gameObject.AddOrGetComponent<LaserPointer>();
                 }
 
-                laser.Source = value;
-                laser.On = true;
+                Laser.Source = value;
+                Laser.On = true;
             }
-            get { return laser.Source; }
+            get { return Laser.Source; }
         }
 
         /// <summary>
@@ -54,8 +54,8 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void Awake()
         {
-            laser = gameObject.AddOrGetComponent<LaserPointer>();
-            laser.On = true;
+            Laser = gameObject.AddOrGetComponent<LaserPointer>();
+            Laser.On = true;
         }
 
         /// <summary>
@@ -76,12 +76,12 @@ namespace SEE.Game.Avatars
                 {
                     Vector3 direction = rotR * Vector3.forward;
                     // Move the aim target to the tip of the laser beam.
-                    Target.position = laser.PointTowards(direction);
+                    Target.position = Laser.PointTowards(direction);
                 }
             }
             else
             {
-                laser.Draw(Target.position);
+                Laser.Draw(Target.position);
             }
         }
     }
