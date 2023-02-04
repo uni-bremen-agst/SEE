@@ -1,8 +1,9 @@
 ﻿using RootMotion.FinalIK;
+using SEE.Net.Actions;
 using Unity.Netcode;
 using UnityEngine;
 
-namespace SEE.Net.Actions
+namespace SEE.Game.Avatars
 {
     /// <summary>
     /// Responsible for synchronizing the VRIK model on all clients.

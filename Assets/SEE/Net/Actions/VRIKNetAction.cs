@@ -249,7 +249,6 @@ namespace SEE.Net.Actions
             {
                 RuntimeAnimatorController animationController =
                     Resources.Load<RuntimeAnimatorController>(AnimatorForVrik);
-                Debug.Log($"Loaded animation controller: {animationController != null}\n");
                 if (animationController != null)
                 {
                     avatar.raceAnimationControllers.defaultAnimationController = animationController;
@@ -257,7 +256,6 @@ namespace SEE.Net.Actions
                     if (networkObject.gameObject.TryGetComponentOrLog(out Animator animator))
                     {
                         animator.runtimeAnimatorController = animationController;
-                        Debug.Log($"Loaded animation controller {animator.name} is human: {animator.isHuman}\n");
                     }
                 }
                 else

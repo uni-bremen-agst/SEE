@@ -1,9 +1,10 @@
-﻿using UMA.PoseTools;
+﻿using System.Collections;
+using SEE.Net.Actions;
+using UMA.PoseTools;
 using Unity.Netcode;
 using UnityEngine;
-using System.Collections;
 
-namespace SEE.Net.Actions
+namespace SEE.Game.Avatars
 {
     /// <summary>
     /// Responsible to synchronize the facial expressions
