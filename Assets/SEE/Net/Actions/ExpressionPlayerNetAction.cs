@@ -14,12 +14,12 @@ namespace SEE.Net.Actions
         /// with a network client ID.
         /// </summary>
         public ulong NetworkObjectID;
-        
+
         // ExpressionPlayer Jaw variables.
         public float JawOpenClose;
         public float JawForwardBackward;
         public float JawLeftRight;
-        
+
         // ExpressionPlayer Mouth variables.
         public float MouthLeftRight;
         public float MouthUpDown;
@@ -30,18 +30,18 @@ namespace SEE.Net.Actions
         public float RightLowerLipUpDown;
         public float LeftUpperLipUpDown;
         public float RightUpperLipUpDown;
-        
+
         // ExpressionPlayer Cheek variables.
         public float LeftCheekPuffSquint;
         public float RightCheekPuffSquint;
-        
+
         // ExpressionPlayer Tongue variables.
         public float TongueOut;
         public float TongueCurl;
         public float TongueUpDown;
         public float TongueLeftRight;
         public float TongueWideNarror;
-        
+
         /// <summary>
         /// Initializes all variables that should be transferred to the remote avatars.
         /// </summary>
@@ -70,7 +70,7 @@ namespace SEE.Net.Actions
             TongueLeftRight = expressionPlayer.tongueLeft_Right;
             TongueWideNarror = expressionPlayer.tongueWide_Narrow;
         }
-        
+
         /// <summary>
         /// If executed by the initiating client, nothing happens. Otherwise the values of the
         /// <see cref="UMAExpressionPlayer"/> are transmitted.
@@ -110,6 +110,10 @@ namespace SEE.Net.Actions
                             expressionPlayer.tongueWide_Narrow = TongueWideNarror;
                         }
                     }
+                    else
+                    {
+                        Debug.LogError($"There is no network object with ID {NetworkObjectID}.\n");
+                    }
                 }
                 else
                 {
@@ -117,7 +121,7 @@ namespace SEE.Net.Actions
                 }
             }
         }
-        
+
         /// <summary>
         /// Does not do anything.
         /// </summary>

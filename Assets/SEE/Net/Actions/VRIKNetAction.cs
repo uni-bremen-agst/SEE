@@ -116,6 +116,10 @@ namespace SEE.Net.Actions
                             SetupRemotePlayer(networkObject);
                         }
                     }
+                    else
+                    {
+                        Debug.LogError($"There is no network object with ID {NetworkObjectID}.\n");
+                    }
                 }
                 else
                 {
