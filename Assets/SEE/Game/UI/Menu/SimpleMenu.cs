@@ -268,6 +268,9 @@ namespace SEE.Game.UI.Menu
             Menu = PrefabInstantiator.InstantiatePrefab(MenuPrefab, Parent, false);
             Menu.name = Title;
             MenuManager = Menu.GetComponent<ModalWindowManager>();
+            
+            // sets the icon
+            Icon = Resources.Load<Sprite>(IconSprite);
         
             // creates the tooltip
             MenuTooltip = Menu.AddComponent<Tooltip.Tooltip>();

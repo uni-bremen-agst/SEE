@@ -78,14 +78,6 @@ namespace SEE.Game.UI.Menu
         }
 
         /// <summary>
-        /// Loads the sprite.
-        /// </summary>
-        private void Awake()
-        {
-            Icon = Resources.Load<Sprite>(IconSprite);
-        }
-
-        /// <summary>
         /// Updates the menu and adds listeners for updating the menu.
         /// </summary>
         protected override void OnStartFinished()
