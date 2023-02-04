@@ -4,6 +4,7 @@ using DG.Tweening;
 using SEE.DataModel;
 using SEE.Game;
 using SEE.GO.NodeFactories;
+using SEE.Utils;
 using UnityEngine;
 using static SEE.GO.Materials.ShaderType;
 using Object = UnityEngine.Object;
@@ -267,7 +268,7 @@ namespace SEE.GO
             foreach (GameObject gameObject in beamMarkers)
             {
                 gameObject.transform.SetParent(null);
-                Object.Destroy(gameObject);
+                Destroyer.Destroy(gameObject);
             }
             beamMarkers.Clear();
             // We reset all marker materials to their original value.

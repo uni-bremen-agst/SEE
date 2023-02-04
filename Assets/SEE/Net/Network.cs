@@ -612,7 +612,7 @@ namespace SEE.Net
             {
                 SceneManager.sceneUnloaded -= OnSceneUnloaded;
                 ShutdownNetwork();
-                Destroy(Instance);
+                Destroyer.Destroy(Instance);
             }
         }
 

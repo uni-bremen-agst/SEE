@@ -1,6 +1,7 @@
 using System;
 using DG.Tweening;
 using SEE.GO;
+using SEE.Utils;
 using TinySpline;
 using UnityEngine;
 
@@ -22,7 +23,7 @@ namespace SEE.Game.Operator
                 if (Animator != null && Animator.IsActive())
                 {
                     Animator.tween.Kill(complete);
-                    Destroy(Animator);
+                    Destroyer.Destroy(Animator);
                     Animator = null;
                 }
             }

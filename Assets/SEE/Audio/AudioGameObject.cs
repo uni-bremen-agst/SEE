@@ -1,5 +1,6 @@
 using SEE.GO;
 using System.Collections.Generic;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Audio
@@ -14,7 +15,7 @@ namespace SEE.Audio
         /// <summary>
         /// Queue of sound effects that this object should play.
         /// </summary>
-        private Queue<AudioClip> effectsQueue = new Queue<AudioClip>();
+        private readonly Queue<AudioClip> effectsQueue = new();
 
         /// <summary>
         /// Audio source of the game object that this object is attached to.
@@ -28,7 +29,6 @@ namespace SEE.Audio
         public GameObject AttachedObject
         {
             get;
-            private set;
         }
 
         /// <summary>
@@ -111,10 +111,10 @@ namespace SEE.Audio
         /// <returns>True, if the queue is empty, else false.</returns>
         public bool EmptyQueue()
         {
-            bool emptyQueue = this.effectsQueue.Count == 0 && !AttachedObject.GetComponent<AudioSource>().isPlaying;
+            bool emptyQueue = effectsQueue.Count == 0 && !AttachedObject.GetComponent<AudioSource>().isPlaying;
             if (emptyQueue)
             {
-                GameObject.Destroy(AttachedObject.GetComponent<AudioSource>());
+                Destroyer.Destroy(AttachedObject.GetComponent<AudioSource>());
             }
             return emptyQueue;
         }

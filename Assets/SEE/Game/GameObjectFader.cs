@@ -162,7 +162,7 @@ namespace SEE.Game
         private void SelfDestruct(GameObject _)
         {
             callBack?.Invoke(gameObject);
-            Destroy(this);
+            Destroyer.Destroy(this);
         }
 
         /// <summary>

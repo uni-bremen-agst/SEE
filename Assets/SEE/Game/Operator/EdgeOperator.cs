@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using HighlightPlus;
 using SEE.DataModel;
+using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
 using TinySpline;
@@ -43,6 +44,11 @@ namespace SEE.Game.Operator
         /// Whether the glow effect is currently (supposed to be) enabled.
         /// </summary>
         private bool glowEnabled;
+
+        /// <summary>
+        /// Operation handling the construction of edges from subsplines.
+        /// </summary>
+        private TweenOperation<bool> construction;
 
         /// <summary>
         /// The <see cref="SEESpline"/> represented by this edge.
@@ -89,12 +95,21 @@ namespace SEE.Game.Operator
         /// Change the color gradient of the edge to a new gradient from <paramref name="newStartColor"/> to
         /// <paramref name="newEndColor"/>.
         /// </summary>
-        /// <param name="target">The spline this edge should animate towards</param>
+        /// <param name="newStartColor">The starting color of the gradient this edge should animate towards.</param>
+        /// <param name="newEndColor">The ending color of the gradient this edge should animate towards.</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> ChangeColorsTo(Color newStartColor, Color newEndColor, float duration)
+        /// <param name="useAlpha">Whether to incorporate the alpha values from the given colors.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> ChangeColorsTo(Color newStartColor, Color newEndColor, 
+                                                         float duration, bool useAlpha = true)
         {
+            if (!useAlpha)
+            {
+                newStartColor.a = color.TargetValue.start.a;
+                newEndColor.a = color.TargetValue.end.a;
+            }
             return color.AnimateTo((newStartColor, newEndColor), duration);
         }
 
@@ -110,7 +125,7 @@ namespace SEE.Game.Operator
         /// range of [0; 1].</exception>
         public IOperationCallback<Action> FadeTo(float alpha, float duration)
         {
-            if (alpha < 0 || alpha > 1)
+            if (alpha is < 0 or > 1)
             {
                 throw new ArgumentException("Given alpha value must be greater than zero and not more than one!");
             }
@@ -165,7 +180,74 @@ namespace SEE.Game.Operator
             highlightEffect.HitFX();
         }
 
+        /// <summary>
+        /// Construct the edge from subsplines.
+        /// </summary>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> Construct(float duration)
+        {
+            return construction.AnimateTo(true, duration);
+        }
+
+        /// <summary>
+        /// Destruct the edge from subsplines.
+        /// </summary>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> Destruct(float duration)
+        {
+            return construction.AnimateTo(false, duration);
+        }
+
+        /// <summary>
+        /// Show the edge, revealing it as specified in the <see cref="animationKind"/>.
+        /// </summary>
+        /// <param name="animationKind">In which way to reveal the edge.</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> Show(EdgeAnimationKind animationKind, float duration)
+        {
+            return ShowOrHide(true, animationKind, duration);
+        }
+        
+        /// <summary>
+        /// Hide the edge, animating it as specified in the <see cref="animationKind"/>.
+        /// </summary>
+        /// <param name="animationKind">In which way to hide the edge.</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> Hide(EdgeAnimationKind animationKind, float duration)
+        {
+            return ShowOrHide(false, animationKind, duration);
+        }
+
         #endregion
+
+        /// <summary>
+        /// Show or hide the edge, animating it as specified in the <see cref="animationKind"/>.
+        /// </summary>
+        /// <param name="show">Whether to show or hide the edge.</param>
+        /// <param name="animationKind">In which way to animate the edge.</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        /// <exception cref="ArgumentOutOfRangeException">If the given <paramref name="animationKind"/>
+        /// is unknown.</exception>
+        private IOperationCallback<Action> ShowOrHide(bool show, EdgeAnimationKind animationKind, float duration)
+        {
+            return animationKind switch
+            {
+                EdgeAnimationKind.None => new DummyOperationCallback<Action>(),
+                EdgeAnimationKind.Fading => FadeTo(show ? 1.0f : 0.0f, duration),
+                EdgeAnimationKind.Buildup => show ? Construct(duration) : Destruct(duration),
+                _ => throw new ArgumentOutOfRangeException(nameof(animationKind), "Unknown edge animation kind supplied.")
+            };
+        }
 
         /// <summary>
         /// Calculates a value for the <see cref="glow"/> operation according to the following formula:
@@ -179,7 +261,7 @@ namespace SEE.Game.Operator
         private float GetTargetGlow(float glowTarget, float alphaTarget)
         {
             // Normalized glow (i.e., glow expressed as value in [0,1]) must not be higher than alpha.
-            return Mathf.Min(glowTarget/fullGlow, alphaTarget) * fullGlow;
+            return Mathf.Min(glowTarget / fullGlow, alphaTarget) * fullGlow;
         }
 
         private void OnEnable()
@@ -227,6 +309,7 @@ namespace SEE.Game.Operator
             }
 
             color = new TweenOperation<(Color start, Color end)>(AnimateToColorAction, spline.GradientColors);
+
             if (TryGetComponent(out highlightEffect))
             {
                 // If the component already exists, we need to rebuild it to be sure it fits our material.
@@ -245,6 +328,17 @@ namespace SEE.Game.Operator
                 // When the hierarchy changes, we need to refresh the glow effect properties.
                 edge.Value.Subscribe(this);
             }
+
+            Tween[] ConstructAction(bool extending, float duration)
+            {
+                return new[] { DOTween.To(() => spline.SubsplineEndT,
+                                          u => spline.SubsplineEndT = u,
+                                          extending ? 1.0f : 0.0f,
+                                          duration).SetEase(Ease.InOutExpo).Play() };
+            }
+
+            construction = new TweenOperation<bool>(ConstructAction, spline.SubsplineEndT >= 1);
+
         }
 
         /// <summary>
