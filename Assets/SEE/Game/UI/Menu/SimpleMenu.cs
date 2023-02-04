@@ -122,7 +122,7 @@ namespace SEE.Game.UI.Menu
         /// The parent of the menu.
         /// Uses <see cref="Canvas"/> by default.
         /// </summary>
-        protected Transform Parent
+        public Transform Parent
         {
             get => parent != null ? parent : Canvas.transform;
             set
