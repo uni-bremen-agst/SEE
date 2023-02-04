@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -130,7 +131,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         private void OnDestroy()
         {
-            Destroy(dialog);
+            Destroyer.Destroy(dialog);
         }
 
         /// <summary>

@@ -602,7 +602,7 @@ namespace SEE.Controls
                 }
                 else
                 {
-                    Destroy(InteractableSynchronizer);
+                    Destroyer.Destroy(InteractableSynchronizer);
                     InteractableSynchronizer = null;
                 }
             }

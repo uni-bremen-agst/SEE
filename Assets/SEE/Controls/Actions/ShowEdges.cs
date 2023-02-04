@@ -4,6 +4,7 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -13,7 +14,7 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class ShowEdges : InteractableObjectAction
     {
-        // TODO: Perhaps edges being hidden should be a city setting? The setting would simply need to set the 
+        // TODO: Perhaps edges being hidden should be a city setting? The setting would simply need to set the
         //       `Edge.IsHiddenToggle` on all edges the user wishes to hide. Such edges will then only be shown
         //        when hovering or selecting connected nodes. This is currently the case for all reflexion edges
         //        except absences and divergences.
@@ -28,7 +29,16 @@ namespace SEE.Controls.Actions
         /// </summary>
         private bool isSelected = false;
 
-        private const float EDGE_FADE_DURATION = 1f;
+        /// <summary>
+        /// The city object this edge is rendered in.
+        /// </summary>
+        private AbstractSEECity codeCity;
+
+        /// <summary>
+        /// The duration that the edge appearance/disappearance
+        /// animation takes from start to end if not interrupted.
+        /// </summary>
+        private const float ANIMATION_DURATION = 1f;
 
         /// <summary>
         /// Registers On() and Off() for the respective hovering and selection events.
@@ -41,6 +51,7 @@ namespace SEE.Controls.Actions
                 Interactable.SelectOut += SelectionOff;
                 Interactable.HoverIn += HoverOn;
                 Interactable.HoverOut += HoverOff;
+                codeCity = City();
             }
             else
             {
@@ -59,6 +70,7 @@ namespace SEE.Controls.Actions
                 Interactable.SelectOut -= SelectionOff;
                 Interactable.HoverIn -= HoverOn;
                 Interactable.HoverOut -= HoverOff;
+                codeCity = null;
             }
             else
             {
@@ -174,40 +186,6 @@ namespace SEE.Controls.Actions
             return nodeRef.Value;
         }
 
-        /// <summary>
-        /// Hides the given <paramref name="edge"/> by fading its alpha value to zero.
-        /// </summary>
-        /// <param name="edge">the edge to hide</param>
-        private static void HideEdge(Edge edge)
-        {
-            GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
-            if (edgeObject == null)
-            {
-                Debug.LogError($"Could not find edge {edge.ToShortString()}!");
-                return;
-            }
-
-            EdgeOperator @operator = edgeObject.AddOrGetComponent<EdgeOperator>();
-            @operator.FadeTo(0f, EDGE_FADE_DURATION);
-        }
-
-        /// <summary>
-        /// Shows the given <paramref name="edge"/> by fading its alpha value to one.
-        /// </summary>
-        /// <param name="edge">the edge to show</param>
-        private static void ShowEdge(Edge edge)
-        {
-            GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
-            if (edgeObject == null)
-            {
-                Debug.LogError($"Could not find edge {edge.ToShortString()}!");
-                return;
-            }
-
-            EdgeOperator @operator = edgeObject.AddOrGetComponent<EdgeOperator>();
-            @operator.FadeTo(1f, EDGE_FADE_DURATION);
-        }
-
         private void On()
         {
             Node node = Node();
@@ -216,10 +194,12 @@ namespace SEE.Controls.Actions
                 return;
             }
 
+            EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
+
             // TODO: Perhaps the node along with its edges should be cached?
             foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
             {
-                ShowEdge(edge);
+                edge.Operator().Show(animationKind, ANIMATION_DURATION);
             }
         }
 
@@ -231,9 +211,11 @@ namespace SEE.Controls.Actions
                 return;
             }
 
+            EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
+
             foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
             {
-                HideEdge(edge);
+                edge.Operator().Hide(animationKind, ANIMATION_DURATION);
             }
         }
     }
