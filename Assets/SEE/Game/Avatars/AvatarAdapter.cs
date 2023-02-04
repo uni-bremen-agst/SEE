@@ -78,7 +78,7 @@ namespace SEE.Game.Avatars
             }
             EnableLocalControl(IsLocalPlayer);
         }
-        
+
         /// <summary>
         /// Enables/disables local control of the aiming system of the avatar.
         /// </summary>
