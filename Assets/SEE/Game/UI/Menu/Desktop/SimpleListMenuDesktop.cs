@@ -19,6 +19,7 @@ namespace SEE.Game.UI.Menu
         protected virtual string EntryListPrefab => UI_PREFAB_FOLDER + "MenuEntries";
         /// <summary>
         /// Prefab for each menu entry.
+        /// Required components: ButtonManagerBasicWithIcon, PointerHelper and Image.
         /// </summary>
         protected virtual string EntryPrefab => UI_PREFAB_FOLDER + "Button";
 
