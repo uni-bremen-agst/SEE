@@ -24,7 +24,7 @@ namespace SEE.Net.Actions
         /// The remote position of the head.
         /// </summary>
         public Vector3 RemoteHeadPosition;
-        
+
         /// <summary>
         /// The remote position of the left hand.
         /// </summary>
@@ -56,7 +56,7 @@ namespace SEE.Net.Actions
         /// as the default race animation controller.
         /// </summary>
         private const string AnimatorForVrik = "Prefabs/Players/VRIKAnimatedLocomotion";
-        
+
         /// <summary>
         /// Initializes all variables that should be transferred to the remote avatars.
         /// </summary>
@@ -67,22 +67,22 @@ namespace SEE.Net.Actions
             GameObject remoteHeadTarget = vrik.solver.spine.headTarget.gameObject;
             GameObject remoteLeftArm = vrik.solver.leftArm.target.gameObject;
             GameObject remoteRightArm = vrik.solver.rightArm.target.gameObject;
-            
+
             NetworkObjectID = networkObjectID;
-            
+
             RemoteHeadPosition = remoteHeadTarget.transform.position;
             RemoteLeftHandPosition = remoteLeftArm.transform.position;
             RemoteRightHandPosition = remoteRightArm.transform.position;
-            
+
             RemoteHeadRotation = remoteHeadTarget.transform.rotation;
             RemoteLeftHandRotation = remoteLeftArm.transform.rotation;
             RemoteRightHandRotation = remoteRightArm.transform.rotation;
         }
-        
+
         /// <summary>
         /// If executed by the initiating client, nothing happens.
-        /// If executed by the remote avatar, the usual positional and rotational model connection are
-        /// established.
+        /// If executed by the remote avatar, the usual positional and rotational model
+        /// connections are established.
         /// </summary>
         protected override void ExecuteOnClient()
         {
@@ -102,7 +102,7 @@ namespace SEE.Net.Actions
                             GameObject headTarget = vrik.solver.spine.headTarget.gameObject;
                             GameObject rightArm = vrik.solver.rightArm.target.gameObject;
                             GameObject leftArm = vrik.solver.leftArm.target.gameObject;
-                            
+
                             headTarget.transform.position = RemoteHeadPosition;
                             rightArm.transform.position = RemoteRightHandPosition;
                             leftArm.transform.position = RemoteLeftHandPosition;
@@ -131,13 +131,13 @@ namespace SEE.Net.Actions
         private void SetupRemotePlayer(NetworkObject networkObject)
         {
             VRIK vrIK = networkObject.gameObject.AddOrGetComponent<VRIK>();
-            
+
             // Note: AddComponents() must be run before TurnOffAvatarAimingSystem() because the latter
             // will remove components, the former must query.
             AddComponents(networkObject);
             TurnOffAvatarAimingSystem(networkObject);
             ReplaceAnimator(networkObject);
-            
+
             GameObject remoteRig = new()
             {
                 name = "RemoteRig",
@@ -147,7 +147,7 @@ namespace SEE.Net.Actions
                     parent = networkObject.gameObject.transform
                 }
             };
-            
+
             GameObject remoteHead = new()
             {
                 name = "RemoteHead",
@@ -158,7 +158,7 @@ namespace SEE.Net.Actions
                     parent = remoteRig.transform
                 }
             };
-            
+
             GameObject remoteLeftHand = new()
             {
                 name = "RemoteLeftHand",
@@ -169,7 +169,7 @@ namespace SEE.Net.Actions
                     parent = remoteRig.transform
                 }
             };
-            
+
             GameObject remoteRightHand = new()
             {
                 name = "RemoteRightHand",
@@ -180,7 +180,7 @@ namespace SEE.Net.Actions
                     parent = remoteRig.transform
                 }
             };
-            
+
             vrIK.solver.spine.headTarget = remoteHead.transform;
             Assert.IsNotNull(vrIK.solver.spine.headTarget);
             vrIK.solver.leftArm.target = remoteLeftHand.transform;
@@ -188,7 +188,7 @@ namespace SEE.Net.Actions
             vrIK.solver.rightArm.target = remoteRightHand.transform;
             Assert.IsNotNull(vrIK.solver.rightArm.target);
         }
-        
+
         /// <summary>
         /// Adds required components.
         /// </summary>
@@ -203,7 +203,7 @@ namespace SEE.Net.Actions
                 aiming.Target = aimIK.solver.target;
             }
         }
-        
+
         /// <summary>
         /// Removes AvatarAimingSystem and its associated AimIK and LookAtIK
         /// because our remote VR avatar is controlled by VRIK instead.
@@ -237,7 +237,7 @@ namespace SEE.Net.Actions
                 Destroyer.Destroy(avatarMovement);
             }
         }
-        
+
         /// <summary>
         /// We need to replace the animator of the avatar.
         /// The prefab has an aiming animation. We just want locomotion.
@@ -266,7 +266,7 @@ namespace SEE.Net.Actions
                 }
             }
         }
-        
+
         /// <summary>
         /// Does not do anything.
         /// </summary>
