@@ -176,15 +176,7 @@ namespace SEE.Game.UI.Menu
             }
             OnKeywordRecognized?.Invoke(args.text);
         }
-    
-        /// <summary>
-        /// Destroying the component also destroys the menu.
-        /// </summary>
-        protected virtual void OnDestroy()
-        {
-            if (Menu != null) Destroy(Menu);
-        }
-    
+
         /// <summary>
         /// Triggers when <see cref="Title"/> was changed.
         /// </summary>
