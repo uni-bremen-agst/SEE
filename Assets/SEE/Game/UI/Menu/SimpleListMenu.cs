@@ -1,10 +1,8 @@
-﻿using System;
-using Michsky.UI.ModernUIPack;
-using SEE.Utils;
-using Sirenix.Utilities;
-using TMPro;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Events;
+using UnityEngine.Windows.Speech;
 
 namespace SEE.Game.UI.Menu
 {
@@ -14,137 +12,139 @@ namespace SEE.Game.UI.Menu
     public class SimpleListMenu : SimpleListMenu<MenuEntry> { }
 
     /// <summary>
-    /// A simple list menu which instantiates prefabs for each menu entry.
-    /// The hierarchy of the prefabs and which prefabs are used are customizable.
+    /// Represents a menu of various actions the user can choose from.
+    /// The Menu consists of multiple MenuEntries of the type <typeparamref name="T"/>.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public class SimpleListMenu<T> : ListMenu<T> where T : MenuEntry
+    /// <typeparam name="T">The type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
+    /// <seealso cref="MenuEntry"/>
+    public partial class SimpleListMenu<T> : SimpleMenu where T : MenuEntry
     {
         /// <summary>
-        /// Prefab for the list containing the menu entries.
-        /// Only used if nothing is found at <see cref="EntryListPath"/>.
+        /// Whether the menu can be closed by not making any selection.
         /// </summary>
-        protected virtual string EntryListPrefab => UI_PREFAB_FOLDER + "MenuEntries";
+        private bool allowNoSelection = true;
         /// <summary>
-        /// Prefab for each menu entry.
+        /// Whether the menu can be closed by not making any selection.
         /// </summary>
-        protected virtual string EntryPrefab => UI_PREFAB_FOLDER + "Button";
+        public bool AllowNoSelection
+        {
+            get => allowNoSelection;
+            set
+            {
+                allowNoSelection = value;
+                OnAllowNoSelectionChanged?.Invoke();
+            }
+        }
 
         /// <summary>
-        /// Path to the content game object.
-        /// Contains the entry list.
+        /// Whether to hide the menu after selection.
         /// </summary>
-        protected virtual string ContentPath => "Main Content/Content Mask/Content";
+        private bool hideAfterSelection = true;
         /// <summary>
-        /// Path to the entry list game object.
-        /// Is child of the content game object.
+        /// Whether to hide the menu after selection.
         /// </summary>
-        protected virtual string EntryListPath => "Menu Entries/Scroll Area/List";
-        
+        public bool HideAfterSelection
+        {
+            get => hideAfterSelection;
+            set
+            {
+                hideAfterSelection = value;
+                OnHideAfterSelectionChanged?.Invoke();
+            }
+        }
+
         /// <summary>
-        /// The content game object.
+        /// The menu entries.
         /// </summary>
-        protected GameObject Content { get; private set; }
+        private readonly List<T> entries = new();
         /// <summary>
-        /// The entry list game object.
+        /// A read-only wrapper around the menu entries.
         /// </summary>
-        protected GameObject EntryList { get; private set; }
-        
+        /// <see cref="entries"/>
+        public IList<T> Entries => entries.AsReadOnly();
+
         /// <summary>
-        /// Returns the game object corresponding to a menu entry.
-        /// Assumes that the menu contains the entry.
+        /// Adds a menu entry.
         /// </summary>
         /// <param name="entry">The menu entry.</param>
-        /// <returns>The game object of the entry.</returns>
-        public override GameObject EntryGameObject(T entry) => EntryList.transform.Find(entry.Title).gameObject;
-
-        /// <summary>
-        /// Initializes the menu and stores specific parts of the menu.
-        /// Creates the entry list if necessary.
-        /// </summary>
-        protected override void StartDesktop()
+        public virtual void AddEntry(T entry)
         {
-            base.StartDesktop();
-            // stores specific parts of the menu
-            Content = Menu.transform.Find(ContentPath).gameObject;
-            // instantiates the entry list if necessary
-            if (!Content.transform.Find(EntryListPath))
-            {
-                GameObject go = PrefabInstantiator.InstantiatePrefab(EntryListPrefab, Content.transform, false);
-                // uses the start of EntryListPath as the name
-                go.name = EntryListPath.Split('/')[0];
-            }
-            EntryList = Content.transform.Find(EntryListPath).gameObject;
+            entries.Add(entry);
+            OnEntryAdded?.Invoke(entry);
         }
 
         /// <summary>
-        /// Updates the menu and adds listeners for updating the menu.
-        /// </summary>
-        protected override void OnStartFinished()
-        {
-            base.OnStartFinished();
-            // updates the menu
-            UpdateCloseButton();
-            Entries.ForEach(AddButton);
-            // adds listeners for updating the menu
-            OnAllowNoSelectionChanged += UpdateCloseButton;
-            OnEntryAdded += AddButton;
-            OnEntryRemoved += DestroyButton;
-        }
-
-        /// <summary>
-        /// Instantiates the button for a menu entry.
+        /// Removes a menu entry.
         /// It is assumed that the menu contains the entry.
         /// </summary>
-        /// <param name="entry">The added menu entry.</param>
-        protected virtual void AddButton(T entry)
+        /// <param name="entry"></param>
+        public void RemoveEntry(T entry)
         {
-            GameObject button =
-                PrefabInstantiator.InstantiatePrefab(EntryPrefab, EntryList.transform, false);
-
-            // title and icon
-            button.name = entry.Title;
-            ButtonManagerBasicWithIcon manager = button.GetComponent<ButtonManagerBasicWithIcon>();
-            manager.buttonText = entry.Title;
-            manager.buttonIcon = entry.Icon;
-            
-            // hover listeners
-            PointerHelper pointerHelper = button.GetComponent<PointerHelper>();
-            pointerHelper.EnterEvent.AddListener(() => MenuTooltip.Show(entry.Description));
-            pointerHelper.ExitEvent.AddListener(MenuTooltip.Hide);
-
-            // select listener or show that button is disabled
-            if (entry.Enabled) 
-                manager.clickEvent.AddListener(() => SelectEntry(entry));
-            else 
-                manager.useRipple = false;
-            
-            // colors
-            Color color = entry.Enabled ? entry.EntryColor : entry.DisabledColor;
-            button.GetComponent<Image>().color = color;
-            Color textColor = color.IdealTextColor();
-            manager.normalText.color = textColor;
-            manager.normalImage.color = textColor;
+            entries.Remove(entry);
+            OnEntryRemoved?.Invoke(entry);
         }
 
         /// <summary>
-        /// Destroys the button for a removed menu entry.
-        /// It is assumed that the menu contained the entry.
+        /// Selects a menu entry.
+        /// It is assumed that the menu contains the entry.
         /// </summary>
         /// <param name="entry">The menu entry.</param>
-        protected virtual void DestroyButton(T entry)
+        public virtual void SelectEntry(T entry)
         {
-            Destroy(EntryGameObject(entry));
+            entry.DoAction();
+            OnEntrySelected?.Invoke(entry);
+        }
+
+        /// <summary>
+        /// The keywords the menu should listen to.
+        /// Adds the titles of the menu entries.
+        /// Removes the CloseMenuKeyword if <see cref="AllowNoSelection"/> isn't true.
+        /// </summary>
+        /// <returns></returns>
+        protected override IEnumerable<string> GetKeywords()
+        {
+            IEnumerable<string> keywords = base.GetKeywords();
+            // removes the CloseMenuKeyword if no selection isn't allowed.
+            if (!AllowNoSelection) keywords = keywords.Where(keyword => keyword != CloseMenuKeyword);
+            // adds the entry titles as keywords
+            keywords = keywords.Concat(Entries.Select(entry => entry.Title));
+            return keywords;
+        }
+
+        /// <summary>
+        /// Selects an entry if the keyword is the entry title.
+        /// </summary>
+        /// <param name="args">The phrase recognized.</param>
+        protected override void HandleKeyword(PhraseRecognizedEventArgs args)
+        {
+            T entry = entries.FirstOrDefault(entry => entry.Title == args.text);
+            if (entry != null) SelectEntry(entry);
+            base.HandleKeyword(args);
         }
         
         /// <summary>
-        /// Updates whether the close button is active.
-        /// Only visible if <see cref="AllowNoSelection"/> is true.
+        /// Triggers when <see cref="AllowNoSelection"/> was changed.
         /// </summary>
-        protected virtual void UpdateCloseButton()
-        {
-            if (MenuManager.confirmButton != null)
-                MenuManager.confirmButton.gameObject.SetActive(AllowNoSelection);
-        }
+        public event UnityAction OnAllowNoSelectionChanged;
+        
+        /// <summary>
+        /// Triggers when <see cref="HideAfterSelection"/> was changed.
+        /// </summary>
+        public event UnityAction OnHideAfterSelectionChanged;
+
+        /// <summary>
+        /// Triggers when an entry was added. (<see cref="AddEntry"/>)
+        /// </summary>
+        public event UnityAction<T> OnEntryAdded;
+
+        /// <summary>
+        /// Triggers when an entry was removed. (<see cref="RemoveEntry"/>)
+        /// </summary>
+        public event UnityAction<T> OnEntryRemoved;
+
+        /// <summary>
+        /// Triggers when an entry was selected. (<see cref="SelectEntry"/>)
+        /// </summary>
+        public event UnityAction<T> OnEntrySelected;
     }
 }
