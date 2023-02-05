@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using SEE.Game;
 using SEE.GO;
-using SEE.Net;
+using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
+using SEE.Audio;
 
 namespace SEE.Controls.Actions
 {
@@ -28,23 +29,18 @@ namespace SEE.Controls.Actions
             {
                 // the hit object is the parent in which to create the new node
                 GameObject parent = raycastHit.collider.gameObject;
-                // The position at which the parent was hit will be the center point of the new node
-                Vector3 position = raycastHit.point;
-                Vector3 scale = FindSize(parent, position);
-                
-                addedGameNode = GameNodeAdder.AddChild(parent, position: position, worldSpaceScale: scale);
-                if (addedGameNode != null)
-                {
-                    memento = new Memento(parent, position: position, scale: scale);
-                    memento.NodeID = addedGameNode.name;
-                    new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
-                    result = true;
-                    currentState = ReversibleAction.Progress.Completed;
-                }
-                else
-                {
-                    Debug.LogError($"New node could not be created.\n");
-                }
+                addedGameNode = GameNodeAdder.AddChild(parent);
+                // addedGameNode has the scale and position of parent.
+                // The position at which the parent was hit will be the center point of the addedGameNode.
+                addedGameNode.transform.position = raycastHit.point;
+                // PutOn makes sure addedGameNode fits into parent.
+                GameNodeMover.PutOn(child: addedGameNode.transform, parent: parent, true);
+                memento = new Memento(child: addedGameNode, parent: parent);
+                memento.NodeID = addedGameNode.name;
+                new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
+                result = true;
+                currentState = ReversibleAction.Progress.Completed;
+                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NEW_NODE_SOUND, parent);
             }
             return result;
         }
@@ -86,43 +82,15 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Constructor setting the information necessary to re-do this action.
             /// </summary>
-            /// <param name="parent">parent of the new node</param>
-            /// <param name="position">position of the new node in world space</param>
-            /// <param name="scale">scale of the new node in world space</param>
-            public Memento(GameObject parent, Vector3 position, Vector3 scale)
+            /// <param name="child">child that was added</param>
+            /// <param name="parent">parent of <paramref name="child"/></param>
+            public Memento(GameObject child, GameObject parent)
             {
                 Parent = parent;
-                Position = position;
-                Scale = scale;
+                Position = child.transform.position;
+                Scale = child.transform.lossyScale;
                 NodeID = null;
             }
-        }
-
-        /// <summary>
-        /// Returns a scale of a square with the given center <see cref="position"/>
-        /// that fits into the ground area of <paramref name="parent"/>.
-        /// </summary>
-        /// <param name="parent">parent in which to fit the rectangle</param>
-        /// <param name="position">center position of the rectangle</param>
-        /// <returns>the scale of a square (actually a cube, but with a very small height)
-        /// with center <see cref="position"/> that fits into the ground area of <paramref name="parent"/></returns>
-        private static Vector3 FindSize(GameObject parent, Vector3 position)
-        {
-            // TODO: We might want to implement something smarter
-            // than that, see for instance:
-            // https://stackoverflow.com/questions/51574829/how-to-algorithmically-find-the-biggest-rectangle-that-can-fit-in-a-space-with-o
-            Vector3 result = parent.transform.lossyScale / 10;
-            // The ground area of the result must be a square.
-            if (result.x > result.z)
-            {
-                result.x = result.z;
-            }
-            else
-            {
-                result.z = result.x;
-            }
-            result.y = 0.01f;
-            return result;
         }
 
         /// <summary>
@@ -135,7 +103,7 @@ namespace SEE.Controls.Actions
             {
                 new DeleteNetAction(addedGameNode.name).Execute();
                 GameElementDeleter.RemoveNodeFromGraph(addedGameNode);
-                Destroyer.DestroyGameObject(addedGameNode);
+                Destroyer.Destroy(addedGameNode);
                 addedGameNode = null;
             }
         }
@@ -146,7 +114,7 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            addedGameNode = GameNodeAdder.AddChild(memento.Parent, position: memento.Position, worldSpaceScale: memento.Scale, nodeID: memento.NodeID);
+            addedGameNode = GameNodeAdder.AddChild(memento.Parent, worldSpacePosition: memento.Position, worldSpaceScale: memento.Scale, nodeID: memento.NodeID);
             if (addedGameNode != null)
             {
                 new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();

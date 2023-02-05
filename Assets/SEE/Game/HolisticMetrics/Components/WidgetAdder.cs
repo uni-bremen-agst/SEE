@@ -64,7 +64,7 @@ namespace SEE.Game.HolisticMetrics.Components
         {
             if (positioningDone)
             {
-                Destroy(this);    
+                Destroyer.Destroy(this);    
             }
         }
     }

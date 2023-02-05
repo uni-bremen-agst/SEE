@@ -77,7 +77,7 @@ namespace SEE.Game.HolisticMetrics.Components
         {
             if (addingDone)
             {
-                Destroy(this);
+                Destroyer.Destroy(this);
             }
         }
     }

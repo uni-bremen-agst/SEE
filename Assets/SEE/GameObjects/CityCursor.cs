@@ -2,6 +2,7 @@ using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.UI3D;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.GO
@@ -38,7 +39,7 @@ namespace SEE.GO
             InteractableObject.AnySelectIn -= AnySelectIn;
             InteractableObject.AnySelectOut -= AnySelectOut;
 
-            Destroy(E);
+            Destroyer.Destroy(E);
         }
 
         private void AnySelectIn(InteractableObject interactableObject, bool isInitiator)

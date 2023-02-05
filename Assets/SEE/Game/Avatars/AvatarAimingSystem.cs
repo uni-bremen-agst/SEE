@@ -99,6 +99,8 @@ namespace SEE.Game.Avatars
         public void SetPointing(bool activate)
         {
             IsPointing = activate;
+            // The pointing animation only overrides the upper body animation while pointing.
+            Animator.SetLayerWeight(1, System.Convert.ToSingle(activate));
             if (aimIK == null)
             {
                 gameObject.TryGetComponentOrLog(out aimIK);
@@ -203,8 +205,7 @@ namespace SEE.Game.Avatars
 
         /// <summary>
         /// If <see cref="IsPointing"/>, adjusts the pose and updates the solver of <see cref="Aim"/>
-        /// and <see cref="LookAt"/> to aim at the target; otherwise a neutral pose will be taken.
-        /// </summary>
+        /// and <see cref="LookAt"/> to aim at the target.
         private void LateUpdate()
         {
             if (IsPointing)
@@ -218,11 +219,6 @@ namespace SEE.Game.Avatars
                 {
                     LookAt.solver.Update();
                 }
-            }
-            else
-            {
-                // Pointing down is our neutral pose.
-                AimTowards(Vector3.down);
             }
         }
 

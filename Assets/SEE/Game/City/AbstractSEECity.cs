@@ -34,6 +34,16 @@ namespace SEE.Game.City
         /// extend the test cases in TestConfigIO.
 
         /// <summary>
+        /// The graph underlying this code city that was loaded from disk. May be null.
+        /// Neither serialized nor saved to the config file.
+        /// </summary>
+        public abstract Graph LoadedGraph
+        {
+            get;
+            protected set;
+        }
+
+        /// <summary>
         /// The screen relative height to use for culling a game node [0-1].
         /// If the game node uses less than this percentage it will be culled.
         /// </summary>
@@ -44,14 +54,14 @@ namespace SEE.Game.City
         /// The path where the settings (the attributes of this class) are stored.
         /// </summary>
         [SerializeField, Tooltip("Path of configuration file."), FoldoutGroup(DataFoldoutGroup)]
-        public FilePath ConfigurationPath = new FilePath();
+        public FilePath ConfigurationPath = new();
 
         /// <summary>
         /// The path to project where the source code can be found.
         /// <see cref="SourceCodeDirectory"/>.
         /// </summary>
         [SerializeField, HideInInspector]
-        private DirectoryPath sourceCodeDirectory = new DirectoryPath();
+        private DirectoryPath sourceCodeDirectory = new();
 
         /// <summary>
         /// The path to project where the source code can be found. This attribute
@@ -85,7 +95,7 @@ namespace SEE.Game.City
         /// this is the VS solution file.
         /// </summary>
         [SerializeField, Tooltip("Path of VS solution file."), FoldoutGroup(DataFoldoutGroup)]
-        public FilePath SolutionPath = new FilePath();
+        public FilePath SolutionPath = new();
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
@@ -99,7 +109,7 @@ namespace SEE.Game.City
         /// </summary>
         [NonSerialized, OdinSerialize, Tooltip("Visual attributes of nodes."), HideReferenceObjectPicker]
         [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes", DisplayMode = DictionaryDisplayOptions.CollapsedFoldout)]
-        public NodeTypeVisualsMap NodeTypes = new NodeTypeVisualsMap();
+        public NodeTypeVisualsMap NodeTypes = new();
 
         /// <summary>
         /// If true, lifted edges whose source and target nodes are the same are ignored.
@@ -124,7 +134,15 @@ namespace SEE.Game.City
         /// </summary>
         [Tooltip("Maps metric names onto colors."), FoldoutGroup(MetricFoldoutGroup), HideReferenceObjectPicker]
         [NonSerialized, OdinSerialize]
-        public ColorMap MetricToColor = new ColorMap();
+        public ColorMap MetricToColor = new();
+
+        /// <summary>
+        /// Yields a graph renderer that can draw this city.
+        /// </summary>
+        public abstract IGraphRenderer Renderer
+        {
+            get;
+        }
 
         /// <summary>
         /// Returns the <see cref="ColorRange"/> for <paramref name="metricName"/> in <see cref="MetricToColor"/>
@@ -162,38 +180,38 @@ namespace SEE.Game.City
         /// The node layout settings.
         /// </summary>
         [Tooltip("Settings for the node layout.")]
-        public NodeLayoutAttributes NodeLayoutSettings = new NodeLayoutAttributes();
+        public NodeLayoutAttributes NodeLayoutSettings = new();
 
         /// <summary>
         /// The edge layout settings.
         /// </summary>
         [Tooltip("Settings for the edge layout.")]
-        public EdgeLayoutAttributes EdgeLayoutSettings = new EdgeLayoutAttributes();
+        public EdgeLayoutAttributes EdgeLayoutSettings = new();
 
         /// <summary>
         /// Attributes regarding the selection of edges.
         /// </summary>
         [Tooltip("Settings for the selection of edges.")]
-        public EdgeSelectionAttributes EdgeSelectionSettings = new EdgeSelectionAttributes();
+        public EdgeSelectionAttributes EdgeSelectionSettings = new();
 
         /// <summary>
         /// The cose graph settings.
         /// </summary>
         [HideInInspector]
         [Obsolete]
-        public CoseGraphAttributes CoseGraphSettings = new CoseGraphAttributes(); // FIXME put into CitySettings.cs
+        public CoseGraphAttributes CoseGraphSettings = new(); // FIXME put into CitySettings.cs
 
         /// <summary>
         /// The metrics for the visualization of erosions.
         /// </summary>
         [Tooltip("Settings for the visualization of software erosions.")]
-        public ErosionAttributes ErosionSettings = new ErosionAttributes();
+        public ErosionAttributes ErosionSettings = new();
 
         /// <summary>
         /// Holistic metric boards.
         /// </summary>
         [Tooltip("Settings for holistic metric boards.")]
-        public BoardAttributes BoardSettings = new BoardAttributes();
+        public BoardAttributes BoardSettings = new();
 
         /// <summary>
         /// Adds all game objects tagged by <see cref="Tags.Node"/> or <see cref="Tags.Edge"/>
@@ -209,10 +227,10 @@ namespace SEE.Game.City
         /// </summary>
         protected virtual void Start()
         {
-            if (!gameObject.TryGetComponent(out EdgeMeshScheduler _))
+            if (LoadedGraph != null && !gameObject.TryGetComponent(out EdgeMeshScheduler _))
             {
                 gameObject.AddComponent<EdgeMeshScheduler>()
-                    .Init(EdgeLayoutSettings, EdgeSelectionSettings);
+                          .Init(EdgeLayoutSettings, EdgeSelectionSettings, LoadedGraph);
             }
         }
 
@@ -261,7 +279,7 @@ namespace SEE.Game.City
         /// <param name="filename">name of the file in which the settings are stored</param>
         public void Save(string filename)
         {
-            using ConfigWriter writer = new ConfigWriter(filename);
+            using ConfigWriter writer = new(filename);
             Save(writer);
         }
 
@@ -271,7 +289,7 @@ namespace SEE.Game.City
         /// <param name="filename">name of the file from which the settings are restored</param>
         public void Load(string filename)
         {
-            using ConfigReader stream = new ConfigReader(filename);
+            using ConfigReader stream = new(filename);
             Restore(stream.Read());
         }
 
@@ -280,7 +298,7 @@ namespace SEE.Game.City
         /// </summary>
         public static HashSet<string> HierarchicalEdgeTypes()
         {
-            HashSet<string> result = new HashSet<string>
+            HashSet<string> result = new()
             {
                 "Enclosing",
                 "Belongs_To",
@@ -388,7 +406,7 @@ namespace SEE.Game.City
         /// any of the <paramref name="tags"/></returns>
         private static ICollection<GameObject> AllDescendantsTaggedBy(GameObject gameObject, string[] tags)
         {
-            List<GameObject> result = new List<GameObject>();
+            List<GameObject> result = new();
             foreach (Transform child in gameObject.transform)
             {
                 if (tags.Contains(child.tag))
@@ -509,7 +527,7 @@ namespace SEE.Game.City
         /// </summary>
         /// <returns>mapping of all node attribute names for leaves onto icon ids</returns>
         public Dictionary<string, IconFactory.Erosion> LeafIssueMap() =>
-            new Dictionary<string, IconFactory.Erosion>
+            new()
             {
                 { ErosionSettings.ArchitectureIssue, IconFactory.Erosion.Architecture_Violation },
                 { ErosionSettings.CloneIssue, IconFactory.Erosion.Clone },
@@ -543,17 +561,17 @@ namespace SEE.Game.City
             if (string.IsNullOrEmpty(filename))
             {
                 Debug.LogError("Empty graph path.\n");
-                Graph graph = new Graph(SourceCodeDirectory.Path);
+                Graph graph = new(SourceCodeDirectory.Path);
                 return graph;
             }
 
             if (File.Exists(filename))
             {
                 Performance p = Performance.Begin("loading graph data from " + filename);
-                GraphReader graphCreator = new GraphReader(filename, HierarchicalEdges,
-                                                           basePath: SourceCodeDirectory.Path,
-                                                           rootID: rootName ?? filename,
-                                                           logger: new SEELogger());
+                GraphReader graphCreator = new(filename, HierarchicalEdges,
+                                               basePath: SourceCodeDirectory.Path,
+                                               rootID: rootName ?? filename,
+                                               logger: new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
                 p.End();
@@ -631,10 +649,10 @@ namespace SEE.Game.City
             {
                 Dictionary<string, bool> dirs = CoseGraphSettings.ListInnerNodeToggle;
                 // the new directories
-                Dictionary<string, bool> dirsLocal = new Dictionary<string, bool>();
+                Dictionary<string, bool> dirsLocal = new();
 
-                Dictionary<string, NodeLayoutKind> dirsLayout = new Dictionary<string, NodeLayoutKind>();
-                Dictionary<string, NodeShapes> dirsShape = new Dictionary<string, NodeShapes>();
+                Dictionary<string, NodeLayoutKind> dirsLayout = new();
+                Dictionary<string, NodeShapes> dirsShape = new();
 
                 foreach (Node node in graph.Nodes())
                 {

@@ -4,6 +4,8 @@ using SEE.GO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Utils;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using static SEE.Net.Network;
@@ -52,12 +54,12 @@ namespace SEE.Game.UI.PropertyDialog
         /// Event triggered when the user presses the OK button. Clients can
         /// register on this event to receive a notification when this happens.
         /// </summary>
-        public readonly UnityEvent OnConfirm = new UnityEvent();
+        public readonly UnityEvent OnConfirm = new();
         /// <summary>
         /// Event triggered when the user presses the Cancel button. Clients can
         /// register on this event to receive a notification when this happens.
         /// </summary>
-        public readonly UnityEvent OnCancel = new UnityEvent();
+        public readonly UnityEvent OnCancel = new();
 
         /// <summary>
         /// The dialog used to manipulate the node.
@@ -287,7 +289,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         private void Close()
         {
-            UnityEngine.Object.Destroy(dialog);
+            Destroyer.Destroy(dialog);
             dialog = null;
         }
     }

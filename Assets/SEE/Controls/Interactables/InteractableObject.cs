@@ -9,6 +9,7 @@ using UnityEngine.Assertions;
 using Valve.VR.InteractionSystem;
 using SEE.Game;
 using SEE.Net.Actions;
+using SEE.Audio;
 
 namespace SEE.Controls
 {
@@ -321,6 +322,7 @@ namespace SEE.Controls
                     // Non-local player are not concerned here.
                     LocalHoverIn?.Invoke(this);
                     LocalAnyHoverIn?.Invoke(this);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.HOVER_SOUND, this.gameObject);
                 }
                 HoveredObjects.Add(this);
                 if (IsHoverFlagSet(HoverFlag.World))
@@ -600,7 +602,7 @@ namespace SEE.Controls
                 }
                 else
                 {
-                    Destroy(InteractableSynchronizer);
+                    Destroyer.Destroy(InteractableSynchronizer);
                     InteractableSynchronizer = null;
                 }
             }

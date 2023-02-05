@@ -249,7 +249,7 @@ namespace SEE.Game.UI.Menu
                 {
                     if (manager)
                     {
-                        Destroy(manager.gameObject);
+                        Destroyer.Destroy(manager.gameObject);
                     }
                     else
                     {
