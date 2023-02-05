@@ -29,20 +29,24 @@ namespace SEE.Controls.Actions
             {
                 throw new ArgumentException($"Duplicate ActionStateTypes {actionStateType.Name} must not exist!");
             }
-            Debug.Log($"Added {actionStateType.Name}.\n");
             AllTypes.Add(actionStateType);
         }
 
         /// <summary>
-        /// Returns the first root <see cref="ActionStateType"/> at top level (root)
+        /// Returns the default <see cref="ActionStateType"/> at top level (root)
         /// of <see cref="AllTypes"/>, i.e. one that does not have a parent.
+        /// This is the one that should be executed initially if the user has not
+        /// made any menu selections yet.
         /// </summary>
-        /// <returns>first root <see cref="ActionStateType"/> at top level</returns>
-        /// <exception cref="InvalidOperationException">thrown if there is no such element</exception>
+        /// <returns>default <see cref="ActionStateType"/> at top level</returns>
+        /// <remarks><see cref="ActionStateType.Move"/> is the returned default</remarks>
         internal static ActionStateType FirstActionStateType()
         {
+            /// Important note: As a side effect of mentioning this <see cref="ActionStateType.Move"/>
+            /// here, its initializer will be executed. C# has a lazy evaluation
+            /// of initializers. This will make sure that it actually has a
+            /// defined value (not <c>null</c>).
             return ActionStateType.Move;
-            //return (ActionStateType)AllTypes.First(a => a is ActionStateType && a.Parent == null);
         }
     }
 
