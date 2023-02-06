@@ -1,5 +1,3 @@
-using SEE.Game.HolisticMetrics;
-using UnityEngine;
 
 namespace SEE.Net.Actions.HolisticMetrics
 {
@@ -45,7 +43,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             if (!IsRequester())
             {
-                Find(BoardName).SwitchCity(CityName);
+                FindWidgetsManager(BoardName).SwitchCity(CityName);
             }
         }
     }

@@ -15,7 +15,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// retrieved.</param>
         /// <returns>The <see cref="WidgetsManager"/> of the board with the given name</returns>
         /// <exception cref="Exception">Thrown when no <see cref="WidgetsManager"/> was found</exception>
-        internal static WidgetsManager Find(string boardName)
+        internal static WidgetsManager FindWidgetsManager(string boardName)
         {
             WidgetsManager widgetsManager = BoardsManager.Find(boardName);
             if (widgetsManager == null)

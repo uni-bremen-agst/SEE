@@ -1,6 +1,4 @@
 using System;
-using SEE.Game.HolisticMetrics;
-using UnityEngine;
 
 namespace SEE.Net.Actions.HolisticMetrics
 {
@@ -45,7 +43,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             if (!IsRequester())
             {
-                Find(BoardName).Delete(WidgetID);   
+                FindWidgetsManager(BoardName).Delete(WidgetID);   
             }
         }
     }

@@ -42,7 +42,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             if (!IsRequester())
             {
-                Find(BoardName).Move(WidgetID, Position);
+                FindWidgetsManager(BoardName).Move(WidgetID, Position);
             }
         }
     }
