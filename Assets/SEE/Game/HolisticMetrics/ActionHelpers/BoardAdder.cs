@@ -73,7 +73,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
         {
             if (positioningDone)
             {
-                Destroy(this);
+                Destroyer.Destroy(this);
             }
         }
 

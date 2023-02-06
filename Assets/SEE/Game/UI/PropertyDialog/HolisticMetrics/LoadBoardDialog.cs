@@ -1,7 +1,7 @@
 using SEE.Controls;
 using SEE.Game.HolisticMetrics;
 using UnityEngine;
-using Object = UnityEngine.Object;
+using SEE.Utils;
 
 namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
 {
@@ -58,7 +58,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             SEEInput.KeyboardShortcutsEnabled = true;
             filename = selectedFile.Value;
             gotInput = true;
-            Object.Destroy(dialog);
+            Destroyer.Destroy(dialog);
         }
 
         /// <summary>

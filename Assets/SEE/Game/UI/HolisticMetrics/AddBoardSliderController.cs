@@ -1,4 +1,5 @@
 using Michsky.UI.ModernUIPack;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.UI.HolisticMetrics
@@ -72,8 +73,8 @@ namespace SEE.Game.UI.HolisticMetrics
         {
             boardRotation = dummyBoard.transform.rotation;
             gotRotation = true;
-            Destroy(dummyBoard);
-            Destroy(gameObject);
+            Destroyer.Destroy(dummyBoard);
+            Destroyer.Destroy(gameObject);
         }
 
         /// <summary>

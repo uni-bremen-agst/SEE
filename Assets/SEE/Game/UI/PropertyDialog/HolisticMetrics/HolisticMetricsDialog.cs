@@ -1,4 +1,5 @@
 using SEE.Controls;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
@@ -33,7 +34,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         protected void Close()
         {
-            Object.Destroy(dialog);
+            Destroyer.Destroy(dialog);
             SEEInput.KeyboardShortcutsEnabled = true;
         }
         

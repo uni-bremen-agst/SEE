@@ -241,6 +241,8 @@ namespace SEE.Game.Evolution
                     {
                         newGameEdge.SetActive(false); // Disable renderer
                         edges.Add(id, newGameEdge);
+                        // FIXME (@koschke): This should be rewritten so that the GraphElementIDMap isn't called here.
+                        //                   That part should be handled by GraphRenderer.CreateGameNode.
                         GraphElementIDMap.Add(newGameEdge);
                     }
                     if (id == edge.ID)

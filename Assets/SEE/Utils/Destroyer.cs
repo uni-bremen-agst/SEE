@@ -16,13 +16,16 @@ namespace SEE.Utils
         /// <see cref="UnityEngine.Object.DestroyImmediate(Object)"/> when in editor mode
         /// (with immediate effect).
         ///
-        /// Note: This method will recurse into the children of <paramref name="gameObject"/>.
+        /// Note: This method will recurse into the children of <paramref name="gameObject"/>
+        /// if <paramref name="recurseIntoChildren"/> is <c>true</c>.
         /// The <paramref name="gameObject"/> is removed from <see cref="GraphElementIDMap"/>
         /// if it represents a node or edge.
         /// </summary>
         /// <param name="gameObject">game object to be destroyed (generally, but not necessarily
         /// representing a node or edge)</param>
-        public static void Destroy(GameObject gameObject)
+        /// <param name="recurseIntoChildren">Whether to also destroy the <paramref name="gameObject"/>'s
+        /// children.</param>
+        public static void Destroy(GameObject gameObject, bool recurseIntoChildren = true)
         {
             if (gameObject != null)
             {
@@ -30,9 +33,12 @@ namespace SEE.Utils
                 {
                     GraphElementIDMap.Remove(gameObject);
                 }
-                foreach (Transform child in gameObject.transform)
+                if (recurseIntoChildren)
                 {
-                    Destroy(child.gameObject);
+                    foreach (Transform child in gameObject.transform)
+                    {
+                        Destroy(child.gameObject);
+                    }
                 }
                 // We must use DestroyImmediate when we are in the editor mode.
                 if (Application.isPlaying)

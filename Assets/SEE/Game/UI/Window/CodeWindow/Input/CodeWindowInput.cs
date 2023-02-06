@@ -7,6 +7,7 @@ using Cysharp.Threading.Tasks;
 using SEE.Game.UI.Notification;
 using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -327,7 +328,7 @@ namespace SEE.Game.UI.Window.CodeWindow
             if (!File.Exists(filename))
             {
                 ShowNotification.Error("File not found", $"Couldn't find file '{filename}'.");
-                Destroy(this);
+                Destroyer.Destroy(this);
                 return;
             }
 
@@ -358,7 +359,7 @@ namespace SEE.Game.UI.Window.CodeWindow
             catch (IOException exception)
             {
                 ShowNotification.Error("File access error", $"Couldn't access file {filename}: {exception}");
-                Destroy(this);
+                Destroyer.Destroy(this);
             }
         }
 
