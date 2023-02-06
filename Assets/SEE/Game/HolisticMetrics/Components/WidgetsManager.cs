@@ -119,10 +119,9 @@ namespace SEE.Game.HolisticMetrics.Components
         /// <param name="widgetConfiguration">The configuration of the new widget.</param>
         internal void Create(WidgetConfig widgetConfiguration)
         {
-            GameObject widget = Array.Find(widgetPrefabs,
+            GameObject widget = Array.Find(widgetPrefabs, 
                 element => element.name.Equals(widgetConfiguration.WidgetName));
-            Type metricType = Array.Find(metricTypes,
-                type => type.Name.Equals(widgetConfiguration.MetricType));
+            Type metricType = Array.Find(metricTypes, type => type.Name.Equals(widgetConfiguration.MetricType));
             if (widget is null)
             {
                 Debug.LogError("Could not load widget because the widget name from the configuration " +
@@ -162,10 +161,8 @@ namespace SEE.Game.HolisticMetrics.Components
         /// <param name="position">The position to which the widget should be moved</param>
         internal void Move(Guid widgetID, Vector3 position)
         {
-            WidgetController controller =
-                widgets
-                .Find(widget => widget.Item1.ID.Equals(widgetID))
-                .Item1;
+            WidgetController controller = widgets
+                .Find(widget => widget.Item1.ID.Equals(widgetID)).Item1;
             controller.transform.position = position;
         }
 
@@ -231,11 +228,8 @@ namespace SEE.Game.HolisticMetrics.Components
         public void OnCitySelectionClick()
         {
             cities = FindObjectsOfType<SEECity>();
-
             string oldSelection = citySelection.selectedText.text;
-
             citySelection.dropdownItems.Clear();
-
             foreach (SEECity city in cities)
             {
                 citySelection.CreateNewItem(city.name, houseIcon);
@@ -245,15 +239,12 @@ namespace SEE.Game.HolisticMetrics.Components
             // might change as soon as the player first clicks the dropdown to expand it.
             if (cities.Any(city => city.name.Equals(oldSelection)))
             {
-                citySelection.selectedItemIndex =
-                    citySelection.dropdownItems.IndexOf(
-                        citySelection.dropdownItems.Find(item => item.itemName.Equals(oldSelection)));
+                citySelection.selectedItemIndex = citySelection.dropdownItems.IndexOf(
+                    citySelection.dropdownItems.Find(item => item.itemName.Equals(oldSelection)));
             }
 
             citySelection.SetupDropdown();
-
-            // Refresh the widgets because the selected city could have changed already
-            Redraw();
+            Redraw();  // Refresh the widgets because the selected city could have changed already
         }
 
         /// <summary>
@@ -309,25 +300,17 @@ namespace SEE.Game.HolisticMetrics.Components
         }
 
         /// <summary>
-        /// 
+        /// Fetches widget movements (one at a time).
         /// </summary>
-        /// <param name="originalPosition"></param>
-        /// <param name="newPosition"></param>
-        /// <param name="widgetID"></param>
-        /// <returns></returns>
-        internal bool GetWidgetMovement(
-            out Vector3 originalPosition,
-            out Vector3 newPosition,
-            out Guid widgetID)
+        /// <param name="originalPosition">The position of the widget before the movement</param>
+        /// <param name="newPosition">The position to which the widget was moved</param>
+        /// <param name="widgetID">The ID of the widget that was moved.</param>
+        /// <returns>Whether a widget movement was found</returns>
+        internal bool GetWidgetMovement(out Vector3 originalPosition, out Vector3 newPosition, out Guid widgetID)
         {
             foreach ((WidgetController, Metric) widget in widgets)
             {
-                if (widget
-                    .Item1
-                    .GetComponent<WidgetMover>()
-                    .GetMovement(
-                        out originalPosition,
-                        out newPosition))
+                if (widget.Item1.GetComponent<WidgetMover>().GetMovement(out originalPosition, out newPosition))
                 {
                     widgetID = widget.Item1.ID;
                     return true;
@@ -365,8 +348,7 @@ namespace SEE.Game.HolisticMetrics.Components
             // requester
             OnCitySelectionClick();
 
-            int indexInDropdown = citySelection
-                .dropdownItems
+            int indexInDropdown = citySelection.dropdownItems
                 .FindIndex(city => city.itemName.Equals(cityName));
             if (indexInDropdown == -1)  // The return value if it was not found
             {
@@ -403,11 +385,7 @@ namespace SEE.Game.HolisticMetrics.Components
         {
             foreach ((WidgetController, Metric) tuple in widgets)
             {
-                // Recalculate the metric
                 MetricValue metricValue = tuple.Item2.Refresh(GetSelectedCity());
-
-                // Display the new value on the widget
-            // Try to find the index of the cityName to select
                 tuple.Item1.Display(metricValue);
             }
         }

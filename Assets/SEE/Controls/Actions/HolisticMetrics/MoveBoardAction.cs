@@ -72,7 +72,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Start()
         {
-            BoardsManager.ToggleMoving();
+            BoardsManager.ToggleMoving(true);
         }
         
         /// <summary>
@@ -99,7 +99,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Stop()
         {
-            BoardsManager.ToggleMoving();
+            BoardsManager.ToggleMoving(false);
         }
         
         /// <summary>

@@ -21,12 +21,6 @@ namespace SEE.Game.HolisticMetrics
             Resources.Load<GameObject>("Prefabs/HolisticMetrics/SceneComponents/MetricsBoard");
 
         /// <summary>
-        /// This field remembers whether or not the little buttons underneath the boards for moving boards around are
-        /// currently enabled.
-        /// </summary>
-        private static bool movingEnabled;
-
-        /// <summary>
         /// List of all the <see cref="WidgetsManager"/>s that this manager manages (there should not be any
         /// <see cref="WidgetsManager"/>s in the scene that are not in this list).
         /// </summary>
@@ -39,26 +33,16 @@ namespace SEE.Game.HolisticMetrics
         /// <param name="boardConfig">The board configuration for the new board.</param>
         internal static void Create(BoardConfig boardConfig)
         {
-            widgetsManagers.RemoveAll(x => x == null);  // remove stale managers
-            bool nameExists = widgetsManagers.Any(widgetsManager =>
-                widgetsManager.GetTitle().Equals(boardConfig.Title));
-            if (nameExists)
+            widgetsManagers.RemoveAll(x => x == null); // remove stale managers
+            if (widgetsManagers.Any(widgetsManager => widgetsManager.GetTitle().Equals(boardConfig.Title)))
             {
                 ShowNotification.Error("Cannot create that board", "The name has to be unique.");
                 return;
             }
 
-            GameObject newBoard = Object.Instantiate(
-                boardPrefab, 
-                boardConfig.Position, 
-                boardConfig.Rotation);
-            
+            GameObject newBoard = Object.Instantiate(boardPrefab, boardConfig.Position, boardConfig.Rotation);
             WidgetsManager newWidgetsManager = newBoard.GetComponent<WidgetsManager>();
-
-            // Set the title of the new board
             newWidgetsManager.SetTitle(boardConfig.Title);
-
-            // Add the widgets to the new board
             foreach (WidgetConfig widgetConfiguration in boardConfig.WidgetConfigs)
             {
                 newWidgetsManager.Create(widgetConfiguration);
@@ -66,7 +50,7 @@ namespace SEE.Game.HolisticMetrics
 
             widgetsManagers.Add(newWidgetsManager);
         }
-        
+
         /// <summary>
         /// Deletes a metrics board identified by its name.
         /// </summary>
@@ -106,15 +90,13 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Toggles the small buttons underneath the boards that allow the player to drag the boards around.
         /// </summary>
-        /// <returns>True if the buttons are enabled now, otherwise false.</returns>
-        internal static bool ToggleMoving()
+        /// <param name="enable">Whether to enable the move buttons</param>
+        internal static void ToggleMoving(bool enable)
         {
-            movingEnabled = !movingEnabled;
             foreach (WidgetsManager controller in widgetsManagers)
             {
-                controller.ToggleMoving(movingEnabled);
+                controller.ToggleMoving(enable);
             }
-            return movingEnabled;
         }
 
         internal static bool GetMovement(out string boardName, out Vector3 oldPosition, out Vector3 newPosition,
@@ -199,6 +181,14 @@ namespace SEE.Game.HolisticMetrics
             
         }
 
+        /// <summary>
+        /// Fetches the position where a widget should be added.
+        /// </summary>
+        /// <param name="boardName">The name of the board on which the widget should be added. If there is no such
+        /// board, this will be null.</param>
+        /// <param name="position">The position at which the widget should be added. If there is no such position, this
+        /// will be some dummy value.</param>
+        /// <returns>Whether a position was fetched successfully</returns>
         internal static bool GetWidgetAdditionPosition(out string boardName, out Vector3 position)
         {
             foreach (WidgetsManager widgetsManager in widgetsManagers)

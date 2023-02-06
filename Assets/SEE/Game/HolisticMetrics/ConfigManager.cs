@@ -96,6 +96,10 @@ namespace SEE.Game.HolisticMetrics
             config.Save(writer);
         }
 
+        /// <summary>
+        /// Deletes the <see cref="BoardConfig"/> file with the given <paramref name="filename"/>.
+        /// </summary>
+        /// <param name="filename">The name of the file to delete</param>
         internal static void DeleteBoard(string filename)
         {
             EnsureBoardsDirectoryExists();
