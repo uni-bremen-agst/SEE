@@ -55,6 +55,12 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             Close();
         }
 
+        /// <summary>
+        /// Fetches the name given by the player.
+        /// </summary>
+        /// <param name="name">The name given by the player, if present and not yet fetched. Otherwise a dummy value.
+        /// </param>
+        /// <returns>The value of <see cref="HolisticMetricsDialog.gotInput"/></returns>
         internal bool GetName(out string name)
         {
             if (gotInput)

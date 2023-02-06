@@ -11,9 +11,15 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     /// </summary>
     internal class AddWidgetDialog : HolisticMetricsDialog
     {
-        private static string metricType;
+        /// <summary>
+        /// The metric type the player selected.
+        /// </summary>
+        private string metricType;
 
-        private static string widgetName;
+        /// <summary>
+        /// The widget type the player selected.
+        /// </summary>
+        private string widgetName;
 
         /// <summary>
         /// The selection allowing the player to select the metric that should be displayed by the new widget.
@@ -104,6 +110,14 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             Close();
         }
 
+        /// <summary>
+        /// Fetches the configuration for the new widget given by the player.
+        /// </summary>
+        /// <param name="metric">If given and not yet fetched, this will be the metric type selected by the player.
+        /// </param>
+        /// <param name="widget">If given and not yet fetched, this will be the widget type selected by the player.
+        /// </param>
+        /// <returns>The value of <see cref="HolisticMetricsDialog.gotInput"/></returns>
         internal bool GetConfig(out string metric, out string widget)
         {
             if (gotInput)

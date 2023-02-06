@@ -61,6 +61,12 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             Object.Destroy(dialog);
         }
 
+        /// <summary>
+        /// Fetches the filename given by the player.
+        /// </summary>
+        /// <param name="nameOfFile">If given and not yet fetched, this will be the filename the player selected.
+        /// </param>
+        /// <returns>The value of <see cref="HolisticMetricsDialog.gotInput"/></returns>
         internal bool GetFilename(out string nameOfFile)
         {
             if (gotInput)

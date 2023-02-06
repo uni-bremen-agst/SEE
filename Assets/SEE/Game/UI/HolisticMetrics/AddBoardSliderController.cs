@@ -1,7 +1,4 @@
 using Michsky.UI.ModernUIPack;
-using SEE.Controls.Actions.HolisticMetrics;
-using SEE.Game.HolisticMetrics;
-using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
 
 namespace SEE.Game.UI.HolisticMetrics
@@ -23,13 +20,15 @@ namespace SEE.Game.UI.HolisticMetrics
         /// </summary>
         [SerializeField] private WindowDragger windowDragger;
 
-        private static bool gotRotation;
         /// <summary>
-        /// The board configuration of the board to be created. So far it should already have a title and a position. In
-        /// this component, we will add the rotation to it and then create it.
+        /// Whether this class has a rotation in store that wasn't yet fetched.
         /// </summary>
-        private Vector3 boardPosition;
+        private static bool gotRotation;
 
+        /// <summary>
+        /// If <see cref="gotRotation"/> is true, this contains the board rotation this slider controller got from the
+        /// player.
+        /// </summary>
         private static Quaternion boardRotation;
 
         /// <summary>
@@ -44,7 +43,6 @@ namespace SEE.Game.UI.HolisticMetrics
         /// </summary>
         internal void Setup(Vector3 position)
         {
-            boardPosition = position;
 
             windowDragger.dragArea = transform.parent.GetComponent<RectTransform>();
             
@@ -78,6 +76,12 @@ namespace SEE.Game.UI.HolisticMetrics
             Destroy(gameObject);
         }
 
+        /// <summary>
+        /// If <see cref="gotRotation"/> is true, the <paramref name="rotation"/> will be the rotation given by the
+        /// player. Otherwise it will be some dummy value.
+        /// </summary>
+        /// <param name="rotation">The rotation the player confirmed, if that doesn't exist, some dummy value</param>
+        /// <returns><see cref="gotRotation"/></returns>
         internal static bool GetRotation(out Quaternion rotation)
         {
             if (gotRotation)
