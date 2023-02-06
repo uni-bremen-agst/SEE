@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SEE.Game.HolisticMetrics;
-using SEE.Game.HolisticMetrics.Components;
+using SEE.Game.HolisticMetrics.ActionHelpers;
 using SEE.Game.UI.PropertyDialog.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;

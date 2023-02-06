@@ -3,7 +3,7 @@ using SEE.Game.HolisticMetrics.WidgetControllers;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game.HolisticMetrics.Components
+namespace SEE.Game.HolisticMetrics.ActionHelpers
 {
     /// <summary>
     /// This component can be attached to a widget. It will listen for left clicks on the widget and when it notices a

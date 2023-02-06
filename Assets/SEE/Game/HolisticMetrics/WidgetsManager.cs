@@ -5,13 +5,14 @@ using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.DataModel;
 using SEE.Game.City;
+using SEE.Game.HolisticMetrics.ActionHelpers;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
 using SEE.Net.Actions.HolisticMetrics;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SEE.Game.HolisticMetrics.Components
+namespace SEE.Game.HolisticMetrics
 {
     /// <summary>
     /// This class manages a holistic metrics board.

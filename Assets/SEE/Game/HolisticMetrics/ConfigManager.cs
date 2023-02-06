@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.IO;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
-using SEE.Game.HolisticMetrics.Components;
 using SEE.Game.UI.Notification;
 using SEE.Utils;
 using UnityEngine;

@@ -1,7 +1,7 @@
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game.HolisticMetrics.Components
+namespace SEE.Game.HolisticMetrics.ActionHelpers
 {
     /// <summary>
     /// This class is a component that should be attached to the little button underneath every metrics board. It is

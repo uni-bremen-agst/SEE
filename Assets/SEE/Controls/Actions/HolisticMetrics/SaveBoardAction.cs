@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using SEE.Game.HolisticMetrics;
-using SEE.Game.HolisticMetrics.Components;
 using SEE.Game.UI.HolisticMetrics;
 using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog.HolisticMetrics;

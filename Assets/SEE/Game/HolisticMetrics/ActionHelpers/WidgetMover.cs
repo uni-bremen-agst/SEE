@@ -2,7 +2,7 @@ using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game.HolisticMetrics.Components
+namespace SEE.Game.HolisticMetrics.ActionHelpers
 {
     /// <summary>
     /// This component can be attached to a widget. It will allow the player to move the widget around by dragging it

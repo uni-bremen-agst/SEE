@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls.Actions.HolisticMetrics;
+using SEE.Game.HolisticMetrics.ActionHelpers;
 using SEE.Game.UI.Notification;
 using UnityEngine;
-using SEE.Game.HolisticMetrics.Components;
 using Object = UnityEngine.Object;
 
 namespace SEE.Game.HolisticMetrics

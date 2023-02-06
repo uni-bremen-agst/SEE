@@ -2,7 +2,7 @@ using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game.HolisticMetrics.Components
+namespace SEE.Game.HolisticMetrics.ActionHelpers
 {
     /// <summary>
     /// This component can be attached to a metrics board. It will then start listening for left mouse clicks on the

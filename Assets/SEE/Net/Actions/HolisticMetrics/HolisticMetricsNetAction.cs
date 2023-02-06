@@ -1,6 +1,5 @@
 using System;
 using SEE.Game.HolisticMetrics;
-using SEE.Game.HolisticMetrics.Components;
 
 namespace SEE.Net.Actions.HolisticMetrics
 {
