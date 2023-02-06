@@ -73,10 +73,6 @@ namespace SEE.Controls.Actions
                 Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                 DrawAction.CreateReversibleAction);
 
-        public static ActionStateType MarkNode { get; } =
-            new ActionStateType(10, "Mark", "Mark a node", Color.magenta, "Materials/ModernUIPack/Pencil",
-                MarkAction.CreateMarkAction);
-
         #endregion
 
         /// <summary>
