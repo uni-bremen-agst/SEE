@@ -12,6 +12,7 @@ namespace SEE.XR
     /// this instance of the game on the computer running the VR),
     /// for instance, a SteamVR camera rig.
     /// </summary>
+#if INCLUDE_STEAM_VR
     internal class ManualXRControl : MonoBehaviour
     {
         /// <summary>
@@ -78,6 +79,8 @@ namespace SEE.XR
             }
         }
 
+
+        
         /// <summary>
         /// If XR was initialized, it will be stopped.
         /// </summary>
@@ -110,4 +113,5 @@ namespace SEE.XR
             return XRGeneralSettings.Instance.Manager.isInitializationComplete;
         }
     }
+#endif
 }

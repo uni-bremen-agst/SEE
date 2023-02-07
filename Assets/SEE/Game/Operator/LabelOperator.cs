@@ -4,7 +4,9 @@ using SEE.Controls.Actions;
 using SEE.GO;
 using TMPro;
 using UnityEngine;
+#if INCLUDE_STEAM_VR
 using Valve.VR.InteractionSystem;
+#endif
 
 namespace SEE.Game.Operator
 {
@@ -41,7 +43,8 @@ namespace SEE.Game.Operator
         {
             // Assumption: There are only very few active labels, compared to all active and inactive labels
             //             that may exist in the descendants of this node. Hence, we go through all active ones.
-            foreach (NodeOperator nodeOperator in ShowLabel.DisplayedLabelOperators.Where(x => x.LabelAlpha.TargetValue > 0f))
+            foreach (NodeOperator nodeOperator in ShowLabel.DisplayedLabelOperators.Where(x =>
+                         x.LabelAlpha.TargetValue > 0f))
             {
                 nodeOperator.LabelTextPosition.AnimateTo(nodeOperator.DesiredLabelTextPosition, duration);
                 nodeOperator.LabelStartLinePosition.AnimateTo(nodeOperator.DesiredLabelStartLinePosition, duration);
@@ -66,11 +69,20 @@ namespace SEE.Game.Operator
                 // First we create the label.
                 // We define starting and ending positions for the animation.
                 Vector3 startLabelPosition = gameObject.GetTop();
+#if INCLUDE_STEAM_VR
                 nodeLabel = TextFactory.GetTextWithSize(shownText,
                                                         startLabelPosition,
                                                         City.NodeTypes[Node.Type].LabelSettings.FontSize,
                                                         lift: true,
                                                         textColor: Color.black.ColorWithAlpha(0f));
+#else
+                nodeLabel = TextFactory.GetTextWithSize(shownText,
+                    startLabelPosition,
+                    City.NodeTypes[Node.Type].LabelSettings.FontSize,
+                    lift: true,
+                    textColor: Color.black);
+#endif
+
                 nodeLabel.name = LABEL_PREFIX + shownText;
                 nodeLabel.transform.SetParent(gameObject.transform);
 
@@ -81,7 +93,7 @@ namespace SEE.Game.Operator
                     name = $"{LABEL_PREFIX}{shownText} (Connecting Line)"
                 };
                 LineFactory.Draw(line, new[] { startLinePosition, startLinePosition }, 0.01f,
-                                 Materials.New(Materials.ShaderType.TransparentLine, Color.black));
+                    Materials.New(Materials.ShaderType.TransparentLine, Color.black));
                 line.transform.SetParent(nodeLabel.transform);
 
                 // The nodeLabel and its child edge must inherit the portal of gameObject.
@@ -92,8 +104,12 @@ namespace SEE.Game.Operator
                 if (nodeLabel.TryGetComponentOrLog(out labelText) && line.TryGetComponentOrLog(out labelLineRenderer))
                 {
                     labelText.alpha = 0f;
+#if INCLUDE_STEAM_VR
                     labelLineRenderer.startColor = labelLineRenderer.startColor.ColorWithAlpha(0f);
                     labelLineRenderer.endColor = labelLineRenderer.endColor.ColorWithAlpha(0f);
+#endif
+                    labelLineRenderer.startColor = labelLineRenderer.startColor;
+                    labelLineRenderer.endColor = labelLineRenderer.endColor;
                 }
             }
         }
@@ -141,18 +157,22 @@ namespace SEE.Game.Operator
             // Animated label to move to top and fade in
             DOTween.ToAlpha(() => labelText.color, color => labelText.color = color, alpha, duration).Play(),
             // Lower start of line should be visible almost immediately due to reduced alpha (smooth transition)
-            DOTween.ToAlpha(() => labelLineRenderer.startColor, c => labelLineRenderer.startColor = c, alpha * 0.5f, duration * 0.1f).Play(),
-            DOTween.ToAlpha(() => labelLineRenderer.endColor, c => labelLineRenderer.endColor = c, alpha, duration).Play(),
+            DOTween.ToAlpha(() => labelLineRenderer.startColor, c => labelLineRenderer.startColor = c, alpha * 0.5f,
+                duration * 0.1f).Play(),
+            DOTween.ToAlpha(() => labelLineRenderer.endColor, c => labelLineRenderer.endColor = c, alpha, duration)
+                .Play(),
         };
 
         private Tween[] AnimateLabelStartLinePositionAction(Vector3 startPosition, float duration) => new Tween[]
         {
-            DOTween.To(() => labelLineRenderer.GetPosition(0), p => labelLineRenderer.SetPosition(0, p), startPosition, duration).Play()
+            DOTween.To(() => labelLineRenderer.GetPosition(0), p => labelLineRenderer.SetPosition(0, p), startPosition,
+                duration).Play()
         };
 
         private Tween[] AnimateLabelEndLinePositionAction(Vector3 endPosition, float duration) => new Tween[]
         {
-            DOTween.To(() => labelLineRenderer.GetPosition(1), p => labelLineRenderer.SetPosition(1, p), endPosition, duration).Play()
+            DOTween.To(() => labelLineRenderer.GetPosition(1), p => labelLineRenderer.SetPosition(1, p), endPosition,
+                duration).Play()
         };
 
         private Tween[] AnimateLabelTextPositionAction(Vector3 position, float duration) => new Tween[]

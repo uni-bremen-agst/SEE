@@ -12,7 +12,9 @@ using SEE.Net.Actions;
 using UMA.CharacterSystem;
 using Unity.Netcode;
 using UnityEngine;
+#if INCLUDE_STEAM_VR
 using Valve.VR.InteractionSystem;
+#endif
 using ViveSR.anipal;
 using ViveSR.anipal.Lip;
 
@@ -28,7 +30,6 @@ namespace SEE.Game.Avatars
     internal class AvatarAdapter : NetworkBehaviour
     {
         [Header("VR specific settings (relevant only for VR players)")]
-
         [Tooltip("Whether the VR controllers should be hidden.")]
         public bool HideVRControllers = false;
 
@@ -61,7 +62,9 @@ namespace SEE.Game.Avatars
                         PrepareLocalPlayerForDesktop();
                         break;
                     case PlayerInputType.VRPlayer:
+#if INCLUDE_STEAM_VR
                         PrepareLocalPlayerForXR();
+#endif
                         break;
                     default:
                         throw new NotImplementedException($"Unhandled case {SceneSettings.InputType}");
@@ -75,6 +78,7 @@ namespace SEE.Game.Avatars
                 // Remote players need to be set up for Dissonance and SALSA lip sync.
                 StartCoroutine(SetUpSALSA());
             }
+
             EnableLocalControl(IsLocalPlayer);
         }
 
@@ -118,6 +122,7 @@ namespace SEE.Game.Avatars
                     playerId = iDissonancePlayer.PlayerId;
                     yield return null;
                 }
+
                 if (!string.IsNullOrEmpty(playerId))
                 {
                     // Wait until we find a Dissonance player representation with the given playerId
@@ -139,6 +144,7 @@ namespace SEE.Game.Avatars
                         {
                             Debug.LogWarning($"{dissonancePlayer.name} has no {typeof(AudioSource)}.\n");
                         }
+
                         if (!gameObject.TryGetComponent(out Salsa _))
                         {
                             Debug.LogWarning($"{name} has no {typeof(Salsa)}.\n");
@@ -174,6 +180,7 @@ namespace SEE.Game.Avatars
                     throw new Exception($"A game object with a {typeof(DissonanceComms)} cannot be found.\n");
                 }
             }
+
             foreach (Transform child in dissonanceComms.transform)
             {
                 if (child.TryGetComponent(out VoicePlayback voicePlayback) && voicePlayback.PlayerName == playerId)
@@ -181,6 +188,7 @@ namespace SEE.Game.Avatars
                     return child.gameObject;
                 }
             }
+
             return null;
         }
 
@@ -202,7 +210,7 @@ namespace SEE.Game.Avatars
                 return gameObject.transform.lossyScale.y;
             }
         }
-
+#if INCLUDE_STEAM_VR
         /// <summary>
         /// Prepares the avatar for a virtual reality environment by adding a VRPlayer prefab
         /// as a child and an <see cref="XRPlayerMovement"/> component.
@@ -211,7 +219,7 @@ namespace SEE.Game.Avatars
         {
             StartCoroutine(StartXRCoroutine());
         }
-
+#endif
         /// <summary>
         /// The path to the animator controller that should be used when the avatar
         /// is set up for VR. This controller will be assigned to the UMA avatar
@@ -223,11 +231,13 @@ namespace SEE.Game.Avatars
         /// The path of the prefab for the VR camera rig.
         /// </summary>
         private const string VRPlayerRigPrefab = "Prefabs/Players/XRRig";
+
         /// <summary>
         /// The composite name of the child within <see cref="VRPlayerRigPrefab"/>
         /// representing the head for VRIK.
         /// </summary>
         private const string VRPlayerHeadForVRIK = "Camera Offset/Main Camera/Head";
+#if INCLUDE_STEAM_VR
         /// <summary>
         /// The composite name of the child within <see cref="VRPlayerRigPrefab"/>
         /// representing the left hand for VRIK.
@@ -238,9 +248,11 @@ namespace SEE.Game.Avatars
         /// representing the right hand for VRIK.
         /// </summary>
         private const string VRPlayerRightHandForVRIK = XRCameraRigManager.RightControllerName + "/RightHand";
-
+#endif
+#if INCLUDE_STEAM_VR
         public IEnumerator StartXRCoroutine()
         {
+
             // Start XR manually.
             StartCoroutine(ManualXRControl.StartXRCoroutine());
 
@@ -249,6 +261,7 @@ namespace SEE.Game.Avatars
             {
                 yield return null;
             }
+
 
             Debug.Log($"[{nameof(AvatarAdapter)}] XR is initialized. Adding the necessary VR components.\n");
 
@@ -269,7 +282,9 @@ namespace SEE.Game.Avatars
             AddComponents();
             TurnOffAvatarAimingSystem();
             ReplaceAnimator();
+#if INCLUDE_STEAM_VR
             SetupVRIK();
+#endif
             PrepareLipTracker();
 
             /// <summary>
@@ -302,7 +317,9 @@ namespace SEE.Game.Avatars
                         Vector3 position = ground.transform.position;
                         position.y += 0.01f;
                         GameObject clonedFloor = Instantiate(ground, position, ground.transform.rotation);
+#if INCLUDE_STEAM_VR
                         clonedFloor.AddComponent<TeleportArea>();
+#endif
                     }
                     // FIXME: This needs to work again for our metric charts.
                     //{
@@ -341,14 +358,17 @@ namespace SEE.Game.Avatars
                 {
                     Destroyer.Destroy(aimingSystem);
                 }
+
                 if (gameObject.TryGetComponentOrLog(out AimIK aimIK))
                 {
                     Destroyer.Destroy(aimIK);
                 }
+
                 if (gameObject.TryGetComponentOrLog(out LookAtIK lookAtIK))
                 {
                     Destroyer.Destroy(lookAtIK);
                 }
+
                 // AvatarMovementAnimator is using animation parameters that are defined only
                 // in our own AvatarAimingSystem animation controller. We will remove it
                 // to avoid error messages.
@@ -364,7 +384,8 @@ namespace SEE.Game.Avatars
             {
                 if (gameObject.TryGetComponentOrLog(out DynamicCharacterAvatar avatar))
                 {
-                    RuntimeAnimatorController animationController = Resources.Load<RuntimeAnimatorController>(AnimatorForVRIK);
+                    RuntimeAnimatorController animationController =
+                        Resources.Load<RuntimeAnimatorController>(AnimatorForVRIK);
                     Debug.Log($"Loaded animation controller: {animationController != null}\n");
                     if (animationController != null)
                     {
@@ -382,10 +403,11 @@ namespace SEE.Game.Avatars
                     }
                 }
             }
-
+#if INCLUDE_STEAM_VR
             // Set up FinalIK's VR IK on the avatar.
             void SetupVRIK()
             {
+                
                 VRIK vrIK = gameObject.AddOrGetComponent<VRIK>();
                 vrIK.solver.spine.headTarget = rig.transform.Find(VRPlayerHeadForVRIK);
                 UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.spine.headTarget);
@@ -394,7 +416,7 @@ namespace SEE.Game.Avatars
                 vrIK.solver.rightArm.target = rig.transform.Find(VRPlayerRightHandForVRIK);
                 UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.rightArm.target);
             }
-
+#endif
             // Adds required components.
             void AddComponents()
             {
@@ -424,13 +446,15 @@ namespace SEE.Game.Avatars
                 if (status == AnipalStatus.ERROR)
                 {
                     Debug.LogWarning("[HTC Facial Tracker] Did you start sr_runtime before?\n");
-                    Debug.LogWarning("[HTC Facial Tracker] Trying to start sr_runtime... This may take some time and can freeze your game!\n");
+                    Debug.LogWarning(
+                        "[HTC Facial Tracker] Trying to start sr_runtime... This may take some time and can freeze your game!\n");
                     StartCoroutine(PrepareLipFramework());
                 }
                 // SR_runtime Status is IDLE or WORKING
                 else
                 {
-                    gameObject.AddComponent<SRanipal_Lip_Framework>().EnableLipVersion = SRanipal_Lip_Framework.SupportedLipVersion.version2;
+                    gameObject.AddComponent<SRanipal_Lip_Framework>().EnableLipVersion =
+                        SRanipal_Lip_Framework.SupportedLipVersion.version2;
                     AddComponentsForFacialTracker();
                 }
             }
@@ -441,8 +465,10 @@ namespace SEE.Game.Avatars
             IEnumerator PrepareLipFramework()
             {
                 // Waiting for sr_runtime and lip_framework initialisation.
-                gameObject.AddComponent<SRanipal_Lip_Framework>().EnableLipVersion = SRanipal_Lip_Framework.SupportedLipVersion.version2;
-                yield return new WaitUntil(() => SRanipal_Lip_Framework.Status != SRanipal_Lip_Framework.FrameworkStatus.STOP);
+                gameObject.AddComponent<SRanipal_Lip_Framework>().EnableLipVersion =
+                    SRanipal_Lip_Framework.SupportedLipVersion.version2;
+                yield return new WaitUntil(() =>
+                    SRanipal_Lip_Framework.Status != SRanipal_Lip_Framework.FrameworkStatus.STOP);
 
                 if (SRanipal_Lip_Framework.Status == SRanipal_Lip_Framework.FrameworkStatus.WORKING)
                 {
@@ -450,7 +476,8 @@ namespace SEE.Game.Avatars
                 }
                 else if (SRanipal_Lip_Framework.Status == SRanipal_Lip_Framework.FrameworkStatus.ERROR)
                 {
-                    Debug.LogError("[HTC Facial Tracker] Please check or install SR_Runtime. Maybe your HMD does not support HTC Facial Tracker.\n");
+                    Debug.LogError(
+                        "[HTC Facial Tracker] Please check or install SR_Runtime. Maybe your HMD does not support HTC Facial Tracker.\n");
                     gameObject.GetComponent<SRanipal_Lip_Framework>().enabled = false;
                 }
             }
@@ -466,7 +493,9 @@ namespace SEE.Game.Avatars
                 Debug.Log("[HTC Facial Tracker] Initialisation complete.\n");
             }
         }
+#endif
 
+#if INCLUDE_STEAM_VR
         /// <summary>
         /// Turns off VR controller hints if <see cref="ShowControllerHints"/> is <c>false</c>.
         /// </summary>
@@ -497,6 +526,7 @@ namespace SEE.Game.Avatars
                 }
             }
         }
+#endif
 
         /// <summary>
         /// Prepares the avatar for a desktop environment by adding a DesktopPlayer prefab
@@ -508,7 +538,8 @@ namespace SEE.Game.Avatars
             GameObject desktopPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/DesktopPlayer");
             desktopPlayer.name = PlayerInputType.DesktopPlayer.ToString();
             desktopPlayer.transform.SetParent(gameObject.transform);
-            desktopPlayer.transform.localPosition = new Vector3(0, DesktopAvatarHeight() - PlayerTopToEyeDistance, 0.3f);
+            desktopPlayer.transform.localPosition =
+                new Vector3(0, DesktopAvatarHeight() - PlayerTopToEyeDistance, 0.3f);
             desktopPlayer.transform.localRotation = Quaternion.Euler(30, 0, 0);
 
             if (gameObject.TryGetComponentOrLog(out AvatarAimingSystem aaSystem))
@@ -517,6 +548,7 @@ namespace SEE.Game.Avatars
                 // we do not turn these on here.
                 aaSystem.enabled = true;
             }
+
             gameObject.AddComponent<DesktopPlayerMovement>();
         }
 

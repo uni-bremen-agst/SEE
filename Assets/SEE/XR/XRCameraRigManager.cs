@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace SEE.XR
 {
+#if INCLUDE_STEAM_VR
     /// <summary>
     /// Enables the two controllers of an XR camera rig when XR is enabled.
     ///
@@ -49,4 +50,5 @@ namespace SEE.XR
             gameObject.SetChildActive(RightControllerName, true);
         }
     }
+#endif
 }

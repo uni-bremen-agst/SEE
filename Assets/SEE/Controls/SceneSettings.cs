@@ -6,8 +6,10 @@ using SEE.Utils;
 using System;
 using DG.Tweening;
 using UnityEngine;
+#if INCLUDE_STEAM_VR
 using Valve.VR;
 using Valve.VR.InteractionSystem;
+#endif
 using Sirenix.OdinInspector;
 using System.IO;
 
