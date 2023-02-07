@@ -39,12 +39,21 @@ jobs:
           lfs: true
       - name: Confirm LFS pull
         run: git lfs pull
-      - name: Run GitScripts checks
-        run: ./GitScripts/run_all
       - name: Remember runner
         id: remember
         # We remember this to make sure all jobs are run on the same machine.
         run: echo "runner=${{ runner.name }}" >> $GITHUB_OUTPUT
+  gitscripts:
+    name: Run GitScript checks
+    runs-on: ${{ needs.setup.outputs.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [self-hosted]
+    needs: [setup]
+    steps:
+      - name: Run GitScripts checks
+        run: ./GitScripts/run_all
   static:
     name: Run static checks
     runs-on: ${{ matrix.os }}
@@ -109,7 +118,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [self-hosted]
-    needs: [setup, static]
+    needs: [setup, gitscripts, static]
     steps:
       - uses: actions/cache@v3
         name: Cache Library
@@ -148,7 +157,7 @@ jobs:
     name: Cleanup
     runs-on: ${{ needs.setup.outputs.runner }}
     if: ${{ always() }}
-    needs: [setup, static, test]
+    needs: [setup, static, gitscripts, test]
     strategy:
       fail-fast: false
       matrix:
