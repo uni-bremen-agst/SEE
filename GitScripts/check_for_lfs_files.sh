@@ -21,9 +21,10 @@ FILE_SIZE="10 * 2^20"  # 10 MB.
 # Maximum allowed total diff size.
 DIFF_SIZE="50 * 2^20"  # 50 MB.
 
-set -e
 
 if [ -n "$CI" ]; then
+
+    set -ex
 
     # Check for non-SEE Assets.
     shopt -s extglob
