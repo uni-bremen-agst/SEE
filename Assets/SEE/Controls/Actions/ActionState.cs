@@ -3,15 +3,15 @@
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Provides user action that depend upon a particular state the user can be in. 
+    /// Provides user action that depend upon a particular state the user can be in.
     /// A user state determines what kinds of actions are triggered for a given
     /// interaction.
     /// </summary>
     [Obsolete("This class will disappear soon.")]
     public static class ActionState
     {
-        private static ActionStateType value = ActionStateType.Move;
-        
+        private static ActionStateType value = ActionStateTypes.Move;
+
         /// <summary>
         /// The type of the state-based action. Upon changing this type,
         /// the event <see cref="OnStateChangedFn"/> will be triggered with
