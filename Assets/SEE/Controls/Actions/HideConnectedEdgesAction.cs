@@ -41,7 +41,7 @@ namespace SEE.Controls.Actions
 
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.HideConnectedEdges;
+            return ActionStateTypes.HideConnectedEdges;
         }
 
         public override bool Update()
@@ -50,13 +50,13 @@ namespace SEE.Controls.Actions
             if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
             {
-                // the hit object is the one whose connected 
+                // the hit object is the one whose connected
                 selectedNode = raycastHit.collider.gameObject;
                 HideAllConnectedEdges(selectedNode);
                 // TODO: new HideNetAction(selectedNode.name).Execute();
                 currentState = ReversibleAction.Progress.Completed;
                 AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
-                return true; 
+                return true;
             }
             else
             {

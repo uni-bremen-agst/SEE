@@ -10,7 +10,7 @@ namespace SEE.Controls.Actions
             bool completed = false;
             return completed;
         }
-        
+
         public override HashSet<string> GetChangedObjects()
         {
             throw new System.NotImplementedException();
@@ -18,7 +18,7 @@ namespace SEE.Controls.Actions
 
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.MetricBoard;
+            return ActionStateTypes.MetricBoard;
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace SEE.Controls.Actions
         {
             return new MetricBoardAction();
         }
-        
+
         /// <summary>
         /// Returns a new instance of <see cref="MetricBoardAction"/>.
         /// </summary>

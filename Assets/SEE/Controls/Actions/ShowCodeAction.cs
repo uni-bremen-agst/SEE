@@ -32,7 +32,7 @@ namespace SEE.Controls.Actions
             // Changes to the window space are handled and synced by us separately, so we won't include them here.
             return new HashSet<string>();
         }
-        public override ActionStateType GetActionStateType() => ActionStateType.ShowCode;
+        public override ActionStateType GetActionStateType() => ActionStateTypes.ShowCode;
 
         /// <summary>
         /// Returns a new instance of <see cref="ShowCodeAction"/>.

@@ -34,55 +34,11 @@ namespace SEE.GO.Menu
         /// <returns>the newly created mode menu component.</returns>
         private static SelectionMenu CreateModeMenu(GameObject attachTo = null)
         {
-
             // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
             GameObject modeMenuGO = attachTo ? attachTo : new GameObject {name = "Mode Menu"};
 
-            // IMPORTANT NOTE: Because an ActionStateType value will be used as an index into
-            // the following field of menu entries, the rank of an entry in this field of entry
-            // must correspond to the ActionStateType value. If this is not the case, we will
-            // run into an endless recursion.
-
-            //List<ToggleMenuEntry> entries = new List<ToggleMenuEntry>();
-            //bool first = true;
-            //foreach (ActionStateType type in ActionStateType.AllTypes)
-            //{
-            //    UnityAction entryAction = () => GlobalActionHistory.Execute(type);
-            //    UnityAction exitAction = null;
-
-            //    //FIXME This is a bad hack and should be replaced with something proper for non-reversible actions.
-            //    // This currently just attaches the ShowCodeAction to the menu and registers entry/exitActions which
-            //    // will enable/disable the component. It should be replaced with something more generalizable.
-            //    // The current behavior also has a bug which doesn't properly leave an action when switching
-            //    // to the code action.
-            //    if (Equals(type, ActionStateType.ShowCode))
-            //    {
-            //        // Attach ShowCodeAction
-            //        ShowCodeAction action = modeMenuGO.AddComponent<ShowCodeAction>();
-            //        entryAction = () => action.enabled = true;
-            //        exitAction = () => action.enabled = false;
-            //        action.enabled = false;
-            //    }
-
-            //    entries.Add(new ToggleMenuEntry(active: first,
-            //                                    entryAction: entryAction,
-            //                                    exitAction: exitAction,
-            //                                    title: type.Name,
-            //                                    description: type.Description,
-            //                                    entryColor: type.Color,
-            //                                    icon: Resources.Load<Sprite>(type.IconPath)));
-            //    if (first)
-            //    {
-            //        GlobalActionHistory.Execute(type);
-            //        first = false;
-            //    }
-            //}
-
-            // Debug.Log($"{ActionStateType.Move.Name}\n");
             ActionStateType firstType = ActionStateTypes.FirstActionStateType();
-            IEnumerable<ToggleMenuEntry> entries = MenuEntries(ActionStateTypes.AllTypes);
-
-            //.Select(ToModeMenuEntry).ToList();
+            IEnumerable<ToggleMenuEntry> entries = MenuEntries(ActionStateTypes.AllRootTypes);
 
             // Initial state will be the first action state type
             GlobalActionHistory.Execute(firstType);
@@ -96,65 +52,61 @@ namespace SEE.GO.Menu
 
             #region Local Functions
 
-            // Constructs a toggle menu entry for the mode menu from the given action state type.
-            ToggleMenuEntry ToModeMenuEntry(ActionStateType type)
-            {
-                return new ToggleMenuEntry(active: Equals(type, firstType),
-                                    entryAction: () => GlobalActionHistory.Execute(type), exitAction: null,
-                                    title: type.Name, description: type.Description, entryColor: type.Color,
-                                    icon: Resources.Load<Sprite>(type.IconPath));
-            }
-
-            IEnumerable<ToggleMenuEntry> MenuEntries(List<AbstractActionStateType> allTypes)
+            IEnumerable<ToggleMenuEntry> MenuEntries(Forrest<AbstractActionStateType> allTypes)
             {
                 List<ToggleMenuEntry> result = new();
-                foreach (AbstractActionStateType action in allTypes)
+                Dictionary<ActionStateTypeGroup, NestedMenuEntry<MenuEntry>> toNestedMenuEntry = new();
+                allTypes.PreorderTraverse(Visit);
+                return result;
+
+                bool Visit(AbstractActionStateType child, AbstractActionStateType parent)
                 {
-                    if (action.Parent == null)
+                    MenuEntry entry;
+
+                    if (child is ActionStateType actionStateType)
                     {
-                        Debug.Log($"Root: {action.Name}\n");
-                        // Root action
-                        if (action is ActionStateType type)
+                        ToggleMenuEntry toggleEntry = new (active: Equals(actionStateType, firstType),
+                                                           entryAction: () => GlobalActionHistory.Execute(actionStateType),
+                                                           exitAction: null,
+                                                           title: actionStateType.Name,
+                                                           description: actionStateType.Description,
+                                                           entryColor: actionStateType.Color,
+                                                           icon: Resources.Load<Sprite>(actionStateType.IconPath));
+                        // Only ToggleMenuEntries are added to result.
+                        result.Add(toggleEntry);
+                        entry = toggleEntry;
+                    }
+                    else if (child is ActionStateTypeGroup actionStateTypeGroup)
+                    {
+                        NestedMenuEntry<MenuEntry> nestedMenuEntry = new (innerEntries: new List<MenuEntry>(),
+                                                                          title: actionStateTypeGroup.Name,
+                                                                          description: actionStateTypeGroup.Description,
+                                                                          entryColor: actionStateTypeGroup.Color,
+                                                                          enabled: Equals(actionStateTypeGroup, firstType),
+                                                                          icon: Resources.Load<Sprite>(actionStateTypeGroup.IconPath));
+                        toNestedMenuEntry[actionStateTypeGroup] = nestedMenuEntry;
+                        entry = nestedMenuEntry;
+                    }
+                    else
+                    {
+                        throw new System.NotImplementedException($"{nameof(child)} not handled.");
+                    }
+
+                    if (parent != null)
+                    {
+                        if (parent is ActionStateTypeGroup parentGroup)
                         {
-                            Debug.Log($"Added as toggle: {action.Name}\n");
-                            result.Add(new ToggleMenuEntry(active: Equals(type, firstType),
-                                                           entryAction: () => GlobalActionHistory.Execute(type), exitAction: null,
-                                                           title: type.Name, description: type.Description, entryColor: type.Color,
-                                                           icon: Resources.Load<Sprite>(type.IconPath)));
+                            toNestedMenuEntry[parentGroup].InnerEntries.Add(entry);
+                        }
+                        else
+                        {
+                            throw new System.InvalidCastException($"parent is expected to be a {nameof(ActionStateTypeGroup)}.");
                         }
                     }
+                    return true;
                 }
-                return result;
-            //      {
-            //         new MenuEntry(action: () => Debug.Log("Option 1"),
-            //                  title: "Option 1",
-            //                  description: "Select option 1",
-            //                  entryColor: Color.red,
-            //                  enabled: true,
-            //                  icon: null),
-            //         new NestedMenuEntry<MenuEntry>(innerEntries: new List<MenuEntry>()
-            //                                          {
-            //                                             new MenuEntry(action: () => Debug.Log("Option 2a"),
-            //                                                           title: "Option 2a",
-            //                                                           description: "Select option 2a",
-            //                                                           entryColor: Color.green,
-            //                                                           enabled: true,
-            //                                                           icon: null),
-            //                                             new MenuEntry(action: () => Debug.Log("Option 2b"),
-            //                                                           title: "Option 2b",
-            //                                                           description: "Select option 2b",
-            //                                                           entryColor: Color.green,
-            //                                                           enabled: true,
-            //                                                           icon: null)
-            //                                          },
-            //                        title: "Sub menu",
-            //                        description: "open subselection 2",
-            //                        entryColor: Color.red,
-            //                        enabled: true,
-            //                        icon: null)
-            //};
-
             }
+
             #endregion
         }
 
@@ -195,16 +147,6 @@ namespace SEE.GO.Menu
         /// </summary>
         private void Update()
         {
-            // Select action state via numbers on the keyboard
-            for (int i = 0; i < ModeMenu.Entries.Count; i++)
-            {
-                if (SEEInput.DigitKeyPressed(i))
-                {
-                    ModeMenu.SelectEntry(i);
-                    break;
-                }
-            }
-
             if (SEEInput.ToggleMenu())
             {
                 ModeMenu.ToggleMenu();

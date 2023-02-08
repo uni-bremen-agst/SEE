@@ -33,7 +33,7 @@ namespace SEE.Game.UI.HolisticMetrics
         {
             menu = CreateMenu();
         }
-        
+
         /// <summary>
         /// In every Update step, we want to check whether the player has pressed the key for toggling the holistic
         /// metrics menu. In that case, we toggle the menu - but only if the <see cref="ActionStateType.MetricBoard"/>
@@ -42,12 +42,12 @@ namespace SEE.Game.UI.HolisticMetrics
         /// </summary>
         private void Update()
         {
-            if (SEEInput.ToggleHolisticMetricsMenu() 
-                && GlobalActionHistory.Current().Equals(ActionStateType.MetricBoard))
+            if (SEEInput.ToggleHolisticMetricsMenu()
+                && GlobalActionHistory.Current().Equals(ActionStateTypes.MetricBoard))
             {
                 menu.ToggleMenu();
             }
-            else if (menu.MenuShown && GlobalActionHistory.Current().Equals(ActionStateType.MetricBoard))
+            else if (menu.MenuShown && GlobalActionHistory.Current().Equals(ActionStateTypes.MetricBoard))
             {
                 menu.ShowMenu(false);
             }
@@ -149,7 +149,7 @@ namespace SEE.Game.UI.HolisticMetrics
             menu.ToggleMenu();
             HolisticMetricsActionHistory.Redo();
         }
-        
+
         /// <summary>
         /// This method reverts the last holistic metrics action and closes the menu.
         /// </summary>
@@ -158,7 +158,7 @@ namespace SEE.Game.UI.HolisticMetrics
             menu.ToggleMenu();
             HolisticMetricsActionHistory.Undo();
         }
-        
+
         /// <summary>
         /// This method gets called when the player clicks on the "New board" button. It will close the menu and open
         /// the dialog for adding a new board to the scene.
@@ -168,7 +168,7 @@ namespace SEE.Game.UI.HolisticMetrics
             menu.ToggleMenu();
             new AddBoardDialog().Open();
         }
-        
+
         /// <summary>
         /// This method gets called when the player clicks on the "Move boards" button. If there are any boards in the
         /// scene, it will toggle the moving option for the boards which means that there will be orange buttons under
@@ -186,7 +186,7 @@ namespace SEE.Game.UI.HolisticMetrics
                     ShowNotification.Info(
                         "Move the boards around as desired",
                         "Click the button under a board to move that board around. Don't forget to " +
-                        " deactivate this mode when done.");   
+                        " deactivate this mode when done.");
                 }
             }
             else
@@ -217,7 +217,7 @@ namespace SEE.Game.UI.HolisticMetrics
                     "There are no metrics boards in the scene");
             }
         }
-        
+
         /// <summary>
         /// This method will be called when the player clicks on the "Add widget" button. It will check whether there
         /// are any metrics boards in the scene. If so, then it will show the dialog for adding a new widget to a board.
@@ -312,7 +312,7 @@ namespace SEE.Game.UI.HolisticMetrics
         private void LoadBoardConfiguration()
         {
             menu.ToggleMenu();
-            
+
             if (ConfigManager.GetSavedFileNames().Any())
             {
                 new LoadBoardConfigurationDialog().Open();
