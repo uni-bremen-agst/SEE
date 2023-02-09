@@ -50,20 +50,22 @@ namespace SEE.UI
             Color color = Color.blue;
 
             return new List<ToggleMenuEntry>
-                    { new(active: false,
-                          entryAction: StartHost,
-                          exitAction: null,
-                          title: "Host",
-                          description: "Starts a server and local client process.",
-                          entryColor: NextColor(),
-                          icon: Resources.Load<Sprite>("Icons/Host")),
-                      new(active: false,
-                          entryAction: StartClient,
-                          exitAction: null,
-                          title: "Client",
-                          description: "Starts a local client connection to a server.",
-                          entryColor: NextColor(),
-                          icon: Resources.Load<Sprite>("Icons/Client")),
+            {
+                new(active: false,
+                    entryAction: StartHost,
+                    exitAction: null,
+                    title: "Host",
+                    description: "Starts a server and local client process.",
+                    entryColor: NextColor(),
+                    icon: Resources.Load<Sprite>("Icons/Host")),
+                new(active: false,
+                    entryAction: StartClient,
+                    exitAction: null,
+                    title: "Client",
+                    description: "Starts a local client connection to a server.",
+                    entryColor: NextColor(),
+                    icon: Resources.Load<Sprite>("Icons/Client")),
+#if INCLUDE_STEAM_VR
                       new(active: false,
                           entryAction: ToggleEnvironment,
                           exitAction: null,
@@ -71,22 +73,23 @@ namespace SEE.UI
                           description: "Toggles between desktop and VR hardware.",
                           entryColor: NextColor(),
                           icon: Resources.Load<Sprite>("Icons/Client")),
+#endif
 
-                      // FIXME: Running only a server is currently not working.
-                      //new ToggleMenuEntry(active: false,
-                      //                    entryAction: StartServer,
-                      //                    exitAction: null,
-                      //                    title: "Server",
-                      //                    description: "Starts a dedicated server without local client.",
-                      //                    entryColor: NextColor(),
-                      //                    icon: Resources.Load<Sprite>("Icons/Server")),
-                      new(active: false,
-                          entryAction: Settings,
-                          exitAction: null,
-                          title: "Settings",
-                          description: "Allows to set additional network settings.",
-                          entryColor: Color.gray,
-                          icon: Resources.Load<Sprite>("Icons/Settings")),
+                // FIXME: Running only a server is currently not working.
+                //new ToggleMenuEntry(active: false,
+                //                    entryAction: StartServer,
+                //                    exitAction: null,
+                //                    title: "Server",
+                //                    description: "Starts a dedicated server without local client.",
+                //                    entryColor: NextColor(),
+                //                    icon: Resources.Load<Sprite>("Icons/Server")),
+                new(active: false,
+                    entryAction: Settings,
+                    exitAction: null,
+                    title: "Settings",
+                    description: "Allows to set additional network settings.",
+                    entryColor: Color.gray,
+                    icon: Resources.Load<Sprite>("Icons/Settings")),
             };
 
             Color NextColor()
@@ -243,7 +246,7 @@ namespace SEE.UI
         /// The currently selected player input type.
         /// </summary>
         private PlayerInputType inputType;
-
+#if INCLUDE_STEAM_VR
         /// <summary>
         /// Toggles <see cref="inputType"/> between <see cref="PlayerInputType.VRPlayer"/>
         /// and <see cref="PlayerInputType.DesktopPlayer"/>. The resulting value is saved.
@@ -258,9 +261,11 @@ namespace SEE.UI
             {
                 inputType = PlayerInputType.DesktopPlayer;
             }
+
             SceneSettings.Save();
             ShowEnvironment();
         }
+#endif
 
         /// <summary>
         /// Notifies the user via <see cref="ShowNotification.Info(string, string, float, bool)"/>
