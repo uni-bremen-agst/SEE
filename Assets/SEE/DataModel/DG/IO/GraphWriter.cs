@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Xml;
+using Joveler.Compression.XZ;
+using SEE.Utils;
 using UnityEngine;
+using Stream = System.IO.Stream;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -28,19 +32,50 @@ namespace SEE.DataModel.DG.IO
             AppendDOCType(doc);
             XmlElement gxl = AppendGXL(doc);
             XmlElement graphNode = AppendGraph(doc, gxl, graph);
-            Dictionary<string, string> nodeIDs_To_GXLids = AppendNodes(doc, graphNode, graph);
-            AppendDependencyEdges(doc, graphNode, graph, nodeIDs_To_GXLids);
+            Dictionary<string, string> nodeIDsToGxlIds = AppendNodes(doc, graphNode, graph);
+            AppendDependencyEdges(doc, graphNode, graph, nodeIDsToGxlIds);
             int hierarchicalEdgeCount = 1;
-            AppendChildren(doc, graphNode, graph, nodeIDs_To_GXLids, hierarchicalEdgeType, ref hierarchicalEdgeCount);
+            AppendChildren(doc, graphNode, graph, nodeIDsToGxlIds, hierarchicalEdgeType, ref hierarchicalEdgeCount);
             try
             {
-                doc.Save(filename);
+                WriteFile(filename, doc);
             }
             catch (Exception e)
             {
-                Debug.LogErrorFormat("Could not save graph to GXL file '{0}' due to: {1}.\n", filename, e.Message);
+                Debug.LogErrorFormat($"Could not save graph to GXL file '{filename}' due to: {e.Message}.\n");
                 throw;
             }
+            Debug.Log($"Successfully saved graph to file '{filename}'!");
+        }
+
+        /// <summary>
+        /// Writes the GXL file represented by <paramref name="doc"/> to the file with
+        /// the given <paramref name="filename"/>.
+        /// Note that this may compress the file via LZMA, depending on the extension indicated
+        /// by <paramref name="filename"/>.
+        /// </summary>
+        /// <param name="filename">Name of the file to save to</param>
+        /// <param name="doc">GXL content to save</param>
+        private static void WriteFile(string filename, XmlDocument doc)
+        {
+            // Transfer XMLDocument to a stream.
+            using Stream source = new MemoryStream();
+            doc.Save(source);
+            source.Flush();
+            source.Position = 0;
+
+            Stream fileStream = new FileStream(filename, FileMode.Create);
+            if (filename.ToLower().EndsWith(Filenames.CompressedGXLExtension))
+            {
+                // Compress to XZ, if necessary.
+                XZCompressOptions options = new()
+                {
+                    LeaveOpen = false
+                };
+                fileStream = new XZStream(fileStream, options);
+            }
+            source.CopyTo(fileStream);
+            fileStream.Close();
         }
 
         /// <summary>

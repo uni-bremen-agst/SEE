@@ -64,7 +64,10 @@ namespace SEE.DataModel.DG.IO
             if (filename.ToLower().EndsWith(Filenames.CompressedGXLExtension))
             {
                 // Handle compressed LZMA2 file.
-                XZDecompressOptions options = new();  // default settings are fine
+                XZDecompressOptions options = new()
+                {
+                    LeaveOpen = false
+                };
                 return new XZStream(stream, options);
             }
             else
