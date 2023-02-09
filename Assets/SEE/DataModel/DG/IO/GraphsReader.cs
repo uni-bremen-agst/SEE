@@ -34,7 +34,7 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Contains all loaded graphs after calling Load().
         /// </summary>
-        public readonly List<Graph> graphs = new List<Graph>();
+        public readonly List<Graph> graphs = new();
 
         /// <summary>
         /// Loads all GXL and their associated CSV files (limited to <paramref name="maxRevisionsToLoad"/> many
@@ -54,23 +54,23 @@ namespace SEE.DataModel.DG.IO
         /// <param name="maxRevisionsToLoad">the upper limit of files to be loaded</param>
         public void Load(string directory, HashSet<string> hierarchicalEdgeTypes, string basePath, string rootName, int maxRevisionsToLoad)
         {
-            IEnumerable<string> sortedGraphNames = Filenames.GXLFilenames(directory);
-            if (sortedGraphNames.Count<string>() == 0)
+            IEnumerable<string> sortedGraphNames = Filenames.GXLFilenames(directory).ToList();
+            if (!sortedGraphNames.Any())
             {
-                throw new Exception("Directory '" + directory + "' has no GXL files.");
+                throw new Exception($"Directory '{directory}' has no GXL files.");
             }
             graphs.Clear();
 
-            Performance p = Performance.Begin("Loading GXL files from " + directory);
+            Performance p = Performance.Begin($"Loading GXL files from {directory}");
             // for all found GXL files load and save the graph data
             foreach (string gxlPath in sortedGraphNames)
             {
                 // load graph (we can safely assume that the file exists because we retrieved its
                 // name just from the directory
-                GraphReader graphCreator = new GraphReader(gxlPath, hierarchicalEdgeTypes,
-                                                           basePath: basePath,
-                                                           rootID: rootName,
-                                                           logger: new SEELogger());
+                GraphReader graphCreator = new(gxlPath, hierarchicalEdgeTypes,
+                                               basePath: basePath,
+                                               rootID: rootName,
+                                               logger: new SEELogger());
                 graphCreator.Load();
                 Graph graph = graphCreator.GetGraph();
 
