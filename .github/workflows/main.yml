@@ -37,6 +37,7 @@ jobs:
         name: Checkout Repository
         with:
           lfs: true
+          fetch-depth: 0
       - name: Confirm LFS pull
         run: git lfs pull
       - name: Remember runner
