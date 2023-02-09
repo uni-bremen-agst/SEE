@@ -5,9 +5,17 @@ using System.Xml;
 
 namespace SEE.Utils
 {
+    /// <summary>
+    /// Class responsible for parsing GXL files.
+    /// </summary>
     public class GXLParser : IDisposable
     {
-        public GXLParser(string filename, SEE.Utils.ILogger logger = null)
+        /// <summary>
+        /// Creates a new GXL Parser for the given <paramref name="filename"/>.
+        /// </summary>
+        /// <param name="filename">Name of the GXL file which shall be parsed</param>
+        /// <param name="logger">Logger to use for log messages</param>
+        protected GXLParser(string filename, ILogger logger = null)
         {
             this.filename = filename;
             this.logger = logger;
@@ -17,6 +25,9 @@ namespace SEE.Utils
             };
         }
 
+        /// <summary>
+        /// State the parser can be in.
+        /// </summary>
         protected enum State
         {
             undefined = 0,
@@ -32,78 +43,76 @@ namespace SEE.Utils
             inEnum = 10 // toggle attributes are represented as <enum/> and nothing else
         }
 
+        /// <summary>
+        /// Converts the given <paramref name="state"/> to a string.
+        /// </summary>
+        /// <param name="state">State to convert to a string</param>
+        /// <returns>Name of the given state</returns>
         protected static string ToString(State state)
         {
-            switch (state)
+            return state switch
             {
-                case State.undefined: return "undefined";
-                case State.inGXL: return "gxl";
-                case State.inGraph: return "graph";
-                case State.inNode: return "node";
-                case State.inEdge: return "edge";
-                case State.inType: return "type";
-                case State.inAttr: return "attr";
-                case State.inString: return "string";
-                case State.inFloat: return "float";
-                case State.inInt: return "int";
-                case State.inEnum: return "enum";
-                default: throw new NotImplementedException();
-            }
+                State.undefined => "undefined",
+                State.inGXL => "gxl",
+                State.inGraph => "graph",
+                State.inNode => "node",
+                State.inEdge => "edge",
+                State.inType => "type",
+                State.inAttr => "attr",
+                State.inString => "string",
+                State.inFloat => "float",
+                State.inInt => "int",
+                State.inEnum => "enum",
+                _ => throw new NotImplementedException()
+            };
         }
 
+        /// <summary>
+        /// Converts the given <paramref name="name"/> to a <see cref="State"/>.
+        /// </summary>
+        /// <param name="name">Name of the State.</param>
+        /// <returns>State corresponding to given state, or <c>undefined</c> if name is unknown.</returns>
         protected static State ToState(string name)
         {
-            if (name == "gxl")
+            return name switch
             {
-                return State.inGXL;
-            }
-            else if (name == "graph")
-            {
-                return State.inGraph;
-            }
-            else if (name == "node")
-            {
-                return State.inNode;
-            }
-            else if (name == "edge")
-            {
-                return State.inEdge;
-            }
-            else if (name == "type")
-            {
-                return State.inType;
-            }
-            else if (name == "attr")
-            {
-                return State.inAttr;
-            }
-            else if (name == "string")
-            {
-                return State.inString;
-            }
-            else if (name == "int")
-            {
-                return State.inInt;
-            }
-            else if (name == "float")
-            {
-                return State.inFloat;
-            }
-            else if (name == "enum")
-            {
-                return State.inEnum;
-            }
-            else
-            {
-                return State.undefined;
-            }
+                "gxl" => State.inGXL,
+                "graph" => State.inGraph,
+                "node" => State.inNode,
+                "edge" => State.inEdge,
+                "type" => State.inType,
+                "attr" => State.inAttr,
+                "string" => State.inString,
+                "int" => State.inInt,
+                "float" => State.inFloat,
+                "enum" => State.inEnum,
+                _ => State.undefined
+            };
         }
 
-        protected Stack<State> context = new Stack<State>();
+        /// <summary>
+        /// Stack storing the context of the parser.
+        /// </summary>
+        protected Stack<State> context = new();
+        
+        /// <summary>
+        /// Name of the GXL file.
+        /// </summary>
         protected string filename;
+        
+        /// <summary>
+        /// Reader responsible for parsing XML.
+        /// </summary>
         protected XmlReader reader;
-        protected SEE.Utils.ILogger logger = null;
+        
+        /// <summary>
+        /// Logger responsible for log messages.
+        /// </summary>
+        protected ILogger logger;
 
+        /// <summary>
+        /// Exception indicating that a syntax error within the GXL file has occurred.
+        /// </summary>
         [Serializable]
         public class SyntaxError : Exception
         {
@@ -122,42 +131,55 @@ namespace SEE.Utils
             }
         }
 
+        /// <summary>
+        /// Logs the given <paramref name="message"/> as a debug message using <see cref="logger"/>.
+        /// </summary>
+        /// <param name="message">The message to log</param>
         protected virtual void LogDebug(string message)
         {
-            if (logger != null)
-            {
-                logger.LogDebug(message);
-            }
+            logger?.LogDebug(message);
         }
 
+        /// <summary>
+        /// Logs the given <paramref name="message"/> as an error message using <see cref="logger"/>.
+        /// </summary>
+        /// <param name="message">The message to log</param>
         protected virtual void LogError(string message)
         {
             if (logger != null)
             {
                 IXmlLineInfo xmlInfo = (IXmlLineInfo) reader;
                 int lineNumber = xmlInfo.LineNumber - 1;
-                logger.LogError(filename + ":" + lineNumber + ": " + message + "\n");
+                logger.LogError($"{filename}:{lineNumber}: {message}\n");
             }
         }
 
-        private void Expected()
+        /// <summary>
+        /// Ensures the actual closing tag corresponds to the expected closing tag.
+        /// </summary>
+        /// <exception cref="SyntaxError">If the opening and closing tags are mismatched</exception>
+        private void EnsureExpectedEndTag()
         {
             State actual = ToState(reader.Name);
             State expected = context.Pop();
 
             if (actual != expected)
             {
-                LogError("syntax error: <\\" + ToString(expected) + "> expected. Actual: " + reader.Name);
-                throw new SyntaxError("mismatched tags");
+                // TODO: Is logging this really necessary, as we throw an exception already?
+                LogError($"syntax error: </{ToString(expected)}> expected. Actual: {reader.Name}");
+                throw new SyntaxError($"Mismatched Tags: </{ToString(expected)}> expected. Actual: {reader.Name}");
             }
         }
 
+        /// <summary>
+        /// Loads the GXL file and parses it.
+        /// </summary>
         public virtual void Load()
         {
             // Preserves the last text content of an XML node seen,
             // e.g., "mystring" in <string>mystring</string>.
             // Defined only at the EndElement, e.g. </string> here.
-            string lastText = "";
+            string lastText = string.Empty;
 
             try
             {
@@ -190,10 +212,10 @@ namespace SEE.Utils
                                     case State.inEdge: StartEdge(); break;
                                     case State.inType: StartType(); break;
                                     case State.inAttr: StartAttr(); break;
-                                    case State.inString: lastText = ""; StartString(); break;
-                                    case State.inFloat: lastText = ""; StartFloat(); break;
-                                    case State.inInt: lastText = ""; StartInt(); break;
-                                    case State.inEnum: lastText = ""; StartEnum(); break;
+                                    case State.inString: lastText = string.Empty; StartString(); break;
+                                    case State.inFloat: lastText = string.Empty; StartFloat(); break;
+                                    case State.inInt: lastText = string.Empty; StartInt(); break;
+                                    case State.inEnum: lastText = string.Empty; StartEnum(); break;
                                     default:
                                         throw new NotImplementedException();
                                 }
@@ -205,7 +227,7 @@ namespace SEE.Utils
                             break;
                         case XmlNodeType.EndElement:
                             // An end element tag (for example, </item> ).
-                            Expected();
+                            EnsureExpectedEndTag();
                             switch (ToState(reader.Name))
                             {
                                 case State.undefined: EndUndefined(); break;
@@ -218,7 +240,7 @@ namespace SEE.Utils
                                 case State.inString: EndString(lastText); break;
                                 case State.inFloat:
                                     {
-                                        if (lastText == "")
+                                        if (lastText == string.Empty)
                                         {
                                             LogError("Float value is expected here.");
                                             throw new SyntaxError("Missing float value.");
@@ -228,16 +250,16 @@ namespace SEE.Utils
                                             float value = float.Parse(lastText, CultureInfo.InvariantCulture.NumberFormat);
                                             EndFloat(value);
                                         }
-                                        catch (Exception e)
+                                        catch (FormatException e)
                                         {
-                                            LogError(lastText + " is no float value.");
-                                            throw new SyntaxError("'" + lastText + "' is no float value: " + e.ToString());
+                                            LogError($"{lastText} is no float value.");
+                                            throw new SyntaxError($"'{lastText}' is no float value: {e}");
                                         }
                                     }
                                     break;
                                 case State.inInt:
                                     {
-                                        if (lastText == "")
+                                        if (lastText == string.Empty)
                                         {
                                             LogError("Int value is expected here.");
                                             throw new SyntaxError("Missing int value.");
@@ -247,10 +269,10 @@ namespace SEE.Utils
                                             int value = int.Parse(lastText, CultureInfo.InvariantCulture.NumberFormat);
                                             EndInt(value);
                                         }
-                                        catch (Exception e)
+                                        catch (FormatException e)
                                         {
-                                            LogError(lastText + " is no int value.");
-                                            throw new SyntaxError("'" + lastText + "' is no int value: " + e.ToString());
+                                            LogError($"{lastText} is no int value.");
+                                            throw new SyntaxError($"'{lastText}' is no int value: {e}");
                                         }
                                     }
                                     break;
@@ -310,18 +332,14 @@ namespace SEE.Utils
                     }
                 }
             }
-            catch (Exception e)
-            {
-                LogError($"Problem in parsing {filename}: {e.Message}");
-            }
             finally
             {
                 reader.Close();
             }
             if (context.Count > 0)
             {
-                LogError("XML parser is still expecting input in state " + context.Peek());
-                throw new SyntaxError("missing closing " + ToString(context.Peek()) + " tag");
+                LogError($"XML parser is still expecting input in state {context.Peek()}");
+                throw new SyntaxError($"missing closing {ToString(context.Peek())} tag");
             }
         }
 
@@ -414,7 +432,7 @@ namespace SEE.Utils
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls of Dispose(bool).
+        private bool disposedValue; // To detect redundant calls of Dispose(bool).
 
         protected virtual void Dispose(bool disposing)
         {
@@ -430,7 +448,7 @@ namespace SEE.Utils
                     }
                 }
 
-                // release unmanaged ressources (requires to override the Finalizer below)
+                // release unmanaged resources (required to override the Finalizer below)
                 // there are none here
 
                 // set larger attributes to null
@@ -438,7 +456,7 @@ namespace SEE.Utils
                 logger = null;
                 filename = null;
 
-                // this object is now considerd disposed
+                // this object is now considered disposed
                 disposedValue = true;
             }
         }
@@ -447,14 +465,14 @@ namespace SEE.Utils
         // unmanaged resources
         //~GXLParser()
         //{
-        //    // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
+        //    // Do not change this code. Add clean up code to Dispose(bool disposing) above.
         //    Dispose(false);
         //}
 
         // Required to implement the Dispose pattern correctly.
         public void Dispose()
         {
-            // All code for releasing ressources should be added to Dispose(bool).
+            // All code for releasing resources should be added to Dispose(bool).
             Dispose(true);
             // Comment out this code when the Finalizer ~GXLParser() is overridden.
             //GC.SuppressFinalize(this);
