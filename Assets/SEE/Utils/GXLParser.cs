@@ -19,10 +19,16 @@ namespace SEE.Utils
         {
             this.filename = filename;
             this.logger = logger;
-            reader = new XmlTextReader(filename)
+            XmlReaderSettings settings = new()
             {
-                WhitespaceHandling = WhitespaceHandling.None
+                CloseInput = true,
+                IgnoreWhitespace = true,
+                IgnoreComments = true,
+                // TODO: Apparently enabling the below has security implications due to the URL being resolved.
+                //       (has been enabled before changes for issue #539).
+                DtdProcessing = DtdProcessing.Parse
             };
+            reader = XmlReader.Create(filename, settings);
         }
 
         /// <summary>
