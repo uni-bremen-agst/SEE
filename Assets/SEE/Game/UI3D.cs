@@ -100,11 +100,11 @@ namespace SEE.Game.UI3D
             c.focusses = new List<InteractableObject>();
 
             GameObject outlineGameObject = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            Destroy(outlineGameObject.GetComponent<MeshCollider>());
+            Destroyer.Destroy(outlineGameObject.GetComponent<MeshCollider>());
             outlineGameObject.transform.parent = go.transform;
             outlineGameObject.transform.localPosition = Vector3.zero;
             outlineGameObject.transform.localScale = Vector3.one;
-            Material outlineMaterial = new Material(Shader.Find(OutlineShaderName));
+            Material outlineMaterial = new(Shader.Find(OutlineShaderName));
             outlineMaterial.SetTexture("_MainTex", TextureGenerator.CreateCircleOutlineTextureR8(32, 31, 1.0f, 0.0f));
             outlineMaterial.SetColor("_Color", UI3DProperties.DefaultColor);
             outlineGameObject.GetComponent<MeshRenderer>().sharedMaterial = outlineMaterial;
@@ -531,7 +531,7 @@ namespace SEE.Game.UI3D
         internal static RotateGizmo Create(int textureResolution)
         {
             GameObject go = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            Destroy(go.GetComponent<MeshCollider>());
+            Destroyer.Destroy(go.GetComponent<MeshCollider>());
             go.name = "RotatePivot";
             go.transform.rotation = Quaternion.Euler(90.0f, 0.0f, 0.0f);
             go.transform.position = Vector3.zero;

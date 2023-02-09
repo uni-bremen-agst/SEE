@@ -20,6 +20,7 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using SEE.Controls;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
@@ -456,7 +457,7 @@ namespace SEE.Game.Charts
             }
             catch
             {
-                Destroy(this);
+                Destroyer.Destroy(this);
             }
         }
 
@@ -472,7 +473,7 @@ namespace SEE.Game.Charts
             }
             catch
             {
-                Destroy(this);
+                Destroyer.Destroy(this);
             }
         }
 

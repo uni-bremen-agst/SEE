@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -33,7 +34,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// A group could, for instance, be shown as a foldout or tab. The exact
         /// visual representation depends on the implementation.
         /// </summary>
-        private readonly List<PropertyGroup> groups = new List<PropertyGroup>();
+        private readonly List<PropertyGroup> groups = new();
 
         /// <summary>
         /// A read-only wrapper around the list of groups for this dialog.
@@ -117,12 +118,12 @@ namespace SEE.Game.UI.PropertyDialog
         /// Event triggered when the user presses the OK button. Clients can
         /// register on this event to receive a notification when this happens.
         /// </summary>
-        public UnityEvent OnConfirm = new UnityEvent();
+        public UnityEvent OnConfirm = new();
         /// <summary>
         /// Event triggered when the user presses the Cancel button. Clients can
         /// register on this event to receive a notification when this happens.
         /// </summary>
-        public UnityEvent OnCancel = new UnityEvent();
+        public UnityEvent OnCancel = new();
 
         /// <summary>
         /// Destroys <see cref="dialog"/>.
@@ -130,7 +131,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         private void OnDestroy()
         {
-            Destroy(dialog);
+            Destroyer.Destroy(dialog);
         }
 
         /// <summary>

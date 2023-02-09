@@ -213,9 +213,10 @@ namespace SEE.Game.City
         /// <see cref="statementCounter"/>, <see cref="nodesGOs"/>, and <see cref="currentGO"/>.
         /// In case of any error, this components disables itself.
         /// </summary>
-        private void Start()
+        protected override void Start()
         {
-            JLGParser jlgParser = new JLGParser(JLGPath.Path);
+            base.Start();
+            JLGParser jlgParser = new(JLGPath.Path);
             parsedJLG = jlgParser.Parse();
 
             if (parsedJLG == null)
@@ -869,7 +870,7 @@ namespace SEE.Game.City
                     if (functionCalls.Count > 0 &&
                         functionCalls.Peek().name.Equals("FunctionCall: " + currentGO.name + " call " + nodeForNextStatement.name))
                     {
-                        Destroy(functionCalls.Pop());
+                        Destroyer.Destroy(functionCalls.Pop());
                     }
                 }
             }
@@ -1173,12 +1174,12 @@ namespace SEE.Game.City
         {
             foreach (GameObject go in textWindows)
             {
-                Destroy(go);
+                Destroyer.Destroy(go);
             }
             textWindows = new Stack<GameObject>();
             foreach (GameObject go in functionCalls)
             {
-                Destroy(go);
+                Destroyer.Destroy(go);
             }
             functionCalls = new Stack<GameObject>();
             statementCounter.Value = 0;

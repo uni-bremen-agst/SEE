@@ -263,7 +263,7 @@ namespace SEE.Game.UI.HelpSystem
 
             if (!helpSystemSpace.TryGetComponentOrLog(out DynamicPanelsCanvas PanelsCanvas))
             {
-                Destroy(this);
+                Destroyer.Destroy(this);
             }
 
             helpSystemEntry.transform.Find("Content/Lower Video/Buttons/Pause")
@@ -306,7 +306,7 @@ namespace SEE.Game.UI.HelpSystem
             videoPlayer?.Stop();
             IsPlaying = false;
             PersonalAssistantBrain.Instance?.Stop();
-            Destroy(helpSystemSpace);
+            Destroyer.Destroy(helpSystemSpace);
             EntryShown = false;
         }
 
@@ -332,36 +332,30 @@ namespace SEE.Game.UI.HelpSystem
                 throw new Exception("No video player found");
             }
             // play the current keyword again
-            if (HelpSystemBuilder.currentEntries.Find(currentHelpEntry).Previous == null)
-            {
-                currentHelpEntry = HelpSystemBuilder.currentEntries.Last.Value;
-            }
-            else
-            {
-                currentHelpEntry = HelpSystemBuilder.currentEntries.Find(currentHelpEntry).Previous.Value;
-            }
+            LinkedListNode<HelpEntry> previous = HelpSystemBuilder.currentEntries.Find(currentHelpEntry)?.Previous;
+            currentHelpEntry = previous == null ? HelpSystemBuilder.currentEntries.Last.Value : previous.Value;
             TextMeshProUGUI tmp = instructionsDisplay.GetComponent<TextMeshProUGUI>();
-            tmp.text = tmp.text.Substring(0, tmp.text.Length - (currentHelpEntry.Text.Length + 1));
+            tmp.text = tmp.text[..^(currentHelpEntry.Text.Length + 1)];
             videoPlayer.time = currentHelpEntry.CumulatedTime;
 
             // play the previous keyword again
             if (videoPlayer.time - 1f < currentHelpEntry.CumulatedTime)
             {
                 string textToBeRemoved;
-                if (HelpSystemBuilder.currentEntries.Find(currentHelpEntry).Previous == null)
+                if (previous == null)
                 {
                     currentHelpEntry = HelpSystemBuilder.currentEntries.Last.Value;
                     textToBeRemoved = currentHelpEntry.Text;
                 }
                 else
                 {
-                    currentHelpEntry = HelpSystemBuilder.currentEntries.Find(currentHelpEntry).Previous.Value;
+                    currentHelpEntry = previous.Value;
                     textToBeRemoved = currentHelpEntry.Text;
                 }
                 try
                 {
                     videoPlayer.time = currentHelpEntry.CumulatedTime;
-                    tmp.text = tmp.text.Substring(0, tmp.text.Length - (textToBeRemoved.Length + 1));
+                    tmp.text = tmp.text[..^(textToBeRemoved.Length + 1)];
                 }
                 catch (ArgumentOutOfRangeException)
                 {
@@ -370,7 +364,7 @@ namespace SEE.Game.UI.HelpSystem
                     {
                         tmp.text += s.Text + "\n";
                     }
-                    tmp.text = tmp.text.Substring(0, tmp.text.Length - (HelpSystemBuilder.currentEntries.Last.Value.Text.Length + 1));
+                    tmp.text = tmp.text[..^(HelpSystemBuilder.currentEntries.Last.Value.Text.Length + 1)];
                 }
             }
         }
@@ -384,7 +378,7 @@ namespace SEE.Game.UI.HelpSystem
             PersonalAssistantBrain.Instance?.Stop();
             videoPlayer?.Stop();
             EntryShown = false;
-            Destroy(helpSystemSpace);
+            Destroyer.Destroy(helpSystemSpace);
         }
 
         /// <summary>

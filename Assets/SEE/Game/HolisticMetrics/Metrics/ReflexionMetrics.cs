@@ -13,7 +13,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
     /// </summary>
     internal class ReflexionMetrics : Metric
     {
-        internal override MetricValue Refresh(SEECity city)
+        internal override MetricValue Refresh(AbstractSEECity city)
         {
             ReflexionGraph graph;
             if (city is SEEReflexionCity reflexionCity)

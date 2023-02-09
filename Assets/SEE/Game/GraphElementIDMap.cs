@@ -25,9 +25,11 @@ namespace SEE.Game
         /// no such game object.
         /// </summary>
         /// <param name="ID">the ID of the game object to be looked up</param>
+        /// <param name="mustFindElement">If true, an exception will be thrown if the element could not be found.
+        /// Otherwise, <c>null</c> will be returned.</param>
         /// <returns>the game object with the given <paramref name="ID"/> or null if there is
         /// no such game object</returns>
-        internal static GameObject Find(string ID)
+        internal static GameObject Find(string ID, bool mustFindElement = false)
         {
             Assert.IsFalse(string.IsNullOrEmpty(ID));
             if (mapping.TryGetValue(ID, out GameObject result))
@@ -35,9 +37,12 @@ namespace SEE.Game
                 Assert.IsNotNull(result, $"Null value for {ID}");
                 return result;
             }
+            else if (mustFindElement)
+            {
+                throw new KeyNotFoundException($"Element with ID '{ID}' was not found.");
+            }
             else
             {
-                //DumpError(ID);
                 return null;
             }
         }

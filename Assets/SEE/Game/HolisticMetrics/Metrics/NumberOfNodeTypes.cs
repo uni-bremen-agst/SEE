@@ -8,11 +8,11 @@ namespace SEE.Game.HolisticMetrics.Metrics
     internal class NumberOfNodeTypes : Metric
     {
         /// <summary>
-        /// Calculates the number of node types of the given SEECity.
+        /// Calculates the number of node types of the given <paramref name="city"/>.
         /// </summary>
         /// <param name="city">The city for which to get the number of node types metric</param>
-        /// <returns>The number of node types of the given city</returns>
-        internal override MetricValue Refresh(SEECity city)
+        /// <returns>The number of node types of the given <paramref name="city"/></returns>
+        internal override MetricValue Refresh(AbstractSEECity city)
         {
             MetricValueRange metricValueRange = new MetricValueRange
             {
