@@ -64,7 +64,7 @@ namespace SEE.DataModel.DG.IO
                 else if (roots.Count > 1)
                 {
                     Debug.LogWarning($"Graph stored in {filename} has multiple roots. Adding an artificial single root {rootName}.\n");
-                    Node singleRoot = new Node
+                    Node singleRoot = new()
                     {
                         Type = Graph.UnknownType,
                         ID = rootName,
@@ -94,19 +94,10 @@ namespace SEE.DataModel.DG.IO
             return graph;
         }
 
-        // Number of errors detected.
-        private int errors = 0;
-
         /// <summary>
         /// Returns the number of errors found during loading the GXL.
         /// </summary>
-        public int Errors
-        {
-            get
-            {
-                return errors;
-            }
-        }
+        public int Errors { get; private set; }
 
         /// <summary>
         /// Logs the given error message using the logger and increments the
@@ -116,20 +107,20 @@ namespace SEE.DataModel.DG.IO
         protected override void LogError(string message)
         {
             base.LogError(message);
-            errors++;
+            Errors++;
         }
 
         // graph where to add the GXL information
         private Graph graph;
 
         // the previously added graph element (node or edge)
-        private GraphElement current = null;
+        private GraphElement current;
 
         // A mapping of the GXL node ids onto the graph nodes.
-        private readonly Dictionary<String, Node> nodes = new Dictionary<string, Node>();
+        private readonly Dictionary<string, Node> nodes = new();
 
         // The set of edge-type names for edges considered to represent nesting.
-        private readonly HashSet<string> hierarchicalEdgeTypes = null;
+        private readonly HashSet<string> hierarchicalEdgeTypes;
 
         /// <summary>
         /// Sets the graph name using the attribute 'id'.
@@ -137,8 +128,10 @@ namespace SEE.DataModel.DG.IO
         protected override void StartGraph()
         {
             // We don't know the base path yet, hence, we use the empty string.
-            graph = new Graph("");
-            graph.Path = filename;
+            graph = new Graph("")
+            {
+                Path = filename
+            };
             if (reader.HasAttributes)
             {
                 while (reader.MoveToNextAttribute())
@@ -191,7 +184,7 @@ namespace SEE.DataModel.DG.IO
             }
             else
             {
-                if (!(current is Node))
+                if (current is not Node node)
                 {
                     LogError("The declaration to be ended is no node.");
                 }
@@ -199,7 +192,6 @@ namespace SEE.DataModel.DG.IO
                 {
                     // Now the current node should have a linkname and we can
                     // actually add it to the graph.
-                    Node node = (Node)current;
                     if (node.TryGetString(Node.LinknameAttribute, out string linkname))
                     {
                         // The attribute Linkage.Name is actually not unique. There are cases where multiple
@@ -208,7 +200,7 @@ namespace SEE.DataModel.DG.IO
                         // make a unique ID. The attribute Linkage.PIR_Node is an integer attribute.
                         if (node.TryGetInt("Linkage.PIR_Node", out int pir))
                         {
-                            node.ID = linkname + "#" + pir;
+                            node.ID = $"{linkname}#{pir}";
                         }
                         else
                         {
@@ -218,7 +210,7 @@ namespace SEE.DataModel.DG.IO
                         {
                             graph.AddNode(node);
                         }
-                        catch (Exception e)
+                        catch (InvalidOperationException e)
                         {
                             LogError($"Node ID {node.ID} is not unique: {e.Message}. This node will be ignored.");
                         }
@@ -244,10 +236,10 @@ namespace SEE.DataModel.DG.IO
 
         private static void Dump(GameObject obj)
         {
-            Debug.Log("Loaded: " + obj.name + "\n");
-            if (obj.TryGetComponent<Node>(out Node node))
+            Debug.Log($"Loaded: {obj.name}\n");
+            if (obj.TryGetComponent(out Node node))
             {
-                Debug.Log(node.ToString() + "\n");
+                Debug.Log($"{node}\n");
             }
         }
 
@@ -274,31 +266,18 @@ namespace SEE.DataModel.DG.IO
                 // determine id, fromNode and toNode
                 while (reader.MoveToNextAttribute())
                 {
-                    if (reader.Name == "from")
+                    switch (reader.Name)
                     {
-                        if (fromNode != "")
-                        {
-                            LogError("Edge has multiple source nodes.");
-                        }
-                        else
-                        {
-                            fromNode = reader.Value;
-                        }
-                    }
-                    else if (reader.Name == "to")
-                    {
-                        if (toNode != "")
-                        {
-                            LogError("Edge has multiple target nodes.");
-                        }
-                        else
-                        {
-                            toNode = reader.Value;
-                        }
-                    }
-                    else if (reader.Name == "id")
-                    {
-                        id = reader.Value;
+                        case "from" when fromNode != "": LogError("Edge has multiple source nodes.");
+                            break;
+                        case "from": fromNode = reader.Value;
+                            break;
+                        case "to" when toNode != "": LogError("Edge has multiple target nodes.");
+                            break;
+                        case "to": toNode = reader.Value;
+                            break;
+                        case "id": id = reader.Value;
+                            break;
                     }
                 } // while
                 if (fromNode == "")
@@ -319,7 +298,7 @@ namespace SEE.DataModel.DG.IO
 
                 // Note that we do not know yet whether this edge is a hierarchical
                 // or non-hierarchical edge until we see the edge type.
-                Edge thisEdge = new Edge();
+                Edge thisEdge = new();
                 // set source of the edge
                 if (nodes.TryGetValue(fromNode, out Node sourceNode))
                 {
@@ -327,7 +306,7 @@ namespace SEE.DataModel.DG.IO
                 }
                 else
                 {
-                    LogError("Unkown source node ID " + fromNode + ".");
+                    LogError($"Unknown source node ID {fromNode}.");
                 }
                 // set target of the edge
                 if (nodes.TryGetValue(toNode, out Node targetNode))
@@ -336,7 +315,7 @@ namespace SEE.DataModel.DG.IO
                 }
                 else
                 {
-                    LogError("Unkown target node ID " + toNode + ".");
+                    LogError($"Unknown target node ID {toNode}.");
                 }
                 current = thisEdge;
             }
@@ -353,16 +332,15 @@ namespace SEE.DataModel.DG.IO
         {
             if (!ReferenceEquals(current, null))
             {
-                if (!(current is Edge))
+                if (current is not Edge edge)
                 {
                     LogError("The declaration to be ended is no edge.");
                 }
                 else
                 {
-                    Edge edge = current as Edge;
                     if (hierarchicalEdgeTypes.Contains(edge.Type) && edge.Target != null && edge.Source != null)
                     {
-                        // hierarchial edges are turned into children
+                        // hierarchical edges are turned into children
                         // Note: a hierarchical edge starts at the child and ends at the parent
                         edge.Target.AddChild(edge.Source);
                     }
@@ -422,7 +400,7 @@ namespace SEE.DataModel.DG.IO
         //   </attr>
         // the attribute name will be Source.Name.
         // Is the empty string outside of an attribute declaration.
-        private string currentAttributeName = "";
+        private string currentAttributeName = string.Empty;
 
         /// <summary>
         /// Defines currentAttributeName.
@@ -452,7 +430,7 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         protected override void StartEnum()
         {
-            if (currentAttributeName == "")
+            if (currentAttributeName == string.Empty)
             {
                 LogError("There is no attribute name for this enum.");
             }
@@ -481,7 +459,7 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         protected override void EndString(string value)
         {
-            if (currentAttributeName == "")
+            if (currentAttributeName == string.Empty)
             {
                 LogError("There is not attribute name for this string.");
             }
@@ -509,7 +487,7 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         protected override void EndFloat(float value)
         {
-            if (currentAttributeName == "")
+            if (currentAttributeName == string.Empty)
             {
                 LogError("There is not attribute name for this float.");
             }
