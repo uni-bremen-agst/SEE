@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Xml;
 
 namespace SEE.Utils
@@ -13,11 +14,12 @@ namespace SEE.Utils
         /// <summary>
         /// Creates a new GXL Parser for the given <paramref name="filename"/>.
         /// </summary>
-        /// <param name="filename">Name of the GXL file which shall be parsed</param>
+        /// <param name="gxl">Content of the GXL file that shall be parsed, given as a stream</param>
+        /// <param name="name">Name of the GXL file. Only used for display purposes in log messages</param>
         /// <param name="logger">Logger to use for log messages</param>
-        protected GXLParser(string filename, ILogger logger = null)
+        protected GXLParser(Stream gxl, string name = "[unknown]", ILogger logger = null)
         {
-            this.filename = filename;
+            this.name = name;
             this.logger = logger;
             XmlReaderSettings settings = new()
             {
@@ -25,10 +27,9 @@ namespace SEE.Utils
                 IgnoreWhitespace = true,
                 IgnoreComments = true,
                 // TODO: Apparently enabling the below has security implications due to the URL being resolved.
-                //       (has been enabled before changes for issue #539).
                 DtdProcessing = DtdProcessing.Parse
             };
-            reader = XmlReader.Create(filename, settings);
+            reader = XmlReader.Create(gxl, settings);
         }
 
         /// <summary>
@@ -100,17 +101,17 @@ namespace SEE.Utils
         /// Stack storing the context of the parser.
         /// </summary>
         protected Stack<State> context = new();
-        
+
         /// <summary>
         /// Name of the GXL file.
         /// </summary>
-        protected string filename;
-        
+        protected string name;
+
         /// <summary>
         /// Reader responsible for parsing XML.
         /// </summary>
         protected XmlReader reader;
-        
+
         /// <summary>
         /// Logger responsible for log messages.
         /// </summary>
@@ -154,9 +155,9 @@ namespace SEE.Utils
         {
             if (logger != null)
             {
-                IXmlLineInfo xmlInfo = (IXmlLineInfo) reader;
+                IXmlLineInfo xmlInfo = (IXmlLineInfo)reader;
                 int lineNumber = xmlInfo.LineNumber - 1;
-                logger.LogError($"{filename}:{lineNumber}: {message}\n");
+                logger.LogError($"{name}:{lineNumber}: {message}\n");
             }
         }
 
@@ -199,33 +200,60 @@ namespace SEE.Utils
                     {
                         case XmlNodeType.Element:
                             // An element(for example, <item> ).
+                        {
+                            State state = ToState(reader.Name);
+                            if (!reader.IsEmptyElement)
                             {
-                                State state = ToState(reader.Name);
-                                if (!reader.IsEmptyElement)
-                                {
-                                    // This is not a self-closing (empty) element, e.g., <item/>.
-                                    // Note: A corresponding EndElement node is not generated for empty elements.
-                                    // That is why we must push an expected EndElement onto the context stack
-                                    // only if the element is not self-closing.
-                                    context.Push(state);
-                                }
-                                switch (state)
-                                {
-                                    case State.undefined: StartUndefined(); break;
-                                    case State.inGXL: StartGXL(); break;
-                                    case State.inGraph: StartGraph(); break;
-                                    case State.inNode: StartNode(); break;
-                                    case State.inEdge: StartEdge(); break;
-                                    case State.inType: StartType(); break;
-                                    case State.inAttr: StartAttr(); break;
-                                    case State.inString: lastText = string.Empty; StartString(); break;
-                                    case State.inFloat: lastText = string.Empty; StartFloat(); break;
-                                    case State.inInt: lastText = string.Empty; StartInt(); break;
-                                    case State.inEnum: lastText = string.Empty; StartEnum(); break;
-                                    default:
-                                        throw new NotImplementedException();
-                                }
+                                // This is not a self-closing (empty) element, e.g., <item/>.
+                                // Note: A corresponding EndElement node is not generated for empty elements.
+                                // That is why we must push an expected EndElement onto the context stack
+                                // only if the element is not self-closing.
+                                context.Push(state);
                             }
+
+                            switch (state)
+                            {
+                                case State.undefined:
+                                    StartUndefined();
+                                    break;
+                                case State.inGXL:
+                                    StartGXL();
+                                    break;
+                                case State.inGraph:
+                                    StartGraph();
+                                    break;
+                                case State.inNode:
+                                    StartNode();
+                                    break;
+                                case State.inEdge:
+                                    StartEdge();
+                                    break;
+                                case State.inType:
+                                    StartType();
+                                    break;
+                                case State.inAttr:
+                                    StartAttr();
+                                    break;
+                                case State.inString:
+                                    lastText = string.Empty;
+                                    StartString();
+                                    break;
+                                case State.inFloat:
+                                    lastText = string.Empty;
+                                    StartFloat();
+                                    break;
+                                case State.inInt:
+                                    lastText = string.Empty;
+                                    StartInt();
+                                    break;
+                                case State.inEnum:
+                                    lastText = string.Empty;
+                                    StartEnum();
+                                    break;
+                                default:
+                                    throw new NotImplementedException();
+                            }
+                        }
                             break;
                         case XmlNodeType.Text:
                             // The text content of a node. (e.g., "this text" in <item>this text</item>
@@ -236,56 +264,77 @@ namespace SEE.Utils
                             EnsureExpectedEndTag();
                             switch (ToState(reader.Name))
                             {
-                                case State.undefined: EndUndefined(); break;
-                                case State.inGXL: EndGXL(); break;
-                                case State.inGraph: EndGraph(); break;
-                                case State.inNode: EndNode(); break;
-                                case State.inEdge: EndEdge(); break;
-                                case State.inType: EndType(); break;
-                                case State.inAttr: EndAttr(); break;
-                                case State.inString: EndString(lastText); break;
+                                case State.undefined:
+                                    EndUndefined();
+                                    break;
+                                case State.inGXL:
+                                    EndGXL();
+                                    break;
+                                case State.inGraph:
+                                    EndGraph();
+                                    break;
+                                case State.inNode:
+                                    EndNode();
+                                    break;
+                                case State.inEdge:
+                                    EndEdge();
+                                    break;
+                                case State.inType:
+                                    EndType();
+                                    break;
+                                case State.inAttr:
+                                    EndAttr();
+                                    break;
+                                case State.inString:
+                                    EndString(lastText);
+                                    break;
                                 case State.inFloat:
+                                {
+                                    if (lastText == string.Empty)
                                     {
-                                        if (lastText == string.Empty)
-                                        {
-                                            LogError("Float value is expected here.");
-                                            throw new SyntaxError("Missing float value.");
-                                        }
-                                        try
-                                        {
-                                            float value = float.Parse(lastText, CultureInfo.InvariantCulture.NumberFormat);
-                                            EndFloat(value);
-                                        }
-                                        catch (FormatException e)
-                                        {
-                                            LogError($"{lastText} is no float value.");
-                                            throw new SyntaxError($"'{lastText}' is no float value: {e}");
-                                        }
+                                        LogError("Float value is expected here.");
+                                        throw new SyntaxError("Missing float value.");
                                     }
+
+                                    try
+                                    {
+                                        float value = float.Parse(lastText, CultureInfo.InvariantCulture.NumberFormat);
+                                        EndFloat(value);
+                                    }
+                                    catch (FormatException e)
+                                    {
+                                        LogError($"{lastText} is no float value.");
+                                        throw new SyntaxError($"'{lastText}' is no float value: {e}");
+                                    }
+                                }
                                     break;
                                 case State.inInt:
+                                {
+                                    if (lastText == string.Empty)
                                     {
-                                        if (lastText == string.Empty)
-                                        {
-                                            LogError("Int value is expected here.");
-                                            throw new SyntaxError("Missing int value.");
-                                        }
-                                        try
-                                        {
-                                            int value = int.Parse(lastText, CultureInfo.InvariantCulture.NumberFormat);
-                                            EndInt(value);
-                                        }
-                                        catch (FormatException e)
-                                        {
-                                            LogError($"{lastText} is no int value.");
-                                            throw new SyntaxError($"'{lastText}' is no int value: {e}");
-                                        }
+                                        LogError("Int value is expected here.");
+                                        throw new SyntaxError("Missing int value.");
                                     }
+
+                                    try
+                                    {
+                                        int value = int.Parse(lastText, CultureInfo.InvariantCulture.NumberFormat);
+                                        EndInt(value);
+                                    }
+                                    catch (FormatException e)
+                                    {
+                                        LogError($"{lastText} is no int value.");
+                                        throw new SyntaxError($"'{lastText}' is no int value: {e}");
+                                    }
+                                }
                                     break;
-                                case State.inEnum: EndEnum(); break;
+                                case State.inEnum:
+                                    EndEnum();
+                                    break;
                                 default:
                                     throw new NotImplementedException();
                             }
+
                             break;
                         case XmlNodeType.None:
                             // This is returned by the XmlReader if a Read method has not been called.
@@ -342,6 +391,7 @@ namespace SEE.Utils
             {
                 reader.Close();
             }
+
             if (context.Count > 0)
             {
                 LogError($"XML parser is still expecting input in state {context.Peek()}");
@@ -438,6 +488,7 @@ namespace SEE.Utils
         }
 
         #region IDisposable Support
+
         private bool disposedValue; // To detect redundant calls of Dispose(bool).
 
         protected virtual void Dispose(bool disposing)
@@ -460,7 +511,7 @@ namespace SEE.Utils
                 // set larger attributes to null
                 context = null;
                 logger = null;
-                filename = null;
+                name = null;
 
                 // this object is now considered disposed
                 disposedValue = true;
@@ -483,6 +534,7 @@ namespace SEE.Utils
             // Comment out this code when the Finalizer ~GXLParser() is overridden.
             //GC.SuppressFinalize(this);
         }
+
         #endregion
     }
 }

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using Joveler.Compression.XZ;
 using SEE.Utils;
+using UnityEditor;
 using UnityEngine;
 
 namespace SEE.DataModel.DG.IO
@@ -8,8 +11,10 @@ namespace SEE.DataModel.DG.IO
     /// <summary>
     /// Reads a graph from a GXL file and returns it as a graph.
     /// </summary>
+    [InitializeOnLoad]
     public class GraphReader : GXLParser
     {
+        
         /// <summary>
         /// Constructor. If <paramref name="rootID"/> is neither null nor the empty string and if
         /// the loaded graph has multiple roots, a single artificial root with that name will be added
@@ -28,11 +33,44 @@ namespace SEE.DataModel.DG.IO
         /// <param name="rootID">unique ID of the artificial root node if required</param>
         /// <param name="logger">the logger used for messages; if null, no messages are emitted</param>
         public GraphReader(string filename, HashSet<string> hierarchicalEdgeTypes, string basePath, string rootID = "", Utils.ILogger logger = null)
-            : base(filename, logger)
+            : base(OpenFile(filename), filename, logger)
         {
             this.hierarchicalEdgeTypes = hierarchicalEdgeTypes;
             this.rootName = string.IsNullOrEmpty(rootID) ? "" : rootID;
             this.basePath = basePath;
+        }
+        
+        /// <summary>
+        /// This static constructor is used to initialize the liblzma library.
+        /// It needn't be called explicitly, Unity does this automatically once via the <c>InitializeOnLoad</c>
+        /// attribute assigned to this class.
+        /// </summary>
+        static GraphReader()
+        {
+            try
+            {
+                XZInit.GlobalInit();
+            }
+            catch (InvalidOperationException)
+            {
+                // Already loaded. We can ignore this.
+            }
+        }
+        
+
+        private static Stream OpenFile(string filename)
+        {
+            FileStream stream = File.OpenRead(filename);
+            if (filename.ToLower().EndsWith(Filenames.CompressedGXLExtension))
+            {
+                // Handle compressed LZMA2 file.
+                XZDecompressOptions options = new();  // default settings are fine
+                return new XZStream(stream, options);
+            }
+            else
+            {
+                return stream;
+            }
         }
 
         /// <summary>
@@ -59,11 +97,11 @@ namespace SEE.DataModel.DG.IO
                 List<Node> roots = graph.GetRoots();
                 if (roots.Count == 0)
                 {
-                    Debug.LogWarning($"Graph stored in {filename} is empty.\n");
+                    Debug.LogWarning($"Graph stored in {name} is empty.\n");
                 }
                 else if (roots.Count > 1)
                 {
-                    Debug.LogWarning($"Graph stored in {filename} has multiple roots. Adding an artificial single root {rootName}.\n");
+                    Debug.LogWarning($"Graph stored in {name} has multiple roots. Adding an artificial single root {rootName}.\n");
                     Node singleRoot = new()
                     {
                         Type = Graph.UnknownType,
@@ -130,7 +168,7 @@ namespace SEE.DataModel.DG.IO
             // We don't know the base path yet, hence, we use the empty string.
             graph = new Graph("")
             {
-                Path = filename
+                Path = name
             };
             if (reader.HasAttributes)
             {
