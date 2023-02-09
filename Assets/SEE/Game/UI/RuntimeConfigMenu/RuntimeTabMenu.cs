@@ -4,12 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Michsky.UI.ModernUIPack;
+using SEE.Controls;
 using SEE.DataModel;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.UI.Menu;
+using SEE.GO;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
+using SimpleFileBrowser;
 using Sirenix.OdinInspector;
 using Sirenix.Utilities;
 using TMPro;
@@ -169,6 +172,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     private GameObject GetViewGameObjectHelper(MemberInfo memberInfo)
     {
         string tabName = memberInfo.GetCustomAttributes().OfType<TabGroupAttribute>().FirstOrDefault()?.TabName ??
+                         memberInfo.GetCustomAttributes().OfType<PropertyGroupAttribute>().FirstOrDefault()?.GroupName ??
                          "Misc";
         ToggleMenuEntry entry = Entries.FirstOrDefault(entry => entry.Title == tabName);
         // adds an entry (tab + view) if necessary
@@ -203,9 +207,9 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             // fieldInfo.SetValue(City, value);
 
             // TODO: Add action
-            if (value is FilePath)
+            if (value is FilePath filePath)
             {
-                CreateFilePicker(fieldInfo, parent);
+                CreateFilePicker(fieldInfo, parent, filePath);
             }
             else if (value is int i)
             {
@@ -374,13 +378,88 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     }
 
     // TODO: Add action
-    private void CreateFilePicker(MemberInfo memberInfo, GameObject parent)
+    private void CreateFilePicker(MemberInfo memberInfo, GameObject parent, FilePath filePath)
     {
         GameObject filePickerGameObject =
             PrefabInstantiator.InstantiatePrefab(FILEPICKER_PREFAB, parent.transform, false);
         AddLayoutElement(filePickerGameObject);
         TextMeshProUGUI text = filePickerGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = memberInfo.Name;
+        
+        CustomDropdown dropdown = filePickerGameObject.transform.Find("DropdownCombo/Dropdown")
+            .GetComponent<CustomDropdown>();
+        TMP_InputField customInput = filePickerGameObject.transform.Find("DropdownCombo/SelectableInput/Input")
+            .GetComponent<TMP_InputField>();
+        TextMeshProUGUI labelText = filePickerGameObject.transform.Find("Label")
+            .GetComponent<TextMeshProUGUI>();
+        ButtonManagerBasic pickerButton = filePickerGameObject.transform.Find("DropdownCombo/SelectableInput/Button")
+            .GetComponent<ButtonManagerBasic>();
+        
+        dropdown.dropdownItems.Clear();
+        foreach (DataPath.RootKind kind in Enum.GetValues(typeof(DataPath.RootKind)))
+        {
+            dropdown.CreateNewItemFast(kind.ToString(), null);
+        }
+        dropdown.selectedItemIndex =
+            dropdown.dropdownItems.FindIndex(
+                item => item.itemName == filePath.Root.ToString());
+        dropdown.SetupDropdown();
+        dropdown.dropdownEvent.AddListener(index =>
+        {
+            String selectedItem = dropdown.dropdownItems[index].itemName;
+            Enum.TryParse(selectedItem, out filePath.Root);
+        });
+        dropdown.isListItem = true;
+        // TODO: What is the correct parent?
+        dropdown.listParent = Canvas.transform;
+        
+        pickerButton.clickEvent.AddListener(() =>
+        {
+            FileBrowser.ShowLoadDialog(paths =>
+                {
+                    if (paths.Length == 0)
+                    {
+                        throw new Exception("Received no paths from file browser.");
+                    }
+                    // There should only be a single path since multiple selections are forbidden.
+                    filePath.Set(paths[0]);
+                    dropdown.selectedItemIndex =
+                        dropdown.dropdownItems.FindIndex(
+                            item => item.itemName == filePath.Root.ToString());
+                    dropdown.SetupDropdown();
+                    if (filePath.Root == DataPath.RootKind.Absolute)
+                    {
+                        customInput.text = filePath.AbsolutePath;
+                    }
+                    else
+                    {
+                        customInput.text = filePath.RelativePath;
+                    }
+                },
+                () => { },
+                allowMultiSelection: false,
+                pickMode: FileBrowser.PickMode.Files,
+                title: "Pick a file/folder",
+                initialPath: filePath.RootPath
+            );
+
+            // Find the newly opened file browser and optimize it for VR.
+            GameObject fileBrowser = GameObject.FindWithTag("FileBrowser");
+            fileBrowser.transform.Find("EventSystem").gameObject.SetActive(false);
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            {
+                Canvas parentCanvas = GetComponentInParent<Canvas>();
+                RectTransform fileBrowserRect = fileBrowser.GetComponent<RectTransform>();
+                Canvas fileBrowserCanvas = fileBrowser.GetComponent<Canvas>();
+
+                fileBrowserCanvas.worldCamera =
+                    GameObject.FindWithTag("VRPointer").GetComponent<Camera>();
+                fileBrowserCanvas.renderMode = RenderMode.WorldSpace;
+
+                fileBrowserRect.transform.position = parentCanvas.transform.position;
+                fileBrowserRect.localScale = new Vector3(0.002f, 0.002f, 0.002f);
+            }
+        });
     }
 
     // TODO: Replace with actual string field prefab
