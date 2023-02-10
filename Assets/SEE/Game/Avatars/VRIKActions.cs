@@ -9,7 +9,7 @@ using UnityEngine.Assertions;
 namespace SEE.Game.Avatars
 {
     /// <summary>
-    /// This class is responsible for setting up a remote VRIK avatar.
+    /// This class is responsible for setting up the remote and local VRIK avatar.
     /// To make sure the avatar's movements and orientation are transferred correctly,
     /// necessary components are added and existing components are either removed or replaced.
     ///
