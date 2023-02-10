@@ -4,11 +4,12 @@
 # commit will be looked at, so existing code cities will be ignored.
 # Only staged (to be committed) changes will be looked at.
 
-set -e
 
 if [ -n "$CI" ]; then
+    set -ex
     DIFF_COMMAND="git diff origin/master"
 else
+    set -e
     DIFF_COMMAND="git diff --staged"
 fi
 

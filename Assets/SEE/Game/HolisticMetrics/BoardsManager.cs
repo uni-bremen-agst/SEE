@@ -8,14 +8,14 @@ using SEE.Utils;
 namespace SEE.Game.HolisticMetrics
 {
     /// <summary>
-    /// This class manages all metrics boards.
+    /// This class manages all metric boards.
     /// </summary>
     public static class BoardsManager
     {
         /// <summary>
         /// The board prefab we will be instantiating here.
         /// </summary>
-        private static readonly GameObject boardPrefab = 
+        private static readonly GameObject boardPrefab =
             Resources.Load<GameObject>("Prefabs/HolisticMetrics/SceneComponents/MetricsBoard");
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace SEE.Game.HolisticMetrics
         /// List of all the <see cref="WidgetsManager"/>s that this manager manages (there should not be any
         /// <see cref="WidgetsManager"/>s in the scene that are not in this list).
         /// </summary>
-        private static readonly List<WidgetsManager> widgetsManagers = new List<WidgetsManager>();
+        private static readonly List<WidgetsManager> widgetsManagers = new();
 
         /// <summary>
         /// Creates a new metrics board and puts its <see cref="WidgetsManager"/> into the list of
@@ -52,10 +52,10 @@ namespace SEE.Game.HolisticMetrics
             }
 
             GameObject newBoard = Object.Instantiate(
-                boardPrefab, 
-                boardConfig.Position, 
+                boardPrefab,
+                boardConfig.Position,
                 boardConfig.Rotation);
-            
+
             WidgetsManager newWidgetsManager = newBoard.GetComponent<WidgetsManager>();
 
             // Set the title of the new board
@@ -69,7 +69,7 @@ namespace SEE.Game.HolisticMetrics
 
             widgetsManagers.Add(newWidgetsManager);
         }
-        
+
         /// <summary>
         /// Deletes a metrics board identified by its name.
         /// </summary>
@@ -105,7 +105,7 @@ namespace SEE.Game.HolisticMetrics
             boardTransform.position = position;
             boardTransform.rotation = rotation;
         }
-        
+
         /// <summary>
         /// Toggles the small buttons underneath the boards that allow the player to drag the boards around.
         /// </summary>
