@@ -5,7 +5,7 @@
 # ("Changes" refers to non-LFS changes):
 #
 # 1. Changes contain a file bigger than 10 MB.
-# 2. Changes as a whole constitute more than 50 MB.
+# 2. Changes as a whole (additions only) constitute more than 50 MB.
 # 3. Changes contain directories within `Assets` which are not a part of SEE.
 #    These should be placed in LFS as they may be subject to copyright
 #    and thus should not be contained in the (potentially in the future) public
@@ -64,11 +64,11 @@ if [ -n "$CI" ]; then
         exit 2
     fi
 
-    # Check for aggregate changes bigger than 50 MB.
-    TOTAL_SIZE=$(git format-patch origin/master --stdout | wc -c | awk "\$1 >= $DIFF_SIZE")
+    # Check for aggregate changes (additions only) bigger than 50 MB.
+    TOTAL_SIZE=$(git format-patch origin/master --stdout | grep '^+' | wc -c | awk "\$1 >= $DIFF_SIZE")
     if [ -n "$TOTAL_SIZE" ]; then
         echo ""
-        echo -n "::error title=Huge diff size::Your PR has a diff size of > 100 MB.%0A"
+        echo -n "::error title=Huge diff size::Your PR has a diff size of > 50 MB.%0A"
         echo -n "You should put big directories into LFS.%0A"
         echo -n "Please rebase your branch and move affected directories into LFS, so that no commit%0A"
         echo -n "remains which references them.%0A"
