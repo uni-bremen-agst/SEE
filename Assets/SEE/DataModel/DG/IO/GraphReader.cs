@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using Joveler.Compression.XZ;
 using SEE.Utils;
 using UnityEditor;
@@ -14,7 +15,6 @@ namespace SEE.DataModel.DG.IO
     [InitializeOnLoad]
     public class GraphReader : GXLParser
     {
-
         /// <summary>
         /// Constructor. If <paramref name="rootID"/> is neither null nor the empty string and if
         /// the loaded graph has multiple roots, a single artificial root with that name will be added
@@ -49,12 +49,96 @@ namespace SEE.DataModel.DG.IO
         {
             try
             {
+                // We first try loading the library dynamically.
+                // This only works on Linux and OSX with liblzma installed.
                 XZInit.GlobalInit();
+            }
+            catch (PlatformNotSupportedException)
+            {
+                // If this doesn't work, we use our bundled native liblzma libraries.
+                XZInit.GlobalInit(GetLiblzmaPath());
             }
             catch (InvalidOperationException)
             {
                 // Already loaded. We can ignore this.
             }
+        }
+
+        /// <summary>
+        /// Returns the platform-dependent path to the liblzma native library.
+        /// </summary>
+        /// <returns>Path to the liblzma library</returns>
+        /// <exception cref="PlatformNotSupportedException">If the system platform is not supported</exception>
+        private static string GetLiblzmaPath()
+        {
+            string libDir = Path.Combine(Application.dataPath, "Native");
+            OSPlatform platform;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                platform = OSPlatform.Windows;
+                libDir = Path.Combine(libDir, "win");
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                platform = OSPlatform.Linux;
+                libDir = Path.Combine(libDir, "linux");
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                platform = OSPlatform.OSX;
+                libDir = Path.Combine(libDir, "osx");
+            }
+
+            switch (RuntimeInformation.ProcessArchitecture)
+            {
+                case Architecture.X86:
+                    libDir += "-x86";
+                    break;
+                case Architecture.X64:
+                    libDir += "-x64";
+                    break;
+                case Architecture.Arm when platform == OSPlatform.Windows:
+                    libDir += "10-arm";
+                    break;
+                case Architecture.Arm64 when platform == OSPlatform.Windows:
+                    libDir += "10-arm64";
+                    break;
+                case Architecture.Arm:
+                    libDir += "-arm";
+                    break;
+                case Architecture.Arm64:
+                    libDir += "-arm64";
+                    break;
+                default: throw new PlatformNotSupportedException($"Unknown architecture {RuntimeInformation.ProcessArchitecture}");
+            }
+
+            libDir = Path.Combine(libDir, "native");
+
+            string libPath = null;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                libPath = Path.Combine(libDir, "liblzma.dll");
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                libPath = Path.Combine(libDir, "liblzma.so");
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                libPath = Path.Combine(libDir, "liblzma.dylib");
+            }
+
+            if (libPath == null)
+            {
+                throw new PlatformNotSupportedException($"Unable to find native library.");
+            }
+
+            if (!File.Exists(libPath))
+            {
+                throw new PlatformNotSupportedException($"Unable to find native library [{libPath}].");
+            }
+
+            return libPath;
         }
 
         /// <summary>
@@ -126,6 +210,7 @@ namespace SEE.DataModel.DG.IO
                     }
                 }
             }
+
             /// The graph is loaded and its node hierarchy established. We can finalize
             /// the node hierarchy. This finalization is necessary to calculate the
             /// node levels. These in turn will be need to be available for setting the
@@ -204,6 +289,7 @@ namespace SEE.DataModel.DG.IO
             {
                 LogError("There is still a pending graph element when new node declaration has begun.");
             }
+
             current = new Node();
             if (reader.HasAttributes)
             {
@@ -255,6 +341,7 @@ namespace SEE.DataModel.DG.IO
                         {
                             node.ID = linkname;
                         }
+
                         try
                         {
                             graph.AddNode(node);
@@ -279,6 +366,7 @@ namespace SEE.DataModel.DG.IO
                         }
                     }
                 }
+
                 current = null;
             }
         }
@@ -317,18 +405,24 @@ namespace SEE.DataModel.DG.IO
                 {
                     switch (reader.Name)
                     {
-                        case "from" when fromNode != "": LogError("Edge has multiple source nodes.");
+                        case "from" when fromNode != "":
+                            LogError("Edge has multiple source nodes.");
                             break;
-                        case "from": fromNode = reader.Value;
+                        case "from":
+                            fromNode = reader.Value;
                             break;
-                        case "to" when toNode != "": LogError("Edge has multiple target nodes.");
+                        case "to" when toNode != "":
+                            LogError("Edge has multiple target nodes.");
                             break;
-                        case "to": toNode = reader.Value;
+                        case "to":
+                            toNode = reader.Value;
                             break;
-                        case "id": id = reader.Value;
+                        case "id":
+                            id = reader.Value;
                             break;
                     }
                 } // while
+
                 if (fromNode == "")
                 {
                     LogError("Edge has no source node.");
@@ -357,6 +451,7 @@ namespace SEE.DataModel.DG.IO
                 {
                     LogError($"Unknown source node ID {fromNode}.");
                 }
+
                 // set target of the edge
                 if (nodes.TryGetValue(toNode, out Node targetNode))
                 {
@@ -366,6 +461,7 @@ namespace SEE.DataModel.DG.IO
                 {
                     LogError($"Unknown target node ID {toNode}.");
                 }
+
                 current = thisEdge;
             }
             else
@@ -394,7 +490,8 @@ namespace SEE.DataModel.DG.IO
                         edge.Target.AddChild(edge.Source);
                     }
                     else
-                    {  // non-hierarchical edges are added to the graph
+                    {
+                        // non-hierarchical edges are added to the graph
                         try
                         {
                             graph.AddEdge(edge);
@@ -405,6 +502,7 @@ namespace SEE.DataModel.DG.IO
                         }
                     }
                 }
+
                 current = null;
             }
             else
