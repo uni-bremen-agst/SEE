@@ -42,7 +42,7 @@ namespace SEE.DataModel.DG.IO
             }
             catch (Exception e)
             {
-                Debug.LogErrorFormat($"Could not save graph to GXL file '{filename}' due to: {e.Message}.\n");
+                Debug.LogError($"Could not save graph to GXL file '{filename}' due to: {e.Message}.\n");
                 throw;
             }
             Debug.Log($"Successfully saved graph to file '{filename}'!");
@@ -120,7 +120,7 @@ namespace SEE.DataModel.DG.IO
         ///    ...
         ///    </graph>
         /// where N = graph.Name.
-        /// 
+        ///
         /// Note: attributes of the graph are not emitted.
         /// </summary>
         /// <param name="doc">the XML document in which to create the XML node</param>
@@ -193,7 +193,7 @@ namespace SEE.DataModel.DG.IO
         }
 
         /// <summary>
-        /// Appends an edge from <paramref name="source"/> to <paramref name="target"/> with the 
+        /// Appends an edge from <paramref name="source"/> to <paramref name="target"/> with the
         /// given <paramref name="type"/> to <paramref name="parentXMLNode"/> as an XML node.
         /// No edge attributes are appended.
         /// </summary>
