@@ -14,7 +14,7 @@ namespace SEE.DataModel.DG.IO
     [InitializeOnLoad]
     public class GraphReader : GXLParser
     {
-        
+
         /// <summary>
         /// Constructor. If <paramref name="rootID"/> is neither null nor the empty string and if
         /// the loaded graph has multiple roots, a single artificial root with that name will be added
@@ -39,7 +39,7 @@ namespace SEE.DataModel.DG.IO
             this.rootName = string.IsNullOrEmpty(rootID) ? "" : rootID;
             this.basePath = basePath;
         }
-        
+
         /// <summary>
         /// This static constructor is used to initialize the liblzma library.
         /// It needn't be called explicitly, Unity does this automatically once via the <c>InitializeOnLoad</c>
@@ -56,8 +56,16 @@ namespace SEE.DataModel.DG.IO
                 // Already loaded. We can ignore this.
             }
         }
-        
 
+        /// <summary>
+        /// Opens the file with given <paramref name="filename"/> and returns it as a <see cref="Stream"/>.
+        /// If <paramref name="filename"/> has the filename extension
+        /// <see cref="Filenames.CompressedGXLExtension"/>, the stream will be the
+        /// uncompressed content of the open file; otherwise it will be the content
+        /// of the file as is.
+        /// </summary>
+        /// <param name="filename">name of the file to be opened</param>
+        /// <returns>stream of the (possibly uncompressed) content of the opened file</returns>
         private static Stream OpenFile(string filename)
         {
             FileStream stream = File.OpenRead(filename);
