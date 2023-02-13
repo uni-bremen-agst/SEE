@@ -1,0 +1,223 @@
+﻿using System;
+using Michsky.UI.ModernUIPack;
+using SEE.Controls;
+using SEE.GO;
+using SEE.Utils;
+using SimpleFileBrowser;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace SEE.Game.UI.FilePicker
+{
+    public partial class FilePicker
+    {
+        /// <summary>
+        ///     The menu prefab.
+        /// </summary>
+        protected virtual string MenuPrefab => "Prefabs/UI/Input Group - File Picker";
+
+        /// <summary>
+        ///     The path to the dropdown.
+        /// </summary>
+        protected virtual string DropdownPath => "DropdownCombo/Dropdown";
+
+        /// <summary>
+        ///     The path to the custom input.
+        /// </summary>
+        protected virtual string CustomInputPath => "DropdownCombo/SelectableInput/Input";
+
+        /// <summary>
+        ///     The path to the picker button.
+        /// </summary>
+        protected virtual string PickerButtonPath => "DropdownCombo/SelectableInput/Button";
+
+        /// <summary>
+        ///     The path to the label.
+        /// </summary>
+        protected virtual string LabelPath => "Label";
+
+        /// <summary>
+        ///     The menu.
+        /// </summary>
+        protected GameObject Menu { get; private set; }
+
+        /// <summary>
+        ///     The dropdown.
+        /// </summary>
+        protected CustomDropdown Dropdown { get; private set; }
+
+        /// <summary>
+        ///     The custom input.
+        /// </summary>
+        protected TMP_InputField CustomInput { get; private set; }
+
+        /// <summary>
+        ///     The picker button.
+        /// </summary>
+        protected ButtonManagerBasic PickerButton { get; private set; }
+
+        /// <summary>
+        ///     The label.
+        /// </summary>
+        protected TextMeshProUGUI LabelText { get; private set; }
+
+
+        /// <summary>
+        ///     Destroys the component if the <see cref="Menu" /> is destroyed.
+        /// </summary>
+        protected override void Update()
+        {
+            if (Menu == null)
+            {
+                Destroyer.Destroy(this);
+                return;
+            }
+
+            base.Update();
+        }
+
+        /// <summary>
+        ///     Destroys the menu when this component is destroyed.
+        /// </summary>
+        private void OnDestroy()
+        {
+            if (Menu != null) Destroyer.Destroy(Menu);
+        }
+
+        /// <summary>
+        ///     Initializes the menu.
+        /// </summary>
+        protected override void StartDesktop()
+        {
+            // instantiates the menu
+            Menu = PrefabInstantiator.InstantiatePrefab(MenuPrefab, transform, false);
+            Menu.name = Label;
+
+            Dropdown = Menu.transform.Find(DropdownPath).GetComponent<CustomDropdown>();
+            CustomInput = Menu.transform.Find(CustomInputPath).GetComponent<TMP_InputField>();
+            LabelText = Menu.transform.Find(LabelPath).GetComponent<TextMeshProUGUI>();
+            PickerButton = Menu.transform.Find(PickerButtonPath).GetComponent<ButtonManagerBasic>();
+
+            LabelText.text = Label;
+
+            // removes default entries
+            Dropdown.dropdownItems.Clear();
+            // adds the different root kinds
+            foreach (DataPath.RootKind kind in Enum.GetValues(typeof(DataPath.RootKind)))
+                Dropdown.CreateNewItemFast(kind.ToString(), null);
+            UpdateDropdown();
+
+            // adds a listener to the dropdown
+            Dropdown.dropdownEvent.AddListener(index =>
+            {
+                var selectedItem = Dropdown.dropdownItems[index].itemName;
+                Enum.TryParse(selectedItem, out DataPathInstance.Root);
+                UpdateInput();
+            });
+
+            Dropdown.isListItem = true;
+            Dropdown.listParent = Canvas.transform;
+
+            // opens a file picker with the picker button
+            PickerButton.clickEvent.AddListener(() =>
+            {
+                FileBrowser.ShowLoadDialog(paths =>
+                    {
+                        if (paths.Length == 0) throw new Exception("Received no paths from file browser.");
+                        // There should only be a single path since multiple selections are forbidden.
+                        DataPathInstance.Set(paths[0]);
+                        UpdateDropdown();
+                        UpdateInput();
+                    },
+                    () => { },
+                    allowMultiSelection: false,
+                    pickMode: FileBrowser.PickMode.Files,
+                    title: "Pick a file/folder",
+                    initialPath: DataPathInstance.RootPath
+                );
+
+                // Find the newly opened file browser and optimize it for VR.
+                GameObject fileBrowser = GameObject.FindWithTag("FileBrowser");
+                fileBrowser.transform.Find("EventSystem").gameObject.SetActive(false);
+                if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                {
+                    Canvas parentCanvas = GetComponentInParent<Canvas>();
+                    RectTransform fileBrowserRect = fileBrowser.GetComponent<RectTransform>();
+                    Canvas fileBrowserCanvas = fileBrowser.GetComponent<Canvas>();
+
+                    fileBrowserCanvas.worldCamera =
+                        GameObject.FindWithTag("VRPointer").GetComponent<Camera>();
+                    fileBrowserCanvas.renderMode = RenderMode.WorldSpace;
+
+                    fileBrowserRect.transform.position = parentCanvas.transform.position;
+                    fileBrowserRect.localScale = new Vector3(0.002f, 0.002f, 0.002f);
+                }
+            });
+            
+            CustomInput.onValueChanged.AddListener(path =>
+            {
+                if (DataPathInstance.Root == DataPath.RootKind.Absolute)
+                    DataPathInstance.AbsolutePath = path;
+                else
+                    DataPathInstance.RelativePath = path;
+                UpdateInput();
+            });
+            
+            LayoutElement le = Menu.AddComponent<LayoutElement>();
+            le.minHeight = ((RectTransform) Menu.transform).rect.height;
+            le.minWidth = ((RectTransform) Menu.transform).rect.width;
+        }
+
+        /// <summary>
+        ///     See <see cref="StartDesktop" />.
+        /// </summary>
+        protected override void StartVR()
+        {
+            StartDesktop();
+        }
+
+        /// <summary>
+        ///     See <see cref="StartDesktop" />.
+        /// </summary>
+        protected override void StartTouchGamepad()
+        {
+            StartDesktop();
+        }
+
+        /// <summary>
+        ///     Handles the file browser success.
+        /// </summary>
+        /// <param name="paths">The paths.</param>
+        /// <exception cref="Exception">Received no paths from file browser</exception>
+        protected void HandleFileBrowserSuccess(string[] paths)
+        {
+            if (paths.Length == 0) throw new Exception("Received no paths from file browser.");
+            // There should only be a single path since multiple selections are forbidden.
+            DataPathInstance.Set(paths[0]);
+            UpdateDropdown();
+            UpdateInput();
+        }
+
+        /// <summary>
+        ///     Updates the dropdown.
+        /// </summary>
+        private void UpdateDropdown()
+        {
+            Dropdown.selectedItemIndex =
+                Dropdown.dropdownItems.FindIndex(
+                    item => item.itemName == DataPathInstance.Root.ToString());
+            Dropdown.SetupDropdown();
+        }
+
+        /// <summary>
+        ///     Updates the custom input text.
+        /// </summary>
+        private void UpdateInput()
+        {
+            CustomInput.text = DataPathInstance.Root == DataPath.RootKind.Absolute
+                ? DataPathInstance.AbsolutePath
+                : DataPathInstance.RelativePath;
+        }
+    }
+}
