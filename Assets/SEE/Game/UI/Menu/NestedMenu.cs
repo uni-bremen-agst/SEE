@@ -12,9 +12,9 @@ using UnityEngine.Windows.Speech;
 namespace SEE.Game.UI.Menu
 {
     /// <summary>
-    /// A menu similar to the <see cref="SimpleMenu"/> with buttons which can open other menus.
+    /// A menu similar to the <see cref="SimpleListMenu"/> with buttons which can open other menus.
     /// </summary>
-    public class NestedMenu : SimpleMenu<MenuEntry>
+    public class NestedListMenu : SimpleListMenu<MenuEntry>
     {
         /// <summary>
         /// The menu levels we have ascended through.

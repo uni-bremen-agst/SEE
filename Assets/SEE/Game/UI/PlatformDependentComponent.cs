@@ -65,7 +65,7 @@ namespace SEE.Game.UI
                 Canvas.name = UI_CANVAS_NAME;
             }
 
-            // Execute platform dependent code
+            // calls the start method for the current platform
             Platform = SceneSettings.InputType;
             switch (Platform)
             {
@@ -83,8 +83,8 @@ namespace SEE.Game.UI
             }
 
             // initialization finished
-            OnStartFinished();
             HasStarted = true;
+            OnStartFinished();
         }
 
         /// <summary>

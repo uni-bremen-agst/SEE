@@ -173,7 +173,7 @@ namespace SEE.Controls
         {
             //TODO: Icons
             WindowMenu = gameObject.AddComponent<SelectionMenu>();
-            ToggleMenuEntry localEntry = new( () => ActivateSpace(LOCAL_PLAYER),
+            ToggleMenuEntry localEntry = new(() => ActivateSpace(LOCAL_PLAYER),
                                              DeactivateCurrentSpace, LOCAL_PLAYER,
                                              "Windows for the local player (you).", Color.black);
             ToggleMenuEntry noneEntry = new(() => CurrentPlayer = NO_PLAYER, () => { }, NO_PLAYER,
