@@ -49,16 +49,11 @@ namespace SEE.DataModel.DG.IO
         {
             try
             {
-                // We first try loading the library dynamically.
-                // This only works on Linux and OSX with liblzma installed.
-                XZInit.GlobalInit();
-            }
-            catch (PlatformNotSupportedException)
-            {
-                // If this doesn't work, we use our bundled native liblzma libraries.
+                // Note that there is a parameterless version which loads the library from the user's system,
+                // but this only works on Linux, and in fact causes a permanent failure state on Windows when called.
                 XZInit.GlobalInit(GetLiblzmaPath());
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e) when (e.Message.Contains(" is already initialized"))
             {
                 // Already loaded. We can ignore this.
             }
