@@ -6,11 +6,11 @@ using UnityEngine;
 namespace SEE.Game.Avatars
 {
     /// <summary>
-    /// Responsible to synchronize the facial expressions
+    /// Responsible for synchronizing the facial expressions
     /// of the <see cref="UMAExpressionPlayer"/> on all clients.
     ///
     /// This component is intended to be attached to a gameobject that has a
-    /// <see cref="UMAExpressionPlayer"/> as component.
+    /// <see cref="UMAExpressionPlayer"/> as a component.
     /// </summary>
     internal class ExpressionPlayerSynchronizer : NetSynchronizer
     {
