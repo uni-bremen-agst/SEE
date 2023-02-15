@@ -71,7 +71,7 @@ namespace SEE.DataModel.DG.IO
         /// <exception cref="PlatformNotSupportedException">If the system platform is not supported</exception>
         private static string GetLiblzmaPath()
         {
-            string libDir = Path.Combine(Application.dataPath, "Native");
+            string libDir = Path.Combine(Path.GetFullPath(Application.dataPath), "Native", "LZMA");
             OSPlatform platform;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -130,7 +130,7 @@ namespace SEE.DataModel.DG.IO
 
             if (libPath == null)
             {
-                throw new PlatformNotSupportedException($"Unable to find native library.");
+                throw new PlatformNotSupportedException("Unable to find native library.");
             }
 
             if (!File.Exists(libPath))
