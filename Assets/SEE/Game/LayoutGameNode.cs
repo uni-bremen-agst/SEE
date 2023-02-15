@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using SEE.DataModel.DG;
 using SEE.GO;
-using SEE.GO.NodeFactories;
 using SEE.Layout;
 using UnityEngine;
 
@@ -14,23 +13,15 @@ namespace SEE.Game
     public class LayoutGameNode : AbstractLayoutNode
     {
         /// <summary>
-        /// The node factory that created the game object. Required to obtain scaling information.
-        /// </summary>
-        private readonly NodeFactory nodeFactory;
-
-        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="toLayoutNode">the mapping of graph nodes onto <see cref="ILayoutNode"/>s
         /// this node should be added to</param>
         /// <param name="gameObject">the game object this layout node represents</param>
-        /// <param name="nodeFactory">the node factory that created <paramref name="gameObject"/>;
-        /// may be null for inner nodes</param>
-        public LayoutGameNode(Dictionary<Node, ILayoutNode> toLayoutNode, GameObject gameObject, NodeFactory nodeFactory)
+        public LayoutGameNode(IDictionary<Node, ILayoutNode> toLayoutNode, GameObject gameObject)
             : base(gameObject.GetComponent<NodeRef>().Value, toLayoutNode)
         {
             this.gameObject = gameObject;
-            this.nodeFactory = nodeFactory;
         }
 
         /// <summary>
@@ -43,17 +34,17 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// The scale of this node.
+        /// The local scale of this node.
         /// </summary>
         public override Vector3 LocalScale
         {
             get
             {
-                return nodeFactory.GetSize(gameObject);
+                return gameObject.transform.localScale;
             }
             set
             {
-                nodeFactory.SetSize(gameObject, value);
+                gameObject.transform.localScale = value;
             }
         }
 
@@ -93,14 +84,11 @@ namespace SEE.Game
         {
             get
             {
-                return nodeFactory.GetCenterPosition(gameObject);
+                return gameObject.transform.position;
             }
             set
             {
-                Vector3 groundPosition = value;
-                Vector3 extent = nodeFactory.GetSize(gameObject) / 2.0f;
-                groundPosition.y -= extent.y;
-                nodeFactory.SetGroundPosition(gameObject, groundPosition);
+                gameObject.transform.position = value;
             }
         }
 
@@ -118,7 +106,7 @@ namespace SEE.Game
         {
             get
             {
-                return nodeFactory.Roof(gameObject);
+                return gameObject.GetRoofCenter();
             }
         }
 
@@ -129,7 +117,7 @@ namespace SEE.Game
         {
             get
             {
-                return nodeFactory.Ground(gameObject);
+                return gameObject.GetGroundCenter();
             }
         }
 

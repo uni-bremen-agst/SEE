@@ -4,5 +4,5 @@
 # This will install a pre-commit hook which verifies that no code cities
 # were left in the scene. Call it by simply executing './generateHook.sh'.
 
-cp GitScripts/run_all.sh .git/hooks/pre-commit
+cp GitScripts/run_all .git/hooks/pre-commit
 chmod +x .git/hooks/pre-commit

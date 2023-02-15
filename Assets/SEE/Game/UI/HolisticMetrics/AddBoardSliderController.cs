@@ -2,6 +2,7 @@ using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.UI.HolisticMetrics
@@ -71,11 +72,11 @@ namespace SEE.Game.UI.HolisticMetrics
         public void CreateBoard()
         {
             boardConfiguration.Rotation = dummyBoard.transform.rotation;
-            Destroy(dummyBoard);
+            Destroyer.Destroy(dummyBoard);
             
             new CreateBoardAction(boardConfiguration).Execute();
             
-            Destroy(gameObject);
+            Destroyer.Destroy(gameObject);
         }
     }
 }

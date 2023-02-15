@@ -4,6 +4,7 @@ using SEE.Controls;
 using SEE.Game.HolisticMetrics;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.UI.Notification;
+using SEE.Utils;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -47,10 +48,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         internal AddWidgetDialog()
         {
             // Load the metric types
-            metricTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(domainAssembly => domainAssembly.GetTypes())
-                .Where(type => type.IsSubclassOf(typeof(Metric)))
-                .ToArray();
+            metricTypes = Metric.GetTypes();
 
             // Load the widget prefabs
             const string widgetPrefabsPath = "Prefabs/HolisticMetrics/Widgets";
@@ -104,7 +102,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         private void AddWidget()
         {
             // Create a widget configuration
-            WidgetConfig widgetConfiguration = new WidgetConfig()
+            WidgetConfig widgetConfiguration = new()
             {
                 ID = Guid.NewGuid(),
                 MetricType = selectedMetric.Value,
@@ -117,7 +115,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             // Ensure they all get deleted once one of them gets a click (that should probably not be done here)
             
             // Close the dialog
-            Object.Destroy(dialog);
+            Destroyer.Destroy(dialog);
             SEEInput.KeyboardShortcutsEnabled = true;
 
             ShowNotification.Info(

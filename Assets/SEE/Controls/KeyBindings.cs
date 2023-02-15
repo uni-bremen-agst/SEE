@@ -333,9 +333,9 @@ namespace SEE.Controls
         //--------------------
 
         /// <summary>
-        /// Toggles the menu of the source-code viewer.
+        /// Toggles the menu of the available windows.
         /// </summary>
-        internal static readonly KeyCode ShowCodeWindowMenu = Register(KeyCode.F1, Scope.CodeViewer, "Toggles the menu of the source-code viewer.");
+        internal static readonly KeyCode ShowWindowMenu = Register(KeyCode.F1, Scope.CodeViewer, "Toggles the menu of the open windows.");
 
         /// <summary>
         /// Undoes an edit in the source-code viewer.

@@ -21,12 +21,12 @@ namespace SEE.Game.UI.PropertyDialog
         /// Event triggered when the user presses the OK button. Clients can
         /// register on this event to receive a notification when this happens.
         /// </summary>
-        public readonly UnityEvent OnConfirm = new UnityEvent();
+        public readonly UnityEvent OnConfirm = new();
         /// <summary>
         /// Event triggered when the user presses the Cancel button. Clients can
         /// register on this event to receive a notification when this happens.
         /// </summary>
-        public readonly UnityEvent OnCancel = new UnityEvent();
+        public readonly UnityEvent OnCancel = new();
 
         /// <summary>
         /// Dialogue providing all functions from the <see cref="HideAction"/> class
@@ -302,12 +302,12 @@ namespace SEE.Game.UI.PropertyDialog
         {
             if (dialog != null)
             {
-                Object.Destroy(dialog);
+                Destroyer.Destroy(dialog);
                 dialog = null;
             }
             if (selectionDialog != null)
             {
-                Object.Destroy(selectionDialog);
+                Destroyer.Destroy(selectionDialog);
                 selectionDialog = null;
             }
         }

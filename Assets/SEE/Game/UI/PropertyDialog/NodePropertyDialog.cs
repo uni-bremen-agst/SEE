@@ -1,5 +1,6 @@
 ﻿using SEE.Controls;
 using SEE.DataModel.DG;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -23,12 +24,12 @@ namespace SEE.Game.UI.PropertyDialog
         /// Event triggered when the user presses the OK button. Clients can
         /// register on this event to receive a notification when this happens.
         /// </summary>
-        public readonly UnityEvent OnConfirm = new UnityEvent();
+        public readonly UnityEvent OnConfirm = new();
         /// <summary>
         /// Event triggered when the user presses the Cancel button. Clients can
         /// register on this event to receive a notification when this happens.
         /// </summary>
-        public readonly UnityEvent OnCancel = new UnityEvent();
+        public readonly UnityEvent OnCancel = new();
 
         /// <summary>
         /// The graph node to be manipulated by this dialog.
@@ -118,7 +119,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         private void Close()
         {
-            Object.Destroy(dialog);
+            Destroyer.Destroy(dialog);
             dialog = null;
         }
     }

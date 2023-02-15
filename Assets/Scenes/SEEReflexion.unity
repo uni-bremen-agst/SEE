@@ -9426,6 +9426,7 @@ MonoBehaviour:
       absolutePath: 
   EdgeLayoutSettings:
     Kind: 3
+    AnimationKind: 2
     EdgeWidth: 0.01
     EdgesAboveBlocks: 1
     Tension: 0.85
@@ -11424,6 +11425,7 @@ MonoBehaviour:
       absolutePath: 
   EdgeLayoutSettings:
     Kind: 3
+    AnimationKind: 1
     EdgeWidth: 0.01
     EdgesAboveBlocks: 1
     Tension: 0.85
@@ -11459,7 +11461,7 @@ MonoBehaviour:
     LoadBoardOnStartup: 1
     BoardPath:
       Root: 3
-      relativePath: /reflexion/compiler/Reflexion.json
+      relativePath: /reflexion/compiler/ReflexionBoard.cfg
       absolutePath: 
   GXLPath:
     Root: 3

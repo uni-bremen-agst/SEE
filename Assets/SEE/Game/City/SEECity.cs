@@ -28,13 +28,13 @@ namespace SEE.Game.City
         /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
         /// </summary>
         [SerializeField, ShowInInspector, Tooltip("Path of GXL file"), FoldoutGroup(DataFoldoutGroup)]
-        public FilePath GXLPath = new FilePath();
+        public FilePath GXLPath = new();
 
         /// <summary>
         /// The path to the CSV file containing the additional metric values.
         /// </summary>
         [SerializeField, ShowInInspector, Tooltip("Path of metric CSV file"), FoldoutGroup(DataFoldoutGroup)]
-        public FilePath CSVPath = new FilePath();
+        public FilePath CSVPath = new();
 
         /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are
@@ -67,7 +67,7 @@ namespace SEE.Game.City
         ///
         /// Neither serialized nor saved to the config file.
         /// </summary>
-        public Graph LoadedGraph
+        public override Graph LoadedGraph
         {
             get => loadedGraph;
             protected set
@@ -396,9 +396,10 @@ namespace SEE.Game.City
         private GraphRenderer graphRenderer;
 
         /// <summary>
-        /// Yields a graph renderer that can draw this city.
+        /// Yields the graph renderer that draws this city.
         /// </summary>
-        public GraphRenderer Renderer => graphRenderer ??= new GraphRenderer(this, VisualizedSubGraph);
+        /// <remarks>Implements <see cref="AbstractSEECity.Renderer"/>.</remarks>
+        public override IGraphRenderer Renderer => graphRenderer ??= new GraphRenderer(this, VisualizedSubGraph);
 
         /// <summary>
         /// Saves the current layout of the city in a file named <see cref="LayoutPath"/>.

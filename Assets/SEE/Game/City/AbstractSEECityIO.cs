@@ -9,6 +9,7 @@ namespace SEE.Game.City
     /// </summary>
     public partial class AbstractSEECity
     {
+        #region Labels
         /// <summary>
         /// Label in the configuration file for <see cref="HierarchicalEdges"/>.
         /// </summary>
@@ -81,6 +82,8 @@ namespace SEE.Game.City
         /// Label in the configuration file for <see cref="AntennaWidth"/>.
         /// </summary>
         private const string AntennaWidthLabel = "AntennaWidth";
+
+        #endregion
 
         /// <summary>
         /// Saves all attributes of this AbstractSEECity instance in the configuration file

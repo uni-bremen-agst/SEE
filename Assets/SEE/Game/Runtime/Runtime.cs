@@ -5,6 +5,7 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.Runtime;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 using Sirenix.OdinInspector;
 
@@ -210,7 +211,7 @@ namespace SEE.Game.Runtime
                 functionCalls[i].Shutdown();
             }
             functionCalls.ForEach(e => e.Shutdown());
-            functionCalls.ForEach(e => Destroy(e.gameObject));
+            functionCalls.ForEach(e => Destroyer.Destroy(e.gameObject));
             functionCalls.Clear();
         }
     }

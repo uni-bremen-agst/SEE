@@ -488,8 +488,8 @@ namespace SEE.Game.Evolution
             sliderMarkerContainer.SliderMarkers.Remove(sliderMarker);
             InputField comment = markerDictionary[marker];
             markerDictionary.Remove(marker);
-            Destroy(comment.gameObject);
-            Destroy(marker.gameObject);
+            Destroyer.Destroy(comment.gameObject);
+            Destroyer.Destroy(marker.gameObject);
         }
 
         /// <summary>
