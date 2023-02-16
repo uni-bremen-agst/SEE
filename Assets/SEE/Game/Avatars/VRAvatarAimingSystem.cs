@@ -1,4 +1,5 @@
 ﻿using SEE.GO;
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.XR;
 
@@ -13,23 +14,29 @@ namespace SEE.Game.Avatars
     internal class VRAvatarAimingSystem : MonoBehaviour
     {
         [Tooltip("The laser beam for pointing. If null, one will be created at run-time.")]
-        public LaserPointer laser;
+        public LaserPointer Laser;
+
+        [Tooltip("If true, local interactions control where the avatar is pointing to.")]
+        public bool IsLocallyControlled = true;
 
         /// <summary>
         /// The source from which to start the laser beam. Assigning
         /// a value to this Source will always turn the laser on.
         /// </summary>
+        [ShowInInspector]
         public Transform Source
         {
             set
             {
-                if (laser == null)
+                if (Laser == null)
                 {
-                    laser = gameObject.AddOrGetComponent<LaserPointer>();
+                    Laser = gameObject.AddOrGetComponent<LaserPointer>();
                 }
-                laser.Source = value;
-                laser.On = true;
+
+                Laser.Source = value;
+                Laser.On = true;
             }
+            get { return Laser.Source; }
         }
 
         /// <summary>
@@ -47,25 +54,34 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void Awake()
         {
-            laser = gameObject.AddOrGetComponent<LaserPointer>();
-            laser.On = true;
+            Laser = gameObject.AddOrGetComponent<LaserPointer>();
+            Laser.On = true;
         }
 
         /// <summary>
         /// Retrieves the direction from the pointing device and aims the laser beam
         /// towards this direction. The position of <see cref="Target"/> is set to
         /// the end of the laser beam.
+        /// Also distinguishes between local controlled player and remote player.
+        /// If it's the remote player, draw method is directly called.
         /// </summary>
         private void Update()
         {
-            // Draw a line from the AimTransform of the avatar into the direction
-            // where the pointing device is pointing to.
-            UnityEngine.XR.InputDevice handR = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
-            if (handR.TryGetFeatureValue(UnityEngine.XR.CommonUsages.deviceRotation, out Quaternion rotR))
+            if (IsLocallyControlled)
             {
-                Vector3 direction = rotR * Vector3.forward;
-                // Move the aim target to the tip of the laser beam.
-                Target.position = laser.PointTowards(direction);
+                // Draw a line from the AimTransform of the avatar into the direction
+                // where the pointing device is pointing to.
+                InputDevice handR = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+                if (handR.TryGetFeatureValue(CommonUsages.deviceRotation, out Quaternion rotR))
+                {
+                    Vector3 direction = rotR * Vector3.forward;
+                    // Move the aim target to the tip of the laser beam.
+                    Target.position = Laser.PointTowards(direction);
+                }
+            }
+            else
+            {
+                Laser.Draw(Target.position);
             }
         }
     }
