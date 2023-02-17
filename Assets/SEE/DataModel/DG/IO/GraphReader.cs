@@ -49,17 +49,7 @@ namespace SEE.DataModel.DG.IO
         {
             try
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                {
-                    // Note that this parameterless version loads the library from the user's system,
-                    // but this only works on Linux, and in fact causes a permanent failure state on Windows
-                    // when called, hence we specify the path manually below.
-                    XZInit.GlobalInit();
-                }
-                else
-                {
-                    XZInit.GlobalInit(GetLiblzmaPath());
-                }
+                XZInit.GlobalInit(GetLiblzmaPath());
             }
             catch (InvalidOperationException e) when (e.Message.Contains(" is already initialized"))
             {
