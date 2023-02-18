@@ -58,6 +58,19 @@ namespace SEE.DataModel.DG.IO
             LoadGraph(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/CodeFacts.gxl.xz");
         }
 
+        private static bool CompressedWritingSupported()
+        {
+            if (Environment.GetEnvironmentVariable("RUNNER_OS") == "Linux")
+            {
+                // Not supported on CI, because docker image for game-ci/unity-test-runner is based on Ubuntu 18.04,
+                // which does not support liblzma properly.
+                Assert.Ignore("Saving compressed GXL files is not yet supported on the CI runner.");
+                return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Test for a simple artificially created graph.
         /// </summary>
@@ -74,7 +87,10 @@ namespace SEE.DataModel.DG.IO
             // when comparing two graphs.
             outGraph.Path = basename + (compress ? NormalExtension : CompressedExtension);
 
-            WriteReadGraph(basename, outGraph, compress);
+            if (!compress || CompressedWritingSupported())
+            {
+                WriteReadGraph(basename, outGraph, compress);
+            }
         }
 
         /// <summary>
@@ -109,7 +125,10 @@ namespace SEE.DataModel.DG.IO
                 // when comparing two graphs.
                 outGraph.Path = basename + (compress ? NormalExtension : CompressedExtension);
 
-                WriteReadGraph(basename, outGraph, compress);
+                if (!compress || CompressedWritingSupported())
+                {
+                    WriteReadGraph(basename, outGraph, compress);
+                }
             }
         }
 
