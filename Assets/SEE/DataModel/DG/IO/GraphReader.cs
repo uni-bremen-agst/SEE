@@ -50,6 +50,7 @@ namespace SEE.DataModel.DG.IO
             try
             {
                 XZInit.GlobalInit(GetLiblzmaPath());
+                Debug.Log($"XZ Version: {XZInit.VersionString()}");
             }
             catch (InvalidOperationException e) when (e.Message.Contains(" is already initialized"))
             {
