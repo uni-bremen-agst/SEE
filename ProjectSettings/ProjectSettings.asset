@@ -143,7 +143,7 @@ PlayerSettings:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: 3133245131686726631, guid: ab503467b672b944faf19db21f3c55cc, type: 2}
+  - {fileID: 2489328711382419796, guid: 1fc620f3d43365f47a0ae74f688e5a96, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -396,8 +396,8 @@ PlayerSettings:
   enableCrashReportAPI: 0
   cameraUsageDescription: Camera
   locationUsageDescription: 
-  microphoneUsageDescription: 
-  bluetoothUsageDescription: 
+  microphoneUsageDescription: Microphone is needed for Voice Chat
+  bluetoothUsageDescription: Bluetooth is nedded
   switchNMETAOverride: 
   switchNetLibKey: 
   switchSocketMemoryPoolSize: 6144
