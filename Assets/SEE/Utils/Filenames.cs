@@ -8,12 +8,13 @@ namespace SEE.Utils
     /// <summary>
     /// Utilities for pathnames.
     /// </summary>
-    public class Filenames
+    public abstract class Filenames
     {
         /// <summary>
         /// Directory separator on Windows.
         /// </summary>
         public const char WindowsDirectorySeparator = '\\';
+        
         /// <summary>
         /// Directory separator on Unix.
         /// </summary>
@@ -70,6 +71,11 @@ namespace SEE.Utils
         public const string SolutionExtension = ".sln";
 
         /// <summary>
+        /// File extension for LZMA compressed GXL files.
+        /// </summary>
+        public const string CompressedGXLExtension = GXLExtension + ".xz";
+
+        /// <summary>
         /// Returns the last part of the given <paramref name="extension"/>
         /// without the period.
         /// 
@@ -79,7 +85,7 @@ namespace SEE.Utils
         /// <returns><paramref name="extension"/> without leading period</returns>
         public static string ExtensionWithoutPeriod(string extension)
         {
-            return extension.Substring(1);
+            return extension[1..];
         }
 
         /// <summary>
@@ -140,6 +146,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// Returns the sorted list of GXL filenames of the given <paramref name="directory"/>.
+        /// Note that this also finds compressed GXL files.
         /// 
         /// Precondition: <paramref name="directory"/> must not be null or empty and must exist
         /// as a directory in the file system.
@@ -148,7 +155,8 @@ namespace SEE.Utils
         /// <returns>sorted list of GXL filenames</returns>
         public static IEnumerable<string> GXLFilenames(string directory)
         {
-            return FilenamesInDirectory(directory, Globbing(GXLExtension));
+            return FilenamesInDirectory(directory, Globbing(GXLExtension))
+                .Concat(FilenamesInDirectory(directory, Globbing(CompressedGXLExtension)));
         }
 
         /// <summary>
@@ -177,7 +185,7 @@ namespace SEE.Utils
         /// <paramref name="globbing"/></returns>
         public static IEnumerable<string> FilenamesInDirectory(string directory, string globbing)
         {
-            if (String.IsNullOrEmpty(directory))
+            if (string.IsNullOrEmpty(directory))
             {
                 throw new Exception("Directory not set.");
             }

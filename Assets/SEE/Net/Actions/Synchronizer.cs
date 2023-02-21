@@ -40,7 +40,7 @@ namespace SEE.Net.Actions
         private const float RepeatCycle = 0.1f;
 
         /// <summary>
-        /// Intializes <see cref="sendUpdate"/>, <see cref="interactable"/>, and
+        /// Initializes <see cref="sendUpdate"/>, <see cref="interactable"/>, and
         /// <see cref="updateTimeout"/>. The period call of <see cref="Synchronize"/> is
         /// triggered.
         /// </summary>

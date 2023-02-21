@@ -681,6 +681,10 @@ namespace SEE.Controls
 
         #endregion
 
+        /// <summary>
+        /// Whether the user wants to toggle the menu for the metric boards.
+        /// </summary>
+        /// <returns>true if the user wants to toggle the menu for the metric boards</returns>
         public static bool ToggleHolisticMetricsMenu()
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleHolisticMetricsMenu);

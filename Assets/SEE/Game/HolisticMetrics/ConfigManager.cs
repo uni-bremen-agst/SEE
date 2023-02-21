@@ -40,7 +40,7 @@ namespace SEE.Game.HolisticMetrics
         internal static string[] GetSavedFileNames()
         {
             EnsureBoardsDirectoryExists();
-            DirectoryInfo directoryInfo = new DirectoryInfo(metricsBoardsPath);
+            DirectoryInfo directoryInfo = new(metricsBoardsPath);
             FileInfo[] fileInfos = directoryInfo.GetFiles();
             string[] fileNames = new string[fileInfos.Length];
             for (int i = 0; i < fileInfos.Length; i++)
@@ -58,25 +58,31 @@ namespace SEE.Game.HolisticMetrics
         /// </summary>
         /// <param name="path">The path to the file which shall be loaded</param>
         /// <returns>The GameObject that represents the metrics displays</returns>
+        /// <exception cref="Exception">thrown if <paramref name="path"/> does not exist</exception>
         internal static BoardConfig LoadBoard(FilePath path)
         {
-            BoardConfig config = new BoardConfig();
+            if (!File.Exists(path.Path))
+            {
+                throw new Exception($"Board configuration file {path.Path} does not exist.");
+            }
+            using ConfigReader stream = new(path.Path);
+            Dictionary<string, object> attributes = stream.Read();
+            BoardConfig config = new();
             try
             {
-                using ConfigReader stream = new ConfigReader(path.Path);
-                Dictionary<string, object> attributes = stream.Read();
                 if (!config.Restore(attributes))
                 {
-                    ShowNotification.Warn(
-                        "Error loading board",
-                        "Not all board attributes were loaded correctly");
+                    ShowNotification.Warn
+                        ("Issue loading board",
+                         "Not all metric board attributes were loaded correctly");
                 }
             }
             catch (Exception e)
             {
-                string description = $"Could not load settings from {path.Path}: {e.Message}";
-                ShowNotification.Error("Error loading board", description);
-                Debug.LogError(description);
+                ShowNotification.Error
+                    ("Error loading board",
+                     $"Metric board configuration could not be loaded: {e.Message}");
+
             }
             return config;
         }
@@ -101,9 +107,10 @@ namespace SEE.Game.HolisticMetrics
         {
             EnsureBoardsDirectoryExists();
             string filePath = metricsBoardsPath + fileName + Filenames.ConfigExtension;
-            using ConfigWriter writer = new ConfigWriter(filePath);
+            using ConfigWriter writer = new(filePath);
             BoardConfig config = GetBoardConfig(widgetsManager);
             config.Save(writer);
+            Debug.Log($"Saved metric-board configuration to file {filePath}.\n");
         }
 
         /// <summary>
@@ -114,7 +121,7 @@ namespace SEE.Game.HolisticMetrics
         internal static BoardConfig GetBoardConfig(WidgetsManager widgetsManager)
         {
             Transform boardTransform = widgetsManager.transform;
-            BoardConfig config = new BoardConfig()
+            BoardConfig config = new()
             {
                 Title = widgetsManager.GetTitle(),
                 Position = boardTransform.localPosition,
@@ -140,7 +147,7 @@ namespace SEE.Game.HolisticMetrics
         {
             string widgetName = widgetController.gameObject.name;
             widgetName = widgetName.Substring(0, widgetName.Length - 7);
-            WidgetConfig config = new WidgetConfig
+            WidgetConfig config = new()
             {
                 ID = widgetController.ID,
                 MetricType = metric.GetType().Name,

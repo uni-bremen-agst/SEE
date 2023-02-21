@@ -4,7 +4,11 @@
 # This commit will only exist on old histories. If it exists, it must not be pushed,
 # otherwise all of the old history we took care to remove will be present again.
 
-set -e
+if [ -n "$CI" ]; then
+    set -ex
+else
+    set -e
+fi
 
 if git --no-replace-objects show -s d5eb0645d999623b72025d0bf19227a787af1fb1 2>/dev/null = 0; then
     if [ -n "$CI" ]; then
