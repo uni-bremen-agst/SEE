@@ -375,7 +375,7 @@ namespace DlibFaceLandmarkDetectorExample
                     testRect = rect;
                     //testRgbaMat = RgbaMat;
 
-                    Debug.Log("rgbaMat height: " + rgbaMat.height() );
+                    //Debug.Log("rgbaMat height: " + rgbaMat.height() );
                     
 
 
