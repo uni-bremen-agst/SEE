@@ -518,6 +518,13 @@ namespace SEE.Game.Avatars
                 aaSystem.enabled = true;
             }
             gameObject.AddComponent<DesktopPlayerMovement>();
+            
+            // WebcamFaceMask
+            Instantiate(Resources.Load<GameObject>("WebcamFaceMask/WEBCAM"), new Vector3(0, 0, 0), Quaternion.identity);
+            //Falls als Child
+            //GameObject myCircle = (GameObject)Instantiate(circle, transform.position, Quaternion.identity);
+            //myCircle.transform.parent = transform;
+
         }
 
         /// <summary>

@@ -52,6 +52,12 @@ namespace DlibFaceLandmarkDetectorExample
         /// </summary>
         public Toggle useOpenCVFaceDetectorToggle;
 
+
+        /// Testing
+        /// 
+
+        public UnityEngine.Rect testRect;
+
         /// <summary>
         /// The gray mat.
         /// </summary>
@@ -334,6 +340,11 @@ namespace DlibFaceLandmarkDetectorExample
                 // set the original scale image
                 OpenCVForUnityUtils.SetImage(faceLandmarkDetector, rgbaMat);
                 // detect face landmarks on the original image
+                
+                //zum testen
+                int rectAnzahl = 0;
+
+
                 foreach (var rect in detectionResult)
                 {
 
@@ -342,8 +353,43 @@ namespace DlibFaceLandmarkDetectorExample
 
                     //draw landmark points
                     OpenCVForUnityUtils.DrawFaceLandmark(rgbaMat, points, new Scalar(0, 255, 0, 255), 2);
+
                     //draw face rect
                     OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(255, 0, 0, 255), 2);
+
+
+
+
+                    if (rectAnzahl == 0 || rectAnzahl % 2 == 0)
+                    {
+                        OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(255, 0, 0, 255), 2);
+                    }
+                    else
+                    {
+                        OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(0, 0, 255, 255), 2);
+                    }
+
+                   // Debug.Log("Listen Range: " + rectAnzahl);
+                    rectAnzahl++;
+                    //Debug.Log("Rectangle: " + rect);
+                    testRect = rect;
+                    //testRgbaMat = RgbaMat;
+
+                    Debug.Log("rgbaMat height: " + rgbaMat.height() );
+                    
+
+
+                    /*
+                    Debug.Log("List Range: " + points.Count);
+                    List<Vector2> points2 = points.GetRange(0, 4);
+                    Debug.Log("List Range: " + points.Count);
+                    Debug.Log("List2 Range: " + points2.Count);
+
+                    OpenCVForUnityUtils.DrawFaceLandmark(rgbaMat, points2, new Scalar(255, 0, 0, 255), 2);
+                    */
+
+
+
                 }
 
                 //Imgproc.putText (rgbaMat, "Original:(" + rgbaMat.width () + "," + rgbaMat.height () + ") DownScale:(" + rgbaMat.width () / imageOptimizationHelper.downscaleRatio + "," + rgbaMat.height () / imageOptimizationHelper.downscaleRatio + ") FrameSkipping: " + imageOptimizationHelper.frameSkippingRatio, new Point (5, rgbaMat.rows () - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 1.0, new Scalar (255, 255, 255, 255), 2, Imgproc.LINE_AA, false);
