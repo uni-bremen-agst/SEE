@@ -93,7 +93,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
     protected virtual void CreateButton(MemberInfo memberInfo)
     {
-        if (memberInfo.CustomAttributes.Where(attribute => attribute.AttributeType == typeof(ButtonGroupAttribute)).Count() > 0)
+        if (memberInfo.CustomAttributes.Where(attribute => attribute.AttributeType == typeof(RuntimeButtonAttribute)).Count() > 0)
         {
             Transform buttonContent = Content.transform.Find("ConfigButtons/Content");
             GameObject button = PrefabInstantiator.InstantiatePrefab(BUTTON_PREFAB, buttonContent, false);
@@ -172,7 +172,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     /// <returns></returns>
     private GameObject GetViewGameObjectHelper(MemberInfo memberInfo)
     {
-        string tabName = memberInfo.GetCustomAttributes().OfType<TabGroupAttribute>().FirstOrDefault()?.TabName ??
+        string tabName = memberInfo.GetCustomAttributes().OfType<RuntimeFoldoutAttribute>().FirstOrDefault()?.name ??
                          memberInfo.GetCustomAttributes().OfType<PropertyGroupAttribute>().FirstOrDefault()?.GroupName ??
                          "Misc";
         ToggleMenuEntry entry = Entries.FirstOrDefault(entry => entry.Title == tabName);
