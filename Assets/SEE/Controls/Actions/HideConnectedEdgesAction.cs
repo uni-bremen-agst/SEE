@@ -8,18 +8,16 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
-    public class HideConnectedEdgesAction : AbstractPlayerAction
+    /// <summary>
+    /// Hides the incoming and outgoing edges of this node.
+    /// </summary>
+    internal class HideConnectedEdgesAction : AbstractHideAction
     {
         /// <summary>
         /// The currently selected node whose connected edges are
         /// to be hidden.
         /// </summary>
         private GameObject selectedNode;
-
-        /// <summary>
-        /// The list of currently hidden objects.
-        /// </summary>
-        private readonly ISet<GameObject> hiddenObjects = new HashSet<GameObject>();
 
         /// <summary>
         /// Returns a new instance of <see cref="HideConnectedEdgesAction"/>.
@@ -52,6 +50,7 @@ namespace SEE.Controls.Actions
             {
                 // the hit object is the one whose connected
                 selectedNode = raycastHit.collider.gameObject;
+
                 HideAllConnectedEdges(selectedNode);
                 // TODO: new HideNetAction(selectedNode.name).Execute();
                 currentState = ReversibleAction.Progress.Completed;
@@ -66,6 +65,7 @@ namespace SEE.Controls.Actions
 
         public override HashSet<string> GetChangedObjects()
         {
+            // FIXME: Must include all hidden objects.
             return new HashSet<string>() { selectedNode.name };
         }
 
