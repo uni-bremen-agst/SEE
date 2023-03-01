@@ -6,10 +6,8 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Layout;
-using SEE.Layout.EdgeLayouts;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
-using TinySpline;
 using UnityEngine;
 
 namespace SEE.Game.Operator
@@ -247,7 +245,7 @@ namespace SEE.Game.Operator
                 return;
             }
 
-            IEnumerable<Node> GetMappedNodes(Node mappedNode)
+            static IEnumerable<Node> GetMappedNodes(Node mappedNode)
             {
                 if (mappedNode.IsInArchitecture())
                 {
