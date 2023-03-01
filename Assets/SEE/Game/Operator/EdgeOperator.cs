@@ -8,7 +8,6 @@ using SEE.GO;
 using SEE.Utils;
 using TinySpline;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Game.Operator
 {
