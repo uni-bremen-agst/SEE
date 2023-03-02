@@ -76,9 +76,9 @@ namespace SEE.Controls.Actions
         {
             foreach (GameObject go in hiddenObjects)
             {
-                if (go.TryGetComponent(out EdgeOperator edgeOperator))
+                if (go.TryGetComponent(out GraphElementOperator graphElementOperator))
                 {
-                    edgeOperator.Show(Game.City.GraphElementAnimationKind.Fading, animationDuration);
+                    graphElementOperator.Show(Game.City.GraphElementAnimationKind.Fading, animationDuration);
                 }
             }
         }
@@ -92,9 +92,9 @@ namespace SEE.Controls.Actions
         {
             foreach (GameObject go in hiddenObjects)
             {
-                if (go.TryGetComponent(out EdgeOperator edgeOperator))
+                if (go.TryGetComponent(out GraphElementOperator graphElementOperator))
                 {
-                    edgeOperator.Hide(Game.City.GraphElementAnimationKind.Fading, animationDuration);
+                    graphElementOperator.Hide(Game.City.GraphElementAnimationKind.Fading, animationDuration);
                 }
             }
         }

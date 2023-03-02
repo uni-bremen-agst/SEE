@@ -17,7 +17,7 @@ namespace SEE.Game.Operator
     /// Available operations consist of the public methods exported by this class.
     /// Operations can be animated or executed directly, by setting the duration to 0.
     /// </summary>
-    public partial class NodeOperator : AbstractOperator
+    public partial class NodeOperator : GraphElementOperator
     {
         // We split up movement on the three axes because it makes sense in certain situations.
         // For example, when dragging a node along the XZ-axis, if we want to place it on top
@@ -307,8 +307,10 @@ namespace SEE.Game.Operator
             }
         }
 
-        private void OnEnable()
+        protected override void OnEnable()
         {
+            base.OnEnable();
+
             Node = GetNode(gameObject);
             City = GetCity(gameObject);
             Vector3 currentPosition = transform.position;
@@ -329,6 +331,18 @@ namespace SEE.Game.Operator
             LabelTextPosition = new TweenOperation<Vector3>(AnimateLabelTextPositionAction, DesiredLabelTextPosition);
             LabelStartLinePosition = new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction, DesiredLabelStartLinePosition);
             LabelEndLinePosition = new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction, DesiredLabelEndLinePosition);
+
+            GameObject go = gameObject;
+
+            color = new TweenOperation<(Color start, Color end)>(AnimateToColorAction, (go.GetColor(), go.GetColor()));
+
+            Tween[] AnimateToColorAction((Color start, Color end) colors, float d)
+            {
+                Tween colorTween = DOTween.To(() => go.GetColor(),
+                                              c => go.SetColor(c),
+                                              colors.start, d);
+                return new[] { colorTween.Play() };
+            }
 
             #region Local Methods
 
@@ -363,8 +377,10 @@ namespace SEE.Game.Operator
             #endregion
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
+            base.OnEnable();
+
             PositionX.KillAnimator();
             PositionX = null;
             PositionY.KillAnimator();
@@ -392,6 +408,16 @@ namespace SEE.Game.Operator
                 UpdateLayout(updateLayoutDuration.Value);
                 updateLayoutDuration = null;
             }
+        }
+
+        protected override IOperationCallback<Action> Construct(float duration)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override IOperationCallback<Action> Destruct(float duration)
+        {
+            throw new NotImplementedException();
         }
     }
 }
