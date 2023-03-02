@@ -1,9 +1,10 @@
 namespace SEE.Game.City
 {
     /// <summary>
-    /// The kinds of edge animations available.
+    /// The kinds of node and edge animations available for appearing
+    /// or disappearing.
     /// </summary>
-    public enum EdgeAnimationKind : byte
+    public enum GraphElementAnimationKind : byte
     {
         /// <summary>
         /// Edges fade into existence from full transparency

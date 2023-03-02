@@ -80,7 +80,7 @@ namespace SEE.Game.City
         {
             if (gameObject.IsCodeCityDrawn())
             {
-                EdgeAnimationKind animationKind = City.EdgeLayoutSettings.AnimationKind;
+                GraphElementAnimationKind animationKind = City.EdgeLayoutSettings.AnimationKind;
                 // We have to set an initial color for the edges, and we have to convert them to meshes.
                 foreach (Edge edge in CityGraph.Edges().Where(x => !x.HasToggle(GraphElement.IsVirtualToggle)))
                 {

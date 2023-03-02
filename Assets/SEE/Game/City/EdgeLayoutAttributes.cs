@@ -19,7 +19,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Kind of animation used to draw edges.
         /// </summary>
-        public EdgeAnimationKind AnimationKind = EdgeAnimationKind.None;
+        public GraphElementAnimationKind AnimationKind = GraphElementAnimationKind.None;
 
         /// <summary>
         /// The width of an edge (drawn as line).

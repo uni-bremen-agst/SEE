@@ -194,7 +194,7 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
+            GraphElementAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
 
             // TODO: Perhaps the node along with its edges should be cached?
             foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
@@ -211,7 +211,7 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
+            GraphElementAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
 
             foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
             {

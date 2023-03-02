@@ -208,7 +208,7 @@ namespace SEE.Game.Operator
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> Show(EdgeAnimationKind animationKind, float duration)
+        public IOperationCallback<Action> Show(GraphElementAnimationKind animationKind, float duration)
         {
             return ShowOrHide(true, animationKind, duration);
         }
@@ -220,7 +220,7 @@ namespace SEE.Game.Operator
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> Hide(EdgeAnimationKind animationKind, float duration)
+        public IOperationCallback<Action> Hide(GraphElementAnimationKind animationKind, float duration)
         {
             return ShowOrHide(false, animationKind, duration);
         }
@@ -237,13 +237,13 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         /// <exception cref="ArgumentOutOfRangeException">If the given <paramref name="animationKind"/>
         /// is unknown.</exception>
-        private IOperationCallback<Action> ShowOrHide(bool show, EdgeAnimationKind animationKind, float duration)
+        private IOperationCallback<Action> ShowOrHide(bool show, GraphElementAnimationKind animationKind, float duration)
         {
             return animationKind switch
             {
-                EdgeAnimationKind.None => new DummyOperationCallback<Action>(),
-                EdgeAnimationKind.Fading => FadeTo(show ? 1.0f : 0.0f, duration),
-                EdgeAnimationKind.Buildup => show ? Construct(duration) : Destruct(duration),
+                GraphElementAnimationKind.None => new DummyOperationCallback<Action>(),
+                GraphElementAnimationKind.Fading => FadeTo(show ? 1.0f : 0.0f, duration),
+                GraphElementAnimationKind.Buildup => show ? Construct(duration) : Destruct(duration),
                 _ => throw new ArgumentOutOfRangeException(nameof(animationKind), "Unknown edge animation kind supplied.")
             };
         }
