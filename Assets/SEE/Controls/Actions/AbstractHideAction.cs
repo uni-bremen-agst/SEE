@@ -1,7 +1,10 @@
-﻿using SEE.Game.Operator;
+﻿using SEE.Audio;
+using SEE.Game.Operator;
+using SEE.GO;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -56,7 +59,11 @@ namespace SEE.Controls.Actions
         }
 
         public abstract ActionStateType GetActionStateType();
-        public abstract HashSet<string> GetChangedObjects();
+
+        public HashSet<string> GetChangedObjects()
+        {
+            return new HashSet<String>(hiddenObjects.Select(o => o.name));
+        }
 
         public abstract ReversibleAction NewInstance();
 
@@ -71,7 +78,7 @@ namespace SEE.Controls.Actions
             {
                 if (go.TryGetComponent(out EdgeOperator edgeOperator))
                 {
-                    edgeOperator.Show(Game.City.EdgeAnimationKind.Fading, animationDuration);
+                    edgeOperator.Show(Game.City.GraphElementAnimationKind.Fading, animationDuration);
                 }
             }
         }
@@ -87,11 +94,35 @@ namespace SEE.Controls.Actions
             {
                 if (go.TryGetComponent(out EdgeOperator edgeOperator))
                 {
-                    edgeOperator.Hide(Game.City.EdgeAnimationKind.Fading, animationDuration);
+                    edgeOperator.Hide(Game.City.GraphElementAnimationKind.Fading, animationDuration);
                 }
             }
         }
 
-        public abstract bool Update();
+        public virtual bool Update()
+        {
+            // FIXME: Needs adaptation for VR where no mouse is available.
+            if (Input.GetMouseButtonDown(0)
+                && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
+            {
+                // TODO: new HideNetAction(selectedNode.name).Execute();
+                hiddenObjects.UnionWith(Hide(raycastHit.collider.gameObject));
+                HideObjects();
+                currentState = ReversibleAction.Progress.Completed;
+                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Returns the nodes and/or edges that are to be hidden.
+        /// </summary>
+        /// <param name="selection">the currently selected node or edge</param>
+        /// <returns>The set of game objects to be hidden.</returns>
+        protected abstract ISet<GameObject> Hide(GameObject selection);
     }
 }

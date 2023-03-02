@@ -1,5 +1,4 @@
-﻿using SEE.Audio;
-using SEE.DataModel;
+﻿using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
@@ -40,33 +39,6 @@ namespace SEE.Controls.Actions
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.HideConnectedEdges;
-        }
-
-        public override bool Update()
-        {
-            // FIXME: Needs adaptation for VR where no mouse is available.
-            if (Input.GetMouseButtonDown(0)
-                && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
-            {
-                // the hit object is the one whose connected
-                selectedNode = raycastHit.collider.gameObject;
-
-                HideAllConnectedEdges(selectedNode);
-                // TODO: new HideNetAction(selectedNode.name).Execute();
-                currentState = ReversibleAction.Progress.Completed;
-                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public override HashSet<string> GetChangedObjects()
-        {
-            // FIXME: Must include all hidden objects.
-            return new HashSet<string>() { selectedNode.name };
         }
 
         /// <summary>
@@ -235,6 +207,12 @@ namespace SEE.Controls.Actions
         private bool HideAllConnectedEdges(GameObject selectedNode)
         {
             return HideIncomingEdges(selectedNode) && HideOutgoingEdges(selectedNode);
+        }
+
+        protected override ISet<GameObject> Hide(GameObject selection)
+        {
+            HashSet<GameObject> result = new() { selection };
+            return result;
         }
     }
 }
