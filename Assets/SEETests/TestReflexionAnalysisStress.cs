@@ -84,7 +84,7 @@ namespace SEE.Tools.Architecture
         {
             string platformPath = Filenames.OnCurrentPlatform(path);
             Debug.LogFormat("Loading graph from {0}...\n", platformPath);
-            GraphReader graphCreator = new GraphReader(platformPath, HierarchicalEdges, basePath: "", rootID: "", logger);
+            GraphReader graphCreator = new(platformPath, HierarchicalEdges, basePath: "", rootID: "", logger);
             graphCreator.Load();
             Graph result = graphCreator.GetGraph();
             Assert.That(result, !Is.Null);
@@ -95,11 +95,11 @@ namespace SEE.Tools.Architecture
 
         private void LoadAll(string folderName, out Graph impl, out Graph arch, out Graph mapping)
         {
-            string path = Application.streamingAssetsPath + "/reflexion/" + folderName + "/";
+            string path = $"{Application.streamingAssetsPath}/reflexion/{folderName}/";
             Performance p = Performance.Begin("Loading graphs");
-            impl = Load(path + "CodeFacts.gxl");
-            arch = Load(path + "Architecture.gxl");
-            mapping = Load(path + "Mapping.gxl");
+            impl = Load($"{path}CodeFacts.gxl.xz");
+            arch = Load($"{path}Architecture.gxl");
+            mapping = Load($"{path}Mapping.gxl");
             p.End();
         }
     }

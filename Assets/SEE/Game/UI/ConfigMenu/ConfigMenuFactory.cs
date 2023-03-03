@@ -89,7 +89,7 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void ReplaceMenu(EditableInstance newInstance)
         {
-            Destroy(configMenu.gameObject);
+            Destroyer.Destroy(configMenu.gameObject);
             BuildConfigMenu(newInstance, true);
         }
 

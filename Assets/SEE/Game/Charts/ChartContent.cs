@@ -25,6 +25,7 @@ using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.GO;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -817,7 +818,7 @@ namespace SEE.Game.Charts
                 // Check for null avoids double destroy. Operator == is overloaded accordingly.
                 foreach (ChartMarker marker in activeMarkers.Where(marker => marker != null && marker.gameObject != null))
                 {
-                    Destroy(marker.gameObject);
+                    Destroyer.Destroy(marker.gameObject);
                 }
                 activeMarkers.Clear();
             }
@@ -1033,7 +1034,7 @@ namespace SEE.Game.Charts
         /// </summary>
         public void Destroy()
         {
-            Destroy(gameObject);
+            Destroyer.Destroy(gameObject);
         }
 
         /// <summary>

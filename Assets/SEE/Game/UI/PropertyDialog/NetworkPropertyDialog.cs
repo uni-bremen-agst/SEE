@@ -4,6 +4,8 @@ using SEE.GO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Utils;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using static SEE.Net.Network;
@@ -287,7 +289,7 @@ namespace SEE.Game.UI.PropertyDialog
         /// </summary>
         private void Close()
         {
-            UnityEngine.Object.Destroy(dialog);
+            Destroyer.Destroy(dialog);
             dialog = null;
         }
     }

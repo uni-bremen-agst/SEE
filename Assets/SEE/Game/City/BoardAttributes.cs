@@ -11,13 +11,13 @@ namespace SEE.Game.City
     /// Attributes relating to the holistic metrics boards.
     /// </summary>
     [Serializable]
-    public class BoardAttributes: VisualAttributes
+    public class BoardAttributes : VisualAttributes
     {
         [Tooltip("Whether a holistic metric board shall be loaded on startup.")]
         public bool LoadBoardOnStartup;
 
         [SerializeField, Tooltip("Path to the board that shall be loaded."), ShowIf(nameof(LoadBoardOnStartup))]
-        public FilePath BoardPath = new FilePath();
+        public FilePath BoardPath = new();
 
         /// <summary>
         /// Loads the board specified at <see cref="BoardPath"/> if
@@ -27,8 +27,7 @@ namespace SEE.Game.City
         {
             if (LoadBoardOnStartup)
             {
-                BoardConfig boardConfiguration = ConfigManager.LoadBoard(BoardPath);
-                BoardsManager.Create(boardConfiguration);
+                BoardsManager.Create(ConfigManager.LoadBoard(BoardPath));
             }
         }
 
@@ -41,6 +40,7 @@ namespace SEE.Game.City
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
+            writer.Save(LoadBoardOnStartup, LoadBoardOnStartupLabel);
             BoardPath.Save(writer, BoardPathLabel);
             writer.EndGroup();
         }
@@ -57,7 +57,7 @@ namespace SEE.Game.City
             if (attributes.TryGetValue(label, out object dictionary))
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-                
+                ConfigIO.Restore(attributes, LoadBoardOnStartupLabel, ref LoadBoardOnStartup);
                 BoardPath.Restore(values, BoardPathLabel);
             }
         }
@@ -66,5 +66,10 @@ namespace SEE.Game.City
         /// Label for <see cref="BoardPath"/> in the configuration file.
         /// </summary>
         private const string BoardPathLabel = "BoardPath";
+
+        /// <summary>
+        /// Label for <see cref="LoadBoardOnStartup"/> in the configuration file.
+        /// </summary>
+        private const string LoadBoardOnStartupLabel = "LoadBoardOnStartup";
     }
 }
