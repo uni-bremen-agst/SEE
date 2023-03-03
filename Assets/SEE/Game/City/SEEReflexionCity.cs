@@ -131,7 +131,7 @@ namespace SEE.Game.City
                 LoadedGraph = reflexionGraph;
                 Debug.Log($"Loaded graph {LoadedGraph.Name}.\n");
                 Visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
-                Visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph);
+                Visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
                 Debug.Log("Initialized Reflexion Analysis.\n");
             }
 

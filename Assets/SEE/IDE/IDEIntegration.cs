@@ -36,6 +36,7 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.UI.Notification;
 using SEE.GO;
+using SEE.Utils;
 using SEE.Utils.RPC;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -49,7 +50,7 @@ namespace SEE.IDE
     /// future.
     /// Note: Only one instance of this class can be created.
     /// </summary>
-    public partial class IDEIntegration : MonoBehaviour
+    public partial class IDEIntegration
     {
         /// <summary>
         /// Whether the integration with the IDE should be enabled.
@@ -160,7 +161,7 @@ namespace SEE.IDE
             if (!EnableIDEIntegration)
             {
                 enabled = false;
-                Destroy(this);
+                Destroyer.Destroy(this);
             }
         }
 
@@ -184,7 +185,7 @@ namespace SEE.IDE
 #if UNITY_EDITOR
                 Debug.LogError($"Only one instance of '{this}' can be initiated!");
 #endif
-                Destroy(this);
+                Destroyer.Destroy(this);
                 return;
             }
 

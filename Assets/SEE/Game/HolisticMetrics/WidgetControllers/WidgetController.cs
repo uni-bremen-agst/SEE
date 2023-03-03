@@ -1,5 +1,6 @@
 using System;
 using SEE.Game.HolisticMetrics.Components;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -59,7 +60,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
             }
             else
             {
-                Destroy(mover);
+                Destroyer.Destroy(mover);
             }
         }
 
@@ -71,7 +72,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         {
             for (int i = parent.childCount -1; i >= 0; i--)
             {
-                Destroy(parent.GetChild(i).gameObject);
+                Destroyer.Destroy(parent.GetChild(i).gameObject);
             }
         }
     }

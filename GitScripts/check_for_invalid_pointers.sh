@@ -5,7 +5,11 @@
 # It's unclear to me how such a situation occurs.
 # So far it just had to be fixed once, in PR #545.
 
-set -e
+if [ -n "$CI" ]; then
+    set -ex
+else
+    set -e
+fi
 
 GIT_FSCK="git lfs fsck"
 
