@@ -8,23 +8,18 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Hides the incoming and outgoing edges of this node.
+    /// Hides selected nodes including their descendants and all
+    /// incoming and outgoing edges of this node and their descendants.
     /// </summary>
-    internal class HideConnectedEdgesAction : AbstractHideAction
+    internal class HideNodeAction : AbstractHideAction
     {
         /// <summary>
-        /// The currently selected node whose connected edges are
-        /// to be hidden.
-        /// </summary>
-        private GameObject selectedNode;
-
-        /// <summary>
-        /// Returns a new instance of <see cref="HideConnectedEdgesAction"/>.
+        /// Returns a new instance of <see cref="HideNodeAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
         public static ReversibleAction CreateReversibleAction()
         {
-            return new HideConnectedEdgesAction();
+            return new HideNodeAction();
         }
 
         /// <summary>

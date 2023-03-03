@@ -73,7 +73,7 @@ namespace SEE.Controls.Actions
         public static ActionStateType HideConnectedEdges { get; } =
             new ActionStateType("Hide Connected Edges", "Hides connected edges",
                                 Color.yellow.Darker(), "Materials/ModernUIPack/Eye",
-                                HideConnectedEdgesAction.CreateReversibleAction,
+                                HideNodeAction.CreateReversibleAction,
                                 Hide);
         public static ActionStateType NewEdge { get; } =
             new ActionStateType("New Edge", "Draw a new edge between two nodes",
