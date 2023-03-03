@@ -34,7 +34,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     public const string COLORPICKER_PREFAB = UI_PREFAB_FOLDER + "Input Group - Color Picker";
     public const string STRINGFIELD_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "Input Group - StringInputField";
     public const string BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "Button";
-    protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenuRework";
+    protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenuRework_v2";
     protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsView";
     protected override string EntryPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeTabButton";
     
@@ -48,7 +48,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     protected override string IconSprite => base.IconSprite;
     // TODO: where can be specific parts of the menu be found
     protected override string ViewListPath => "SettingsContentView";
-    protected override string ContentPath => "SeeSettingsPanel/MainContent";
+    protected override string ContentPath => "SeeSettingsPanel";
     protected override string EntryListPath => "Tabs/TabObjects";
     
     private HorizontalSelector citySwitcher;
