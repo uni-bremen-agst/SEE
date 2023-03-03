@@ -91,7 +91,7 @@ namespace SEE.Game.UI.Menu
             // destroys the component without a menu
             if (Menu == null)
             {
-                Destroy(this);
+                Destroyer.Destroy(this);
                 return;
             }
             base.Update();

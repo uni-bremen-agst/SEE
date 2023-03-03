@@ -135,7 +135,7 @@ namespace SEE.Game.UI.Menu
         /// <param name="entry">The menu entry.</param>
         protected virtual void DestroyButton(T entry)
         {
-            Destroy(EntryGameObject(entry));
+            Destroyer.Destroy(EntryGameObject(entry));
         }
         
         /// <summary>
