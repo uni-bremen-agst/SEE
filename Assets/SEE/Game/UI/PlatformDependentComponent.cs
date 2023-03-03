@@ -4,6 +4,7 @@ using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using Sirenix.Utilities;
+using UnityEngine.Events;
 
 namespace SEE.Game.UI
 {
@@ -85,6 +86,7 @@ namespace SEE.Game.UI
             // initialization finished
             HasStarted = true;
             OnStartFinished();
+            OnMenuInitialized?.Invoke();
         }
 
         /// <summary>
@@ -152,5 +154,10 @@ namespace SEE.Game.UI
         /// Can be used add listeners and update UI after initialization.
         /// </summary>
         protected virtual void OnStartFinished() { }
+        
+        /**
+         * Triggers when the menu is initialized. (<see cref="Start"/> and <see cref="HasStarted"/>)
+         */
+        public event UnityAction OnMenuInitialized;
     }
 }
