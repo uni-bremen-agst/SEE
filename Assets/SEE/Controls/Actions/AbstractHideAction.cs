@@ -74,13 +74,7 @@ namespace SEE.Controls.Actions
 
         private void HideObjects()
         {
-            foreach (GameObject go in hiddenObjects)
-            {
-                if (go.TryGetComponent(out GraphElementOperator graphElementOperator))
-                {
-                    graphElementOperator.Show(Game.City.GraphElementAnimationKind.Fading, animationDuration);
-                }
-            }
+            Hide(hiddenObjects);
         }
 
         public void Undo()
@@ -90,27 +84,49 @@ namespace SEE.Controls.Actions
 
         private void ShowObjects()
         {
-            foreach (GameObject go in hiddenObjects)
+            Show(hiddenObjects);
+        }
+
+        private static void Hide(IEnumerable<GameObject> objects)
+        {
+            foreach (GameObject go in objects)
             {
-                if (go.TryGetComponent(out GraphElementOperator graphElementOperator))
+                if (go.TryGetComponentOrLog(out GraphElementOperator graphElementOperator))
                 {
                     graphElementOperator.Hide(Game.City.GraphElementAnimationKind.Fading, animationDuration);
                 }
             }
         }
 
+        private static void Show(IEnumerable<GameObject> objects)
+        {
+            foreach (GameObject go in objects)
+            {
+                if (go.TryGetComponentOrLog(out GraphElementOperator graphElementOperator))
+                {
+                    graphElementOperator.Show(Game.City.GraphElementAnimationKind.Fading, animationDuration);
+                }
+            }
+        }
+
         public virtual bool Update()
         {
-            // FIXME: Needs adaptation for VR where no mouse is available.
-            if (Input.GetMouseButtonDown(0)
+            if (SEEInput.Select()
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
             {
                 // TODO: new HideNetAction(selectedNode.name).Execute();
                 hiddenObjects.UnionWith(Hide(raycastHit.collider.gameObject));
                 HideObjects();
-                currentState = ReversibleAction.Progress.Completed;
                 AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
-                return true;
+                if (SEEInput.ContinueSelect())
+                {
+                    return false;
+                }
+                else
+                {
+                    currentState = ReversibleAction.Progress.Completed;
+                    return true;
+                }
             }
             else
             {
