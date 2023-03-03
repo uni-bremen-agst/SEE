@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using InControl;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.GO;
@@ -27,13 +28,13 @@ namespace SEE.Game.City
         /// The path to the GXL file containing the graph data.
         /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of GXL file"), TabGroup(DataFoldoutGroup)]
+        [SerializeField, ShowInInspector, Tooltip("Path of GXL file"), TabGroup(DataFoldoutGroup), RuntimeFoldout(DataFoldoutGroup)]
         public FilePath GXLPath = new();
 
         /// <summary>
         /// The path to the CSV file containing the additional metric values.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of metric CSV file"), TabGroup(DataFoldoutGroup)]
+        [SerializeField, ShowInInspector, Tooltip("Path of metric CSV file"), TabGroup(DataFoldoutGroup), RuntimeFoldout(DataFoldoutGroup)]
         public FilePath CSVPath = new();
 
         /// <summary>
@@ -303,7 +304,7 @@ namespace SEE.Game.City
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public virtual void LoadData()
         {
@@ -326,7 +327,7 @@ namespace SEE.Game.City
         /// Saves the graph data to the GXL file with GXLPath().
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderSave)]
         public virtual void SaveData()
         {
@@ -363,7 +364,7 @@ namespace SEE.Game.City
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
-        [ButtonGroup(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
         public virtual void DrawGraph()
         {
@@ -408,7 +409,7 @@ namespace SEE.Game.City
         /// the file is saved in the SLD format.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
         public void SaveLayout()
         {
@@ -429,7 +430,7 @@ namespace SEE.Game.City
         /// the underlying graph, and all game objects visualizing information about it.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
-        [ButtonGroup(ResetButtonsGroup)]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup)]
         [PropertyOrder(ResetButtonsGroupOrderReset)]
         public override void Reset()
         {
