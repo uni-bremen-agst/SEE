@@ -632,6 +632,18 @@ namespace SEE.Controls
             return SelectionEnabled && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI();
         }
 
+        /// <summary>
+        /// True if the user selects a game object (in a desktop environment, the user
+        /// presses the left mouse but while the mouse cursor is not over a GUI element
+        /// while holding the left or right Ctrl key).
+        /// Selection is enabled only if <see cref="SelectionEnabled"/>.
+        /// </summary>
+        /// <returns>true if the user selects a game object and <see cref="SelectionEnabled"/></returns>
+        public static bool ContinueSelect()
+        {
+            return isModPressed && Select();
+        }
+
         #endregion
 
         //----------------------------------------------------
