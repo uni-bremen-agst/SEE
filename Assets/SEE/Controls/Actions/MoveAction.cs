@@ -523,7 +523,7 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            if (UserIsGrabbing()) // start to grab the object or continue to move the grabbed object
+            if (SEEInput.Grab()) // start to grab the object or continue to move the grabbed object
             {
                 if (!grabbedObject.IsGrabbed)
                 {
@@ -561,18 +561,6 @@ namespace SEE.Controls.Actions
                 return true;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Returns true if the user is currently grabbing.
-        /// </summary>
-        /// <returns>true if user is grabbing</returns>
-        private static bool UserIsGrabbing()
-        {
-            // Index of the left mouse button.
-            const int LeftMouseButton = 0;
-            // FIXME: We need a VR interaction, too.
-            return Input.GetMouseButton(LeftMouseButton);
         }
 
         /// <summary>

@@ -623,13 +623,24 @@ namespace SEE.Controls
 
         /// <summary>
         /// True if the user selects a game object (in a desktop environment, the user
-        /// presses the left mouse but while the mouse cursor is not over a GUI element).
+        /// presses the left mouse while the mouse cursor is not over a GUI element).
         /// Selection is enabled only if <see cref="SelectionEnabled"/>.
         /// </summary>
         /// <returns>true if the user selects a game object and <see cref="SelectionEnabled"/></returns>
         public static bool Select()
         {
             return SelectionEnabled && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI();
+        }
+
+        /// <summary>
+        /// True if the user grabs a game object (in a desktop environment, the user
+        /// holds the left mouse while the mouse cursor is not over a GUI element).
+        /// Grabbing is enabled only if <see cref="SelectionEnabled"/>.
+        /// </summary>
+        /// <returns>true if the user grabs a game object and <see cref="SelectionEnabled"/></returns>
+        public static bool Grab()
+        {
+            return SelectionEnabled && Input.GetMouseButton(0) && !Raycasting.IsMouseOverGUI();
         }
 
         /// <summary>
