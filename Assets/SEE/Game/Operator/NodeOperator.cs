@@ -93,7 +93,7 @@ namespace SEE.Game.Operator
         /// The position this node is supposed to be at.
         /// </summary>
         /// <seealso cref="AbstractOperator"/>
-        public Vector3 TargetPosition => new Vector3(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
+        public Vector3 TargetPosition => new(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
 
         /// <summary>
         /// The scale this node is supposed to be at.
