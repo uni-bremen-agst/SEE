@@ -22,7 +22,7 @@ namespace SEE.Controls.Actions
         protected ReversibleAction.Progress currentState = ReversibleAction.Progress.NoEffect;
 
         /// <summary>
-        /// Returns the current state of the action indicating whether it has had an effect 
+        /// Returns the current state of the action indicating whether it has had an effect
         /// that may need to be undone and whether it is still ongoing.
         /// Implements <see cref="ReversibleAction.CurrentProgress"/>.
         /// </summary>
@@ -74,7 +74,7 @@ namespace SEE.Controls.Actions
 
         private void HideObjects()
         {
-            Hide(hiddenObjects);
+            ShowOrHide(hiddenObjects, false);
         }
 
         public void Undo()
@@ -84,27 +84,34 @@ namespace SEE.Controls.Actions
 
         private void ShowObjects()
         {
-            Show(hiddenObjects);
+            ShowOrHide(hiddenObjects, true);
         }
 
-        private static void Hide(IEnumerable<GameObject> objects)
+        private static void ShowOrHide(IEnumerable<GameObject> objects, bool show)
         {
             foreach (GameObject go in objects)
             {
-                if (go.TryGetComponentOrLog(out GraphElementOperator graphElementOperator))
+                GraphElementOperator graphElementOperator;
+                // The operators may not already be present, hence, we may need to add them.
+                if (go.IsNode())
                 {
-                    graphElementOperator.Hide(Game.City.GraphElementAnimationKind.Fading, animationDuration);
+                    graphElementOperator = go.AddOrGetComponent<NodeOperator>();
                 }
-            }
-        }
-
-        private static void Show(IEnumerable<GameObject> objects)
-        {
-            foreach (GameObject go in objects)
-            {
-                if (go.TryGetComponentOrLog(out GraphElementOperator graphElementOperator))
+                else if (go.IsEdge())
+                {
+                    graphElementOperator = go.AddOrGetComponent<EdgeOperator>();
+                }
+                else
+                {
+                    continue;
+                }
+                if (show)
                 {
                     graphElementOperator.Show(Game.City.GraphElementAnimationKind.Fading, animationDuration);
+                }
+                else
+                {
+                    graphElementOperator.Hide(Game.City.GraphElementAnimationKind.Fading, animationDuration);
                 }
             }
         }
@@ -115,7 +122,7 @@ namespace SEE.Controls.Actions
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
             {
                 // TODO: new HideNetAction(selectedNode.name).Execute();
-                hiddenObjects.UnionWith(Hide(raycastHit.collider.gameObject));
+                hiddenObjects.UnionWith(HiddenObjects(raycastHit.collider.gameObject));
                 HideObjects();
                 AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
                 if (SEEInput.ContinueSelect())
@@ -139,6 +146,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="selection">the currently selected node or edge</param>
         /// <returns>The set of game objects to be hidden.</returns>
-        protected abstract ISet<GameObject> Hide(GameObject selection);
+        protected abstract ISet<GameObject> HiddenObjects(GameObject selection);
     }
 }
