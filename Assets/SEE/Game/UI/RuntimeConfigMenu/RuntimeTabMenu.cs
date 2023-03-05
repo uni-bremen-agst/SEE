@@ -9,6 +9,7 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.UI.FilePicker;
 using SEE.Game.UI.Menu;
+using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
 using SimpleFileBrowser;
 using Sirenix.OdinInspector;
@@ -73,19 +74,13 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     /// Creates the UI for a setting.
     /// </summary>
     /// <param name="memberInfo"></param>
-    protected virtual void CreateSetting(MemberInfo memberInfo)
+    protected virtual void CreateSetting(FieldInfo fieldInfo)
     {
         // gets the view game object
-        GameObject view = GetViewGameObjectHelper(memberInfo);
-        Transform viewContent = view.transform.Find("Content");
-        // Debug.Log("\t"+"CreateSetting____ "+ memberInfo.Name);
-        // TODO: Instantiate and setup prefabs based on member info
-
-        GameObject setting = PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, viewContent, false);
-        setting.name = memberInfo.Name;
-        setting.GetComponentInChildren<TextMeshProUGUI>().text = memberInfo.Name;
-        GameObject settingContent = setting.transform.Find("Content").gameObject;
-        CreateSettingObject(memberInfo, settingContent, City);
+        GameObject view = GetViewGameObjectHelper(fieldInfo);
+        GameObject viewContent = view.transform.Find("Content").gameObject;
+        
+        CreateSettingObject(fieldInfo, viewContent, City);
     }
 
     protected virtual void CreateButton(MemberInfo memberInfo)
@@ -190,160 +185,192 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
         return ViewGameObject(entry);
     }
-
-    private void CreateSettingObject(MemberInfo memberInfo, GameObject parent, object obj)
+    
+    /// <summary>
+    /// Sets the misc button as the last in the tab list.
+    /// </summary>
+    protected virtual void SetMiscAsLastTab()
     {
-        /*
-         * TODO: MembersTypes
-         * Relevant: Field, Method, Property
-         * Irrelevant: All, Constructor, Custom, Event, NestedType, TypeInfo
-         */
-        
-        if (memberInfo is FieldInfo fieldInfo)
-        {
-            Debug.Log("Create " + memberInfo.Name + " (" + fieldInfo.GetValue(obj).GetType() + ")");
-            object value = fieldInfo.GetValue(obj);
-            if (value is bool b)
-            {
-                CreateSwitch(
-                    name: memberInfo.Name, 
-                    setter: changedValue => fieldInfo.SetValue(obj, changedValue), 
-                    value: b, 
-                    parent: parent
-                    );
-            }
-            else if (value is int i)
-            {
-                CreateSlider(
-                    name: memberInfo.Name, 
-                    range: memberInfo.GetAttributes().OfType<RangeAttribute>().ElementAtOrDefault(0), 
-                    setter: changedValue => fieldInfo.SetValue(obj, (int) changedValue), 
-                    value: i, 
-                    useRoundValue: true, 
-                    parent: parent
-                    );
-            }
-            else if (value is uint ui)
-            {
-                CreateSlider(
-                    name: memberInfo.Name, 
-                    range: memberInfo.GetAttributes().OfType<RangeAttribute>().ElementAtOrDefault(0), 
-                    setter: changedValue => fieldInfo.SetValue(obj, (int) changedValue), 
-                    value: ui, 
-                    useRoundValue: true, 
-                    parent: parent
-                );
-            }
-            else if (value is float f)
-            {
-                CreateSlider(
-                    name: memberInfo.Name, 
-                    range: memberInfo.GetAttributes().OfType<RangeAttribute>().ElementAtOrDefault(0), 
-                    setter: changedValue => fieldInfo.SetValue(obj, changedValue), 
-                    value: f, 
-                    useRoundValue: false, 
-                    parent: parent
-                );
-            }
-            else if (value is string s)
-            {
-                CreateStringField(
-                    name: memberInfo.Name,
-                    setter: changedValue => fieldInfo.SetValue(obj, changedValue),
-                    value: s,
-                    parent: parent
-                    );
-            }
-            else if (value is Color c)
-            {
-                CreateColorPicker(
-                    name: memberInfo.Name, 
-                    parent: parent
-                    );
-            }
-            else if (value is DataPath dataPath)
-            {
-                FilePicker filePicker = parent.AddComponent<FilePicker>();
-                filePicker.DataPathInstance = dataPath;
-                filePicker.Label = memberInfo.Name;
-                filePicker.PickingMode = FileBrowser.PickMode.Files;
-            }
-            else if (value.GetType().IsEnum)
-            {
-                CreateDropDown(fieldInfo.Name, parent);
-            }
-            else if (value is VisualAttributes visualAttribute)
-            {
-                // TODO: Is this right?
-                value.GetType().GetMembers().ForEach(attribute => CreateSettingObject(attribute, parent, value));
-            }
-            else if (value is IEnumerable enumerable)
-            {
-                GameObject container =
-                    PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, parent.transform, false);
-                container.name = fieldInfo.Name;
-                container.GetComponentInChildren<TextMeshProUGUI>().text = fieldInfo.Name;
-
-                GameObject content = container.transform.Find("Content").gameObject;
-                // TODO: Correct handling of each enumerable type?
-                if (enumerable is IEnumerable<KeyValuePair<string,VisualNodeAttributes>> visualDict)
-                {
-                    foreach (KeyValuePair<string, VisualNodeAttributes> visual in visualDict)
-                    {
-                        GameObject nodeType = PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, content.transform, false);
-                        nodeType.name = visual.Key;
-                        nodeType.GetComponentInChildren<TextMeshProUGUI>().text = visual.Key;
-                        visual.Value.GetType().GetMembers().ForEach(nestedMember => CreateSettingObject(
-                            nestedMember, nodeType.transform.Find("Content").gameObject, visual.Value)
-                        );
-                    }
-                }
-                else if (enumerable is IEnumerable<KeyValuePair<string, ColorRange>> colorDict)
-                {
-                    foreach (KeyValuePair<string, ColorRange> visual in colorDict)
-                    {
-                        GameObject nodeType = PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, content.transform, false);
-                        nodeType.name = visual.Key;
-                        nodeType.GetComponentInChildren<TextMeshProUGUI>().text = visual.Key;
-                        visual.Value.GetType().GetMembers().ForEach(nestedMember => CreateSettingObject(
-                            nestedMember, nodeType.transform.Find("Content").gameObject, visual.Value)
-                        );
-                    }
-                }
-                else if (enumerable is IEnumerable<string> hashSet)
-                {
-                    foreach(string str in hashSet)
-                    {
-                        str.GetType().GetMembers().ForEach(info => CreateSettingObject(info, content, value));   
-                    }
-                }
-                else
-                {
-                    Debug.Log("Missing Enumerable: " + fieldInfo.Name + " "  + enumerable.GetType());
-                }
-            }
-            else
-            {
-                Debug.Log("Missing " + fieldInfo.Name + " (" + value.GetType() + ")" + " ");
-            }
-        } else if (memberInfo is MethodInfo methodInfo)
-        {
-            // TODO: Buttons für Methoden
-        }
-        // TODO: Some fields don't implement VisualAttributes (or LayoutSettings)
-        // CoseGraphSettings, LabelSettings, AntennaSettings
-
+        ToggleMenuEntry miscEntry = Entries.FirstOrDefault(entry => entry.Title == "Misc");
+        if (miscEntry != null) EntryGameObject(miscEntry).transform.SetAsLastSibling();
     }
 
-    private void CreateSlider(string name, RangeAttribute range, UnityAction<float> setter, float value, bool useRoundValue, GameObject parent)
+    private static void CreateSettingObject(FieldInfo fieldInfo, GameObject parent, object obj)
+    {
+        object value = fieldInfo.GetValue(obj);
+        if (value is bool b)
+        {
+            CreateSwitch(
+                name: fieldInfo.Name, 
+                setter: changedValue => fieldInfo.SetValue(obj, changedValue), 
+                value: b, 
+                parent: parent
+                );
+        }
+        else if (value is int i)
+        {
+            CreateSlider(
+                name: fieldInfo.Name, 
+                range: fieldInfo.GetAttributes().OfType<RangeAttribute>().ElementAtOrDefault(0), 
+                setter: changedValue => fieldInfo.SetValue(obj, (int) changedValue), 
+                value: i, 
+                useRoundValue: true, 
+                parent: parent
+                );
+        }
+        else if (value is uint ui)
+        {
+            CreateSlider(
+                name: fieldInfo.Name, 
+                range: fieldInfo.GetAttributes().OfType<RangeAttribute>().ElementAtOrDefault(0), 
+                setter: changedValue => fieldInfo.SetValue(obj, (int) changedValue), 
+                value: ui, 
+                useRoundValue: true, 
+                parent: parent
+            );
+        }
+        else if (value is float f)
+        {
+            CreateSlider(
+                name: fieldInfo.Name, 
+                range: fieldInfo.GetAttributes().OfType<RangeAttribute>().ElementAtOrDefault(0), 
+                setter: changedValue => fieldInfo.SetValue(obj, changedValue), 
+                value: f, 
+                useRoundValue: false, 
+                parent: parent
+            );
+        }
+        else if (value is string s)
+        {
+            CreateStringField(
+                name: fieldInfo.Name,
+                setter: changedValue => fieldInfo.SetValue(obj, changedValue),
+                value: s,
+                parent: parent
+                );
+        }
+        else if (value is Color c)
+        {
+            CreateColorPicker(
+                name: fieldInfo.Name, 
+                parent: parent
+                );
+        }
+        else if (value is DataPath dataPath)
+        {
+            parent = CreateNestedSettingsObject(fieldInfo.Name, parent);
+            FilePicker filePicker = parent.AddComponent<FilePicker>();
+            filePicker.DataPathInstance = dataPath;
+            filePicker.Label = fieldInfo.Name;
+            filePicker.PickingMode = FileBrowser.PickMode.Files;
+        }
+        else if (value.GetType().IsEnum)
+        {
+            CreateDropDown(fieldInfo.Name, parent);
+        }
+        // from here on come nested settings
+        else if (value is IEnumerable<string> stringEnumerable)
+        {
+            parent = CreateNestedSettingsObject(fieldInfo.Name, parent);
+            foreach (string str in stringEnumerable)
+            {
+                CreateStringField(
+                    name: fieldInfo.Name,
+                    setter: changedValue => fieldInfo.SetValue(obj, changedValue),
+                    value: str,
+                    parent: parent
+                );
+            }
+        }
+        else if (value is IEnumerable<KeyValuePair<string, VisualNodeAttributes>> visualNodeMap)
+        {
+            parent = CreateNestedSettingsObject(fieldInfo.Name, parent);
+            foreach (KeyValuePair<string, VisualNodeAttributes> visualNodePair in visualNodeMap)
+            {
+                GameObject nestedParent = CreateNestedSettingsObject(visualNodePair.Key, parent);
+                visualNodePair.Value.GetType().GetFields().ForEach(nestedInfo =>
+                    CreateSettingObject(nestedInfo, nestedParent, visualNodePair.Value));
+            }
+        }
+        else if (value is IEnumerable<KeyValuePair<string, ColorRange>> colorMap)
+        {
+            parent = CreateNestedSettingsObject(fieldInfo.Name, parent);
+            foreach (KeyValuePair<string, ColorRange> colorPair in colorMap)
+            {
+                GameObject nestedParent = CreateNestedSettingsObject(colorPair.Key, parent);
+                colorPair.Value.GetType().GetFields().ForEach(nestedInfo =>
+                    CreateSettingObject(nestedInfo, nestedParent, colorPair.Value));
+            }
+        }
+        else if (value is IEnumerable<KeyValuePair<string, bool>> boolMap)
+        {
+            parent = CreateNestedSettingsObject(fieldInfo.Name, parent);
+            foreach (KeyValuePair<string, bool> boolPair in boolMap)
+            {
+                GameObject nestedParent = CreateNestedSettingsObject(boolPair.Key, parent);
+                boolPair.Value.GetType().GetFields().ForEach(nestedInfo =>
+                    CreateSettingObject(nestedInfo, nestedParent, boolPair.Value));
+            }
+        }
+        else if (value is IEnumerable<KeyValuePair<string, NodeLayoutKind>> layoutKindMap)
+        {
+            parent = CreateNestedSettingsObject(fieldInfo.Name, parent);
+            foreach (KeyValuePair<string, NodeLayoutKind> layoutKindPair in layoutKindMap)
+            {
+                GameObject nestedParent = CreateNestedSettingsObject(layoutKindPair.Key, parent);
+                layoutKindPair.Value.GetType().GetFields().ForEach(nestedInfo =>
+                    CreateSettingObject(nestedInfo, nestedParent, layoutKindPair.Value));
+            }
+        }
+        else if (value is IEnumerable<KeyValuePair<string, NodeShapes>> nodeShapesMap)
+        {
+            parent = CreateNestedSettingsObject(fieldInfo.Name, parent);
+            foreach (KeyValuePair<string, NodeShapes> nodeShapesPair in nodeShapesMap)
+            {
+                GameObject nestedParent = CreateNestedSettingsObject(nodeShapesPair.Key, parent);
+                nodeShapesPair.Value.GetType().GetFields().ForEach(nestedInfo =>
+                    CreateSettingObject(nestedInfo, nestedParent, nodeShapesPair.Value));
+            }
+        }
+        else if (value is VisualAttributes or ConfigIO.PersistentConfigItem 
+                 or LabelAttributes or CoseGraphAttributes)
+        {
+            parent = CreateNestedSettingsObject(fieldInfo.Name, parent);
+            value.GetType().GetFields().ForEach(nestedInfo => CreateSettingObject(nestedInfo, parent, value));
+        }
+        else if (value is IEnumerable) {
+            Type entryType = value.GetType().GetInterface(typeof(IEnumerable<>).Name).GetGenericArguments()[0];
+            parent = CreateNestedSettingsObject(
+                    "Missing<" + entryType.GetNiceName() + ">: " + fieldInfo.Name, parent);
+            Debug.LogWarning("Missing: " + fieldInfo.Name + "(" + value.GetType().GetNiceName() 
+                             + ", " + "Enumerable<" + entryType.GetNiceName() + ">"
+                             + ")");
+        }
+        else
+        {
+            parent = CreateNestedSettingsObject("Missing: " + fieldInfo.Name + " (" + value.GetType().GetNiceName() + ")",
+                parent);
+            Debug.LogWarning("Missing: " + fieldInfo.Name + "(" + value.GetType().GetNiceName() +")");
+        }
+    }
+    private static GameObject CreateNestedSettingsObject(string name, GameObject parent)
+    {
+        GameObject container =
+            PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, parent.transform, false);
+        container.name = name;
+        container.GetComponentInChildren<TextMeshProUGUI>().text = name;
+        return container.transform.Find("Content").gameObject;
+    }
+
+    private static void CreateSlider(string name, RangeAttribute range, UnityAction<float> setter, float value, bool useRoundValue, GameObject parent)
     {
         range ??= new RangeAttribute(0, 2);
-        
+
         GameObject sliderGameObject =
             PrefabInstantiator.InstantiatePrefab(SLIDER_PREFAB, parent.transform, false);
         AddLayoutElement(sliderGameObject);
         SliderManager sliderManager = sliderGameObject.GetComponentInChildren<SliderManager>();
-        UnityEngine.UI.Slider slider = sliderGameObject.GetComponentInChildren<UnityEngine.UI.Slider>();
+        Slider slider = sliderGameObject.GetComponentInChildren<Slider>();
         TextMeshProUGUI text = sliderGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = name;
                 
@@ -356,7 +383,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         slider.onValueChanged.AddListener(setter);
     }
 
-    private void CreateSwitch(string name, UnityAction<bool> setter, bool value, GameObject parent)
+    private static void CreateSwitch(string name, UnityAction<bool> setter, bool value, GameObject parent)
     {
         GameObject switchGameObject =
             PrefabInstantiator.InstantiatePrefab(SWITCH_PREFAB, parent.transform, false);
@@ -372,7 +399,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
     // TODO: Replace with actual string field prefab
     // TODO: Add action
-    private void CreateStringField(string name, UnityAction<string> setter, string value, GameObject parent)
+    private static void CreateStringField(string name, UnityAction<string> setter, string value, GameObject parent)
     {
         GameObject stringGameObject =
             PrefabInstantiator.InstantiatePrefab(STRINGFIELD_PREFAB, parent.transform, false);
@@ -386,7 +413,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     }
 
     // TODO: Add action
-    private void CreateDropDown(string name, GameObject parent)
+    private static void CreateDropDown(string name, GameObject parent)
     {
         GameObject dropDownGameObject =
             PrefabInstantiator.InstantiatePrefab(DROPDOWN_PREFAB, parent.transform, false);
@@ -397,8 +424,10 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     }
 
     // TODO: Add action
-    private void CreateColorPicker(string name, GameObject parent)
+    private static void CreateColorPicker(string name, GameObject parent)
     {
+        parent = CreateNestedSettingsObject("Color Picker: " + name, parent);
+
         GameObject colorPickerGameObject =
             PrefabInstantiator.InstantiatePrefab(COLORPICKER_PREFAB, parent.transform, false);
         AddLayoutElement(colorPickerGameObject);
@@ -406,21 +435,12 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         text.text = name;
         // TODO: Value and setter
     }
-    
-    /// <summary>
-    /// Sets the misc button as the last in the tab list.
-    /// </summary>
-    protected virtual void SetMiscAsLastTab()
-    {
-        ToggleMenuEntry miscEntry = Entries.FirstOrDefault(entry => entry.Title == "Misc");
-        if (miscEntry != null) EntryGameObject(miscEntry).transform.SetAsLastSibling();
-    }
 
-    private void AddLayoutElement(GameObject go)
+    private static void AddLayoutElement(GameObject gameObject)
     {
-        LayoutElement le = go.AddComponent<LayoutElement>();
-        le.minHeight = ((RectTransform) go.transform).rect.height;
-        le.minWidth = ((RectTransform) go.transform).rect.width;
+        LayoutElement le = gameObject.AddComponent<LayoutElement>();
+        le.minHeight = ((RectTransform) gameObject.transform).rect.height;
+        le.minWidth = ((RectTransform) gameObject.transform).rect.width;
     }
     
 
