@@ -1,0 +1,315 @@
+
+V3.2.1
+Bug Fixes
+- Fixed bug with player drifting while using zero-gravity
+- Fixed bug with force grab not working sometimes
+- Fixed bug with handoffsets not working as expected
+- Fixed bug with the players collider not following tracking space movement properly
+- Fixed bug with Place Point "Destroy On Place" not working as expected
+- Fixed bug with Force Grab not working with grab poses when called immediately after an instantiate
+- Fixed bug with grab collider list not being generated properly
+
+
+V3.2
+New Features
+- Added Gun with Reloadable Magazine and Slide example
+- Added Grabbable Pose Animation
+- Added Grabbable Dispenser Point
+- Added "Held No Friction" toggle on grabbable
+- Added Grabbable Held Joint
+- Added Documentation for all new features on gitbook docs
+
+General Improvements
+- Hands no longer use cone of raycast now one raycast for each overlapping collider
+- Player no longer uses rayscasts but instead uses a single spherecast for grounding
+- Ignore collision after release now stays active until hand is removed from inside all grabbable colliders to strongly prevent clipping
+- Improved stability of two handed holding especially when pulling hands far apart while holding
+- Grabbables no longer have a local update function, instead they use a heldupdate function which is called through the hand while being held
+- Improved TryGrab function to remove failure edge cases. Also included alternatively named ForceGrab() function to make it easier to find
+- Lowered recommended Solver rates
+- Interpolation system replaced with dynamic timestep, which removes the need for a few sweep tests
+- Increased Stability of Joints
+
+Bug Fixes
+- Fixed "editorSelected" variable error warning
+- Fixed bug with (saved grab pose + grabbable to hand) not working cleanly
+- Fixed bug with placepoint tag setting not working properly
+- Fixed bug causing grenades to crash the demo scene
+- Fixed bug setting child layers to parent grabbable layers on grab
+- Fixed bug causing grab return to happen too quickly
+- Fixed bug causing parent on grab to not work properly when using nested grabbables
+- Fixed logic around multiple grabbables under one body with place points
+- Fixed bug with platforming failing on the edge of a large rotating object
+- Fixed bug with platform rotation not being perfectly smooth
+- Auto Hand no longer resets recommended setting on every start, only when the apply button is pressed
+- Fixed bug with hand sway not working smoothly under some settings
+- Other bug fixes
+
+
+V3.1.3
+Bug Fixes
+- Haptics now supported on OpenXR
+- Fixed player sometimes flickering and getting thrown
+- Fixed hand projection/highlight not working in the demo scene
+- Fixed place point not accounting for pivot properly
+- Fixed hand sway not working on proper axis
+- Fixed place points not allowing grab after place with rigidbody deactivation
+- Fixed objects held by two hands sometimes jitter while moving
+- Fixed player tilting over when stepping on dynamic objects
+- Fixed NaN error
+
+V3.1.2
+Bug Fixes
+- Fixed broken prefab link in the Oculus Integration Hand Tracking package
+- Fixed bug with rotationg platforms
+- Fixed hand offsets for OpenXR demo
+
+V3.1.1
+Bug Fixes
+- Fixed broken prefab links in the Oculus Integration package
+- Fixed broken/outdated documenation link
+
+V3.1
+New Features
+- Improved documentation and moved it to a better website
+- Added Magnetic Force Components and (New Demo)
+- Added stepping options to the slider and lever gadgets (New Demo)
+- Improvements to place points (New Demo)
+- "Destroy Object on Place"
+- "Disable Rigidbody on Place"
+- "Disable Grab on Place"
+- "Disable Place Point on Place"
+- Added compare by tag option on Place Points
+- Added additional parameters to the place point unity events (will NOT affect backward compatibility)
+- Made the process for setting up VRIK + Auto Hand simpler
+- Added "IgnoreHandPlayerCollision" component
+- Added force release function to sticky and stickables
+- Added platforming layermask to AutoHandPlayer
+- Improved UI pointer with new events and values
+
+Bug Fixes
+- Fixed issues with place points not working properly under some setup conditions
+- Fixed bugs with jumping
+- Fixed issue with the player "tilting over" from stepping on dynamic objects
+- Fixed bug with hands or held object sometimes flickering during snap turning
+- Fixed performance bug when leaning head over surfaces
+- Fixed issues with smooth turning and snap turning not working properly for some setups
+- Fixed issue with highlight projection being incorrect based on local player body rotation
+- Fixed bug where climbing would sometimes fling you (also recommend using gentle grab on climbable grabbables)
+- UI System will now automatically disable other UI event systems in the scene the will prevent it from running
+
+
+
+3.0: MAKE SURE TO DOWNLOAD AND TRY THE LATEST DEMO SCENE
+ - Hand Projection System
+	- Includes highlight projection option, which can be used to project the grab pose of the hand onto the grabbable while highlighting
+	- Include grab transition option which will project from the current hand pose to the highlight grab pose using an input axis
+
+ - Hand Quality Improvmenets
+	- Auto posing algorithm has been improved, average pose quality is higher, greatly reduced chances weird poses
+	- Poses transitions (generated using the hands grabTimes on grab) have been visually improved
+	- Hand movement interpolation improvements will show an increased smoothness in the hands when the framerate is higher than the fixed update
+
+ - Player Controller Improvements
+	 - Automatic Height smoothing
+	 - Hands no longer clip into colliders when moving too fast
+	 - External forces can now be applied to the Auto Hand Player via AddForce
+	 - Climbing can now throw the player in any direction
+	 - Stabbable Climbing now possible with included stabbers and climbable component
+	 - Platforming is now done automatically 
+
+- Added demonstration for FinalIK support
+- Added cabinets and drawers examples
+- Added grenades with pullable pin examples
+- Grabbables now have a "gentle grab" option that will make the hand return to the follow position based on the follow's movement
+- Distance Grabbables now how a Grabbable to Hand option
+- Throwing algorithm changed, should see improvements
+- Improved sound settings in the demo
+
+ Bug Fixes:
+ - Hands clipping while body moving majorly reduced
+ - Fixed issue where sometimes drop held item while teleporting
+ - Fixed bug related to passing an object between hands and losing collision
+ - Fixed minor flickering that was happening when snap turning while holding a grabbable
+ - Fixed bug where player-body throwing only works on Y-axis
+
+
+
+2.1:
+- Major perfomance optimizations to highlighting and posing functions
+- Major quality improvements with dynamic physics interactions
+- Smoothness improvements to AutoHandPlayer
+- Improved place points
+- Popular scripts have new cleaner interface
+- Setup wizard improved
+- Hand/Grabbable scripts internally rewritten to be easily readable/usable
+- Hand now includes GrabType setting that will allow for "Grabbable To Hand" lerp grabbing option 
+- New Easy Haptics
+	- Grabbables have new PlayHapticVibration function
+	- Hands have new PlayHapticVibration function
+- Grabbables now have custom configurable grab joint option
+- Added "WristLookEvent" script to enable wrist object when it is looking at the camera
+- Added "invert" toggle on AdvancedGrabPoses to allow for poses on both up/downs of an object
+
+Bug Fixes:
+- Fixed bug that prevented the Auto Hand Player from being scalable
+- Platforms will no longer increase player height when moving up
+- Saving buttons backward on finger scripts
+- Fixed Bug preventing collision with grabbable after hand swapping
+- Place points should no longer be inconsistent when accepting objects
+
+
+
+2.0:
+Major:
+- New Auto Hand Rigidbody Player Controller
+	- Climbing
+	- Platforms
+	- Flying
+	- Body Pushing
+- Advanced Grab Poses allow for poses around object length and or radius
+- Distance Grabbing and Gravity Pulling
+- Stabbables and Stabbers
+- Stickys and Stickables
+- Hand Touch Event handler
+- Hand Trigger Area Event Handler
+- Throwing Improvements
+- Weightless toggle added to Grabbables
+- Door with handle example
+
+Minor:
+- Multiple Grab poses now possible on one grabbable collider
+- Multiple Hands can use grab poses with pose index
+- Added weightless option to grabbabels
+- Improved Teleporter by adding new Events
+- Improved Smasher and Smashables by adding new Events
+
+Bug Fixes:
+- Hand less likely to stick into objects finger first
+- Setup Window wont always popup
+- Highlight layer can be set to none
+- Flickering on Grab
+- Instant Grab wont suddenly release
+- Objects still during grab
+- Hand sometimes far away on grab
+- Pose Area and Grabbable Poses no longer conflict
+- Maintain Grab Offset option on grabbables more precise
+- Distance grabbing math corrected
+- Grab hand frame flickering eliminated
+
+
+
+1.5:
+Major:
+- Setup Wizard (No more setting overrides)
+- Hand Tracking Examples
+- Vive Index Support
+- Quest Hand Tracking Support
+- General improvements to hand quality and stability
+- Velocity Based Sounds
+- Sound Examples
+
+Minor:
+- Advanced layer options
+- Grabbable Layermask added
+- Highlight Layermask added
+- Improved throw quality
+- Easier to adjust hands to the ideal position/rotation
+- Grab time added with animation curve
+- Grab return time value added
+- Added Hand Public Events Script to access hand events without code
+
+Bug Fixes:
+- Objects no longer freezes when being grabbed by multiple hands during the same frame
+- Objects will no longer be thrown when rapidly grabbing and releasing between two hands
+- Hands are positioned and scaled better for most devices
+- Tiny jitters when the hand is still no longer occur
+- Removed yellow warnings
+
+
+
+1.4:
+FOR UPDATING FROM V1.3 --- Please redownload the input package and try the new demo scene
+
+Major:
+- Brand new demo to show all the new major features
+- Added new gadgets and improved old gadgets:
+	- Steering Wheel
+	- Joystick
+	- Slider
+	- Dial
+	- Door with knob and lock
+- Added Finger Bending Gestures
+- Added Custom Hand Pose Areas
+- Added Custom Hand Pose Driver
+- Added Snap option to Grabbable Place Point
+- Added Grab Time added to Hand for smoother non-instant grabbing option
+- Added Instant Grab option added to Grabbables
+- Added Maintain Grab Offset toggle added to Grabbables
+- Hand Prefabs updated to have much snappier follow settings
+
+Minor:
+- Hands made more stable with static colliders
+- Hand movement smoothness improvements through drag (recommend turning physics timestep to match device Hz/maxFPS)
+- Fixed a jitter that would sometimes occur with the look assist
+- Improvements to SteamVRHandControllerLink
+
+Technical Changes:
+- Removed Legacy Input Package
+- Removed Custom Input Package (instead suggested use XR for examples to build custom setup)
+- Fixed issue with jittering related to non-default render pipeline
+- Gadgets now all have the prefix PhysicsGadget
+- Changed various buttons and gadgets scripts
+- Renamed PoseData to HandPoseData
+- Added additional programmer events in Hand.cs, Grabbable.cs, and PlacePoint.cs
+
+
+
+
+1.3:
+- 2020 XR Demo package
+- Grab Points to Easily Force Auto Grabbing at Predetermined Points (Examples in Demo Scene)
+- Place Points to Easily Allow Placement of Grabbables at Predetermined Points (Examples in Demo Scene)
+- New Robot Hand Model
+- Hands Rotation Offset Value Replaced With Root Offsetting (See FAQ.)
+- ParentOnGrab Value to Grabbables to Allow for Smooth Locomotion While Holding
+- Significantly Reduced Likelyhood of Weird Auto Grabs
+- Significantly Reduced General Jittering
+- Hands with "Hand" Physics Material Will Interact More Smoothly with Static Surfaces
+- Bug Fixes and Errors Solved
+- Added "Editor Auto Grab" toggle to hand for use of continous auto grabbing feature in editor (great for setting static poses)
+- Added function for easy saving and loading of a generated pose at runtime SEE: hand.GetGrabPose()/hand.SetGrabPose()
+- Grabbable objects now have a lock grab option to freeze the hand in place
+- Bug fixes related to multiple grabbables connected to the same rigidbody not working
+- Bug fixes to static pose
+- Fixed version control issue related to dependencies
+- Implemented SteamVR 2020 Input Demo Support
+
+
+
+
+1.2:
+- Added Static Poses With Examples: Gun, Hammer, Cube Pinch 
+- Added Grab Lock 
+- Public Offset Values Added to Hand 
+- Added Teleport Example 
+- Demo Package for Vive SteamVR Support 
+- Demo Package for Oculus Integration Support 
+- Demo Package for Legacy Unity Input System Support 
+- Added Cartoon Hand Example 
+- Updated Documentation 
+- Bug Fixes
+
+
+
+
+1.1:
+- Completely removed instabilities/jittering for holding against static colliders
+- Added editor support for hand and finger script
+- Bug fixes
+- Scene tweaks
+- Updated Documentation with FAQ
+
+
+1.0: 
+- Package released
