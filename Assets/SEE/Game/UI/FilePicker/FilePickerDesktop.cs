@@ -163,10 +163,6 @@ namespace SEE.Game.UI.FilePicker
                     DataPathInstance.RelativePath = path;
                 UpdateInput();
             });
-            
-            LayoutElement le = Menu.AddComponent<LayoutElement>();
-            le.minHeight = ((RectTransform) Menu.transform).rect.height;
-            le.minWidth = ((RectTransform) Menu.transform).rect.width;
         }
 
         /// <summary>

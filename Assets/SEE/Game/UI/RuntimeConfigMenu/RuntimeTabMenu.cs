@@ -1,13 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Michsky.UI.ModernUIPack;
 using SEE.DataModel;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.UI.FilePicker;
+using SEE.Game.UI.ConfigMenu;
 using SEE.Game.UI.Menu;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
@@ -18,8 +20,10 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using FilePicker = SEE.Game.UI.FilePicker.FilePicker;
 using Object = System.Object;
 using Random = UnityEngine.Random;
+using Slider = UnityEngine.UI.Slider;
 
 public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 {
@@ -263,10 +267,22 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             filePicker.DataPathInstance = dataPath;
             filePicker.Label = fieldInfo.Name;
             filePicker.PickingMode = FileBrowser.PickMode.Files;
+            filePicker.OnMenuInitialized += () =>
+            {
+                GameObject filePickerGO = parent.transform.Find(fieldInfo.Name).gameObject;
+                AddLayoutElement(filePickerGO);
+            };
         }
         else if (value.GetType().IsEnum)
         {
-            CreateDropDown(fieldInfo.Name, parent);
+            // TODO: Does the setter work?
+            CreateDropDown(
+                name: fieldInfo.Name, 
+                setter: changedValue => fieldInfo.SetValue(obj, Enum.ToObject(value.GetType(), changedValue)),
+                values: value.GetType().GetEnumNames(),
+                value: value.ToString(),
+                parent: parent
+            );
         }
         // from here on come nested settings
         else if (value is IEnumerable<string> stringEnumerable)
@@ -368,6 +384,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
         GameObject sliderGameObject =
             PrefabInstantiator.InstantiatePrefab(SLIDER_PREFAB, parent.transform, false);
+        sliderGameObject.name = name;
         AddLayoutElement(sliderGameObject);
         SliderManager sliderManager = sliderGameObject.GetComponentInChildren<SliderManager>();
         Slider slider = sliderGameObject.GetComponentInChildren<Slider>();
@@ -387,6 +404,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     {
         GameObject switchGameObject =
             PrefabInstantiator.InstantiatePrefab(SWITCH_PREFAB, parent.transform, false);
+        switchGameObject.name = name;
         AddLayoutElement(switchGameObject);
         SwitchManager switchManager = switchGameObject.GetComponentInChildren<SwitchManager>();
         TextMeshProUGUI text = switchGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
@@ -403,6 +421,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     {
         GameObject stringGameObject =
             PrefabInstantiator.InstantiatePrefab(STRINGFIELD_PREFAB, parent.transform, false);
+        stringGameObject.name = name;
         AddLayoutElement(stringGameObject);
         TextMeshProUGUI text = stringGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = name;
@@ -413,14 +432,28 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     }
 
     // TODO: Add action
-    private static void CreateDropDown(string name, GameObject parent)
+    private static void CreateDropDown(string name, UnityAction<int> setter, IEnumerable<string> values, string value, GameObject parent)
     {
         GameObject dropDownGameObject =
             PrefabInstantiator.InstantiatePrefab(DROPDOWN_PREFAB, parent.transform, false);
+        dropDownGameObject.name = name;
         AddLayoutElement(dropDownGameObject);
         TextMeshProUGUI text = dropDownGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = name;
         // TODO: value and setter
+
+        CustomDropdown dropdown = dropDownGameObject.transform.Find("DropdownCombo/Dropdown").GetComponent<CustomDropdown>();
+        TMP_InputField customInput = dropDownGameObject.transform.Find("DropdownCombo/Input").GetComponent<TMP_InputField>();
+        Dictaphone dictaphone = dropDownGameObject.transform.Find("DropdownCombo/DictateButton").GetComponent<Dictaphone>();
+        
+        customInput.gameObject.SetActive(false);
+        dictaphone.gameObject.SetActive(false);
+        
+        dropdown.isListItem = true;
+        dropdown.listParent = GameObject.Find("UI Canvas").transform;
+        dropdown.dropdownEvent.AddListener(setter);
+        values.ForEach(s => dropdown.CreateNewItem(s, null));
+        dropdown.SetupDropdown();
     }
 
     // TODO: Add action
@@ -430,6 +463,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
         GameObject colorPickerGameObject =
             PrefabInstantiator.InstantiatePrefab(COLORPICKER_PREFAB, parent.transform, false);
+        colorPickerGameObject.name = name;
         AddLayoutElement(colorPickerGameObject);
         TextMeshProUGUI text = colorPickerGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = name;
