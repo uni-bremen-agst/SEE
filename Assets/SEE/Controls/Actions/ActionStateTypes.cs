@@ -70,8 +70,8 @@ namespace SEE.Controls.Actions
             new ActionStateTypeGroup("Hide", "Hides nodes or edges",
                                      Color.yellow.Darker(), "Materials/ModernUIPack/Eye");
 
-        public static ActionStateType HideConnectedEdges { get; } =
-            new ActionStateType("Hide Connected Edges", "Hides connected edges",
+        public static ActionStateType HideNodes { get; } =
+            new ActionStateType("Hide Nodes", "Hides nodes and their edges",
                                 Color.yellow.Darker(), "Materials/ModernUIPack/Eye",
                                 HideNodeAction.CreateReversibleAction,
                                 Hide);
