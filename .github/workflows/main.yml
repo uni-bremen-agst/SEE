@@ -123,6 +123,8 @@ jobs:
     steps:
       - uses: actions/cache@v3
         name: Cache Library
+        env:
+          SEGMENT_DOWNLOAD_TIMEOUT_MINS: 11
         with:
           path: ./Library
           key: Library-SEE-Tests-${{ hashFiles('./ProjectSettings/ProjectVersion.txt') }}
