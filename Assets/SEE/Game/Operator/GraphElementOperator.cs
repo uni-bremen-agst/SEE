@@ -40,7 +40,7 @@ namespace SEE.Game.Operator
         /// <summary>
         /// The highlight effect of the edge.
         /// </summary>
-        private HighlightEffect highlightEffect;
+        protected HighlightEffect highlightEffect;
 
         /// <summary>
         /// Show the element, revealing it as specified in the <see cref="animationKind"/>.
@@ -84,7 +84,7 @@ namespace SEE.Game.Operator
             }
 
             (Color start, Color end) = color.TargetValue;
-            // Edges being faded should also lead to highlights being faded.
+            // Elements being faded should also lead to highlights being faded.
             float targetGlow = GetTargetGlow(glowEnabled ? fullGlow : 0, alpha);
 
             return new AndCombinedOperationCallback<Action>(new[]
@@ -131,28 +131,6 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
-        /// Change the color gradient of the edge to a new gradient from <paramref name="newStartColor"/> to
-        /// <paramref name="newEndColor"/>.
-        /// </summary>
-        /// <param name="newStartColor">The starting color of the gradient this edge should animate towards.</param>
-        /// <param name="newEndColor">The ending color of the gradient this edge should animate towards.</param>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
-        /// <returns>An operation callback for the requested animation</returns>
-        /// <param name="useAlpha">Whether to incorporate the alpha values from the given colors.</param>
-        /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> ChangeColorsTo(Color newStartColor, Color newEndColor,
-                                                         float duration, bool useAlpha = true)
-        {
-            if (!useAlpha)
-            {
-                newStartColor.a = color.TargetValue.start.a;
-                newEndColor.a = color.TargetValue.end.a;
-            }
-            return color.AnimateTo((newStartColor, newEndColor), duration);
-        }
-
-        /// <summary>
         /// Fade in the glow effect on this edge.
         /// </summary>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
@@ -175,20 +153,6 @@ namespace SEE.Game.Operator
         {
             glowEnabled = false;
             return glow.AnimateTo(0, duration);
-        }
-
-        /// <summary>
-        /// Flashes an edge in its inverted color for a short <paramref name="duration"/>.
-        /// Note that this animation is not controlled by an operation and thus not necessarily synchronized.
-        /// </summary>
-        /// <param name="duration">Amount of time the flashed color shall fade out for.</param>
-        public void HitEffect(float duration = 0.5f)
-        {
-            // NOTE: This is not controlled by an operation. HighlightEffect itself controls the animation.
-            //       Should be alright because overlapping animations aren't a big problem here.
-            highlightEffect.hitFxFadeOutDuration = duration;
-            highlightEffect.hitFxColor = Color.Lerp(color.TargetValue.start, color.TargetValue.end, 0.5f).Invert();
-            highlightEffect.HitFX();
         }
 
         protected abstract IOperationCallback<Action> Construct(float duration);

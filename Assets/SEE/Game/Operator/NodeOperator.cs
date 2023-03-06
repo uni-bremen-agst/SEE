@@ -334,7 +334,7 @@ namespace SEE.Game.Operator
 
             GameObject go = gameObject;
 
-            color = new TweenOperation<(Color start, Color end)>(AnimateToColorAction, (go.GetColor(), go.GetColor()));
+            color = new TweenOperation<(Color start, Color end)>(AnimateToColorAction, (go.GetColor(), Color.clear));
 
             Tween[] AnimateToColorAction((Color start, Color end) colors, float d)
             {
