@@ -1,0 +1,21 @@
+Jacob Wright; AKA: Earnest Robot - Lead Developer/Programmer
+
+Shelby Juno - Programming / Scene Development assistance / QA
+
+Brian Hillegeist - Modeling assistance / QA
+
+William Kirk - Provided draft code for distance gravity grabbing and flick pulling
+
+Reddit user KenNL - https://www.reddit.com/user/KenNL/ for all of his public domain models that were used
+
+Alberto Lubiano - https://alberto-luviano.itch.io/lowpoly-classroom-pack for the lowpoly classroom models
+
+Github user Naojitaniguchi - https://gist.github.com/naojitaniguchi for doubled sided shader used on robot hand
+
+Key - https://sketchfab.com/3d-models/key-3ebf41c7d1a54acfa901b6ba34ff7be4
+
+Unit Blocks - https://sketchfab.com/3d-models/unit-block-f87169ef0eb64b688eb6d60435d2d3f3
+
+Basket Ball Hoop - https://sketchfab.com/3d-models/basketball-hoop-d3fc2490cbe54e37b6d5b159704c787f
+
+Basket Ball - https://sketchfab.com/3d-models/basketball-2343abdae7674f46ad85071858db93c6
