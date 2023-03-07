@@ -1,17 +1,3 @@
-﻿using System;
-
-namespace NaughtyAttributes
-{
-	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-	public class ValidateInputAttribute : ValidatorAttribute
-	{
-		public string CallbackName { get; private set; }
-		public string Message { get; private set; }
-
-		public ValidateInputAttribute(string callbackName, string message = null)
-		{
-			CallbackName = callbackName;
-			Message = message;
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:67b6bac4ab1d72f3a1b98c3f9002c989e05e4a62d330f837de82bbc6d8fe1324
+size 450

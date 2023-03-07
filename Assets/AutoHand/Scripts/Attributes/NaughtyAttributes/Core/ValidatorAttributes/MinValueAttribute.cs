@@ -1,20 +1,3 @@
-﻿using System;
-
-namespace NaughtyAttributes
-{
-	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-	public class MinValueAttribute : ValidatorAttribute
-	{
-		public float MinValue { get; private set; }
-
-		public MinValueAttribute(float minValue)
-		{
-			MinValue = minValue;
-		}
-
-		public MinValueAttribute(int minValue)
-		{
-			MinValue = minValue;
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:b8fe2b97549666498bbbf25497e2f3c23fc2362faaacd93a6846eeb34bd96300
+size 408

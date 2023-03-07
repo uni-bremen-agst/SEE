@@ -1,29 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
-
-namespace Autohand.Demo {
-    public class XRControllerEvent : MonoBehaviour
-    {
-        public XRHandControllerLink link;
-        public CommonButton button;
-        public UnityEvent Pressed;
-        public UnityEvent Released;
-        bool pressed = false;
-        private void Update()
-        {
-
-            if (link.ButtonPressed(button) && !pressed)
-            {
-                Pressed?.Invoke();
-                pressed = true;
-            }
-            else if (!link.ButtonPressed(button) && pressed)
-            {
-                Released?.Invoke();
-                pressed = false;
-            }
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:27b5de486c411293d7b0d589ce31ae65bf56d6f449543694db315b00a8a9a517
+size 763

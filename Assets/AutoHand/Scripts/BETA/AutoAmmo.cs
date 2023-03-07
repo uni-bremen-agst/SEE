@@ -1,29 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Autohand {
-    [RequireComponent(typeof(Grabbable))]
-    public class AutoAmmo : MonoBehaviour {
-        public int currentAmmo = 16;
-        public TMPro.TextMeshPro ammoText;
-
-        private void Start() {
-            SetAmmo(currentAmmo);
-        }
-
-        public bool RemoveAmmo() {
-            if(currentAmmo > 0) {
-                SetAmmo(--currentAmmo);
-                return true;
-            }
-            return false;
-        }
-
-        public void SetAmmo(int amount) {
-            currentAmmo = amount;
-            if(ammoText != null)
-                ammoText.text = currentAmmo.ToString();
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:6eae01826e801e85fa1475acf6cdd99087f0f80033383ab9ac5ee149bd8e8a5f
+size 743
