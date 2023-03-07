@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using SEE.Tools;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.DataModel.DG.IO
@@ -14,7 +15,11 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// The extension of GXL files.
         /// </summary>
-        private const string extension = ".gxl";
+        private const string NormalExtension = ".gxl";
+        /// <summary>
+        /// The extension of compressed GXL files.
+        /// </summary>
+        private const string CompressedExtension = ".gxl.xz";
         /// <summary>
         /// A suffix to be added for GXL backup files. Will be appended at the end
         /// of a filename, just before the extension.
@@ -26,14 +31,14 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         private const string hierarchicalEdgeType = "Enclosing";
 
-        //[Test]
-        //public void TestReadingRealBigGraph()
-        //{
-        //    string filename = Application.dataPath + "/../Data/GXL/graphs/bash.gxl";
-        //    Performance p = Performance.Begin("Loading GXL file " + filename);
-        //    Graph graph = LoadGraph(filename);
-        //    p.End();
-        //}
+        [Test]
+        public void TestReadingRealBigGraph()
+        {
+            string filename = Application.dataPath + "/../Data/GXL/SEE/CodeFacts.gxl.xz";
+            Performance p = Performance.Begin("Loading big GXL file " + filename);
+            LoadGraph(filename);
+            p.End();
+        }
 
         [Test]
         public void TestReadingArchitecture()
@@ -50,16 +55,29 @@ namespace SEE.DataModel.DG.IO
         [Test]
         public void TestReadingCodeFacts()
         {
-            LoadGraph(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/CodeFacts.gxl");
+            LoadGraph(Application.dataPath + "/../Data/GXL/reflexion/java2rfg/CodeFacts.gxl.xz");
+        }
+
+        private static bool CompressedWritingSupported()
+        {
+            if (Environment.GetEnvironmentVariable("RUNNER_OS") == "Linux")
+            {
+                // Not supported on CI, because docker image for game-ci/unity-test-runner is based on Ubuntu 18.04,
+                // which does not support liblzma properly.
+                Assert.Ignore("Saving compressed GXL files is not yet supported on the CI runner.");
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
         /// Test for a simple artificially created graph.
         /// </summary>
-        [Test]
-        public void TestGraphWriter()
+        [Test, Sequential]
+        public void TestGraphWriter([Values(true, false)] bool compress)
         {
-            string basename = "test";
+            const string basename = "test";
 
             // Create and save the initial graph
             Graph outGraph = Create();
@@ -67,26 +85,29 @@ namespace SEE.DataModel.DG.IO
             // Note: the path will not be stored in the GXL but will be set when the
             // graph is loaded by the GraphReader and it will be used by Equals
             // when comparing two graphs.
-            outGraph.Path = basename + extension;
+            outGraph.Path = basename + (compress ? NormalExtension : CompressedExtension);
 
-            WriteReadGraph(basename, outGraph);
+            if (!compress || CompressedWritingSupported())
+            {
+                WriteReadGraph(basename, outGraph, compress);
+            }
         }
 
         /// <summary>
         /// Test with randomly generated graphs with increasing number of nodes.
         /// </summary>
-        [Test]
-        public void TestRandomGraphWriter()
+        [Test, Sequential]
+        public void TestRandomGraphWriter([Values(true, false)] bool compress)
         {
-            RandomGraphs random = new RandomGraphs();
-            Constraint leafConstraint = new Constraint("Routine", 10, "calls", 0.01f);
-            Constraint innerNodesConstraint = new Constraint("File", 3, "imports", 0.01f);
-            List<RandomAttributeDescriptor> attributeConstraints = new List<RandomAttributeDescriptor>()
+            RandomGraphs random = new();
+            Constraint leafConstraint = new("Routine", 10, "calls", 0.01f);
+            Constraint innerNodesConstraint = new("File", 3, "imports", 0.01f);
+            List<RandomAttributeDescriptor> attributeConstraints = new()
             {
                 new RandomAttributeDescriptor("Metric.LOC", 200, 50, -10, 100),
                 new RandomAttributeDescriptor("Metric.Clone_Rate", 0.5f, 0.1f, -0.5f, 1.3f),
             };
-            string basename = "random";
+            const string basename = "random";
 
             for (int i = 0; i <= 100; i += 10)
             {
@@ -102,19 +123,22 @@ namespace SEE.DataModel.DG.IO
                 // Note: the path will not be stored in the GXL but will be set when the
                 // graph is loaded by the GraphReader and it will be used by Equals
                 // when comparing two graphs.
-                outGraph.Path = basename + extension;
+                outGraph.Path = basename + (compress ? NormalExtension : CompressedExtension);
 
-                WriteReadGraph(basename, outGraph);
+                if (!compress || CompressedWritingSupported())
+                {
+                    WriteReadGraph(basename, outGraph, compress);
+                }
             }
         }
 
-        private void RoundMetrics(Graph graph)
+        private static void RoundMetrics(Graph graph)
         {
             foreach (Node node in graph.Nodes())
             {
                 // Make a copy of the attributes so that we can modify the original
                 // values in the loop.
-                Dictionary<string, float> floatAttributes = new Dictionary<string, float>(node.FloatAttributes);
+                Dictionary<string, float> floatAttributes = new(node.FloatAttributes);
                 foreach (KeyValuePair<string, float> entry in floatAttributes)
                 {
                     node.SetFloat(entry.Key, (float)Math.Round(entry.Value, 2));
@@ -132,14 +156,16 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="basename">basename of the filename for storing graphs</param>
         /// <param name="outGraph">the initial graph to be written</param>
-        private static void WriteReadGraph(string basename, Graph outGraph)
+        /// <param name="compress">whether to LZMA compress the graph</param>
+        private static void WriteReadGraph(string basename, Graph outGraph, bool compress)
         {
-            string filename = basename + extension;
+            string Extension = compress ? CompressedExtension : NormalExtension;
+            string filename = basename + Extension;
 
             // We need to finalize the node hierarchy so that the integer node attribute
             // Metric.Level is calculated for outgraph. Otherwise its node would not have
             // this attribute, but the nodes loaded from the saved graph would, which would
-            // lead to an artifical discrepancy.
+            // lead to an artificial discrepancy.
             outGraph.FinalizeNodeHierarchy();
 
             // Write outGraph
@@ -150,7 +176,7 @@ namespace SEE.DataModel.DG.IO
             Assert.AreEqual(filename, inGraph.Path);
 
             // Write the loaded saved initial graph again as a backup
-            string backupFilename = basename + backupSuffix + extension;
+            string backupFilename = basename + backupSuffix + Extension;
             GraphWriter.Save(backupFilename, inGraph, hierarchicalEdgeType);
 
             // Read the backup graph again
@@ -158,22 +184,22 @@ namespace SEE.DataModel.DG.IO
             // The path of backupGraph will be backupFilename.
             Assert.AreEqual(backupFilename, backupGraph.Path);
             // For the comparison, we need to reset the path.
-            backupGraph.Path = inGraph.Path;
+            backupGraph.Path = inGraph.Path = outGraph.Path;
 
-            Assert.That(outGraph.Equals(inGraph));
-            Assert.That(backupGraph.Equals(inGraph));
+            Assert.AreEqual(outGraph, inGraph);
+            Assert.AreEqual(backupGraph, inGraph);
         }
 
         private static Graph LoadGraph(string filename)
         {
-            GraphReader graphReader = new GraphReader(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
+            GraphReader graphReader = new(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
             graphReader.Load();
             return graphReader.GetGraph();
         }
 
         private static Node NewNode(Graph graph, string linkname)
         {
-            Node result = new Node
+            Node result = new()
             {
                 ID = linkname,
                 SourceName = linkname,
@@ -189,7 +215,7 @@ namespace SEE.DataModel.DG.IO
 
         private static Edge NewEdge(Graph graph, Node from, Node to, string type)
         {
-            Edge result = new Edge(from, to, type);
+            Edge result = new(from, to, type);
             result.SetToggle("Is Real");
             result.SetString("Source.Path", "path");
             result.SetFloat("Pi", 3.14f);
@@ -201,7 +227,7 @@ namespace SEE.DataModel.DG.IO
 
         private static Graph Create()
         {
-            Graph graph = new Graph("DUMMYBASEPATH");
+            Graph graph = new("DUMMYBASEPATH");
             // Note: GXL does currently not support attributes of graphs
             //graph.SetString("Date", "2020-04-02");
             //graph.SetToggle("IsGenerated");

@@ -132,7 +132,7 @@ namespace SEE.Game.UI.Tooltip
                     {
                         canvasGroup.alpha = a;
                     }
-                }, 0f, FADE_OUT_DURATION);
+                }, 0f, FADE_OUT_DURATION).Play();
             }
             else
             {

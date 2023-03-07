@@ -38,7 +38,7 @@ namespace SEE.Game.HolisticMetrics
         internal static string[] GetSavedFileNames()
         {
             EnsureBoardsDirectoryExists();
-            DirectoryInfo directoryInfo = new DirectoryInfo(metricsBoardsPath);
+            DirectoryInfo directoryInfo = new(metricsBoardsPath);
             FileInfo[] fileInfos = directoryInfo.GetFiles();
             string[] fileNames = new string[fileInfos.Length];
             for (int i = 0; i < fileInfos.Length; i++)
@@ -58,13 +58,13 @@ namespace SEE.Game.HolisticMetrics
         /// <returns>The GameObject that represents the metrics displays</returns>
         internal static BoardConfig LoadBoard(FilePath path)
         {
-            using ConfigReader stream = new ConfigReader(path.Path);
+            using ConfigReader stream = new(path.Path);
             Dictionary<string, object> attributes = stream.Read();
             BoardConfig config = new BoardConfig();
             if (!config.Restore(attributes))
             {
                 ShowNotification.Warn(
-                    "Error loading board", 
+                    "Error loading board",
                     "Not all board attributes were loaded correctly");
             }
             return config;
@@ -80,7 +80,7 @@ namespace SEE.Game.HolisticMetrics
             EnsureBoardsDirectoryExists();
             return LoadBoard(new FilePath(metricsBoardsPath + fileName + Filenames.ConfigExtension));
         }
-        
+
         /// <summary>
         /// Persist a metrics board to a file.
         /// </summary>
@@ -90,9 +90,10 @@ namespace SEE.Game.HolisticMetrics
         {
             EnsureBoardsDirectoryExists();
             string filePath = metricsBoardsPath + fileName + Filenames.ConfigExtension;
-            using ConfigWriter writer = new ConfigWriter(filePath);
+            using ConfigWriter writer = new(filePath);
             BoardConfig config = GetBoardConfig(widgetsManager);
             config.Save(writer);
+            Debug.Log($"Saved metric-board configuration to file {filePath}.\n");
         }
 
         /// <summary>
@@ -114,7 +115,7 @@ namespace SEE.Game.HolisticMetrics
         internal static BoardConfig GetBoardConfig(WidgetsManager widgetsManager)
         {
             Transform boardTransform = widgetsManager.transform;
-            BoardConfig config = new BoardConfig()
+            BoardConfig config = new()
             {
                 Title = widgetsManager.GetTitle(),
                 Position = boardTransform.localPosition,
@@ -140,7 +141,7 @@ namespace SEE.Game.HolisticMetrics
         {
             string widgetName = widgetController.gameObject.name;
             widgetName = widgetName.Substring(0, widgetName.Length - 7);
-            WidgetConfig config = new WidgetConfig
+            WidgetConfig config = new()
             {
                 ID = widgetController.ID,
                 MetricType = metric.GetType().Name,

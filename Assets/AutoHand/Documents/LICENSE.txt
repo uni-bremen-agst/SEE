@@ -1,0 +1,11 @@
+
+This asset follows the standard Unity Asset Store License
+https://unity3d.com/legal/as_terms
+
+Most importantly:
+ This asset shall not be entitled to distribute or transfer in any way
+ other than as integrated components of electronic applications and 
+ digital media or in supporting physical marketing materials.
+
+ I.E.
+	Do not redistribute this unbuilt code 

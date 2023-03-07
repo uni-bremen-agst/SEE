@@ -12,14 +12,14 @@ using Object = UnityEngine.Object;
 namespace SEE.Game.HolisticMetrics
 {
     /// <summary>
-    /// This class manages all metrics boards.
+    /// This class manages all metric boards.
     /// </summary>
     public static class BoardsManager
     {
         /// <summary>
         /// The board prefab we will be instantiating here.
         /// </summary>
-        private static readonly GameObject boardPrefab = 
+        private static readonly GameObject boardPrefab =
             Resources.Load<GameObject>("Prefabs/HolisticMetrics/SceneComponents/MetricsBoard");
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace SEE.Game.HolisticMetrics
             boardTransform.position = position;
             boardTransform.rotation = rotation;
         }
-        
+
         /// <summary>
         /// Toggles the small buttons underneath the boards that allow the player to drag the boards around.
         /// </summary>
