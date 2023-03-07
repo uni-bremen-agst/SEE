@@ -4,7 +4,9 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Joveler.Compression.XZ;
 using SEE.Utils;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace SEE.DataModel.DG.IO
@@ -12,7 +14,9 @@ namespace SEE.DataModel.DG.IO
     /// <summary>
     /// Reads a graph from a GXL file and returns it as a graph.
     /// </summary>
+#if UNITY_EDITOR
     [InitializeOnLoad]
+#endif
     public class GraphReader : GXLParser
     {
         /// <summary>
