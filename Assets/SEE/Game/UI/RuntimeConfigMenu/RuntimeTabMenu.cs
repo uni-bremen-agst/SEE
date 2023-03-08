@@ -1,17 +1,14 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Michsky.UI.ModernUIPack;
 using SEE.DataModel;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.UI.ConfigMenu;
 using SEE.Game.UI.Menu;
-using SEE.GO;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
 using SimpleFileBrowser;
@@ -22,7 +19,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using FilePicker = SEE.Game.UI.FilePicker.FilePicker;
-using Object = System.Object;
 using Random = UnityEngine.Random;
 using Slider = UnityEngine.UI.Slider;
 
@@ -67,10 +63,9 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     protected override void OnStartFinished()
     {
         base.OnStartFinished();
-        OnEntryAdded += _ => SetMiscAsLastTab();
-        // TODO: Auch Properties und Methoden umsetzen:
         LoadCity(0);
         SetupCitySwitcher();
+        OnEntryAdded += _ => SetMiscAsLastTab();
     }
 
     protected virtual void CreateButton(MemberInfo memberInfo)
@@ -82,7 +77,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             button.name = memberInfo.Name;
             ButtonManagerWithIcon buttonManager = button.GetComponent<ButtonManagerWithIcon>();
             buttonManager.buttonText = memberInfo.Name;
-            UnityEvent buttonEvent = new UnityEvent();
+            UnityEvent buttonEvent = new();
             buttonEvent.AddListener(() => City.Invoke(memberInfo.Name, 0));
             buttonManager.clickEvent =  buttonEvent;
 
@@ -95,7 +90,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         Entries.Reverse().ForEach(RemoveEntry);
         foreach (Transform button in Content.transform.Find("ConfigButtons/Content"))
         {
-            Destroy(button.gameObject);
+            Destroyer.Destroy(button.gameObject);
         }
         //TODO Remove Buttons as well: Listener und Buttons muessen zu TabMenu.cs hinzugeuegt werden
     }
@@ -103,10 +98,10 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     public void LoadCity(int i)
     {
         City = GameObject.FindGameObjectsWithTag(Tags.CodeCity)[i].GetComponent<AbstractSEECity>();
-        City.GetType().GetFields().ForEach(fieldInfo => CreateSettingNew(
+        City.GetType().GetFields().ForEach(fieldInfo => CreateSetting(
             value: fieldInfo.GetValue(City),
             name: fieldInfo.Name,
-            parent: GetViewGameObjectHelper(fieldInfo),
+            parent: CreateOrGetViewGameObject(fieldInfo).transform.Find("Content").gameObject,
             setter: changedValue => fieldInfo.SetValue(City, changedValue),
             attributes: fieldInfo.GetCustomAttributes()
         ));
@@ -157,7 +152,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     /// </summary>
     /// <param name="memberInfo"></param>
     /// <returns></returns>
-    private GameObject GetViewGameObjectHelper(MemberInfo memberInfo)
+    private GameObject CreateOrGetViewGameObject(MemberInfo memberInfo)
     {
         string tabName = memberInfo.GetCustomAttributes().OfType<RuntimeFoldoutAttribute>().FirstOrDefault()?.name ??
                          memberInfo.GetCustomAttributes().OfType<PropertyGroupAttribute>().FirstOrDefault()?.GroupName ??
@@ -178,7 +173,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             AddEntry(entry);
         }
 
-        return ViewGameObject(entry).transform.Find("Content").gameObject;
+        return ViewGameObject(entry);
     }
     
     /// <summary>
@@ -190,7 +185,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         if (miscEntry != null) EntryGameObject(miscEntry).transform.SetAsLastSibling();
     }
 
-    private static void CreateSettingNew(object value, string name, GameObject parent, 
+    private static void CreateSetting(object value, string name, GameObject parent, 
         UnityAction<object> setter = null, IEnumerable<Attribute> attributes = null)
     {
         switch (value)
@@ -248,7 +243,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 );
                 break;
             case DataPath dataPath:
-                parent = CreateNestedSettingsObject(name, parent);
+                parent = CreateNestedSetting(name, parent);
                 FilePicker filePicker = parent.AddComponent<FilePicker>();
                 filePicker.DataPathInstance = dataPath;
                 filePicker.Label = name;
@@ -264,10 +259,11 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                     parent: parent
                 );
                 break;
+            // from here on come nested settings
             case NodeTypeVisualsMap:
             case ColorMap:
                 FieldInfo mapInfo = value.GetType().GetField("map", BindingFlags.Instance | BindingFlags.NonPublic)!;
-                CreateSettingNew(
+                CreateSetting(
                     value: mapInfo.GetValue(value),
                     name: name,
                     parent: parent,
@@ -278,7 +274,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 break;
             case AntennaAttributes:
                 FieldInfo antennaInfo = value.GetType().GetField("AntennaSections")!;
-                CreateSettingNew(
+                CreateSetting(
                     value: antennaInfo.GetValue(value),
                     name: name,
                     parent: parent,
@@ -291,11 +287,11 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             case HashSet<string> hashSet:
                 // TODO: How to edit the strings?
                 // TODO: Currently only works on first edit
-                parent = CreateNestedSettingsObject("HashSet: " + name, parent);
+                parent = CreateNestedSetting("HashSet: " + name, parent);
                 int strIndex = 0;
                 foreach (string str in hashSet)
                 {
-                    CreateSettingNew(
+                    CreateSetting(
                         value: str,
                         name: strIndex.ToString(),
                         parent: parent,
@@ -310,10 +306,10 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 }
                 break;
             case IDictionary dict:
-                parent = CreateNestedSettingsObject("Dictionary: " + name, parent);
+                parent = CreateNestedSetting("Dictionary: " + name, parent);
                 foreach (object key in dict.Keys)
                 {
-                    CreateSettingNew(
+                    CreateSetting(
                         value: dict[key],
                         name: "Hello " + key.ToString(),
                         parent: parent,
@@ -322,11 +318,11 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 }
                 break;
             case IList<string> list:
-                parent = CreateNestedSettingsObject("IList<string>: " + name, parent);
+                parent = CreateNestedSetting("IList<string>: " + name, parent);
                 for (int i = 0; i < list.Count; i++)
                 {
                     int iCopy = i;
-                    CreateSettingNew(
+                    CreateSetting(
                         value: list[i],
                         name: i.ToString(),
                         parent: parent,
@@ -334,6 +330,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                     );
                 }
                 break;
+            // confirmed types where the nested fields should be edited
             case ColorRange:
             case ColorProperty:
             case CoseGraphAttributes:
@@ -343,10 +340,10 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             case EdgeSelectionAttributes:
             case ErosionAttributes:
             case BoardAttributes:
-                parent = CreateNestedSettingsObject(name, parent);
+                parent = CreateNestedSetting(name, parent);
                 foreach (FieldInfo nestedInfo in value.GetType().GetFields())
                 {
-                    CreateSettingNew(
+                    CreateSetting(
                         value: nestedInfo.GetValue(value),
                         name: nestedInfo.Name,
                         parent: parent,
@@ -355,6 +352,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                     );
                 }
                 break;
+            // confirmed types where the nested fields should be edited
             case VisualAttributes:
             case ConfigIO.PersistentConfigItem:
             case LabelAttributes:
@@ -363,12 +361,12 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                     && value.GetType() != typeof(LabelAttributes)
                    )
                 {
-                    Debug.Log("Maybe Missing: " + name + " " + value.GetType().GetNiceName());
+                    Debug.Log("Missing: (Maybe)" + name + " " + value.GetType().GetNiceName());
                 }
-                parent = CreateNestedSettingsObject("Nested Fields: " + name, parent);
+                parent = CreateNestedSetting("Nested Fields: " + name, parent);
                 foreach (FieldInfo nestedInfo in value.GetType().GetFields())
                 {
-                    CreateSettingNew(
+                    CreateSetting(
                         value: nestedInfo.GetValue(value),
                         name: nestedInfo.Name,
                         parent: parent,
@@ -378,12 +376,12 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 }
                 break;
             default:
-                Debug.Log("Missing: " + name + " " + value.GetType().GetNiceName());
+                Debug.LogWarning("Missing: " + name + " " + value.GetType().GetNiceName());
                 break;
         }
     } 
     
-    private static GameObject CreateNestedSettingsObject(string name, GameObject parent)
+    private static GameObject CreateNestedSetting(string name, GameObject parent)
     {
         GameObject container =
             PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, parent.transform, false);
@@ -473,7 +471,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     // TODO: Add action
     private static void CreateColorPicker(string name, GameObject parent)
     {
-        parent = CreateNestedSettingsObject("Color Picker: " + name, parent);
+        parent = CreateNestedSetting("Color Picker: " + name, parent);
 
         GameObject colorPickerGameObject =
             PrefabInstantiator.InstantiatePrefab(COLORPICKER_PREFAB, parent.transform, false);
