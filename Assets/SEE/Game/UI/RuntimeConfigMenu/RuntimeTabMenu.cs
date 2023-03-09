@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using JetBrains.Annotations;
 using Michsky.UI.ModernUIPack;
 using SEE.DataModel;
 using SEE.Game;
@@ -98,13 +99,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     public void LoadCity(int i)
     {
         City = GameObject.FindGameObjectsWithTag(Tags.CodeCity)[i].GetComponent<AbstractSEECity>();
-        City.GetType().GetFields().ForEach(fieldInfo => CreateSetting(
-            value: fieldInfo.GetValue(City),
-            name: fieldInfo.Name,
-            parent: CreateOrGetViewGameObject(fieldInfo).transform.Find("Content").gameObject,
-            setter: changedValue => fieldInfo.SetValue(City, changedValue),
-            attributes: fieldInfo.GetCustomAttributes()
-        ));
+        City.GetType().GetMembers().ForEach(memberInfo => CreateSetting(memberInfo, null, City));
         City.GetType().GetMethods().ForEach(CreateButton);
         SelectEntry(Entries.First(entry => entry.Title != "Misc"));
     } 
@@ -152,10 +147,10 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     /// </summary>
     /// <param name="memberInfo"></param>
     /// <returns></returns>
-    private GameObject CreateOrGetViewGameObject(MemberInfo memberInfo)
+    private GameObject CreateOrGetViewGameObject(IEnumerable<Attribute> attributes)
     {
-        string tabName = memberInfo.GetCustomAttributes().OfType<RuntimeFoldoutAttribute>().FirstOrDefault()?.name ??
-                         memberInfo.GetCustomAttributes().OfType<PropertyGroupAttribute>().FirstOrDefault()?.GroupName ??
+        string tabName = attributes.OfType<RuntimeFoldoutAttribute>().FirstOrDefault()?.name ??
+                         attributes.OfType<PropertyGroupAttribute>().FirstOrDefault()?.GroupName ??
                          "Misc";
         ToggleMenuEntry entry = Entries.FirstOrDefault(entry => entry.Title == tabName);
         // adds an entry (tab + view) if necessary
@@ -185,9 +180,38 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         if (miscEntry != null) EntryGameObject(miscEntry).transform.SetAsLastSibling();
     }
 
-    private static void CreateSetting(object value, string name, GameObject parent, 
+    private void CreateSetting(MemberInfo memberInfo, GameObject parent, object obj)
+    {
+        switch (memberInfo)
+        {
+            case FieldInfo fieldInfo:
+                if (fieldInfo.IsLiteral || fieldInfo.IsInitOnly) return;
+                CreateSetting(
+                    value: fieldInfo.GetValue(obj),
+                    name: memberInfo.Name,
+                    parent: parent,
+                    setter: changedValue => fieldInfo.SetValue(obj, changedValue),
+                    attributes: memberInfo.GetCustomAttributes()
+                );
+                break;
+            case PropertyInfo propertyInfo:
+                if (!propertyInfo.CanRead || !propertyInfo.CanWrite) return;
+                CreateSetting(
+                    value: propertyInfo.GetValue(obj),
+                    name: memberInfo.Name,
+                    parent: parent,
+                    setter: changedValue => propertyInfo.SetValue(obj, changedValue),
+                    attributes: memberInfo.GetCustomAttributes()
+                );
+                break;
+        }
+    }
+
+    private void CreateSetting(object value, string name, GameObject parent, 
         UnityAction<object> setter = null, IEnumerable<Attribute> attributes = null)
     {
+        parent ??= CreateOrGetViewGameObject(attributes ?? Enumerable.Empty<Attribute>()).transform.Find("Content").gameObject;
+        
         switch (value)
         {
             case bool bValue:
@@ -287,7 +311,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             case HashSet<string> hashSet:
                 // TODO: How to edit the strings?
                 // TODO: Currently only works on first edit
-                parent = CreateNestedSetting("HashSet: " + name, parent);
+                parent = CreateNestedSetting( name, parent);
                 int strIndex = 0;
                 foreach (string str in hashSet)
                 {
@@ -306,7 +330,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 }
                 break;
             case IDictionary dict:
-                parent = CreateNestedSetting("Dictionary: " + name, parent);
+                parent = CreateNestedSetting(name, parent);
                 foreach (object key in dict.Keys)
                 {
                     CreateSetting(
@@ -318,7 +342,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 }
                 break;
             case IList<string> list:
-                parent = CreateNestedSetting("IList<string>: " + name, parent);
+                parent = CreateNestedSetting( name, parent);
                 for (int i = 0; i < list.Count; i++)
                 {
                     int iCopy = i;
@@ -341,18 +365,9 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             case ErosionAttributes:
             case BoardAttributes:
                 parent = CreateNestedSetting(name, parent);
-                foreach (FieldInfo nestedInfo in value.GetType().GetFields())
-                {
-                    CreateSetting(
-                        value: nestedInfo.GetValue(value),
-                        name: nestedInfo.Name,
-                        parent: parent,
-                        setter: changedValue => nestedInfo.SetValue(value, changedValue),
-                        attributes: nestedInfo.GetCustomAttributes()
-                    );
-                }
+                value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                 break;
-            // confirmed types where the nested fields should be edited
+            // unconfirmed types where the nested fields should be edited
             case VisualAttributes:
             case ConfigIO.PersistentConfigItem:
             case LabelAttributes:
@@ -363,20 +378,11 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 {
                     Debug.Log("Missing: (Maybe)" + name + " " + value.GetType().GetNiceName());
                 }
-                parent = CreateNestedSetting("Nested Fields: " + name, parent);
-                foreach (FieldInfo nestedInfo in value.GetType().GetFields())
-                {
-                    CreateSetting(
-                        value: nestedInfo.GetValue(value),
-                        name: nestedInfo.Name,
-                        parent: parent,
-                        setter: changedValue => nestedInfo.SetValue(value, changedValue),
-                        attributes: nestedInfo.GetCustomAttributes()
-                    );
-                }
+                parent = CreateNestedSetting(name, parent);
+                value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                 break;
             default:
-                Debug.LogWarning("Missing: " + name + " " + value.GetType().GetNiceName());
+                Debug.LogWarning("Missing: " + name + " " + value?.GetType().GetNiceName());
                 break;
         }
     } 
