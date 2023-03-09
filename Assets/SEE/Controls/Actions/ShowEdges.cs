@@ -2,7 +2,6 @@ using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -188,6 +187,11 @@ namespace SEE.Controls.Actions
 
         private void On()
         {
+            OnOff(true);
+        }
+
+        private void OnOff(bool show)
+        {
             Node node = Node();
             if (node == null)
             {
@@ -199,24 +203,13 @@ namespace SEE.Controls.Actions
             // TODO: Perhaps the node along with its edges should be cached?
             foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
             {
-                edge.Operator().Show(animationKind, ANIMATION_DURATION);
+                edge.Operator().ShowOrHide(show, animationKind, ANIMATION_DURATION);
             }
         }
 
         private void Off()
         {
-            Node node = Node();
-            if (node == null)
-            {
-                return;
-            }
-
-            EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
-
-            foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
-            {
-                edge.Operator().Hide(animationKind, ANIMATION_DURATION);
-            }
+            OnOff(false);
         }
     }
 }
