@@ -71,7 +71,7 @@ namespace SEE.Game.City
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public override void LoadData()
         {
@@ -143,7 +143,7 @@ namespace SEE.Game.City
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
         public override void DrawGraph()
         {
@@ -154,7 +154,7 @@ namespace SEE.Game.City
         /// Saves implementation, architecture, and mapping graphs as GXL.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
         [PropertyOrder(DataButtonsGroupOrderSave)]
         public override void SaveData()
         {

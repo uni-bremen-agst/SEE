@@ -75,9 +75,9 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         {
             Transform buttonContent = Content.transform.Find("ConfigButtons/Content");
             GameObject button = PrefabInstantiator.InstantiatePrefab(BUTTON_PREFAB, buttonContent, false);
-            button.name = memberInfo.Name;
+            button.name = memberInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
             ButtonManagerWithIcon buttonManager = button.GetComponent<ButtonManagerWithIcon>();
-            buttonManager.buttonText = memberInfo.Name;
+            buttonManager.buttonText = memberInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
             UnityEvent buttonEvent = new();
             buttonEvent.AddListener(() => City.Invoke(memberInfo.Name, 0));
             buttonManager.clickEvent =  buttonEvent;
