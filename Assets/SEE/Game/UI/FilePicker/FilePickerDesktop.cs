@@ -101,23 +101,18 @@ namespace SEE.Game.UI.FilePicker
 
             LabelText.text = Label;
 
-            // removes default entries
+            // setup dropdown
+            Dropdown.isListItem = true;
+            Dropdown.listParent = Canvas.transform;
             Dropdown.dropdownItems.Clear();
-            // adds the different root kinds
             foreach (DataPath.RootKind kind in Enum.GetValues(typeof(DataPath.RootKind)))
                 Dropdown.CreateNewItemFast(kind.ToString(), null);
-            UpdateDropdown();
-
-            // adds a listener to the dropdown
             Dropdown.dropdownEvent.AddListener(index =>
             {
                 var selectedItem = Dropdown.dropdownItems[index].itemName;
                 Enum.TryParse(selectedItem, out DataPathInstance.Root);
                 UpdateInput();
             });
-
-            Dropdown.isListItem = true;
-            Dropdown.listParent = Canvas.transform;
 
             // opens a file picker with the picker button
             PickerButton.clickEvent.AddListener(() =>
@@ -163,6 +158,13 @@ namespace SEE.Game.UI.FilePicker
                     DataPathInstance.RelativePath = path;
                 UpdateInput();
             });
+        }
+
+        protected override void OnStartFinished()
+        {
+            base.OnStartFinished();
+            UpdateDropdown();
+            UpdateInput();
         }
 
         /// <summary>
