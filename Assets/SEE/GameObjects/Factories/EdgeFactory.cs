@@ -80,7 +80,7 @@ namespace SEE.GO
         public ICollection<GameObject> DrawEdges<T>(IEnumerable<T> nodes, ICollection<LayoutGraphEdge<T>> edges)
         where T : LayoutGameNode, IHierarchyNode<ILayoutNode>
         {
-            List<GameObject> result = new List<GameObject>(edges.Count);
+            List<GameObject> result = new(edges.Count);
             if (edges.Count == 0)
             {
                 return result;
