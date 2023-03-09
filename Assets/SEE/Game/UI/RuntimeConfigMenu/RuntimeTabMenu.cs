@@ -64,9 +64,10 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     protected override void OnStartFinished()
     {
         base.OnStartFinished();
+        OnEntryAdded += _ => SetMiscAsLastTab();
+
         LoadCity(0);
         SetupCitySwitcher();
-        OnEntryAdded += _ => SetMiscAsLastTab();
     }
 
     protected virtual void CreateButton(MemberInfo memberInfo)
@@ -99,7 +100,12 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     public void LoadCity(int i)
     {
         City = GameObject.FindGameObjectsWithTag(Tags.CodeCity)[i].GetComponent<AbstractSEECity>();
-        City.GetType().GetMembers().ForEach(memberInfo => CreateSetting(memberInfo, null, City));
+        City.GetType().GetMembers().ForEach(memberInfo =>
+        {
+            if (memberInfo.DeclaringType == typeof(AbstractSEECity) || 
+                memberInfo.DeclaringType!.IsSubclassOf(typeof(AbstractSEECity))) 
+                CreateSetting(memberInfo, null, City);
+        });
         City.GetType().GetMethods().ForEach(CreateButton);
         SelectEntry(Entries.First(entry => entry.Title != "Misc"));
     } 
@@ -195,7 +201,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 );
                 break;
             case PropertyInfo propertyInfo:
-                if (!propertyInfo.CanRead || !propertyInfo.CanWrite) return;
+                if (propertyInfo.GetMethod == null || propertyInfo.SetMethod == null || 
+                    !propertyInfo.CanRead || !propertyInfo.CanWrite) return;
                 CreateSetting(
                     value: propertyInfo.GetValue(obj),
                     name: memberInfo.Name,
@@ -335,7 +342,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 {
                     CreateSetting(
                         value: dict[key],
-                        name: "Hello " + key.ToString(),
+                        name: key.ToString(),
                         parent: parent,
                         setter: changedValue => dict[key] = changedValue
                     );
