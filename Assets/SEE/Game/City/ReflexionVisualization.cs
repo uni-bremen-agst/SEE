@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.Operator;
@@ -46,7 +47,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Percentage by which the starting color of an edge differs to its end color.
         /// </summary>
-        private const float EDGE_GRADIENT_FACTOR = 0.7f;
+        private const float EDGE_GRADIENT_FACTOR = 1.0f;
 
         /// <summary>
         /// States in which an edge shall be hidden.
@@ -115,6 +116,55 @@ namespace SEE.Game.City
             while (UnhandledEvents.Count > 0 && gameObject.IsCodeCityDrawn())
             {
                 OnNext(UnhandledEvents.Dequeue());
+            }
+            //if (SEEInput.ShowAllDivergences())
+            //{
+            //    ShowAllDivergences(true);
+            //}
+            //else
+            //{
+            //    ShowAllDivergences(false);
+            //}
+        }
+
+        /// <summary>
+        /// Whether all divergent implementation dependencies are currently shown.
+        /// </summary>
+        private bool allDivergencesAreShown = false;
+
+        /// <summary>
+        /// If <paramref name="show"/>, all divergent implementation dependencies will
+        /// be shown; otherwise they will be hidden.
+        /// </summary>
+        /// <param name="show">whether all divergent implementation dependencies should
+        /// be shown</param>
+        private void ShowAllDivergences(bool show)
+        {
+            // Do we really have a change of the visibility?
+            if (allDivergencesAreShown != show)
+            {
+                allDivergencesAreShown = show;
+                foreach (Edge edge in CityGraph.Edges())
+                {
+                    if (!edge.HasToggle(GraphElement.IsVirtualToggle)
+                        && edge.IsInImplementation()
+                        && edge.State() == State.Divergent)
+                    {
+                        GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
+                        if (gameEdge != null)
+                        {
+                            EdgeOperator edgeOperator = gameEdge.AddOrGetComponent<EdgeOperator>();
+                            if (allDivergencesAreShown)
+                            {
+                                edgeOperator.Show(City.EdgeLayoutSettings.AnimationKind, ANIMATION_DURATION);
+                            }
+                            else
+                            {
+                                edgeOperator.Hide(City.EdgeLayoutSettings.AnimationKind, ANIMATION_DURATION);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -269,6 +319,7 @@ namespace SEE.Game.City
             {
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge);
                 EdgeOperator edgeOperator = edge.AddOrGetComponent<EdgeOperator>();
+                edgeOperator.ShowOrHide(!edgeChange.Edge.HasToggle(Edge.IsHiddenToggle), City.EdgeLayoutSettings.AnimationKind, ANIMATION_DURATION);
                 edgeOperator.ChangeColorsTo(newColors.start, newColors.end, ANIMATION_DURATION, false);
 
                 if (!PreviousEdgeStates.TryGetValue(edgeChange.Edge.ID, out State previous) || previous != edgeChange.NewState)
