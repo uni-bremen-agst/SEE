@@ -97,7 +97,14 @@ namespace SEE.Game
             Assert.IsNotNull(gameObject);
             Assert.IsFalse(string.IsNullOrEmpty(gameObject.name));
             Assert.IsTrue(gameObject.IsNode() || gameObject.IsEdge());
-            mapping.Add(gameObject.name, gameObject);
+            try
+            {
+                mapping.Add(gameObject.name, gameObject);
+            }
+            catch (Exception)
+            {
+                Debug.LogError($"A graph element with unique id {gameObject.name} exists in the scene already. Expect undefined behaviour.\n");
+            }
         }
 
         /// <summary>
