@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Tools.ReflexionAnalysis;
 
@@ -40,7 +39,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
 
             int Count(State state) => states.TryGetValue(state, out int value) ? value : 0;
 
-            MetricValueRange convergences = new MetricValueRange
+            MetricValueRange convergences = new()
             {
                 Name = "Convergent and allowed edges",
                 DecimalPlaces = 0,
@@ -49,7 +48,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
                 Lower = 0,
                 Higher = maximum
             };
-            MetricValueRange absences = new MetricValueRange
+            MetricValueRange absences = new()
             {
                 Name = "Absent edges",
                 DecimalPlaces = 0,
@@ -57,7 +56,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
                 Lower = 0,
                 Higher = maximum
             };
-            MetricValueRange divergences = new MetricValueRange
+            MetricValueRange divergences = new()
             {
                 Name = "Divergent edges",
                 DecimalPlaces = 0,
@@ -65,7 +64,7 @@ namespace SEE.Game.HolisticMetrics.Metrics
                 Lower = 0,
                 Higher = maximum
             };
-            MetricValueRange unmapped = new MetricValueRange
+            MetricValueRange unmapped = new()
             {
                 Name = "Unmapped edges",
                 DecimalPlaces = 0,
