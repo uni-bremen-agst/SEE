@@ -150,9 +150,9 @@ namespace SEE.Controls
         //----------------------------------------------------
 
         /// <summary>
-        /// Architecture mapping: maps implementation entity onto architecture entity.
+        /// Reflexion analysis: Show all divergent implementation dependencies.
         /// </summary>
-        internal static KeyCode Mapping = Register(KeyCode.V, Scope.Architecture, "Architecture mapping: maps implementation entity onto architecture entity.");
+        internal static KeyCode ShowDivergences = Register(KeyCode.V, Scope.Architecture, "Show all divergent implementation dependencies.");
 
         /// <summary>
         /// Architecture mapping: saves the current architecture mapping.
@@ -390,7 +390,7 @@ namespace SEE.Controls
         internal static readonly KeyCode CloseNotifications = Register(KeyCode.X, Scope.Always, "Clears all notifications.");
 
         #endregion
-        
+
         //-----------------------------------------------------
         // Holistic metrics menu
         //-----------------------------------------------------

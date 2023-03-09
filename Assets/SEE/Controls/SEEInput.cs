@@ -1,4 +1,5 @@
 ﻿using SEE.Utils;
+using System;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -212,12 +213,12 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// The user wants to map an implementation node onto an architecture node for the architecture analysis.
+        /// The user wants to see all divergent implementation dependencies in the architecture analysis.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        internal static bool Mapping()
+        internal static bool ShowAllDivergences()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Mapping);
+            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ShowDivergences);
         }
 
         #endregion
