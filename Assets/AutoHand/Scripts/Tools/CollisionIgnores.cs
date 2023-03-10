@@ -1,27 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class CollisionIgnores : MonoBehaviour {
-    public bool disableOnStart = true;
-    public Collider[] cols1;
-    public Collider[] cols2;
-
-    void Start() {
-        DisableCollisions();
-    }
-
-    public void EnableCollisions() {
-        for(int i = 0; i < cols1.Length; i++)
-            for(int j = 0; j < cols2.Length; j++)
-                Physics.IgnoreCollision(cols1[i], cols2[j], false);
-    }
-
-    public void DisableCollisions() {
-        for(int i = 0; i < cols1.Length; i++)
-            for(int j = 0; j < cols2.Length; j++)
-                Physics.IgnoreCollision(cols1[i], cols2[j], true);
-    }
-
-
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:0a39dd08f0ff8492d3f6f250e7c41d35d49bdb017de7128ebd06a925d67da6eb
+size 727

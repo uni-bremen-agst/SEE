@@ -1,21 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class AutoHandSettings : ScriptableObject{
-    [Tooltip("Whether the popup should be ignored on launch or not")]
-    public bool ignoreSetup = false;
-    public bool usingDynamicTimestep = true;
-    [Tooltip("-1 is custom, 0 is low, 1 is medium, 2 is high")]
-    public float quality = -1;
-
-    public static void ClearSettings() {
-        var _handSettings = Resources.Load<AutoHandSettings>("AutoHandSettings");
-        _handSettings.ignoreSetup = false;
-        _handSettings.quality = -1;
-    }
-    public static bool UsingDynamicTimestep() {
-        var _handSettings = Resources.Load<AutoHandSettings>("AutoHandSettings");
-        return _handSettings.usingDynamicTimestep;
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:f6471ed7d7cb09e190629bf6287459df1729b3ba89417fd053b9232febd67653
+size 796

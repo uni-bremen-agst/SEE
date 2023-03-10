@@ -1,33 +1,3 @@
-﻿using System;
-
-namespace NaughtyAttributes
-{
-	public enum EButtonEnableMode
-	{
-		/// <summary>
-		/// Button should be active always
-		/// </summary>
-		Always,
-		/// <summary>
-		/// Button should be active only in editor
-		/// </summary>
-		Editor,
-		/// <summary>
-		/// Button should be active only in playmode
-		/// </summary>
-		Playmode
-	}
-
-	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
-	public class ButtonAttribute : SpecialCaseDrawerAttribute
-	{
-		public string Text { get; private set; }
-		public EButtonEnableMode SelectedEnableMode { get; private set; }		
-
-		public ButtonAttribute(string text = null, EButtonEnableMode enabledMode = EButtonEnableMode.Always)
-		{
-			this.Text = text;
-			this.SelectedEnableMode = enabledMode;
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:620f88458f0e3d8369c9a74351004cf6749a741d22d9a88e37a98019096f71ee
+size 817

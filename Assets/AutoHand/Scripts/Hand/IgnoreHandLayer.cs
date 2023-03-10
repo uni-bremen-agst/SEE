@@ -1,30 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-/// <summary>For the special use case of attaching something under the hand component and 
-/// wanting to ignore the hand layer override operation</summary>
-[DefaultExecutionOrder(-100000)]
-public class IgnoreHandLayer : MonoBehaviour
-{
-    public bool includeChildren = true;
-    int startLayer;
-
-    void Awake(){
-        startLayer = gameObject.layer;
-        Invoke("LateStart", 0.1f);
-    }
-
-    void LateStart(){
-        if(includeChildren)
-            SetLayerRecursive(transform, startLayer);
-        else
-            transform.gameObject.layer = startLayer;
-    }
-    
-    internal void SetLayerRecursive(Transform obj, int newLayer) {
-        obj.gameObject.layer = newLayer;
-        for (int i = 0; i < obj.childCount; i++)
-            SetLayerRecursive(obj.GetChild(i), newLayer);
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:21efc0b17a8144f76d800e72e253848d295bf6fa90beb4c54aa3678909ea8767
+size 911

@@ -1,18 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Autohand.Demo{
-    public class ScaleHighlight : MonoBehaviour{
-        public Vector3 highlighScale;
-        public Vector3 normalScale;
-
-        public void Highlight() {
-            transform.localScale = highlighScale;
-        }
-
-        public void HighlightStop() {
-            transform.localScale = normalScale;
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:16f2daf1b657560e1d7fce4e404a366c551ee292e93067700b6e7030a786f02f
+size 446

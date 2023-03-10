@@ -1,22 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Autohand {
-    public class EditorHand : MonoBehaviour {
-        public bool useEditorGUI = true;
-        public GrabbablePose grabbablePose;
-        public HandPoseArea grabbablePoseArea;
-
-        Hand _hand = null;
-        public Hand hand {
-            get {
-                if(_hand == null)
-                    _hand = GetComponent<Hand>();
-
-                return _hand;
-            }
-        }
-
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:f05a720dbf89a742c5b12818824cb0d3e9200f7390eb1be738785d8c989ead05
+size 520
