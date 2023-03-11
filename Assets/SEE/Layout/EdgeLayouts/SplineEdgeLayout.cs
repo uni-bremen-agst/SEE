@@ -8,7 +8,7 @@ namespace SEE.Layout.EdgeLayouts
     /// Draws edges as splines with three control points between either the roof or ground of
     /// game objects.
     /// </summary>
-    public class SplineEdgeLayout : IEdgeLayout
+    public class SplineEdgeLayout : CurvyEdgeLayoutBase
     {
         /// <summary>
         /// Constructor.
@@ -51,20 +51,28 @@ namespace SEE.Layout.EdgeLayouts
             {
                 T source = edge.Source;
                 T target = edge.Target;
-                // define the points along the line
-                Vector3 start;
-                Vector3 end;
-                if (edgesAboveBlocks)
+                EqualityComparer<T> comparer = EqualityComparer<T>.Default;
+                if (comparer.Equals(source, target))
                 {
-                    start = source.Roof;
-                    end = target.Roof;
+                    edge.Spline = SelfLoop(source, edgesAboveBlocks, offset);
                 }
                 else
                 {
-                    start = source.Ground;
-                    end = target.Ground;
+                    // define the points along the line
+                    Vector3 start;
+                    Vector3 end;
+                    if (edgesAboveBlocks)
+                    {
+                        start = source.Roof;
+                        end = target.Roof;
+                    }
+                    else
+                    {
+                        start = source.Ground;
+                        end = target.Ground;
+                    }
+                    edge.Spline = CreateSpline(start, end, edgesAboveBlocks, offset);
                 }
-                edge.Spline = CreateSpline(start, end, edgesAboveBlocks, offset);
             }
         }
 
