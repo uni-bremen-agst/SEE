@@ -33,6 +33,13 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private readonly string filename;
 
+        /// <summary>
+        /// See <see cref="HierarchicalNodeLayout.Layout()"/>.
+        /// Note: The layout may not only be returned but also applied depending on the implementation
+        /// of <see cref="ILayoutNode"/>.
+        /// </summary>
+        /// <param name="layoutNodes">nodes to be laid out</param>
+        /// <returns>resulting layout</returns>
         public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
         {
             Dictionary<ILayoutNode, NodeTransform> result = new();
