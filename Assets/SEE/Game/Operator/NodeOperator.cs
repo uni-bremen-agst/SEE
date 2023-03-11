@@ -25,17 +25,17 @@ namespace SEE.Game.Operator
         // still letting the user drag the node.
 
         /// <summary>
-        /// Operation handling X-axis movement.
+        /// Operation handling X-axis movement in world space.
         /// </summary>
         private TweenOperation<float> PositionX;
 
         /// <summary>
-        /// Operation handling Y-axis movement.
+        /// Operation handling Y-axis movement in world space.
         /// </summary>
         private TweenOperation<float> PositionY;
 
         /// <summary>
-        /// Operation handling Z-axis movement.
+        /// Operation handling Z-axis movement in world space.
         /// </summary>
         private TweenOperation<float> PositionZ;
 
@@ -93,7 +93,7 @@ namespace SEE.Game.Operator
         /// The position this node is supposed to be at.
         /// </summary>
         /// <seealso cref="AbstractOperator"/>
-        public Vector3 TargetPosition => new Vector3(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
+        public Vector3 TargetPosition => new(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
 
         /// <summary>
         /// The scale this node is supposed to be at.
@@ -104,9 +104,9 @@ namespace SEE.Game.Operator
         #region Public API
 
         /// <summary>
-        /// Moves the node to the <paramref name="newXPosition"/>, taking <paramref name="duration"/> seconds.
+        /// Moves the node to the <paramref name="newXPosition"/> in world space, taking <paramref name="duration"/> seconds.
         /// </summary>
-        /// <param name="newXPosition">the desired new target X coordinate</param>
+        /// <param name="newXPosition">the desired new target X coordinate in world space</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
@@ -117,9 +117,9 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
-        /// Moves the node to the <paramref name="newYPosition"/>, taking <paramref name="duration"/> seconds.
+        /// Moves the node to the <paramref name="newYPosition"/> in world space, taking <paramref name="duration"/> seconds.
         /// </summary>
-        /// <param name="newYPosition">the desired new target Y coordinate</param>
+        /// <param name="newYPosition">the desired new target Y coordinate in world space</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
@@ -130,9 +130,9 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
-        /// Moves the node to the <paramref name="newZPosition"/>, taking <paramref name="duration"/> seconds.
+        /// Moves the node to the <paramref name="newZPosition"/> in world space, taking <paramref name="duration"/> seconds.
         /// </summary>
-        /// <param name="newZPosition">the desired new target Z coordinate</param>
+        /// <param name="newZPosition">the desired new target Z coordinate in world space</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
@@ -143,9 +143,9 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
-        /// Moves the node to the <paramref name="newPosition"/>, taking <paramref name="duration"/> seconds.
+        /// Moves the node to the <paramref name="newPosition"/> in world space, taking <paramref name="duration"/> seconds.
         /// </summary>
-        /// <param name="newPosition">the desired new target position</param>
+        /// <param name="newPosition">the desired new target position in world space</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
