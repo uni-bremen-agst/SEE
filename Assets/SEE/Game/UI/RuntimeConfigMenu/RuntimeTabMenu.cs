@@ -30,6 +30,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     protected const string RUNTIME_CONFIG_PREFAB_FOLDER = UI_PREFAB_FOLDER + "RuntimeConfigMenu/";
     public const string SETTINGS_OBJECT_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsObject";
     public const string SWITCH_PREFAB = UI_PREFAB_FOLDER + "Input Group - Switch";
+    public const string SMALLWINDOW_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfig_SmallConfigWindow";
     public const string FILEPICKER_PREFAB = UI_PREFAB_FOLDER + "Input Group - File Picker";
     public const string SLIDER_PREFAB = UI_PREFAB_FOLDER + "Input Group - Slider";
     public const string DROPDOWN_PREFAB = UI_PREFAB_FOLDER + "Input Group - Dropdown";
@@ -199,7 +200,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         if (miscEntry != null) EntryGameObject(miscEntry).transform.SetAsLastSibling();
     }
 
-    private static void CreateSettingObject(FieldInfo fieldInfo, GameObject parent, object obj)
+    private void CreateSettingObject(FieldInfo fieldInfo, GameObject parent, object obj)
     {
         object value = fieldInfo.GetValue(obj);
         if (value is bool b)
@@ -369,7 +370,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             Debug.LogWarning("Missing: " + fieldInfo.Name + "(" + value.GetType().GetNiceName() +")");
         }
     }
-    private static GameObject CreateNestedSettingsObject(string name, GameObject parent)
+    private GameObject CreateNestedSettingsObject(string name, GameObject parent)
     {
         GameObject container =
             PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, parent.transform, false);
@@ -378,7 +379,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         return container.transform.Find("Content").gameObject;
     }
 
-    private static void CreateSlider(string name, RangeAttribute range, UnityAction<float> setter, float value, bool useRoundValue, GameObject parent)
+    private void CreateSlider(string name, RangeAttribute range, UnityAction<float> setter, float value, bool useRoundValue, GameObject parent)
     {
         range ??= new RangeAttribute(0, 2);
 
@@ -398,9 +399,21 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 
         slider.value = value;
         slider.onValueChanged.AddListener(setter);
+        
+        sliderGameObject.AddComponent<Button>().onClick.AddListener(() =>  ShowSmallEditorSlider(name, range, setter,value , useRoundValue));
+    }
+    
+    private void ShowSmallEditorSlider(string name, RangeAttribute range, UnityAction<float> setter, float value, bool useRoundValue)
+    {
+        Action<GameObject> createSlider = delegate(GameObject parentObject)
+        {
+            CreateSlider(name, range, setter, value, useRoundValue, parentObject.transform.Find("Content").gameObject);
+        };
+
+        ShowSmallEditor(createSlider);
     }
 
-    private static void CreateSwitch(string name, UnityAction<bool> setter, bool value, GameObject parent)
+    private void CreateSwitch(string name, UnityAction<bool> setter, bool value, GameObject parent)
     {
         GameObject switchGameObject =
             PrefabInstantiator.InstantiatePrefab(SWITCH_PREFAB, parent.transform, false);
@@ -413,11 +426,22 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         switchManager.isOn = value;
         switchManager.OnEvents.AddListener(() => setter(true));
         switchManager.OffEvents.AddListener(() => setter(false));
+
+        switchGameObject.AddComponent<Button>().onClick.AddListener(() => ShowSmallEditorSwitch(name,setter,value));
+    }
+    
+    private void ShowSmallEditorSwitch(string name, UnityAction<bool> setter, bool value)
+    {
+        Action<GameObject> createSwitch = delegate(GameObject parentObject)
+        {
+            CreateSwitch(name, setter, value, parentObject.transform.Find("Content").gameObject);
+        };
+        ShowSmallEditor(createSwitch);
     }
 
     // TODO: Replace with actual string field prefab
     // TODO: Add action
-    private static void CreateStringField(string name, UnityAction<string> setter, string value, GameObject parent)
+    private void CreateStringField(string name, UnityAction<string> setter, string value, GameObject parent)
     {
         GameObject stringGameObject =
             PrefabInstantiator.InstantiatePrefab(STRINGFIELD_PREFAB, parent.transform, false);
@@ -429,10 +453,21 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         TMP_InputField inputField = stringGameObject.GetComponentInChildren<TMP_InputField>();
         inputField.text = value;
         inputField.onValueChanged.AddListener(setter);
+        
+        stringGameObject.AddComponent<Button>().onClick.AddListener(() => ShowSmallEditorStringField(name,setter,value));
+    }
+    
+    private void ShowSmallEditorStringField(string name, UnityAction<string> setter, string value)
+    {
+        Action<GameObject> createStringField = delegate(GameObject parentObject)
+        {
+            CreateStringField(name, setter, value, parentObject.transform.Find("Content").gameObject);
+        };
+        ShowSmallEditor(createStringField);
     }
 
     // TODO: Add action
-    private static void CreateDropDown(string name, UnityAction<int> setter, IEnumerable<string> values, string value, GameObject parent)
+    private void CreateDropDown(string name, UnityAction<int> setter, IEnumerable<string> values, string value, GameObject parent)
     {
         GameObject dropDownGameObject =
             PrefabInstantiator.InstantiatePrefab(DROPDOWN_PREFAB, parent.transform, false);
@@ -454,10 +489,21 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         dropdown.dropdownEvent.AddListener(setter);
         values.ForEach(s => dropdown.CreateNewItem(s, null));
         dropdown.SetupDropdown();
+        
+        dropDownGameObject.AddComponent<Button>().onClick.AddListener(() => ShowSmallEditorDropDown(name,setter, values, value));
+    }
+    
+    private void ShowSmallEditorDropDown(string name, UnityAction<int> setter, IEnumerable<string> values, string value)
+    {
+        Action<GameObject> createDropDown = delegate(GameObject parentObject)
+        {
+            CreateDropDown(name, setter, values, value, parentObject.transform.Find("Content").gameObject);
+        };
+        ShowSmallEditor(createDropDown);
     }
 
     // TODO: Add action
-    private static void CreateColorPicker(string name, GameObject parent)
+    private void CreateColorPicker(string name, GameObject parent)
     {
         parent = CreateNestedSettingsObject("Color Picker: " + name, parent);
 
@@ -468,13 +514,43 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         TextMeshProUGUI text = colorPickerGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = name;
         // TODO: Value and setter
+
+
+        colorPickerGameObject.AddComponent<Button>().onClick.AddListener(() => ShowSmallEditorColorPicker(name));
+    }
+    
+    private void ShowSmallEditorColorPicker(string name)
+    {
+        Action<GameObject> createColorPicker = delegate(GameObject parentObject)
+        {
+            CreateColorPicker(name, parentObject.transform.Find("Content").gameObject);
+        };
+        ShowSmallEditor(createColorPicker);
     }
 
-    private static void AddLayoutElement(GameObject gameObject)
+    private void AddLayoutElement(GameObject gameObject)
     {
         LayoutElement le = gameObject.AddComponent<LayoutElement>();
         le.minHeight = ((RectTransform) gameObject.transform).rect.height;
         le.minWidth = ((RectTransform) gameObject.transform).rect.width;
+    }
+    
+    private void ShowSmallEditor(Action<GameObject> createSettingObject)
+    {
+        if (!ShowMenu) return;
+        
+        ToggleMenu();
+
+        GameObject containerGameObject =
+            PrefabInstantiator.InstantiatePrefab(SMALLWINDOW_PREFAB, Canvas.transform, false);
+
+        createSettingObject(containerGameObject);
+
+        containerGameObject.transform.Find("CloseButton").GetComponent<Button>().onClick.AddListener(() =>
+        {
+            Destroy(containerGameObject);
+            ToggleMenu();
+        });
     }
     
 
