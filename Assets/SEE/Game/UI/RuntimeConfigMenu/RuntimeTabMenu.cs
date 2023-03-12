@@ -573,8 +573,10 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
         containerGameObject.transform.Find("CloseButton").GetComponent<Button>().onClick.AddListener(() =>
         {
-            Destroy(containerGameObject);
+            Destroyer.Destroy(containerGameObject);
+            // TODO Updaten der UI Settings
             ToggleMenu();
+            
         });
     }
     
