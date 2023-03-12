@@ -4,6 +4,7 @@ using SEE.Controls.Actions;
 using SEE.GO;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering;
 using Valve.VR.InteractionSystem;
 
 namespace SEE.Game.Operator
@@ -55,6 +56,9 @@ namespace SEE.Game.Operator
         /// </summary>
         private void PrepareLabel()
         {
+            Color textColor = Color.white; // .ColorWithAlpha(1f)
+            Color lineColor = Color.white;
+
             string shownText = Node.SourceName;
 
             nodeLabel = transform.Find(LABEL_PREFIX + shownText)?.gameObject;
@@ -70,18 +74,18 @@ namespace SEE.Game.Operator
                                                         startLabelPosition,
                                                         City.NodeTypes[Node.Type].LabelSettings.FontSize,
                                                         lift: true,
-                                                        textColor: Color.black.ColorWithAlpha(0f));
+                                                        textColor: textColor);
                 nodeLabel.name = LABEL_PREFIX + shownText;
                 nodeLabel.transform.SetParent(gameObject.transform);
 
                 // Second, add connecting line between "roof" of the game object and the text.
                 Vector3 startLinePosition = gameObject.GetRoofCenter();
-                GameObject line = new GameObject
+                GameObject line = new()
                 {
                     name = $"{LABEL_PREFIX}{shownText} (Connecting Line)"
                 };
                 LineFactory.Draw(line, new[] { startLinePosition, startLinePosition }, 0.01f,
-                                 Materials.New(Materials.ShaderType.TransparentLine, Color.black));
+                                 LineMaterial(lineColor));
                 line.transform.SetParent(nodeLabel.transform);
 
                 // The nodeLabel and its child edge must inherit the portal of gameObject.
@@ -92,10 +96,31 @@ namespace SEE.Game.Operator
                 if (nodeLabel.TryGetComponentOrLog(out labelText) && line.TryGetComponentOrLog(out labelLineRenderer))
                 {
                     labelText.alpha = 0f;
-                    labelLineRenderer.startColor = labelLineRenderer.startColor.ColorWithAlpha(0f);
-                    labelLineRenderer.endColor = labelLineRenderer.endColor.ColorWithAlpha(0f);
+                    labelLineRenderer.startColor = lineColor.ColorWithAlpha(0f);
+                    labelLineRenderer.endColor = lineColor.ColorWithAlpha(0f);
                 }
             }
+        }
+
+        /// <summary>
+        /// Material for the line connecting a node and its label. We use the
+        /// exactly the same material for all.
+        /// </summary>
+        private static Material lineMaterial;
+
+        /// <summary>
+        /// Returns the material for the line connecting a node and its label.
+        /// </summary>
+        /// <param name="lineColor"></param>
+        /// <returns></returns>
+        private static Material LineMaterial(Color lineColor)
+        {
+            if (lineMaterial == null)
+            {
+                lineMaterial = Materials.New(Materials.ShaderType.TransparentLine, lineColor, texture: null,
+                                             renderQueueOffset: (int)(RenderQueue.Transparent + 1));
+            }
+            return lineMaterial;
         }
 
         /// <summary>
@@ -141,7 +166,7 @@ namespace SEE.Game.Operator
             // Animated label to move to top and fade in
             DOTween.ToAlpha(() => labelText.color, color => labelText.color = color, alpha, duration).Play(),
             // Lower start of line should be visible almost immediately due to reduced alpha (smooth transition)
-            DOTween.ToAlpha(() => labelLineRenderer.startColor, c => labelLineRenderer.startColor = c, alpha * 0.5f, duration * 0.1f).Play(),
+            DOTween.ToAlpha(() => labelLineRenderer.startColor, c => labelLineRenderer.startColor = c, alpha, duration * 0.1f).Play(),
             DOTween.ToAlpha(() => labelLineRenderer.endColor, c => labelLineRenderer.endColor = c, alpha, duration).Play(),
         };
 
