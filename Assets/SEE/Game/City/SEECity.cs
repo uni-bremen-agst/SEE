@@ -304,7 +304,7 @@ namespace SEE.Game.City
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public virtual void LoadData()
         {
@@ -327,7 +327,7 @@ namespace SEE.Game.City
         /// Saves the graph data to the GXL file with GXLPath().
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
         [PropertyOrder(DataButtonsGroupOrderSave)]
         public virtual void SaveData()
         {
@@ -364,7 +364,7 @@ namespace SEE.Game.City
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Graph")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
         public virtual void DrawGraph()
         {
@@ -409,7 +409,7 @@ namespace SEE.Game.City
         /// the file is saved in the SLD format.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Layout")]
         [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
         public void SaveLayout()
         {
@@ -430,7 +430,7 @@ namespace SEE.Game.City
         /// the underlying graph, and all game objects visualizing information about it.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup)]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset")]
         [PropertyOrder(ResetButtonsGroupOrderReset)]
         public override void Reset()
         {

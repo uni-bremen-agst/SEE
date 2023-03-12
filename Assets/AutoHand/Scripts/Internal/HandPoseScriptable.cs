@@ -1,34 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Autohand
-{
-    [CreateAssetMenu(fileName = "AutoHand Pose", menuName = "Auto Hand/Custom Pose", order = 1)]
-    public class HandPoseScriptable : ScriptableObject{
-        [HideInInspector]
-        public bool rightSaved;
-        [HideInInspector]
-        public bool leftSaved;
-        public HandPoseData rightPose;
-        public HandPoseData leftPose;
-
-        public void SavePoses(HandPoseData right, HandPoseData left)
-        {
-            SaveRightPose(right);
-            SaveLeftPose(left);
-        }
-
-        public void SaveRightPose(HandPoseData right)
-        {
-            rightPose = right;
-            rightSaved = true;
-        }
-
-        public void SaveLeftPose(HandPoseData left)
-        {
-            leftPose = left;
-            leftSaved = true;
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:c7d995c1a6836cf585cfed3bd1764909d94ef44b0931e72698a0aa63b5a62644
+size 913

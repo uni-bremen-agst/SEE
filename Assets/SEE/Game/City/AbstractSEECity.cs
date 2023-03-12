@@ -256,7 +256,7 @@ namespace SEE.Game.City
         /// Saves the settings of this code city to <see cref="ConfigurationPath"/>.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup)]
+        [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Save Configuration")]
         [PropertyOrder(ConfigurationButtonsGroupSave)]
         public void SaveConfiguration()
         {
@@ -267,7 +267,7 @@ namespace SEE.Game.City
         /// Loads the settings of this code city from <see cref="ConfigurationPath"/>.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup)]
+        [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Load Configuration")]
         [PropertyOrder(ConfigurationButtonsGroupLoad)]
         public void LoadConfiguration()
         {
@@ -314,7 +314,7 @@ namespace SEE.Game.City
         /// all game objects created for this city.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup)]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset")]
         [PropertyOrder(ResetButtonsGroupOrderReset)]
         public virtual void Reset()
         {
@@ -325,7 +325,7 @@ namespace SEE.Game.City
         /// Resets the selected node types to be visualized.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Node-Type Settings")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup)]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Selected Node Types")]
         [PropertyOrder(ResetButtonsGroupOrderReset + 1)]
         public void ResetSelectedNodeTypes()
         {
@@ -337,7 +337,7 @@ namespace SEE.Game.City
         /// Used for debugging.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Dump Map")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup)]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Dump Graph Element ID Map")]
         [PropertyOrder(ResetButtonsGroupOrderReset + 2)]
         public void DumpGraphElementIDMap()
         {
@@ -349,7 +349,7 @@ namespace SEE.Game.City
         /// Used for debugging.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Clear Map")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup)]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Clear Graph Element ID Map")]
         [PropertyOrder(ResetButtonsGroupOrderReset + 3)]
         public void ClearGraphElementIDMap()
         {
@@ -594,7 +594,7 @@ namespace SEE.Game.City
         /// Lists the metrics for each node type.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "List Node Metrics")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup)]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "List Node Metrics")]
         [PropertyOrder(ResetButtonsGroupOrderReset + 2)]
         private void ListNodeMetrics()
         {

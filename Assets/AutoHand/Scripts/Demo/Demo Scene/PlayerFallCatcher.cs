@@ -1,26 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-
-namespace Autohand.Demo{
-    public class PlayerFallCatcher : MonoBehaviour{
-        Vector3 startPos;
-
-        void Start(){
-            if(AutoHandPlayer.Instance != null) {
-                startPos = AutoHandPlayer.Instance.transform.position;
-                if(!SceneManager.GetActiveScene().name.ToLower().Contains("demo"))
-                    enabled = false;
-            }
-        }
-        
-        void Update() {
-            if(AutoHandPlayer.Instance != null) {
-                if(AutoHandPlayer.Instance.transform.position.y < -10f) {
-                    AutoHandPlayer.Instance.SetPosition(startPos);
-                }
-            }
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:266f1774dfbb0e89aebed770b7e046cd9bde6a70c8233184d4bb4b0932f1a8ff
+size 806

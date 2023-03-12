@@ -1,15 +1,3 @@
-﻿using System;
-
-namespace NaughtyAttributes
-{
-	[AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-	public class BoxGroupAttribute : MetaAttribute, IGroupAttribute
-	{
-		public string Name { get; private set; }
-
-		public BoxGroupAttribute(string name = "")
-		{
-			Name = name;
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:42de509b36b589962421561c574f7a276b12312359564ff91bef3213958a95e2
+size 332

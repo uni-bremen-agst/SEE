@@ -1,20 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-
-namespace Autohand{
-    /// <summary>
-    /// THIS SCRIPT CAN BE ATTACHED TO A COLLIDER OBJECT TO REFERENCE A GRABBABLE BODY
-    /// </summary>
-    [DefaultExecutionOrder(1)]
-    public class GrabbableChild : MonoBehaviour{
-        public Grabbable grabParent;
-
-        private void Start() {
-            grabParent.SetGrabbableChild(this);
-            if(gameObject.layer == LayerMask.NameToLayer("Default") || LayerMask.LayerToName(gameObject.layer) == "")
-                gameObject.layer = LayerMask.NameToLayer(Hand.grabbableLayerNameDefault);
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:d7526df748c5cbb2a831add1b8adc2db5b22410f715e9045217d680d252b4859
+size 668

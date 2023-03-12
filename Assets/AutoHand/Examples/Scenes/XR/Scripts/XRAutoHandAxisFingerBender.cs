@@ -1,30 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Autohand.Demo{
-    public class XRAutoHandAxisFingerBender : MonoBehaviour{
-        public XRHandControllerLink controller;
-        public CommonAxis axis;
-        
-        [HideInInspector]
-        public float[] bendOffsets;
-        float lastAxis;
-
-        void LateUpdate(){
-            var currAxis = controller.GetAxis(axis);
-            for(int i = 0; i < controller.hand.fingers.Length; i++) {
-                controller.hand.fingers[i].bendOffset += (currAxis-lastAxis)*bendOffsets[i];
-            }
-            lastAxis = currAxis;
-        }
-        
-        
-        private void OnDrawGizmosSelected() {
-            if(controller == null && GetComponent<XRHandControllerLink>()){
-                controller = GetComponent<XRHandControllerLink>();
-                bendOffsets = new float[controller.hand.fingers.Length];
-            }
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:0cfc85e2d64bc7bf263d07923a1764d053e68f631117cfd1a5cc0e4230178169
+size 984

@@ -1,15 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Autohand {
-    public class HandControllerLink : MonoBehaviour {
-        public static HandControllerLink handLeft, handRight;
-
-        public Hand hand;
-
-        public virtual void TryHapticImpulse(float duration, float amp, float freq = 10f) {
-
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:7a88517bd7511b34c9dc3d6b68c02d6fb8483945c476de260bfd315e84263229
+size 369

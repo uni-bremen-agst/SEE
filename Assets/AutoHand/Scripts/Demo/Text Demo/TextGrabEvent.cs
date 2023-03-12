@@ -1,27 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Autohand;
-
-namespace Autohand.Demo{
-    public class TextGrabEvent : MonoBehaviour{
-        public TextChanger changer;
-        public Grabbable grab;
-        [TextArea]
-        public string message;
-
-        private void Start() {
-            if(grab == null && GetComponent<Grabbable>() != null)
-                grab = GetComponent<Grabbable>();
-
-            if(grab == null || changer == null)
-                Destroy(this);
-
-            grab.OnGrabEvent += OnGrab;
-        }
-        
-        void OnGrab(Hand hand, Grabbable grab) {
-            changer?.UpdateText(message);
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:5ebcc70c543f663cdbc09e5c6276f1e0da5e07e38d46337b006b0f0292c0622b
+size 710

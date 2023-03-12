@@ -1,27 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Autohand.Demo {
-    public class HandTouchEventDebugger : MonoBehaviour {
-        public HandTouchEvent touchEvent;
-
-        private void OnEnable() {
-            touchEvent.HandStartTouchEvent += StartTouch;
-            touchEvent.HandStopTouchEvent += StopTouch;
-        }
-
-        private void OnDisable() {
-            touchEvent.HandStartTouchEvent -= StartTouch;
-            touchEvent.HandStopTouchEvent -= StopTouch;
-        }
-
-        void StartTouch(Hand hand) {
-            Debug.Log("Start Touch: " + hand.name);
-        }
-        void StopTouch(Hand hand) {
-            Debug.Log("Stop Touch: " + hand.name);
-        }
-    }
-
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:4ecda5b37da8f7655f9c969651349188cba5df7aa3a4123928215d40950534b1
+size 756

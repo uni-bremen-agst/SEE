@@ -1,16 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Autohand.Demo{
-    public class JointBreakStopForce1 : MonoBehaviour
-    {
-
-        void OnJointBreak(float breakForce) {
-            if(gameObject.CanGetComponent(out Rigidbody body)) {
-                body.velocity = Vector3.zero;
-                body.angularVelocity = Vector3.zero;
-            }
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:32e83b39c6a74da5698664602b775dcb21e50faf09e5f499bfd3e7c0bd92cedc
+size 422

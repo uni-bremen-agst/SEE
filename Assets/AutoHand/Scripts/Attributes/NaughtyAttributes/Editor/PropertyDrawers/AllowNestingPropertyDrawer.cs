@@ -1,16 +1,3 @@
-﻿using UnityEngine;
-using UnityEditor;
-
-namespace NaughtyAttributes.Editor
-{
-	[CustomPropertyDrawer(typeof(AllowNestingAttribute))]
-	public class AllowNestingPropertyDrawer : PropertyDrawerBase
-	{
-		protected override void OnGUI_Internal(Rect rect, SerializedProperty property, GUIContent label)
-		{
-			EditorGUI.BeginProperty(rect, label, property);
-			EditorGUI.PropertyField(rect, property, label, true);
-			EditorGUI.EndProperty();
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:84b19b326f8107e4f8abb54c9da54bcb199662b51e31485f488c77df05f37e0c
+size 463

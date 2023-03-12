@@ -1,22 +1,3 @@
-using UnityEngine;
-using System.Collections;
-
-namespace Autohand {
-    [DefaultExecutionOrder(100)]
-    public class InterpolatedTransformUpdater : MonoBehaviour {
-
-        private InterpolatedTransform _interpolatedTransform;
-        private InterpolatedTransform interpolatedTransform {
-            get {
-                if(_interpolatedTransform == null)
-                    _interpolatedTransform = GetComponent<InterpolatedTransform>();
-
-                return _interpolatedTransform;
-            }
-        }
-
-        void FixedUpdate() {
-            interpolatedTransform?.LateFixedUpdate();
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:228011919ed7472f5b1677eea07aadc82fa88c7b321e2953e3bd5058c66670ce
+size 636
