@@ -364,7 +364,7 @@ namespace SEE.Game.City
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Graph")]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
         public virtual void DrawGraph()
         {
@@ -430,7 +430,7 @@ namespace SEE.Game.City
         /// the underlying graph, and all game objects visualizing information about it.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset")]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
         [PropertyOrder(ResetButtonsGroupOrderReset)]
         public override void Reset()
         {

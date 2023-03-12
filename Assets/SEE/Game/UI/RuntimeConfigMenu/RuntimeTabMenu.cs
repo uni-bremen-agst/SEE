@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using JetBrains.Annotations;
 using Michsky.UI.ModernUIPack;
+using SEE.Controls;
 using SEE.DataModel;
 using SEE.Game;
 using SEE.Game.City;
@@ -81,7 +82,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             ButtonManagerWithIcon buttonManager = button.GetComponent<ButtonManagerWithIcon>();
             buttonManager.buttonText = memberInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
             UnityEvent buttonEvent = new();
-            buttonEvent.AddListener(() => City.Invoke(memberInfo.Name, 0));
+            buttonEvent.AddListener(() => { City.Invoke(memberInfo.Name, 0); StartCoroutine(ClearAndLoadCity(citySwitcher.index)); });
             buttonManager.clickEvent =  buttonEvent;
 
             //Debug.Log("\t"+"CreateButton____ "+ memberInfo.Name);
@@ -96,6 +97,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             Destroyer.Destroy(button.gameObject);
         }
         //TODO Remove Buttons as well: Listener und Buttons muessen zu TabMenu.cs hinzugeuegt werden
+        MenuManager.UpdateUI();
     }
     
     public void LoadCity(int i)
@@ -189,29 +191,32 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
     private void CreateSetting(MemberInfo memberInfo, GameObject parent, object obj)
     {
-        switch (memberInfo)
+        if (memberInfo.GetAttributes<ObsoleteAttribute>().Count() == 0)
         {
-            case FieldInfo fieldInfo:
-                if (fieldInfo.IsLiteral || fieldInfo.IsInitOnly) return;
-                CreateSetting(
-                    value: fieldInfo.GetValue(obj),
-                    name: memberInfo.Name,
-                    parent: parent,
-                    setter: changedValue => fieldInfo.SetValue(obj, changedValue),
-                    attributes: memberInfo.GetCustomAttributes()
-                );
-                break;
-            case PropertyInfo propertyInfo:
-                if (propertyInfo.GetMethod == null || propertyInfo.SetMethod == null || 
-                    !propertyInfo.CanRead || !propertyInfo.CanWrite) return;
-                CreateSetting(
-                    value: propertyInfo.GetValue(obj),
-                    name: memberInfo.Name,
-                    parent: parent,
-                    setter: changedValue => propertyInfo.SetValue(obj, changedValue),
-                    attributes: memberInfo.GetCustomAttributes()
-                );
-                break;
+            switch (memberInfo)
+            {
+                case FieldInfo fieldInfo:
+                    if (fieldInfo.IsLiteral || fieldInfo.IsInitOnly) return;
+                    CreateSetting(
+                        value: fieldInfo.GetValue(obj),
+                        name: memberInfo.Name,
+                        parent: parent,
+                        setter: changedValue => fieldInfo.SetValue(obj, changedValue),
+                        attributes: memberInfo.GetCustomAttributes()
+                    );
+                    break;
+                case PropertyInfo propertyInfo:
+                    if (propertyInfo.GetMethod == null || propertyInfo.SetMethod == null ||
+                        !propertyInfo.CanRead || !propertyInfo.CanWrite) return;
+                    CreateSetting(
+                        value: propertyInfo.GetValue(obj),
+                        name: memberInfo.Name,
+                        parent: parent,
+                        setter: changedValue => propertyInfo.SetValue(obj, changedValue),
+                        attributes: memberInfo.GetCustomAttributes()
+                    );
+                    break;
+            }
         }
     }
 
@@ -464,8 +469,6 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         ShowSmallEditor(createSwitch);
     }
 
-    // TODO: Replace with actual string field prefab
-    // TODO: Add action
     private void CreateStringField(string name, UnityAction<string> setter, string value, GameObject parent)
     {
         GameObject stringGameObject =
@@ -477,6 +480,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
         TMP_InputField inputField = stringGameObject.GetComponentInChildren<TMP_InputField>();
         inputField.text = value;
+        inputField.onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false);
+        inputField.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
         inputField.onValueChanged.AddListener(setter);
         
         stringGameObject.AddComponent<Button>().onClick.AddListener(() => ShowSmallEditorStringField(name,setter,value));

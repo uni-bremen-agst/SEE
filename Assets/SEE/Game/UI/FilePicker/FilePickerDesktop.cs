@@ -149,7 +149,9 @@ namespace SEE.Game.UI.FilePicker
                     fileBrowserRect.localScale = new Vector3(0.002f, 0.002f, 0.002f);
                 }
             });
-            
+
+            CustomInput.onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false);
+            CustomInput.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
             CustomInput.onValueChanged.AddListener(path =>
             {
                 if (DataPathInstance.Root == DataPath.RootKind.Absolute)
