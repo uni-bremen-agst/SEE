@@ -337,7 +337,6 @@ namespace SEE.Game.Operator
             }
 
             construction = new TweenOperation<bool>(ConstructAction, spline.SubsplineEndT >= 1);
-
         }
 
         /// <summary>
@@ -422,6 +421,5 @@ namespace SEE.Game.Operator
         {
             throw error;
         }
-
     }
 }
