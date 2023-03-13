@@ -213,12 +213,12 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// The user wants to see all divergent implementation dependencies in the architecture analysis.
+        /// The user wants to toggle the visibility of all edges in a hovered code city.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        internal static bool ShowAllDivergences()
+        internal static bool ToggleEdges()
         {
-            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ShowDivergences);
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleEdges);
         }
 
         #endregion

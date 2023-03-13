@@ -145,40 +145,16 @@ namespace SEE.Controls
 
         #endregion
 
-        //----------------------------------------------------
-        #region Architecture mapping and analysis
-        //----------------------------------------------------
-
-        /// <summary>
-        /// Reflexion analysis: Show all divergent implementation dependencies.
-        /// </summary>
-        internal static KeyCode ShowDivergences = Register(KeyCode.V, Scope.Architecture, "Show all divergent implementation dependencies.");
-
-        /// <summary>
-        /// Architecture mapping: saves the current architecture mapping.
-        /// </summary>
-        //internal static KeyCode SaveArchitectureMapping = Register(KeyCode.F, Scope.Architecture, "Architecture mapping: saves the current architecture mapping.");
-
-        /// <summary>
-        /// Architecture mapping: copies/removes selected implementation node to/from clipboard.
-        /// </summary>
-        //internal static KeyCode AddOrRemoveFromClipboard = Register(KeyCode.C, Scope.Architecture, "Architecture mapping: copies/removes selected implementation node to/from clipboard.");
-
-        /// <summary>
-        /// Architecture mapping: maps all nodes in clipboard onto selected architecture node.
-        /// </summary>
-        //internal static KeyCode PasteClipboard = Register(KeyCode.V, Scope.Architecture, "Architecture mapping: maps all nodes in clipboard onto selected architecture node.");
-
-        /// <summary>
-        /// Architecture mapping: clears clipboard.
-        /// </summary>
-        //internal static KeyCode ClearClipboard = Register(KeyCode.X, Scope.Architecture, "Architecture mapping: clears clipboard.");
-
-        #endregion
 
         //-----------------------------------------------------
         #region Navigation in a code city
         //-----------------------------------------------------
+
+        /// <summary>
+        /// Toggles the visibility of all edges of a hovered code city.
+        /// </summary>
+        internal static KeyCode ToggleEdges = Register(KeyCode.V, Scope.Browsing, "Toggles the visibility of all edges of a hovered code city.");
+
 
         /// <summary>
         /// Forgets all currently selected objects.
