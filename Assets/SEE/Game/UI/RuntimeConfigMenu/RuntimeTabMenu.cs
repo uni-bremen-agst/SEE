@@ -198,7 +198,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 case FieldInfo fieldInfo:
                     if (fieldInfo.IsLiteral || fieldInfo.IsInitOnly) return;
                     CreateSetting(
-                        value: fieldInfo.GetValue(obj),
+                        getter: () => fieldInfo.GetValue(obj),
                         name: memberInfo.Name,
                         parent: parent,
                         setter: changedValue => fieldInfo.SetValue(obj, changedValue),
@@ -209,7 +209,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                     if (propertyInfo.GetMethod == null || propertyInfo.SetMethod == null ||
                         !propertyInfo.CanRead || !propertyInfo.CanWrite) return;
                     CreateSetting(
-                        value: propertyInfo.GetValue(obj),
+                        getter: () => propertyInfo.GetValue(obj),
                         name: memberInfo.Name,
                         parent: parent,
                         setter: changedValue => propertyInfo.SetValue(obj, changedValue),
@@ -220,18 +220,19 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         }
     }
 
-    private void CreateSetting(object value, string name, GameObject parent, 
+    private void CreateSetting(Func<object> getter, string name, GameObject parent, 
         UnityAction<object> setter = null, IEnumerable<Attribute> attributes = null)
     {
         parent ??= CreateOrGetViewGameObject(attributes ?? Enumerable.Empty<Attribute>()).transform.Find("Content").gameObject;
-        
+
+        object value = getter();
         switch (value)
         {
             case bool bValue:
                 CreateSwitch(
                     name: name, 
                     setter: changedValue => setter!(changedValue), 
-                    value: bValue, 
+                    getter: () => (bool) getter(), 
                     parent: parent
                 );
                 break;
@@ -240,7 +241,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                     name: name, 
                     range: attributes?.OfType<RangeAttribute>().ElementAtOrDefault(0), 
                     setter: changedValue => setter!((int) changedValue), 
-                    value: iValue, 
+                    getter: () => (float)(int)getter(), 
                     useRoundValue: true, 
                     parent: parent
                 );
@@ -250,7 +251,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                     name: name, 
                     range: attributes?.OfType<RangeAttribute>().ElementAtOrDefault(0), 
                     setter: changedValue => setter!((uint) changedValue), 
-                    value: uiValue, 
+                    getter: () => (float)(uint)getter(), 
                     useRoundValue: true, 
                     parent: parent
                 );
@@ -260,7 +261,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                     name: name, 
                     range: attributes?.OfType<RangeAttribute>().ElementAtOrDefault(0), 
                     setter: changedValue => setter!(changedValue), 
-                    value: fValue, 
+                    getter: () => (float)getter(), 
                     useRoundValue: false, 
                     parent: parent
                 );
@@ -269,7 +270,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 CreateStringField(
                     name: name,
                     setter: changedValue => setter!(changedValue),
-                    value: sValue,
+                    getter: () => (string)getter(),
                     parent: parent
                 );
                 break;
@@ -292,7 +293,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                     name: name, 
                     setter: changedValue => setter!(Enum.ToObject(value.GetType(), changedValue)),
                     values: value.GetType().GetEnumNames(),
-                    value: value.ToString(),
+                    getter: () => getter().ToString(),
                     parent: parent
                 );
                 break;
@@ -301,7 +302,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             case ColorMap:
                 FieldInfo mapInfo = value.GetType().GetField("map", BindingFlags.Instance | BindingFlags.NonPublic)!;
                 CreateSetting(
-                    value: mapInfo.GetValue(value),
+                    getter: () => mapInfo.GetValue(value),
                     name: name,
                     parent: parent,
                     setter: null,
@@ -312,7 +313,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             case AntennaAttributes:
                 FieldInfo antennaInfo = value.GetType().GetField("AntennaSections")!;
                 CreateSetting(
-                    value: antennaInfo.GetValue(value),
+                    getter: () => antennaInfo.GetValue(value),
                     name: name,
                     parent: parent,
                     setter: null,
@@ -324,6 +325,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             case HashSet<string> hashSet:
                 // TODO: How to edit the strings?
                 // TODO: Currently only works on first edit
+                /*
                 parent = CreateNestedSetting( name, parent);
                 int strIndex = 0;
                 foreach (string str in hashSet)
@@ -341,13 +343,14 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                     );
                     strIndex++;
                 }
+                */
                 break;
             case IDictionary dict:
                 parent = CreateNestedSetting(name, parent);
                 foreach (object key in dict.Keys)
                 {
                     CreateSetting(
-                        value: dict[key],
+                        getter: () => dict[key],
                         name: key.ToString(),
                         parent: parent,
                         setter: changedValue => dict[key] = changedValue
@@ -360,7 +363,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 {
                     int iCopy = i;
                     CreateSetting(
-                        value: list[i],
+                        getter: () => list[iCopy],
                         name: i.ToString(),
                         parent: parent,
                         setter: changedValue => list[iCopy] = changedValue as string
@@ -409,7 +412,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         return container.transform.Find("Content").gameObject;
     }
 
-    private void CreateSlider(string name, RangeAttribute range, UnityAction<float> setter, float value, bool useRoundValue, GameObject parent)
+    private void CreateSlider(string name, RangeAttribute range, UnityAction<float> setter, Func<float> getter, bool useRoundValue, GameObject parent)
     {
         range ??= new RangeAttribute(0, 2);
 
@@ -427,23 +430,25 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         slider.minValue = range.min;
         slider.maxValue = range.max;
                 
-        slider.value = value;
+        slider.value = getter();
         slider.onValueChanged.AddListener(setter);
         
-        sliderGameObject.AddComponent<Button>().onClick.AddListener(() =>  ShowSmallEditorSlider(name, range, setter,value , useRoundValue));
+        sliderGameObject.AddComponent<Button>().onClick.AddListener(() =>  ShowSmallEditorSlider(name, range, setter,getter() , useRoundValue));
+        
+        OnUpdateMenuValues += () => slider.value = getter();
     }
     
     private void ShowSmallEditorSlider(string name, RangeAttribute range, UnityAction<float> setter, float value, bool useRoundValue)
     {
         Action<GameObject> createSlider = delegate(GameObject parentObject)
         {
-            CreateSlider(name, range, setter, value, useRoundValue, parentObject.transform.Find("Content").gameObject);
+            CreateSlider(name, range, setter, () => value, useRoundValue, parentObject.transform.Find("Content").gameObject);
         };
 
         ShowSmallEditor(createSlider);
     }
 
-    private void CreateSwitch(string name, UnityAction<bool> setter, bool value, GameObject parent)
+    private void CreateSwitch(string name, UnityAction<bool> setter, Func<bool> getter, GameObject parent)
     {
         GameObject switchGameObject =
             PrefabInstantiator.InstantiatePrefab(SWITCH_PREFAB, parent.transform, false);
@@ -453,23 +458,30 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         TextMeshProUGUI text = switchGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = name;
 
-        switchManager.isOn = value;
+        switchManager.isOn = getter();
+        switchManager.UpdateUI();
         switchManager.OnEvents.AddListener(() => setter(true));
         switchManager.OffEvents.AddListener(() => setter(false));
 
-        switchGameObject.AddComponent<Button>().onClick.AddListener(() => ShowSmallEditorSwitch(name,setter,value));
+        switchGameObject.AddComponent<Button>().onClick.AddListener(() => ShowSmallEditorSwitch(name,setter,getter()));
+        
+        OnUpdateMenuValues += () =>
+        {
+            switchManager.isOn = getter();
+            switchManager.UpdateUI();
+        };
     }
     
     private void ShowSmallEditorSwitch(string name, UnityAction<bool> setter, bool value)
     {
         Action<GameObject> createSwitch = delegate(GameObject parentObject)
         {
-            CreateSwitch(name, setter, value, parentObject.transform.Find("Content").gameObject);
+            CreateSwitch(name, setter, () => value, parentObject.transform.Find("Content").gameObject);
         };
         ShowSmallEditor(createSwitch);
     }
 
-    private void CreateStringField(string name, UnityAction<string> setter, string value, GameObject parent)
+    private void CreateStringField(string name, UnityAction<string> setter, Func<string> getter, GameObject parent)
     {
         GameObject stringGameObject =
             PrefabInstantiator.InstantiatePrefab(STRINGFIELD_PREFAB, parent.transform, false);
@@ -479,25 +491,27 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         text.text = name;
 
         TMP_InputField inputField = stringGameObject.GetComponentInChildren<TMP_InputField>();
-        inputField.text = value;
+        inputField.text = getter();
         inputField.onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false);
         inputField.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
         inputField.onValueChanged.AddListener(setter);
         
-        stringGameObject.AddComponent<Button>().onClick.AddListener(() => ShowSmallEditorStringField(name,setter,value));
+        stringGameObject.AddComponent<Button>().onClick.AddListener(() => ShowSmallEditorStringField(name,setter,getter()));
+
+        OnUpdateMenuValues += () => inputField.text = getter();
     }
     
     private void ShowSmallEditorStringField(string name, UnityAction<string> setter, string value)
     {
         Action<GameObject> createStringField = delegate(GameObject parentObject)
         {
-            CreateStringField(name, setter, value, parentObject.transform.Find("Content").gameObject);
+            CreateStringField(name, setter, () => value, parentObject.transform.Find("Content").gameObject);
         };
         ShowSmallEditor(createStringField);
     }
 
     // TODO: Add action
-    private void CreateDropDown(string name, UnityAction<int> setter, IEnumerable<string> values, string value, GameObject parent)
+    private void CreateDropDown(string name, UnityAction<int> setter, IEnumerable<string> values, Func<string> getter, GameObject parent)
     {
         GameObject dropDownGameObject =
             PrefabInstantiator.InstantiatePrefab(DROPDOWN_PREFAB, parent.transform, false);
@@ -520,14 +534,17 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         values.ForEach(s => dropdown.CreateNewItem(s, null));
         dropdown.SetupDropdown();
         
-        dropDownGameObject.AddComponent<Button>().onClick.AddListener(() => ShowSmallEditorDropDown(name,setter, values, value));
+        dropDownGameObject.AddComponent<Button>().onClick.AddListener(() => ShowSmallEditorDropDown(name,setter, values, getter()));
+        
+        // TODO: Set current dropdown item
+        // TODO: OnUpdateMenuValues
     }
     
     private void ShowSmallEditorDropDown(string name, UnityAction<int> setter, IEnumerable<string> values, string value)
     {
         Action<GameObject> createDropDown = delegate(GameObject parentObject)
         {
-            CreateDropDown(name, setter, values, value, parentObject.transform.Find("Content").gameObject);
+            CreateDropDown(name, setter, values, () => value, parentObject.transform.Find("Content").gameObject);
         };
         ShowSmallEditor(createDropDown);
     }
@@ -580,10 +597,10 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         {
             Destroyer.Destroy(containerGameObject);
             // TODO Updaten der UI Settings
+            OnUpdateMenuValues?.Invoke();
             ToggleMenu();
-            
         });
     }
-    
 
+    private event Action OnUpdateMenuValues;
 }
