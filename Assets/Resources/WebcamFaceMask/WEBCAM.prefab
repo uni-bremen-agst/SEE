@@ -516,8 +516,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2875178615299563476}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 361.707, y: 326.28, z: -515.5}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2875178615125791769}
@@ -603,8 +603,14 @@ MonoBehaviour:
   enableDownScaleToggle: {fileID: 2875178614826452325}
   enableSkipFrame: 1
   enableSkipFrameToggle: {fileID: 2875178616678433524}
-  useOpenCVFaceDetector: 0
+  useOpenCVFaceDetector: 1
   useOpenCVFaceDetectorToggle: {fileID: 2875178615749289712}
+  testRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 0
+    height: 0
 --- !u!114 &2875178615299563484
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -352,21 +352,21 @@ namespace DlibFaceLandmarkDetectorExample
                     List<Vector2> points = faceLandmarkDetector.DetectLandmark(rect);
 
                     //draw landmark points
-                    OpenCVForUnityUtils.DrawFaceLandmark(rgbaMat, points, new Scalar(0, 255, 0, 255), 2);
+                    //OpenCVForUnityUtils.DrawFaceLandmark(rgbaMat, points, new Scalar(0, 255, 0, 70), 2);
 
                     //draw face rect
-                    OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(255, 0, 0, 255), 2);
+                    //OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(255, 0, 0, 70), 2);
 
 
 
 
                     if (rectAnzahl == 0 || rectAnzahl % 2 == 0)
                     {
-                        OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(255, 0, 0, 255), 2);
+                     //   OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(255, 0, 0, 70), 2);
                     }
                     else
                     {
-                        OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(0, 0, 255, 255), 2);
+                    //    OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(0, 0, 255, 70), 2);
                     }
 
                    // Debug.Log("Listen Range: " + rectAnzahl);

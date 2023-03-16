@@ -525,6 +525,18 @@ namespace SEE.Game.Avatars
             //GameObject myCircle = (GameObject)Instantiate(circle, transform.position, Quaternion.identity);
             //myCircle.transform.parent = transform;
 
+            //LookAtTarget
+            //Eyes wird overwritten, da look at target zuerst erstellt werden muss.. kann man bestimmt schöner lösen indem man es direkt richtig implementiert
+            //ggf. einfach aus den beispielen entfernen und dann hinzufügen.
+            GameObject LookAtTarget = new GameObject("LookAtTarget");
+            LookAtTarget.transform.parent = desktopPlayer.transform;
+            LookAtTarget.transform.position = desktopPlayer.transform.position;
+            LookAtTarget.transform.rotation = desktopPlayer.transform.rotation;
+            LookAtTarget.transform.position += LookAtTarget.transform.forward * 1f;
+            gameObject.transform.GetComponent<Eyes>().lookTarget = LookAtTarget.transform;
+            //gameObject.transform.GetComponent<Eyes>().headClamp = new Vector3 (90,180,45); // Head maximum horizontal(Y), vertical(X), or rotational(Z) degrees of movement before clamping.
+
+
         }
 
         /// <summary>

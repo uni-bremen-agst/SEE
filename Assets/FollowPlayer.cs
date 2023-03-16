@@ -28,7 +28,7 @@ public class FollowPlayer : MonoBehaviour
     void Start()
     {
         // Screen der Webcam z -1 damit weg vom player y- einfachere berchenung da ...
-        transform.localScale = new Vector3(0.64f,-0.48f,-1);
+        transform.localScale = new Vector3(0.2f,-0.48f,-1);
 
         // gebraucht für ???? zoom oder so??? 
         rend = GetComponent<Renderer>();
@@ -41,13 +41,20 @@ public class FollowPlayer : MonoBehaviour
         if (player == null) //finde den spieler falls noch nicht gefunden // geht in 'start' oder zu früh?
         {
             //Debug.Log("Player searching, player: " + player);
-            player = GameObject.Find("/Local Player 1/DesktopPlayer");
+            //player = GameObject.Find("/Local Player 1/DesktopPlayer");
+            player = GameObject.Find("/Local Player 1/Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase");
         }
+        /*moved to late update
         else { // falls gefunden, klemme deine Position an den Spieler..
             //Debug.Log("Player found, player:     " + player);
             transform.position = player.transform.position;
             transform.rotation = player.transform.rotation;
+            transform.Rotate(0, -90, -90);
+
+            /// nach vorne bewegen:
+            transform.position += transform.forward * 0.025f;
         }
+        */
 
         //transform.localScale += new Vector3(0.01f, 0.01f, 0);
 
@@ -83,7 +90,7 @@ public class FollowPlayer : MonoBehaviour
             // Die breite der Anzeige ist festgelegt die Höhe nicht, eventuell immer das kleinere nehmen, aber momentan sowieso quadrat
             // wieso sowieso quadrat
             float ratio = rect.width / rect.height;
-            transform.localScale = new Vector3(0.64f, -0.64f / ratio, -1);
+            transform.localScale = new Vector3(0.2f, (-0.2f / ratio) - 0.06f , -1);
 
             //funktionier aber überkopf y transform scale muss also - (minus) sein
 
@@ -171,14 +178,15 @@ public class FollowPlayer : MonoBehaviour
             else { step = 0.0001F; }*/
 
             // hat sich das ziel geändert? Falls ja dann tue was // aktuelles quadrat wird nächsten quadrat vergleicht??
-            if (nextOffset != new Vector2(rect.x / 640, rect.y / -480)) {
-                nextOffset = new Vector2(rect.x / 640, rect.y / -480);
+            if (nextOffset != new Vector2(rect.x / 640, rect.y * 0.76f / -480 ))//-(480 * 1.3f)
+            {  
+                nextOffset = new Vector2(rect.x / 640, rect.y * 0.76f / -480);
                 //scale wird geupdatet
                 currentFlowStateOffset = 0; // step = quasi wie 0 nur ein schritt weiter, damit nicht unnötig gestoppt wird, falls das ziel immer wechselt und es sofort losgeht mit der transition
             }
-            if (nextScale != new Vector2(rect.width / 640, (rect.height / -480)))
+            if (nextScale != new Vector2(rect.width / 640, (rect.height * 1.3f / -480)))
             {
-                nextScale = new Vector2(rect.width / 640, (rect.height / -480));
+                nextScale = new Vector2(rect.width / 640, (rect.height * 1.3f / -480));
                 //offset wird geupdatet
                 currentFlowStateScale =  0; // step = quasi wie 0 nur ein schritt weiter, damit nicht unnötig gestoppt wird, falls das ziel immer wechselt und es sofort losgeht mit der transition
             }
@@ -213,4 +221,17 @@ public class FollowPlayer : MonoBehaviour
 
         }
     }
+
+    void LateUpdate()
+        {
+    // falls gefunden, klemme deine Position an den Spieler..
+            //Debug.Log("Player found, player:     " + player);
+            transform.position = player.transform.position;
+            transform.rotation = player.transform.rotation;
+            transform.Rotate(0, -90, -90);
+
+            /// nach vorne bewegen:
+            transform.position += transform.forward* 0.025f;
+        }
+
 }
