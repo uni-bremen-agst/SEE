@@ -11,6 +11,7 @@ using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using TinySpline;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Game.Operator
 {
@@ -214,13 +215,17 @@ namespace SEE.Game.Operator
         /// <param name="duration">Time in seconds the animation should take.</param>
         private void UpdateLayout(float duration)
         {
-            if (!Node.IsRoot())
+            if (Node != null)
             {
-                // If we are moving the root node, the whole graph will be moved,
-                // hence, the layout of the edges does not need to be updated.
-                UpdateEdgeLayout(duration);
+                Assert.IsNotNull(Node, $"[{nameof(NodeOperator)}]{gameObject.FullName()} has undefined graph node");
+                if (!Node.IsRoot())
+                {
+                    // If we are moving the root node, the whole graph will be moved,
+                    // hence, the layout of the edges does not need to be updated.
+                    UpdateEdgeLayout(duration);
+                }
+                UpdateLabelLayout(duration);
             }
-            UpdateLabelLayout(duration);
         }
 
         /// <summary>
