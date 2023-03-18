@@ -102,7 +102,7 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         /// <param name="useAlpha">Whether to incorporate the alpha values from the given colors.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> ChangeColorsTo(Color newStartColor, Color newEndColor, 
+        public IOperationCallback<Action> ChangeColorsTo(Color newStartColor, Color newEndColor,
                                                          float duration, bool useAlpha = true)
         {
             if (!useAlpha)
@@ -213,7 +213,7 @@ namespace SEE.Game.Operator
         {
             return ShowOrHide(true, animationKind, duration);
         }
-        
+
         /// <summary>
         /// Hide the edge, animating it as specified in the <see cref="animationKind"/>.
         /// </summary>
@@ -331,14 +331,16 @@ namespace SEE.Game.Operator
 
             Tween[] ConstructAction(bool extending, float duration)
             {
-                return new[] { DOTween.To(() => spline.SubsplineEndT,
-                                          u => spline.SubsplineEndT = u,
-                                          extending ? 1.0f : 0.0f,
-                                          duration).SetEase(Ease.InOutExpo).Play() };
+                return new Tween[]
+                {
+                    DOTween.To(() => spline.SubsplineEndT,
+                               u => spline.SubsplineEndT = u,
+                               extending ? 1.0f : 0.0f,
+                               duration).SetEase(Ease.InOutExpo).Play()
+                };
             }
 
             construction = new TweenOperation<bool>(ConstructAction, spline.SubsplineEndT >= 1);
-
         }
 
         /// <summary>
@@ -355,6 +357,7 @@ namespace SEE.Game.Operator
             }
 
             highlightEffect.outline = 0;
+
             Tween[] AnimateToGlowAction(float endGlow, float duration) => new Tween[]
             {
                 DOTween.To(() => highlightEffect.glow, g =>
@@ -393,7 +396,7 @@ namespace SEE.Game.Operator
                 {
                     glow.KillAnimator();
                     Destroyer.Destroy(highlightEffect);
-                    await UniTask.WaitForEndOfFrame();  // component is only destroyed by the end of the frame.
+                    await UniTask.WaitForEndOfFrame(); // component is only destroyed by the end of the frame.
                     highlightEffect = Highlighter.GetHighlightEffect(gameObject);
                     SetupGlow();
                 }
@@ -423,6 +426,5 @@ namespace SEE.Game.Operator
         {
             throw error;
         }
-
     }
 }
