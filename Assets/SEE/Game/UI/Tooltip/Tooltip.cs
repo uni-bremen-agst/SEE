@@ -123,7 +123,6 @@ namespace SEE.Game.UI.Tooltip
         /// </summary>
         public void Hide()
         {
-            return; // FIXME: Remove this line.
             if (HasStarted)
             {
                 fadeIn?.Pause(); // if we're still fading in right now, we need to stop that
