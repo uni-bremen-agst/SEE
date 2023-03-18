@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Sirenix.Serialization.Utilities;
+using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -58,14 +58,7 @@ namespace SEE.GO
         /// <returns>true if a code city was drawn</returns>
         public static bool IsCodeCityDrawn(this GameObject gameObject)
         {
-            foreach (Transform child in gameObject.transform)
-            {
-                if (child.gameObject.IsNode())
-                {
-                    return true;
-                }
-            }
-            return false;
+            return gameObject.transform.Cast<Transform>().Any(child => child.gameObject.IsNode());
         }
 
         /// <summary>

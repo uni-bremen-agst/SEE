@@ -50,7 +50,7 @@ namespace SEE.GO
         /// <returns>new game edge</returns>
         private static GameObject NewGameEdge<T>(LayoutGraphEdge<T> layoutGraphEdge) where T : ILayoutNode
         {
-            GameObject gameEdge = new GameObject
+            GameObject gameEdge = new()
             {
                 tag = Tags.Edge,
                 isStatic = false,

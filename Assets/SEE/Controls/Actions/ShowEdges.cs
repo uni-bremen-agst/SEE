@@ -50,7 +50,6 @@ namespace SEE.Controls.Actions
                 Interactable.SelectOut += SelectionOff;
                 Interactable.HoverIn += HoverOn;
                 Interactable.HoverOut += HoverOff;
-                codeCity = City();
             }
             else
             {
@@ -69,7 +68,7 @@ namespace SEE.Controls.Actions
                 Interactable.SelectOut -= SelectionOff;
                 Interactable.HoverIn -= HoverOn;
                 Interactable.HoverOut -= HoverOff;
-                codeCity = null;
+                codeCity = null;  // Reset codeCity
             }
             else
             {
@@ -164,6 +163,7 @@ namespace SEE.Controls.Actions
             GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
             if (codeCityObject == null)
             {
+                Debug.LogError($"Could not retrieve CodeCity for {gameObject.name}!");
                 return null;
             }
 
@@ -190,6 +190,11 @@ namespace SEE.Controls.Actions
             OnOff(true);
         }
 
+        private void Off()
+        {
+            OnOff(false);
+        }
+
         private void OnOff(bool show)
         {
             Node node = Node();
@@ -198,6 +203,8 @@ namespace SEE.Controls.Actions
                 return;
             }
 
+            codeCity ??= City();
+
             EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
 
             // TODO: Perhaps the node along with its edges should be cached?
@@ -205,11 +212,6 @@ namespace SEE.Controls.Actions
             {
                 edge.Operator().ShowOrHide(show, animationKind, ANIMATION_DURATION);
             }
-        }
-
-        private void Off()
-        {
-            OnOff(false);
         }
     }
 }

@@ -90,21 +90,20 @@ namespace SEE.Game
         /// Assumption: <paramref name="gameObject"/> represents a graph node or edge.
         /// </summary>
         /// <param name="gameObject">game object to be added</param>
+        /// <param name="ignoreDuplicate">If a game object with the same name has already been added, nothing will
+        /// happen. Otherwise, an exception will be thrown.</param>
         /// <exception cref="ArgumentException">thrown if there is already a game object with
         /// this ID (name attribute)</exception>
-        internal static void Add(GameObject gameObject)
+        internal static void Add(GameObject gameObject, bool ignoreDuplicate = false)
         {
             Assert.IsNotNull(gameObject);
             Assert.IsFalse(string.IsNullOrEmpty(gameObject.name));
             Assert.IsTrue(gameObject.IsNode() || gameObject.IsEdge());
-            try
+            if (ignoreDuplicate && mapping.ContainsKey(gameObject.name))
             {
-                mapping.Add(gameObject.name, gameObject);
+                return;
             }
-            catch (Exception)
-            {
-                Debug.LogError($"A graph element with unique id {gameObject.name} exists in the scene already. Expect undefined behaviour.\n");
-            }
+            mapping.Add(gameObject.name, gameObject);
         }
 
         /// <summary>
