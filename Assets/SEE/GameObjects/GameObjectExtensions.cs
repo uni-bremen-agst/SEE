@@ -41,7 +41,6 @@ namespace SEE.GO
                     return edgeRef.Value.ID;
                 }
             }
-
             return nodeRef.Value.ID;
         }
 
@@ -139,7 +138,7 @@ namespace SEE.GO
         /// <returns>all transitive children with <paramref name="tag"/></returns>
         public static List<GameObject> AllDescendants(this GameObject gameObject, string tag)
         {
-            List<GameObject> result = new List<GameObject>();
+            List<GameObject> result = new();
             if (gameObject.CompareTag(tag))
             {
                 result.Add(gameObject);
@@ -195,7 +194,7 @@ namespace SEE.GO
         /// <returns>found game objects</returns>
         public static IList<GameObject> Descendants(this GameObject gameObject, ISet<string> gameObjectIDs)
         {
-            List<GameObject> result = new List<GameObject>();
+            List<GameObject> result = new();
             foreach (Transform child in gameObject.transform)
             {
                 if (gameObjectIDs.Contains(child.name))
@@ -323,10 +322,17 @@ namespace SEE.GO
         /// <param name="scale">the new scale in world space</param>
         public static void SetScale(this GameObject node, Vector3 scale)
         {
-            NodeOperator @operator = node.AddOrGetComponent<NodeOperator>();
             Transform parent = node.transform.parent;
             node.transform.parent = null;
-            @operator.ScaleTo(scale, 0f);
+            if (node.HasNodeRef())
+            {
+                NodeOperator @operator = node.AddOrGetComponent<NodeOperator>();
+                @operator.ScaleTo(scale, 0f);
+            }
+            else
+            {
+                node.transform.localScale = scale;
+            }
             node.transform.parent = parent;
         }
 
@@ -465,7 +471,7 @@ namespace SEE.GO
             block.MustGetComponent(out Collider collider);
             Vector3 blockCenter = collider.bounds.center;
             // We only care about the XZ-plane. Setting z to zero here makes it consistent with the bounds setup below.
-            Bounds blockBounds = new Bounds(new Vector3(blockCenter.x, blockCenter.z, 0), collider.bounds.extents);
+            Bounds blockBounds = new(new Vector3(blockCenter.x, blockCenter.z, 0), collider.bounds.extents);
             parentBlock.MustGetComponent(out Collider parentCollider);
             Bounds parentBlockBounds = parentCollider.bounds;
 
@@ -475,28 +481,28 @@ namespace SEE.GO
             Vector2 bottomRight = topRight.WithXY(y: bottomLeft.y);
 
             // These represent the outer edge regions of the parent block with the margins applied.
-            Bounds left = new Bounds(bottomLeft, Vector3.zero);
+            Bounds left = new(bottomLeft, Vector3.zero);
             left.Encapsulate(topLeft.WithXY(x: topLeft.x + outerEdgeMargin));
             if (left.Intersects(blockBounds))
             {
                 return true;
             }
 
-            Bounds right = new Bounds(bottomRight, Vector3.zero);
+            Bounds right = new(bottomRight, Vector3.zero);
             right.Encapsulate(topRight.WithXY(x: topRight.x - outerEdgeMargin));
             if (right.Intersects(blockBounds))
             {
                 return true;
             }
 
-            Bounds bottom = new Bounds(bottomLeft, Vector3.zero);
+            Bounds bottom = new(bottomLeft, Vector3.zero);
             bottom.Encapsulate(bottomRight.WithXY(y: bottomRight.y + outerEdgeMargin));
             if (bottom.Intersects(blockBounds))
             {
                 return true;
             }
 
-            Bounds top = new Bounds(topLeft, Vector3.zero);
+            Bounds top = new(topLeft, Vector3.zero);
             top.Encapsulate(topRight.WithXY(y: topRight.y - outerEdgeMargin));
             return top.Intersects(blockBounds);
         }
