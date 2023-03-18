@@ -35,7 +35,17 @@ namespace SEE.Utils
                 }
                 if (recurseIntoChildren)
                 {
+                    // We cannot traverse the children and destroy them at the same time.
+                    // We first need to collect all children.
+                    GameObject[] allChildren = new GameObject[gameObject.transform.childCount];
+                    int i = 0;
                     foreach (Transform child in gameObject.transform)
+                    {
+                        allChildren[i++] = child.gameObject;
+                    }
+
+                    // Now we can destroy the children.
+                    foreach (GameObject child in allChildren)
                     {
                         Destroy(child.gameObject);
                     }
