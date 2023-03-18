@@ -220,13 +220,8 @@ namespace SEE.Game.HolisticMetrics.Components
         /// <returns>The currently selected code city</returns>
         private SEECity GetSelectedCity()
         {
-            SEECity selectedCity = cities.FirstOrDefault(city => city.name.Equals(citySelection.selectedText.text));
-            if (selectedCity is null)
-            {
-                // This should not be possible, so throw an exception if this happens.
-                throw new Exception();
-            }
-            return selectedCity;
+            return cities.Where(x => x != null)
+                         .FirstOrDefault(city => city.name.Equals(citySelection.selectedText.text));
         }
 
         /// <summary>
