@@ -48,7 +48,7 @@ namespace SEE.Game
         {
             if (graphs == null || graphs.Count == 0)
             {
-                throw new ArgumentNullException("No graph given");
+                throw new ArgumentNullException(nameof(graphs));
             }
             SetGraph(settings, graphs);
         }
@@ -399,11 +399,11 @@ namespace SEE.Game
                 }
 
                 // Set materials of clone classes.
-                // NOTE: This is a very dirty hack!!!
+                // FIXME: This is a very dirty hack!!!
                 if (nodes.Count > 0 && nodeTypeToFactory[nodes.First().Type] is CubeFactory)
                 {
                     int matIdx = 1;
-                    foreach (var cc in cloneClasses)
+                    foreach (HashSet<Node> cc in cloneClasses)
                     {
                         Material material = Resources.Load("Materials/LSHMetal/" + matIdx++, typeof(Material)) as Material;
                         foreach (Node node in cc)

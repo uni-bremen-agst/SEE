@@ -51,7 +51,6 @@ namespace SEE.Controls.Actions
                 Interactable.SelectOut += SelectionOff;
                 Interactable.HoverIn += HoverOn;
                 Interactable.HoverOut += HoverOff;
-                codeCity = City();
             }
             else
             {
@@ -70,7 +69,7 @@ namespace SEE.Controls.Actions
                 Interactable.SelectOut -= SelectionOff;
                 Interactable.HoverIn -= HoverOn;
                 Interactable.HoverOut -= HoverOff;
-                codeCity = null;
+                codeCity = null;  // Reset codeCity
             }
             else
             {
@@ -165,6 +164,7 @@ namespace SEE.Controls.Actions
             GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
             if (codeCityObject == null)
             {
+                Debug.LogError($"Could not retrieve CodeCity for {gameObject.name}!");
                 return null;
             }
 
@@ -193,6 +193,8 @@ namespace SEE.Controls.Actions
             {
                 return;
             }
+            
+            codeCity ??= City();
 
             EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
 
@@ -210,6 +212,8 @@ namespace SEE.Controls.Actions
             {
                 return;
             }
+            
+            codeCity ??= City();
 
             EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
 

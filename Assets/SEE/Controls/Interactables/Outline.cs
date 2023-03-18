@@ -109,7 +109,7 @@ namespace SEE.Controls.Interactables
 
             if (go)
             {
-                result = go.AddComponent<Outline>();
+                result = go.AddOrGetComponent<Outline>();
                 if (go.HasEdgeRef())
                 {
                     result.enabled = false;
