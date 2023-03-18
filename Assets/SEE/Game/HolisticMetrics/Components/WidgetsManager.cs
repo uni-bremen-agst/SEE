@@ -296,8 +296,8 @@ namespace SEE.Game.HolisticMetrics.Components
         internal void OnGraphDraw()
         {
             graphUnsubscriber?.Dispose();
+            OnCitySelectionClick();  // regenerates list of cities
             graphUnsubscriber = GetSelectedCity().LoadedGraph?.Subscribe(this);
-            Redraw();
         }
 
         /// <summary>
