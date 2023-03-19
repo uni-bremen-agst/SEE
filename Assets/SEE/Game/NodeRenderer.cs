@@ -24,6 +24,11 @@ namespace SEE.Game
     public partial class GraphRenderer
     {
         /// <summary>
+        /// The duration of an animation in seconds.
+        /// </summary>
+        const float animationDuration = 1.0f;
+
+        /// <summary>
         /// Sets the name (<see cref="Node.ID"/>) and tag (<see cref="Tags.Node"/>)
         /// of given <paramref name="gameNode"/> and lets the node reference
         /// of it refer to <paramref name="node"/>.
@@ -416,7 +421,6 @@ namespace SEE.Game
                     GameObject node = GraphElementIDMap.Find(item.Key.ID);
                     if (node != null)
                     {
-                        const float animationDuration = 1.0f;
                         NodeTransform nodeTransform = item.Value;
                         NodeOperator nodeOperator = node.AddOrGetComponent<NodeOperator>();
                         // nodeTransform.position.y relates to the ground of the node;
