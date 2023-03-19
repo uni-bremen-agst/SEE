@@ -172,45 +172,41 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns the node this class is attached to.
-        /// May be null.
+        /// Shows all incoming/outgoing edges of the node this component is
+        /// attached to.
         /// </summary>
-        private Node Node()
-        {
-            if (!gameObject.TryGetComponent(out NodeRef nodeRef) || nodeRef.Value == null)
-            {
-                return null;
-            }
-
-            return nodeRef.Value;
-        }
-
         private void On()
         {
             OnOff(true);
         }
 
+        /// <summary>
+        /// Hides all incoming/outgoing edges of the node this component is
+        /// attached to.
+        /// </summary>
         private void Off()
         {
             OnOff(false);
         }
 
+        /// <summary>
+        /// Shows/hides all incoming/outgoing edges of the node this component is
+        /// attached to.
+        /// </summary>
+        /// <param name="show">if true, the edges are shown; otherwise hidden</param>
         private void OnOff(bool show)
         {
-            Node node = Node();
-            if (node == null)
+            if (gameObject.TryGetNode(out Node node))
             {
-                return;
-            }
+                codeCity ??= City();
 
-            codeCity ??= City();
+                EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
 
-            EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
-
-            // TODO: Perhaps the node along with its edges should be cached?
-            foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
-            {
-                edge.Operator().ShowOrHide(show, animationKind, ANIMATION_DURATION);
+                // TODO: Perhaps the node along with its edges should be cached?
+                foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
+                {
+                    edge.Operator().ShowOrHide(show, animationKind, ANIMATION_DURATION);
+                }
             }
         }
     }
