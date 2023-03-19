@@ -280,10 +280,9 @@ namespace SEE.Game.City
         /// Loads all graphs, calculates their layouts, and displays the first graph in the
         /// graph series.
         /// </summary>
-        override protected void Start()
+        protected void Start()
         {
             Reset();
-            base.Start();
 
             List<Graph> graphs = LoadDataSeries();
             evolutionRenderer = CreateEvolutionRenderer(graphs);
