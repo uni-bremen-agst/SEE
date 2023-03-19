@@ -115,11 +115,8 @@ namespace SEE.Game.Operator
         /// <returns></returns>
         private static Material LineMaterial(Color lineColor)
         {
-            if (lineMaterial == null)
-            {
-                lineMaterial = Materials.New(Materials.ShaderType.TransparentLine, lineColor, texture: null,
-                                             renderQueueOffset: (int)(RenderQueue.Transparent + 1));
-            }
+            lineMaterial ??= Materials.New(Materials.ShaderType.TransparentLine, lineColor, texture: null,
+                                           renderQueueOffset: (int)(RenderQueue.Transparent + 1));
             return lineMaterial;
         }
 
