@@ -56,7 +56,7 @@ namespace SEE.Game.Operator
         /// </summary>
         private void PrepareLabel()
         {
-            Color textColor = Color.white; // .ColorWithAlpha(1f)
+            Color textColor = Color.white;
             Color lineColor = Color.white;
 
             string shownText = Node.SourceName;
@@ -112,7 +112,7 @@ namespace SEE.Game.Operator
         /// Returns the material for the line connecting a node and its label.
         /// </summary>
         /// <param name="lineColor"></param>
-        /// <returns></returns>
+        /// <returns>a new material for the line connecting a node and its label</returns>
         private static Material LineMaterial(Color lineColor)
         {
             lineMaterial ??= Materials.New(Materials.ShaderType.TransparentLine, lineColor, texture: null,
