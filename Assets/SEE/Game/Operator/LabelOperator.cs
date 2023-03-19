@@ -103,7 +103,7 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
-        /// Material for the line connecting a node and its label. We use the
+        /// Material for the line connecting a node and its label. We use
         /// exactly the same material for all.
         /// </summary>
         private static Material lineMaterial;
