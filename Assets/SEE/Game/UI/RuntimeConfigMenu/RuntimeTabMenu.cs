@@ -359,16 +359,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 break;
             case IList<string> list:
                 parent = CreateNestedSetting( name, parent);
-                for (int i = 0; i < list.Count; i++)
-                {
-                    int iCopy = i;
-                    CreateSetting(
-                        getter: () => list[iCopy],
-                        name: i.ToString(),
-                        parent: parent,
-                        setter: changedValue => list[iCopy] = changedValue as string
-                    );
-                }
+                CreateListSetting( list, parent);
                 break;
             // confirmed types where the nested fields should be edited
             case ColorRange:
@@ -573,6 +564,23 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             CreateColorPicker(name, parentObject.transform.Find("Content").gameObject);
         };
         ShowSmallEditor(createColorPicker);
+    }
+
+    private void CreateListSetting(IList<string> list, GameObject parent)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            int iCopy = i;
+            CreateSetting(
+                getter: () => list[iCopy],
+                name: i.ToString(),
+                parent: parent,
+                setter: changedValue => list[iCopy] = changedValue as string
+            );
+        }
+        GameObject AddButton = PrefabInstantiator.InstantiatePrefab(RUNTIME_CONFIG_PREFAB_FOLDER + "AddButton", parent.transform);
+        ButtonManagerWithIcon AddButtonManager = AddButton.GetComponent<ButtonManagerWithIcon>();
+        AddButtonManager.clickEvent.AddListener(() => { list.Add(""); foreach (Transform child in parent.transform) { Destroyer.Destroy(child.gameObject); } CreateListSetting(list, parent); } );
     }
 
     private void AddLayoutElement(GameObject gameObject)
