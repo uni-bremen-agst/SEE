@@ -157,14 +157,7 @@ namespace SEE.Game.City
                         if (gameEdge != null)
                         {
                             EdgeOperator edgeOperator = gameEdge.AddOrGetComponent<EdgeOperator>();
-                            if (allDivergencesAreShown)
-                            {
-                                edgeOperator.Show(City.EdgeLayoutSettings.AnimationKind, ANIMATION_DURATION);
-                            }
-                            else
-                            {
-                                edgeOperator.Hide(City.EdgeLayoutSettings.AnimationKind, ANIMATION_DURATION);
-                            }
+                            edgeOperator.ShowOrHide(allDivergencesAreShown, City.EdgeLayoutSettings.AnimationKind, ANIMATION_DURATION);
                         }
                     }
                 }
