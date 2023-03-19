@@ -10,7 +10,7 @@ namespace SEE.Controls.Actions
     /// <summary>
     /// Shows or hides all edges of a hovered code city.
     /// </summary>
-    /// <remarks>This behaviour is meant to be attached to a player.</remarks>
+    /// <remarks>This component is meant to be attached to a player.</remarks>
     public class ShowEdgesAction : MonoBehaviour
     {
         /// <summary>
