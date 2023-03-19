@@ -419,8 +419,8 @@ namespace SEE.Game
                         const float animationDuration = 1.0f;
                         NodeTransform nodeTransform = item.Value;
                         NodeOperator nodeOperator = node.AddOrGetComponent<NodeOperator>();
-                        //// nodeTransform.position.y relates to the ground of the node;
-                        //// the node operator's y co-ordinate is meant to be the center
+                        // nodeTransform.position.y relates to the ground of the node;
+                        // the node operator's y co-ordinate is meant to be the center
                         nodeTransform.position.y += nodeTransform.scale.y / 2;
                         //Debug.Log($"{node.name} [{node.transform.position}, {node.transform.lossyScale}] => [{nodeTransform.position}), ({nodeTransform.scale}]\n");
                         nodeOperator.MoveTo(nodeTransform.position, animationDuration);
