@@ -35,13 +35,10 @@ mapping graph simply consists of all Maps_To edges and their connected nodes.
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using UnityEngine;
 using UnityEngine.Assertions;
-using static SEE.Game.GraphRenderer;
-using static SEE.Tools.ReflexionAnalysis.ReflexionGraphTools;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
 
 namespace SEE.Tools.ReflexionAnalysis
@@ -62,7 +59,9 @@ namespace SEE.Tools.ReflexionAnalysis
         Allowed = 1,
 
         /// <summary>
-        /// Disallowed implementation dependency (divergence).
+        /// Disallowed implementation dependency (divergence). Note: An edge tagged
+        /// by this state is one that is present in the underlying implementation graph.
+        /// It is not an edge between architecture components.
         /// </summary>
         Divergent = 2,
 
@@ -94,7 +93,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// architecture dependency; only for architecture dependencies.
         /// </summary>
         Specified = 7,
-        
+
         /// <summary>
         /// Tags an implementation edge that has not yet been mapped.
         /// </summary>
@@ -122,7 +121,6 @@ namespace SEE.Tools.ReflexionAnalysis
     /// </remarks>
     public partial class ReflexionGraph : Graph
     {
-
         /// <summary>
         /// Runs the reflexion analysis. If an observer has registered before,
         /// the observer will receive the results via the callback Update(ChangeEvent).
@@ -139,7 +137,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// The edge type maps-to for edges mapping implementation entities onto architecture entities.
         /// </summary>
         public const string MapsToType = "Maps_To";
-        
+
         /// <summary>
         /// Whether the reflexion analysis has already been initialized / run.
         /// If this is false, incremental events like <see cref="AddNode"/> will only modify the graph
@@ -181,7 +179,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 if (edge.IsInArchitecture() && !IsSpecified(edge))
                 {
                     // If this is in fact a propagated edge, we transition the originating implementation edges too.
-                    // Observers won't be notified of this propagated edge, we instead tell them about each 
+                    // Observers won't be notified of this propagated edge, we instead tell them about each
                     // of these originating edges.
                     AssertOrThrow(propagationTable.ContainsKey(edge.ID), () => new ExpectedPropagatedEdgeException(edge));
                     foreach (Edge originatingEdge in GetOriginatingEdges(edge))
@@ -715,7 +713,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 AssertOrThrow(source.IsInImplementation(), () => new NotInSubgraphException(Implementation, source));
                 AssertOrThrow(target.IsInArchitecture(), () => new NotInSubgraphException(Architecture, target));
                 AddSubtreeToImplicitMap(source, target);
-                
+
                 // We'll now also notify our observer's that a "new" mapping edge exists.
                 Notify(new EdgeEvent(version, mapsTo, ChangeType.Addition, Mapping));
                 // TODO: Unsure whether we still need the above notification?
@@ -1145,7 +1143,7 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 result.SetToggle(Edge.IsVirtualToggle);
             }
-            
+
             SetState(result, State.Undefined);
 
             if (addToGraph)
