@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.Operator;
@@ -46,7 +47,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Percentage by which the starting color of an edge differs to its end color.
         /// </summary>
-        private const float EDGE_GRADIENT_FACTOR = 0.7f;
+        private const float EDGE_GRADIENT_FACTOR = 1.0f;
 
         /// <summary>
         /// States in which an edge shall be hidden.
@@ -76,36 +77,39 @@ namespace SEE.Game.City
         /// </summary>
         private IDictionary<string, State> PreviousEdgeStates = new Dictionary<string, State>();
 
-        private void Start()
+        /// <summary>
+        /// Sets edges' gradient to correct colors depending on reflexion state and hides edges
+        /// whose <see cref="IsHiddenToggle"/> is set.
+        /// </summary>
+        public void InitializeEdges()
         {
-            if (gameObject.IsCodeCityDrawn())
+            if (!gameObject.IsCodeCityDrawn())
             {
-                EdgeAnimationKind animationKind = City.EdgeLayoutSettings.AnimationKind;
-                // We have to set an initial color for the edges, and we have to convert them to meshes.
-                foreach (Edge edge in CityGraph.Edges().Where(x => !x.HasToggle(GraphElement.IsVirtualToggle)))
-                {
-                    GameObject edgeObject = edge.GameObject();
-                    if (edgeObject != null && edgeObject.TryGetComponent(out SEESpline spline))
-                    {
-                        spline.CreateMesh();
-                        spline.GradientColors = GetEdgeGradient(edge);
+                Debug.LogWarning($"There is no code city drawn for {gameObject.FullName()}. "
+                                 + "Self-destruction imminent.\n");
+                Destroyer.Destroy(this);
+                return;
+            }
 
-                        if (edge.HasToggle(Edge.IsHiddenToggle))
-                        {
-                            // We will instantly hide this edge. It should not show up yet.
-                            edgeObject.AddOrGetComponent<EdgeOperator>().Hide(animationKind, 0f);
-                        }
-                    }
-                    else
+            EdgeAnimationKind animationKind = City.EdgeLayoutSettings.AnimationKind;
+            // We have to set an initial color for the edges, and we have to convert them to meshes.
+            foreach (Edge edge in CityGraph.Edges().Where(x => !x.HasToggle(GraphElement.IsVirtualToggle)))
+            {
+                GameObject edgeObject = edge.GameObject();
+                if (edgeObject != null && edgeObject.TryGetComponent(out SEESpline spline))
+                {
+                    spline.GradientColors = GetEdgeGradient(edge);
+
+                    if (edge.HasToggle(Edge.IsHiddenToggle))
                     {
-                        Debug.LogError($"Edge has no associated game object: {edge}\n");
+                        // We will instantly hide this edge. It should not show up yet.
+                        edgeObject.AddOrGetComponent<EdgeOperator>().Hide(animationKind, 0f);
                     }
                 }
-            }
-            else
-            {
-                Debug.LogWarning($"There is no code city drawn for {gameObject.FullName()}. This {nameof(ReflexionVisualization)} is disabled.\n");
-                enabled = false;
+                else
+                {
+                    Debug.LogError($"Edge has no associated game object: {edge}\n");
+                }
             }
         }
 
@@ -115,6 +119,48 @@ namespace SEE.Game.City
             while (UnhandledEvents.Count > 0 && gameObject.IsCodeCityDrawn())
             {
                 OnNext(UnhandledEvents.Dequeue());
+            }
+            //if (SEEInput.ShowAllDivergences())
+            //{
+            //    ShowAllDivergences(true);
+            //}
+            //else
+            //{
+            //    ShowAllDivergences(false);
+            //}
+        }
+
+        /// <summary>
+        /// Whether all divergent implementation dependencies are currently shown.
+        /// </summary>
+        private bool allDivergencesAreShown = false;
+
+        /// <summary>
+        /// If <paramref name="show"/>, all divergent implementation dependencies will
+        /// be shown; otherwise they will be hidden.
+        /// </summary>
+        /// <param name="show">whether all divergent implementation dependencies should
+        /// be shown</param>
+        private void ShowAllDivergences(bool show)
+        {
+            // Do we really have a change of the visibility?
+            if (allDivergencesAreShown != show)
+            {
+                allDivergencesAreShown = show;
+                foreach (Edge edge in CityGraph.Edges())
+                {
+                    if (!edge.HasToggle(GraphElement.IsVirtualToggle)
+                        && edge.IsInImplementation()
+                        && edge.State() == State.Divergent)
+                    {
+                        GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
+                        if (gameEdge != null)
+                        {
+                            EdgeOperator edgeOperator = gameEdge.AddOrGetComponent<EdgeOperator>();
+                            edgeOperator.ShowOrHide(allDivergencesAreShown, City.EdgeLayoutSettings.AnimationKind, ANIMATION_DURATION);
+                        }
+                    }
+                }
             }
         }
 
@@ -130,7 +176,7 @@ namespace SEE.Game.City
             Events.Clear();
             graph.Subscribe(this);
             graph.RunAnalysis();
-            graph.NewVersion();  // required because we don't want to highlight any initial changes
+            graph.NewVersion(); // required because we don't want to highlight any initial changes
         }
 
         /// <summary>
@@ -182,10 +228,6 @@ namespace SEE.Game.City
                 UnhandledEvents.Enqueue(changeEvent);
                 return;
             }
-
-            // TODO: Make sure these actions don't interfere with reversible actions.
-            // TODO: Send these changes over the network? Maybe not the edges themselves, but the events?
-            // TODO: Handle these asynchronously?
 
             switch (changeEvent)
             {
@@ -269,6 +311,7 @@ namespace SEE.Game.City
             {
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge);
                 EdgeOperator edgeOperator = edge.AddOrGetComponent<EdgeOperator>();
+                edgeOperator.ShowOrHide(!edgeChange.Edge.HasToggle(Edge.IsHiddenToggle), City.EdgeLayoutSettings.AnimationKind, ANIMATION_DURATION);
                 edgeOperator.ChangeColorsTo(newColors.start, newColors.end, ANIMATION_DURATION, false);
 
                 if (!PreviousEdgeStates.TryGetValue(edgeChange.Edge.ID, out State previous) || previous != edgeChange.NewState)

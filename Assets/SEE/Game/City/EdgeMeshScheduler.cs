@@ -53,6 +53,16 @@ namespace SEE.Game.City
         private EdgeSelectionAttributes selection;
 
         /// <summary>
+        /// Indicates whether initial graph edges have all been converted yet.
+        /// </summary>
+        private bool initialEdgesDone;
+
+        /// <summary>
+        /// Event that is triggered once all graph edges have been processed for the first time.
+        /// </summary>
+        public event Action OnInitialEdgesDone;
+
+        /// <summary>
         /// Initialize this component with given settings.
         ///
         /// Precondition: The given parameters are not null.
@@ -102,6 +112,12 @@ namespace SEE.Game.City
         /// Processes the next (up to) <see cref="EdgesPerFrame"/> edges.
         private void LateUpdate()
         {
+            if (!initialEdgesDone && edges.Count == 0)
+            {
+                // We're done with the initial edges.
+                initialEdgesDone = true;
+                OnInitialEdgesDone?.Invoke();
+            }
             // We will loop until either we converted `EdgesPerFrame` many edges,
             // or until there are no further edges to convert to meshes.
             int remaining = Mathf.Min(edges.Count, EdgesPerFrame);

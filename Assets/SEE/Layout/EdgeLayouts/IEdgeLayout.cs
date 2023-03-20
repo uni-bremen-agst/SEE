@@ -47,8 +47,8 @@ namespace SEE.Layout.EdgeLayouts
 
         /// <summary>
         /// Orientation of the edges;
-        /// if false, the edges are drawn below the houses;
-        /// if true, the edges are drawn above the houses;
+        /// if false, the edges are drawn below the game nodes;
+        /// if true, the edges are drawn above the game nodes;
         /// </summary>
         protected readonly bool edgesAboveBlocks;
 

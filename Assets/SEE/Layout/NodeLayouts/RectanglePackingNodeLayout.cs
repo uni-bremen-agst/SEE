@@ -40,7 +40,7 @@ namespace SEE.Layout.NodeLayouts
         /// <returns>retangle packing layout</returns>
         public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
         {
-            Dictionary<ILayoutNode, NodeTransform> layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
+            Dictionary<ILayoutNode, NodeTransform> layoutResult = new();
 
             IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
             if (layoutNodeList.Count == 1)
@@ -90,7 +90,7 @@ namespace SEE.Layout.NodeLayouts
             {
                 ILayoutNode root = roots.FirstOrDefault();
                 Vector2 area = PlaceNodes(layoutResult, root);
-                Vector3 position = new Vector3(0.0f, groundLevel, 0.0f);
+                Vector3 position = new(0.0f, groundLevel, 0.0f);
                 // Maintain the original height of all inner nodes (and root is an inner node).
                 layoutResult[root] = new NodeTransform(position, new Vector3(area.x, root.LocalScale.y, area.y));
                 RemovePadding(layoutResult, padding);

@@ -125,7 +125,10 @@ namespace SEE.Game.City
                     tasks.Add(LoadGraphMetrics(ArchitectureGraph, CsvArchitecturePath.Path, ErosionSettings));
                 }
 
-                await UniTask.WhenAll(tasks);
+                if (tasks.Count > 0)
+                {
+                    await UniTask.WhenAll(tasks);
+                }
 
                 ReflexionGraph reflexionGraph = new(ImplementationGraph, ArchitectureGraph, MappingGraph, CityName);
                 LoadedGraph = reflexionGraph;
@@ -177,6 +180,18 @@ namespace SEE.Game.City
                 Debug.Log($"Implementation graph saved at {GXLPath.Path}.\n");
                 GraphWriter.Save(GxlMappingPath.Path, mapping, hierarchicalType);
                 Debug.Log($"Mapping graph saved at {GxlMappingPath.Path}.\n");
+            }
+        }
+
+        protected override void InitializeAfterDrawn()
+        {
+            base.InitializeAfterDrawn();
+            
+            // We also need to have the ReflexionVisualization apply the correct edge
+            // visualization, but we have to wait until all edges have become meshes.
+            if (gameObject.TryGetComponentOrLog(out EdgeMeshScheduler scheduler))
+            {
+                scheduler.OnInitialEdgesDone += Visualization.InitializeEdges;
             }
         }
 

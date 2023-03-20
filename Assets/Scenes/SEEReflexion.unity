@@ -9430,7 +9430,6 @@ MonoBehaviour:
     EdgeWidth: 0.01
     EdgesAboveBlocks: 1
     Tension: 0.85
-    RDP: 0.0001
   EdgeSelectionSettings:
     TubularSegments: 50
     Radius: 0.005
@@ -11429,7 +11428,6 @@ MonoBehaviour:
     EdgeWidth: 0.01
     EdgesAboveBlocks: 1
     Tension: 0.85
-    RDP: 0.0001
   EdgeSelectionSettings:
     TubularSegments: 50
     Radius: 0.005
