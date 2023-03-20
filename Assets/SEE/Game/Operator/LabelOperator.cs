@@ -76,7 +76,7 @@ namespace SEE.Game.Operator
 
                 // Second, add connecting line between "roof" of the game object and the text.
                 Vector3 startLinePosition = gameObject.GetRoofCenter();
-                GameObject line = new GameObject
+                GameObject line = new()
                 {
                     name = $"{LABEL_PREFIX}{shownText} (Connecting Line)"
                 };
