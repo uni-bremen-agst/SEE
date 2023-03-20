@@ -6,10 +6,8 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Layout;
-using SEE.Layout.EdgeLayouts;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
-using TinySpline;
 using UnityEngine;
 using UnityEngine.Assertions;
 
