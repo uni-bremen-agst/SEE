@@ -17,6 +17,8 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using SEE.Game.Operator;
+using SEE.GO;
 using SEE.Layout;
 using SEE.Utils;
 using System;
@@ -76,22 +78,22 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Animates the node transformation of given <paramref name="gameObject"/>. If needed, a <paramref name="callback"/>
+        /// Animates the node transformation of given <paramref name="gameObject"/>. If needed, a <paramref name="callbackWhenAnimationFinished"/>
         /// that is invoked with <paramref name="gameObject"/> as a parameter when the animation is finished can be passed.
         ///
         /// Precondition: the caller of this method AnimateTo() is a Monobehaviour instance attached to a game object.
         ///
         /// Let C be the caller (a Monobehaviour) of AnimateTo(). Then the actual callback will be as follows:
-        ///   O.<paramref name="callback"/>(<paramref name="gameObject"/>) where O is the game object caller C
+        ///   O.<paramref name="callbackWhenAnimationFinished"/>(<paramref name="gameObject"/>) where O is the game object caller C
         ///   is attached to (its gameObject).
         /// </summary>
         /// <param name="gameObject">game object to be animated</param>
         /// <param name="nodeTransform">the node transformation to be applied</param>
-        /// <param name="callback">an optional callback to be called when the animation has finished</param>
+        /// <param name="callbackWhenAnimationFinished">an optional callback to be called when the animation has finished</param>
         /// <param name="moveCallback">an optional callback to be called when the move animation is about to start</param>
         public void AnimateTo(GameObject gameObject,
                               ILayoutNode nodeTransform,
-                              Action<object> callback = null,
+                              Action<object> callbackWhenAnimationFinished = null,
                               Action<float> moveCallback = null)
         {
             gameObject.AssertNotNull("gameObject");
@@ -106,11 +108,11 @@ namespace SEE.Game.Evolution
                 position.y += nodeTransform.LocalScale.y / 2;
                 gameObject.transform.position = position;
                 gameObject.transform.localScale = nodeTransform.LocalScale;
-                callback?.Invoke(gameObject);
+                callbackWhenAnimationFinished?.Invoke(gameObject);
             }
             else
             {
-                AnimateToInternalWithCallback(gameObject, nodeTransform, callback, moveCallback);
+                AnimateToInternalWithCallback(gameObject, nodeTransform, callbackWhenAnimationFinished, moveCallback);
             }
         }
 
@@ -123,18 +125,18 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Moves, scales, and then finally shakes (if <paramref name="difference"/>) the animated game object.
-        /// At the end of the animation, the <see cref="Action"/> <paramref name="callback"/>
-        /// will be called with <paramref name="gameObject"/> as parameter if <paramref name="callback"/>
-        /// is not null. If <paramref name="callback"/> equals null, no callback happens.
+        /// At the end of the animation, the <see cref="Action"/> <paramref name="callbackWhenAnimationFinished"/>
+        /// will be called with <paramref name="gameObject"/> as parameter if <paramref name="callbackWhenAnimationFinished"/>
+        /// is not null. If <paramref name="callbackWhenAnimationFinished"/> equals null, no callback happens.
         /// </summary>
         /// <param name="gameObject">game object to be animated</param>
         /// <param name="layout">the node transformation to be applied</param>
-        /// <param name="callback">method to be called when the animation has finished</param>
+        /// <param name="callbackWhenAnimationFinished">method to be called when the animation has finished</param>
         /// <param name="moveCallback">method to be called when the move animation is about to start</param>
         private void AnimateToInternalWithCallback
                   (GameObject gameObject,
                    ILayoutNode layout,
-                   Action<object> callback,
+                   Action<object> callbackWhenAnimationFinished,
                    Action<float> moveCallback = null)
         {
             // layout.scale is in world space, while the animation by iTween
@@ -145,9 +147,40 @@ namespace SEE.Game.Evolution
                                      layout.LocalScale
                                    : gameObject.transform.parent.InverseTransformVector(layout.LocalScale);
 
-            Tweens.MoveScaleShakeRotate(gameObject, position: layout.CenterPosition, localScale: localScale,
-                                        strength: ShakeStrength(), duration: MaxAnimationTime, callback,
-                                        moveCallback);
+            MoveScaleShakeRotate(gameObject,
+                                 position: layout.CenterPosition, localScale: localScale,
+                                 strength: ShakeStrength(), duration: MaxAnimationTime, callbackWhenAnimationFinished,
+                                 moveCallback);
+        }
+
+        /// <summary>
+        /// Moves, scales, and shakes <paramref name="gameObject"/> as a sequence of animations.
+        /// </summary>
+        /// <param name="gameObject">the game object to be animated</param>
+        /// <param name="position">the final destination of <paramref name="gameObject"/></param>
+        /// <param name="localScale">the final scale of <paramref name="gameObject"/></param>
+        /// <param name="strength">the shake strength; each component corresponds to one axis (x, y, z)</param>
+        /// <param name="duration">the duration of the whole animation in seconds</param>
+        /// <param name="callbackWhenAnimationFinished">the method to be called when the animation has finished</param>
+        /// <param name="moveCallback">the method to be called when the move animation is about to start</param>
+        private static void MoveScaleShakeRotate(GameObject gameObject,
+                                                Vector3 position,
+                                                Vector3 localScale,
+                                                Vector3 strength,
+                                                float duration,
+                                                Action<object> callbackWhenAnimationFinished,
+                                                Action<float> moveCallback = null)
+        {
+            //Sequence sequence = DOTween.Sequence();
+            //sequence.Append(gameObject.transform.DOScale(localScale, duration / 3));
+            //sequence.Append(gameObject.transform.DOMove(position, duration / 3).OnStart(() => { moveCallback?.Invoke(duration / 3); }));
+            //sequence.Append(gameObject.transform.DOShakeRotation(duration: duration / 3,
+            //                strength: strength, vibrato: 2, randomness: 0, fadeOut: true).OnComplete(() => { callbackWhenAnimationFinished?.Invoke(gameObject); }));
+            Debug.Log($"MoveScaleShakeRotate({gameObject.name})\n");
+            NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+            nodeOperator.MoveTo(position, duration).SetOnStart(() => moveCallback?.Invoke(duration));
+            nodeOperator.ScaleTo(localScale, duration).SetOnComplete(() => callbackWhenAnimationFinished?.Invoke(gameObject));
+            // TODO: We need a substitute for DOShakeRotation
         }
     }
 }
