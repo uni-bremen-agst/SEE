@@ -124,6 +124,17 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Returns all game objects tagged as <see cref="Tags.Edge"/> that are descendants
+        /// of <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">root game object to be traversed</param>
+        /// <returns>all game objects tagged as <see cref="Tags.Edge"/></returns>
+        internal static IEnumerable<GameObject> AllEdges(this GameObject gameObject)
+        {
+            return gameObject.AllDescendants(Tags.Edge);
+        }
+
+        /// <summary>
         /// Returns all transitive children of <paramref name="gameObject"/> tagged by
         /// given <paramref name="tag"/> (including <paramref name="gameObject"/> itself).
         /// </summary>

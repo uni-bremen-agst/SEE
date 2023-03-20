@@ -101,7 +101,8 @@ namespace SEE.Game.UI.Tooltip
                     {
                         canvasGroup.alpha = a;
                     }
-                }, 1f, FADE_IN_DURATION)); fadeIn.Play();
+                }, 1f, FADE_IN_DURATION));
+                fadeIn.Play();
             }
             else
             {
@@ -161,7 +162,7 @@ namespace SEE.Game.UI.Tooltip
                     textComp = texts.SingleOrDefault(x => x.name == "Description");
                     if (textComp == null)
                     {
-                        Debug.LogError("Couldn't find Description text component for tooltip.");
+                        Debug.LogError("Couldn't find Description text component for tooltip.\n");
                     }
                     else if (textBeforeStart != null)
                     {

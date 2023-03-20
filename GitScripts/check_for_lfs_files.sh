@@ -28,7 +28,7 @@ if [ -n "$CI" ]; then
 
     # Check for non-SEE Assets.
     shopt -s extglob
-    CHANGED_ASSETS=$(git diff --name-only --diff-filter=AM origin/master -- Assets/!(Editor|Native|StreamingAssets|Resources|SEE*)/ | git check-attr --stdin filter | grep -v "filter: lfs" || exit 0)
+    CHANGED_ASSETS=$(git diff --name-only --diff-filter=AM origin/master -- Assets/!(Editor|Native|StreamingAssets|Resources|Scenes|SEE*)/ | git check-attr --stdin filter | grep -v "filter: lfs" || exit 0)
     shopt -u extglob
     if [ -n "$CHANGED_ASSETS" ]; then
         echo ""

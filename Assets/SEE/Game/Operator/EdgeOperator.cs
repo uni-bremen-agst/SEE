@@ -8,7 +8,6 @@ using SEE.GO;
 using SEE.Utils;
 using TinySpline;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Game.Operator
 {
@@ -226,8 +225,6 @@ namespace SEE.Game.Operator
             return ShowOrHide(false, animationKind, duration);
         }
 
-        #endregion
-
         /// <summary>
         /// Show or hide the edge, animating it as specified in the <see cref="animationKind"/>.
         /// </summary>
@@ -238,7 +235,7 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         /// <exception cref="ArgumentOutOfRangeException">If the given <paramref name="animationKind"/>
         /// is unknown.</exception>
-        private IOperationCallback<Action> ShowOrHide(bool show, EdgeAnimationKind animationKind, float duration)
+        public IOperationCallback<Action> ShowOrHide(bool show, EdgeAnimationKind animationKind, float duration)
         {
             return animationKind switch
             {
@@ -248,6 +245,8 @@ namespace SEE.Game.Operator
                 _ => throw new ArgumentOutOfRangeException(nameof(animationKind), "Unknown edge animation kind supplied.")
             };
         }
+
+        #endregion
 
         /// <summary>
         /// Calculates a value for the <see cref="glow"/> operation according to the following formula:

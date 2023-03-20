@@ -42,15 +42,6 @@ namespace SEE.Game.City
         [Range(0.0f, 1.0f)]
         public float Tension = 0.85f;
 
-        /// <summary>
-        /// Determines to which extent the polylines of the generated splines are
-        /// simplified. Range: [0.0, inf] (0.0 means no simplification). More precisely,
-        /// stores the epsilon parameter of the RamerDouglasPeucker algorithm which
-        /// is used to identify and remove points based on their distances to the line
-        /// drawn between their neighbors.
-        /// </summary>
-        public float RDP = 0.0001f;
-
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
@@ -59,7 +50,6 @@ namespace SEE.Game.City
             writer.Save(EdgeWidth, EdgeWidthLabel);
             writer.Save(EdgesAboveBlocks, EdgesAboveBlocksLabel);
             writer.Save(Tension, TensionLabel);
-            writer.Save(RDP, RDPLabel);
             writer.EndGroup();
         }
 
@@ -74,7 +64,6 @@ namespace SEE.Game.City
                 ConfigIO.Restore(values, EdgeWidthLabel, ref EdgeWidth);
                 ConfigIO.Restore(values, EdgesAboveBlocksLabel, ref EdgesAboveBlocks);
                 ConfigIO.Restore(values, TensionLabel, ref Tension);
-                ConfigIO.Restore(values, RDPLabel, ref RDP);
             }
         }
 
@@ -82,7 +71,6 @@ namespace SEE.Game.City
         private const string EdgeWidthLabel = "EdgeWidth";
         private const string EdgesAboveBlocksLabel = "EdgesAboveBlocks";
         private const string TensionLabel = "Tension";
-        private const string RDPLabel = "RDP";
         private const string AnimationKindLabel = "AnimationKind";
     }
 }
