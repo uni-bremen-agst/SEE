@@ -646,7 +646,7 @@ namespace SEE.Game
         /// </summary>
         private void UpdateGameNodeHierarchy()
         {
-            Dictionary<Node, GameObject> nodeMap = new Dictionary<Node, GameObject>();
+            Dictionary<Node, GameObject> nodeMap = new();
             CollectNodes(gameObject, nodeMap);
             // Check(nodeMap);
             GraphRenderer.CreateGameNodeHierarchy(nodeMap, gameObject);
@@ -819,8 +819,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Renders the game object corresponding to the given <paramref name="graphNode"/>
-        /// by creating a copy of the GameObject that is used during the animation.
+        /// Renders the game object corresponding to the given <paramref name="graphNode"/>.
         /// </summary>
         /// <param name="graphNode">graph node to be displayed</param>
         private void RenderNode(Node graphNode)
@@ -829,6 +828,7 @@ namespace SEE.Game
             ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.ID];
             // The game node representing the graphNode if there is any; null if there is none
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
+            Assert.IsTrue(currentGameNode.HasNodeRef());
 
             Difference difference;
             if (formerGraphNode == null)
@@ -887,7 +887,11 @@ namespace SEE.Game
             // we want the animator to move each node separately, which is why we
             // remove each from the hierarchy; later the node hierarchy will be
             // re-established
-            RemoveFromNodeHierarchy(currentGameNode);
+            // FIXME: Should the following line be removed and RemoveFromNodeHierarchy() be
+            // re-enabled?
+            currentGameNode.transform.SetParent(gameObject.transform);
+            //RemoveFromNodeHierarchy(currentGameNode);
+
             // currentGameNode is shifted to its new position through the animator.
             Action<float> onEdgeAnimationStart = null;
             if (edgeTweens.TryGetValue(graphNode, out Tween tween))
@@ -895,7 +899,7 @@ namespace SEE.Game
                 onEdgeAnimationStart = duration => OnEdgeAnimationStart(tween, duration);
             }
             changeAndBirthAnimator.AnimateTo(currentGameNode, layoutNode,
-                OnAnimationNodeAnimationFinished, onEdgeAnimationStart);
+                                             OnAnimationNodeAnimationFinished, onEdgeAnimationStart);
         }
 
         /// <summary>
@@ -923,7 +927,7 @@ namespace SEE.Game
         /// of phase 2, respectively).
         /// <seealso cref="DestroyDeletedGraphElements"/>.
         /// </summary>
-        private IList<GameObject> toBeDestroyed = new List<GameObject>();
+        private readonly IList<GameObject> toBeDestroyed = new List<GameObject>();
 
         /// <summary>
         /// Destroys all game nodes and edges in <see cref="toBeDestroyed"/>. <see cref="toBeDestroyed"/>
@@ -970,6 +974,7 @@ namespace SEE.Game
         /// <param name="gameNode">new or existing game object representing a graph node</param>
         private void OnAnimationNodeAnimationFinished(object gameNode)
         {
+            phase2AnimationWatchDog.Finished();
             if (gameNode is GameObject go)
             {
                 graphRenderer.AdjustAntenna(go);
@@ -985,7 +990,6 @@ namespace SEE.Game
                     go.transform.SetParent(gameObject.transform);
                 }
             }
-            phase2AnimationWatchDog.Finished();
         }
 
         /// <summary>
