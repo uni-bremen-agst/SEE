@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Autohand;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.GO;
@@ -43,6 +44,32 @@ namespace SEE.Game
                 gameObject.AddComponentIfNecessary<ShowLabel>();
                 gameObject.AddComponentIfNecessary<ShowEdges>();
                 gameObject.AddComponentIfNecessary<HighlightErosion>();
+
+                // Add AutoHand related components
+                Rigidbody rigidbody = gameObject.AddOrGetComponent<Rigidbody>();
+                rigidbody.useGravity = false; // No gravity
+                rigidbody.isKinematic = false;
+                rigidbody.freezeRotation = true; // No rotation
+
+                rigidbody.interpolation = RigidbodyInterpolation.Extrapolate; // Interpolation
+                rigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
+
+                rigidbody.mass = 1.5f;
+                rigidbody.drag = 20;
+                rigidbody.angularDrag = 2;
+                rigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
+
+                Grabbable grabable = gameObject.AddOrGetComponent<Grabbable>();
+
+                grabable.allowHeldSwapping = true;
+                grabable.heldNoFriction = true;
+                grabable.parentOnGrab = true;
+
+                grabable.throwPower = 1;
+                grabable.jointBreakForce = 2500;
+
+                Material mat = Resources.Load<Material>("Materials/HighlightMaterial/Highlight");
+                grabable.hightlightMaterial = mat;
             }
         }
 
