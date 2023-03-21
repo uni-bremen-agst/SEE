@@ -220,7 +220,11 @@ namespace SEE.Game.Operator
                 {
                     // If we are moving the root node, the whole graph will be moved,
                     // hence, the layout of the edges does not need to be updated.
-                    UpdateEdgeLayout(duration);
+                    if (City.EdgeLayoutSettings.Kind != EdgeLayoutKind.None)
+                    {
+                        // The edge layout needs to be updated only if we actually have an edge layout.
+                        UpdateEdgeLayout(duration);
+                    }
                 }
                 UpdateLabelLayout(duration);
             }
