@@ -9,9 +9,8 @@ namespace SEE.Controls.Actions
 {
     public class LiveDocumentationAction : AbstractPlayerAction
     {
-        
         private WindowSpaceManager spaceManager;
-        
+
         public static LiveDocumentationAction CreateAction() => new LiveDocumentationAction();
 
         public override HashSet<string> GetChangedObjects() => new HashSet<string>();
@@ -26,6 +25,7 @@ namespace SEE.Controls.Actions
             {
                 new NetCRDT().RequestID();
             }
+
             spaceManager = WindowSpaceManager.ManagerInstance;
         }
 
@@ -39,8 +39,19 @@ namespace SEE.Controls.Actions
                 if (!selectedNode.TryGetComponent(out LiveDocumentationWindow documentationWindow))
                 {
                     documentationWindow = selectedNode.gameObject.AddComponent<LiveDocumentationWindow>();
+                    documentationWindow.ClassName = selectedNode.Value.SourceName;
                     documentationWindow.Title = "LiveDoc";
 
+                    LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
+                    buffer.Add(new LiveDocumentationBufferText("Dies ist ein Text erstmal"));
+                    buffer.Add(new LiveDocumentationLink("Test.cs", "Name of link"));
+                    buffer.Add(new LiveDocumentationBufferText("Dies ist ein Text erstmal"));
+
+                    buffer.Add(new LiveDocumentationBufferText("Dies ist ein Text erstmal"));
+
+                    buffer.Add(new LiveDocumentationBufferText("Dies ist ein Text erstmal"));
+
+                    documentationWindow.DocumentationBuffer = buffer;
                 }
 
 
@@ -49,6 +60,7 @@ namespace SEE.Controls.Actions
                 {
                     spaceManager[WindowSpaceManager.LOCAL_PLAYER].AddWindow(documentationWindow);
                 }
+
                 spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = documentationWindow;
             }
 
