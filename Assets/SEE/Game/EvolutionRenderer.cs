@@ -868,8 +868,10 @@ namespace SEE.Game
             {
                 onEdgeAnimationStart = duration => OnEdgeAnimationStart(tween, duration);
             }
-            changeAndBirthAnimator.AnimateTo(currentGameNode, layoutNode,
-                                             OnAnimationNodeAnimationFinished, onEdgeAnimationStart);
+            changeAndBirthAnimator.AnimateTo(gameObject: currentGameNode,
+                                             layoutNode: layoutNode,
+                                             callbackWhenAnimationFinished: OnAnimationNodeAnimationFinished,
+                                             moveCallback: onEdgeAnimationStart);
         }
 
         /// <summary>
@@ -1022,6 +1024,12 @@ namespace SEE.Game
             }
         }
 
+        /// <summary>
+        /// Triggers an animation indicating that the given <paramref name="gameObject"/> was
+        /// deleted by moving it up to the sky. When it reaches the sky at <see cref="SkyLevel"/>,
+        /// it will disappear (via <see cref="OnRemoveFinishedAnimation"/>).
+        /// </summary>
+        /// <param name="gameObject">a game object representing either a node or edge</param>
         private void AnimateToDeath(GameObject gameObject)
         {
             gameObject.transform.SetParent(null);
