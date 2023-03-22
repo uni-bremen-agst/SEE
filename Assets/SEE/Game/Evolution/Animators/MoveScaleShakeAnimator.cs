@@ -17,6 +17,9 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using SEE.Game.Operator;
+using SEE.GO;
+using System;
 using UnityEngine;
 
 namespace SEE.Game.Evolution
@@ -35,9 +38,32 @@ namespace SEE.Game.Evolution
             : base(maxAnimationTime)
         { }
 
-        protected override Vector3 ShakeStrength()
+        /// <summary>
+        /// Moves, scales, and shakes <paramref name="gameObject"/> as a sequence of animations.
+        /// </summary>
+        /// <param name="gameObject">the game object to be animated</param>
+        /// <param name="position">the final destination of <paramref name="gameObject"/></param>
+        /// <param name="localScale">the final scale of <paramref name="gameObject"/></param>
+        /// <param name="duration">the duration of the whole animation in seconds</param>
+        /// <param name="callbackWhenAnimationFinished">the method to be called when the animation has finished</param>
+        /// <param name="moveCallback">the method to be called when the move animation is about to start</param>
+        protected override void InternalAnimateTo(GameObject gameObject,
+                                                Vector3 position,
+                                                Vector3 localScale,
+                                                float duration,
+                                                Action<object> callbackWhenAnimationFinished,
+                                                Action<float> moveCallback = null)
         {
-            return new Vector3(0, 10, 0);
+            if (gameObject.IsNode())
+            {
+                NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+                nodeOperator.MoveTo(position, duration).SetOnStart(() => moveCallback?.Invoke(duration));
+                nodeOperator.ScaleTo(localScale, duration).SetOnComplete(() => callbackWhenAnimationFinished?.Invoke(gameObject));
+            }
+            else
+            {
+                throw new Exception($"MoveScaleShakeRotate.InternalAnimateTo({gameObject.name}) applied although the argument is not a node.\n");
+            }
         }
     }
 }

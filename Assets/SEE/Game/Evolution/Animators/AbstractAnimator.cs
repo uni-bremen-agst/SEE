@@ -17,8 +17,6 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using SEE.Game.Operator;
-using SEE.GO;
 using SEE.Layout;
 using SEE.Utils;
 using System;
@@ -52,21 +50,12 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Defines the maximum time an animation is allowed to take in seconds.
         /// </summary>
-        private float maxAnimationTime;
-        /// <summary>
-        /// If true animations are skipped and the new values are applied instantly.
-        /// </summary>
-        private bool animationsDisabled = false;
-
-        /// <summary>
-        /// Defines the maximum time an animation is allowed to take in seconds.
-        /// </summary>
-        public float MaxAnimationTime { get => maxAnimationTime; set => maxAnimationTime = value; }
+        public float MaxAnimationTime { get; set; } = DefaultAnimationTime;
 
         /// <summary>
         /// If set to true animations are skipped and the new values are applied instantly.
         /// </summary>
-        public bool AnimationsDisabled { get => animationsDisabled; set => animationsDisabled = value; }
+        public bool AnimationsDisabled { get; set; } = false;
 
         /// <summary>
         /// Creates a new animator with a given maximal animation time.
@@ -88,99 +77,64 @@ namespace SEE.Game.Evolution
         ///   is attached to (its gameObject).
         /// </summary>
         /// <param name="gameObject">game object to be animated</param>
-        /// <param name="nodeTransform">the node transformation to be applied</param>
+        /// <param name="layoutNode">the node transformation to be applied</param>
         /// <param name="callbackWhenAnimationFinished">an optional callback to be called when the animation has finished</param>
-        /// <param name="moveCallback">an optional callback to be called when the move animation is about to start</param>
+        /// <param name="moveCallback">an optional callback to be called when the move animation is about to start;
+        /// the argument passed to it is <see cref="MaxAnimationTime"/></param>
         public void AnimateTo(GameObject gameObject,
-                              ILayoutNode nodeTransform,
+                              ILayoutNode layoutNode,
                               Action<object> callbackWhenAnimationFinished = null,
                               Action<float> moveCallback = null)
         {
             gameObject.AssertNotNull("gameObject");
-            nodeTransform.AssertNotNull("nodeTransform");
+            layoutNode.AssertNotNull("nodeTransform");
 
             if (AnimationsDisabled)
             {
                 // Note: nodeTransform.position.y denotes the ground of the game object, not
                 // the center as normally in Unity. The following position is the one in
                 // Unity's terms where the y co-ordinate denotes the center.
-                Vector3 position = nodeTransform.CenterPosition;
-                position.y += nodeTransform.LocalScale.y / 2;
+                Vector3 position = layoutNode.CenterPosition;
+                position.y += layoutNode.LocalScale.y / 2;
                 gameObject.transform.position = position;
-                gameObject.transform.localScale = nodeTransform.LocalScale;
+                gameObject.transform.localScale = layoutNode.LocalScale;
+                // FIXME: Shouldn't we also call moveCallback?
                 callbackWhenAnimationFinished?.Invoke(gameObject);
             }
             else
             {
-                AnimateToInternalWithCallback(gameObject, nodeTransform, callbackWhenAnimationFinished, moveCallback);
+                // layoutNode.LocalScale is in world space, while the animation by iTween
+                // is in local space. Our game objects may be nested in other game objects,
+                // hence, the two spaces may be different.
+                // We may need to transform layoutNode.LocalScale from world space to local space.
+                Vector3 localScale = gameObject.transform.parent == null ?
+                                         layoutNode.LocalScale
+                                       : gameObject.transform.parent.InverseTransformVector(layoutNode.LocalScale);
+
+                InternalAnimateTo(gameObject,
+                     position: layoutNode.CenterPosition,
+                     localScale: localScale,
+                     duration: MaxAnimationTime,
+                     callbackWhenAnimationFinished,
+                     moveCallback);
             }
         }
 
         /// <summary>
-        /// Returns the strength of shaking an animated game object. Each component
-        /// is a degree and corresponds to one axis (x, y, z).
-        /// </summary>
-        /// <returns>the degree by which to shake an animated object</returns>
-        protected abstract Vector3 ShakeStrength();
-
-        /// <summary>
-        /// Moves, scales, and then finally shakes (if <paramref name="difference"/>) the animated game object.
-        /// At the end of the animation, the <see cref="Action"/> <paramref name="callbackWhenAnimationFinished"/>
-        /// will be called with <paramref name="gameObject"/> as parameter if <paramref name="callbackWhenAnimationFinished"/>
-        /// is not null. If <paramref name="callbackWhenAnimationFinished"/> equals null, no callback happens.
-        /// </summary>
-        /// <param name="gameObject">game object to be animated</param>
-        /// <param name="layout">the node transformation to be applied</param>
-        /// <param name="callbackWhenAnimationFinished">method to be called when the animation has finished</param>
-        /// <param name="moveCallback">method to be called when the move animation is about to start</param>
-        private void AnimateToInternalWithCallback
-                  (GameObject gameObject,
-                   ILayoutNode layout,
-                   Action<object> callbackWhenAnimationFinished,
-                   Action<float> moveCallback = null)
-        {
-            // layout.scale is in world space, while the animation by iTween
-            // is in local space. Our game objects may be nested in other game objects,
-            // hence, the two spaces may be different.
-            // We may need to transform nodeTransform.scale from world space to local space.
-            Vector3 localScale = gameObject.transform.parent == null ?
-                                     layout.LocalScale
-                                   : gameObject.transform.parent.InverseTransformVector(layout.LocalScale);
-
-            MoveScaleShakeRotate(gameObject,
-                                 position: layout.CenterPosition, localScale: localScale,
-                                 strength: ShakeStrength(), duration: MaxAnimationTime, callbackWhenAnimationFinished,
-                                 moveCallback);
-        }
-
-        /// <summary>
-        /// Moves, scales, and shakes <paramref name="gameObject"/> as a sequence of animations.
+        /// Moves and scales <paramref name="gameObject"/> as a sequence of animations.
         /// </summary>
         /// <param name="gameObject">the game object to be animated</param>
         /// <param name="position">the final destination of <paramref name="gameObject"/></param>
         /// <param name="localScale">the final scale of <paramref name="gameObject"/></param>
-        /// <param name="strength">the shake strength; each component corresponds to one axis (x, y, z)</param>
         /// <param name="duration">the duration of the whole animation in seconds</param>
         /// <param name="callbackWhenAnimationFinished">the method to be called when the animation has finished</param>
         /// <param name="moveCallback">the method to be called when the move animation is about to start</param>
-        private static void MoveScaleShakeRotate(GameObject gameObject,
-                                                Vector3 position,
-                                                Vector3 localScale,
-                                                Vector3 strength,
-                                                float duration,
-                                                Action<object> callbackWhenAnimationFinished,
-                                                Action<float> moveCallback = null)
-        {
-            //Sequence sequence = DOTween.Sequence();
-            //sequence.Append(gameObject.transform.DOScale(localScale, duration / 3));
-            //sequence.Append(gameObject.transform.DOMove(position, duration / 3).OnStart(() => { moveCallback?.Invoke(duration / 3); }));
-            //sequence.Append(gameObject.transform.DOShakeRotation(duration: duration / 3,
-            //                strength: strength, vibrato: 2, randomness: 0, fadeOut: true).OnComplete(() => { callbackWhenAnimationFinished?.Invoke(gameObject); }));
-            Debug.Log($"MoveScaleShakeRotate({gameObject.name})\n");
-            NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
-            nodeOperator.MoveTo(position, duration).SetOnStart(() => moveCallback?.Invoke(duration));
-            nodeOperator.ScaleTo(localScale, duration).SetOnComplete(() => callbackWhenAnimationFinished?.Invoke(gameObject));
-            // TODO: We need a substitute for DOShakeRotation
-        }
+        protected abstract void InternalAnimateTo(GameObject gameObject,
+                                                  Vector3 position,
+                                                  Vector3 localScale,
+                                                  float duration,
+                                                  Action<object> callbackWhenAnimationFinished,
+                                                  Action<float> moveCallback = null);
+
     }
 }
