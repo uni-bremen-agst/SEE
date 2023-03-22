@@ -166,7 +166,7 @@ namespace SEE.Game
             InteractionDecorator.PrepareForInteraction(resultingEdge);
             // The edge becomes a child of the root node of the game-node hierarchy
             GameObject codeCity = SceneQueries.GetCodeCity(from.transform).gameObject;
-            GameObject rootNode = SceneQueries.GetCityRootNode(codeCity).gameObject;
+            GameObject rootNode = SceneQueries.GetCityRootNode(codeCity);
             resultingEdge.transform.SetParent(rootNode.transform);
             // The portal of the new edge is inherited from the codeCity.
             Portal.SetPortal(root: codeCity, gameObject: resultingEdge);
