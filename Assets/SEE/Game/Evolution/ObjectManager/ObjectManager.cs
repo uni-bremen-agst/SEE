@@ -220,7 +220,7 @@ namespace SEE.Game.Evolution
                 // to GetEdge() when moving from one graph to the next one.
 
                 // Determine all game nodes.
-                List<GameObject> gameNodes = new List<GameObject>();
+                List<GameObject> gameNodes = new();
                 foreach (Node node in edge.ItsGraph.Nodes())
                 {
                     GetNode(node, out GameObject gameNode);
