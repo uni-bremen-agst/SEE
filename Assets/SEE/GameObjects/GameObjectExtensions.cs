@@ -319,25 +319,25 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Sets the scale of this <paramref name="node"/> to <paramref name="scale"/> independent from
-        /// the local scale from the parent.
+        /// Sets the scale of this <paramref name="gameObject"/> to <paramref name="worldScale"/> independent from
+        /// the local scale from its parent.
         /// </summary>
-        /// <param name="node">object whose scale should be set</param>
-        /// <param name="scale">the new scale in world space</param>
-        public static void SetScale(this GameObject node, Vector3 scale)
+        /// <param name="gameObject">object whose scale should be set</param>
+        /// <param name="worldScale">the new scale in world space</param>
+        public static void SetScale(this GameObject gameObject, Vector3 worldScale)
         {
-            Transform parent = node.transform.parent;
-            node.transform.parent = null;
-            if (node.HasNodeRef())
+            Transform parent = gameObject.transform.parent;
+            gameObject.transform.parent = null;
+            if (gameObject.HasNodeRef())
             {
-                NodeOperator @operator = node.AddOrGetComponent<NodeOperator>();
-                @operator.ScaleTo(scale, 0f);
+                NodeOperator @operator = gameObject.AddOrGetComponent<NodeOperator>();
+                @operator.ScaleTo(worldScale, 0f);
             }
             else
             {
-                node.transform.localScale = scale;
+                gameObject.transform.localScale = worldScale;
             }
-            node.transform.parent = parent;
+            gameObject.transform.parent = parent;
         }
 
         /// <summary>
