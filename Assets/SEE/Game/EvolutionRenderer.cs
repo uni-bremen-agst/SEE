@@ -71,7 +71,7 @@ namespace SEE.Game
                 edgesAreDrawn = graphRenderer.AreEdgesDrawn();
 
                 objectManager = new ObjectManager(graphRenderer, gameObject);
-                marker = new MarkerFactory(markerWidth: cityEvolution.MarkerWidth,
+                markerFactory = new MarkerFactory(markerWidth: cityEvolution.MarkerWidth,
                                     markerHeight: cityEvolution.MarkerHeight,
                                     additionColor: cityEvolution.AdditionBeamColor,
                                     changeColor: cityEvolution.ChangeBeamColor,
@@ -116,9 +116,9 @@ namespace SEE.Game
         private ObjectManager objectManager;  // not serialized by Unity; will be set in CityEvolution property
 
         /// <summary>
-        /// The marker used to mark the new and removed game objects.
+        /// The marker factory used to mark the new and removed game objects.
         /// </summary>
-        private MarkerFactory marker;  // not serialized by Unity; will be set in CityEvolution property
+        private MarkerFactory markerFactory;  // not serialized by Unity; will be set in CityEvolution property
 
         /// <summary>
         /// The kind of comparison to determine whether there are any differences between
@@ -160,7 +160,7 @@ namespace SEE.Game
         /// removing nodes and the second phase of drawing the nodes of
         /// the next graph.
         /// </summary>
-        private AbstractAnimator changeAndBirthAnimator
+        private readonly AbstractAnimator changeAndBirthAnimator
             = new MoveScaleShakeAnimator(AbstractAnimator.DefaultAnimationTime / 2.0f);
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace SEE.Game
         /// used by <see cref="RenderNode(Node)"/> to synchronize node
         /// animation with edge animation.
         /// </summary>
-        private readonly Dictionary<Node, Tween> edgeTweens = new Dictionary<Node, Tween>();
+        private readonly Dictionary<Node, Tween> edgeTweens = new();
 
         /// <summary>
         /// True if animation is still ongoing.
@@ -241,16 +241,20 @@ namespace SEE.Game
         private readonly EdgeEqualityComparer edgeEqualityComparer = new();
 
         /// <summary>
-        /// All pre-computed layouts for the whole graph series.
+        /// All pre-computed layouts for the whole graph series. The order of those layouts
+        /// corresponds to the order of <see cref="graphs"/>, that is, graphs[i] has
+        /// NodeLayouts[i].
         /// </summary>
-        private Dictionary<Graph, Dictionary<string, ILayoutNode>> Layouts { get; }
-             = new Dictionary<Graph, Dictionary<string, ILayoutNode>>();  // not serialized by Unity
+        private IList<Dictionary<string, ILayoutNode>> NodeLayouts { get; }
+             = new List<Dictionary<string, ILayoutNode>>();
 
         /// <summary>
-        /// All pre-computed edge layouts for the whole graph series.
+        /// All pre-computed edge layouts for the whole graph series.  The order of those layouts
+        /// corresponds to the order of <see cref="graphs"/>, that is, graphs[i] has
+        /// EdgeLayouts[i].
         /// </summary>
-        private Dictionary<Graph, Dictionary<string, ILayoutEdge<ILayoutNode>>> EdgeLayouts { get; }
-            = new Dictionary<Graph, Dictionary<string, ILayoutEdge<ILayoutNode>>>(); // not serialized by Unity
+        private IList<Dictionary<string, ILayoutEdge<ILayoutNode>>> EdgeLayouts { get; }
+            = new List<Dictionary<string, ILayoutEdge<ILayoutNode>>>();
 
         /// <summary>
         /// Creates and saves the layouts for all given <paramref name="graphs"/>. This will
@@ -264,7 +268,7 @@ namespace SEE.Game
             ISet<string> numericNodeAttributes = new HashSet<string>();
             graphs.ForEach(graph =>
             {
-                Layouts[graph] = CalculateLayout(graph);
+                NodeLayouts.Add(CalculateLayout(graph));
                 numericNodeAttributes.UnionWith(graph.AllNumericNodeAttributes());
             });
             diff = new NumericAttributeDiff(numericNodeAttributes);
@@ -283,6 +287,10 @@ namespace SEE.Game
         /// All the game objects created for the nodes of <paramref name="graph"/> will
         /// be created by the objectManager, thus, be available for later use. The layout
         /// is not actually applied.
+        ///
+        /// Note: This method assumes that it is called in the order of <see cref="graphs"/>,
+        /// that is, the i'th call is assumed to calculate the edge layout for
+        /// <paramref name="graph"/>[i].
         /// </summary>
         /// <param name="graph">graph for which the layout is to be calculated</param>
         /// <returns>the node layout for all nodes in <paramref name="graph"/></returns>
@@ -333,11 +341,12 @@ namespace SEE.Game
             if (edgesAreDrawn)
             {
                 List<LayoutGraphEdge<LayoutGraphNode>> layoutEdges = graphRenderer.LayoutEdges(layoutNodes).ToList();
-                EdgeLayouts[graph] = new Dictionary<string, ILayoutEdge<ILayoutNode>>(layoutEdges.Count);
+                Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout = new(layoutEdges.Count);
                 foreach (LayoutGraphEdge<LayoutGraphNode> le in layoutEdges)
                 {
-                    EdgeLayouts[graph].Add(le.ItsEdge.ID, le);
+                    edgeLayout.Add(le.ItsEdge.ID, le);
                 }
+                EdgeLayouts.Add(edgeLayout);
             }
             return ToNodeIDLayout(layoutNodes.ToList<ILayoutNode>());
 
@@ -363,19 +372,6 @@ namespace SEE.Game
                 result[layoutNode.ID] = layoutNode;
             }
             return result;
-        }
-
-        /// <summary>
-        /// Retrieves the pre-computed stored layout for given <paramref name="graph"/>
-        /// in output parameter <paramref name="layout"/> if one can be found. If a
-        /// layout was actually found, true is returned; otherwise false.
-        /// </summary>
-        /// <param name="graph">the graph for which to determine the layout</param>
-        /// <param name="layout">the retrieved layout or null</param>
-        /// <returns>true if a layout could be found</returns>
-        public bool TryGetLayout(Graph graph, out Dictionary<string, ILayoutNode> layout)
-        {
-            return Layouts.TryGetValue(graph, out layout);
         }
 
         /// <summary>
@@ -405,7 +401,8 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Starts the animations to transition from the current to the next graph.
+        /// Starts the animations to transition from the <paramref name="current"/> graph
+        /// to the <paramref name="next"/> graph.
         /// </summary>
         /// <param name="current">the currently shown graph</param>
         /// <param name="next">the next graph to be shown</param>
@@ -413,7 +410,6 @@ namespace SEE.Game
         {
             current.AssertNotNull("current");
             next.AssertNotNull("next");
-
             if (IsStillAnimating)
             {
                 Debug.Log("Graph changes are blocked while animations are running.\n");
@@ -434,7 +430,7 @@ namespace SEE.Game
 
             IsStillAnimating = true;
             // First remove all markings of the previous animation cycle.
-            marker.Clear();
+            markerFactory.Clear();
             Phase1RemoveDeletedGraphElements(current, next);
         }
 
@@ -522,8 +518,10 @@ namespace SEE.Game
         /// <param name="next">the next graph to be drawn</param>
         private void Phase2AddNewAndExistingGraphElements(LaidOutGraph next)
         {
-            /// We need to assign _nextCity because the callbacks <see cref="RenderPlane"/>
-            /// and <see cref="RenderNode(Node)"/> will access it.
+            /// We need to assign nextCity because the callbacks <see cref="RenderPlane"/>
+            /// and <see cref="RenderNode(Node)"/> will access it. More precisely,
+            /// <see cref="RenderNode(Node)"/> uses <see cref="NextLayoutToBeShown"/>
+            /// which in turn uses <see cref="nextCity"/>.
             nextCity = next;
 
             // Edge Animation must be set up before node animation because it
@@ -688,11 +686,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Current graph revision counter
-        /// </summary>
-        private int currentGraphRevisionCounter;
-
-        /// <summary>
         /// Event function triggered when all animations are finished. Animates the transition of the edges
         /// and renders all edges as new and notifies everyone that the animation is finished.
         ///
@@ -702,7 +695,7 @@ namespace SEE.Game
         private void OnAnimationsFinished()
         {
             NodeChangesBuffer nodeChangesBuffer = NodeChangesBuffer.GetSingleton();
-            nodeChangesBuffer.currentRevisionCounter = currentGraphRevisionCounter;
+            nodeChangesBuffer.currentRevisionCounter = CurrentGraphIndex;
             nodeChangesBuffer.addedNodeIDsCache = new List<string>(nodeChangesBuffer.addedNodeIDs);
             nodeChangesBuffer.addedNodeIDs.Clear();
             nodeChangesBuffer.changedNodeIDsCache = new List<string>(nodeChangesBuffer.changedNodeIDs);
@@ -712,7 +705,6 @@ namespace SEE.Game
 
             UpdateGameNodeHierarchy();
             RenderPlane();
-            DestroyDeletedGraphElements();
 
             IsStillAnimating = false;
             AnimationFinishedEvent.Invoke();
@@ -784,7 +776,6 @@ namespace SEE.Game
         /// <param name="node">node to be displayed</param>
         private void IgnoreNode(Node node)
         {
-            // intentionally left blank
             phase2AnimationWatchDog.Finished();
         }
 
@@ -794,6 +785,7 @@ namespace SEE.Game
         /// <param name="graphNode">graph node to be displayed</param>
         private void RenderNode(Node graphNode)
         {
+            Debug.Log($"RenderNode({graphNode.ID} from {graphNode.ItsGraph.Name} loaded from {graphNode.ItsGraph.Path})\n");
             // The layout to be applied to graphNode
             ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.ID];
             // The game node representing the graphNode if there is any; null if there is none
@@ -841,7 +833,7 @@ namespace SEE.Game
             {
                 case Difference.Changed:
                     NodeChangesBuffer.GetSingleton().changedNodeIDs.Add(currentGameNode.name);
-                    marker.MarkChanged(currentGameNode);
+                    markerFactory.MarkChanged(currentGameNode);
                     // There is a change. It may or may not be the metric determining the style.
                     // We will not further check that and just call the following method.
                     // If there is no change, this method does not need to be called because then
@@ -851,7 +843,7 @@ namespace SEE.Game
                     break;
                 case Difference.Added:
                     NodeChangesBuffer.GetSingleton().addedNodeIDs.Add(currentGameNode.name);
-                    marker.MarkBorn(currentGameNode);
+                    markerFactory.MarkBorn(currentGameNode);
                     break;
             }
             // we want the animator to move each node separately, which is why we
@@ -866,6 +858,7 @@ namespace SEE.Game
             Action<float> onEdgeAnimationStart = null;
             if (edgeTweens.TryGetValue(graphNode, out Tween tween))
             {
+
                 onEdgeAnimationStart = duration => OnEdgeAnimationStart(tween, duration);
             }
             changeAndBirthAnimator.AnimateTo(gameObject: currentGameNode,
@@ -894,27 +887,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// The list of game nodes and edges that were removed from the current graph to the next
-        /// graph. They will need to be destroyed at the end of phase 1 (or at the beginning
-        /// of phase 2, respectively).
-        /// <seealso cref="DestroyDeletedGraphElements"/>.
-        /// </summary>
-        private readonly IList<GameObject> toBeDestroyed = new List<GameObject>();
-
-        /// <summary>
-        /// Destroys all game nodes and edges in <see cref="toBeDestroyed"/>. <see cref="toBeDestroyed"/>
-        /// will be cleared at the end.
-        /// </summary>
-        private void DestroyDeletedGraphElements()
-        {
-            foreach (GameObject gameObject in toBeDestroyed)
-            {
-                DestroyGameObject(gameObject);
-            }
-            toBeDestroyed.Clear();
-        }
-
-        /// <summary>
         /// Event function that destroys the given <paramref name="gameObject"/>.
         /// It will be called as a callback after the animation of a node to be
         /// removed has been finished.
@@ -923,15 +895,7 @@ namespace SEE.Game
         private void OnRemoveFinishedAnimation(object gameObject)
         {
             GameObject go = gameObject as GameObject;
-            /// The gameObject must not be destroyed immediately, because the animator still
-            /// accesses it. Therefore, we defer the destruction and just add it to
-            /// <see cref="toBeDestroyed"/>.
-            toBeDestroyed.Add(go);
-            /// We set the game object inactive. This will later be considered in
-            /// <see cref="CollectNodes(GameObject, Dictionary{Node, GameObject})"/>,
-            /// where inactive objects will be ignored (because they are considered
-            /// deleted).
-            go.SetActive(false);
+            Destroyer.Destroy(go);
             phase1AnimationWatchDog.Finished();
         }
 
@@ -946,11 +910,10 @@ namespace SEE.Game
         /// <param name="gameNode">new or existing game object representing a graph node</param>
         private void OnAnimationNodeAnimationFinished(object gameNode)
         {
-            phase2AnimationWatchDog.Finished();
             if (gameNode is GameObject go)
             {
                 graphRenderer.AdjustAntenna(go);
-                marker.AdjustMarkerY(go);
+                markerFactory.AdjustMarkerY(go);
 
                 if (go.transform.parent == null)
                 {
@@ -962,6 +925,7 @@ namespace SEE.Game
                     go.transform.SetParent(gameObject.transform);
                 }
             }
+            phase2AnimationWatchDog.Finished();
         }
 
         /// <summary>
@@ -1015,8 +979,10 @@ namespace SEE.Game
             if (objectManager.RemoveNode(node, out GameObject nodeObject))
             {
                 Assert.IsNotNull(nodeObject);
-                marker.MarkDead(nodeObject);
+                markerFactory.MarkDead(nodeObject);
                 AnimateToDeath(nodeObject);
+                // AnimateToDeath() will call phase1AnimationWatchDog.Finished();
+                // hence, we must not call it here.
             }
             else
             {
@@ -1051,6 +1017,8 @@ namespace SEE.Game
             if (edgesAreDrawn && objectManager.RemoveEdge(edge, out GameObject edgeObject))
             {
                 AnimateToDeath(edgeObject);
+                // AnimateToDeath() will call phase1AnimationWatchDog.Finished();
+                // hence, we must not call it here.
             }
             else
             {
@@ -1093,7 +1061,7 @@ namespace SEE.Game
         /// <summary>
         /// The index of the currently visualized graph.
         /// </summary>
-        private int currentGraphIndex;  // not serialized by Unity
+        private int currentGraphIndex = 0;  // not serialized by Unity
 
         /// <summary>
         /// Returns the index of the currently shown graph.
@@ -1111,7 +1079,7 @@ namespace SEE.Game
         /// <summary>
         /// An event fired when the view graph has changed.
         /// </summary>
-        private readonly UnityEvent shownGraphHasChangedEvent = new UnityEvent();
+        private readonly UnityEvent shownGraphHasChangedEvent = new();
 
         /// <summary>
         /// Whether the user has selected auto-play mode.
@@ -1196,7 +1164,7 @@ namespace SEE.Game
             }
             if (index < 0 || index >= GraphCount)
             {
-                Debug.LogErrorFormat("The value {0} is no valid index.\n", index);
+                Debug.LogError($"The value {index} is no valid index.\n");
                 return false;
             }
             if (HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph) && HasLaidOutGraph(index, out LaidOutGraph newGraph))
@@ -1207,7 +1175,7 @@ namespace SEE.Game
             }
             else
             {
-                Debug.LogErrorFormat("Could not retrieve a layout for graph with index {0}.\n", index);
+                Debug.LogError($"Could not retrieve a layout for graph with index {index}.\n");
                 return false;
             }
         }
@@ -1238,22 +1206,12 @@ namespace SEE.Game
                 Debug.LogError($"There is no graph available for graph with index {index}.\n");
                 return false;
             }
-            if (!TryGetLayout(graph, out Dictionary<string, ILayoutNode> nodeLayout) || nodeLayout == null)
-            {
-                Debug.LogError($"There is no layout available for graph with index {index}.\n");
-                return false;
-            }
+            Dictionary<string, ILayoutNode> nodeLayout = NodeLayouts[index];
+
             if (edgesAreDrawn)
             {
-                if (!EdgeLayouts.TryGetValue(graph, out Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout) )
-                {
-                    Debug.LogError($"There is no edge layout available for graph with index {index}.\n");
-                    return false;
-                }
-                else
-                {
-                    laidOutGraph = new LaidOutGraph(graph, nodeLayout, edgeLayout);
-                }
+                Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout = EdgeLayouts[index];
+                laidOutGraph = new LaidOutGraph(graph, nodeLayout, edgeLayout);
             }
             else
             {
@@ -1295,7 +1253,7 @@ namespace SEE.Game
         /// <returns>true iff we are not at the end of the graph series</returns>
         private bool ShowNextIfPossible()
         {
-            if (currentGraphIndex == graphs.Count - 1)
+            if (CurrentGraphIndex == graphs.Count - 1)
             {
                 return false;
             }
@@ -1304,7 +1262,6 @@ namespace SEE.Game
             if (HasCurrentLaidOutGraph(out LaidOutGraph newlyShownGraph) &&
                 HasLaidOutGraph(CurrentGraphIndex - 1, out LaidOutGraph currentlyShownGraph))
             {
-                currentGraphRevisionCounter++;
                 NodeChangesBuffer.GetSingleton().revisionChanged = true;
                 // Note: newlyShownGraph is the very next future of currentlyShownGraph
                 TransitionToNextGraph(currentlyShownGraph, newlyShownGraph);
@@ -1335,7 +1292,6 @@ namespace SEE.Game
             if (HasCurrentLaidOutGraph(out LaidOutGraph newlyShownGraph) &&
                 HasLaidOutGraph(CurrentGraphIndex + 1, out LaidOutGraph currentlyShownGraph))
             {
-                currentGraphRevisionCounter--;
                 NodeChangesBuffer.GetSingleton().revisionChanged = true;
                 // Note: newlyShownGraph is the most recent past of currentlyShownGraph
                 TransitionToNextGraph(currentlyShownGraph, newlyShownGraph);
