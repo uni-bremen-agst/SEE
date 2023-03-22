@@ -1,9 +1,10 @@
 using System;
+using System.Collections.Generic;
 using SEE.Game.UI.Window;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace SEE.Game.UI.LiveDocumantation
 {
@@ -19,11 +20,15 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         private const string PREFAB_NAME = "Prefabs/UI/LiveDocumentation/LiveDocumentation";
 
+        private const string ClassDocumentationPath = "Content/ClassDocumentation/Viewport/Content/ClassDoc";
+        private const string ClassMemberListPath = "Content/ClassMembers/Scroll Area/List";
+
         /// <summary>
         /// Text mesh for the (shortened) class name
         /// </summary>
         private TextMeshProUGUI ClassNameField;
 
+        private GameObject ClassMembersList;
 
         /// <summary>
         /// Text mesh for the class documentation
@@ -32,11 +37,10 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         private TextMeshProUGUI ClassDocumentation;
 
-        private const string ClassDocumentationPath = "Content/ClassDocumentation/Viewport/Content/ClassDoc";
 
         public Camera Camera;
 
-  
+
         /// <summary>
         /// The name of the class
         /// </summary>
@@ -48,12 +52,30 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         public LiveDocumentationBuffer DocumentationBuffer { get; set; }
 
+        public IList<LiveDocumentationBuffer> ClassMembers { get; set; }
+
 
         /// <summary>
         /// Checks if all the necessary fields are set in the class
         /// </summary>
         /// <returns>Returns true when all fields are set. Otherwise false</returns>
         private bool CheckNecessaryFields() => ClassName != null;
+
+        private void AddClassMember(LiveDocumentationBuffer buffer)
+        {
+            GameObject classMem = new GameObject();
+            classMem.name = "Item";
+            classMem.AddComponent<CanvasRenderer>();
+            RectTransform rt = classMem.AddComponent<RectTransform>();
+            ClassMember cm = classMem.AddComponent<ClassMember>();
+            cm.Text = buffer.PrintBuffer();
+
+
+            classMem.transform.parent = ClassMembersList.transform;
+            rt.localScale = new Vector3(1, 1, 1);
+            rt.anchorMin = new Vector2(0, 1);
+            rt.anchorMax = new Vector2(0, 1);
+        }
 
         protected override void StartDesktop()
         {
@@ -73,6 +95,7 @@ namespace SEE.Game.UI.LiveDocumantation
             Window.transform.Find("Dragger/Title").gameObject.GetComponent<TextMeshProUGUI>().text =
                 "LiveDocumentation";
 
+
             // Initializing Unity Components 
             ClassNameField = livedoc.transform.Find("Content/ClassName").gameObject
                 .GetComponent<TextMeshProUGUI>();
@@ -81,11 +104,22 @@ namespace SEE.Game.UI.LiveDocumantation
                 livedoc.transform.Find(ClassDocumentationPath).gameObject.GetComponent<TextMeshProUGUI>();
 
 
+            ClassMembersList = livedoc.transform.Find(ClassMemberListPath).gameObject;
+
             // Setting the classname.
             ClassNameField.text = ClassName;
             ClassDocumentation.text = DocumentationBuffer.PrintBuffer();
-            
+
+
+            //     GameObject livedoc =
+            //         PrefabInstantiator.InstantiatePrefab("Prefabs/UI/LiveDocumentation/ClassMember", ClassMembers.transform, false);
+
             ClassDocumentation.ForceMeshUpdate();
+
+            foreach (var item in ClassMembers)
+            {
+                AddClassMember(item);
+            }
         }
 
 
@@ -122,16 +156,12 @@ namespace SEE.Game.UI.LiveDocumantation
             if (Input.GetMouseButtonDown(0))
             {
                 int link = TMP_TextUtilities.FindIntersectingLink(ClassDocumentation, Input.mousePosition, null);
-                
+
                 if (link != -1)
                 {
                     string linkId = ClassDocumentation.textInfo.linkInfo[link].GetLinkID()[0].ToString();
-                    
                 }
-
             }
         }
-
-
     }
 }

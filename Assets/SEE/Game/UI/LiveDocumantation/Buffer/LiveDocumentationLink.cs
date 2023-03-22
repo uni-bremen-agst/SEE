@@ -30,7 +30,7 @@ namespace SEE.Game.UI.LiveDocumantation
         /// <returns></returns>
         public string GetPrintableText()
         {
-            return $"<link=\"{this.TargetPath}\"> <color=\"#0000FF\">{this.LinkName}</color></link>";
+            return $"<link=\"{this.TargetPath}\"> <color=#0000FF>{this.LinkName}</color></link>";
         }
     }
 }
