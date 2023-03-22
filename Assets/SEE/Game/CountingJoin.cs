@@ -1,4 +1,6 @@
-﻿namespace SEE.Game
+﻿using UnityEngine;
+
+namespace SEE.Game
 {
     /// <summary>
     /// An execution join awaiting a given number of events until execution can continue.
@@ -19,6 +21,11 @@
         {
             outstandingEvents = expectedNumberOfEvents;
         }
+
+        /// <summary>
+        /// Name of this <see cref="CountingJoin"/>. Can be used for debugging.
+        /// </summary>
+        protected abstract string Name { get; }
 
         /// <summary>
         /// Signals this <see cref="CountingJoin"/> that one awaited event has occurred.

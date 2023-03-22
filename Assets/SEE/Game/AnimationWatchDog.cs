@@ -38,6 +38,8 @@ namespace SEE.Game
         /// </summary>
         private class Phase1AnimationWatchDog : AnimationWatchDog
         {
+            protected override string Name { get => nameof(Phase1AnimationWatchDog); }
+
             /// <summary>
             /// The next graph to be shown.
             /// </summary>
@@ -62,6 +64,7 @@ namespace SEE.Game
             /// <param name="numberOfAnimations">the number of animations to be awaited</param>
             public void Await(int numberOfAnimations, LaidOutGraph next)
             {
+                this.next = next;
                 Await(numberOfAnimations);
             }
 
@@ -96,6 +99,8 @@ namespace SEE.Game
         /// </summary>
         private class Phase2AnimationWatchDog : AnimationWatchDog
         {
+            protected override string Name { get => nameof(Phase2AnimationWatchDog); }
+
             /// <summary>
             /// Constructor setting the <see cref="EvolutionRenderer"/> whose method should
             /// be called when there are no more outstanding animations. The number of
