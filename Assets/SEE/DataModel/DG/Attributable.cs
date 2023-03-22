@@ -48,7 +48,7 @@ namespace SEE.DataModel.DG
         /// The version of this <see cref="Attributable"/>.
         /// </summary>
         public Guid version { get; private set; } = Guid.Empty;
-        
+
         /// <summary>
         /// Unit type consisting of a single value.
         /// </summary>
@@ -324,7 +324,7 @@ namespace SEE.DataModel.DG
         /// <typeparam name="V">any kind of type for a dictionary value</typeparam>
         /// <param name="left">left dictionary for the comparison</param>
         /// <param name="right">right dictionary for the comparison</param>
-        /// <returns></returns>
+        /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are equal</returns>
         protected static bool AreEqual<V>(Dictionary<string, V> left, Dictionary<string, V> right)
         {
             return left.Count == right.Count && !left.Except(right).Any();
