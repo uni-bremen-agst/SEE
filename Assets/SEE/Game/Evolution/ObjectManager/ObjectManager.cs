@@ -231,21 +231,31 @@ namespace SEE.Game.Evolution
                 // put all game edges into the cache 'edges' (if not already present) and find `gameEdge'.
                 foreach (GameObject newGameEdge in graphRenderer.EdgeLayout(gameNodes, city, false))
                 {
-                    string id = newGameEdge.GetComponent<EdgeRef>().Value.ID;
-                    if (edges.ContainsKey(id))
+                    string edgeID = newGameEdge.GetComponent<EdgeRef>().Value.ID;
+                    if (edges.ContainsKey(edgeID))
                     {
                         // Edge object has already been created in previous call.
                         Destroyer.Destroy(newGameEdge);
                     }
                     else
                     {
+                        // FIXME: Why is the renderer disabled? Likely, because all edges
+                        // will be re-drawn after the animations have finished.
                         newGameEdge.SetActive(false); // Disable renderer
-                        edges.Add(id, newGameEdge);
+                        edges.Add(edgeID, newGameEdge);
                         // FIXME (@koschke): This should be rewritten so that the GraphElementIDMap isn't called here.
                         //                   That part should be handled by GraphRenderer.CreateGameNode.
                         GraphElementIDMap.Add(newGameEdge);
+                        // We meed to set the portal ourselves. The portal cannot be derived from
+                        // SceneQueries.GetCityRootNode(city) because the nodes are not yet
+                        // children of the city. The node hierarchy will be established only at
+                        // the end of an animation cycle.
+                        Portal.GetDimensions(city, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
+                        Portal.SetPortal(newGameEdge, leftFrontCorner, rightBackCorner);
                     }
-                    if (id == edge.ID)
+                    // FIXME: if edges.ContainsKey(edgeID), newGameEdge will be destroyed.
+                    // How can we then assign newGameEdge to gameEdge?
+                    if (edgeID == edge.ID)
                     {
                         gameEdge = newGameEdge;
                     }
