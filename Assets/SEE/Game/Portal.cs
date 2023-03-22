@@ -120,7 +120,7 @@ namespace SEE.Game
             }
             else
             {
-                Debug.LogWarning($"Game object {gameObject.name} has no GO.Plane.\n");
+                Debug.LogWarning($"Game object {gameObject.name} has no {nameof(GO.Plane)}.\n");
                 leftFrontCorner = Vector2.zero;
                 rightBackCorner = Vector2.zero;
             }
