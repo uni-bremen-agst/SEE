@@ -20,8 +20,8 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         private const string PREFAB_NAME = "Prefabs/UI/LiveDocumentation/LiveDocumentation";
 
-        private const string ClassDocumentationPath = "Content/ClassDocumentation/Viewport/Content/ClassDoc";
-        private const string ClassMemberListPath = "Content/ClassMembers/Scroll Area/List";
+        private const string ClassDocumentationPath = "ClassDocumentation/Viewport/Content/ClassDoc";
+        private const string ClassMemberListPath = "ClassMembers/Scroll Area/List";
 
         /// <summary>
         /// Text mesh for the (shortened) class name
@@ -61,16 +61,28 @@ namespace SEE.Game.UI.LiveDocumantation
         /// <returns>Returns true when all fields are set. Otherwise false</returns>
         private bool CheckNecessaryFields() => ClassName != null;
 
+        /// <summary>
+        /// Adds a new Class member to the ClassMember section in the LiveDocumentation Window.
+        ///
+        /// Currently ClassMembers are represented by a <see cref="LiveDocumentationBuffer"/>.
+        /// In this buffer all information and links of the method signature is stored. 
+        /// </summary>
+        /// <param name="buffer"></param>
         private void AddClassMember(LiveDocumentationBuffer buffer)
         {
+            // Creating a new GameObject and naming it
             GameObject classMem = new GameObject();
             classMem.name = "Item";
+
+            // Adding some other Components
             classMem.AddComponent<CanvasRenderer>();
             RectTransform rt = classMem.AddComponent<RectTransform>();
+
+            //Adding the ClassMember component
             ClassMember cm = classMem.AddComponent<ClassMember>();
             cm.Text = buffer.PrintBuffer();
 
-
+            // Setting the correct anchor point for the new game object 
             classMem.transform.parent = ClassMembersList.transform;
             rt.localScale = new Vector3(1, 1, 1);
             rt.anchorMin = new Vector2(0, 1);
