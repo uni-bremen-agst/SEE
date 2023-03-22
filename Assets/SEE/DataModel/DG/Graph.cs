@@ -14,10 +14,10 @@ namespace SEE.DataModel.DG
     public class Graph : Attributable
     {
         // The list of graph nodes indexed by their unique IDs
-        private Dictionary<string, Node> nodes = new Dictionary<string, Node>();
+        private Dictionary<string, Node> nodes = new();
 
         // The list of graph edges indexed by their unique IDs.
-        private Dictionary<string, Edge> edges = new Dictionary<string, Edge>();
+        private Dictionary<string, Edge> edges = new();
 
         /// <summary>
         /// Name of the artificial node type used for artificial root nodes added
@@ -218,7 +218,7 @@ namespace SEE.DataModel.DG
             /// </summary>
             /// <param name="children">children to be re-parented</param>
             /// <param name="parent">new parent of <see cref="children"/></param>
-            void Reparent(IEnumerable<Node> children, Node parent)
+            static void Reparent(IEnumerable<Node> children, Node parent)
             {
                 foreach (Node child in children)
                 {
@@ -342,7 +342,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         public virtual Edge AddEdge(Node from, Node to, string type)
         {
-            Edge edge = new Edge(from, to, type);
+            Edge edge = new(from, to, type);
             AddEdge(edge);
             return edge;
         }
@@ -761,6 +761,7 @@ namespace SEE.DataModel.DG
             string result = "{\n";
             result += " \"kind\": graph,\n";
             result += $" \"name\": \"{Name}\",\n";
+            result += $" \"path\": \"{Path}\",\n";
             // its own attributes
             result += base.ToString();
             // its nodes
@@ -1351,73 +1352,14 @@ namespace SEE.DataModel.DG
         /// Returns true if <paramref name="other"/> meets all of the following
         /// conditions:
         ///  (1) is not null
-        ///  (2) has exactly the same C# type
-        ///  (3) has exactly the same attributes with exactly the same values
-        ///  (4) has the same path
-        ///  (5) has the same graph name
-        ///  (6) has the same number of nodes and the sets of nodes are equal
-        ///  (7) has the same number of edges and the sets of edges are equal
-        ///  (8) has the same node hierarchy
-        ///
-        /// Note: This node and the other node may or may not be in the same graph.
+        ///  (2) has exactly the same C# type as this graph
+        ///  (3) has exactly the same Name and Path as this graph
         /// </summary>
         /// <param name="other">to be compared to</param>
         /// <returns>true if equal</returns>
         public override bool Equals(object other)
         {
-            if (!base.Equals(other))
-            {
-                Graph otherNode = other as Graph;
-                if (other != null)
-                {
-                    Report($"Graphs {Name} {otherNode?.Name} have differences");
-                }
-
-                return false;
-            }
-
-            Graph otherGraph = other as Graph;
-            Assert.IsNotNull(otherGraph);
-            if (Path != otherGraph.Path)
-            {
-                Report("Graph paths are different");
-                return false;
-            }
-
-            if (Name != otherGraph.Name)
-            {
-                Report("Graph names are different");
-                return false;
-            }
-
-            if (NodeCount != otherGraph.NodeCount)
-            {
-                Report("Number of nodes are different");
-                return false;
-            }
-
-            if (!AreEqual(nodes, otherGraph.nodes))
-            {
-                // Note: because the Equals operation for nodes checks also the ID
-                // of the node's parents and children, we will also implicitly check the
-                // node hierarchy.
-                Report("Graph nodes are different");
-                return false;
-            }
-
-            if (edges.Count != otherGraph.edges.Count)
-            {
-                Report("Number of edges are different");
-                return false;
-            }
-
-            bool equal = AreEqual(edges, otherGraph.edges);
-            if (!equal)
-            {
-                Report("Graph edges are different");
-            }
-
-            return true;
+            return (other is Graph otherGraph) && (Name == otherGraph.Name) && (Path == otherGraph.Path);
         }
 
         /// <summary>
@@ -1426,8 +1368,7 @@ namespace SEE.DataModel.DG
         /// <returns>hash code</returns>
         public override int GetHashCode()
         {
-            // we are using the viewName which is intended to be unique
-            return Name.GetHashCode();
+            return HashCode.Combine(Name, Path);
         }
 
         /// <summary>
