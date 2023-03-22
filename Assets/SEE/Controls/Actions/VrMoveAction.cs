@@ -11,6 +11,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GrabbedObject grabbedObject;
 
+        private bool IsGrabbing = false;
+
         internal static ReversibleAction CreateReversibleAction() => new VrMoveAction(); // obsolete?
 
         public override ReversibleAction NewInstance() => new VrMoveAction();
@@ -18,6 +20,18 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             throw new System.NotImplementedException();
+        }
+
+        /// <summary>
+        /// Returns true if the user is currently grabbing.
+        /// </summary>
+        /// <returns>true if user is grabbing</returns>
+        private static bool UserIsGrabbing()
+        {
+            // Index of the left mouse button.
+            const int LeftMouseButton = 0;
+            // FIXME: We need a VR interaction, too.
+            return Input.GetMouseButton(LeftMouseButton);
         }
 
         /// <summary>
@@ -32,7 +46,6 @@ namespace SEE.Controls.Actions
         {
             throw new System.NotImplementedException();
         }
-
 
         /// <summary>
         /// Returns the set of IDs of all game objects changed by this action.

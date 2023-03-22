@@ -479,8 +479,5 @@ namespace SEE.Controls.Actions
         /// an object.
         /// </summary>
         public float distanceToUser { get; set; }
-
-
-
     }
 }

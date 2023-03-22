@@ -4,6 +4,11 @@ using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.GO;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
+using UnityEngine.XR;
+using Hand = UnityEngine.XR.Hand;
+
 //using Valve.VR.InteractionSystem;
 
 namespace SEE.Game
@@ -44,7 +49,12 @@ namespace SEE.Game
                 gameObject.AddComponentIfNecessary<ShowLabel>();
                 gameObject.AddComponentIfNecessary<ShowEdges>();
                 gameObject.AddComponentIfNecessary<HighlightErosion>();
+                setupRigidbody();
+                setupGrabbable();
+            }
 
+            void setupRigidbody()
+            {
                 // Add AutoHand related components
                 Rigidbody rigidbody = gameObject.AddOrGetComponent<Rigidbody>();
                 rigidbody.useGravity = false; // No gravity
@@ -58,18 +68,23 @@ namespace SEE.Game
                 rigidbody.drag = 20;
                 rigidbody.angularDrag = 2;
                 rigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
+            }
 
-                Grabbable grabable = gameObject.AddOrGetComponent<Grabbable>();
+            void setupGrabbable()
+            {
+                Grabbable grabbable = gameObject.AddOrGetComponent<Grabbable>();
 
-                grabable.allowHeldSwapping = true;
-                grabable.heldNoFriction = true;
-                grabable.parentOnGrab = true;
+                gameObject.AddOrGetComponent<VrActions>();
 
-                grabable.throwPower = 1;
-                grabable.jointBreakForce = 2500;
+                grabbable.allowHeldSwapping = true;
+                grabbable.heldNoFriction = true;
+                grabbable.parentOnGrab = true;
+
+                grabbable.throwPower = 1;
+                grabbable.jointBreakForce = 2500;
 
                 Material mat = Resources.Load<Material>("Materials/HighlightMaterial/Highlight");
-                grabable.hightlightMaterial = mat;
+                grabbable.hightlightMaterial = mat;
             }
         }
 

@@ -19,6 +19,7 @@ namespace SEE.Controls.Actions
             grabbableExtraEvents.OnLastRelease.AddListener(OnLastRelease);
         }
 
+        //FIXME
         private void OnFirstGrab(Hand hand, Grabbable grabbable)
         {
             Debug.LogWarning("first grab");
@@ -29,6 +30,5 @@ namespace SEE.Controls.Actions
         {
             Debug.LogWarning("last release");
         }
-
     }
 }
