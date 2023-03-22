@@ -629,7 +629,7 @@ namespace SEE.Game
         /// <param name="nodeMap">mapping of graph nodes onto their corresponding game nodes</param>
         private static void Check(Dictionary<Node, GameObject> nodeMap)
         {
-            HashSet<Graph> graphs = new HashSet<Graph>();
+            HashSet<Graph> graphs = new();
 
             foreach (GameObject go in nodeMap.Values)
             {
@@ -785,7 +785,6 @@ namespace SEE.Game
         /// <param name="graphNode">graph node to be displayed</param>
         private void RenderNode(Node graphNode)
         {
-            Debug.Log($"RenderNode({graphNode.ID} from {graphNode.ItsGraph.Name} loaded from {graphNode.ItsGraph.Path})\n");
             // The layout to be applied to graphNode
             ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.ID];
             // The game node representing the graphNode if there is any; null if there is none
@@ -846,19 +845,18 @@ namespace SEE.Game
                     markerFactory.MarkBorn(currentGameNode);
                     break;
             }
-            // we want the animator to move each node separately, which is why we
+            // We want the animator to move each node separately, which is why we
             // remove each from the hierarchy; later the node hierarchy will be
-            // re-established
-            // FIXME: Should the following line be removed and RemoveFromNodeHierarchy() be
-            // re-enabled?
+            // re-established. It still needs to be a child of the code city,
+            // however, because methods called in the course of the animation
+            // will try to retrieve the code city from the game node.
             currentGameNode.transform.SetParent(gameObject.transform);
-            //RemoveFromNodeHierarchy(currentGameNode);
 
             // currentGameNode is shifted to its new position through the animator.
             Action<float> onEdgeAnimationStart = null;
             if (edgeTweens.TryGetValue(graphNode, out Tween tween))
             {
-
+                Debug.Log($"onEdgeAnimationStart set for {graphNode.ID} {currentGameNode.name}\n");
                 onEdgeAnimationStart = duration => OnEdgeAnimationStart(tween, duration);
             }
             changeAndBirthAnimator.AnimateTo(gameObject: currentGameNode,
@@ -868,30 +866,11 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Removes <paramref name="currentGameNode"/> from the game-object hierarchy,
-        /// that is, its parent will be set to <code>null</code> and all its immediate
-        /// children tagged by <see cref="Tags.Node"/> will no longer be its children,
-        /// that is, their parent is set to <code>null</code>, too.
-        /// </summary>
-        /// <param name="currentGameNode">a game node to be removed from the game-object hierarchy</param>
-        private static void RemoveFromNodeHierarchy(GameObject currentGameNode)
-        {
-            currentGameNode.transform.SetParent(null);
-            foreach (Transform child in currentGameNode.transform)
-            {
-                if (child.CompareTag(Tags.Node))
-                {
-                    child.SetParent(null);
-                }
-            }
-        }
-
-        /// <summary>
         /// Event function that destroys the given <paramref name="gameObject"/>.
-        /// It will be called as a callback after the animation of a node to be
+        /// It will be called as a callback after the animation of a node or edge to be
         /// removed has been finished.
         /// </summary>
-        /// <param name="gameObject">game object to be destroyed</param>
+        /// <param name="gameObject">game object to be destroyed (can be a node or edge)</param>
         private void OnRemoveFinishedAnimation(object gameObject)
         {
             GameObject go = gameObject as GameObject;
@@ -935,6 +914,7 @@ namespace SEE.Game
         /// <param name="duration">Duration of the animation</param>
         private void OnEdgeAnimationStart(Tween animatorTween, float duration)
         {
+            Debug.Log("OnEdgeAnimationStart\n");
             if (animatorTween != null)
             {
                 // We previously set the duration to 1 second and now want
@@ -1008,8 +988,9 @@ namespace SEE.Game
 
         /// <summary>
         /// Removes the given edge. The edge is not destroyed immediately, however.
-        /// Its destruction is postponed to <see cref="toBeDestroyed"/>. Yet, it is
-        /// set inactive here.
+        /// Its destruction is postponed by <see cref="AnimateToDeath(GameObject)"/>
+        /// to the point in time when the animation is finished in which case
+        /// <see cref="OnRemoveFinishedAnimation"/> will be called.
         /// </summary>
         /// <param name="edge">removed edge</param>
         private void RenderRemovedEdge(Edge edge)
