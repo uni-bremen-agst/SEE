@@ -65,7 +65,7 @@ namespace SEE.GO
         /// <summary>
         /// The list of beam markers added for the new game objects since the last call to Clear().
         /// </summary>
-        private readonly List<GameObject> beamMarkers = new List<GameObject>();
+        private readonly List<GameObject> beamMarkers = new();
 
         /// <summary>
         /// The factory to create beam markers above new blocks coming into existence.
@@ -116,7 +116,8 @@ namespace SEE.GO
 
         /// <summary>
         /// Marks the given <paramref name="gameNode"/> as by putting a beam marker
-        /// on top of its roof (including any of its children).
+        /// on top of its roof (including any of its children). The resulting
+        /// game object representing the marker is tagged by <see cref="Tags.Decoration"/>.
         /// </summary>
         /// <param name="gameNode">node above which to add a beam marker</param>
         /// <param name="factory">factory to create the beam marker</param>
@@ -127,6 +128,7 @@ namespace SEE.GO
             beamMarker.tag = Tags.Decoration;
             beamMarker.SetScale(markerScale);
             beamMarker.transform.SetParent(gameNode.transform);
+            Portal.InheritPortal(from: gameNode, to: beamMarker);
             PutAbove(gameNode, beamMarker);
             return beamMarker;
         }
@@ -179,8 +181,7 @@ namespace SEE.GO
         /// <param name="beamMarker">marker for <paramref name="gameNode"/></param>
         private static void PutAbove(GameObject gameNode, GameObject beamMarker)
         {
-            Vector3 position = gameNode.transform.position;
-            position.y = gameNode.GetMaxY();
+            Vector3 position = gameNode.GetRoofCenter();
             position.y += Gap + beamMarker.transform.lossyScale.y / 2;
             beamMarker.transform.position = position;
         }
@@ -197,13 +198,12 @@ namespace SEE.GO
                 if (child.CompareTag(Tags.Decoration)
                     && (child.name == ChangeMarkerName || child.name == BornMarkerName || child.name == DeadMarkerName))
                 {
-                    child.gameObject.SetScale(markerScale);
-                    /// We need to set the child inactive so that it will be ignored by
-                    /// <see cref="GameObjectExtensions.GetMaxY(GameObject)"/>, called in
-                    /// <see cref="PutAbove(GameObject, GameObject)"/>.
-                    child.gameObject.SetActive(false);
-                    PutAbove(gameNode, child.gameObject);
-                    child.gameObject.SetActive(true);
+                    GameObject marker = child.gameObject;
+                    // The scale of gameNode may have changed, but we want our markers to
+                    // have a world-space scale independent from its gameNode; hence,
+                    // we may need to re-set the scale again.
+                    marker.SetScale(markerScale);
+                    PutAbove(gameNode, marker);
                     break;
                 }
             }
