@@ -53,40 +53,8 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="layoutNodes">nodes to be laid out</param>
         /// <returns>treemap layout scaled in x and z axes</returns>
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(T, , int d, int c)
         {
-            layout_result = new Dictionary<ILayoutNode, NodeTransform>();
-
-            IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
-            switch (layoutNodeList.Count)
-            {
-                case 0:
-                    throw new ArgumentException("No nodes to be laid out.");
-                case 1:
-                {
-                    using IEnumerator<ILayoutNode> enumerator = layoutNodeList.GetEnumerator();
-                    if (enumerator.MoveNext())
-                    {
-                        // MoveNext() must be called before we can call Current.
-                        ILayoutNode gameNode = enumerator.Current;
-                        UnityEngine.Assertions.Assert.AreEqual(gameNode.AbsoluteScale, gameNode.LocalScale);
-                        layout_result[gameNode] = new NodeTransform(Vector3.zero,
-                            new Vector3(width, gameNode.LocalScale.y, depth));
-                    }
-                    else
-                    {
-                        Assert.IsTrue(false, "We should never arrive here.\n");
-                    }
-
-                    break;
-                }
-                default:
-                    roots = LayoutNodes.GetRoots(layoutNodeList);
-                    CalculateSize();
-                    CalculateLayout();
-                    break;
-            }
-
             return layout_result;
         }
 
@@ -98,23 +66,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private void CalculateLayout()
         {
-            /// Our "logical" rectangle in which to put the whole treemap is assumed to have its
-            /// center at Vector3.zero here. <see cref="CalculateLayout(ICollection{ILayoutNode}, float, float, float, float)"/>
-            /// assumes the rectangle's location be specified by its left front corner.
-            /// Hence, we need to transform the center of the "logical" rectangle to the left front
-            /// corner of the rectangle by -width/2 and -depth/2, respectively.
-            if (roots.Count == 1)
-            {
-                ILayoutNode root = roots[0];
-                Assert.AreEqual(root.AbsoluteScale, root.LocalScale);
-                layout_result[root] = new NodeTransform(Vector3.zero,
-                                                        new Vector3(width, root.LocalScale.y, depth));
-                CalculateLayout(root.Children(), x: -width / 2.0f, z: -depth / 2.0f, width, depth);
-            }
-            else
-            {
-                CalculateLayout(roots, x: -width / 2.0f, z: -depth / 2.0f, width, depth);
-            }
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -130,27 +82,7 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="depth">depth of the rectangle in which to fit the nodes</param>
         private void CalculateLayout(ICollection<ILayoutNode> siblings, float x, float z, float width, float depth)
         {
-            List<RectangleTiling.NodeSize> sizes = GetSizes(siblings);
-            float padding = Padding(width, depth);
-            List<RectangleTiling.Rectangle> rects = RectangleTiling.SquarifiedLayoutWithPadding(sizes, x, z, width, depth, padding);
-            AddToLayout(sizes, rects);
-
-            foreach (ILayoutNode node in siblings)
-            {
-                ICollection<ILayoutNode> children = node.Children();
-                if (children.Count > 0)
-                {
-                    // Note: nodeTransform.position is the center position, while
-                    // CalculateLayout assumes co-ordinates x and z as the left front corner
-                    Assert.AreEqual(node.AbsoluteScale, node.LocalScale);
-                    NodeTransform nodeTransform = layout_result[node];
-                    CalculateLayout(children,
-                                    nodeTransform.position.x - nodeTransform.scale.x / 2.0f,
-                                    nodeTransform.position.z - nodeTransform.scale.z / 2.0f,
-                                    nodeTransform.scale.x,
-                                    nodeTransform.scale.z);
-                }
-            }
+            throw new NotImplementedException();
         }
 
         /// <summary>
