@@ -16,27 +16,32 @@ namespace SEE.Game
         /// <summary>
         /// If true, a label with the node's SourceName will be displayed above each node.
         /// </summary>
+        [Tooltip("Whether the label should be shown during hovering.")]
         public bool Show = true;
 
         /// <summary>
         /// The distance between the top of the node and its label.
         /// </summary>
+        [Tooltip("The distance between the top of the node and its label.")]
         public float Distance = 0.2f;
 
         /// <summary>
         /// The font size of the node's label.
         /// </summary>
+        [Tooltip("The font size of the label.")]
         public float FontSize = 0.4f;
 
         /// <summary>
         /// How many seconds the label should take to (dis)appear.
         /// </summary>
+        [Tooltip("How many seconds the label should take to (dis)appear.")]
         public float AnimationDuration = 0.5f;
 
         /// <summary>
         /// The alpha value of the label.
         /// </summary>
         [Range(0f, 1f)]
+        [Tooltip("The alpha value (degree of transparency) of the label.")]
         public float LabelAlpha = 1f;
 
         private const string ShowLabel = "Show";

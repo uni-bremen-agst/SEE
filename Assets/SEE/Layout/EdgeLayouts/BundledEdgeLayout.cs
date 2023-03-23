@@ -9,38 +9,28 @@ using UnityEngine.Assertions;
 namespace SEE.Layout.EdgeLayouts
 {
     /// <summary>
-    /// Draws edges as hierarchically bundled edges. 
-    /// 
-    /// See D. Holten, "Hierarchical Edge Bundles: Visualization of Adjacency Relations in Hierarchical Data" 
+    /// Draws edges as hierarchically bundled edges.
+    ///
+    /// See D. Holten, "Hierarchical Edge Bundles: Visualization of Adjacency Relations in Hierarchical Data"
     /// in IEEE Transactions on Visualization and Computer Graphics, vol. 12, no. 5, pp. 741-748, Sept.-Oct. 2006.
     /// </summary>
-    public class BundledEdgeLayout : IEdgeLayout
+    public class BundledEdgeLayout : CurvyEdgeLayoutBase
     {
         /// <summary>
         /// Constructor.
-        /// 
-        /// Parameter <paramref name="tension"/> specifies the degree of bundling. A value of 
+        ///
+        /// Parameter <paramref name="tension"/> specifies the degree of bundling. A value of
         /// zero means no bundling at all; the maximal value of 1 means maximal bundling.
-        /// 
-        /// Parameter <paramref name="rdp"/> specifies the extent the polylines of the generated
-        /// splines are simplified. Neighboring line points whose distances fall below 
-        /// <paramref name="rdp"/> (with respect to the line drawn between their neighbors) will 
-        /// be removed. The greater the value is, the more aggressively points are removed 
-        /// (note: values greater than one are fine). A positive value close to zero results 
-        /// in a line with little to no reduction. A negative value is treated as 0. A value 
-        /// of zero has no effect.
         /// </summary>
         /// <param name="edgesAboveBlocks">if true, edges are drawn above nodes, otherwise below</param>
         /// <param name="minLevelDistance">the minimal distance between different edge levels</param>
         /// <param name="tension">strength of the tension for bundling edges; must be in the range [0,1]</param>
-        /// <param name="rdp">epsilon parameter of the Ramer–Douglas–Peucker algorithm</param>
-        public BundledEdgeLayout(bool edgesAboveBlocks, float minLevelDistance, float tension = 0.85f, float rdp = 0.0f)
+        public BundledEdgeLayout(bool edgesAboveBlocks, float minLevelDistance, float tension = 0.85f)
             : base(edgesAboveBlocks, minLevelDistance)
         {
             name = "Hierarchically Bundled";
             Debug.Assert(0.0f <= tension && tension <= 1.0f);
             this.tension = tension;
-            this.rdp = rdp;
             levelDistance = minLevelDistance;
         }
 
@@ -49,16 +39,6 @@ namespace SEE.Layout.EdgeLayouts
         /// range from 0.0 (straight lines) to 1.0 (maximal bundling along the spline).
         /// </summary>
         private readonly float tension = 0.85f; // 0.85 is the value recommended by Holten
-
-        /// <summary>
-        /// Determines to which extent the polylines of the generated splines are simplified.
-        /// Neighboring line points whose distances fall below rdp (with respect to the line 
-        /// drawn between their neighbors) will be removed. The greater the value is, the more 
-        /// aggressively points are removed (note: values greater than one are fine). A positive 
-        /// value close to zero results in a line with little to no reduction. A negative value 
-        /// is treated as 0. A value of zero has no effect.
-        /// </summary>
-        private readonly float rdp = 0.0f; // 0.0f means no simplification
 
         /// <summary>
         /// The number of Unity units per level of the hierarchy for the height of control points.
@@ -71,10 +51,10 @@ namespace SEE.Layout.EdgeLayouts
         /// <summary>
         /// The minimal/maximal y co-ordinate for all hierarchical control points at level 2 and above.
         /// Control points at level 0 (self loops) will be handled separately: self loops will be
-        /// drawn from corner to corner on the roof or ground, respectively, depending upon 
+        /// drawn from corner to corner on the roof or ground, respectively, depending upon
         /// edgesAboveBlocks. Likewise, edges for nodes that are siblings in the hierarchy will be
         /// drawn as simple splines from roof to roof or ground to ground of the two blocks, respectively,
-        /// on their shortest path. The y co-ordinate of inner control points of all other edges will be 
+        /// on their shortest path. The y co-ordinate of inner control points of all other edges will be
         /// at levelOffset or above/below. See GetLevelHeight() for more details.
         /// </summary>
         private float levelOffset = 0.0f;
@@ -83,11 +63,11 @@ namespace SEE.Layout.EdgeLayouts
         /// Adds way points to the given <paramref name="edges"/> along hierarchically
         /// bundled splines.
         /// The <paramref name="edges"/> are assumed to be in between pairs of nodes in
-        /// the given set of <paramref name="nodes"/>. Because this is a hierarchical edge 
+        /// the given set of <paramref name="nodes"/>. Because this is a hierarchical edge
         /// layout,  <paramref name="nodes"/> must include all ancestors for all nodes that are
         /// source or target of any edge in the given set of <paramref name="edges"/>.
         /// </summary>
-        /// <param name="nodes">nodes whose edges are to be drawn or which are 
+        /// <param name="nodes">nodes whose edges are to be drawn or which are
         /// ancestors of any nodes whose edges are to be drawn</param>
         /// <param name="edges">edges for which to add way points</param>
         public override void Create<T>(IEnumerable<T> nodes, IEnumerable<ILayoutEdge<T>> edges)
@@ -120,7 +100,7 @@ namespace SEE.Layout.EdgeLayouts
         private int maxLevel = 0;
 
         /// <summary>
-        /// Returns the maximal tree level of the given <paramref name="nodes"/>, that is, the 
+        /// Returns the maximal tree level of the given <paramref name="nodes"/>, that is, the
         /// longest path from a leaf to any node in <paramref name="nodes"/>.
         /// </summary>
         /// <param name="nodes">nodes whose maximal level is to be determined</param>
@@ -144,7 +124,7 @@ namespace SEE.Layout.EdgeLayouts
         }
 
         /// <summary>
-        /// Returns the path from <paramref name="child"/> to <paramref name="child"/> in the 
+        /// Returns the path from <paramref name="child"/> to <paramref name="child"/> in the
         /// node hierarchy including the child and the ancestor.
         /// Assertations on result: path[0] = child and path[path.Length-1] = ancestor.
         /// If child = ancestor, path[0] = child = path[path.Length-1] = ancestor.
@@ -180,20 +160,20 @@ namespace SEE.Layout.EdgeLayouts
         /// <summary>
         /// Creates a spline along the node hierarchy. The path of the
         /// spline is determined as follows:
-        /// 
+        ///
         /// If <paramref name="source"/> equals <paramref name="target"/>, a
         /// self loop is generated atop of the node.
-        /// 
+        ///
         /// If <paramref name="source"/> and <paramref name="target"/> have no
         /// common LCA, the path starts at <paramref name="source"/> and ends
         /// at <paramref name="target"/> and reaches through the point on half
         /// distance between these two nodes, but at the top-most edge height
         /// (given by <paramref name="maxLevel"/>).
-        /// 
+        ///
         /// If <paramref name="source"/> and <paramref name="target"/> are
         /// siblings (i.e., they are immediate ancestors of the same parent
         /// node), a direct spline is created between them.
-        /// 
+        ///
         /// Otherwise, the control points of the spline are chosen along the
         /// node hierarchy path from the source node to their lowest common
         /// ancestor and then down again to the target node. The height of
@@ -204,13 +184,13 @@ namespace SEE.Layout.EdgeLayouts
         /// <param name="target">ending node</param>
         /// <param name="lcaFinder">to retrieve the lowest common ancestor of source and target</param>
         /// <returns>points to draw a spline between source and target</returns>
-        private TinySpline.BSpline CreateSpline<T>(T source, T target, LCAFinder<T> lcaFinder) 
+        private TinySpline.BSpline CreateSpline<T>(T source, T target, LCAFinder<T> lcaFinder)
             where T : ILayoutNode, IHierarchyNode<T>
         {
             EqualityComparer<T> comparer = EqualityComparer<T>.Default;
             if (comparer.Equals(source, target))
             {
-                return SelfLoop(source);
+                return SelfLoop(source, edgesAboveBlocks, levelDistance);
             }
 
             // Lowest common ancestor
@@ -246,9 +226,9 @@ namespace SEE.Layout.EdgeLayouts
             {
                 // source and target are siblings in the same subtree at the same level.
                 // We assume that those nodes are close to each other for all hierarchical layouts,
-                // which is true for EvoStreets, Balloon, TreeMap, and CirclePacking. If all edges 
-                // between siblings were led over one single control point, they would often take 
-                // a detour even though the nodes are close by. The detour would make it difficult 
+                // which is true for EvoStreets, Balloon, TreeMap, and CirclePacking. If all edges
+                // between siblings were led over one single control point, they would often take
+                // a detour even though the nodes are close by. The detour would make it difficult
                 // to follow the edges visually.
                 return DirectSpline(source, target, levelOffset);
             }
@@ -263,13 +243,13 @@ namespace SEE.Layout.EdgeLayouts
             {
                 fullPath[sourceToLCA.Length + i - 1] = targetToLCA[i];
             }
-            // Calculate control points along the node hierarchy 
+            // Calculate control points along the node hierarchy
             Vector3[] controlPoints = new Vector3[fullPath.Length];
             controlPoints[0] = edgesAboveBlocks ? source.Roof : source.Ground;
             for (int i = 1; i < fullPath.Length - 1; i++)
             {
                 // We consider the height of intermediate nodes.
-                // Note that a root has level 0 and the level is increased along 
+                // Note that a root has level 0 and the level is increased along
                 // the childrens' depth. That is why we need to choose the height
                 // as a measure relative to maxLevel.
                 // TODO: Do we really want the center position here?
@@ -278,7 +258,7 @@ namespace SEE.Layout.EdgeLayouts
                     fullPath[i].CenterPosition.z);
 
             }
-                        
+
             controlPoints[controlPoints.Length - 1] = edgesAboveBlocks ? target.Roof : target.Ground;
             uint degree = controlPoints.Length >= 4 ? 3 : (uint)controlPoints.Length - 1;
             return new TinySpline.BSpline((uint)controlPoints.Length, 3, degree)
@@ -292,8 +272,8 @@ namespace SEE.Layout.EdgeLayouts
         /// The first point is the center of the roof/ground of <paramref name="source"/> and the last
         /// point the center of the roof/ground of <paramref name="target"/>. The middle peak point
         /// is the position in between <paramref name="source"/> and <paramref name="target"/> where
-        /// the y co-ordinate is specified by <paramref name="yLevel"/>. 
-        /// That means, an edge between the nodes is drawn as a direct spline on the shortest path 
+        /// the y co-ordinate is specified by <paramref name="yLevel"/>.
+        /// That means, an edge between the nodes is drawn as a direct spline on the shortest path
         /// between the two nodes from roof/ground to roof/ground. Thus, no hierarchical bundling is applied.
         /// </summary>
         /// <param name="source">the node where to start the edge</param>
@@ -316,8 +296,8 @@ namespace SEE.Layout.EdgeLayouts
         /// of the node hierarchy. Root nodes are assumed to have level 0. There may be node hierarchies
         /// that are actually forrests rather than simple trees. In such cases, the lowest common ancestor
         /// of nodes in different trees does not exist and -1 will be passed as <paramref name="level"/>,
-        /// which is perfectly acceptable. In such cases, the returned value will be just one levelDistance 
-        /// above those for normal root nodes: 
+        /// which is perfectly acceptable. In such cases, the returned value will be just one levelDistance
+        /// above those for normal root nodes:
         ///     levelOffset +/- (maxLevel + 1) * levelDistance  (+ if edgesAboveBlocks; otherwise -)
         /// If level = maxLevel, levelOffset will be returned.
         /// In all other cases the returned value is guaranteed to be greater (or smaller if edges
@@ -339,40 +319,15 @@ namespace SEE.Layout.EdgeLayouts
         }
 
         /// <summary>
-        /// Yields a spline for a self loop at a node. The first point
-        /// is the front left corner of the roof/ground of <paramref name="node"/>
-        /// and the last point is its opposite back right roof/ground corner. Thus, the 
-        /// edge is diagonal across the roof/ground. The peak of the spline is in the
-        /// middle of the start and end, where the y co-ordinate of that peak
-        /// is levelDistance above the roof or below the ground, respectively.
-        /// </summary>
-        /// <param name="node">node whose self loop line points are required</param>
-        /// <returns>line points forming a self loop above/below <paramref name="node"/></returns>
-        private TinySpline.BSpline SelfLoop(ILayoutNode node)
-        {
-            // center area (roof or ground)
-            Vector3 center = edgesAboveBlocks ? node.Roof : node.Ground;
-            Vector3 extent = node.LocalScale / 2.0f;
-            // left front corner of center area
-            Vector3 start = new Vector3(center.x - extent.x, center.y, center.z - extent.z);
-            // right back corner of center area
-            Vector3 end = new Vector3(center.x + extent.x, center.y, center.z + extent.z);
-            Vector3 middle = center;
-            middle.y += edgesAboveBlocks ? levelDistance : -levelDistance;
-            return TinySpline.BSpline.InterpolateCubicNatural(
-                TinySplineInterop.VectorsToList(start, middle, end), 3);
-        }
-
-        /// <summary>
         /// Yields line points for two nodes that do not have a common ancestor in the
         /// node hierarchy. This may occur when we have multiple roots in the graph, that
         /// is, the node hierarchy is a forest and not just a single tree. In this case,
         /// we want the spline to reach above/below all other splines of nodes having a common
-        /// ancestor. 
+        /// ancestor.
         /// The first and last points are the respective roofs/grounds of <paramref name="source"/>
-        /// and <paramref name="target"/>. The peak point of the direct spline lies in between the 
-        /// two nodes with respect to the x and z axis; its height (y axis) is the highest 
-        /// hierarchical level, that is, one levelDistance above all other edges within the same 
+        /// and <paramref name="target"/>. The peak point of the direct spline lies in between the
+        /// two nodes with respect to the x and z axis; its height (y axis) is the highest
+        /// hierarchical level, that is, one levelDistance above all other edges within the same
         /// trees.
         /// </summary>
         /// <param name="source">start of edge (in one tree)</param>

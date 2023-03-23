@@ -349,7 +349,6 @@ namespace SEE.Game
         {
             float minimalEdgeLevelDistance = 2.5f * Settings.EdgeLayoutSettings.EdgeWidth;
             bool edgesAboveBlocks = Settings.EdgeLayoutSettings.EdgesAboveBlocks;
-            float rdp = Settings.EdgeLayoutSettings.RDP;
             switch (Settings.EdgeLayoutSettings.Kind)
             {
                 case EdgeLayoutKind.Straight:
@@ -358,7 +357,7 @@ namespace SEE.Game
                     return new SplineEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance);
                 case EdgeLayoutKind.Bundling:
                     return new BundledEdgeLayout(edgesAboveBlocks, minimalEdgeLevelDistance,
-                                                 Settings.EdgeLayoutSettings.Tension, rdp);
+                                                 Settings.EdgeLayoutSettings.Tension);
                 case EdgeLayoutKind.None:
                     // nothing to be done
                     return null;

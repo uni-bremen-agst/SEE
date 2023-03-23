@@ -308,20 +308,17 @@ namespace SEE.Game
             Fit(parent, layoutNodes);
             Stack(parent, layoutNodes);
 
-            // a mapping of graph nodes onto the game objects by which they are represented
-            Dictionary<Node, GameObject>.ValueCollection nodeToGameObject = nodeMap.Values;
-
             CreateGameNodeHierarchy(nodeMap, parent);
-
-            // Decorations must be applied after the blocks have been placed, so that
-            // we also know their positions.
-            AddDecorations(nodeToGameObject);
 
             // Create the laid out edges; they will be children of the unique root game node
             // representing the node hierarchy. This way the edges can be moved along with
             // the nodes.
             GameObject rootGameNode = RootGameNode(parent);
             EdgeLayout(gameNodes, rootGameNode, true);
+
+            // Decorations must be applied after the blocks have been placed, so that
+            // we also know their positions.
+            AddDecorations(nodeMap.Values);
 
             Portal.SetPortal(parent);
 

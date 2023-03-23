@@ -696,6 +696,11 @@ namespace SEE.Game.City
         protected const float DataButtonsGroupOrderSaveLayout = DataButtonsGroupOrderSave + 1;
 
         /// <summary>
+        /// The order of the Load-Layout button in the button group <see cref="DataButtonsGroup"/>.
+        /// </summary>
+        protected const float DataButtonsGroupOrderLoadLayout = DataButtonsGroupOrderSaveLayout + 1;
+
+        /// <summary>
         /// The name of the group for the Inspector buttons resettting the data.
         /// </summary>
         protected const string ResetButtonsGroup = "ResetButtonsGroup";

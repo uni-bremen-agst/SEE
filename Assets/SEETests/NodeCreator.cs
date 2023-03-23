@@ -10,7 +10,7 @@ namespace SEE.Layout
     {
         /// <summary>
         /// Creates and returns <paramref name="howManyRootNodes"/> root nodes
-        /// where each root node is the root of a <paramref name="howDeeplyNested"/> 
+        /// where each root node is the root of a <paramref name="howDeeplyNested"/>
         /// binary tree.
         /// </summary>
         /// <param name="howManyRootNodes">how many root nodes to be created</param>
@@ -21,12 +21,13 @@ namespace SEE.Layout
             Vector3 initialSize = Vector3.one;
             int id = 0;
 
-            LayoutVertex root = new LayoutVertex(initialSize, id);
+            LayoutVertex root = new(initialSize, id);
             id++;
 
-            ICollection<ILayoutNode> gameObjects = new List<ILayoutNode>();
-            gameObjects.Add(root);
-
+            ICollection<ILayoutNode> gameObjects = new List<ILayoutNode>
+            {
+                root
+            };
 
             for (int i = 1; i <= howManyRootNodes; i++)
             {
@@ -39,7 +40,7 @@ namespace SEE.Layout
 
         private static LayoutVertex AddChild(ICollection<ILayoutNode> gameObjects, LayoutVertex parent, Vector3 scale, ref int id)
         {
-            LayoutVertex child = new LayoutVertex(scale, id);
+            LayoutVertex child = new(scale, id);
             gameObjects.Add(child);
             parent.AddChild(child);
             id++;

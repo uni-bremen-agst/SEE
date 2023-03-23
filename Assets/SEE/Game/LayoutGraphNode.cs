@@ -90,7 +90,7 @@ namespace SEE.Game
         /// </summary>
         public override Vector3 Roof
         {
-            get => centerPosition + Vector3.up * 0.5f * scale.y;
+            get => centerPosition + 0.5f * scale.y * Vector3.up;
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace SEE.Game
         /// </summary>
         public override Vector3 Ground
         {
-            get => centerPosition - Vector3.up * 0.5f * scale.y;
+            get => centerPosition - 0.5f * scale.y * Vector3.up;
         }
     }
 }
