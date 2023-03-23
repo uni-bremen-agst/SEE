@@ -3085,7 +3085,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 336951275}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 9.09, y: 45.799995, z: 5.5}
+  m_LocalPosition: {x: 9.09, y: 42.8, z: 5.5}
   m_LocalScale: {x: 75, y: 0.0001859913, z: 75}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3317,13 +3317,13 @@ MonoBehaviour:
       Data: 3
     - Name: 
       Entry: 1
-      Data: 0.001
+      Data: Metric.Lines.LOC
     - Name: 
       Entry: 1
       Data: 0.001
     - Name: 
       Entry: 1
-      Data: 0.001
+      Data: Metric.Lines.LOC
     - Name: 
       Entry: 13
       Data: 
@@ -3569,13 +3569,13 @@ MonoBehaviour:
       Data: 3
     - Name: 
       Entry: 1
-      Data: 0.1
+      Data: 0.01
     - Name: 
       Entry: 1
-      Data: 0.3
+      Data: 0.03
     - Name: 
       Entry: 1
-      Data: 0.1
+      Data: 0.01
     - Name: 
       Entry: 13
       Data: 
@@ -4051,11 +4051,10 @@ MonoBehaviour:
       absolutePath: 
   EdgeLayoutSettings:
     Kind: 0
-    AnimationKind: 2
+    AnimationKind: 1
     EdgeWidth: 0.01
     EdgesAboveBlocks: 1
     Tension: 0.85
-    RDP: 0.0001
   EdgeSelectionSettings:
     TubularSegments: 50
     Radius: 0.005
@@ -4094,7 +4093,7 @@ MonoBehaviour:
     Root: 3
     relativePath: /mini-evolution
     absolutePath: 
-  MarkerHeight: 0.2
+  MarkerHeight: 0.5
   MarkerWidth: 0.01
   AdditionBeamColor: {r: 0, g: 1, b: 0, a: 1}
   ChangeBeamColor: {r: 1, g: 0.9215686, b: 0.01568628, a: 1}
@@ -4124,7 +4123,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ScaleFactor: 1
-  HeightOffset: 0.0012078285
+  HeightOffset: 0.0011100173
 --- !u!65 &336951280
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -25472,6 +25471,10 @@ PrefabInstance:
         type: 3}
       propertyPath: m_StaticEditorFlags
       value: 4294967295
+      objectReference: {fileID: 0}
+    - target: {fileID: 100000, guid: 599a3bd0d84b5a745a2ce9ee52e67120, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 100000, guid: 599a3bd0d84b5a745a2ce9ee52e67120, type: 3}
       propertyPath: m_StaticEditorFlags
