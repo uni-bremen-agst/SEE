@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using JetBrains.Annotations;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
 using SEE.DataModel;
@@ -26,16 +25,15 @@ using Slider = UnityEngine.UI.Slider;
 
 public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 {
-    protected const string RUNTIME_CONFIG_PREFAB_FOLDER = UI_PREFAB_FOLDER + "RuntimeConfigMenu/";
+    public const string RUNTIME_CONFIG_PREFAB_FOLDER = UI_PREFAB_FOLDER + "RuntimeConfigMenu/";
     public const string SETTINGS_OBJECT_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsObject";
     public const string SWITCH_PREFAB = UI_PREFAB_FOLDER + "Input Group - Switch";
-    public const string SMALLWINDOW_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfig_SmallConfigWindow";
-    public const string FILEPICKER_PREFAB = UI_PREFAB_FOLDER + "Input Group - File Picker";
     public const string SLIDER_PREFAB = UI_PREFAB_FOLDER + "Input Group - Slider";
     public const string DROPDOWN_PREFAB = UI_PREFAB_FOLDER + "Input Group - Dropdown";
     public const string COLORPICKER_PREFAB = UI_PREFAB_FOLDER + "Input Group - Color Picker";
     public const string STRINGFIELD_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "Input Group - StringInputField";
     public const string BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "Button";
+    public const string ADD_ELEMENT_BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "AddButton";
     protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenuRework_v2";
     protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsView";
     protected override string EntryPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeTabButton";
@@ -154,7 +152,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     /// Returns the view game object.
     /// Adds an entry if necessary.
     /// </summary>
-    /// <param name="memberInfo"></param>
+    /// <param name="attributes"></param>
     /// <returns></returns>
     private GameObject CreateOrGetViewGameObject(IEnumerable<Attribute> attributes)
     {
@@ -191,109 +189,108 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
     private void CreateSetting(MemberInfo memberInfo, GameObject parent, object obj)
     {
-        if (memberInfo.GetAttributes<ObsoleteAttribute>().Count() == 0)
+        if (memberInfo.GetCustomAttributes().Any(attribute => attribute is ObsoleteAttribute)) return;
+        switch (memberInfo)
         {
-            switch (memberInfo)
-            {
-                case FieldInfo fieldInfo:
-                    if (fieldInfo.IsLiteral || fieldInfo.IsInitOnly) return;
-                    CreateSetting(
-                        getter: () => fieldInfo.GetValue(obj),
-                        name: memberInfo.Name,
-                        parent: parent,
-                        setter: changedValue => fieldInfo.SetValue(obj, changedValue),
-                        attributes: memberInfo.GetCustomAttributes()
-                    );
-                    break;
-                case PropertyInfo propertyInfo:
-                    if (propertyInfo.GetMethod == null || propertyInfo.SetMethod == null ||
-                        !propertyInfo.CanRead || !propertyInfo.CanWrite) return;
-                    CreateSetting(
-                        getter: () => propertyInfo.GetValue(obj),
-                        name: memberInfo.Name,
-                        parent: parent,
-                        setter: changedValue => propertyInfo.SetValue(obj, changedValue),
-                        attributes: memberInfo.GetCustomAttributes()
-                    );
-                    break;
-            }
+            case FieldInfo fieldInfo:
+                if (fieldInfo.IsLiteral || fieldInfo.IsInitOnly) return;
+                CreateSetting(
+                    getter: () => fieldInfo.GetValue(obj),
+                    settingName: memberInfo.Name,
+                    parent: parent,
+                    setter: changedValue => fieldInfo.SetValue(obj, changedValue),
+                    attributes: memberInfo.GetCustomAttributes()
+                );
+                break;
+            case PropertyInfo propertyInfo:
+                if (propertyInfo.GetMethod == null || propertyInfo.SetMethod == null ||
+                    !propertyInfo.CanRead || !propertyInfo.CanWrite) return;
+                CreateSetting(
+                    getter: () => propertyInfo.GetValue(obj),
+                    settingName: memberInfo.Name,
+                    parent: parent,
+                    setter: changedValue => propertyInfo.SetValue(obj, changedValue),
+                    attributes: memberInfo.GetCustomAttributes()
+                );
+                break;
         }
     }
 
-    private void CreateSetting(Func<object> getter, string name, GameObject parent, 
+    private void CreateSetting(Func<object> getter, string settingName, GameObject parent, 
         UnityAction<object> setter = null, IEnumerable<Attribute> attributes = null)
     {
-        parent ??= CreateOrGetViewGameObject(attributes ?? Enumerable.Empty<Attribute>()).transform.Find("Content").gameObject;
+        Attribute[] attributeArray = attributes as Attribute[] ?? attributes?.ToArray() ?? Array.Empty<Attribute>();
+        parent ??= CreateOrGetViewGameObject(attributeArray).transform.Find("Content").gameObject;
 
         object value = getter();
         switch (value)
         {
-            case bool bValue:
+            case bool:
                 CreateSwitch(
-                    name: name, 
+                    settingName: settingName, 
                     setter: changedValue => setter!(changedValue), 
                     getter: () => (bool) getter(), 
                     parent: parent
                 );
                 break;
-            case int iValue:
+            case int:
                 CreateSlider(
-                    name: name, 
-                    range: attributes?.OfType<RangeAttribute>().ElementAtOrDefault(0), 
+                    settingName: settingName, 
+                    range: attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0), 
                     setter: changedValue => setter!((int) changedValue), 
-                    getter: () => (float)(int)getter(), 
+                    getter: () => (int)getter(), 
                     useRoundValue: true, 
                     parent: parent
                 );
                 break;
-            case uint uiValue:
+            case uint:
                 CreateSlider(
-                    name: name, 
-                    range: attributes?.OfType<RangeAttribute>().ElementAtOrDefault(0), 
+                    settingName: settingName, 
+                    range: attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0), 
                     setter: changedValue => setter!((uint) changedValue), 
-                    getter: () => (float)(uint)getter(), 
+                    getter: () => (uint)getter(), 
                     useRoundValue: true, 
                     parent: parent
                 );
                 break;
-            case float fValue:
+            case float:
                 CreateSlider(
-                    name: name, 
-                    range: attributes?.OfType<RangeAttribute>().ElementAtOrDefault(0), 
+                    settingName: settingName, 
+                    range: attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0), 
                     setter: changedValue => setter!(changedValue), 
                     getter: () => (float)getter(), 
                     useRoundValue: false, 
                     parent: parent
                 );
                 break;
-            case string sValue:
+            case string:
                 CreateStringField(
-                    name: name,
+                    settingName: settingName,
                     setter: changedValue => setter!(changedValue),
-                    getter: () => (string)getter(),
+                    getter: () => (string) getter(),
                     parent: parent
                 );
                 break;
-            case Color cValue:
+            case Color:
                 CreateColorPicker(
-                    name: name, 
+                    settingName: settingName, 
                     parent: parent
                 );
                 break;
             case DataPath dataPath:
-                parent = CreateNestedSetting(name, parent);
+                parent = CreateNestedSetting(settingName, parent);
                 FilePicker filePicker = parent.AddComponent<FilePicker>();
                 filePicker.DataPathInstance = dataPath;
-                filePicker.Label = name;
+                filePicker.Label = settingName;
                 filePicker.PickingMode = FileBrowser.PickMode.Files;
-                filePicker.OnMenuInitialized += () => AddLayoutElement(parent.transform.Find(name).gameObject);
+                filePicker.OnMenuInitialized += () => AddLayoutElement(parent.transform.Find(settingName).gameObject);
                 break;
             case Enum:
                 CreateDropDown(
-                    name: name, 
+                    settingName: settingName, 
                     setter: changedValue => setter!(Enum.ToObject(value.GetType(), changedValue)),
                     values: value.GetType().GetEnumNames(),
-                    getter: () => getter().ToString(),
+                    getter: () => (string) getter(),
                     parent: parent
                 );
                 break;
@@ -303,7 +300,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 FieldInfo mapInfo = value.GetType().GetField("map", BindingFlags.Instance | BindingFlags.NonPublic)!;
                 CreateSetting(
                     getter: () => mapInfo.GetValue(value),
-                    name: name,
+                    settingName: settingName,
                     parent: parent,
                     setter: null,
                     // TODO: Which attributes? Both or which one?
@@ -314,7 +311,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 FieldInfo antennaInfo = value.GetType().GetField("AntennaSections")!;
                 CreateSetting(
                     getter: () => antennaInfo.GetValue(value),
-                    name: name,
+                    settingName: settingName,
                     parent: parent,
                     setter: null,
                     // TODO: Which attributes? Both or which one?
@@ -322,7 +319,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 );
                 break;
             // from here on come nested settings
-            case HashSet<string> hashSet:
+            case HashSet<string>:
                 // TODO: How to edit the strings?
                 // TODO: Currently only works on first edit
                 /*
@@ -346,20 +343,26 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 */
                 break;
             case IDictionary dict:
-                parent = CreateNestedSetting(name, parent);
-                foreach (object key in dict.Keys)
-                {
-                    CreateSetting(
-                        getter: () => dict[key],
-                        name: key.ToString(),
-                        parent: parent,
-                        setter: changedValue => dict[key] = changedValue
-                    );
-                }
+                parent = CreateNestedSetting(settingName, parent);
+                UpdateDictChildren(parent, dict);
+                OnUpdateMenuValues += () => UpdateDictChildren(parent, dict);
                 break;
             case IList<string> list:
-                parent = CreateNestedSetting( name, parent);
-                CreateListSetting( list, parent);
+                parent = CreateNestedSetting(settingName, parent);
+                GameObject addButton = PrefabInstantiator.InstantiatePrefab(ADD_ELEMENT_BUTTON_PREFAB, parent.transform);
+                addButton.name = "AddElementButton";
+                ButtonManagerWithIcon addButtonManager = addButton.GetComponent<ButtonManagerWithIcon>();
+                addButtonManager.clickEvent.AddListener(() => {
+                    list.Add(""); 
+                    UpdateListChildren(list, parent);
+                    addButtonManager.transform.SetAsLastSibling();
+                });
+                UpdateListChildren(list, parent);
+                addButtonManager.transform.SetAsLastSibling();
+                OnUpdateMenuValues += () => {
+                    UpdateListChildren(list, parent);
+                    addButtonManager.transform.SetAsLastSibling();
+                };
                 break;
             // confirmed types where the nested fields should be edited
             case ColorRange:
@@ -371,7 +374,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             case EdgeSelectionAttributes:
             case ErosionAttributes:
             case BoardAttributes:
-                parent = CreateNestedSetting(name, parent);
+                parent = CreateNestedSetting(settingName, parent);
                 value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                 break;
             // unconfirmed types where the nested fields should be edited
@@ -383,38 +386,38 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                     && value.GetType() != typeof(LabelAttributes)
                    )
                 {
-                    Debug.Log("Missing: (Maybe)" + name + " " + value.GetType().GetNiceName());
+                    Debug.Log("Missing: (Maybe)" + settingName + " " + value.GetType().GetNiceName());
                 }
-                parent = CreateNestedSetting(name, parent);
+                parent = CreateNestedSetting(settingName, parent);
                 value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                 break;
             default:
-                Debug.LogWarning("Missing: " + name + " " + value?.GetType().GetNiceName());
+                Debug.LogWarning("Missing: " + settingName + " " + value?.GetType().GetNiceName());
                 break;
         }
     } 
     
-    private GameObject CreateNestedSetting(string name, GameObject parent)
+    private GameObject CreateNestedSetting(string settingName, GameObject parent)
     {
         GameObject container =
             PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, parent.transform, false);
-        container.name = name;
-        container.GetComponentInChildren<TextMeshProUGUI>().text = name;
+        container.name = settingName;
+        container.GetComponentInChildren<TextMeshProUGUI>().text = settingName;
         return container.transform.Find("Content").gameObject;
     }
 
-    private void CreateSlider(string name, RangeAttribute range, UnityAction<float> setter, Func<float> getter, bool useRoundValue, GameObject parent)
+    private void CreateSlider(string settingName, RangeAttribute range, UnityAction<float> setter, Func<float> getter, bool useRoundValue, GameObject parent)
     {
         range ??= new RangeAttribute(0, 2);
 
         GameObject sliderGameObject =
             PrefabInstantiator.InstantiatePrefab(SLIDER_PREFAB, parent.transform, false);
-        sliderGameObject.name = name;
+        sliderGameObject.name = settingName;
         AddLayoutElement(sliderGameObject);
         SliderManager sliderManager = sliderGameObject.GetComponentInChildren<SliderManager>();
         Slider slider = sliderGameObject.GetComponentInChildren<Slider>();
         TextMeshProUGUI text = sliderGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
-        text.text = name;
+        text.text = settingName;
                 
         sliderManager.usePercent = false;
         sliderManager.useRoundValue = useRoundValue;
@@ -423,38 +426,30 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 
         slider.value = getter();
         slider.onValueChanged.AddListener(setter);
-        
-        sliderGameObject.AddComponent<Button>().onClick.AddListener(() =>  ShowSmallEditorSlider(name, range, setter,getter() , useRoundValue));
+
+        RuntimeSmallEditorButton smallEditorButton = sliderGameObject.AddComponent<RuntimeSmallEditorButton>();
+        smallEditorButton.OnShowMenuChanged += () => ShowMenu = !smallEditorButton.ShowMenu;
         
         OnUpdateMenuValues += () => slider.value = getter();
     }
-    
-    private void ShowSmallEditorSlider(string name, RangeAttribute range, UnityAction<float> setter, float value, bool useRoundValue)
-    {
-        Action<GameObject> createSlider = delegate(GameObject parentObject)
-        {
-            CreateSlider(name, range, setter, () => value, useRoundValue, parentObject.transform.Find("Content").gameObject);
-        };
 
-        ShowSmallEditor(createSlider);
-    }
-
-    private void CreateSwitch(string name, UnityAction<bool> setter, Func<bool> getter, GameObject parent)
+    private void CreateSwitch(string settingName, UnityAction<bool> setter, Func<bool> getter, GameObject parent)
     {
         GameObject switchGameObject =
             PrefabInstantiator.InstantiatePrefab(SWITCH_PREFAB, parent.transform, false);
-        switchGameObject.name = name;
+        switchGameObject.name = settingName;
         AddLayoutElement(switchGameObject);
         SwitchManager switchManager = switchGameObject.GetComponentInChildren<SwitchManager>();
         TextMeshProUGUI text = switchGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
-        text.text = name;
+        text.text = settingName;
 
         switchManager.isOn = getter();
         switchManager.UpdateUI();
         switchManager.OnEvents.AddListener(() => setter(true));
         switchManager.OffEvents.AddListener(() => setter(false));
 
-        switchGameObject.AddComponent<Button>().onClick.AddListener(() => ShowSmallEditorSwitch(name,setter,getter()));
+        RuntimeSmallEditorButton smallEditorButton = switchGameObject.AddComponent<RuntimeSmallEditorButton>();
+        smallEditorButton.OnShowMenuChanged += () => ShowMenu = !smallEditorButton.ShowMenu;
         
         OnUpdateMenuValues += () =>
         {
@@ -462,24 +457,15 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             switchManager.UpdateUI();
         };
     }
-    
-    private void ShowSmallEditorSwitch(string name, UnityAction<bool> setter, bool value)
-    {
-        Action<GameObject> createSwitch = delegate(GameObject parentObject)
-        {
-            CreateSwitch(name, setter, () => value, parentObject.transform.Find("Content").gameObject);
-        };
-        ShowSmallEditor(createSwitch);
-    }
 
-    private void CreateStringField(string name, UnityAction<string> setter, Func<string> getter, GameObject parent)
+    private void CreateStringField(string settingName, UnityAction<string> setter, Func<string> getter, GameObject parent)
     {
         GameObject stringGameObject =
             PrefabInstantiator.InstantiatePrefab(STRINGFIELD_PREFAB, parent.transform, false);
-        stringGameObject.name = name;
+        stringGameObject.name = settingName;
         AddLayoutElement(stringGameObject);
         TextMeshProUGUI text = stringGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
-        text.text = name;
+        text.text = settingName;
 
         TMP_InputField inputField = stringGameObject.GetComponentInChildren<TMP_InputField>();
         inputField.text = getter();
@@ -487,29 +473,21 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         inputField.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
         inputField.onValueChanged.AddListener(setter);
         
-        stringGameObject.AddComponent<Button>().onClick.AddListener(() => ShowSmallEditorStringField(name,setter,getter()));
+        RuntimeSmallEditorButton smallEditorButton = stringGameObject.AddComponent<RuntimeSmallEditorButton>();
+        smallEditorButton.OnShowMenuChanged += () => ShowMenu = !smallEditorButton.ShowMenu;
 
         OnUpdateMenuValues += () => inputField.text = getter();
     }
-    
-    private void ShowSmallEditorStringField(string name, UnityAction<string> setter, string value)
-    {
-        Action<GameObject> createStringField = delegate(GameObject parentObject)
-        {
-            CreateStringField(name, setter, () => value, parentObject.transform.Find("Content").gameObject);
-        };
-        ShowSmallEditor(createStringField);
-    }
 
     // TODO: Add action
-    private void CreateDropDown(string name, UnityAction<int> setter, IEnumerable<string> values, Func<string> getter, GameObject parent)
+    private void CreateDropDown(string settingName, UnityAction<int> setter, IEnumerable<string> values, Func<string> getter, GameObject parent)
     {
         GameObject dropDownGameObject =
             PrefabInstantiator.InstantiatePrefab(DROPDOWN_PREFAB, parent.transform, false);
-        dropDownGameObject.name = name;
+        dropDownGameObject.name = settingName;
         AddLayoutElement(dropDownGameObject);
         TextMeshProUGUI text = dropDownGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
-        text.text = name;
+        text.text = settingName;
         // TODO: value and setter
 
         CustomDropdown dropdown = dropDownGameObject.transform.Find("DropdownCombo/Dropdown").GetComponent<CustomDropdown>();
@@ -525,89 +503,85 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         values.ForEach(s => dropdown.CreateNewItem(s, null));
         dropdown.SetupDropdown();
         
-        dropDownGameObject.AddComponent<Button>().onClick.AddListener(() => ShowSmallEditorDropDown(name,setter, values, getter()));
+        RuntimeSmallEditorButton smallEditorButton = dropDownGameObject.AddComponent<RuntimeSmallEditorButton>();
+        smallEditorButton.OnShowMenuChanged += () => ShowMenu = !smallEditorButton.ShowMenu;
         
         // TODO: Set current dropdown item
         // TODO: OnUpdateMenuValues
     }
-    
-    private void ShowSmallEditorDropDown(string name, UnityAction<int> setter, IEnumerable<string> values, string value)
-    {
-        Action<GameObject> createDropDown = delegate(GameObject parentObject)
-        {
-            CreateDropDown(name, setter, values, () => value, parentObject.transform.Find("Content").gameObject);
-        };
-        ShowSmallEditor(createDropDown);
-    }
 
     // TODO: Add action
-    private void CreateColorPicker(string name, GameObject parent)
+    private void CreateColorPicker(string settingName, GameObject parent)
     {
-        parent = CreateNestedSetting("Color Picker: " + name, parent);
+        parent = CreateNestedSetting("Color Picker: " + settingName, parent);
 
         GameObject colorPickerGameObject =
             PrefabInstantiator.InstantiatePrefab(COLORPICKER_PREFAB, parent.transform, false);
-        colorPickerGameObject.name = name;
+        colorPickerGameObject.name = settingName;
         AddLayoutElement(colorPickerGameObject);
         TextMeshProUGUI text = colorPickerGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
-        text.text = name;
+        text.text = settingName;
         // TODO: Value and setter
 
-
-        colorPickerGameObject.AddComponent<Button>().onClick.AddListener(() => ShowSmallEditorColorPicker(name));
+        RuntimeSmallEditorButton smallEditorButton = colorPickerGameObject.AddComponent<RuntimeSmallEditorButton>();
+        smallEditorButton.OnShowMenuChanged += () => ShowMenu = !smallEditorButton.ShowMenu;
     }
-    
-    private void ShowSmallEditorColorPicker(string name)
+
+    private void UpdateListChildren(IList<string> list, GameObject parent)
     {
-        Action<GameObject> createColorPicker = delegate(GameObject parentObject)
+        // removes superfluous children
+        foreach (Transform child in parent.transform)
         {
-            CreateColorPicker(name, parentObject.transform.Find("Content").gameObject);
-        };
-        ShowSmallEditor(createColorPicker);
-    }
-
-    private void CreateListSetting(IList<string> list, GameObject parent)
-    {
+            if (child.name != "AddElementButton")
+            {
+                int index = Int32.Parse(child.name);
+                if (index >= list.Count) Destroyer.Destroy(child.gameObject);
+            }
+        }
+        // creates needed children
         for (int i = 0; i < list.Count; i++)
         {
-            int iCopy = i;
-            CreateSetting(
-                getter: () => list[iCopy],
-                name: i.ToString(),
-                parent: parent,
-                setter: changedValue => list[iCopy] = changedValue as string
-            );
+            if (parent.transform.Find(i.ToString()) == null)
+            {
+                int iCopy = i;
+                CreateSetting(
+                    getter: () => list[iCopy],
+                    settingName: i.ToString(),
+                    parent: parent,
+                    setter: changedValue => list[iCopy] = changedValue as string
+                );
+            }
         }
-        GameObject AddButton = PrefabInstantiator.InstantiatePrefab(RUNTIME_CONFIG_PREFAB_FOLDER + "AddButton", parent.transform);
-        ButtonManagerWithIcon AddButtonManager = AddButton.GetComponent<ButtonManagerWithIcon>();
-        AddButtonManager.clickEvent.AddListener(() => { list.Add(""); foreach (Transform child in parent.transform) { Destroyer.Destroy(child.gameObject); } CreateListSetting(list, parent); } );
     }
 
+    private void UpdateDictChildren(GameObject parent, IDictionary dict)
+    {
+        // removes children that aren't in the dictionary any more
+        foreach (Transform child in parent.transform)
+        {
+            if (!dict.Contains(child.name)) Destroyer.Destroy(child);
+        }
+        // goes through all dictionary keys
+        foreach (object key in dict.Keys)
+        {
+            // creates a child if it doesn't exist yet
+            if (parent.transform.Find(key.ToString()) == null)
+            {
+                CreateSetting(
+                    getter: () => dict[key],
+                    settingName: key.ToString(),
+                    parent: parent,
+                    setter: changedValue => dict[key] = changedValue
+                );
+            }
+        }
+    }
+    
     private void AddLayoutElement(GameObject gameObject)
     {
         LayoutElement le = gameObject.AddComponent<LayoutElement>();
         le.minHeight = ((RectTransform) gameObject.transform).rect.height;
         le.minWidth = ((RectTransform) gameObject.transform).rect.width;
-    }
-    
-    private void ShowSmallEditor(Action<GameObject> createSettingObject)
-    {
-        if (!ShowMenu) return;
-        
-        ToggleMenu();
-
-        GameObject containerGameObject =
-            PrefabInstantiator.InstantiatePrefab(SMALLWINDOW_PREFAB, Canvas.transform, false);
-
-        createSettingObject(containerGameObject);
-
-        containerGameObject.transform.Find("CloseButton").GetComponent<Button>().onClick.AddListener(() =>
-        {
-            Destroyer.Destroy(containerGameObject);
-            // TODO Updaten der UI Settings
-            OnUpdateMenuValues?.Invoke();
-            ToggleMenu();
-        });
     }
 
     private event Action OnUpdateMenuValues;
