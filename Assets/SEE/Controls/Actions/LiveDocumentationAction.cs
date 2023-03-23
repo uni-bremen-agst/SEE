@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using SEE.Game.UI.LiveDocumantation;
+using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
@@ -36,8 +37,18 @@ namespace SEE.Controls.Actions
                 Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef _) == HitGraphElement.Node)
             {
                 NodeRef selectedNode = hit.collider.gameObject.GetComponent<NodeRef>();
+
+                if (!selectedNode.Value.IsLeaf())
+                {
+                    ShowNotification.Warn("Node not supported", "Only leaf nodes can be analysed");
+                    return false;
+                }
+                
                 if (!selectedNode.TryGetComponent(out LiveDocumentationWindow documentationWindow))
                 {
+                    
+                    string fileName = selectedNode.Value.Filename();
+                    
                     documentationWindow = selectedNode.gameObject.AddComponent<LiveDocumentationWindow>();
                     documentationWindow.ClassName = selectedNode.Value.SourceName;
                     documentationWindow.Title = "LiveDoc";
@@ -51,7 +62,15 @@ namespace SEE.Controls.Actions
 
                     buffer.Add(new LiveDocumentationBufferText("Dies ist ein Text erstmal"));
 
+
+                    List<LiveDocumentationBuffer> classMembers = new List<LiveDocumentationBuffer>();
+                    LiveDocumentationBuffer b = new LiveDocumentationBuffer();
+                    b.Add(new LiveDocumentationBufferText("test member"));
+                    
+                    classMembers.Add(b);
+                    
                     documentationWindow.DocumentationBuffer = buffer;
+                    documentationWindow.ClassMembers = classMembers;
                 }
 
 

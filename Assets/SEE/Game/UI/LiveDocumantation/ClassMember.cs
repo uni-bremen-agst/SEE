@@ -6,33 +6,29 @@ using UnityEngine.UI;
 
 namespace SEE.Game.UI.LiveDocumantation
 {
+    /// <summary>
+    /// Represents a class member
+    /// </summary>
     public class ClassMember : MonoBehaviour
     {
         private const string PREFAB_NAME = "Prefabs/UI/LiveDocumentation/ClassMember";
+        private const string CLASS_MEMBER_OBJECT_PATH = "Scroll View/Viewport/Content/MemberText";
 
         public string Text { get; set; }
-        
+
         public void Start()
         {
-            //       gameObject.AddComponent<CanvasRenderer>();
-
-            //       Image image = gameObject.AddComponent<Image>();
-            //      image.sprite = Sprite.Create();
-            //     var imageColor = image.color;
-            //    imageColor.a = 0.05F;
-            //   image.color = imageColor;
-
             GameObject classMember =
-                PrefabInstantiator.InstantiatePrefab("Prefabs/UI/LiveDocumentation/ClassMember", transform, false);
+                PrefabInstantiator.InstantiatePrefab(PREFAB_NAME, transform, false);
 
-            TextMeshProUGUI tm = classMember.transform.Find("MemberText").gameObject.GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI tm = classMember.transform.Find(CLASS_MEMBER_OBJECT_PATH).gameObject
+                .GetComponent<TextMeshProUGUI>();
             tm.text = Text;
 
-            RectTransform rt = classMember.GetComponent<RectTransform>();
-            rt.anchorMin = new Vector2(0, 0);
-            rt.anchorMax = new Vector2(1, 1);
-            rt.pivot = new Vector2(0.5f, 0.5f);
-            
+            //RectTransform rt = classMember.GetComponent<RectTransform>();
+            //     rt.anchorMin = new Vector2(0, 0);
+            //     rt.anchorMax = new Vector2(1, 1);
+            //     rt.pivot = new Vector2(0.5f, 0.5f);
         }
     }
 }
