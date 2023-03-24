@@ -34,6 +34,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     public const string STRINGFIELD_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "Input Group - StringInputField";
     public const string BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "Button";
     public const string ADD_ELEMENT_BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "AddButton";
+    public const string REMOVE_ELEMENT_BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RemoveButton";
     protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenuRework_v2";
     protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsView";
     protected override string EntryPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeTabButton";
@@ -349,19 +350,37 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 break;
             case IList<string> list:
                 parent = CreateNestedSetting(settingName, parent);
+                // Buttons erstellen
                 GameObject addButton = PrefabInstantiator.InstantiatePrefab(ADD_ELEMENT_BUTTON_PREFAB, parent.transform);
+                GameObject removeButton = PrefabInstantiator.InstantiatePrefab(REMOVE_ELEMENT_BUTTON_PREFAB, parent.transform);
+                removeButton.name = "RemoveElementButton";
+                ButtonManagerWithIcon removeButtonManager = removeButton.GetComponent<ButtonManagerWithIcon>();
                 addButton.name = "AddElementButton";
                 ButtonManagerWithIcon addButtonManager = addButton.GetComponent<ButtonManagerWithIcon>();
+                // Listener AddButton
                 addButtonManager.clickEvent.AddListener(() => {
+                    Debug.Log("Add element");
                     list.Add(""); 
                     UpdateListChildren(list, parent);
                     addButtonManager.transform.SetAsLastSibling();
+                    removeButtonManager.transform.SetAsLastSibling();
                 });
-                UpdateListChildren(list, parent);
-                addButtonManager.transform.SetAsLastSibling();
-                OnUpdateMenuValues += () => {
+                // Listener RemoveButton
+                removeButtonManager.clickEvent.AddListener(() => {
+                    Debug.Log("Remove element");
+                    list.RemoveAt(list.Count - 1);
                     UpdateListChildren(list, parent);
                     addButtonManager.transform.SetAsLastSibling();
+                    removeButtonManager.transform.SetAsLastSibling();
+                });
+                // Update
+                UpdateListChildren(list, parent);
+                addButton.transform.SetAsLastSibling();
+                removeButton.transform.SetAsLastSibling();
+                OnUpdateMenuValues += () => {
+                    UpdateListChildren(list, parent);
+                    addButton.transform.SetAsLastSibling();
+                    removeButton.transform.SetAsLastSibling();
                 };
                 break;
             // confirmed types where the nested fields should be edited
@@ -532,11 +551,11 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         // removes superfluous children
         foreach (Transform child in parent.transform)
         {
-            if (child.name != "AddElementButton")
+            if (Int32.TryParse(child.name, out int index))
             {
-                int index = Int32.Parse(child.name);
-                if (index >= list.Count) Destroyer.Destroy(child.gameObject);
-            }
+                if (index >= list.Count) 
+                    Destroyer.Destroy(child.gameObject);
+            } 
         }
         // creates needed children
         for (int i = 0; i < list.Count; i++)
