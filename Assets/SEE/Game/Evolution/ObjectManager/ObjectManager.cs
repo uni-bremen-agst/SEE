@@ -84,14 +84,6 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Returns all created GameObjects till now.
-        /// </summary>
-        public List<GameObject> GameObjects
-        {
-            get => gameObjects;
-        }
-
-        /// <summary>
         /// List of all created nodes that are in use.
         /// </summary>
         private List<GameObject> gameObjects => nodes.Values.ToList();
@@ -384,8 +376,8 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Clears the internal cache containing all game objects created by GetInnerNode(),
-        /// GetLeaf(), GetNode(), or GetPlane() and also destroys those game objects.
+        /// Clears the internal cache containing all game objects created for nodes
+        /// and edges as well as the plane and also destroys those game objects.
         /// </summary>
         public void Clear()
         {
