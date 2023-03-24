@@ -58,7 +58,7 @@ namespace SEE.Game
                 // Add AutoHand related components
                 Rigidbody rigidbody = gameObject.AddOrGetComponent<Rigidbody>();
                 rigidbody.useGravity = false; // No gravity
-                rigidbody.isKinematic = false;
+                rigidbody.isKinematic = true;
                 rigidbody.freezeRotation = true; // No rotation
 
                 rigidbody.interpolation = RigidbodyInterpolation.Extrapolate; // Interpolation
@@ -75,10 +75,11 @@ namespace SEE.Game
                 Grabbable grabbable = gameObject.AddOrGetComponent<Grabbable>();
 
                 gameObject.AddOrGetComponent<VrActions>();
+                gameObject.AddComponent<VrTriggerEvents>().enabled = false;
 
                 grabbable.allowHeldSwapping = true;
                 grabbable.heldNoFriction = true;
-                grabbable.parentOnGrab = true;
+                grabbable.parentOnGrab = false;
 
                 grabbable.throwPower = 1;
                 grabbable.jointBreakForce = 2500;
