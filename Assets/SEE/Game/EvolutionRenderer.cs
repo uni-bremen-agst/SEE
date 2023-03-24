@@ -179,7 +179,7 @@ namespace SEE.Game
         /// The collection of registered <see cref="AbstractAnimator"/> to be updated
         /// automatically for changes during the animation time period.
         /// </summary>
-        private readonly List<AbstractAnimator> animators = new List<AbstractAnimator>();
+        private readonly List<AbstractAnimator> animators = new();
 
         /// <summary>
         /// The duration of an animation. This value can be controlled by the user.
@@ -229,11 +229,6 @@ namespace SEE.Game
         /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
         /// </summary>
         private readonly NodeEqualityComparer nodeEqualityComparer = new();
-
-        /// <summary>
-        /// Saves the names of the game objects representing nodes that were not moved during an iteration.
-        /// </summary>
-        private readonly ISet<string> negligibleNodes = new HashSet<string>();
 
         /// <summary>
         /// Allows the comparison of two instances of <see cref="Edge"/> from different graphs.
@@ -425,7 +420,6 @@ namespace SEE.Game
         /// <param name="next">the new graph to be shown, in which to migrate the current graph; must not be null</param>
         private void RenderGraph(LaidOutGraph current, LaidOutGraph next)
         {
-            negligibleNodes.Clear();
             next.AssertNotNull("next");
 
             IsStillAnimating = true;
@@ -588,8 +582,6 @@ namespace SEE.Game
                 {
                     next.Graph.Traverse(RenderNode, RenderNode, RenderNode);
                 }
-
-                objectManager.NegligibleNodes = negligibleNodes;
             }
 
             /// Note: <see cref="OnAnimationsFinished"/> will be called by <see cref="phase2AnimationWatchDog"/>
@@ -813,11 +805,6 @@ namespace SEE.Game
             }
             else
             {
-                // Edge was not moved
-                if (XZAreEqual(layoutNode.CenterPosition, currentGameNode.transform.position))
-                {
-                    negligibleNodes.Add(currentGameNode.ID());
-                }
                 // Node existed before.
                 if (diff.AreDifferent(formerGraphNode, graphNode))
                 {

@@ -54,11 +54,6 @@ namespace SEE.Game.Evolution
         private GameObject currentPlane;
 
         /// <summary>
-        /// The names of the game objects representing nodes that do not need to be considered when animating.
-        /// </summary>
-        public ISet<string> NegligibleNodes { get; set; }
-
-        /// <summary>
         /// A dictionary containing all created nodes that are currently in use. The set of
         /// nodes contained may be an accumulation of all nodes created and added by GetInnerNode()
         /// and GetLeaf() so far and not just those of one single graph in the graph series
