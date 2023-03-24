@@ -19,6 +19,7 @@
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
@@ -377,7 +378,7 @@ namespace SEE.Game
         /// The graph is drawn from scratch.
         /// </summary>
         /// <param name="graph">graph to be drawn initially</param>
-        public void DisplayGraphAsNew(LaidOutGraph graph)
+        private void DisplayGraphAsNew(LaidOutGraph graph)
         {
             graph.AssertNotNull("graph");
 
@@ -393,6 +394,17 @@ namespace SEE.Game
             // first.
             objectManager?.Clear();
             RenderGraph(currentCity, graph);
+            //StartCoroutine(DelayedDisplayGraphAsNew(graph));
+        }
+
+        IEnumerator DelayedDisplayGraphAsNew(LaidOutGraph graph)
+        {
+            //wait for space to be pressed
+            while (!Input.GetKeyDown(KeyCode.D))
+            {
+                yield return null;
+            }
+            
         }
 
         /// <summary>
@@ -491,8 +503,9 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Implements the second phase in the transition from the current to the <paramref name="next"/>
-        /// graph. In this phase, all nodes in <paramref name="next"/> will be drawn. These may be
+        /// Implements the second phase in the transition from the <see cref="currentCity"/> 
+        /// to the <paramref name="next"/> graph. 
+        /// In this phase, all nodes in <paramref name="next"/> will be drawn. These may be
         /// either new or existing nodes (the latter being nodes that have been present in the
         /// currently drawn graph). When this phase has been completed, <see cref="OnAnimationsFinished"/>
         /// will be called eventually.
@@ -846,6 +859,7 @@ namespace SEE.Game
                 Debug.Log($"onEdgeAnimationStart set for {graphNode.ID} {currentGameNode.name}\n");
                 onEdgeAnimationStart = duration => OnEdgeAnimationStart(tween, duration);
             }
+            Debug.Log($"Move {currentGameNode.name} from {currentGameNode.transform.position} to {layoutNode.CenterPosition}.\n");
             changeAndBirthAnimator.AnimateTo(gameObject: currentGameNode,
                                              layoutNode: layoutNode,
                                              callbackWhenAnimationFinished: OnAnimationNodeAnimationFinished,
