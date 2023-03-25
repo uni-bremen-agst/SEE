@@ -126,7 +126,7 @@ namespace SEE.GO
         {
             GameObject beamMarker = NewBeam(factory);
             beamMarker.tag = Tags.Decoration;
-            beamMarker.SetScale(markerScale);
+            beamMarker.SetAbsoluteScale(markerScale);
             beamMarker.transform.SetParent(gameNode.transform);
             Portal.InheritPortal(from: gameNode, to: beamMarker);
             PutAbove(gameNode, beamMarker);
@@ -202,7 +202,7 @@ namespace SEE.GO
                     // The scale of gameNode may have changed, but we want our markers to
                     // have a world-space scale independent from its gameNode; hence,
                     // we may need to re-set the scale again.
-                    marker.SetScale(markerScale);
+                    marker.SetAbsoluteScale(markerScale);
                     PutAbove(gameNode, marker);
                     break;
                 }

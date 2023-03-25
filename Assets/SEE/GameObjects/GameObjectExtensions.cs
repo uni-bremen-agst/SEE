@@ -324,11 +324,14 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">object whose scale should be set</param>
         /// <param name="worldScale">the new scale in world space</param>
-        public static void SetScale(this GameObject gameObject, Vector3 worldScale)
+        /// <param name="animate">if true and <paramref name="gameObject"/> is a graph node,
+        /// a <see cref="NodeOperator"/> will be used to animate the scaling; otherwise the
+        /// scale of <paramref name="gameObject"/> is set immediately without any animation</param>
+        public static void SetAbsoluteScale(this GameObject gameObject, Vector3 worldScale, bool animate = true)
         {
             Transform parent = gameObject.transform.parent;
             gameObject.transform.parent = null;
-            if (gameObject.HasNodeRef())
+            if (animate && gameObject.HasNodeRef())
             {
                 NodeOperator @operator = gameObject.AddOrGetComponent<NodeOperator>();
                 @operator.ScaleTo(worldScale, 0f);
