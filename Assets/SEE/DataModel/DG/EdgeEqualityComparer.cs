@@ -26,6 +26,12 @@ namespace SEE.DataModel.DG
     /// </summary>
     public class EdgeEqualityComparer : IEqualityComparer<Edge>
     {
+        /// <summary>
+        /// True if <paramref name="x"/> and <paramref name="y"/> have the same ID.
+        /// </summary>
+        /// <param name="x">node to be compared to <paramref name="y"/></param>
+        /// <param name="y">node to be compared to <paramref name="x"/></param>
+        /// <returns>True if <paramref name="x"/> and <paramref name="y"/> have the same ID.</returns>
         public bool Equals(Edge x, Edge y)
         {
             return x.ID.Equals(y.ID);

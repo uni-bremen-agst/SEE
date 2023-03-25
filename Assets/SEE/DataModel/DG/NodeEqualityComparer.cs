@@ -26,14 +26,25 @@ namespace SEE.DataModel.DG
     /// </summary>
     public class NodeEqualityComparer : IEqualityComparer<Node>
     {
+        /// <summary>
+        /// True if <paramref name="x"/> and <paramref name="y"/> have the same ID.
+        /// </summary>
+        /// <param name="x">node to be compared to <paramref name="y"/></param>
+        /// <param name="y">node to be compared to <paramref name="x"/></param>
+        /// <returns>True if <paramref name="x"/> and <paramref name="y"/> have the same ID.</returns>
         public bool Equals(Node x, Node y)
         {
             return x.ID.Equals(y?.ID);
         }
 
-        public int GetHashCode(Node obj)
+        /// <summary>
+        /// Hash code for <paramref name="node"/> based on its ID.
+        /// </summary>
+        /// <param name="node">node whose hash code is requested</param>
+        /// <returns>hash code for <paramref name="node"/></returns>
+        public int GetHashCode(Node node)
         {
-            return obj.ID.GetHashCode();
+            return node.ID.GetHashCode();
         }
     }
 }
