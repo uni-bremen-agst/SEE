@@ -44,7 +44,7 @@ namespace SEE.Game.Evolution
             if (gameObject.IsNode())
             {
                 NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
-                callback = nodeOperator.MoveTo(position, duration);
+                callback = nodeOperator.MoveTo(position, duration, updateEdges: false);
             }
             else if (gameObject.IsEdge())
             {

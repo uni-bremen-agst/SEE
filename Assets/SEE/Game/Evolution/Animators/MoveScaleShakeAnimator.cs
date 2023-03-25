@@ -48,16 +48,16 @@ namespace SEE.Game.Evolution
         /// <param name="callbackWhenAnimationFinished">the method to be called when the animation has finished</param>
         /// <param name="moveCallback">the method to be called when the move animation is about to start</param>
         protected override void InternalAnimateTo(GameObject gameObject,
-                                                Vector3 position,
-                                                Vector3 localScale,
-                                                float duration,
-                                                Action<object> callbackWhenAnimationFinished,
-                                                Action<float> moveCallback = null)
+                                                  Vector3 position,
+                                                  Vector3 localScale,
+                                                  float duration,
+                                                  Action<object> callbackWhenAnimationFinished,
+                                                  Action<float> moveCallback = null)
         {
             if (gameObject.IsNode())
             {
                 NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
-                nodeOperator.MoveTo(position, duration).SetOnStart(() => moveCallback?.Invoke(duration));
+                nodeOperator.MoveTo(position, duration, updateEdges: false).SetOnStart(() => moveCallback?.Invoke(duration));
                 nodeOperator.ScaleTo(localScale, duration).SetOnComplete(() => callbackWhenAnimationFinished?.Invoke(gameObject));
             }
             else

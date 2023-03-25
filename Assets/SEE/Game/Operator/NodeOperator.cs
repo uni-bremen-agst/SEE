@@ -91,6 +91,11 @@ namespace SEE.Game.Operator
         private float? updateLayoutDuration;
 
         /// <summary>
+        /// If true, the incoming and outgoing edges will be adjusted, too.
+        /// </summary>
+        private bool updateEdges = false;
+
+        /// <summary>
         /// The position this node is supposed to be at.
         /// </summary>
         /// <seealso cref="AbstractOperator"/>
@@ -111,9 +116,10 @@ namespace SEE.Game.Operator
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveXTo(float newXPosition, float duration)
+        public IOperationCallback<Action> MoveXTo(float newXPosition, float duration, bool updateEdges = true)
         {
             updateLayoutDuration = duration;
+            this.updateEdges = updateEdges;
             return PositionX.AnimateTo(newXPosition, duration);
         }
 
@@ -124,9 +130,10 @@ namespace SEE.Game.Operator
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveYTo(float newYPosition, float duration)
+        public IOperationCallback<Action> MoveYTo(float newYPosition, float duration, bool updateEdges = true)
         {
             updateLayoutDuration = duration;
+            this.updateEdges = updateEdges;
             return PositionY.AnimateTo(newYPosition, duration);
         }
 
@@ -137,9 +144,10 @@ namespace SEE.Game.Operator
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveZTo(float newZPosition, float duration)
+        public IOperationCallback<Action> MoveZTo(float newZPosition, float duration, bool updateEdges = true)
         {
             updateLayoutDuration = duration;
+            this.updateEdges = updateEdges;
             return PositionZ.AnimateTo(newZPosition, duration);
         }
 
@@ -150,9 +158,10 @@ namespace SEE.Game.Operator
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveTo(Vector3 newPosition, float duration)
+        public IOperationCallback<Action> MoveTo(Vector3 newPosition, float duration, bool updateEdges = true)
         {
             updateLayoutDuration = duration;
+            this.updateEdges = updateEdges;
             return new AndCombinedOperationCallback<Action>(new[]
             {
                 PositionX.AnimateTo(newPosition.x, duration),
@@ -169,9 +178,10 @@ namespace SEE.Game.Operator
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> ScaleTo(Vector3 newLocalScale, float duration)
+        public IOperationCallback<Action> ScaleTo(Vector3 newLocalScale, float duration, bool updateEdges = true)
         {
             updateLayoutDuration = duration;
+            this.updateEdges = updateEdges;
             return Scale.AnimateTo(newLocalScale, duration);
         }
 
@@ -194,17 +204,6 @@ namespace SEE.Game.Operator
                 LabelEndLinePosition.AnimateTo(DesiredLabelEndLinePosition, duration)
             });
 
-        /// <summary>
-        /// Updates the layout of objects (edges, labels) attached to this node during the next
-        /// <see cref="Update"/> cycle. This involves recalculating the edge layout for each attached edge.
-        /// Note that this is already automatically done when the node is moved or scaled.
-        /// </summary>
-        /// <param name="duration">Time in seconds the animation should take.</param>
-        public void TriggerLayoutUpdate(float duration)
-        {
-            updateLayoutDuration = duration;
-        }
-
         #endregion
 
         /// <summary>
@@ -220,7 +219,7 @@ namespace SEE.Game.Operator
                 {
                     // If we are moving the root node, the whole graph will be moved,
                     // hence, the layout of the edges does not need to be updated.
-                    if (City.EdgeLayoutSettings.Kind != EdgeLayoutKind.None)
+                    if (updateEdges && City.EdgeLayoutSettings.Kind != EdgeLayoutKind.None)
                     {
                         // The edge layout needs to be updated only if we actually have an edge layout.
                         UpdateEdgeLayout(duration);
@@ -400,6 +399,7 @@ namespace SEE.Game.Operator
             {
                 UpdateLayout(updateLayoutDuration.Value);
                 updateLayoutDuration = null;
+                updateEdges = true;
             }
         }
     }
