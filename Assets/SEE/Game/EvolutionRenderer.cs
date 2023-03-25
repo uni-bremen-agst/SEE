@@ -404,7 +404,7 @@ namespace SEE.Game
             {
                 yield return null;
             }
-            
+
         }
 
         /// <summary>
@@ -503,8 +503,8 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Implements the second phase in the transition from the <see cref="currentCity"/> 
-        /// to the <paramref name="next"/> graph. 
+        /// Implements the second phase in the transition from the <see cref="currentCity"/>
+        /// to the <paramref name="next"/> graph.
         /// In this phase, all nodes in <paramref name="next"/> will be drawn. These may be
         /// either new or existing nodes (the latter being nodes that have been present in the
         /// currently drawn graph). When this phase has been completed, <see cref="OnAnimationsFinished"/>
@@ -531,23 +531,18 @@ namespace SEE.Game
             /// which in turn uses <see cref="nextCity"/>.
             nextCity = next;
 
-            // Edge Animation must be set up before node animation because it
-            // prepares the edge animators that are used during node
-            // animation. If the other way around => BOOM!
+            NodeAnimation(next);
+            CreateEdges(next);
             if (edgesAreDrawn)
             {
                 EdgeAnimation(next);
             }
-            NodeAnimation(next);
 
             // We have made the transition to the next graph.
             currentCity = next;
 
-            void EdgeAnimation(LaidOutGraph next)
+            void CreateEdges(LaidOutGraph next)
             {
-                // Create (or read from cache) the edge objects of the next
-                // visible graph, update their spline, and make the objects
-                // visible.
                 foreach (Edge edge in next.Graph.Edges())
                 {
                     objectManager.GetEdge(edge, out GameObject edgeObject);
@@ -557,6 +552,13 @@ namespace SEE.Game
                     }
                     edgeObject.SetActive(true); // Make visible
                 }
+            }
+
+            void EdgeAnimation(LaidOutGraph next)
+            {
+                // Create (or read from cache) the edge objects of the next
+                // visible graph, update their spline, and make the objects
+                // visible.
                 if (currentCity != null)
                 {
                     // We are transitioning to another graph.
@@ -795,25 +797,27 @@ namespace SEE.Game
             // The game node representing the graphNode if there is any; null if there is none
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
             Assert.IsTrue(currentGameNode.HasNodeRef());
+            Debug.Log($"[RenderNode] {graphNode.ID} is new {formerGraphNode == null}: position={layoutNode.CenterPosition} scale={layoutNode.AbsoluteScale}\n");
 
             Difference difference;
             if (formerGraphNode == null)
             {
+                Debug.Log($"[RenderNode] {graphNode.ID} is new: position={layoutNode.CenterPosition} scale={layoutNode.AbsoluteScale}\n");
                 // The node is new. It has no layout applied to it yet.
                 // If the node is new, we animate it by moving it out of the ground.
-                // Note layoutNode.position.y denotes the ground position of
+                // Note: layoutNode.position.y denotes the ground position of
                 // a game object, not its center.
                 Vector3 position = layoutNode.CenterPosition;
-                position.y -= layoutNode.LocalScale.y;
+                position.y -= layoutNode.AbsoluteScale.y;
                 layoutNode.CenterPosition = position;
 
                 // Revert the change to the y co-ordindate.
-                position.y += layoutNode.LocalScale.y;
+                position.y += layoutNode.AbsoluteScale.y;
                 layoutNode.CenterPosition = position;
                 difference = Difference.Added;
 
                 // Set the layout for the copied node.
-                currentGameNode.transform.localScale = layoutNode.LocalScale;
+                currentGameNode.SetAbsoluteScale(layoutNode.AbsoluteScale, animate: false);
                 currentGameNode.transform.position = layoutNode.CenterPosition;
             }
             else
@@ -915,14 +919,14 @@ namespace SEE.Game
         /// <param name="duration">Duration of the animation</param>
         private void OnEdgeAnimationStart(Tween animatorTween, float duration)
         {
-            Debug.Log("OnEdgeAnimationStart\n");
+            Debug.Log($"OnEdgeAnimationStart {animatorTween != null}\n");
             if (animatorTween != null)
             {
-                // We previously set the duration to 1 second and now want
-                // to change it to `duration` (henceforth actualDuration):
+                // We previously set the duration to 1 second (i.e., setDuration = 1)
+                // and now want to change it to `duration` (henceforth actualDuration):
                 // actualDuration = setDuration / timeScale
-                // => actualDuration = 1 / timeScale
-                // => timeScale = 1 / actualDuration
+                // <=> actualDuration = 1 / timeScale
+                // <=> timeScale = 1 / actualDuration
                 animatorTween.timeScale = 1.0f / duration;
                 animatorTween.PlayForward();
             }
