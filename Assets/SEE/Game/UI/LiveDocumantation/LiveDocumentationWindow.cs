@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SEE.Controls;
 using SEE.Game.UI.Window;
 using SEE.Utils;
 using TMPro;
@@ -37,22 +38,27 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         private TextMeshProUGUI ClassDocumentation;
 
-
-        public Camera Camera;
-
-
         /// <summary>
         /// The name of the class
         /// </summary>
         public string ClassName { get; set; }
 
+        private WindowSpaceManager spaceManager;
+
+
+        /// <summary>
+        /// Enables and disables automatic line breaks in the LiveDocumentation window text fields.
+        ///
+        /// TODO: Needs to be implemented
+        /// </summary>
+        public bool AutoLineBreaksEnabled { get; set; } = true;
 
         /// <summary>
         /// The <see cref="LiveDocumentationBuffer"/> which contains the documentation of the class including links
         /// </summary>
         public LiveDocumentationBuffer DocumentationBuffer { get; set; }
 
-        public IList<LiveDocumentationBuffer> ClassMembers { get; set; }
+        public IList<LiveDocumentationBuffer> ClassMembers { get; set; } = new List<LiveDocumentationBuffer>();
 
 
         /// <summary>
@@ -82,15 +88,18 @@ namespace SEE.Game.UI.LiveDocumantation
             ClassMember cm = classMem.AddComponent<ClassMember>();
             cm.Text = buffer.PrintBuffer();
 
-            // Setting the correct anchor point for the new game object 
+            // Setting the correct anchor point (upper left corner) for the new game object
             classMem.transform.parent = ClassMembersList.transform;
             rt.localScale = new Vector3(1, 1, 1);
+            // This will set the 
             rt.anchorMin = new Vector2(0, 1);
             rt.anchorMax = new Vector2(0, 1);
         }
 
+
         protected override void StartDesktop()
         {
+            spaceManager = WindowSpaceManager.ManagerInstance;
             if (!CheckNecessaryFields())
             {
                 Debug.LogError("Some fields are not set; cant load LiveDocumentation");
@@ -109,7 +118,7 @@ namespace SEE.Game.UI.LiveDocumantation
 
 
             // Initializing Unity Components 
-            ClassNameField = livedoc.transform.Find("Content/ClassName").gameObject
+            ClassNameField = livedoc.transform.Find("ClassName/Viewport/Content/ClassName").gameObject
                 .GetComponent<TextMeshProUGUI>();
 
             ClassDocumentation =
@@ -120,9 +129,9 @@ namespace SEE.Game.UI.LiveDocumantation
 
             // Setting the classname.
             ClassNameField.text = ClassName;
-            ClassDocumentation.text = DocumentationBuffer.PrintBuffer();
 
-
+            // Try setting the documentation 
+            ClassDocumentation.text = DocumentationBuffer?.PrintBuffer() ?? "NO DOCS AVAILABLE";
             //     GameObject livedoc =
             //         PrefabInstantiator.InstantiatePrefab("Prefabs/UI/LiveDocumentation/ClassMember", ClassMembers.transform, false);
 
@@ -171,7 +180,28 @@ namespace SEE.Game.UI.LiveDocumantation
 
                 if (link != -1)
                 {
-                    string linkId = ClassDocumentation.textInfo.linkInfo[link].GetLinkID()[0].ToString();
+                    string linkId = ClassDocumentation.textInfo.linkInfo[link].GetLinkID().ToString();
+                    //TODO Open new the Link
+                    LiveDocumentationWindow newWin = gameObject.AddComponent<LiveDocumentationWindow>();
+                    newWin.ClassName = "New Node test";
+
+
+                    var filenames = linkId.Split("\\");
+                    newWin.ClassName = filenames[filenames.Length - 1].ToString().Split(".")[0];
+                    newWin.Title = filenames[filenames.Length - 1].ToString();
+
+                    LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
+                    buffer.Add(new LiveDocumentationBufferText(
+                        "Dies ist eine Test documentation für die andere Klasse "));
+
+                    //  newWin.DocumentationBuffer = buffer;
+                    // Add code window to our space of code window, if it isn't in there yet
+                    if (!spaceManager[WindowSpaceManager.LOCAL_PLAYER].Windows.Contains(newWin))
+                    {
+                        spaceManager[WindowSpaceManager.LOCAL_PLAYER].AddWindow(newWin);
+                    }
+
+                    spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = newWin;
                 }
             }
         }

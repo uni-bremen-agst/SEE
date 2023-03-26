@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using SEE.Game.UI.LiveDocumantation;
 using SEE.Game.UI.Notification;
 using SEE.GO;
@@ -38,37 +39,49 @@ namespace SEE.Controls.Actions
             {
                 NodeRef selectedNode = hit.collider.gameObject.GetComponent<NodeRef>();
 
+                // When the node the user has clicked on wasn't a leaf node.
+                // In this case an error message is displayed and the LiveDocumentation windows is not going to open.
                 if (!selectedNode.Value.IsLeaf())
                 {
-                    ShowNotification.Warn("Node not supported", "Only leaf nodes can be analysed");
+                    ShowNotification.Error("Node not supported", "Only leaf nodes can be analysed");
                     return false;
                 }
                 
+
                 if (!selectedNode.TryGetComponent(out LiveDocumentationWindow documentationWindow))
                 {
-                    
                     string fileName = selectedNode.Value.Filename();
                     
+                    // Copied from ShowCodeAction
+                    if (fileName == null)
+                    {
+                        ShowNotification.Warn("No file", $"Selected node '{selectedNode.Value.SourceName}' has no filename.");
+                        return false;
+                    }
+                    string absolutePlatformPath = selectedNode.Value.AbsolutePlatformPath();
+                    if (!File.Exists(absolutePlatformPath))
+                    {
+                        ShowNotification.Warn("File does not exist", $"Path {absolutePlatformPath} of selected node '{selectedNode.Value.SourceName}' does not exist.");
+                        return false;
+                    }
+
                     documentationWindow = selectedNode.gameObject.AddComponent<LiveDocumentationWindow>();
                     documentationWindow.ClassName = selectedNode.Value.SourceName;
-                    documentationWindow.Title = "LiveDoc";
+                    documentationWindow.Title = selectedNode.Value.SourceName;
 
                     LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
-                    buffer.Add(new LiveDocumentationBufferText("Dies ist ein Text erstmal"));
-                    buffer.Add(new LiveDocumentationLink("Test.cs", "Name of link"));
-                    buffer.Add(new LiveDocumentationBufferText("Dies ist ein Text erstmal"));
-
-                    buffer.Add(new LiveDocumentationBufferText("Dies ist ein Text erstmal"));
-
-                    buffer.Add(new LiveDocumentationBufferText("Dies ist ein Text erstmal"));
+                    buffer.Add(new LiveDocumentationBufferText("Dies ist eine Test documentation für diese Klasse "));
+                    buffer.Add(new LiveDocumentationBufferText("Die klasse benutzt auch irgendwie "));
+                    buffer.Add(new LiveDocumentationLink("C:\\SEE\\Assets\\StreamingAssets\\mini\\src\\C2.cs", "CS2.cs"));
+                    buffer.Add(new LiveDocumentationBufferText("\nLorem ipsum oder so ähnlich"));
 
 
                     List<LiveDocumentationBuffer> classMembers = new List<LiveDocumentationBuffer>();
                     LiveDocumentationBuffer b = new LiveDocumentationBuffer();
-                    b.Add(new LiveDocumentationBufferText("test member"));
-                    
+                    b.Add(new LiveDocumentationBufferText("public void SomeFunc(int num)"));
+
                     classMembers.Add(b);
-                    
+
                     documentationWindow.DocumentationBuffer = buffer;
                     documentationWindow.ClassMembers = classMembers;
                 }

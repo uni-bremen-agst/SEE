@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
@@ -67,7 +68,7 @@ namespace SEE.Game.UI.LiveDocumantation
         /// <param name="text">The Text that should be added</param>
         public void Add(LiveDocumentationBufferText text) => BufferItems.Add(text);
 
-
+        
         public string PrintBuffer()
         {
             StringBuilder builder = new StringBuilder();
