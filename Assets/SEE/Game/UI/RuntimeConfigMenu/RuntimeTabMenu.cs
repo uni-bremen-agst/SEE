@@ -13,7 +13,6 @@ using SEE.Game.UI.Menu;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
 using SimpleFileBrowser;
-using Sirenix.OdinInspector;
 using Sirenix.Utilities;
 using TMPro;
 using UnityEngine;
@@ -38,26 +37,32 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenuRework_v2";
     protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsView";
     protected override string EntryPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeTabButton";
-    
-    // is already part of the MenuPrefab
-    protected override string ViewListPrefab => null;
-    
-    // is already part of the MenuPrefab
-    protected override string EntryListPrefab => null;
-    
-    // which sprite should be used as the icon
-    protected override string IconSprite => base.IconSprite;
-    // TODO: where can be specific parts of the menu be found
-    protected override string ViewListPath => "SettingsContentView";
-    protected override string ContentPath => "SeeSettingsPanel";
-    protected override string EntryListPath => "Tabs/TabObjects";
-    
+
+    protected override string ContentPath => "Main Content";
+    protected override string ViewListPath => "ViewList";
+    protected override string EntryListPath => "TabButtons/TabObjects";
+    protected virtual string ConfigButtonListPath => "ConfigButtons/Content";
+
+    protected virtual string CitySwitcherPath => "City Switcher";
+
     private HorizontalSelector citySwitcher;
+    private GameObject configButtonList;
+    private AbstractSEECity[] cities;
 
     /// <summary>
     /// The SEE-city.
     /// </summary>
     public AbstractSEECity City { private get; set; }
+
+    protected override void StartDesktop()
+    {
+        base.StartDesktop();
+        cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity).Select(go => go.GetComponent<AbstractSEECity>()).ToArray();
+        configButtonList = Content.transform.Find(ConfigButtonListPath).gameObject;
+        citySwitcher =  Content.transform.Find(CitySwitcherPath).GetComponent<HorizontalSelector>();
+
+        SetupCitySwitcher();
+    }
 
     /// <summary>
     /// Updates the menu and adds listeners.
@@ -68,42 +73,38 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         OnEntryAdded += _ => SetMiscAsLastTab();
 
         LoadCity(0);
-        SetupCitySwitcher();
     }
 
-    protected virtual void CreateButton(MemberInfo memberInfo)
+    protected virtual void CreateButton(MethodInfo methodInfo)
     {
-        if (memberInfo.CustomAttributes.Any(attribute => attribute.AttributeType == typeof(RuntimeButtonAttribute)))
-        {
-            Transform buttonContent = Content.transform.Find("ConfigButtons/Content");
-            GameObject button = PrefabInstantiator.InstantiatePrefab(BUTTON_PREFAB, buttonContent, false);
-            button.name = memberInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
-            ButtonManagerWithIcon buttonManager = button.GetComponent<ButtonManagerWithIcon>();
-            buttonManager.buttonText = memberInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
-            UnityEvent buttonEvent = new();
-            buttonEvent.AddListener(() => { City.Invoke(memberInfo.Name, 0); StartCoroutine(ClearAndLoadCity(citySwitcher.index)); });
-            buttonManager.clickEvent =  buttonEvent;
+        RuntimeButtonAttribute buttonAttribute = methodInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault();
+        // only methods with the button attribute
+        if (buttonAttribute == null) return;
+        // only methods with no parameters
+        if (methodInfo.GetParameters().Length > 0) return;
 
-            //Debug.Log("\t"+"CreateButton____ "+ memberInfo.Name);
-        }
+        GameObject button = PrefabInstantiator.InstantiatePrefab(BUTTON_PREFAB, configButtonList.transform, false);
+        button.name = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
+        ButtonManagerWithIcon buttonManager = button.GetComponent<ButtonManagerWithIcon>();
+        buttonManager.buttonText = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
+    
+        buttonManager.clickEvent.AddListener(() => {
+            methodInfo.Invoke(City, null); // calls the method
+            OnUpdateMenuValues?.Invoke(); // updates the menu
+        });
     }
 
     protected void ClearCity()
     {
         Entries.Reverse().ForEach(RemoveEntry);
-        foreach (Transform button in Content.transform.Find("ConfigButtons/Content"))
-        {
-            Destroyer.Destroy(button.gameObject);
-        }
-        //TODO Remove Buttons as well: Listener und Buttons muessen zu TabMenu.cs hinzugeuegt werden
-        MenuManager.UpdateUI();
+        foreach (Transform button in configButtonList.transform) Destroyer.Destroy(button.gameObject);
+        OnUpdateMenuValues = null;
     }
-    
+
     public void LoadCity(int i)
     {
         City = GameObject.FindGameObjectsWithTag(Tags.CodeCity)[i].GetComponent<AbstractSEECity>();
-        City.GetType().GetMembers().ForEach(memberInfo =>
-        {
+        City.GetType().GetMembers().ForEach(memberInfo => {
             if (memberInfo.DeclaringType == typeof(AbstractSEECity) || 
                 memberInfo.DeclaringType!.IsSubclassOf(typeof(AbstractSEECity))) 
                 CreateSetting(memberInfo, null, City);
@@ -111,31 +112,16 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         City.GetType().GetMethods().ForEach(CreateButton);
         SelectEntry(Entries.First(entry => entry.Title != "Misc"));
     } 
-    
-    public List<GameObject> GetAllCities()
-    {
-        List<GameObject> seeCities = GameObject.FindGameObjectsWithTag(Tags.CodeCity).ToList();
-        return seeCities;
-    } 
-    
+
     private void SetupCitySwitcher()
     {
-        citySwitcher =  GameObject.Find("Horizontal Selector").GetComponent<HorizontalSelector>();
-        citySwitcher.name = "CitySwitcher";
         citySwitcher.itemList.Clear();
-        List<GameObject> seeCities = GetAllCities();
-        foreach (GameObject city in seeCities)
-        {
-            citySwitcher.CreateNewItem(city.GetComponent<AbstractSEECity>().name);
-        }
         citySwitcher.defaultIndex = 0;
+        cities.ForEach(city => citySwitcher.CreateNewItem(city.name));
         citySwitcher.SetupSelector();
-        citySwitcher.selectorEvent.AddListener(index =>
-        {
-            StartCoroutine(ClearAndLoadCity(index));
-        });
+        citySwitcher.selectorEvent.AddListener(index => StartCoroutine(ClearAndLoadCity(index)));
     }
-    
+
     /// <summary>
     /// Clear and load city.
     /// Delays the loading of a city by one frame since destroying GameObject is not immediate.
@@ -158,7 +144,6 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     private GameObject CreateOrGetViewGameObject(IEnumerable<Attribute> attributes)
     {
         string tabName = attributes.OfType<RuntimeFoldoutAttribute>().FirstOrDefault()?.name ??
-                         attributes.OfType<PropertyGroupAttribute>().FirstOrDefault()?.GroupName ??
                          "Misc";
         ToggleMenuEntry entry = Entries.FirstOrDefault(entry => entry.Title == tabName);
         // adds an entry (tab + view) if necessary
@@ -178,7 +163,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
         return ViewGameObject(entry);
     }
-    
+
     /// <summary>
     /// Sets the misc button as the last in the tab list.
     /// </summary>
@@ -291,7 +276,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                     settingName: settingName, 
                     setter: changedValue => setter!(Enum.ToObject(value.GetType(), changedValue)),
                     values: value.GetType().GetEnumNames(),
-                    getter: () => (string) getter(),
+                    getter: () => getter().ToString(),
                     parent: parent
                 );
                 break;
@@ -324,24 +309,24 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 // TODO: How to edit the strings?
                 // TODO: Currently only works on first edit
                 /*
-                parent = CreateNestedSetting( name, parent);
-                int strIndex = 0;
-                foreach (string str in hashSet)
-                {
-                    CreateSetting(
-                        value: str,
-                        name: strIndex.ToString(),
-                        parent: parent,
-                        setter: changedValue =>
-                        {
-                            hashSet.Remove(str); 
-                            hashSet.Add((string)changedValue);
-                        },
-                        attributes: null
-                    );
-                    strIndex++;
-                }
-                */
+            parent = CreateNestedSetting( name, parent);
+            int strIndex = 0;
+            foreach (string str in hashSet)
+            {
+                CreateSetting(
+                    value: str,
+                    name: strIndex.ToString(),
+                    parent: parent,
+                    setter: changedValue =>
+                    {
+                        hashSet.Remove(str); 
+                        hashSet.Add((string)changedValue);
+                    },
+                    attributes: null
+                );
+                strIndex++;
+            }
+            */
                 break;
             case IDictionary dict:
                 parent = CreateNestedSetting(settingName, parent);
@@ -359,7 +344,6 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 ButtonManagerWithIcon addButtonManager = addButton.GetComponent<ButtonManagerWithIcon>();
                 // Listener AddButton
                 addButtonManager.clickEvent.AddListener(() => {
-                    Debug.Log("Add element");
                     list.Add(""); 
                     UpdateListChildren(list, parent);
                     addButtonManager.transform.SetAsLastSibling();
@@ -367,7 +351,6 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 });
                 // Listener RemoveButton
                 removeButtonManager.clickEvent.AddListener(() => {
-                    Debug.Log("Remove element");
                     list.RemoveAt(list.Count - 1);
                     UpdateListChildren(list, parent);
                     addButtonManager.transform.SetAsLastSibling();
@@ -415,7 +398,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 break;
         }
     } 
-    
+
     private GameObject CreateNestedSetting(string settingName, GameObject parent)
     {
         GameObject container =
@@ -437,18 +420,18 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         Slider slider = sliderGameObject.GetComponentInChildren<Slider>();
         TextMeshProUGUI text = sliderGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = settingName;
-                
+            
         sliderManager.usePercent = false;
         sliderManager.useRoundValue = useRoundValue;
         slider.minValue = range.min;
         slider.maxValue = range.max;
-                
+            
         slider.value = getter();
         slider.onValueChanged.AddListener(setter);
 
         RuntimeSmallEditorButton smallEditorButton = sliderGameObject.AddComponent<RuntimeSmallEditorButton>();
         smallEditorButton.OnShowMenuChanged += () => ShowMenu = !smallEditorButton.ShowMenu;
-        
+    
         OnUpdateMenuValues += () => slider.value = getter();
     }
 
@@ -469,7 +452,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
         RuntimeSmallEditorButton smallEditorButton = switchGameObject.AddComponent<RuntimeSmallEditorButton>();
         smallEditorButton.OnShowMenuChanged += () => ShowMenu = !smallEditorButton.ShowMenu;
-        
+    
         OnUpdateMenuValues += () =>
         {
             switchManager.isOn = getter();
@@ -488,10 +471,10 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
         TMP_InputField inputField = stringGameObject.GetComponentInChildren<TMP_InputField>();
         inputField.text = getter();
-        inputField.onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false);
-        inputField.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
+        inputField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
+        inputField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
         inputField.onValueChanged.AddListener(setter);
-        
+    
         RuntimeSmallEditorButton smallEditorButton = stringGameObject.AddComponent<RuntimeSmallEditorButton>();
         smallEditorButton.OnShowMenuChanged += () => ShowMenu = !smallEditorButton.ShowMenu;
 
@@ -501,6 +484,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     // TODO: Add action
     private void CreateDropDown(string settingName, UnityAction<int> setter, IEnumerable<string> values, Func<string> getter, GameObject parent)
     {
+        string[] valueArray = values as string[] ?? values.ToArray();
+    
         GameObject dropDownGameObject =
             PrefabInstantiator.InstantiatePrefab(DROPDOWN_PREFAB, parent.transform, false);
         dropDownGameObject.name = settingName;
@@ -512,21 +497,23 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         CustomDropdown dropdown = dropDownGameObject.transform.Find("DropdownCombo/Dropdown").GetComponent<CustomDropdown>();
         TMP_InputField customInput = dropDownGameObject.transform.Find("DropdownCombo/Input").GetComponent<TMP_InputField>();
         Dictaphone dictaphone = dropDownGameObject.transform.Find("DropdownCombo/DictateButton").GetComponent<Dictaphone>();
-        
+    
         customInput.gameObject.SetActive(false);
         dictaphone.gameObject.SetActive(false);
-        
+    
         dropdown.isListItem = true;
-        dropdown.listParent = GameObject.Find("UI Canvas").transform;
+        dropdown.listParent = Canvas.transform;
+        dropdown.selectedItemIndex = Array.IndexOf(valueArray, getter());
+        valueArray.ForEach(s => dropdown.CreateNewItemFast(s, null));
         dropdown.dropdownEvent.AddListener(setter);
-        values.ForEach(s => dropdown.CreateNewItem(s, null));
-        dropdown.SetupDropdown();
-        
+    
         RuntimeSmallEditorButton smallEditorButton = dropDownGameObject.AddComponent<RuntimeSmallEditorButton>();
         smallEditorButton.OnShowMenuChanged += () => ShowMenu = !smallEditorButton.ShowMenu;
-        
-        // TODO: Set current dropdown item
-        // TODO: OnUpdateMenuValues
+
+        OnUpdateMenuValues += () => {
+            dropdown.selectedItemIndex = Array.IndexOf(valueArray, getter());
+            // TODO: Is dropdown.UpdateValues() necessary?
+        };
     }
 
     // TODO: Add action
@@ -595,13 +582,14 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             }
         }
     }
-    
-    private void AddLayoutElement(GameObject gameObject)
+
+    private void AddLayoutElement(GameObject go)
     {
-        LayoutElement le = gameObject.AddComponent<LayoutElement>();
-        le.minHeight = ((RectTransform) gameObject.transform).rect.height;
-        le.minWidth = ((RectTransform) gameObject.transform).rect.width;
+        LayoutElement le = go.AddComponent<LayoutElement>();
+        le.minWidth = ((RectTransform) go.transform).rect.width;
+        le.minHeight = ((RectTransform) go.transform).rect.height;
     }
 
+    // TODO: Is the event working?
     private event Action OnUpdateMenuValues;
 }

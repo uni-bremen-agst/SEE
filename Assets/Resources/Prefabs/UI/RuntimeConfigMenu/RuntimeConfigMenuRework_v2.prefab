@@ -518,7 +518,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 982.5, y: 0}
+  m_AnchoredPosition: {x: 802, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9023297408135620304
@@ -1176,7 +1176,7 @@ GameObject:
   - component: {fileID: 2682587557438871174}
   - component: {fileID: 8885159943708936061}
   m_Layer: 5
-  m_Name: SeeSettingsPanel
+  m_Name: Main Content
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2023,7 +2023,7 @@ GameObject:
   - component: {fileID: 2799032429101295006}
   - component: {fileID: 4687039071375272903}
   m_Layer: 0
-  m_Name: SettingsContentView
+  m_Name: ViewList
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2354,7 +2354,7 @@ GameObject:
   - component: {fileID: 4504525893848358020}
   - component: {fileID: 7313934428901245017}
   m_Layer: 0
-  m_Name: Tabs
+  m_Name: TabButtons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2533,7 +2533,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1601132473248214, guid: 206739ec74e396e439ed908b0005e631, type: 3}
       propertyPath: m_Name
-      value: Horizontal Selector
+      value: City Switcher
       objectReference: {fileID: 0}
     - target: {fileID: 114028478300728266, guid: 206739ec74e396e439ed908b0005e631,
         type: 3}
