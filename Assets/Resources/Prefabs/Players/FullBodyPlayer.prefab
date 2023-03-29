@@ -1039,7 +1039,6 @@ MonoBehaviour:
   follow: {fileID: 918972834420394626}
   maxFollowDistance: 0.25
   throwPower: 1
-  enableInterpolation: 1
   advancedFollowSettings: 1
   enableIK: 1
   swayStrength: 0.7
@@ -1098,6 +1097,7 @@ MonoBehaviour:
   hand: {fileID: 918972834733679919}
   grabButton: 0
   grabAxis: 1
+  squeezeAxis: 1
   squeezeButton: 4
 --- !u!114 &918972834733679917
 MonoBehaviour:
@@ -2843,7 +2843,6 @@ MonoBehaviour:
   follow: {fileID: 918972835545636558}
   maxFollowDistance: 0.25
   throwPower: 1
-  enableInterpolation: 1
   advancedFollowSettings: 1
   enableIK: 1
   swayStrength: 0.7
@@ -2902,6 +2901,7 @@ MonoBehaviour:
   hand: {fileID: 918972835571062097}
   grabButton: 0
   grabAxis: 1
+  squeezeAxis: 1
   squeezeButton: 4
 --- !u!114 &918972835571062102
 MonoBehaviour:
@@ -3000,6 +3000,7 @@ GameObject:
   - component: {fileID: 6150281781846471092}
   - component: {fileID: 8192161889179998645}
   - component: {fileID: 2003498329288785869}
+  - component: {fileID: 6858770247465292987}
   m_Layer: 0
   m_Name: FullBodyPlayer
   m_TagString: Untagged
@@ -3098,6 +3099,18 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+--- !u!114 &6858770247465292987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 918972835602171096}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da67338d65ed43338b0719756cb3d9d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &918972835619124371
 GameObject:
   m_ObjectHideFlags: 0
@@ -4010,6 +4023,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &918972836184260306
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4845,6 +4859,11 @@ PrefabInstance:
       propertyPath: primaryHand
       value: 
       objectReference: {fileID: 918972834733679919}
+    - target: {fileID: 6876478601354298033, guid: 035aaa70c735c164bbf1a8760fad9f76,
+        type: 3}
+      propertyPath: layers.m_Bits
+      value: 268435456
+      objectReference: {fileID: 0}
     - target: {fileID: 6876478601354298033, guid: 035aaa70c735c164bbf1a8760fad9f76,
         type: 3}
       propertyPath: secondaryHand
