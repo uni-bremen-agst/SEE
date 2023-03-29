@@ -22,9 +22,9 @@ using System.Collections.Generic;
 namespace SEE.DataModel.DG
 {
     /// <summary>
-    /// Compares two nodes by Node.ID for equality.
+    /// Compares two instances of <see cref="GraphElement"/> by their ID for equality.
     /// </summary>
-    public class NodeEqualityComparer : IEqualityComparer<Node>
+    public abstract class GraphElementEqualityComparer<T> : IEqualityComparer<T> where T : GraphElement
     {
         /// <summary>
         /// True if <paramref name="x"/> and <paramref name="y"/> have the same ID.
@@ -32,7 +32,7 @@ namespace SEE.DataModel.DG
         /// <param name="x">node to be compared to <paramref name="y"/></param>
         /// <param name="y">node to be compared to <paramref name="x"/></param>
         /// <returns>True if <paramref name="x"/> and <paramref name="y"/> have the same ID.</returns>
-        public bool Equals(Node x, Node y)
+        public bool Equals(T x, T y)
         {
             return x.ID.Equals(y?.ID);
         }
@@ -42,9 +42,19 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <param name="node">node whose hash code is requested</param>
         /// <returns>hash code for <paramref name="node"/></returns>
-        public int GetHashCode(Node node)
+        public int GetHashCode(T node)
         {
             return node.ID.GetHashCode();
         }
     }
+
+    /// <summary>
+    /// Compares two instances of <see cref="Node"/> by their ID for equality.
+    /// </summary>
+    public class NodeEqualityComparer : GraphElementEqualityComparer<Node> { }
+
+    /// <summary>
+    /// Compares two instances of <see cref="Edge"/> by their ID for equality.
+    /// </summary>
+    public class EdgeEqualityComparer : GraphElementEqualityComparer<Edge> { }
 }
