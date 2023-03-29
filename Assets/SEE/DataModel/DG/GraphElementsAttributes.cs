@@ -32,7 +32,7 @@ namespace SEE.DataModel.DG
         /// All names of integer attributes of all nodes and edges in the graph.
         /// </summary>
         /// <returns>names of integer attributes</returns>
-        public ISet<string> AllIntAttributes()
+        public ISet<string> AllIntGraphElementAttributes()
         {
             return AllAttributes(true, true, ge => ge.AllIntAttributeNames());
         }
@@ -63,7 +63,7 @@ namespace SEE.DataModel.DG
         /// All names of float attributes of all nodes and edges in the graph.
         /// </summary>
         /// <returns>names of attributes</returns>
-        public ISet<string> AllFloatAttributes()
+        public ISet<string> AllFloatGraphElementAttributes()
         {
             return AllAttributes(true, true, ge => ge.AllFloatAttributeNames());
         }
@@ -94,7 +94,7 @@ namespace SEE.DataModel.DG
         /// All names of toggle attributes of all graph elements in the graph.
         /// </summary>
         /// <returns>names of toggle attributes</returns>
-        public ISet<string> AllToggleAttributes()
+        public ISet<string> AllToggleGraphElementAttributes()
         {
             return AllAttributes(true, true, ge => ge.AllToggleAttributeNames());
         }
@@ -125,7 +125,7 @@ namespace SEE.DataModel.DG
         /// All names of string attributes of all graph elements in the graph.
         /// </summary>
         /// <returns>names of string attributes</returns>
-        public ISet<string> AllStringAttributes()
+        public ISet<string> AllStringGraphElementAttributes()
         {
             return AllAttributes(true, true, ge => ge.AllStringAttributeNames());
         }
