@@ -10,6 +10,7 @@ using UnityEngine.Assertions;
 using SEE.Game;
 using SEE.Net.Actions;
 using SEE.Audio;
+using UnityEngine.UI;
 
 namespace SEE.Controls
 {
@@ -571,31 +572,37 @@ namespace SEE.Controls
 
             IsGrabbed = grab;
 
-            if (grab)
+            // FIXME: This part is not working with vr right now.
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
             {
-                GrabIn?.Invoke(this, isInitiator);
-                AnyGrabIn?.Invoke(this, isInitiator);
-                if (isInitiator)
+                if (grab)
                 {
-                    // The local player has grabbed this object and needs to be informed about it.
-                    // Non-local player are not concerned here.
-                    LocalGrabIn?.Invoke(this);
-                    LocalAnyGrabIn?.Invoke(this);
+                    GrabIn?.Invoke(this, isInitiator);
+                    AnyGrabIn?.Invoke(this, isInitiator);
+                    if (isInitiator)
+                    {
+                        // The local player has grabbed this object and needs to be informed about it.
+                        // Non-local player are not concerned here.
+                        LocalGrabIn?.Invoke(this);
+                        LocalAnyGrabIn?.Invoke(this);
+                    }
+
+                    GrabbedObjects.Add(this);
                 }
-                GrabbedObjects.Add(this);
-            }
-            else
-            {
-                GrabOut?.Invoke(this, isInitiator);
-                AnyGrabOut?.Invoke(this, isInitiator);
-                if (isInitiator)
+                else
                 {
-                    // The local player has finished grabbing this object and needs to be informed about it.
-                    // Non-local player are not concerned here.
-                    LocalGrabOut?.Invoke(this);
-                    LocalAnyGrabOut?.Invoke(this);
+                    GrabOut?.Invoke(this, isInitiator);
+                    AnyGrabOut?.Invoke(this, isInitiator);
+                    if (isInitiator)
+                    {
+                        // The local player has finished grabbing this object and needs to be informed about it.
+                        // Non-local player are not concerned here.
+                        LocalGrabOut?.Invoke(this);
+                        LocalAnyGrabOut?.Invoke(this);
+                    }
+
+                    GrabbedObjects.Remove(this);
                 }
-                GrabbedObjects.Remove(this);
             }
 
             if (isInitiator)
