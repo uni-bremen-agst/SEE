@@ -30,7 +30,7 @@ namespace SEE.DataModel.DG
     /// </summary>
     public abstract class Attributable : Observable<ChangeEvent>, ICloneable
     {
-        public static readonly HashSet<string> NumericAttributeNames = new HashSet<string>();
+        public static readonly HashSet<string> NumericAttributeNames = new();
 
         //----------------------------------
         // Toggle attributes
@@ -245,11 +245,47 @@ namespace SEE.DataModel.DG
         /// Returns the names of all numeric attributes (metrics).
         /// </summary>
         /// <returns>names of all numeric attributes</returns>
-        public HashSet<string> AllMetrics()
+        public ISet<string> AllMetrics()
         {
-            HashSet<string> result = new HashSet<string>(FloatAttributes.Keys);
+            HashSet<string> result = new(FloatAttributes.Keys);
             result.UnionWith(IntAttributes.Keys);
             return result;
+        }
+
+        /// <summary>
+        /// Yields all string attribute names of this <see cref="Attributable"/>.
+        /// </summary>
+        /// <returns>all string attribute names</returns>
+        public ICollection<string> AllStringAttributeNames()
+        {
+            return StringAttributes.Keys;
+        }
+
+        /// <summary>
+        /// Yields all toggle attribute names of this <see cref="Attributable"/>.
+        /// </summary>
+        /// <returns>all toggle attribute names</returns>
+        public ICollection<string> AllToggleAttributeNames()
+        {
+            return ToggleAttributes;
+        }
+
+        /// <summary>
+        /// Yields all float attribute names of this <see cref="Attributable"/>.
+        /// </summary>
+        /// <returns>all float attribute names</returns>
+        public ICollection<string> AllFloatAttributeNames()
+        {
+            return FloatAttributes.Keys;
+        }
+
+        /// <summary>
+        /// Yields all integer attribute names of this <see cref="Attributable"/>.
+        /// </summary>
+        /// <returns>all integer attribute names</returns>
+        public ICollection<string> AllIntAttributeNames()
+        {
+            return IntAttributes.Keys;
         }
 
         //----------------------------------
@@ -288,31 +324,45 @@ namespace SEE.DataModel.DG
             }
             else
             {
-                Attributable otherAttributable = other as Attributable;
-                if (!toggleAttributes.SetEquals(otherAttributable!.toggleAttributes))
-                {
-                    Report("The toggle attributes are different");
-                    return false;
-                }
-                else if (!AreEqual(StringAttributes, otherAttributable.StringAttributes))
-                {
-                    Report("The string attributes are different");
-                    return false;
-                }
-                else if (!AreEqual(IntAttributes, otherAttributable.IntAttributes))
-                {
-                    Report("The int attributes are different");
-                    return false;
-                }
-                else if (!AreEqual(FloatAttributes, otherAttributable.FloatAttributes))
-                {
-                    Report("The float attributes are different");
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
+                return HasSameAttributes(other as Attributable);
+            }
+        }
+
+        /// <summary>
+        /// Yields true if this <see cref="Attributable"/> has exactly the same attributes
+        /// as <paramref name="other"/>.
+        /// </summary>
+        /// <param name="other">other <see cref="Attributable"/> to be compared to</param>
+        /// <returns></returns>
+        public bool HasSameAttributes(Attributable other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            else if (!toggleAttributes.SetEquals(other!.toggleAttributes))
+            {
+                Report("The toggle attributes are different");
+                return false;
+            }
+            else if (!AreEqual(StringAttributes, other.StringAttributes))
+            {
+                Report("The string attributes are different");
+                return false;
+            }
+            else if (!AreEqual(IntAttributes, other.IntAttributes))
+            {
+                Report("The int attributes are different");
+                return false;
+            }
+            else if (!AreEqual(FloatAttributes, other.FloatAttributes))
+            {
+                Report("The float attributes are different");
+                return false;
+            }
+            else
+            {
+                return true;
             }
         }
 
@@ -325,7 +375,7 @@ namespace SEE.DataModel.DG
         /// <param name="left">left dictionary for the comparison</param>
         /// <param name="right">right dictionary for the comparison</param>
         /// <returns>true if <paramref name="left"/> and <paramref name="right"/> are equal</returns>
-        protected static bool AreEqual<V>(Dictionary<string, V> left, Dictionary<string, V> right)
+        protected static bool AreEqual<V>(IDictionary<string, V> left, IDictionary<string, V> right)
         {
             return left.Count == right.Count && !left.Except(right).Any();
         }
