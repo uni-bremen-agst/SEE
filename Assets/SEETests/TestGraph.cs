@@ -8,45 +8,8 @@ namespace SEE.DataModel.DG
     /// <summary>
     /// Unit tests for Graph.
     /// </summary>
-    internal class TestGraph
+    internal class TestGraph : TestGraphBase
     {
-        private static Node NewNode(Graph graph, string id, string type = "Routine")
-        {
-            Node result = new Node
-            {
-                SourceName = id,
-                ID = id,
-                Type = type
-            };
-            graph.AddNode(result);
-            return result;
-        }
-
-        private static Edge NewEdge(Graph graph, Node from, Node to, string type = "call")
-        {
-            Edge result = new Edge(from, to, type);
-            graph.AddEdge(result);
-            return result;
-        }
-
-        private bool HasEdge(Node source, Node target, string edgeType = null)
-        {
-            return source.Outgoings.Any(outgoing => outgoing.Target == target && (edgeType == null || outgoing.Type == edgeType));
-        }
-
-        private void AssertHasChild(Graph subgraph, Node parent, Node child)
-        {
-            Assert.AreSame(Pendant(subgraph, parent), Pendant(subgraph, child).Parent);
-        }
-
-        private Node Pendant(Graph subgraph, Node baa) => subgraph.GetNode(baa.ID);
-
-        private static Node Child(Graph g, Node parent, string id, string nodeType = "Routine")
-        {
-            Node child = NewNode(g, id, nodeType);
-            parent.AddChild(child);
-            return child;
-        }
 
         /// <summary>
         /// Tests the following operations:
@@ -114,22 +77,6 @@ namespace SEE.DataModel.DG
             Assert.AreEqual(new HashSet<Edge> { call_n1_n1 }, AsSet(n1.FromTo(n1, "call")));
             Assert.AreEqual(new HashSet<Edge>(), AsSet(n1.FromTo(n2, "use")));
             Assert.AreEqual(new HashSet<Edge> { call_n1_n1, call_n1_n2, call_n1_n3, use_n1_n3_a }, AsSet(n1.Outgoings));
-        }
-
-        /// <summary>
-        /// Creates a new graph with default basepath and graph name.
-        /// </summary>
-        /// <param name="viewName">the name of the graph</param>
-        /// <param name="basePath">the basepath of the graph for looking up the source code files</param>
-        /// <returns>new graph</returns>
-        private static Graph NewGraph(string viewName = "CodeFacts", string basePath = "DUMMYBASEPATH")
-        {
-            return new Graph(basePath, viewName);
-        }
-
-        private static HashSet<Edge> AsSet(IEnumerable<Edge> edges)
-        {
-            return new HashSet<Edge>(edges);
         }
 
         /// <summary>
