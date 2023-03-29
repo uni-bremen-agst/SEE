@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.XR;
-using Hand = UnityEngine.XR.Hand;
+using UnityEngine.XR.Interaction.Toolkit;
 
 //using Valve.VR.InteractionSystem;
 
@@ -33,6 +33,7 @@ namespace SEE.Game
         public static void PrepareForInteraction(GameObject gameObject)
         {
             gameObject.isStatic = false; // we want to move the object during the game
+
 #if false // FIXME STEAMVR
             Interactable interactable = gameObject.AddComponentIfNecessary<Interactable>();
             interactable.highlightOnHover = false;
@@ -49,43 +50,103 @@ namespace SEE.Game
                 gameObject.AddComponentIfNecessary<ShowLabel>();
                 gameObject.AddComponentIfNecessary<ShowEdges>();
                 gameObject.AddComponentIfNecessary<HighlightErosion>();
-                setupRigidbody();
-                setupGrabbable();
+
+                SetupRigidbody();
+                SetupGrabbable();
+                gameObject.AddOrGetComponent<VrActions>();
+
             }
 
-            void setupRigidbody()
+            // Add AutoHand related components.
+            void SetupRigidbody()
             {
-                // Add AutoHand related components
                 Rigidbody rigidbody = gameObject.AddOrGetComponent<Rigidbody>();
-                rigidbody.useGravity = false; // No gravity
-                rigidbody.isKinematic = true;
-                rigidbody.freezeRotation = true; // No rotation
+                rigidbody.useGravity = false; // No gravity for every node,
+                rigidbody.isKinematic = true; // Initial every node is kinematic.
+                rigidbody.freezeRotation = true; // No rotation while grabbed.
 
-                rigidbody.interpolation = RigidbodyInterpolation.Extrapolate; // Interpolation
-                rigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
+                // It is recommended to turn on interpolation for the main character but disable it for everything else.
+                // https://docs.unity3d.com/ScriptReference/Rigidbody-interpolation.html
+                // Interpolation is initially deactivated and is only activated for the moving object.
+                rigidbody.interpolation = RigidbodyInterpolation.None; // Interpolation
 
-                rigidbody.mass = 1.5f;
-                rigidbody.drag = 20;
-                rigidbody.angularDrag = 2;
-                rigidbody.collisionDetectionMode = CollisionDetectionMode.Discrete;
+                // For best results, set this value to CollisionDetectionMode.ContinuousDynamic for fast moving objects,
+                // and for other objects which these need to collide with, set it to CollisionDetectionMode.Continuous.
+                // https://docs.unity3d.com/ScriptReference/Rigidbody-collisionDetectionMode.html
+                // Initially set to continous.
+                rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+                // FIXME: obsolete because of ignoreWeight flag in grabbable component?
+                rigidbody.mass = 25;
+                rigidbody.drag = 25;
+                rigidbody.angularDrag = 1;
+
+                // Set the physic material to reduce bounciness.
+                if (gameObject.TryGetComponent(out BoxCollider boxCollider))
+                {
+                    PhysicMaterial noBounciness = Resources.Load<PhysicMaterial>("Materials/Physics/NoBounciness");
+                    boxCollider.material = noBounciness;
+
+                    /*
+                    IgnoreHandPlayerCollision ignoreHandPlayerCollision = gameObject.AddComponent<IgnoreHandPlayerCollision>();
+                    ignoreHandPlayerCollision.colliders = new List<Collider>();
+                    ignoreHandPlayerCollision.colliders.Add(boxCollider);
+                    */
+                }
             }
 
-            void setupGrabbable()
+            // Configure grabbable component.
+            void SetupGrabbable()
             {
                 Grabbable grabbable = gameObject.AddOrGetComponent<Grabbable>();
 
-                gameObject.AddOrGetComponent<VrActions>();
-                gameObject.AddComponent<VrTriggerEvents>().enabled = false;
+                //gameObject.AddComponent<GrabbableCollisionHaptics>();
 
-                grabbable.allowHeldSwapping = true;
-                grabbable.heldNoFriction = true;
+                // Hand grab type
+                grabbable.grabType = HandGrabType.GrabbableToHand;
+
+                // Which hands are allowed to grab (Both\Left\Right).
+                grabbable.handType = HandType.right;
+
+                // Single hand only for now.
+                grabbable.singleHandOnly = true;
+
+                // If false single handed items cannot passes back and forth on grab.
+                grabbable.allowHeldSwapping = false;
+
+                // If true replaces physics material with NoFriction while grabbed.
+                grabbable.heldNoFriction = false;
+
+                // Will parent the grabbable to the Hand's PARENT on the grab.
+                // Should be true for any object you can pickup and carry away.
                 grabbable.parentOnGrab = false;
 
-                grabbable.throwPower = 1;
-                grabbable.jointBreakForce = 2500;
+                // Will apply a movement follower component (only while held) to simulate weightlessness.
+                grabbable.ignoreWeight = true;
 
+                // the hand holding this grabbable will ignore these colliders only while holding this grabbable.
+                // For example, a door handle where you don't want the door collider to interfere with the hand colliders
+                // grabbable.heldIgnoreColliders = ...;
+
+                // Determines how long the hand will ignore the colliders of the grabbable when released.
+                // Allows for smoother releases with thrown objects, recommend setting to 0 for things like doors and walls.
+                //grabbable.ignoreReleaseTime = 0;
+
+                grabbable.throwPower = 0;
+                grabbable.jointBreakForce = 5000;
+
+                //gameObject.AddComponent<GrabLock>();
+
+                // Sets the highlight material.
                 Material mat = Resources.Load<Material>("Materials/HighlightMaterial/Highlight");
                 grabbable.hightlightMaterial = mat;
+
+                // Distance Grabbing FIXME: Not working as intendet right now.
+                DistanceGrabbable distanceGrabbable = gameObject.AddComponent<DistanceGrabbable>();
+                distanceGrabbable.targetedMaterial = mat;
+                distanceGrabbable.rotate = false;
+                distanceGrabbable.instantPull = true;
+                //distanceGrabbable.grabType = DistanceGrabType.Velocity;
             }
         }
 
