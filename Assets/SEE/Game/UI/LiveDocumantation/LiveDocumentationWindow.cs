@@ -1,6 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using JetBrains.Annotations;
 using SEE.Controls;
+using SEE.DataModel.DG;
+using SEE.Game.UI.Notification;
 using SEE.Game.UI.Window;
 using SEE.Utils;
 using TMPro;
@@ -11,8 +16,18 @@ namespace SEE.Game.UI.LiveDocumantation
 {
     /// <summary>
     /// This class represents a LiveDocumentation window.
-    ///
+    /// 
     /// In this window the Name of the Class, the documentation and all class methods are shown.
+    /// 
+    /// 
+    /// The following fields must be set:
+    /// <ul>
+    ///     <li><see cref="ClassName"/> </li>
+    ///     <li><see cref="BasePath"/> </li>
+    ///     <li><see cref="RelativePath"/> </li>
+    /// </ul>
+    /// Otherwise an error is displayed and the window is not rendereed.
+    /// 
     /// </summary>
     public class LiveDocumentationWindow : BaseWindow
     {
@@ -38,13 +53,48 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         private TextMeshProUGUI ClassDocumentation;
 
+
         /// <summary>
         /// The name of the class
         /// </summary>
         public string ClassName { get; set; }
 
+        /// <summary>
+        /// The base path of the folder containing the source code files
+        /// </summary>
+        public string BasePath { get; set; }
+
+        /// <summary>
+        /// The relative Path
+        /// </summary>
+        public string RelativePath { get; set; }
+
+        /// <summary>
+        /// The graph which the node the user has clicked on belongs to.
+        /// This node is the node which documentation is displayed in this window.
+        ///
+        /// The Graph is needed to find a corresponding node when the user clicked on a link
+        /// </summary>
+        public Graph Graph;
+
         private WindowSpaceManager spaceManager;
 
+        private bool SpaceManagerContainsWindow(string filePath, out BaseWindow win)
+        {
+            List<LiveDocumentationWindow> matchingWindows = spaceManager[WindowSpaceManager.LOCAL_PLAYER].Windows
+                .OfType<LiveDocumentationWindow>()
+                .Where(x => x.RelativePath == filePath).ToList();
+
+
+            if (matchingWindows.Count == 0)
+            {
+                win = null;
+                return false;
+            }
+
+            win = matchingWindows[0];
+            return true;
+        }
 
         /// <summary>
         /// Enables and disables automatic line breaks in the LiveDocumentation window text fields.
@@ -65,7 +115,8 @@ namespace SEE.Game.UI.LiveDocumantation
         /// Checks if all the necessary fields are set in the class
         /// </summary>
         /// <returns>Returns true when all fields are set. Otherwise false</returns>
-        private bool CheckNecessaryFields() => ClassName != null;
+        private bool CheckNecessaryFields() =>
+            ClassName != null && BasePath != null && RelativePath != null && Graph != null;
 
         /// <summary>
         /// Adds a new Class member to the ClassMember section in the LiveDocumentation Window.
@@ -94,6 +145,8 @@ namespace SEE.Game.UI.LiveDocumantation
             // This will set the 
             rt.anchorMin = new Vector2(0, 1);
             rt.anchorMax = new Vector2(0, 1);
+
+            cm.OnLinkClicked += OnLinkClicked;
         }
 
 
@@ -171,6 +224,62 @@ namespace SEE.Game.UI.LiveDocumantation
             }
         }
 
+        [CanBeNull]
+        private Node FindNodeWithPath(string path)
+        {
+            foreach (var item in Graph.Nodes())
+            {
+                if ((item.Path() + item.Filename()).Equals(path))
+                {
+                    return item;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Called when a user has clicked on a link
+        /// </summary>
+        /// <param name="linkPath"></param>
+        public void OnLinkClicked(string linkPath)
+        {
+            Node nodeOfLink = FindNodeWithPath(linkPath);
+            if (nodeOfLink == null)
+            {
+                ShowNotification.Error("Cant open link", "The class can't be found");
+                return;
+            }
+
+            if (!SpaceManagerContainsWindow(linkPath, out BaseWindow w))
+            {
+                LiveDocumentationWindow newWin = nodeOfLink.GameObject().AddComponent<LiveDocumentationWindow>();
+                var filenames = linkPath.Split("\\");
+                newWin.ClassName = filenames[filenames.Length - 1].Split(".")[0];
+                newWin.Title = linkPath;
+                newWin.BasePath = BasePath;
+                newWin.RelativePath = linkPath;
+                newWin.Graph = Graph;
+
+                LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
+                buffer.Add(new LiveDocumentationBufferText(
+                    "Dies ist eine Test documentation für die andere Klasse "));
+                buffer.Add(new LiveDocumentationLink("src/C2.cs", "CS2.cs"));
+
+                newWin.DocumentationBuffer = buffer;
+                //  newWin.DocumentationBuffer = buffer;
+                // Add code window to our space of code window, if it isn't in there yet
+
+
+                spaceManager[WindowSpaceManager.LOCAL_PLAYER].AddWindow(newWin);
+                spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = newWin;
+            }
+            else
+            {
+                spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = w;
+            }
+        }
+
         protected override void UpdateDesktop()
         {
             // When the user clicked in the LiveDocumentation window
@@ -181,27 +290,7 @@ namespace SEE.Game.UI.LiveDocumantation
                 if (link != -1)
                 {
                     string linkId = ClassDocumentation.textInfo.linkInfo[link].GetLinkID().ToString();
-                    //TODO Open new the Link
-                    LiveDocumentationWindow newWin = gameObject.AddComponent<LiveDocumentationWindow>();
-                    newWin.ClassName = "New Node test";
-
-
-                    var filenames = linkId.Split("\\");
-                    newWin.ClassName = filenames[filenames.Length - 1].ToString().Split(".")[0];
-                    newWin.Title = filenames[filenames.Length - 1].ToString();
-
-                    LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
-                    buffer.Add(new LiveDocumentationBufferText(
-                        "Dies ist eine Test documentation für die andere Klasse "));
-
-                    //  newWin.DocumentationBuffer = buffer;
-                    // Add code window to our space of code window, if it isn't in there yet
-                    if (!spaceManager[WindowSpaceManager.LOCAL_PLAYER].Windows.Contains(newWin))
-                    {
-                        spaceManager[WindowSpaceManager.LOCAL_PLAYER].AddWindow(newWin);
-                    }
-
-                    spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = newWin;
+                    OnLinkClicked(linkId);
                 }
             }
         }

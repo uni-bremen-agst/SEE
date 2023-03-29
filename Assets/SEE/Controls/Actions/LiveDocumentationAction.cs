@@ -20,6 +20,8 @@ namespace SEE.Controls.Actions
 
         public override ReversibleAction NewInstance() => CreateAction();
 
+        private SyncWindowSpaceAction syncAction;
+
         public override void Awake()
         {
             // In case we do not have an ID yet, we request one.
@@ -31,14 +33,32 @@ namespace SEE.Controls.Actions
             spaceManager = WindowSpaceManager.ManagerInstance;
         }
 
+        public override void Start()
+        {
+            syncAction = new SyncWindowSpaceAction();
+        }
+
         public override bool Update()
         {
+            //  SceneQueries.GetCodeCity(selectedNode.transform).gameObject;
             // Only allow local player to open new code windows
             if (Input.GetMouseButtonDown(0) &&
-                Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef _) == HitGraphElement.Node)
+                Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef g) == HitGraphElement.Node)
             {
                 NodeRef selectedNode = hit.collider.gameObject.GetComponent<NodeRef>();
 
+                // When the node the user has clicked on has no file attached.
+                // In this case an error is displayed.
+                if (selectedNode.Value.Path() == null || selectedNode.Value.Filename() == null)
+                {
+                    ShowNotification.Error("Node has no File", "The selected node has no source code file attached");
+                    return false;
+                }
+
+                // Concat the path and the file name to get the relative path of the file in the project
+                string path = selectedNode.Value.Path() + selectedNode.elem.Filename();
+                
+                
                 // When the node the user has clicked on wasn't a leaf node.
                 // In this case an error message is displayed and the LiveDocumentation windows is not going to open.
                 if (!selectedNode.Value.IsLeaf())
@@ -46,33 +66,39 @@ namespace SEE.Controls.Actions
                     ShowNotification.Error("Node not supported", "Only leaf nodes can be analysed");
                     return false;
                 }
-                
+
 
                 if (!selectedNode.TryGetComponent(out LiveDocumentationWindow documentationWindow))
                 {
                     string fileName = selectedNode.Value.Filename();
-                    
+
                     // Copied from ShowCodeAction
                     if (fileName == null)
                     {
-                        ShowNotification.Warn("No file", $"Selected node '{selectedNode.Value.SourceName}' has no filename.");
+                        ShowNotification.Warn("No file",
+                            $"Selected node '{selectedNode.Value.SourceName}' has no filename.");
                         return false;
                     }
+
                     string absolutePlatformPath = selectedNode.Value.AbsolutePlatformPath();
                     if (!File.Exists(absolutePlatformPath))
                     {
-                        ShowNotification.Warn("File does not exist", $"Path {absolutePlatformPath} of selected node '{selectedNode.Value.SourceName}' does not exist.");
+                        ShowNotification.Warn("File does not exist",
+                            $"Path {absolutePlatformPath} of selected node '{selectedNode.Value.SourceName}' does not exist.");
                         return false;
                     }
 
                     documentationWindow = selectedNode.gameObject.AddComponent<LiveDocumentationWindow>();
                     documentationWindow.ClassName = selectedNode.Value.SourceName;
-                    documentationWindow.Title = selectedNode.Value.SourceName;
+                    documentationWindow.Title = path;
+                    documentationWindow.BasePath = selectedNode.elem.ItsGraph.BasePath;
+                    documentationWindow.RelativePath = path;
+                    documentationWindow.Graph = selectedNode.Value.ItsGraph;
 
                     LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
                     buffer.Add(new LiveDocumentationBufferText("Dies ist eine Test documentation für diese Klasse "));
                     buffer.Add(new LiveDocumentationBufferText("Die klasse benutzt auch irgendwie "));
-                    buffer.Add(new LiveDocumentationLink("C:\\SEE\\Assets\\StreamingAssets\\mini\\src\\C2.cs", "CS2.cs"));
+                    buffer.Add(new LiveDocumentationLink("src/C2.cs", "CS2.cs"));
                     buffer.Add(new LiveDocumentationBufferText("\nLorem ipsum oder so ähnlich"));
 
 
