@@ -18,10 +18,6 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using DG.Tweening;
 using SEE.DataModel;
 using SEE.DataModel.DG;
@@ -32,6 +28,10 @@ using SEE.GO;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
@@ -229,12 +229,12 @@ namespace SEE.Game
         /// <summary>
         /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
         /// </summary>
-        private readonly NodeEqualityComparer nodeEqualityComparer = new();
+        private static readonly NodeEqualityComparer nodeEqualityComparer = new();
 
         /// <summary>
         /// Allows the comparison of two instances of <see cref="Edge"/> from different graphs.
         /// </summary>
-        private readonly EdgeEqualityComparer edgeEqualityComparer = new();
+        private static readonly EdgeEqualityComparer edgeEqualityComparer = new();
 
         /// <summary>
         /// All pre-computed layouts for the whole graph series. The order of those layouts
