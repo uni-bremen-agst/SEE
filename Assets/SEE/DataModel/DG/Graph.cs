@@ -11,7 +11,7 @@ namespace SEE.DataModel.DG
     /// A graph with nodes and edges representing the data to be visualized
     /// by way of blocks and connections.
     /// </summary>
-    public class Graph : Attributable
+    public partial class Graph : Attributable
     {
         // The list of graph nodes indexed by their unique IDs
         private Dictionary<string, Node> nodes = new();
@@ -1372,135 +1372,6 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// All names of integer attributes of all nodes in the graph.
-        /// </summary>
-        /// <returns>names of integer node attributes</returns>
-        public ISet<string> AllIntNodeAttributes()
-        {
-            return AllNodeAttributes(AllIntAttributeNames);
-        }
-
-        /// <summary>
-        /// All names of float attributes of all nodes in the graph.
-        /// </summary>
-        /// <returns>names of float node attributes</returns>
-        public ISet<string> AllFloatNodeAttributes()
-        {
-            return AllNodeAttributes(AllFloatAttributeNames);
-        }
-
-        /// <summary>
-        /// Returns the concatenation of <see cref="AllFloatNodeAttributes()"/>
-        /// and <see cref="AllIntNodeAttributes()"/>.
-        /// </summary>
-        /// <returns>names of all numeric (int or float) node attributes</returns>
-        public ISet<string> AllNumericNodeAttributes()
-        {
-            ISet<string> result = AllIntNodeAttributes();
-            result.UnionWith(AllFloatNodeAttributes());
-            return result;
-        }
-
-        /// <summary>
-        /// All names of toggle attributes of all nodes in the graph.
-        /// </summary>
-        /// <returns>names of toggle node attributes</returns>
-        public ISet<string> AllToggleNodeAttributes()
-        {
-            return AllNodeAttributes(AllToggleAttributeNames);
-        }
-
-        /// <summary>
-        /// All names of string attributes of all nodes in the graph.
-        /// </summary>
-        /// <returns>names of string node attributes</returns>
-        public ISet<string> AllStringNodeAttributes()
-        {
-            return AllNodeAttributes(AllStringAttributeNames);
-        }
-
-        /// <summary>
-        /// Returns the attribute names of given <paramref name="node"/>.
-        /// </summary>
-        /// <param name="node">the node whose attribute names are to be retrieved</param>
-        /// <returns>attribute names of a particular type</returns>
-        private delegate ICollection<string> AllAttributeNames(Node node);
-
-        /// <summary>
-        /// Yields all string attribute names of given <paramref name="node"/>.
-        /// </summary>
-        /// <param name="node">node whose string attributes are to be retrieved</param>
-        /// <returns>all string attribute names</returns>
-        private static ICollection<string> AllStringAttributeNames(Node node)
-        {
-            return node.StringAttributes.Keys;
-        }
-
-        /// <summary>
-        /// Yields all toggle attribute names of given <paramref name="node"/>.
-        /// </summary>
-        /// <param name="node">node whose toggle attributes are to be retrieved</param>
-        /// <returns>all toggle attribute names</returns>
-        private static ICollection<string> AllToggleAttributeNames(Node node)
-        {
-            return node.ToggleAttributes;
-        }
-
-        /// <summary>
-        /// Yields all float attribute names of given <paramref name="node"/>.
-        /// </summary>
-        /// <param name="node">node whose float attributes are to be retrieved</param>
-        /// <returns>all float attribute names</returns>
-        private static ICollection<string> AllFloatAttributeNames(Node node)
-        {
-            return node.FloatAttributes.Keys;
-        }
-
-        /// <summary>
-        /// Yields all integer attribute names of given <paramref name="node"/>.
-        /// </summary>
-        /// <param name="node">node whose integer attributes are to be retrieved</param>
-        /// <returns>all integer attribute names</returns>
-        private static ICollection<string> AllIntAttributeNames(Node node)
-        {
-            return node.IntAttributes.Keys;
-        }
-
-        /// <summary>
-        /// Returns all node attribute names collected via given <paramref name="attributeNames"/>
-        /// over all nodes in the graph.
-        /// </summary>
-        /// <param name="attributeNames">yields the node attribute names to collect</param>
-        /// <returns>all node attribute names collected via <paramref name="attributeNames"/></returns>
-        private ISet<string> AllNodeAttributes(AllAttributeNames attributeNames)
-        {
-            HashSet<string> result = new HashSet<string>();
-            foreach (Node node in Nodes())
-            {
-                foreach (string name in attributeNames(node))
-                {
-                    result.Add(name);
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Returns the union of the names of all numeric node attributes of the given <paramref name="graphs"/>.
-        /// </summary>
-        /// <param name="graphs">graphs for which to yield the metric names</param>
-        /// <returns>union of the names of all numeric node attributes</returns>
-        internal static HashSet<string> AllMetrics(ICollection<Graph> graphs)
-        {
-            HashSet<string> result = new HashSet<string>();
-            foreach (Graph graph in graphs)
-            {
-                result.UnionWith(graph.AllNumericNodeAttributes());
-            }
-            return result;
-        }
-
-        /// <summary>
         /// If <paramref name="graph"/> has a single root, nothing is done. Otherwise
         /// an artificial root is created and added to the <paramref name="graph"/>
         /// All true roots of <paramref name="graph"/> will
@@ -1538,7 +1409,10 @@ namespace SEE.DataModel.DG
             return null;
         }
 
-
+        /// <summary>
+        /// Returns true if <paramref name="graph"/> is not <c>null</c>.
+        /// </summary>
+        /// <param name="graph">graph to be checked</param>
         public static implicit operator bool(Graph graph)
         {
             return graph != null;
