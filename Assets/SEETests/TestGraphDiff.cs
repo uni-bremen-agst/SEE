@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using static SEE.DataModel.DG.GraphExtensions;
 
 namespace SEE.DataModel.DG
 {
     /// <summary>
-    /// Tests for <see cref="SEE.DataModel.DG.GraphExtensions"/>.
+    /// Tests for <see cref="GraphExtensions"/>.
     /// </summary>
     class TestGraphDiff : TestGraphBase
     {
@@ -75,6 +74,7 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Two non-empty graphs are compared where nodes and edges have attributes.
+        /// The two graphs differ in terms of a toggle attribute.
         /// </summary>
         [Test]
         public void TestToggleAttribute()
@@ -91,18 +91,51 @@ namespace SEE.DataModel.DG
 
             // Note: toggle attributes are ignored by numeric attribute differences
             Check(g1, g2,
+                  expectedAdded: S(only_g2),    expectedRemoved: S(only_g1),
+                  expectedChanged: S(n1_in_g2), expectedEqual: S(n1_in_g2, n2_in_g2));
+            Check(g2, g1,
+                  expectedAdded: S(only_g1),    expectedRemoved: S(only_g2),
+                  expectedChanged: S(n1_in_g1), expectedEqual: S(n1_in_g1, n2_in_g1));
+
+            Check(g1, g2,
+                  expectedAdded: S<Edge>(),    expectedRemoved: S(e_only_g1),
+                  expectedChanged: S(e_in_g1), expectedEqual: S<Edge>());
+            Check(g2, g1,
+                  expectedAdded: S(e_only_g1), expectedRemoved: S<Edge>(),
+                  expectedChanged: S(e_in_g2), expectedEqual:   S<Edge>());
+        }
+
+        /// <summary>
+        /// Two non-empty graphs are compared where nodes and edges have attributes.
+        /// The two graphs differ in terms of a float attribute.
+        /// </summary>
+        [Test]
+        public void TestFloatAttribute()
+        {
+            CreateGraphs(out Graph g1, out Graph g2,
+                         out Node only_g1, out Node only_g2, out Edge e_only_g1,
+                         out Node n1_in_g1, out Node n1_in_g2, out Node n2_in_g1,
+                         out Node n2_in_g2, out Edge e_in_g1, out Edge e_in_g2,
+                         true);
+
+
+            e_in_g2.SetFloat(FloatAttribute, 2);
+            n1_in_g1.SetFloat(FloatAttribute, 3);
+
+            // Note: toggle attributes are ignored by numeric attribute differences
+            Check(g1, g2,
                   expectedAdded: S(only_g2), expectedRemoved: S(only_g1),
-                  expectedChanged: S<Node>(), expectedEqual: S(n1_in_g2, n2_in_g2));
+                  expectedChanged: S(n1_in_g2), expectedEqual: S(n1_in_g2, n2_in_g2));
             Check(g2, g1,
                   expectedAdded: S(only_g1), expectedRemoved: S(only_g2),
-                  expectedChanged: S<Node>(), expectedEqual: S(n1_in_g1, n2_in_g1));
+                  expectedChanged: S(n1_in_g1), expectedEqual: S(n1_in_g1, n2_in_g1));
 
             Check(g1, g2,
                   expectedAdded: S<Edge>(), expectedRemoved: S(e_only_g1),
-                  expectedChanged: S<Edge>(), expectedEqual: S(e_in_g2));
+                  expectedChanged: S(e_in_g2), expectedEqual: S(e_in_g2));
             Check(g2, g1,
                   expectedAdded: S(e_only_g1), expectedRemoved: S<Edge>(),
-                  expectedChanged: S<Edge>(), expectedEqual: S(e_in_g1));
+                  expectedChanged: S(e_in_g1), expectedEqual: S(e_in_g1));
         }
 
         /// <summary>
