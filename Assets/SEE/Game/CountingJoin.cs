@@ -20,6 +20,7 @@ namespace SEE.Game
         public void Await(int expectedNumberOfEvents)
         {
             outstandingEvents = expectedNumberOfEvents;
+            Debug.Log($"[{Name}] Awaiting {outstandingEvents} events.\n");
         }
 
         /// <summary>
@@ -38,7 +39,12 @@ namespace SEE.Game
             UnityEngine.Assertions.Assert.IsTrue(outstandingEvents >= 0);
             if (outstandingEvents == 0)
             {
+                Debug.Log($"[{Name}] No outstanding events. Will continue.\n");
                 Continue();
+            }
+            else
+            {
+                Debug.Log($"[{Name}] Still awaiting {outstandingEvents} events.\n");
             }
         }
 
