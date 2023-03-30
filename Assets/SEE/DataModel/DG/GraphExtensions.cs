@@ -100,5 +100,30 @@ namespace SEE.DataModel.DG
                 }
             }
         }
+
+        /// <summary>
+        /// Returns a new <see cref="GraphElementDiff"/> that considers all
+        /// node and edge attributes contained in any of the given <paramref name="graphs"/>.
+        /// </summary>
+        /// <param name="graphs">list of graphs</param>
+        /// <returns>a <see cref="GraphElementDiff"/> for all types of node and edge attributes</returns>
+        public static GraphElementDiff AttributeDiff(params Graph[] graphs)
+        {
+            ISet<string> floatAttributes = new HashSet<string>();
+            ISet<string> intAttributes = new HashSet<string>();
+            ISet<string> stringAttributes = new HashSet<string>();
+            ISet<string> toggleAttributes = new HashSet<string>();
+            graphs.ToList().ForEach(graph =>
+            {
+                if (graph != null)
+                {
+                    floatAttributes.UnionWith(graph.AllFloatGraphElementAttributes());
+                    intAttributes.UnionWith(graph.AllIntGraphElementAttributes());
+                    stringAttributes.UnionWith(graph.AllStringGraphElementAttributes());
+                    toggleAttributes.UnionWith(graph.AllToggleGraphElementAttributes());
+                }
+            });
+            return new AttributeDiff(floatAttributes, intAttributes, stringAttributes, toggleAttributes);
+        }
     }
 }

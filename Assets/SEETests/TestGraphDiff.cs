@@ -27,31 +27,6 @@ namespace SEE.DataModel.DG
         private const string StringAttribute = "String";
 
         /// <summary>
-        /// Returns a new <see cref="GraphElementDiff"/> that considers all
-        /// numeric node attributes
-        /// </summary>
-        /// <param name="graphs"></param>
-        /// <returns></returns>
-        private static GraphElementDiff AttributeDiff(params Graph[] graphs)
-        {
-            ISet<string> floatAttributes = new HashSet<string>();
-            ISet<string> intAttributes = new HashSet<string>();
-            ISet<string> stringAttributes = new HashSet<string>();
-            ISet<string> toggleAttributes = new HashSet<string>();
-            graphs.ToList().ForEach(graph =>
-            {
-                if (graph != null)
-                {
-                    floatAttributes.UnionWith(graph.AllFloatGraphElementAttributes());
-                    intAttributes.UnionWith(graph.AllIntGraphElementAttributes());
-                    stringAttributes.UnionWith(graph.AllStringGraphElementAttributes());
-                    toggleAttributes.UnionWith(graph.AllToggleGraphElementAttributes());
-                }
-            });
-            return new AttributeDiff(floatAttributes, intAttributes, stringAttributes, toggleAttributes);
-        }
-
-        /// <summary>
         /// Two non-empty graphs are compared. Once with and once without attributes.
         /// </summary>
         [Test]
