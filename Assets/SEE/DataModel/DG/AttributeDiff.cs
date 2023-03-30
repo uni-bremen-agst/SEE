@@ -123,14 +123,12 @@ namespace SEE.DataModel.DG
                         // and right has attribute; if they are different, we have found one difference
                         if (!leftValue.Equals(rightValue))
                         {
-                            UnityEngine.Debug.Log($"{attribute} value: {left.ID}={leftValue}; {right.ID}={rightValue}\n");
                             return true;
                         }
                         // the two attribute values are the same => we need to continue
                     }
                     else
                     {
-                        UnityEngine.Debug.Log($"right {right.ID} does not have {attribute}, left {left.ID} has it\n");
                         // right does not have attribute
                         return true;
                     }
@@ -142,7 +140,6 @@ namespace SEE.DataModel.DG
                     // is a difference
                     if (tryGetValue(right, attribute, out T _))
                     {
-                        UnityEngine.Debug.Log($"left {left.ID} does not have {attribute}, right {right.ID} has it\n");
                         return true;
                     }
                     // Neither of the two nodes have the attribute => we need to continue
