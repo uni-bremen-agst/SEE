@@ -126,6 +126,9 @@ namespace SEE.Game.Evolution
             }
             /// Note: <see cref="Phase2MoveExistingGraphElements"/> will be called by <see cref="phase1AnimationWatchDog"/>
             /// when phase 1 has completed (or skipped).
+            ///
+            /// HIER WEITER
+            new Join().Await(2, () => Phase2MoveExistingGraphElements(next));
         }
 
         /// <summary>
