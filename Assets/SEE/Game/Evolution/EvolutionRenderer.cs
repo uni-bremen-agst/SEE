@@ -1,5 +1,4 @@
 //Copyright 2020 Florian Garbade
-//Copyright 2020 Florian Garbade
 
 //Permission is hereby granted, free of charge, to any person obtaining a
 //copy of this software and associated documentation files (the "Software"),
@@ -26,8 +25,8 @@ using SEE.Game.City;
 using SEE.Game.Evolution;
 using SEE.GO;
 using SEE.Layout;
-using SEE.Layout.NodeLayouts;
 using SEE.Utils;
+using Sirenix.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -221,12 +220,6 @@ namespace SEE.Game
         private LaidOutGraph nextCity;  // not serialized by Unity
 
         /// <summary>
-        /// The layout of _nextGraph. The layout is a mapping of the graph
-        /// nodes' IDs onto their ILayoutNodes.
-        /// </summary>
-        private Dictionary<string, ILayoutNode> NextLayoutToBeShown => nextCity?.Layout;  // not serialized by Unity
-
-        /// <summary>
         /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
         /// </summary>
         private static readonly NodeEqualityComparer nodeEqualityComparer = new();
@@ -237,138 +230,12 @@ namespace SEE.Game
         private static readonly EdgeEqualityComparer edgeEqualityComparer = new();
 
         /// <summary>
-        /// All pre-computed layouts for the whole graph series. The order of those layouts
-        /// corresponds to the order of <see cref="graphs"/>, that is, graphs[i] has
-        /// NodeLayouts[i].
-        /// </summary>
-        private IList<Dictionary<string, ILayoutNode>> NodeLayouts { get; }
-             = new List<Dictionary<string, ILayoutNode>>();
-
-        /// <summary>
-        /// All pre-computed edge layouts for the whole graph series.  The order of those layouts
-        /// corresponds to the order of <see cref="graphs"/>, that is, graphs[i] has
-        /// EdgeLayouts[i].
-        /// </summary>
-        private IList<Dictionary<string, ILayoutEdge<ILayoutNode>>> EdgeLayouts { get; }
-            = new List<Dictionary<string, ILayoutEdge<ILayoutNode>>>();
-
-        /// <summary>
-        /// Creates and saves the layouts for all given <paramref name="graphs"/>. This will
-        /// also create all necessary game objects -- even those game objects that are not
-        /// present in the first graph in this list.
-        /// </summary>
-        private void CalculateAllGraphLayouts(List<Graph> graphs)
-        {
-            // Determine the layouts of all loaded graphs upfront.
-            Performance p = Performance.Begin("Layouting all " + graphs.Count + " graphs");
-            ISet<string> numericNodeAttributes = new HashSet<string>();
-            graphs.ForEach(graph =>
-            {
-                NodeLayouts.Add(CalculateLayout(graph));
-                numericNodeAttributes.UnionWith(graph.AllNumericNodeAttributes());
-            });
-            diff = new NumericAttributeDiff(numericNodeAttributes);
-            objectManager.Clear();
-            p.End(true);
-        }
-
-        /// <summary>
         /// If true, inner nodes should not be rendered. This will be true if a non-hierarchical
         /// layout is applied.
         /// </summary>
         private bool ignoreInnerNodes = true;  // not serialized by Unity
 
-        /// <summary>
-        /// Calculates the layout data for <paramref name="graph"/> using the graphRenderer.
-        /// All the game objects created for the nodes of <paramref name="graph"/> will
-        /// be created by the objectManager, thus, be available for later use. The layout
-        /// is not actually applied.
-        ///
-        /// Note: This method assumes that it is called in the order of <see cref="graphs"/>,
-        /// that is, the i'th call is assumed to calculate the edge layout for
-        /// <paramref name="graph"/>[i].
-        /// </summary>
-        /// <param name="graph">graph for which the layout is to be calculated</param>
-        /// <returns>the node layout for all nodes in <paramref name="graph"/></returns>
-        private Dictionary<string, ILayoutNode> CalculateLayout(Graph graph)
-        {
-            // The following code assumes that a leaf node remains a leaf across all
-            // graphs of the graph series and an inner node remains an inner node.
-            // This may not necessarily be true. For instance, an empty directory could
-            // get subdirectories in the course of the evolution.
 
-            // Collecting all game objects corresponding to nodes of the given graph.
-            // If the node existed in a previous graph, we will re-use its corresponding
-            // game object created earlier.
-            List<GameObject> gameObjects = new();
-
-            // The layout to be applied.
-            NodeLayout nodeLayout = graphRenderer.GetLayout(gameObject);
-
-            // Gather all nodes for the layout.
-            ignoreInnerNodes = !nodeLayout.IsHierarchical();
-            foreach (Node node in graph.Nodes().Where(node => !ignoreInnerNodes || node.IsLeaf()))
-            {
-                // All layouts (flat and hierarchical ones) must be able to handle leaves;
-                // hence, leaves can be added at any rate. For a hierarchical layout, we
-                // need to add the game objects for inner nodes, too. To put it differently,
-                // inner nodes are added only if we apply a hierarchical layout.
-                objectManager.GetNode(node, out GameObject gameNode);
-                // Now after having attached the new node to the game object,
-                // we must adjust the scale of it according to the newly attached node so
-                // that the layouter has these. We need to adjust the scale only for leaves,
-                // however, because the layouter will select the scale for inner nodes.
-                if (node.IsLeaf())
-                {
-                    graphRenderer.AdjustScaleOfLeaf(gameNode);
-                }
-                gameObjects.Add(gameNode);
-            }
-
-            // Calculate and apply the node layout
-            ICollection<LayoutGraphNode> layoutNodes = GraphRenderer.ToAbstractLayoutNodes(gameObjects);
-            // Note: Apply applies its results only on the layoutNodes but not on the game objects
-            // these layoutNodes represent. Here, we leave the game objects untouched. The layout
-            // must be later applied when we render a city. Here, we only store the layout for later use.
-            nodeLayout.Apply(layoutNodes);
-            GraphRenderer.Fit(gameObject, layoutNodes);
-            GraphRenderer.Stack(gameObject, layoutNodes);
-
-            if (edgesAreDrawn)
-            {
-                List<LayoutGraphEdge<LayoutGraphNode>> layoutEdges = graphRenderer.LayoutEdges(layoutNodes).ToList();
-                Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout = new(layoutEdges.Count);
-                foreach (LayoutGraphEdge<LayoutGraphNode> le in layoutEdges)
-                {
-                    edgeLayout.Add(le.ItsEdge.ID, le);
-                }
-                EdgeLayouts.Add(edgeLayout);
-            }
-            return ToNodeIDLayout(layoutNodes.ToList<ILayoutNode>());
-
-            // Note: The game objects for leaf nodes are already properly scaled by the call to
-            // objectManager.GetNode() above. Yet, inner nodes are generally not scaled by
-            // the layout and there may be layouts that may shrink leaf nodes. For instance,
-            // TreeMap shrinks leaves so that they fit into the available space.
-            // Anyhow, we do not need to apply the layout already now. That can be deferred
-            // to the point in time when the city is actually visualized. Here, we just calculate
-            // the layout for every graph in the graph series for later use.
-        }
-
-        /// <summary>
-        /// Returns a mapping of graph-node IDs onto their corresponding <paramref name="layoutNodes"/>.
-        /// </summary>
-        /// <param name="layoutNodes">collection of layout nodes to be mapped</param>
-        /// <returns>mapping indexed by the IDs of the nodes corresponding to the layout nodes</returns>
-        private static Dictionary<string, T> ToNodeIDLayout<T>(ICollection<T> layoutNodes) where T : ILayoutNode
-        {
-            Dictionary<string, T> result = new();
-            foreach (T layoutNode in layoutNodes)
-            {
-                result[layoutNode.ID] = layoutNode;
-            }
-            return result;
-        }
 
         /// <summary>
         /// Displays the given graph instantly if all animations are finished. This is
@@ -425,6 +292,16 @@ namespace SEE.Game
             RenderGraph(current, next);
         }
 
+        private ISet<Node> addedNodes;
+        private ISet<Node> removedNodes;
+        private ISet<Node> changedNodes;
+        private ISet<Node> equalNodes;
+
+        private ISet<Edge> addedEdges;
+        private ISet<Edge> removedEdges;
+        private ISet<Edge> changedEdges;
+        private ISet<Edge> equalEdges;
+
         /// <summary>
         /// Renders the animation from <paramref name="current"/> to <paramref name="next"/>.
         /// </summary>
@@ -437,8 +314,42 @@ namespace SEE.Game
             IsStillAnimating = true;
             // First remove all markings of the previous animation cycle.
             markerFactory.Clear();
-            Phase1RemoveDeletedGraphElements(current, next);
+
+            Graph oldGraph = current != null ? current.Graph : null;
+            Graph newGraph = next != null ? next.Graph : null;
+
+            // Node comparison.
+            {
+                newGraph.Diff(oldGraph,
+                              g => g.Nodes(),
+                              (g, id) => g.GetNode(id),
+                              GraphExtensions.AttributeDiff(newGraph, oldGraph),
+                              nodeEqualityComparer,
+                              out addedNodes,
+                              out removedNodes,
+                              out changedNodes,
+                              out equalNodes);
+            }
+
+            // Edge comparison.
+            {
+                newGraph.Diff(oldGraph,
+                              g => g.Edges(),
+                              (g, id) => g.GetEdge(id),
+                              GraphExtensions.AttributeDiff(newGraph, oldGraph),
+                              edgeEqualityComparer,
+                              out addedEdges,
+                              out removedEdges,
+                              out changedEdges,
+                              out equalEdges);
+            }
+            if (OLD)
+            {
+                Phase1RemoveDeletedGraphElements(current, next);
+            }
         }
+
+        private bool OLD = false;
 
         /// <summary>
         /// Implements the first phase of the transition from the <paramref name="current"/> graph to
@@ -465,41 +376,64 @@ namespace SEE.Game
         /// <param name="next">the next graph to be shown</param>
         private void Phase1RemoveDeletedGraphElements(LaidOutGraph current, LaidOutGraph next)
         {
-            if (current != null && current.Graph != null)
+            if (OLD)
             {
-                // The set of nodes of the current graph not in the other graph, in other words,
-                // the set of deleted nodes.
-                // Note: The comparison is based on the IDs of the nodes because nodes between
-                // two graphs must be different even if they denote the "logically same" node.
-                List<Node> deletedNodes = current.Graph.Nodes().Except(next.Graph.Nodes(), nodeEqualityComparer).ToList();
-
-                // The set of edges of the current graph not in the next graph; that is, all
-                // edges removed. As above, edges are compared by their IDs.
-                List<Edge> deletedEdges = current.Graph.Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList();
-
-                int deletedGraphElements = deletedNodes.Count + deletedEdges.Count;
-                if (deletedGraphElements > 0)
+                if (current != null && current.Graph != null)
                 {
-                    phase1AnimationWatchDog.Await(deletedGraphElements, next);
+                    // The set of nodes of the current graph not in the other graph, in other words,
+                    // the set of deleted nodes.
+                    // Note: The comparison is based on the IDs of the nodes because nodes between
+                    // two graphs must be different even if they denote the "logically same" node.
+                    List<Node> deletedNodes = current.Graph.Nodes().Except(next.Graph.Nodes(), nodeEqualityComparer).ToList();
 
-                    // Remove those nodes.
-                    deletedNodes.ForEach(RenderRemovedNode);
-                    // Remove those edges.
-                    deletedEdges.ForEach(RenderRemovedEdge);
+                    // The set of edges of the current graph not in the next graph; that is, all
+                    // edges removed. As above, edges are compared by their IDs.
+                    List<Edge> deletedEdges = current.Graph.Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList();
+
+                    int deletedGraphElements = deletedNodes.Count + deletedEdges.Count;
+                    if (deletedGraphElements > 0)
+                    {
+                        phase1AnimationWatchDog.Await(deletedGraphElements, next);
+
+                        // Remove those nodes.
+                        deletedNodes.ForEach(RenderRemovedNode);
+                        // Remove those edges.
+                        deletedEdges.ForEach(RenderRemovedEdge);
+                    }
+                    else
+                    {
+                        // To trigger the next phase where new and existing edges are to be drawn.
+                        phase1AnimationWatchDog.Skip(next);
+                    }
                 }
                 else
                 {
                     // To trigger the next phase where new and existing edges are to be drawn.
                     phase1AnimationWatchDog.Skip(next);
                 }
+                /// Note: <see cref="Phase2AddNewAndExistingGraphElements"/> will be called by <see cref="phase1AnimationWatchDog"/>
+                /// when phase 1 has completed (or skipped).
             }
             else
             {
-                // To trigger the next phase where new and existing edges are to be drawn.
-                phase1AnimationWatchDog.Skip(next);
+                int deletedGraphElements = removedNodes.Count + removedEdges.Count;
+                if (deletedGraphElements > 0)
+                {
+                    phase1AnimationWatchDog.Await(deletedGraphElements, next);
+
+                    // Remove those nodes.
+                    removedNodes.ForEach(RenderRemovedNode);
+                    // Remove those edges.
+                    removedEdges.ForEach(RenderRemovedEdge);
+                }
+                else
+                {
+                    // To trigger the next phase where new and existing edges are to be drawn.
+                    phase1AnimationWatchDog.Skip(next);
+                }
+                /// Note: <see cref="Phase2AddNewAndExistingGraphElements"/> will be called by <see cref="phase1AnimationWatchDog"/>
+                /// when phase 1 has completed (or skipped).
             }
-            /// Note: <see cref="Phase2AddNewAndExistingGraphElements"/> will be called by <see cref="phase1AnimationWatchDog"/>
-            /// when phase 1 has completed (or skipped).
         }
 
         /// <summary>
