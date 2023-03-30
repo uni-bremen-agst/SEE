@@ -22,7 +22,6 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.Charts;
 using SEE.Game.City;
-using SEE.Game.Evolution;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Utils;
@@ -35,7 +34,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
 
-namespace SEE.Game
+namespace SEE.Game.Evolution
 {
     /// <summary>
     /// Renders the evolution of the graph series through animations. Incrementally updates

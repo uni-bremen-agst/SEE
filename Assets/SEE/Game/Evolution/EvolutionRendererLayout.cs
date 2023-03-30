@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.Evolution
 {
     /// <summary>
     /// Part of the <see cref="EvolutionRenderer"/> taking care of the graph layouts.

@@ -1,6 +1,4 @@
-﻿using SEE.Game.Evolution;
-
-namespace SEE.Game
+﻿namespace SEE.Game.Evolution
 {
     public partial class EvolutionRenderer
     {
