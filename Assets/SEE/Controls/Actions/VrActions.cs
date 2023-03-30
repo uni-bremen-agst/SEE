@@ -56,6 +56,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         private const int GrabbableLayer = 29;
 
+        private bool IsColliding = false;
+
         /// <summary>
         /// Adds listeners to the grabbable component for onGrab and onRelease. Also for the distance grabbable
         /// component for on pull.
@@ -89,6 +91,11 @@ namespace SEE.Controls.Actions
                 GameObjectExtensions.SetAllChildLayer(grabbable.gameObject.transform, IgnoreChildrenLayer, true);
                 grabbable.gameObject.layer = GrabbableLayer;
 
+                Rigidbody rigidbody = grabbable.gameObject.GetComponent<Rigidbody>();
+                rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
+                rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+                rigidbody.isKinematic = false;
+
                 AdjustGrabbedNode = true;
                 IsGrabbed = true;
 
@@ -115,6 +122,11 @@ namespace SEE.Controls.Actions
             if (gameObject.TryGetNode(out Node node) && !node.IsRoot())
             {
                 IsReleased = true;
+                IsGrabbed = false;
+                Rigidbody rigidbody = grabbable.gameObject.GetComponent<Rigidbody>();
+                rigidbody.interpolation = RigidbodyInterpolation.None;
+                rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
+                rigidbody.isKinematic = true;
 
                 Debug.LogWarning("Player released grabbed object: " + GrabbedObject);
                 GrabbedObject = null;
@@ -134,9 +146,10 @@ namespace SEE.Controls.Actions
         /// <param name="collisionInfo"></param>
         private void OnCollisionEnter(Collision collisionInfo)
         {
+            IsColliding = true;
             if (collisionInfo.gameObject.TryGetNode(out Node node) && IsGrabbed && !node.IsRoot() && GrabbedObject == gameObject)
             {
-                if (!IsDescendant(collisionInfo.gameObject, gameObject))
+                if (GrabbedObject.transform.parent.gameObject != collisionInfo.gameObject)
                 {
                     Debug.LogWarning("Collision with node: " + collisionInfo.gameObject.name);
                     MoveAction.ReparentVR(collisionInfo.gameObject);
@@ -150,29 +163,34 @@ namespace SEE.Controls.Actions
         /// <param name="collisionInfo"></param>
         private void OnCollisionExit(Collision collisionInfo)
         {
-            if (collisionInfo.gameObject.TryGetNode(out Node node) && IsGrabbed && !node.IsRoot() && gameObject == GrabbedObject)
-            {
-                if (!IsDescendant(collisionInfo.gameObject, GrabbedObject))
+            IsColliding = false;
+            if (collisionInfo.gameObject.TryGetNode(out Node node) && IsGrabbed && !node.IsRoot() &&
+                    gameObject == GrabbedObject)
                 {
-                    Debug.LogWarning("UnReparenting - exit collision with node: " + collisionInfo.gameObject.name);
-                    MoveAction.UnReparentVR();
+                    if (!IsDescendant(GrabbedObject, collisionInfo.gameObject))
+                    {
+                        Debug.LogWarning("UnReparenting - exit collision with node: " + collisionInfo.gameObject.name);
+                        MoveAction.UnReparentVR();
+                    }
                 }
-            }
+
         }
 
         /// <summary>
         /// We will use FixedUpdate when working with rigidbodys.
         /// FixedUpdate occurs at a measured time step that typically does not coincide with MonoBehaviour.Update.
         /// </summary>
+
         public void FixedUpdate()
         {
             Rigidbody rigidbody = gameObject.GetComponent<Rigidbody>();
-            /*
+
             if (IsColliding)
             {
                 rigidbody.velocity = new Vector3(0, 0, 0);
             }
-            */
+
+            /*
             // Adjust grabbed node only once.
             if (AdjustGrabbedNode)
             {
@@ -193,6 +211,7 @@ namespace SEE.Controls.Actions
 
                 IsReleased = false;
             }
+            */
         }
 
         /// <summary>

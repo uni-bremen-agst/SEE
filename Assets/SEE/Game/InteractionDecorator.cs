@@ -77,8 +77,8 @@ namespace SEE.Game
                 rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
 
                 // FIXME: obsolete because of ignoreWeight flag in grabbable component?
-                rigidbody.mass = 25;
-                rigidbody.drag = 25;
+                rigidbody.mass = 15;
+                rigidbody.drag = 15;
                 rigidbody.angularDrag = 1;
 
                 // Set the physic material to reduce bounciness.
