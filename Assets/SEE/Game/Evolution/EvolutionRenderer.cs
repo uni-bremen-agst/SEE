@@ -45,7 +45,7 @@ namespace SEE.Game
     /// object. As a consequence, a constructor will not be called and is meaningless.
     ///
     /// Assumption: This EvolutionRenderer is attached to a game object representing a code
-    /// city that has another component of type SEECityEvolution.
+    /// city that has another component of type <see cref="SEECityEvolution"/>.
     /// </summary>
     public partial class EvolutionRenderer : MonoBehaviour, IGraphRenderer
     {
