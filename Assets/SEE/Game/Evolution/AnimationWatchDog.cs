@@ -27,37 +27,5 @@
                 this.evolutionRenderer = evolutionRenderer;
             }
         }
-
-        /// <summary>
-        /// A watchdog awaiting all animations of the second phase to be finished. The second
-        /// phase is dedicated to drawing all graph elements present in the graph next to
-        /// be drawn.When all deletion animations have completed, <see cref="OnAnimationsFinished"/>
-        /// will be called.
-        /// </summary>
-        private class Phase2AnimationWatchDog : AnimationWatchDog
-        {
-            protected override string Name { get => nameof(Phase2AnimationWatchDog); }
-
-            /// <summary>
-            /// Constructor setting the <see cref="EvolutionRenderer"/> whose method should
-            /// be called when there are no more outstanding animations. The number of
-            /// outstanding animations is assumed to be zero at this point. The correct
-            /// value can be set by <see cref="Await(int)"/> later.
-            /// </summary>
-            /// <param name="evolutionRenderer"><see cref="EvolutionRenderer"/> whose method should be called
-            /// when there are no more outstanding animations</param>
-            public Phase2AnimationWatchDog(EvolutionRenderer evolutionRenderer)
-                : base(evolutionRenderer)
-            { }
-
-            /// <summary>
-            /// If there are no more other animations to be awaited, <see cref="OnAnimationsFinished"/>
-            /// will be called.
-            /// </summary>
-            protected override void Continue()
-            {
-                evolutionRenderer.OnAnimationsFinished();
-            }
-        }
     }
 }

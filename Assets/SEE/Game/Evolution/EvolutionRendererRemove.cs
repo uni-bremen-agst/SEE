@@ -1,5 +1,6 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Layout;
+using SEE.Utils;
 using Sirenix.Utilities;
 using System.Collections.Generic;
 using System.Linq;
@@ -217,6 +218,19 @@ namespace SEE.Game.Evolution
             {
                 phase1AnimationWatchDog.Finished();
             }
+        }
+
+        /// <summary>
+        /// Event function that destroys the given <paramref name="gameObject"/>.
+        /// It will be called as a callback after the animation of a node or edge to be
+        /// removed has been finished.
+        /// </summary>
+        /// <param name="gameObject">game object to be destroyed (can be a node or edge)</param>
+        private void OnRemoveFinishedAnimation(object gameObject)
+        {
+            GameObject go = gameObject as GameObject;
+            Destroyer.Destroy(go);
+            phase1AnimationWatchDog.Finished();
         }
     }
 }
