@@ -50,8 +50,8 @@ namespace SEE.Game
 
         public void Skip()
         {
-            Await(1);
-            Finished();
+            outstandingEvents = 0;
+            Continue();
         }
 
         /// <summary>
