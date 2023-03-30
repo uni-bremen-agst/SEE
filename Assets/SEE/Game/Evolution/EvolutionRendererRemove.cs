@@ -2,8 +2,6 @@
 using SEE.Layout;
 using SEE.Utils;
 using Sirenix.Utilities;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -12,18 +10,28 @@ namespace SEE.Game.Evolution
     /// <summary>
     /// Part of the <see cref="EvolutionRenderer"/> taking care of deleting
     /// graph elements from the currently shown graph to the next one.
+    ///
+    /// The transition from the current graph to the next one is organized in
+    /// the following phases:
+    ///
+    /// (1) Remove deleted nodes and edges from the scene.
+    /// (2) Move existing nodes and edges to their new position in the scene.
+    /// (3) Adjust existing changed nodes and edges in the scene.
+    /// (4) Add newly created nodes and edges to the scene.
+    ///
+    /// The code following here implements phase (1).
     /// </summary>
     public partial class EvolutionRenderer
     {
         /// <summary>
         /// A watchdog awaiting all animations of the first phase to be finished. The first
         /// phase is dedicated to the deletion of graph elements not present in the next graph.
-        /// When all deletion animations have completed, <see cref="Phase2AddNewAndExistingGraphElements"/>
+        /// When all deletion animations have completed, <see cref="Phase2MoveExistingGraphElements"/>
         /// will be called.
         /// </summary>
-        private class Phase1AnimationWatchDog : AnimationWatchDog
+        private class Phase1DeletionAnimationWatchDog : AnimationWatchDog
         {
-            protected override string Name { get => nameof(Phase1AnimationWatchDog); }
+            protected override string Name { get => nameof(Phase1DeletionAnimationWatchDog); }
 
             /// <summary>
             /// The next graph to be shown.
@@ -38,13 +46,13 @@ namespace SEE.Game.Evolution
             /// </summary>
             /// <param name="evolutionRenderer"><see cref="EvolutionRenderer"/> whose method should be called
             /// when there are no more outstanding animations</param>
-            public Phase1AnimationWatchDog(EvolutionRenderer evolutionRenderer)
+            public Phase1DeletionAnimationWatchDog(EvolutionRenderer evolutionRenderer)
                 : base(evolutionRenderer)
             { }
 
             /// <summary>
             /// Sets the <paramref name="numberOfAnimations"/> to be waited for until the
-            /// <see cref="Phase2AddNewAndExistingGraphElements"/> should be called.
+            /// <see cref="Phase2MoveExistingGraphElements"/> should be called.
             /// </summary>
             /// <param name="numberOfAnimations">the number of animations to be awaited</param>
             public void Await(int numberOfAnimations, LaidOutGraph next)
@@ -54,19 +62,19 @@ namespace SEE.Game.Evolution
             }
 
             /// <summary>
-            /// If there are no more other animations to be awaited, <see cref="Phase2AddNewAndExistingGraphElements"/>
+            /// If there are no more other animations to be awaited, <see cref="Phase2MoveExistingGraphElements"/>
             /// will be called.
             /// </summary>
             protected override void Continue()
             {
-                evolutionRenderer.Phase2AddNewAndExistingGraphElements(next);
+                evolutionRenderer.Phase2MoveExistingGraphElements(next);
             }
 
             /// <summary>
-            /// Tells this <see cref="Phase1AnimationWatchDog"/> to skip the waiting for
-            /// outstanding animations. <see cref="Phase2AddNewAndExistingGraphElements"/>
+            /// Tells this <see cref="Phase1DeletionAnimationWatchDog"/> to skip the waiting for
+            /// outstanding animations. <see cref="Phase2MoveExistingGraphElements"/>
             /// will be called immediately. <paramref name="next"/> will be passed as
-            /// argument to <see cref="Phase2AddNewAndExistingGraphElements"/>.
+            /// argument to <see cref="Phase2MoveExistingGraphElements"/>.
             /// </summary>
             /// <param name="next">the next graph to be shown</param>
             public void Skip(LaidOutGraph next)
@@ -81,9 +89,9 @@ namespace SEE.Game.Evolution
         /// the <paramref name="next"/> graph in which nodes and edges present in <paramref name="current"/>
         /// but not in <paramref name="next"/> (in other words, the deleted nodes and edges) are removed.
         /// When all animations triggered in this first phase have completed, execution will continue with
-        /// <see cref="Phase2AddNewAndExistingGraphElements(LaidOutGraph)"/>.
+        /// <see cref="Phase2MoveExistingGraphElements(LaidOutGraph)"/>.
         ///
-        /// The mechanism to call <see cref="Phase2AddNewAndExistingGraphElements(LaidOutGraph)"/> is
+        /// The mechanism to call <see cref="Phase2MoveExistingGraphElements(LaidOutGraph)"/> is
         /// as follows. The <see cref="phase1AnimationWatchDog"/> is set up to await the
         /// deletion of nodes and edges in <paramref name="current"/> but not in <paramref name="next"/>.
         /// Then the methods implementing this deletion will be called for each graph element to
@@ -91,7 +99,7 @@ namespace SEE.Game.Evolution
         /// respectively. When the animation of the deletion triggered by these has finished, each
         /// will signal the <see cref="phase1AnimationWatchDog"/> its completion. The <see cref="phase1AnimationWatchDog"/>
         /// awaits all outstanding deletions and then finally calls
-        /// <see cref="Phase2AddNewAndExistingGraphElements(LaidOutGraph)"/>.
+        /// <see cref="Phase2MoveExistingGraphElements(LaidOutGraph)"/>.
         ///
         /// Note: <paramref name="next"/> will be a graph for the previous revision of
         /// <paramref name="current"/> in the graph series when the evolution visualization
@@ -101,64 +109,23 @@ namespace SEE.Game.Evolution
         /// <param name="next">the next graph to be shown</param>
         private void Phase1RemoveDeletedGraphElements(LaidOutGraph current, LaidOutGraph next)
         {
-            if (OLD)
+            int deletedGraphElements = removedNodes.Count + removedEdges.Count;
+            if (deletedGraphElements > 0)
             {
-                if (current != null && current.Graph != null)
-                {
-                    // The set of nodes of the current graph not in the other graph, in other words,
-                    // the set of deleted nodes.
-                    // Note: The comparison is based on the IDs of the nodes because nodes between
-                    // two graphs must be different even if they denote the "logically same" node.
-                    IList<Node> deletedNodes = current.Graph.Nodes().Except(next.Graph.Nodes(), nodeEqualityComparer).ToList();
+                phase1AnimationWatchDog.Await(deletedGraphElements, next);
 
-                    // The set of edges of the current graph not in the next graph; that is, all
-                    // edges removed. As above, edges are compared by their IDs.
-                    IList<Edge> deletedEdges = current.Graph.Edges().Except(next.Graph.Edges(), edgeEqualityComparer).ToList();
-
-                    int deletedGraphElements = deletedNodes.Count + deletedEdges.Count;
-                    if (deletedGraphElements > 0)
-                    {
-                        phase1AnimationWatchDog.Await(deletedGraphElements, next);
-
-                        // Remove those nodes.
-                        deletedNodes.ForEach(RenderRemovedNode);
-                        // Remove those edges.
-                        deletedEdges.ForEach(RenderRemovedEdge);
-                    }
-                    else
-                    {
-                        // To trigger the next phase where new and existing edges are to be drawn.
-                        phase1AnimationWatchDog.Skip(next);
-                    }
-                }
-                else
-                {
-                    // To trigger the next phase where new and existing edges are to be drawn.
-                    phase1AnimationWatchDog.Skip(next);
-                }
-                /// Note: <see cref="Phase2AddNewAndExistingGraphElements"/> will be called by <see cref="phase1AnimationWatchDog"/>
-                /// when phase 1 has completed (or skipped).
+                // Remove those nodes.
+                removedNodes.ForEach(RenderRemovedNode);
+                // Remove those edges.
+                removedEdges.ForEach(RenderRemovedEdge);
             }
             else
             {
-                int deletedGraphElements = removedNodes.Count + removedEdges.Count;
-                if (deletedGraphElements > 0)
-                {
-                    phase1AnimationWatchDog.Await(deletedGraphElements, next);
-
-                    // Remove those nodes.
-                    removedNodes.ForEach(RenderRemovedNode);
-                    // Remove those edges.
-                    removedEdges.ForEach(RenderRemovedEdge);
-                }
-                else
-                {
-                    // To trigger the next phase where new and existing edges are to be drawn.
-                    phase1AnimationWatchDog.Skip(next);
-                }
-                /// Note: <see cref="Phase2AddNewAndExistingGraphElements"/> will be called by <see cref="phase1AnimationWatchDog"/>
-                /// when phase 1 has completed (or skipped).
+                // To trigger the next phase where new and existing edges are to be drawn.
+                phase1AnimationWatchDog.Skip(next);
             }
+            /// Note: <see cref="Phase2MoveExistingGraphElements"/> will be called by <see cref="phase1AnimationWatchDog"/>
+            /// when phase 1 has completed (or skipped).
         }
 
         /// <summary>

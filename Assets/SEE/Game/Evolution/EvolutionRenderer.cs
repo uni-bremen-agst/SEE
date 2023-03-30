@@ -74,8 +74,8 @@ namespace SEE.Game.Evolution
                                     changeColor: cityEvolution.ChangeBeamColor,
                                     deletionColor: cityEvolution.DeletionBeamColor);
                 RegisterAllAnimators(animators);
-                phase1AnimationWatchDog = new Phase1AnimationWatchDog(this);
-                phase2AnimationWatchDog = new Phase2AnimationWatchDog(this);
+                phase1AnimationWatchDog = new Phase1DeletionAnimationWatchDog(this);
+                phase2AnimationWatchDog = new Phase2MoveAnimationWatchDog(this);
             }
             else
             {
@@ -348,16 +348,18 @@ namespace SEE.Game.Evolution
 
 
         /// <summary>
-        /// Watchdog triggering <see cref="Phase2AddNewAndExistingGraphElements"/> when phase 1 has been
+        /// Watchdog triggering <see cref="Phase2MoveExistingGraphElements"/> when phase 1 has been
         /// completed, in which the necessary nodes and edges are deleted.
         /// </summary>
-        private Phase1AnimationWatchDog phase1AnimationWatchDog;
+        private Phase1DeletionAnimationWatchDog phase1AnimationWatchDog;
 
         /// <summary>
         /// Watchdog triggering <see cref="OnAnimationsFinished"/> when phase 2 has been
         /// completed, in which the nodes and edges of the next graph to be shown are drawn.
         /// </summary>
-        private Phase2AnimationWatchDog phase2AnimationWatchDog;
+        private Phase2MoveAnimationWatchDog phase2AnimationWatchDog;
+
+
 
         /// <summary>
         /// Updates the hierarchy of game nodes so that it is isomorphic to the node
@@ -518,103 +520,6 @@ namespace SEE.Game.Evolution
 
             return x1 == x2 && z1 == z2;
         }
-
-        /// <summary>
-        /// Ignores the given <paramref name="node"/> in rendering. This method can
-        /// be used if inner or leaf nodes are to be ignored (e.g., for non-hierarchical
-        /// layouts).
-        /// </summary>
-        /// <param name="node">node to be displayed</param>
-        private void IgnoreNode(Node node)
-        {
-            phase2AnimationWatchDog.Finished();
-        }
-
-        /// <summary>
-        /// Renders the game object corresponding to the given <paramref name="graphNode"/>.
-        /// </summary>
-        /// <param name="graphNode">graph node to be displayed</param>
-        private void RenderNode(Node graphNode)
-        {
-            // The layout to be applied to graphNode
-            ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.ID];
-            // The game node representing the graphNode if there is any; null if there is none
-            Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject currentGameNode);
-            Assert.IsTrue(currentGameNode.HasNodeRef());
-            Debug.Log($"[RenderNode] {graphNode.ID} is new {formerGraphNode == null}: position={layoutNode.CenterPosition} scale={layoutNode.AbsoluteScale}\n");
-
-            Difference difference;
-            if (formerGraphNode == null)
-            {
-                Debug.Log($"[RenderNode] {graphNode.ID} is new: position={layoutNode.CenterPosition} scale={layoutNode.AbsoluteScale}\n");
-                // The node is new. It has no layout applied to it yet.
-                // If the node is new, we animate it by moving it out of the ground.
-                // Note: layoutNode.position.y denotes the ground position of
-                // a game object, not its center.
-                Vector3 position = layoutNode.CenterPosition;
-                position.y -= layoutNode.AbsoluteScale.y;
-                layoutNode.CenterPosition = position;
-
-                // Revert the change to the y co-ordindate.
-                position.y += layoutNode.AbsoluteScale.y;
-                layoutNode.CenterPosition = position;
-                difference = Difference.Added;
-
-                // Set the layout for the copied node.
-                currentGameNode.SetAbsoluteScale(layoutNode.AbsoluteScale, animate: false);
-                currentGameNode.transform.position = layoutNode.CenterPosition;
-            }
-            else
-            {
-                // Node existed before.
-                if (diff.AreDifferent(formerGraphNode, graphNode))
-                {
-                    difference = Difference.Changed;
-                }
-                else
-                {
-                    difference = Difference.None;
-                }
-            }
-            switch (difference)
-            {
-                case Difference.Changed:
-                    NodeChangesBuffer.GetSingleton().changedNodeIDs.Add(currentGameNode.name);
-                    markerFactory.MarkChanged(currentGameNode);
-                    // There is a change. It may or may not be the metric determining the style.
-                    // We will not further check that and just call the following method.
-                    // If there is no change, this method does not need to be called because then
-                    // we know that the metric values determining the style and antenna of the former
-                    // and the new graph node are the same.
-                    graphRenderer.AdjustStyle(currentGameNode);
-                    break;
-                case Difference.Added:
-                    NodeChangesBuffer.GetSingleton().addedNodeIDs.Add(currentGameNode.name);
-                    markerFactory.MarkBorn(currentGameNode);
-                    break;
-            }
-            // We want the animator to move each node separately, which is why we
-            // remove each from the hierarchy; later the node hierarchy will be
-            // re-established. It still needs to be a child of the code city,
-            // however, because methods called in the course of the animation
-            // will try to retrieve the code city from the game node.
-            currentGameNode.transform.SetParent(gameObject.transform);
-
-            // currentGameNode is shifted to its new position through the animator.
-            Action<float> onEdgeAnimationStart = null;
-            if (edgeTweens.TryGetValue(graphNode, out Tween tween))
-            {
-                Debug.Log($"onEdgeAnimationStart set for {graphNode.ID} {currentGameNode.name}\n");
-                onEdgeAnimationStart = duration => OnEdgeAnimationStart(tween, duration);
-            }
-            Debug.Log($"Move {currentGameNode.name} from {currentGameNode.transform.position} to {layoutNode.CenterPosition}.\n");
-            changeAndBirthAnimator.AnimateTo(gameObject: currentGameNode,
-                                             layoutNode: layoutNode,
-                                             callbackWhenAnimationFinished: OnAnimationNodeAnimationFinished,
-                                             moveCallback: onEdgeAnimationStart);
-        }
-
-
 
         /// <summary>
         /// Destroys <paramref name="gameObject"/> if it is an instance of <see cref="GameObject"/>.
