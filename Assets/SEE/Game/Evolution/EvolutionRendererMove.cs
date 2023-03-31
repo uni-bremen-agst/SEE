@@ -29,38 +29,6 @@ namespace SEE.Game.Evolution
     public partial class EvolutionRenderer
     {
         /// <summary>
-        /// A watchdog awaiting all animations of the second phase to be finished. The second
-        /// phase is dedicated to drawing all graph elements present in the graph next to
-        /// be drawn.When all deletion animations have completed, <see cref="OnAnimationsFinished"/>
-        /// will be called.
-        /// </summary>
-        private class Phase2MoveAnimationWatchDog : AnimationWatchDog
-        {
-            protected override string Name { get => nameof(Phase2MoveAnimationWatchDog); }
-
-            /// <summary>
-            /// Constructor setting the <see cref="EvolutionRenderer"/> whose method should
-            /// be called when there are no more outstanding animations. The number of
-            /// outstanding animations is assumed to be zero at this point. The correct
-            /// value can be set by <see cref="Await(int)"/> later.
-            /// </summary>
-            /// <param name="evolutionRenderer"><see cref="EvolutionRenderer"/> whose method should be called
-            /// when there are no more outstanding animations</param>
-            public Phase2MoveAnimationWatchDog(EvolutionRenderer evolutionRenderer)
-                : base(evolutionRenderer)
-            { }
-
-            /// <summary>
-            /// If there are no more other animations to be awaited, <see cref="OnAnimationsFinished"/>
-            /// will be called.
-            /// </summary>
-            protected override void Continue()
-            {
-                evolutionRenderer.OnAnimationsFinished();
-            }
-        }
-
-        /// <summary>
         /// Implements the second phase in the transition from the <see cref="currentCity"/>
         /// to the <paramref name="next"/> graph.
         /// In this phase, all nodes in <paramref name="next"/> will be drawn. These may be
@@ -146,7 +114,7 @@ namespace SEE.Game.Evolution
 
                 void NodeAnimation(LaidOutGraph next)
                 {
-                    phase2AnimationWatchDog.Await(next.Graph.NodeCount);
+                    phase2AnimationWatchDog.Await(next.Graph.NodeCount, () => OnAnimationsFinished());
                     // Draw all nodes of next graph.
                     if (ignoreInnerNodes)
                     {
@@ -170,13 +138,13 @@ namespace SEE.Game.Evolution
 
 
                 int existingElements = equalNodes.Count + changedNodes.Count /* + equalEdges.Count + changedEdges.Count */;
+                phase2AnimationWatchDog.Await(existingElements, () => OnAnimationsFinished());
                 if (existingElements == 0)
                 {
                     phase2AnimationWatchDog.Skip();
                 }
                 else
                 {
-                    phase2AnimationWatchDog.Await(existingElements);
                     equalNodes.ForEach(RenderExistingNode);
                     changedNodes.ForEach(RenderExistingNode);
                 }

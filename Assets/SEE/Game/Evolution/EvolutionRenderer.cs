@@ -74,8 +74,8 @@ namespace SEE.Game.Evolution
                                     changeColor: cityEvolution.ChangeBeamColor,
                                     deletionColor: cityEvolution.DeletionBeamColor);
                 RegisterAllAnimators(animators);
-                phase1AnimationWatchDog = new Phase1DeletionAnimationWatchDog(this);
-                phase2AnimationWatchDog = new Phase2MoveAnimationWatchDog(this);
+                phase1AnimationWatchDog = new Utils.CountingJoin();
+                phase2AnimationWatchDog = new Utils.CountingJoin();
             }
             else
             {
@@ -344,22 +344,13 @@ namespace SEE.Game.Evolution
             Phase1RemoveDeletedGraphElements(current, next);
         }
 
-        private bool OLD = false;
-
-
-        /// <summary>
-        /// Watchdog triggering <see cref="Phase2MoveExistingGraphElements"/> when phase 1 has been
-        /// completed, in which the necessary nodes and edges are deleted.
-        /// </summary>
-        private Phase1DeletionAnimationWatchDog phase1AnimationWatchDog;
+        private bool OLD = true;
 
         /// <summary>
         /// Watchdog triggering <see cref="OnAnimationsFinished"/> when phase 2 has been
         /// completed, in which the nodes and edges of the next graph to be shown are drawn.
         /// </summary>
-        private Phase2MoveAnimationWatchDog phase2AnimationWatchDog;
-
-
+        private Utils.CountingJoin phase2AnimationWatchDog;
 
         /// <summary>
         /// Updates the hierarchy of game nodes so that it is isomorphic to the node
