@@ -68,48 +68,93 @@ namespace SEE.DataModel.DG.IO
         /// <exception cref="PlatformNotSupportedException">If the system platform is not supported</exception>
         private static string GetLiblzmaPath()
         {
-            string libDir = Path.Combine(Path.GetFullPath(Application.dataPath), "Native", "LZMA");
-            OSPlatform platform;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                platform = OSPlatform.Windows;
-                libDir = Path.Combine(libDir, "win");
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                platform = OSPlatform.Linux;
-                libDir = Path.Combine(libDir, "linux");
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                platform = OSPlatform.OSX;
-                libDir = Path.Combine(libDir, "osx");
-            }
+            // The library liblzma.dll is located in Assets/Native/LZMA/<arch>/native/liblzma.dll
+            // where <arch> specifies the operating system the Unity editor is currently running on
+            // and the hardware architecture (e.g., win-x64).
+            //
+            // If SEE is started from the Unity editor, the library will be looked up
+            // under this path.
+            // In a build application of SEE (i.e., an executable running independently
+            // from the Unity editor, the library is located in
+            // SEE_Data/Plugins/<arch>/liblzma.dll instead, where <arch> specifies
+            // the hardware architecture (e.g., x86_64; see also
+            // https://docs.unity3d.com/Manual/PluginInspector.html).
 
-            switch (RuntimeInformation.ProcessArchitecture)
-            {
-                case Architecture.X86:
-                    libDir += "-x86";
-                    break;
-                case Architecture.X64:
-                    libDir += "-x64";
-                    break;
-                case Architecture.Arm when platform == OSPlatform.Windows:
-                    libDir += "10-arm";
-                    break;
-                case Architecture.Arm64 when platform == OSPlatform.Windows:
-                    libDir += "10-arm64";
-                    break;
-                case Architecture.Arm:
-                    libDir += "-arm";
-                    break;
-                case Architecture.Arm64:
-                    libDir += "-arm64";
-                    break;
-                default: throw new PlatformNotSupportedException($"Unknown architecture {RuntimeInformation.ProcessArchitecture}");
-            }
+            string libDir = Application.isEditor ?
+                                Path.Combine(Path.GetFullPath(Application.dataPath), "Native", "LZMA")
+                              : Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins");
 
-            libDir = Path.Combine(libDir, "native");
+            if (Application.isEditor)
+            {
+                // In the editor, the <arch> specifier is a combination of the OS and the process
+                // architecture. We will first handle the OS.
+                OSPlatform platform = GetOSPlatform();
+                if (platform == OSPlatform.Windows)
+                {
+                    libDir = Path.Combine(libDir, "win");
+                }
+                else if (platform == OSPlatform.Linux)
+                {
+                    libDir = Path.Combine(libDir, "linux");
+                }
+                else if (platform == OSPlatform.OSX)
+                {
+                    libDir = Path.Combine(libDir, "osx");
+                }
+
+                // Now follows the process architecture.
+                switch (RuntimeInformation.ProcessArchitecture)
+                {
+                    case Architecture.X86:
+                        libDir += "-x86";
+                        break;
+                    case Architecture.X64:
+                        libDir += "-x64";
+                        break;
+                    case Architecture.Arm when platform == OSPlatform.Windows:
+                        libDir += "10-arm";
+                        break;
+                    case Architecture.Arm64 when platform == OSPlatform.Windows:
+                        libDir += "10-arm64";
+                        break;
+                    case Architecture.Arm:
+                        libDir += "-arm";
+                        break;
+                    case Architecture.Arm64:
+                        libDir += "-arm64";
+                        break;
+                    default: throw new PlatformNotSupportedException($"Unknown architecture {RuntimeInformation.ProcessArchitecture}");
+                }
+
+                libDir = Path.Combine(libDir, "native");
+            }
+            else
+            {
+                // In a deployed application, only the process architecture matters.
+                OSPlatform platform = GetOSPlatform();
+                switch (RuntimeInformation.ProcessArchitecture)
+                {
+                    case Architecture.X86:
+                        libDir += "x86";
+                        break;
+                    case Architecture.X64:
+                        libDir += "x86_64";
+                        break;
+                    case Architecture.Arm when platform == OSPlatform.Windows:
+                        libDir += "x86";
+                        break;
+                    case Architecture.Arm64 when platform == OSPlatform.Windows:
+                        libDir += "x86_64";
+                        break;
+                    case Architecture.Arm:
+                        libDir += "x86";
+                        break;
+                    case Architecture.Arm64:
+                        libDir += "x86_64";
+                        break;
+                    default: throw new PlatformNotSupportedException($"Unknown architecture {RuntimeInformation.ProcessArchitecture}");
+                }
+            }
 
             string libPath = null;
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -136,6 +181,29 @@ namespace SEE.DataModel.DG.IO
             }
 
             return libPath;
+
+            // Returns the type of operating system. If other than Windows, Linux,
+            // or OSX, an exception is thrown.
+            static OSPlatform GetOSPlatform()
+            {
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    return OSPlatform.Windows;
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                {
+                    return OSPlatform.Linux;
+                }
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                {
+                    return OSPlatform.OSX;
+                }
+                else
+                {
+                    throw new PlatformNotSupportedException
+                        ("Only Windows, Linux, and OSX are supported operating systems.");
+                }
+            }
         }
 
         /// <summary>
