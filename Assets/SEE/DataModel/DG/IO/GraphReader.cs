@@ -75,7 +75,7 @@ namespace SEE.DataModel.DG.IO
             // If SEE is started from the Unity editor, the library will be looked up
             // under this path.
             // In a build application of SEE (i.e., an executable running independently
-            // from the Unity editor, the library is located in
+            // from the Unity editor), the library is located in
             // SEE_Data/Plugins/<arch>/liblzma.dll instead, where <arch> specifies
             // the hardware architecture (e.g., x86_64; see also
             // https://docs.unity3d.com/Manual/PluginInspector.html).
