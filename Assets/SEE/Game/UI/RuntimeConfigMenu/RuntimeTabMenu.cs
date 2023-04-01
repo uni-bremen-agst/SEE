@@ -408,7 +408,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         return container.transform.Find("Content").gameObject;
     }
 
-    private void CreateSlider(string settingName, RangeAttribute range, UnityAction<float> setter, Func<float> getter, bool useRoundValue, GameObject parent)
+    private void CreateSlider(string settingName, RangeAttribute range, UnityAction<float> setter, Func<float> getter, 
+        bool useRoundValue, GameObject parent, bool recursive = false)
     {
         range ??= new RangeAttribute(0, 2);
 
@@ -429,13 +430,27 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         slider.value = getter();
         slider.onValueChanged.AddListener(setter);
 
-        RuntimeSmallEditorButton smallEditorButton = sliderGameObject.AddComponent<RuntimeSmallEditorButton>();
-        smallEditorButton.OnShowMenuChanged += () => ShowMenu = !smallEditorButton.ShowMenu;
-    
-        OnUpdateMenuValues += () => slider.value = getter();
+        OnUpdateMenuValues += () =>
+        {
+            slider.value = getter();
+            sliderManager.UpdateUI();
+        };
+
+        if (!recursive)
+        {
+            RuntimeSmallEditorButton smallEditorButton = sliderGameObject.AddComponent<RuntimeSmallEditorButton>();
+            smallEditorButton.OnShowMenuChanged += () =>
+            {
+                ShowMenu = !smallEditorButton.ShowMenu;
+                OnUpdateMenuValues?.Invoke();
+            };
+            smallEditorButton.CreateWidget = smallEditor => 
+                CreateSlider(settingName, range, setter, getter, useRoundValue, smallEditor, true);
+        }        
     }
 
-    private void CreateSwitch(string settingName, UnityAction<bool> setter, Func<bool> getter, GameObject parent)
+    private void CreateSwitch(string settingName, UnityAction<bool> setter, Func<bool> getter, GameObject parent,
+        bool recursive = false)
     {
         GameObject switchGameObject =
             PrefabInstantiator.InstantiatePrefab(SWITCH_PREFAB, parent.transform, false);
@@ -449,18 +464,31 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         switchManager.UpdateUI();
         switchManager.OnEvents.AddListener(() => setter(true));
         switchManager.OffEvents.AddListener(() => setter(false));
-
-        RuntimeSmallEditorButton smallEditorButton = switchGameObject.AddComponent<RuntimeSmallEditorButton>();
-        smallEditorButton.OnShowMenuChanged += () => ShowMenu = !smallEditorButton.ShowMenu;
-    
+        
         OnUpdateMenuValues += () =>
         {
             switchManager.isOn = getter();
             switchManager.UpdateUI();
         };
+
+        if (!recursive)
+        {
+            RuntimeSmallEditorButton smallEditorButton = switchGameObject.AddComponent<RuntimeSmallEditorButton>();
+            smallEditorButton.OnShowMenuChanged += () =>
+            {
+                ShowMenu = !smallEditorButton.ShowMenu;
+                OnUpdateMenuValues?.Invoke();
+            };
+            smallEditorButton.CreateWidget = smallEditor =>
+                CreateSwitch(settingName, setter, getter, smallEditor, true);
+        }
+
+    
+
     }
 
-    private void CreateStringField(string settingName, UnityAction<string> setter, Func<string> getter, GameObject parent)
+    private void CreateStringField(string settingName, UnityAction<string> setter, Func<string> getter, 
+        GameObject parent, bool recursive = false)
     {
         GameObject stringGameObject =
             PrefabInstantiator.InstantiatePrefab(STRINGFIELD_PREFAB, parent.transform, false);
@@ -474,15 +502,25 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         inputField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
         inputField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
         inputField.onValueChanged.AddListener(setter);
-    
-        RuntimeSmallEditorButton smallEditorButton = stringGameObject.AddComponent<RuntimeSmallEditorButton>();
-        smallEditorButton.OnShowMenuChanged += () => ShowMenu = !smallEditorButton.ShowMenu;
-
+        
         OnUpdateMenuValues += () => inputField.text = getter();
+
+        if (!recursive)
+        {
+            RuntimeSmallEditorButton smallEditorButton = stringGameObject.AddComponent<RuntimeSmallEditorButton>();
+            smallEditorButton.OnShowMenuChanged += () =>
+            {
+                ShowMenu = !smallEditorButton.ShowMenu;
+                OnUpdateMenuValues?.Invoke();
+            };
+            smallEditorButton.CreateWidget = smallEditor =>
+                CreateStringField(settingName, setter, getter, smallEditor, true);
+        }
     }
 
     // TODO: Add action
-    private void CreateDropDown(string settingName, UnityAction<int> setter, IEnumerable<string> values, Func<string> getter, GameObject parent)
+    private void CreateDropDown(string settingName, UnityAction<int> setter, IEnumerable<string> values, 
+        Func<string> getter, GameObject parent, bool recursive = false)
     {
         string[] valueArray = values as string[] ?? values.ToArray();
     
@@ -506,18 +544,24 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         dropdown.selectedItemIndex = Array.IndexOf(valueArray, getter());
         valueArray.ForEach(s => dropdown.CreateNewItemFast(s, null));
         dropdown.dropdownEvent.AddListener(setter);
-    
-        RuntimeSmallEditorButton smallEditorButton = dropDownGameObject.AddComponent<RuntimeSmallEditorButton>();
-        smallEditorButton.OnShowMenuChanged += () => ShowMenu = !smallEditorButton.ShowMenu;
 
-        OnUpdateMenuValues += () => {
-            dropdown.selectedItemIndex = Array.IndexOf(valueArray, getter());
-            // TODO: Is dropdown.UpdateValues() necessary?
-        };
+        OnUpdateMenuValues += () => dropdown.selectedItemIndex = Array.IndexOf(valueArray, getter());
+
+        if (!recursive)
+        {
+            RuntimeSmallEditorButton smallEditorButton = dropDownGameObject.AddComponent<RuntimeSmallEditorButton>();
+            smallEditorButton.OnShowMenuChanged += () =>
+            {
+                ShowMenu = !smallEditorButton.ShowMenu;
+                OnUpdateMenuValues?.Invoke();
+            };
+            smallEditorButton.CreateWidget = smallEditor =>
+                CreateDropDown(settingName, setter, valueArray, getter, smallEditor, true);
+        }
     }
 
     // TODO: Add action
-    private void CreateColorPicker(string settingName, GameObject parent)
+    private void CreateColorPicker(string settingName, GameObject parent, bool recursive = false)
     {
         parent = CreateNestedSetting("Color Picker: " + settingName, parent);
 
@@ -529,8 +573,18 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         text.text = settingName;
         // TODO: Value and setter
 
-        RuntimeSmallEditorButton smallEditorButton = colorPickerGameObject.AddComponent<RuntimeSmallEditorButton>();
-        smallEditorButton.OnShowMenuChanged += () => ShowMenu = !smallEditorButton.ShowMenu;
+        if (!recursive)
+        {
+            RuntimeSmallEditorButton smallEditorButton = colorPickerGameObject.AddComponent<RuntimeSmallEditorButton>();
+            smallEditorButton.OnShowMenuChanged += () =>
+            {
+                ShowMenu = !smallEditorButton.ShowMenu;
+                OnUpdateMenuValues?.Invoke();
+            };
+            smallEditorButton.CreateWidget = smallEditor =>
+                CreateColorPicker(settingName, smallEditor, true);
+        }
+
     }
 
     private void UpdateListChildren(IList<string> list, GameObject parent)

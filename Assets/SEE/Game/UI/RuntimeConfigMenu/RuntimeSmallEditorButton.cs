@@ -1,4 +1,5 @@
-﻿using SEE.Game.UI;
+﻿using System;
+using SEE.Game.UI;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
@@ -8,11 +9,10 @@ public class RuntimeSmallEditorButton : PlatformDependentComponent
 {
     public const string SMALLWINDOW_PREFAB = RuntimeTabMenu.RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfig_SmallConfigWindow";
 
-    private Button button;
+    public Action<GameObject> CreateWidget;
     
+    private Button button;
     private static GameObject smallEditor;
-    private Transform originalParent;
-    private int originalSiblingIndex;
 
     private bool showMenu;
     public bool ShowMenu
@@ -21,25 +21,16 @@ public class RuntimeSmallEditorButton : PlatformDependentComponent
         set
         {
             if (value == showMenu) return;
-            if (value && originalParent != null) return;
-            if (!value && originalParent == null) return;
             if (value)
             {
-                originalParent = transform.parent;
-                originalSiblingIndex = transform.GetSiblingIndex();
-                
                 smallEditor = PrefabInstantiator.InstantiatePrefab(SMALLWINDOW_PREFAB, Canvas.transform, false);
                 smallEditor.transform.Find("CloseButton").GetComponent<Button>().onClick.AddListener(() => ShowMenu = false);
-                transform.SetParent(smallEditor.transform.Find("Content"));
+                CreateWidget(smallEditor.transform.Find("Content").gameObject);
             }
             else
             {
-                transform.SetParent(originalParent);
-                transform.SetSiblingIndex(originalSiblingIndex);
                 Destroyer.Destroy(smallEditor);
-                originalParent = null;
             }
-            button.enabled = !value;
             showMenu = value;
             OnShowMenuChanged?.Invoke();
         }
