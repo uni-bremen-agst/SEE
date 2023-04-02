@@ -131,29 +131,13 @@ namespace SEE.DataModel.DG.IO
             else
             {
                 // In a deployed application, only the process architecture matters.
-                OSPlatform platform = GetOSPlatform();
-                switch (RuntimeInformation.ProcessArchitecture)
+                string arch = RuntimeInformation.ProcessArchitecture switch
                 {
-                    case Architecture.X86:
-                        libDir += "x86";
-                        break;
-                    case Architecture.X64:
-                        libDir += "x86_64";
-                        break;
-                    case Architecture.Arm when platform == OSPlatform.Windows:
-                        libDir += "x86";
-                        break;
-                    case Architecture.Arm64 when platform == OSPlatform.Windows:
-                        libDir += "x86_64";
-                        break;
-                    case Architecture.Arm:
-                        libDir += "x86";
-                        break;
-                    case Architecture.Arm64:
-                        libDir += "x86_64";
-                        break;
-                    default: throw new PlatformNotSupportedException($"Unknown architecture {RuntimeInformation.ProcessArchitecture}");
-                }
+                    Architecture.X86 or Architecture.Arm => "x86",
+                    Architecture.X64 or Architecture.Arm64 => "x86_64",
+                    _ => throw new PlatformNotSupportedException($"Unknown architecture {RuntimeInformation.ProcessArchitecture}"),
+                };
+                libDir = Path.Combine(libDir, arch);
             }
 
             string libPath = null;
