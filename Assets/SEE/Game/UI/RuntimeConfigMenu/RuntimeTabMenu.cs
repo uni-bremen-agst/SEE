@@ -10,7 +10,9 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.UI.ConfigMenu;
 using SEE.Game.UI.Menu;
+using SEE.GO;
 using SEE.Layout.NodeLayouts.Cose;
+using SEE.Net.Actions;
 using SEE.Utils;
 using SimpleFileBrowser;
 using Sirenix.Utilities;
@@ -502,9 +504,26 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         inputField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
         inputField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
         inputField.onValueChanged.AddListener(setter);
+        inputField.onValueChanged.AddListener(changedValue => {
+            UpdateCityFieldNetAction action = new();
+            action.widgetPath = stringGameObject.FullName();
+            action.newValue = changedValue;
+            action.Execute();
+        });
         
         OnUpdateMenuValues += () => inputField.text = getter();
 
+        OnUpdateField += (widgetPath, value) =>
+        {
+            Debug.LogError("Checking Widget: " + settingName);
+            if (widgetPath == stringGameObject.FullName())
+            {
+                Debug.LogError("Changing value: " + settingName + " " + value);
+                setter(value as string);
+            }
+        };
+        
+        
         if (!recursive)
         {
             RuntimeSmallEditorButton smallEditorButton = stringGameObject.AddComponent<RuntimeSmallEditorButton>();
@@ -644,6 +663,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         le.minHeight = ((RectTransform) go.transform).rect.height;
     }
 
+    public Action<string, object> OnUpdateField;
+
     // TODO: Is the event working?
-    private event Action OnUpdateMenuValues;
+    public Action OnUpdateMenuValues;
 }
