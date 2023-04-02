@@ -15,15 +15,6 @@ namespace SEE.Game.Evolution
     /// Part of the <see cref="EvolutionRenderer"/> taking care of moving
     /// graph elements existing in the currently shown graph and the next
     /// one to their new position.
-    ///
-    /// The transition from the current graph to the next one is organized in
-    /// the following phases:
-    ///
-    /// (1) Remove deleted nodes and edges from the scene.
-    /// (2) Move existing nodes and edges to their new position in the scene.
-    /// (3) Adjust existing changed nodes and edges in the scene.
-    /// (4) Add newly created nodes and edges to the scene.
-    ///
     /// The code following here implements phase (2).
     /// </summary>
     public partial class EvolutionRenderer

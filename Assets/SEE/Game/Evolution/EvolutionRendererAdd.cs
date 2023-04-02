@@ -11,15 +11,6 @@ namespace SEE.Game.Evolution
     /// <summary>
     /// Part of the <see cref="EvolutionRenderer"/> taking care of adding new
     /// graph elements.
-    ///
-    /// The transition from the current graph to the next one is organized in
-    /// the following phases:
-    ///
-    /// (1) Remove deleted nodes and edges from the scene.
-    /// (2) Move existing nodes and edges to their new position in the scene.
-    /// (3) Adjust existing changed nodes and edges in the scene.
-    /// (4) Add newly created nodes and edges to the scene.
-    ///
     /// The code following here implements phase (4).
     /// </summary>
     public partial class EvolutionRenderer
@@ -33,7 +24,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void Phase4AddNewGraphElements()
         {
-            int addedElements = addedNodes.Count; // + addedEdges.Count;
+            int addedElements = addedNodes.Count + addedEdges.Count;
             Debug.Log($"Phase4AddNewGraphElements: {addedElements}\n");
             animationWatchDog.Await(addedElements, OnAnimationsFinished);
             if (addedElements > 0)
