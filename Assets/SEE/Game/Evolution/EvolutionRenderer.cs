@@ -25,6 +25,7 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Utils;
+using Sirenix.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -46,6 +47,12 @@ namespace SEE.Game.Evolution
     /// </summary>
     public partial class EvolutionRenderer : MonoBehaviour, IGraphRenderer
     {
+        /// <summary>
+        /// Watchdog triggering the next animation phase when the previous phase has been
+        /// completed.
+        /// </summary>
+        private CountingJoin animationWatchDog;
+
         /// <summary>
         /// Sets the evolving series of <paramref name="graphs"/> to be visualized.
         /// The actual visualization is triggered by <see cref="ShowGraphEvolution"/>
@@ -74,8 +81,7 @@ namespace SEE.Game.Evolution
                                     changeColor: cityEvolution.ChangeBeamColor,
                                     deletionColor: cityEvolution.DeletionBeamColor);
                 RegisterAllAnimators(animators);
-                phase1AnimationWatchDog = new Utils.CountingJoin();
-                phase2AnimationWatchDog = new Utils.CountingJoin();
+                animationWatchDog = new CountingJoin();
             }
             else
             {
@@ -92,8 +98,10 @@ namespace SEE.Game.Evolution
         private bool edgesAreDrawn = false;
 
         /// <summary>
-        /// The y co-ordinate where to to move deleted nodes in world space. Deleted nodes will
-        /// be lifted to this level and then disappear.
+        /// The y co-ordinate in world space where to move deleted nodes to and to move
+        /// added nodes from. Deleted nodes will be lifted to this level and then disappear.
+        /// Added nodes will appear there and then be moved to their location in the code
+        /// city.
         /// </summary>
         private const float SkyLevel = 2.0f;
 
@@ -204,6 +212,30 @@ namespace SEE.Game.Evolution
                     shownGraphHasChangedEvent.Invoke();
                 }
             }
+        }
+
+        /// <summary>
+        /// The transition from the current graph to the next one is organized in
+        /// the following phases:
+        ///
+        /// (1) Remove deleted nodes and edges from the scene.
+        /// (2) Move existing nodes and edges to their new position in the scene.
+        /// (3) Adjust existing changed nodes and edges in the scene.
+        /// (4) Add newly created nodes and edges to the scene.
+        ///
+        /// This constant is the number of phases.
+        /// </summary>
+        private const int NumberOfPhases = 4;
+
+        /// <summary>
+        /// Returns the time for the animation for each individual animation phase
+        /// in seconds, i.e., the total <see cref="AnimationLag"/> divided by
+        /// <see cref="NumberOfPhases"/>.
+        /// </summary>
+        /// <returns>time for the animation for each individual animation phase</returns>
+        private float AnimationLagPerPhase()
+        {
+            return AnimationLag / NumberOfPhases;
         }
 
         /// <summary>
@@ -341,16 +373,10 @@ namespace SEE.Game.Evolution
                               out equalEdges);
             }
 
-            Phase1RemoveDeletedGraphElements(current, next);
+            Phase1RemoveDeletedGraphElements(next);
         }
 
-        private bool OLD = true;
-
-        /// <summary>
-        /// Watchdog triggering <see cref="OnAnimationsFinished"/> when phase 2 has been
-        /// completed, in which the nodes and edges of the next graph to be shown are drawn.
-        /// </summary>
-        private Utils.CountingJoin phase2AnimationWatchDog;
+        private bool OLD = false;
 
         /// <summary>
         /// Updates the hierarchy of game nodes so that it is isomorphic to the node
@@ -438,6 +464,8 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void OnAnimationsFinished()
         {
+            Debug.Log("OnAnimationsFinished\n");
+            MarkNodes();
             NodeChangesBuffer nodeChangesBuffer = NodeChangesBuffer.GetSingleton();
             nodeChangesBuffer.currentRevisionCounter = CurrentGraphIndex;
             nodeChangesBuffer.addedNodeIDsCache = new List<string>(nodeChangesBuffer.addedNodeIDs);
@@ -452,6 +480,21 @@ namespace SEE.Game.Evolution
 
             IsStillAnimating = false;
             AnimationFinishedEvent.Invoke();
+        }
+
+        /// <summary>
+        /// Markes all <see cref="addedNodes"/> and <see cref="changedNodes"/>.
+        /// </summary>
+        private void MarkNodes()
+        {
+            foreach (Node node in addedNodes)
+            {
+                markerFactory.MarkBorn(GraphElementIDMap.Find(node.ID, true));
+            }
+            foreach (Node node in changedNodes)
+            {
+                markerFactory.MarkChanged(GraphElementIDMap.Find(node.ID, true));
+            }
         }
 
         /// <summary>
@@ -1008,79 +1051,6 @@ namespace SEE.Game.Evolution
         public IDictionary<string, ILayoutEdge<ILayoutNode>> LayoutEdges(ICollection<GameObject> gameEdges)
         {
             return graphRenderer.LayoutEdges(gameEdges);
-        }
-
-        /// <summary>
-        /// An implementation of ILayoutNode that is used for animation purposes only.
-        /// The only features it supports are the position and scale of node.
-        /// That is what is currently needed by the animators.
-        /// </summary>
-        private class AnimationNode : ILayoutNode
-        {
-            /// <summary>
-            /// Constructor.
-            /// </summary>
-            /// <param name="centerPosition">position of the center in world space</param>
-            /// <param name="scale">local scale</param>
-            public AnimationNode(Vector3 centerPosition, Vector3 scale)
-            {
-                this.CenterPosition = centerPosition;
-                this.LocalScale = scale;
-            }
-
-            public Vector3 LocalScale { get; set; }
-
-            public Vector3 AbsoluteScale => LocalScale;
-
-            public Vector3 CenterPosition { get; set; }
-
-            public void ScaleBy(float factor)
-            {
-                throw new NotImplementedException();
-            }
-
-            public ILayoutNode Parent => throw new NotImplementedException();
-
-            public int Level { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-            public bool IsLeaf => throw new NotImplementedException();
-
-            public string ID => throw new NotImplementedException();
-
-            public float Rotation { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-            public Vector3 Roof => throw new NotImplementedException();
-
-            public Vector3 Ground => throw new NotImplementedException();
-
-            public ICollection<ILayoutNode> Successors => throw new NotImplementedException();
-
-            public GameObject gameObject => throw new NotImplementedException();
-
-            public Vector3 RelativePosition { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-            public bool IsSublayoutNode { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-            public bool IsSublayoutRoot { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-            public Sublayout Sublayout { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-            public ILayoutNode SublayoutRoot { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
-            public ICollection<ILayoutNode> Children()
-            {
-                throw new NotImplementedException();
-            }
-
-            public void SetOrigin()
-            {
-                throw new NotImplementedException();
-            }
-
-            public void SetRelative(ILayoutNode node)
-            {
-                throw new NotImplementedException();
-            }
         }
     }
 }

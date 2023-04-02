@@ -30,19 +30,10 @@ namespace SEE.Game.Evolution
     {
         /// <summary>
         /// Implements the second phase in the transition from the <see cref="currentCity"/>
-        /// to the <paramref name="next"/> graph.
-        /// In this phase, all nodes in <paramref name="next"/> will be drawn. These may be
-        /// either new or existing nodes (the latter being nodes that have been present in the
-        /// currently drawn graph). When this phase has been completed, <see cref="OnAnimationsFinished"/>
-        /// will be called eventually.
-        ///
-        /// To make sure that <see cref="OnAnimationsFinished"/> is called only when all nodes
-        /// have been drawn, <see cref="phase2AnimationWatchDog"/> will be used. It will be
-        /// set up to await the number of nodes present in <paramref name="next"/>. Then
-        /// <see cref="RenderNode(Node)"/> or <see cref="IgnoreNode(Node)"/>, respectively, will be
-        /// called for each such node. These in turn will signal <see cref="phase2AnimationWatchDog"/>
-        /// when they have finished. When all outstanding node additions have been completed,
-        /// <see cref="phase2AnimationWatchDog"/> will call <see cref="OnAnimationsFinished"/>.
+        /// to the <paramref name="nextCity"/>.
+        /// In this phase, all existing nodes (nodes in both graphs, no matter whether they were
+        /// changed or not) will be moved to their new location. When this phase has been
+        /// completed, <see cref="Phase3AdjustExistingGraphElements"/> will be called eventually.
         ///
         /// Note: <paramref name="next"/> will be a graph for the previous revision of
         /// the currently drawn graph in the graph series when the evolution visualization
@@ -114,7 +105,7 @@ namespace SEE.Game.Evolution
 
                 void NodeAnimation(LaidOutGraph next)
                 {
-                    phase2AnimationWatchDog.Await(next.Graph.NodeCount, () => OnAnimationsFinished());
+                    animationWatchDog.Await(next.Graph.NodeCount, () => OnAnimationsFinished());
                     // Draw all nodes of next graph.
                     if (ignoreInnerNodes)
                     {
@@ -127,23 +118,19 @@ namespace SEE.Game.Evolution
                     }
                 }
 
-                /// Note: <see cref="OnAnimationsFinished"/> will be called by <see cref="phase2AnimationWatchDog"/>
+                /// Note: <see cref="OnAnimationsFinished"/> will be called by <see cref="animationWatchDog"/>
                 /// when phase 2 has completed.
             }
             else
             {
+                Debug.Log("Phase2MoveExistingGraphElements\n");
                 /// We need to assign nextCity because the callbacks <see cref="RenderPlane"/>
                 /// and <see cref="RenderExistingNode(Node)"/> will access it.
                 nextCity = next;
 
-
                 int existingElements = equalNodes.Count + changedNodes.Count /* + equalEdges.Count + changedEdges.Count */;
-                phase2AnimationWatchDog.Await(existingElements, () => OnAnimationsFinished());
-                if (existingElements == 0)
-                {
-                    phase2AnimationWatchDog.Skip();
-                }
-                else
+                animationWatchDog.Await(existingElements, () => Phase3AdjustExistingGraphElements());
+                if (existingElements > 0)
                 {
                     equalNodes.ForEach(RenderExistingNode);
                     changedNodes.ForEach(RenderExistingNode);
@@ -151,6 +138,11 @@ namespace SEE.Game.Evolution
             }
         }
 
+        /// <summary>
+        /// Moves the game node corresponding to <paramref name="graphNode"/> (a node that exists
+        /// in the current and next graph) to its new location according to <see cref="NextLayoutToBeShown"/>.
+        /// </summary>
+        /// <param name="graphNode">graph node whose corresponding game node is to be moved</param>
         private void RenderExistingNode(Node graphNode)
         {
             Assert.IsNotNull(graphNode);
@@ -167,15 +159,13 @@ namespace SEE.Game.Evolution
             // will try to retrieve the code city from the game node.
             gameNode.transform.SetParent(gameObject.transform);
             MoveTo(gameNode, layoutNode);
-        }
 
-        private void MoveTo(GameObject gameNode, ILayoutNode layoutNode)
-        {
-            NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
-            Debug.Log($"[MoveTo] Move {gameNode.name} from {gameNode.transform.position} to {layoutNode.CenterPosition}.\n");
-
-            IOperationCallback<Action> callback = nodeOperator.MoveTo(layoutNode.CenterPosition, AnimationLag, updateEdges: true);
-            callback.SetOnComplete(phase2AnimationWatchDog.Finished);
+            void MoveTo(GameObject gameNode, ILayoutNode layoutNode)
+            {
+                gameNode.AddOrGetComponent<NodeOperator>()
+                    .MoveTo(layoutNode.CenterPosition, AnimationLagPerPhase(), updateEdges: edgesAreDrawn)
+                    .SetOnComplete(animationWatchDog.Finished);
+            }
         }
 
         /// <summary>
@@ -186,7 +176,7 @@ namespace SEE.Game.Evolution
         /// <param name="node">node to be displayed</param>
         private void IgnoreNode(Node node)
         {
-            phase2AnimationWatchDog.Finished();
+            animationWatchDog.Finished();
         }
 
         /// <summary>
@@ -299,7 +289,7 @@ namespace SEE.Game.Evolution
                     go.transform.SetParent(gameObject.transform);
                 }
             }
-            phase2AnimationWatchDog.Finished();
+            animationWatchDog.Finished();
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using SEE.DataModel.DG;
-using SEE.Layout;
+using SEE.Game.Operator;
+using SEE.GO;
 using SEE.Utils;
 using Sirenix.Utilities;
 using UnityEngine;
@@ -24,12 +25,6 @@ namespace SEE.Game.Evolution
     public partial class EvolutionRenderer
     {
         /// <summary>
-        /// Watchdog triggering <see cref="Phase2MoveExistingGraphElements"/> when phase 1 has been
-        /// completed, in which the necessary nodes and edges are deleted.
-        /// </summary>
-        private Utils.CountingJoin phase1AnimationWatchDog;
-
-        /// <summary>
         /// Implements the first phase of the transition from the <paramref name="current"/> graph to
         /// the <paramref name="next"/> graph in which nodes and edges present in <paramref name="current"/>
         /// but not in <paramref name="next"/> (in other words, the deleted nodes and edges) are removed.
@@ -37,12 +32,12 @@ namespace SEE.Game.Evolution
         /// <see cref="Phase2MoveExistingGraphElements(LaidOutGraph)"/>.
         ///
         /// The mechanism to call <see cref="Phase2MoveExistingGraphElements(LaidOutGraph)"/> is
-        /// as follows. The <see cref="phase1AnimationWatchDog"/> is set up to await the
+        /// as follows. The <see cref="animationWatchDog"/> is set up to await the
         /// deletion of nodes and edges in <paramref name="current"/> but not in <paramref name="next"/>.
         /// Then the methods implementing this deletion will be called for each graph element to
         /// be deleted; these are <see cref="RenderRemovedNode(Node)"/> and <see cref="RenderRemovedEdge(Edge)"/>,
         /// respectively. When the animation of the deletion triggered by these has finished, each
-        /// will signal the <see cref="phase1AnimationWatchDog"/> its completion. The <see cref="phase1AnimationWatchDog"/>
+        /// will signal the <see cref="animationWatchDog"/> its completion. The <see cref="animationWatchDog"/>
         /// awaits all outstanding deletions and then finally calls
         /// <see cref="Phase2MoveExistingGraphElements(LaidOutGraph)"/>.
         ///
@@ -50,12 +45,12 @@ namespace SEE.Game.Evolution
         /// <paramref name="current"/> in the graph series when the evolution visualization
         /// is played backward.
         /// </summary>
-        /// <param name="current">the currently shown graph</param>
         /// <param name="next">the next graph to be shown</param>
-        private void Phase1RemoveDeletedGraphElements(LaidOutGraph current, LaidOutGraph next)
+        private void Phase1RemoveDeletedGraphElements(LaidOutGraph next)
         {
+            Debug.Log("Phase1RemoveDeletedGraphElements\n");
             int deletedGraphElements = removedNodes.Count + removedEdges.Count;
-            phase1AnimationWatchDog.Await(deletedGraphElements, () => Phase2MoveExistingGraphElements(next));
+            animationWatchDog.Await(deletedGraphElements, () => Phase2MoveExistingGraphElements(next));
             if (deletedGraphElements > 0)
             {
                 // Remove those nodes.
@@ -63,12 +58,7 @@ namespace SEE.Game.Evolution
                 // Remove those edges.
                 removedEdges.ForEach(RenderRemovedEdge);
             }
-            else
-            {
-                // To trigger the next phases where new and existing nodes/edges are to be drawn.
-                phase1AnimationWatchDog.Skip();
-            }
-            /// Note: <see cref="Phase2MoveExistingGraphElements"/> will be called by <see cref="phase1AnimationWatchDog"/>
+            /// Note: <see cref="Phase2MoveExistingGraphElements"/> will be called by <see cref="animationWatchDog"/>
             /// when phase 1 has completed (or skipped).
         }
 
@@ -85,12 +75,12 @@ namespace SEE.Game.Evolution
                 Assert.IsNotNull(nodeObject);
                 markerFactory.MarkDead(nodeObject);
                 AnimateToDeath(nodeObject);
-                // AnimateToDeath() will call phase1AnimationWatchDog.Finished();
+                // AnimateToDeath() will call animationWatchDog.Finished();
                 // hence, we must not call it here.
             }
             else
             {
-                phase1AnimationWatchDog.Finished();
+                animationWatchDog.Finished();
             }
         }
 
@@ -106,8 +96,28 @@ namespace SEE.Game.Evolution
             /// Let it raise to <see cref="SkyLevel"/>.
             Vector3 newPosition = gameObject.transform.position;
             newPosition.y = SkyLevel;
-            ILayoutNode nodeTransform = new AnimationNode(newPosition, gameObject.transform.localScale);
-            moveAnimator.AnimateTo(gameObject, nodeTransform, OnRemoveFinishedAnimation);
+
+            MoveTo(gameObject, newPosition);
+
+            void MoveTo(GameObject gameObject, Vector3 newPosition)
+            {
+                if (gameObject.IsNode())
+                {
+                    gameObject.AddOrGetComponent<NodeOperator>()
+                              .MoveTo(newPosition, AnimationLagPerPhase(), updateEdges: edgesAreDrawn)
+                              .SetOnComplete(() => OnRemoveFinishedAnimation(gameObject));
+                }
+                else if (gameObject.IsEdge())
+                {
+                    gameObject.AddOrGetComponent<EdgeOperator>()
+                        .GlowIn(AnimationLagPerPhase())
+                        .SetOnComplete(() => OnRemoveFinishedAnimation(gameObject));
+                }
+                else
+                {
+                    throw new System.Exception($"Game object {gameObject.name} is expected to be a node or edge.");
+                }
+            }
         }
 
         /// <summary>
@@ -122,12 +132,12 @@ namespace SEE.Game.Evolution
             if (edgesAreDrawn && objectManager.RemoveEdge(edge, out GameObject edgeObject))
             {
                 AnimateToDeath(edgeObject);
-                // AnimateToDeath() will call phase1AnimationWatchDog.Finished();
+                // AnimateToDeath() will call animationWatchDog.Finished();
                 // hence, we must not call it here.
             }
             else
             {
-                phase1AnimationWatchDog.Finished();
+                animationWatchDog.Finished();
             }
         }
 
@@ -141,7 +151,7 @@ namespace SEE.Game.Evolution
         {
             GameObject go = gameObject as GameObject;
             Destroyer.Destroy(go);
-            phase1AnimationWatchDog.Finished();
+            animationWatchDog.Finished();
         }
     }
 }
