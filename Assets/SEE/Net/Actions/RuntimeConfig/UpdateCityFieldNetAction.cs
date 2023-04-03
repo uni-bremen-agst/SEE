@@ -1,11 +1,13 @@
 using SEE.DataModel;
+using SEE.Game.UI.RuntimeConfigMenu;
 using SEE.Net.Actions;
 using UnityEngine;
 
 public class UpdateCityFieldNetAction : AbstractNetAction
 {
-    public string widgetPath;
-    public string newValue;
+    public int CityIndex;
+    public string WidgetPath;
+    public string Value;
     
     protected override void ExecuteOnServer()
     {
@@ -13,16 +15,7 @@ public class UpdateCityFieldNetAction : AbstractNetAction
 
     protected override void ExecuteOnClient()
     {
-        Debug.LogError("Executed UpdateCityFieldNetAction\t" + widgetPath + "\t" + newValue);
-        //GetConfigMenu().OnUpdateField?.Invoke(widgetPath, newValue);
-        //GetConfigMenu().OnUpdateMenuValues?.Invoke();
+        // if (!IsRequester())
+        RuntimeConfigMenu.GetMenuForCity(CityIndex).OnSyncField?.Invoke(WidgetPath, Value);
     }
-
-
-    private static RuntimeTabMenu GetConfigMenu()
-    {
-        return GameObject.FindGameObjectWithTag(Tags.MainCamera).GetComponent<RuntimeTabMenu>();
-    }
-    
-    
 }

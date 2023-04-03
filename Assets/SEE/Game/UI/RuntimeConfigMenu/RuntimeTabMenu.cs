@@ -5,14 +5,13 @@ using System.Linq;
 using System.Reflection;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
-using SEE.DataModel;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.UI.ConfigMenu;
 using SEE.Game.UI.Menu;
+using SEE.Game.UI.RuntimeConfigMenu;
 using SEE.GO;
 using SEE.Layout.NodeLayouts.Cose;
-using SEE.Net.Actions;
 using SEE.Utils;
 using SimpleFileBrowser;
 using Sirenix.Utilities;
@@ -49,17 +48,12 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
     private HorizontalSelector citySwitcher;
     private GameObject configButtonList;
-    private AbstractSEECity[] cities;
 
-    /// <summary>
-    /// The SEE-city.
-    /// </summary>
-    public AbstractSEECity City { private get; set; }
+    public int CityIndex;
 
     protected override void StartDesktop()
     {
         base.StartDesktop();
-        cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity).Select(go => go.GetComponent<AbstractSEECity>()).ToArray();
         configButtonList = Content.transform.Find(ConfigButtonListPath).gameObject;
         citySwitcher =  Content.transform.Find(CitySwitcherPath).GetComponent<HorizontalSelector>();
 
@@ -74,10 +68,16 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         base.OnStartFinished();
         OnEntryAdded += _ => SetMiscAsLastTab();
 
-        LoadCity(0);
+        LoadCity(CityIndex);
+
+        OnSyncField += (widgetName, value) =>
+        {
+            Debug.LogError("Sync " + RuntimeConfigMenu.GetCity(CityIndex).name
+                           + widgetName + "\t" + value);
+        };
     }
 
-    protected virtual void CreateButton(MethodInfo methodInfo)
+    protected virtual void CreateButton(MethodInfo methodInfo, AbstractSEECity city)
     {
         RuntimeButtonAttribute buttonAttribute = methodInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault();
         // only methods with the button attribute
@@ -91,50 +91,35 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         buttonManager.buttonText = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
     
         buttonManager.clickEvent.AddListener(() => {
-            methodInfo.Invoke(City, null); // calls the method
+            methodInfo.Invoke(city, null); // calls the method
             OnUpdateMenuValues?.Invoke(); // updates the menu
         });
     }
-
-    protected void ClearCity()
-    {
-        Entries.Reverse().ForEach(RemoveEntry);
-        foreach (Transform button in configButtonList.transform) Destroyer.Destroy(button.gameObject);
-        OnUpdateMenuValues = null;
-    }
-
+    
     public void LoadCity(int i)
     {
-        City = GameObject.FindGameObjectsWithTag(Tags.CodeCity)[i].GetComponent<AbstractSEECity>();
-        City.GetType().GetMembers().ForEach(memberInfo => {
+        AbstractSEECity city = RuntimeConfigMenu.GetCity(i);
+        city.GetType().GetMembers().ForEach(memberInfo => {
             if (memberInfo.DeclaringType == typeof(AbstractSEECity) || 
                 memberInfo.DeclaringType!.IsSubclassOf(typeof(AbstractSEECity))) 
-                CreateSetting(memberInfo, null, City);
+                CreateSetting(memberInfo, null, city);
         });
-        City.GetType().GetMethods().ForEach(CreateButton);
+        city.GetType().GetMethods().ForEach(methodInfo => CreateButton(methodInfo, city));
         SelectEntry(Entries.First(entry => entry.Title != "Misc"));
     } 
 
     private void SetupCitySwitcher()
     {
         citySwitcher.itemList.Clear();
-        citySwitcher.defaultIndex = 0;
-        cities.ForEach(city => citySwitcher.CreateNewItem(city.name));
+        citySwitcher.defaultIndex = CityIndex;
+        RuntimeConfigMenu.GetCities().ForEach(city => citySwitcher.CreateNewItem(city.name));
         citySwitcher.SetupSelector();
-        citySwitcher.selectorEvent.AddListener(index => StartCoroutine(ClearAndLoadCity(index)));
-    }
-
-    /// <summary>
-    /// Clear and load city.
-    /// Delays the loading of a city by one frame since destroying GameObject is not immediate.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
-    IEnumerator ClearAndLoadCity(int index)
-    {
-        ClearCity();
-        yield return 0;
-        LoadCity(index);
+        citySwitcher.selectorEvent.AddListener(index =>
+        {
+            OnSwitchCity?.Invoke(index);
+            citySwitcher.index = CityIndex;
+            citySwitcher.UpdateUI();
+        });
     }
 
     /// <summary>
@@ -506,20 +491,20 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         inputField.onValueChanged.AddListener(setter);
         inputField.onValueChanged.AddListener(changedValue => {
             UpdateCityFieldNetAction action = new();
-            action.widgetPath = stringGameObject.FullName();
-            action.newValue = changedValue;
+            action.CityIndex = CityIndex;
+            action.WidgetPath = stringGameObject.FullName();
+            action.Value = changedValue;
             action.Execute();
         });
         
         OnUpdateMenuValues += () => inputField.text = getter();
 
-        OnUpdateField += (widgetPath, value) =>
+        OnSyncField += (widgetPath, value) =>
         {
-            Debug.LogError("Checking Widget: " + settingName);
             if (widgetPath == stringGameObject.FullName())
             {
-                Debug.LogError("Changing value: " + settingName + " " + value);
                 setter(value as string);
+                inputField.text = value as string;
             }
         };
         
@@ -663,8 +648,9 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         le.minHeight = ((RectTransform) go.transform).rect.height;
     }
 
-    public Action<string, object> OnUpdateField;
+    public Action<string, object> OnSyncField;
 
-    // TODO: Is the event working?
-    public Action OnUpdateMenuValues;
+    public event Action OnUpdateMenuValues;
+
+    public event Action<int> OnSwitchCity;
 }
