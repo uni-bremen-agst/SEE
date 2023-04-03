@@ -414,15 +414,37 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         sliderManager.useRoundValue = useRoundValue;
         slider.minValue = range.min;
         slider.maxValue = range.max;
+
+        RuntimeSliderManager endEditManager =  slider.gameObject.AddComponent<RuntimeSliderManager>();
             
         slider.value = getter();
-        slider.onValueChanged.AddListener(setter);
+        endEditManager.OnEndEdit += () => setter(slider.value);
 
+        endEditManager.OnEndEdit += () =>
+        {
+            UpdateFloatCityFieldNetAction action = new();
+            action.CityIndex = CityIndex;
+            action.WidgetPath = sliderGameObject.FullName();
+            action.Value = slider.value;
+            action.Execute();
+        };
+        
+        OnSyncField += (widgetPath, value) =>
+        {
+            if (widgetPath == sliderGameObject.FullName())
+            {
+                setter((float) value);
+                slider.value = (float) value;
+                sliderManager.UpdateUI();
+            }
+        };
+        
         OnUpdateMenuValues += () =>
         {
             slider.value = getter();
             sliderManager.UpdateUI();
         };
+        
 
         if (!recursive)
         {
@@ -468,13 +490,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             action.Value = false;
             action.Execute();
         });
-        
-        OnUpdateMenuValues += () =>
-        {
-            switchManager.isOn = getter();
-            switchManager.UpdateUI();
-        };
-        
+
         OnSyncField += (widgetPath, value) =>
         {
             if (widgetPath == switchGameObject.FullName())
@@ -483,6 +499,12 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 switchManager.isOn = (bool) value;
                 switchManager.UpdateUI();
             }
+        };
+        
+        OnUpdateMenuValues += () =>
+        {
+            switchManager.isOn = getter();
+            switchManager.UpdateUI();
         };
 
         if (!recursive)
