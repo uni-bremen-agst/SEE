@@ -34,7 +34,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Is gameobject grabbed.
         /// </summary>
-        public static bool IsGrabbed { get; set; }= false;
+        public static bool IsGrabbed { get; private set; }= false;
 
         /// <summary>
         /// The grabbed gameobject.
@@ -146,7 +146,7 @@ namespace SEE.Controls.Actions
         /// <param name="collisionInfo"></param>
         private void OnCollisionEnter(Collision collisionInfo)
         {
-            IsColliding = true;
+            //IsColliding = true;
             if (collisionInfo.gameObject.TryGetNode(out Node node) && IsGrabbed && !node.IsRoot() && GrabbedObject == gameObject)
             {
                 if (GrabbedObject.transform.parent.gameObject != collisionInfo.gameObject)
@@ -163,7 +163,7 @@ namespace SEE.Controls.Actions
         /// <param name="collisionInfo"></param>
         private void OnCollisionExit(Collision collisionInfo)
         {
-            IsColliding = false;
+            //IsColliding = false;
             if (collisionInfo.gameObject.TryGetNode(out Node node) && IsGrabbed && !node.IsRoot() &&
                     gameObject == GrabbedObject)
                 {
@@ -180,9 +180,10 @@ namespace SEE.Controls.Actions
         /// We will use FixedUpdate when working with rigidbodys.
         /// FixedUpdate occurs at a measured time step that typically does not coincide with MonoBehaviour.Update.
         /// </summary>
-
+/*
         public void FixedUpdate()
         {
+
             Rigidbody rigidbody = gameObject.GetComponent<Rigidbody>();
 
             if (IsColliding)
@@ -211,8 +212,9 @@ namespace SEE.Controls.Actions
 
                 IsReleased = false;
             }
-            */
+
         }
+    */
 
         /// <summary>
         /// This function is called when the object is grabbed from a distance. //FIXME not working properly

@@ -141,7 +141,7 @@ namespace SEE.Game
                 Material mat = Resources.Load<Material>("Materials/HighlightMaterial/Highlight");
                 grabbable.hightlightMaterial = mat;
 
-                // Distance Grabbing FIXME: Not working as intendet right now.
+                // Distance Grabbing FIXME: Not working as intended right now.
                 DistanceGrabbable distanceGrabbable = gameObject.AddComponent<DistanceGrabbable>();
                 distanceGrabbable.targetedMaterial = mat;
                 distanceGrabbable.rotate = false;
