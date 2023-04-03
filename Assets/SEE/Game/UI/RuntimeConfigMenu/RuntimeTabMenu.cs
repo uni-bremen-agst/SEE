@@ -12,6 +12,7 @@ using SEE.Game.UI.Menu;
 using SEE.Game.UI.RuntimeConfigMenu;
 using SEE.GO;
 using SEE.Layout.NodeLayouts.Cose;
+using SEE.Net.Actions.RuntimeConfig;
 using SEE.Utils;
 using SimpleFileBrowser;
 using Sirenix.Utilities;
@@ -450,12 +451,38 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         switchManager.isOn = getter();
         switchManager.UpdateUI();
         switchManager.OnEvents.AddListener(() => setter(true));
+        switchManager.OnEvents.AddListener(() =>
+        {
+            UpdateBoolCityFieldNetAction action = new();
+            action.CityIndex = CityIndex;
+            action.WidgetPath = switchGameObject.FullName();
+            action.Value = true;
+            action.Execute();
+        });
         switchManager.OffEvents.AddListener(() => setter(false));
+        switchManager.OffEvents.AddListener(() =>
+        {
+            UpdateBoolCityFieldNetAction action = new();
+            action.CityIndex = CityIndex;
+            action.WidgetPath = switchGameObject.FullName();
+            action.Value = false;
+            action.Execute();
+        });
         
         OnUpdateMenuValues += () =>
         {
             switchManager.isOn = getter();
             switchManager.UpdateUI();
+        };
+        
+        OnSyncField += (widgetPath, value) =>
+        {
+            if (widgetPath == switchGameObject.FullName())
+            {
+                setter((bool) value);
+                switchManager.isOn = (bool) value;
+                switchManager.UpdateUI();
+            }
         };
 
         if (!recursive)
@@ -488,9 +515,10 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         inputField.text = getter();
         inputField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
         inputField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
-        inputField.onValueChanged.AddListener(setter);
-        inputField.onValueChanged.AddListener(changedValue => {
-            UpdateCityFieldNetAction action = new();
+        inputField.onEndEdit.AddListener(setter);
+        inputField.onEndEdit.AddListener(changedValue =>
+        {
+            UpdateStringCityFieldNetAction action = new();
             action.CityIndex = CityIndex;
             action.WidgetPath = stringGameObject.FullName();
             action.Value = changedValue;
