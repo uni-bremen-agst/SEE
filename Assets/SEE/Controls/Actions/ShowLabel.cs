@@ -173,7 +173,7 @@ namespace SEE.Controls.Actions
                 }
             }
         }
-        
+
         /// <summary>
         /// Hides the text label above the object if it exists.
         ///
@@ -181,7 +181,8 @@ namespace SEE.Controls.Actions
         /// <seealso cref="SelectionOn"/>
         private void Off()
         {
-            Operator.FadeLabel(0f, 1.0f);
+            LabelAttributes settings = GetLabelSettings(Operator.Node, Operator.City);
+            Operator.FadeLabel(0f, settings.AnimationDuration);
             DisplayedLabelOperators.Remove(Operator);
         }
 

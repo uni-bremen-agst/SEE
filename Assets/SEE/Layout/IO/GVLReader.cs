@@ -13,13 +13,14 @@ namespace SEE.Layout.IO
     {
         /// <summary>
         /// Reads layout information from given GVL file with given <paramref name="filename"/>.
-        /// The given position and scale of the <paramref name="gameNodes"/> are updated 
+        /// The given position and scale of the <paramref name="gameNodes"/> are updated
         /// according to the layout data contained therein. The x and z co-ordinates will
         /// be set according to the layout information contained in the GVL file; the
-        /// y co-ordinate will be zero (that information is not contained in the GVL file).
-        /// 
-        /// TODO: We need to extend GVL for a third dimension.
-        /// 
+        /// y co-ordinate will be <paramref name="groundLevel"/> plus an offset.
+        /// This offset will be chosen such that the <paramref name="gameNodes"/> are stacked
+        /// onto each other. GVL is only two dimensional, Unity's y axis is lost in this
+        /// file format.
+        ///
         /// Precondition: <paramref name="filename"/> must exist and its content conform to GVL.
         /// </summary>
         /// <param name="filename">name of GVL file</param>
@@ -27,7 +28,7 @@ namespace SEE.Layout.IO
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
         /// <param name="logger">logger used to emit errors, warnings, etc.</param>
-        public GVLReader(string filename, ICollection<IGameNode> gameNodes, float groundLevel, SEE.Utils.ILogger logger = null)
+        public GVLReader(string filename, ICollection<IGameNode> gameNodes, float groundLevel = 0, SEE.Utils.ILogger logger = null)
         {
             this.filename = filename;
             this.logger = logger;
@@ -66,7 +67,7 @@ namespace SEE.Layout.IO
         /// <returns>mapping from the IDs onto <paramref name="gameNodes"/></returns>
         private static Dictionary<string, IGameNode> ToMap(ICollection<IGameNode> gameNodes)
         {
-            Dictionary<string, IGameNode> result = new Dictionary<string, IGameNode>();
+            Dictionary<string, IGameNode> result = new();
             foreach (IGameNode gameNode in gameNodes)
             {
                 result[gameNode.ID] = gameNode;
@@ -126,7 +127,7 @@ namespace SEE.Layout.IO
         /// </summary>
         protected readonly SEE.Utils.ILogger logger;
         /// <summary>
-        /// A mapping of the IDs of all gameNodes onto the gameNodes. This 
+        /// A mapping of the IDs of all gameNodes onto the gameNodes. This
         /// mapping allows us to quickly identify the nodes by their IDs.
         /// </summary>
         protected readonly Dictionary<string, IGameNode> gameNodes;
@@ -181,7 +182,7 @@ namespace SEE.Layout.IO
         }
 
         /// <summary>
-        /// Checks whether the XML closing element is as expected according to the 
+        /// Checks whether the XML closing element is as expected according to the
         /// current context.
         /// </summary>
         private void Expected()
@@ -266,7 +267,7 @@ namespace SEE.Layout.IO
         /// <summary>
         /// Walks through the GVL nested elements and gathers the layout data.
         /// Updates gameNodes accordingly. This method implements the traversal,
-        /// the actual handling of the elements is deferred to the called 
+        /// the actual handling of the elements is deferred to the called
         /// methods (see below).
         /// </summary>
         protected virtual void Load()
@@ -287,8 +288,8 @@ namespace SEE.Layout.IO
                                 State state = ToState(reader.Name);
                                 if (!reader.IsEmptyElement)
                                 {
-                                    // This is not a self-closing (empty) element, e.g., <item/>. 
-                                    // Note: A corresponding EndElement node is not generated for empty elements. 
+                                    // This is not a self-closing (empty) element, e.g., <item/>.
+                                    // Note: A corresponding EndElement node is not generated for empty elements.
                                     // That is why we must push an expected EndElement onto the context stack
                                     // only if the element is not self-closing.
                                     context.Push(state);
@@ -379,8 +380,8 @@ namespace SEE.Layout.IO
             }
             if (context.Count > 0)
             {
-                LogError("XML parser is still expecting input in state " + context.Peek());
-                throw new SyntaxError("missing closing " + ToString(context.Peek()) + " tag");
+                LogError($"XML parser is still expecting input in state {context.Peek()}.");
+                throw new SyntaxError($"missing closing {ToString(context.Peek())} tag.");
             }
         }
 
@@ -437,59 +438,59 @@ namespace SEE.Layout.IO
             //
             // The nesting of nodes is expressed as nested XML node
             // elements in GVL. Every node has a unique Id, which is
-            // a node's linkname with a leading L or the node's 
-            // source name with a leading S. This way, the node of a 
+            // a node's linkname with a leading L or the node's
+            // source name with a leading S. This way, the node of a
             // graph from a GXL file and its layout information from
             // a GVL file are connected.
-            // 
+            //
             // In the example, we have a node with Id "1" and another
             // node with Id "2" where "2" is nested in "1".
             //
-            // Gravis has a two-dimensional canvas. The two axes are 
+            // Gravis has a two-dimensional canvas. The two axes are
             // named X (horizontal) and Y (vertical), respectively.
-            // While Gravis's X axis increases from left to right, 
+            // While Gravis's X axis increases from left to right,
             // Gravis's Y axis increases from top to bottom. That is,
             // the orientation of Gravis's and Unity's x axes conform
-            // to each other, Gravis's Y axis and the corresponding 
+            // to each other, Gravis's Y axis and the corresponding
             // Z axis in Unity are inverse to each other.
             //
-            // All nodes are logical rectangles with respect to the 
+            // All nodes are logical rectangles with respect to the
             // layout. That is, they have two co-ordinates and a
             // width and height.
             //
             // The X and Y co-ordinates of a node refer to the left
-            // upper corner of the node. For root nodes, they are 
-            // relative to a unique point of reference of the canvas in 
+            // upper corner of the node. For root nodes, they are
+            // relative to a unique point of reference of the canvas in
             // dots. This point of reference is arbitrary but the same
             // for all root nodes on the canvas. Negative co-ordinates are possible.
             // For nodes nested in other nodes, X and Y denote the offset
-            // to the X and Y co-ordinates of their containing 
+            // to the X and Y co-ordinates of their containing
             // node in dot. These can never be negative.
             //
             // In the example above, the composite node "1" is located at
-            // (-1360, -633). The nested node "2" has the offset (45, 97), 
+            // (-1360, -633). The nested node "2" has the offset (45, 97),
             // thus, is located at (-1360+45, -633+97).
             //
             // Every node (composite or not) may or may not be expanded indicated
-            // by the attribute "Exp". If the attribute value is false or missing 
-            // altogether, the node is not expanded. 
+            // by the attribute "Exp". If the attribute value is false or missing
+            // altogether, the node is not expanded.
             //
             // For instance, node "1" is expanded, but "2" is not.
             //
             // A node has two different appearances depending upon whether
             // it is expanded or not. If a node is not expanded, only an
             // icon is shown. If a node is expanded, the icon and a rectangle
-            // are shown in which the children are nested. 
+            // are shown in which the children are nested.
             // The two attributes W and H specify the width and height of
             // this rectangle in dots. These size measures apply when the node is
             // expanded. The size of the icon is specified by the attribute
             // CS (for "child size"). Every node has such an attribute, but
             // that value applies only to its immediate children. That is
             // why it is called "child size" in the first place. In other
-            // words, the size of the icon of a node is the value of the 
+            // words, the size of the icon of a node is the value of the
             // attribute CS of the node immediately containing it.
-            // 
-            // In the example above, the expanded composite node "1" has width 246 
+            //
+            // In the example above, the expanded composite node "1" has width 246
             // and height 147, whereas the unexpanded leaf node "2" has width
             // and height 14.14 (all values in dots).
 
@@ -497,8 +498,7 @@ namespace SEE.Layout.IO
 
             if (!gameNodes.TryGetValue(ID, out IGameNode gameNode))
             {
-                LogWarning(String.Format("Unknown id {0}", ID));
-                Debug.LogError(String.Format("Unknown id {0}", ID));
+                LogWarning($"Unknown id {ID}.");
                 // We create a new game node so that we can continue as normal.
                 gameNode = new LayoutVertex(ID);
             }
@@ -536,7 +536,7 @@ namespace SEE.Layout.IO
             // The resulting position of the node; the y co-ordinate remains zero.
             Vector3 position = Vector3.zero;
             // (X, Y) define the left upper corner. In Unity, we use the center of a node.
-            // If this node is a root, (X, Y) relates to a common reference point on 
+            // If this node is a root, (X, Y) relates to a common reference point on
             // the canvas. If this node is contained in another node, they are an offset
             // to their parent node.
             if (parent.gameNode != null)
@@ -545,22 +545,18 @@ namespace SEE.Layout.IO
                 // (X, Y) denote the offset of the nested node to its parent's left upper corner
                 Vector3 parentPosition = parent.gameNode.CenterPosition; // world space in Unity
                 Vector3 parentScale = parent.gameNode.AbsoluteScale;     // world space in Unity
-                //Debug.LogFormat("parent {0} center position={1} absolute scale={2}\n", parent.gameNode.ID, parentPosition, parentScale);
+
                 // Transform parent's center position to its left upper corner.
                 parentPosition.x -= parentScale.x / 2.0f;
                 parentPosition.z += parentScale.z / 2.0f;
-                //Debug.LogFormat("parent {0} left upper corner={1} absolute scale={2}\n", parent.gameNode.ID, parentPosition, parentScale);
+
                 // Calculate left upper corner of node.
                 position.x = parentPosition.x + X;
                 position.z = parentPosition.z - Y; // Gravis's Y axis is inverse to Unity's z axis
 
-                //Debug.LogFormat("child {0}'s left upper corner ({1}, {2}) where X={3} Y={4})\n",
-                //                ID, position.x, position.z, X, Y);
                 // position must refer to the center of the node.
                 position.x += scale.x / 2.0f;
-                //position.y =  scale.y / 2.0f; // lift y center so that the node stants on ground zero
                 position.z -= scale.z / 2.0f;
-                //Debug.LogFormat("child {0}'s center position ({1}, {2})\n", ID, position.x, position.z);
 
                 // Lift y center so that the node stands on its parent's roof.
                 position.y = (parentPosition.y + parentScale.y / 2.0f) + Mathf.Max(MinimalHeight, scale.y) / 2.0f;
@@ -577,9 +573,6 @@ namespace SEE.Layout.IO
                 // as follows: z = -Y. By mirroring Y, the left upper corner of a node
                 // becomes its left lower corner.
                 position.z = -Y - scale.z / 2.0f;
-
-                //Debug.LogFormat("root {0}'s center position ({1}, {2}) with size {3} where X={4} Y={5}\n", 
-                //                ID, position.x, position.z, scale, X, Y);
             }
 
             // Although we assign the local scale here, the node is not yet contained in any
@@ -587,15 +580,12 @@ namespace SEE.Layout.IO
             // Nodes will be nested later by the client of this layout.
             gameNode.LocalScale = scale;
             gameNode.CenterPosition = position;
-
-            //Debug.LogFormat("result for node {0} center={1} left upper corner={2} scale={3}\n", 
-            //                gameNode.ID, gameNode.CenterPosition, ToLeftUpperCorner(gameNode.CenterPosition, gameNode.LocalScale), gameNode.LocalScale);
         }
 
         /// <summary>
         /// Returns the float value of the given XML <paramref name="attribute"/>.
         /// If no such attribute exists, a syntax error is thrown.
-        /// 
+        ///
         /// Precondition: The value of <paramref name="attribute"/> must be a float.
         /// </summary>
         /// <param name="reader">reader processing the XML data</param>
@@ -606,15 +596,15 @@ namespace SEE.Layout.IO
             string value = reader.GetAttribute(attribute);
             if (value.Length == 0)
             {
-                throw new SyntaxError("Node does not have an attribute " + attribute + ".");
+                throw new SyntaxError($"Node does not have an attribute {attribute}.");
             }
             return ToFloat(value);
         }
 
         /// <summary>
-        /// Returns the value of the Id attribute. If no such attribute exists, a 
+        /// Returns the value of the Id attribute. If no such attribute exists, a
         /// syntax error is thrown.
-        /// 
+        ///
         /// </summary>
         /// <param name="reader">reader processing the XML data</param>
         /// <returns>value of the Id attribute</returns>
@@ -637,17 +627,17 @@ namespace SEE.Layout.IO
 
         protected virtual void StartUndefined()
         {
-
+            // Intentionally left blank.
         }
 
         protected virtual void EndUndefined()
         {
-
+            // Intentionally left blank.
         }
 
         /// <summary>
         /// Returns the <paramref name="value"/> as a float.
-        /// 
+        ///
         /// Precondition: <paramref name="value"/> must conform to the
         /// CultureInfo.InvariantCulture.NumberFormat for floats.
         /// </summary>

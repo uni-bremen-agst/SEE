@@ -27,7 +27,6 @@ namespace SEE.Game
             public AnimationWatchDog(EvolutionRenderer evolutionRenderer)
             {
                 this.evolutionRenderer = evolutionRenderer;
-
             }
         }
 

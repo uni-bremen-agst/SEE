@@ -5,6 +5,7 @@ using SEE.GO;
 using TMPro;
 using UnityEngine;
 #if INCLUDE_STEAM_VR
+using UnityEngine.Rendering;
 using Valve.VR.InteractionSystem;
 #endif
 
@@ -43,8 +44,7 @@ namespace SEE.Game.Operator
         {
             // Assumption: There are only very few active labels, compared to all active and inactive labels
             //             that may exist in the descendants of this node. Hence, we go through all active ones.
-            foreach (NodeOperator nodeOperator in ShowLabel.DisplayedLabelOperators.Where(x =>
-                         x.LabelAlpha.TargetValue > 0f))
+            foreach (NodeOperator nodeOperator in ShowLabel.DisplayedLabelOperators.Where(x => x.LabelAlpha.TargetValue > 0f))
             {
                 nodeOperator.LabelTextPosition.AnimateTo(nodeOperator.DesiredLabelTextPosition, duration);
                 nodeOperator.LabelStartLinePosition.AnimateTo(nodeOperator.DesiredLabelStartLinePosition, duration);
@@ -58,6 +58,9 @@ namespace SEE.Game.Operator
         /// </summary>
         private void PrepareLabel()
         {
+            Color textColor = Color.white;
+            Color lineColor = Color.white;
+
             string shownText = Node.SourceName;
 
             nodeLabel = transform.Find(LABEL_PREFIX + shownText)?.gameObject;
@@ -69,31 +72,22 @@ namespace SEE.Game.Operator
                 // First we create the label.
                 // We define starting and ending positions for the animation.
                 Vector3 startLabelPosition = gameObject.GetTop();
-#if INCLUDE_STEAM_VR
                 nodeLabel = TextFactory.GetTextWithSize(shownText,
                                                         startLabelPosition,
                                                         City.NodeTypes[Node.Type].LabelSettings.FontSize,
                                                         lift: true,
-                                                        textColor: Color.black.ColorWithAlpha(0f));
-#else
-                nodeLabel = TextFactory.GetTextWithSize(shownText,
-                    startLabelPosition,
-                    City.NodeTypes[Node.Type].LabelSettings.FontSize,
-                    lift: true,
-                    textColor: Color.black);
-#endif
-
+                                                        textColor: textColor);
                 nodeLabel.name = LABEL_PREFIX + shownText;
                 nodeLabel.transform.SetParent(gameObject.transform);
 
                 // Second, add connecting line between "roof" of the game object and the text.
                 Vector3 startLinePosition = gameObject.GetRoofCenter();
-                GameObject line = new GameObject
+                GameObject line = new()
                 {
                     name = $"{LABEL_PREFIX}{shownText} (Connecting Line)"
                 };
                 LineFactory.Draw(line, new[] { startLinePosition, startLinePosition }, 0.01f,
-                    Materials.New(Materials.ShaderType.TransparentLine, Color.black));
+                                 LineMaterial(lineColor));
                 line.transform.SetParent(nodeLabel.transform);
 
                 // The nodeLabel and its child edge must inherit the portal of gameObject.
@@ -112,6 +106,24 @@ namespace SEE.Game.Operator
                     labelLineRenderer.endColor = labelLineRenderer.endColor;
                 }
             }
+        }
+
+        /// <summary>
+        /// Material for the line connecting a node and its label. We use
+        /// exactly the same material for all.
+        /// </summary>
+        private static Material lineMaterial;
+
+        /// <summary>
+        /// Returns the material for the line connecting a node and its label.
+        /// </summary>
+        /// <param name="lineColor"></param>
+        /// <returns>a new material for the line connecting a node and its label</returns>
+        private static Material LineMaterial(Color lineColor)
+        {
+            lineMaterial ??= Materials.New(Materials.ShaderType.TransparentLine, lineColor, texture: null,
+                                           renderQueueOffset: (int)(RenderQueue.Transparent + 1));
+            return lineMaterial;
         }
 
         /// <summary>
@@ -157,10 +169,8 @@ namespace SEE.Game.Operator
             // Animated label to move to top and fade in
             DOTween.ToAlpha(() => labelText.color, color => labelText.color = color, alpha, duration).Play(),
             // Lower start of line should be visible almost immediately due to reduced alpha (smooth transition)
-            DOTween.ToAlpha(() => labelLineRenderer.startColor, c => labelLineRenderer.startColor = c, alpha * 0.5f,
-                duration * 0.1f).Play(),
-            DOTween.ToAlpha(() => labelLineRenderer.endColor, c => labelLineRenderer.endColor = c, alpha, duration)
-                .Play(),
+            DOTween.ToAlpha(() => labelLineRenderer.startColor, c => labelLineRenderer.startColor = c, alpha, duration * 0.1f).Play(),
+            DOTween.ToAlpha(() => labelLineRenderer.endColor, c => labelLineRenderer.endColor = c, alpha, duration).Play(),
         };
 
         private Tween[] AnimateLabelStartLinePositionAction(Vector3 startPosition, float duration) => new Tween[]

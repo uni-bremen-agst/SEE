@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Sirenix.Serialization.Utilities;
+using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -58,14 +58,7 @@ namespace SEE.GO
         /// <returns>true if a code city was drawn</returns>
         public static bool IsCodeCityDrawn(this GameObject gameObject)
         {
-            foreach (Transform child in gameObject.transform)
-            {
-                if (child.gameObject.IsNode())
-                {
-                    return true;
-                }
-            }
-            return false;
+            return gameObject.transform.Cast<Transform>().Any(child => child.gameObject.IsNode());
         }
 
         /// <summary>
@@ -132,6 +125,17 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Returns all game objects tagged as <see cref="Tags.Edge"/> that are descendants
+        /// of <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">root game object to be traversed</param>
+        /// <returns>all game objects tagged as <see cref="Tags.Edge"/></returns>
+        internal static IEnumerable<GameObject> AllEdges(this GameObject gameObject)
+        {
+            return gameObject.AllDescendants(Tags.Edge);
+        }
+
+        /// <summary>
         /// Returns all transitive children of <paramref name="gameObject"/> tagged by
         /// given <paramref name="tag"/> (including <paramref name="gameObject"/> itself).
         /// </summary>
@@ -139,7 +143,7 @@ namespace SEE.GO
         /// <returns>all transitive children with <paramref name="tag"/></returns>
         public static List<GameObject> AllDescendants(this GameObject gameObject, string tag)
         {
-            List<GameObject> result = new List<GameObject>();
+            List<GameObject> result = new();
             if (gameObject.CompareTag(tag))
             {
                 result.Add(gameObject);

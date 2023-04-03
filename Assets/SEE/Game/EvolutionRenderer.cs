@@ -140,7 +140,7 @@ namespace SEE.Game
         /// <summary>
         /// An event fired upon the end of an animation.
         /// </summary>
-        private readonly UnityEvent AnimationFinishedEvent = new UnityEvent();
+        private readonly UnityEvent AnimationFinishedEvent = new();
 
         /// <summary>
         /// The animator used when an inner node is removed from the scene
@@ -228,7 +228,7 @@ namespace SEE.Game
         /// <summary>
         /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
         /// </summary>
-        private readonly NodeEqualityComparer nodeEqualityComparer = new NodeEqualityComparer();
+        private readonly NodeEqualityComparer nodeEqualityComparer = new();
 
         /// <summary>
         /// Saves the names of the game objects representing nodes that were not moved during an iteration.
@@ -238,7 +238,7 @@ namespace SEE.Game
         /// <summary>
         /// Allows the comparison of two instances of <see cref="Edge"/> from different graphs.
         /// </summary>
-        private readonly EdgeEqualityComparer edgeEqualityComparer = new EdgeEqualityComparer();
+        private readonly EdgeEqualityComparer edgeEqualityComparer = new();
 
         /// <summary>
         /// All pre-computed layouts for the whole graph series.
@@ -296,7 +296,7 @@ namespace SEE.Game
             // Collecting all game objects corresponding to nodes of the given graph.
             // If the node existed in a previous graph, we will re-use its corresponding
             // game object created earlier.
-            List<GameObject> gameObjects = new List<GameObject>();
+            List<GameObject> gameObjects = new();
 
             // The layout to be applied.
             NodeLayout nodeLayout = graphRenderer.GetLayout(gameObject);
@@ -322,7 +322,7 @@ namespace SEE.Game
             }
 
             // Calculate and apply the node layout
-            ICollection<AbstractLayoutNode> layoutNodes = ToLayoutNodes(gameObjects);
+            ICollection<LayoutGraphNode> layoutNodes = GraphRenderer.ToAbstractLayoutNodes(gameObjects);
             // Note: Apply applies its results only on the layoutNodes but not on the game objects
             // these layoutNodes represent. Here, we leave the game objects untouched. The layout
             // must be later applied when we render a city. Here, we only store the layout for later use.
@@ -332,9 +332,9 @@ namespace SEE.Game
 
             if (edgesAreDrawn)
             {
-                List<LayoutGraphEdge<AbstractLayoutNode>> layoutEdges = graphRenderer.LayoutEdges(layoutNodes).ToList();
+                List<LayoutGraphEdge<LayoutGraphNode>> layoutEdges = graphRenderer.LayoutEdges(layoutNodes).ToList();
                 EdgeLayouts[graph] = new Dictionary<string, ILayoutEdge<ILayoutNode>>(layoutEdges.Count);
-                foreach (LayoutGraphEdge<AbstractLayoutNode> le in layoutEdges)
+                foreach (LayoutGraphEdge<LayoutGraphNode> le in layoutEdges)
                 {
                     EdgeLayouts[graph].Add(le.ItsEdge.ID, le);
                 }
@@ -351,43 +351,13 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Yields the collection of LayoutNodes corresponding to the given <paramref name="gameNodes"/>.
-        /// Each LayoutNode has the position, scale, and rotation of the game node. The graph node
-        /// attached to the game node is passed on to the LayoutNode so that the graph node data is
-        /// available to the node layout (e.g., Parent or Children).
-        /// Sets also the node levels of all resulting LayoutNodes.
-        /// </summary>
-        /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
-        /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        private ICollection<AbstractLayoutNode> ToLayoutNodes(List<GameObject> gameNodes)
-        {
-            IList<AbstractLayoutNode> result = new List<AbstractLayoutNode>();
-            Dictionary<Node, ILayoutNode> toLayoutNode = new Dictionary<Node, ILayoutNode>();
-
-            foreach (GameObject gameObject in gameNodes)
-            {
-                Node node = gameObject.GetComponent<NodeRef>().Value;
-                LayoutGraphNode layoutNode = new LayoutGraphNode(node, toLayoutNode)
-                {
-                    // We must transfer the scale from gameObject to layoutNode.
-                    // but the layout needs the game object's scale.
-                    // Rotation and CenterPosition are all zero. They will be computed by the layout,
-                    LocalScale = graphRenderer.GetSize(gameObject)
-                };
-                result.Add(layoutNode);
-            }
-            LayoutNodes.SetLevels(result);
-            return result;
-        }
-
-        /// <summary>
         /// Returns a mapping of graph-node IDs onto their corresponding <paramref name="layoutNodes"/>.
         /// </summary>
         /// <param name="layoutNodes">collection of layout nodes to be mapped</param>
         /// <returns>mapping indexed by the IDs of the nodes corresponding to the layout nodes</returns>
         private static Dictionary<string, T> ToNodeIDLayout<T>(ICollection<T> layoutNodes) where T : ILayoutNode
         {
-            Dictionary<string, T> result = new Dictionary<string, T>();
+            Dictionary<string, T> result = new();
             foreach (T layoutNode in layoutNodes)
             {
                 result[layoutNode.ID] = layoutNode;

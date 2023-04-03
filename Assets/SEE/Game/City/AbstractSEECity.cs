@@ -32,7 +32,6 @@ namespace SEE.Game.City
         /// <see cref="Restore"/>,
         /// respectively (both declared in AbstractSEECityIO). You should also
         /// extend the test cases in TestConfigIO.
-
         /// <summary>
         /// The graph underlying this code city that was loaded from disk. May be null.
         /// Neither serialized nor saved to the config file.
@@ -215,27 +214,6 @@ namespace SEE.Game.City
 
         /// <summary>
         /// Adds all game objects tagged by <see cref="Tags.Node"/> or <see cref="Tags.Edge"/>
-        /// of this game object including its descendants to <see cref="GraphElementIDMap"/>.
-        /// </summary>
-        protected virtual void Awake()
-        {
-            UpdateGraphElementIDMap(gameObject);
-        }
-
-        /// <summary>
-        /// Called at game start. Sets up additional components.
-        /// </summary>
-        protected virtual void Start()
-        {
-            if (LoadedGraph != null && !gameObject.TryGetComponent(out EdgeMeshScheduler _))
-            {
-                gameObject.AddComponent<EdgeMeshScheduler>()
-                          .Init(EdgeLayoutSettings, EdgeSelectionSettings, LoadedGraph);
-            }
-        }
-
-        /// <summary>
-        /// Adds all game objects tagged by <see cref="Tags.Node"/> or <see cref="Tags.Edge"/>
         /// of <paramref name="parent"/> including its descendants to <see cref="GraphElementIDMap"/>.
         /// </summary>
         /// <param name="parent">root node of the game-object tree to be added to <see cref="GraphElementIDMap"/></param>
@@ -243,7 +221,7 @@ namespace SEE.Game.City
         {
             if (parent.CompareTag(Tags.Node) || parent.CompareTag(Tags.Edge))
             {
-                GraphElementIDMap.Add(parent);
+                GraphElementIDMap.Add(parent, true);
             }
             foreach (Transform child in parent.transform)
             {
@@ -475,7 +453,7 @@ namespace SEE.Game.City
             else
             {
                 ICollection<string> relevantNodeTypes = NodeTypes.Where(pair => pair.Value.IsRelevant)
-                  .Select(pair => pair.Key).ToList();
+                                                                 .Select(pair => pair.Key).ToList();
                 return graph.SubgraphByNodeType(relevantNodeTypes, IgnoreSelfLoopsInLifting);
             }
         }
@@ -486,15 +464,15 @@ namespace SEE.Game.City
         /// <returns>all attribute names of the different kinds of software erosions</returns>
         public IList<string> AllLeafIssues() =>
             new List<string>
-               {
-                  ErosionSettings.ArchitectureIssue,
-                  ErosionSettings.CloneIssue,
-                  ErosionSettings.CycleIssue,
-                  ErosionSettings.Dead_CodeIssue,
-                  ErosionSettings.MetricIssue,
-                  ErosionSettings.StyleIssue,
-                  ErosionSettings.UniversalIssue
-               };
+            {
+                ErosionSettings.ArchitectureIssue,
+                ErosionSettings.CloneIssue,
+                ErosionSettings.CycleIssue,
+                ErosionSettings.Dead_CodeIssue,
+                ErosionSettings.MetricIssue,
+                ErosionSettings.StyleIssue,
+                ErosionSettings.UniversalIssue
+            };
 
         /// <summary>
         /// Returns all attribute names of the different kinds of software erosions for inner
@@ -504,14 +482,14 @@ namespace SEE.Game.City
         public IList<string> AllInnerNodeIssues() =>
             new List<string>
             {
-                  ErosionSettings.ArchitectureIssue_SUM,
-                  ErosionSettings. CloneIssue_SUM,
-                  ErosionSettings.CycleIssue_SUM,
-                  ErosionSettings.Dead_CodeIssue_SUM,
-                  ErosionSettings.MetricIssue_SUM,
-                  ErosionSettings.StyleIssue_SUM,
-                  ErosionSettings.UniversalIssue_SUM
-               };
+                ErosionSettings.ArchitectureIssue_SUM,
+                ErosionSettings.CloneIssue_SUM,
+                ErosionSettings.CycleIssue_SUM,
+                ErosionSettings.Dead_CodeIssue_SUM,
+                ErosionSettings.MetricIssue_SUM,
+                ErosionSettings.StyleIssue_SUM,
+                ErosionSettings.UniversalIssue_SUM
+            };
 
         /// <summary>
         /// Returns the names of all node metrics that truly exist in the underlying
@@ -678,7 +656,7 @@ namespace SEE.Game.City
                 }
 
                 CoseGraphSettings.LoadedForNodeTypes = NodeTypes.Where(type => type.Value.IsRelevant)
-                                                                        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.IsRelevant);
+                                                                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.IsRelevant);
             }
         }
 
@@ -715,6 +693,11 @@ namespace SEE.Game.City
         /// The order of the Save-Layout button in the button group <see cref="DataButtonsGroup"/>.
         /// </summary>
         protected const float DataButtonsGroupOrderSaveLayout = DataButtonsGroupOrderSave + 1;
+
+        /// <summary>
+        /// The order of the Load-Layout button in the button group <see cref="DataButtonsGroup"/>.
+        /// </summary>
+        protected const float DataButtonsGroupOrderLoadLayout = DataButtonsGroupOrderSaveLayout + 1;
 
         /// <summary>
         /// The name of the group for the Inspector buttons resettting the data.

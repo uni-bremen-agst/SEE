@@ -141,11 +141,11 @@ namespace SEE.Controls.Actions
                     Vector3 totalDragOffsetFromStart = Vector3.Scale(planeHitPoint - (dragStartTransformPosition + dragStartOffset), cityRootNode.localScale);
                     if (SEEInput.Snap())
                     {
-                        Vector2 point2 = new Vector2(totalDragOffsetFromStart.x, totalDragOffsetFromStart.z);
+                        Vector2 point2 = new(totalDragOffsetFromStart.x, totalDragOffsetFromStart.z);
                         float angleDeg = point2.Angle360();
                         float snappedAngleDeg = Mathf.Round(angleDeg / SnapStepAngle) * SnapStepAngle;
                         float snappedAngleRad = Mathf.Deg2Rad * snappedAngleDeg;
-                        Vector2 dir = new Vector2(Mathf.Cos(snappedAngleRad), Mathf.Sin(-snappedAngleRad));
+                        Vector2 dir = new(Mathf.Cos(snappedAngleRad), Mathf.Sin(-snappedAngleRad));
                         Vector2 proj = dir * Vector2.Dot(point2, dir);
                         totalDragOffsetFromStart = new Vector3(proj.x, totalDragOffsetFromStart.y, proj.y);
                     }

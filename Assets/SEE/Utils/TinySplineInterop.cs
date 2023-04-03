@@ -53,7 +53,7 @@ namespace SEE.Utils
         /// to the the Vector3 `i' in <paramref name="vectors"/></returns>
         public static IList<double> VectorsToList(IList<Vector3> vectors)
         {
-            List<double> list = new List<double>();
+            List<double> list = new(3 * vectors.Count);
             foreach (Vector3 vector in vectors)
             {
                 list.Add(vector.x);

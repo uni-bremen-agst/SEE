@@ -90,7 +90,7 @@ namespace SEE.Game
         /// <returns>all root nodes in the scene</returns>
         public static List<Node> GetRoots(ICollection<GameObject> gameNodes)
         {
-            List<Node> result = new List<Node>();
+            List<Node> result = new();
             foreach (Graph graph in GetGraphs(gameNodes))
             {
                 result.AddRange(graph.GetRoots());
@@ -105,7 +105,7 @@ namespace SEE.Game
         /// <returns>all root nodes of the graphs containing any node referenced in <paramref name="nodeRefs"/></returns>
         public static HashSet<Node> GetRoots(ICollection<NodeRef> nodeRefs)
         {
-            HashSet<Node> result = new HashSet<Node>();
+            HashSet<Node> result = new();
             foreach (NodeRef nodeRef in nodeRefs)
             {
                 IEnumerable<Node> nodes = nodeRef?.Value?.ItsGraph?.GetRoots();
@@ -133,7 +133,7 @@ namespace SEE.Game
         /// <returns>all graphs in the scene</returns>
         public static HashSet<Graph> GetGraphs(ICollection<GameObject> gameNodes)
         {
-            HashSet<Graph> result = new HashSet<Graph>();
+            HashSet<Graph> result = new();
             foreach (GameObject go in gameNodes)
             {
                 result.Add(go.GetComponent<NodeRef>().Value.ItsGraph);
@@ -206,40 +206,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Equivalent to: GetCityRootNode(gameObject).GetComponent<NodeRef>.node.
-        /// </summary>
-        /// <param name="codeCity">object representing a code city</param>
-        /// <returns>the root node of the graph or null if there is none</returns>
-        public static Node GetCityRootGraphNode(GameObject codeCity)
-        {
-            Transform transform = GetCityRootNode(codeCity);
-            if (transform == null)
-            {
-                return null;
-            }
-            else if (transform.TryGetComponent(out NodeRef nodeRef))
-            {
-                return nodeRef.Value;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Returns the graph of the root node of <paramref name="codeCity"/> assumed
-        /// to represent a code city. Equivalent to: GetCityRootGraphNode(gameObject).ItsGraph.
-        /// </summary>
-        /// <param name="codeCity">object representing a code city</param>
-        /// <returns>the graph represented by <paramref name="codeCity"/> or null</returns>
-        public static Graph GetGraph(this GameObject codeCity)
-        {
-            Node root = GetCityRootGraphNode(codeCity);
-            return root?.ItsGraph;
-        }
-
-        /// <summary>
         /// Retrieves the game object representing a node with the given <paramref name="nodeID"/>.
         ///
         /// Precondition: Such a game object actually exists.
@@ -274,46 +240,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Retrieves the game object representing the node referenced by the given <paramref name="nodeRef"/>.
-        ///
-        /// Preconditions:
-        /// (1) <paramref name="nodeRef"/> must reference a valid node.
-        /// (2) Such a game object actually exists.
-        /// </summary>
-        /// <param name="nodeRef">a reference to the node to be retrieved</param>
-        /// <returns>the game object representing the node referenced by the given <paramref name="nodeRef"/></returns>
-        /// <exception cref="Exception">thrown if there is no such object</exception>
-        public static GameObject RetrieveGameNode(NodeRef nodeRef)
-        {
-            return RetrieveGameNode(nodeRef.Value);
-        }
-
-        /// <summary>
-        /// Returns the first game object in the current scene with the given <paramref name="name"/>.
-        /// Will also return inactive game objects. If no such object exists, null will be returned.
-        ///
-        /// Note: This method is expensive because it will iterate over all game objects in the
-        /// scene. Use it wisely.
-        /// </summary>
-        /// <param name="name">name of the game object to be found</param>
-        /// <returns>found game object or null</returns>
-        public static GameObject Find(string name)
-        {
-            UnityEngine.SceneManagement.Scene activeScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
-
-            // GetRootGameObjects() yields also inactive game objects
-            foreach (GameObject root in activeScene.GetRootGameObjects())
-            {
-                GameObject ancestor = root.Descendant(name);
-                if (ancestor != null)
-                {
-                    return ancestor;
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
         /// Returns all game objects in the current scene having a name contained in <paramref name="gameObjectNames"/>.
         /// Will also return inactive game objects.
         ///
@@ -331,91 +257,6 @@ namespace SEE.Game
             foreach (GameObject root in activeScene.GetRootGameObjects())
             {
                 result.UnionWith(root.Descendants(gameObjectNames));
-            }
-            return result;
-        }
-
-        //------------------------------------------------------------
-        // Queries necessary in the context of the reflexion analysis.
-        //------------------------------------------------------------
-
-        /// <summary>
-        /// Cached implementation city
-        /// </summary>
-        private static SEECity cachedImplementation = null;
-
-        /// <summary>
-        /// Cached architecture city
-        /// </summary>
-        private static SEECity cachedArchitecture = null;
-
-        /// <summary>
-        /// Cached mapping city
-        /// </summary>
-        private static SEECity cachedMapping = null;
-
-        /// <summary>
-        /// Finds the implementation city in the scene. The city may be cached.
-        /// </summary>
-        /// <returns>The implementation city of the scene.</returns>
-        public static SEECity FindImplementation()
-        {
-            if (!cachedImplementation)
-            {
-                cachedImplementation = FindSEECity("Implementation");
-            }
-            return cachedImplementation;
-        }
-
-        /// <summary>
-        /// Finds the architecture city in the scene. The city may be cached.
-        /// </summary>
-        /// <returns>The architecture city of the scene.</returns>
-        public static SEECity FindArchitecture()
-        {
-            if (!cachedArchitecture)
-            {
-                cachedArchitecture = FindSEECity("Architecture");
-            }
-            return cachedArchitecture;
-        }
-
-        /// <summary>
-        /// Finds the mapping city in the scene. The city may be cached.
-        /// </summary>
-        /// <returns>The mapping city of the scene.</returns>
-        public static SEECity FindMapping()
-        {
-            if (!cachedMapping)
-            {
-                cachedMapping = FindSEECity("Mapping");
-            }
-            return cachedMapping;
-        }
-
-        /// <summary>
-        /// Finds the <see cref="SEECity"/> of <see cref="GameObject"/> with name
-        /// <paramref name="name"/>. As this method does not cache anything, this call is quite
-        /// heavy and should not be called too often.
-        /// </summary>
-        /// <param name="name">The name of the object with city component attached.</param>
-        /// <returns>The found city or <code>null</code>, if no such city exists.</returns>
-        private static SEECity FindSEECity(string name)
-        {
-            SEECity result = null;
-            SEECity[] cities = UnityEngine.Object.FindObjectsOfType<SEECity>();
-            foreach (SEECity city in cities)
-            {
-                if (city.gameObject.name.Equals(name))
-                {
-#if UNITY_EDITOR
-                    Assert.IsNull(result, "There must be exactly one city named " + name + "!");
-#endif
-                    result = city;
-#if !UNITY_EDITOR
-                    break;
-#endif
-                }
             }
             return result;
         }

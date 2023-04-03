@@ -1,4 +1,6 @@
-﻿using CrazyMinnow.SALSA;
+﻿using System;
+using System.Collections;
+using CrazyMinnow.SALSA;
 using Dissonance;
 using Dissonance.Audio.Playback;
 using RootMotion.FinalIK;
@@ -6,12 +8,9 @@ using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
 using SEE.XR;
-using System;
-using System.Collections;
-using SEE.Net.Actions;
-using UMA.CharacterSystem;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Assertions;
 #if INCLUDE_STEAM_VR
 using Valve.VR.InteractionSystem;
 #endif
@@ -243,6 +242,7 @@ namespace SEE.Game.Avatars
         /// representing the left hand for VRIK.
         /// </summary>
         private const string VRPLayerLeftHandForVRIK = XRCameraRigManager.LeftControllerName + "/LeftHand";
+
         /// <summary>
         /// The composite name of the child within <see cref="VRPlayerRigPrefab"/>
         /// representing the right hand for VRIK.
@@ -279,13 +279,14 @@ namespace SEE.Game.Avatars
             PrepareScene();
             // Note: AddComponents() must be run before TurnOffAvatarAimingSystem() because the latter
             // will remove components, the former must query.
-            AddComponents();
-            TurnOffAvatarAimingSystem();
-            ReplaceAnimator();
+            VRIKActions.AddComponents(gameObject, IsLocalPlayer);
+            VRIKActions.TurnOffAvatarAimingSystem(gameObject);
+            VRIKActions.ReplaceAnimator(gameObject, AnimatorForVRIK);
 #if INCLUDE_STEAM_VR
             SetupVRIK();
 #endif
             PrepareLipTracker();
+            InitializeVrikRemote();
 
             /// <summary>
             /// Sets up the scene for playing in an VR environment. This means to instantiate the
@@ -347,61 +348,10 @@ namespace SEE.Game.Avatars
                 }
             }
 
-            // Removes AvatarAimingSystem and its associated AimIK and LookAtIK
-            // because our local VR avatar is controlled by VRIK instead.
-            // Removes AvatarMovementAnimator from gameObject, too, because
-            // it is using animation parameters that are defined only
-            // in our own AvatarAimingSystem animation controller.
-            void TurnOffAvatarAimingSystem()
+            // Adds component to VR-Player to sent data from VRIK to all remote clients.
+            void InitializeVrikRemote()
             {
-                if (gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
-                {
-                    Destroyer.Destroy(aimingSystem);
-                }
-
-                if (gameObject.TryGetComponentOrLog(out AimIK aimIK))
-                {
-                    Destroyer.Destroy(aimIK);
-                }
-
-                if (gameObject.TryGetComponentOrLog(out LookAtIK lookAtIK))
-                {
-                    Destroyer.Destroy(lookAtIK);
-                }
-
-                // AvatarMovementAnimator is using animation parameters that are defined only
-                // in our own AvatarAimingSystem animation controller. We will remove it
-                // to avoid error messages.
-                if (gameObject.TryGetComponentOrLog(out AvatarMovementAnimator avatarMovement))
-                {
-                    Destroyer.Destroy(avatarMovement);
-                }
-            }
-
-            // We need to replace the animator of the avatar.
-            // The prefab has an aiming animation. We just want locomotion.
-            void ReplaceAnimator()
-            {
-                if (gameObject.TryGetComponentOrLog(out DynamicCharacterAvatar avatar))
-                {
-                    RuntimeAnimatorController animationController =
-                        Resources.Load<RuntimeAnimatorController>(AnimatorForVRIK);
-                    Debug.Log($"Loaded animation controller: {animationController != null}\n");
-                    if (animationController != null)
-                    {
-                        avatar.raceAnimationControllers.defaultAnimationController = animationController;
-
-                        if (gameObject.TryGetComponentOrLog(out Animator animator))
-                        {
-                            animator.runtimeAnimatorController = animationController;
-                            Debug.Log($"Loaded animation controller {animator.name} is human: {animator.isHuman}\n");
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError($"Could not load the animation controller at '{AnimatorForVRIK}.'\n");
-                    }
-                }
+                gameObject.AddComponent<VRIKSynchronizer>();
             }
 #if INCLUDE_STEAM_VR
             // Set up FinalIK's VR IK on the avatar.
@@ -409,33 +359,15 @@ namespace SEE.Game.Avatars
             {
                 
                 VRIK vrIK = gameObject.AddOrGetComponent<VRIK>();
+
                 vrIK.solver.spine.headTarget = rig.transform.Find(VRPlayerHeadForVRIK);
-                UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.spine.headTarget);
+                Assert.IsNotNull(vrIK.solver.spine.headTarget);
                 vrIK.solver.leftArm.target = rig.transform.Find(VRPLayerLeftHandForVRIK);
-                UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.leftArm.target);
+                Assert.IsNotNull(vrIK.solver.leftArm.target);
                 vrIK.solver.rightArm.target = rig.transform.Find(VRPlayerRightHandForVRIK);
-                UnityEngine.Assertions.Assert.IsNotNull(vrIK.solver.rightArm.target);
+                Assert.IsNotNull(vrIK.solver.rightArm.target);
             }
 #endif
-            // Adds required components.
-            void AddComponents()
-            {
-                VRAvatarAimingSystem aiming = gameObject.AddOrGetComponent<VRAvatarAimingSystem>();
-                if (gameObject.TryGetComponentOrLog(out AimIK aimIK))
-                {
-                    aiming.Source = aimIK.solver.transform;
-                    aiming.Target = aimIK.solver.target;
-                }
-                //GameObject vrPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/VRPlayer");
-                //gameObject.transform.position = vrPlayer.transform.position;
-                //gameObject.transform.rotation = vrPlayer.transform.rotation;
-                //vrPlayer.transform.SetParent(gameObject.transform);
-
-                //XRPlayerMovement movement = gameObject.AddOrGetComponent<XRPlayerMovement>();
-                //movement.DirectingHand = rig.
-                //movement.DirectingHand = vrPlayer.transform.Find("SteamVRObjects/LeftHand").GetComponent<Hand>();
-                //movement.characterController = gameObject.GetComponentInChildren<CharacterController>();
-            }
 
             // Prepare HTC Facial Tracker
             void PrepareLipTracker()

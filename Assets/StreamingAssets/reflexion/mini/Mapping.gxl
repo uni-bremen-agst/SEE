@@ -2,5 +2,68 @@
 <!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
 <gxl xmlns:xlink="http://www.w3.org/1999/xlink">
   <graph id="Mapping" edgeids="true">
+      <node id="UI">
+      <type xlink:href="Module"/>
+      <attr name="Source.Name">
+        <string>UI</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>UI</string>
+      </attr>
+    </node>
+    <node id="Logic">
+      <type xlink:href="Module"/>
+      <attr name="Source.Name">
+        <string>Logic</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Logic</string>
+      </attr>
+    </node>
+    <node id="HAL">
+      <type xlink:href="Module"/>
+      <attr name="Source.Name">
+        <string>HAL</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>HAL</string>
+      </attr>
+    </node>
+	<node id="Dashboard">
+	  <type xlink:href="Class"/>
+      <attr name="Source.Name">
+        <string>Dashboard</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Dashboard</string>
+      </attr>
+    </node>
+    <node id="Fusion">
+      <type xlink:href="Class"/>
+      <attr name="Source.Name">
+        <string>Fusion</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Fusion</string>
+      </attr>
+    </node>
+    <node id="Sensor">
+      <type xlink:href="Class"/>  
+      <attr name="Source.Name">
+        <string>Sensor</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Sensor</string>
+      </attr>
+    </node>
+	<edge id="E1" from="Dashboard" to="UI">
+      <type xlink:href="Maps_To"/>
+    </edge>
+	<edge id="E2" from="Fusion" to="Logic">
+      <type xlink:href="Maps_To"/>
+    </edge>
+	<edge id="E3" from="Sensor" to="HAL">
+      <type xlink:href="Maps_To"/>
+    </edge>
   </graph>
 </gxl>
