@@ -67,7 +67,6 @@ namespace SEE.DataModel.DG
             }
             else
             {
-
                 return AttributesDiffer(left, right, floatAttributes, (GraphElement e, string a, out float v) => e.TryGetFloat(a, out v))
                    || AttributesDiffer(left, right, intAttributes, (GraphElement e, string a, out int v) => e.TryGetInt(a, out v))
                    || AttributesDiffer(left, right, stringAttributes, (GraphElement e, string a, out string v) => e.TryGetString(a, out v))
