@@ -2,6 +2,7 @@
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
+using Sirenix.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -15,7 +16,7 @@ namespace SEE.Game.Evolution
     {
         /// <summary>
         /// The layout of <see cref="nextCity"/>. The layout is a mapping of the graph
-        /// nodes' IDs onto their ILayoutNodes.
+        /// nodes' IDs onto their <see cref="ILayoutNode"/>.
         /// </summary>
         private Dictionary<string, ILayoutNode> NextLayoutToBeShown => nextCity?.Layout;
 
@@ -36,18 +37,20 @@ namespace SEE.Game.Evolution
             = new List<Dictionary<string, ILayoutEdge<ILayoutNode>>>();
 
         /// <summary>
-        /// Creates and saves the layouts for all given <paramref name="graphs"/>. This will
-        /// also create all necessary game objects -- even those game objects that are not
-        /// present in the first graph in this list.
+        /// Creates and saves the node and edge layouts for all given <paramref name="graphs"/>. This will
+        /// also create all necessary game nodes and game edges-- even those game nodes and game edges
+        /// that are not present in the first graph in <see cref="graphs"/>.
+        /// This method will also define <see cref="diff"/> based on all
+        /// <see cref="Graph.AllNumericNodeAttributes"/>.
         /// </summary>
-        private void CalculateAllGraphLayouts(List<Graph> graphs)
+        private void CalculateAllGraphLayouts(IList<Graph> graphs)
         {
-            // Determine the layouts of all loaded graphs upfront.
+            // Determines the layouts of all loaded graphs upfront.
             Performance p = Performance.Begin("Layouting all " + graphs.Count + " graphs");
             ISet<string> numericNodeAttributes = new HashSet<string>();
             graphs.ForEach(graph =>
             {
-                NodeLayouts.Add(CalculateLayout(graph));
+                CalculateLayout(graph);
                 numericNodeAttributes.UnionWith(graph.AllNumericNodeAttributes());
             });
             diff = new NumericAttributeDiff(numericNodeAttributes);
@@ -56,10 +59,13 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Calculates the layout data for <paramref name="graph"/> using the graphRenderer.
-        /// All the game objects created for the nodes of <paramref name="graph"/> will
-        /// be created by the objectManager, thus, be available for later use. The layout
+        /// Calculates the node and edge layout data for <paramref name="graph"/> using the <see cref="graphRenderer"/>.
+        /// All the game objects created for the nodes and edges of <paramref name="graph"/> will
+        /// be created by the <see cref="objectManager"/>, thus, be available for later use. The layout
         /// is not actually applied.
+        ///
+        /// The edge layout will be added to <see cref="EdgeLayouts"/>. The node layout will
+        /// be added to <see cref="NodeLayouts"/>.
         ///
         /// Note: This method assumes that it is called in the order of <see cref="graphs"/>,
         /// that is, the i'th call is assumed to calculate the edge layout for
@@ -67,7 +73,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         /// <param name="graph">graph for which the layout is to be calculated</param>
         /// <returns>the node layout for all nodes in <paramref name="graph"/></returns>
-        private Dictionary<string, ILayoutNode> CalculateLayout(Graph graph)
+        private void CalculateLayout(Graph graph)
         {
             // The following code assumes that a leaf node remains a leaf across all
             // graphs of the graph series and an inner node remains an inner node.
@@ -113,7 +119,7 @@ namespace SEE.Game.Evolution
 
             if (edgesAreDrawn)
             {
-                List<LayoutGraphEdge<LayoutGraphNode>> layoutEdges = graphRenderer.LayoutEdges(layoutNodes).ToList();
+                IList<LayoutGraphEdge<LayoutGraphNode>> layoutEdges = graphRenderer.LayoutEdges(layoutNodes).ToList();
                 Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout = new(layoutEdges.Count);
                 foreach (LayoutGraphEdge<LayoutGraphNode> le in layoutEdges)
                 {
@@ -121,7 +127,7 @@ namespace SEE.Game.Evolution
                 }
                 EdgeLayouts.Add(edgeLayout);
             }
-            return ToNodeIDLayout(layoutNodes.ToList<ILayoutNode>());
+            NodeLayouts.Add(ToNodeIDLayout(layoutNodes.ToList<ILayoutNode>()));
 
             // Note: The game objects for leaf nodes are already properly scaled by the call to
             // objectManager.GetNode() above. Yet, inner nodes are generally not scaled by
@@ -145,6 +151,46 @@ namespace SEE.Game.Evolution
                 result[layoutNode.ID] = layoutNode;
             }
             return result;
+        }
+
+        /// <summary>
+        /// Returns true and a LoadedGraph if there is a LoadedGraph for the active graph index
+        /// CurrentGraphIndex.
+        /// </summary>
+        /// <param name="loadedGraph"></param>
+        /// <returns>true if there is graph to be visualized (index _openGraphIndex)</returns>
+        private bool HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph)
+        {
+            return HasLaidOutGraph(CurrentGraphIndex, out loadedGraph);
+        }
+
+        /// <summary>
+        /// Returns true and a LaidOutGraph if there is a LaidOutGraph for the given graph index.
+        /// </summary>
+        /// <param name="index">index of the requested graph</param>
+        /// <param name="laidOutGraph">the resulting graph with given index; defined only if this method returns true</param>
+        /// <returns>true iff there is a graph at the given index</returns>
+        private bool HasLaidOutGraph(int index, out LaidOutGraph laidOutGraph)
+        {
+            laidOutGraph = null;
+            Graph graph = graphs[index];
+            if (graph == null)
+            {
+                Debug.LogError($"There is no graph available for graph with index {index}.\n");
+                return false;
+            }
+            Dictionary<string, ILayoutNode> nodeLayout = NodeLayouts[index];
+
+            if (edgesAreDrawn)
+            {
+                Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout = EdgeLayouts[index];
+                laidOutGraph = new LaidOutGraph(graph, nodeLayout, edgeLayout);
+            }
+            else
+            {
+                laidOutGraph = new LaidOutGraph(graph, nodeLayout, null);
+            }
+            return true;
         }
     }
 }

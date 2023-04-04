@@ -17,18 +17,17 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-using DG.Tweening;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.Charts;
 using SEE.Game.City;
+using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Utils;
-using Sirenix.Utilities;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
@@ -49,46 +48,41 @@ namespace SEE.Game.Evolution
     {
         /// <summary>
         /// Watchdog triggering the next animation phase when the previous phase has been
-        /// completed.
+        /// completed, that is, if all awaited events have occurred.
         /// </summary>
         private CountingJoin animationWatchDog;
 
         /// <summary>
-        /// Sets the evolving series of <paramref name="graphs"/> to be visualized.
-        /// The actual visualization is triggered by <see cref="ShowGraphEvolution"/>
-        /// that can be called next.
-        /// This method is expected to be called before attemption to draw any graph.
+        /// The series of underlying graphs to be rendered.
         /// </summary>
-        /// <param name="graphs">series of graphs to be visualized</param>
-        public void SetGraphEvolution(List<Graph> graphs)
-        {
-            this.graphs = graphs;
-            if (gameObject.TryGetComponent(out SEECityEvolution cityEvolution))
-            {
-                // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
-                // So we cannot make the following assignment in the constructor. Neither
-                // can we assign this value at the declaration of graphRenderer because
-                // we need the city argument, which comes only later. Anyhow, whenever we
-                // assign a new city, we also need a new graph renderer for that city.
-                // So in fact this is the perfect place to assign graphRenderer.
-                graphRenderer = new GraphRenderer(cityEvolution, graphs);
-                edgesAreDrawn = graphRenderer.AreEdgesDrawn();
+        private IList<Graph> graphs;
 
-                objectManager = new ObjectManager(graphRenderer, gameObject);
-                markerFactory = new MarkerFactory(markerWidth: cityEvolution.MarkerWidth,
-                                    markerHeight: cityEvolution.MarkerHeight,
-                                    additionColor: cityEvolution.AdditionBeamColor,
-                                    changeColor: cityEvolution.ChangeBeamColor,
-                                    deletionColor: cityEvolution.DeletionBeamColor);
-                RegisterAllAnimators(animators);
-                animationWatchDog = new CountingJoin();
-            }
-            else
+        /// <summary>
+        /// The number of graphs of the graph series to be rendered.
+        /// </summary>
+        public int GraphCount => graphs.Count;
+
+        /// <summary>
+        /// Current graph of the graph series to be rendered.
+        /// </summary>
+        public Graph GraphCurrent => graphs[currentGraphIndex];
+
+        /// <summary>
+        /// The index of the currently visualized graph.
+        /// </summary>
+        private int currentGraphIndex = 0;
+
+        /// <summary>
+        /// Returns the index of the currently shown graph.
+        /// </summary>
+        public int CurrentGraphIndex
+        {
+            get => currentGraphIndex;
+            private set
             {
-                Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type {nameof(SEECityEvolution)}.\n");
-                enabled = false;
+                currentGraphIndex = value;
+                shownGraphHasChangedEvent.Invoke();
             }
-            graphRenderer.SetScaler(graphs);
         }
 
         /// <summary>
@@ -133,11 +127,16 @@ namespace SEE.Game.Evolution
         private GraphElementDiff diff;  // not serialized by Unity; will be set in CityEvolution property
 
         /// <summary>
+        /// An event fired when the view graph has changed.
+        /// </summary>
+        private readonly UnityEvent shownGraphHasChangedEvent = new();
+
+        /// <summary>
         /// Registers <paramref name="action"/> to be called back when the shown
         /// graph has changed.
         /// </summary>
         /// <param name="action">action to be called back</param>
-        internal void Register(UnityAction action)
+        internal void RegisterOnNewGraph(UnityAction action)
         {
             shownGraphHasChangedEvent.AddListener(action);
         }
@@ -148,43 +147,9 @@ namespace SEE.Game.Evolution
         private readonly UnityEvent AnimationFinishedEvent = new();
 
         /// <summary>
-        /// The animator used when an inner node is removed from the scene
-        /// and also for animating the new plane.
-        ///
-        /// Note: We split the animation in halves for the first phase of
-        /// removing nodes and the second phase of drawing the nodes of
-        /// the next graph.
-        /// </summary>
-        private readonly AbstractAnimator moveAnimator
-            = new MoveAnimator(AbstractAnimator.DefaultAnimationTime / 2.0f);
-
-        /// <summary>
-        /// An animator used for all other occasions (new nodes, existing nodes, changed nodes).
-        ///
-        /// Note: We split the animation in halves for the first phase of
-        /// removing nodes and the second phase of drawing the nodes of
-        /// the next graph.
-        /// </summary>
-        private readonly AbstractAnimator changeAndBirthAnimator
-            = new MoveScaleShakeAnimator(AbstractAnimator.DefaultAnimationTime / 2.0f);
-
-        /// <summary>
-        /// Maps from the source of an edge to its tween. This storage is
-        /// used by <see cref="RenderNode(Node)"/> to synchronize node
-        /// animation with edge animation.
-        /// </summary>
-        private readonly Dictionary<Node, Tween> edgeTweens = new();
-
-        /// <summary>
         /// True if animation is still ongoing.
         /// </summary>
         public bool IsStillAnimating { get; private set; }
-
-        /// <summary>
-        /// The collection of registered <see cref="AbstractAnimator"/> to be updated
-        /// automatically for changes during the animation time period.
-        /// </summary>
-        private readonly List<AbstractAnimator> animators = new();
 
         /// <summary>
         /// The duration of an animation. This value can be controlled by the user.
@@ -203,12 +168,6 @@ namespace SEE.Game.Evolution
                 if (value >= 0)
                 {
                     animationDuration = value;
-                    animators.ForEach(animator =>
-                    {
-                        animator.MaxAnimationTime = value;
-                        animator.AnimationsDisabled = value == 0;
-                    });
-
                     shownGraphHasChangedEvent.Invoke();
                 }
             }
@@ -221,11 +180,12 @@ namespace SEE.Game.Evolution
         /// (1) Remove deleted nodes and edges from the scene.
         /// (2) Move existing nodes and edges to their new position in the scene.
         /// (3) Adjust existing changed nodes and edges in the scene.
-        /// (4) Add newly created nodes and edges to the scene.
+        /// (4) Add newly created nodes to the scene.
+        /// (5) Add newly created edges to the scene.
         ///
         /// This constant is the number of phases.
         /// </summary>
-        private const int NumberOfPhases = 4;
+        private const int NumberOfPhases = 5;
 
         /// <summary>
         /// Returns the time for the animation for each individual animation phase
@@ -246,7 +206,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// The city (graph + layout) to be shown next.
         /// </summary>
-        private LaidOutGraph nextCity;  // not serialized by Unity
+        private LaidOutGraph nextCity;
 
         /// <summary>
         /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
@@ -262,410 +222,150 @@ namespace SEE.Game.Evolution
         /// If true, inner nodes should not be rendered. This will be true if a non-hierarchical
         /// layout is applied.
         /// </summary>
-        private bool ignoreInnerNodes = true;  // not serialized by Unity
+        private bool ignoreInnerNodes = true;
 
-
+        #region User Messages
 
         /// <summary>
-        /// Displays the given graph instantly if all animations are finished. This is
-        /// called when we jump directly to a specific graph in the graph series: when
-        /// we start the visualization of the graph evolution initially and when the user
-        /// selects a specific graph revision.
-        /// The graph is drawn from scratch.
+        /// The title of user notifications used here.
         /// </summary>
-        /// <param name="graph">graph to be drawn initially</param>
-        private void DisplayGraphAsNew(LaidOutGraph graph)
+        private const string NotificationTitle = "City Evolution";
+
+        /// <summary>
+        /// Informs the user that graph transition is currently blocked.
+        /// </summary>
+        private static void UserInfoGraphTransitionIsBlocked()
         {
-            graph.AssertNotNull("graph");
-
-            if (IsStillAnimating)
-            {
-                Debug.LogWarning("Graph changes are blocked while animations are running.\n");
-                return;
-            }
-            // The upfront calculation of the node layout for all graphs has filled
-            // objectManager with game objects for those nodes. Likewise, when we jump
-            // to a graph directly in the version history, the nodes of its predecessors
-            // may still be contained in the scene and objectManager. We need to clean up
-            // first.
-            objectManager?.Clear();
-            RenderGraph(currentCity, graph);
-            //StartCoroutine(DelayedDisplayGraphAsNew(graph));
-        }
-
-        IEnumerator DelayedDisplayGraphAsNew(LaidOutGraph graph)
-        {
-            //wait for space to be pressed
-            while (!Input.GetKeyDown(KeyCode.D))
-            {
-                yield return null;
-            }
-
+            ShowNotification.Info(NotificationTitle, "Graph transition is blocked while animations are running.");
         }
 
         /// <summary>
-        /// Starts the animations to transition from the <paramref name="current"/> graph
-        /// to the <paramref name="next"/> graph.
+        /// Informs the user that the renderer is currently occupied with an animation.
         /// </summary>
-        /// <param name="current">the currently shown graph</param>
-        /// <param name="next">the next graph to be shown</param>
-        public void TransitionToNextGraph(LaidOutGraph current, LaidOutGraph next)
+        private static void UserInfoStillOccupied()
         {
-            current.AssertNotNull("current");
-            next.AssertNotNull("next");
-            if (IsStillAnimating)
-            {
-                Debug.Log("Graph changes are blocked while animations are running.\n");
-                return;
-            }
-            RenderGraph(current, next);
+            ShowNotification.Info(NotificationTitle, "The renderer is already occupied with animating, wait till animations are finished.");
         }
 
+        /// <summary>
+        /// _Informs the user that we already reached the begin of the graph series.
+        /// </summary>
+        private static void UserInfoFirstGraph()
+        {
+            ShowNotification.Info(NotificationTitle, "This is already the first graph revision.");
+        }
+
+        /// <summary>
+        /// _Informs the user that we already reached the end of the graph series.
+        /// </summary>
+        private static void UserInfoLastGraph()
+        {
+            ShowNotification.Info(NotificationTitle, "This is already the last graph revision.");
+        }
+
+        /// <summary>
+        /// Informs the user that auto play is on.
+        /// </summary>
+        private static void UserInfoAutoPlayIsOn()
+        {
+            ShowNotification.Info(NotificationTitle, "Auto-play mode is turned on. You cannot move to the next graph manually.");
+        }
+
+        private static Notification UserInfoNoLayout()
+        {
+            return ShowNotification.Error(NotificationTitle, "Could not retrieve a layout for the graph.");
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Sets the evolving series of <paramref name="graphs"/> to be visualized.
+        /// The actual visualization is triggered by <see cref="ShowGraphEvolution"/>
+        /// that can be called next.
+        /// This method is expected to be called before attemption to draw any graph.
+        /// </summary>
+        /// <param name="graphs">series of graphs to be visualized</param>
+        public void SetGraphEvolution(IList<Graph> graphs)
+        {
+            this.graphs = graphs;
+            if (gameObject.TryGetComponent(out SEECityEvolution cityEvolution))
+            {
+                // A constructor with a parameter is meaningless for a class that derives from MonoBehaviour.
+                // So we cannot make the following assignment in the constructor. Neither
+                // can we assign this value at the declaration of graphRenderer because
+                // we need the city argument, which comes only later. Anyhow, whenever we
+                // assign a new city, we also need a new graph renderer for that city.
+                // So in fact this is the perfect place to assign graphRenderer.
+                graphRenderer = new GraphRenderer(cityEvolution, graphs);
+                edgesAreDrawn = graphRenderer.AreEdgesDrawn();
+
+                objectManager = new ObjectManager(graphRenderer, gameObject);
+                markerFactory = new MarkerFactory(markerWidth: cityEvolution.MarkerWidth,
+                                    markerHeight: cityEvolution.MarkerHeight,
+                                    additionColor: cityEvolution.AdditionBeamColor,
+                                    changeColor: cityEvolution.ChangeBeamColor,
+                                    deletionColor: cityEvolution.DeletionBeamColor);
+                animationWatchDog = new CountingJoin();
+            }
+            else
+            {
+                Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type {nameof(SEECityEvolution)}.\n");
+                enabled = false;
+            }
+            graphRenderer.SetScaler(graphs);
+        }
+
+        /// <summary>
+        /// Set of added nodes from the current to the next graph.
+        /// They are contained in the next graph.
+        /// </summary>
         private ISet<Node> addedNodes;
+        /// <summary>
+        /// Set of removed nodes from the current to the next graph.
+        /// They are contained in the current graph.
+        /// </summary>
         private ISet<Node> removedNodes;
+        /// <summary>
+        /// Set of changed nodes from the current to the next graph.
+        /// They are contained in the next graph (and logically also
+        /// in the current graph, that is, there is a node in the
+        /// current graph that has the same ID).
+        /// </summary>
         private ISet<Node> changedNodes;
+        /// <summary>
+        /// Set of equal nodes (i.e., nodes without any changes) from
+        /// the current to the next graph.
+        /// They are contained in the next graph (and logically also
+        /// in the current graph, that is, there is a node in the
+        /// current graph that has the same ID).
+        /// </summary>
         private ISet<Node> equalNodes;
 
+        /// <summary>
+        /// Set of added edges from the current to the next graph.
+        /// They are contained in the next graph.
+        /// </summary>
         private ISet<Edge> addedEdges;
+        /// <summary>
+        /// Set of removed edges from the current to the next graph.
+        /// They are contained in the current graph.
+        /// </summary>
         private ISet<Edge> removedEdges;
+        /// <summary>
+        /// Set of changed edges from the current to the next graph.
+        /// They are contained in the next graph (and logically also
+        /// in the current graph, that is, there is an edge in the
+        /// current graph that has the same ID).
+        /// </summary>
         private ISet<Edge> changedEdges;
+        /// <summary>
+        /// Set of equal edges (i.e., edges without any changes) from
+        /// the current to the next graph.
+        /// They are contained in the next graph (and logically also
+        /// in the current graph, that is, there is an edge in the
+        /// current graph that has the same ID).
+        /// </summary>
         private ISet<Edge> equalEdges;
-
-        /// <summary>
-        /// Renders the animation from <paramref name="current"/> to <paramref name="next"/>.
-        /// </summary>
-        /// <param name="current">the graph currently shown that is to be migrated into the next graph; may be null</param>
-        /// <param name="next">the new graph to be shown, in which to migrate the current graph; must not be null</param>
-        private void RenderGraph(LaidOutGraph current, LaidOutGraph next)
-        {
-            next.AssertNotNull("next");
-
-            IsStillAnimating = true;
-            // First remove all markings of the previous animation cycle.
-            markerFactory.Clear();
-
-            Graph oldGraph = current != null ? current.Graph : null;
-            Graph newGraph = next != null ? next.Graph : null;
-
-            // Node comparison.
-            {
-                newGraph.Diff(oldGraph,
-                              g => g.Nodes(),
-                              (g, id) => g.GetNode(id),
-                              GraphExtensions.AttributeDiff(newGraph, oldGraph),
-                              nodeEqualityComparer,
-                              out addedNodes,
-                              out removedNodes,
-                              out changedNodes,
-                              out equalNodes);
-            }
-
-            // Edge comparison.
-            {
-                newGraph.Diff(oldGraph,
-                              g => g.Edges(),
-                              (g, id) => g.GetEdge(id),
-                              GraphExtensions.AttributeDiff(newGraph, oldGraph),
-                              edgeEqualityComparer,
-                              out addedEdges,
-                              out removedEdges,
-                              out changedEdges,
-                              out equalEdges);
-            }
-
-            Phase1RemoveDeletedGraphElements(next);
-        }
-
-        private bool OLD = false;
-
-        /// <summary>
-        /// Updates the hierarchy of game nodes so that it is isomorphic to the node
-        /// hierarchy of the underlying graph.
-        /// </summary>
-        private void UpdateGameNodeHierarchy()
-        {
-            Dictionary<Node, GameObject> nodeMap = new();
-            CollectNodes(gameObject, nodeMap);
-            // Check(nodeMap);
-            GraphRenderer.CreateGameNodeHierarchy(nodeMap, gameObject);
-        }
-
-        /// <summary>
-        /// Checks whether all graph nodes and game nodes in <paramref name="nodeMap"/> are
-        /// members of the same graph. Emits warnings and asserts that they are all in
-        /// the same graph.
-        /// Used only for debugging.
-        /// </summary>
-        /// <param name="nodeMap">mapping of graph nodes onto their corresponding game nodes</param>
-        private static void Check(Dictionary<Node, GameObject> nodeMap)
-        {
-            HashSet<Graph> graphs = new();
-
-            foreach (GameObject go in nodeMap.Values)
-            {
-                graphs.Add(go.GetNode().ItsGraph);
-            }
-            foreach (Node node in nodeMap.Keys)
-            {
-                graphs.Add(node.ItsGraph);
-            }
-            if (graphs.Count > 1)
-            {
-                Debug.LogError("There are nodes from different graphs in the same game-node hierarchy!\n");
-                foreach (GameObject go in nodeMap.Values)
-                {
-                    Node node = go.GetNode();
-                    Debug.LogWarning($"Node {node.ID} contained in graph {node.ItsGraph.Name} from file {node.ItsGraph.Path}\n");
-                }
-            }
-            Assert.AreEqual(1, graphs.Count);
-        }
-
-        /// <summary>
-        /// Collects all graph nodes and their corresponding game nodes that are (transitive)
-        /// descendants of <paramref name="root"/>. The result is added to <paramref name="nodeMap"/>,
-        /// where the <paramref name="root"/> itself will not be added.
-        /// </summary>
-        /// <param name="root">root of the game-node hierarchy whose hierarchy members are to be collected</param>
-        /// <param name="nodeMap">the mapping of graph nodes onto their corresponding game nodes</param>
-        /// <exception cref="Exception">thrown if a game node has no valid node reference</exception>
-        private static void CollectNodes(GameObject root, IDictionary<Node, GameObject> nodeMap)
-        {
-            if (root != null)
-            {
-                foreach (Transform childTransform in root.transform)
-                {
-                    GameObject child = childTransform.gameObject;
-                    /// If a game node was deleted, it was marked inactive in
-                    /// <see cref="OnRemoveFinishedAnimation"/>. We need to ignore such
-                    /// game nodes.
-                    if (child.activeInHierarchy && child.CompareTag(Tags.Node))
-                    {
-                        if (child.TryGetNodeRef(out NodeRef nodeRef))
-                        {
-                            nodeMap[nodeRef.Value] = child;
-                            CollectNodes(child, nodeMap);
-                        }
-                        else
-                        {
-                            throw new Exception($"Game node {child.name} without valid node reference.");
-                        }
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Event function triggered when all animations are finished. Animates the transition of the edges
-        /// and renders all edges as new and notifies everyone that the animation is finished.
-        ///
-        /// Note: This method is a callback called from the animation framework (DoTween). It is
-        /// passed to this animation framework in <see cref="RenderGraph"/>.
-        /// </summary>
-        private void OnAnimationsFinished()
-        {
-            Debug.Log("OnAnimationsFinished\n");
-            MarkNodes();
-            NodeChangesBuffer nodeChangesBuffer = NodeChangesBuffer.GetSingleton();
-            nodeChangesBuffer.currentRevisionCounter = CurrentGraphIndex;
-            nodeChangesBuffer.addedNodeIDsCache = new List<string>(nodeChangesBuffer.addedNodeIDs);
-            nodeChangesBuffer.addedNodeIDs.Clear();
-            nodeChangesBuffer.changedNodeIDsCache = new List<string>(nodeChangesBuffer.changedNodeIDs);
-            nodeChangesBuffer.changedNodeIDs.Clear();
-            nodeChangesBuffer.removedNodeIDsCache = new List<string>(nodeChangesBuffer.removedNodeIDs);
-            nodeChangesBuffer.removedNodeIDs.Clear();
-
-            UpdateGameNodeHierarchy();
-            RenderPlane();
-
-            IsStillAnimating = false;
-            AnimationFinishedEvent.Invoke();
-        }
-
-        /// <summary>
-        /// Markes all <see cref="addedNodes"/> and <see cref="changedNodes"/>.
-        /// </summary>
-        private void MarkNodes()
-        {
-            foreach (Node node in addedNodes)
-            {
-                markerFactory.MarkBorn(GraphElementIDMap.Find(node.ID, true));
-            }
-            foreach (Node node in changedNodes)
-            {
-                markerFactory.MarkChanged(GraphElementIDMap.Find(node.ID, true));
-            }
-        }
-
-        /// <summary>
-        /// Is called by Constructor the register all given <paramref name="animators"/>,
-        /// so they can be updated accordingly.
-        /// </summary>
-        /// <param name="animators">list of animators to be informed</param>
-        private void RegisterAllAnimators(IList<AbstractAnimator> animators)
-        {
-            animators.Add(changeAndBirthAnimator);
-            animators.Add(moveAnimator);
-        }
-
-        /// <summary>
-        /// Renders a plane enclosing all game objects of the currently shown graph.
-        /// </summary>
-        private void RenderPlane()
-        {
-            bool isPlaneNew = !objectManager.GetPlane(out GameObject plane);
-            if (!isPlaneNew)
-            {
-                // We are re-using the existing plane, hence, we animate its change
-                // (new position and new scale).
-                objectManager.GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale);
-                Tweens.Scale(plane, scale, moveAnimator.MaxAnimationTime / 2);
-                Tweens.Move(plane, centerPosition, moveAnimator.MaxAnimationTime / 2);
-            }
-        }
-
-        /// <summary>
-        /// Checks whether two edges are equal.
-        /// </summary>
-        /// <param name="left">First edge to be checked</param>
-        /// <param name="right">Second edge to be checked</param>
-        /// <returns>true if both edges are equal</returns>
-        private static bool AreEqualGameEdges(GameObject left, GameObject right)
-        {
-            return left.TryGetComponent(out EdgeRef leftEdgeRef)
-                && right.TryGetComponent(out EdgeRef rightEdgeRef)
-                && leftEdgeRef.Value.ID == rightEdgeRef.Value.ID;
-        }
-
-        /// <summary>
-        /// Returns true if the x and z co-ordindates of the two vectors are approximately equal.
-        /// </summary>
-        /// <param name="v1">First vector</param>
-        /// <param name="v2">Second vector</param>
-        /// <returns>true if the x and z co-ordindates of the two vectors are approximately equal</returns>
-        private bool XZAreEqual(Vector3 v1, Vector3 v2)
-        {
-            double x1, z1, x2, z2;
-
-            x1 = Math.Round(v1.x, 2);
-            z1 = Math.Round(v1.z, 2);
-            x2 = Math.Round(v2.x, 2);
-            z2 = Math.Round(v2.z, 2);
-
-            return x1 == x2 && z1 == z2;
-        }
-
-        /// <summary>
-        /// Destroys <paramref name="gameObject"/> if it is an instance of <see cref="GameObject"/>.
-        /// The ancestors of <paramref name="gameObject"/> will not be destroyed; their parent will
-        /// just be set to null.
-        /// </summary>
-        /// <param name="gameObject">object to be destroyed</param>
-        private static void DestroyGameObject(object gameObject)
-        {
-            if (gameObject is GameObject go)
-            {
-                foreach (Transform child in go.transform)
-                {
-                    if (child.CompareTag(Tags.Node))
-                    {
-                        child.SetParent(null);
-                    }
-                }
-                Destroyer.Destroy(go);
-            }
-        }
-
-        // **********************************************************************
-
-        /// <summary>
-        /// The series of underlying graphs to be rendered.
-        /// </summary>
-        private List<Graph> graphs;  // not serialized by Unity
-
-        /// <summary>
-        /// Updates the base path of all graphs.
-        /// </summary>
-        /// <param name="basePath">the new base path to be set</param>
-        internal void ProjectPathChanged(string basePath)
-        {
-            if (graphs != null)
-            {
-                foreach (Graph graph in graphs)
-                {
-                    graph.BasePath = basePath;
-                }
-            }
-        }
-
-        /// <summary>
-        /// The number of graphs of the graph series to be rendered.
-        /// </summary>
-        public int GraphCount => graphs.Count;
-
-        /// <summary>
-        /// Current graph of the graph series to be rendered.
-        /// </summary>
-        public Graph GraphCurrent => graphs[currentGraphIndex];
-
-        /// <summary>
-        /// The index of the currently visualized graph.
-        /// </summary>
-        private int currentGraphIndex = 0;  // not serialized by Unity
-
-        /// <summary>
-        /// Returns the index of the currently shown graph.
-        /// </summary>
-        public int CurrentGraphIndex
-        {
-            get => currentGraphIndex;
-            private set
-            {
-                currentGraphIndex = value;
-                shownGraphHasChangedEvent.Invoke();
-            }
-        }
-
-        /// <summary>
-        /// An event fired when the view graph has changed.
-        /// </summary>
-        private readonly UnityEvent shownGraphHasChangedEvent = new();
-
-        /// <summary>
-        /// Whether the user has selected auto-play mode.
-        /// </summary>
-        private bool isAutoplay;  // not serialized by Unity
-
-        /// <summary>
-        /// Whether the user has selected reverse auto-play mode.
-        /// </summary>
-        private bool isAutoplayReverse;  // not serialized by Unity
-
-        /// <summary>
-        /// Returns true if automatic animations are active.
-        /// </summary>
-        public bool IsAutoPlay
-        {
-            get => isAutoplay;
-            private set
-            {
-                shownGraphHasChangedEvent.Invoke();
-                isAutoplay = value;
-            }
-        }
-
-        /// <summary>
-        /// Returns true if automatic reverse animations are active.
-        /// </summary>
-        public bool IsAutoPlayReverse
-        {
-            get => isAutoplayReverse;
-            private set
-            {
-                shownGraphHasChangedEvent.Invoke();
-                isAutoplayReverse = value;
-            }
-        }
 
         /// <summary>
         /// Initiates the visualization of the evolving series of graphs
@@ -688,8 +388,54 @@ namespace SEE.Game.Evolution
             }
             else
             {
-                Debug.LogError("Evolution renderer could not show the initial graph.\n");
+                UserInfoNoLayout();
             }
+        }
+
+        #region Transition between graphs in the series
+
+        /// <summary>
+        /// Displays the given graph instantly if all animations are finished. This is
+        /// called when we jump directly to a specific graph in the graph series: when
+        /// we start the visualization of the graph evolution initially and when the user
+        /// selects a specific graph revision.
+        /// The graph is drawn from scratch.
+        /// </summary>
+        /// <param name="graph">graph to be drawn initially</param>
+        private void DisplayGraphAsNew(LaidOutGraph graph)
+        {
+            graph.AssertNotNull("graph");
+
+            if (IsStillAnimating)
+            {
+                UserInfoGraphTransitionIsBlocked();
+                return;
+            }
+            // The upfront calculation of the node layout for all graphs has filled
+            // objectManager with game objects for those nodes. Likewise, when we jump
+            // to a graph directly in the version history, the nodes of its predecessors
+            // may still be contained in the scene and objectManager. We need to clean up
+            // first.
+            objectManager?.Clear();
+            RenderGraph(currentCity, graph);
+        }
+
+        /// <summary>
+        /// Starts the animations to transition from the <paramref name="current"/> graph
+        /// to the <paramref name="next"/> graph.
+        /// </summary>
+        /// <param name="current">the currently shown graph</param>
+        /// <param name="next">the next graph to be shown</param>
+        private void TransitionToNextGraph(LaidOutGraph current, LaidOutGraph next)
+        {
+            current.AssertNotNull("current");
+            next.AssertNotNull("next");
+            if (IsStillAnimating)
+            {
+                UserInfoGraphTransitionIsBlocked();
+                return;
+            }
+            RenderGraph(current, next);
         }
 
         /// <summary>
@@ -704,12 +450,12 @@ namespace SEE.Game.Evolution
         {
             if (IsStillAnimating)
             {
-                Debug.Log("The renderer is already occupied with animating, wait till animations are finished.\n");
+                UserInfoStillOccupied();
                 return false;
             }
             if (IsAutoPlay || IsAutoPlayReverse)
             {
-                Debug.Log("Auto-play mode is turned on. You cannot move to the next graph manually.\n");
+                UserInfoAutoPlayIsOn();
                 return false;
             }
             if (index < 0 || index >= GraphCount)
@@ -731,46 +477,6 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Returns true and a LoadedGraph if there is a LoadedGraph for the active graph index
-        /// CurrentGraphIndex.
-        /// </summary>
-        /// <param name="loadedGraph"></param>
-        /// <returns>true if there is graph to be visualized (index _openGraphIndex)</returns>
-        private bool HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph)
-        {
-            return HasLaidOutGraph(CurrentGraphIndex, out loadedGraph);
-        }
-
-        /// <summary>
-        /// Returns true and a LaidOutGraph if there is a LaidOutGraph for the given graph index.
-        /// </summary>
-        /// <param name="index">index of the requested graph</param>
-        /// <param name="laidOutGraph">the resulting graph with given index; defined only if this method returns true</param>
-        /// <returns>true iff there is a graph at the given index</returns>
-        private bool HasLaidOutGraph(int index, out LaidOutGraph laidOutGraph)
-        {
-            laidOutGraph = null;
-            Graph graph = graphs[index];
-            if (graph == null)
-            {
-                Debug.LogError($"There is no graph available for graph with index {index}.\n");
-                return false;
-            }
-            Dictionary<string, ILayoutNode> nodeLayout = NodeLayouts[index];
-
-            if (edgesAreDrawn)
-            {
-                Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout = EdgeLayouts[index];
-                laidOutGraph = new LaidOutGraph(graph, nodeLayout, edgeLayout);
-            }
-            else
-            {
-                laidOutGraph = new LaidOutGraph(graph, nodeLayout, null);
-            }
-            return true;
-        }
-
-        /// <summary>
         /// If animation is still ongoing, auto-play mode is turned on, or we are at
         /// the end of the graph series, nothing happens.
         /// Otherwise we make the transition from the currently shown graph to its
@@ -780,17 +486,17 @@ namespace SEE.Game.Evolution
         {
             if (IsStillAnimating)
             {
-                Debug.Log("The renderer is already occupied with animating, wait till animations are finished.\n");
+                UserInfoStillOccupied();
                 return;
             }
             if (IsAutoPlay || IsAutoPlayReverse)
             {
-                Debug.Log("Auto-play mode is turned on. You cannot move to the next graph manually.\n");
+                UserInfoAutoPlayIsOn();
                 return;
             }
             if (!ShowNextIfPossible())
             {
-                Debug.Log("This is already the last graph revision.\n");
+                UserInfoLastGraph();
             }
         }
 
@@ -812,13 +518,13 @@ namespace SEE.Game.Evolution
             if (HasCurrentLaidOutGraph(out LaidOutGraph newlyShownGraph) &&
                 HasLaidOutGraph(CurrentGraphIndex - 1, out LaidOutGraph currentlyShownGraph))
             {
-                NodeChangesBuffer.GetSingleton().revisionChanged = true;
+                NodeChangesBuffer.Instance().RevisionChanged = true;
                 // Note: newlyShownGraph is the very next future of currentlyShownGraph
                 TransitionToNextGraph(currentlyShownGraph, newlyShownGraph);
             }
             else
             {
-                Debug.LogError("Could not retrieve a layout for the graph.\n");
+                UserInfoNoLayout();
             }
             return true;
         }
@@ -834,7 +540,7 @@ namespace SEE.Game.Evolution
         {
             if (CurrentGraphIndex == 0)
             {
-                Debug.Log("This is already the first graph revision.\n");
+                UserInfoFirstGraph();
                 return false;
             }
             CurrentGraphIndex--;
@@ -842,13 +548,13 @@ namespace SEE.Game.Evolution
             if (HasCurrentLaidOutGraph(out LaidOutGraph newlyShownGraph) &&
                 HasLaidOutGraph(CurrentGraphIndex + 1, out LaidOutGraph currentlyShownGraph))
             {
-                NodeChangesBuffer.GetSingleton().revisionChanged = true;
+                NodeChangesBuffer.Instance().RevisionChanged = true;
                 // Note: newlyShownGraph is the most recent past of currentlyShownGraph
                 TransitionToNextGraph(currentlyShownGraph, newlyShownGraph);
             }
             else
             {
-                Debug.LogError("Could not retrieve a graph layout.\n");
+                UserInfoNoLayout();
             }
             return true;
         }
@@ -863,12 +569,238 @@ namespace SEE.Game.Evolution
         {
             if (IsStillAnimating || IsAutoPlay || IsAutoPlayReverse)
             {
-                Debug.Log("The renderer is already occupied with animating, wait till animations are finished.\n");
+                UserInfoStillOccupied();
                 return;
             }
             if (!ShowPreviousIfPossible())
             {
-                Debug.Log("This is already the first graph revision.\n");
+                UserInfoFirstGraph();
+            }
+        }
+
+        /// <summary>
+        /// Renders the animation from <paramref name="current"/> to <paramref name="next"/>.
+        /// </summary>
+        /// <param name="current">the graph currently shown that is to be migrated into the next graph; may be null</param>
+        /// <param name="next">the new graph to be shown, in which to migrate the current graph; must not be null</param>
+        private void RenderGraph(LaidOutGraph current, LaidOutGraph next)
+        {
+            next.AssertNotNull("next");
+
+            IsStillAnimating = true;
+            // First remove all markings of the previous animation cycle.
+            markerFactory.Clear();
+
+            Graph oldGraph = current != null ? current.Graph : null;
+            Graph newGraph = next != null ? next.Graph : null;
+
+            // Node comparison.
+            newGraph.Diff(oldGraph,
+                          g => g.Nodes(),
+                          (g, id) => g.GetNode(id),
+                          GraphExtensions.AttributeDiff(newGraph, oldGraph),
+                          nodeEqualityComparer,
+                          out addedNodes,
+                          out removedNodes,
+                          out changedNodes,
+                          out equalNodes);
+
+            // Edge comparison.
+            newGraph.Diff(oldGraph,
+                          g => g.Edges(),
+                          (g, id) => g.GetEdge(id),
+                          GraphExtensions.AttributeDiff(newGraph, oldGraph),
+                          edgeEqualityComparer,
+                          out addedEdges,
+                          out removedEdges,
+                          out changedEdges,
+                          out equalEdges);
+
+            Phase1RemoveDeletedGraphElements(next);
+        }
+
+        /// <summary>
+        /// Event function triggered when all animations are finished.
+        /// Marks the new and changed nodes.
+        /// Updates <see cref="NodeChangesBuffer.Instance()"/>.
+        /// Restores the game node hierarchy.
+        /// Renders the plane under the code city.
+        ///
+        /// Note: This method is a callback called from the animation framework (DoTween). It is
+        /// passed to this animation framework in <see cref="RenderGraph"/>.
+        /// </summary>
+        private void OnAnimationsFinished()
+        {
+            Debug.Log("Animation cycle has finished.\n");
+            MarkNodes();
+            UpdateNodeChangeBuffer();
+            UpdateGameNodeHierarchy();
+            RenderPlane();
+
+            IsStillAnimating = false;
+            AnimationFinishedEvent.Invoke();
+
+            // We have made the transition to the next graph.
+            currentCity = nextCity;
+
+            /// <summary>
+            /// Updates the hierarchy of game nodes so that it is isomorphic to the node
+            /// hierarchy of the underlying graph.
+            /// </summary>
+            void UpdateGameNodeHierarchy()
+            {
+                Dictionary<Node, GameObject> nodeMap = new();
+                CollectNodes(gameObject, nodeMap);
+                //Check(nodeMap);
+                GraphRenderer.CreateGameNodeHierarchy(nodeMap, gameObject);
+
+                /// <summary>
+                /// Collects all graph nodes and their corresponding game nodes that are (transitive)
+                /// descendants of <paramref name="root"/>. The result is added to <paramref name="nodeMap"/>,
+                /// where the <paramref name="root"/> itself will not be added.
+                /// </summary>
+                /// <param name="root">root of the game-node hierarchy whose hierarchy members are to be collected</param>
+                /// <param name="nodeMap">the mapping of graph nodes onto their corresponding game nodes</param>
+                /// <exception cref="Exception">thrown if a game node has no valid node reference</exception>
+                static void CollectNodes(GameObject root, IDictionary<Node, GameObject> nodeMap)
+                {
+                    if (root != null)
+                    {
+                        foreach (Transform childTransform in root.transform)
+                        {
+                            GameObject child = childTransform.gameObject;
+                            /// If a game node was deleted, it was marked inactive in
+                            /// <see cref="OnRemoveFinishedAnimation"/>. We need to ignore such
+                            /// game nodes.
+                            if (child.activeInHierarchy && child.CompareTag(Tags.Node))
+                            {
+                                if (child.TryGetNodeRef(out NodeRef nodeRef))
+                                {
+                                    nodeMap[nodeRef.Value] = child;
+                                    CollectNodes(child, nodeMap);
+                                }
+                                else
+                                {
+                                    throw new Exception($"Game node {child.name} without valid node reference.");
+                                }
+                            }
+                        }
+                    }
+                }
+
+                /// <summary>
+                /// Checks whether all graph nodes and game nodes in <paramref name="nodeMap"/> are
+                /// members of the same graph. Emits warnings and asserts that they are all in
+                /// the same graph.
+                /// Used only for debugging.
+                /// </summary>
+                /// <param name="nodeMap">mapping of graph nodes onto their corresponding game nodes</param>
+                static void Check(Dictionary<Node, GameObject> nodeMap)
+                {
+                    HashSet<Graph> graphs = new();
+
+                    foreach (GameObject go in nodeMap.Values)
+                    {
+                        graphs.Add(go.GetNode().ItsGraph);
+                    }
+                    foreach (Node node in nodeMap.Keys)
+                    {
+                        graphs.Add(node.ItsGraph);
+                    }
+                    if (graphs.Count > 1)
+                    {
+                        Debug.LogError("There are nodes from different graphs in the same game-node hierarchy!\n");
+                        foreach (GameObject go in nodeMap.Values)
+                        {
+                            Node node = go.GetNode();
+                            Debug.LogWarning($"Node {node.ID} contained in graph {node.ItsGraph.Name} from file {node.ItsGraph.Path}\n");
+                        }
+                    }
+                    Assert.AreEqual(1, graphs.Count);
+                }
+            }
+
+            /// <summary>
+            /// Updates <see cref="NodeChangesBuffer"/> with the <see cref="addedNodes"/>,
+            /// <see cref="changedNodes"/>, and <see cref="removedNodes"/>.
+            /// </summary>
+            void UpdateNodeChangeBuffer()
+            {
+                NodeChangesBuffer nodeChangesBuffer = NodeChangesBuffer.Instance();
+                nodeChangesBuffer.CurrentRevisionCounter = CurrentGraphIndex;
+                nodeChangesBuffer.AddedNodeIDsCache = new List<string>(addedNodes.Select(n => n.ID));
+                nodeChangesBuffer.ChangedNodeIDsCache = new List<string>(changedNodes.Select(n => n.ID));
+                nodeChangesBuffer.RemovedNodeIDsCache = new List<string>(removedNodes.Select(n => n.ID));
+            }
+
+            /// <summary>
+            /// Markes all <see cref="addedNodes"/> and <see cref="changedNodes"/>.
+            /// </summary>
+            void MarkNodes()
+            {
+                foreach (Node node in addedNodes)
+                {
+                    markerFactory.MarkBorn(GraphElementIDMap.Find(node.ID, true));
+                }
+                foreach (Node node in changedNodes)
+                {
+                    markerFactory.MarkChanged(GraphElementIDMap.Find(node.ID, true));
+                }
+            }
+
+            /// <summary>
+            /// Renders a plane enclosing all game objects of the currently shown graph.
+            /// </summary>
+            void RenderPlane()
+            {
+                bool isPlaneNew = !objectManager.GetPlane(out GameObject plane);
+                if (!isPlaneNew)
+                {
+                    // We are re-using the existing plane, hence, we animate its change
+                    // (new position and new scale).
+                    objectManager.GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale);
+                    Tweens.Scale(plane, scale, AnimationLag);
+                    Tweens.Move(plane, centerPosition, AnimationLag / 2);
+                }
+            }
+        }
+        #endregion
+
+        #region auto play mode
+
+        /// <summary>
+        /// Whether the user has selected auto-play mode.
+        /// </summary>
+        private bool isAutoplay;
+
+        /// <summary>
+        /// Returns true if automatic animations are active.
+        /// </summary>
+        public bool IsAutoPlay
+        {
+            get => isAutoplay;
+            private set
+            {
+                shownGraphHasChangedEvent.Invoke();
+                isAutoplay = value;
+            }
+        }
+
+        /// <summary>
+        /// Whether the user has selected reverse auto-play mode.
+        /// </summary>
+        private bool isAutoplayReverse;
+
+        /// <summary>
+        /// Returns true if automatic reverse animations are active.
+        /// </summary>
+        public bool IsAutoPlayReverse
+        {
+            get => isAutoplayReverse;
+            private set
+            {
+                shownGraphHasChangedEvent.Invoke();
+                isAutoplayReverse = value;
             }
         }
 
@@ -890,7 +822,6 @@ namespace SEE.Game.Evolution
             SetAutoPlayReverse(!IsAutoPlayReverse);
         }
 
-
         /// <summary>
         /// Sets auto-play mode to <paramref name="enabled"/>. If <paramref name="enabled"/>
         /// is true, the next graph in the series is shown and from there all other
@@ -907,7 +838,7 @@ namespace SEE.Game.Evolution
                 AnimationFinishedEvent.AddListener(OnAutoPlayCanContinue);
                 if (!ShowNextIfPossible())
                 {
-                    Debug.Log("This is already the last graph revision.\n");
+                    UserInfoLastGraph();
                 }
             }
             else
@@ -933,7 +864,7 @@ namespace SEE.Game.Evolution
                 AnimationFinishedEvent.AddListener(OnAutoPlayReverseCanContinue);
                 if (!ShowPreviousIfPossible())
                 {
-                    Debug.Log("This is already the first graph revision.\n");
+                    UserInfoFirstGraph();
                 }
             }
             else
@@ -971,27 +902,7 @@ namespace SEE.Game.Evolution
             }
         }
 
-        /// <summary>
-        /// Returns the names of all node metrics that truly exist in the underlying
-        /// graph currently shown, that is, there is at least one node in the graph
-        /// that has this metric.
-        ///
-        /// The metric names are derived from the graph currently drawn by the
-        /// evolution renderer.
-        /// If no graph has been loaded yet, the empty list will be returned.
-        /// </summary>
-        /// <returns>names of all existing node metrics</returns>
-        internal ISet<string> AllExistingMetrics()
-        {
-            if (currentCity == null || currentCity.Graph == null)
-            {
-                return new HashSet<string>();
-            }
-            else
-            {
-                return currentCity.Graph.AllNumericNodeAttributes();
-            }
-        }
+        #endregion
 
         /// <summary>
         /// Yields a graph renderer that can draw this city.
@@ -1051,6 +962,43 @@ namespace SEE.Game.Evolution
         public IDictionary<string, ILayoutEdge<ILayoutNode>> LayoutEdges(ICollection<GameObject> gameEdges)
         {
             return graphRenderer.LayoutEdges(gameEdges);
+        }
+
+        /// <summary>
+        /// Returns the names of all node metrics that truly exist in the underlying
+        /// graph currently shown, that is, there is at least one node in the graph
+        /// that has this metric.
+        ///
+        /// The metric names are derived from the graph currently drawn by the
+        /// evolution renderer.
+        /// If no graph has been loaded yet, the empty list will be returned.
+        /// </summary>
+        /// <returns>names of all existing node metrics</returns>
+        internal ISet<string> AllExistingMetrics()
+        {
+            if (currentCity == null || currentCity.Graph == null)
+            {
+                return new HashSet<string>();
+            }
+            else
+            {
+                return currentCity.Graph.AllNumericNodeAttributes();
+            }
+        }
+
+        /// <summary>
+        /// Updates the base path of all graphs.
+        /// </summary>
+        /// <param name="basePath">the new base path to be set</param>
+        internal void ProjectPathChanged(string basePath)
+        {
+            if (graphs != null)
+            {
+                foreach (Graph graph in graphs)
+                {
+                    graph.BasePath = basePath;
+                }
+            }
         }
     }
 }

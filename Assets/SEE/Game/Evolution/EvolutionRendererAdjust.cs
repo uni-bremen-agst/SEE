@@ -21,16 +21,16 @@ namespace SEE.Game.Evolution
         /// to the <paramref name="nextCity"/>.
         /// In this phase, the scale and style of all existing nodes (nodes in both graphs,
         /// no matter whether they were changed or not) will adjusted.
-        /// When this phase has been completed, <see cref="Phase4AddNewGraphElements"/>
+        /// When this phase has been completed, <see cref="Phase4AddNewNodes"/>
         /// will be called.
         /// </summary>
         private void Phase3AdjustExistingGraphElements()
         {
-            Debug.Log("Phase3AdjustExistingGraphElements\n");
             // Even the equal nodes need adjustments because the layout could have
             // changed their dimensions. The treemap layout, for instance, may do that.
             int changedElements = equalNodes.Count + changedNodes.Count;
-            animationWatchDog.Await(changedElements, () => Phase4AddNewGraphElements());
+            Debug.Log($"Phase 3: Adjusting {changedElements} changed graph elements.\n");
+            animationWatchDog.Await(changedElements, () => Phase4AddNewNodes());
             if (changedElements > 0)
             {
                 equalNodes.ForEach(AdjustExistingNode);
@@ -81,6 +81,8 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Adjusts the antenna and the marker of <paramref name="gameNode"/> because
         /// its height might have changed.
+        /// Notifies <see cref="animationWatchDog"/> that the animation of this <paramref name="gameNode"/>
+        /// has finished.
         /// </summary>
         /// <param name="gameNode">game node whose antenna and marker need to be adjusted</param>
         private void OnScalingFinished(object gameNode)

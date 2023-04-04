@@ -39,8 +39,8 @@ namespace SEE.Game.Evolution
         /// <param name="next">the next graph to be shown</param>
         private void Phase1RemoveDeletedGraphElements(LaidOutGraph next)
         {
-            Debug.Log("Phase1RemoveDeletedGraphElements\n");
             int deletedGraphElements = removedNodes.Count + removedEdges.Count;
+            Debug.Log($"Phase 1: Removing {deletedGraphElements} graph elements.\n");
             animationWatchDog.Await(deletedGraphElements, () => Phase2MoveExistingGraphElements(next));
             if (deletedGraphElements > 0)
             {
@@ -101,7 +101,7 @@ namespace SEE.Game.Evolution
                 else if (gameObject.IsEdge())
                 {
                     gameObject.AddOrGetComponent<EdgeOperator>()
-                        .GlowIn(AnimationLagPerPhase())
+                        .FadeTo(0, AnimationLagPerPhase())
                         .SetOnComplete(() => OnRemoveFinishedAnimation(gameObject));
                 }
                 else

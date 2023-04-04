@@ -9,8 +9,7 @@ using UnityEngine.Assertions;
 namespace SEE.Game.Evolution
 {
     /// <summary>
-    /// Part of the <see cref="EvolutionRenderer"/> taking care of adding new
-    /// graph elements.
+    /// Part of the <see cref="EvolutionRenderer"/> taking care of adding new nodes.
     /// The code following here implements phase (4).
     /// </summary>
     public partial class EvolutionRenderer
@@ -18,19 +17,15 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Implements the fourth phase in the transition from the <see cref="currentCity"/>
         /// to the <paramref name="nextCity"/>.
-        /// In this phase, all <see cref="addedNodes"/> and <see cref="addedEdges"/> will
-        /// be rendered by new game objects. When their animated appearance has
-        /// finished, <see cref="OnAnimationsFinished"/> will be called.
+        /// In this phase, all <see cref="addedNodes"/> will be rendered by new game objects.
+        /// When their animated appearance has finished, <see cref="Phase5AddNewEdges"/>
+        /// will be called.
         /// </summary>
-        private void Phase4AddNewGraphElements()
+        private void Phase4AddNewNodes()
         {
-            int addedElements = addedNodes.Count + addedEdges.Count;
-            Debug.Log($"Phase4AddNewGraphElements: {addedElements}\n");
-            animationWatchDog.Await(addedElements, OnAnimationsFinished);
-            if (addedElements > 0)
-            {
-                addedNodes.ForEach(AddNode);
-            }
+            Debug.Log($"Phase 4: Adding {addedNodes.Count} new nodes.\n");
+            animationWatchDog.Await(addedNodes.Count, Phase5AddNewEdges);
+            addedNodes.ForEach(AddNode);
         }
 
         /// <summary>
