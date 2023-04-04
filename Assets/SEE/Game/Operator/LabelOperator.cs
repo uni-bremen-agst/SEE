@@ -4,8 +4,8 @@ using SEE.Controls.Actions;
 using SEE.GO;
 using TMPro;
 using UnityEngine;
-#if INCLUDE_STEAM_VR
 using UnityEngine.Rendering;
+#if INCLUDE_STEAM_VR
 using Valve.VR.InteractionSystem;
 #endif
 
