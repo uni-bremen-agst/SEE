@@ -152,10 +152,15 @@ namespace SEE.Game.Evolution
         public bool IsStillAnimating { get; private set; }
 
         /// <summary>
+        /// The default time for the complete graph transition animation.
+        /// </summary>
+        private const float DefaultAnimationTime = 5.0f;
+
+        /// <summary>
         /// The duration of an animation. This value can be controlled by the user.
         /// </summary>
         [SerializeField]
-        private float animationDuration = AbstractAnimator.DefaultAnimationTime;
+        private float animationDuration = DefaultAnimationTime;
 
         /// <summary>
         /// The time in seconds for showing a single graph revision during auto-play animation.
