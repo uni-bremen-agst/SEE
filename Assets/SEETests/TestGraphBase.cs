@@ -9,7 +9,6 @@ namespace SEE.DataModel.DG
     /// </summary>
     internal abstract class TestGraphBase
     {
-
         /// <summary>
         /// Creates and returns a new node to <paramref name="graph"/>.
         /// </summary>
