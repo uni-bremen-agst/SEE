@@ -44,10 +44,10 @@ namespace SEE.Game.Evolution
             animationWatchDog.Await(deletedGraphElements, () => Phase2MoveExistingGraphElements(next));
             if (deletedGraphElements > 0)
             {
-                // Remove those nodes.
-                removedNodes.ForEach(RenderRemovedNode);
                 // Remove those edges.
                 removedEdges.ForEach(RenderRemovedEdge);
+                // Remove those nodes.
+                removedNodes.ForEach(RenderRemovedNode);
             }
             /// Note: <see cref="Phase2MoveExistingGraphElements"/> will be called by <see cref="animationWatchDog"/>
             /// when phase 1 has completed (or skipped).
@@ -95,7 +95,7 @@ namespace SEE.Game.Evolution
                 if (gameObject.IsNode())
                 {
                     gameObject.AddOrGetComponent<NodeOperator>()
-                              .MoveTo(newPosition, AnimationLagPerPhase(), updateEdges: edgesAreDrawn)
+                              .MoveTo(newPosition, AnimationLagPerPhase(), updateEdges: false)
                               .SetOnComplete(() => OnRemoveFinishedAnimation(gameObject));
                 }
                 else if (gameObject.IsEdge())
