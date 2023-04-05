@@ -88,7 +88,7 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Yields true if <paramref name="element"/> has an attribute <paramref name="attributeName"/> of type
+        /// Yields true if <paramref name="element"/> has an attribute <paramref name="attributeName"/> of type <typeparamref name="T">
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="element">element to be queried</param>
