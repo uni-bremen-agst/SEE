@@ -320,7 +320,7 @@ namespace SEE.GO
 
         /// <summary>
         /// Sets the scale of this <paramref name="gameObject"/> to <paramref name="worldScale"/> independent from
-        /// the local scale from its parent.
+        /// the local scale of its parent.
         /// </summary>
         /// <param name="gameObject">object whose scale should be set</param>
         /// <param name="worldScale">the new scale in world space</param>
