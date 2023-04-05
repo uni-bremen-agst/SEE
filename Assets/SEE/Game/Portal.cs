@@ -39,7 +39,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Sets the portal of <paramref name="to"/> to the portal of  <paramref name="from"/>.
+        /// Sets the portal of <paramref name="to"/> to the portal of <paramref name="from"/>.
         ///
         /// Postcondition: The portals of <paramref name="from"/> and <paramref name="to"/>
         /// are equal and <paramref name="from"/> has its original portal.
