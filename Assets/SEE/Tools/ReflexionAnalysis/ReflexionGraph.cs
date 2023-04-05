@@ -111,7 +111,7 @@ namespace SEE.Tools.ReflexionAnalysis
             foreach (Edge mapsTo in MappingGraph.Edges())
             {
                 Assert.IsTrue(mapsTo.HasSupertypeOf(MapsToType));
-                mapsTo.SetToggle(Edge.IsVirtualToggle);
+                mapsTo.SetToggle(GraphElement.IsVirtualToggle);
             }
 
             // We set the name for the implementation graph, because its name will be used for the merged graph.
@@ -136,7 +136,7 @@ namespace SEE.Tools.ReflexionAnalysis
                                  + $"Offending elements: {string.Join(", ", edgesOverlap)}");
             }
 
-            if (!(ImplementationGraph is ReflexionGraph))
+            if (ImplementationGraph is not ReflexionGraph)
             {
                 ImplementationGraph = new ReflexionGraph(ImplementationGraph);
             }

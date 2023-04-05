@@ -1496,5 +1496,8 @@
         <string>MainClass.cs</string>
       </attr>
     </edge>
+	<edge id="E103071" from="N35099" to="N35099">
+      <type xlink:href="SELFLOOP"/>
+    </edge>
   </graph>
 </gxl>

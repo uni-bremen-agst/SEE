@@ -12,7 +12,7 @@ elif [[ $# == 1 ]]; then
 		TARGET="$1"
 	else
 		echo "The given file either doesn't exist, or isn't readable and writable."
-		exit -1
+		exit 1
 	fi
 fi
 

@@ -42860,7 +42860,6 @@ MonoBehaviour:
     EdgeWidth: 0.01
     EdgesAboveBlocks: 1
     Tension: 0.85
-    RDP: 0.0001
   EdgeSelectionSettings:
     TubularSegments: 50
     Radius: 0.005
@@ -50963,7 +50962,6 @@ MonoBehaviour:
     EdgeWidth: 0.01
     EdgesAboveBlocks: 1
     Tension: 0.85
-    RDP: 0.0001
   EdgeSelectionSettings:
     TubularSegments: 50
     Radius: 0.005
@@ -50995,11 +50993,11 @@ MonoBehaviour:
     LoadBoardOnStartup: 1
     BoardPath:
       Root: 3
-      relativePath: /reflexion/compiler/Reflexion.json
+      relativePath: /reflexion/compiler/ReflexionBoard.cfg
       absolutePath: 
   GXLPath:
     Root: 3
-    relativePath: /reflexion/compiler/CodeFacts.gxl
+    relativePath: /reflexion/compiler/CodeFacts.gxl.xz
     absolutePath: CodeFacts.gxl
   CSVPath:
     Root: 2
@@ -94216,6 +94214,7 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &1800030787
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109522,6 +109521,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 83e4e6cca11330d4088d729ab4fc9d9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_StartingHoverFilters: []
+  m_StartingSelectFilters: []
 --- !u!4 &2062505355
 Transform:
   m_ObjectHideFlags: 0
