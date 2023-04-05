@@ -81,6 +81,11 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             Debug.LogError("Sync " + RuntimeConfigMenu.GetCity(CityIndex).name + "\t"
                            + widgetName.Split("/").Last());
         };
+        OnSyncPath += (widgetName, value, isAbsolute)=>
+        {
+            Debug.LogError("SyncPath " + RuntimeConfigMenu.GetCity(CityIndex).name + "\t"
+                           + widgetName.Split("/").Last() + "\t" + value + "\t" + isAbsolute);
+        };
     }
 
     protected virtual void CreateButton(MethodInfo methodInfo, AbstractSEECity city)
@@ -276,6 +281,42 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 filePicker.Label = settingName;
                 filePicker.PickingMode = FileBrowser.PickMode.Files;
                 filePicker.OnMenuInitialized += () => AddLayoutElement(parent.transform.Find(settingName).gameObject);
+                
+                filePicker.OnChangedDropdown += () =>
+                {
+                    UpdateIntCityFieldNetAction netAction = new();
+                    netAction.Value = (int) dataPath.Root;
+                    netAction.CityIndex = CityIndex;
+                    netAction.WidgetPath = filePicker.gameObject.FullName() + "/" + settingName;
+                    netAction.Execute();
+                };
+                
+                filePicker.OnChangedPath += () =>
+                {
+                    UpdatePathCityFieldNetAction netAction = new();
+                    netAction.IsAbsolute = dataPath.Root == DataPath.RootKind.Absolute;
+                    netAction.Value = netAction.IsAbsolute ? dataPath.AbsolutePath : dataPath.RelativePath;
+                    netAction.CityIndex = CityIndex;
+                    netAction.WidgetPath = filePicker.gameObject.FullName() + "/" + settingName;
+                    netAction.Execute();
+                };
+                
+                OnSyncPath += (widgetPath, newValue, isAbsolute) =>
+                {
+                    if (widgetPath == filePicker.gameObject.FullName()+ "/" + settingName)
+                    {
+                        filePicker.ChangePath(newValue, isAbsolute);
+                    }
+                };
+                
+                OnSyncField += (widgetPath, newValue) =>
+                {
+                    if (widgetPath == filePicker.gameObject.FullName()+ "/" + settingName)
+                    {
+                        filePicker.ChangeDropdown((int) newValue);
+                    }
+                };
+                
                 break;
             case Enum:
                 CreateDropDown(
@@ -738,7 +779,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
     public Action<string, object> OnSyncField;
     public Action<string> OnSyncMethod;
-
+    public Action<string, string, bool> OnSyncPath;
     public event Action OnUpdateMenuValues;
 
     public event Action<int> OnSwitchCity;
