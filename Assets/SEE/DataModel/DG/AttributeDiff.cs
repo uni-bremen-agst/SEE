@@ -48,7 +48,7 @@ namespace SEE.DataModel.DG
         private readonly ICollection<string> toggleAttributes;
 
         /// <summary>
-        /// True whether there is a difference between <paramref name="left"/> and
+        /// True when there is a difference between <paramref name="left"/> and
         /// <paramref name="right"/> in terms of the the attributes set in the
         /// constructor.
         /// </summary>
