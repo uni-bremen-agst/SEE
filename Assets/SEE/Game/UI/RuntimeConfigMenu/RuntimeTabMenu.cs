@@ -73,8 +73,13 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
         OnSyncField += (widgetName, value) =>
         {
-            Debug.LogError("Sync " + RuntimeConfigMenu.GetCity(CityIndex).name
-                           + widgetName + "\t" + value);
+            Debug.LogError("Sync " + RuntimeConfigMenu.GetCity(CityIndex).name + "\t"
+                           + widgetName.Split("/").Last() + "\t" + value);
+        };
+        OnSyncMethod += widgetName =>
+        {
+            Debug.LogError("Sync " + RuntimeConfigMenu.GetCity(CityIndex).name + "\t"
+                           + widgetName.Split("/").Last());
         };
     }
 
@@ -95,6 +100,19 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             methodInfo.Invoke(city, null); // calls the method
             OnUpdateMenuValues?.Invoke(); // updates the menu
         });
+        buttonManager.clickEvent.AddListener(() =>
+        {
+            UpdateCityMethodNetAction netAction = new();
+            netAction.CityIndex = CityIndex;
+            netAction.WidgetPath = button.FullName();
+            netAction.Execute();
+        });
+        OnSyncMethod += widgetPath => {
+            if (widgetPath == button.FullName()) {
+                methodInfo.Invoke(city, null); // calls the method
+                OnUpdateMenuValues?.Invoke(); // updates the menu  
+            }
+        };
     }
     
     public void LoadCity(int i)
@@ -592,7 +610,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     
         customInput.gameObject.SetActive(false);
         dictaphone.gameObject.SetActive(false);
-
+    
         dropdown.isListItem = true;
         dropdown.listParent = Canvas.transform;
         dropdown.selectedItemIndex = Array.IndexOf(valueArray, getter());
@@ -719,6 +737,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     }
 
     public Action<string, object> OnSyncField;
+    public Action<string> OnSyncMethod;
+
     public event Action OnUpdateMenuValues;
 
     public event Action<int> OnSwitchCity;
