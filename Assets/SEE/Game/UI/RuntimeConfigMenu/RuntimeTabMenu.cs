@@ -592,14 +592,34 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     
         customInput.gameObject.SetActive(false);
         dictaphone.gameObject.SetActive(false);
-    
+
         dropdown.isListItem = true;
         dropdown.listParent = Canvas.transform;
         dropdown.selectedItemIndex = Array.IndexOf(valueArray, getter());
         valueArray.ForEach(s => dropdown.CreateNewItemFast(s, null));
+        
+        dropdown.SetupDropdown();
+        
         dropdown.dropdownEvent.AddListener(setter);
+        dropdown.dropdownEvent.AddListener(changedValue =>
+        {
+            UpdateIntCityFieldNetAction action = new();
+            action.CityIndex = CityIndex;
+            action.WidgetPath = dropDownGameObject.FullName();
+            action.Value = changedValue;
+            action.Execute();
+        });
+        
+        OnSyncField += (widgetPath, value) =>
+        {
+            if (widgetPath == dropDownGameObject.FullName())
+            {
+                setter((int) value);
+                dropdown.ChangeDropdownInfo((int) value);
+            }
+        };
 
-        OnUpdateMenuValues += () => dropdown.selectedItemIndex = Array.IndexOf(valueArray, getter());
+        OnUpdateMenuValues += () => dropdown.ChangeDropdownInfo(Array.IndexOf(valueArray, getter()));
 
         if (!recursive)
         {
@@ -699,7 +719,6 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     }
 
     public Action<string, object> OnSyncField;
-
     public event Action OnUpdateMenuValues;
 
     public event Action<int> OnSwitchCity;
