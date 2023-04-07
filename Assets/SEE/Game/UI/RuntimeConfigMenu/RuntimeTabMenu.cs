@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Crosstales;
+using HSVPicker;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
 using SEE.Game;
@@ -20,6 +22,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 using FilePicker = SEE.Game.UI.FilePicker.FilePicker;
 using Random = UnityEngine.Random;
 using Slider = UnityEngine.UI.Slider;
@@ -36,6 +39,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     public const string BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "Button";
     public const string ADD_ELEMENT_BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "AddButton";
     public const string REMOVE_ELEMENT_BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RemoveButton";
+    public const string PICKER2_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "Picker 2.0";
     protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenuRework_v2";
     protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsView";
     protected override string EntryPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeTabButton";
@@ -73,7 +77,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
         OnSyncField += (widgetName, value) =>
         {
-            Debug.LogError("Sync " + RuntimeConfigMenu.GetCity(CityIndex).name
+            Debug.Log("Sync " + RuntimeConfigMenu.GetCity(CityIndex).name
                            + widgetName + "\t" + value);
         };
     }
@@ -248,7 +252,9 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             case Color:
                 CreateColorPicker(
                     settingName: settingName, 
-                    parent: parent
+                    parent: parent,
+                    setter: changedValue => setter!(changedValue),
+                    getter: () => (Color) getter()
                 );
                 break;
             case DataPath dataPath:
@@ -415,8 +421,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         slider.minValue = range.min;
         slider.maxValue = range.max;
 
-        RuntimeSliderManager endEditManager =  slider.gameObject.AddComponent<RuntimeSliderManager>();
-            
+        RuntimeSliderManager endEditManager = slider.gameObject.AddComponent<RuntimeSliderManager>();
+
         slider.value = getter();
         endEditManager.OnEndEdit += () => setter(slider.value);
 
@@ -615,17 +621,41 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     }
 
     // TODO: Add action
-    private void CreateColorPicker(string settingName, GameObject parent, bool recursive = false)
+    private void CreateColorPicker(string settingName, GameObject parent, UnityAction<Color> setter, Func<Color> getter, bool recursive = false)
     {
         parent = CreateNestedSetting("Color Picker: " + settingName, parent);
 
         GameObject colorPickerGameObject =
-            PrefabInstantiator.InstantiatePrefab(COLORPICKER_PREFAB, parent.transform, false);
+            PrefabInstantiator.InstantiatePrefab(PICKER2_PREFAB, parent.transform, false);
         colorPickerGameObject.name = settingName;
         AddLayoutElement(colorPickerGameObject);
-        TextMeshProUGUI text = colorPickerGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
-        text.text = settingName;
-        // TODO: Value and setter
+        HSVPicker.ColorPicker colorPicker = colorPickerGameObject.GetComponent<HSVPicker.ColorPicker>();
+        colorPicker.CurrentColor = getter();
+
+        colorPicker.onValueChanged.AddListener(setter);
+        BoxSlider boxSlider = colorPickerGameObject.GetComponentInChildren<BoxSlider>();
+        boxSlider.onValueChanged.AddListener((f, f1) =>
+        {
+            UpdateColorCityFieldNetAction action = new();
+            action.CityIndex = CityIndex;
+            action.WidgetPath = colorPickerGameObject.FullName();
+            action.Value = getter();
+            action.Execute();
+        });
+
+        OnSyncField += (widgetPath, value) =>
+        {
+            if (widgetPath == colorPickerGameObject.FullName())
+            {
+                setter((Color)value);
+                colorPicker.CurrentColor = getter();
+            }
+        };
+
+        OnUpdateMenuValues += () =>
+        {
+            colorPicker.CurrentColor = getter();
+        };
 
         if (!recursive)
         {
@@ -636,7 +666,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 OnUpdateMenuValues?.Invoke();
             };
             smallEditorButton.CreateWidget = smallEditor =>
-                CreateColorPicker(settingName, smallEditor, true);
+                CreateColorPicker(settingName, smallEditor, setter, getter, true);
         }
 
     }

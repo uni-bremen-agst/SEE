@@ -442,7 +442,7 @@ namespace SEE.Game.City
         /// the file is assumed to be in the SLD format.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Layout")]
         [PropertyOrder(DataButtonsGroupOrderLoadLayout)]
         public void LoadLayout()
         {
