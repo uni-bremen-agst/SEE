@@ -57,7 +57,7 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 3
-  m_Spacing: 12
+  m_Spacing: 8
   m_ChildForceExpandWidth: 0
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
@@ -75,7 +75,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3594441040548046578}
   - component: {fileID: 2373544810490526761}
-  - component: {fileID: 6208499510918507880}
+  - component: {fileID: 4048336328782596150}
   m_Layer: 5
   m_Name: Icon
   m_TagString: Untagged
@@ -92,7 +92,7 @@ RectTransform:
   m_GameObject: {fileID: 3883168754644485073}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 4, y: 4, z: 1}
+  m_LocalScale: {x: 3, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1427277968576878418}
@@ -101,7 +101,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: -25, y: -25}
+  m_SizeDelta: {x: -24, y: -24}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2373544810490526761
 CanvasRenderer:
@@ -111,7 +111,7 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3883168754644485073}
   m_CullTransparentMesh: 0
---- !u!114 &6208499510918507880
+--- !u!114 &4048336328782596150
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -124,7 +124,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.1764706, g: 0.25490198, b: 0.33333334, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -133,7 +133,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: 544fba2e5a542c240b2ebe642ff8f479, type: 3}
   m_Type: 0
-  m_PreserveAspect: 1
+  m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -477,7 +477,7 @@ MonoBehaviour:
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
   buttonVar: {fileID: 0}
-  normalIcon: {fileID: 6208499510918507880}
+  normalIcon: {fileID: 0}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 7249890383891256170}
   useCustomContent: 0
@@ -585,7 +585,7 @@ MonoBehaviour:
   basicFilled: {fileID: 0}
   basicText: {fileID: 0}
   basicOnlyIconFilled: {fileID: 6923392807836165755}
-  basicOnlyIconIcon: {fileID: 6208499510918507880}
+  basicOnlyIconIcon: {fileID: 0}
   basicWithIconFilled: {fileID: 0}
   basicWithIconIcon: {fileID: 0}
   basicWithIconText: {fileID: 0}
@@ -786,7 +786,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 30, y: 0}
+  m_AnchoredPosition: {x: 26, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &223187603897824983

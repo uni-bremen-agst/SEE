@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Crosstales;
 using HSVPicker;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
@@ -22,7 +21,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
 using FilePicker = SEE.Game.UI.FilePicker.FilePicker;
 using Random = UnityEngine.Random;
 using Slider = UnityEngine.UI.Slider;
@@ -60,7 +58,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     {
         base.StartDesktop();
         configButtonList = Content.transform.Find(ConfigButtonListPath).gameObject;
-        citySwitcher =  Content.transform.Find(CitySwitcherPath).GetComponent<HorizontalSelector>();
+        citySwitcher = Content.transform.Find(CitySwitcherPath).GetComponent<HorizontalSelector>();
 
         SetupCitySwitcher();
     }
@@ -77,8 +75,18 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
         OnSyncField += (widgetName, value) =>
         {
-            Debug.Log("Sync " + RuntimeConfigMenu.GetCity(CityIndex).name
-                           + widgetName + "\t" + value);
+            Debug.LogError("Sync " + RuntimeConfigMenu.GetCity(CityIndex).name + "\t"
+                           + widgetName.Split("/").Last() + "\t" + value);
+        };
+        OnSyncMethod += widgetName =>
+        {
+            Debug.LogError("Sync " + RuntimeConfigMenu.GetCity(CityIndex).name + "\t"
+                           + widgetName.Split("/").Last());
+        };
+        OnSyncPath += (widgetName, value, isAbsolute) =>
+        {
+            Debug.LogError("SyncPath " + RuntimeConfigMenu.GetCity(CityIndex).name + "\t"
+                           + widgetName.Split("/").Last() + "\t" + value + "\t" + isAbsolute);
         };
     }
 
@@ -94,24 +102,41 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         button.name = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
         ButtonManagerWithIcon buttonManager = button.GetComponent<ButtonManagerWithIcon>();
         buttonManager.buttonText = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
-    
-        buttonManager.clickEvent.AddListener(() => {
+
+        buttonManager.clickEvent.AddListener(() =>
+        {
             methodInfo.Invoke(city, null); // calls the method
             OnUpdateMenuValues?.Invoke(); // updates the menu
         });
+        buttonManager.clickEvent.AddListener(() =>
+        {
+            UpdateCityMethodNetAction netAction = new();
+            netAction.CityIndex = CityIndex;
+            netAction.WidgetPath = button.FullName();
+            netAction.Execute();
+        });
+        OnSyncMethod += widgetPath =>
+        {
+            if (widgetPath == button.FullName())
+            {
+                methodInfo.Invoke(city, null); // calls the method
+                OnUpdateMenuValues?.Invoke(); // updates the menu  
+            }
+        };
     }
-    
+
     public void LoadCity(int i)
     {
         AbstractSEECity city = RuntimeConfigMenu.GetCity(i);
-        city.GetType().GetMembers().ForEach(memberInfo => {
-            if (memberInfo.DeclaringType == typeof(AbstractSEECity) || 
-                memberInfo.DeclaringType!.IsSubclassOf(typeof(AbstractSEECity))) 
+        city.GetType().GetMembers().ForEach(memberInfo =>
+        {
+            if (memberInfo.DeclaringType == typeof(AbstractSEECity) ||
+                memberInfo.DeclaringType!.IsSubclassOf(typeof(AbstractSEECity)))
                 CreateSetting(memberInfo, null, city);
         });
         city.GetType().GetMethods().ForEach(methodInfo => CreateButton(methodInfo, city));
         SelectEntry(Entries.First(entry => entry.Title != "Misc"));
-    } 
+    }
 
     private void SetupCitySwitcher()
     {
@@ -194,7 +219,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         }
     }
 
-    private void CreateSetting(Func<object> getter, string settingName, GameObject parent, 
+    private void CreateSetting(Func<object> getter, string settingName, GameObject parent,
         UnityAction<object> setter = null, IEnumerable<Attribute> attributes = null)
     {
         Attribute[] attributeArray = attributes as Attribute[] ?? attributes?.ToArray() ?? Array.Empty<Attribute>();
@@ -205,39 +230,39 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         {
             case bool:
                 CreateSwitch(
-                    settingName: settingName, 
-                    setter: changedValue => setter!(changedValue), 
-                    getter: () => (bool) getter(), 
+                    settingName: settingName,
+                    setter: changedValue => setter!(changedValue),
+                    getter: () => (bool)getter(),
                     parent: parent
                 );
                 break;
             case int:
                 CreateSlider(
-                    settingName: settingName, 
-                    range: attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0), 
-                    setter: changedValue => setter!((int) changedValue), 
-                    getter: () => (int)getter(), 
-                    useRoundValue: true, 
+                    settingName: settingName,
+                    range: attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
+                    setter: changedValue => setter!((int)changedValue),
+                    getter: () => (int)getter(),
+                    useRoundValue: true,
                     parent: parent
                 );
                 break;
             case uint:
                 CreateSlider(
-                    settingName: settingName, 
-                    range: attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0), 
-                    setter: changedValue => setter!((uint) changedValue), 
-                    getter: () => (uint)getter(), 
-                    useRoundValue: true, 
+                    settingName: settingName,
+                    range: attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
+                    setter: changedValue => setter!((uint)changedValue),
+                    getter: () => (uint)getter(),
+                    useRoundValue: true,
                     parent: parent
                 );
                 break;
             case float:
                 CreateSlider(
-                    settingName: settingName, 
-                    range: attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0), 
-                    setter: changedValue => setter!(changedValue), 
-                    getter: () => (float)getter(), 
-                    useRoundValue: false, 
+                    settingName: settingName,
+                    range: attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
+                    setter: changedValue => setter!(changedValue),
+                    getter: () => (float)getter(),
+                    useRoundValue: false,
                     parent: parent
                 );
                 break;
@@ -245,16 +270,16 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 CreateStringField(
                     settingName: settingName,
                     setter: changedValue => setter!(changedValue),
-                    getter: () => (string) getter(),
+                    getter: () => (string)getter(),
                     parent: parent
                 );
                 break;
             case Color:
                 CreateColorPicker(
-                    settingName: settingName, 
+                    settingName: settingName,
                     parent: parent,
                     setter: changedValue => setter!(changedValue),
-                    getter: () => (Color) getter()
+                    getter: () => (Color)getter()
                 );
                 break;
             case DataPath dataPath:
@@ -264,10 +289,46 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 filePicker.Label = settingName;
                 filePicker.PickingMode = FileBrowser.PickMode.Files;
                 filePicker.OnMenuInitialized += () => AddLayoutElement(parent.transform.Find(settingName).gameObject);
+
+                filePicker.OnChangedDropdown += () =>
+                {
+                    UpdateIntCityFieldNetAction netAction = new();
+                    netAction.Value = (int)dataPath.Root;
+                    netAction.CityIndex = CityIndex;
+                    netAction.WidgetPath = filePicker.gameObject.FullName() + "/" + settingName;
+                    netAction.Execute();
+                };
+
+                filePicker.OnChangedPath += () =>
+                {
+                    UpdatePathCityFieldNetAction netAction = new();
+                    netAction.IsAbsolute = dataPath.Root == DataPath.RootKind.Absolute;
+                    netAction.Value = netAction.IsAbsolute ? dataPath.AbsolutePath : dataPath.RelativePath;
+                    netAction.CityIndex = CityIndex;
+                    netAction.WidgetPath = filePicker.gameObject.FullName() + "/" + settingName;
+                    netAction.Execute();
+                };
+
+                OnSyncPath += (widgetPath, newValue, isAbsolute) =>
+                {
+                    if (widgetPath == filePicker.gameObject.FullName() + "/" + settingName)
+                    {
+                        filePicker.ChangePath(newValue, isAbsolute);
+                    }
+                };
+
+                OnSyncField += (widgetPath, newValue) =>
+                {
+                    if (widgetPath == filePicker.gameObject.FullName() + "/" + settingName)
+                    {
+                        filePicker.ChangeDropdown((int)newValue);
+                    }
+                };
+
                 break;
             case Enum:
                 CreateDropDown(
-                    settingName: settingName, 
+                    settingName: settingName,
                     setter: changedValue => setter!(Enum.ToObject(value.GetType(), changedValue)),
                     values: value.GetType().GetEnumNames(),
                     getter: () => getter().ToString(),
@@ -337,14 +398,16 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 addButton.name = "AddElementButton";
                 ButtonManagerWithIcon addButtonManager = addButton.GetComponent<ButtonManagerWithIcon>();
                 // Listener AddButton
-                addButtonManager.clickEvent.AddListener(() => {
-                    list.Add(""); 
+                addButtonManager.clickEvent.AddListener(() =>
+                {
+                    list.Add("");
                     UpdateListChildren(list, parent);
                     addButtonManager.transform.SetAsLastSibling();
                     removeButtonManager.transform.SetAsLastSibling();
                 });
                 // Listener RemoveButton
-                removeButtonManager.clickEvent.AddListener(() => {
+                removeButtonManager.clickEvent.AddListener(() =>
+                {
                     list.RemoveAt(list.Count - 1);
                     UpdateListChildren(list, parent);
                     addButtonManager.transform.SetAsLastSibling();
@@ -354,7 +417,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 UpdateListChildren(list, parent);
                 addButton.transform.SetAsLastSibling();
                 removeButton.transform.SetAsLastSibling();
-                OnUpdateMenuValues += () => {
+                OnUpdateMenuValues += () =>
+                {
                     UpdateListChildren(list, parent);
                     addButton.transform.SetAsLastSibling();
                     removeButton.transform.SetAsLastSibling();
@@ -391,7 +455,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 Debug.LogWarning("Missing: " + settingName + " " + value?.GetType().GetNiceName());
                 break;
         }
-    } 
+    }
 
     private GameObject CreateNestedSetting(string settingName, GameObject parent)
     {
@@ -402,7 +466,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         return container.transform.Find("Content").gameObject;
     }
 
-    private void CreateSlider(string settingName, RangeAttribute range, UnityAction<float> setter, Func<float> getter, 
+    private void CreateSlider(string settingName, RangeAttribute range, UnityAction<float> setter, Func<float> getter,
         bool useRoundValue, GameObject parent, bool recursive = false)
     {
         range ??= new RangeAttribute(0, 2);
@@ -415,7 +479,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         Slider slider = sliderGameObject.GetComponentInChildren<Slider>();
         TextMeshProUGUI text = sliderGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = settingName;
-            
+
         sliderManager.usePercent = false;
         sliderManager.useRoundValue = useRoundValue;
         slider.minValue = range.min;
@@ -434,23 +498,23 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             action.Value = slider.value;
             action.Execute();
         };
-        
+
         OnSyncField += (widgetPath, value) =>
         {
             if (widgetPath == sliderGameObject.FullName())
             {
-                setter((float) value);
-                slider.value = (float) value;
+                setter((float)value);
+                slider.value = (float)value;
                 sliderManager.UpdateUI();
             }
         };
-        
+
         OnUpdateMenuValues += () =>
         {
             slider.value = getter();
             sliderManager.UpdateUI();
         };
-        
+
 
         if (!recursive)
         {
@@ -460,9 +524,9 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 ShowMenu = !smallEditorButton.ShowMenu;
                 OnUpdateMenuValues?.Invoke();
             };
-            smallEditorButton.CreateWidget = smallEditor => 
+            smallEditorButton.CreateWidget = smallEditor =>
                 CreateSlider(settingName, range, setter, getter, useRoundValue, smallEditor, true);
-        }        
+        }
     }
 
     private void CreateSwitch(string settingName, UnityAction<bool> setter, Func<bool> getter, GameObject parent,
@@ -501,12 +565,12 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         {
             if (widgetPath == switchGameObject.FullName())
             {
-                setter((bool) value);
-                switchManager.isOn = (bool) value;
+                setter((bool)value);
+                switchManager.isOn = (bool)value;
                 switchManager.UpdateUI();
             }
         };
-        
+
         OnUpdateMenuValues += () =>
         {
             switchManager.isOn = getter();
@@ -525,11 +589,11 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 CreateSwitch(settingName, setter, getter, smallEditor, true);
         }
 
-    
+
 
     }
 
-    private void CreateStringField(string settingName, UnityAction<string> setter, Func<string> getter, 
+    private void CreateStringField(string settingName, UnityAction<string> setter, Func<string> getter,
         GameObject parent, bool recursive = false)
     {
         GameObject stringGameObject =
@@ -552,7 +616,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             action.Value = changedValue;
             action.Execute();
         });
-        
+
         OnUpdateMenuValues += () => inputField.text = getter();
 
         OnSyncField += (widgetPath, value) =>
@@ -563,8 +627,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 inputField.text = value as string;
             }
         };
-        
-        
+
+
         if (!recursive)
         {
             RuntimeSmallEditorButton smallEditorButton = stringGameObject.AddComponent<RuntimeSmallEditorButton>();
@@ -579,11 +643,11 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     }
 
     // TODO: Add action
-    private void CreateDropDown(string settingName, UnityAction<int> setter, IEnumerable<string> values, 
+    private void CreateDropDown(string settingName, UnityAction<int> setter, IEnumerable<string> values,
         Func<string> getter, GameObject parent, bool recursive = false)
     {
         string[] valueArray = values as string[] ?? values.ToArray();
-    
+
         GameObject dropDownGameObject =
             PrefabInstantiator.InstantiatePrefab(DROPDOWN_PREFAB, parent.transform, false);
         dropDownGameObject.name = settingName;
@@ -595,17 +659,37 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         CustomDropdown dropdown = dropDownGameObject.transform.Find("DropdownCombo/Dropdown").GetComponent<CustomDropdown>();
         TMP_InputField customInput = dropDownGameObject.transform.Find("DropdownCombo/Input").GetComponent<TMP_InputField>();
         Dictaphone dictaphone = dropDownGameObject.transform.Find("DropdownCombo/DictateButton").GetComponent<Dictaphone>();
-    
+
         customInput.gameObject.SetActive(false);
         dictaphone.gameObject.SetActive(false);
-    
+
         dropdown.isListItem = true;
         dropdown.listParent = Canvas.transform;
         dropdown.selectedItemIndex = Array.IndexOf(valueArray, getter());
         valueArray.ForEach(s => dropdown.CreateNewItemFast(s, null));
-        dropdown.dropdownEvent.AddListener(setter);
 
-        OnUpdateMenuValues += () => dropdown.selectedItemIndex = Array.IndexOf(valueArray, getter());
+        dropdown.SetupDropdown();
+
+        dropdown.dropdownEvent.AddListener(setter);
+        dropdown.dropdownEvent.AddListener(changedValue =>
+        {
+            UpdateIntCityFieldNetAction action = new();
+            action.CityIndex = CityIndex;
+            action.WidgetPath = dropDownGameObject.FullName();
+            action.Value = changedValue;
+            action.Execute();
+        });
+
+        OnSyncField += (widgetPath, value) =>
+        {
+            if (widgetPath == dropDownGameObject.FullName())
+            {
+                setter((int)value);
+                dropdown.ChangeDropdownInfo((int)value);
+            }
+        };
+
+        OnUpdateMenuValues += () => dropdown.ChangeDropdownInfo(Array.IndexOf(valueArray, getter()));
 
         if (!recursive)
         {
@@ -624,14 +708,12 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     private void CreateColorPicker(string settingName, GameObject parent, UnityAction<Color> setter, Func<Color> getter, bool recursive = false)
     {
         parent = CreateNestedSetting("Color Picker: " + settingName, parent);
-
         GameObject colorPickerGameObject =
             PrefabInstantiator.InstantiatePrefab(PICKER2_PREFAB, parent.transform, false);
         colorPickerGameObject.name = settingName;
         AddLayoutElement(colorPickerGameObject);
         HSVPicker.ColorPicker colorPicker = colorPickerGameObject.GetComponent<HSVPicker.ColorPicker>();
         colorPicker.CurrentColor = getter();
-
         colorPicker.onValueChanged.AddListener(setter);
         BoxSlider boxSlider = colorPickerGameObject.GetComponentInChildren<BoxSlider>();
         boxSlider.onValueChanged.AddListener((f, f1) =>
@@ -642,7 +724,6 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             action.Value = getter();
             action.Execute();
         });
-
         OnSyncField += (widgetPath, value) =>
         {
             if (widgetPath == colorPickerGameObject.FullName())
@@ -651,12 +732,14 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 colorPicker.CurrentColor = getter();
             }
         };
-
         OnUpdateMenuValues += () =>
         {
             colorPicker.CurrentColor = getter();
         };
-
+        if (!recursive)
+        {
+            OnUpdateMenuValues?.Invoke();
+        };
         if (!recursive)
         {
             RuntimeSmallEditorButton smallEditorButton = colorPickerGameObject.AddComponent<RuntimeSmallEditorButton>();
@@ -678,9 +761,9 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         {
             if (Int32.TryParse(child.name, out int index))
             {
-                if (index >= list.Count) 
+                if (index >= list.Count)
                     Destroyer.Destroy(child.gameObject);
-            } 
+            }
         }
         // creates needed children
         for (int i = 0; i < list.Count; i++)
@@ -724,12 +807,13 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     private void AddLayoutElement(GameObject go)
     {
         LayoutElement le = go.AddComponent<LayoutElement>();
-        le.minWidth = ((RectTransform) go.transform).rect.width;
-        le.minHeight = ((RectTransform) go.transform).rect.height;
+        le.minWidth = ((RectTransform)go.transform).rect.width;
+        le.minHeight = ((RectTransform)go.transform).rect.height;
     }
 
     public Action<string, object> OnSyncField;
-
+    public Action<string> OnSyncMethod;
+    public Action<string, string, bool> OnSyncPath;
     public event Action OnUpdateMenuValues;
 
     public event Action<int> OnSwitchCity;

@@ -99,6 +99,9 @@ namespace SEE.Game.UI.FilePicker
             LabelText = Menu.transform.Find(LabelPath).GetComponent<TextMeshProUGUI>();
             PickerButton = Menu.transform.Find(PickerButtonPath).GetComponent<ButtonManagerBasic>();
 
+            TMP_InputField inputField = Menu.transform.Find("DropdownCombo/SelectableInput/Input")
+                .GetComponent<TMP_InputField>();
+            
             LabelText.text = Label;
 
             // setup dropdown
@@ -112,19 +115,13 @@ namespace SEE.Game.UI.FilePicker
                 var selectedItem = Dropdown.dropdownItems[index].itemName;
                 Enum.TryParse(selectedItem, out DataPathInstance.Root);
                 UpdateInput();
+                OnChangedDropdown?.Invoke();
             });
 
             // opens a file picker with the picker button
             PickerButton.clickEvent.AddListener(() =>
             {
-                FileBrowser.ShowLoadDialog(paths =>
-                    {
-                        if (paths.Length == 0) throw new Exception("Received no paths from file browser.");
-                        // There should only be a single path since multiple selections are forbidden.
-                        DataPathInstance.Set(paths[0]);
-                        UpdateDropdown();
-                        UpdateInput();
-                    },
+                FileBrowser.ShowLoadDialog(HandleFileBrowserSuccess,
                     () => { },
                     allowMultiSelection: false,
                     pickMode: FileBrowser.PickMode.Files,
@@ -152,13 +149,14 @@ namespace SEE.Game.UI.FilePicker
 
             CustomInput.onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false);
             CustomInput.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
-            CustomInput.onValueChanged.AddListener(path =>
+            inputField.onEndEdit.AddListener(path =>
             {
                 if (DataPathInstance.Root == DataPath.RootKind.Absolute)
                     DataPathInstance.AbsolutePath = path;
                 else
                     DataPathInstance.RelativePath = path;
                 UpdateInput();
+                OnChangedPath?.Invoke();
             });
         }
 
@@ -167,6 +165,7 @@ namespace SEE.Game.UI.FilePicker
             base.OnStartFinished();
             UpdateDropdown();
             UpdateInput();
+            OnChangedPath?.Invoke();
         }
 
         /// <summary>
@@ -196,6 +195,7 @@ namespace SEE.Game.UI.FilePicker
             // There should only be a single path since multiple selections are forbidden.
             DataPathInstance.Set(paths[0]);
             UpdateDropdown();
+            OnChangedDropdown?.Invoke();
             UpdateInput();
         }
 
@@ -219,5 +219,24 @@ namespace SEE.Game.UI.FilePicker
                 ? DataPathInstance.AbsolutePath
                 : DataPathInstance.RelativePath;
         }
+
+        public void ChangePath(string newValue, bool isAbsolute)
+        {
+            if (isAbsolute)
+                DataPathInstance.AbsolutePath = newValue;
+            else
+                DataPathInstance.RelativePath = newValue;
+            UpdateInput();
+        }
+
+        public void ChangeDropdown(int newValue)
+        {
+            var selectedItem = Dropdown.dropdownItems[newValue].itemName;
+            Enum.TryParse(selectedItem, out DataPathInstance.Root);
+            UpdateInput();
+        }
+
+        public Action OnChangedDropdown;
+        public Action OnChangedPath;
     }
 }
