@@ -724,6 +724,33 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             action.Value = getter();
             action.Execute();
         });
+
+        Slider hueSlider = colorPickerGameObject.GetComponentInChildren<Slider>();
+        RuntimeSliderManager endEditManager = hueSlider.gameObject.AddComponent<RuntimeSliderManager>();
+        endEditManager.OnEndEdit += () =>
+        {
+            UpdateColorCityFieldNetAction action = new();
+            action.CityIndex = CityIndex;
+            action.WidgetPath = colorPickerGameObject.FullName();
+            action.Value = getter();
+            action.Execute();
+        };
+
+        TMP_InputField inputField = colorPickerGameObject.GetComponentInChildren<TMP_InputField>();
+        inputField.onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false);
+        inputField.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
+        inputField.onEndEdit.AddListener(str =>
+        {
+            UpdateColorCityFieldNetAction action = new();
+            action.CityIndex = CityIndex;
+            action.WidgetPath = colorPickerGameObject.FullName();
+            action.Value = getter();
+            action.Execute();
+        });
+
+        colorPickerGameObject.transform.Find("Presets").gameObject.SetActive(false);
+        colorPickerGameObject.transform.parent.parent.GetComponentInChildren<RuntimeConfigMenuCollapse>().OnClickCollapse();
+
         OnSyncField += (widgetPath, value) =>
         {
             if (widgetPath == colorPickerGameObject.FullName())
