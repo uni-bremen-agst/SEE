@@ -1,5 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using System.Net;
+using HSVPicker;
 using UnityEngine;
 
 public class RuntimeConfigMenuCollapse : MonoBehaviour
@@ -12,14 +13,21 @@ public class RuntimeConfigMenuCollapse : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
-    }
+        // collapse Setting Object if color picker
+        try
+        {
+            if (this.transform.parent.parent.Find("Content").GetChild(0).GetComponent<ColorPicker>() != null)
+            {
+                OnClickCollapse();
+            }
+        }
+        catch (Exception e)
+        {
+            //ignore
+        }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
+    
     /// <summary>
     /// All settings of the SettingObject are shown/hidden
     /// </summary>
@@ -33,6 +41,5 @@ public class RuntimeConfigMenuCollapse : MonoBehaviour
         if (settingVisibility) this.transform.Find("Icon").transform.Rotate(0,0,-90);
         else this.transform.Find("Icon").transform.Rotate(0,0,90);
     }
-    
-    
+
 }
