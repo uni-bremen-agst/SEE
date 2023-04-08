@@ -391,8 +391,12 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             case IList<string> list:
                 parent = CreateNestedSetting(settingName, parent);
                 // Buttons erstellen
-                GameObject addButton = PrefabInstantiator.InstantiatePrefab(ADD_ELEMENT_BUTTON_PREFAB, parent.transform);
-                GameObject removeButton = PrefabInstantiator.InstantiatePrefab(REMOVE_ELEMENT_BUTTON_PREFAB, parent.transform);
+                GameObject buttonContainer = new GameObject("ButtonContainer");
+                buttonContainer.AddComponent<HorizontalLayoutGroup>();
+                buttonContainer.transform.SetParent(parent.transform);
+
+                GameObject addButton = PrefabInstantiator.InstantiatePrefab(ADD_ELEMENT_BUTTON_PREFAB, buttonContainer.transform);
+                GameObject removeButton = PrefabInstantiator.InstantiatePrefab(REMOVE_ELEMENT_BUTTON_PREFAB, buttonContainer.transform);
                 removeButton.name = "RemoveElementButton";
                 ButtonManagerWithIcon removeButtonManager = removeButton.GetComponent<ButtonManagerWithIcon>();
                 addButton.name = "AddElementButton";
@@ -402,21 +406,18 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
                 {
                     list.Add("");
                     UpdateListChildren(list, parent);
-                    addButtonManager.transform.SetAsLastSibling();
-                    removeButtonManager.transform.SetAsLastSibling();
+                    buttonContainer.transform.SetAsLastSibling();
                 });
                 // Listener RemoveButton
                 removeButtonManager.clickEvent.AddListener(() =>
                 {
                     list.RemoveAt(list.Count - 1);
                     UpdateListChildren(list, parent);
-                    addButtonManager.transform.SetAsLastSibling();
-                    removeButtonManager.transform.SetAsLastSibling();
+                    buttonContainer.transform.SetAsLastSibling();
                 });
                 // Update
                 UpdateListChildren(list, parent);
-                addButton.transform.SetAsLastSibling();
-                removeButton.transform.SetAsLastSibling();
+                buttonContainer.transform.SetAsLastSibling();
                 OnUpdateMenuValues += () =>
                 {
                     UpdateListChildren(list, parent);
