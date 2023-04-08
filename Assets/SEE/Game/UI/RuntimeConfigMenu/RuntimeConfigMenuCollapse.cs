@@ -8,37 +8,19 @@ public class RuntimeConfigMenuCollapse : MonoBehaviour
     /// <summary>
     /// Are the settings collapsed
     /// </summary>
-    private bool settingVisibility = true;
+    private bool _settingVisibility = true;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        // collapse Setting Object if color picker
-        try
-        {
-            if (this.transform.parent.parent.Find("Content").GetChild(0).GetComponent<ColorPicker>() != null)
-            {
-                OnClickCollapse();
-            }
-        }
-        catch (Exception e)
-        {
-            //ignore
-        }
-
-    }
-    
     /// <summary>
     /// All settings of the SettingObject are shown/hidden
     /// </summary>
-    /// <see cref="settingVisibility"/>
+    /// <see cref="_settingVisibility"/>
     public void OnClickCollapse()
     {
-        settingVisibility = !settingVisibility;
-        this.transform.parent.parent.Find("Content").gameObject.SetActive(settingVisibility);
+        _settingVisibility = !_settingVisibility;
+        this.transform.parent.parent.Find("Content").gameObject.SetActive(_settingVisibility);
 
         // change rotation when pressed
-        if (settingVisibility) this.transform.Find("Icon").transform.Rotate(0,0,-90);
+        if (_settingVisibility) this.transform.Find("Icon").transform.Rotate(0,0,-90);
         else this.transform.Find("Icon").transform.Rotate(0,0,90);
     }
 
