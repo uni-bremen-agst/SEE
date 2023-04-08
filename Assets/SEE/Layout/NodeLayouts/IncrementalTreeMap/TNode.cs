@@ -4,17 +4,24 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     public class TNode
     {
-        public void Rectangle(ILayoutNode layoutNode, float size)
+        public TNode(ILayoutNode layoutNode, float size, TNode parent)
         {
             this.size = size;
             this.representLayoutNode = layoutNode;
+            this.parent = parent;
         }
 
-        public TRectangle rectangle;
+        private TNode parent;
+        public TNode Parent {get;}
+        private IList<TNode> children;
 
+        public IList<TNode> Children {get; set;}
+        private TRectangle rectangle;
+
+        public TRectangle Rectangle {get;}
         private float size;
 
-        public float Size {get;}
+        public float Size {get; set;}
         private ILayoutNode representLayoutNode;
         private TSegment leftBoundingSegment;
         private TSegment rightBoundingSegment;

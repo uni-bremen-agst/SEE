@@ -45,40 +45,95 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private Dictionary<ILayoutNode, NodeTransform> layout_result;
 
-        private Dictionary<ILayoutNode, DataModel.DG.Node> tNodes;
+        private IList<TNode> tNodes;
 
-        public Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, int width)
-        {
-            throw new NotImplementedException();
-        }
+
         public Dictionary<ILayoutNode, NodeTransform> Layout
             (ICollection<ILayoutNode> layoutNodes, IncrementalTreeMapLayout oldLayout)
         {
-            // init nodes
+            layout_result = new Dictionary<ILayoutNode, NodeTransform>();
 
-            // trav tree
-            // for each set of siblings
-            //     dissect or local moves
+            IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
+            switch (layoutNodeList.Count)
+            {
+                case 0:
+                    throw new ArgumentException("No nodes to be laid out.");
+                case 1:
+                {
+                    using IEnumerator<ILayoutNode> enumerator = layoutNodeList.GetEnumerator();
+                    if (enumerator.MoveNext())
+                    {
+                        // MoveNext() must be called before we can call Current.
+                        ILayoutNode gameNode = enumerator.Current;
+                        UnityEngine.Assertions.Assert.AreEqual(gameNode.AbsoluteScale, gameNode.LocalScale);
+                        layout_result[gameNode] = new NodeTransform(Vector3.zero,
+                            new Vector3(width, gameNode.LocalScale.y, depth));
+                    }
+                    else
+                    {
+                        Assert.IsTrue(false, "We should never arrive here.\n");
+                    }
 
-            // make nodeTransforms out of nodes_list -> save to layout_result
-
-            // return layout_result
-
+                    break;
+                }
+                default:
+                    roots = LayoutNodes.GetRoots(layoutNodeList);
+                    InitTNodes();
+                    {
+                        float total_size = tNodes.Sum( x => x.Parent == null ? x.Size : 0);
+                        if( total_size != width * depth)
+                        {
+                            Debug.Log("total size: " + total_size.ToString()
+                                        + "\n rect size:  " + (width*depth).ToString()
+                            );
+                        }
+                    }
+                    //CalculateLayout();
+                    break;
+            }
+            return layout_result;
             throw new NotImplementedException();
         }    
 
-        private void initTNodes()
+        private void InitTNodes()
         {
-            // create a tNode entry for each ilayout node
-            // calc area size this node should occupy
-            // starts with this.roots 
+            tNodes = new List<TNode>();
+            foreach(ILayoutNode node in roots)
+            {
+                InitTNode(node, null);
+            }
         }
 
-        private void calculateLayout(ICollection<TNode> siblings,TRectangle rectangle)
+        private float InitTNode(ILayoutNode node, TNode parent)
         {
-            // 
+            if (node.IsLeaf)
+            {
+                // a leaf
+                Vector3 size = node.LocalScale;
+                // x and z lengths may differ; we need to consider the larger value
+                float result = Mathf.Max(size.x, size.z);
+                TNode newTNode = new TNode(node,result,parent);
+                tNodes.Add(newTNode);
+                return result;
+            }
+            else
+            {
+                TNode newTNode = new TNode(node, 0, parent);
+                tNodes.Add(newTNode);
+                float total_size = 0.0f;
+                foreach (ILayoutNode child in node.Children())
+                {
+                    total_size += InitTNode(child, newTNode);
+                }
+                newTNode.Size = total_size;
+                return total_size;
+            }
         }
 
+        private void CalculateLayout(ICollection<TNode> siblings,TRectangle rectangle)
+        {
+            //
+        }
 
         public override Dictionary<ILayoutNode, NodeTransform> Layout
             (ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges,
