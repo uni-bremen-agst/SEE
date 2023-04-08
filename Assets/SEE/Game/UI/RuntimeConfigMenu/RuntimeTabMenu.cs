@@ -749,8 +749,11 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             action.Execute();
         });
 
+        // deactivate presets
         colorPickerGameObject.transform.Find("Presets").gameObject.SetActive(false);
-        colorPickerGameObject.transform.parent.parent.GetComponentInChildren<RuntimeConfigMenuCollapse>().OnClickCollapse();
+        // Colorpicker should be collapsed by default
+        if (!recursive)
+            colorPickerGameObject.transform.parent.parent.GetComponentInChildren<RuntimeConfigMenuCollapse>().OnClickCollapse();
 
         OnSyncField += (widgetPath, value) =>
         {
@@ -764,10 +767,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         {
             colorPicker.CurrentColor = getter();
         };
-        if (!recursive)
-        {
-            OnUpdateMenuValues?.Invoke();
-        };
+
         if (!recursive)
         {
             RuntimeSmallEditorButton smallEditorButton = colorPickerGameObject.AddComponent<RuntimeSmallEditorButton>();
