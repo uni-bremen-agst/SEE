@@ -4,12 +4,12 @@ using SEE.Net.Actions;
 public class UpdateCityMethodNetAction : AbstractNetAction
 {
     public int CityIndex;
-    public string WidgetPath;
+    public string MethodName;
     
     protected override void ExecuteOnServer() { }
 
     protected override void ExecuteOnClient()
     {
-        RuntimeConfigMenu.GetMenuForCity(CityIndex).OnSyncMethod?.Invoke(WidgetPath);
+        RuntimeConfigMenu.GetMenuForCity(CityIndex).OnSyncMethod?.Invoke(MethodName);
     }
 }

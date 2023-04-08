@@ -53,6 +53,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     private GameObject configButtonList;
 
     public int CityIndex;
+    private AbstractSEECity city;
+    private bool immediateRedraw;
 
     protected override void StartDesktop()
     {
@@ -69,25 +71,29 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     protected override void OnStartFinished()
     {
         base.OnStartFinished();
+        city = RuntimeConfigMenu.GetCity(CityIndex);
         OnEntryAdded += _ => SetMiscAsLastTab();
+        OnSyncMethod += methodName => {
+            if (methodName == nameof(TriggerImmediateRedraw)) TriggerImmediateRedraw();
+        };
 
-        LoadCity(CityIndex);
+        LoadCity();
 
-        OnSyncField += (widgetName, value) =>
-        {
-            Debug.LogError("Sync " + RuntimeConfigMenu.GetCity(CityIndex).name + "\t"
-                           + widgetName.Split("/").Last() + "\t" + value);
-        };
-        OnSyncMethod += widgetName =>
-        {
-            Debug.LogError("Sync " + RuntimeConfigMenu.GetCity(CityIndex).name + "\t"
-                           + widgetName.Split("/").Last());
-        };
-        OnSyncPath += (widgetName, value, isAbsolute) =>
-        {
-            Debug.LogError("SyncPath " + RuntimeConfigMenu.GetCity(CityIndex).name + "\t"
-                           + widgetName.Split("/").Last() + "\t" + value + "\t" + isAbsolute);
-        };
+        // OnSyncField += (widgetName, value) =>
+        // {
+        //     Debug.LogError("Sync " + RuntimeConfigMenu.GetCity(CityIndex).name + "\t"
+        //                    + widgetName.Split("/").Last() + "\t" + value);
+        // };
+        // OnSyncMethod += widgetName =>
+        // {
+        //     Debug.LogError("Sync " + RuntimeConfigMenu.GetCity(CityIndex).name + "\t"
+        //                    + widgetName.Split("/").Last());
+        // };
+        // OnSyncPath += (widgetName, value, isAbsolute) =>
+        // {
+        //     Debug.LogError("SyncPath " + RuntimeConfigMenu.GetCity(CityIndex).name + "\t"
+        //                    + widgetName.Split("/").Last() + "\t" + value + "\t" + isAbsolute);
+        // };
     }
 
     protected virtual void CreateButton(MethodInfo methodInfo, AbstractSEECity city)
@@ -112,12 +118,12 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         {
             UpdateCityMethodNetAction netAction = new();
             netAction.CityIndex = CityIndex;
-            netAction.WidgetPath = button.FullName();
+            netAction.MethodName = methodInfo.Name;
             netAction.Execute();
         });
-        OnSyncMethod += widgetPath =>
+        OnSyncMethod += methodName =>
         {
-            if (widgetPath == button.FullName())
+            if (methodName == methodInfo.Name)
             {
                 methodInfo.Invoke(city, null); // calls the method
                 OnUpdateMenuValues?.Invoke(); // updates the menu  
@@ -125,9 +131,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         };
     }
 
-    public void LoadCity(int i)
+    private void LoadCity()
     {
-        AbstractSEECity city = RuntimeConfigMenu.GetCity(i);
         city.GetType().GetMembers().ForEach(memberInfo =>
         {
             if (memberInfo.DeclaringType == typeof(AbstractSEECity) ||
@@ -498,6 +503,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             action.Value = slider.value;
             action.Execute();
         };
+        endEditManager.OnEndEdit += CheckImmediateRedraw;
 
         OnSyncField += (widgetPath, value) =>
         {
@@ -521,6 +527,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             RuntimeSmallEditorButton smallEditorButton = sliderGameObject.AddComponent<RuntimeSmallEditorButton>();
             smallEditorButton.OnShowMenuChanged += () =>
             {
+                immediateRedraw = smallEditorButton.ShowMenu;
                 ShowMenu = !smallEditorButton.ShowMenu;
                 OnUpdateMenuValues?.Invoke();
             };
@@ -551,6 +558,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             action.Value = true;
             action.Execute();
         });
+        switchManager.OnEvents.AddListener(CheckImmediateRedraw);
         switchManager.OffEvents.AddListener(() => setter(false));
         switchManager.OffEvents.AddListener(() =>
         {
@@ -560,6 +568,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             action.Value = false;
             action.Execute();
         });
+        switchManager.OffEvents.AddListener(CheckImmediateRedraw);
 
         OnSyncField += (widgetPath, value) =>
         {
@@ -582,6 +591,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             RuntimeSmallEditorButton smallEditorButton = switchGameObject.AddComponent<RuntimeSmallEditorButton>();
             smallEditorButton.OnShowMenuChanged += () =>
             {
+                immediateRedraw = smallEditorButton.ShowMenu;
                 ShowMenu = !smallEditorButton.ShowMenu;
                 OnUpdateMenuValues?.Invoke();
             };
@@ -616,6 +626,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             action.Value = changedValue;
             action.Execute();
         });
+        inputField.onEndEdit.AddListener(_ => CheckImmediateRedraw());
 
         OnUpdateMenuValues += () => inputField.text = getter();
 
@@ -634,6 +645,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             RuntimeSmallEditorButton smallEditorButton = stringGameObject.AddComponent<RuntimeSmallEditorButton>();
             smallEditorButton.OnShowMenuChanged += () =>
             {
+                immediateRedraw = smallEditorButton.ShowMenu;
                 ShowMenu = !smallEditorButton.ShowMenu;
                 OnUpdateMenuValues?.Invoke();
             };
@@ -679,6 +691,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             action.Value = changedValue;
             action.Execute();
         });
+        dropdown.dropdownEvent.AddListener(_ => CheckImmediateRedraw());
 
         OnSyncField += (widgetPath, value) =>
         {
@@ -696,6 +709,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             RuntimeSmallEditorButton smallEditorButton = dropDownGameObject.AddComponent<RuntimeSmallEditorButton>();
             smallEditorButton.OnShowMenuChanged += () =>
             {
+                immediateRedraw = smallEditorButton.ShowMenu;
                 ShowMenu = !smallEditorButton.ShowMenu;
                 OnUpdateMenuValues?.Invoke();
             };
@@ -715,6 +729,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         HSVPicker.ColorPicker colorPicker = colorPickerGameObject.GetComponent<HSVPicker.ColorPicker>();
         colorPicker.CurrentColor = getter();
         colorPicker.onValueChanged.AddListener(setter);
+        colorPicker.onValueChanged.AddListener(_ => CheckImmediateRedraw());
         BoxSlider boxSlider = colorPickerGameObject.GetComponentInChildren<BoxSlider>();
         boxSlider.onValueChanged.AddListener((f, f1) =>
         {
@@ -724,6 +739,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             action.Value = getter();
             action.Execute();
         });
+        boxSlider.onValueChanged.AddListener((_, _) => CheckImmediateRedraw());
         OnSyncField += (widgetPath, value) =>
         {
             if (widgetPath == colorPickerGameObject.FullName())
@@ -736,15 +752,18 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         {
             colorPicker.CurrentColor = getter();
         };
+        /* TODO: What is the purpose of this?
         if (!recursive)
         {
             OnUpdateMenuValues?.Invoke();
         };
+        */
         if (!recursive)
         {
             RuntimeSmallEditorButton smallEditorButton = colorPickerGameObject.AddComponent<RuntimeSmallEditorButton>();
             smallEditorButton.OnShowMenuChanged += () =>
             {
+                immediateRedraw = smallEditorButton.ShowMenu;
                 ShowMenu = !smallEditorButton.ShowMenu;
                 OnUpdateMenuValues?.Invoke();
             };
@@ -809,6 +828,23 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         LayoutElement le = go.AddComponent<LayoutElement>();
         le.minWidth = ((RectTransform)go.transform).rect.width;
         le.minHeight = ((RectTransform)go.transform).rect.height;
+    }
+
+    private void CheckImmediateRedraw()
+    {
+        if (!immediateRedraw) return;
+        TriggerImmediateRedraw();
+        UpdateCityMethodNetAction netAction = new();
+        netAction.CityIndex = CityIndex;
+        netAction.MethodName = nameof(TriggerImmediateRedraw);
+        netAction.Execute();
+    }
+
+    private void TriggerImmediateRedraw()
+    {
+        // TODO: How to redraw the city?
+        ((SEECity)city).LoadData();
+        city.Invoke(nameof(SEECity.ReDrawGraph), 0);
     }
 
     public Action<string, object> OnSyncField;

@@ -165,7 +165,6 @@ namespace SEE.Game.UI.FilePicker
             base.OnStartFinished();
             UpdateDropdown();
             UpdateInput();
-            OnChangedPath?.Invoke();
         }
 
         /// <summary>
