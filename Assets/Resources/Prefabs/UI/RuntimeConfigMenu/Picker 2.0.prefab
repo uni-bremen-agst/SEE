@@ -2587,11 +2587,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _color: {r: 1, g: 0, b: 0, a: 1}
   Setup:
-    ShowRgb: 1
+    ShowRgb: 0
     ShowHsv: 0
-    ShowAlpha: 1
+    ShowAlpha: 0
     ShowColorBox: 1
-    ShowColorSliderToggle: 1
+    ShowColorSliderToggle: 0
     ShowHeader: 3
     RgbSliders:
       Elements:

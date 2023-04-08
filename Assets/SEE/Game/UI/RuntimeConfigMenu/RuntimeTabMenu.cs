@@ -739,7 +739,39 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             action.Value = getter();
             action.Execute();
         });
+
         boxSlider.onValueChanged.AddListener((_, _) => CheckImmediateRedraw());
+
+        Slider hueSlider = colorPickerGameObject.GetComponentInChildren<Slider>();
+        RuntimeSliderManager endEditManager = hueSlider.gameObject.AddComponent<RuntimeSliderManager>();
+        endEditManager.OnEndEdit += () =>
+        {
+            UpdateColorCityFieldNetAction action = new();
+            action.CityIndex = CityIndex;
+            action.WidgetPath = colorPickerGameObject.FullName();
+            action.Value = getter();
+            action.Execute();
+        };
+        // TODO: Trigger CheckImmediateRedraw
+
+        TMP_InputField inputField = colorPickerGameObject.GetComponentInChildren<TMP_InputField>();
+        inputField.onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false);
+        inputField.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
+        inputField.onEndEdit.AddListener(str =>
+        {
+            UpdateColorCityFieldNetAction action = new();
+            action.CityIndex = CityIndex;
+            action.WidgetPath = colorPickerGameObject.FullName();
+            action.Value = getter();
+            action.Execute();
+        });
+
+        // deactivate presets
+        colorPickerGameObject.transform.Find("Presets").gameObject.SetActive(false);
+        // Colorpicker should be collapsed by default
+        if (!recursive)
+            colorPickerGameObject.transform.parent.parent.GetComponentInChildren<RuntimeConfigMenuCollapse>().OnClickCollapse();
+
         OnSyncField += (widgetPath, value) =>
         {
             if (widgetPath == colorPickerGameObject.FullName())
@@ -752,12 +784,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         {
             colorPicker.CurrentColor = getter();
         };
-        /* TODO: What is the purpose of this?
-        if (!recursive)
-        {
-            OnUpdateMenuValues?.Invoke();
-        };
-        */
+
         if (!recursive)
         {
             RuntimeSmallEditorButton smallEditorButton = colorPickerGameObject.AddComponent<RuntimeSmallEditorButton>();

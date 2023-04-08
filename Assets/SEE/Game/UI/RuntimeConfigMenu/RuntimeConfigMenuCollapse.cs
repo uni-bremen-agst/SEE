@@ -1,5 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
+using System.Net;
+using HSVPicker;
 using UnityEngine;
 
 public class RuntimeConfigMenuCollapse : MonoBehaviour
@@ -7,32 +8,20 @@ public class RuntimeConfigMenuCollapse : MonoBehaviour
     /// <summary>
     /// Are the settings collapsed
     /// </summary>
-    private bool settingVisibility = true;
+    private bool _settingVisibility = true;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     /// <summary>
     /// All settings of the SettingObject are shown/hidden
     /// </summary>
-    /// <see cref="settingVisibility"/>
+    /// <see cref="_settingVisibility"/>
     public void OnClickCollapse()
     {
-        settingVisibility = !settingVisibility;
-        this.transform.parent.parent.Find("Content").gameObject.SetActive(settingVisibility);
+        _settingVisibility = !_settingVisibility;
+        this.transform.parent.parent.Find("Content").gameObject.SetActive(_settingVisibility);
 
         // change rotation when pressed
-        if (settingVisibility) this.transform.Find("Icon").transform.Rotate(0,0,-90);
+        if (_settingVisibility) this.transform.Find("Icon").transform.Rotate(0,0,-90);
         else this.transform.Find("Icon").transform.Rotate(0,0,90);
     }
-    
-    
+
 }

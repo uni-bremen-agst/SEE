@@ -477,7 +477,7 @@ MonoBehaviour:
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
   buttonVar: {fileID: 0}
-  normalIcon: {fileID: 0}
+  normalIcon: {fileID: 4048336328782596150}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 7249890383891256170}
   useCustomContent: 0
