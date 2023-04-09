@@ -253,7 +253,7 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// _Informs the user that we already reached the begin of the graph series.
+        /// Informs the user that we already reached the begin of the graph series.
         /// </summary>
         private static void UserInfoFirstGraph()
         {
