@@ -1359,7 +1359,8 @@ namespace SEE.DataModel.DG
         /// <returns>true if equal</returns>
         public override bool Equals(object other)
         {
-            return (other is Graph otherGraph) && (Name == otherGraph.Name) && (Path == otherGraph.Path);
+            return (other is Graph otherGraph) && (GetType() == otherGraph.GetType())
+                && (Name == otherGraph.Name) && (Path == otherGraph.Path);
         }
 
         /// <summary>
