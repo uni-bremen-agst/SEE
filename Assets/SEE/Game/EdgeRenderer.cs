@@ -219,7 +219,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Adds <paramref name="node"/> and all its transitive parent game objects tagged by
-        /// <see cref="Tags.Node "/> to <paramref name="gameNodes"/>.
+        /// <see cref="Tags.Node"/> to <paramref name="gameNodes"/>.
         /// </summary>
         /// <param name="node">the game objects whose ascendant game nodes are to be added to <paramref name="gameNodes"/></param>
         /// <param name="gameNodes">where to add the ascendants</param>
