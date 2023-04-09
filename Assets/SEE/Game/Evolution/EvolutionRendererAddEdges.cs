@@ -20,20 +20,27 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void Phase5AddNewEdges()
         {
-            Debug.Log($"Phase 5: Adding {addedEdges.Count} new edges.\n");
-            animationWatchDog.Await(addedEdges.Count, OnAnimationsFinished);
-            City.EdgeAnimationKind animationKind = Renderer.Settings.EdgeLayoutSettings.AnimationKind;
-            foreach (Edge edge in addedEdges)
+            if (edgesAreDrawn)
             {
-                objectManager.GetEdge(edge, out GameObject edgeObject);
-                if (edgeObject.TryGetComponent(out SEESpline spline))
+                Debug.Log($"Phase 5: Adding {addedEdges.Count} new edges.\n");
+                animationWatchDog.Await(addedEdges.Count, OnAnimationsFinished);
+                City.EdgeAnimationKind animationKind = Renderer.Settings.EdgeLayoutSettings.AnimationKind;
+                foreach (Edge edge in addedEdges)
                 {
-                    spline.Spline = nextCity.EdgeLayout[edge.ID].Spline;
+                    objectManager.GetEdge(edge, out GameObject edgeObject);
+                    if (edgeObject.TryGetComponent(out SEESpline spline))
+                    {
+                        spline.Spline = nextCity.EdgeLayout[edge.ID].Spline;
+                    }
+                    edgeObject.AddOrGetComponent<EdgeOperator>()
+                              .Show(animationKind, AnimationLagPerPhase())
+                              .SetOnComplete(animationWatchDog.Finished);
                 }
-                edgeObject.SetActive(true); // Make visible
-                edgeObject.AddOrGetComponent<EdgeOperator>()
-                          .Show(animationKind, AnimationLagPerPhase())
-                          .SetOnComplete(animationWatchDog.Finished);
+            }
+            else
+            {
+                Debug.Log($"Phase 5: No edge layout enbabled. No new edges.\n");
+                OnAnimationsFinished();
             }
         }
     }
