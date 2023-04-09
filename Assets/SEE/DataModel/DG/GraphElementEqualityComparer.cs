@@ -32,8 +32,14 @@ namespace SEE.DataModel.DG
         /// <param name="x">node to be compared to <paramref name="y"/></param>
         /// <param name="y">node to be compared to <paramref name="x"/></param>
         /// <returns>True if <paramref name="x"/> and <paramref name="y"/> have the same ID.</returns>
+        /// <exception cref="System.ArgumentNullException">thrown if <paramref name="x"/> or
+        /// <paramref name="y"/> is null</exception>
         public bool Equals(T x, T y)
         {
+            if (x == null || y == null)
+            {
+                throw new System.ArgumentNullException("Parameters must not be null.");
+            }
             return x.ID.Equals(y?.ID);
         }
 
