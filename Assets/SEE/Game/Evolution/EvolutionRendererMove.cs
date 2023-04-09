@@ -38,7 +38,7 @@ namespace SEE.Game.Evolution
 
             int existingElements = equalNodes.Count + changedNodes.Count + equalEdges.Count + changedEdges.Count;
             Debug.Log($"Phase2: Moving {existingElements} existing graph elements.\n");
-            animationWatchDog.Await(existingElements, () => Phase3AdjustExistingGraphElements());
+            animationWatchDog.Await(existingElements, Phase3AdjustExistingGraphElements);
             if (existingElements > 0)
             {
                 ISet<Edge> equalAndChangedEdges = new HashSet<Edge>(equalEdges);
