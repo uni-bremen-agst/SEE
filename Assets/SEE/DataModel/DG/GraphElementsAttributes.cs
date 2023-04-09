@@ -16,7 +16,7 @@ namespace SEE.DataModel.DG
         /// <returns>names of integer attributes</returns>
         public ISet<string> AllIntNodeAttributes()
         {
-            return AllAttributes(true, false, ge => ge.AllIntAttributeNames());
+            return AllAttributes(forNodes: true, forEdges: false, ge => ge.AllIntAttributeNames());
         }
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace SEE.DataModel.DG
         /// <returns>names of integer attributes</returns>
         public ISet<string> AllIntEdgeAttributes()
         {
-            return AllAttributes(false, true, ge => ge.AllIntAttributeNames());
+            return AllAttributes(forNodes: false, forEdges: true, ge => ge.AllIntAttributeNames());
         }
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace SEE.DataModel.DG
         /// <returns>names of integer attributes</returns>
         public ISet<string> AllIntGraphElementAttributes()
         {
-            return AllAttributes(true, true, ge => ge.AllIntAttributeNames());
+            return AllAttributes(forNodes: true, forEdges: true, ge => ge.AllIntAttributeNames());
         }
 
         #endregion
@@ -47,7 +47,7 @@ namespace SEE.DataModel.DG
         /// <returns>names of attributes</returns>
         public ISet<string> AllFloatNodeAttributes()
         {
-            return AllAttributes(true, false, ge => ge.AllFloatAttributeNames());
+            return AllAttributes(forNodes: true, forEdges: false, ge => ge.AllFloatAttributeNames());
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace SEE.DataModel.DG
         /// <returns>names of attributes</returns>
         public ISet<string> AllFloatEdgeAttributes()
         {
-            return AllAttributes(false, true, ge => ge.AllFloatAttributeNames());
+            return AllAttributes(forNodes: false, forEdges: true, ge => ge.AllFloatAttributeNames());
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace SEE.DataModel.DG
         /// <returns>names of attributes</returns>
         public ISet<string> AllFloatGraphElementAttributes()
         {
-            return AllAttributes(true, true, ge => ge.AllFloatAttributeNames());
+            return AllAttributes(forNodes: true, forEdges: true, ge => ge.AllFloatAttributeNames());
         }
 
         #endregion
@@ -78,7 +78,7 @@ namespace SEE.DataModel.DG
         /// <returns>names of toggle attributes</returns>
         public ISet<string> AllToggleNodeAttributes()
         {
-            return AllAttributes(true, false, ge => ge.AllToggleAttributeNames());
+            return AllAttributes(forNodes: true, forEdges: false, ge => ge.AllToggleAttributeNames());
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace SEE.DataModel.DG
         /// <returns>names of toggle attributes</returns>
         public ISet<string> AllToggleEdgeAttributes()
         {
-            return AllAttributes(false, true, ge => ge.AllToggleAttributeNames());
+            return AllAttributes(forNodes: false, forEdges: true, ge => ge.AllToggleAttributeNames());
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace SEE.DataModel.DG
         /// <returns>names of toggle attributes</returns>
         public ISet<string> AllToggleGraphElementAttributes()
         {
-            return AllAttributes(true, true, ge => ge.AllToggleAttributeNames());
+            return AllAttributes(forNodes: true, forEdges: true, ge => ge.AllToggleAttributeNames());
         }
 
         #endregion
@@ -109,7 +109,7 @@ namespace SEE.DataModel.DG
         /// <returns>names of string attributes</returns>
         public ISet<string> AllStringNodeAttributes()
         {
-            return AllAttributes(true, false, ge => ge.AllStringAttributeNames());
+            return AllAttributes(forNodes: true, forEdges: false, ge => ge.AllStringAttributeNames());
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace SEE.DataModel.DG
         /// <returns>names of string attributes</returns>
         public ISet<string> AllStringEdgeAttributes()
         {
-            return AllAttributes(false, true, ge => ge.AllStringAttributeNames());
+            return AllAttributes(forNodes: false, forEdges: true, ge => ge.AllStringAttributeNames());
         }
 
         /// <summary>
@@ -127,7 +127,7 @@ namespace SEE.DataModel.DG
         /// <returns>names of string attributes</returns>
         public ISet<string> AllStringGraphElementAttributes()
         {
-            return AllAttributes(true, true, ge => ge.AllStringAttributeNames());
+            return AllAttributes(forNodes: true, forEdges: true, ge => ge.AllStringAttributeNames());
         }
 
         #endregion
