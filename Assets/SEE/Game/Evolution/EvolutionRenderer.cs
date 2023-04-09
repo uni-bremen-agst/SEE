@@ -235,11 +235,11 @@ namespace SEE.Game.Evolution
         /// </summary>
         private static void UserInfoStillOccupied()
         {
-            ShowNotification.Info(NotificationTitle, "The renderer is already occupied with animating, wait till animations are finished.");
+            ShowNotification.Info(NotificationTitle, "The renderer is already occupied with animating, wait until animations are finished.");
         }
 
         /// <summary>
-        /// _Informs the user that we already reached the begin of the graph series.
+        /// Informs the user that we already reached the begin of the graph series.
         /// </summary>
         private static void UserInfoFirstGraph()
         {
@@ -247,7 +247,7 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// _Informs the user that we already reached the end of the graph series.
+        /// Informs the user that we already reached the end of the graph series.
         /// </summary>
         private static void UserInfoLastGraph()
         {
@@ -585,8 +585,8 @@ namespace SEE.Game.Evolution
             // First remove all markings of the previous animation cycle.
             markerFactory.Clear();
 
-            Graph oldGraph = current != null ? current.Graph : null;
-            Graph newGraph = next != null ? next.Graph : null;
+            Graph oldGraph = current?.Graph;
+            Graph newGraph = next?.Graph;
 
             // Node comparison.
             newGraph.Diff(oldGraph,
@@ -971,7 +971,7 @@ namespace SEE.Game.Evolution
         /// <returns>names of all existing node metrics</returns>
         internal ISet<string> AllExistingMetrics()
         {
-            if (currentCity == null || currentCity.Graph == null)
+            if (currentCity?.Graph == null)
             {
                 return new HashSet<string>();
             }

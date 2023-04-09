@@ -142,12 +142,7 @@ namespace SEE.Game.Evolution
         /// <returns>mapping indexed by the IDs of the nodes corresponding to the layout nodes</returns>
         private static Dictionary<string, T> ToNodeIDLayout<T>(ICollection<T> layoutNodes) where T : ILayoutNode
         {
-            Dictionary<string, T> result = new();
-            foreach (T layoutNode in layoutNodes)
-            {
-                result[layoutNode.ID] = layoutNode;
-            }
-            return result;
+            return layoutNodes.ToDictionary(layoutNode => layoutNode.ID);
         }
 
         /// <summary>

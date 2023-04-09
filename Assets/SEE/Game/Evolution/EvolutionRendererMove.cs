@@ -38,7 +38,7 @@ namespace SEE.Game.Evolution
 
             int existingElements = equalNodes.Count + changedNodes.Count + equalEdges.Count + changedEdges.Count;
             Debug.Log($"Phase2: Moving {existingElements} existing graph elements.\n");
-            animationWatchDog.Await(existingElements, () => Phase3AdjustExistingGraphElements());
+            animationWatchDog.Await(existingElements, Phase3AdjustExistingGraphElements);
             if (existingElements > 0)
             {
                 ISet<Edge> equalAndChangedEdges = new HashSet<Edge>(equalEdges);
@@ -72,7 +72,7 @@ namespace SEE.Game.Evolution
                 if (currentCity != null)
                 {
                     // We are transitioning from a previous graph, i.e., next is not
-                    // the inital graph in the graph series.
+                    // the initial graph in the graph series.
                     foreach (Edge edge in edges)
                     {
                         if (!next.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge<ILayoutNode> newLayoutEdge))
