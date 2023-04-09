@@ -338,7 +338,7 @@ namespace SEE.Game.Operator
             {
                 if (!gameObject.TryGetComponent(out NodeRef nodeRef) || nodeRef.Value == null)
                 {
-                    throw new InvalidOperationException("NodeOperator-operated object must have NodeRef attached!");
+                    throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have {nameof(NodeRef)} attached!");
                 }
 
                 return nodeRef.Value;
