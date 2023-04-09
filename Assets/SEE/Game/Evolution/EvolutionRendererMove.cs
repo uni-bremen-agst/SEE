@@ -126,34 +126,5 @@ namespace SEE.Game.Evolution
                          .SetOnComplete(animationWatchDog.Finished);
             }
         }
-
-        /// <summary>
-        /// Event function that adds the given <paramref name="gameNode"/>
-        /// to <see cref="gameObject"/> as a child if <paramref name="gameNode"/>
-        /// is a <see cref="GameObject"/> and has no parent yet. Informs
-        /// <see cref="animationWatchDog"/> that this animation has finished.
-        /// Called as a callback when the animation of new and existing
-        /// nodes is finished; <see cref="RenderExistingNode(Node)"/>.
-        /// </summary>
-        /// <param name="gameNode">new or existing game object representing a graph node</param>
-        private void OnAnimationNodeAnimationFinished(object gameNode)
-        {
-            if (gameNode is GameObject go)
-            {
-                graphRenderer.AdjustAntenna(go);
-                markerFactory.AdjustMarkerY(go);
-
-                if (go.transform.parent == null)
-                {
-                    /// We will just put this game object under <see cref="gameObject"/>
-                    /// (the game object representing the city as a whole) as a child. When
-                    /// the animation is over and all nodes have reached their destination,
-                    /// <see cref="UpdateGameNodeHierarchy"/> will put this node to its
-                    /// actual logical game-node parent.
-                    go.transform.SetParent(gameObject.transform);
-                }
-            }
-            animationWatchDog.Finished();
-        }
     }
 }
