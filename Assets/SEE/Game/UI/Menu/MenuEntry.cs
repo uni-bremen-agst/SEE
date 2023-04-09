@@ -1,4 +1,5 @@
 ﻿using System;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 #if INCLUDE_STEAM_VR
@@ -44,13 +45,13 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         public bool Enabled;
 
-#if INCLUDE_STEAM_VR
 
         /// <summary>
         /// The color of this entry when disabled.
         /// </summary>
-        public Color DisabledColor => EntryColor.ColorWithAlpha(0.2f);
-#endif
+        public Color DisabledColor => EntryColor.WithAlpha(0.2f);
+        
+        
         /// <summary>
         /// Instantiates and returns a new MenuEntry.
         /// </summary>

@@ -2,6 +2,7 @@ using System.Linq;
 using DG.Tweening;
 using SEE.Controls.Actions;
 using SEE.GO;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
 #if INCLUDE_STEAM_VR
@@ -69,19 +70,13 @@ namespace SEE.Game.Operator
                 // First we create the label.
                 // We define starting and ending positions for the animation.
                 Vector3 startLabelPosition = gameObject.GetTop();
-#if INCLUDE_STEAM_VR
+
                 nodeLabel = TextFactory.GetTextWithSize(shownText,
                                                         startLabelPosition,
                                                         City.NodeTypes[Node.Type].LabelSettings.FontSize,
                                                         lift: true,
-                                                        textColor: Color.black.ColorWithAlpha(0f));
-#else
-                nodeLabel = TextFactory.GetTextWithSize(shownText,
-                    startLabelPosition,
-                    City.NodeTypes[Node.Type].LabelSettings.FontSize,
-                    lift: true,
-                    textColor: Color.black);
-#endif
+                                                        textColor: Color.black.WithAlpha(0f));
+
 
                 nodeLabel.name = LABEL_PREFIX + shownText;
                 nodeLabel.transform.SetParent(gameObject.transform);
