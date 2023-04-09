@@ -27,6 +27,26 @@ namespace SEE.DataModel.DG
         private const string StringAttribute = "String";
 
         /// <summary>
+        /// Both graphs are null.
+        /// </summary>
+        [Test]
+        public void TestNullGraphs()
+        {
+            GraphExtensions.Diff(null, null, g => g.Nodes(),
+              (g, id) => g.GetNode(id),
+              null,
+              new NodeEqualityComparer(),
+              out ISet<Node> added,
+              out ISet<Node> removed,
+              out ISet<Node> changed,
+              out ISet<Node> equal);
+            Assert.AreEqual(0, added.Count);
+            Assert.AreEqual(0, removed.Count);
+            Assert.AreEqual(0, changed.Count);
+            Assert.AreEqual(0, equal.Count);
+        }
+
+        /// <summary>
         /// Two non-empty graphs are compared. Once with and once without attributes.
         /// </summary>
         [Test]
