@@ -140,29 +140,9 @@ namespace SEE.DataModel.DG
         /// <returns>all node attribute names collected via <paramref name="attributeNames"/></returns>
         private ISet<string> AllAttributes(bool forNodes, bool forEdges, AllAttributeNames attributeNames)
         {
-            HashSet<string> result = new();
-            if (forNodes)
-            {
-                ForAll(Nodes().Cast<GraphElement>(), attributeNames, result);
-            }
-            if (forEdges)
-            {
-                ForAll(Edges().Cast<GraphElement>(), attributeNames, result);
-            }
-            return result;
+            return Elements().Where(x => (forNodes && x is Node) || (forEdges && x is Edge))
+                             .SelectMany(x => attributeNames(x)).ToHashSet();
 
-            // Adds all attribute name of all elements to result.
-            // The attributes are retrieved from those elements by way of function attributeNames.
-            static void ForAll(IEnumerable<GraphElement> elements, AllAttributeNames attributeNames, HashSet<string> result)
-            {
-                foreach (GraphElement element in elements)
-                {
-                    foreach (string name in attributeNames(element))
-                    {
-                        result.Add(name);
-                    }
-                }
-            }
         }
 
         /// <summary>
