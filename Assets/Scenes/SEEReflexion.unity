@@ -4050,7 +4050,7 @@ MonoBehaviour:
       relativePath: 
       absolutePath: 
   EdgeLayoutSettings:
-    Kind: 0
+    Kind: 3
     AnimationKind: 1
     EdgeWidth: 0.01
     EdgesAboveBlocks: 1
