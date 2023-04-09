@@ -11,7 +11,7 @@ namespace SEE.DataModel.DG
     {
         /// <summary>
         /// Yields the differences of the graph elements of type <typeparamref name="T"/>
-        /// in <paramref name="newGraph"/> relative to <paramref name="oldGraph"/>.
+        /// in this <paramref name="newGraph"/> relative to <paramref name="oldGraph"/>.
         /// </summary>
         /// <typeparam name="T">the type of graph elements (nodes or edges)</typeparam>
         /// <param name="newGraph">the new graph to be compared against <paramref name="oldGraph"/></param>
