@@ -2,7 +2,6 @@ using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -51,7 +50,6 @@ namespace SEE.Controls.Actions
                 Interactable.SelectOut += SelectionOff;
                 Interactable.HoverIn += HoverOn;
                 Interactable.HoverOut += HoverOff;
-                codeCity = City();
             }
             else
             {
@@ -70,7 +68,7 @@ namespace SEE.Controls.Actions
                 Interactable.SelectOut -= SelectionOff;
                 Interactable.HoverIn -= HoverOn;
                 Interactable.HoverOut -= HoverOff;
-                codeCity = null;
+                codeCity = null;  // Reset codeCity
             }
             else
             {
@@ -165,6 +163,7 @@ namespace SEE.Controls.Actions
             GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
             if (codeCityObject == null)
             {
+                Debug.LogError($"Could not retrieve CodeCity for {gameObject.name}!");
                 return null;
             }
 
@@ -173,49 +172,41 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns the node this class is attached to.
-        /// May be null.
+        /// Shows all incoming/outgoing edges of the node this component is
+        /// attached to.
         /// </summary>
-        private Node Node()
-        {
-            if (!gameObject.TryGetComponent(out NodeRef nodeRef) || nodeRef.Value == null)
-            {
-                return null;
-            }
-
-            return nodeRef.Value;
-        }
-
         private void On()
         {
-            Node node = Node();
-            if (node == null)
-            {
-                return;
-            }
-
-            EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
-
-            // TODO: Perhaps the node along with its edges should be cached?
-            foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
-            {
-                edge.Operator().Show(animationKind, ANIMATION_DURATION);
-            }
+            OnOff(true);
         }
 
+        /// <summary>
+        /// Hides all incoming/outgoing edges of the node this component is
+        /// attached to.
+        /// </summary>
         private void Off()
         {
-            Node node = Node();
-            if (node == null)
-            {
-                return;
-            }
+            OnOff(false);
+        }
 
-            EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
-
-            foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
+        /// <summary>
+        /// Shows/hides all incoming/outgoing edges of the node this component is
+        /// attached to.
+        /// </summary>
+        /// <param name="show">if true, the edges are shown; otherwise hidden</param>
+        private void OnOff(bool show)
+        {
+            if (gameObject.TryGetNode(out Node node))
             {
-                edge.Operator().Hide(animationKind, ANIMATION_DURATION);
+                codeCity ??= City();
+
+                EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
+
+                // TODO: Perhaps the node along with its edges should be cached?
+                foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
+                {
+                    edge.Operator().ShowOrHide(show, animationKind, ANIMATION_DURATION);
+                }
             }
         }
     }

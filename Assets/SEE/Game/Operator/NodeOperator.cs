@@ -6,11 +6,10 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Layout;
-using SEE.Layout.EdgeLayouts;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
-using TinySpline;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Game.Operator
 {
@@ -27,17 +26,17 @@ namespace SEE.Game.Operator
         // still letting the user drag the node.
 
         /// <summary>
-        /// Operation handling X-axis movement.
+        /// Operation handling X-axis movement in world space.
         /// </summary>
         private TweenOperation<float> PositionX;
 
         /// <summary>
-        /// Operation handling Y-axis movement.
+        /// Operation handling Y-axis movement in world space.
         /// </summary>
         private TweenOperation<float> PositionY;
 
         /// <summary>
-        /// Operation handling Z-axis movement.
+        /// Operation handling Z-axis movement in world space.
         /// </summary>
         private TweenOperation<float> PositionZ;
 
@@ -92,10 +91,15 @@ namespace SEE.Game.Operator
         private float? updateLayoutDuration;
 
         /// <summary>
+        /// If true, the incoming and outgoing edges will be adjusted, too.
+        /// </summary>
+        private bool updateEdges = false;
+
+        /// <summary>
         /// The position this node is supposed to be at.
         /// </summary>
         /// <seealso cref="AbstractOperator"/>
-        public Vector3 TargetPosition => new Vector3(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
+        public Vector3 TargetPosition => new(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
 
         /// <summary>
         /// The scale this node is supposed to be at.
@@ -106,54 +110,62 @@ namespace SEE.Game.Operator
         #region Public API
 
         /// <summary>
-        /// Moves the node to the <paramref name="newXPosition"/>, taking <paramref name="duration"/> seconds.
+        /// Moves the node to the <paramref name="newXPosition"/> in world space, taking <paramref name="duration"/> seconds.
         /// </summary>
-        /// <param name="newXPosition">the desired new target X coordinate</param>
+        /// <param name="newXPosition">the desired new target X coordinate in world space</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveXTo(float newXPosition, float duration)
+        public IOperationCallback<Action> MoveXTo(float newXPosition, float duration, bool updateEdges = true)
         {
             updateLayoutDuration = duration;
+            this.updateEdges = updateEdges;
             return PositionX.AnimateTo(newXPosition, duration);
         }
 
         /// <summary>
-        /// Moves the node to the <paramref name="newYPosition"/>, taking <paramref name="duration"/> seconds.
+        /// Moves the node to the <paramref name="newYPosition"/> in world space, taking <paramref name="duration"/> seconds.
         /// </summary>
-        /// <param name="newYPosition">the desired new target Y coordinate</param>
+        /// <param name="newYPosition">the desired new target Y coordinate in world space</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveYTo(float newYPosition, float duration)
+        public IOperationCallback<Action> MoveYTo(float newYPosition, float duration, bool updateEdges = true)
         {
             updateLayoutDuration = duration;
+            this.updateEdges = updateEdges;
             return PositionY.AnimateTo(newYPosition, duration);
         }
 
         /// <summary>
-        /// Moves the node to the <paramref name="newZPosition"/>, taking <paramref name="duration"/> seconds.
+        /// Moves the node to the <paramref name="newZPosition"/> in world space, taking <paramref name="duration"/> seconds.
         /// </summary>
-        /// <param name="newZPosition">the desired new target Z coordinate</param>
+        /// <param name="newZPosition">the desired new target Z coordinate in world space</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveZTo(float newZPosition, float duration)
+        public IOperationCallback<Action> MoveZTo(float newZPosition, float duration, bool updateEdges = true)
         {
             updateLayoutDuration = duration;
+            this.updateEdges = updateEdges;
             return PositionZ.AnimateTo(newZPosition, duration);
         }
 
         /// <summary>
-        /// Moves the node to the <paramref name="newPosition"/>, taking <paramref name="duration"/> seconds.
+        /// Moves the node to the <paramref name="newPosition"/> in world space, taking <paramref name="duration"/> seconds.
         /// </summary>
-        /// <param name="newPosition">the desired new target position</param>
+        /// <param name="newPosition">the desired new target position in world space</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveTo(Vector3 newPosition, float duration)
+        public IOperationCallback<Action> MoveTo(Vector3 newPosition, float duration, bool updateEdges = true)
         {
             updateLayoutDuration = duration;
+            this.updateEdges = updateEdges;
             return new AndCombinedOperationCallback<Action>(new[]
             {
                 PositionX.AnimateTo(newPosition.x, duration),
@@ -169,10 +181,12 @@ namespace SEE.Game.Operator
         /// should be scaled relative to its parent (i.e., local scale)</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> ScaleTo(Vector3 newLocalScale, float duration)
+        public IOperationCallback<Action> ScaleTo(Vector3 newLocalScale, float duration, bool updateEdges = true)
         {
             updateLayoutDuration = duration;
+            this.updateEdges = updateEdges;
             return Scale.AnimateTo(newLocalScale, duration);
         }
 
@@ -195,17 +209,6 @@ namespace SEE.Game.Operator
                 LabelEndLinePosition.AnimateTo(DesiredLabelEndLinePosition, duration)
             });
 
-        /// <summary>
-        /// Updates the layout of objects (edges, labels) attached to this node during the next
-        /// <see cref="Update"/> cycle. This involves recalculating the edge layout for each attached edge.
-        /// Note that this is already automatically done when the node is moved or scaled.
-        /// </summary>
-        /// <param name="duration">Time in seconds the animation should take.</param>
-        public void TriggerLayoutUpdate(float duration)
-        {
-            updateLayoutDuration = duration;
-        }
-
         #endregion
 
         /// <summary>
@@ -214,13 +217,21 @@ namespace SEE.Game.Operator
         /// <param name="duration">Time in seconds the animation should take.</param>
         private void UpdateLayout(float duration)
         {
-            if (!Node.IsRoot())
+            if (Node != null)
             {
-                // If we are moving the root node, the whole graph will be moved,
-                // hence, the layout of the edges does not need to be updated.
-                UpdateEdgeLayout(duration);
+                Assert.IsNotNull(Node, $"[{nameof(NodeOperator)}]{gameObject.FullName()} has undefined graph node");
+                if (!Node.IsRoot())
+                {
+                    // If we are moving the root node, the whole graph will be moved,
+                    // hence, the layout of the edges does not need to be updated.
+                    if (updateEdges && City.EdgeLayoutSettings.Kind != EdgeLayoutKind.None)
+                    {
+                        // The edge layout needs to be updated only if we actually have an edge layout.
+                        UpdateEdgeLayout(duration);
+                    }
+                }
+                UpdateLabelLayout(duration);
             }
-            UpdateLabelLayout(duration);
         }
 
         /// <summary>
@@ -247,7 +258,7 @@ namespace SEE.Game.Operator
                 return;
             }
 
-            IEnumerable<Node> GetMappedNodes(Node mappedNode)
+            static IEnumerable<Node> GetMappedNodes(Node mappedNode)
             {
                 if (mappedNode.IsInArchitecture())
                 {
@@ -393,6 +404,7 @@ namespace SEE.Game.Operator
             {
                 UpdateLayout(updateLayoutDuration.Value);
                 updateLayoutDuration = null;
+                updateEdges = true;
             }
         }
     }

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Sirenix.Serialization.Utilities;
+using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -41,7 +41,6 @@ namespace SEE.GO
                     return edgeRef.Value.ID;
                 }
             }
-
             return nodeRef.Value.ID;
         }
 
@@ -58,14 +57,7 @@ namespace SEE.GO
         /// <returns>true if a code city was drawn</returns>
         public static bool IsCodeCityDrawn(this GameObject gameObject)
         {
-            foreach (Transform child in gameObject.transform)
-            {
-                if (child.gameObject.IsNode())
-                {
-                    return true;
-                }
-            }
-            return false;
+            return gameObject.transform.Cast<Transform>().Any(child => child.gameObject.IsNode());
         }
 
         /// <summary>
@@ -132,6 +124,17 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Returns all game objects tagged as <see cref="Tags.Edge"/> that are descendants
+        /// of <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">root game object to be traversed</param>
+        /// <returns>all game objects tagged as <see cref="Tags.Edge"/></returns>
+        internal static IEnumerable<GameObject> AllEdges(this GameObject gameObject)
+        {
+            return gameObject.AllDescendants(Tags.Edge);
+        }
+
+        /// <summary>
         /// Returns all transitive children of <paramref name="gameObject"/> tagged by
         /// given <paramref name="tag"/> (including <paramref name="gameObject"/> itself).
         /// </summary>
@@ -139,7 +142,7 @@ namespace SEE.GO
         /// <returns>all transitive children with <paramref name="tag"/></returns>
         public static List<GameObject> AllDescendants(this GameObject gameObject, string tag)
         {
-            List<GameObject> result = new List<GameObject>();
+            List<GameObject> result = new();
             if (gameObject.CompareTag(tag))
             {
                 result.Add(gameObject);
@@ -195,7 +198,7 @@ namespace SEE.GO
         /// <returns>found game objects</returns>
         public static IList<GameObject> Descendants(this GameObject gameObject, ISet<string> gameObjectIDs)
         {
-            List<GameObject> result = new List<GameObject>();
+            List<GameObject> result = new();
             foreach (Transform child in gameObject.transform)
             {
                 if (gameObjectIDs.Contains(child.name))
@@ -316,18 +319,28 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Sets the scale of this <paramref name="node"/> to <paramref name="scale"/> independent from
-        /// the local scale from the parent.
+        /// Sets the scale of this <paramref name="gameObject"/> to <paramref name="worldScale"/> independent from
+        /// the local scale of its parent.
         /// </summary>
-        /// <param name="node">object whose scale should be set</param>
-        /// <param name="scale">the new scale in world space</param>
-        public static void SetScale(this GameObject node, Vector3 scale)
+        /// <param name="gameObject">object whose scale should be set</param>
+        /// <param name="worldScale">the new scale in world space</param>
+        /// <param name="animate">if true and <paramref name="gameObject"/> is a graph node,
+        /// a <see cref="NodeOperator"/> will be used to animate the scaling; otherwise the
+        /// scale of <paramref name="gameObject"/> is set immediately without any animation</param>
+        public static void SetAbsoluteScale(this GameObject gameObject, Vector3 worldScale, bool animate = true)
         {
-            NodeOperator @operator = node.AddOrGetComponent<NodeOperator>();
-            Transform parent = node.transform.parent;
-            node.transform.parent = null;
-            @operator.ScaleTo(scale, 0f);
-            node.transform.parent = parent;
+            Transform parent = gameObject.transform.parent;
+            gameObject.transform.parent = null;
+            if (animate && gameObject.HasNodeRef())
+            {
+                NodeOperator @operator = gameObject.AddOrGetComponent<NodeOperator>();
+                @operator.ScaleTo(worldScale, 0f);
+            }
+            else
+            {
+                gameObject.transform.localScale = worldScale;
+            }
+            gameObject.transform.parent = parent;
         }
 
         /// <summary>
@@ -465,7 +478,7 @@ namespace SEE.GO
             block.MustGetComponent(out Collider collider);
             Vector3 blockCenter = collider.bounds.center;
             // We only care about the XZ-plane. Setting z to zero here makes it consistent with the bounds setup below.
-            Bounds blockBounds = new Bounds(new Vector3(blockCenter.x, blockCenter.z, 0), collider.bounds.extents);
+            Bounds blockBounds = new(new Vector3(blockCenter.x, blockCenter.z, 0), collider.bounds.extents);
             parentBlock.MustGetComponent(out Collider parentCollider);
             Bounds parentBlockBounds = parentCollider.bounds;
 
@@ -475,28 +488,28 @@ namespace SEE.GO
             Vector2 bottomRight = topRight.WithXY(y: bottomLeft.y);
 
             // These represent the outer edge regions of the parent block with the margins applied.
-            Bounds left = new Bounds(bottomLeft, Vector3.zero);
+            Bounds left = new(bottomLeft, Vector3.zero);
             left.Encapsulate(topLeft.WithXY(x: topLeft.x + outerEdgeMargin));
             if (left.Intersects(blockBounds))
             {
                 return true;
             }
 
-            Bounds right = new Bounds(bottomRight, Vector3.zero);
+            Bounds right = new(bottomRight, Vector3.zero);
             right.Encapsulate(topRight.WithXY(x: topRight.x - outerEdgeMargin));
             if (right.Intersects(blockBounds))
             {
                 return true;
             }
 
-            Bounds bottom = new Bounds(bottomLeft, Vector3.zero);
+            Bounds bottom = new(bottomLeft, Vector3.zero);
             bottom.Encapsulate(bottomRight.WithXY(y: bottomRight.y + outerEdgeMargin));
             if (bottom.Intersects(blockBounds))
             {
                 return true;
             }
 
-            Bounds top = new Bounds(topLeft, Vector3.zero);
+            Bounds top = new(topLeft, Vector3.zero);
             top.Encapsulate(topRight.WithXY(y: topRight.y - outerEdgeMargin));
             return top.Intersects(blockBounds);
         }

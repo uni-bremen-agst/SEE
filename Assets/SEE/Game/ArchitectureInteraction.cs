@@ -8,10 +8,10 @@ using UnityEngine;
 namespace SEE.Game
 {
     /// <summary>
-    /// This component is intended to provide interactions with a 
-    /// code city representing a reflexion model. One can show/hide nodes 
+    /// This component is intended to provide interactions with a
+    /// code city representing a reflexion model. One can show/hide nodes
     /// and edges in the architecture by user interactions.
-    /// 
+    ///
     /// Its only purpose was to create a video. Do not use this class.
     /// </summary>
     [ExecuteAlways]
@@ -24,7 +24,7 @@ namespace SEE.Game
         public SEECity CodeCity;
 
         //------------------
-        // Edge types 
+        // Edge types
         //------------------
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace SEE.Game
 
         private HashSet<string> implementationEdgeTypes = new HashSet<string>();
         /// <summary>
-        /// All edge types in the graph that are neither reflexion edges 
+        /// All edge types in the graph that are neither reflexion edges
         /// nor architecture dependencies.
         /// </summary>
         public HashSet<string> ImplementationEdgeTypes
@@ -69,7 +69,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns all edge types in the graph that are neither reflexion edges 
+        /// Returns all edge types in the graph that are neither reflexion edges
         /// nor architecture dependencies.
         /// </summary>
         /// <returns>all implementation edge types</returns>
@@ -156,7 +156,7 @@ namespace SEE.Game
             }
             if (Input.GetKeyDown(KeyCode.F11))
             {
-                ArchitectureNodesVisible = !ArchitectureNodesVisible;                
+                ArchitectureNodesVisible = !ArchitectureNodesVisible;
             }
             if (Input.GetKeyDown(KeyCode.F12))
             {
@@ -177,7 +177,7 @@ namespace SEE.Game
                 if (root != null)
                 {
                     Debug.LogFormat("Root of {0} is {1}\n", CodeCity.name, root.name);
-                    SetAllNodes(root);                    
+                    SetAllNodes(root);
                     SetAllEdges();
                 }
             }
@@ -214,7 +214,7 @@ namespace SEE.Game
         /// <returns>root node of <see cref="CodeCity"/></returns>
         private GameObject GetCityRootNode()
         {
-            return SceneQueries.GetCityRootNode(CodeCity.gameObject).gameObject;            
+            return SceneQueries.GetCityRootNode(CodeCity.gameObject);
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace SEE.Game
         ///   (2) if <paramref name="architectureNode"/> is false, the nodes are implementation nodes.
         /// The color is increasingly darkened from level to level, that is, the deeper a node
         /// in the node tree, the darker its color originating from the initial given <paramref name="color"/>.
-        /// 
+        ///
         /// Note: The color of implementation leaf nodes is never changed.
         /// </summary>
         /// <param name="parent">root of the node tree to be colored</param>
@@ -354,7 +354,7 @@ namespace SEE.Game
         private List<GameObject> GetAllNodes()
         {
             GameObject root = GetCityRootNode();
-            List<GameObject> nodes = new List<GameObject>() { root };            
+            List<GameObject> nodes = new List<GameObject>() { root };
             AddAllNodes(root, nodes);
             return nodes;
         }
@@ -767,7 +767,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Returns given <paramref name="color"/> darkened by <paramref name="degree"/>.
-        /// 
+        ///
         /// Precondition: 0 <= <paramref name="degree"/> <= 1
         /// </summary>
         /// <param name="color">base color to be darkened</param>

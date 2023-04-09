@@ -5,9 +5,12 @@ using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.GO;
+using SEE.Layout;
+using SEE.Layout.NodeLayouts;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Game.City
 {
@@ -22,7 +25,6 @@ namespace SEE.Game.City
         /// <see cref="SEECity.Save(ConfigWriter)"/> and
         /// <see cref="SEECity.Restore(Dictionary{string,object})"/>,
         /// respectively. You should also extend the test cases in TestConfigIO.
-
         /// <summary>
         /// The path to the GXL file containing the graph data.
         /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
@@ -123,53 +125,53 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Sets up drawn city (if it has been drawn yet) and loads the metric board.
+        /// </summary>
+        protected void Start()
+        {
+            if (!gameObject.IsCodeCityDrawn())
+            {
+                Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
+                return;
+            }
+            LoadData();
+            InitializeAfterDrawn();
+            BoardSettings.LoadBoard();
+        }
+
+        /// <summary>
         /// Loads the graph and metric data and sets all NodeRef and EdgeRef components to the
         /// loaded nodes and edges. This "deserializes" the graph to make it available at runtime.
         /// Note: <see cref="LoadedGraph"/> will be <see cref="VisualizedSubGraph"/> afterwards,
         /// that is, if node types are filtered, <see cref="LoadedGraph"/> may not contain all
         /// nodes saved in the underlying GXL file.
+        /// Also note that this method may only be called after the code city has been drawn.
         /// </summary>
-        protected override void Awake()
+        protected virtual void InitializeAfterDrawn()
         {
-            base.Awake();
-            if (gameObject.IsCodeCityDrawn())
+            Assert.IsTrue(gameObject.IsCodeCityDrawn());
+            Graph subGraph = VisualizedSubGraph;
+            if (subGraph != null)
             {
-                LoadData();
-                Graph subGraph = VisualizedSubGraph;
-                if (subGraph != null)
+                foreach (GraphElement graphElement in loadedGraph.Elements().Except(subGraph.Elements()))
                 {
-                    foreach (GraphElement graphElement in loadedGraph.Elements().Except(subGraph.Elements()))
-                    {
-                        // All other elements are virtual, i.e., should not be drawn.
-                        graphElement.SetToggle(GraphElement.IsVirtualToggle);
-                    }
-
-                    SetNodeEdgeRefs(subGraph, gameObject);
-                }
-                else
-                {
-                    Debug.LogError($"SEECity.Awake: Could not load city {name}.\n");
+                    // All other elements are virtual, i.e., should not be drawn.
+                    graphElement.SetToggle(GraphElement.IsVirtualToggle);
                 }
 
-                loadedGraph = subGraph;
+                SetNodeEdgeRefs(subGraph, gameObject);
             }
             else
             {
-                Debug.LogWarning($"There is no code city drawn for {gameObject.FullName()}.\n");
+                Debug.LogError($"Could not load city {name}.\n");
             }
-        }
 
-        /// <summary>
-        /// Loads the metric board.
-        /// </summary>
-        protected override void Start()
-        {
-            base.Start();
-            // Load the holistic metric board, if one was setup.
-            if (gameObject.IsCodeCityDrawn())
-            {
-                BoardSettings.LoadBoard();
-            }
+            // Add EdgeMeshScheduler to convert edge lines to meshes over time.
+            gameObject.AddOrGetComponent<EdgeMeshScheduler>().Init(EdgeLayoutSettings, EdgeSelectionSettings,
+                                                                   visualizedSubGraph);
+            loadedGraph = subGraph;
+
+            UpdateGraphElementIDMap(gameObject);
         }
 
         /// <summary>
@@ -268,13 +270,13 @@ namespace SEE.Game.City
             {
                 Debug.LogWarning($"CSV file {csvPath} has {numberOfErrors} many errors.\n");
             }
+
             p.End();
 
             // Substitute missing values from the dashboard
             if (erosionSettings.LoadDashboardMetrics)
             {
-                string startVersion = string.IsNullOrEmpty(erosionSettings.IssuesAddedFromVersion) ?
-                    "EMPTY" : erosionSettings.IssuesAddedFromVersion;
+                string startVersion = string.IsNullOrEmpty(erosionSettings.IssuesAddedFromVersion) ? "EMPTY" : erosionSettings.IssuesAddedFromVersion;
                 Debug.Log($"Loading metrics and added issues from the Axivion Dashboard for start version {startVersion}.\n");
                 await MetricImporter.LoadDashboard(graph, erosionSettings.OverrideMetrics,
                                                    erosionSettings.IssuesAddedFromVersion);
@@ -317,6 +319,7 @@ namespace SEE.Game.City
                 {
                     Reset();
                 }
+
                 LoadedGraph = LoadGraph(GXLPath.Path);
                 LoadMetrics();
             }
@@ -373,17 +376,24 @@ namespace SEE.Game.City
             }
             else
             {
-                Graph visualizedSubGraph = VisualizedSubGraph;
-                if (ReferenceEquals(visualizedSubGraph, null))
+                Graph theVisualizedSubGraph = VisualizedSubGraph;
+                if (ReferenceEquals(theVisualizedSubGraph, null))
                 {
                     Debug.LogError("No graph loaded.\n");
                 }
                 else
                 {
-                    graphRenderer = new GraphRenderer(this, visualizedSubGraph);
+                    graphRenderer = new GraphRenderer(this, theVisualizedSubGraph);
                     // We assume here that this SEECity instance was added to a game object as
                     // a component. The inherited attribute gameObject identifies this game object.
-                    graphRenderer.DrawGraph(visualizedSubGraph, gameObject);
+                    graphRenderer.DrawGraph(theVisualizedSubGraph, gameObject);
+
+                    // If we're in editmode, InitializeAfterDrawn() will be called by Start() once the
+                    // game starts. Otherwise, in playmode, we have to call it ourselves.
+                    if (Application.isPlaying)
+                    {
+                        InitializeAfterDrawn();
+                    }
                 }
             }
         }
@@ -422,6 +432,21 @@ namespace SEE.Game.City
             {
                 Layout.IO.SLDWriter.Save(path, AllNodeDescendants(gameObject));
             }
+        }
+
+        /// <summary>
+        /// Reads the a saved layout of the city from a file named <see cref="LayoutPath"/>.
+        /// The format of the written file depends upon the file extension. If the extension
+        /// is <see cref="Filenames.GVLExtension"/> it is expected to be in the GVL format; otherwise
+        /// the file is assumed to be in the SLD format.
+        /// </summary>
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup)]
+        [PropertyOrder(DataButtonsGroupOrderLoadLayout)]
+        public void LoadLayout()
+        {
+            ICollection<GameObject> gameNodes = AllNodeDescendants(gameObject);
+            graphRenderer.LoadLayout(gameNodes, gameObject.transform.position.y);
         }
 
         /// <summary>
@@ -483,6 +508,7 @@ namespace SEE.Game.City
         /// Label of attribute <see cref="GXLPath"/> in the configuration file.
         /// </summary>
         private const string GXLPathLabel = "GXLPath";
+
         /// <summary>
         /// Label of attribute <see cref="CSVPath"/> in the configuration file.
         /// </summary>

@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using SEE.Game.Operator;
 using SEE.GO;
@@ -138,7 +137,7 @@ namespace SEE.Controls.Actions
         /// root node.
         /// </summary>
         private readonly Dictionary<Transform, ZoomState> rootTransformToZoomStates = new Dictionary<Transform, ZoomState>();
-        
+
         /// <summary>
         /// The node operator for every root transform of a city.
         /// </summary>
