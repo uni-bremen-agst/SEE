@@ -249,7 +249,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         private static void UserInfoStillOccupied()
         {
-            ShowNotification.Info(NotificationTitle, "The renderer is already occupied with animating, wait till animations are finished.");
+            ShowNotification.Info(NotificationTitle, "The renderer is already occupied with animating, wait until animations are finished.");
         }
 
         /// <summary>
