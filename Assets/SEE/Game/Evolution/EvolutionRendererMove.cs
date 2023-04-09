@@ -72,7 +72,7 @@ namespace SEE.Game.Evolution
                 if (currentCity != null)
                 {
                     // We are transitioning from a previous graph, i.e., next is not
-                    // the inital graph in the graph series.
+                    // the initial graph in the graph series.
                     foreach (Edge edge in edges)
                     {
                         if (!next.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge<ILayoutNode> newLayoutEdge))
