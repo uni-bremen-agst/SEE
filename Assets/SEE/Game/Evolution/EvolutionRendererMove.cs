@@ -36,21 +36,27 @@ namespace SEE.Game.Evolution
             /// and <see cref="RenderExistingNode(Node)"/> will access it.
             nextCity = next;
 
-            int existingElements = equalNodes.Count + changedNodes.Count + equalEdges.Count + changedEdges.Count;
+            int existingElements = equalNodes.Count + changedNodes.Count;
+            if (edgesAreDrawn)
+            {
+                existingElements += equalEdges.Count + changedEdges.Count;
+            }
             Debug.Log($"Phase2: Moving {existingElements} existing graph elements.\n");
             animationWatchDog.Await(existingElements, Phase3AdjustExistingGraphElements);
             if (existingElements > 0)
             {
-                ISet<Edge> equalAndChangedEdges = new HashSet<Edge>(equalEdges);
-                equalAndChangedEdges.UnionWith(changedEdges);
-                CreateEdges(equalAndChangedEdges);
-                SetUpEdgeAnimation(equalAndChangedEdges);
-
+                if (edgesAreDrawn)
+                {
+                    ISet<Edge> equalAndChangedEdges = new HashSet<Edge>(equalEdges);
+                    equalAndChangedEdges.UnionWith(changedEdges);
+                    CreateEdges(equalAndChangedEdges);
+                    SetUpEdgeAnimation(equalAndChangedEdges);
+                }
                 equalNodes.ForEach(RenderExistingNode);
                 changedNodes.ForEach(RenderExistingNode);
             }
 
-            // Creates the game edges for all given graph edges and apply their layout.
+            // Creates the game edges for all given graph edges and applies their layout.
             void CreateEdges(ISet<Edge> edges)
             {
                 foreach (Edge edge in edges)
@@ -75,17 +81,15 @@ namespace SEE.Game.Evolution
                     // the initial graph in the graph series.
                     foreach (Edge edge in edges)
                     {
-                        if (!next.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge<ILayoutNode> newLayoutEdge))
-                        {
-                            Debug.LogWarning($"Missing layout for graph edge with id '{edge.ID}'; skipping it.\n");
-                            continue;
-                        }
-                        if (currentCity.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge<ILayoutNode> oldLayoutEdge))
+                        if (next.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge<ILayoutNode> newLayoutEdge))
                         {
                             objectManager.GetEdge(edge, out GameObject gameEdge);
-                            gameEdge.AddOrGetComponent<SplineMorphism>()
-                                    .CreateTween(oldLayoutEdge.Spline, newLayoutEdge.Spline, AnimationLagPerPhase())
-                                    .OnComplete(() => animationWatchDog.Finished()).Play();
+                            gameEdge.AddOrGetComponent<EdgeOperator>().MorphTo(newLayoutEdge.Spline, AnimationLagPerPhase())
+                                .SetOnComplete(animationWatchDog.Finished);
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"Missing layout for graph edge with id '{edge.ID}'; skipping it.\n");
                         }
                     }
                 }
