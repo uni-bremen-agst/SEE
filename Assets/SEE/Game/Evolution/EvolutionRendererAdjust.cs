@@ -30,7 +30,7 @@ namespace SEE.Game.Evolution
             // changed their dimensions. The treemap layout, for instance, may do that.
             int changedElements = equalNodes.Count + changedNodes.Count;
             Debug.Log($"Phase 3: Adjusting {changedElements} changed graph elements.\n");
-            animationWatchDog.Await(changedElements, () => Phase4AddNewNodes());
+            animationWatchDog.Await(changedElements, Phase4AddNewNodes);
             if (changedElements > 0)
             {
                 equalNodes.ForEach(AdjustExistingNode);
