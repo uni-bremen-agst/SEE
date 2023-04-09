@@ -596,8 +596,8 @@ namespace SEE.Game.Evolution
             // First remove all markings of the previous animation cycle.
             markerFactory.Clear();
 
-            Graph oldGraph = current != null ? current.Graph : null;
-            Graph newGraph = next != null ? next.Graph : null;
+            Graph oldGraph = current?.Graph;
+            Graph newGraph = next?.Graph;
 
             // Node comparison.
             newGraph.Diff(oldGraph,
