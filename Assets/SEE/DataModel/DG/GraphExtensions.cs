@@ -38,8 +38,8 @@ namespace SEE.DataModel.DG
             out ISet<T> equal)
            where T : GraphElement
         {
-            IEnumerable<T> oldElements = oldGraph != null ? GetElements(oldGraph) : null;
-            IEnumerable<T> newElements = newGraph != null ? GetElements(newGraph) : null;
+            IEnumerable<T> oldElements = oldGraph != null ? GetElements(oldGraph).ToList() : null;
+            IEnumerable<T> newElements = newGraph != null ? GetElements(newGraph).ToList() : null;
 
             if (oldElements == null || !oldElements.Any())
             {
