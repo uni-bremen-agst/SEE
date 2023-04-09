@@ -51,14 +51,13 @@ namespace SEE.Game.UI.StateIndicator
         /// Background image (color) of the mode panel.
         /// </summary>
         protected Image ModePanelImage;
-
-#if INCLUDE_STEAM_VR
+        
         /// <summary>
         /// The color of the state indicator after it has been instantiated.
         /// </summary>
-        protected Color StartColor = Color.gray.ColorWithAlpha(0.5f);
-#endif
+        protected Color StartColor = Color.gray.WithAlpha(0.5f);
 
+  
         /// <summary>
         /// The text of the state indicator after it has been instantiated.
         /// </summary>
@@ -71,19 +70,19 @@ namespace SEE.Game.UI.StateIndicator
         /// <param name="color">The background color of the indicator</param>
         public void ChangeState(string text, Color color)
         {
-#if INCLUDE_STEAM_VR
+
             if (HasStarted)
             {
-                ModePanelImage.color = color.ColorWithAlpha(0.5f);
+                ModePanelImage.color = color.WithAlpha(0.5f);
                 ModePanelText.text = text;
             }
             else
             {
                 // Indicator has not yet been initialized
-                StartColor = color.ColorWithAlpha(0.5f);
+                StartColor = color.WithAlpha(0.5f);
                 StartText = text;
             }
-#endif
+
         }
 
         protected GameObject StartDesktopInit()
@@ -99,9 +98,7 @@ namespace SEE.Game.UI.StateIndicator
 
             if (indicator.TryGetComponentOrLog(out ModePanelImage))
             {
-#if INCLUDE_STEAM_VR
                 ModePanelImage.color = StartColor;
-#endif
             }
 
             if (indicator.transform.Find("ModeText")?.gameObject.TryGetComponentOrLog(out ModePanelText) != null)
