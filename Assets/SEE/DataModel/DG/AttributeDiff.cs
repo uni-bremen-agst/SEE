@@ -28,22 +28,22 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// The float attributes ought to be used for the comparison.
+        /// The float attributes to be used for the comparison.
         /// </summary>
         private readonly ICollection<string> floatAttributes;
 
         /// <summary>
-        /// The integer attributes ought to be used for the comparison.
+        /// The integer attributes to be used for the comparison.
         /// </summary>
         private readonly ICollection<string> intAttributes;
 
         /// <summary>
-        /// The string attributes ought to be used for the comparison.
+        /// The string attributes to be used for the comparison.
         /// </summary>
         private readonly ICollection<string> stringAttributes;
 
         /// <summary>
-        /// The toggle attributes ought to be used for the comparison.
+        /// The toggle attributes to be used for the comparison.
         /// </summary>
         private readonly ICollection<string> toggleAttributes;
 
@@ -90,11 +90,11 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Yields true if <paramref name="element"/> has an attribute <paramref name="attributeName"/> of type <typeparamref name="T">
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">data type of the attribute</typeparam>
         /// <param name="element">element to be queried</param>
         /// <param name="attributeName">name of the attribute</param>
         /// <param name="value">value of the attribute, if it exists; undefined otherwise</param>
-        /// <returns></returns>
+        /// <returns>True if <paramref name="element"/> has an attribute <paramref name="attributeName"/></returns>
         private delegate bool TryGetValue<T>(GraphElement element, string attributeName, out T value);
 
         /// <summary>
