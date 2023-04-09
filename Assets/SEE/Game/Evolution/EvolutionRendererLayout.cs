@@ -86,7 +86,7 @@ namespace SEE.Game.Evolution
             List<GameObject> gameObjects = new();
 
             // The layout to be applied.
-            NodeLayout nodeLayout = graphRenderer.GetLayout(gameObject);
+            NodeLayout nodeLayout = Renderer.GetLayout(gameObject);
 
             // Gather all nodes for the layout.
             ignoreInnerNodes = !nodeLayout.IsHierarchical();
@@ -103,7 +103,7 @@ namespace SEE.Game.Evolution
                 // however, because the layouter will select the scale for inner nodes.
                 if (node.IsLeaf())
                 {
-                    graphRenderer.AdjustScaleOfLeaf(gameNode);
+                    Renderer.AdjustScaleOfLeaf(gameNode);
                 }
                 gameObjects.Add(gameNode);
             }
@@ -119,7 +119,7 @@ namespace SEE.Game.Evolution
 
             if (edgesAreDrawn)
             {
-                IList<LayoutGraphEdge<LayoutGraphNode>> layoutEdges = graphRenderer.LayoutEdges(layoutNodes).ToList();
+                IList<LayoutGraphEdge<LayoutGraphNode>> layoutEdges = Renderer.LayoutEdges(layoutNodes).ToList();
                 Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout = new(layoutEdges.Count);
                 foreach (LayoutGraphEdge<LayoutGraphNode> le in layoutEdges)
                 {
@@ -154,14 +154,15 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Returns true and a LoadedGraph if there is a LoadedGraph for the active graph index
-        /// CurrentGraphIndex.
+        /// Returns true and a <see cref="LaidOutGraph"/> if there is one for <see cref="CurrentGraphIndex"/>
+        /// in <see cref="graphs"/>.
         /// </summary>
-        /// <param name="loadedGraph"></param>
-        /// <returns>true if there is graph to be visualized (index _openGraphIndex)</returns>
-        private bool HasCurrentLaidOutGraph(out LaidOutGraph loadedGraph)
+        /// <param name="laidOutGraph">the <see cref="LaidOutGraph"/> at the <see cref="CurrentGraphIndex"/>
+        /// or undefined if there is none (that is, defined only if this method returns true)</param>
+        /// <returns>true if there is graph at <see cref="CurrentGraphIndex"/></returns>
+        private bool HasCurrentLaidOutGraph(out LaidOutGraph laidOutGraph)
         {
-            return HasLaidOutGraph(CurrentGraphIndex, out loadedGraph);
+            return HasLaidOutGraph(CurrentGraphIndex, out laidOutGraph);
         }
 
         /// <summary>

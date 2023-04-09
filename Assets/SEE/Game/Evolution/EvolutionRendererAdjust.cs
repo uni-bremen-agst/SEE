@@ -58,7 +58,7 @@ namespace SEE.Game.Evolution
             // If there is no change, this method does not need to be called because then
             // we know that the metric values determining the style and antenna of the former
             // and the new graph node are the same.
-            graphRenderer.AdjustStyle(gameNode);
+            Renderer.AdjustStyle(gameNode);
 
             ScaleTo(gameNode, layoutNode);
 
@@ -89,7 +89,7 @@ namespace SEE.Game.Evolution
         {
             if (gameNode is GameObject go)
             {
-                graphRenderer.AdjustAntenna(go);
+                Renderer.AdjustAntenna(go);
                 markerFactory.AdjustMarkerY(go);
             }
             animationWatchDog.Finished();

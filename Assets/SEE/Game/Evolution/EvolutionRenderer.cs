@@ -100,31 +100,24 @@ namespace SEE.Game.Evolution
         private const float SkyLevel = 2.0f;
 
         /// <summary>
-        /// The graph renderer used to draw a single graph and the later added nodes and edges.
-        /// This attribute will be set in the setter of the attribute CityEvolution because it
-        /// depends upon the city, which is set by this setter.
-        /// </summary>
-        private GraphRenderer graphRenderer;  // not serialized by Unity; will be set in CityEvolution property
-
-        /// <summary>
         /// The manager of the game objects created for the city.
         /// This attribute will be set in the setter of the attribute CityEvolution because it
         /// depends upon the graphRenderer, which in turn depends upon the city, which is set by
         /// this setter.
         /// </summary>
-        private ObjectManager objectManager;  // not serialized by Unity; will be set in CityEvolution property
+        private ObjectManager objectManager;
 
         /// <summary>
         /// The marker factory used to mark the new and removed game objects.
         /// </summary>
-        private MarkerFactory markerFactory;  // not serialized by Unity; will be set in CityEvolution property
+        private MarkerFactory markerFactory;
 
         /// <summary>
         /// The kind of comparison to determine whether there are any differences between
         /// two corresponding graph elements (corresponding by their ID) in
         /// two different graphs of the graph series.
         /// </summary>
-        private GraphElementDiff diff;  // not serialized by Unity; will be set in CityEvolution property
+        private GraphElementDiff diff;
 
         /// <summary>
         /// An event fired when the view graph has changed.
@@ -276,6 +269,9 @@ namespace SEE.Game.Evolution
             ShowNotification.Info(NotificationTitle, "Auto-play mode is turned on. You cannot move to the next graph manually.");
         }
 
+        /// <summary>
+        /// Informs the user about an error when attempting to load a layout.
+        /// </summary>
         private static Notification UserInfoNoLayout()
         {
             return ShowNotification.Error(NotificationTitle, "Could not retrieve a layout for the graph.");
@@ -301,10 +297,10 @@ namespace SEE.Game.Evolution
                 // we need the city argument, which comes only later. Anyhow, whenever we
                 // assign a new city, we also need a new graph renderer for that city.
                 // So in fact this is the perfect place to assign graphRenderer.
-                graphRenderer = new GraphRenderer(cityEvolution, graphs);
-                edgesAreDrawn = graphRenderer.AreEdgesDrawn();
+                Renderer = new GraphRenderer(cityEvolution, graphs);
+                edgesAreDrawn = Renderer.AreEdgesDrawn();
 
-                objectManager = new ObjectManager(graphRenderer, gameObject);
+                objectManager = new ObjectManager(Renderer, gameObject);
                 markerFactory = new MarkerFactory(markerWidth: cityEvolution.MarkerWidth,
                                     markerHeight: cityEvolution.MarkerHeight,
                                     additionColor: cityEvolution.AdditionBeamColor,
@@ -317,7 +313,7 @@ namespace SEE.Game.Evolution
                 Debug.LogError($"This EvolutionRenderer attached to {name} has no sibling component of type {nameof(SEECityEvolution)}.\n");
                 enabled = false;
             }
-            graphRenderer.SetScaler(graphs);
+            Renderer.SetScaler(graphs);
         }
 
         /// <summary>
@@ -910,10 +906,11 @@ namespace SEE.Game.Evolution
         #endregion
 
         /// <summary>
-        /// Yields a graph renderer that can draw this city.
+        /// Yields a graph renderer that can draw code cities for the each graph of
+        /// the graph series.
         /// </summary>
         /// <remarks>Implements <see cref="AbstractSEECity.Renderer"/>.</remarks>
-        public GraphRenderer Renderer => graphRenderer;
+        public GraphRenderer Renderer { get; private set; }
 
         /// <summary>
         /// Creates and returns a new game edge between <paramref name="source"/> and <paramref name="target"/>
@@ -934,7 +931,7 @@ namespace SEE.Game.Evolution
         /// <remarks>Implements <see cref="IGraphRenderer.DrawEdge(GameObject, GameObject, string, Edge)"/>.</remarks>
         public GameObject DrawEdge(GameObject source, GameObject target, string edgeType)
         {
-            return graphRenderer.DrawEdge(source, target, edgeType);
+            return Renderer.DrawEdge(source, target, edgeType);
         }
 
         /// <summary>
@@ -949,7 +946,7 @@ namespace SEE.Game.Evolution
         /// <remarks>Implements <see cref="IGraphRenderer.DrawNode(Node, GameObject)"/>.</remarks>
         public GameObject DrawNode(Node node, GameObject city = null)
         {
-            return graphRenderer.DrawNode(node, city);
+            return Renderer.DrawNode(node, city);
         }
 
         /// <summary>
@@ -966,7 +963,7 @@ namespace SEE.Game.Evolution
         /// <remarks>Implements <see cref="IGraphRenderer.LayoutEdges(ICollection{GameObject})"/>.</remarks>
         public IDictionary<string, ILayoutEdge<ILayoutNode>> LayoutEdges(ICollection<GameObject> gameEdges)
         {
-            return graphRenderer.LayoutEdges(gameEdges);
+            return Renderer.LayoutEdges(gameEdges);
         }
 
         /// <summary>

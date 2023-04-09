@@ -22,7 +22,7 @@ namespace SEE.Game.Evolution
         {
             Debug.Log($"Phase 5: Adding {addedEdges.Count} new edges.\n");
             animationWatchDog.Await(addedEdges.Count, OnAnimationsFinished);
-            City.EdgeAnimationKind animationKind = graphRenderer.Settings.EdgeLayoutSettings.AnimationKind;
+            City.EdgeAnimationKind animationKind = Renderer.Settings.EdgeLayoutSettings.AnimationKind;
             foreach (Edge edge in addedEdges)
             {
                 objectManager.GetEdge(edge, out GameObject edgeObject);
