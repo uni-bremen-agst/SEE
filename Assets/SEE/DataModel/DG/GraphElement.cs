@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using SEE.Utils;
+﻿using SEE.Utils;
 
 namespace SEE.DataModel.DG
 {
@@ -73,40 +72,6 @@ namespace SEE.DataModel.DG
             // which type subsumes which other type. For the time being, we insist that
             // the types must be the same.
             return this.type == type;
-        }
-
-        /// <summary>
-        /// Returns true if <paramref name="other"/> meets all of the following conditions:
-        /// (1) is not null
-        /// (2) has exactly the same C# type
-        /// (3) has exactly the same attributes with exactly the same values as this graph element
-        /// (4) has the same type name
-        ///
-        /// Note: This graph element and the other graph element may or may not be in the same graph.
-        /// </summary>
-        /// <param name="other">to be compared to</param>
-        /// <returns>true if equal</returns>
-        public override bool Equals(object other)
-        {
-            if (!base.Equals(other))
-            {
-                GraphElement otherNode = other as GraphElement;
-                if (other != null)
-                {
-                    Report(ID + " " + otherNode.ID + " have differences");
-                }
-                return false;
-            }
-            else
-            {
-                GraphElement graphElement = other as GraphElement;
-                bool equal = type == graphElement.type;
-                if (!equal)
-                {
-                    Report("The types are different");
-                }
-                return equal;
-            }
         }
 
         /// <summary>
@@ -232,7 +197,7 @@ namespace SEE.DataModel.DG
         /// <returns>string representation of type and all attributes</returns>
         public override string ToString()
         {
-            return " \"type\": " + type + "\",\n" + base.ToString();
+            return " \"type\": \"" + type + "\",\n" + base.ToString();
         }
 
         /// <summary>
@@ -258,16 +223,36 @@ namespace SEE.DataModel.DG
             target.graph = null;
         }
 
+        /// <summary>
+        /// Returns true if <paramref name="other"/> meets all of the following conditions:
+        /// (1) is not null
+        /// (2) has exactly the same C# type as this graph element
+        /// (3) has exactly the same ID as this graph element
+        /// (4) belongs to the same graph as this graph element (or both
+        ///     do not belong to any graph)
+        /// </summary>
+        /// <param name="other">to be compared to</param>
+        /// <returns>true if equal</returns>
+        public override bool Equals(object other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+            else if (GetType() != other.GetType())
+            {
+                return false;
+            }
+            else
+            {
+                return other is GraphElement otherGraphElement
+                    && ID == otherGraphElement.ID && ItsGraph == otherGraphElement.ItsGraph;
+            }
+        }
+
         public override int GetHashCode()
         {
-            int hashCode = 316397938;
-            hashCode = hashCode * -1521134295 + base.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(type);
-            hashCode = hashCode * -1521134295 + EqualityComparer<Graph>.Default.GetHashCode(graph);
-            hashCode = hashCode * -1521134295 + EqualityComparer<Graph>.Default.GetHashCode(ItsGraph);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Type);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ID);
-            return hashCode;
+            return ID.GetHashCode();
         }
     }
 }

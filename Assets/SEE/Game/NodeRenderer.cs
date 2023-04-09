@@ -92,7 +92,7 @@ namespace SEE.Game
         /// <summary>
         /// Creates and returns a new game object for representing the given <paramref name="node"/>.
         /// The <paramref name="node"/> is attached to that new game object via a NodeRef component.
-        /// LOD is added and the resulting node is prepared for interaction.
+        /// LOD is added, its portal is set, and the resulting game node is prepared for interaction.
         /// </summary>
         /// <param name="node">graph node to be represented</param>
         /// <param name="city">the game object representing the city in which to draw this node;

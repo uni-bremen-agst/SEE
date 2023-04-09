@@ -23,13 +23,12 @@ using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
-using SEE.Game.Charts;
 
 namespace SEE.Game.Evolution
 {
     /// <summary>
-    /// An ObjectManager creates and manages GameObjects by using a supplied
-    /// GraphRenderer to create game objects for graph nodes. Those game objects
+    /// An <see cref="ObjectManager"/> creates and manages GameObjects by using a supplied
+    /// <see cref="GraphRenderer"/> to create game objects for graph nodes. Those game objects
     /// will be cached, that is, non-existing GameObjects are created and stored
     /// for reuse during query. Each GameObject is identified by the ID of
     /// a node and can be retrieved via any node with the same ID.
@@ -54,17 +53,13 @@ namespace SEE.Game.Evolution
         private GameObject currentPlane;
 
         /// <summary>
-        /// The names of the game objects representing nodes that do not need to be considered when animating.
-        /// </summary>
-        public ISet<string> NegligibleNodes { get; set; }
-
-        /// <summary>
         /// A dictionary containing all created nodes that are currently in use. The set of
-        /// nodes contained may be an accumulation of all nodes created and added by GetInnerNode()
-        /// and GetLeaf() so far and not just those of one single graph in the graph series
-        /// (unless a node was removed by RemoveNode() meanwhile).
+        /// nodes contained may be an accumulation of all nodes created and added by
+        /// <see cref="GetNode(Node, out GameObject)"/> so far and not just those of one
+        /// single graph in the graph series (unless a node was removed by
+        /// <see cref="RemoveNode(Node, out GameObject)"/> meanwhile).
         /// </summary>
-        private readonly Dictionary<string, GameObject> nodes = new Dictionary<string, GameObject>();
+        private readonly Dictionary<string, GameObject> nodes = new();
 
         /// <summary>
         /// A dictionary containing all created edges that are currently in use. The set of
@@ -73,7 +68,7 @@ namespace SEE.Game.Evolution
         /// graph in the graph series (unless an edge was removed by
         /// <see cref="RemoveEdge(Edge, out GameObject)"/> meanwhile).
         /// </summary>
-        private readonly Dictionary<string, GameObject> edges = new Dictionary<string, GameObject>();
+        private readonly Dictionary<string, GameObject> edges = new();
 
         /// <summary>
         /// Constructor.
@@ -89,17 +84,9 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Returns all created GameObjects till now.
+        /// List of all created game nodes that are in use.
         /// </summary>
-        public List<GameObject> GameObjects
-        {
-            get => gameObjects;
-        }
-
-        /// <summary>
-        /// List of all created nodes that are in use.
-        /// </summary>
-        private List<GameObject> gameObjects => nodes.Values.ToList();
+        private IList<GameObject> gameNodes => nodes.Values.ToList();
 
         /// <summary>
         /// Returns a saved plane or generates a new one if it does not already exist. The resulting
@@ -107,14 +94,16 @@ namespace SEE.Game.Evolution
         /// generated. It may need to be adjusted if it was not newly generated. The resulting
         /// plane is an immediate child of <see cref="city"/>.
         /// </summary>
-        /// <param name="plane">the plane intended to enclose all game objects of the city; the y co-ordinate of the plane will be 0</param>
-        /// <returns>true if the plane already existed (thus, can be re-used) and false if it was newly created</returns>
+        /// <param name="plane">the plane intended to enclose all game objects of the city; the
+        /// y co-ordinate of the plane will be 0</param>
+        /// <returns>true if the plane already existed (thus, can be re-used) and false if it
+        /// was newly created</returns>
         public bool GetPlane(out GameObject plane)
         {
             bool hasPlane = currentPlane != null;
             if (!hasPlane)
             {
-                currentPlane = graphRenderer.DrawPlane(gameObjects, city.transform.position.y);
+                currentPlane = graphRenderer.DrawPlane(gameNodes, city.transform.position.y);
                 currentPlane.transform.SetParent(city.transform);
             }
             plane = currentPlane;
@@ -122,18 +111,18 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Adjusts the current plane so that all current game objects managed here
+        /// Adjusts the current plane so that all current <see cref="gameNodes"/> managed here
         /// fit onto it. Height and y co-ordinate will be maintained. Only its
         /// x and z co-ordinates will be adjusted.
         /// </summary>
         public void AdjustPlane()
         {
-            graphRenderer.AdjustPlane(currentPlane, gameObjects);
+            graphRenderer.AdjustPlane(currentPlane, gameNodes);
         }
 
         /// <summary>
         /// Determines the new <paramref name="centerPosition"/> and <paramref name="scale"/> for the
-        /// plane so that it would enclose all cached game objects of the city where
+        /// <see cref="currentPlane"/> so that it would enclose all cached <see cref="gameNodes"/> of the city where
         /// the y co-ordinate and the height of the plane would remain the same. The plane itself
         /// is not actually changed.
         /// </summary>
@@ -141,23 +130,23 @@ namespace SEE.Game.Evolution
         /// <param name="scale">the new scale of the plane</param>
         public void GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale)
         {
-            graphRenderer.GetPlaneTransform(currentPlane, gameObjects, out centerPosition, out scale);
+            graphRenderer.GetPlaneTransform(currentPlane, gameNodes, out centerPosition, out scale);
         }
 
         /// <summary>
-        /// Sets <paramref name="gameNode"/> to a cached GameObject for a leaf or inner node
-        /// or creates a new one if none has existed. The game object is identified
-        /// by the attribute ID of <paramref name="node"/>.
+        /// Sets <paramref name="gameNode"/> to a cached GameObject or creates a new one
+        /// if none has existed yet. The game object is identified by the attribute <see cref="Node.ID"/>
+        /// of <paramref name="node"/>.
         /// If a game object existed already, the given <paramref name="node"/> will be
         /// attached to <paramref name="gameNode"/> replacing its previously attached graph
         /// node and that previously attached graph node will be returned. If no such game object
         /// existed before, <paramref name="node"/> will be attached to the new game object
-        /// and null will be returned.
+        /// and <c>null</c> will be returned.
         /// </summary>
         /// <param name="node">the node to be represented by <paramref name="gameNode"/></param>
         /// <param name="gameNode">the resulting GameObject representing <paramref name="node"/></param>
         /// <returns>the formerly attached graph node of <paramref name="gameNode"/> if
-        /// such a game object existed or null if the game node was newly created</returns>
+        /// such a game object existed or <c>null</c> if the game node was newly created</returns>
         public Node GetNode(Node node, out GameObject gameNode)
         {
             if (nodes.TryGetValue(node.ID, out gameNode))
@@ -183,18 +172,18 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Sets <paramref name="gameEdge"/> to a cached GameObject for an edge
-        /// or creates a new one if none has existed. The game object is identified
-        /// by the attribute ID of <paramref name="edge"/>.
+        /// or creates a new one if none has existed yet. The game object is identified
+        /// by the attribute <see cref="Edge.ID"/> of <paramref name="edge"/>.
         /// If a game object existed already, the given <paramref name="edge"/> will be
         /// attached to <paramref name="gameEdge"/> replacing its previously attached graph
         /// edge and that previously attached graph edge will be returned. If no such game object
         /// existed before, <paramref name="edge"/> will be attached to the new game object
-        /// and null will be returned.
+        /// and <c>null</c> will be returned.
         /// </summary>
         /// <param name="edge">the edge to be represented by <paramref name="gameEdge"/></param>
         /// <param name="gameEdge">the resulting GameObject representing <paramref name="edge"/></param>
         /// <returns>the formerly attached graph edge of <paramref name="gameEdge"/> if
-        /// such a game object existed or null if the game edge was newly created</returns>
+        /// such a game object existed or <c>null</c> if the game edge was newly created</returns>
         public Edge GetEdge(Edge edge, out GameObject gameEdge)
         {
             if (edges.TryGetValue(edge.ID, out gameEdge))
@@ -220,7 +209,7 @@ namespace SEE.Game.Evolution
                 // to GetEdge() when moving from one graph to the next one.
 
                 // Determine all game nodes.
-                List<GameObject> gameNodes = new List<GameObject>();
+                List<GameObject> gameNodes = new();
                 foreach (Node node in edge.ItsGraph.Nodes())
                 {
                     GetNode(node, out GameObject gameNode);
@@ -231,21 +220,28 @@ namespace SEE.Game.Evolution
                 // put all game edges into the cache 'edges' (if not already present) and find `gameEdge'.
                 foreach (GameObject newGameEdge in graphRenderer.EdgeLayout(gameNodes, city, false))
                 {
-                    string id = newGameEdge.GetComponent<EdgeRef>().Value.ID;
-                    if (edges.ContainsKey(id))
+                    string edgeID = newGameEdge.GetComponent<EdgeRef>().Value.ID;
+                    if (edges.ContainsKey(edgeID))
                     {
                         // Edge object has already been created in previous call.
                         Destroyer.Destroy(newGameEdge);
                     }
                     else
                     {
-                        newGameEdge.SetActive(false); // Disable renderer
-                        edges.Add(id, newGameEdge);
+                        edges.Add(edgeID, newGameEdge);
                         // FIXME (@koschke): This should be rewritten so that the GraphElementIDMap isn't called here.
                         //                   That part should be handled by GraphRenderer.CreateGameNode.
                         GraphElementIDMap.Add(newGameEdge);
+                        // We need to set the portal ourselves. The portal cannot be derived from
+                        // SceneQueries.GetCityRootNode(city) because the nodes are not yet
+                        // children of the city. The node hierarchy will be established only at
+                        // the end of an animation cycle.
+                        Portal.GetDimensions(city, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
+                        Portal.SetPortal(newGameEdge, leftFrontCorner, rightBackCorner);
                     }
-                    if (id == edge.ID)
+                    // FIXME: if edges.ContainsKey(edgeID), newGameEdge will be destroyed.
+                    // How can we then assign newGameEdge to gameEdge?
+                    if (edgeID == edge.ID)
                     {
                         gameEdge = newGameEdge;
                     }
@@ -352,11 +348,7 @@ namespace SEE.Game.Evolution
         public bool RemoveNode(Node node, out GameObject gameObject)
         {
             node.AssertNotNull("node");
-
             bool wasNodeRemoved = nodes.TryGetValue(node.ID, out gameObject);
-            // Add the removed node id to the revision changes list
-            NodeChangesBuffer.GetSingleton().removedNodeIDs.Add(node.ID);
-
             nodes.Remove(node.ID);
             return wasNodeRemoved;
         }
@@ -379,8 +371,8 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Clears the internal cache containing all game objects created by GetInnerNode(),
-        /// GetLeaf(), GetNode(), or GetPlane() and also destroys those game objects.
+        /// Clears the internal cache containing all game objects created for nodes
+        /// and edges as well as the plane and also destroys those game objects.
         /// </summary>
         public void Clear()
         {
@@ -390,12 +382,12 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Destroys the game object created for the plane (if one exists).
-        /// Postcondition: currentPlane = null.
+        /// Destroys the game object created for the <see cref="currentPlane"/> (if one exists).
+        /// Postcondition: <see cref="currentPlane"/> equals <c>null</c>.
         /// </summary>
         private void ClearPlane()
         {
-            if (currentPlane ?? true)
+            if (currentPlane != null)
             {
                 Destroyer.Destroy(currentPlane);
                 currentPlane = null;
@@ -403,7 +395,8 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Destroys all game objects created for nodes. Clears the node cache.
+        /// Destroys all game objects in <see cref="nodes"/>.
+        /// Clears the node cache <see cref="nodes"/>.
         /// </summary>
         private void ClearNodes()
         {
@@ -415,7 +408,8 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Destroys all game objects created for edges. Clears the edge cache.
+        /// Destroys all game objects in <see cref="edges"/>.
+        /// Clears the edge cache <see cref="edges"/>.
         /// </summary>
         private void ClearEdges()
         {
