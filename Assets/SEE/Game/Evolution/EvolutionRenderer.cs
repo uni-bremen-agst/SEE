@@ -981,7 +981,7 @@ namespace SEE.Game.Evolution
         /// <returns>names of all existing node metrics</returns>
         internal ISet<string> AllExistingMetrics()
         {
-            if (currentCity == null || currentCity.Graph == null)
+            if (currentCity?.Graph == null)
             {
                 return new HashSet<string>();
             }
