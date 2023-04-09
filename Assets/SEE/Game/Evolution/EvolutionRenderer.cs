@@ -261,7 +261,7 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// _Informs the user that we already reached the end of the graph series.
+        /// Informs the user that we already reached the end of the graph series.
         /// </summary>
         private static void UserInfoLastGraph()
         {
