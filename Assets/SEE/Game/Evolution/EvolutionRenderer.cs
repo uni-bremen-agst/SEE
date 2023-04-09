@@ -113,13 +113,6 @@ namespace SEE.Game.Evolution
         private MarkerFactory markerFactory;
 
         /// <summary>
-        /// The kind of comparison to determine whether there are any differences between
-        /// two corresponding graph elements (corresponding by their ID) in
-        /// two different graphs of the graph series.
-        /// </summary>
-        private GraphElementDiff diff;
-
-        /// <summary>
         /// An event fired when the view graph has changed.
         /// </summary>
         private readonly UnityEvent shownGraphHasChangedEvent = new();

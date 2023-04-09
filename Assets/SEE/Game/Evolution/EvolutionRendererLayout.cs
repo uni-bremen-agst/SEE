@@ -40,8 +40,6 @@ namespace SEE.Game.Evolution
         /// Creates and saves the node and edge layouts for all given <paramref name="graphs"/>. This will
         /// also create all necessary game nodes and game edges-- even those game nodes and game edges
         /// that are not present in the first graph in <see cref="graphs"/>.
-        /// This method will also define <see cref="diff"/> based on all
-        /// <see cref="Graph.AllNumericNodeAttributes"/>.
         /// </summary>
         private void CalculateAllGraphLayouts(IList<Graph> graphs)
         {
@@ -53,7 +51,6 @@ namespace SEE.Game.Evolution
                 CalculateLayout(graph);
                 numericNodeAttributes.UnionWith(graph.AllNumericNodeAttributes());
             });
-            diff = new NumericAttributeDiff(numericNodeAttributes);
             objectManager.Clear();
             p.End(true);
         }
