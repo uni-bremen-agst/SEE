@@ -115,6 +115,7 @@ namespace SEE.Game.Operator
         /// <param name="newXPosition">the desired new target X coordinate in world space</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> MoveXTo(float newXPosition, float duration, bool updateEdges = true)
         {
@@ -129,6 +130,7 @@ namespace SEE.Game.Operator
         /// <param name="newYPosition">the desired new target Y coordinate in world space</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> MoveYTo(float newYPosition, float duration, bool updateEdges = true)
         {
@@ -143,6 +145,7 @@ namespace SEE.Game.Operator
         /// <param name="newZPosition">the desired new target Z coordinate in world space</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> MoveZTo(float newZPosition, float duration, bool updateEdges = true)
         {
@@ -157,6 +160,7 @@ namespace SEE.Game.Operator
         /// <param name="newPosition">the desired new target position in world space</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> MoveTo(Vector3 newPosition, float duration, bool updateEdges = true)
         {
@@ -177,6 +181,7 @@ namespace SEE.Game.Operator
         /// should be scaled relative to its parent (i.e., local scale)</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> ScaleTo(Vector3 newLocalScale, float duration, bool updateEdges = true)
         {
