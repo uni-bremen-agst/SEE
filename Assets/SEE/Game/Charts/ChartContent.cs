@@ -175,17 +175,17 @@ namespace SEE.Game.Charts
         /// <summary>
         /// IDs of the nodes that have been added in this revision
         /// </summary>
-        private List<string> newNodeIDs = new List<string>();
+        private IList<string> newNodeIDs = new List<string>();
 
         /// <summary>
         /// IDs of the nodes that have changed in this revision
         /// </summary>
-        private List<string> changedNodeIDs = new List<string>();
+        private IList<string> changedNodeIDs = new List<string>();
 
         /// <summary>
         /// IDs of the nodes that have been removed in this revision
         /// </summary>
-        private List<string> removedNodeIDs = new List<string>();
+        private IList<string> removedNodeIDs = new List<string>();
 
         /// <summary>
         /// Color of added node labels
@@ -271,17 +271,17 @@ namespace SEE.Game.Charts
 
         private void Update()
         {
-            if (currentRevisionCountCache != NodeChangesBuffer.GetSingleton().currentRevisionCounter)
+            if (currentRevisionCountCache != NodeChangesBuffer.Instance().CurrentRevisionCounter)
             {
                 // Push game objects to pool
                 PushScrollViewEntriesToPool(previousFirst, previousOnePastLast);
                 ReloadData();
-                currentRevisionCountCache = NodeChangesBuffer.GetSingleton().currentRevisionCounter;
-                NodeChangesBuffer.GetSingleton().revisionChanged = false;
+                currentRevisionCountCache = NodeChangesBuffer.Instance().CurrentRevisionCounter;
+                NodeChangesBuffer.Instance().RevisionChanged = false;
             }
             // Prevents scrolling while the data is updating, as it would otherwise crash the graph (because
             // the data takes some time to update).
-            if (!NodeChangesBuffer.GetSingleton().revisionChanged)
+            if (!NodeChangesBuffer.Instance().RevisionChanged)
             {
                 float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / ScrollViewEntryHeight;
                 int totalEntryCount = scrollViewEntries.Length - (scrollViewIsTree ? 2 : 0);
@@ -1085,9 +1085,9 @@ namespace SEE.Game.Charts
         /// </summary>
         private void FillListsWithChanges()
         {
-            newNodeIDs = NodeChangesBuffer.GetSingleton().addedNodeIDsCache;
-            changedNodeIDs = NodeChangesBuffer.GetSingleton().changedNodeIDsCache;
-            removedNodeIDs = NodeChangesBuffer.GetSingleton().removedNodeIDsCache;
+            newNodeIDs = NodeChangesBuffer.Instance().AddedNodeIDsCache;
+            changedNodeIDs = NodeChangesBuffer.Instance().ChangedNodeIDsCache;
+            removedNodeIDs = NodeChangesBuffer.Instance().RemovedNodeIDsCache;
         }
 
         /// <summary>
@@ -1137,14 +1137,14 @@ namespace SEE.Game.Charts
     public class NodeChangesBuffer
     {
         /// <summary>
-        /// Singleton
+        /// Singleton instance of this class.
         /// </summary>
         private static NodeChangesBuffer singleton;
 
         /// <summary>
-        /// Get singleton instance
+        /// Get singleton instance of this class.
         /// </summary>
-        public static NodeChangesBuffer GetSingleton()
+        public static NodeChangesBuffer Instance()
         {
             return singleton ??= new NodeChangesBuffer();
         }
@@ -1152,41 +1152,26 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Current revision "id"
         /// </summary>
-        public int currentRevisionCounter = 0;
+        public int CurrentRevisionCounter = 0;
 
         /// <summary>
         /// Detects a revision change
         /// </summary>
-        public bool revisionChanged = false;
-
-        /// <summary>
-        /// Stores the IDs of nodes that have been added in the current revision
-        /// </summary>
-        public readonly List<string> addedNodeIDs = new List<string>();
-
-        /// <summary>
-        /// Stores the IDs of nodes that have been changed in the current revision
-        /// </summary>
-        public readonly List<string> changedNodeIDs = new List<string>();
-
-        /// <summary>
-        /// Stores the IDs of nodes that have been removed in the current revision
-        /// </summary>
-        public readonly List<string> removedNodeIDs = new List<string>();
+        public bool RevisionChanged = false;
 
         /// <summary>
         /// Old ids of newly added nodes, needed when closing and re-opening the chart
         /// </summary>
-        public List<string> addedNodeIDsCache = new List<string>();
+        public IList<string> AddedNodeIDsCache = new List<string>();
 
         /// <summary>
         /// Old ids of changed nodes, needed when closing and re-opening the chart
         /// </summary>
-        public List<string> changedNodeIDsCache = new List<string>();
+        public IList<string> ChangedNodeIDsCache = new List<string>();
 
         /// <summary>
         /// Old ids of removed nodes, needed when closing and re-opening the chart
         /// </summary>
-        public List<string> removedNodeIDsCache = new List<string>();
+        public IList<string> RemovedNodeIDsCache = new List<string>();
     }
 }
