@@ -16,6 +16,7 @@ using SEE.Layout.NodeLayouts.Cose;
 using SEE.Net.Actions.RuntimeConfig;
 using SEE.Utils;
 using SimpleFileBrowser;
+using Sirenix.OdinInspector;
 using Sirenix.Utilities;
 using TMPro;
 using UnityEngine;
@@ -72,7 +73,6 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     {
         base.OnStartFinished();
         city = RuntimeConfigMenu.GetCity(CityIndex);
-        OnEntryAdded += _ => SetMiscAsLastTab();
         OnSyncMethod += methodName => {
             if (methodName == nameof(TriggerImmediateRedraw)) TriggerImmediateRedraw();
         };
@@ -133,14 +133,44 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
     private void LoadCity()
     {
-        city.GetType().GetMembers().ForEach(memberInfo =>
+        IOrderedEnumerable<MemberInfo> members = city.GetType().GetMembers().OrderBy(HasFoldoutAttribute).ThenBy(GetTabName);
+        members.ForEach(memberInfo => CreateSetting(memberInfo, null, city));
+        SelectEntry(Entries.First());
+        
+        IOrderedEnumerable<MethodInfo> methods = city.GetType().GetMethods().
+            Where(HasButtonAttribute).Where(IsCityAttribute).
+            OrderBy(GetButtonGroup).ThenBy(GetOrderOfMemberInfo);
+        methods.ForEach(methodInfo => CreateButton(methodInfo, city));
+
+        string GetTabName(MemberInfo memberInfo)
         {
-            if (memberInfo.DeclaringType == typeof(AbstractSEECity) ||
-                memberInfo.DeclaringType!.IsSubclassOf(typeof(AbstractSEECity)))
-                CreateSetting(memberInfo, null, city);
-        });
-        city.GetType().GetMethods().ForEach(methodInfo => CreateButton(methodInfo, city));
-        SelectEntry(Entries.First(entry => entry.Title != "Misc"));
+            return memberInfo.GetCustomAttributes().OfType<RuntimeFoldoutAttribute>().FirstOrDefault()?.name;
+        }
+        bool IsCityAttribute(MemberInfo memberInfo)
+        {
+            return memberInfo.DeclaringType == typeof(AbstractSEECity) ||
+                   memberInfo.DeclaringType!.IsSubclassOf(typeof(AbstractSEECity));
+        }
+        int HasFoldoutAttribute(MemberInfo memberInfo)
+        {
+            return memberInfo.GetCustomAttributes().Any(a => a is RuntimeFoldoutAttribute) ? 0 : 1;
+        }
+        float GetOrderOfMemberInfo(MemberInfo memberInfo)
+        {
+            PropertyOrderAttribute a = memberInfo.GetCustomAttributes().OfType<PropertyOrderAttribute>()
+                .FirstOrDefault() ?? new PropertyOrderAttribute();
+            return a.Order;
+        }
+        string GetButtonGroup(MemberInfo memberInfo)
+        {
+            ButtonGroupAttribute buttonGroup = memberInfo.GetCustomAttributes().OfType<ButtonGroupAttribute>().FirstOrDefault() 
+                                               ?? new ButtonGroupAttribute();
+            return buttonGroup.GroupID;
+        }
+        bool HasButtonAttribute(MemberInfo memberInfo)
+        {
+            return memberInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().Any();
+        }
     }
 
     private void SetupCitySwitcher()
@@ -184,15 +214,6 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         }
 
         return ViewGameObject(entry);
-    }
-
-    /// <summary>
-    /// Sets the misc button as the last in the tab list.
-    /// </summary>
-    protected virtual void SetMiscAsLastTab()
-    {
-        ToggleMenuEntry miscEntry = Entries.FirstOrDefault(entry => entry.Title == "Misc");
-        if (miscEntry != null) EntryGameObject(miscEntry).transform.SetAsLastSibling();
     }
 
     private void CreateSetting(MemberInfo memberInfo, GameObject parent, object obj)
