@@ -32,6 +32,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     public const string SWITCH_PREFAB = UI_PREFAB_FOLDER + "Input Group - Switch";
     public const string SLIDER_PREFAB = UI_PREFAB_FOLDER + "Input Group - Slider";
     public const string DROPDOWN_PREFAB = UI_PREFAB_FOLDER + "Input Group - Dropdown";
+    public const string DROPDOWN_2_PREFAB = UI_PREFAB_FOLDER + "Input Group - Dropdown 2";
     public const string COLORPICKER_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeColorPicker";
     public const string STRINGFIELD_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "Input Group - StringInputField";
     public const string BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "Button";
@@ -661,20 +662,15 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         string[] valueArray = values as string[] ?? values.ToArray();
 
         GameObject dropDownGameObject =
-            PrefabInstantiator.InstantiatePrefab(DROPDOWN_PREFAB, parent.transform, false);
+            PrefabInstantiator.InstantiatePrefab(DROPDOWN_2_PREFAB, parent.transform, false);
         dropDownGameObject.name = settingName;
         AddLayoutElement(dropDownGameObject);
         TextMeshProUGUI text = dropDownGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
         text.text = settingName;
         // TODO: value and setter
 
-        CustomDropdown dropdown = dropDownGameObject.transform.Find("DropdownCombo/Dropdown").GetComponent<CustomDropdown>();
-        TMP_InputField customInput = dropDownGameObject.transform.Find("DropdownCombo/Input").GetComponent<TMP_InputField>();
-        Dictaphone dictaphone = dropDownGameObject.transform.Find("DropdownCombo/DictateButton").GetComponent<Dictaphone>();
-
-        customInput.gameObject.SetActive(false);
-        dictaphone.gameObject.SetActive(false);
-
+        CustomDropdown dropdown = dropDownGameObject.transform.Find("Dropdown").GetComponent<CustomDropdown>();
+        
         dropdown.isListItem = true;
         dropdown.listParent = Canvas.transform;
         dropdown.selectedItemIndex = Array.IndexOf(valueArray, getter());
