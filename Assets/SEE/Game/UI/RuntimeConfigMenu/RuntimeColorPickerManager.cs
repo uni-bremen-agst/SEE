@@ -6,12 +6,12 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 {
     public class RuntimeColorPickerManager : MonoBehaviour, IPointerClickHandler
     {
-    
-    
-        public event Action OnEndEdit;
         public void OnPointerClick(PointerEventData eventData)
         {
             OnEndEdit?.Invoke();
         }
+
+
+        public event Action OnEndEdit;
     }
 }

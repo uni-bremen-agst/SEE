@@ -20,16 +20,11 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
-using Slider = UnityEngine.UI.Slider;
 
 namespace SEE.Game.UI.RuntimeConfigMenu
 {
     public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     {
-        protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenu";
-        protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsView";
-        protected override string EntryPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeTabButton";
-    
         public const string RUNTIME_CONFIG_PREFAB_FOLDER = UI_PREFAB_FOLDER + "RuntimeConfigMenu/";
         public const string SETTINGS_OBJECT_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsObject";
         public const string SWITCH_PREFAB = UI_PREFAB_FOLDER + "Input Group - Switch";
@@ -41,19 +36,27 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         public const string ADD_ELEMENT_BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeAddButton";
         public const string REMOVE_ELEMENT_BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeRemoveButton";
 
+        public int CityIndex;
+        private AbstractSEECity city;
+
+        private HorizontalSelector citySwitcher;
+        private GameObject configButtonList;
+        private bool immediateRedraw;
+
+
+        public Action<string, object> OnSyncField;
+        public Action<string> OnSyncMethod;
+        public Action<string, string, bool> OnSyncPath;
+        protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenu";
+        protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsView";
+        protected override string EntryPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeTabButton";
+
         protected override string ContentPath => "Main Content";
         protected override string ViewListPath => "ViewList";
         protected override string EntryListPath => "TabButtons/TabObjects";
         protected virtual string ConfigButtonListPath => "ConfigButtons/Content";
 
         protected virtual string CitySwitcherPath => "City Switcher";
-
-        private HorizontalSelector citySwitcher;
-        private GameObject configButtonList;
-
-        public int CityIndex;
-        private AbstractSEECity city;
-        private bool immediateRedraw;
 
         protected override void StartDesktop()
         {
@@ -65,13 +68,14 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         }
 
         /// <summary>
-        /// Updates the menu and adds listeners.
+        ///     Updates the menu and adds listeners.
         /// </summary>
         protected override void OnStartFinished()
         {
             base.OnStartFinished();
             city = RuntimeConfigMenu.GetCity(CityIndex);
-            OnSyncMethod += methodName => {
+            OnSyncMethod += methodName =>
+            {
                 if (methodName == nameof(TriggerImmediateRedraw)) TriggerImmediateRedraw();
             };
 
@@ -96,7 +100,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
         protected virtual void CreateButton(MethodInfo methodInfo, AbstractSEECity city)
         {
-            RuntimeButtonAttribute buttonAttribute = methodInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault();
+            RuntimeButtonAttribute buttonAttribute =
+                methodInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault();
             // only methods with the button attribute
             if (buttonAttribute == null) return;
             // only methods with no parameters
@@ -131,41 +136,46 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
         private void LoadCity()
         {
-            IOrderedEnumerable<MemberInfo> members = city.GetType().GetMembers().Where(IsCityAttribute).
-                OrderBy(HasFoldoutAttribute).ThenBy(GetTabName);
+            var members = city.GetType().GetMembers().Where(IsCityAttribute).OrderBy(HasFoldoutAttribute)
+                .ThenBy(GetTabName);
             members.ForEach(memberInfo => CreateSetting(memberInfo, null, city));
             SelectEntry(Entries.First());
-        
-            IOrderedEnumerable<MethodInfo> methods = city.GetType().GetMethods().
-                Where(HasButtonAttribute).Where(IsCityAttribute).
-                OrderBy(GetButtonGroup).ThenBy(GetOrderOfMemberInfo);
+
+            var methods = city.GetType().GetMethods().Where(HasButtonAttribute).Where(IsCityAttribute)
+                .OrderBy(GetButtonGroup).ThenBy(GetOrderOfMemberInfo);
             methods.ForEach(methodInfo => CreateButton(methodInfo, city));
 
             string GetTabName(MemberInfo memberInfo)
             {
                 return memberInfo.GetCustomAttributes().OfType<RuntimeFoldoutAttribute>().FirstOrDefault()?.name;
             }
+
             bool IsCityAttribute(MemberInfo memberInfo)
             {
                 return memberInfo.DeclaringType == typeof(AbstractSEECity) ||
                        memberInfo.DeclaringType!.IsSubclassOf(typeof(AbstractSEECity));
             }
+
             int HasFoldoutAttribute(MemberInfo memberInfo)
             {
                 return memberInfo.GetCustomAttributes().Any(a => a is RuntimeFoldoutAttribute) ? 0 : 1;
             }
+
             float GetOrderOfMemberInfo(MemberInfo memberInfo)
             {
                 PropertyOrderAttribute a = memberInfo.GetCustomAttributes().OfType<PropertyOrderAttribute>()
                     .FirstOrDefault() ?? new PropertyOrderAttribute();
                 return a.Order;
             }
+
             string GetButtonGroup(MemberInfo memberInfo)
             {
-                ButtonGroupAttribute buttonGroup = memberInfo.GetCustomAttributes().OfType<ButtonGroupAttribute>().FirstOrDefault() 
-                                                   ?? new ButtonGroupAttribute();
+                ButtonGroupAttribute buttonGroup =
+                    memberInfo.GetCustomAttributes().OfType<ButtonGroupAttribute>().FirstOrDefault()
+                    ?? new ButtonGroupAttribute();
                 return buttonGroup.GroupID;
             }
+
             bool HasButtonAttribute(MemberInfo memberInfo)
             {
                 return memberInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().Any();
@@ -187,8 +197,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         }
 
         /// <summary>
-        /// Returns the view game object.
-        /// Adds an entry if necessary.
+        ///     Returns the view game object.
+        ///     Adds an entry if necessary.
         /// </summary>
         /// <param name="attributes"></param>
         /// <returns></returns>
@@ -201,13 +211,13 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             if (entry == null)
             {
                 entry = new ToggleMenuEntry(
-                    entryAction: () => { },
-                    exitAction: () => { },
+                    () => { },
+                    () => { },
                     tabName,
-                    description: $"Settings for {tabName}",
-                    entryColor: Random.ColorHSV(), // TODO: Color
-                    icon: Icon, // TODO: Icon
-                    enabled: true
+                    $"Settings for {tabName}",
+                    Random.ColorHSV(), // TODO: Color
+                    Icon, // TODO: Icon
+                    true
                 );
                 AddEntry(entry);
             }
@@ -223,22 +233,22 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 case FieldInfo fieldInfo:
                     if (fieldInfo.IsLiteral || fieldInfo.IsInitOnly) return;
                     CreateSetting(
-                        getter: () => fieldInfo.GetValue(obj),
-                        settingName: memberInfo.Name,
-                        parent: parent,
-                        setter: changedValue => fieldInfo.SetValue(obj, changedValue),
-                        attributes: memberInfo.GetCustomAttributes()
+                        () => fieldInfo.GetValue(obj),
+                        memberInfo.Name,
+                        parent,
+                        changedValue => fieldInfo.SetValue(obj, changedValue),
+                        memberInfo.GetCustomAttributes()
                     );
                     break;
                 case PropertyInfo propertyInfo:
                     if (propertyInfo.GetMethod == null || propertyInfo.SetMethod == null ||
                         !propertyInfo.CanRead || !propertyInfo.CanWrite) return;
                     CreateSetting(
-                        getter: () => propertyInfo.GetValue(obj),
-                        settingName: memberInfo.Name,
-                        parent: parent,
-                        setter: changedValue => propertyInfo.SetValue(obj, changedValue),
-                        attributes: memberInfo.GetCustomAttributes()
+                        () => propertyInfo.GetValue(obj),
+                        memberInfo.Name,
+                        parent,
+                        changedValue => propertyInfo.SetValue(obj, changedValue),
+                        memberInfo.GetCustomAttributes()
                     );
                     break;
             }
@@ -247,7 +257,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         private void CreateSetting(Func<object> getter, string settingName, GameObject parent,
             UnityAction<object> setter = null, IEnumerable<Attribute> attributes = null)
         {
-            Attribute[] attributeArray = attributes as Attribute[] ?? attributes?.ToArray() ?? Array.Empty<Attribute>();
+            var attributeArray = attributes as Attribute[] ?? attributes?.ToArray() ?? Array.Empty<Attribute>();
             parent ??= CreateOrGetViewGameObject(attributeArray).transform.Find("Content").gameObject;
 
             object value = getter();
@@ -255,56 +265,56 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             {
                 case bool:
                     CreateSwitch(
-                        settingName: settingName,
-                        setter: changedValue => setter!(changedValue),
-                        getter: () => (bool)getter(),
-                        parent: parent
+                        settingName,
+                        changedValue => setter!(changedValue),
+                        () => (bool)getter(),
+                        parent
                     );
                     break;
                 case int:
                     CreateSlider(
-                        settingName: settingName,
-                        range: attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
-                        setter: changedValue => setter!((int)changedValue),
-                        getter: () => (int)getter(),
-                        useRoundValue: true,
-                        parent: parent
+                        settingName,
+                        attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
+                        changedValue => setter!((int)changedValue),
+                        () => (int)getter(),
+                        true,
+                        parent
                     );
                     break;
                 case uint:
                     CreateSlider(
-                        settingName: settingName,
-                        range: attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
-                        setter: changedValue => setter!((uint)changedValue),
-                        getter: () => (uint)getter(),
-                        useRoundValue: true,
-                        parent: parent
+                        settingName,
+                        attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
+                        changedValue => setter!((uint)changedValue),
+                        () => (uint)getter(),
+                        true,
+                        parent
                     );
                     break;
                 case float:
                     CreateSlider(
-                        settingName: settingName,
-                        range: attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
-                        setter: changedValue => setter!(changedValue),
-                        getter: () => (float)getter(),
-                        useRoundValue: false,
-                        parent: parent
+                        settingName,
+                        attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
+                        changedValue => setter!(changedValue),
+                        () => (float)getter(),
+                        false,
+                        parent
                     );
                     break;
                 case string:
                     CreateStringField(
-                        settingName: settingName,
-                        setter: changedValue => setter!(changedValue),
-                        getter: () => (string)getter(),
-                        parent: parent
+                        settingName,
+                        changedValue => setter!(changedValue),
+                        () => (string)getter(),
+                        parent
                     );
                     break;
                 case Color:
                     CreateColorPicker(
-                        settingName: settingName,
-                        parent: parent,
-                        setter: changedValue => setter!(changedValue),
-                        getter: () => (Color)getter()
+                        settingName,
+                        parent,
+                        changedValue => setter!(changedValue),
+                        () => (Color)getter()
                     );
                     break;
                 case DataPath dataPath:
@@ -313,7 +323,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     filePicker.DataPathInstance = dataPath;
                     filePicker.Label = settingName;
                     filePicker.PickingMode = FileBrowser.PickMode.Files;
-                    filePicker.OnMenuInitialized += () => AddLayoutElement(parent.transform.Find(settingName).gameObject);
+                    filePicker.OnMenuInitialized +=
+                        () => AddLayoutElement(parent.transform.Find(settingName).gameObject);
 
                     filePicker.OnChangedDropdown += () =>
                     {
@@ -337,51 +348,48 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     OnSyncPath += (widgetPath, newValue, isAbsolute) =>
                     {
                         if (widgetPath == filePicker.gameObject.FullName() + "/" + settingName)
-                        {
                             filePicker.ChangePath(newValue, isAbsolute);
-                        }
                     };
 
                     OnSyncField += (widgetPath, newValue) =>
                     {
                         if (widgetPath == filePicker.gameObject.FullName() + "/" + settingName)
-                        {
                             filePicker.ChangeDropdown((int)newValue);
-                        }
                     };
 
                     break;
                 case Enum:
                     CreateDropDown(
-                        settingName: settingName,
-                        setter: changedValue => setter!(Enum.ToObject(value.GetType(), changedValue)),
-                        values: value.GetType().GetEnumNames(),
-                        getter: () => getter().ToString(),
-                        parent: parent
+                        settingName,
+                        changedValue => setter!(Enum.ToObject(value.GetType(), changedValue)),
+                        value.GetType().GetEnumNames(),
+                        () => getter().ToString(),
+                        parent
                     );
                     break;
                 // from here on come nested settings
                 case NodeTypeVisualsMap:
                 case ColorMap:
-                    FieldInfo mapInfo = value.GetType().GetField("map", BindingFlags.Instance | BindingFlags.NonPublic)!;
+                    FieldInfo mapInfo =
+                        value.GetType().GetField("map", BindingFlags.Instance | BindingFlags.NonPublic)!;
                     CreateSetting(
-                        getter: () => mapInfo.GetValue(value),
-                        settingName: settingName,
-                        parent: parent,
-                        setter: null,
+                        () => mapInfo.GetValue(value),
+                        settingName,
+                        parent,
+                        null,
                         // TODO: Which attributes? Both or which one?
-                        attributes: mapInfo.GetCustomAttributes().Concat(attributes ?? Enumerable.Empty<Attribute>())
+                        mapInfo.GetCustomAttributes().Concat(attributes ?? Enumerable.Empty<Attribute>())
                     );
                     break;
                 case AntennaAttributes:
                     FieldInfo antennaInfo = value.GetType().GetField("AntennaSections")!;
                     CreateSetting(
-                        getter: () => antennaInfo.GetValue(value),
-                        settingName: settingName,
-                        parent: parent,
-                        setter: null,
+                        () => antennaInfo.GetValue(value),
+                        settingName,
+                        parent,
+                        null,
                         // TODO: Which attributes? Both or which one?
-                        attributes: antennaInfo.GetCustomAttributes().Concat(attributes ?? Enumerable.Empty<Attribute>())
+                        antennaInfo.GetCustomAttributes().Concat(attributes ?? Enumerable.Empty<Attribute>())
                     );
                     break;
                 // from here on come nested settings
@@ -416,12 +424,14 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 case IList<string> list:
                     parent = CreateNestedSetting(settingName, parent);
                     // Buttons erstellen
-                    GameObject buttonContainer = new GameObject("ButtonContainer");
+                    GameObject buttonContainer = new("ButtonContainer");
                     buttonContainer.AddComponent<HorizontalLayoutGroup>();
                     buttonContainer.transform.SetParent(parent.transform);
 
-                    GameObject addButton = PrefabInstantiator.InstantiatePrefab(ADD_ELEMENT_BUTTON_PREFAB, buttonContainer.transform);
-                    GameObject removeButton = PrefabInstantiator.InstantiatePrefab(REMOVE_ELEMENT_BUTTON_PREFAB, buttonContainer.transform);
+                    GameObject addButton =
+                        PrefabInstantiator.InstantiatePrefab(ADD_ELEMENT_BUTTON_PREFAB, buttonContainer.transform);
+                    GameObject removeButton =
+                        PrefabInstantiator.InstantiatePrefab(REMOVE_ELEMENT_BUTTON_PREFAB, buttonContainer.transform);
                     removeButton.name = "RemoveElementButton";
                     ButtonManagerWithIcon removeButtonManager = removeButton.GetComponent<ButtonManagerWithIcon>();
                     addButton.name = "AddElementButton";
@@ -471,9 +481,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                         && value.GetType() != typeof(ConfigIO.PersistentConfigItem)
                         && value.GetType() != typeof(LabelAttributes)
                        )
-                    {
                         Debug.Log("Missing: (Maybe)" + settingName + " " + value.GetType().GetNiceName());
-                    }
                     parent = CreateNestedSetting(settingName, parent);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
@@ -492,7 +500,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             return container.transform.Find("Content").gameObject;
         }
 
-        private void CreateSlider(string settingName, RangeAttribute range, UnityAction<float> setter, Func<float> getter,
+        private void CreateSlider(string settingName, RangeAttribute range, UnityAction<float> setter,
+            Func<float> getter,
             bool useRoundValue, GameObject parent, bool recursive = false)
         {
             range ??= new RangeAttribute(0, 2);
@@ -619,9 +628,6 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateSwitch(settingName, setter, getter, smallEditor, true);
             }
-
-
-
         }
 
         private void CreateStringField(string settingName, UnityAction<string> setter, Func<string> getter,
@@ -690,7 +696,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             // TODO: value and setter
 
             CustomDropdown dropdown = dropDownGameObject.transform.Find("Dropdown").GetComponent<CustomDropdown>();
-        
+
             dropdown.isListItem = true;
             dropdown.listParent = Canvas.transform;
             dropdown.selectedItemIndex = Array.IndexOf(valueArray, getter());
@@ -722,7 +728,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             if (!recursive)
             {
-                RuntimeSmallEditorButton smallEditorButton = dropDownGameObject.AddComponent<RuntimeSmallEditorButton>();
+                RuntimeSmallEditorButton smallEditorButton =
+                    dropDownGameObject.AddComponent<RuntimeSmallEditorButton>();
                 smallEditorButton.OnShowMenuChanged += () =>
                 {
                     immediateRedraw = smallEditorButton.ShowMenu;
@@ -735,7 +742,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         }
 
         // TODO: Add action
-        private void CreateColorPicker(string settingName, GameObject parent, UnityAction<Color> setter, Func<Color> getter, bool recursive = false)
+        private void CreateColorPicker(string settingName, GameObject parent, UnityAction<Color> setter,
+            Func<Color> getter, bool recursive = false)
         {
             parent = CreateNestedSetting(settingName, parent);
             GameObject colorPickerGameObject =
@@ -743,11 +751,11 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             colorPickerGameObject.name = settingName;
             AddLayoutElement(colorPickerGameObject);
             // Set values for colorPicker
-            HSVPicker.ColorPicker colorPicker = colorPickerGameObject.GetComponent<HSVPicker.ColorPicker>();
+            ColorPicker colorPicker = colorPickerGameObject.GetComponent<ColorPicker>();
             colorPicker.CurrentColor = getter();
             colorPicker.onValueChanged.AddListener(setter);
             // colorPicker.onValueChanged.AddListener(_ => CheckImmediateRedraw());
-        
+
             // Add netAction to boxSlider element ossf colorPicker
             BoxSlider boxSlider = colorPickerGameObject.GetComponentInChildren<BoxSlider>();
             RuntimeSliderManager boxEndEditManager = boxSlider.gameObject.AddComponent<RuntimeSliderManager>();
@@ -794,7 +802,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             // Colorpicker should be collapsed by default
             if (!recursive)
-                colorPickerGameObject.transform.parent.parent.GetComponentInChildren<RuntimeConfigMenuCollapse>().OnClickCollapse();
+                colorPickerGameObject.transform.parent.parent.GetComponentInChildren<RuntimeConfigMenuCollapse>()
+                    .OnClickCollapse();
 
             OnSyncField += (widgetPath, value) =>
             {
@@ -804,14 +813,12 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     colorPicker.CurrentColor = getter();
                 }
             };
-            OnUpdateMenuValues += () =>
-            {
-                colorPicker.CurrentColor = getter();
-            };
+            OnUpdateMenuValues += () => { colorPicker.CurrentColor = getter(); };
 
             if (!recursive)
             {
-                RuntimeSmallEditorButton smallEditorButton = colorPickerGameObject.AddComponent<RuntimeSmallEditorButton>();
+                RuntimeSmallEditorButton smallEditorButton =
+                    colorPickerGameObject.AddComponent<RuntimeSmallEditorButton>();
                 smallEditorButton.OnShowMenuChanged += () =>
                 {
                     immediateRedraw = smallEditorButton.ShowMenu;
@@ -821,57 +828,45 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateColorPicker(settingName, smallEditor, setter, getter, true);
             }
-
         }
 
         private void UpdateListChildren(IList<string> list, GameObject parent)
         {
             // removes superfluous children
             foreach (Transform child in parent.transform)
-            {
-                if (Int32.TryParse(child.name, out int index))
-                {
+                if (int.TryParse(child.name, out int index))
                     if (index >= list.Count)
                         Destroyer.Destroy(child.gameObject);
-                }
-            }
             // creates needed children
             for (int i = 0; i < list.Count; i++)
-            {
                 if (parent.transform.Find(i.ToString()) == null)
                 {
                     int iCopy = i;
                     CreateSetting(
-                        getter: () => list[iCopy],
-                        settingName: i.ToString(),
-                        parent: parent,
-                        setter: changedValue => list[iCopy] = changedValue as string
+                        () => list[iCopy],
+                        i.ToString(),
+                        parent,
+                        changedValue => list[iCopy] = changedValue as string
                     );
                 }
-            }
         }
 
         private void UpdateDictChildren(GameObject parent, IDictionary dict)
         {
             // removes children that aren't in the dictionary any more
             foreach (Transform child in parent.transform)
-            {
-                if (!dict.Contains(child.name)) Destroyer.Destroy(child);
-            }
+                if (!dict.Contains(child.name))
+                    Destroyer.Destroy(child);
             // goes through all dictionary keys
             foreach (object key in dict.Keys)
-            {
                 // creates a child if it doesn't exist yet
                 if (parent.transform.Find(key.ToString()) == null)
-                {
                     CreateSetting(
-                        getter: () => dict[key],
-                        settingName: key.ToString(),
-                        parent: parent,
-                        setter: changedValue => dict[key] = changedValue
+                        () => dict[key],
+                        key.ToString(),
+                        parent,
+                        changedValue => dict[key] = changedValue
                     );
-                }
-            }
         }
 
         private void AddLayoutElement(GameObject go)
@@ -896,7 +891,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             if (city.LoadedGraph == null) return;
             city.Invoke("LoadData", 0);
             StartCoroutine(DrawNextFrame());
-        
+
             IEnumerator DrawNextFrame()
             {
                 yield return 0;
@@ -904,11 +899,6 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             }
         }
 
-
-
-        public Action<string, object> OnSyncField;
-        public Action<string> OnSyncMethod;
-        public Action<string, string, bool> OnSyncPath;
         public event Action OnUpdateMenuValues;
 
         public event Action<int> OnSwitchCity;

@@ -6,13 +6,14 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 {
     public class RuntimeButtonAttribute : Attribute
     {
+        // The label for the Button
+        public string Label;
+
         // The name of the ButtonGroup
         public string Name;
 
-        // The label for the Button
-        public string Label;
         public RuntimeButtonAttribute(string Name, string Label)
-        { 
+        {
             this.Name = Name;
             this.Label = Label;
         }

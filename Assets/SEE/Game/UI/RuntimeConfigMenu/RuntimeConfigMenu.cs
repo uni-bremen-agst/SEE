@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls;
 using SEE.DataModel;
@@ -12,8 +10,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
     {
         private static RuntimeTabMenu[] CityMenus;
         private int currentCity;
-        
-        void Start()
+
+        private void Start()
         {
             int cityCount = GameObject.FindGameObjectsWithTag(Tags.CodeCity).Length;
             CityMenus = new RuntimeTabMenu[cityCount];
@@ -26,8 +24,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 CityMenus[i].OnSwitchCity += SwitchCity;
             }
         }
-        
-        void Update()
+
+        private void Update()
         {
             if (SEEInput.ToggleConfigMenu()) CityMenus[currentCity].ToggleMenu();
         }
@@ -45,8 +43,15 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             return GameObject.FindGameObjectsWithTag(Tags.CodeCity).Select(go => go.GetComponent<AbstractSEECity>())
                 .OrderBy(go => go.name).ToArray();
         }
-        
-        public static AbstractSEECity GetCity(int i) => GetCities()[i];
-        public static RuntimeTabMenu GetMenuForCity(int i) => CityMenus[i];
+
+        public static AbstractSEECity GetCity(int i)
+        {
+            return GetCities()[i];
+        }
+
+        public static RuntimeTabMenu GetMenuForCity(int i)
+        {
+            return CityMenus[i];
+        }
     }
 }
