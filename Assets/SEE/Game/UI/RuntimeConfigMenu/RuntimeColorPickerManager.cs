@@ -2,13 +2,16 @@ using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class RuntimeColorPickerManager : MonoBehaviour, IPointerClickHandler
+namespace SEE.Game.UI.RuntimeConfigMenu
 {
-    
-    
-    public event Action OnEndEdit;
-    public void OnPointerClick(PointerEventData eventData)
+    public class RuntimeColorPickerManager : MonoBehaviour, IPointerClickHandler
     {
-        OnEndEdit?.Invoke();
+    
+    
+        public event Action OnEndEdit;
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            OnEndEdit?.Invoke();
+        }
     }
 }

@@ -1,50 +1,52 @@
 ﻿using System;
-using SEE.Game.UI;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class RuntimeSmallEditorButton : PlatformDependentComponent
+namespace SEE.Game.UI.RuntimeConfigMenu
 {
-    public const string SMALLWINDOW_PREFAB = RuntimeTabMenu.RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfig_SmallConfigWindow";
-
-    public Action<GameObject> CreateWidget;
-    
-    private Button button;
-    private static GameObject smallEditor;
-
-    private bool showMenu;
-    public bool ShowMenu
+    public class RuntimeSmallEditorButton : PlatformDependentComponent
     {
-        get => showMenu;
-        set
+        public const string SMALLWINDOW_PREFAB = RuntimeTabMenu.RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfig_SmallConfigWindow";
+
+        public Action<GameObject> CreateWidget;
+    
+        private Button button;
+        private static GameObject smallEditor;
+
+        private bool showMenu;
+        public bool ShowMenu
         {
-            if (value == showMenu) return;
-            if (value)
+            get => showMenu;
+            set
             {
-                smallEditor = PrefabInstantiator.InstantiatePrefab(SMALLWINDOW_PREFAB, Canvas.transform, false);
-                smallEditor.transform.Find("CloseButton").GetComponent<Button>().onClick.AddListener(() => ShowMenu = false);
-                CreateWidget(smallEditor.transform.Find("Content").gameObject);
+                if (value == showMenu) return;
+                if (value)
+                {
+                    smallEditor = PrefabInstantiator.InstantiatePrefab(SMALLWINDOW_PREFAB, Canvas.transform, false);
+                    smallEditor.transform.Find("CloseButton").GetComponent<Button>().onClick.AddListener(() => ShowMenu = false);
+                    CreateWidget(smallEditor.transform.Find("Content").gameObject);
+                }
+                else
+                {
+                    Destroyer.Destroy(smallEditor);
+                }
+                showMenu = value;
+                OnShowMenuChanged?.Invoke();
             }
-            else
-            {
-                Destroyer.Destroy(smallEditor);
-            }
-            showMenu = value;
-            OnShowMenuChanged?.Invoke();
         }
-    }
     
-    protected override void StartDesktop()
-    {
-        button = gameObject.AddComponent<Button>();
-        button.onClick.AddListener(() => ShowMenu = true);
+        protected override void StartDesktop()
+        {
+            button = gameObject.AddComponent<Button>();
+            button.onClick.AddListener(() => ShowMenu = true);
+        }
+
+        protected override void StartVR() => StartDesktop();
+
+        protected override void StartTouchGamepad() => StartDesktop();
+
+        public event UnityAction OnShowMenuChanged;
     }
-
-    protected override void StartVR() => StartDesktop();
-
-    protected override void StartTouchGamepad() => StartDesktop();
-
-    public event UnityAction OnShowMenuChanged;
 }

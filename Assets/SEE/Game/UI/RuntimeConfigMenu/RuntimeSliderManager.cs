@@ -1,16 +1,17 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class RuntimeSliderManager : MonoBehaviour, IPointerUpHandler 
+namespace SEE.Game.UI.RuntimeConfigMenu
 {
-    
-    
-    public event Action OnEndEdit;
-    public void OnPointerUp(PointerEventData eventData)
+    public class RuntimeSliderManager : MonoBehaviour, IPointerUpHandler 
     {
-        OnEndEdit?.Invoke();
+    
+    
+        public event Action OnEndEdit;
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            OnEndEdit?.Invoke();
+        }
     }
 }

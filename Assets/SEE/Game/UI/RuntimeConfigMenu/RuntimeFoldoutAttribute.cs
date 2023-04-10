@@ -1,10 +1,13 @@
 using System;
 
-public class RuntimeFoldoutAttribute : Attribute
+namespace SEE.Game.UI.RuntimeConfigMenu
 {
-    public string name;
-    public RuntimeFoldoutAttribute(string name)
-    { 
-        this.name = name;
+    public class RuntimeFoldoutAttribute : Attribute
+    {
+        public string name;
+        public RuntimeFoldoutAttribute(string name)
+        { 
+            this.name = name;
+        }
     }
 }
