@@ -47,6 +47,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         public Action<string, object> OnSyncField;
         public Action<string> OnSyncMethod;
         public Action<string, string, bool> OnSyncPath;
+        public Action<string> OnSyncAddListElement;
+        public Action<string> OnSyncRemoveListElement;
         protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenu";
         protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsView";
         protected override string EntryPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeTabButton";
@@ -442,14 +444,42 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                         list.Add("");
                         UpdateListChildren(list, parent);
                         buttonContainer.transform.SetAsLastSibling();
+                        AddListElementNetAction netAction = new();
+                        netAction.CityIndex = CityIndex;
+                        netAction.WidgetPath = parent.FullName();
+                        netAction.Execute();
                     });
                     // Listener RemoveButton
                     removeButtonManager.clickEvent.AddListener(() =>
                     {
+                        if (list.Count == 0) return;
                         list.RemoveAt(list.Count - 1);
                         UpdateListChildren(list, parent);
                         buttonContainer.transform.SetAsLastSibling();
+                        RemoveListElementNetAction netAction = new();
+                        netAction.CityIndex = CityIndex;
+                        netAction.WidgetPath = parent.FullName();
+                        netAction.Execute();
                     });
+
+                    OnSyncAddListElement += widgetPath =>
+                    {
+                        if (widgetPath == parent.FullName())
+                        {
+                            list.Add("");
+                            UpdateListChildren(list, parent);
+                            buttonContainer.transform.SetAsLastSibling();
+                        }
+                    };
+                    OnSyncRemoveListElement += widgetPath =>
+                    {
+                        if (widgetPath == parent.FullName())
+                        {
+                            list.RemoveAt(list.Count - 1);
+                            UpdateListChildren(list, parent);
+                            buttonContainer.transform.SetAsLastSibling();
+                        }
+                    };
                     // Update
                     UpdateListChildren(list, parent);
                     buttonContainer.transform.SetAsLastSibling();
