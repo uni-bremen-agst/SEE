@@ -895,10 +895,18 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
     private void TriggerImmediateRedraw()
     {
-        // TODO: How to redraw the city?
-        ((SEECity)city).LoadData();
-        city.Invoke(nameof(SEECity.ReDrawGraph), 0);
+        if (city.LoadedGraph == null) return;
+        city.Invoke("LoadData", 0);
+        StartCoroutine(DrawNextFrame());
+        
+        IEnumerator DrawNextFrame()
+        {
+            yield return 0;
+            city.Invoke("DrawGraph", 0);
+        }
     }
+
+
 
     public Action<string, object> OnSyncField;
     public Action<string> OnSyncMethod;
