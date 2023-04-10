@@ -133,7 +133,8 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
 
     private void LoadCity()
     {
-        IOrderedEnumerable<MemberInfo> members = city.GetType().GetMembers().OrderBy(HasFoldoutAttribute).ThenBy(GetTabName);
+        IOrderedEnumerable<MemberInfo> members = city.GetType().GetMembers().Where(IsCityAttribute).
+            OrderBy(HasFoldoutAttribute).ThenBy(GetTabName);
         members.ForEach(memberInfo => CreateSetting(memberInfo, null, city));
         SelectEntry(Entries.First());
         
