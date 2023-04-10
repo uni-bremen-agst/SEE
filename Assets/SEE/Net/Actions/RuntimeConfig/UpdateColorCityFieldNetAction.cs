@@ -6,8 +6,8 @@ namespace SEE.Net.Actions.RuntimeConfig
     public class UpdateColorCityFieldNetAction : AbstractNetAction
     {
         public int CityIndex;
-        public string WidgetPath;
         public Color Value;
+        public string WidgetPath;
 
         protected override void ExecuteOnServer()
         {

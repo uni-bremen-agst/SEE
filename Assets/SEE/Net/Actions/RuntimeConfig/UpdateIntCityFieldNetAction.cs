@@ -5,8 +5,8 @@ namespace SEE.Net.Actions.RuntimeConfig
     public class UpdateIntCityFieldNetAction : AbstractNetAction
     {
         public int CityIndex;
-        public string WidgetPath;
         public int Value;
+        public string WidgetPath;
 
         protected override void ExecuteOnServer()
         {

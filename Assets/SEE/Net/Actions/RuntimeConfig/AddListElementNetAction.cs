@@ -6,14 +6,14 @@ namespace SEE.Net.Actions.RuntimeConfig
     {
         public int CityIndex;
         public string WidgetPath;
-        
+
         protected override void ExecuteOnServer()
         {
         }
 
         protected override void ExecuteOnClient()
         {
-            if (!IsRequester()) 
+            if (!IsRequester())
                 RuntimeConfigMenu.GetMenuForCity(CityIndex).OnSyncAddListElement?.Invoke(WidgetPath);
         }
     }

@@ -2,11 +2,11 @@
 
 namespace SEE.Net.Actions.RuntimeConfig
 {
-    public class UpdateBoolCityFieldNetAction: AbstractNetAction
+    public class UpdateBoolCityFieldNetAction : AbstractNetAction
     {
         public int CityIndex;
-        public string WidgetPath;
         public bool Value;
+        public string WidgetPath;
 
         protected override void ExecuteOnServer()
         {

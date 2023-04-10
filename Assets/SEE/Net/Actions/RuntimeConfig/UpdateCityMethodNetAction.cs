@@ -5,8 +5,10 @@ public class UpdateCityMethodNetAction : AbstractNetAction
 {
     public int CityIndex;
     public string MethodName;
-    
-    protected override void ExecuteOnServer() { }
+
+    protected override void ExecuteOnServer()
+    {
+    }
 
     protected override void ExecuteOnClient()
     {

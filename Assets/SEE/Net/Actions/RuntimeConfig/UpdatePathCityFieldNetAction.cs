@@ -5,9 +5,9 @@ namespace SEE.Net.Actions.RuntimeConfig
     public class UpdatePathCityFieldNetAction : AbstractNetAction
     {
         public int CityIndex;
-        public string WidgetPath;
+        public bool IsAbsolute;
         public string Value;
-        public bool IsAbsolute; 
+        public string WidgetPath;
 
         protected override void ExecuteOnServer()
         {
@@ -15,7 +15,7 @@ namespace SEE.Net.Actions.RuntimeConfig
 
         protected override void ExecuteOnClient()
         {
-            if (!IsRequester()) 
+            if (!IsRequester())
                 RuntimeConfigMenu.GetMenuForCity(CityIndex).OnSyncPath?.Invoke(WidgetPath, Value, IsAbsolute);
         }
     }
