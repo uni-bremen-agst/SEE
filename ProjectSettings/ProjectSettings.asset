@@ -143,7 +143,6 @@ PlayerSettings:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: 2489328711382419796, guid: 1fc620f3d43365f47a0ae74f688e5a96, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -366,6 +365,12 @@ PlayerSettings:
     m_GraphicsJobMode: 0
   m_BuildTargetGraphicsAPIs:
   - m_BuildTarget: iOSSupport
+    m_APIs: 10000000
+    m_Automatic: 1
+  - m_BuildTarget: LinuxStandaloneSupport
+    m_APIs: 11000000
+    m_Automatic: 0
+  - m_BuildTarget: MacStandaloneSupport
     m_APIs: 10000000
     m_Automatic: 1
   m_BuildTargetVRSettings: []
