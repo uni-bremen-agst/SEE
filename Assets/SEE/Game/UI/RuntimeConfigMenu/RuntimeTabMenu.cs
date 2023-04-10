@@ -730,13 +730,14 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         HSVPicker.ColorPicker colorPicker = colorPickerGameObject.GetComponent<HSVPicker.ColorPicker>();
         colorPicker.CurrentColor = getter();
         colorPicker.onValueChanged.AddListener(setter);
-        colorPicker.onValueChanged.AddListener(_ => CheckImmediateRedraw());
+        // colorPicker.onValueChanged.AddListener(_ => CheckImmediateRedraw());
         
-        // Add netAction to boxSlider element of colorPicker
+        // Add netAction to boxSlider element ossf colorPicker
         BoxSlider boxSlider = colorPickerGameObject.GetComponentInChildren<BoxSlider>();
         RuntimeSliderManager boxEndEditManager = boxSlider.gameObject.AddComponent<RuntimeSliderManager>();
         boxEndEditManager.OnEndEdit += () =>
         {
+            CheckImmediateRedraw();
             UpdateColorCityFieldNetAction action = new();
             action.CityIndex = CityIndex;
             action.WidgetPath = colorPickerGameObject.FullName();
@@ -749,6 +750,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         RuntimeSliderManager hueEndEditManager = hueSlider.gameObject.AddComponent<RuntimeSliderManager>();
         hueEndEditManager.OnEndEdit += () =>
         {
+            CheckImmediateRedraw();
             UpdateColorCityFieldNetAction action = new();
             action.CityIndex = CityIndex;
             action.WidgetPath = colorPickerGameObject.FullName();
@@ -762,6 +764,7 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
         inputField.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
         inputField.onEndEdit.AddListener(str =>
         {
+            CheckImmediateRedraw();
             UpdateColorCityFieldNetAction action = new();
             action.CityIndex = CityIndex;
             action.WidgetPath = colorPickerGameObject.FullName();
