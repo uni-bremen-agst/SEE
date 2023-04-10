@@ -10,6 +10,7 @@ public class UpdateCityMethodNetAction : AbstractNetAction
 
     protected override void ExecuteOnClient()
     {
-        RuntimeConfigMenu.GetMenuForCity(CityIndex).OnSyncMethod?.Invoke(MethodName);
+        if (!IsRequester())
+            RuntimeConfigMenu.GetMenuForCity(CityIndex).OnSyncMethod?.Invoke(MethodName);
     }
 }

@@ -15,8 +15,8 @@ namespace SEE.Net.Actions.RuntimeConfig
 
         protected override void ExecuteOnClient()
         {
-            // if (!IsRequester()) 
-            RuntimeConfigMenu.GetMenuForCity(CityIndex).OnSyncPath?.Invoke(WidgetPath, Value, IsAbsolute);
+            if (!IsRequester()) 
+                RuntimeConfigMenu.GetMenuForCity(CityIndex).OnSyncPath?.Invoke(WidgetPath, Value, IsAbsolute);
         }
     }
 }

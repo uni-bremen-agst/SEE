@@ -14,8 +14,8 @@ namespace SEE.Net.Actions.RuntimeConfig
 
         protected override void ExecuteOnClient()
         {
-            // if (!IsRequester())
-            RuntimeConfigMenu.GetMenuForCity(CityIndex).OnSyncField?.Invoke(WidgetPath, Value);
+            if (!IsRequester())
+                RuntimeConfigMenu.GetMenuForCity(CityIndex).OnSyncField?.Invoke(WidgetPath, Value);
         }
     }
 }
