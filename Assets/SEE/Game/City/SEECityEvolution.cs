@@ -50,7 +50,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Sets the maximum number of revisions to load.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Maximum number of revisions to load."), FoldoutGroup(EvolutionFoldoutGroup)]
+        [SerializeField, ShowInInspector, Tooltip("Maximum number of revisions to load."), FoldoutGroup(EvolutionFoldoutGroup), RuntimeFoldout(EvolutionFoldoutGroup)]
         public int MaxRevisionsToLoad = 500;  // serialized by Unity
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The directory in which the GXL files of the graph series are located.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("The directory in which the GXL files are located."), FoldoutGroup(DataFoldoutGroup)]
+        [SerializeField, ShowInInspector, Tooltip("The directory in which the GXL files are located."), FoldoutGroup(DataFoldoutGroup), RuntimeFoldout(DataFoldoutGroup)]
         public DirectoryPath GXLDirectory = new DirectoryPath();
 
         //-----------------------------------------------------
@@ -74,35 +74,35 @@ namespace SEE.Game.City
         /// The height of posts used as markers for new and deleted elements.
         /// </summary>
         [Tooltip("The height of posts used as markers for new, changed, and deleted elements (>=0).")]
-        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup)]
+        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup), RuntimeFoldout(EvolutionFoldoutGroup)]
         public float MarkerHeight = 0.2f;
 
         /// <summary>
         /// The width (x and z lengths) of posts used as markers for new and deleted elements.
         /// </summary>
         [Tooltip("The width (x and z lengths) of posts used as markers for new and deleted elements (>=0).")]
-        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup)]
+        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup), RuntimeFoldout(EvolutionFoldoutGroup)]
         public float MarkerWidth = 0.01f;
 
         /// <summary>
         /// Color for power beams of newly added nodes, can be set in inspector
         /// </summary>
         [Tooltip("The color of the beam for newly created nodes.")]
-        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup)]
+        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup), RuntimeFoldout(EvolutionFoldoutGroup)]
         public Color AdditionBeamColor = Color.green;
 
         /// <summary>
         /// Changed nodes beam color to be pickable in inspector
         /// </summary>
         [Tooltip("The color of the beam for changed nodes.")]
-        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup)]
+        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup), RuntimeFoldout(EvolutionFoldoutGroup)]
         public Color ChangeBeamColor = Color.yellow;
 
         /// <summary>
         /// Deleted nodes beam color to be pickable in inspector
         /// </summary>
         [Tooltip("The color of the beam for deleted nodes.")]
-        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup)]
+        [SerializeField, ShowInInspector, FoldoutGroup(EvolutionFoldoutGroup), RuntimeFoldout(EvolutionFoldoutGroup)]
         public Color DeletionBeamColor = Color.black;
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace SEE.Game.City
         /// loaded, that graph will be destroyed.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public void LoadData()
         {
@@ -207,7 +207,7 @@ namespace SEE.Game.City
         /// Postcondition: <see cref="firstGraph"/> will be <c>null</c>.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
-        [ButtonGroup(ResetButtonsGroup)]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset")]
         [PropertyOrder(ResetButtonsGroupOrderReset)]
         public override void Reset()
         {
@@ -222,7 +222,7 @@ namespace SEE.Game.City
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
-        [ButtonGroup(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
         public void DrawGraph()
         {
