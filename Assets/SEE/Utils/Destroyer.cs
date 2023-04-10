@@ -52,7 +52,7 @@ namespace SEE.Utils
                     // Now we can destroy the children.
                     foreach (GameObject child in allChildren)
                     {
-                        Destroy(child.gameObject);
+                        Destroy(child);
                     }
                 }
                 // We must use DestroyImmediate when we are in the editor mode.

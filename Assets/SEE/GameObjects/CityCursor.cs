@@ -7,15 +7,14 @@ using UnityEngine;
 
 namespace SEE.GO
 {
-    // [RequireComponent(typeof(SEECity))] // FIXME: We cannot simply request that a SEECity exists. There are also other kinds of AbstractSEECity classes.
     public class CityCursor : MonoBehaviour
     {
         internal Cursor3D E { get; private set; }
-        private SEECity city;
+        private AbstractSEECity city;
 
         private void Start()
         {
-            if (TryGetComponent(out SEECity city))
+            if (TryGetComponent(out AbstractSEECity city))
             {
                 this.city = city;
 #if UNITY_EDITOR
@@ -29,7 +28,7 @@ namespace SEE.GO
             }
             else
             {
-                Debug.LogWarning($"{name} has no SEECity component attached to it. {nameof(CityCursor)} will be disabled.\n");
+                Debug.LogWarning($"{name} has no {nameof(AbstractSEECity)} component attached to it. {nameof(CityCursor)} will be disabled.\n");
                 enabled = false;
             }
         }

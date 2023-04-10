@@ -591,13 +591,13 @@ namespace SEE.Game.City
         /// <param name="graphs">graphs whose metric names are to be emitted</param>
         protected static void DumpNodeMetrics(ICollection<Graph> graphs)
         {
-            IDictionary<string, HashSet<string>> result = new Dictionary<string, HashSet<string>>();
+            IDictionary<string, ISet<string>> result = new Dictionary<string, ISet<string>>();
 
             foreach (Graph graph in graphs)
             {
                 foreach (Node node in graph.Nodes())
                 {
-                    if (result.TryGetValue(node.Type, out HashSet<string> metrics))
+                    if (result.TryGetValue(node.Type, out ISet<string> metrics))
                     {
                         metrics.UnionWith(node.AllMetrics());
                     }
@@ -608,7 +608,7 @@ namespace SEE.Game.City
                 }
             }
 
-            foreach (KeyValuePair<string, HashSet<string>> item in result)
+            foreach (KeyValuePair<string, ISet<string>> item in result)
             {
                 Debug.Log($"Node type {item.Key}:\n");
                 foreach (string metric in item.Value)

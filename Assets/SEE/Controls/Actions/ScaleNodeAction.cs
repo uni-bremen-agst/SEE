@@ -573,7 +573,7 @@ namespace SEE.Controls.Actions
 
             // Transform the new position and scale
             Operator.MoveTo(position, 0f);
-            objectToScale.SetScale(scale);
+            objectToScale.SetAbsoluteScale(scale);
             MoveAndScale();
             currentState = ReversibleAction.Progress.InProgress;
         }
