@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1991858568271024275}
   - component: {fileID: 1991858568271024277}
   m_Layer: 5
-  m_Name: Input Group - StringInputField
+  m_Name: Input Group - String Input Field
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
