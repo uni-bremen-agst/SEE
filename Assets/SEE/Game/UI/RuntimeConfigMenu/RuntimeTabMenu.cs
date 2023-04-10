@@ -537,7 +537,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             OnSyncField += (widgetPath, value) =>
             {
-                if (widgetPath == sliderGameObject.FullName())
+                if (sliderGameObject != null && widgetPath == sliderGameObject.FullName())
                 {
                     setter((float)value);
                     slider.value = (float)value;
@@ -602,7 +602,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             OnSyncField += (widgetPath, value) =>
             {
-                if (widgetPath == switchGameObject.FullName())
+                if (switchGameObject != null && widgetPath == switchGameObject.FullName())
                 {
                     setter((bool)value);
                     switchManager.isOn = (bool)value;
@@ -659,7 +659,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             OnSyncField += (widgetPath, value) =>
             {
-                if (widgetPath == stringGameObject.FullName())
+                if (stringGameObject != null && widgetPath == stringGameObject.FullName())
                 {
                     setter(value as string);
                     inputField.text = value as string;
@@ -717,7 +717,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             OnSyncField += (widgetPath, value) =>
             {
-                if (widgetPath == dropDownGameObject.FullName())
+                if (dropDownGameObject != null && widgetPath == dropDownGameObject.FullName())
                 {
                     setter((int)value);
                     dropdown.ChangeDropdownInfo((int)value);
@@ -807,7 +807,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             OnSyncField += (widgetPath, value) =>
             {
-                if (widgetPath == colorPickerGameObject.FullName())
+                if (colorPickerGameObject != null && widgetPath == colorPickerGameObject.FullName())
                 {
                     setter((Color)value);
                     colorPicker.CurrentColor = getter();
