@@ -32,12 +32,11 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     public const string SWITCH_PREFAB = UI_PREFAB_FOLDER + "Input Group - Switch";
     public const string SLIDER_PREFAB = UI_PREFAB_FOLDER + "Input Group - Slider";
     public const string DROPDOWN_PREFAB = UI_PREFAB_FOLDER + "Input Group - Dropdown";
-    public const string COLORPICKER_PREFAB = UI_PREFAB_FOLDER + "Input Group - Color Picker";
+    public const string COLORPICKER_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeColorPicker";
     public const string STRINGFIELD_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "Input Group - StringInputField";
     public const string BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "Button";
     public const string ADD_ELEMENT_BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "AddButton";
     public const string REMOVE_ELEMENT_BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RemoveButton";
-    public const string PICKER2_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "Picker 2.0";
     protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenuRework_v2";
     protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsView";
     protected override string EntryPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeTabButton";
@@ -722,30 +721,21 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
     // TODO: Add action
     private void CreateColorPicker(string settingName, GameObject parent, UnityAction<Color> setter, Func<Color> getter, bool recursive = false)
     {
-        parent = CreateNestedSetting("Color Picker: " + settingName, parent);
+        parent = CreateNestedSetting(settingName, parent);
         GameObject colorPickerGameObject =
-            PrefabInstantiator.InstantiatePrefab(PICKER2_PREFAB, parent.transform, false);
+            PrefabInstantiator.InstantiatePrefab(COLORPICKER_PREFAB, parent.transform, false);
         colorPickerGameObject.name = settingName;
         AddLayoutElement(colorPickerGameObject);
+        // Set values for colorPicker
         HSVPicker.ColorPicker colorPicker = colorPickerGameObject.GetComponent<HSVPicker.ColorPicker>();
         colorPicker.CurrentColor = getter();
         colorPicker.onValueChanged.AddListener(setter);
         colorPicker.onValueChanged.AddListener(_ => CheckImmediateRedraw());
+        
+        // Add netAction to boxSlider element of colorPicker
         BoxSlider boxSlider = colorPickerGameObject.GetComponentInChildren<BoxSlider>();
-        boxSlider.onValueChanged.AddListener((f, f1) =>
-        {
-            UpdateColorCityFieldNetAction action = new();
-            action.CityIndex = CityIndex;
-            action.WidgetPath = colorPickerGameObject.FullName();
-            action.Value = getter();
-            action.Execute();
-        });
-
-        boxSlider.onValueChanged.AddListener((_, _) => CheckImmediateRedraw());
-
-        Slider hueSlider = colorPickerGameObject.GetComponentInChildren<Slider>();
-        RuntimeSliderManager endEditManager = hueSlider.gameObject.AddComponent<RuntimeSliderManager>();
-        endEditManager.OnEndEdit += () =>
+        RuntimeSliderManager boxEndEditManager = boxSlider.gameObject.AddComponent<RuntimeSliderManager>();
+        boxEndEditManager.OnEndEdit += () =>
         {
             UpdateColorCityFieldNetAction action = new();
             action.CityIndex = CityIndex;
@@ -753,8 +743,20 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             action.Value = getter();
             action.Execute();
         };
-        // TODO: Trigger CheckImmediateRedraw
 
+        // Add netAction to hueSlider element of colorPicker
+        Slider hueSlider = colorPickerGameObject.GetComponentInChildren<Slider>();
+        RuntimeSliderManager hueEndEditManager = hueSlider.gameObject.AddComponent<RuntimeSliderManager>();
+        hueEndEditManager.OnEndEdit += () =>
+        {
+            UpdateColorCityFieldNetAction action = new();
+            action.CityIndex = CityIndex;
+            action.WidgetPath = colorPickerGameObject.FullName();
+            action.Value = getter();
+            action.Execute();
+        };
+
+        // Add netAction to string input element of colorPicker
         TMP_InputField inputField = colorPickerGameObject.GetComponentInChildren<TMP_InputField>();
         inputField.onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false);
         inputField.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
@@ -767,8 +769,10 @@ public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
             action.Execute();
         });
 
-        // deactivate presets
+        // Deactivate presets and sliders
         colorPickerGameObject.transform.Find("Presets").gameObject.SetActive(false);
+        colorPickerGameObject.transform.Find("Sliders").gameObject.SetActive(false);
+
         // Colorpicker should be collapsed by default
         if (!recursive)
             colorPickerGameObject.transform.parent.parent.GetComponentInChildren<RuntimeConfigMenuCollapse>().OnClickCollapse();
