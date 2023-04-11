@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel;
 using SEE.Game;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;

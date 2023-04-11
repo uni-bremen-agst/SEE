@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SEE.Controls;
-using SEE.DataModel;
 using SEE.Game.Runtime;
 using SEE.GO;
 using SEE.Utils;

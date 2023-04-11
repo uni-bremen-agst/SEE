@@ -1,5 +1,4 @@
-﻿using SEE.DataModel;
-using SEE.Utils;
+﻿using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game
@@ -102,7 +101,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Decorates the given <paramref name="architectureDependency"/> by decorations 
+        /// Decorates the given <paramref name="architectureDependency"/> by decorations
         /// objects created from AbsenceMaterial.
         /// </summary>
         /// <param name="architectureDependency">architecture dependency to be decorated as absence</param>
@@ -112,24 +111,24 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Intended to decorate the given <paramref name="architectureDependency"/> by decorations 
+        /// Intended to decorate the given <paramref name="architectureDependency"/> by decorations
         /// objects created from ConvergenceMaterial. Currently, we do not decorate convergences.
-        /// They are expected and just add clutter. A user wants to focus on the discrepancies 
+        /// They are expected and just add clutter. A user wants to focus on the discrepancies
         /// (absences and divergences). However, the edge could previously have been decorated
         /// as absence, in which case we need to remove those decorations.
         /// </summary>
         /// <param name="architectureDependency">architecture dependency to be decorated as convergence</param>
         internal void DecorateConvergence(GameObject gameEdge)
         {
-            // No need to decorate convergences. 
+            // No need to decorate convergences.
             //DecorateEdge(edge, ConvergenceMaterial, "convergence");
         }
 
         /// <summary>
-        /// Decorates the given <paramref name="propagatedDependency"/> by decorations 
+        /// Decorates the given <paramref name="propagatedDependency"/> by decorations
         /// objects created from DivergenceMaterial.
         /// </summary>
-        /// <param name="propagatedDependency">implementation dependency propagated to the 
+        /// <param name="propagatedDependency">implementation dependency propagated to the
         /// architecture to be decorated as divergence</param>
         internal void DecorateDivergence(GameObject gameEdge)
         {

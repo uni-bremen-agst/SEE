@@ -1,4 +1,4 @@
-﻿namespace SEE.DataModel
+﻿namespace SEE.Game
 {
     /// <summary>
     /// The Unity tags for the graph entities represented by the GameObjects.
