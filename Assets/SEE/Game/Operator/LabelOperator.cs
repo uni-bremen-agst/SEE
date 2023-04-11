@@ -2,6 +2,7 @@ using System.Linq;
 using DG.Tweening;
 using SEE.Controls.Actions;
 using SEE.GO;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -98,12 +99,8 @@ namespace SEE.Game.Operator
                 if (nodeLabel.TryGetComponentOrLog(out labelText) && line.TryGetComponentOrLog(out labelLineRenderer))
                 {
                     labelText.alpha = 0f;
-#if INCLUDE_STEAM_VR
-                    labelLineRenderer.startColor = labelLineRenderer.startColor.ColorWithAlpha(0f);
-                    labelLineRenderer.endColor = labelLineRenderer.endColor.ColorWithAlpha(0f);
-#endif
-                    labelLineRenderer.startColor = labelLineRenderer.startColor;
-                    labelLineRenderer.endColor = labelLineRenderer.endColor;
+                    labelLineRenderer.startColor = labelLineRenderer.startColor.WithAlpha(0f);
+                    labelLineRenderer.endColor = labelLineRenderer.endColor.WithAlpha(0f);
                 }
             }
         }
