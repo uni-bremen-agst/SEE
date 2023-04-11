@@ -459,6 +459,8 @@ namespace SEE.GO
                 UpdateMaterial();
             }
 
+            SetCookingOptions();
+
             // Remove line meshRenderer.
             if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
             {
@@ -466,6 +468,16 @@ namespace SEE.GO
             }
 
             return mesh;
+
+            void SetCookingOptions()
+            {
+                if (gameObject.TryGetComponent(out MeshCollider collider))
+                {
+                    collider.cookingOptions = MeshColliderCookingOptions.EnableMeshCleaning
+                                            | MeshColliderCookingOptions.WeldColocatedVertices
+                                            | MeshColliderCookingOptions.CookForFasterSimulation;
+                }
+            }
         }
 
         /// <summary>
