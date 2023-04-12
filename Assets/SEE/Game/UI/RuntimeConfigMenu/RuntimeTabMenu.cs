@@ -138,15 +138,18 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
         private void LoadCity()
         {
-            var members = city.GetType().GetMembers().Where(IsCityAttribute).OrderBy(HasFoldoutAttribute)
-                .ThenBy(GetTabName);
+            var members = city.GetType().GetMembers().
+                Where(IsCityAttribute).OrderBy(HasFoldoutAttribute).ThenBy(GetTabName).ThenBy(SortIsNotNested);
             members.ForEach(memberInfo => CreateSetting(memberInfo, null, city));
             SelectEntry(Entries.First());
 
-            var methods = city.GetType().GetMethods().Where(HasButtonAttribute).Where(IsCityAttribute)
-                .OrderBy(GetButtonGroup).ThenBy(GetOrderOfMemberInfo);
+            var methods = city.GetType().GetMethods().
+                Where(HasButtonAttribute).Where(IsCityAttribute)
+                .OrderBy(GetButtonGroup).ThenBy(GetOrderOfMemberInfo).ThenBy(GetButtonName);
             methods.ForEach(methodInfo => CreateButton(methodInfo, city));
 
+            string GetButtonName(MemberInfo memberInfo) => memberInfo.Name;
+            
             string GetTabName(MemberInfo memberInfo)
             {
                 return memberInfo.GetCustomAttributes().OfType<RuntimeFoldoutAttribute>().FirstOrDefault()?.name;
@@ -157,10 +160,10 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 return memberInfo.DeclaringType == typeof(AbstractSEECity) ||
                        memberInfo.DeclaringType!.IsSubclassOf(typeof(AbstractSEECity));
             }
-
-            int HasFoldoutAttribute(MemberInfo memberInfo)
+            
+            bool HasFoldoutAttribute(MemberInfo memberInfo)
             {
-                return memberInfo.GetCustomAttributes().Any(a => a is RuntimeFoldoutAttribute) ? 0 : 1;
+                return !memberInfo.GetCustomAttributes().Any(a => a is RuntimeFoldoutAttribute);
             }
 
             float GetOrderOfMemberInfo(MemberInfo memberInfo)
@@ -172,15 +175,43 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             string GetButtonGroup(MemberInfo memberInfo)
             {
-                ButtonGroupAttribute buttonGroup =
-                    memberInfo.GetCustomAttributes().OfType<ButtonGroupAttribute>().FirstOrDefault()
-                    ?? new ButtonGroupAttribute();
-                return buttonGroup.GroupID;
+                RuntimeButtonAttribute buttonGroup =
+                    memberInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault()
+                    ?? new RuntimeButtonAttribute(null, null);
+                return buttonGroup.Name;
             }
 
             bool HasButtonAttribute(MemberInfo memberInfo)
             {
                 return memberInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().Any();
+            }
+            
+            bool SortIsNotNested(MemberInfo memberInfo)
+            {
+                object value;
+                switch (memberInfo)
+                {
+                    case FieldInfo { IsLiteral: false, IsInitOnly: false } fieldInfo:
+                        value = fieldInfo.GetValue(city);
+                        break;
+                    case PropertyInfo propertyInfo when !(propertyInfo.GetMethod == null 
+                                                          || propertyInfo.SetMethod == null 
+                                                          || !propertyInfo.CanRead 
+                                                          || !propertyInfo.CanWrite
+                                                          ):
+                        value = propertyInfo.GetValue(city);
+                        break;
+                    default:
+                        return false;
+                }
+                return value switch
+                {
+                    bool => true,
+                    float => true,
+                    int => true,
+                    uint => true,
+                    _ => false
+                };
             }
         }
 
@@ -206,8 +237,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         /// <returns></returns>
         private GameObject CreateOrGetViewGameObject(IEnumerable<Attribute> attributes)
         {
-            string tabName = attributes.OfType<RuntimeFoldoutAttribute>().FirstOrDefault()?.name ??
-                             "Misc";
+            var tabName = attributes.OfType<RuntimeFoldoutAttribute>().FirstOrDefault()?.name ?? "Misc";
             ToggleMenuEntry entry = Entries.FirstOrDefault(entry => entry.Title == tabName);
             // adds an entry (tab + view) if necessary
             if (entry == null)
@@ -217,14 +247,21 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     () => { },
                     tabName,
                     $"Settings for {tabName}",
-                    Random.ColorHSV(), // TODO: Color
-                    Icon, // TODO: Icon
-                    true
+                    GetColorForTab(tabName),
+                    Resources.Load<Sprite>("Materials/Charts/MoveIcon")
                 );
                 AddEntry(entry);
             }
-
             return ViewGameObject(entry);
+        }
+
+        private int tabColorCounter = 0;
+        private Color GetColorForTab(string tabName)
+        {
+            tabColorCounter++;
+            float t = 0.5f; // base
+            t *= tabColorCounter % 2 == 1 ? 0.75f : 1.25f; // switch slightly between bright and dark
+            return Color.Lerp(Color.black, Color.white, t);
         }
 
         private void CreateSetting(MemberInfo memberInfo, GameObject parent, object obj)
