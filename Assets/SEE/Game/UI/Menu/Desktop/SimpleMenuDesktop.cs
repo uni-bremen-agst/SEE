@@ -78,7 +78,8 @@ namespace SEE.Game.UI.Menu
             OnIconChanged += UpdateIcon;
             OnShowMenuChanged += UpdateShowMenu;
             OnShowMenuChanged += UpdateKeywordListener;
-            OnCloseMenuCommandChanged += UpdateKeywordListener; ;
+            OnCloseMenuCommandChanged += UpdateKeywordListener;
+            MenuManager.confirmButton.onClick.AddListener(() => ShowMenu = false);
         }
 
         /// <summary>
