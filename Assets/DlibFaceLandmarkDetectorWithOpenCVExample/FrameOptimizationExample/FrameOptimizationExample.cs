@@ -425,6 +425,43 @@ namespace DlibFaceLandmarkDetectorExample
         }
 
         /// <summary>
+        /// Raises the disable web camera event.
+        /// </summary>
+        public void OnDisableWebCamButtonClick()
+        {
+
+            /**if (texture != null)
+            {
+                texture = gameObject.GetComponent<Texture2D>();
+                gameObject.SetActive(false);
+            }
+
+            if (grayMat != null)
+            {
+                grayMat = gameObject.GetComponent<Mat>();
+                gameObject.SetActive(false);
+            }**/
+
+            if (webCamTextureToMatHelper != null)
+            {
+                webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper>();
+                gameObject.SetActive(false);
+            }
+
+
+        }
+
+        /// <summary>
+        /// Raises the enable web camera event.
+        /// </summary>
+        public void OnEnableWebCamButtonClick()
+        {
+
+            gameObject.SetActive(true);
+
+        }
+
+        /// <summary>
         /// Raises the back button click event.
         /// </summary>
         public void OnBackButtonClick()
