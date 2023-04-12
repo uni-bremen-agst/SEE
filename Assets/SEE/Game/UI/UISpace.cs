@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using DynamicPanels;
-using SEE.Game.UI.LiveDocumentation;
 using SEE.Utils;
 using UnityEngine;
 
