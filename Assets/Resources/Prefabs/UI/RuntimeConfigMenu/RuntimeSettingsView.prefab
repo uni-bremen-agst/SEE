@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 8334426985670405744}
   - component: {fileID: 4482896771734816783}
   - component: {fileID: 712066712922122677}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97,7 +97,7 @@ GameObject:
   - component: {fileID: 6233151544370425990}
   - component: {fileID: 5649049039759427513}
   - component: {fileID: 3957930290429931941}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: RuntimeSettingsView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -229,7 +229,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 38312341569244518}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Sliding Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -270,7 +270,7 @@ GameObject:
   - component: {fileID: 8124884439210241428}
   - component: {fileID: 5545950578473946043}
   - component: {fileID: 3598096039544353157}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: TabScrollbar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -379,8 +379,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4736184567586311842}
   m_HandleRect: {fileID: 3612620010917193053}
   m_Direction: 3
-  m_Value: 0
-  m_Size: 0.9907407
+  m_Value: 1
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -416,7 +416,7 @@ GameObject:
   - component: {fileID: 3612620010917193053}
   - component: {fileID: 8467635049949834352}
   - component: {fileID: 4736184567586311842}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Handle
   m_TagString: Untagged
   m_Icon: {fileID: 0}

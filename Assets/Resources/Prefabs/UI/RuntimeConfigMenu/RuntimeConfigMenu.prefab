@@ -547,10 +547,10 @@ RectTransform:
   m_Father: {fileID: 622825185188337946}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 982.5, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 1302.5, y: -14.625}
+  m_SizeDelta: {x: 0, y: 29.25}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &9023297408135620304
 CanvasRenderer:
@@ -736,7 +736,7 @@ GameObject:
   - component: {fileID: 5782401636765229652}
   - component: {fileID: 5494199377591374688}
   - component: {fileID: 2861784706379062370}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: RuntimeConfigMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1287,7 +1287,7 @@ GameObject:
   - component: {fileID: 6124922284564543907}
   - component: {fileID: 3526787070277817966}
   - component: {fileID: 5750735571764106547}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Handle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1497,7 +1497,7 @@ GameObject:
   - component: {fileID: 3438917289352614726}
   - component: {fileID: 6567959357972539263}
   - component: {fileID: 8383365334660851587}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: TabObjects
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1928,7 +1928,7 @@ GameObject:
   - component: {fileID: 3761495235844493093}
   - component: {fileID: 3839781550335240709}
   - component: {fileID: 8237363819057167176}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: TabScrollbar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2054,7 +2054,7 @@ GameObject:
   - component: {fileID: 2799032429101295006}
   - component: {fileID: 4687039071375272903}
   - component: {fileID: 6738400520142280276}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: ViewList
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2393,7 +2393,7 @@ GameObject:
   - component: {fileID: 3735976009448385518}
   - component: {fileID: 4504525893848358020}
   - component: {fileID: 7313934428901245017}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: TabButtons
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2536,7 +2536,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8264360995754953071}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Sliding Area
   m_TagString: Untagged
   m_Icon: {fileID: 0}
