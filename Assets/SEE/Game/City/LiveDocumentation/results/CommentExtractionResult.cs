@@ -1,5 +1,4 @@
-﻿using ICSharpCode.NRefactory.Ast;
-
+﻿
 namespace SEE.Game.City.LiveDocumentation.results
 {
     public class CommentExtractionResult: IExtractionResult
