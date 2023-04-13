@@ -21,6 +21,8 @@ TagManager:
   - FileBrowser
   - Path
   - Erosion
+  - Chart
+  - ChartContainer
   layers:
   - Default
   - TransparentFX
@@ -28,8 +30,8 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - Grid
+  - PlacementGrid
   - Player
   - Post Processing
   - 
