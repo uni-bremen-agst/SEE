@@ -1,0 +1,27 @@
+T__0=1
+T__1=2
+T__2=3
+T__3=4
+T__4=5
+WS=6
+Comment=7
+PARAM=8
+TEXT=9
+SHORT_COMMENT=10
+EQUALS=11
+LineComment=12
+Classname=13
+TEXT_SKIP=14
+CURLY_BRACKET_OPEN=15
+CURLY_BRACKET_CLOSE=16
+CLASS_LINK=17
+PARAMREF=18
+'/// <summary>'=1
+'/// </summary>'=2
+'/// <returns>'=3
+'/// </returns>'=4
+'</returns>'=5
+'//'=10
+'='=11
+'{'=15
+'}'=16
