@@ -252,7 +252,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         private const string aboutText = "I am SEE. "
             + "Myself and all the world you see, was created by Christian, Falko, Jan, Leonard, Lino, Marcel, Moritz, "
-            + "Nick, Rainer, Robin, Simon, Sören, Thore, Thorsten, Torben, and many others. "
+            + "Nick, Rainer, Robin, Simon, SÃ¶ren, Thore, Thorsten, Torben, and many others. "
             + "<emphasis level=\"strong\">Thanks, guys!</emphasis>";
 
         /// <summary>
