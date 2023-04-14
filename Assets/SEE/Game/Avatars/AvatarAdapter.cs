@@ -11,7 +11,6 @@ using SEE.XR;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Valve.VR.InteractionSystem;
 using ViveSR.anipal;
 using ViveSR.anipal.Lip;
 
@@ -289,7 +288,7 @@ namespace SEE.Game.Avatars
             /// </summary>
             void PrepareScene()
             {
-                const string GroundName = "Ground";
+                const string GroundName = "Floor";
 
                 GameObject ground = GameObject.Find(GroundName);
                 if (ground == null)
@@ -298,6 +297,7 @@ namespace SEE.Game.Avatars
                 }
                 else
                 {
+#if false // FIXME STEAMVR
                     // Create Teleporting game object
                     PrefabInstantiator.InstantiatePrefab("Prefabs/Players/Teleporting").name = "Teleporting";
                     {
@@ -311,6 +311,7 @@ namespace SEE.Game.Avatars
                         GameObject clonedFloor = Instantiate(ground, position, ground.transform.rotation);
                         clonedFloor.AddComponent<TeleportArea>();
                     }
+#endif
                     // FIXME: This needs to work again for our metric charts.
                     //{
                     //    // Assign the VR camera to the chart manager so that charts can move along with the camera.
@@ -418,6 +419,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void TurnOffControllerHintsIfRequested()
         {
+#if false // FIXME STEAMVR
             if (SceneSettings.InputType == PlayerInputType.VRPlayer && !ShowControllerHints)
             {
                 if (Player.instance != null)
@@ -442,6 +444,7 @@ namespace SEE.Game.Avatars
                     Debug.LogWarning($"{nameof(Teleport)}.instance is null. Is there no teleport area in the scene?\n");
                 }
             }
+#endif
         }
 
         /// <summary>

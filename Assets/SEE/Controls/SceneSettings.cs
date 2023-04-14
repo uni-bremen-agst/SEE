@@ -1,13 +1,10 @@
 ﻿using Sirenix.Serialization;
 using SEE.Game;
-using SEE.Game.Charts.VR;
 using SEE.GO;
 using SEE.Utils;
 using System;
 using DG.Tweening;
 using UnityEngine;
-using Valve.VR;
-using Valve.VR.InteractionSystem;
 using Sirenix.OdinInspector;
 using System.IO;
 

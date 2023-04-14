@@ -1,5 +1,5 @@
 ﻿using System;
-using Valve.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Metric
 {
@@ -20,14 +20,14 @@ namespace SEE.Net.Dashboard.Model.Metric
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public readonly string displayName;
-        
+
         /// <summary>
         /// The configured minimum threshold for the metric.
         /// If not configured, this field will not be available.
         /// </summary>
         [JsonProperty(Required = Required.Default)]
-        public readonly float? minValue; 
-        
+        public readonly float? minValue;
+
         /// <summary>
         /// The configured maximum threshold for the metric.
         /// If not configured, this field will not be available.

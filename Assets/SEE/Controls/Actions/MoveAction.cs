@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using SEE.Audio;
 using SEE.Game;
+using SEE.Game.Charts.VR;
 using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.Game.UI.Notification;
@@ -125,12 +126,21 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    UnmarkAsTarget();
+                    if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                    {
+                        UnmarkAsTarget();
+                    }
+
                     if (grabbedObject.TryGetComponent(out InteractableObject interactableObject))
                     {
                         interactableObject.SetGrab(grab: false, isInitiator: true) ;
                     }
-                    ShowLabel.Off(grabbedObject);
+
+                    if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                    {
+                        ShowLabel.Off(grabbedObject);
+                    }
+
                     IsGrabbed = false;
                     // Note: We do not set grabbedObject to null because we may need its
                     // value later for Undo/Redo.
@@ -346,8 +356,12 @@ namespace SEE.Controls.Actions
                 if (!IsDescendant(target, grabbedObject))
                 {
                     PutOnAndFit(grabbedObject, target, originalParent.gameObject, originalLocalScale);
-                    UnmarkAsTarget();
-                    MarkAsTarget(target.transform);
+                    if (SceneSettings.InputType != PlayerInputType.VRPlayer)
+                    {
+                        UnmarkAsTarget();
+                        MarkAsTarget(target.transform);
+                    }
+
                     AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, originalParent.gameObject);
 
                     newParent = target;
@@ -380,7 +394,11 @@ namespace SEE.Controls.Actions
             /// </summary>
             internal void UnReparent()
             {
-                UnmarkAsTarget();
+                if (SceneSettings.InputType != PlayerInputType.VRPlayer)
+                {
+                    UnmarkAsTarget();
+                }
+
                 if (grabbedObject.transform.parent.gameObject != originalParent.gameObject)
                 {
                     if (withinReflexionCity)
@@ -499,7 +517,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The currently grabbed object if any.
         /// </summary>
-        private GrabbedObject grabbedObject = new GrabbedObject();
+        private static GrabbedObject grabbedObject = new GrabbedObject();
 
         /// <summary>
         /// The distance from the the position of <see cref="grabbedObject"/> when it was grabbed to
@@ -522,6 +540,19 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
+        {
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                return MoveActionDesktop();
+            }
+            else if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            {
+                return MoveActionVR();
+            }
+            return false;
+        }
+
+        private bool MoveActionDesktop()
         {
             if (UserIsGrabbing()) // start to grab the object or continue to move the grabbed object
             {
@@ -563,16 +594,71 @@ namespace SEE.Controls.Actions
             return false;
         }
 
+        // FIXME: parts of this needs to be fixed in the future.
+        private bool MoveActionVR()
+        {
+            if (VRGrabber.IsGrabbed)
+            {
+                if (!grabbedObject.IsGrabbed)
+                {
+                    GameObject grabbedObj = VRGrabber.GrabbedObject;
+
+                    if (grabbedObj.TryGetNode(out Node node) && !node.IsRoot())
+                    {
+                        grabbedObject.Grab(grabbedObj);
+                        // Remember the current distance from the pointing device to the grabbed object.
+                        //distanceToUser = Vector3.Distance(Raycasting.UserPointsTo().origin, grabbedObject.Position);
+                        //currentState = ReversibleAction.Progress.InProgress;
+                    }
+                }
+                // UpdateHierarchy() (with collision)
+            }
+            else if (grabbedObject.IsGrabbed)
+            {
+                grabbedObject.UnGrab();
+                // Action is finished.
+                // currentState = ReversibleAction.Progress.Completed;
+                return true;
+            }
+            return false;
+        }
+
         /// <summary>
-        /// Returns true if the user is currently grabbing.
+        /// Is called from OnCollisionEnter() in <see cref="VRGrabber"/>.
+        /// </summary>
+        /// <param name="target"></param>
+        public static void ReparentVR(GameObject target)
+        {
+            grabbedObject.Reparent(target);
+        }
+
+        /// <summary>
+        /// Is called from OnCollisionExit() in <see cref="VRGrabber"/>.
+        /// FIXME: UnReparenting with collisionexit() has some strange effects on hierarchy. Need to look into this Problem.
+        /// </summary>
+        public static void UnReparentVR()
+        {
+            grabbedObject.UnReparent();
+        }
+
+        /// <summary>
+        /// Returns true if the user is currently grabbing in VR or Desktop mode.
         /// </summary>
         /// <returns>true if user is grabbing</returns>
         private static bool UserIsGrabbing()
         {
-            // Index of the left mouse button.
-            const int LeftMouseButton = 0;
-            // FIXME: We need a VR interaction, too.
-            return Input.GetMouseButton(LeftMouseButton);
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                // Index of the left mouse button.
+                const int LeftMouseButton = 0;
+                // FIXME: We need a VR interaction, too.
+                return Input.GetMouseButton(LeftMouseButton);
+            }
+            else if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            {
+                return VRGrabber.IsGrabbed;
+            }
+            return false;
         }
 
         /// <summary>

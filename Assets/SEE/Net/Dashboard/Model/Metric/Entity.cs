@@ -1,5 +1,5 @@
 ﻿using System;
-using Valve.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Metric
 {
@@ -14,25 +14,25 @@ namespace SEE.Net.Dashboard.Model.Metric
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public readonly string id;
-        
+
         /// <summary>
         /// A non-unique name of the entity.
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public readonly string name;
-        
+
         /// <summary>
         /// The type of the entity.
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public readonly string type;
-        
+
         /// <summary>
         /// The file path of an entity if it can be associated with a file.
         /// </summary>
         [JsonProperty(Required = Required.Default)]
         public readonly string path;
-        
+
         /// <summary>
         /// The line number of an entity if it can be associated with a file location.
         /// </summary>

@@ -17,12 +17,12 @@ namespace SEE.XR
         /// Name of the child of the <see cref="gameObject"/> representing the left
         /// controller to be enabled.
         /// </summary>
-        internal const string LeftControllerName = "Camera Offset/LeftHand Controller";
+        internal const string LeftControllerName = "TrackerOffsets/Controller (left)"; //"Camera Offset/LeftHand Controller";
         /// <summary>
         /// Name of the child of the <see cref="gameObject"/> representing the right
         /// controller to be enabled.
         /// </summary>
-        internal const string RightControllerName = "Camera Offset/RightHand Controller";
+        internal const string RightControllerName = "TrackerOffsets/Controller (right)"; //"Camera Offset/RightHand Controller";
 
         /// <summary>
         /// Enables the two controllers when XR is initialized.
@@ -47,6 +47,22 @@ namespace SEE.XR
             Debug.Log($"[{nameof(XRCameraRigManager)}] Enabling controllers.\n");
             gameObject.SetChildActive(LeftControllerName, true);
             gameObject.SetChildActive(RightControllerName, true);
+
+            // An XRHandOffset component is assumed to be attached and disabled initially.
+            // It will query the XR devices, however, it needs to wait until we have started XR.
+            // That is why it should be disabled initially. Now we know XR is running, hence,
+            // we can start it.
+            if (gameObject.TryGetComponent(out XRHandOffset xrHandOffset))
+            {
+                if (xrHandOffset.enabled)
+                {
+                    Debug.LogWarning($"{gameObject.FullName()} has an enabled {nameof(XRHandOffset)} component. It should disabled initially.\n");
+                }
+                else
+                {
+                    xrHandOffset.enabled = true;
+                }
+            }
         }
     }
 }

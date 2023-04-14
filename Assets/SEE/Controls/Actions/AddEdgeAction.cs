@@ -134,9 +134,11 @@ namespace SEE.Controls.Actions
             // Assigning the game objects to be connected.
             // Checking whether the two game objects are not null and whether they are
             // actually nodes.
-            // FIXME: We need an interaction for VR, too.
-            if (hoveredObject != null && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI() && hoveredObject.HasNodeRef())
+            // FIXME: Needs adaptation for VR where no mouse is available.
+            if (Input.GetMouseButtonDown(0)
+                && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
             {
+                GameObject hoveredObject = raycastHit.collider.gameObject;
                 if (from == null)
                 {
                     // No source selected yet; this interaction is meant to set the source.

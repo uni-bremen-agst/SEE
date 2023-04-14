@@ -30,6 +30,8 @@ Assets/Alstrainfinite/** filter=lfs diff=lfs merge=lfs -text
 Assets/AmplifyShaderEditor.meta filter=lfs diff=lfs merge=lfs -text
 Assets/AmplifyShaderEditor/** filter=lfs diff=lfs merge=lfs -text
 Assets/Antlr4.Runtime.Standard.dll filter=lfs diff=lfs merge=lfs -text
+Assets/Asset[[:space:]]Cleaner.meta filter=lfs diff=lfs merge=lfs -text
+Assets/Asset[[:space:]]Cleaner/** filter=lfs diff=lfs merge=lfs -text
 Assets/AutoHand.meta filter=lfs diff=lfs merge=lfs -text
 Assets/AutoHand/** filter=lfs diff=lfs merge=lfs -text
 Assets/BigFurniturePack/** filter=lfs diff=lfs merge=lfs -text
@@ -64,7 +66,7 @@ Assets/OfficeArchviz.meta filter=lfs diff=lfs merge=lfs -text
 Assets/OfficeArchviz/** filter=lfs diff=lfs merge=lfs -text
 Assets/OpenCVForUnity/** filter=lfs diff=lfs merge=lfs -text
 Assets/OpenCVForUnity/OpenCVForUnity.meta filter=lfs diff=lfs merge=lfs -text
-Assets/Plugins filter=lfs diff=lfs merge=lfs -text
+Assets/Plugins.meta filter=lfs diff=lfs merge=lfs -text
 Assets/Plugins/** filter=lfs diff=lfs merge=lfs -text
 Assets/Plugins/Sirenix/Odin[[:space:]]Validator.meta filter=lfs diff=lfs merge=lfs -text
 Assets/Plugins/Sirenix/Odin[[:space:]]Validator/** filter=lfs diff=lfs merge=lfs -text

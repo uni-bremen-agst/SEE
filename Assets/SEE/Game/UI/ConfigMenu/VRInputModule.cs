@@ -20,9 +20,10 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using Valve.VR;
+//using Valve.VR;
 
 namespace SEE.Game.UI.ConfigMenu
 {
@@ -31,8 +32,21 @@ namespace SEE.Game.UI.ConfigMenu
     ///
     /// Based on: https://www.youtube.com/watch?v=3mRI1hu9Y3w
     /// </summary>
+    [System.Obsolete("FIXME: Reactivate with Unity XR")]
     public class VRInputModule : BaseInputModule
     {
+#if true
+        public override void Process()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        internal PointerEventData GetData()
+        {
+            throw new NotImplementedException();
+        }
+        public Camera PointerCamera { get; set; }
+#else
         private readonly SteamVR_Input_Sources inputSource = SteamVR_Input_Sources.LeftHand;
         private readonly SteamVR_Action_Boolean clickAction = SteamVR_Actions._default.InteractUI;
 
@@ -107,5 +121,6 @@ namespace SEE.Game.UI.ConfigMenu
             data.pointerDrag = null;
             data.rawPointerPress = null;
         }
+#endif
     }
 }

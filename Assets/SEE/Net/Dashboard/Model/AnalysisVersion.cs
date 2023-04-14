@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Valve.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model
 {
