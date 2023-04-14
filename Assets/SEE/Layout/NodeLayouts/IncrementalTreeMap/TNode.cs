@@ -11,6 +11,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             this.parent = parent;
         }
 
+        // do i rly need parent?
         private TNode parent;
         public TNode Parent {get;}
         private IList<TNode> children;
@@ -18,7 +19,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         public IList<TNode> Children {get; set;}
         private TRectangle rectangle;
 
-        public TRectangle Rectangle {get;}
+        public TRectangle Rectangle {get; set;}
         private float size;
 
         public float Size {get; set;}

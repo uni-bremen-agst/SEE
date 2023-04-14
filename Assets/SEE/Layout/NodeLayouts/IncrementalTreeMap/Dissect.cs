@@ -27,7 +27,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             if(nodes.Count == 1)
             {
                 TNode node = nodes[0];
-                node.rectangle = rectangle;
+                node.Rectangle = rectangle;
                 node.registerSegment(leftBound, Direction.Left);
                 node.registerSegment(rightBound,Direction.Right);
                 node.registerSegment(lowerBound,Direction.Lower);
