@@ -7,6 +7,7 @@ using SEE.Game.UI.PropertyDialog;
 using System;
 using SEE.Game.UI.Notification;
 using SEE.Controls;
+using Sirenix.Utilities;
 
 namespace SEE.UI
 {
@@ -19,25 +20,25 @@ namespace SEE.UI
         /// <summary>
         /// The UI object representing the menu the user chooses the action from.
         /// </summary>
-        private SimpleMenu menu;
+        private SimpleListMenu menu;
 
         /// <summary>
         /// This creates and returns the action menu, with which a user can configure the
         /// networking.
         /// </summary>
         /// <returns>the newly created action menu component.</returns>
-        private SimpleMenu CreateMenu()
+        private SimpleListMenu CreateMenu()
         {
             GameObject actionMenuGO = new() { name = "Network Menu" };
             IList<ToggleMenuEntry> entries = SelectionEntries();
-            SimpleMenu actionMenu = actionMenuGO.AddComponent<SimpleMenu>();
-            actionMenu.AllowNoSelection(false); // the menu cannot be closed; user must make a decision
+            SimpleListMenu actionMenu = actionMenuGO.AddComponent<SimpleListMenu>();
+            actionMenu.AllowNoSelection = false; // the menu cannot be closed; user must make a decision
             actionMenu.Title = "Network Configuration";
             actionMenu.Description = "Please select the network configuration you want to activate.";
-            actionMenu.AddEntries(entries);
+            entries.ForEach(actionMenu.AddEntry);
             // We will handle the closing of the menu ourselves: we need to wait until a network
             // connection can be established.
-            actionMenu.HideAfterSelection(false);
+            actionMenu.HideAfterSelection = false;
             return actionMenu;
         }
 
@@ -50,27 +51,27 @@ namespace SEE.UI
             Color color = Color.blue;
 
             return new List<ToggleMenuEntry>
-                    { new(active: false,
-                          entryAction: StartHost,
-                          exitAction: null,
-                          title: "Host",
-                          description: "Starts a server and local client process.",
-                          entryColor: NextColor(),
-                          icon: Resources.Load<Sprite>("Icons/Host")),
-                      new(active: false,
-                          entryAction: StartClient,
-                          exitAction: null,
-                          title: "Client",
-                          description: "Starts a local client connection to a server.",
-                          entryColor: NextColor(),
-                          icon: Resources.Load<Sprite>("Icons/Client")),
-                      new(active: false,
-                          entryAction: ToggleEnvironment,
-                          exitAction: null,
-                          title: "Toggle Desktop/VR",
-                          description: "Toggles between desktop and VR hardware.",
-                          entryColor: NextColor(),
-                          icon: Resources.Load<Sprite>("Icons/Client")),
+                    { new(
+                                          entryAction: this.StartHost,
+                                          exitAction: null,
+                                          title: "Host",
+                                          description: "Starts a server and local client process.",
+                                          entryColor: NextColor(),
+                                          icon: Resources.Load<Sprite>("Icons/Host")),
+                      new(
+                                          entryAction: this.StartClient,
+                                          exitAction: null,
+                                          title: "Client",
+                                          description: "Starts a local client connection to a server.",
+                                          entryColor: NextColor(),
+                                          icon: Resources.Load<Sprite>("Icons/Client")),
+                      new(
+                                          entryAction: this.ToggleEnvironment,
+                                          exitAction: null,
+                                          title: "Toggle Desktop/VR",
+                                          description: "Toggles between desktop and VR hardware.",
+                                          entryColor: NextColor(),
+                                          icon: Resources.Load<Sprite>("Icons/Client")),
 
                       // FIXME: Running only a server is currently not working.
                       //new ToggleMenuEntry(active: false,
@@ -80,13 +81,13 @@ namespace SEE.UI
                       //                    description: "Starts a dedicated server without local client.",
                       //                    entryColor: NextColor(),
                       //                    icon: Resources.Load<Sprite>("Icons/Server")),
-                      new(active: false,
-                          entryAction: Settings,
-                          exitAction: null,
-                          title: "Settings",
-                          description: "Allows to set additional network settings.",
-                          entryColor: Color.gray,
-                          icon: Resources.Load<Sprite>("Icons/Settings")),
+                      new(
+                                          entryAction: this.Settings,
+                                          exitAction: null,
+                                          title: "Settings",
+                                          description: "Allows to set additional network settings.",
+                                          entryColor: Color.gray,
+                                          icon: Resources.Load<Sprite>("Icons/Settings")),
             };
 
             Color NextColor()
@@ -113,13 +114,13 @@ namespace SEE.UI
                 // user select any menu entry while this process is running. We do
                 // not want the user to start any other network setting until this
                 // process has come to an end.
-                menu.ShowMenu(false);
+                menu.ShowMenu = false;
                 SceneSettings.InputType = inputType;
                 network.StartHost(NetworkCallBack);
             }
             catch (Exception exception)
             {
-                menu.ShowMenu(true);
+                menu.ShowMenu = true;
                 ShowNotification.Error("Host cannot be started", exception.Message);
             }
         }
@@ -135,13 +136,13 @@ namespace SEE.UI
                 // user select any menu entry while this process is running. We do
                 // not want the user to start any other network setting until this
                 // process has come to an end.
-                menu.ShowMenu(false);
+                menu.ShowMenu = false;
                 SceneSettings.InputType = inputType;
                 network.StartClient(NetworkCallBack);
             }
             catch (Exception exception)
             {
-                menu.ShowMenu(true);
+                menu.ShowMenu = true;
                 ShowNotification.Error("Server connection failed", exception.Message);
             }
         }
@@ -178,7 +179,7 @@ namespace SEE.UI
         /// <param name="message">a description of what happened</param>
         private void NetworkCallBack(bool success, string message)
         {
-            menu.ShowMenu(!success);
+            menu.ShowMenu = !success;
             if (!success)
             {
                 ShowNotification.Error("Network problem", message);
@@ -203,7 +204,7 @@ namespace SEE.UI
         /// </summary>
         private void Reactivate()
         {
-            menu.ShowMenu(true);
+            menu.ShowMenu = true;
         }
 
         /// <summary>
@@ -235,7 +236,7 @@ namespace SEE.UI
             // will be toggled by request of the user and only when the host or client is
             // actually started, we assign the value of inputType to SceneSettings.InputType.
             SceneSettings.InputType = PlayerInputType.DesktopPlayer;
-            menu.ShowMenu(true);
+            menu.ShowMenu = true;
             ShowEnvironment();
         }
 

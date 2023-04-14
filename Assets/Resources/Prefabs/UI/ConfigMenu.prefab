@@ -593,6 +593,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
+  webglMode: 0
   images:
   - {fileID: 2362114129132732813}
   - {fileID: 2116626092329625140}
@@ -1412,15 +1413,19 @@ MonoBehaviour:
       m_Calls: []
   hoverSound: {fileID: 0}
   clickSound: {fileID: 0}
+  buttonVar: {fileID: 0}
   normalText: {fileID: 6299520937289255401}
   highlightedText: {fileID: 6299520938188579177}
   soundSource: {fileID: 0}
   rippleParent: {fileID: 6299520938435610395}
+  animationSolution: 1
+  fadingMultiplier: 8
   useCustomContent: 0
   enableButtonSounds: 0
   useHoverSound: 1
   useClickSound: 1
   useRipple: 1
+  rippleUpdateMode: 1
   rippleShape: {fileID: 0}
   speed: 2.4
   maxSize: 6
@@ -1505,6 +1510,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   UIManagerAsset: {fileID: 11400000, guid: 2a619a9609984be49b53b928dd94e61b, type: 2}
   buttonType: 3
+  webglMode: 0
   basicFilled: {fileID: 0}
   basicText: {fileID: 0}
   basicOnlyIconFilled: {fileID: 0}
@@ -1790,8 +1796,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294703865
-  m_fontColor: {r: 0.9764706, g: 0.98039216, b: 0.9843137, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1850,18 +1856,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &4420016294861765469
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6299520937511484086}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b337f8eba930442a99e72edcf2ed3afc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &6299520937574518846
 GameObject:
   m_ObjectHideFlags: 0
@@ -1937,8 +1931,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2fcee686f08dcf94a97e9722a354d866, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tabButtons: []
-  tabController: {fileID: 0}
+  TabButtons: []
+  TabController: {fileID: 0}
 --- !u!1 &6299520938115902967
 GameObject:
   m_ObjectHideFlags: 0
@@ -2018,8 +2012,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0db67bd588c21c24b9dbf77ba30c4358, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pages: []
-  startIndex: 0
+  Pages: []
+  StartIndex: 0
 --- !u!222 &6299520938115902956
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2132,8 +2126,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4280752145
-  m_fontColor: {r: 0.06666667, g: 0.09411765, b: 0.15294118, a: 1}
+    rgba: 4283777325
+  m_fontColor: {r: 0.1764706, g: 0.25490198, b: 0.33333334, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -2250,7 +2244,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.9764706, g: 0.98039216, b: 0.9843137, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2415,7 +2409,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 2147484471
 --- !u!1 &6299520938435610395
 GameObject:
   m_ObjectHideFlags: 0
@@ -2563,7 +2557,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.9764706, g: 0.98039216, b: 0.9843137, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4210,3 +4204,15 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 157272, guid: 916ee089a0d7b63419075f91e1c657ec, type: 3}
   m_PrefabInstance: {fileID: 6299520937511591150}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4420016294861765469
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6299520937511484086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b337f8eba930442a99e72edcf2ed3afc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
