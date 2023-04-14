@@ -51,9 +51,9 @@ namespace SEE.Game
                 gameObject.AddComponentIfNecessary<ShowEdges>();
                 gameObject.AddComponentIfNecessary<HighlightErosion>();
 
-                SetupRigidbody();
-                SetupGrabbable();
-                gameObject.AddOrGetComponent<VrActions>();
+                //SetupRigidbody();
+                //SetupGrabbable();
+                //gameObject.AddOrGetComponent<VrActions>();
 
             }
 
