@@ -45,7 +45,9 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private Dictionary<ILayoutNode, NodeTransform> layout_result;
 
-        private IList<TNode> tNodes;
+        private IDictionary<string,TNode> tNodes;
+
+        private HashSet<TSegment> segments;
 
         private IncrementalTreeMapLayout oldLayout;
 
@@ -81,9 +83,10 @@ namespace SEE.Layout.NodeLayouts
                     this.roots = LayoutNodes.GetRoots(layoutNodeList);
                     this.oldLayout = oldLayout;
                     InitTNodes();
+                    this.segments = new HashSet<TSegment>();
                     {
                         // TODO remove if checked
-                        float total_size = tNodes.Sum( x => x.Parent == null ? x.Size : 0);
+                        float total_size = tNodes.Values.Sum( x => x.Parent == null ? x.Size : 0);
                         if( total_size != width * depth)
                         {
                             Debug.Log("total size: " + total_size.ToString()
@@ -100,7 +103,7 @@ namespace SEE.Layout.NodeLayouts
 
         private void InitTNodes()
         {
-            tNodes = new List<TNode>();
+            tNodes = new Dictionary<string,TNode>();
             foreach(ILayoutNode node in roots)
             {
                 InitTNode(node, null);
@@ -116,13 +119,13 @@ namespace SEE.Layout.NodeLayouts
                 // x and z lengths may differ; we need to consider the larger value
                 float result = Mathf.Max(size.x, size.z);
                 TNode newTNode = new TNode(node,result,parent);
-                tNodes.Add(newTNode);
+                tNodes.Add(node.ID, newTNode);
                 return result;
             }
             else
             {
                 TNode newTNode = new TNode(node, 0, parent);
-                tNodes.Add(newTNode);
+                tNodes.Add(node.ID, newTNode);
                 float total_size = 0.0f;
                 foreach (ILayoutNode child in node.Children())
                 {
@@ -167,11 +170,24 @@ namespace SEE.Layout.NodeLayouts
                 || this.oldLayout.NumberOfOccurrencesInOldGraph(siblings) <= 1
                 || this.oldLayout.HaveSingleParentInOldGraph(siblings))
             {
-                // dissect
-                // extract segments?
+                IList<TNode> nodes = GetTNodes(siblings);
+                Dissect.dissect(rectangle: rectangle, nodes: nodes);
+                ExtractSegments(nodes);
             }
             else
             {
+                // segments or nodes first?
+
+                // get all nodes in old graph
+                // for node in oldnode:
+                //      if node not in new graph:
+                //          TNode = new TNode( )
+                // 
+                //          artif_added_nodes.append(new_tnode)
+                //      else:
+                //          get Tnode of node
+                //          tnode apply segments
+
                 //TNodes.add(new_nodes_for_old_siblings)
                 //TSegments.add(all_Segments(old_siblings))
                 //siblings.register()
@@ -183,7 +199,6 @@ namespace SEE.Layout.NodeLayouts
                 //#correct
                 //localMoves(siblings, segments)
             }
-
             foreach (ILayoutNode node in siblings)
             {
                 ICollection<ILayoutNode> children = node.Children();
@@ -218,7 +233,7 @@ namespace SEE.Layout.NodeLayouts
             }
             return parents.Count == 1;
         }
-        
+
         private int NumberOfOccurrencesInOldGraph(ICollection<ILayoutNode> nodes)
         {
             int counter = 0;
@@ -247,7 +262,7 @@ namespace SEE.Layout.NodeLayouts
             return false;
         }
 
-        public ILayoutNode findILayoutNodeByID(string ID)
+        internal ILayoutNode findILayoutNodeByID(string ID)
         {
             foreach(ILayoutNode node in roots)
             {
@@ -273,6 +288,28 @@ namespace SEE.Layout.NodeLayouts
                     }
                 }
                 return null;
+            }
+        }
+
+        internal IList<TNode> GetTNodes(ICollection<ILayoutNode> layoutNodes)
+        {
+            List<TNode> result = new List<TNode>();
+            foreach( ILayoutNode layoutNode in layoutNodes)
+            {
+                result.Add(this.tNodes[layoutNode.ID]);
+            }
+            return result;
+        }
+
+        internal void ExtractSegments(ICollection<TNode> nodes)
+        {
+            foreach(TNode node in nodes)
+            {
+                IList<TSegment> boundingSegments = node.getAllSegments();
+                foreach(TSegment segment in boundingSegments)
+                {
+                    this.segments.Add(segment);
+                }
             }
         }
 

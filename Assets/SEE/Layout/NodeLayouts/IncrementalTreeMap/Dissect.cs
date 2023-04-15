@@ -1,16 +1,16 @@
-using System.Collections.Generic;
-//using System.Collections.Generic;
 using System.Linq;
+using System;
+using System.Collections.Generic;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     static class Dissect{
         static public void dissect(TRectangle rectangle, IEnumerable<TNode> nodes)
         {
-            List<TNode> nodesList =  nodes.ToList();
-            nodesList.Sort((x,y) => (x.Size.CompareTo(y.Size)));
+            TNode[] nodesArray = nodes.ToArray();
+            Array.Sort(nodesArray,(x,y) => (x.Size.CompareTo(y.Size)));
             dissect(rectangle,
-                    nodesList,
+                    nodesArray,
                     new TSegment(true, true),
                     new TSegment(true, true), 
                     new TSegment(true, false),
@@ -18,13 +18,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         static private void dissect( TRectangle rectangle, 
-                                IList<TNode> nodes,
+                                TNode[] nodes,
                                 TSegment leftBound,
                                 TSegment rightBound,
                                 TSegment upperBound, 
                                 TSegment lowerBound)
         {
-            if(nodes.Count == 1)
+            if(nodes.Length == 1)
             {
                 TNode node = nodes[0];
                 node.Rectangle = rectangle;
@@ -34,65 +34,75 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 node.registerSegment(upperBound,Direction.Upper);
                 return;
             }
-            int splitIndex;
+            else
+            {
+                int splitIndex = getSplitIndex(nodes);
+                TNode[] nodes_1 = nodes[..splitIndex];
+                TNode[] nodes_2 = nodes[..splitIndex];
+                float ratio = nodes_1.Sum(x => x.Size) / nodes_2.Sum(x => x.Size);
+
+                TRectangle rectangle_1 = new TRectangle(x : rectangle.x, z : rectangle.z,
+                    width : rectangle.width, depth : rectangle.depth);
+                TRectangle rectangle_2 = new TRectangle(x : rectangle.x, z : rectangle.z,
+                    width : rectangle.width, depth : rectangle.depth);
+                if(rectangle.width >= rectangle.depth)
+                {
+                    rectangle_1.width *= ratio;
+                    rectangle_2.width *= (1 - ratio);
+                    rectangle_2.x = rectangle_1.x + rectangle_1.width;
+                    TSegment newSegment = new TSegment(false,false);
+
+                    Dissect.dissect(rectangle_1, nodes_1,
+                                    leftBound : leftBound,
+                                    rightBound: newSegment,
+                                    upperBound: upperBound,
+                                    lowerBound: lowerBound);
+
+                    Dissect.dissect(rectangle_2, nodes_2,
+                                    leftBound :  newSegment,
+                                    rightBound: rightBound,
+                                    upperBound: upperBound,
+                                    lowerBound: lowerBound);
+                }
+                else
+                {
+                    rectangle_1.depth *= ratio;
+                    rectangle_2.depth *= (1 - ratio);
+                    rectangle_2.z = rectangle_1.z + rectangle_1.depth;
+                    TSegment newSegment = new TSegment(false,true);
+
+                    Dissect.dissect(rectangle_1, nodes_1,
+                                    leftBound : leftBound,
+                                    rightBound: rightBound,
+                                    upperBound: newSegment,
+                                    lowerBound: lowerBound);
+
+                    Dissect.dissect(rectangle_2, nodes_2,
+                                    leftBound :  leftBound,
+                                    rightBound: rightBound,
+                                    upperBound: upperBound,
+                                    lowerBound: newSegment);
+                }
+            }
+       }
+
+        internal static int getSplitIndex(TNode[] nodes)
+        {
             if(nodes.Sum( x => x.Size)  <=  nodes.Last().Size )
             {
-                splitIndex = nodes.Count -1;
+                return nodes.Length -1;
             }
             else
             {
-
+                for (int i = 1; i <= nodes.Length+1; i++)
+                {
+                    if( nodes[..i].Sum(x => x.Size) * 3 >= nodes.Sum(x => x.Size))
+                    {
+                        return i;
+                    }                    
+                }
             }
-
-
+            throw new System.Exception("we should never arrive here");
         }
-
     }
 }
-
-//   Dissect in Python
-//   -----------------
-//
-//    def __dissect(rectangle : Rectangle,
-//                  areas : list[tuple[str,float]]) -> Node:
-//        if len(areas) == 1:
-//            return Node(name = areas[0][0],
-//                        rectangle=rectangle, 
-//                        split=None,
-//                        child_1= None,
-//                        child_2= None)
-//
-//        if sum(map(lambda x: x[1], areas)) <= areas[-1][1] * 3.0:
-//            k = -1
-//        else:
-//            for k in range(1,len(areas)+1):
-//                if sum(map(lambda x: x[1], areas[:k]))  * 3.0 >= sum(map(lambda x: x[1], areas)):
-//                    break
-//        areas_1 = areas[:k]
-//        areas_2 = areas[k:]
-//        ratio = sum(map(lambda x: x[1],areas_1))/sum(map(lambda x: x[1],areas))
-//
-//        if rectangle.width >= rectangle.height:
-//            split = "w"
-//            rectangle_1 = rectangle.copy()
-//            rectangle_1.width *= ratio
-//            rectangle_2 = rectangle.copy()
-//            rectangle_2.x += ratio * rectangle.width
-//            rectangle_2.width *= (1-ratio)
-//        else:
-//            split = "h"
-//            rectangle_1 = rectangle.copy()
-//            rectangle_1.height *= ratio
-//            rectangle_2 = rectangle.copy()
-//            rectangle_2.y += ratio * rectangle.height
-//            rectangle_2.height *= (1-ratio)
-//
-//        child_1 = Layout.__dissect( rectangle = rectangle_1,
-//                                       areas = areas_1)
-//        child_2 = Layout.__dissect( rectangle = rectangle_2,
-//                                    areas = areas_2)
-//        return Node(name="INNER_NODE",
-//                    rectangle=rectangle,
-//                    child_1=child_1,
-//                    child_2=child_2,
-//                    split = split)

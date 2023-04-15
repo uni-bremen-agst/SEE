@@ -73,5 +73,14 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 this.upperBoundingSegment.Side1Nodes.Remove(this);
             }
         }
+
+        public IList<TSegment> getAllSegments()
+        {
+            return new List<TSegment> 
+                {this.leftBoundingSegment,
+                 this.rightBoundingSegment,
+                 this.lowerBoundingSegment,
+                 this.upperBoundingSegment};
+        }
     }
 }
