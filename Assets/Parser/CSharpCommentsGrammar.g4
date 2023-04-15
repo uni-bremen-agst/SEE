@@ -34,4 +34,6 @@ comment: summary
         | param;
 line_comment: LineComment (classLink)?;
 
-start: (TEXT | CURLY_BRACKET_OPEN | CURLY_BRACKET_CLOSE | EQUALS | comment)*;
+claasDefinition: summary 'public class';
+
+start: (claasDefinition | TEXT | CURLY_BRACKET_OPEN | CURLY_BRACKET_CLOSE | EQUALS | comment)*;
