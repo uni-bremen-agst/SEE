@@ -767,7 +767,6 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             CustomDropdown dropdown = dropDownGameObject.transform.Find("Dropdown").GetComponent<CustomDropdown>();
 
             dropdown.isListItem = true;
-            dropdown.outOnPointerExit = true;
             dropdown.listParent = !recursive ? Menu.transform : Canvas.transform;
             dropdown.selectedItemIndex = Array.IndexOf(valueArray, getter());
             valueArray.ForEach(s => dropdown.CreateNewItemFast(s, null));
