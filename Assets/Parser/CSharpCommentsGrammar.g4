@@ -18,7 +18,7 @@ CURLY_BRACKET_OPEN: '{';
 CURLY_BRACKET_CLOSE: '}';
 CLASS_LINK: '<see cref="' TEXT '"/>';
 
-className: TEXT;
+//className: TEXT;
 PARAMREF: '<paramref name="' TEXT '"/>';
 
 //Language specific
@@ -37,12 +37,12 @@ line_comment: LineComment (classLink)?;
 methodSignature: TEXT*;
 
 methodDeclaration
-    : summary? ('public'| 'private' | 'protected')? returnType=methodSignature CURLY_BRACKET_OPEN TEXT* CURLY_BRACKET_CLOSE;
+    : summary? accesModifier=('public'| 'private' | 'protected')? returnType=methodSignature CURLY_BRACKET_OPEN TEXT* CURLY_BRACKET_CLOSE;
     
  classContent
     : (methodDeclaration
     | TEXT+)*;
 
-claasDefinition: summary? 'public class' className CURLY_BRACKET_OPEN classContent CURLY_BRACKET_CLOSE;
+claasDefinition: summary? 'public class' className=TEXT CURLY_BRACKET_OPEN classContent CURLY_BRACKET_CLOSE;
 
-start: (claasDefinition | TEXT | CURLY_BRACKET_OPEN | CURLY_BRACKET_CLOSE | EQUALS | comment)*;
+start: (claasDefinition | TEXT | CURLY_BRACKET_OPEN | CURLY_BRACKET_CLOSE | EQUALS )*;
