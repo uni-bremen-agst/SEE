@@ -34,6 +34,15 @@ comment: summary
         | param;
 line_comment: LineComment (classLink)?;
 
-claasDefinition: summary 'public class' className;
+methodSignature: TEXT*;
+
+methodDeclaration
+    : summary? ('public'| 'private' | 'protected')? returnType=methodSignature CURLY_BRACKET_OPEN TEXT* CURLY_BRACKET_CLOSE;
+    
+ classContent
+    : (methodDeclaration
+    | TEXT+)*;
+
+claasDefinition: summary? 'public class' className CURLY_BRACKET_OPEN classContent CURLY_BRACKET_CLOSE;
 
 start: (claasDefinition | TEXT | CURLY_BRACKET_OPEN | CURLY_BRACKET_CLOSE | EQUALS | comment)*;
