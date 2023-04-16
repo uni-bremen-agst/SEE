@@ -365,6 +365,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     filePicker.OnMenuInitialized +=
                         () => AddLayoutElement(parent.transform.Find(settingName).gameObject);
 
+                    OnShowMenuChanged += () => { if (!ShowMenu) filePicker.CloseDropdown();};
+
                     filePicker.OnChangedDropdown += () =>
                     {
                         UpdateIntCityFieldNetAction netAction = new();
@@ -765,7 +767,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             CustomDropdown dropdown = dropDownGameObject.transform.Find("Dropdown").GetComponent<CustomDropdown>();
 
             dropdown.isListItem = true;
-            dropdown.listParent = Canvas.transform;
+            dropdown.outOnPointerExit = true;
+            dropdown.listParent = !recursive ? Menu.transform : Canvas.transform;
             dropdown.selectedItemIndex = Array.IndexOf(valueArray, getter());
             valueArray.ForEach(s => dropdown.CreateNewItemFast(s, null));
 
