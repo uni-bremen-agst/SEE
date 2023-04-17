@@ -34,15 +34,25 @@ comment: summary
         | param;
 line_comment: LineComment (classLink)?;
 
-methodSignature: TEXT*;
+methodSignature: TEXT+;
 
 methodDeclaration
-    : summary? accesModifier=('public'| 'private' | 'protected')? returnType=methodSignature CURLY_BRACKET_OPEN TEXT* CURLY_BRACKET_CLOSE;
-    
+    : summary? accesModifier=('public'| 'private' | 'protected') returnType=methodSignature CURLY_BRACKET_OPEN TEXT* CURLY_BRACKET_CLOSE;
+scope
+    : CURLY_BRACKET_OPEN (scope | TEXT*) CURLY_BRACKET_CLOSE;  
+     
  classContent
-    : (methodDeclaration
+    : (scope
+    |methodDeclaration
+    
     | TEXT+)*;
 
 claasDefinition: summary? 'public class' className=TEXT CURLY_BRACKET_OPEN classContent CURLY_BRACKET_CLOSE;
 
-start: (claasDefinition | TEXT | CURLY_BRACKET_OPEN | CURLY_BRACKET_CLOSE | EQUALS )*;
+start
+    : (
+        claasDefinition | 
+        TEXT | 
+        CURLY_BRACKET_OPEN | 
+        CURLY_BRACKET_CLOSE | 
+        EQUALS )*;
