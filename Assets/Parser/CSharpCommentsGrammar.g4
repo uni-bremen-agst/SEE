@@ -11,12 +11,13 @@ Comment: ('///' | '///' ~[\r\n<]* [/a-zA-Z0-9.#_="!-][/a-zA-Z0-9.;()_#"=!-]+);
 PARAM: '<param name="' TEXT* '">' TEXT* '</param>';
 
 
-TEXT: [/a-zA-Z0-9&#_."=()+|-][/a-zA-Z0-9.()_&#=|-]+;
+TEXT: [/a-zA-Z0-9&#_."=()+|-]+;
+//[/a-zA-Z0-9.()_&#=|-]+;
 SHORT_COMMENT: '//' -> skip;
 
 EQUALS: '=';
 LineComment: '/*' .*? '*/';
-Classname: [a-zA-Z_][a-zA-Z0-9_]*;
+//Classname: [a-zA-Z_][a-zA-Z0-9_]*;
 
 TEXT_SKIP: [/a-zA-Z0-9#_".!-][/a-zA-Z0-9.()_#!-]+ -> skip;
 CURLY_BRACKET_OPEN: '{';
@@ -41,8 +42,10 @@ line_comment: LineComment (classLink)?;
 
 methodSignature: TEXT+;
 
+methodContent: (TEXT+ | SEMICOLON | EQUALS )*;
+
 methodDeclaration
-    : summary? accesModifier=(Public| 'private' | 'protected') returnType=methodSignature CURLY_BRACKET_OPEN (TEXT | SEMICOLON)* CURLY_BRACKET_CLOSE;
+    : summary? accesModifier=(Public| 'private' | 'protected') returnType=methodSignature CURLY_BRACKET_OPEN methodContent CURLY_BRACKET_CLOSE;
 
 // A Simple C# Scope
 // This means a block of {} which also can inlude more other scopes or methods or classes   
@@ -71,7 +74,7 @@ start
     : ( classDefinition 
     | namespaceDeclaration
     | usingClause
-    | TEXT 
+     
     | CURLY_BRACKET_OPEN 
     | CURLY_BRACKET_CLOSE 
     | EQUALS )*;
