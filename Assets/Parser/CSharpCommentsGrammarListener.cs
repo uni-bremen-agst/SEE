@@ -111,6 +111,16 @@ public interface ICSharpCommentsGrammarListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitLine_comment([NotNull] CSharpCommentsGrammarParser.Line_commentContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.claasDefinition"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterClaasDefinition([NotNull] CSharpCommentsGrammarParser.ClaasDefinitionContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.claasDefinition"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitClaasDefinition([NotNull] CSharpCommentsGrammarParser.ClaasDefinitionContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.start"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
