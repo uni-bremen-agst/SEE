@@ -51,8 +51,10 @@ namespace SEE.Layout.NodeLayouts
 
         private IncrementalTreeMapLayout oldLayout;
 
-        public Dictionary<ILayoutNode, NodeTransform> Layout
-            (ICollection<ILayoutNode> layoutNodes, IncrementalTreeMapLayout oldLayout)
+        public IncrementalTreeMapLayout OldLayout
+        {get => OldLayout; set {this.oldLayout = value;}}
+
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
         {
             layout_result = new Dictionary<ILayoutNode, NodeTransform>();
 
@@ -80,36 +82,32 @@ namespace SEE.Layout.NodeLayouts
                     break;
                 }
                 default:
+                {
                     this.roots = LayoutNodes.GetRoots(layoutNodeList);
-                    this.oldLayout = oldLayout;
                     InitTNodes();
-                    this.segments = new HashSet<TSegment>();
-                    {
-                        // TODO remove if checked
-                        float total_size = tNodes.Values.Sum( x => x.Parent == null ? x.Size : 0);
-                        if( total_size != width * depth)
-                        {
-                            Debug.Log("total size: " + total_size.ToString()
-                                        + "\n rect size:  " + (width*depth).ToString()
-                            );
-                        }
-                    }
+                    this.segments = new HashSet<TSegment>();                    
                     CalculateLayout();
                     break;
+                }
             }
             return layout_result;
-            throw new NotImplementedException();
         }    
 
         private void InitTNodes()
         {
             tNodes = new Dictionary<string,TNode>();
+            float totalLocalScale = 0;
             foreach(ILayoutNode node in roots)
             {
-                InitTNode(node, null);
+                totalLocalScale += InitTNode(node, null);
+            }
+            // adjust size 
+            float adjustFactor = (width*depth) / totalLocalScale;
+            foreach(var node in tNodes.Values)
+            {
+                node.Size *= adjustFactor;
             }
         }
-
         private float InitTNode(ILayoutNode node, TNode parent)
         {
             if (node.IsLeaf)
@@ -118,13 +116,14 @@ namespace SEE.Layout.NodeLayouts
                 Vector3 size = node.LocalScale;
                 // x and z lengths may differ; we need to consider the larger value
                 float result = Mathf.Max(size.x, size.z);
-                TNode newTNode = new TNode(node,result,parent);
+                TNode newTNode = new TNode(node,parent);
+                newTNode.Size = result;
                 tNodes.Add(node.ID, newTNode);
                 return result;
             }
             else
             {
-                TNode newTNode = new TNode(node, 0, parent);
+                TNode newTNode = new TNode(node, parent);
                 tNodes.Add(node.ID, newTNode);
                 float total_size = 0.0f;
                 foreach (ILayoutNode child in node.Children())
@@ -168,10 +167,11 @@ namespace SEE.Layout.NodeLayouts
         {
             if(    this.oldLayout == null
                 || this.oldLayout.NumberOfOccurrencesInOldGraph(siblings) <= 1
-                || this.oldLayout.HaveSingleParentInOldGraph(siblings))
+                || this.oldLayout.HaveSingleParentInOldGraph(siblings)
+                || true)
             {
                 IList<TNode> nodes = GetTNodes(siblings);
-                Dissect.dissect(rectangle: rectangle, nodes: nodes);
+                Dissect.dissect(rectangle, nodes);
                 ExtractSegments(nodes);
             }
             else
@@ -199,6 +199,9 @@ namespace SEE.Layout.NodeLayouts
                 //#correct
                 //localMoves(siblings, segments)
             }
+
+            AddToLayout(GetTNodes(siblings));
+
             foreach (ILayoutNode node in siblings)
             {
                 ICollection<ILayoutNode> children = node.Children();
@@ -207,15 +210,10 @@ namespace SEE.Layout.NodeLayouts
                     // Note: nodeTransform.position is the center position, while
                     // CalculateLayout assumes co-ordinates x and z as the left front corner
 
-                    // tNodes to dic -> rectangle
-
-                    //Assert.AreEqual(node.AbsoluteScale, node.LocalScale);
-                    //NodeTransform nodeTransform = layout_result[node];
-                    //CalculateLayout(children,
-                    //                nodeTransform.position.x - nodeTransform.scale.x / 2.0f,
-                    //                nodeTransform.position.z - nodeTransform.scale.z / 2.0f,
-                    //                nodeTransform.scale.x,
-                    //                nodeTransform.scale.z);
+                    Assert.AreEqual(node.AbsoluteScale, node.LocalScale);
+                    NodeTransform nodeTransform = layout_result[node];
+                    TRectangle childRectangle = tNodes[node.ID].Rectangle;
+                    CalculateLayout(children, childRectangle);
                 }
             }
         }
@@ -253,10 +251,7 @@ namespace SEE.Layout.NodeLayouts
         {
             throw new NotImplementedException();
         }
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
-        {
-            throw new NotImplementedException();
-        }
+
         public override bool UsesEdgesAndSublayoutNodes()
         {
             return false;
@@ -313,5 +308,18 @@ namespace SEE.Layout.NodeLayouts
             }
         }
 
+        private void AddToLayout (IList<TNode> nodes)
+        {
+            foreach (TNode node in nodes)
+            {
+                ILayoutNode o = node.RepresentLayoutNode;
+                TRectangle rect = node.Rectangle;
+                
+                Vector3 position = new Vector3(rect.x + rect.width / 2.0f, groundLevel, rect.z + rect.depth / 2.0f);
+                Vector3 scale = new Vector3(rect.width, o.LocalScale.y, rect.depth);
+                Assert.AreEqual(o.AbsoluteScale, o.LocalScale, $"{o.ID}: {o.AbsoluteScale} != {o.LocalScale}");
+                layout_result[o] = new NodeTransform(position, scale);
+            }
+        }
     }
 }

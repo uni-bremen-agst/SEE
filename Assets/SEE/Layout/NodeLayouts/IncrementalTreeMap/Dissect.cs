@@ -1,7 +1,8 @@
 using System.Linq;
 using System;
 using System.Collections.Generic;
-
+using UnityEngine;
+using UnityEngine.Assertions;
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     static class Dissect{
@@ -11,10 +12,10 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             Array.Sort(nodesArray,(x,y) => (x.Size.CompareTo(y.Size)));
             dissect(rectangle,
                     nodesArray,
-                    new TSegment(true, true),
-                    new TSegment(true, true), 
-                    new TSegment(true, false),
-                    new TSegment(true, false));
+                    leftBound : new TSegment(true, true),
+                    rightBound: new TSegment(true, true), 
+                    upperBound: new TSegment(true, false),
+                    lowerBound: new TSegment(true, false));
         }
 
         static private void dissect( TRectangle rectangle, 
@@ -38,8 +39,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             {
                 int splitIndex = getSplitIndex(nodes);
                 TNode[] nodes_1 = nodes[..splitIndex];
-                TNode[] nodes_2 = nodes[..splitIndex];
-                float ratio = nodes_1.Sum(x => x.Size) / nodes_2.Sum(x => x.Size);
+                TNode[] nodes_2 = nodes[splitIndex..];
+                
+                float ratio = nodes_1.Sum(x => x.Size) / nodes.Sum(x => x.Size);
 
                 TRectangle rectangle_1 = new TRectangle(x : rectangle.x, z : rectangle.z,
                     width : rectangle.width, depth : rectangle.depth);
@@ -84,11 +86,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                                     lowerBound: newSegment);
                 }
             }
-       }
+        }
 
         internal static int getSplitIndex(TNode[] nodes)
         {
-            if(nodes.Sum( x => x.Size)  <=  nodes.Last().Size )
+            if(nodes.Sum( x => x.Size)  <=  nodes.Last().Size * 3)
             {
                 return nodes.Length -1;
             }
@@ -102,7 +104,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     }                    
                 }
             }
-            throw new System.Exception("we should never arrive here");
+            throw new ArgumentException("We should never arrive here.\n");
         }
     }
 }
