@@ -122,6 +122,8 @@ namespace SEE.Layout.NodeLayouts.Cose
                     return new EvoStreetsNodeLayout(groundLevel);
                 case NodeLayoutKind.Treemap:
                     return new TreemapLayout(groundLevel, 1000.0f, 1000.0f);
+                case NodeLayoutKind.IncrementalTreeMap:
+                    return new IncrementalTreeMapLayout(groundLevel, 1000.0f, 1000.0f);
                 case NodeLayoutKind.Balloon:
                     return new BalloonNodeLayout(groundLevel);
                 case NodeLayoutKind.CirclePacking:
