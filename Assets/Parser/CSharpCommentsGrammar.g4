@@ -31,21 +31,25 @@ PARAMREF: '<paramref name="' TEXT '"/>';
 classLink: CLASS_LINK;
 paramref: PARAMREF;
 param: Comment* PARAM;
-summary: '/// <summary>' comment* '/// </summary>';
-return: '/// <returns>' (comment | TEXT| classLink)* ('/// </returns>' | '</returns>');
-comment: summary
-        | return TEXT
-        | Comment (classLink)? Comment*
+summary: '/// <summary>' comments '/// </summary>';
+return: '/// <returns>' (comments | TEXT| classLink) ('/// </returns>' | '</returns>');
+
+comments: 
+        ( return
+        | Comment (classLink)?
         | paramref TEXT*
-        | param;
+        | param)*;
+        
 line_comment: LineComment (classLink)?;
 
-methodSignature: TEXT+;
+methodSignature
+    : accesModifier=(Public| 'private' | 'protected') TEXT+;
 
-methodContent: (TEXT+ | SEMICOLON | EQUALS )*;
+methodContent
+    : (TEXT+ | SEMICOLON | EQUALS )*;
 
 methodDeclaration
-    : summary? accesModifier=(Public| 'private' | 'protected') returnType=methodSignature CURLY_BRACKET_OPEN methodContent CURLY_BRACKET_CLOSE;
+    : summary? returnType=methodSignature CURLY_BRACKET_OPEN methodContent CURLY_BRACKET_CLOSE;
 
 // A Simple C# Scope
 // This means a block of {} which also can inlude more other scopes or methods or classes   
