@@ -471,7 +471,7 @@ namespace SEE.GO
 
             void SetCookingOptions()
             {
-                if (gameObject.TryGetComponent(out MeshCollider collider))
+                if (gameObject.TryGetComponentOrLog(out MeshCollider collider))
                 {
                     collider.cookingOptions = MeshColliderCookingOptions.EnableMeshCleaning
                                             | MeshColliderCookingOptions.WeldColocatedVertices
