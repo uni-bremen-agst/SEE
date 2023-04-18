@@ -33,19 +33,19 @@ CURLY_BRACKET_CLOSE: '}';
 PARAMREF: '<paramref name="' TEXT '"/>';
 
 //Language specific
-classLink: ('///')? '<see cref="' TEXT* '"/>' ;
+classLink: '<see cref="' TEXT* '"/>' ;
 paramref: PARAMREF;
 param: Comment* PARAM;
 summary: '/// <summary>' comments '/// </summary>';
 return: '/// <returns>' (comments | TEXT| classLink) ('/// </returns>' | '</returns>');
 
 comment
-    : Comment (classLink)?;
+    : Comment ((classLink) | (TEXT))*  ;
 
 comments: 
         ( return
         | comment
-        | classLink
+        //| classLink
         | paramref TEXT*
         | param)*;
         
