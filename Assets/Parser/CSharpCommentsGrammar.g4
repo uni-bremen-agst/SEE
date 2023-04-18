@@ -6,12 +6,17 @@ Namespace : 'namespace';
 Public: 'public';
 Using : 'using';
 SEMICOLON : ';';
+
+
+fragment CommentText : ~[\r\n<]* [/a-zA-Z0-9.#_="!-][/a-zA-Z0-9.;()_#"=!-]+;
+fragment LinkText : ~[\r\n<]* [/a-zA-Z0-9.#_=!-][/a-zA-Z0-9.;()_#=!-]+;
+
 // Define the rule for comments
-Comment: ('///' | '///' ~[\r\n<]* [/a-zA-Z0-9.#_="!-][/a-zA-Z0-9.;()_#"=!-]+);
+Comment: ('///' | '///' CommentText);
 PARAM: '<param name="' TEXT* '">' TEXT* '</param>';
 
 
-TEXT: [/a-zA-Z0-9&#_."=()+|-]+;
+TEXT: [/a-zA-Z0-9&#_.=()+|-]+;
 //[/a-zA-Z0-9.()_&#=|-]+;
 SHORT_COMMENT: '//' -> skip;
 
@@ -22,21 +27,25 @@ LineComment: '/*' .*? '*/';
 TEXT_SKIP: [/a-zA-Z0-9#_".!-][/a-zA-Z0-9.()_#!-]+ -> skip;
 CURLY_BRACKET_OPEN: '{';
 CURLY_BRACKET_CLOSE: '}';
-CLASS_LINK: '<see cref="' TEXT '"/>';
+//CLASS_LINK: '<see cref="' TEXT '"/>';
 
 //className: TEXT;
 PARAMREF: '<paramref name="' TEXT '"/>';
 
 //Language specific
-classLink: CLASS_LINK;
+classLink: ('///')? '<see cref="' TEXT* '"/>' ;
 paramref: PARAMREF;
 param: Comment* PARAM;
 summary: '/// <summary>' comments '/// </summary>';
 return: '/// <returns>' (comments | TEXT| classLink) ('/// </returns>' | '</returns>');
 
+comment
+    : Comment (classLink)?;
+
 comments: 
         ( return
-        | Comment (classLink)?
+        | comment
+        | classLink
         | paramref TEXT*
         | param)*;
         
