@@ -341,7 +341,7 @@ namespace SEE.Game.Operator
         {
             Node = GetNode(gameObject);
             City = GetCity(gameObject);
-            Material material = GetRenderer(gameObject).sharedMaterial;
+            Material material = GetRenderer(gameObject).material;
             Vector3 currentPosition = transform.position;
             Vector3 currentScale = transform.localScale;
 
