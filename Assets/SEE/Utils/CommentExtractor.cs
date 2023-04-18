@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 using Newtonsoft.Json;
 using SEE.Game.UI.LiveDocumantation;
 
@@ -22,13 +23,28 @@ namespace SEE.Utils
 
             var parser = new CSharpCommentsGrammarParser(tokens);
             // var t = parser.start().children;
-            var claasComments = parser.start().claasDefinition(0).summary().comment();
-            foreach (var i in claasComments)
+            var classComments = parser.start().namespaceDeclaration(0).classDefinition(0).summary().comments().children;
+            foreach (var i in classComments)
             {
-                foreach (var j in i.children)
+                if (i is CSharpCommentsGrammarParser.CommentContext comment)
                 {
-                    buffer.Add(new LiveDocumentationBufferText(j.GetText()));
+                    foreach (var j in comment.children)
+                    {
+                        if (j is ITerminalNode)
+                        {
+                            var commentString = j.GetText();
+                            buffer.Add(new LiveDocumentationBufferText(commentString.Substring(3).Trim()));
+                        }
+                        else if (j is CSharpCommentsGrammarParser.ClassLinkContext classLink)
+                        {
+                            buffer.Add(new LiveDocumentationLink(classLink.linkID.Text, classLink.linkID.Text));
+                        }
+                       
+                    }
+                  
                 }
+
+                buffer.Add(new LiveDocumentationBufferText("\n"));
             }
         }
     }

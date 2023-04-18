@@ -36,18 +36,6 @@ using ParserRuleContext = Antlr4.Runtime.ParserRuleContext;
 [System.CLSCompliant(false)]
 public partial class CSharpCommentsGrammarBaseListener : ICSharpCommentsGrammarListener {
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.className"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterClassName([NotNull] CSharpCommentsGrammarParser.ClassNameContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.className"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitClassName([NotNull] CSharpCommentsGrammarParser.ClassNameContext context) { }
-	/// <summary>
 	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.classLink"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -120,6 +108,18 @@ public partial class CSharpCommentsGrammarBaseListener : ICSharpCommentsGrammarL
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitComment([NotNull] CSharpCommentsGrammarParser.CommentContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.comments"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterComments([NotNull] CSharpCommentsGrammarParser.CommentsContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.comments"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitComments([NotNull] CSharpCommentsGrammarParser.CommentsContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.line_comment"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -132,17 +132,101 @@ public partial class CSharpCommentsGrammarBaseListener : ICSharpCommentsGrammarL
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitLine_comment([NotNull] CSharpCommentsGrammarParser.Line_commentContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.claasDefinition"/>.
+	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.methodSignature"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterClaasDefinition([NotNull] CSharpCommentsGrammarParser.ClaasDefinitionContext context) { }
+	public virtual void EnterMethodSignature([NotNull] CSharpCommentsGrammarParser.MethodSignatureContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.claasDefinition"/>.
+	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.methodSignature"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitClaasDefinition([NotNull] CSharpCommentsGrammarParser.ClaasDefinitionContext context) { }
+	public virtual void ExitMethodSignature([NotNull] CSharpCommentsGrammarParser.MethodSignatureContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.methodContent"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterMethodContent([NotNull] CSharpCommentsGrammarParser.MethodContentContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.methodContent"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitMethodContent([NotNull] CSharpCommentsGrammarParser.MethodContentContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.methodDeclaration"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterMethodDeclaration([NotNull] CSharpCommentsGrammarParser.MethodDeclarationContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.methodDeclaration"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitMethodDeclaration([NotNull] CSharpCommentsGrammarParser.MethodDeclarationContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.scope"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterScope([NotNull] CSharpCommentsGrammarParser.ScopeContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.scope"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitScope([NotNull] CSharpCommentsGrammarParser.ScopeContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.classContent"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterClassContent([NotNull] CSharpCommentsGrammarParser.ClassContentContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.classContent"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitClassContent([NotNull] CSharpCommentsGrammarParser.ClassContentContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.classDefinition"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterClassDefinition([NotNull] CSharpCommentsGrammarParser.ClassDefinitionContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.classDefinition"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitClassDefinition([NotNull] CSharpCommentsGrammarParser.ClassDefinitionContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.usingClause"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterUsingClause([NotNull] CSharpCommentsGrammarParser.UsingClauseContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.usingClause"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitUsingClause([NotNull] CSharpCommentsGrammarParser.UsingClauseContext context) { }
+	/// <summary>
+	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.namespaceDeclaration"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterNamespaceDeclaration([NotNull] CSharpCommentsGrammarParser.NamespaceDeclarationContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.namespaceDeclaration"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitNamespaceDeclaration([NotNull] CSharpCommentsGrammarParser.NamespaceDeclarationContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.start"/>.
 	/// <para>The default implementation does nothing.</para>

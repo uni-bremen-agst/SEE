@@ -37,7 +37,7 @@ namespace SEE.GO.Menu
 
         public DocumentationMenu()
         {
-            extractors.Add(new CommentExtractor());
+          //  extractors.Add(new CommentExtractor());
         }
 
         private void Start()

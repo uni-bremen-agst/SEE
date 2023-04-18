@@ -96,10 +96,7 @@ namespace SEE.Controls.Actions
                     documentationWindow.Graph = selectedNode.Value.ItsGraph;
 
                     LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
-                    buffer.Add(new LiveDocumentationBufferText("Dies ist eine Test documentation für diese Klasse "));
-                    buffer.Add(new LiveDocumentationBufferText("Die klasse benutzt auch irgendwie "));
-                    buffer.Add(new LiveDocumentationLink("src/C2.cs", "CS2.cs"));
-                    buffer.Add(new LiveDocumentationBufferText("\nLorem ipsum oder so ähnlich"));
+                    CommentExtractor.writeInBuffer(buffer, selectedNode.Value.AbsolutePlatformPath());
 
 
                     List<LiveDocumentationBuffer> classMembers = new List<LiveDocumentationBuffer>();
