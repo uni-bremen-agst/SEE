@@ -5,13 +5,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     static class LocalMoves
     {
         private const int number_of_local_moves = 4;
-        private static void correctNodes(List<TNode> nodes)
+        public static void CorretNodes(IList<TNode> nodes)
         {}
-        public static void addNodes(List<TNode> newNodes)
+        public static void AddNode(IList<TNode> nodes,TNode newNode)
         {}
-        public static void deleteNodes(List<TNode> obsoleteNodes)
+        public static void DeleteNode(TNode obsoleteNode)
         {}
-        public static void makeLocalMoves(List<TNode> nodes)
+        public static void MakeLocalMoves(IList<TNode> nodes)
         {}
     }
 }

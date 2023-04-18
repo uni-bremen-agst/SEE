@@ -47,8 +47,6 @@ namespace SEE.Layout.NodeLayouts
 
         private IDictionary<string,TNode> tNodes;
 
-        private HashSet<TSegment> segments;
-
         private IncrementalTreeMapLayout oldLayout;
 
         public IncrementalTreeMapLayout OldLayout
@@ -84,8 +82,7 @@ namespace SEE.Layout.NodeLayouts
                 default:
                 {
                     this.roots = LayoutNodes.GetRoots(layoutNodeList);
-                    InitTNodes();
-                    this.segments = new HashSet<TSegment>();                    
+                    InitTNodes();                  
                     CalculateLayout();
                     break;
                 }
@@ -165,39 +162,108 @@ namespace SEE.Layout.NodeLayouts
 
         private void CalculateLayout(ICollection<ILayoutNode> siblings,TRectangle rectangle)
         {
+            // GetNodes can be done before if then else
             if(    this.oldLayout == null
                 || this.oldLayout.NumberOfOccurrencesInOldGraph(siblings) <= 1
-                || this.oldLayout.HaveSingleParentInOldGraph(siblings)
-                || true)
+                || this.oldLayout.ParentsInOldGraph(siblings).Count == 1)
             {
                 IList<TNode> nodes = GetTNodes(siblings);
                 Dissect.dissect(rectangle, nodes);
-                ExtractSegments(nodes);
             }
             else
             {
-                // segments or nodes first?
+                //  [      oldTNodes              ]--------------   <- nodes of old Layout, do not edit them
+                //  --------------[         newTNodes           ]   <- nodes of new Lauout 
+                //  [ toBeDeleted | toBeModiegied | toBeAdded   ]   <- nodes of new Layout
+                //  [      workWith               ]--------------   <- nodes layout designed to be changed over time to newTNodes
 
-                // get all nodes in old graph
-                // for node in oldnode:
-                //      if node not in new graph:
-                //          TNode = new TNode( )
-                // 
-                //          artif_added_nodes.append(new_tnode)
-                //      else:
-                //          get Tnode of node
-                //          tnode apply segments
+                // not only the siblings that are in the old graph and in the new one, but all siblings in old graph
+                // note that there is exact one single parent (because of if-clause), but can be null if children == roots
+                ILayoutNode oldILayoutParent = ParentsInOldGraph(siblings).First();
+                ICollection<ILayoutNode> oldILayoutSiblings = oldILayoutParent == null ? oldLayout.roots : oldILayoutParent.Children();
+                IList<TNode> oldTNodes = oldLayout.GetTNodes(oldILayoutSiblings);
+                IList<TNode> newTNodes = GetTNodes(siblings);
 
-                //TNodes.add(new_nodes_for_old_siblings)
-                //TSegments.add(all_Segments(old_siblings))
-                //siblings.register()
-                //siblings.apply(layout_old)
-                //transform Rectangles 
-                //# correct 
-                //addNewNodes
-                //deleteOldeNodes
-                //#correct
-                //localMoves(siblings, segments)
+                IList<TNode> workWith = new List<TNode>();
+                IList<TNode> nodesToBeDeleted  = new List<TNode>();
+                IList<TNode> nodesToBeModified  = new List<TNode>();
+                IList<TNode> nodesToBeAdded    = new List<TNode>();
+
+
+
+                // get nodes form old layout .. over take their rectangles
+                foreach(var oldTNode in oldTNodes)
+                {
+                    TNode newTNode = ((List<TNode>) newTNodes).Find(x => x.RepresentLayoutNode.ID.Equals(oldTNode.RepresentLayoutNode.ID));
+                    if(newTNode == null)
+                    {   
+                        newTNode = new TNode(null,newTNodes[0].Parent);
+                        nodesToBeDeleted.Add(newTNode);
+                        workWith.Add(newTNode);
+                    }
+                    else
+                    {
+                        workWith.Add(newTNode);
+                        nodesToBeModified.Add(newTNode);
+                    }
+                    newTNode.Rectangle = oldTNode.Rectangle;                    
+                }
+
+                foreach(var newTNode in newTNodes)
+                {
+                    if( !nodesToBeModified.Contains(newTNode))
+                    {
+                        nodesToBeAdded.Add(newTNode);
+                    }
+                }
+
+                // get segments from old layout
+                foreach(var segment in oldLayout.ExtractSegments(oldTNodes))
+                {
+                    TSegment newSegment = new TSegment(segment.IsConst, segment.IsVertical);
+                    foreach(var oldTNode in segment.Side1Nodes)
+                    {
+                        // TODO optimize with hash set 
+                        TNode newNode = ((List<TNode>) newTNodes).Find(x => x.RepresentLayoutNode.ID.Equals(oldTNode.RepresentLayoutNode.ID));
+                        newNode.registerSegment(newSegment, newSegment.IsVertical ? Direction.Lower : Direction.Left);
+                    }
+                    foreach(var oldTNode in segment.Side2Nodes)
+                    {
+                        TNode newNode = ((List<TNode>) newTNodes).Find(x => x.RepresentLayoutNode.ID.Equals(oldTNode.RepresentLayoutNode.ID));
+                        newNode.registerSegment(newSegment, newSegment.IsVertical ? Direction.Upper : Direction.Right);
+                    }
+                }
+
+                TRectangle oldRectangle = oldTNodes[0].Parent == null 
+                    ? new TRectangle(x: oldLayout.width / 2.0f, z: -oldLayout.depth / 2.0f, oldLayout.width, oldLayout.depth) 
+                    : oldTNodes[0].Parent.Rectangle;
+
+                TransformRectangles(newTNodes, oldRectangle: oldRectangle, newRectangle: rectangle);
+
+                LocalMoves.CorretNodes(workWith);
+                foreach(var nodeToBeAdded in nodesToBeAdded)
+                {
+                    LocalMoves.AddNode(workWith,nodeToBeAdded);
+                    workWith.Add(nodeToBeAdded);
+                }
+                foreach(var obsoleteNode in nodesToBeDeleted)
+                {
+                    LocalMoves.DeleteNode(obsoleteNode);
+                    workWith.Remove(obsoleteNode);
+                }
+
+                // TODO DEBUG CHECK IF WORKIF == NEWTNODES
+                foreach(var node in workWith)
+                {
+                    Assert.IsTrue(newTNodes.Contains(node));
+                }
+                foreach(var node in newTNodes)
+                {
+                    Assert.IsTrue(workWith.Contains(node));
+                }
+
+                LocalMoves.CorretNodes(workWith);
+                LocalMoves.MakeLocalMoves(workWith);
             }
 
             AddToLayout(GetTNodes(siblings));
@@ -218,7 +284,7 @@ namespace SEE.Layout.NodeLayouts
             }
         }
 
-        private bool HaveSingleParentInOldGraph(ICollection<ILayoutNode> nodes)
+        private ICollection<ILayoutNode> ParentsInOldGraph(ICollection<ILayoutNode> nodes)
         {
             HashSet<ILayoutNode> parents = new HashSet<ILayoutNode>();
             foreach(ILayoutNode node in nodes)
@@ -229,7 +295,7 @@ namespace SEE.Layout.NodeLayouts
                     parents.Add(oldNode.Parent);
                 }
             }
-            return parents.Count == 1;
+            return parents;
         }
 
         private int NumberOfOccurrencesInOldGraph(ICollection<ILayoutNode> nodes)
@@ -259,6 +325,8 @@ namespace SEE.Layout.NodeLayouts
 
         internal ILayoutNode findILayoutNodeByID(string ID)
         {
+            // TODO mach das hier doch mit ein dict, zb mit tnodes 
+
             foreach(ILayoutNode node in roots)
             {
                 ILayoutNode result = findILayoutNodeByID(node, ID);
@@ -296,16 +364,18 @@ namespace SEE.Layout.NodeLayouts
             return result;
         }
 
-        internal void ExtractSegments(ICollection<TNode> nodes)
+        internal HashSet<TSegment> ExtractSegments(ICollection<TNode> nodes)
         {
+            HashSet<TSegment> result = new HashSet<TSegment>();
             foreach(TNode node in nodes)
             {
                 IList<TSegment> boundingSegments = node.getAllSegments();
                 foreach(TSegment segment in boundingSegments)
                 {
-                    this.segments.Add(segment);
+                    result.Add(segment);
                 }
             }
+            return result;
         }
 
         private void AddToLayout (IList<TNode> nodes)
@@ -319,6 +389,20 @@ namespace SEE.Layout.NodeLayouts
                 Vector3 scale = new Vector3(rect.width, o.LocalScale.y, rect.depth);
                 Assert.AreEqual(o.AbsoluteScale, o.LocalScale, $"{o.ID}: {o.AbsoluteScale} != {o.LocalScale}");
                 layout_result[o] = new NodeTransform(position, scale);
+            }
+        }
+
+        private void TransformRectangles(IList<TNode> nodes, TRectangle newRectangle ,TRectangle oldRectangle)
+        {
+            float scale_x = newRectangle.width / oldRectangle.width;
+            float scale_z = newRectangle.depth / oldRectangle.depth;
+
+            foreach( var node in nodes)
+            {
+                node.Rectangle.x = (node.Rectangle.x - oldRectangle.x) * scale_x + newRectangle.x;
+                node.Rectangle.z = (node.Rectangle.z - oldRectangle.z) * scale_z + newRectangle.z;
+                node.Rectangle.width *= scale_x;
+                node.Rectangle.depth *= scale_z;
             }
         }
     }
