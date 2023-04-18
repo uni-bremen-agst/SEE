@@ -238,15 +238,15 @@ namespace SEE.Layout.NodeLayouts
 
                 TransformRectangles(newTNodes, oldRectangle: oldRectangle, newRectangle: rectangle);
 
-                LocalMove.CorretNodes(workWith);
+                LocalMoves.CorretNodes(workWith);
                 foreach(var nodeToBeAdded in nodesToBeAdded)
                 {
-                    LocalMove.AddNode(workWith,nodeToBeAdded);
+                    LocalMoves.AddNode(workWith,nodeToBeAdded);
                     workWith.Add(nodeToBeAdded);
                 }
                 foreach(var obsoleteNode in nodesToBeDeleted)
                 {
-                    LocalMove.DeleteNode(obsoleteNode);
+                    LocalMoves.DeleteNode(obsoleteNode);
                     workWith.Remove(obsoleteNode);
                 }
 
@@ -260,8 +260,8 @@ namespace SEE.Layout.NodeLayouts
                     Assert.IsTrue(workWith.Contains(node));
                 }
 
-                LocalMove.CorretNodes(workWith);
-                LocalMove.MakeLocalMoves(workWith);
+                LocalMoves.CorretNodes(workWith);
+                LocalMoves.MakeLocalMoves(workWith);
             }
 
             AddToLayout(GetTNodes(siblings));

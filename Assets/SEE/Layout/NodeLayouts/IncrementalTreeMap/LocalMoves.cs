@@ -4,15 +4,8 @@ using System;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
-    internal enum MoveKind
-    {Flip, Stretch} 
-
-    abstract class LocalMove
+    static class LocalMoves
     {
-        protected TNode node1;
-        protected TNode node2;
-
-        abstract public void apply();
         // 
         private static void findLocalMoves()
         {}
@@ -62,37 +55,5 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         {}
         public static void MakeLocalMoves(IList<TNode> nodes)
         {}
-    }
-
-    // TODO own file own class etc
-    internal class FlipMove : LocalMove
-    {
-        bool clockwise;
-        internal FlipMove(TNode node1, TNode node2, bool clockwise)
-        {
-            this.node1 = node1; this.node2 = node2; this.clockwise = clockwise;
-        }
-        
-        override 
-        public void apply()
-        {
-
-        }
-
-    }
-
-    internal class StretchMove : LocalMove
-    {
-
-        internal StretchMove(TNode node1, TNode node2)
-        {
-            this.node1 = node1; this.node2 = node2;
-        }
-
-        override 
-        public void apply()
-        {
-
-        }
     }
 }
