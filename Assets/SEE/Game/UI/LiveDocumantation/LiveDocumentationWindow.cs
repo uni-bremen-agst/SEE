@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Linq;
+using Antlr4.Runtime;
 using JetBrains.Annotations;
 using SEE.Controls;
 using SEE.DataModel.DG;
@@ -10,7 +11,6 @@ using SEE.Game.UI.Window;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace SEE.Game.UI.LiveDocumantation
 {
@@ -52,6 +52,8 @@ namespace SEE.Game.UI.LiveDocumantation
         /// The Path inside the prefab should be "LiveDocumentation/ClassDocumentation/Viewport/Content/ClassDoc"
         /// </summary>
         private TextMeshProUGUI ClassDocumentation;
+
+        private Dictionary<String, Node> NamespaceCache = new();
 
 
         /// <summary>
@@ -224,16 +226,43 @@ namespace SEE.Game.UI.LiveDocumantation
             }
         }
 
+        /// <summary>
+        /// Finds a node given from a clicked filename.
+        /// </summary>
+        /// <param name="filename">The filename to find a corresponding node for.</param>
+        /// <returns>The node or null if none could be found.</returns>
         [CanBeNull]
-        private Node FindNodeWithPath(string path)
+        private Node FindNodeWithPath(string filename, Node currentNode)
         {
-            foreach (var item in Graph.Nodes())
+            //See if an item was found in the cache.
+            if (NamespaceCache.ContainsKey(filename))
             {
-                if ((item.Path() + item.Filename()).Equals(path))
-                {
-                    return item;
-                }
+                return NamespaceCache[filename];
             }
+
+                // Iterate through each node in the code city.
+                foreach (var item in Graph.Nodes())
+                {
+                    //Collect all namespaces
+                    //TODO replace using with namespaces.
+                    var filePath = item.AbsolutePlatformPath();
+                    var input = File.ReadAllText(filePath);
+                    var lexer = new CSharpUsingGrammarLexer(new AntlrInputStream(input));
+                    var tokens = new CommonTokenStream(lexer);
+                    tokens.Fill();
+
+                    var parser = new CSharpUsingGrammarParser(tokens);
+                    var namespaces = parser.start().usingDirective(0).children;
+
+                    foreach (var parsedNamespace in namespaces)
+                    {
+                        if (parsedNamespace.GetText().Equals(filename))
+                        {
+                            NamespaceCache[filename] = item;
+                            return item;
+                        }
+                    }
+                }
 
             return null;
         }
