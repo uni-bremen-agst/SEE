@@ -11,6 +11,7 @@ using SEE.Utils;
 using UnityEngine;
 using SEE.DataModel.DG;
 using System;
+using DiffMatchPatch;
 
 namespace SEE.Controls.Actions
 {
@@ -125,7 +126,7 @@ namespace SEE.Controls.Actions
                 string[] diff = Diff(sourceAbsolutePlatformPath, sourceStartLine, sourceEndLine,
                                      targetAbsolutePlatformPath, targetStartLine, targetEndLine);
                 CodeWindow codeWindow = GetOrCreateCodeWindow(edge, graphElementRef, sourceFilename);
-                codeWindow.EnterFromText(diff);
+                codeWindow.EnterFromText(diff, isHTML: true);
                 codeWindow.VisibleLine = 1;
                 return codeWindow;
             }
@@ -217,8 +218,9 @@ namespace SEE.Controls.Actions
 
         private static string[] Diff(string sourcePath, int sourceStartLine, int sourceEndLine, string targetPath, int targetStartLine, int targetEndLine)
         {
-            string[] result = new[] { "hello", "world!" };
-            return result;
+            diff_match_patch diff = new diff_match_patch();
+            List<Diff> result = diff.diff_main("jumps over the lazy", "jumped over a lazy");
+            return new string[] { diff.diff_prettyHtml(result) };
         }
     }
 }

@@ -292,7 +292,7 @@ namespace SEE.Game.UI.Window.CodeWindow
         /// </summary>
         /// <param name="text">An array of lines to use for the code window.</param>
         /// <exception cref="ArgumentException">If <paramref name="text"/> is empty or <c>null</c></exception>
-        public void EnterFromText(string[] text)
+        public void EnterFromText(string[] text, bool isHTML = false)
         {
             if (text == null || text.Length <= 0)
             {
@@ -306,7 +306,14 @@ namespace SEE.Game.UI.Window.CodeWindow
                 // Add whitespace next to line number so it's consistent.
                 Text += string.Join("", Enumerable.Repeat(" ", neededPadding - $"{i + 1}".Length));
                 // Line number will be typeset in yellow to distinguish it from the rest.
-                Text += $"<color=\"yellow\">{i + 1}</color> <noparse>{text[i].Replace("noparse", "")}</noparse>\n";
+                if (isHTML)
+                {
+                    Text += $"<color=\"yellow\">{i + 1}</color> {text[i]}\n";
+                }
+                else
+                {
+                    Text += $"<color=\"yellow\">{i + 1}</color> <noparse>{text[i].Replace("noparse", "")}</noparse>\n";
+                }
             }
 
             lines = text.Length;
