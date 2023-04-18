@@ -47,6 +47,7 @@ namespace SEE.Game.Operator
 
         /// <summary>
         /// Operation handling the blinking of the node.
+        /// The parameter specifies the number of blinks.
         /// </summary>
         private TweenOperation<int> Blinking;
 
@@ -361,12 +362,12 @@ namespace SEE.Game.Operator
             LabelStartLinePosition = new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction, DesiredLabelStartLinePosition);
             LabelEndLinePosition = new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction, DesiredLabelEndLinePosition);
 
-            Tween[] BlinkAction(int c, float d)
+            Tween[] BlinkAction(int count, float duration)
             {
                 Sequence sequence = DOTween.Sequence();
-                sequence.Append(material.DOColor(material.color.Invert(), d / (2 * c)));
-                sequence.Append(material.DOColor(material.color, d / (2 * c)));
-                return new Tween[] { sequence.SetLoops(c).Play() };
+                sequence.Append(material.DOColor(material.color.Invert(), duration / (2 * count)));
+                sequence.Append(material.DOColor(material.color, duration / (2 * count)));
+                return new Tween[] { sequence.SetLoops(count).Play() };
             }
 
             Blinking = new TweenOperation<int>(BlinkAction, 0, equalityComparer: new AlwaysFalseEqualityComparer<int>());
