@@ -102,7 +102,10 @@ namespace SEE.Game.Avatars
                     DumpVoices();
                 }
             }
-            animator?.SetBool(isTalking, true);
+            if (animator != null)
+            {
+                animator.SetBool(isTalking, true);
+            }
             Speaker.Instance.Speak(text, audioSource, voice: voice);
             Speaker.Instance.OnSpeakCompleted.AddListener(BackToIdle);
         }
