@@ -9,6 +9,7 @@ using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
+using SEE.DataModel.DG;
 
 namespace SEE.Controls.Actions
 {
@@ -61,40 +62,54 @@ namespace SEE.Controls.Actions
         {
             // Only allow local player to open new code windows
             if (spaceManager.CurrentPlayer == WindowSpaceManager.LOCAL_PLAYER
-                && Input.GetMouseButtonDown(0)
-                && Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef _) == HitGraphElement.Node)
+                && SEEInput.Select()
+                && Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef graphElementRef) != HitGraphElement.None)
             {
-                NodeRef selectedNode = hit.collider.gameObject.GetComponent<NodeRef>();
                 // If nothing is selected, there's nothing more we need to do
-                if (selectedNode == null)
+                if (graphElementRef == null)
                 {
                     return false;
                 }
+                GraphElement graphElement;
+                if (graphElementRef is NodeRef nodeRef)
+                {
+                    graphElement = nodeRef.Value;
+                }
+                else if (graphElementRef is EdgeRef edgeRef)
+                {
+                    graphElement = edgeRef.Value;
+                }
+                else
+                {
+                    Debug.LogError("Neither node nor edge.\n");
+                    return false;
+                }
+
                 // File name of source code file to read from it
-                string selectedFile = selectedNode.Value.Filename();
+                string selectedFile = graphElement.Filename();
                 if (selectedFile == null)
                 {
-                    ShowNotification.Warn("No file", $"Selected node '{selectedNode.Value.SourceName}' has no filename.");
+                    ShowNotification.Warn("No file", $"Selected {GetName(graphElement)} has no filename.");
                     return false;
                 }
-                string absolutePlatformPath = selectedNode.Value.AbsolutePlatformPath();
+                string absolutePlatformPath = graphElement.AbsolutePlatformPath();
                 if (!File.Exists(absolutePlatformPath))
                 {
-                    ShowNotification.Warn("File does not exist", $"Path {absolutePlatformPath} of selected node '{selectedNode.Value.SourceName}' does not exist.");
+                    ShowNotification.Warn("File does not exist", $"Path {absolutePlatformPath} of selected {GetName(graphElement)} does not exist.");
                     return false;
                 }
                 if ((File.GetAttributes(absolutePlatformPath) & FileAttributes.Directory) == FileAttributes.Directory)
                 {
-                    ShowNotification.Warn("Not a file", $"Path {absolutePlatformPath} of selected node '{selectedNode.Value.SourceName}' is a directory.");
+                    ShowNotification.Warn("Not a file", $"Path {absolutePlatformPath} of selected {GetName(graphElement)} is a directory.");
                     return false;
                 }
 
                 // Create new window for active selection, or use existing one
-                if (!selectedNode.TryGetComponent(out CodeWindow codeWindow))
+                if (!graphElementRef.TryGetComponent(out CodeWindow codeWindow))
                 {
-                    codeWindow = selectedNode.gameObject.AddComponent<CodeWindow>();
+                    codeWindow = graphElementRef.gameObject.AddComponent<CodeWindow>();
 
-                    codeWindow.Title = selectedNode.Value.SourceName;
+                    codeWindow.Title = GetName(graphElement);
                     // If SourceName differs from Source.File (except for its file extension), display both
                     if (!codeWindow.Title.Replace(".", "").Equals(selectedFile.Split('.').Reverse().Skip(1)
                                                                               .Aggregate("", (acc, s) => s + acc)))
@@ -106,18 +121,22 @@ namespace SEE.Controls.Actions
                 }
 
                 // Pass line number to automatically scroll to it, if it exists
-                int? line = selectedNode.Value.SourceLine();
+                int? line = graphElement.SourceLine();
                 if (line.HasValue)
                 {
                     codeWindow.VisibleLine = line.Value;
                 }
+                else
+                {
+                    Debug.LogWarning($"Selected {GetName(graphElement)} has no source line.\n");
+                }
 
                 // Add solution path
-                GameObject cityObject = SceneQueries.GetCodeCity(selectedNode.transform).gameObject;
+                GameObject cityObject = SceneQueries.GetCodeCity(graphElementRef.transform).gameObject;
                 if (cityObject == null || !cityObject.TryGetComponent(out AbstractSEECity city))
                 {
                     ShowNotification.Warn("No code city",
-                      $"Selected node '{selectedNode.Value.SourceName}' is not contained in a code city.");
+                      $"Selected {GetName(graphElement)} is not contained in a code city.");
                     return false;
                 }
                 codeWindow.ShowIssues = city.ErosionSettings.ShowIssuesInCodeWindow;
@@ -134,6 +153,12 @@ namespace SEE.Controls.Actions
             }
 
             return false;
+
+            // Returns a human-readable representation of given graphElement.
+            static string GetName(GraphElement graphElement)
+            {
+                return graphElement.ToShortString();
+            }
         }
     }
 }
