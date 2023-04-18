@@ -4,10 +4,12 @@ using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using OpenAI;
 using OpenAI.Chat;
 using SEE.Game.UI.Notification;
+using Sirenix.Utilities;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
 
@@ -19,21 +21,20 @@ namespace SEE.Game.Avatars
     /// </summary>
     public class PersonalAssistantSpeechInput : MonoBehaviour
     {
-        
         /// <summary>
         /// Whether to use ChatGPT to answer all queries.
         /// If this is set to true, the grammar file is ignored, and we will listen to all input.
         /// </summary>
         [Tooltip("Whether to use ChatGPT to answer all queries.")]
         public bool UseChatGPT = true;
-        
-        // TODO: Keyboard shortcut to disable this temporarily.
+
+        // TODO: Keyboard shortcut to disable/enable dictation.
 
         /// <summary>
         /// The OpenAI API key to use for ChatGPT.
         /// </summary>
         public string OpenAiApiKey = "";
-        
+
         /// <summary>
         /// Path to the SRGS grammar file. The grammar is expected to define the
         /// following semantics: help, time, about.
@@ -50,15 +51,24 @@ namespace SEE.Game.Avatars
         /// The brain of the personal assistant.
         /// </summary>
         private PersonalAssistantBrain brain;
-        
+
         /// <summary>
         /// The OpenAI client to use for ChatGPT.
         /// </summary>
         private OpenAIClient openAiClient;
 
+        /// <summary>
+        /// The history of the ChatGPT conversation.
+        /// At the start, this only consists of the prompt.
+        /// </summary>
+        private readonly IList<Message> chatGptHistory = new List<Message> { new(Role.System, PROMPT) };
+
+        /// <summary>
+        /// The prompt to use for ChatGPT.
+        /// </summary>
         private const string PROMPT = "You are the digital assistant for SEE, which stands for "
             + "Software Engineering Experience. You are also named SEE yourself. "
-            + "You are helpful, concise and friendly. YOU MUST NOT HALLUCINATE FEATURES OF SEE WHICH DO NOT EXIST! "
+            + "You are helpful, concise and friendly. YOU MUST NOT HALLUCINATE FEATURES OF SEE THAT DON'T EXIST! "
             + "\nHere is a general description of SEE:\n"
             + "SEE let's you visualize your software as code cities in 3D, using the Unity game engine. "
             + "SEE is developed by the AG Softwaretechnik at the University of Bremen, led by Rainer Koschke. "
@@ -97,7 +107,7 @@ namespace SEE.Game.Avatars
                     return;
                 }
             }
-            
+
             input.Start();
             if (!gameObject.TryGetComponentOrLog(out brain))
             {
@@ -123,7 +133,7 @@ namespace SEE.Game.Avatars
                 Debug.LogError($"Grammar file {GrammarFilePath} for speech recognition does not exist.\n");
                 return false;
             }
-            
+
             GrammarInput grammarInput;
             input = grammarInput = new GrammarInput(GrammarFilePath.Path);
             grammarInput.Register(OnPhraseRecognized);
@@ -141,7 +151,7 @@ namespace SEE.Game.Avatars
                 Debug.LogError("OpenAI API key is not defined.\n");
                 return false;
             }
-            
+
             openAiClient = new OpenAIClient(OpenAiApiKey);
             if (PhraseRecognitionSystem.Status == SpeechSystemStatus.Running)
             {
@@ -151,14 +161,7 @@ namespace SEE.Game.Avatars
             DictationInput dictationInput;
             input = dictationInput = new DictationInput();
             dictationInput.Register(OnDictationResult);
-            SayHello().Forget();
             return true;
-        }
-
-        private async UniTaskVoid SayHello()
-        {
-            await UniTask.Delay(TimeSpan.FromSeconds(5));
-            OnDictationResult("Hi SEE! How are you today?", ConfidenceLevel.High);
         }
 
         /// <summary>
@@ -180,15 +183,20 @@ namespace SEE.Game.Avatars
                         switch (value)
                         {
                             // data, interact, time, about, goodBye
-                            case "data": brain.Overview();
+                            case "data":
+                                brain.Overview();
                                 break;
-                            case "interact": brain.Interaction();
+                            case "interact":
+                                brain.Interaction();
                                 break;
-                            case "time": brain.CurrentTime();
+                            case "time":
+                                brain.CurrentTime();
                                 break;
-                            case "about": brain.About();
+                            case "about":
+                                brain.About();
                                 break;
-                            case "goodBye": brain.GoodBye();
+                            case "goodBye":
+                                brain.GoodBye();
                                 break;
                         }
                     }
@@ -208,23 +216,19 @@ namespace SEE.Game.Avatars
             Debug.Log($"Detected phrase '{text}' with confidence {confidence}\n");
             if (confidence != ConfidenceLevel.Rejected)
             {
-                // TODO: Remember and include conversation history here.
-                List<Message> chatPrompts = new()
-                {
-                    new Message(Role.System, PROMPT),
-                    new Message(Role.User, text)
-                };
-
-                Notification notification = ShowNotification.Info("Thinking...", 
+                chatGptHistory.Add(new Message(Role.User, text));
+                Notification notification = ShowNotification.Info("Thinking...",
                                                                   "Please wait while I think about what you said...");
-                SendChatMessage(new ChatRequest(chatPrompts, "gpt-3.5-turbo"), notification).Forget();
+                SendChatMessage(new ChatRequest(chatGptHistory, "gpt-3.5-turbo"), notification).Forget();
             }
-            
+
             async UniTaskVoid SendChatMessage(ChatRequest request, Notification notification)
             {
                 ChatResponse result = await openAiClient.ChatEndpoint.GetCompletionAsync(request);
                 notification.Close();
-                brain.Say(result.FirstChoice.Message.Content);
+                string message = result.FirstChoice.Message.Content;
+                chatGptHistory.Add(new Message(Role.Assistant, message));
+                brain.Say(message);
             }
         }
 
