@@ -100,10 +100,10 @@ namespace SEE.Controls.Actions
 
 
                     List<LiveDocumentationBuffer> classMembers = new List<LiveDocumentationBuffer>();
-                    LiveDocumentationBuffer b = new LiveDocumentationBuffer();
-                    b.Add(new LiveDocumentationBufferText("public void SomeFunc(int num)"));
+                   // LiveDocumentationBuffer b = new LiveDocumentationBuffer();
+                    MethodExtractor.FillMethods(classMembers, selectedNode.Value.AbsolutePlatformPath());
 
-                    classMembers.Add(b);
+                  //  classMembers.Add(b);
 
                     documentationWindow.DocumentationBuffer = buffer;
                     documentationWindow.ClassMembers = classMembers;

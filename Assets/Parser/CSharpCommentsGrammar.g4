@@ -52,13 +52,13 @@ comments:
 line_comment: LineComment (classLink)?;
 
 methodSignature
-    : accesModifier=(Public| 'private' | 'protected') TEXT+;
+    : accesModifier=(Public| 'private' | 'protected') nameAndParameters=TEXT+;
 
 methodContent
     : (TEXT+ | SEMICOLON | EQUALS )*;
 
 methodDeclaration
-    : summary? returnType=methodSignature CURLY_BRACKET_OPEN methodContent CURLY_BRACKET_CLOSE;
+    : summary? methodSignature CURLY_BRACKET_OPEN methodContent CURLY_BRACKET_CLOSE;
 
 // A Simple C# Scope
 // This means a block of {} which also can inlude more other scopes or methods or classes   

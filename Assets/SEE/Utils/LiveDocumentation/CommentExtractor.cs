@@ -16,14 +16,12 @@ namespace SEE.Utils
             var lexer = new CSharpCommentsGrammarLexer(new AntlrInputStream(input));
             var tokens = new CommonTokenStream(lexer);
             tokens.Fill();
-            var comments = tokens.GetTokens().Where(x => x.Type == CSharpCommentsGrammarLexer.Comment);
-            foreach (var i in tokens.GetTokens())
-            {
-            }
+         
 
             var parser = new CSharpCommentsGrammarParser(tokens);
             // var t = parser.start().children;
             var classComments = parser.start().namespaceDeclaration(0).classDefinition(0).summary().comments().children;
+            // Write class documentation in Buffer
             foreach (var i in classComments)
             {
                 if (i is CSharpCommentsGrammarParser.CommentContext comment)
@@ -41,9 +39,7 @@ namespace SEE.Utils
                         }
                        
                     }
-                  
                 }
-
                 buffer.Add(new LiveDocumentationBufferText("\n"));
             }
         }

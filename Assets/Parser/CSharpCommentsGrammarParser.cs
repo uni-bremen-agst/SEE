@@ -653,6 +653,7 @@ public partial class CSharpCommentsGrammarParser : Parser {
 
 	public partial class MethodSignatureContext : ParserRuleContext {
 		public IToken accesModifier;
+		public IToken nameAndParameters;
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Public() { return GetToken(CSharpCommentsGrammarParser.Public, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] TEXT() { return GetTokens(CSharpCommentsGrammarParser.TEXT); }
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode TEXT(int i) {
@@ -700,7 +701,7 @@ public partial class CSharpCommentsGrammarParser : Parser {
 				{
 				{
 				State = 93;
-				Match(TEXT);
+				_localctx.nameAndParameters = Match(TEXT);
 				}
 				}
 				State = 96;
@@ -825,15 +826,14 @@ public partial class CSharpCommentsGrammarParser : Parser {
 	}
 
 	public partial class MethodDeclarationContext : ParserRuleContext {
-		public MethodSignatureContext returnType;
+		[System.Diagnostics.DebuggerNonUserCode] public MethodSignatureContext methodSignature() {
+			return GetRuleContext<MethodSignatureContext>(0);
+		}
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CURLY_BRACKET_OPEN() { return GetToken(CSharpCommentsGrammarParser.CURLY_BRACKET_OPEN, 0); }
 		[System.Diagnostics.DebuggerNonUserCode] public MethodContentContext methodContent() {
 			return GetRuleContext<MethodContentContext>(0);
 		}
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CURLY_BRACKET_CLOSE() { return GetToken(CSharpCommentsGrammarParser.CURLY_BRACKET_CLOSE, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public MethodSignatureContext methodSignature() {
-			return GetRuleContext<MethodSignatureContext>(0);
-		}
 		[System.Diagnostics.DebuggerNonUserCode] public SummaryContext summary() {
 			return GetRuleContext<SummaryContext>(0);
 		}
@@ -873,7 +873,7 @@ public partial class CSharpCommentsGrammarParser : Parser {
 			}
 
 			State = 113;
-			_localctx.returnType = methodSignature();
+			methodSignature();
 			State = 114;
 			Match(CURLY_BRACKET_OPEN);
 			State = 115;
