@@ -287,7 +287,7 @@ namespace SEE.Game.UI.Window.CodeWindow
         }
 
         /// <summary>
-        /// Populates the code window with the contents of the given file.
+        /// Populates the code window with the given <paramref name="text"/>.
         /// This will overwrite any existing text.
         /// </summary>
         /// <param name="text">An array of lines to use for the code window.</param>
