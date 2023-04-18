@@ -7,8 +7,6 @@ using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.UI.RuntimeConfigMenu;
 using SEE.GO;
-using SEE.Layout;
-using SEE.Layout.NodeLayouts;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
