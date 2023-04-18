@@ -10,6 +10,7 @@ using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
 using SEE.DataModel.DG;
+using System;
 
 namespace SEE.Controls.Actions
 {
@@ -85,51 +86,9 @@ namespace SEE.Controls.Actions
                     return false;
                 }
 
-                // File name of source code file to read from it
-                string selectedFile = graphElement.Filename();
-                if (selectedFile == null)
-                {
-                    ShowNotification.Warn("No file", $"Selected {GetName(graphElement)} has no filename.");
-                    return false;
-                }
-                string absolutePlatformPath = graphElement.AbsolutePlatformPath();
-                if (!File.Exists(absolutePlatformPath))
-                {
-                    ShowNotification.Warn("File does not exist", $"Path {absolutePlatformPath} of selected {GetName(graphElement)} does not exist.");
-                    return false;
-                }
-                if ((File.GetAttributes(absolutePlatformPath) & FileAttributes.Directory) == FileAttributes.Directory)
-                {
-                    ShowNotification.Warn("Not a file", $"Path {absolutePlatformPath} of selected {GetName(graphElement)} is a directory.");
-                    return false;
-                }
-
-                // Create new window for active selection, or use existing one
-                if (!graphElementRef.TryGetComponent(out CodeWindow codeWindow))
-                {
-                    codeWindow = graphElementRef.gameObject.AddComponent<CodeWindow>();
-
-                    codeWindow.Title = GetName(graphElement);
-                    // If SourceName differs from Source.File (except for its file extension), display both
-                    if (!codeWindow.Title.Replace(".", "").Equals(selectedFile.Split('.').Reverse().Skip(1)
-                                                                              .Aggregate("", (acc, s) => s + acc)))
-                    {
-                        codeWindow.Title += $" ({selectedFile})";
-                    }
-
-                    codeWindow.EnterFromFile(absolutePlatformPath);
-                }
-
-                // Pass line number to automatically scroll to it, if it exists
-                int? line = graphElement.SourceLine();
-                if (line.HasValue)
-                {
-                    codeWindow.VisibleLine = line.Value;
-                }
-                else
-                {
-                    Debug.LogWarning($"Selected {GetName(graphElement)} has no source line.\n");
-                }
+                CodeWindow codeWindow = graphElement is Edge edge && edge.Type == "Clone" ?
+                                        ShowUnifiedDiff(edge, graphElementRef)
+                                      : ShowCode(graphElement, graphElementRef);
 
                 // Add solution path
                 GameObject cityObject = SceneQueries.GetCodeCity(graphElementRef.transform).gameObject;
@@ -154,6 +113,101 @@ namespace SEE.Controls.Actions
 
             return false;
 
+            static CodeWindow ShowUnifiedDiff(Edge edge, GraphElementRef graphElementRef)
+            {
+                (string sourceFilename, string sourceAbsolutePlatformPath) = GetPath(edge.Source);
+                (string targetFilename, string targetAbsolutePlatformPath) = GetPath(edge.Target);
+                int sourceStartLine = GetAttribute(edge, "Clone.Source.Start.Line");
+                int sourceEndLine = GetAttribute(edge, "Clone.Source.End.Line");
+                int targetStartLine = GetAttribute(edge, "Clone.Target.Start.Line");
+                int targetEndLine = GetAttribute(edge, "Clone.Target.End.Line");
+
+                string[] diff = Diff(sourceAbsolutePlatformPath, sourceStartLine, sourceEndLine,
+                                     targetAbsolutePlatformPath, targetStartLine, targetEndLine);
+                CodeWindow codeWindow = GetOrCreateCodeWindow(edge, graphElementRef, sourceFilename);
+                codeWindow.EnterFromText(diff);
+                codeWindow.VisibleLine = 1;
+                return codeWindow;
+            }
+
+            static int GetAttribute(Edge edge, string attribute)
+            {
+                if (edge.TryGetInt(attribute, out int value))
+                {
+                    return value;
+                }
+                else
+                {
+                    string message = $"Selected {GetName(edge)} has no attribute {attribute}.";
+                    ShowNotification.Warn("No attribute", message);
+                    throw new Exception(message);
+                }
+            }
+
+            static (string filename, string absolutePlatformPath) GetPath(GraphElement graphElement)
+            {
+                string filename = graphElement.Filename();
+                if (filename == null)
+                {
+                    string message = $"Selected {GetName(graphElement)} has no filename.";
+                    ShowNotification.Warn("No file", message);
+                    throw new Exception(message);
+                }
+                string absolutePlatformPath = graphElement.AbsolutePlatformPath();
+                if (!File.Exists(absolutePlatformPath))
+                {
+                    string message = $"Path {absolutePlatformPath} of selected {GetName(graphElement)} does not exist.";
+                    ShowNotification.Warn("File does not exist", message);
+                    throw new Exception(message);
+                }
+                if ((File.GetAttributes(absolutePlatformPath) & FileAttributes.Directory) == FileAttributes.Directory)
+                {
+                    string message = $"Path {absolutePlatformPath} of selected {GetName(graphElement)} is a directory.";
+                    ShowNotification.Warn("Not a file", message);
+                    throw new Exception(message);
+                }
+                return (filename, absolutePlatformPath);
+            }
+
+            static CodeWindow GetOrCreateCodeWindow(GraphElement graphElement, GraphElementRef graphElementRef, string filename)
+            {
+                // Create new window for active selection, or use existing one
+                if (!graphElementRef.TryGetComponent(out CodeWindow codeWindow))
+                {
+                    codeWindow = graphElementRef.gameObject.AddComponent<CodeWindow>();
+
+                    codeWindow.Title = GetName(graphElement);
+                    // If SourceName differs from Source.File (except for its file extension), display both
+                    if (!codeWindow.Title.Replace(".", "").Equals(filename.Split('.').Reverse().Skip(1)
+                                                                              .Aggregate("", (acc, s) => s + acc)))
+                    {
+                        codeWindow.Title += $" ({filename})";
+                    }
+                }
+                return codeWindow;
+            }
+
+            static CodeWindow ShowCode(GraphElement graphElement, GraphElementRef graphElementRef)
+            {
+                // File name of source code file to read from it
+                (string filename, string absolutePlatformPath) = GetPath(graphElement);
+                CodeWindow codeWindow = GetOrCreateCodeWindow(graphElement, graphElementRef, filename);
+                codeWindow.EnterFromFile(absolutePlatformPath);
+
+                // Pass line number to automatically scroll to it, if it exists
+                int? line = graphElement.SourceLine();
+                if (line.HasValue)
+                {
+                    codeWindow.VisibleLine = line.Value;
+                }
+                else
+                {
+                    Debug.LogWarning($"Selected {GetName(graphElement)} has no source line.\n");
+                }
+
+                return codeWindow;
+            }
+
             // Returns a human-readable representation of given graphElement.
             static string GetName(GraphElement graphElement)
             {
@@ -171,6 +225,12 @@ namespace SEE.Controls.Actions
                     return "";
                 }
             }
+        }
+
+        private static string[] Diff(string sourcePath, int sourceStartLine, int sourceEndLine, string targetPath, int targetStartLine, int targetEndLine)
+        {
+            string[] result = new[] { "hello", "world!" };
+            return result;
         }
     }
 }
