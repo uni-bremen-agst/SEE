@@ -157,19 +157,7 @@ namespace SEE.Controls.Actions
             // Returns a human-readable representation of given graphElement.
             static string GetName(GraphElement graphElement)
             {
-                if (graphElement is Node node)
-                {
-                    return $"node '{node.SourceName}'";
-                }
-                else if (graphElement is Edge edge)
-                {
-                    return $"{edge.Type} edge from '{edge.Source.SourceName}' to '{edge.Target.SourceName}'";
-                }
-                else
-                {
-                    Debug.LogError("Neither node nor edge.\n");
-                    return "";
-                }
+                return graphElement.ToShortString();
             }
         }
     }
