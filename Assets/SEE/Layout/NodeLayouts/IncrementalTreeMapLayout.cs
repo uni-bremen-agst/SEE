@@ -172,10 +172,12 @@ namespace SEE.Layout.NodeLayouts
             }
             else
             {
-                //  [      oldTNodes              ]--------------   <- nodes of old Layout, do not edit them
-                //  --------------[         newTNodes           ]   <- nodes of new Lauout 
-                //  [ toBeDeleted | toBeModiegied | toBeAdded   ]   <- nodes of new Layout
-                //  [      workWith               ]--------------   <- nodes layout designed to be changed over time to newTNodes
+                // here can be done some improvment
+
+                //  [         oldTNodes           ]--------------   <- nodes of old Layout, do not edit them
+                //  [         workWith            ]--------------   <- nodes of new Layout, designed to be changed over time to newTNodes
+                //  --------------[           newTNodes         ]   <- nodes of new Lauout 
+                //  [ toBeDeleted ]---------------[  toBeAdded  ]   <- nodes of new Layout
 
                 // not only the siblings that are in the old graph and in the new one, but all siblings in old graph
                 // note that there is exact one single parent (because of if-clause), but can be null if children == roots
@@ -186,10 +188,7 @@ namespace SEE.Layout.NodeLayouts
 
                 IList<TNode> workWith = new List<TNode>();
                 IList<TNode> nodesToBeDeleted  = new List<TNode>();
-                IList<TNode> nodesToBeModified  = new List<TNode>();
                 IList<TNode> nodesToBeAdded    = new List<TNode>();
-
-
 
                 // get nodes form old layout .. over take their rectangles
                 foreach(var oldTNode in oldTNodes)
@@ -197,21 +196,20 @@ namespace SEE.Layout.NodeLayouts
                     TNode newTNode = ((List<TNode>) newTNodes).Find(x => x.RepresentLayoutNode.ID.Equals(oldTNode.RepresentLayoutNode.ID));
                     if(newTNode == null)
                     {   
-                        newTNode = new TNode(null,newTNodes[0].Parent);
+                        newTNode = new TNode(null,null);
                         nodesToBeDeleted.Add(newTNode);
                         workWith.Add(newTNode);
                     }
                     else
                     {
                         workWith.Add(newTNode);
-                        nodesToBeModified.Add(newTNode);
                     }
                     newTNode.Rectangle = oldTNode.Rectangle;                    
                 }
 
                 foreach(var newTNode in newTNodes)
                 {
-                    if( !nodesToBeModified.Contains(newTNode))
+                    if( !workWith.Contains(newTNode))
                     {
                         nodesToBeAdded.Add(newTNode);
                     }
@@ -240,15 +238,15 @@ namespace SEE.Layout.NodeLayouts
 
                 TransformRectangles(newTNodes, oldRectangle: oldRectangle, newRectangle: rectangle);
 
-                LocalMoves.CorretNodes(workWith);
+                LocalMove.CorretNodes(workWith);
                 foreach(var nodeToBeAdded in nodesToBeAdded)
                 {
-                    LocalMoves.AddNode(workWith,nodeToBeAdded);
+                    LocalMove.AddNode(workWith,nodeToBeAdded);
                     workWith.Add(nodeToBeAdded);
                 }
                 foreach(var obsoleteNode in nodesToBeDeleted)
                 {
-                    LocalMoves.DeleteNode(obsoleteNode);
+                    LocalMove.DeleteNode(obsoleteNode);
                     workWith.Remove(obsoleteNode);
                 }
 
@@ -262,8 +260,8 @@ namespace SEE.Layout.NodeLayouts
                     Assert.IsTrue(workWith.Contains(node));
                 }
 
-                LocalMoves.CorretNodes(workWith);
-                LocalMoves.MakeLocalMoves(workWith);
+                LocalMove.CorretNodes(workWith);
+                LocalMove.MakeLocalMoves(workWith);
             }
 
             AddToLayout(GetTNodes(siblings));
@@ -369,7 +367,7 @@ namespace SEE.Layout.NodeLayouts
             HashSet<TSegment> result = new HashSet<TSegment>();
             foreach(TNode node in nodes)
             {
-                IList<TSegment> boundingSegments = node.getAllSegments();
+                ICollection<TSegment> boundingSegments = node.getAllSegments().Values;
                 foreach(TSegment segment in boundingSegments)
                 {
                     result.Add(segment);

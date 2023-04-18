@@ -82,13 +82,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
         }
 
-        public IList<TSegment> getAllSegments()
+        public IDictionary<Direction,TSegment> getAllSegments()
         {
-            return new List<TSegment> 
-                {this.leftBoundingSegment,
-                 this.rightBoundingSegment,
-                 this.lowerBoundingSegment,
-                 this.upperBoundingSegment};
+            return new Dictionary<Direction,TSegment>{
+                 {Direction.Left,  this.leftBoundingSegment},
+                 {Direction.Right, this.rightBoundingSegment},
+                 {Direction.Lower, this.lowerBoundingSegment},
+                 {Direction.Upper, this.upperBoundingSegment}};
         }
     }
 }
