@@ -81,34 +81,26 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void Start()
         {
-            try
+            if (!UseChatGPT)
             {
-                if (!UseChatGPT)
-                {
-                    if (!InitializeGrammarInput())
-                    {
-                        enabled = false;
-                        return;
-                    }
-                }
-                else
-                {
-                    if (!InitializeDictationInput())
-                    {
-                        enabled = false;
-                        return;
-                    }
-                }
-                
-                input.Start();
-                if (!gameObject.TryGetComponentOrLog(out brain))
+                if (!InitializeGrammarInput())
                 {
                     enabled = false;
+                    return;
                 }
             }
-            catch (Exception e)
+            else
             {
-                Debug.LogError($"Failure in starting speech recognition with grammar file {GrammarFilePath}: {e.Message}\n");
+                if (!InitializeDictationInput())
+                {
+                    enabled = false;
+                    return;
+                }
+            }
+            
+            input.Start();
+            if (!gameObject.TryGetComponentOrLog(out brain))
+            {
                 enabled = false;
             }
         }
@@ -151,10 +143,22 @@ namespace SEE.Game.Avatars
             }
             
             openAiClient = new OpenAIClient(OpenAiApiKey);
+            if (PhraseRecognitionSystem.Status == SpeechSystemStatus.Running)
+            {
+                // Disable phrase recognition system first if it is running.
+                PhraseRecognitionSystem.Shutdown();
+            }
             DictationInput dictationInput;
             input = dictationInput = new DictationInput();
             dictationInput.Register(OnDictationResult);
+            SayHello().Forget();
             return true;
+        }
+
+        private async UniTaskVoid SayHello()
+        {
+            await UniTask.Delay(TimeSpan.FromSeconds(5));
+            OnDictationResult("Hi SEE! How are you today?", ConfidenceLevel.High);
         }
 
         /// <summary>
@@ -248,7 +252,7 @@ namespace SEE.Game.Avatars
                 }
                 else if (input is GrammarInput grammarInput)
                 {
-                    grammarInput.Unregister(OnPhraseRecognized);
+                    grammarInput.Register(OnPhraseRecognized);
                 }
             }
         }
