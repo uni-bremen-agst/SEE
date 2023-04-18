@@ -6,12 +6,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     static class LocalMoves
     {
-        // 
         private static void findLocalMoves()
         {}
-
-        // -------------------------------------------------------------------
-        // public methods all static 
 
         public static void CorretNodes(IList<TNode> nodes)
         {}
