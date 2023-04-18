@@ -3,6 +3,7 @@ using Crosstales.RTVoice;
 using Crosstales.RTVoice.Model;
 using System;
 using System.Text;
+using Crosstales.RTVoice.Model.Enum;
 
 namespace SEE.Game.Avatars
 {
@@ -95,7 +96,17 @@ namespace SEE.Game.Avatars
             /// <see cref="Speaker.Instance.VoiceForGender"/> cannot return any voice.
             if (voice == null)
             {
-                voice = Speaker.Instance.VoiceForGender(Crosstales.RTVoice.Model.Enum.Gender.FEMALE, culture: "en-US");
+                if (Application.platform == RuntimePlatform.LinuxEditor || Application.platform == RuntimePlatform.LinuxPlayer)
+                {
+                    voice = new Voice
+                    {
+                        Name = "en-US+f4"
+                    };
+                }
+                else
+                {
+                    voice = Speaker.Instance.VoiceForGender(Gender.FEMALE, culture: "en-US");
+                }
                 if (voice == null)
                 {
                     Debug.LogError("Requested voice not found. A default voice will be used. The available voices are:\n");
