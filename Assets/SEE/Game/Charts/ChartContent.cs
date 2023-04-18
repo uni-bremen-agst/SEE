@@ -22,7 +22,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls;
-using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;

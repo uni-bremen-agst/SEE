@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls.Interactables;
-using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.Operator;

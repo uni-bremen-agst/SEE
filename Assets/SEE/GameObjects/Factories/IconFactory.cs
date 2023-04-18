@@ -1,5 +1,5 @@
 ﻿using System;
-using SEE.DataModel;
+using SEE.Game;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
@@ -181,14 +181,14 @@ namespace SEE.GO
 
             // Add LOD levels (currently only one).
             LOD[] lods = new LOD[1];
-            
+
             // Add metric text label
             GameObject text = PrefabInstantiator.InstantiatePrefab("Prefabs/Metric Value Label", gameObject.transform);
             TextMeshPro MetricMesh = text.GetComponent<TextMeshPro>();
             MetricMesh.text = metricText;
             MetricMesh.enableAutoSizing = true;
             text.SetActive(false);
-            
+
             // Add the erosion sprite.
             GameObject erosionSprite;
             UnityEngine.Object prefab = erosionToSprite[(int)erosion];
@@ -214,7 +214,7 @@ namespace SEE.GO
             }
             Renderer[] renderers = { renderer };
             lods[0] = new LOD(ScreenRelativeTransitionHeight, renderers);
-                
+
             group.SetLODs(lods);
             group.RecalculateBounds();
             return gameObject;
