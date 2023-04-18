@@ -48,6 +48,18 @@ public partial class CSharpCommentsGrammarBaseListener : ICSharpCommentsGrammarL
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitClassLink([NotNull] CSharpCommentsGrammarParser.ClassLinkContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.parameter"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterParameter([NotNull] CSharpCommentsGrammarParser.ParameterContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.parameter"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitParameter([NotNull] CSharpCommentsGrammarParser.ParameterContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.paramref"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
@@ -59,18 +71,6 @@ public partial class CSharpCommentsGrammarBaseListener : ICSharpCommentsGrammarL
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitParamref([NotNull] CSharpCommentsGrammarParser.ParamrefContext context) { }
-	/// <summary>
-	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.param"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void EnterParam([NotNull] CSharpCommentsGrammarParser.ParamContext context) { }
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.param"/>.
-	/// <para>The default implementation does nothing.</para>
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	public virtual void ExitParam([NotNull] CSharpCommentsGrammarParser.ParamContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.summary"/>.
 	/// <para>The default implementation does nothing.</para>

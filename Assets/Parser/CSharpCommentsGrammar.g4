@@ -3,7 +3,10 @@ grammar CSharpCommentsGrammar;
 // Skip rules
 WS: [ \t\r\n]+ -> skip;
 Namespace : 'namespace';
-Public: 'public';
+//Public: 'public';
+//Private : 'private';
+//Protected : 'protected';
+//Static : 'static';
 Using : 'using';
 SEMICOLON : ';';
 
@@ -13,7 +16,7 @@ fragment LinkText : ~[\r\n<]* [/a-zA-Z0-9.#_=!-][/a-zA-Z0-9.;()_#=!-]+;
 
 // Define the rule for comments
 Comment: ('///' | '///' CommentText);
-PARAM: '<param name="' TEXT* '">' TEXT* '</param>';
+//PARAM: '<param name="' TEXT* '">' TEXT* '</param>';
 
 
 TEXT: [/a-zA-Z0-9&#_.=()+|-]+;
@@ -33,26 +36,34 @@ CURLY_BRACKET_CLOSE: '}';
 PARAMREF: '<paramref name="' TEXT '"/>';
 
 //Language specific
-classLink: '<see cref="' linkID=TEXT* '"/>' ;
+
+// Rule for class links
+classLink
+    : '<see cref="' linkID=TEXT* '"/>' ;
+    
+parameter
+    : '<param name="' paramName=TEXT* '">' paramDescription=TEXT* '</param>';
+    
 paramref: PARAMREF;
-param: Comment* PARAM;
+//param: Comment* PARAM;
 summary: '/// <summary>' comments '/// </summary>';
 return: '/// <returns>' (comments | TEXT| classLink) ('/// </returns>' | '</returns>');
 
 comment
-    : Comment ((classLink) | (TEXT))*  ;
+    : Comment ((classLink) | parameter | (TEXT))*  ;
 
 comments: 
         ( return
         | comment
         //| classLink
         | paramref TEXT*
-        | param)*;
+        //| param
+        )*;
         
 line_comment: LineComment (classLink)?;
 
 methodSignature
-    : accesModifier=(Public| 'private' | 'protected') nameAndParameters=TEXT+;
+    :  nameAndParameters=TEXT+;
 
 methodContent
     : (TEXT+ | SEMICOLON | EQUALS )*;
@@ -69,10 +80,11 @@ scope
     : (scope
     |methodDeclaration
     | TEXT+
-    | SEMICOLON)*;
+    | SEMICOLON)+;
 
+// Declaration of an class
 classDefinition
-    : summary? Public 'class' className=TEXT CURLY_BRACKET_OPEN 
+    : summary? TEXT* 'class' className=TEXT CURLY_BRACKET_OPEN 
       classContent CURLY_BRACKET_CLOSE;
 
 usingClause
@@ -86,6 +98,7 @@ namespaceDeclaration
 start
     : ( classDefinition 
     | namespaceDeclaration
+    | methodDeclaration
     | usingClause
      
     | CURLY_BRACKET_OPEN 

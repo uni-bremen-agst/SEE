@@ -41,6 +41,16 @@ public interface ICSharpCommentsGrammarListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitClassLink([NotNull] CSharpCommentsGrammarParser.ClassLinkContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.parameter"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterParameter([NotNull] CSharpCommentsGrammarParser.ParameterContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.parameter"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitParameter([NotNull] CSharpCommentsGrammarParser.ParameterContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.paramref"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
@@ -50,16 +60,6 @@ public interface ICSharpCommentsGrammarListener : IParseTreeListener {
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
 	void ExitParamref([NotNull] CSharpCommentsGrammarParser.ParamrefContext context);
-	/// <summary>
-	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.param"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void EnterParam([NotNull] CSharpCommentsGrammarParser.ParamContext context);
-	/// <summary>
-	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.param"/>.
-	/// </summary>
-	/// <param name="context">The parse tree.</param>
-	void ExitParam([NotNull] CSharpCommentsGrammarParser.ParamContext context);
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.summary"/>.
 	/// </summary>
