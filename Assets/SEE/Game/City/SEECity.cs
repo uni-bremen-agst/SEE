@@ -7,8 +7,6 @@ using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.UI.RuntimeConfigMenu;
 using SEE.GO;
-using SEE.Layout;
-using SEE.Layout.NodeLayouts;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -228,7 +226,7 @@ namespace SEE.Game.City
                     }
                 }
 #if UNITY_EDITOR
-                else if (child.CompareTag(DataModel.Tags.Node) || child.CompareTag(DataModel.Tags.Edge))
+                else if (child.CompareTag(Tags.Node) || child.CompareTag(Tags.Edge))
                 {
                     Debug.LogWarning($"Game object {child.name} has neither node nor edge reference.\n");
                 }

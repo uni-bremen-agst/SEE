@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Cysharp.Threading.Tasks;
 using FuzzySharp;
 using SEE.Controls;
 using SEE.Game;
-using SEE.Game.Evolution;
+using SEE.Game.Operator;
 using SEE.Game.UI.Menu;
 using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog;
-using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.GO.Menu
@@ -18,17 +15,17 @@ namespace SEE.GO.Menu
     /// A menu which allows its user to fuzzy search for nodes by entering the
     /// source name of a node.
     /// </summary>
-    public class SearchMenu: MonoBehaviour
+    public class SearchMenu : MonoBehaviour
     {
         /// <summary>
         /// The time (in seconds) the found node will blink.
         /// </summary>
-        private const int BLINK_SECONDS = 15;
+        private const float BLINK_SECONDS = 15;
 
         /// <summary>
-        /// The time (in seconds) between color inversions for found nodes.
+        /// The number of times the found node will blink.
         /// </summary>
-        private const float BLINK_INTERVAL = 0.3f;
+        private const int BLINK_COUNT = 20;
 
         /// <summary>
         /// The height of the marker used to mark the found node.
@@ -57,13 +54,6 @@ namespace SEE.GO.Menu
         private SimpleListMenu resultMenu;
 
         /// <summary>
-        /// Whether we're currently highlighting a node.
-        /// Will be set to true when a node starts blinking, and will be set to false when a new search is started,
-        /// which will cause the node to stop blinking.
-        /// </summary>
-        private bool stillHighlighting = true;
-
-        /// <summary>
         /// The color of the marker pointing to the found node.
         /// </summary>
         private static readonly Color MARKER_COLOR = Color.red;
@@ -81,7 +71,7 @@ namespace SEE.GO.Menu
         /// </summary>
         /// <remarks>This is not an <see cref="IList{T}"/> because the <c>ForEach</c> function is not defined for the
         /// interface, which is used in <see cref="ShowResultsMenu"/>.</remarks>
-        private readonly List<MenuEntry> resultMenuEntries = new List<MenuEntry>();
+        private readonly List<MenuEntry> resultMenuEntries = new();
 
         /// <summary>
         /// Executes the search with the values entered in the <see cref="searchDialog"/>.
@@ -97,7 +87,7 @@ namespace SEE.GO.Menu
                        .ToList();
 
             // In cases there are duplicates in the result, we append the filename too
-            HashSet<string> encounteredNames = new HashSet<string>();
+            HashSet<string> encounteredNames = new();
             results = results.GroupBy(x => x.Item2)
                              .SelectMany(x => x.Select((entry, i) => (entry, index: i)))
                              .Select(x =>
@@ -122,14 +112,13 @@ namespace SEE.GO.Menu
                                      }
                                      return (entry.score, newName, entry.gameObject);
                                  }
-                             });
-
+                             }).ToList();
 
             switch (results.Count())
             {
                 case 0:
                     ShowNotification.Warn("No nodes found", "No nodes found for the search term "
-                                                            + $"'{FilterString(searchString.Value)}'.");
+                                          + $"'{FilterString(searchString.Value)}'.");
                     break;
                 case 1:
                     HighlightNode(results.First().Item3, results.First().Item2);
@@ -177,59 +166,26 @@ namespace SEE.GO.Menu
         /// </summary>
         /// <param name="score">score for the shade of gray</param>
         /// <returns>shade of gray</returns>
-        public static Color ScoreColor(int score) => Color.Lerp(Color.gray, Color.white, score / 100f);
+        private static Color ScoreColor(int score) => Color.Lerp(Color.gray, Color.white, score / 100f);
 
         /// <summary>
         /// Highlights the given <paramref name="result"/>> node with the name <paramref name="resultName"/>
-        /// by displaying a marker above it and starting the <see cref="BlinkFor"/> coroutine.
+        /// by displaying a marker above it and making it blink.
         /// </summary>
         /// <param name="result">The game object of the node which shall be highlighted.</param>
         /// <param name="resultName">The name of the node which shall be highlighted.</param>
-        private void HighlightNode(GameObject result, string resultName)
+        private static void HighlightNode(GameObject result, string resultName)
         {
             ShowNotification.Info($"Highlighting '{resultName}'",
-                                  $"The selected node will be blinking and marked by a spear for {BLINK_SECONDS}.");
-            GameObject cityObject = SceneQueries.GetCodeCity(result.transform).gameObject;
-            if (result.TryGetComponentOrLog(out Renderer cityRenderer))
-            {
-                // Display marker above the node
-                MarkerFactory marker = new MarkerFactory(MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR, default, default);
-                Material material = cityRenderer.sharedMaterial;
-                BlinkFor(material).Forget();
-                RemoveMarkerWhenDone(marker).Forget();
-                marker.MarkBorn(result);
-            }
+                                  "The selected node will be blinking and marked by a spear "
+                                  + $"for {BLINK_SECONDS} seconds.");
+            NodeOperator nodeOperator = result.AddOrGetComponent<NodeOperator>();
+            // Display marker above the node
+            MarkerFactory marker = new(MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR, default, default);
+            marker.MarkBorn(result);
+            nodeOperator.Blink(BLINK_COUNT, BLINK_SECONDS).SetOnComplete(RemoveMarker);
 
-            async UniTaskVoid RemoveMarkerWhenDone(MarkerFactory marker)
-            {
-                // Remove marker either when a new search is started or when time is up
-                await UniTask.WhenAny(UniTask.Delay(TimeSpan.FromSeconds(BLINK_SECONDS)),
-                                      UniTask.WaitUntil(() => !stillHighlighting));
-                marker.Clear();
-            }
-        }
-
-        /// <summary>
-        /// Inverts the given <paramref name="material"/>'s color periodically every <see cref="BLINK_INTERVAL"/>
-        /// seconds for <see cref="BLINK_SECONDS"/> seconds.
-        /// </summary>
-        /// <param name="material">The material whose color to invert.</param>
-        private async UniTaskVoid BlinkFor(Material material)
-        {
-            Color originalColor = material.color;
-            stillHighlighting = true;
-            for (float i = BLINK_SECONDS; i > 0; i -= BLINK_INTERVAL)
-            {
-                if (!stillHighlighting)
-                {
-                    // Another search has been started
-                    break;
-                }
-                material.color = material.color.Invert();
-                await UniTask.Delay(TimeSpan.FromSeconds(BLINK_INTERVAL));
-            }
-
-            material.color = originalColor;
+            void RemoveMarker() => marker.Clear();
         }
 
         /// <summary>
@@ -289,7 +245,6 @@ namespace SEE.GO.Menu
         {
             if (SEEInput.ToggleSearch())
             {
-                stillHighlighting = false;
                 searchDialog.DialogShouldBeShown = true;
                 SEEInput.KeyboardShortcutsEnabled = false;
             }

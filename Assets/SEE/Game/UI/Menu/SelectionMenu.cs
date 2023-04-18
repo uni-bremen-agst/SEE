@@ -1,10 +1,7 @@
-﻿using System.Linq;
-using Michsky.UI.ModernUIPack;
+﻿using Michsky.UI.ModernUIPack;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
-using Valve.VR.InteractionSystem;
 
 namespace SEE.Game.UI.Menu
 {
@@ -86,12 +83,12 @@ namespace SEE.Game.UI.Menu
             manager.normalText.fontStyle = FontStyles.Normal;
             manager.normalText.text = manager.buttonText;
         }
-        
+
         /// <summary>
         /// Triggers when the <see cref="ActiveEntry"/> was unselected.
         /// </summary>
         public event UnityAction<T> OnEntryUnselected;
-        
+
         /// <summary>
         /// Triggers when <see cref="ActiveEntry"/> was changed.
         /// </summary>
