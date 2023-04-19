@@ -12,6 +12,7 @@ using UnityEngine;
 using SEE.DataModel.DG;
 using System;
 using DiffMatchPatch;
+using System.Text;
 
 namespace SEE.Controls.Actions
 {
@@ -126,7 +127,7 @@ namespace SEE.Controls.Actions
                 string[] diff = Diff(sourceAbsolutePlatformPath, sourceStartLine, sourceEndLine,
                                      targetAbsolutePlatformPath, targetStartLine, targetEndLine);
                 CodeWindow codeWindow = GetOrCreateCodeWindow(edge, graphElementRef, sourceFilename);
-                codeWindow.EnterFromText(diff, isHTML: true);
+                codeWindow.EnterFromText(diff, true);
                 codeWindow.VisibleLine = 1;
                 return codeWindow;
             }
@@ -220,7 +221,39 @@ namespace SEE.Controls.Actions
         {
             diff_match_patch diff = new diff_match_patch();
             List<Diff> result = diff.diff_main("jumps over the lazy", "jumped over a lazy");
-            return new string[] { diff.diff_prettyHtml(result) };
+            return new string[] { Diff2RichText(result) };
+        }
+
+        /// <summary>
+        /// Converts given list of <paramref name="diffs"/> into a Rich Text markup
+        /// for TextMesh Pro highlighting the inserts and deletions.
+        /// </summary>
+        /// <param name="diffs">List of Diff objects</param>
+        /// <returns>representation of diff in Rich Text markup</returns>
+        private static string Diff2RichText(IList<Diff> diffs)
+        {
+            StringBuilder result = new StringBuilder();
+            foreach (Diff aDiff in diffs)
+            {
+                string text = aDiff.text;
+                  // .Replace("&", "&amp;").Replace("<", "&lt;")
+                  // .Replace(">", "&gt;").Replace("\n", "&para;<br>");
+                switch (aDiff.operation)
+                {
+                    case Operation.INSERT:
+                        // red and stroke through
+                        result.Append("<color=\"red\"><s>").Append(text).Append("</s></color>");
+                        break;
+                    case Operation.DELETE:
+                        // green and underlined
+                        result.Append("<color=\"green\"><u>").Append(text).Append("</u></color>");
+                        break;
+                    case Operation.EQUAL:
+                        result.Append(text);
+                        break;
+                }
+            }
+            return result.ToString();
         }
     }
 }
