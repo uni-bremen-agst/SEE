@@ -60,7 +60,8 @@ comments:
         //| param
         )*;
         
-line_comment: LineComment (classLink)?;
+line_comment
+    : LineComment (classLink)?;
 
 methodSignature
     :  nameAndParameters=TEXT+;
@@ -78,11 +79,14 @@ scope
      
  classContent
     : (scope
-    |methodDeclaration
-    | TEXT+
-    | SEMICOLON)+;
+        |methodDeclaration
+        | TEXT+
+        | SEMICOLON)+;
 
 // Declaration of an class
+// All modifiers of the class signature are ignored since we dont need them
+// If we need them in the future you might consider to use a predefined C# Grammar.
+// We just dont use them because they usasly dont support the parsing of C# documentation.
 classDefinition
     : summary? TEXT* 'class' className=TEXT CURLY_BRACKET_OPEN 
       classContent CURLY_BRACKET_CLOSE;
@@ -100,7 +104,7 @@ start
     | namespaceDeclaration
     | methodDeclaration
     | usingClause
-     
     | CURLY_BRACKET_OPEN 
     | CURLY_BRACKET_CLOSE 
+    | Comment
     | EQUALS )*;
