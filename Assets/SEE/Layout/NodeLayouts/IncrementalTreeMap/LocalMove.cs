@@ -5,14 +5,13 @@ using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
-    public enum MoveKind
-    {Flip, Stretch} 
-
     abstract public class LocalMove
     {
         protected TNode node1;
+        public TNode Node1{get => this.node1;}
         protected TNode node2;
 
+        public TNode Node2{get => this.node2;}
         abstract public void apply();
         // 
     }
