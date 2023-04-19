@@ -86,7 +86,8 @@ namespace SEE.Game.Avatars
         /// A female US English voice will be used if available.
         /// </summary>
         /// <param name="text">text to be spoken</param>
-        public void Say(string text)
+        /// <param name="onSpeakCompleted">callback to be called when the text has been spoken</param>
+        public void Say(string text, Action onSpeakCompleted = null)
         {
             /// Note: We do not set <see cref="voice"/> in <see cref="Start"/>
             /// because we do not want to rely on the order in which the various
@@ -118,7 +119,14 @@ namespace SEE.Game.Avatars
                 animator.SetBool(isTalking, true);
             }
             Speaker.Instance.Speak(text, audioSource, voice: voice);
-            Speaker.Instance.OnSpeakCompleted.AddListener(BackToIdle);
+            Speaker.Instance.OnSpeakCompleted.AddListener(OnSpeakCompleted);
+            
+            void OnSpeakCompleted(string _)
+            {
+                onSpeakCompleted?.Invoke();
+                BackToIdle();
+                Speaker.Instance.OnSpeakCompleted.RemoveListener(OnSpeakCompleted);
+            }
         }
 
         /// <summary>
@@ -126,11 +134,9 @@ namespace SEE.Game.Avatars
         /// be registered by <see cref="Say"/> and be called when the text
         /// if completely spoken.
         /// </summary>
-        /// <param name="message">a message from RT-Voice (currently not used)</param>
-        private void BackToIdle(string message)
+        private void BackToIdle()
         {
             Stop();
-            Speaker.Instance.OnSpeakCompleted.RemoveListener(BackToIdle);
         }
 
         /// <summary>

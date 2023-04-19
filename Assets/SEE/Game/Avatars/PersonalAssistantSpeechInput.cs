@@ -228,7 +228,9 @@ namespace SEE.Game.Avatars
                 notification.Close();
                 string message = result.FirstChoice.Message.Content;
                 chatGptHistory.Add(new Message(Role.Assistant, message));
-                brain.Say(message);
+                // We need to stop listening before we start speaking, else we will hear our own voice.
+                StopListening();
+                brain.Say(message, StartListening);
             }
         }
 
@@ -241,11 +243,30 @@ namespace SEE.Game.Avatars
             OnDisable();
             input?.Dispose();
         }
+        
+        /// <summary>
+        /// Stops listening to the user.
+        /// </summary>
+        private void StopListening() 
+        {
+            if (input != null)
+            {
+                input.Stop();
+                if (UseChatGPT && input is DictationInput dictationInput)
+                {
+                    dictationInput.Unregister(OnDictationResult);
+                }
+                else if (input is GrammarInput grammarInput)
+                {
+                    grammarInput.Unregister(OnPhraseRecognized);
+                }
+            }
+        }
 
         /// <summary>
-        /// Re-starts <see cref="input"/>.
+        /// Starts listening to the user.
         /// </summary>
-        private void OnEnable()
+        private void StartListening()
         {
             if (input != null)
             {
@@ -262,22 +283,19 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
+        /// Re-starts <see cref="input"/>.
+        /// </summary>
+        private void OnEnable()
+        {
+            StartListening();
+        }
+
+        /// <summary>
         /// Stops <see cref="input"/>.
         /// </summary>
         private void OnDisable()
         {
-            if (input != null)
-            {
-                input.Stop();
-                if (UseChatGPT && input is DictationInput dictationInput)
-                {
-                    dictationInput.Unregister(OnDictationResult);
-                }
-                else if (input is GrammarInput grammarInput)
-                {
-                    grammarInput.Unregister(OnPhraseRecognized);
-                }
-            }
+            StopListening();
         }
     }
 }
