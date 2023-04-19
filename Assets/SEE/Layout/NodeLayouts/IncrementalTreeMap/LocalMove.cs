@@ -197,13 +197,116 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
         }
 
-        private void apply_StretchLeftOverVertical(TNode leftNode, TNode rightNode){}
-        private void apply_StretchRightOverVertical(TNode leftNode, TNode rightNode){}
-
-        private void apply_StretchLowerOverHorizontal(TNode lowerNode, TNode upperNode){}
-        private void apply_StretchUpperOverHorizontal(TNode lowerNode, TNode upperNode){}
-
+        private void apply_StretchLeftOverVertical(TNode leftNode, TNode rightNode)
+        {
+            // along lower           along upper   
+            //    [r]         [r]    [l][r]  ->  [llll]
+            // [l][r]  ->  [llll]       [r]         [r]
+            var segmentsLeftNode = leftNode.getAllSegments();
+            var segmentsRightNode = rightNode.getAllSegments();
+            bool alongLowerSegment = segmentsLeftNode[Direction.Lower] == segmentsRightNode[Direction.Lower];
+            // adjust rectangles
+            leftNode.Rectangle.width += rightNode.Rectangle.width;
+            rightNode.Rectangle.depth -= leftNode.Rectangle.depth;
+            if(alongLowerSegment)
+            {
+                rightNode.Rectangle.z = leftNode.Rectangle.z + leftNode.Rectangle.depth;
+            }
+            // switch segments
+            leftNode.registerSegment(segmentsRightNode[Direction.Right], Direction.Right);
+            if(alongLowerSegment)
+            {
+                rightNode.registerSegment(segmentsLeftNode[Direction.Upper], Direction.Lower);
+            }
+            else
+            {
+                rightNode.registerSegment(segmentsLeftNode[Direction.Lower],Direction.Lower);
+            }
+        }
         
+        private void apply_StretchRightOverVertical(TNode leftNode, TNode rightNode)
+        {
+            // along lower           along upper   
+            // [l]         [l]       [l][r]  ->  [r][r]
+            // [l][r]  ->  [r][r]    [l]         [l]
+            var segmentsLeftNode = leftNode.getAllSegments();
+            var segmentsRightNode = rightNode.getAllSegments();
+            bool alongLowerSegment = segmentsLeftNode[Direction.Lower] == segmentsRightNode[Direction.Lower];
+            // adjust rectangles
+            rightNode.Rectangle.width += leftNode.Rectangle.width;
+            rightNode.Rectangle.x = leftNode.Rectangle.x;
+            leftNode.Rectangle.depth -= leftNode.Rectangle.depth;
+            if(alongLowerSegment)
+            {
+                leftNode.Rectangle.z = rightNode.Rectangle.z + rightNode.Rectangle.depth;
+            } 
+            // switch segments
+            rightNode.registerSegment(segmentsLeftNode[Direction.Left], Direction.Left);
+            if(alongLowerSegment)
+            {
+                leftNode.registerSegment(segmentsRightNode[Direction.Upper], Direction.Lower);
+            }
+            else
+            {
+                leftNode.registerSegment(segmentsRightNode[Direction.Lower],Direction.Lower);
+            }
+        }
+
+        private void apply_StretchLowerOverHorizontal(TNode lowerNode, TNode upperNode)
+        {
+            // along left           along right   
+            // [uuuu] ->  [l][u]    [uuuu]  ->  [u][l]
+            // [l]        [l]          [l]         [l]
+            var segmentsLowerNode = lowerNode.getAllSegments();
+            var segmentsUpperNode = upperNode.getAllSegments();
+            bool alongLeftSegment = segmentsLowerNode[Direction.Left] == segmentsUpperNode[Direction.Left];
+            // adjust rectangles
+            lowerNode.Rectangle.depth += upperNode.Rectangle.depth;
+            upperNode.Rectangle.width -= lowerNode.Rectangle.width;
+            if(alongLeftSegment)
+            {
+                upperNode.Rectangle.x = lowerNode.Rectangle.x + lowerNode.Rectangle.width;
+            }
+            // switch segments
+            lowerNode.registerSegment(segmentsUpperNode[Direction.Upper], Direction.Upper);
+            if(alongLeftSegment)
+            {
+                upperNode.registerSegment(segmentsLowerNode[Direction.Right], Direction.Left);
+            }
+            else
+            {
+                upperNode.registerSegment(segmentsLowerNode[Direction.Left],Direction.Right);
+            }
+        }
+        
+        private void apply_StretchUpperOverHorizontal(TNode lowerNode, TNode upperNode)
+        {
+            // along left           along right
+            // [u]    ->  [u]          [u]  ->      [u]
+            // [llll]     [u][l]    [llll]       [l][u]
+            var segmentsLowerNode = lowerNode.getAllSegments();
+            var segmentsUpperNode = upperNode.getAllSegments();
+            bool alongLeftSegment = segmentsLowerNode[Direction.Left] == segmentsUpperNode[Direction.Left];
+            // adjust rectangles
+            upperNode.Rectangle.depth += lowerNode.Rectangle.depth;
+            upperNode.Rectangle.z = lowerNode.Rectangle.z;
+
+            lowerNode.Rectangle.width -= upperNode.Rectangle.width;
+            if(alongLeftSegment)
+            {
+                lowerNode.Rectangle.x = upperNode.Rectangle.x + upperNode.Rectangle.width;
+            }
+            // switch segments
+            upperNode.registerSegment(segmentsLowerNode[Direction.Lower], Direction.Lower);
+            if(alongLeftSegment)
+            {
+                lowerNode.registerSegment(segmentsUpperNode[Direction.Right], Direction.Left);
+            }
+            else
+            {
+                lowerNode.registerSegment(segmentsUpperNode[Direction.Left],Direction.Right);
+            }
+        }        
     }
 }
 
