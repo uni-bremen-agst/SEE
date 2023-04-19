@@ -291,8 +291,10 @@ namespace SEE.Game.UI.Window.CodeWindow
         /// This will overwrite any existing text.
         /// </summary>
         /// <param name="text">An array of lines to use for the code window.</param>
+        /// <param name="asIs">if true, the <paramref name="text"/> will be added as is, that is,
+        /// without being included into a noparse clause</param>
         /// <exception cref="ArgumentException">If <paramref name="text"/> is empty or <c>null</c></exception>
-        public void EnterFromText(string[] text, bool isHTML = false)
+        public void EnterFromText(string[] text, bool asIs = false)
         {
             if (text == null || text.Length <= 0)
             {
@@ -306,13 +308,14 @@ namespace SEE.Game.UI.Window.CodeWindow
                 // Add whitespace next to line number so it's consistent.
                 Text += string.Join("", Enumerable.Repeat(" ", neededPadding - $"{i + 1}".Length));
                 // Line number will be typeset in yellow to distinguish it from the rest.
-                if (isHTML)
+                Text += $"<color=\"yellow\">{i + 1}</color> ";
+                if (asIs)
                 {
-                    Text += $"<color=\"yellow\">{i + 1}</color> {text[i]}\n";
+                    Text += text[i] + "\n";
                 }
                 else
                 {
-                    Text += $"<color=\"yellow\">{i + 1}</color> <noparse>{text[i].Replace("noparse", "")}</noparse>\n";
+                    Text += $"<noparse>{text[i].Replace("noparse", "")}</noparse>\n";
                 }
             }
 
