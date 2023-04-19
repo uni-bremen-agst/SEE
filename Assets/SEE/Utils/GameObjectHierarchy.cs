@@ -1,4 +1,4 @@
-﻿using SEE.DataModel;
+﻿using SEE.Game;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -45,7 +45,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// Returns all roots of <paramref name="gameNodes"/>. A game object is a root
-        /// if is has no ascendants or when it has ascendants, none of its ascendants 
+        /// if is has no ascendants or when it has ascendants, none of its ascendants
         /// is tagged by the given <paramref name="tag"/>.
         /// </summary>
         /// <param name="gameNodes">where to search for roots</param>
@@ -53,7 +53,7 @@ namespace SEE.Utils
         /// <returns>all roots in <paramref name="gameNodes"/></returns>
         public static ICollection<GameObject> Roots(ICollection<GameObject> gameNodes, string tag = Tags.Node)
         {
-            List<GameObject> result = new List<GameObject>();
+            List<GameObject> result = new();
             foreach (GameObject gameNode in gameNodes)
             {
                 GameObject parent = Parent(gameNode, tag);
@@ -66,7 +66,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Returns the parent of the given <paramref name="gameNode"/>. A node P is the 
+        /// Returns the parent of the given <paramref name="gameNode"/>. A node P is the
         /// parent of <paramref name="gameNode"/> if it is the closest ascendants of
         /// <paramref name="gameNode"/> in the game-object hierarchy tagged with <paramref name="tag"/>.
         /// </summary>
@@ -78,7 +78,7 @@ namespace SEE.Utils
             Transform cursor = gameNode.transform.parent;
             while (cursor != null)
             {
-                if (cursor.tag.Equals(tag))
+                if (cursor.CompareTag(tag))
                 {
                     return cursor.gameObject;
                 }
@@ -101,7 +101,7 @@ namespace SEE.Utils
         /// <returns></returns>
         public static ICollection<GameObject> Children(GameObject parent, string tag = Tags.Node)
         {
-            List<GameObject> result = new List<GameObject>();
+            List<GameObject> result = new();
             foreach (Transform child in parent.transform)
             {
                 if (child.tag.Equals(tag))

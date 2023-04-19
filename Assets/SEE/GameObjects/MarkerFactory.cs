@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using DG.Tweening;
-using SEE.DataModel;
 using SEE.Game;
 using SEE.GO.NodeFactories;
 using SEE.Utils;
