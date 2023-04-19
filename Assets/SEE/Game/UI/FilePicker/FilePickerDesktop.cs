@@ -6,7 +6,6 @@ using SEE.Utils;
 using SimpleFileBrowser;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace SEE.Game.UI.FilePicker
 {
@@ -84,7 +83,7 @@ namespace SEE.Game.UI.FilePicker
         {
             if (Menu != null) Destroyer.Destroy(Menu);
         }
-
+        
         /// <summary>
         ///     Initializes the menu.
         /// </summary>
@@ -165,6 +164,7 @@ namespace SEE.Game.UI.FilePicker
             base.OnStartFinished();
             UpdateDropdown();
             UpdateInput();
+            
         }
 
         /// <summary>
@@ -233,6 +233,12 @@ namespace SEE.Game.UI.FilePicker
             var selectedItem = Dropdown.dropdownItems[newValue].itemName;
             Enum.TryParse(selectedItem, out DataPathInstance.Root);
             UpdateInput();
+        }
+
+        public void CloseDropdown()
+        {
+            if (!HasStarted) return;
+            if (Dropdown.isOn) Dropdown.Animate();
         }
 
         public Action OnChangedDropdown;
