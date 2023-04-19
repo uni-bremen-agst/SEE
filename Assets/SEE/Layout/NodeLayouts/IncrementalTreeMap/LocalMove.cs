@@ -163,7 +163,79 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         override 
         public void apply()
         {
-
+            var segmentsNode1 = node1.getAllSegments();
+            var segmentsNode2 = node2.getAllSegments();
+            if(    segmentsNode1[Direction.Right] == segmentsNode2[Direction.Left]
+                || segmentsNode1[Direction.Left] == segmentsNode2[Direction.Right])
+            {
+                var (leftNode, rightNode) = (segmentsNode1[Direction.Right] == segmentsNode2[Direction.Left]) ? (node1,node2) : (node2, node1);
+                if(leftNode.Rectangle.width >= rightNode.Rectangle.width)
+                {
+                    apply_StretchRightOverVertical(leftNode: leftNode, rightNode: rightNode);
+                }
+                else
+                {
+                    apply_StretchLeftOverVertical(leftNode: leftNode, rightNode: rightNode);
+                }
+            }
+            else if (   segmentsNode1[Direction.Upper] == segmentsNode2[Direction.Lower]
+                     || segmentsNode1[Direction.Lower] == segmentsNode2[Direction.Upper])
+            {
+                var (lowerNode, upperNode) = (segmentsNode1[Direction.Upper] == segmentsNode2[Direction.Lower]) ? (node1,node2) : (node2, node1);
+                if(lowerNode.Rectangle.depth >= upperNode.Rectangle.depth)
+                {
+                    apply_StretchUpperOverHorizontal(lowerNode: lowerNode, upperNode: upperNode);
+                }
+                else
+                {
+                    apply_StretchLowerOverHorizontal(lowerNode: lowerNode, upperNode: upperNode);
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Cant apply flip move");
+            }
         }
+
+        private void apply_StretchLeftOverVertical(TNode leftNode, TNode rightNode){}
+        private void apply_StretchRightOverVertical(TNode leftNode, TNode rightNode){}
+
+        private void apply_StretchLowerOverHorizontal(TNode lowerNode, TNode upperNode){}
+        private void apply_StretchUpperOverHorizontal(TNode lowerNode, TNode upperNode){}
+
+        
     }
 }
+
+/*
+ over vertical:
+    along lower:
+        stretch left:
+               [r]         [r]
+            [l][r]  ->  [llll]
+        stretch right:
+            [l]         [l]
+            [l][r]  ->  [rrrr]
+    along upper:
+        stretch left:
+            [l][r]  ->  [llll]
+               [r]         [r]
+        stretch right:
+            [l][r]  ->  [rrrr] 
+            [l]         [l]
+ over horizontal:
+    along left:
+        stretch lower:
+            [uuuu]  ->  [l][u]
+            [l]         [l]
+        stretch upper:
+            [u]     ->  [u] 
+            [llll]      [u][l]
+    along right:
+        stretch lower:
+            [uuuu]  ->  [u][l]
+               [l]         [l]
+        stretch upper:
+               [u]  ->     [u]
+            [llll]      [l][u]
+*/
