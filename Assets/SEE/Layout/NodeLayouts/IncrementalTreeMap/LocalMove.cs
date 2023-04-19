@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
@@ -33,110 +34,121 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             if(segmentsNode1[Direction.Right] == segmentsNode2[Direction.Left])
             {
                 // [Node1][Node2]
-                if(clockwise)
-                {
-                    clockwise_onVerticalSegment(leftNode: node1, rightNode: node2);
-                }
-                else
-                {
-                    anticlockwise_onVerticalSegment(leftNode: node1, rightNode: node2);
-                }
+                apply_flipOnVerticalSegment(leftNode: node1, rightNode: node2);
             }
             else if(segmentsNode1[Direction.Left] == segmentsNode2[Direction.Right])
             {
                 // [Node2][Node1]
-                if(clockwise)
-                {
-                    clockwise_onVerticalSegment(leftNode: node2, rightNode: node1);
-                }
-                else
-                {
-                    anticlockwise_onVerticalSegment(leftNode: node2, rightNode: node1);
-                }
+                apply_flipOnVerticalSegment(leftNode: node2, rightNode: node1);
             }
             else if(segmentsNode1[Direction.Upper] == segmentsNode2[Direction.Lower])
             {
                 // [Node2]
                 // [Node1]
-                if(clockwise)
-                {
-                    clockwise_onHorizontalSegment(lowerNode: node1, upperNode: node2);
-                }
-                else
-                {
-                    anticlockwise_onHorizontalSegment(lowerNode: node1, upperNode: node2);
-                }
+                apply_flipOnHorizontalSegment(lowerNode: node1, upperNode: node2);
             }
             else if(segmentsNode1[Direction.Lower] == segmentsNode2[Direction.Upper])
             {
                 // [Node1]
                 // [Node2]
-                if(clockwise)
-                {
-                    clockwise_onHorizontalSegment(lowerNode: node2, upperNode: node1);
-                }
-                else
-                {
-                    anticlockwise_onHorizontalSegment(lowerNode: node2, upperNode: node1);
-                }
+                apply_flipOnHorizontalSegment(lowerNode: node2, upperNode: node1);
             }
             else
             {
                     throw new ArgumentException("Cant apply flip move");
             }
-
         }
 
-
-        // [l][r] -> [lll]
-        // [l][r]    [rrr]
-        private void clockwise_onVerticalSegment(TNode leftNode, TNode rightNode)
+        private void apply_flipOnVerticalSegment(TNode leftNode, TNode rightNode)
         {
+            // clockwise            anticlockwise
+            // [l][r] -> [lll]      [l][r] -> [rrr]
+            // [l][r]    [rrr]      [l][r]    [lll]
+
             // adjust rectangles
             float width = leftNode.Rectangle.width + rightNode.Rectangle.width;
             float ratio = leftNode.Rectangle.area() / (leftNode.Rectangle.area() + rightNode.Rectangle.area());
             
             leftNode.Rectangle.width = width;
-            rightNode.Rectangle.x = leftNode.Rectangle.x;
             rightNode.Rectangle.width = width;
-
-            rightNode.Rectangle.depth *= (1-ratio);
-            leftNode.Rectangle.z = rightNode.Rectangle.z + rightNode.Rectangle.depth;
+            rightNode.Rectangle.x = leftNode.Rectangle.x;            
+            
             leftNode.Rectangle.depth *= ratio;
+            rightNode.Rectangle.depth *= (1-ratio);
+            if(clockwise)
+            {
+                leftNode.Rectangle.z = rightNode.Rectangle.z + rightNode.Rectangle.depth;
+            }
+            else
+            {
+                rightNode.Rectangle.z = leftNode.Rectangle.z + leftNode.Rectangle.depth;
+            }
 
             // switch segments
             TSegment newRightSegmentForLeftNode = rightNode.getAllSegments()[Direction.Right];
             TSegment newLeftSegmentForRightNode  = leftNode.getAllSegments()[Direction.Left];
             TSegment middle = leftNode.getAllSegments()[Direction.Right];
+            middle.IsVertical = false;
 
             leftNode.registerSegment(newRightSegmentForLeftNode, Direction.Right);
-            leftNode.registerSegment(middle, Direction.Lower);
             rightNode.registerSegment(newLeftSegmentForRightNode, Direction.Left);
-            rightNode.registerSegment(middle, Direction.Upper);
 
-            // TODO middle.IsVertical = false
+            if(clockwise)
+            {
+                leftNode.registerSegment(middle, Direction.Lower);
+                rightNode.registerSegment(middle, Direction.Upper);
+            }
+            else
+            {
+                leftNode.registerSegment(middle, Direction.Upper);
+                rightNode.registerSegment(middle, Direction.Lower);
+            }   
         }
 
-
-        // [l][r] -> [rrr]
-        // [l][r]    [lll]
-        private void anticlockwise_onVerticalSegment(TNode leftNode, TNode rightNode)
+        private void apply_flipOnHorizontalSegment(TNode lowerNode, TNode upperNode)
         {
+            // clockwise                anticlockwise
+            // [uuu]  ->  [l][u]        [uuu]  ->  [u][l]
+            // [lll]      [l][u]        [lll]      [u][l]
 
-        }
+            // adjust rectangles
+            float depth = lowerNode.Rectangle.depth + upperNode.Rectangle.depth;
+            float ratio = lowerNode.Rectangle.area() / (lowerNode.Rectangle.area() + upperNode.Rectangle.area());
+            
+            lowerNode.Rectangle.depth = depth;
+            upperNode.Rectangle.depth = depth;
+            upperNode.Rectangle.z = lowerNode.Rectangle.z;         
+            
+            lowerNode.Rectangle.width *= ratio;
+            lowerNode.Rectangle.width *= (1-ratio);
+            if(clockwise)
+            {
+                upperNode.Rectangle.x = lowerNode.Rectangle.x  + lowerNode.Rectangle.width;
+            }
+            else
+            {
+                lowerNode.Rectangle.x = upperNode.Rectangle.x + upperNode.Rectangle.width;
+            }
 
-        // [uuu]  ->  [l][u]
-        // [lll]      [l][u]
-        private void clockwise_onHorizontalSegment(TNode lowerNode, TNode upperNode)
-        {
+            // switch segments
+            TSegment newUpperSegmentForLowerNode = upperNode.getAllSegments()[Direction.Upper];
+            TSegment newLowerSegmentForUpperNode = lowerNode.getAllSegments()[Direction.Lower];
+            TSegment middle = lowerNode.getAllSegments()[Direction.Upper];
+            middle.IsVertical = true;
 
-        }
+            lowerNode.registerSegment(newUpperSegmentForLowerNode, Direction.Upper);
+            upperNode.registerSegment(newLowerSegmentForUpperNode, Direction.Lower);
 
-        // [uuu]  ->  [u][l]
-        // [lll]      [u][l]
-        private void anticlockwise_onHorizontalSegment(TNode lowerNode, TNode upperNode)
-        {
-
+            if(clockwise)
+            {
+                lowerNode.registerSegment(middle, Direction.Right);
+                upperNode.registerSegment(middle, Direction.Left);
+            }
+            else
+            {
+                lowerNode.registerSegment(middle, Direction.Left);
+                upperNode.registerSegment(middle, Direction.Right);
+            }
         }
     }
 

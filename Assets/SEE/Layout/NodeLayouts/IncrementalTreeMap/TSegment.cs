@@ -19,7 +19,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         private IList<TNode> side2Nodes;
         public IList<TNode> Side2Nodes{get => side2Nodes;}
         private bool isVertical;
-        public bool IsVertical {get => isVertical;}
+        public bool IsVertical {get => isVertical; set {this.isVertical = value;}}
 
     }
 }

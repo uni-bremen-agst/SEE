@@ -221,13 +221,12 @@ namespace SEE.Layout.NodeLayouts
                     TSegment newSegment = new TSegment(segment.IsConst, segment.IsVertical);
                     foreach(var oldTNode in segment.Side1Nodes)
                     {
-                        // TODO optimize with hash set 
-                        TNode newNode = ((List<TNode>) newTNodes).Find(x => x.RepresentLayoutNode.ID.Equals(oldTNode.RepresentLayoutNode.ID));
+                        TNode newNode =  tNodes[oldTNode.RepresentLayoutNode.ID];
                         newNode.registerSegment(newSegment, newSegment.IsVertical ? Direction.Lower : Direction.Left);
                     }
                     foreach(var oldTNode in segment.Side2Nodes)
                     {
-                        TNode newNode = ((List<TNode>) newTNodes).Find(x => x.RepresentLayoutNode.ID.Equals(oldTNode.RepresentLayoutNode.ID));
+                        TNode newNode =  tNodes[oldTNode.RepresentLayoutNode.ID];
                         newNode.registerSegment(newSegment, newSegment.IsVertical ? Direction.Upper : Direction.Right);
                     }
                 }
