@@ -196,6 +196,7 @@ namespace SEE.Game.UI.FilePicker
             UpdateDropdown();
             OnChangedDropdown?.Invoke();
             UpdateInput();
+            OnChangedPath?.Invoke();
         }
 
         /// <summary>
@@ -219,7 +220,7 @@ namespace SEE.Game.UI.FilePicker
                 : DataPathInstance.RelativePath;
         }
 
-        public void ChangePath(string newValue, bool isAbsolute)
+        public void SyncPath(string newValue, bool isAbsolute)
         {
             if (isAbsolute)
                 DataPathInstance.AbsolutePath = newValue;
@@ -228,11 +229,11 @@ namespace SEE.Game.UI.FilePicker
             UpdateInput();
         }
 
-        public void ChangeDropdown(int newValue)
+        public void SyncDropdown(int newValue)
         {
             var selectedItem = Dropdown.dropdownItems[newValue].itemName;
             Enum.TryParse(selectedItem, out DataPathInstance.Root);
-            UpdateInput();
+            UpdateDropdown();
         }
 
         public void CloseDropdown()

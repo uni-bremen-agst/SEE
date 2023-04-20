@@ -391,13 +391,13 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     OnSyncPath += (widgetPath, newValue, isAbsolute) =>
                     {
                         if (widgetPath == getWidgetName())
-                            filePicker.ChangePath(newValue, isAbsolute);
+                            filePicker.SyncPath(newValue, isAbsolute);
                     };
 
                     OnSyncField += (widgetPath, newValue) =>
                     {
                         if (widgetPath == getWidgetName())
-                            filePicker.ChangeDropdown((int)newValue);
+                            filePicker.SyncDropdown((int)newValue);
                     };
 
                     break;
