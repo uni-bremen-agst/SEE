@@ -397,8 +397,8 @@ MonoBehaviour:
   PlayerObject: {fileID: 831127263}
   DefaultMusicVolume: 0.4
   DefaultSoundEffectVolume: 1
-  MusicVolume: 0
-  SoundEffectVolume: 0
+  MusicVolume: 0.4
+  SoundEffectVolume: 1
 --- !u!1 &1909299425
 GameObject:
   m_ObjectHideFlags: 0
