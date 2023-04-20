@@ -11424,7 +11424,7 @@ MonoBehaviour:
       absolutePath: 
   EdgeLayoutSettings:
     Kind: 3
-    AnimationKind: 1
+    AnimationKind: 2
     EdgeWidth: 0.01
     EdgesAboveBlocks: 1
     Tension: 0.85

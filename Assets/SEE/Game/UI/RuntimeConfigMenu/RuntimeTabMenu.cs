@@ -365,6 +365,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     filePicker.OnMenuInitialized +=
                         () => AddLayoutElement(parent.transform.Find(settingName).gameObject);
 
+                    Func<string> getWidgetName = () => filePicker.gameObject.FullName() + "/" + settingName;
+
                     OnShowMenuChanged += () => { if (!ShowMenu) filePicker.CloseDropdown();};
 
                     filePicker.OnChangedDropdown += () =>
@@ -372,7 +374,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                         UpdateIntCityFieldNetAction netAction = new();
                         netAction.Value = (int)dataPath.Root;
                         netAction.CityIndex = CityIndex;
-                        netAction.WidgetPath = filePicker.gameObject.FullName() + "/" + settingName;
+                        netAction.WidgetPath = getWidgetName();
                         netAction.Execute();
                     };
 
@@ -382,20 +384,20 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                         netAction.IsAbsolute = dataPath.Root == DataPath.RootKind.Absolute;
                         netAction.Value = netAction.IsAbsolute ? dataPath.AbsolutePath : dataPath.RelativePath;
                         netAction.CityIndex = CityIndex;
-                        netAction.WidgetPath = filePicker.gameObject.FullName() + "/" + settingName;
+                        netAction.WidgetPath = getWidgetName();
                         netAction.Execute();
                     };
 
                     OnSyncPath += (widgetPath, newValue, isAbsolute) =>
                     {
-                        if (widgetPath == filePicker.gameObject.FullName() + "/" + settingName)
-                            filePicker.ChangePath(newValue, isAbsolute);
+                        if (widgetPath == getWidgetName())
+                            filePicker.SyncPath(newValue, isAbsolute);
                     };
 
                     OnSyncField += (widgetPath, newValue) =>
                     {
-                        if (widgetPath == filePicker.gameObject.FullName() + "/" + settingName)
-                            filePicker.ChangeDropdown((int)newValue);
+                        if (widgetPath == getWidgetName())
+                            filePicker.SyncDropdown((int)newValue);
                     };
 
                     break;
@@ -570,8 +572,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         }
 
         private void CreateSlider(string settingName, RangeAttribute range, UnityAction<float> setter,
-            Func<float> getter,
-            bool useRoundValue, GameObject parent, bool recursive = false)
+            Func<float> getter, bool useRoundValue, GameObject parent, 
+            bool recursive = false, Func<string> getWidgetName = null)
         {
             range ??= new RangeAttribute(0, 2);
 
@@ -583,6 +585,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             Slider slider = sliderGameObject.GetComponentInChildren<Slider>();
             TextMeshProUGUI text = sliderGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
             text.text = settingName;
+            
+            getWidgetName ??= () => sliderGameObject.FullName();
 
             sliderManager.usePercent = false;
             sliderManager.useRoundValue = useRoundValue;
@@ -598,7 +602,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             {
                 UpdateFloatCityFieldNetAction action = new();
                 action.CityIndex = CityIndex;
-                action.WidgetPath = sliderGameObject.FullName();
+                action.WidgetPath = getWidgetName();
                 action.Value = slider.value;
                 action.Execute();
             };
@@ -606,7 +610,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             OnSyncField += (widgetPath, value) =>
             {
-                if (sliderGameObject != null && widgetPath == sliderGameObject.FullName())
+                if (sliderGameObject != null && widgetPath == getWidgetName())
                 {
                     setter((float)value);
                     slider.value = (float)value;
@@ -631,12 +635,12 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     OnUpdateMenuValues?.Invoke();
                 };
                 smallEditorButton.CreateWidget = smallEditor =>
-                    CreateSlider(settingName, range, setter, getter, useRoundValue, smallEditor, true);
+                    CreateSlider(settingName, range, setter, getter, useRoundValue, smallEditor, true, getWidgetName);
             }
         }
 
         private void CreateSwitch(string settingName, UnityAction<bool> setter, Func<bool> getter, GameObject parent,
-            bool recursive = false)
+            bool recursive = false, Func<string> getWidgetName = null)
         {
             GameObject switchGameObject =
                 PrefabInstantiator.InstantiatePrefab(SWITCH_PREFAB, parent.transform, false);
@@ -645,6 +649,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             SwitchManager switchManager = switchGameObject.GetComponentInChildren<SwitchManager>();
             TextMeshProUGUI text = switchGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
             text.text = settingName;
+            
+            getWidgetName ??= () => switchGameObject.FullName();
 
             switchManager.isOn = getter();
             switchManager.UpdateUI();
@@ -653,7 +659,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             {
                 UpdateBoolCityFieldNetAction action = new();
                 action.CityIndex = CityIndex;
-                action.WidgetPath = switchGameObject.FullName();
+                action.WidgetPath = getWidgetName();
                 action.Value = true;
                 action.Execute();
             });
@@ -663,7 +669,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             {
                 UpdateBoolCityFieldNetAction action = new();
                 action.CityIndex = CityIndex;
-                action.WidgetPath = switchGameObject.FullName();
+                action.WidgetPath = getWidgetName();
                 action.Value = false;
                 action.Execute();
             });
@@ -671,7 +677,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             OnSyncField += (widgetPath, value) =>
             {
-                if (switchGameObject != null && widgetPath == switchGameObject.FullName())
+                if (switchGameObject != null && widgetPath == getWidgetName())
                 {
                     setter((bool)value);
                     switchManager.isOn = (bool)value;
@@ -695,12 +701,12 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     OnUpdateMenuValues?.Invoke();
                 };
                 smallEditorButton.CreateWidget = smallEditor =>
-                    CreateSwitch(settingName, setter, getter, smallEditor, true);
+                    CreateSwitch(settingName, setter, getter, smallEditor, true, getWidgetName);
             }
         }
 
         private void CreateStringField(string settingName, UnityAction<string> setter, Func<string> getter,
-            GameObject parent, bool recursive = false)
+            GameObject parent, bool recursive = false, Func<string> getWidgetName = null)
         {
             GameObject stringGameObject =
                 PrefabInstantiator.InstantiatePrefab(STRINGFIELD_PREFAB, parent.transform, false);
@@ -708,6 +714,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             AddLayoutElement(stringGameObject);
             TextMeshProUGUI text = stringGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
             text.text = settingName;
+            
+            getWidgetName ??= () => stringGameObject.FullName();
 
             TMP_InputField inputField = stringGameObject.GetComponentInChildren<TMP_InputField>();
             inputField.text = getter();
@@ -718,7 +726,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             {
                 UpdateStringCityFieldNetAction action = new();
                 action.CityIndex = CityIndex;
-                action.WidgetPath = stringGameObject.FullName();
+                action.WidgetPath = getWidgetName();
                 action.Value = changedValue;
                 action.Execute();
             });
@@ -728,7 +736,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             OnSyncField += (widgetPath, value) =>
             {
-                if (stringGameObject != null && widgetPath == stringGameObject.FullName())
+                if (stringGameObject != null && widgetPath == getWidgetName())
                 {
                     setter(value as string);
                     inputField.text = value as string;
@@ -746,13 +754,13 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     OnUpdateMenuValues?.Invoke();
                 };
                 smallEditorButton.CreateWidget = smallEditor =>
-                    CreateStringField(settingName, setter, getter, smallEditor, true);
+                    CreateStringField(settingName, setter, getter, smallEditor, true, getWidgetName);
             }
         }
 
         // TODO: Add action
         private void CreateDropDown(string settingName, UnityAction<int> setter, IEnumerable<string> values,
-            Func<string> getter, GameObject parent, bool recursive = false)
+            Func<string> getter, GameObject parent, bool recursive = false, Func<string> getWidgetName = null)
         {
             string[] valueArray = values as string[] ?? values.ToArray();
 
@@ -763,6 +771,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             TextMeshProUGUI text = dropDownGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
             text.text = settingName;
             // TODO: value and setter
+            
+            getWidgetName ??= () => dropDownGameObject.FullName();
 
             CustomDropdown dropdown = dropDownGameObject.transform.Find("Dropdown").GetComponent<CustomDropdown>();
 
@@ -778,7 +788,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             {
                 UpdateIntCityFieldNetAction action = new();
                 action.CityIndex = CityIndex;
-                action.WidgetPath = dropDownGameObject.FullName();
+                action.WidgetPath = getWidgetName();
                 action.Value = changedValue;
                 action.Execute();
             });
@@ -786,7 +796,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             OnSyncField += (widgetPath, value) =>
             {
-                if (dropDownGameObject != null && widgetPath == dropDownGameObject.FullName())
+                if (dropDownGameObject != null && widgetPath == getWidgetName())
                 {
                     setter((int)value);
                     dropdown.ChangeDropdownInfo((int)value);
@@ -806,13 +816,13 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     OnUpdateMenuValues?.Invoke();
                 };
                 smallEditorButton.CreateWidget = smallEditor =>
-                    CreateDropDown(settingName, setter, valueArray, getter, smallEditor, true);
+                    CreateDropDown(settingName, setter, valueArray, getter, smallEditor, true, getWidgetName);
             }
         }
 
         // TODO: Add action
         private void CreateColorPicker(string settingName, GameObject parent, UnityAction<Color> setter,
-            Func<Color> getter, bool recursive = false)
+            Func<Color> getter, bool recursive = false, Func<string> getWidgetName = null)
         {
             parent = CreateNestedSetting(settingName, parent);
             GameObject colorPickerGameObject =
@@ -824,6 +834,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             colorPicker.CurrentColor = getter();
             colorPicker.onValueChanged.AddListener(setter);
             // colorPicker.onValueChanged.AddListener(_ => CheckImmediateRedraw());
+            
+            getWidgetName ??= () => colorPickerGameObject.FullName();
 
             // Add netAction to boxSlider element ossf colorPicker
             BoxSlider boxSlider = colorPickerGameObject.GetComponentInChildren<BoxSlider>();
@@ -833,7 +845,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 CheckImmediateRedraw();
                 UpdateColorCityFieldNetAction action = new();
                 action.CityIndex = CityIndex;
-                action.WidgetPath = colorPickerGameObject.FullName();
+                action.WidgetPath = getWidgetName();
                 action.Value = getter();
                 action.Execute();
             };
@@ -846,7 +858,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 CheckImmediateRedraw();
                 UpdateColorCityFieldNetAction action = new();
                 action.CityIndex = CityIndex;
-                action.WidgetPath = colorPickerGameObject.FullName();
+                action.WidgetPath = getWidgetName();
                 action.Value = getter();
                 action.Execute();
             };
@@ -860,7 +872,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 CheckImmediateRedraw();
                 UpdateColorCityFieldNetAction action = new();
                 action.CityIndex = CityIndex;
-                action.WidgetPath = colorPickerGameObject.FullName();
+                action.WidgetPath = getWidgetName();
                 action.Value = getter();
                 action.Execute();
             });
@@ -876,7 +888,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             OnSyncField += (widgetPath, value) =>
             {
-                if (colorPickerGameObject != null && widgetPath == colorPickerGameObject.FullName())
+                if (colorPickerGameObject != null && widgetPath == getWidgetName())
                 {
                     setter((Color)value);
                     colorPicker.CurrentColor = getter();
@@ -895,7 +907,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     OnUpdateMenuValues?.Invoke();
                 };
                 smallEditorButton.CreateWidget = smallEditor =>
-                    CreateColorPicker(settingName, smallEditor, setter, getter, true);
+                    CreateColorPicker(settingName, smallEditor, setter, getter, true, getWidgetName);
             }
         }
 
