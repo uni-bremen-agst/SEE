@@ -42,6 +42,15 @@ namespace SEE.XR
                       + ".\n");
         }
 
+        public  static void DisableXR()
+        {
+            Debug.Log("Stopping XR...");
+            XRGeneralSettings.Instance.Manager.StopSubsystems();
+            XRGeneralSettings.Instance.Manager.DeinitializeLoader();
+            Debug.Log("XR stopped completely.");
+        }
+        
+        
         /// <summary>
         /// Initializes XR. Upon the completion of this initialization all registered
         /// XR plug-ins are started (as set in the project settings).
@@ -83,6 +92,7 @@ namespace SEE.XR
         /// </summary>
         private void OnDestroy()
         {
+            DisableXR();
             if (XRGeneralSettings.Instance.Manager.isInitializationComplete)
             {
                 StopXR();
