@@ -47,7 +47,11 @@ parameter
 paramref: PARAMREF;
 //param: Comment* PARAM;
 summary: '/// <summary>' comments '/// </summary>';
-return: '/// <returns>' (comments | TEXT| classLink) ('/// </returns>' | '</returns>');
+
+returnContent
+    : (comment | TEXT | classLink)*;
+
+return: '/// <returns>' returnContent ('/// </returns>' | '</returns>');
 
 comment
     : Comment ((classLink) | parameter | (TEXT))*  ;
@@ -55,6 +59,8 @@ comment
 comments: 
         ( return
         | comment
+        | parameter
+        | return
         //| classLink
         | paramref TEXT*
         //| param
