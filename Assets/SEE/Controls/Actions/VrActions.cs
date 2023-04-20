@@ -1,12 +1,20 @@
-﻿using Autohand;
+﻿using System;
+using Autohand;
+using SEE.Audio;
 using SEE.DataModel.DG;
-using SEE.Game;
 using SEE.GO;
 using UnityEngine;
+using SEE.Game;
+using SEE.Game.City;
+using SEE.Game.Operator;
+using SEE.Game.UI.Notification;
+using SEE.Net.Actions;
+using SEE.Tools.ReflexionAnalysis;
 
+// FIXME: vrActions needs a better name and location
 namespace SEE.Controls.Actions
 {
-    public class VRGrabber : MonoBehaviour
+    public class VrActions : MonoBehaviour
     {
         /// <summary>
         /// Left back vector of Portal
@@ -125,8 +133,7 @@ namespace SEE.Controls.Actions
 
                 // Set portal to old values when released
                 // FIXME: Should remain visible outside the portal when released, or only be able to be moved within the portal.
-                Portal.SetInfinitePortal(gameObject);
-                //Portal.SetPortal(gameObject, leftFront, rightBack);
+                Portal.SetPortal(gameObject, leftFront, rightBack);
 
                 // Set layer back to normal (Grabbable layer).
                 GameObjectExtensions.SetAllChildLayer(grabbable.gameObject.transform, GrabbableLayer, true);

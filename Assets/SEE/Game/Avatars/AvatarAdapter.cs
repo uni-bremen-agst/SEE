@@ -288,7 +288,7 @@ namespace SEE.Game.Avatars
             /// </summary>
             void PrepareScene()
             {
-                const string GroundName = "Floor";
+                const string GroundName = "Ground";
 
                 GameObject ground = GameObject.Find(GroundName);
                 if (ground == null)

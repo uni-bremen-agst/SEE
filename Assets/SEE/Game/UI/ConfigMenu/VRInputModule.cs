@@ -45,7 +45,6 @@ namespace SEE.Game.UI.ConfigMenu
         {
             throw new NotImplementedException();
         }
-        public Camera PointerCamera { get; set; }
 #else
         private readonly SteamVR_Input_Sources inputSource = SteamVR_Input_Sources.LeftHand;
         private readonly SteamVR_Action_Boolean clickAction = SteamVR_Actions._default.InteractUI;
