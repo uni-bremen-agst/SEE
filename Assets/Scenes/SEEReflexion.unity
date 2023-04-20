@@ -17774,10 +17774,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerSpawns:
-  - PlayerPrefab: {fileID: 918972835602171096, guid: 77ed4d7ddcaff094fbcf590d5f339f0b,
-      type: 3}
-    Position: {x: -28.9, y: 0.017, z: 9.4}
-    Rotation: 0
   - PlayerPrefab: {fileID: 5742082173775082023, guid: d3731029eb4ac1641a0db38185e57382,
       type: 3}
     Position: {x: -31.3, y: 0.017, z: 9.19}
@@ -17798,6 +17794,10 @@ MonoBehaviour:
       type: 3}
     Position: {x: -31.3, y: 0.017, z: 7.931}
     Rotation: 90
+  - PlayerPrefab: {fileID: 918972835602171096, guid: 77ed4d7ddcaff094fbcf590d5f339f0b,
+      type: 3}
+    Position: {x: -28.9, y: 0.017, z: 9.4}
+    Rotation: 0
 --- !u!4 &1706360000
 Transform:
   m_ObjectHideFlags: 0
