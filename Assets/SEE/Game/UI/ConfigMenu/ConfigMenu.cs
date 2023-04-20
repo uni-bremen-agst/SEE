@@ -208,9 +208,9 @@ namespace SEE.Game.UI.ConfigMenu
                 GameObject vrEventSystem = GameObject.FindWithTag("VREventSystem");
                 vrEventSystem.GetComponent<StandaloneInputModule>().enabled = false;
                 VRInputModule vrInputModule = vrEventSystem.AddComponent<VRInputModule>();
-#if false // FIXME
+                // Assign the pointer camera to the VRInputModule's PointerCamera property.
                 vrInputModule.PointerCamera = pointerCamera;
-#endif
+                
                 pointer.GetComponent<Pointer>().InputModule = vrInputModule;
 
                 // Set the canvas to world space and adjust its positition.
