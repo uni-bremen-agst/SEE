@@ -197,7 +197,7 @@ namespace SEE.Game.UI.Window.CodeWindow
             {
                 throw new UnsupportedTypeException(typeof(CodeWindowValues), valueObject.GetType());
             }
-            
+
             if (codeValues.Path != null)
             {
                 EnterFromFile(codeValues.Path);
@@ -232,9 +232,13 @@ namespace SEE.Game.UI.Window.CodeWindow
         public override WindowValues ToValueObject()
         {
             string attachedTo = gameObject.name;
-            return SYNC_FULL_TEXT
-                ? new CodeWindowValues(Title, VisibleLine, attachedTo, Text)
-                : new CodeWindowValues(Title, VisibleLine, attachedTo, path: FilePath);
+            return FilePath == null ? new CodeWindowValues(Title, VisibleLine, attachedTo, Text)
+                                    : new CodeWindowValues(Title, VisibleLine, attachedTo, path: FilePath);
+
+            // TODO: Why was SYNC_FULL_TEXT always false so that Text is never used?
+            //return SYNC_FULL_TEXT
+            //    ? new CodeWindowValues(Title, VisibleLine, attachedTo, Text)
+            //    : new CodeWindowValues(Title, VisibleLine, attachedTo, path: FilePath);
         }
 
         /// <summary>
@@ -265,7 +269,7 @@ namespace SEE.Game.UI.Window.CodeWindow
 
             /// <summary>
             /// Creates a new CodeWindowValues object from the given parameters.
-            /// Note that either text or Path must not be <c>null</c>.
+            /// Note that either <paramref name="text"/> or <paramref name="title"/> must not be <c>null</c>.
             /// </summary>
             /// <param name="title">The title of the code window.</param>
             /// <param name="visibleLine">The line currently at the top of the code window which is fully visible.</param>
