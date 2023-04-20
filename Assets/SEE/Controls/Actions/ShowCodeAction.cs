@@ -88,6 +88,7 @@ namespace SEE.Controls.Actions
                     return false;
                 }
 
+                Debug.Log($"[ShowCodeAction] {GetName(graphElement)}.\n");
                 CodeWindow codeWindow = graphElement is Edge edge && edge.Type == "Clone" ?
                                         ShowUnifiedDiff(edge, graphElementRef)
                                       : ShowCode(graphElement, graphElementRef);
@@ -217,43 +218,95 @@ namespace SEE.Controls.Actions
             }
         }
 
-        private static string[] Diff(string sourcePath, int sourceStartLine, int sourceEndLine, string targetPath, int targetStartLine, int targetEndLine)
+        private static string[] Diff(string sourcePath, int sourceStartLine, int sourceEndLine,
+                                     string targetPath, int targetStartLine, int targetEndLine)
         {
-            diff_match_patch diff = new diff_match_patch();
-            List<Diff> result = diff.diff_main("jumps over the lazy", "jumped over a lazy");
-            return new string[] { Diff2RichText(result) };
+            diff_match_patch diff = new();
+            string sourceLines = Read2(sourcePath, sourceStartLine, sourceEndLine);
+            string targetLines = Read2(targetPath, targetStartLine, targetEndLine);
+            List<Diff> result = diff.diff_main(sourceLines, targetLines);
+            return Diff2RichText(result);
+        }
+
+        private static string Read(string fileName, int fromLine, int toLine)
+        {
+            UnityEngine.Assertions.Assert.IsTrue(fromLine > 0 && fromLine <= toLine);
+
+            StringBuilder result = new();
+            int lineNo = 0;
+            foreach (string line in File.ReadAllLines(fileName))
+            {
+                lineNo++;
+                if (lineNo > toLine)
+                {
+                    break;
+                }
+                else if (fromLine <= lineNo)
+                {
+                    result.AppendLine(line);
+                }
+            }
+            return result.ToString();
+        }
+
+        private static string Read2(string fileName, int fromLine, int toLine)
+        {
+            UnityEngine.Assertions.Assert.IsTrue(fromLine > 0 && fromLine <= toLine);
+
+            StringBuilder result = new();
+            int lineNo = 0;
+
+            using (FileStream fileStream = new(path: fileName, mode: FileMode.Open, access: FileAccess.Read,
+                                               share: FileShare.Read, bufferSize: 4096, options: FileOptions.SequentialScan))
+            using (StreamReader streamReader = new(fileStream, Encoding.UTF8, true))
+            {
+                String line;
+                while ((line = streamReader.ReadLine()) != null)
+                {
+                    lineNo++;
+                    if (lineNo > toLine)
+                    {
+                        break;
+                    }
+                    else if (fromLine <= lineNo)
+                    {
+                        result.AppendLine(line);
+                    }
+                }
+            }
+            return result.ToString();
         }
 
         /// <summary>
         /// Converts given list of <paramref name="diffs"/> into a Rich Text markup
         /// for TextMesh Pro highlighting the inserts and deletions.
+        /// The result is split into lines (using the typical newline separators
+        /// used on Linux, MacOS, or Windows).
         /// </summary>
         /// <param name="diffs">List of Diff objects</param>
         /// <returns>representation of diff in Rich Text markup</returns>
-        private static string Diff2RichText(IList<Diff> diffs)
+        private static string[] Diff2RichText(IList<Diff> diffs)
         {
-            StringBuilder result = new StringBuilder();
+            StringBuilder result = new();
             foreach (Diff aDiff in diffs)
             {
-                string text = aDiff.text;
-                  // .Replace("&", "&amp;").Replace("<", "&lt;")
-                  // .Replace(">", "&gt;").Replace("\n", "&para;<br>");
                 switch (aDiff.operation)
                 {
                     case Operation.INSERT:
                         // red and stroke through
-                        result.Append("<color=\"red\"><s>").Append(text).Append("</s></color>");
+                        result.Append("<color=\"red\"><s>").Append(aDiff.text).Append("</s></color>");
                         break;
                     case Operation.DELETE:
                         // green and underlined
-                        result.Append("<color=\"green\"><u>").Append(text).Append("</u></color>");
+                        result.Append("<color=\"green\"><u>").Append(aDiff.text).Append("</u></color>");
                         break;
                     case Operation.EQUAL:
-                        result.Append(text);
+                        result.Append(aDiff.text);
                         break;
                 }
             }
-            return result.ToString();
+            return result.ToString().Split(new string[] { "\r\n", "\r", "\n" },
+                                           StringSplitOptions.None);
         }
     }
 }
