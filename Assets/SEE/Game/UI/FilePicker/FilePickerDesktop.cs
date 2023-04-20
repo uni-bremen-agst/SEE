@@ -164,7 +164,6 @@ namespace SEE.Game.UI.FilePicker
             base.OnStartFinished();
             UpdateDropdown();
             UpdateInput();
-            
         }
 
         /// <summary>
@@ -234,6 +233,7 @@ namespace SEE.Game.UI.FilePicker
             var selectedItem = Dropdown.dropdownItems[newValue].itemName;
             Enum.TryParse(selectedItem, out DataPathInstance.Root);
             UpdateDropdown();
+            UpdateInput();
         }
 
         public void CloseDropdown()
