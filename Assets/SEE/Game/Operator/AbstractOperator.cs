@@ -58,6 +58,11 @@ namespace SEE.Game.Operator
             /// May be <c>null</c> if no animation is running.
             /// </summary>
             protected T Animator { get; set; }
+            
+            /// <summary>
+            /// The equality comparer used to check whether the target value has changed.
+            /// </summary>
+            protected IEqualityComparer<V> EqualityComparer { get; }
 
             /// <summary>
             /// The target value that we're animating towards.
@@ -69,10 +74,16 @@ namespace SEE.Game.Operator
             /// </summary>
             /// <param name="animateToAction">The function that starts the animation.</param>
             /// <param name="targetValue">The initial target value (i.e., the current value).</param>
-            protected Operation(Func<V, float, T> animateToAction, V targetValue)
+            /// <param name="equalityComparer">
+            /// The equality comparer used to check whether the target value has changed.
+            /// If <c>null</c>, the default equality comparer for <typeparamref name="V"/> is used.
+            /// </param>
+            protected Operation(Func<V, float, T> animateToAction, V targetValue, 
+                                IEqualityComparer<V> equalityComparer = null)
             {
                 AnimateToAction = animateToAction;
                 TargetValue = targetValue;
+                EqualityComparer = equalityComparer ?? EqualityComparer<V>.Default;
             }
 
             /// <summary>
@@ -111,7 +122,7 @@ namespace SEE.Game.Operator
                     throw new ArgumentOutOfRangeException(nameof(duration), "Duration must be greater than zero!");
                 }
 
-                if (EqualityComparer<V>.Default.Equals(target, TargetValue) && duration > 0)
+                if (EqualityComparer.Equals(target, TargetValue) && duration > 0)
                 {
                     // Nothing to be done, we're already where we want to be.
                     // If duration is 0, however, we must trigger the change immediately.
@@ -170,7 +181,9 @@ namespace SEE.Game.Operator
 
             protected override IOperationCallback<Action> AnimatorCallback => new AndCombinedOperationCallback<TweenCallback>(Animator.Select(x => new TweenOperationCallback(x)), x => new TweenCallback(x));
 
-            public TweenOperation(Func<V, float, IList<Tween>> animateToAction, V targetValue) : base(animateToAction, targetValue)
+            public TweenOperation(Func<V, float, IList<Tween>> animateToAction, V targetValue, 
+                                  IEqualityComparer<V> equalityComparer = null) 
+                : base(animateToAction, targetValue, equalityComparer)
             {
             }
         }

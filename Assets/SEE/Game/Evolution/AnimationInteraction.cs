@@ -206,7 +206,7 @@ namespace SEE.Game.Evolution
 
             SetMode(false);
             OnShownGraphHasChanged();
-            evolutionRenderer.Register(OnShownGraphHasChanged);
+            evolutionRenderer.RegisterOnNewGraph(OnShownGraphHasChanged);
         }
 
         /// <summary>

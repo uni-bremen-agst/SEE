@@ -39,6 +39,20 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Sets the portal of <paramref name="to"/> to the portal of <paramref name="from"/>.
+        ///
+        /// Postcondition: The portals of <paramref name="from"/> and <paramref name="to"/>
+        /// are equal and <paramref name="from"/> has its original portal.
+        /// </summary>
+        /// <param name="from">the game object from which to retrieve the portal</param>
+        /// <param name="to">the game object receiving the portal of <paramref name="from"/></param>
+        public static void InheritPortal(GameObject from, GameObject to)
+        {
+            GetPortal(from, out Vector2 leftFront, out Vector2 rightBack);
+            SetPortal(to, leftFront, rightBack);
+        }
+
+        /// <summary>
         /// Returns the portal of <paramref name="gameObject"/> a rectangle in the x/z plane
         /// with <paramref name="leftFront"/> corner and <paramref name="rightBack"/> corner.
         ///
@@ -106,7 +120,7 @@ namespace SEE.Game
             }
             else
             {
-                Debug.LogWarning($"Game object {gameObject.name} has no GO.Plane.\n");
+                Debug.LogWarning($"Game object {gameObject.name} has no {nameof(GO.Plane)}.\n");
                 leftFrontCorner = Vector2.zero;
                 rightBackCorner = Vector2.zero;
             }
@@ -234,7 +248,15 @@ namespace SEE.Game
             }
         }
 
-        private static void SetPortalOfMaterials(GameObject go, Vector2 leftFront, Vector2 rightBack)
+        /// <summary>
+        /// If <paramref name="go"/> has no <see cref="Renderer"/>, nothing happens.
+        /// Otherwise the portal of the shared material of each renderer of <paramref name="go"/>
+        /// is set to the rectangle defined by <paramref name="leftFrontCorner"/> and <paramref name="rightBackCorner"/>.
+        /// </summary>
+        /// <param name="go">the game objects whose renderers should receive the new portal information</param>
+        /// <param name="leftFrontCorner">left front corner of the portal</param>
+        /// <param name="rightBackCorner">right back corner of the portal</param>
+        private static void SetPortalOfMaterials(GameObject go, Vector2 leftFrontCorner, Vector2 rightBackCorner)
         {
             Renderer[] renderers = go.GetComponents<Renderer>();
             if (renderers.Length == 0)
@@ -245,11 +267,18 @@ namespace SEE.Game
             {
                 foreach (Material material in renderer.sharedMaterials)
                 {
-                    SetPortal(material, leftFront, rightBack);
+                    SetPortal(material, leftFrontCorner, rightBackCorner);
                 }
             }
         }
 
+        /// <summary>
+        /// Sets <see cref="PortalMin"/> of <paramref name="material"/> to <paramref name="leftFrontCorner"/>
+        /// and <see cref="PortalMax"/> of <paramref name="material"/> to <paramref name="rightBackCorner"/>.
+        /// </summary>
+        /// <param name="material">the material whose portal is to be set</param>
+        /// <param name="leftFrontCorner">left front corner of the portal</param>
+        /// <param name="rightBackCorner">right back corner of the portal</param>
         private static void SetPortal(Material material, Vector2 leftFrontCorner, Vector2 rightBackCorner)
         {
             material.SetVector(PortalMin, new Vector4(leftFrontCorner.x, leftFrontCorner.y));

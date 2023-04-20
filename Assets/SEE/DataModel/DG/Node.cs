@@ -212,75 +212,6 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns true if <paramref name="other"/> if other meets all of the following
-        /// conditions:
-        ///  (1) is not null
-        ///  (2) has exactly the same C# type
-        ///  (3) has the same type name
-        ///  (4) has exactly the same attributes with exactly the same values
-        ///  (5) has a parent with the same ID as the parent of this node
-        ///  (6) has the same level
-        ///  (7) has the same number of children
-        ///  (8) the set of IDs of the children are the same
-        ///  (9) has the same number of outgoing edges and the set of the edges' IDs are the same
-        /// (10) has the same number of incoming edges and the set of the edges' IDs are the same
-        ///
-        /// Note: This node and the other node may or may not be in the same graph.
-        /// </summary>
-        /// <param name="other">to be compared to</param>
-        /// <returns>true if equal</returns>
-        public override bool Equals(object other)
-        {
-            if (!base.Equals(other))
-            {
-                return false;
-            }
-            else
-            {
-                Node otherNode = other as Node;
-                if (level != otherNode?.level)
-                {
-                    Report(ID + ": The levels are different");
-                    return false;
-                }
-                else if ((Parent == null && otherNode.Parent != null)
-                          || ((Parent != null && otherNode.Parent == null)))
-                {
-                    Report(ID + ": The parents are different (only one of them is null)");
-                    return false;
-                }
-                else if (Parent != null && otherNode.Parent != null
-                          && Parent.ID != otherNode.Parent.ID)
-                {
-                    Report(ID + ": The parents' IDs are different");
-                    return false;
-                }
-                else if (NumberOfChildren() != otherNode.NumberOfChildren()
-                         || !GetIDs(children).SetEquals(GetIDs(otherNode.children)))
-                {
-                    Report(ID + ": The children are different.");
-                    return false;
-                }
-                else if (Outgoings.Count != otherNode.Outgoings.Count
-                         || !GetIDs(Outgoings).SetEquals(GetIDs(otherNode.Outgoings)))
-                {
-                    Report(ID + ": The outgoing edges are different.");
-                    return false;
-                }
-                else if (Incomings.Count != otherNode.Incomings.Count
-                         || !GetIDs(Incomings).SetEquals(GetIDs(otherNode.Incomings)))
-                {
-                    Report(ID + ": The incoming edges are different.");
-                    return false;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-        }
-
-        /// <summary>
         /// Returns the set of IDs of all given <paramref name="graphElements"/>.
         /// </summary>
         /// <typeparam name="T">a GraphElement type</typeparam>
@@ -288,22 +219,12 @@ namespace SEE.DataModel.DG
         /// <returns>IDs of all given <paramref name="graphElements"/></returns>
         private static HashSet<string> GetIDs<T>(IEnumerable<T> graphElements) where T : GraphElement
         {
-            HashSet<string> result = new HashSet<string>();
+            HashSet<string> result = new();
             foreach (T graphElement in graphElements)
             {
                 result.Add(graphElement.ID);
             }
             return result;
-        }
-
-        /// <summary>
-        /// Returns a hash code.
-        /// </summary>
-        /// <returns>hash code</returns>
-        public override int GetHashCode()
-        {
-            // we are using the ID, which is intended to be unique
-            return ID.GetHashCode();
         }
 
         public override string ToString()

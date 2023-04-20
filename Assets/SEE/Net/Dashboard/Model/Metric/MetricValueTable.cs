@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Valve.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Metric
 {
@@ -11,7 +11,7 @@ namespace SEE.Net.Dashboard.Model.Metric
     public class MetricValueTable
     {
         // Note: ColumnInfo isn't included, as it requires a new type which isn't yet necessary for SEE.
-        
+
         /// <summary>
         /// The entity data.
         /// </summary>

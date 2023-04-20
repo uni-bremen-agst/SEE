@@ -1,12 +1,12 @@
-﻿using System;
+﻿using SEE.Utils;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
-using Valve.VR.InteractionSystem;
 
 namespace SEE.Game.UI.Menu
 {
     /// <summary>
-    /// This class represents a platform-independent entry in a <see cref="SimpleMenu"/>,
+    /// This class represents a platform-independent entry in a <see cref="SimpleListMenu"/>,
     /// which performs a designated action when it is chosen there.
     /// </summary>
     public class MenuEntry
@@ -45,7 +45,7 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// The color of this entry when disabled.
         /// </summary>
-        public Color DisabledColor => EntryColor.ColorWithAlpha(0.2f);
+        public Color DisabledColor => EntryColor.WithAlpha(0.2f);
 
         /// <summary>
         /// Instantiates and returns a new MenuEntry.

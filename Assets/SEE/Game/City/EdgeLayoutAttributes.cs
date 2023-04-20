@@ -24,7 +24,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The width of an edge (drawn as line).
         /// </summary>
-        [Range(0.0f, float.MaxValue)]
+        [Range(0.0f, 0.1f)]
         public float EdgeWidth = 0.01f;
 
         /// <summary>
