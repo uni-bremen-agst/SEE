@@ -6,21 +6,39 @@ using System.Text;
 namespace SEE.Utils
 {
     /// <summary>
-    /// 
+    /// Determines differences in two texts.
     /// </summary>
     public static class TextualDiff
     {
-
-        public static string[] Diff(string sourcePath, int sourceStartLine, int sourceEndLine,
-                                    string targetPath, int targetStartLine, int targetEndLine)
+        /// <summary>
+        /// Returns the unified difference of two text regions in two files. A text region
+        /// is defined by the path to a file and a starting and ending line within this
+        /// file. The unified diff contains Rich Text markup that indicates the additions
+        /// and deletions between the two regions. An addition is text that is contained
+        /// in the new region only and a deletion is text that is contained only in the
+        /// old region.
+        ///
+        /// The Rich Text markup of a deletion renders the deleted text in red
+        /// and stroken through. The markup of an additions renders the added text
+        /// in green and underlined.
+        ///
+        /// Each entry in the result is a line of text of the new region.
+        /// </summary>
+        /// <param name="oldPath">path to the file containing the old region</param>
+        /// <param name="oldStartLine">starting line of the old region</param>
+        /// <param name="oldEndLine">ending line of the old region</param>
+        /// <param name="newPath">path to the file containing the new region</param>
+        /// <param name="newStartLine">starting line of the new region</param>
+        /// <param name="newEndLine">ending line of the new region</param>
+        /// <returns>unified diff in Rich Text markup</returns>
+        public static string[] Diff(string oldPath, int oldStartLine, int oldEndLine,
+                                    string newPath, int newStartLine, int newEndLine)
         {
             diff_match_patch diff = new();
-            string sourceLines = FileIO.Read(sourcePath, sourceStartLine, sourceEndLine);
-            string targetLines = FileIO.Read(targetPath, targetStartLine, targetEndLine);
-            return Diff2RichText(diff.diff_main(sourceLines, targetLines));
+            string oldRegion = FileIO.Read(oldPath, oldStartLine, oldEndLine);
+            string newRegion = FileIO.Read(newPath, newStartLine, newEndLine);
+            return Diff2RichText(diff.diff_main(oldRegion, newRegion));
         }
-
-
 
         /// <summary>
         /// Converts given list of <paramref name="diffs"/> into a Rich Text markup
