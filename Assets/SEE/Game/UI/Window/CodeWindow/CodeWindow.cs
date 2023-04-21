@@ -67,11 +67,6 @@ namespace SEE.Game.UI.Window.CodeWindow
         private const string CODE_WINDOW_PREFAB = "Prefabs/UI/CodeWindowContent";
 
         /// <summary>
-        /// Whether the full text of the code window should be transmitted instead of just the filename.
-        /// </summary>
-        private const bool SYNC_FULL_TEXT = false;
-
-        /// <summary>
         /// Visually marks the line at the given <paramref name="lineNumber"/> and scrolls to it.
         /// Will also unmark any other line. Sets <see cref="markedLine"/> to
         /// <paramref name="lineNumber"/>.
@@ -225,20 +220,15 @@ namespace SEE.Game.UI.Window.CodeWindow
 
         /// <summary>
         /// Generates and returns a <see cref="CodeWindowValues"/> struct for this code window.
+        /// If <see cref="FilePath"/> is <c>null</c>, the resulting <see cref="CodeWindowValues"/>
+        /// is created with <see cref="Text"/>; otherwise with <see cref="FilePath"/>.
         /// </summary>
-        /// <param name="fulltext">Whether the whole text should be included. Iff false, the filename will be saved
-        /// instead of the text.</param>
         /// <returns>The newly created <see cref="CodeWindowValues"/>, matching this class</returns>
         public override WindowValues ToValueObject()
         {
             string attachedTo = gameObject.name;
             return FilePath == null ? new CodeWindowValues(Title, VisibleLine, attachedTo, Text)
                                     : new CodeWindowValues(Title, VisibleLine, attachedTo, path: FilePath);
-
-            // TODO: Why was SYNC_FULL_TEXT always false so that Text is never used?
-            //return SYNC_FULL_TEXT
-            //    ? new CodeWindowValues(Title, VisibleLine, attachedTo, Text)
-            //    : new CodeWindowValues(Title, VisibleLine, attachedTo, path: FilePath);
         }
 
         /// <summary>
