@@ -1,34 +1,3 @@
-﻿using System.Diagnostics;
-using UnityEngine.Assertions;
-
-namespace Asset_Cleaner {
-    static class FLAGS {
-        //  cleanup in release
-        public const string DEBUG = "DEBUG1";
-        public const string M_DISABLE_POOLING = "M_DISABLE_POOLING";
-    }
-
-    static class Asr {
-#line hidden
-        [Conditional(FLAGS.DEBUG)]
-        public static void AreEqual(int a, int b) {
-            Assert.AreEqual(a, b);
-        }
-
-        [Conditional(FLAGS.DEBUG)]
-        public static void IsTrue(bool b, string format = null) {
-            Assert.IsTrue(b, format);
-        }
-
-        [Conditional(FLAGS.DEBUG)]
-        public static void IsFalse(bool b, string format = null) {
-            Assert.IsFalse(b, format);
-        }
-
-        [Conditional(FLAGS.DEBUG)]
-        public static void IsNotNull(object target, string format = null) {
-            Assert.IsNotNull(target, format);
-        }
-#line default
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:036239209fe8183f0a842ec459dd71eaca26e54b0f348547ed6209143c9c454a
+size 956

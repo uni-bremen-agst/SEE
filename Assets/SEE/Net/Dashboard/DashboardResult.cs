@@ -1,7 +1,7 @@
 ﻿using System;
 using SEE.Net.Dashboard.Model;
 using UnityEngine;
-using Valve.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard
 {
@@ -16,21 +16,21 @@ namespace SEE.Net.Dashboard
         /// Whether the API call has been successful.
         /// </summary>
         public bool Success { get; private set; }
-        
+
         /// <summary>
         /// This contains the error object which has been returned from the dashboard, if the call was not successful
         /// due to an API error. Will be <see cref="null"/> if <see cref="Success"/> is <c>true</c>
         /// or if <see cref="Exception"/> is not <c>null</c>.
         /// </summary>
         public readonly DashboardError Error;
-        
+
         /// <summary>
         /// This contains the exception which occurred when trying to access the dashboard.
         /// Will be <see cref="null"/> if <see cref="Success"/> is <c>true</c> or if <see cref="Error"/>
         /// is not <c>null</c>.
         /// </summary>
         public readonly Exception Exception;
-        
+
         /// <summary>
         /// Contains the received JSON from the dashboard.
         /// May be <c>null</c> if <see cref="Success"/> is <c>false</c>.

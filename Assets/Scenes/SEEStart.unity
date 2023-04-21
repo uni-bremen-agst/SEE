@@ -279,12 +279,6 @@ MonoBehaviour:
     PlayerPrefab: {fileID: 0}
     NetworkPrefabs:
     - Override: 0
-      Prefab: {fileID: 1540848273603986277, guid: e24fb68f145dafb4b9fe506c2d7ae0a0,
-        type: 3}
-      SourcePrefabToOverride: {fileID: 0}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 0}
-    - Override: 0
       Prefab: {fileID: 5742082173775082023, guid: d3731029eb4ac1641a0db38185e57382,
         type: 3}
       SourcePrefabToOverride: {fileID: 0}
@@ -310,6 +304,12 @@ MonoBehaviour:
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
       Prefab: {fileID: 4749666707957422873, guid: 1c018d74588b5b74eaaf639548ff76fa,
+        type: 3}
+      SourcePrefabToOverride: {fileID: 0}
+      SourceHashToOverride: 0
+      OverridingTargetPrefab: {fileID: 0}
+    - Override: 0
+      Prefab: {fileID: 918972835602171096, guid: 77ed4d7ddcaff094fbcf590d5f339f0b,
         type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
@@ -397,8 +397,8 @@ MonoBehaviour:
   PlayerObject: {fileID: 831127263}
   DefaultMusicVolume: 0.4
   DefaultSoundEffectVolume: 1
-  MusicVolume: 0
-  SoundEffectVolume: 0
+  MusicVolume: 0.4
+  SoundEffectVolume: 1
 --- !u!1 &1909299425
 GameObject:
   m_ObjectHideFlags: 0

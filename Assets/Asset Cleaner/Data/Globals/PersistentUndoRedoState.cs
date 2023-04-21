@@ -1,15 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Asset_Cleaner {
-    [Serializable]
-    class PersistentUndoRedoState {
-        public List<SelectionEntry> History = new List<SelectionEntry>();
-        public int Id;
-
-        public void Deconstruct(out List<SelectionEntry> list, out int id) {
-            id = Id;
-            list = History;
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:5bf84f4978febe0f9b21b581875d68402a6f0f9afd8d693eb36cd6de02ed7254
+size 388

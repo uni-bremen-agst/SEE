@@ -21,8 +21,8 @@ TagManager:
   - FileBrowser
   - Path
   - Erosion
-  - Chart
   - ChartContainer
+  - Chart
   layers:
   - Default
   - TransparentFX

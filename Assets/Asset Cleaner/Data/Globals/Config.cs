@@ -1,23 +1,3 @@
-﻿namespace Asset_Cleaner {
-    class Config {
-        // serialized
-        public bool MarkRed;
-        public string IgnorePathContainsCombined;
-        public bool ShowInfoBox;
-        public bool RebuildCacheOnDemand;
-        public bool UpdateUnusedAssetsOnDemand;
-
-        // todo make type array
-        public bool IgnoreMaterial;
-        public bool IgnoreScriptable;
-        public bool IgnoreSprite;
-
-        // serialized only while window is opened
-        public bool Locked;
-
-        // non-serialized
-        public string[] IgnorePathContains;
-        public string InitializationTime;
-        public bool PendingUpdateUnusedAssets;
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:c2aeac8bcfdff12632a79d45447c2e58d2d19f07e4660d33009478588acc7e6f
+size 681

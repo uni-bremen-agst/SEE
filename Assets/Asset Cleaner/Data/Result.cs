@@ -1,19 +1,3 @@
-﻿using Leopotam.Ecs;
-using UnityEngine;
-using Object = UnityEngine.Object;
-
-namespace Asset_Cleaner {
-    class Result : IEcsAutoReset {
-        public string FilePath;
-        public Object File;
-        public Object MainFile;
-        public GameObject RootGo;
-
-        public void Reset() {
-            FilePath = default;
-            File = default;
-            MainFile = default;
-            RootGo = default;
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:5f30411ad9ca1bcaafd8fc0c466228b4091800dae6f8accb38d1324bc4ffad68
+size 453

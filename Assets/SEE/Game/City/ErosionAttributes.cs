@@ -42,7 +42,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Factor by which erosion icons shall be scaled.
         /// </summary>
-        [Range(0.0f, float.MaxValue)]
+        [Range(0.0f, 5.0f)]
         public float ErosionScalingFactor = 1.5f;
 
         /// <summary>

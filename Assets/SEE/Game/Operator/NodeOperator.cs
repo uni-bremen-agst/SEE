@@ -46,6 +46,12 @@ namespace SEE.Game.Operator
         private TweenOperation<float> LabelAlpha;
 
         /// <summary>
+        /// Operation handling the blinking of the node.
+        /// The parameter specifies the number of blinks.
+        /// </summary>
+        private TweenOperation<int> Blinking;
+
+        /// <summary>
         /// Operation handling the starting position of the label's line.
         /// </summary>
         private TweenOperation<Vector3> LabelStartLinePosition;
@@ -191,6 +197,18 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
+        /// Makes the node blink <paramref name="blinkCount"/> times, taking <paramref name="duration"/> seconds.
+        /// </summary>
+        /// <param name="blinkCount">The number of times the node should blink.</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the blinking is stopped before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> Blink(int blinkCount, float duration)
+        {
+            return Blinking.AnimateTo(blinkCount, duration);
+        }
+
+        /// <summary>
         /// Shows the label with given <paramref name="alpha"/> value if it is greater than zero.
         /// Otherwise, hides the label.
         /// </summary>
@@ -324,17 +342,18 @@ namespace SEE.Game.Operator
         {
             Node = GetNode(gameObject);
             City = GetCity(gameObject);
+            Material material = GetRenderer(gameObject).material;
             Vector3 currentPosition = transform.position;
             Vector3 currentScale = transform.localScale;
 
-            Tween[] AnimateToXAction(float x, float d) => new Tween[] {transform.DOMoveX(x, d).Play()};
-            Tween[] AnimateToYAction(float y, float d) => new Tween[] {transform.DOMoveY(y, d).Play()};
-            Tween[] AnimateToZAction(float z, float d) => new Tween[] {transform.DOMoveZ(z, d).Play()};
+            Tween[] AnimateToXAction(float x, float d) => new Tween[] { transform.DOMoveX(x, d).Play() };
+            Tween[] AnimateToYAction(float y, float d) => new Tween[] { transform.DOMoveY(y, d).Play() };
+            Tween[] AnimateToZAction(float z, float d) => new Tween[] { transform.DOMoveZ(z, d).Play() };
             PositionX = new TweenOperation<float>(AnimateToXAction, currentPosition.x);
             PositionY = new TweenOperation<float>(AnimateToYAction, currentPosition.y);
             PositionZ = new TweenOperation<float>(AnimateToZAction, currentPosition.z);
 
-            Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] {transform.DOScale(s, d).Play()};
+            Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] { transform.DOScale(s, d).Play() };
             Scale = new TweenOperation<Vector3>(AnimateToScaleAction, currentScale);
 
             PrepareLabel();
@@ -343,7 +362,27 @@ namespace SEE.Game.Operator
             LabelStartLinePosition = new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction, DesiredLabelStartLinePosition);
             LabelEndLinePosition = new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction, DesiredLabelEndLinePosition);
 
+            Tween[] BlinkAction(int count, float duration)
+            {
+                Sequence sequence = DOTween.Sequence();
+                sequence.Append(material.DOColor(material.color.Invert(), duration / (2 * count)));
+                sequence.Append(material.DOColor(material.color, duration / (2 * count)));
+                return new Tween[] { sequence.SetLoops(count).Play() };
+            }
+
+            Blinking = new TweenOperation<int>(BlinkAction, 0, equalityComparer: new AlwaysFalseEqualityComparer<int>());
+
             #region Local Methods
+
+            static Renderer GetRenderer(GameObject gameObject)
+            {
+                if (!gameObject.TryGetComponent(out Renderer renderer))
+                {
+                    throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have a Renderer component!");
+                }
+
+                return renderer;
+            }
 
             static Node GetNode(GameObject gameObject)
             {
@@ -361,8 +400,8 @@ namespace SEE.Game.Operator
                 if (codeCityObject == null || !codeCityObject.TryGetComponent(out AbstractSEECity city))
                 {
                     throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()}"
-                        + $" in code city {CodeCityName(codeCityObject)}"
-                        + $" must have an {nameof(AbstractSEECity)} component!");
+                                                        + $" in code city {CodeCityName(codeCityObject)}"
+                                                        + $" must have an {nameof(AbstractSEECity)} component!");
                 }
 
                 return city;

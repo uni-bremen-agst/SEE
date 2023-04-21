@@ -1,32 +1,3 @@
-﻿using System.Collections.Generic;
-using Leopotam.Ecs;
-using UnityEditor;
-using UnityEngine;
-
-namespace Asset_Cleaner {
-    class SearchResultGui : IEcsAutoReset {
-        public SerializedObject SerializedObject;
-        public List<PropertyData> Properties;
-        public GUIContent Label;
-        public string TransformPath;
-
-        public void Reset() {
-            SerializedObject?.Dispose();
-            SerializedObject = default;
-
-            if (Properties != default)
-                foreach (var propertyData in Properties) {
-                    propertyData.Property.Dispose();
-                }
-
-            Properties = default;
-            Label = default;
-            TransformPath = default;
-        }
-
-        public class PropertyData {
-            public SerializedProperty Property;
-            public GUIContent Content;
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:5a26fc19b1afd31057ed74a97ea56aa662006a82e5fb0d49f3b8bf075333d737
+size 897

@@ -1,23 +1,3 @@
-﻿using System;
-
-namespace Asset_Cleaner {
-    public static class CommonUtils {
-        static string[] _suffix = {"B", "KB", "MB", "GB", "TB"};
-
-        public static string BytesToString(long byteCount) {
-            if (byteCount == 0)
-                return $"0 {_suffix[0]}";
-
-            var bytes = Math.Abs(byteCount);
-            var place = Convert.ToInt32(Math.Floor(Math.Log(bytes, 1024)));
-            double num;
-            if (place == 0 || place == 1) { // display B, KB in MB
-                num = Math.Round(bytes / Math.Pow(1024, 2), 4);
-                return $"{Math.Sign(byteCount) * num:N} {_suffix[2]}";
-            }
-
-            num = Math.Round(bytes / Math.Pow(1024, place), 1);
-            return $"{Math.Sign(byteCount) * num:F0} {_suffix[place]}";
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:c2ff292a67689ba0273186dad106bb61018d4aef8a38087a2ad36f455393f4c1
+size 821

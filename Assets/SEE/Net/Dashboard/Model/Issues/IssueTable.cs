@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Valve.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
 {
@@ -44,7 +44,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         public readonly uint totalRowCount;
 
         /// <summary>
-        /// The total number of issues existing in the current version and not in the baseline version. 
+        /// The total number of issues existing in the current version and not in the baseline version.
         /// </summary>
         /// <remarks>
         /// Only useful in diff queries and only calculated when <c>computeTotalRowCount</c> was specified as <c>true</c>.
@@ -53,7 +53,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         public readonly uint totalAddedCount;
 
         /// <summary>
-        /// The total number of issues existing in the baseline version and not in the current version. 
+        /// The total number of issues existing in the baseline version and not in the current version.
         /// </summary>
         /// <remarks>
         /// Only useful in diff queries and only calculated when <c>computeTotalRowCount</c> was specified as <c>true</c>.
@@ -61,7 +61,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         [JsonProperty(Required = Required.Default)]
         public readonly uint totalRemovedCount;
 
-        public IssueTable(AnalysisVersion startVersion, AnalysisVersion endVersion, IList<T> rows, 
+        public IssueTable(AnalysisVersion startVersion, AnalysisVersion endVersion, IList<T> rows,
                           uint totalRowCount, uint totalAddedCount, uint totalRemovedCount)
         {
             this.startVersion = startVersion;

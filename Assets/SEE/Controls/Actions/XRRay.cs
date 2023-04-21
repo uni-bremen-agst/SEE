@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
-using Valve.VR;
-using Valve.VR.InteractionSystem;
+//using Valve.VR;
+//using Valve.VR.InteractionSystem;
 
 namespace SEE.Controls.Actions
 {
+    [System.Obsolete("FIXME: Reactivate with Unity XR")]
     public class XRRay : MonoBehaviour
     {
+#if false //FIXME
         private class DelayedToggle
         {
             [Tooltip("The least amount of seconds the selection and grab buttons must have been pressed to be considered activated."),
@@ -231,5 +233,6 @@ namespace SEE.Controls.Actions
             lineRenderer.SetPosition(0, origin);
             lineRenderer.SetPosition(1, origin);
         }
+#endif
     }
 }

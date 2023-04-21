@@ -2,10 +2,10 @@ using System.Linq;
 using DG.Tweening;
 using SEE.Controls.Actions;
 using SEE.GO;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
-using Valve.VR.InteractionSystem;
 
 namespace SEE.Game.Operator
 {
@@ -96,8 +96,8 @@ namespace SEE.Game.Operator
                 if (nodeLabel.TryGetComponentOrLog(out labelText) && line.TryGetComponentOrLog(out labelLineRenderer))
                 {
                     labelText.alpha = 0f;
-                    labelLineRenderer.startColor = lineColor.ColorWithAlpha(0f);
-                    labelLineRenderer.endColor = lineColor.ColorWithAlpha(0f);
+                    labelLineRenderer.startColor = lineColor.WithAlpha(0f);
+                    labelLineRenderer.endColor = lineColor.WithAlpha(0f);
                 }
             }
         }

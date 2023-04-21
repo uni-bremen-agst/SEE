@@ -1,26 +1,3 @@
-﻿using System.Collections.Generic;
-using Leopotam.Ecs;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-
-namespace Asset_Cleaner {
-    class SearchArg : IEcsAutoReset {
-        public Object Target;
-        public Object Main;
-        public string FilePath;
-        public Option<Object[]> SubAssets;
-        public Scene Scene;
-        public List<string> UnusedAssetsFiltered;
-        public List<string> UnusedScenesFiltered;
-
-        public void Reset() {
-            UnusedAssetsFiltered = default;
-            UnusedScenesFiltered = default;
-            Target = default;
-            Main = default;
-            SubAssets = default;
-            Scene = default;
-            FilePath = default;
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:ddf201dac108b74ef796d1e347b50e88dfea7ab8ca89ada8ea51d2b97f76c9af
+size 750
