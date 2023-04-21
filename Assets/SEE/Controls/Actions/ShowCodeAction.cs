@@ -11,8 +11,6 @@ using SEE.Utils;
 using UnityEngine;
 using SEE.DataModel.DG;
 using System;
-using DiffMatchPatch;
-using System.Text;
 
 namespace SEE.Controls.Actions
 {
@@ -36,6 +34,7 @@ namespace SEE.Controls.Actions
             // Changes to the window space are handled and synced by us separately, so we won't include them here.
             return new HashSet<string>();
         }
+
         public override ActionStateType GetActionStateType() => ActionStateType.ShowCode;
 
         /// <summary>
@@ -88,7 +87,8 @@ namespace SEE.Controls.Actions
                     return false;
                 }
 
-                Debug.Log($"[ShowCodeAction] {GetName(graphElement)}.\n");
+                // Edges of type Clone will be handled differently. For these, we will be
+                // showing a unified diff.
                 CodeWindow codeWindow = graphElement is Edge edge && edge.Type == "Clone" ?
                                         ShowUnifiedDiff(edge, graphElementRef)
                                       : ShowCode(graphElement, graphElementRef);
@@ -116,6 +116,8 @@ namespace SEE.Controls.Actions
 
             return false;
 
+            // Returns a new CodeWindow showing a unified diff for the given Clone edge.
+            // We are assuming that the edge has type Clone.
             static CodeWindow ShowUnifiedDiff(Edge edge, GraphElementRef graphElementRef)
             {
                 (string sourceFilename, string sourceAbsolutePlatformPath) = GetPath(edge.Source);
@@ -125,14 +127,16 @@ namespace SEE.Controls.Actions
                 int targetStartLine = GetAttribute(edge, "Clone.Target.Start.Line");
                 int targetEndLine = GetAttribute(edge, "Clone.Target.End.Line");
 
-                string[] diff = Diff(sourceAbsolutePlatformPath, sourceStartLine, sourceEndLine,
-                                     targetAbsolutePlatformPath, targetStartLine, targetEndLine);
+                string[] diff = TextualDiff.Diff(sourceAbsolutePlatformPath, sourceStartLine, sourceEndLine,
+                                                 targetAbsolutePlatformPath, targetStartLine, targetEndLine);
                 CodeWindow codeWindow = GetOrCreateCodeWindow(edge, graphElementRef, sourceFilename);
                 codeWindow.EnterFromText(diff, true);
                 codeWindow.VisibleLine = 1;
                 return codeWindow;
             }
 
+            // Returns the value of the edge's integer attribute.
+            // If none exists, the user will be notified and an exception will be thrown.
             static int GetAttribute(Edge edge, string attribute)
             {
                 if (edge.TryGetInt(attribute, out int value))
@@ -147,6 +151,8 @@ namespace SEE.Controls.Actions
                 }
             }
 
+            // Returns the filename and the absolute platform-specific path of
+            // given graphElement.
             static (string filename, string absolutePlatformPath) GetPath(GraphElement graphElement)
             {
                 string filename = graphElement.Filename();
@@ -172,6 +178,10 @@ namespace SEE.Controls.Actions
                 return (filename, absolutePlatformPath);
             }
 
+            // If the gameObject associated with graphElementRef has already a CodeWindow
+            // attached to it, that CodeWindow will be returned. Otherwise a new CodeWindow
+            // will be attached to the gameObject associated with graphElementRef and returned.
+            // The title for the newly created CodeWindow will be GetName(graphElement).
             static CodeWindow GetOrCreateCodeWindow(GraphElement graphElement, GraphElementRef graphElementRef, string filename)
             {
                 // Create new window for active selection, or use existing one
@@ -190,6 +200,10 @@ namespace SEE.Controls.Actions
                 return codeWindow;
             }
 
+            // Returns a CodeWindow showing the code range of graphElement 
+            // retrieved from a file. The path of the file is retrieved from
+            // the absolute path as specified by the graphElements source location
+            // attributes.
             static CodeWindow ShowCode(GraphElement graphElement, GraphElementRef graphElementRef)
             {
                 // File name of source code file to read from it
@@ -216,97 +230,6 @@ namespace SEE.Controls.Actions
             {
                 return graphElement.ToShortString();
             }
-        }
-
-        private static string[] Diff(string sourcePath, int sourceStartLine, int sourceEndLine,
-                                     string targetPath, int targetStartLine, int targetEndLine)
-        {
-            diff_match_patch diff = new();
-            string sourceLines = Read2(sourcePath, sourceStartLine, sourceEndLine);
-            string targetLines = Read2(targetPath, targetStartLine, targetEndLine);
-            List<Diff> result = diff.diff_main(sourceLines, targetLines);
-            return Diff2RichText(result);
-        }
-
-        private static string Read(string fileName, int fromLine, int toLine)
-        {
-            UnityEngine.Assertions.Assert.IsTrue(fromLine > 0 && fromLine <= toLine);
-
-            StringBuilder result = new();
-            int lineNo = 0;
-            foreach (string line in File.ReadAllLines(fileName))
-            {
-                lineNo++;
-                if (lineNo > toLine)
-                {
-                    break;
-                }
-                else if (fromLine <= lineNo)
-                {
-                    result.AppendLine(line);
-                }
-            }
-            return result.ToString();
-        }
-
-        private static string Read2(string fileName, int fromLine, int toLine)
-        {
-            UnityEngine.Assertions.Assert.IsTrue(fromLine > 0 && fromLine <= toLine);
-
-            StringBuilder result = new();
-            int lineNo = 0;
-
-            using (FileStream fileStream = new(path: fileName, mode: FileMode.Open, access: FileAccess.Read,
-                                               share: FileShare.Read, bufferSize: 4096, options: FileOptions.SequentialScan))
-            using (StreamReader streamReader = new(fileStream, Encoding.UTF8, true))
-            {
-                String line;
-                while ((line = streamReader.ReadLine()) != null)
-                {
-                    lineNo++;
-                    if (lineNo > toLine)
-                    {
-                        break;
-                    }
-                    else if (fromLine <= lineNo)
-                    {
-                        result.AppendLine(line);
-                    }
-                }
-            }
-            return result.ToString();
-        }
-
-        /// <summary>
-        /// Converts given list of <paramref name="diffs"/> into a Rich Text markup
-        /// for TextMesh Pro highlighting the inserts and deletions.
-        /// The result is split into lines (using the typical newline separators
-        /// used on Linux, MacOS, or Windows).
-        /// </summary>
-        /// <param name="diffs">List of Diff objects</param>
-        /// <returns>representation of diff in Rich Text markup</returns>
-        private static string[] Diff2RichText(IList<Diff> diffs)
-        {
-            StringBuilder result = new();
-            foreach (Diff aDiff in diffs)
-            {
-                switch (aDiff.operation)
-                {
-                    case Operation.INSERT:
-                        // red and stroke through
-                        result.Append("<color=\"red\"><s>").Append(aDiff.text).Append("</s></color>");
-                        break;
-                    case Operation.DELETE:
-                        // green and underlined
-                        result.Append("<color=\"green\"><u>").Append(aDiff.text).Append("</u></color>");
-                        break;
-                    case Operation.EQUAL:
-                        result.Append(aDiff.text);
-                        break;
-                }
-            }
-            return result.ToString().Split(new string[] { "\r\n", "\r", "\n" },
-                                           StringSplitOptions.None);
         }
     }
 }
