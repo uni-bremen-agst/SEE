@@ -349,6 +349,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     );
                     break;
                 case Color:
+                    parent = CreateNestedSetting(settingName, parent);
                     CreateColorPicker(
                         settingName,
                         parent,
@@ -824,7 +825,6 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         private void CreateColorPicker(string settingName, GameObject parent, UnityAction<Color> setter,
             Func<Color> getter, bool recursive = false, Func<string> getWidgetName = null)
         {
-            parent = CreateNestedSetting(settingName, parent);
             GameObject colorPickerGameObject =
                 PrefabInstantiator.InstantiatePrefab(COLORPICKER_PREFAB, parent.transform, false);
             colorPickerGameObject.name = settingName;
