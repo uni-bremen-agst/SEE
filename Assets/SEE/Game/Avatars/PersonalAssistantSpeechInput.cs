@@ -61,10 +61,14 @@ namespace SEE.Game.Avatars
         /// The history of the ChatGPT conversation.
         /// At the start, this only consists of the prompt.
         /// </summary>
-        private readonly IList<Message> chatGptHistory = new List<Message> { new(Role.System, PROMPT) };
+        private readonly IList<Message> chatGptHistory = new List<Message>
+        {
+            new(Role.System, string.Format(PROMPT, DateTime.Now.Year))
+        };
 
         /// <summary>
         /// The prompt to use for ChatGPT.
+        /// Note that the string should be formatted with the current year.
         /// </summary>
         private const string PROMPT = "You are the digital assistant for SEE, which stands for "
             + "Software Engineering Experience. You are also named SEE yourself. "
@@ -82,8 +86,7 @@ namespace SEE.Game.Avatars
             + "Inner nodes of this tree can be visualized as nested circles or rectangles "
             + "depending on the layout you choose. "
             + "Dependencies can be depicted by connecting edges between blocks. \n\n"
-            + "Knowledge Cutoff: 2021. It is now 2023. Today is the Bachelor Project Day at the University of Bremen, "
-            + "where SEE is presented to other students. ";
+            + "Knowledge Cutoff: 2021. Current year: {0}\n\n";
 
         /// <summary>
         /// Sets up the grammar <see cref="input"/> and registers the callback
