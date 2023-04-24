@@ -4,12 +4,10 @@ using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using OpenAI;
 using OpenAI.Chat;
 using SEE.Game.UI.Notification;
-using Sirenix.Utilities;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
 
@@ -27,8 +25,6 @@ namespace SEE.Game.Avatars
         /// </summary>
         [Tooltip("Whether to use ChatGPT to answer all queries.")]
         public bool UseChatGPT = true;
-
-        // TODO: Keyboard shortcut to disable/enable dictation.
 
         /// <summary>
         /// The OpenAI API key to use for ChatGPT.
@@ -56,6 +52,11 @@ namespace SEE.Game.Avatars
         /// The OpenAI client to use for ChatGPT.
         /// </summary>
         private OpenAIClient openAiClient;
+
+        /// <summary>
+        /// Whether the personal assistant is currently listening for speech input.
+        /// </summary>
+        private bool currentlyListening = true;
 
         /// <summary>
         /// The history of the ChatGPT conversation.
@@ -94,6 +95,8 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void Start()
         {
+            // TODO: Rather than this boolean, SEE should react to the "Ok, SEE" keyword and then listen for
+            //       ChatGPT input next.
             if (!UseChatGPT)
             {
                 if (!InitializeGrammarInput())
@@ -246,11 +249,11 @@ namespace SEE.Game.Avatars
             OnDisable();
             input?.Dispose();
         }
-        
+
         /// <summary>
         /// Stops listening to the user.
         /// </summary>
-        private void StopListening() 
+        private void StopListening()
         {
             if (input != null)
             {
@@ -263,6 +266,7 @@ namespace SEE.Game.Avatars
                 {
                     grammarInput.Unregister(OnPhraseRecognized);
                 }
+                currentlyListening = false;
             }
         }
 
@@ -282,6 +286,7 @@ namespace SEE.Game.Avatars
                 {
                     grammarInput.Register(OnPhraseRecognized);
                 }
+                currentlyListening = true;
             }
         }
 
@@ -299,6 +304,23 @@ namespace SEE.Game.Avatars
         private void OnDisable()
         {
             StopListening();
+        }
+
+        private void Update()
+        {
+            if (SEEInput.ToggleVoiceInput() && input != null)
+            {
+                if (currentlyListening)
+                {
+                    ShowNotification.Info("Stopped listening", "Disabled voice input.", 5f);
+                    StopListening();
+                }
+                else
+                {
+                    ShowNotification.Info("Started listening", "Enabled voice input.", 5f);
+                    StartListening();
+                }
+            }
         }
     }
 }

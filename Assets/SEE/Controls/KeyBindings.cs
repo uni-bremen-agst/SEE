@@ -82,6 +82,12 @@ namespace SEE.Controls
         /// Prints help on the key bindings.
         /// </summary>
         internal static readonly KeyCode Help = Register(KeyCode.H, Scope.Always, "Prints help on the key bindings.");
+        
+        /// <summary>
+        /// Toggles voice input (i.e., for voice commands) on/off.
+        /// </summary>
+        internal static readonly KeyCode ToggleVoiceInput = Register(KeyCode.Period, Scope.Always, 
+                                                               "Toggles voice input on/off.");
 
         #endregion
 
