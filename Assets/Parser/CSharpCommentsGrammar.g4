@@ -1,3 +1,6 @@
+// This grammar is used to parse C# source code files to extract the documentation.
+// It can extract both class and method documentation and also the signature of methods
+
 grammar CSharpCommentsGrammar;
 
 // Skip rules
@@ -11,8 +14,10 @@ Using : 'using';
 SEMICOLON : ';';
 
 
-fragment CommentText : ~[\r\n<]* [/a-zA-Z0-9.#_="!-][/a-zA-Z0-9.;()_#"=!-]+;
-fragment LinkText : ~[\r\n<]* [/a-zA-Z0-9.#_=!-][/a-zA-Z0-9.;()_#=!-]+;
+fragment CommentText 
+    : ~[\r\n<]* [/a-zA-Z0-9.#_="!-][/a-zA-Z0-9.;()_#"=!-]+;
+fragment LinkText 
+    : ~[\r\n<]* [/a-zA-Z0-9.#_=!-][/a-zA-Z0-9.;()_#=!-]+;
 
 // Define the rule for comments
 Comment: ('///' | '///' CommentText);
@@ -46,12 +51,14 @@ parameter
     
 paramref: PARAMREF;
 //param: Comment* PARAM;
-summary: '/// <summary>' comments '/// </summary>';
+summary
+    : '/// <summary>' comments '/// </summary>';
 
 returnContent
     : (comment | TEXT | classLink)*;
 
-return: '/// <returns>' returnContent ('/// </returns>' | '</returns>');
+return
+    : '/// <returns>' returnContent ('/// </returns>' | '</returns>');
 
 comment
     : Comment ((classLink) | parameter | (TEXT))*  ;
