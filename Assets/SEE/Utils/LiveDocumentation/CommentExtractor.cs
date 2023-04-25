@@ -9,7 +9,7 @@ namespace SEE.Utils
 {
     public class CommentExtractor
     {
-        public static void writeInBuffer(LiveDocumentationBuffer buffer, string fileName)
+        public static void WriteInBuffer(LiveDocumentationBuffer buffer, string fileName)
         {
             var input = File.ReadAllText(fileName);
             var lexer = new CSharpCommentsGrammarLexer(new AntlrInputStream(input));

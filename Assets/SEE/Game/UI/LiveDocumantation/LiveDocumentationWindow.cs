@@ -232,33 +232,35 @@ namespace SEE.Game.UI.LiveDocumantation
         /// <param name="filename">The filename to find a corresponding node for.</param>
         /// <returns>The node or null if none could be found.</returns>
         [CanBeNull]
-        private Node FindNodeWithPath(string filename)
+        private Node FindNodeWithPath(string @namespace)
         {
             //See if an item was found in the cache.
-            if (NamespaceCache.ContainsKey(filename))
+            if (NamespaceCache.ContainsKey(@namespace))
             {
-                return NamespaceCache[filename];
+                return NamespaceCache[@namespace];
             }
 
                 // Iterate through each node in the code city.
                 foreach (var item in Graph.Nodes())
                 {
+                    if(!item.IsLeaf())
+                        continue;
                     //Collect all namespaces
                     //TODO replace using with namespaces.
                     var filePath = item.AbsolutePlatformPath();
                     var input = File.ReadAllText(filePath);
-                    var lexer = new CSharpUsingGrammarLexer(new AntlrInputStream(input));
+                    var lexer = new CSharpCommentsGrammarLexer(new AntlrInputStream(input));
                     var tokens = new CommonTokenStream(lexer);
                     tokens.Fill();
 
-                    var parser = new CSharpUsingGrammarParser(tokens);
-                    var namespaces = parser.start().usingDirective(0).children;
+                    var parser = new CSharpCommentsGrammarParser(tokens);
+                    var namespaces = parser.start().namespaceDeclaration();
 
                     foreach (var parsedNamespace in namespaces)
                     {
-                        if (parsedNamespace.GetText().Equals(filename))
+                        if (parsedNamespace.nameSpaceName.Text.Equals(@namespace))
                         {
-                            NamespaceCache[filename] = item;
+                            NamespaceCache[@namespace] = item;
                             return item;
                         }
                     }
@@ -281,22 +283,23 @@ namespace SEE.Game.UI.LiveDocumantation
             }
             else
             {
-                ShowNotification.Info("Link found", nodeOfLink.AbsolutePlatformPath() + nodeOfLink.SourceFile);
+                ShowNotification.Info("Link found", nodeOfLink.AbsolutePlatformPath());
             }
 
             if (!SpaceManagerContainsWindow(linkPath, out BaseWindow w))
             {
+                
                 LiveDocumentationWindow newWin = nodeOfLink.GameObject().AddComponent<LiveDocumentationWindow>();
                 var filenames = linkPath.Split("\\");
-                newWin.ClassName = filenames[filenames.Length - 1].Split(".")[0];
-                newWin.Title = linkPath;
+                newWin.ClassName = nodeOfLink.SourceFile;
+                newWin.Title = nodeOfLink.SourceFile;
                 newWin.BasePath = BasePath;
                 newWin.RelativePath = linkPath;
                 newWin.Graph = Graph;
-
+                ShowNotification.Info("We are here", "");
                 LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
-                CommentExtractor.writeInBuffer(buffer, nodeOfLink.AbsolutePlatformPath());
-                buffer.Add(new LiveDocumentationLink(nodeOfLink.RelativePath(), nodeOfLink.SourceName));
+                CommentExtractor.WriteInBuffer(buffer, nodeOfLink.AbsolutePlatformPath());
+                ShowNotification.Info("We are here", buffer.PrintBuffer());
 
                 newWin.DocumentationBuffer = buffer;
                 //  newWin.DocumentationBuffer = buffer;

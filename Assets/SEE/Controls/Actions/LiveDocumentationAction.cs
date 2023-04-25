@@ -96,7 +96,7 @@ namespace SEE.Controls.Actions
                     documentationWindow.Graph = selectedNode.Value.ItsGraph;
 
                     LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
-                    CommentExtractor.writeInBuffer(buffer, selectedNode.Value.AbsolutePlatformPath());
+                    CommentExtractor.WriteInBuffer(buffer, selectedNode.Value.AbsolutePlatformPath());
 
 
                     List<LiveDocumentationBuffer> classMembers = new List<LiveDocumentationBuffer>();
