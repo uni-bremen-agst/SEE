@@ -232,7 +232,7 @@ namespace SEE.Game.UI.LiveDocumantation
         /// <param name="filename">The filename to find a corresponding node for.</param>
         /// <returns>The node or null if none could be found.</returns>
         [CanBeNull]
-        private Node FindNodeWithPath(string filename, Node currentNode)
+        private Node FindNodeWithPath(string filename)
         {
             //See if an item was found in the cache.
             if (NamespaceCache.ContainsKey(filename))
@@ -279,6 +279,10 @@ namespace SEE.Game.UI.LiveDocumantation
                 ShowNotification.Error("Cant open link", "The class can't be found");
                 return;
             }
+            else
+            {
+                ShowNotification.Info("Link found", nodeOfLink.AbsolutePlatformPath() + nodeOfLink.SourceFile);
+            }
 
             if (!SpaceManagerContainsWindow(linkPath, out BaseWindow w))
             {
@@ -291,9 +295,8 @@ namespace SEE.Game.UI.LiveDocumantation
                 newWin.Graph = Graph;
 
                 LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
-                buffer.Add(new LiveDocumentationBufferText(
-                    "Dies ist eine Test documentation für die andere Klasse "));
-                buffer.Add(new LiveDocumentationLink("src/C2.cs", "CS2.cs"));
+                CommentExtractor.writeInBuffer(buffer, nodeOfLink.AbsolutePlatformPath());
+                buffer.Add(new LiveDocumentationLink(nodeOfLink.RelativePath(), nodeOfLink.SourceName));
 
                 newWin.DocumentationBuffer = buffer;
                 //  newWin.DocumentationBuffer = buffer;

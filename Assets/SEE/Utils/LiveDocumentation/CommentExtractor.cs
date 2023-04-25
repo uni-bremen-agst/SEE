@@ -11,7 +11,6 @@ namespace SEE.Utils
     {
         public static void writeInBuffer(LiveDocumentationBuffer buffer, string fileName)
         {
-            //TODO Here you have to integrate your code
             var input = File.ReadAllText(fileName);
             var lexer = new CSharpCommentsGrammarLexer(new AntlrInputStream(input));
             var tokens = new CommonTokenStream(lexer);
