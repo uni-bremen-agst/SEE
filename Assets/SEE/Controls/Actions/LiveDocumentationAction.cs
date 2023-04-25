@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using SEE.Game.UI.LiveDocumantation;
 using SEE.Game.UI.Notification;
 using SEE.GO;
@@ -87,10 +88,19 @@ namespace SEE.Controls.Actions
                             $"Path {absolutePlatformPath} of selected node '{selectedNode.Value.SourceName}' does not exist.");
                         return false;
                     }
-
+                    string selectedFile = selectedNode.Value.Filename();
+                    
+                  
                     documentationWindow = selectedNode.gameObject.AddComponent<LiveDocumentationWindow>();
-                    documentationWindow.ClassName = selectedNode.Value.SourceName;
-                    documentationWindow.Title = path;
+                  
+                    documentationWindow.Title = selectedNode.Value.SourceName;
+
+                    if (!documentationWindow.Title.Replace(".", "").Equals(selectedFile.Split('.').Reverse().Skip(1)
+                            .Aggregate("", (acc, s) => s + acc)))
+                    {
+                        documentationWindow.Title += $" ({selectedFile})";
+                    }
+                    documentationWindow.ClassName = documentationWindow.Title;
                     documentationWindow.BasePath = selectedNode.elem.ItsGraph.BasePath;
                     documentationWindow.RelativePath = path;
                     documentationWindow.Graph = selectedNode.Value.ItsGraph;

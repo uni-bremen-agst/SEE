@@ -290,9 +290,17 @@ namespace SEE.Game.UI.LiveDocumantation
             {
                 
                 LiveDocumentationWindow newWin = nodeOfLink.GameObject().AddComponent<LiveDocumentationWindow>();
+                
+                string path = nodeOfLink.Path() + nodeOfLink.Filename();
                 var filenames = linkPath.Split("\\");
-                newWin.ClassName = nodeOfLink.SourceFile;
-                newWin.Title = nodeOfLink.SourceFile;
+                newWin.Title = nodeOfLink.SourceName;
+                string selectedFile = nodeOfLink.Filename();
+                if (!newWin.Title.Replace(".", "").Equals(selectedFile.Split('.').Reverse().Skip(1)
+                        .Aggregate("", (acc, s) => s + acc)))
+                {
+                    newWin.Title += $" ({selectedFile})";
+                }
+                newWin.ClassName = newWin.Title;
                 newWin.BasePath = BasePath;
                 newWin.RelativePath = linkPath;
                 newWin.Graph = Graph;
