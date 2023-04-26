@@ -78,8 +78,6 @@ namespace SEE.XR
                 Debug.Log("[XR] XR subsystems were started.\n");
             }
         }
-
-
         
         /// <summary>
         /// If XR was initialized, it will be stopped.
