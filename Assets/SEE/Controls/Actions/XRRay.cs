@@ -12,7 +12,7 @@ namespace SEE.Controls.Actions
         private class DelayedToggle
         {
             [Tooltip(
-                 "The least amount of seconds the selection and grab buttons must have been pressed to be considered activated."),
+                 "The smallest number of seconds the selection and grab buttons must have been pressed to be considered activated."),
              Range(0.01f, 1.0f)]
             public float ButtonDurationThreshold = 0.5f;
 
