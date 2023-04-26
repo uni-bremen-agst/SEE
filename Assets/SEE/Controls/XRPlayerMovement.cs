@@ -16,7 +16,7 @@ namespace SEE.Controls
         /// </summary>
         private static readonly Vector3 gravity = new Vector3(0, 0.981f, 0);
 #if INCLUDE_STEAM_VR
-        [Tooltip("The VR controller for directing")]
+        [Tooltip("The VR controller for navigation")]
         public Hand DirectingHand;
 #endif
         [Tooltip("If true, movements stay in the x/z plane. You cannot go up or down.")]

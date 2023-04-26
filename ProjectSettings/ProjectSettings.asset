@@ -402,7 +402,7 @@ PlayerSettings:
   cameraUsageDescription: Camera
   locationUsageDescription: 
   microphoneUsageDescription: Microphone is needed for Voice Chat
-  bluetoothUsageDescription: Bluetooth is nedded
+  bluetoothUsageDescription: Bluetooth is nedded for SEE to run
   switchNMETAOverride: 
   switchNetLibKey: 
   switchSocketMemoryPoolSize: 6144
