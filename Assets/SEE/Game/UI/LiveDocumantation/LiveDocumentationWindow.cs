@@ -286,7 +286,7 @@ namespace SEE.Game.UI.LiveDocumantation
                 ShowNotification.Info("Link found", nodeOfLink.AbsolutePlatformPath());
             }
 
-            if (!SpaceManagerContainsWindow(linkPath, out BaseWindow w))
+            if (!SpaceManagerContainsWindow(nodeOfLink.Path() + nodeOfLink.Filename(), out BaseWindow w))
             {
                 
                 LiveDocumentationWindow newWin = nodeOfLink.GameObject().AddComponent<LiveDocumentationWindow>();
@@ -302,7 +302,7 @@ namespace SEE.Game.UI.LiveDocumantation
                 }
                 newWin.ClassName = newWin.Title;
                 newWin.BasePath = BasePath;
-                newWin.RelativePath = linkPath;
+                newWin.RelativePath = nodeOfLink.Path() + nodeOfLink.Filename();
                 newWin.Graph = Graph;
                 ShowNotification.Info("We are here", "");
                 LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
