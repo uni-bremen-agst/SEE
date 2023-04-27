@@ -39,6 +39,10 @@ namespace SEE.Game.UI.LiveDocumantation
         private const string ClassDocumentationPath = "ClassDocumentation/Viewport/Content/ClassDoc";
         private const string ClassMemberListPath = "ClassMembers/Scroll Area/List";
 
+        private float oldIDXCoolDown;
+
+        private int oldIDX = -1;
+
         /// <summary>
         /// Text mesh for the (shortened) class name
         /// </summary>
@@ -240,31 +244,31 @@ namespace SEE.Game.UI.LiveDocumantation
                 return NamespaceCache[@namespace];
             }
 
-                // Iterate through each node in the code city.
-                foreach (var item in Graph.Nodes())
+            // Iterate through each node in the code city.
+            foreach (var item in Graph.Nodes())
+            {
+                if (!item.IsLeaf())
+                    continue;
+                //Collect all namespaces
+                //TODO replace using with namespaces.
+                var filePath = item.AbsolutePlatformPath();
+                var input = File.ReadAllText(filePath);
+                var lexer = new CSharpCommentsGrammarLexer(new AntlrInputStream(input));
+                var tokens = new CommonTokenStream(lexer);
+                tokens.Fill();
+
+                var parser = new CSharpCommentsGrammarParser(tokens);
+                var namespaces = parser.start().namespaceDeclaration();
+
+                foreach (var parsedNamespace in namespaces)
                 {
-                    if(!item.IsLeaf())
-                        continue;
-                    //Collect all namespaces
-                    //TODO replace using with namespaces.
-                    var filePath = item.AbsolutePlatformPath();
-                    var input = File.ReadAllText(filePath);
-                    var lexer = new CSharpCommentsGrammarLexer(new AntlrInputStream(input));
-                    var tokens = new CommonTokenStream(lexer);
-                    tokens.Fill();
-
-                    var parser = new CSharpCommentsGrammarParser(tokens);
-                    var namespaces = parser.start().namespaceDeclaration();
-
-                    foreach (var parsedNamespace in namespaces)
+                    if (parsedNamespace.nameSpaceName.Text.Equals(@namespace))
                     {
-                        if (parsedNamespace.nameSpaceName.Text.Equals(@namespace))
-                        {
-                            NamespaceCache[@namespace] = item;
-                            return item;
-                        }
+                        NamespaceCache[@namespace] = item;
+                        return item;
                     }
                 }
+            }
 
             return null;
         }
@@ -288,9 +292,8 @@ namespace SEE.Game.UI.LiveDocumantation
 
             if (!SpaceManagerContainsWindow(nodeOfLink.Path() + nodeOfLink.Filename(), out BaseWindow w))
             {
-                
                 LiveDocumentationWindow newWin = nodeOfLink.GameObject().AddComponent<LiveDocumentationWindow>();
-                
+
                 string path = nodeOfLink.Path() + nodeOfLink.Filename();
                 var filenames = linkPath.Split("\\");
                 newWin.Title = nodeOfLink.SourceName;
@@ -300,6 +303,7 @@ namespace SEE.Game.UI.LiveDocumantation
                 {
                     newWin.Title += $" ({selectedFile})";
                 }
+
                 newWin.ClassName = newWin.Title;
                 newWin.BasePath = BasePath;
                 newWin.RelativePath = nodeOfLink.Path() + nodeOfLink.Filename();
@@ -328,12 +332,22 @@ namespace SEE.Game.UI.LiveDocumantation
             // When the user clicked in the LiveDocumentation window
             if (Input.GetMouseButtonDown(0))
             {
-                int link = TMP_TextUtilities.FindIntersectingLink(ClassDocumentation, Input.mousePosition, null);
-
-                if (link != -1)
+                if (Time.time > oldIDXCoolDown)
                 {
-                    string linkId = ClassDocumentation.textInfo.linkInfo[link].GetLinkID().ToString();
-                    OnLinkClicked(linkId);
+                    oldIDX = -1;
+                }
+
+                if (oldIDX == -1)
+                {
+                    int link = TMP_TextUtilities.FindIntersectingLink(ClassDocumentation, Input.mousePosition, null);
+
+                    if (link != -1)
+                    {
+                        oldIDX++;
+                        oldIDXCoolDown = Time.time + 0.1f;
+                        string linkId = ClassDocumentation.textInfo.linkInfo[link].GetLinkID().ToString();
+                        OnLinkClicked(linkId);
+                    }
                 }
             }
         }
