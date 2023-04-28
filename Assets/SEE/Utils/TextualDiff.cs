@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SEE.Utils
 {
@@ -57,14 +58,14 @@ namespace SEE.Utils
                 {
                     case Operation.INSERT:
                         // red and struck through
-                        result.Append("<color=\"red\"><s><noparse>").Append(aDiff.text).Append("</noparse></s></color>");
+                        result.Append("<color=\"red\"><s><noparse>").Append(ReplaceNewlines(aDiff.text)).Append("</noparse></s></color>");
                         break;
                     case Operation.DELETE:
                         // green and underlined
-                        result.Append("<color=\"green\"><u><noparse>").Append(aDiff.text).Append("</noparse></u></color>");
+                        result.Append("<color=\"green\"><u><noparse>").Append(ReplaceNewlines(aDiff.text)).Append("</noparse></u></color>");
                         break;
                     case Operation.EQUAL:
-                        result.Append("<noparse>").Append(aDiff.text).Append("</noparse>");
+                        result.Append("<noparse>").Append(ReplaceNewlines(aDiff.text)).Append("</noparse>");
                         break;
                     default:
                         throw new NotImplementedException($"Case {aDiff.operation} not supported.");
@@ -72,6 +73,13 @@ namespace SEE.Utils
             }
             return result.ToString().Split(new string[] { "\r\n", "\r", "\n" },
                                            StringSplitOptions.None);
+
+            // We must close an open <noparse> for each newline and open it again after
+            // the newline.
+            static string ReplaceNewlines(string value)
+            {
+                return Regex.Replace(value, @"\r\n?|\n", "</noparse>\n<noparse>");
+            }
         }
     }
 }
