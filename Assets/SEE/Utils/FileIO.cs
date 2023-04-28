@@ -31,22 +31,20 @@ namespace SEE.Utils
             StringBuilder result = new();
             int lineNo = 0;
 
-            using (FileStream fileStream = new(path: fileName, mode: FileMode.Open, access: FileAccess.Read,
-                                               share: FileShare.Read, bufferSize: 4096, options: FileOptions.SequentialScan))
-            using (StreamReader streamReader = new(fileStream, Encoding.UTF8, true))
+            using FileStream fileStream = new(path: fileName, mode: FileMode.Open, access: FileAccess.Read,
+                                              share: FileShare.Read, bufferSize: 4096, options: FileOptions.SequentialScan);
+            using StreamReader streamReader = new(fileStream, Encoding.UTF8, true);
+            string line;
+            while ((line = streamReader.ReadLine()) != null)
             {
-                string line;
-                while ((line = streamReader.ReadLine()) != null)
+                lineNo++;
+                if (lineNo > toLine)
                 {
-                    lineNo++;
-                    if (lineNo > toLine)
-                    {
-                        break;
-                    }
-                    else if (fromLine <= lineNo)
-                    {
-                        result.AppendLine(line);
-                    }
+                    break;
+                }
+                else if (fromLine <= lineNo)
+                {
+                    result.AppendLine(line);
                 }
             }
             return result.ToString();
