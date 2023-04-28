@@ -56,7 +56,7 @@ namespace SEE.Utils
                 switch (aDiff.operation)
                 {
                     case Operation.INSERT:
-                        // red and stroke through
+                        // red and struck through
                         result.Append("<color=\"red\"><s>").Append(aDiff.text).Append("</s></color>");
                         break;
                     case Operation.DELETE:
