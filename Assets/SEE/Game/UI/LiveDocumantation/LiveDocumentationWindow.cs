@@ -9,6 +9,7 @@ using SEE.DataModel.DG;
 using SEE.Game.UI.Notification;
 using SEE.Game.UI.Window;
 using SEE.Utils;
+using SEE.Utils.LiveDocumentation;
 using TMPro;
 using UnityEngine;
 
@@ -38,7 +39,8 @@ namespace SEE.Game.UI.LiveDocumantation
 
         private const string ClassDocumentationPath = "ClassDocumentation/Viewport/Content/ClassDoc";
         private const string ClassMemberListPath = "ClassMembers/Scroll Area/List";
-        
+
+        private const string NodeClassType = "Class";
 
         /// <summary>
         /// Text mesh for the (shortened) class name
@@ -244,7 +246,8 @@ namespace SEE.Game.UI.LiveDocumantation
             // Iterate through each node in the code city.
             foreach (var item in Graph.Nodes())
             {
-                if (!item.IsLeaf())
+                // Only check for leaf nodes and classes.
+                if (!(item.IsLeaf() || item.Type.Equals(NodeClassType)))
                     continue;
                 //Collect all namespaces
                 //TODO replace using with namespaces.
@@ -286,6 +289,7 @@ namespace SEE.Game.UI.LiveDocumantation
             {
                 ShowNotification.Info("Link found", nodeOfLink.AbsolutePlatformPath());
             }
+
             // If the Space manager don't contains a LiveDocumentationWindow of the same file a new one is created
             // Otherwise the old one is set as the active window
             if (!SpaceManagerContainsWindow(nodeOfLink.Path() + nodeOfLink.Filename(), out BaseWindow w))
@@ -307,12 +311,12 @@ namespace SEE.Game.UI.LiveDocumantation
                 newWin.RelativePath = nodeOfLink.Path() + nodeOfLink.Filename();
                 newWin.Graph = Graph;
                 LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
-                
-                CommentExtractor.WriteInBuffer(buffer, nodeOfLink.AbsolutePlatformPath());
+
+                Extractor.ExtractClassComment(buffer, nodeOfLink.AbsolutePlatformPath());
                 newWin.DocumentationBuffer = buffer;
 
                 List<LiveDocumentationBuffer> methods = new List<LiveDocumentationBuffer>();
-                MethodExtractor.FillMethods(methods, nodeOfLink.AbsolutePlatformPath());
+                Extractor.ExtractMethods(methods, nodeOfLink.AbsolutePlatformPath());
                 newWin.ClassMembers = methods;
                 //  newWin.DocumentationBuffer = buffer;
                 // Add code window to our space of code window, if it isn't in there yet

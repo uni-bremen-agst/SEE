@@ -23,10 +23,10 @@ fragment LinkText
 Comment: ('///' | '///' CommentText);
 //PARAM: '<param name="' TEXT* '">' TEXT* '</param>';
 
-
+SHORT_COMMENT: '//' TEXT* -> skip;
 TEXT: [/a-zA-Z0-9&#_.=()+|-]+;
 //[/a-zA-Z0-9.()_&#=|-]+;
-SHORT_COMMENT: '//' -> skip;
+
 
 EQUALS: '=';
 LineComment: '/*' .*? '*/';
@@ -77,10 +77,14 @@ line_comment
     : LineComment (classLink)?;
 
 methodSignature
-    :  nameAndParameters=(TEXT | ',')+;
+    :  nameAndParameters=(TEXT | ',' | '<' | '>')+;
+
+// For any Scope inside of an method eg. if, while, switch
+methodScope
+    : CURLY_BRACKET_OPEN (TEXT | SEMICOLON | EQUALS | '>' |methodScope)* CURLY_BRACKET_CLOSE;
 
 methodContent
-    : (TEXT+ | SEMICOLON | EQUALS )*;
+    : (TEXT | SEMICOLON | EQUALS |'>' | methodScope  )*;
 
 methodDeclaration
     : summary? methodSignature CURLY_BRACKET_OPEN methodContent CURLY_BRACKET_CLOSE;
@@ -88,8 +92,10 @@ methodDeclaration
 // A Simple C# Scope
 // This means a block of {} which also can inlude more other scopes or methods or classes   
 scope
-    : CURLY_BRACKET_OPEN ((scope | methodDeclaration | classDefinition)* | TEXT*) CURLY_BRACKET_CLOSE;  
-     
+    : CURLY_BRACKET_OPEN ((scope | methodDeclaration | classDefinition)* | TEXT*)? CURLY_BRACKET_CLOSE;  
+
+
+
  classContent
     : (scope
         |methodDeclaration

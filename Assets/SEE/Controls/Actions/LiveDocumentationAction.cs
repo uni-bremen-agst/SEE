@@ -6,6 +6,7 @@ using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
+using SEE.Utils.LiveDocumentation;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -106,12 +107,12 @@ namespace SEE.Controls.Actions
                     documentationWindow.Graph = selectedNode.Value.ItsGraph;
 
                     LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
-                    CommentExtractor.WriteInBuffer(buffer, selectedNode.Value.AbsolutePlatformPath());
+                    Extractor.ExtractClassComment(buffer, selectedNode.Value.AbsolutePlatformPath());
 
 
                     List<LiveDocumentationBuffer> classMembers = new List<LiveDocumentationBuffer>();
                    // LiveDocumentationBuffer b = new LiveDocumentationBuffer();
-                    MethodExtractor.FillMethods(classMembers, selectedNode.Value.AbsolutePlatformPath());
+                    Extractor.ExtractMethods(classMembers, selectedNode.Value.AbsolutePlatformPath());
 
                   //  classMembers.Add(b);
 
