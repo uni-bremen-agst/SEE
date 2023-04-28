@@ -77,7 +77,7 @@ line_comment
     : LineComment (classLink)?;
 
 methodSignature
-    :  nameAndParameters=TEXT+;
+    :  nameAndParameters=(TEXT | ',')+;
 
 methodContent
     : (TEXT+ | SEMICOLON | EQUALS )*;
@@ -93,6 +93,7 @@ scope
  classContent
     : (scope
         |methodDeclaration
+        | summary? methodSignature SEMICOLON
         | TEXT+
         | SEMICOLON)+;
 

@@ -38,10 +38,7 @@ namespace SEE.Game.UI.LiveDocumantation
 
         private const string ClassDocumentationPath = "ClassDocumentation/Viewport/Content/ClassDoc";
         private const string ClassMemberListPath = "ClassMembers/Scroll Area/List";
-
-        private float oldIDXCoolDown;
-
-        private int oldIDX = -1;
+        
 
         /// <summary>
         /// Text mesh for the (shortened) class name
@@ -289,7 +286,8 @@ namespace SEE.Game.UI.LiveDocumantation
             {
                 ShowNotification.Info("Link found", nodeOfLink.AbsolutePlatformPath());
             }
-
+            // If the Space manager don't contains a LiveDocumentationWindow of the same file a new one is created
+            // Otherwise the old one is set as the active window
             if (!SpaceManagerContainsWindow(nodeOfLink.Path() + nodeOfLink.Filename(), out BaseWindow w))
             {
                 LiveDocumentationWindow newWin = nodeOfLink.GameObject().AddComponent<LiveDocumentationWindow>();
@@ -308,12 +306,14 @@ namespace SEE.Game.UI.LiveDocumantation
                 newWin.BasePath = BasePath;
                 newWin.RelativePath = nodeOfLink.Path() + nodeOfLink.Filename();
                 newWin.Graph = Graph;
-                ShowNotification.Info("We are here", "");
                 LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
+                
                 CommentExtractor.WriteInBuffer(buffer, nodeOfLink.AbsolutePlatformPath());
-                ShowNotification.Info("We are here", buffer.PrintBuffer());
-
                 newWin.DocumentationBuffer = buffer;
+
+                List<LiveDocumentationBuffer> methods = new List<LiveDocumentationBuffer>();
+                MethodExtractor.FillMethods(methods, nodeOfLink.AbsolutePlatformPath());
+                newWin.ClassMembers = methods;
                 //  newWin.DocumentationBuffer = buffer;
                 // Add code window to our space of code window, if it isn't in there yet
 
@@ -330,24 +330,14 @@ namespace SEE.Game.UI.LiveDocumantation
         protected override void UpdateDesktop()
         {
             // When the user clicked in the LiveDocumentation window
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && Window.activeSelf)
             {
-                if (Time.time > oldIDXCoolDown)
+                int link = TMP_TextUtilities.FindIntersectingLink(ClassDocumentation, Input.mousePosition, null);
+                // If the point the user has clicked really is a link
+                if (link != -1)
                 {
-                    oldIDX = -1;
-                }
-
-                if (oldIDX == -1)
-                {
-                    int link = TMP_TextUtilities.FindIntersectingLink(ClassDocumentation, Input.mousePosition, null);
-
-                    if (link != -1)
-                    {
-                        oldIDX++;
-                        oldIDXCoolDown = Time.time + 0.1f;
-                        string linkId = ClassDocumentation.textInfo.linkInfo[link].GetLinkID().ToString();
-                        OnLinkClicked(linkId);
-                    }
+                    string linkId = ClassDocumentation.textInfo.linkInfo[link].GetLinkID().ToString();
+                    OnLinkClicked(linkId);
                 }
             }
         }

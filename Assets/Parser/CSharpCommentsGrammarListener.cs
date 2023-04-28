@@ -71,6 +71,16 @@ public interface ICSharpCommentsGrammarListener : IParseTreeListener {
 	/// <param name="context">The parse tree.</param>
 	void ExitSummary([NotNull] CSharpCommentsGrammarParser.SummaryContext context);
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.returnContent"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void EnterReturnContent([NotNull] CSharpCommentsGrammarParser.ReturnContentContext context);
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.returnContent"/>.
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	void ExitReturnContent([NotNull] CSharpCommentsGrammarParser.ReturnContentContext context);
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.return"/>.
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
