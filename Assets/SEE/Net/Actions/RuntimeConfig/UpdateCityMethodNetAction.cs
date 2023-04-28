@@ -1,18 +1,36 @@
 using SEE.Game.UI.RuntimeConfigMenu;
-using SEE.Net.Actions;
 
-public class UpdateCityMethodNetAction : AbstractNetAction
+namespace SEE.Net.Actions.RuntimeConfig
 {
-    public int CityIndex;
-    public string MethodName;
-
-    protected override void ExecuteOnServer()
+    /// <summary>
+    /// Network action when a city method was called. 
+    /// </summary>
+    public class UpdateCityMethodNetAction : AbstractNetAction
     {
-    }
+        /// <summary>
+        /// City index
+        /// </summary>
+        public int CityIndex;
+        
+        /// <summary>
+        /// The method name
+        /// </summary>
+        public string MethodName;
 
-    protected override void ExecuteOnClient()
-    {
-        if (!IsRequester())
-            RuntimeConfigMenu.GetMenuForCity(CityIndex).OnSyncMethod?.Invoke(MethodName);
+        /// <summary>
+        /// Does nothing on the server.
+        /// </summary>
+        protected override void ExecuteOnServer()
+        {
+        }
+
+        /// <summary>
+        /// Triggers 'SyncMethod' on <see cref="RuntimeTabMenu"/>.
+        /// </summary>
+        protected override void ExecuteOnClient()
+        {
+            if (!IsRequester())
+                RuntimeConfigMenu.GetMenuForCity(CityIndex).SyncMethod?.Invoke(MethodName);
+        }
     }
 }

@@ -34,7 +34,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 cityMenus[i] = gameObject.AddComponent<RuntimeTabMenu>();
                 cityMenus[i].Title = "City Configuration";
                 cityMenus[i].HideAfterSelection = false;
-                cityMenus[i].CityIndex = i;
+                cityMenus[i].cityIndex = i;
                 cityMenus[i].OnSwitchCity += SwitchCity;
             }
         }
