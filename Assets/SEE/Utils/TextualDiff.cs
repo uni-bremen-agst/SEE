@@ -19,7 +19,7 @@ namespace SEE.Utils
         /// old region.
         ///
         /// The Rich Text markup of a deletion renders the deleted text in red
-        /// and stroken through. The markup of an additions renders the added text
+        /// and struck through. The markup of an additions renders the added text
         /// in green and underlined.
         ///
         /// Each entry in the result is a line of text of the new region.
