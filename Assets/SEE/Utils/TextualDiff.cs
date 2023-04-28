@@ -57,15 +57,17 @@ namespace SEE.Utils
                 {
                     case Operation.INSERT:
                         // red and struck through
-                        result.Append("<color=\"red\"><s>").Append(aDiff.text).Append("</s></color>");
+                        result.Append("<color=\"red\"><s><noparse>").Append(aDiff.text).Append("</noparse></s></color>");
                         break;
                     case Operation.DELETE:
                         // green and underlined
-                        result.Append("<color=\"green\"><u>").Append(aDiff.text).Append("</u></color>");
+                        result.Append("<color=\"green\"><u><noparse>").Append(aDiff.text).Append("</noparse></u></color>");
                         break;
                     case Operation.EQUAL:
-                        result.Append(aDiff.text);
+                        result.Append("<noparse>").Append(aDiff.text).Append("</noparse>");
                         break;
+                    default:
+                        throw new NotImplementedException($"Case {aDiff.operation} not supported.");
                 }
             }
             return result.ToString().Split(new string[] { "\r\n", "\r", "\n" },
