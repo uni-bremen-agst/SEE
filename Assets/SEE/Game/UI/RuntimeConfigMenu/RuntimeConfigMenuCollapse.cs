@@ -2,24 +2,27 @@ using UnityEngine;
 
 namespace SEE.Game.UI.RuntimeConfigMenu
 {
+    /// <summary>
+    /// Can be used to collapse the nested settings of a 'SettingsObject' in the <see cref="RuntimeTabMenu"/>.
+    /// </summary>
     public class RuntimeConfigMenuCollapse : MonoBehaviour
     {
         /// <summary>
-        ///     Are the settings collapsed
+        ///     Is the setting collapsed.
         /// </summary>
-        private bool _settingVisibility = true;
+        private bool visibility = true;
 
         /// <summary>
-        ///     All settings of the SettingObject are shown/hidden
+        ///     Toggles the visibility of the nested settings.
         /// </summary>
-        /// <see cref="_settingVisibility" />
+        /// <see cref="visibility" />
         public void OnClickCollapse()
         {
-            _settingVisibility = !_settingVisibility;
-            transform.parent.parent.Find("Content").gameObject.SetActive(_settingVisibility);
+            visibility = !visibility;
+            transform.parent.parent.Find("Content").gameObject.SetActive(visibility);
 
-            // change rotation when pressed
-            if (_settingVisibility) transform.Find("Icon").transform.Rotate(0, 0, -90);
+            // changes icon rotation when pressed
+            if (visibility) transform.Find("Icon").transform.Rotate(0, 0, -90);
             else transform.Find("Icon").transform.Rotate(0, 0, 90);
         }
     }

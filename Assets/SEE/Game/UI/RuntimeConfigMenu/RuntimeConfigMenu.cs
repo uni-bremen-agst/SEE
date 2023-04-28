@@ -1,57 +1,87 @@
 using System.Linq;
 using SEE.Controls;
-using SEE.DataModel;
 using SEE.Game.City;
 using UnityEngine;
 
 namespace SEE.Game.UI.RuntimeConfigMenu
 {
+    /// <summary>
+    /// The primary wrapper script for the <see cref="RuntimeTabMenu"/>.
+    /// The runtime config menu allows to configure a <see cref="AbstractSEECity"/> at runtime.
+    ///
+    /// Instantiates the <see cref="RuntimeTabMenu"/>s for each table and handles switching between the tables. 
+    /// </summary>
     public class RuntimeConfigMenu : MonoBehaviour
     {
-        private static RuntimeTabMenu[] CityMenus;
+        /// <summary>
+        /// Contains the menus for each table/city.
+        /// </summary>
+        private static RuntimeTabMenu[] cityMenus;
+        /// <summary>
+        /// The index of the currently selected table.
+        /// </summary>
         private int currentCity;
 
+        /// <summary>
+        /// Instantiates the tab menu for each city.
+        /// </summary>
         private void Start()
         {
             int cityCount = GameObject.FindGameObjectsWithTag(Tags.CodeCity).Length;
-            CityMenus = new RuntimeTabMenu[cityCount];
+            cityMenus = new RuntimeTabMenu[cityCount];
             for (int i = 0; i < cityCount; i++)
             {
-                CityMenus[i] = gameObject.AddComponent<RuntimeTabMenu>();
-                CityMenus[i].Title = "City Configuration";
-                CityMenus[i].HideAfterSelection = false;
-                CityMenus[i].CityIndex = i;
-                CityMenus[i].OnSwitchCity += SwitchCity;
+                cityMenus[i] = gameObject.AddComponent<RuntimeTabMenu>();
+                cityMenus[i].Title = "City Configuration";
+                cityMenus[i].HideAfterSelection = false;
+                cityMenus[i].CityIndex = i;
+                cityMenus[i].OnSwitchCity += SwitchCity;
             }
         }
 
+        /// <summary>
+        /// Opens and closes the menu.
+        ///
+        /// <seealso cref="SEEInput"/>
+        /// </summary>
         private void Update()
         {
-            if (SEEInput.ToggleConfigMenu()) CityMenus[currentCity].ToggleMenu();
+            if (SEEInput.ToggleConfigMenu()) cityMenus[currentCity].ToggleMenu();
         }
 
+        /// <summary>
+        /// Changes the currently selected table/city.
+        /// </summary>
+        /// <param name="i">index</param>
         private void SwitchCity(int i)
         {
             if (i == currentCity) return;
-            CityMenus[currentCity].ShowMenu = false;
-            CityMenus[i].ShowMenu = true;
+            cityMenus[currentCity].ShowMenu = false;
+            cityMenus[i].ShowMenu = true;
             currentCity = i;
         }
 
+        /// <summary>
+        /// Returns a sorted list of all tables/cities.
+        ///
+        /// Sorted by the game object name.
+        /// </summary>
+        /// <returns>table list</returns>
         public static AbstractSEECity[] GetCities()
         {
-            return GameObject.FindGameObjectsWithTag(Tags.CodeCity).Select(go => go.GetComponent<AbstractSEECity>())
+            return GameObject.FindGameObjectsWithTag(Tags.CodeCity).
+                Select(go => go.GetComponent<AbstractSEECity>())
                 .OrderBy(go => go.name).ToArray();
         }
 
-        public static AbstractSEECity GetCity(int i)
-        {
-            return GetCities()[i];
-        }
-
+        /// <summary>
+        /// Returns the menu of a table/city by index.
+        /// </summary>
+        /// <param name="i">city index</param>
+        /// <returns>table menu</returns>
         public static RuntimeTabMenu GetMenuForCity(int i)
         {
-            return CityMenus[i];
+            return cityMenus[i];
         }
     }
 }

@@ -53,7 +53,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The path where the settings (the attributes of this class) are stored.
         /// </summary>
-        [SerializeField, Tooltip("Path of configuration file."), TabGroup(DataFoldoutGroup), RuntimeFoldout(DataFoldoutGroup)]
+        [SerializeField, Tooltip("Path of configuration file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath ConfigurationPath = new();
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace SEE.Game.City
         /// The path to project where the source code can be found. This attribute
         /// is needed to show the source code of nodes and edges.
         /// </summary>
-        [SerializeField, TabGroup(DataFoldoutGroup), RuntimeFoldout(DataFoldoutGroup)]
+        [SerializeField, TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         [PropertyTooltip("Directory where the source code is located")]
         [HideReferenceObjectPicker]
         public DirectoryPath SourceCodeDirectory
@@ -94,13 +94,13 @@ namespace SEE.Game.City
         /// of an IDE for a particular project. Concretely, if the IDE is Visual Studio,
         /// this is the VS solution file.
         /// </summary>
-        [SerializeField, Tooltip("Path of VS solution file."), TabGroup(DataFoldoutGroup), RuntimeFoldout(DataFoldoutGroup)]
+        [SerializeField, Tooltip("Path of VS solution file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath SolutionPath = new();
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
-        [OdinSerialize, Tooltip("Edge types of hierarchical edges."), TabGroup(EdgeFoldoutGroup), RuntimeFoldout(EdgeFoldoutGroup)]
+        [OdinSerialize, Tooltip("Edge types of hierarchical edges."), TabGroup(EdgeFoldoutGroup), RuntimeTab(EdgeFoldoutGroup)]
         public HashSet<string> HierarchicalEdges = HierarchicalEdgeTypes();
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace SEE.Game.City
         /// they should be visualized or not and if so, how.
         /// </summary>
         [NonSerialized, OdinSerialize, Tooltip("Visual attributes of nodes."), HideReferenceObjectPicker]
-        [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes", DisplayMode = DictionaryDisplayOptions.CollapsedFoldout), TabGroup(NodeFoldoutGroup), RuntimeFoldout(NodeFoldoutGroup)]
+        [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes", DisplayMode = DictionaryDisplayOptions.CollapsedFoldout), TabGroup(NodeFoldoutGroup), RuntimeTab(NodeFoldoutGroup)]
         public NodeTypeVisualsMap NodeTypes = new();
 
         /// <summary>
@@ -132,7 +132,7 @@ namespace SEE.Game.City
         /// <summary>
         /// A mapping of node metric names onto colors.
         /// </summary>
-        [Tooltip("Maps metric names onto colors."), TabGroup(MetricFoldoutGroup), RuntimeFoldout(MetricFoldoutGroup), HideReferenceObjectPicker]
+        [Tooltip("Maps metric names onto colors."), TabGroup(MetricFoldoutGroup), RuntimeTab(MetricFoldoutGroup), HideReferenceObjectPicker]
         [NonSerialized, OdinSerialize]
         public ColorMap MetricToColor = new();
 
@@ -167,31 +167,31 @@ namespace SEE.Game.City
         /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
         /// for range [0, max-value] is used, where max-value is the maximum value of a metric.
         /// </summary>
-        [Tooltip("Whether metrics should be normalized by Z score."), TabGroup(MetricFoldoutGroup), RuntimeFoldout(MetricFoldoutGroup)]
+        [Tooltip("Whether metrics should be normalized by Z score."), TabGroup(MetricFoldoutGroup), RuntimeTab(MetricFoldoutGroup)]
         public bool ZScoreScale = false;
 
         /// <summary>
         /// If true, only the metrics of leaf nodes are scaled.
         /// </summary>
-        [Tooltip("Whether only leaf metrics should be normalized."), TabGroup(MetricFoldoutGroup), RuntimeFoldout(MetricFoldoutGroup)]
+        [Tooltip("Whether only leaf metrics should be normalized."), TabGroup(MetricFoldoutGroup), RuntimeTab(MetricFoldoutGroup)]
         public bool ScaleOnlyLeafMetrics = true;
 
         /// <summary>
         /// The node layout settings.
         /// </summary>
-        [Tooltip("Settings for the node layout."), TabGroup(NodeFoldoutGroup), RuntimeFoldout(NodeFoldoutGroup)]
+        [Tooltip("Settings for the node layout."), TabGroup(NodeFoldoutGroup), RuntimeTab(NodeFoldoutGroup)]
         public NodeLayoutAttributes NodeLayoutSettings = new();
 
         /// <summary>
         /// The edge layout settings.
         /// </summary>
-        [Tooltip("Settings for the edge layout."), TabGroup(EdgeFoldoutGroup), RuntimeFoldout(EdgeFoldoutGroup)]
+        [Tooltip("Settings for the edge layout."), TabGroup(EdgeFoldoutGroup), RuntimeTab(EdgeFoldoutGroup)]
         public EdgeLayoutAttributes EdgeLayoutSettings = new();
 
         /// <summary>
         /// Attributes regarding the selection of edges.
         /// </summary>
-        [Tooltip("Settings for the selection of edges."), TabGroup(EdgeFoldoutGroup), RuntimeFoldout(EdgeFoldoutGroup)]
+        [Tooltip("Settings for the selection of edges."), TabGroup(EdgeFoldoutGroup), RuntimeTab(EdgeFoldoutGroup)]
         public EdgeSelectionAttributes EdgeSelectionSettings = new();
 
         /// <summary>
@@ -204,7 +204,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The metrics for the visualization of erosions.
         /// </summary>
-        [Tooltip("Settings for the visualization of software erosions."), TabGroup(ErosionFoldoutGroup), RuntimeFoldout(ErosionFoldoutGroup)]
+        [Tooltip("Settings for the visualization of software erosions."), TabGroup(ErosionFoldoutGroup), RuntimeTab(ErosionFoldoutGroup)]
         public ErosionAttributes ErosionSettings = new();
 
         /// <summary>

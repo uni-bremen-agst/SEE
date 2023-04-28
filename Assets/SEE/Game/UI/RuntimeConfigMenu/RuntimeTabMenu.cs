@@ -75,7 +75,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         protected override void OnStartFinished()
         {
             base.OnStartFinished();
-            city = RuntimeConfigMenu.GetCity(CityIndex);
+            city = RuntimeConfigMenu.GetCities()[CityIndex];
             OnSyncMethod += methodName =>
             {
                 if (methodName == nameof(TriggerImmediateRedraw)) TriggerImmediateRedraw();
@@ -152,7 +152,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             
             string GetTabName(MemberInfo memberInfo)
             {
-                return memberInfo.GetCustomAttributes().OfType<RuntimeFoldoutAttribute>().FirstOrDefault()?.name;
+                return memberInfo.GetCustomAttributes().OfType<RuntimeTabAttribute>().FirstOrDefault()?.Name;
             }
 
             bool IsCityAttribute(MemberInfo memberInfo)
@@ -163,7 +163,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             
             bool HasFoldoutAttribute(MemberInfo memberInfo)
             {
-                return !memberInfo.GetCustomAttributes().Any(a => a is RuntimeFoldoutAttribute);
+                return !memberInfo.GetCustomAttributes().Any(a => a is RuntimeTabAttribute);
             }
 
             float GetOrderOfMemberInfo(MemberInfo memberInfo)
@@ -237,7 +237,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         /// <returns></returns>
         private GameObject CreateOrGetViewGameObject(IEnumerable<Attribute> attributes)
         {
-            var tabName = attributes.OfType<RuntimeFoldoutAttribute>().FirstOrDefault()?.name ?? "Misc";
+            var tabName = attributes.OfType<RuntimeTabAttribute>().FirstOrDefault()?.Name ?? "Misc";
             ToggleMenuEntry entry = Entries.FirstOrDefault(entry => entry.Title == tabName);
             // adds an entry (tab + view) if necessary
             if (entry == null)

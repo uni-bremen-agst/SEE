@@ -1,21 +1,32 @@
 using System;
 
-// This class is necessary to conserve the menu structure as it is in the Unity Editor for
-// the build because all Odin Attributes use the Unity Editor which is not available in build
+
 namespace SEE.Game.UI.RuntimeConfigMenu
 {
+    /// <summary>
+    /// Marks a method as a button for the runtime config menu.
+    /// </summary>
     public class RuntimeButtonAttribute : Attribute
     {
-        // The label for the Button
-        public string Label;
+        /// <summary>
+        /// The label of the button.
+        /// </summary>
+        public readonly string Label;
 
-        // The name of the ButtonGroup
-        public string Name;
+        /// <summary>
+        /// The displayed name of the button.
+        /// </summary>
+        public readonly string Name;
 
-        public RuntimeButtonAttribute(string Name, string Label)
+        /// <summary>
+        /// The constructor.
+        /// </summary>
+        /// <param name="name">name</param>
+        /// <param name="label">label</param>
+        public RuntimeButtonAttribute(string name, string label)
         {
-            this.Name = Name;
-            this.Label = Label;
+            this.Name = name;
+            this.Label = label;
         }
     }
 }
