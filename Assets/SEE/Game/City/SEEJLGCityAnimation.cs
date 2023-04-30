@@ -710,6 +710,8 @@ namespace SEE.Game.City
         private GameObject GetNodeForStatement(int index)
         {
             string searchedName = parsedJLG.GetStatementLocationString(index);
+            Debug.Log($"searchedName: {searchedName}\n");
+            Debug.Log($"nodesGOs: {string.Join(", ", nodesGOs.Keys.ToList())}\n");
             return nodesGOs.TryGetValue(searchedName, out GameObject result) ? result : null;
         }
 
