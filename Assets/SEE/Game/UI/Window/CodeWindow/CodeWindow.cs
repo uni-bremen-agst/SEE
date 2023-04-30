@@ -67,11 +67,6 @@ namespace SEE.Game.UI.Window.CodeWindow
         private const string CODE_WINDOW_PREFAB = "Prefabs/UI/CodeWindowContent";
 
         /// <summary>
-        /// Whether the full text of the code window should be transmitted instead of just the filename.
-        /// </summary>
-        private const bool SYNC_FULL_TEXT = false;
-
-        /// <summary>
         /// Visually marks the line at the given <paramref name="lineNumber"/> and scrolls to it.
         /// Will also unmark any other line. Sets <see cref="markedLine"/> to
         /// <paramref name="lineNumber"/>.
@@ -197,7 +192,7 @@ namespace SEE.Game.UI.Window.CodeWindow
             {
                 throw new UnsupportedTypeException(typeof(CodeWindowValues), valueObject.GetType());
             }
-            
+
             if (codeValues.Path != null)
             {
                 EnterFromFile(codeValues.Path);
@@ -225,16 +220,15 @@ namespace SEE.Game.UI.Window.CodeWindow
 
         /// <summary>
         /// Generates and returns a <see cref="CodeWindowValues"/> struct for this code window.
+        /// If <see cref="FilePath"/> is <c>null</c>, the resulting <see cref="CodeWindowValues"/>
+        /// is created with <see cref="Text"/>; otherwise with <see cref="FilePath"/>.
         /// </summary>
-        /// <param name="fulltext">Whether the whole text should be included. Iff false, the filename will be saved
-        /// instead of the text.</param>
         /// <returns>The newly created <see cref="CodeWindowValues"/>, matching this class</returns>
         public override WindowValues ToValueObject()
         {
             string attachedTo = gameObject.name;
-            return SYNC_FULL_TEXT
-                ? new CodeWindowValues(Title, VisibleLine, attachedTo, Text)
-                : new CodeWindowValues(Title, VisibleLine, attachedTo, path: FilePath);
+            return FilePath == null ? new CodeWindowValues(Title, VisibleLine, attachedTo, Text)
+                                    : new CodeWindowValues(Title, VisibleLine, attachedTo, path: FilePath);
         }
 
         /// <summary>
@@ -265,7 +259,7 @@ namespace SEE.Game.UI.Window.CodeWindow
 
             /// <summary>
             /// Creates a new CodeWindowValues object from the given parameters.
-            /// Note that either text or Path must not be <c>null</c>.
+            /// Note that either <paramref name="text"/> or <paramref name="title"/> must not be <c>null</c>.
             /// </summary>
             /// <param name="title">The title of the code window.</param>
             /// <param name="visibleLine">The line currently at the top of the code window which is fully visible.</param>
