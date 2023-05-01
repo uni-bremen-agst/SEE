@@ -312,11 +312,11 @@ namespace SEE.Game.UI.LiveDocumantation
                 newWin.Graph = Graph;
                 LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
 
-                Extractor.ExtractClassComment(buffer, nodeOfLink.AbsolutePlatformPath());
+                CSharpExtractor.ExtractClassComment(buffer, nodeOfLink.AbsolutePlatformPath(), nodeOfLink.SourceName);
                 newWin.DocumentationBuffer = buffer;
 
                 List<LiveDocumentationBuffer> methods = new List<LiveDocumentationBuffer>();
-                Extractor.ExtractMethods(methods, nodeOfLink.AbsolutePlatformPath());
+                CSharpExtractor.ExtractMethods(methods, nodeOfLink.AbsolutePlatformPath(), nodeOfLink.SourceName);
                 newWin.ClassMembers = methods;
                 //  newWin.DocumentationBuffer = buffer;
                 // Add code window to our space of code window, if it isn't in there yet

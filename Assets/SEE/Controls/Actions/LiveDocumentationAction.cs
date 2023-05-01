@@ -8,6 +8,7 @@ using SEE.Net.Actions;
 using SEE.Utils;
 using SEE.Utils.LiveDocumentation;
 using UnityEngine;
+using Extractor = SEE.Game.City.LiveDocumentation.Extractor;
 
 namespace SEE.Controls.Actions
 {
@@ -40,6 +41,8 @@ namespace SEE.Controls.Actions
             syncAction = new SyncWindowSpaceAction();
         }
 
+        
+        
         public override bool Update()
         {
             //  SceneQueries.GetCodeCity(selectedNode.transform).gameObject;
@@ -63,7 +66,7 @@ namespace SEE.Controls.Actions
                 
                 // When the node the user has clicked on wasn't a leaf node.
                 // In this case an error message is displayed and the LiveDocumentation windows is not going to open.
-                if (!selectedNode.Value.IsLeaf())
+                if ( !selectedNode.Value.Type.Equals("Class") )
                 {
                     ShowNotification.Error("Node not supported", "Only leaf nodes can be analysed");
                     return false;
@@ -107,12 +110,12 @@ namespace SEE.Controls.Actions
                     documentationWindow.Graph = selectedNode.Value.ItsGraph;
 
                     LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
-                    Extractor.ExtractClassComment(buffer, selectedNode.Value.AbsolutePlatformPath());
+                    CSharpExtractor.ExtractClassComment(buffer, selectedNode.Value.AbsolutePlatformPath(), selectedNode.Value.SourceName);
 
 
                     List<LiveDocumentationBuffer> classMembers = new List<LiveDocumentationBuffer>();
                    // LiveDocumentationBuffer b = new LiveDocumentationBuffer();
-                    Extractor.ExtractMethods(classMembers, selectedNode.Value.AbsolutePlatformPath());
+                    CSharpExtractor.ExtractMethods(classMembers, selectedNode.Value.AbsolutePlatformPath(), selectedNode.Value.SourceName);
 
                   //  classMembers.Add(b);
 

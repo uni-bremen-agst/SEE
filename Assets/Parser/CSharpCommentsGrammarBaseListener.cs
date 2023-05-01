@@ -84,6 +84,18 @@ public partial class CSharpCommentsGrammarBaseListener : ICSharpCommentsGrammarL
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitSummary([NotNull] CSharpCommentsGrammarParser.SummaryContext context) { }
 	/// <summary>
+	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.docs"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void EnterDocs([NotNull] CSharpCommentsGrammarParser.DocsContext context) { }
+	/// <summary>
+	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.docs"/>.
+	/// <para>The default implementation does nothing.</para>
+	/// </summary>
+	/// <param name="context">The parse tree.</param>
+	public virtual void ExitDocs([NotNull] CSharpCommentsGrammarParser.DocsContext context) { }
+	/// <summary>
 	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.returnContent"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>

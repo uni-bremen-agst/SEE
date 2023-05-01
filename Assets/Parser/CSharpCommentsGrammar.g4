@@ -54,6 +54,8 @@ paramref: PARAMREF;
 summary
     : '/// <summary>' comments '/// </summary>';
 
+docs : Comment* summary;
+
 returnContent
     : (comment | TEXT | classLink)*;
 

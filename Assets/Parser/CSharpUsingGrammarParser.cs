@@ -32,7 +32,7 @@ using DFA = Antlr4.Runtime.Dfa.DFA;
 
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "4.9.2")]
 [System.CLSCompliant(false)]
-public partial class CSharpUsingGrammarParser : Parser {
+public partial class CSharpUsingGrammarParser : Antlr4.Runtime.Parser {
 	protected static DFA[] decisionToDFA;
 	protected static PredictionContextCache sharedContextCache = new PredictionContextCache();
 	public const int
