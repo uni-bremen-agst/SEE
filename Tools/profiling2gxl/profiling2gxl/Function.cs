@@ -17,6 +17,8 @@
         public float MemStore { get; set; }
         public float MemLoad { get; set; }
         public int AllocHeap { get; set; }
+        public string Path { get; set; }
+        public string Filename { get; set; }
 
         public Function()
         {
@@ -26,6 +28,8 @@
             Id = "";
             Name = "";
             Module = "";
+            Path = "";
+            Filename = "";
         }
     }
 }

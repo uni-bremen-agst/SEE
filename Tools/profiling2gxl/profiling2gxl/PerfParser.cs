@@ -70,7 +70,8 @@ namespace profiling2gxl
                     Id = $"{module}:{name}",
                     Name = name,
                     Module = module,
-                    Called = 1
+                    Called = 1,
+                    Filename = module
                 };
 
                 var descendantsGroup = mo.Groups.GetValueOrDefault("descendants");
@@ -124,9 +125,17 @@ namespace profiling2gxl
                     }
 
                     var module = Path.GetFileName(module_group.Value);
+                    var filename = module;
                     if (module == "[unknown]")
                     {
                         module = "UnknownClass";
+                        filename = "";
+                    }
+
+                    var path = Path.GetDirectoryName(module_group.Value);
+                    if (path == "[unknown]")
+                    {
+                        path = "";
                     }
 
                     var func = Functions.Find(f => f.Id == $"{module}:{name}");
@@ -141,7 +150,9 @@ namespace profiling2gxl
                             Id = $"{module}:{name}",
                             Name = name,
                             Module = module,
-                            Called = 1
+                            Called = 1,
+                            Filename = filename,
+                            Path = path ?? ""
                         };
                         Functions.Add(func);
                     }

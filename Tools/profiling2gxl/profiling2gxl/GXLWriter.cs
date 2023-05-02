@@ -254,6 +254,8 @@ namespace profiling2gxl
 
             stringAttributes.Add("Source.Name", function.Name);
             stringAttributes.Add("Linkage.Name", function.Id);
+            stringAttributes.Add("Source.Path", function.Path);
+            stringAttributes.Add("Source.File", function.Filename);
 
             AppendAttributes(doc, xmlNode, "string", stringAttributes, StringToString);
             AppendAttributes(doc, xmlNode, "float", floatAttributes, FloatToString);
