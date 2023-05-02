@@ -22,12 +22,19 @@ namespace SEE.Utils.LiveDocumentation
         [CanBeNull]
         private static (CSharpParser.Type_declarationContext, int) GetClassByName(CSharpParser parser, string className)
         {
-            var namespaces = parser.compilation_unit().namespace_member_declarations().namespace_member_declaration();
+            var namespaces = parser
+                .compilation_unit()
+                .namespace_member_declarations()
+                .namespace_member_declaration();
             foreach (var namspace in namespaces)
             {
                 var namespaceDefLine = namspace.namespace_declaration().Start.Line;
-                var types = namspace.namespace_declaration().namespace_body().namespace_member_declarations()
-                    .namespace_member_declaration().ToList();
+                var types = namspace
+                    .namespace_declaration()
+                    .namespace_body()
+                    .namespace_member_declarations()
+                    .namespace_member_declaration()
+                    .ToList();
                 foreach (var type in types)
                 {
                     // Extract the name of the class or struct and compare it with the passed className
@@ -51,7 +58,7 @@ namespace SEE.Utils.LiveDocumentation
 
             return (null, -1);
         }
-        
+
         public LiveDocumentationBuffer ExtractComments(string fileName, string className)
         {
             LiveDocumentationBuffer buffer = new();
@@ -145,10 +152,19 @@ namespace SEE.Utils.LiveDocumentation
                     .ToList();
                 foreach (var clss in classes)
                 {
-                    if (clss.type_declaration().class_definition().identifier().GetText().Equals(className))
+                    if (clss.type_declaration()
+                        .class_definition()
+                        .identifier()
+                        .GetText()
+                        .Equals(className))
                     {
-                        var classBody = clss.type_declaration().class_definition().class_body();
-                        var methods = classBody.class_member_declarations().class_member_declaration()
+                        var classBody = clss
+                        .type_declaration()
+                        .class_definition()
+                        .class_body();
+                        var methods = classBody
+                            .class_member_declarations()
+                            .class_member_declaration()
                             .Where(x => x.common_member_declaration().method_declaration() != null).ToList();
                         foreach (var i in methods)
                         {
@@ -159,10 +175,15 @@ namespace SEE.Utils.LiveDocumentation
                                                 .method_member_name().GetText();
                             signature += "(";
                             methodBuffer.Add(new LiveDocumentationBufferText(signature));
-                            if (i.common_member_declaration().method_declaration().formal_parameter_list() != null)
+                            if (i.common_member_declaration()
+                                    .method_declaration()
+                                    .formal_parameter_list() != null)
                             {
-                                var parameters = i.common_member_declaration().method_declaration()
-                                    .formal_parameter_list().fixed_parameters().fixed_parameter();
+                                var parameters = i.common_member_declaration()
+                                    .method_declaration()
+                                    .formal_parameter_list()
+                                    .fixed_parameters()
+                                    .fixed_parameter();
                                 foreach (var parameter in parameters)
                                 {
                                     var pType = parameter.arg_declaration().type_().GetText() + " ";
@@ -208,6 +229,11 @@ namespace SEE.Utils.LiveDocumentation
             }
 
             return buffers;
+        }
+
+        public List<string> ExtractImportedNamespaces(string fileName)
+        {
+            throw new NotImplementedException();
         }
     }
 }

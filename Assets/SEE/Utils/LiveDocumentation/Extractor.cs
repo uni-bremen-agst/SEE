@@ -18,5 +18,7 @@ namespace SEE.Utils.LiveDocumentation
         LiveDocumentationBuffer ExtractComments(string fileName, string className);
 
         List<LiveDocumentationBuffer> ExtractMethods(string fileName, string className);
+
+        List<string> ExtractImportedNamespaces(string fileName);
     }
 }
