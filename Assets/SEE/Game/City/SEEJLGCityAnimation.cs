@@ -43,7 +43,7 @@ namespace SEE.Game.City
         /// </summary>
         [Tooltip("The distance between the code city and the source-code window."),
          FoldoutGroup(JLGFoldoutGroup)]
-        public float DistanceAboveCity = 0.01f;
+        public float DistanceAboveCity = 0.3f;
 
         /// <summary>
         /// The distance between the line connecting the code city and the source-code window
@@ -200,20 +200,22 @@ namespace SEE.Game.City
         /// <summary>
         /// Stack of all existing FileContent text windows.
         /// </summary>
-        private Stack<GameObject> textWindows = new Stack<GameObject>();
+        private Stack<GameObject> textWindows = new();
 
         /// <summary>
         /// Stack of all existing function calls.
         /// </summary>
-        private Stack<GameObject> functionCalls = new Stack<GameObject>();
+        private Stack<GameObject> functionCalls = new();
 
         /// <summary>
         /// Reads the JLG data from <see cref="JLGPath"/>, initializes <see cref="parsedJLG"/>,
         /// <see cref="statementCounter"/>, <see cref="nodesGOs"/>, and <see cref="currentGO"/>.
         /// In case of any error, this components disables itself.
         /// </summary>
-        protected void Start()
+        protected override void Start()
         {
+            base.Start();
+
             JLGParser jlgParser = new(JLGPath.Path);
             parsedJLG = jlgParser.Parse();
 
@@ -259,7 +261,7 @@ namespace SEE.Game.City
         /// <returns>all ancestors representing nodes</returns>
         private Dictionary<string, GameObject> GetNodes()
         {
-            Dictionary<string, GameObject> result = new Dictionary<string, GameObject>();
+            Dictionary<string, GameObject> result = new();
             foreach(GameObject node in gameObject.AllDescendants(Tags.Node))
             {
                 result[node.name] = node;
@@ -267,9 +269,13 @@ namespace SEE.Game.City
             return result;
         }
 
-        /// Update is called once per frame
-        private void Update()
+        /// <summary>
+        /// Reacts to the user's interactions.
+        /// </summary>
+        protected override void Update()
         {
+            base.Update();
+
             // Update Visualisation every 'interval' seconds.
             if (Time.time >= nextUpdateTime)
             {
@@ -524,14 +530,26 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Checks, if there is an existing scrollable text window for a given GameObject.
+        /// Checks, if there is an existing scrollable text window for a given <paramref name="node"/>.
         /// </summary>
-        /// <param name="node"></param>
-        /// <returns></returns>
+        /// <param name="node">a game object representing a graph node</param>
+        /// <returns>true if there is an existing scrollable text window for a given <paramref name="node"/></returns>
         private bool TextWindowForNodeExists(GameObject node)
         {
             return textWindows.Count != 0 && textWindows.Any(go => go.name.Equals(node.name + FileContentNamePostfix));
         }
+
+        /// <summary>
+        /// The prefab to be instantiated for the composite object containing the variables
+        /// and source code window.
+        /// </summary>
+        private const string TracingDisplayPrefab = "TracingDisplay";
+
+        /// <summary>
+        /// Name of the scroll container where the source code currently being executed
+        /// is shown. This name is used in the prefab <see cref="TracingDisplayPrefab"/>.
+        /// </summary>
+        private const string ScrollContainerFileContent = "ScrollContainerFileContent";
 
         /// <summary>
         /// This method generates a new ScrollableTextMeshProWindow above the code city.
@@ -544,46 +562,88 @@ namespace SEE.Game.City
         /// </summary>
         private void GenerateScrollableTextWindow()
         {
-            GameObject textWindow = Instantiate((GameObject)Resources.Load("ScrollableTextWindow"), Vector3.zero, rotation: currentGO.transform.rotation);
-            textWindow.name = currentGO.name + FileContentNamePostfix;
+            // The tracing display consists of two parts: (1) a window where the source code of
+            // the currently executed code is shown and (2) a window where the values of the
+            // currently visible variables at that source-code location are shown.
+            GameObject tracingDisplay = Instantiate((GameObject)Resources.Load(TracingDisplayPrefab),
+                                                Vector3.zero,
+                                                rotation: Quaternion.identity);
+                                                //rotation: currentGO.transform.rotation);
+            tracingDisplay.name = currentGO.name + FileContentNamePostfix;
+            ///set canvas order in layer to textwindows.count so that the text windows can be renderer in front of each other
+            tracingDisplay.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = GetFileContentForNode(currentGO);
 
-            float textWindowHeight = GetWindowHeight(textWindow);
+            float textWindowHeight = GetWindowHeight(tracingDisplay);
 
             {
-                // Sets the position of the textWindow.
-                Transform referencePlane = GetReferencePlane();
-                Vector3 cityExtent = referencePlane.transform.lossyScale / 2.0f;
-
-                Vector3 windowPosition = referencePlane.position;
-                // the position of the textWindow rectangle is the
-                windowPosition.y += DistanceAboveCity - textWindowHeight / 2;
-                windowPosition.z += cityExtent.z + DistanceBehindCity; // at the back edge of the city
-                textWindow.transform.position = windowPosition;
+                // Sets the position of the tracingDisplay relative to transform;
+                // transform is the game object this component is attached to,
+                // i.e., a game object representing a code city.
+                Vector3 cityExtent = transform.transform.lossyScale / 2.0f;
+                Vector3 windowPosition = transform.position;
+                windowPosition.y += DistanceAboveCity + textWindowHeight / 2;
+                windowPosition.z += cityExtent.z + DistanceBehindCity;
+                tracingDisplay.transform.position = windowPosition;
             }
 
-            ///set canvas order in layer to textwindows.count so that the text windows can be renderer in front of each other
-            textWindow.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = GetFileContentForNode(currentGO);
-            textWindows.Push(textWindow);
+            textWindows.Push(tracingDisplay);
 
-            ///add line between Class and FileContentWindow
-            LineRenderer line = new GameObject(currentGO.name + "FileContentConnector").AddComponent<LineRenderer>();
-            line.positionCount = 2;
-            line.material = new Material(Shader.Find("Sprites/Default")) {color = new Color(0.219f, 0.329f, 0.556f, 1f)};
-            line.startWidth = LineWidth;
-            line.endWidth = LineWidth;
-            line.useWorldSpace = true;
-            Vector3 startPosition = textWindow.transform.position;
-            // FIXME: The beam just above the lower edge of the text window. It seems as if the
-            // textWindow is resized. At least we are not getting its correct height.
-            startPosition.y -= textWindowHeight;
-            line.SetPosition(0, startPosition);
-            line.SetPosition(1, currentGO.transform.position);
-            line.gameObject.transform.parent = textWindow.transform;
+            {
+                Transform codeWindow = GetCodeWindow(tracingDisplay);
+
+                ///add line between Class and FileContentWindow
+                LineRenderer line = new GameObject(currentGO.name + "FileContentConnector").AddComponent<LineRenderer>();
+                line.positionCount = 2;
+                line.material = new Material(Shader.Find("Sprites/Default")) { color = new Color(0.219f, 0.329f, 0.556f, 1f) };
+                line.startWidth = LineWidth;
+                line.endWidth = LineWidth;
+                line.useWorldSpace = true;
+                Vector3 startPosition = codeWindow.transform.position;
+                startPosition.y -= textWindowHeight / 2;
+                line.SetPosition(0, startPosition);
+                line.SetPosition(1, currentGO.transform.position);
+                line.transform.SetParent(tracingDisplay.transform);
+            }
         }
 
-        private static float GetWindowHeight(GameObject textWindow)
+        /// <summary>
+        /// Returns the <see cref="Transform"/> of the immediate child of <paramref name="tracingDisplay"/>
+        /// where the source code is shown.
+        ///
+        /// Assumption: <paramref name="tracingDisplay"/> has an immediate child named
+        /// <see cref="ScrollContainerFileContent"/>.
+        /// </summary>
+        /// <param name="tracingDisplay">composite game object representing the </param>
+        /// <returns>the scroll container where the source code is displayed</returns>
+        /// <exception cref="Exception">thrown if <paramref name="tracingDisplay"/> does not have
+        /// an immediate child named <see cref="ScrollContainerFileContent"/></exception>
+        private static Transform GetCodeWindow(GameObject tracingDisplay)
         {
-            if (textWindow.TryGetComponent(out RectTransform rectTransform))
+            Transform codeWindow = tracingDisplay.transform.Find(ScrollContainerFileContent);
+            if (codeWindow == null)
+            {
+                throw new Exception($"Text window {tracingDisplay.FullName()} has no child {ScrollContainerFileContent}.");
+            }
+            else
+            {
+                return codeWindow;
+            }
+        }
+
+        /// <summary>
+        /// Returns the height of the given <paramref name="tracingDisplay"/>.
+        /// The <paramref name="tracingDisplay"/> is assumed to have a <see cref="RectTransform"/>
+        /// attached.
+        /// </summary>
+        /// <param name="tracingDisplay">text windows whose height is to be determined</param>
+        /// <returns>height of <paramref name="tracingDisplay"/></returns>
+        /// <exception cref="Exception">thrown if <paramref name="tracingDisplay"/> does
+        /// not have a <see cref="RectTransform"/></exception>
+        private static float GetWindowHeight(GameObject tracingDisplay)
+        {
+            Transform codeWindow = GetCodeWindow(tracingDisplay);
+
+            if (codeWindow.TryGetComponent(out RectTransform rectTransform))
             {
                 // Each corner provides its world space value. The returned array of 4 vertices
                 // is clockwise. It starts bottom left and rotates to top left, then top right,
@@ -591,32 +651,14 @@ namespace SEE.Game.City
                 // vector with x being left and y being bottom.
                 Vector3[] corners = new Vector3[4];
                 rectTransform.GetWorldCorners(corners);
+                // corners[1] is top left corner
+                // corners[0] is bottom left corner
                 return corners[1].y - corners[0].y;
             }
             else
             {
-                throw new Exception("Text window " + textWindow.name + "does not have a RectTransform.");
+                throw new Exception($"Text window {codeWindow.gameObject.FullName()} does not have a {nameof(RectTransform)}.");
             }
-        }
-
-        /// <summary>
-        /// Returns the transform of the plane underlying the game objects forming the code city
-        /// if it exists; otherwise the transform of the code-city object is returned.
-        ///
-        /// Assumption: The plane is an immediate child of the code-city object, named "Plane"
-        /// and tagged by Tags.Decoration.
-        /// </summary>
-        /// <returns>transform of plane or code-city</returns>
-        private Transform GetReferencePlane()
-        {
-            foreach (Transform child in gameObject.transform)
-            {
-                if (child.CompareTag(Tags.Decoration) && child.name == "Plane")
-                {
-                    return child.transform;
-                }
-            }
-            return gameObject.transform.parent;
         }
 
         /// <summary>
