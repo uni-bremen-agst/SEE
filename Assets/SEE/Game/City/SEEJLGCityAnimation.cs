@@ -571,7 +571,7 @@ namespace SEE.Game.City
                                                 rotation: Quaternion.identity);
                                                 //rotation: currentGO.transform.rotation);
             tracingDisplay.name = currentGO.name + FileContentNamePostfix;
-            ///set canvas order in layer to textwindows.count so that the text windows can be renderer in front of each other
+            ///set canvas order in layer to textwindows.count so that the text windows can be rendered in front of each other
             tracingDisplay.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = GetFileContentForNode(currentGO);
 
             float textWindowHeight = GetWindowHeight(tracingDisplay);
