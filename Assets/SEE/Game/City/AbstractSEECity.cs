@@ -25,6 +25,21 @@ namespace SEE.Game.City
     [Serializable]
     public abstract partial class AbstractSEECity : SerializedMonoBehaviour
     {
+        protected virtual void Awake()
+        {
+            // Intentionally left blank
+        }
+
+        protected virtual void Start()
+        {
+            // Intentionally left blank
+        }
+
+        protected virtual void Update()
+        {
+            // Intentionally left blank
+        }
+
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
         /// <see cref="AbstractSEECity.Save"/> and
