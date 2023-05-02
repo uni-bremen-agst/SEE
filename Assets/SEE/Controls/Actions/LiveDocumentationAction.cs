@@ -110,13 +110,16 @@ namespace SEE.Controls.Actions
                     documentationWindow.Graph = selectedNode.Value.ItsGraph;
 
                     LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
-                    CSharpExtractor.ExtractClassComment(buffer, selectedNode.Value.AbsolutePlatformPath(), selectedNode.Value.SourceName);
+                    buffer = FileParser.ParseClassDoc(selectedNode.Value.AbsolutePlatformPath(), selectedNode.Value.SourceName);
 
 
                     List<LiveDocumentationBuffer> classMembers = new List<LiveDocumentationBuffer>();
                    // LiveDocumentationBuffer b = new LiveDocumentationBuffer();
-                    CSharpExtractor.ExtractMethods(classMembers, selectedNode.Value.AbsolutePlatformPath(), selectedNode.Value.SourceName);
-
+                   classMembers = FileParser.ParseClassMethods( selectedNode.Value.AbsolutePlatformPath(), selectedNode.Value.SourceName);
+                   if (buffer == null || classMembers == null)
+                   {
+                       return false;
+                   }
                   //  classMembers.Add(b);
 
                     documentationWindow.DocumentationBuffer = buffer;

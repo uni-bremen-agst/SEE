@@ -3,8 +3,7 @@ using SEE.Game.UI.LiveDocumantation;
 
 namespace SEE.Utils.LiveDocumentation
 {
-   
-    
+
     /// <summary>
     /// Represents 
     /// </summary>
