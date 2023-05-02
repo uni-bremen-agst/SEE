@@ -1,5 +1,4 @@
-﻿// Code from http://wiki.unity3d.com/index.php?title=CameraFacingBillboard
-// Credits go to Neil Carter (NCarter)
+﻿// Code inspired by https://github.com/Firnox/Billboarding/blob/main/Billboard.cs
 
 using SEE.Utils;
 using UnityEngine;
@@ -7,15 +6,49 @@ using UnityEngine;
 namespace SEE.GO
 {
     /// <summary>
-    /// This script can be added to a Canvas GameObject to make it always face the main camera.
-    /// It is a component of the prefab ScrollableTextWindow.
+    /// This script can be added to any game object to make it always face
+    /// the main camera. It supports locking of all three axes.
+    /// It is a component of the prefab TracingDisplay.
     /// </summary>
-    public class CanvasFaceCamera : MonoBehaviour
+    public class FaceCamera : MonoBehaviour
     {
         /// <summary>
         /// Main camera of the scene.
         /// </summary>
         private Transform mainCamera;
+
+        /// <summary>
+        /// The original rotation the game object had at <see cref="Awake"/>.
+        /// This will be used for locking.
+        /// </summary>
+        private Vector3 originalRotation;
+
+        /// <summary>
+        /// Whether to lock rotation around the x axis.
+        /// </summary>
+        [Header("Lock Rotation")]
+        [SerializeField]
+        private bool lockX;
+        /// <summary>
+        /// Whether to lock rotation around the y axis.
+        /// </summary>
+        [SerializeField]
+        private bool lockY;
+
+        /// <summary>
+        /// Whether to lock rotation around the z axis.
+        /// </summary>
+        [SerializeField]
+        private bool lockZ;
+
+        /// <summary>
+        /// Sets <see cref="originalRotation"/> to the current rotation
+        /// of the game object.
+        /// </summary>
+        private void Awake()
+        {
+            originalRotation = transform.rotation.eulerAngles;
+        }
 
         /// <summary>
         /// Sets <see cref="mainCamera"/> to the transform of <see cref="MainCamera.Camera"/>
@@ -52,8 +85,20 @@ namespace SEE.GO
         /// </summary>
         private void LateUpdate()
         {
-            Quaternion rotation = mainCamera.localRotation;
-            transform.LookAt(transform.position + rotation * Vector3.forward, rotation * Vector3.up);
+            {
+                // Rotate such that the front of game objects looks at the camera.
+                Quaternion rotation = mainCamera.rotation;
+                transform.LookAt(transform.position + rotation * Vector3.forward, rotation * Vector3.up);
+            }
+
+            {
+                // Modify the rotation in Euler space to lock certain dimensions.
+                Vector3 rotation = transform.rotation.eulerAngles;
+                if (lockX) { rotation.x = originalRotation.x; }
+                if (lockY) { rotation.y = originalRotation.y; }
+                if (lockZ) { rotation.z = originalRotation.z; }
+                transform.rotation = Quaternion.Euler(rotation);
+            }
         }
     }
 }
