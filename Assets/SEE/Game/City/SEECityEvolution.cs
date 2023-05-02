@@ -281,8 +281,9 @@ namespace SEE.Game.City
         /// Loads all graphs, calculates their layouts, and displays the first graph in the
         /// graph series.
         /// </summary>
-        protected void Start()
+        protected override void Start()
         {
+            base.Start();
             Reset();
 
             List<Graph> graphs = LoadDataSeries();

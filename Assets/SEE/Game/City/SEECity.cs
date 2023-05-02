@@ -127,8 +127,10 @@ namespace SEE.Game.City
         /// <summary>
         /// Sets up drawn city (if it has been drawn yet) and loads the metric board.
         /// </summary>
-        protected void Start()
+        protected override void Start()
         {
+            base.Start();
+
             if (!gameObject.IsCodeCityDrawn())
             {
                 Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");

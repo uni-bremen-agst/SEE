@@ -186,10 +186,15 @@ namespace SEE.Controls.Actions
             DisplayedLabelOperators.Remove(Operator);
         }
 
-        /**
-         * Returns the label attributes for this node using values defined in AbstractSEECity.
-         * <param name="node">The node.</param>
-         */
+        /// <summary>
+        /// Returns the label attributes for <paramref name="node"/> using values
+        /// defined in <paramref name="city"/>.
+        ///
+        /// Assumption: <paramref name="node"/> is "contained" in <paramref name="city"/>.
+        /// </summary>
+        /// <param name="node">node whose label settings are requested</param>
+        /// <param name="city">the city holding the settings</param>
+        /// <returns>label attributes for <paramref name="node"/></returns>
         private static LabelAttributes GetLabelSettings(Node node, AbstractSEECity city)
         {
             return city.NodeTypes[node.Type].LabelSettings;

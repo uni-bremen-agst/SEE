@@ -46,7 +46,7 @@ namespace SEE.Game.City
         /// </summary>
         /// <returns>path of JLG file</returns>
         [SerializeField, ShowInInspector, Tooltip("Path of JLG file"), FoldoutGroup(DataFoldoutGroup)]
-        public FilePath JLGPath = new FilePath();
+        public FilePath JLGPath = new();
 
         /// <summary>
         /// Loads all city data as in <see cref="SEECity.LoadData()"/> plus the

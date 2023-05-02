@@ -32,6 +32,15 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Help);
         }
+        
+        /// <summary>
+        /// Toggles voice input (i.e., for voice commands) on/off.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleVoiceInput()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleVoiceInput);
+        }
 
         /// <summary>
         /// Turns on/off the player-action menu.
