@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SEE.Controls;
+using SEE.DataModel.DG;
 using SEE.Game.Runtime;
 using SEE.GO;
 using SEE.Utils;
@@ -670,35 +671,32 @@ namespace SEE.Game.City
         /// <returns>the file content of the corresponding source-code file (line numbers are appended)</returns>
         private string GetFileContentForNode(GameObject go)
         {
-            string classname = go.name;
-            if (classname.Contains("."))
+            if (go.TryGetNode(out Node node))
             {
-                classname = classname.Substring(classname.LastIndexOf(".", StringComparison.Ordinal) + 1);
-            }
-            classname += ".java";
-            foreach (string p in parsedJLG.FilesOfProject)
-            {
-                if (p.EndsWith(classname))
+                string path = node.AbsolutePlatformPath();
+
+                if (File.Exists(path))
                 {
-                    if (File.Exists(p))
+                    int lineNumber = 1;
+                    string output = "";
+                    foreach (string lineContent in File.ReadLines(path))
                     {
-                        int lineNumber = 1;
-                        string output = "";
-                        foreach (string lineContent in File.ReadLines(p))
-                        {
-                            output += lineNumber + ". " + lineContent + Environment.NewLine;
-                            lineNumber++;
-                        }
-                        return output;
+                        output += lineNumber + ". " + lineContent + Environment.NewLine;
+                        lineNumber++;
                     }
-                    else
-                    {
-                        Debug.LogError($"Source code file {p} not found for game object {go.name}.\n");
-                        return "1. // empty" + Environment.NewLine;
-                    }
+                    return output;
+                }
+                else
+                {
+                    Debug.LogError($"Source code file {path} not found for game object {go.name}.\n");
+                    return "1. // empty" + Environment.NewLine;
                 }
             }
-            throw new Exception("File could not be loaded for " + classname + ".");
+            else
+            {
+                Debug.LogError($"Game object {go.FullName()} has no valid {nameof(NodeRef)}.\n");
+                return "1. // empty" + Environment.NewLine;
+            }
         }
 
         /// <summary>
