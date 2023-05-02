@@ -569,7 +569,6 @@ namespace SEE.Game.City
             GameObject tracingDisplay = Instantiate((GameObject)Resources.Load(TracingDisplayPrefab),
                                                 Vector3.zero,
                                                 rotation: Quaternion.identity);
-                                                //rotation: currentGO.transform.rotation);
             tracingDisplay.name = currentGO.name + FileContentNamePostfix;
             ///set canvas order in layer to textwindows.count so that the text windows can be rendered in front of each other
             tracingDisplay.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = GetFileContentForNode(currentGO);
@@ -614,7 +613,8 @@ namespace SEE.Game.City
         /// Assumption: <paramref name="tracingDisplay"/> has an immediate child named
         /// <see cref="ScrollContainerFileContent"/>.
         /// </summary>
-        /// <param name="tracingDisplay">composite game object representing the </param>
+        /// <param name="tracingDisplay">composite game object representing the tracing display
+        /// consisting of a source-code window and window showing the variable values</param>
         /// <returns>the scroll container where the source code is displayed</returns>
         /// <exception cref="Exception">thrown if <paramref name="tracingDisplay"/> does not have
         /// an immediate child named <see cref="ScrollContainerFileContent"/></exception>
