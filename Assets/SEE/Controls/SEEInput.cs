@@ -210,15 +210,7 @@ namespace SEE.Controls
         /// <returns>true if the user wants to toggle the run-time configuration menu</returns>
         internal static bool ToggleConfigMenu()
         {
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
-            {
-                isModPressed = true;
-            }
-            if (Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift))
-            {
-                isModPressed = false;
-            }
-            return isModPressed && Input.GetKeyUp(KeyCode.Escape);
+            return KeyboardShortcutsEnabled & Input.GetKeyDown(KeyBindings.ConfigMenu);
         }
 
         /// <summary>

@@ -116,6 +116,11 @@ namespace SEE.Controls
         /// </summary>
         internal static readonly KeyCode Redo = Register(KeyCode.Y, Scope.Always, "Re-does the last action.");
 
+        /// <summary>
+        /// Opens/Closes the configuration menu.
+        /// </summary>
+        internal static readonly KeyCode ConfigMenu = Register(KeyCode.K, Scope.Always, "Opens/Closes the configuration menu.");
+
         #endregion
 
         //-----------------------------------------------------
