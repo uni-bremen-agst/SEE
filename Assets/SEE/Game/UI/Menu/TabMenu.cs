@@ -116,7 +116,7 @@ namespace SEE.Game.UI.Menu
         /// <param name="entry">The menu entry.</param>
         protected virtual void RemoveView(T entry)
         {
-            Destroy(ViewGameObject(entry));
+            Destroyer.Destroy(ViewGameObject(entry));
         }
 
         /// <summary>
