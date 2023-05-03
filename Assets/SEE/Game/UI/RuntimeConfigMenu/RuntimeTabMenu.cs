@@ -984,7 +984,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             
             // collapse by default
             if (!recursive)
-                colorPickerGameObject.transform.parent.parent.GetComponentInChildren<RuntimeConfigMenuCollapse>()
+                colorPickerGameObject.transform.parent.parent.GetComponent<RuntimeConfigMenuCollapse>()
                     .OnClickCollapse();
             
             // getter of widget name (if not provided)
@@ -993,6 +993,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             // add listeners to BoxSlider
             BoxSlider boxSlider = colorPickerGameObject.GetComponentInChildren<BoxSlider>();
             RuntimeSliderManager boxEndEditManager = boxSlider.gameObject.AddComponent<RuntimeSliderManager>();
+            
             // Add netAction to boxSlider element
             boxEndEditManager.OnEndEdit += () =>
             {
@@ -1009,6 +1010,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             // add listeners to Slider
             Slider hueSlider = colorPickerGameObject.GetComponentInChildren<Slider>();
             RuntimeSliderManager hueEndEditManager = hueSlider.gameObject.AddComponent<RuntimeSliderManager>();
+            
             // Add netAction to hueSlider element
             hueEndEditManager.OnEndEdit += () =>
             {
@@ -1026,6 +1028,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             TMP_InputField inputField = colorPickerGameObject.GetComponentInChildren<TMP_InputField>();
             inputField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
             inputField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
+            
             // Add netAction to string input element
             inputField.onEndEdit.AddListener(_ =>
             {

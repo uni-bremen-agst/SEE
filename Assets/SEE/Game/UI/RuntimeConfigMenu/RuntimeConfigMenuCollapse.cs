@@ -8,22 +8,34 @@ namespace SEE.Game.UI.RuntimeConfigMenu
     public class RuntimeConfigMenuCollapse : MonoBehaviour
     {
         /// <summary>
-        ///     Is the setting collapsed.
+        /// Is the setting collapsed.
         /// </summary>
         private bool visibility = true;
 
         /// <summary>
-        ///     Toggles the visibility of the nested settings.
+        /// Parent game object that contains all setting objects
+        /// </summary>
+        public GameObject mainContentContainer;
+
+        /// <summary>
+        /// Collapse icon
+        /// </summary>
+        public GameObject collapseIcon;
+
+        /// <summary>
+        /// Toggles the visibility of the nested settings.
         /// </summary>
         /// <see cref="visibility" />
         public void OnClickCollapse()
         {
             visibility = !visibility;
-            transform.parent.parent.Find("Content").gameObject.SetActive(visibility);
 
-            // changes icon rotation when pressed
-            if (visibility) transform.Find("Icon").transform.Rotate(0, 0, -90);
-            else transform.Find("Icon").transform.Rotate(0, 0, 90);
+            // hide setting objects
+            mainContentContainer.gameObject.SetActive(visibility);
+
+            // change icon rotation when pressed
+            if (visibility) collapseIcon.transform.Rotate(0, 0, -90);
+            else collapseIcon.transform.Rotate(0, 0, 90);
         }
     }
 }
