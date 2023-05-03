@@ -2,12 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Antlr4.Runtime;
+using DG.Tweening;
 using JetBrains.Annotations;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game.UI.Notification;
 using SEE.Game.UI.Window;
+using SEE.GO;
 using SEE.Utils;
 using SEE.Utils.LiveDocumentation;
 using TMPro;
@@ -82,6 +85,8 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         public Graph Graph;
 
+        public Node NodeOfClass;
+
         private WindowSpaceManager spaceManager;
 
         private bool SpaceManagerContainsWindow(string filePath, out BaseWindow win)
@@ -121,7 +126,7 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         /// <returns>Returns true when all fields are set. Otherwise false</returns>
         private bool CheckNecessaryFields() =>
-            ClassName != null && BasePath != null && RelativePath != null && Graph != null;
+            ClassName != null && BasePath != null && RelativePath != null && Graph != null && NodeOfClass != null;
 
         /// <summary>
         /// Adds a new Class member to the ClassMember section in the LiveDocumentation Window.
@@ -179,6 +184,7 @@ namespace SEE.Game.UI.LiveDocumantation
             ClassNameField = livedoc.transform.Find("ClassName/Viewport/Content/ClassName").gameObject
                 .GetComponent<TextMeshProUGUI>();
 
+
             ClassDocumentation =
                 livedoc.transform.Find(ClassDocumentationPath).gameObject.GetComponent<TextMeshProUGUI>();
 
@@ -199,6 +205,29 @@ namespace SEE.Game.UI.LiveDocumantation
             {
                 AddClassMember(item);
             }
+        }
+
+        /// <summary>
+        /// Is called when the user clicked on a Text segment in the class name field.
+        /// If the user technically clicked on the field, but hasn't hit any text the function isn't called.
+        /// </summary>
+        private void OnClickClassName()
+        {
+            var marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            //  var m = NodeOfClass.GameObject().GetComponent<Renderer>().materials.First(x => x.name.Contains("SEEMaterial"));
+            // m.color = Color.black;
+            //marker.transform.parent = NodeOfClass.GameObject().transform;
+            //marker.transform.localScale = new Vector3(1f, 1f, 1f);
+            //NodeOfClass.GameObject().transform.localScale += new Vector3(1.3f, 1.3f, 1.3f);
+            var newScale = new Vector3(1.5f, 1.5f, 1.5f);
+            var oldScale = NodeOfClass.GameObject().transform.localScale;
+            NodeOfClass.GameObject().transform.DOScale(oldScale *2 ,2.0f).SetEase(Ease.InOutSine).SetLoops(2, LoopType.Yoyo).OnComplete(
+                () => 
+                {
+                    ShowNotification.Warn("sdds", "sdsd");
+                }).Restart();
+          //  Thread.Sleep(1000);
+           // NodeOfClass.GameObject().transform.localScale = oldScale;
         }
 
 
@@ -310,18 +339,20 @@ namespace SEE.Game.UI.LiveDocumantation
                 newWin.BasePath = BasePath;
                 newWin.RelativePath = nodeOfLink.Path() + nodeOfLink.Filename();
                 newWin.Graph = Graph;
+                newWin.NodeOfClass = nodeOfLink;
                 LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
 
-                buffer= FileParser.ParseClassDoc( nodeOfLink.AbsolutePlatformPath(), nodeOfLink.SourceName);
+                buffer = FileParser.ParseClassDoc(nodeOfLink.AbsolutePlatformPath(), nodeOfLink.SourceName);
                 newWin.DocumentationBuffer = buffer;
 
                 List<LiveDocumentationBuffer> methods = new List<LiveDocumentationBuffer>();
-                methods= FileParser.ParseClassMethods( nodeOfLink.AbsolutePlatformPath(), nodeOfLink.SourceName);
+                methods = FileParser.ParseClassMethods(nodeOfLink.AbsolutePlatformPath(), nodeOfLink.SourceName);
 
                 if (buffer == null || methods == null)
                 {
                     return;
                 }
+
                 newWin.ClassMembers = methods;
                 //  newWin.DocumentationBuffer = buffer;
                 // Add code window to our space of code window, if it isn't in there yet
@@ -341,12 +372,23 @@ namespace SEE.Game.UI.LiveDocumantation
             // When the user clicked in the LiveDocumentation window
             if (Input.GetMouseButtonDown(0) && Window.activeSelf)
             {
-                int link = TMP_TextUtilities.FindIntersectingLink(ClassDocumentation, Input.mousePosition, null);
+                int classDoclink =
+                    TMP_TextUtilities.FindIntersectingLink(ClassDocumentation, Input.mousePosition, null);
+                int clickedWordInClassName =
+                    TMP_TextUtilities.FindIntersectingWord(ClassNameField, Input.mousePosition, null);
+
+                // ShowNotification.Warn("sdsd", a.ToString());
+
                 // If the point the user has clicked really is a link
-                if (link != -1)
+                if (classDoclink != -1)
                 {
-                    string linkId = ClassDocumentation.textInfo.linkInfo[link].GetLinkID().ToString();
+                    string linkId = ClassDocumentation.textInfo.linkInfo[classDoclink].GetLinkID().ToString();
                     OnLinkClicked(linkId);
+                }
+
+                if (clickedWordInClassName != -1)
+                {
+                    OnClickClassName();
                 }
             }
         }

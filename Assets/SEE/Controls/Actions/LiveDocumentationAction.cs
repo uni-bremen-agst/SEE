@@ -108,6 +108,7 @@ namespace SEE.Controls.Actions
                     documentationWindow.BasePath = selectedNode.elem.ItsGraph.BasePath;
                     documentationWindow.RelativePath = path;
                     documentationWindow.Graph = selectedNode.Value.ItsGraph;
+                    documentationWindow.NodeOfClass = selectedNode.Value;
 
                     LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
                     buffer = FileParser.ParseClassDoc(selectedNode.Value.AbsolutePlatformPath(), selectedNode.Value.SourceName);
