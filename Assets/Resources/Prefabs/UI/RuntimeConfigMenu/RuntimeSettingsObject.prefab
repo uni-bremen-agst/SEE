@@ -308,7 +308,6 @@ GameObject:
   - component: {fileID: 3495013259211788976}
   - component: {fileID: 6923392807836165755}
   - component: {fileID: 101304723379398229}
-  - component: {fileID: 4635794758916717459}
   m_Layer: 5
   m_Name: CollapseButton
   m_TagString: Untagged
@@ -362,8 +361,9 @@ MonoBehaviour:
   clickEvent:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4635794758916717459}
-        m_TargetAssemblyTypeName: RuntimeConfigMenuCollapse, Assembly-CSharp
+      - m_Target: {fileID: 2425702356705578388}
+        m_TargetAssemblyTypeName: SEE.Game.UI.RuntimeConfigMenu.RuntimeConfigMenuCollapse,
+          SEE
         m_MethodName: OnClickCollapse
         m_Mode: 1
         m_Arguments:
@@ -518,18 +518,6 @@ MonoBehaviour:
   roundedOutlineFilled: {fileID: 0}
   roundedOutlineText: {fileID: 0}
   roundedOutlineTextHighligted: {fileID: 0}
---- !u!114 &4635794758916717459
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7878332406795656724}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f20090c2db74fd747ae16d32d6723987, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &8279319979252572930
 GameObject:
   m_ObjectHideFlags: 0
@@ -543,6 +531,7 @@ GameObject:
   - component: {fileID: 2578773328684734805}
   - component: {fileID: 6492914946350113708}
   - component: {fileID: 9155637850249767115}
+  - component: {fileID: 2425702356705578388}
   m_Layer: 5
   m_Name: RuntimeSettingsObject
   m_TagString: Untagged
@@ -651,6 +640,20 @@ MonoBehaviour:
   m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
   m_EffectDistance: {x: 1, y: -1}
   m_UseGraphicAlpha: 1
+--- !u!114 &2425702356705578388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8279319979252572930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f20090c2db74fd747ae16d32d6723987, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainContentContainer: {fileID: 7725125712292814367}
+  collapseIcon: {fileID: 3883168754644485073}
 --- !u!1 &8434431449910065122
 GameObject:
   m_ObjectHideFlags: 0
@@ -686,9 +689,9 @@ RectTransform:
   m_Father: {fileID: 1476068588984138947}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 26, y: -15}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 26, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0.5}
 --- !u!222 &223187603897824983
