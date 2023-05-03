@@ -688,6 +688,11 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     OnUpdateMenuValues?.Invoke();
                 };
                 
+                OnShowMenuChanged += () =>
+                {
+                    if (ShowMenu) smallEditorButton.ShowMenu = false;
+                };
+                
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateSlider(settingName, range, setter, getter, useRoundValue, smallEditor, true, getWidgetName);
             }
@@ -778,6 +783,11 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     OnUpdateMenuValues?.Invoke();
                 };
                 
+                OnShowMenuChanged += () =>
+                {
+                    if (ShowMenu) smallEditorButton.ShowMenu = false;
+                };
+                
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateSwitch(settingName, setter, getter, smallEditor, true, getWidgetName);
             }
@@ -849,6 +859,11 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
+                };
+                
+                OnShowMenuChanged += () =>
+                {
+                    if (ShowMenu) smallEditorButton.ShowMenu = false;
                 };
                 
                 smallEditorButton.CreateWidget = smallEditor =>
@@ -928,6 +943,11 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
+                };
+                
+                OnShowMenuChanged += () =>
+                {
+                    if (ShowMenu) smallEditorButton.ShowMenu = false;
                 };
                 
                 smallEditorButton.CreateWidget = smallEditor =>
@@ -1041,6 +1061,11 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
+                };
+                
+                OnShowMenuChanged += () =>
+                {
+                    if (ShowMenu) smallEditorButton.ShowMenu = false;
                 };
                 
                 smallEditorButton.CreateWidget = smallEditor =>
