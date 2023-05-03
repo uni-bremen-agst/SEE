@@ -70,7 +70,7 @@ namespace SEE.Controls
         /// </summary>
         public override void Stop()
         {
-            if (recognizer != null && recognizer.IsRunning)
+            if (recognizer is { IsRunning: true })
             {
                 recognizer.Stop();
             }

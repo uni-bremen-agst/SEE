@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Sirenix.Serialization;
-using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.GO;
@@ -26,6 +25,21 @@ namespace SEE.Game.City
     [Serializable]
     public abstract partial class AbstractSEECity : SerializedMonoBehaviour
     {
+        protected virtual void Awake()
+        {
+            // Intentionally left blank
+        }
+
+        protected virtual void Start()
+        {
+            // Intentionally left blank
+        }
+
+        protected virtual void Update()
+        {
+            // Intentionally left blank
+        }
+
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
         /// <see cref="AbstractSEECity.Save"/> and
@@ -590,13 +604,13 @@ namespace SEE.Game.City
         /// <param name="graphs">graphs whose metric names are to be emitted</param>
         protected static void DumpNodeMetrics(ICollection<Graph> graphs)
         {
-            IDictionary<string, HashSet<string>> result = new Dictionary<string, HashSet<string>>();
+            IDictionary<string, ISet<string>> result = new Dictionary<string, ISet<string>>();
 
             foreach (Graph graph in graphs)
             {
                 foreach (Node node in graph.Nodes())
                 {
-                    if (result.TryGetValue(node.Type, out HashSet<string> metrics))
+                    if (result.TryGetValue(node.Type, out ISet<string> metrics))
                     {
                         metrics.UnionWith(node.AllMetrics());
                     }
@@ -607,7 +621,7 @@ namespace SEE.Game.City
                 }
             }
 
-            foreach (KeyValuePair<string, HashSet<string>> item in result)
+            foreach (KeyValuePair<string, ISet<string>> item in result)
             {
                 Debug.Log($"Node type {item.Key}:\n");
                 foreach (string metric in item.Value)
