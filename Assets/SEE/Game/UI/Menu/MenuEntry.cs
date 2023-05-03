@@ -1,8 +1,11 @@
 ﻿using System;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
-using Valve.VR.InteractionSystem;
+#if INCLUDE_STEAM_VR
 
+using Valve.VR.InteractionSystem;
+#endif
 namespace SEE.Game.UI.Menu
 {
     /// <summary>
@@ -42,11 +45,13 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         public bool Enabled;
 
+
         /// <summary>
         /// The color of this entry when disabled.
         /// </summary>
-        public Color DisabledColor => EntryColor.ColorWithAlpha(0.2f);
-
+        public Color DisabledColor => EntryColor.WithAlpha(0.2f);
+        
+        
         /// <summary>
         /// Instantiates and returns a new MenuEntry.
         /// </summary>

@@ -23,21 +23,23 @@ SOFTWARE.
 
 using System.Collections.Generic;
 using UnityEngine;
+#if INCLUDE_STEAM_VR
 using Valve.VR.InteractionSystem;
+#endif
 
 namespace SEE.GO.Whiteboard
 {
     [System.Obsolete("Experimental code. Do not use it. May be removed soon.")]
     [RequireComponent(typeof(Rigidbody))]
+#if  INCLUDE_STEAM_VR
     [RequireComponent(typeof(Interactable))]
+#endif
     public class DraggableObject : MonoBehaviour
     {
-        [SerializeField]
-        private readonly Transform wallTransform, offsetTransform;
+        [SerializeField] private readonly Transform wallTransform, offsetTransform;
 
-        [SerializeField]
-        private readonly float followingSpeed = 50f;
-
+        [SerializeField] private readonly float followingSpeed = 50f;
+		
         protected Rigidbody mRigidbody;
 
         private const int MaxNumberOfPositions = 8;
@@ -53,17 +55,15 @@ namespace SEE.GO.Whiteboard
 
         public bool IsDragged
         {
-            get
-            {
-                return controllerTransform != null;
-            }
+            get { return controllerTransform != null; }
         }
-
+#if INCLUDE_STEAM_VR
         /// <summary>
         /// SteamVR component required for interactions. We assume the gameObject has it as 
         /// component attached. It will be set in Start().
         /// </summary>
         private Interactable interactable;
+#endif
 
         protected virtual void Awake()
         {
@@ -71,13 +71,14 @@ namespace SEE.GO.Whiteboard
 
             startPosition = mRigidbody.position;
             starRotation = mRigidbody.rotation;
-
+#if INCLUDE_STEAM_VR
             interactable = GetComponent<Interactable>();
             if (interactable == null)
             {
                 Debug.LogErrorFormat("Game object {0} has no component Interactable attached to it.\n", gameObject.name);
                 return;
             }
+#endif
         }
 
         private void FixedUpdate()
@@ -87,7 +88,8 @@ namespace SEE.GO.Whiteboard
                 if (lastPosition.HasValue)
                 {
                     UpdatePosition(controllerTransform.position, followingSpeed);
-                    UpdateRotation(controllerTransform.rotation * Quaternion.Euler(Vector3.right * 90f), followingSpeed);
+                    UpdateRotation(controllerTransform.rotation * Quaternion.Euler(Vector3.right * 90f),
+                        followingSpeed);
 
                     Vector3 velocity = (mRigidbody.position - lastPosition.Value) / Time.deltaTime;
 
@@ -191,6 +193,7 @@ namespace SEE.GO.Whiteboard
         // Private actions called by the hand when the object is hovered.
         //---------------------------------------------------------------
 
+#if INCLUDE_STEAM_VR
         /// <summary>
         /// Called by the Hand when that Hand starts hovering over this object.
         /// 
@@ -258,5 +261,7 @@ namespace SEE.GO.Whiteboard
                 Debug.LogFormat("released object {0}\n", hand.gameObject.name);
             }
         }
+
+#endif
     }
 }

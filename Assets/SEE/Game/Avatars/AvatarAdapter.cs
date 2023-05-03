@@ -11,7 +11,9 @@ using SEE.XR;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Assertions;
+#if INCLUDE_STEAM_VR
 using Valve.VR.InteractionSystem;
+#endif
 using ViveSR.anipal;
 using ViveSR.anipal.Lip;
 
@@ -59,7 +61,9 @@ namespace SEE.Game.Avatars
                         PrepareLocalPlayerForDesktop();
                         break;
                     case PlayerInputType.VRPlayer:
+#if INCLUDE_STEAM_VR
                         PrepareLocalPlayerForXR();
+#endif
                         break;
                     default:
                         throw new NotImplementedException($"Unhandled case {SceneSettings.InputType}");
@@ -205,7 +209,7 @@ namespace SEE.Game.Avatars
                 return gameObject.transform.lossyScale.y;
             }
         }
-
+#if INCLUDE_STEAM_VR
         /// <summary>
         /// Prepares the avatar for a virtual reality environment by adding a VRPlayer prefab
         /// as a child and an <see cref="XRPlayerMovement"/> component.
@@ -214,7 +218,7 @@ namespace SEE.Game.Avatars
         {
             StartCoroutine(StartXRCoroutine());
         }
-
+#endif
         /// <summary>
         /// The path to the animator controller that should be used when the avatar
         /// is set up for VR. This controller will be assigned to the UMA avatar
@@ -232,7 +236,7 @@ namespace SEE.Game.Avatars
         /// representing the head for VRIK.
         /// </summary>
         private const string VRPlayerHeadForVRIK = "Camera Offset/Main Camera/Head";
-
+#if INCLUDE_STEAM_VR
         /// <summary>
         /// The composite name of the child within <see cref="VRPlayerRigPrefab"/>
         /// representing the left hand for VRIK.
@@ -244,9 +248,11 @@ namespace SEE.Game.Avatars
         /// representing the right hand for VRIK.
         /// </summary>
         private const string VRPlayerRightHandForVRIK = XRCameraRigManager.RightControllerName + "/RightHand";
-
+#endif
+#if INCLUDE_STEAM_VR
         public IEnumerator StartXRCoroutine()
         {
+
             // Start XR manually.
             StartCoroutine(ManualXRControl.StartXRCoroutine());
 
@@ -255,6 +261,7 @@ namespace SEE.Game.Avatars
             {
                 yield return null;
             }
+
 
             Debug.Log($"[{nameof(AvatarAdapter)}] XR is initialized. Adding the necessary VR components.\n");
 
@@ -275,7 +282,9 @@ namespace SEE.Game.Avatars
             VRIKActions.AddComponents(gameObject, IsLocalPlayer);
             VRIKActions.TurnOffAvatarAimingSystem(gameObject);
             VRIKActions.ReplaceAnimator(gameObject, AnimatorForVRIK);
+#if INCLUDE_STEAM_VR
             SetupVRIK();
+#endif
             PrepareLipTracker();
             InitializeVrikRemote();
 
@@ -309,7 +318,9 @@ namespace SEE.Game.Avatars
                         Vector3 position = ground.transform.position;
                         position.y += 0.01f;
                         GameObject clonedFloor = Instantiate(ground, position, ground.transform.rotation);
+#if INCLUDE_STEAM_VR
                         clonedFloor.AddComponent<TeleportArea>();
+#endif
                     }
                     // FIXME: This needs to work again for our metric charts.
                     //{
@@ -342,10 +353,11 @@ namespace SEE.Game.Avatars
             {
                 gameObject.AddComponent<VRIKSynchronizer>();
             }
-
+#if INCLUDE_STEAM_VR
             // Set up FinalIK's VR IK on the avatar.
             void SetupVRIK()
             {
+                
                 VRIK vrIK = gameObject.AddOrGetComponent<VRIK>();
 
                 vrIK.solver.spine.headTarget = rig.transform.Find(VRPlayerHeadForVRIK);
@@ -355,6 +367,7 @@ namespace SEE.Game.Avatars
                 vrIK.solver.rightArm.target = rig.transform.Find(VRPlayerRightHandForVRIK);
                 Assert.IsNotNull(vrIK.solver.rightArm.target);
             }
+#endif
 
             // Prepare HTC Facial Tracker
             void PrepareLipTracker()
@@ -412,7 +425,9 @@ namespace SEE.Game.Avatars
                 Debug.Log("[HTC Facial Tracker] Initialisation complete.\n");
             }
         }
+#endif
 
+#if INCLUDE_STEAM_VR
         /// <summary>
         /// Turns off VR controller hints if <see cref="ShowControllerHints"/> is <c>false</c>.
         /// </summary>
@@ -443,6 +458,7 @@ namespace SEE.Game.Avatars
                 }
             }
         }
+#endif
 
         /// <summary>
         /// Prepares the avatar for a desktop environment by adding a DesktopPlayer prefab

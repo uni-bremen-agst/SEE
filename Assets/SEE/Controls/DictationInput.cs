@@ -94,7 +94,10 @@ namespace SEE.Controls
         /// <param name="dictationResultDelegate">delegate to be unregistered</param>
         public void Unregister(DictationResultDelegate dictationResultDelegate)
         {
-            recognizer.DictationResult -= dictationResultDelegate;
+            if (recognizer != null)
+            {
+                recognizer.DictationResult -= dictationResultDelegate;
+            }
         }
 
         /// <summary>
@@ -154,7 +157,7 @@ namespace SEE.Controls
         /// nothing happens.
         /// </summary>
         /// <param name="completionCause">the reason why the dictation was completed</param>
-        private void ReportCompletion(DictationCompletionCause completionCause)
+        private static void ReportCompletion(DictationCompletionCause completionCause)
         {
             switch (completionCause)
             {
@@ -165,7 +168,7 @@ namespace SEE.Controls
                     Debug.LogError("Dictation session completion was caused by bad audio quality.\n");
                     break;
                 case DictationCompletionCause.Canceled:
-                    Debug.LogError("Dictation session completion was caused by bad audio quality.\n");
+                    Debug.LogError("Dictation session completion was cancelled.\n");
                     break;
                 case DictationCompletionCause.TimeoutExceeded:
                     Debug.LogError("Dictation session has reached its timeout.\n");
@@ -186,7 +189,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Callback that is triggered when the recognizer session encouters an error.
+        /// Callback that is triggered when the recognizer session encounters an error.
         /// </summary>
         /// <param name="error">the error message</param>
         /// <param name="hresult">HRESULT code that corresponds to the error</param>

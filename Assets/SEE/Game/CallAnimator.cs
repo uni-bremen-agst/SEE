@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using SEE.Controls;
-using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
@@ -10,10 +9,10 @@ using UnityEngine;
 namespace SEE.Game
 {
     /// <summary>
-    /// This scene animator is intended to animate calls in a code city for capturing 
+    /// This scene animator is intended to animate calls in a code city for capturing
     /// videos to showcase SEE. The call chains are generated via random graph
-    /// tree walks. 
-    /// 
+    /// tree walks.
+    ///
     /// Its only purpose was to create a video. Do not use this class.
     /// </summary>
     //[ExecuteAlways]
@@ -124,7 +123,7 @@ namespace SEE.Game
                     Hide(graphWalker.CurrentPath());
                     graphWalker.Next();
                     Show(graphWalker.CurrentPath());
-                    // callGraphRoot should be highlighted no matter what             
+                    // callGraphRoot should be highlighted no matter what
                     nodeToGameObject[callGraphRoot].SetColor(ExecutionColor);
                     executionTimer = CallDuration;
                 }
@@ -138,7 +137,7 @@ namespace SEE.Game
             executionTimer = 0.0f;
             nodeToGameObject = CollectImplementationNodes();
             Debug.Log($"[CallAnimation] {nodeToGameObject.Count} many nodes.\n");
-            initialNodeColors = CollectNodeColors(nodeToGameObject.Values);            
+            initialNodeColors = CollectNodeColors(nodeToGameObject.Values);
             edgeToGameObject = CollectImplementationEdges();
             Debug.Log($"[CallAnimation] {edgeToGameObject.Count} many edges.\n");
             initialEdgeColors = CollectEdgeColors(edgeToGameObject.Values);
@@ -225,7 +224,7 @@ namespace SEE.Game
         /// <returns>root node of <see cref="CodeCity"/></returns>
         private GameObject GetCityRootNode()
         {
-            return SceneQueries.GetCityRootNode(gameObject).gameObject;
+            return SceneQueries.GetCityRootNode(gameObject);
         }
 
         /// <summary>
@@ -399,7 +398,7 @@ namespace SEE.Game
 
         /// <summary>
         /// Returns given <paramref name="color"/> darkened by <paramref name="degree"/>.
-        /// 
+        ///
         /// Precondition: 0 <= <paramref name="degree"/> <= 1
         /// </summary>
         /// <param name="color">base color to be darkened</param>

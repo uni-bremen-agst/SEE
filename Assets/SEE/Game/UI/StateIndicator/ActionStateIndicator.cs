@@ -1,5 +1,8 @@
 ﻿using SEE.Controls.Actions;
+using SEE.Utils;
+#if INCLUDE_STEAM_VR
 using Valve.VR.InteractionSystem;
+#endif
 
 namespace SEE.Game.UI.StateIndicator
 {
@@ -16,7 +19,7 @@ namespace SEE.Game.UI.StateIndicator
         {
             if (newState != null)
             {
-                ChangeState(newState.Name, newState.Color.ColorWithAlpha(0.5f));
+                ChangeState(newState.Name, newState.Color.WithAlpha(0.5f));
             }
         }
     }

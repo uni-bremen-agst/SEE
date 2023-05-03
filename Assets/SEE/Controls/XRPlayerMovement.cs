@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
+#if INCLUDE_STEAM_VR
 using Valve.VR;
 using Valve.VR.InteractionSystem;
+#endif
 
 namespace SEE.Controls
 {
@@ -13,17 +15,18 @@ namespace SEE.Controls
         /// Gravity of the player. This is required to let a player jump down from platforms.
         /// </summary>
         private static readonly Vector3 gravity = new Vector3(0, 0.981f, 0);
-
-        [Tooltip("The VR controller for directing")]
+#if INCLUDE_STEAM_VR
+        [Tooltip("The VR controller for navigation")]
         public Hand DirectingHand;
-
+#endif
         [Tooltip("If true, movements stay in the x/z plane. You cannot go up or down.")]
         public bool KeepDirectionInPlane = false;
 
         public CharacterController characterController;
-
-        private readonly SteamVR_Action_Single throttleAction = SteamVR_Input.GetSingleAction(XRInput.DefaultActionSetName, XRInput.ThrottleActionName);
-
+#if INCLUDE_STEAM_VR
+        private readonly SteamVR_Action_Single throttleAction =
+ SteamVR_Input.GetSingleAction(XRInput.DefaultActionSetName, XRInput.ThrottleActionName);
+#endif
         /// <summary>
         /// Moves the game object this action is attached to based on input of the direction
         /// and throttle device. The speed of the movement depends on the throttle and the
@@ -31,6 +34,7 @@ namespace SEE.Controls
         /// </summary>
         public void Update()
         {
+#if INCLUDE_STEAM_VR
             // Check for the magnitude of the speed up so that the teleport locomotion
             // system does not interfere with the locomotion based on the VR controller
             // direction and throttle.
@@ -44,13 +48,16 @@ namespace SEE.Controls
                 }
                 float speed = throttleAction.axis * heightFactor;
 
-                Vector3 direction = SteamVR_Actions.default_Pose.GetLocalRotation(DirectingHand.handType) * Vector3.forward;
+                Vector3 direction =
+ SteamVR_Actions.default_Pose.GetLocalRotation(DirectingHand.handType) * Vector3.forward;
                 if (KeepDirectionInPlane)
                 {
-                    direction = Vector3.ProjectOnPlane(direction, Vector3.up) - gravity; // TODO: gravity is currently handled as velocity, not as acceleration
+                    direction =
+ Vector3.ProjectOnPlane(direction, Vector3.up) - gravity; // TODO: gravity is currently handled as velocity, not as acceleration
                 }
                 characterController.Move(direction * speed * Time.deltaTime);
             }
+#endif
         }
     }
 }
