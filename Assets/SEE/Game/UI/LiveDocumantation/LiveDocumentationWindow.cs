@@ -207,6 +207,8 @@ namespace SEE.Game.UI.LiveDocumantation
             }
         }
 
+        private bool HighlightAnomation = false;
+
         /// <summary>
         /// Is called when the user clicked on a Text segment in the class name field.
         /// If the user technically clicked on the field, but hasn't hit any text the function isn't called.
@@ -221,13 +223,17 @@ namespace SEE.Game.UI.LiveDocumantation
             //NodeOfClass.GameObject().transform.localScale += new Vector3(1.3f, 1.3f, 1.3f);
             var newScale = new Vector3(1.5f, 1.5f, 1.5f);
             var oldScale = NodeOfClass.GameObject().transform.localScale;
-            NodeOfClass.GameObject().transform.DOScale(oldScale *2 ,2.0f).SetEase(Ease.InOutSine).SetLoops(2, LoopType.Yoyo).OnComplete(
-                () => 
-                {
-                    ShowNotification.Warn("sdds", "sdsd");
-                }).Restart();
-          //  Thread.Sleep(1000);
-           // NodeOfClass.GameObject().transform.localScale = oldScale;
+            if (!HighlightAnomation)
+            {
+                HighlightAnomation = true;
+                NodeOfClass.GameObject().transform.DOScale(oldScale * 1.5f, 0.3f).SetEase(Ease.InOutSine)
+                    .SetLoops(2, LoopType.Yoyo).OnComplete(
+                        () => { HighlightAnomation = false; }).Restart();
+            }
+
+
+            //  Thread.Sleep(1000);
+            // NodeOfClass.GameObject().transform.localScale = oldScale;
         }
 
 
