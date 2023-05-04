@@ -271,12 +271,29 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Returns true if the user is currently hovering over any node of this city.
+        /// </summary>
+        /// <returns>true if user is hovering over this city</returns>
+        private bool UserIsHoveringCity()
+        {
+            if (!TryGetComponent(out GO.Plane clippingPlane) || clippingPlane == null)
+            {
+                Debug.LogError($"Code city {gameObject.FullName()} has no {typeof(GO.Plane)}.\n");
+                return false;
+            }
+
+            Raycasting.RaycastClippingPlane(clippingPlane, out _, out bool hitInsideClippingArea, out Vector3 _);
+            return hitInsideClippingArea;
+        }
+
+        /// <summary>
         /// Reacts to the user's interactions.
         /// </summary>
         protected override void Update()
         {
             base.Update();
 
+            Debug.Log($"UserIsHoveringCity() {UserIsHoveringCity()}\n");
             // Update Visualisation every 'interval' seconds.
             if (Time.time >= nextUpdateTime)
             {
