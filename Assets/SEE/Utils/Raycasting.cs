@@ -232,7 +232,7 @@ namespace SEE.Utils
         public static void RaycastClippingPlane(GO.Plane clippingPlane, out bool hit, out bool hitInsideClippingArea, out Vector3 hitPointOnPlane)
         {
             Ray ray = UserPointsTo();
-            UnityEngine.Plane raycastPlane = new UnityEngine.Plane(Vector3.up, clippingPlane.transform.position);
+            UnityEngine.Plane raycastPlane = new(Vector3.up, clippingPlane.transform.position);
             hit = raycastPlane.Raycast(ray, out float enter);
             if (hit)
             {
