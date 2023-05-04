@@ -1,4 +1,6 @@
 ﻿using SEE.Game;
+using SEE.Game.Operator;
+using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -23,7 +25,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public float YAngle;
 
-        public RotateNodeNetAction(string nodeID, Vector3 position, float yAngle) : base()
+        public RotateNodeNetAction(string nodeID, Vector3 position, float yAngle)
         {
             GameObjectID = nodeID;
             Position = position;
@@ -40,7 +42,9 @@ namespace SEE.Net.Actions
                 GameObject gameObject = GraphElementIDMap.Find(GameObjectID);
                 if (gameObject != null)
                 {
-                    Positioner.Set(gameObject.transform, position: Position, yAngle: YAngle);
+                    NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+                    nodeOperator.RotateTo(Quaternion.Euler(0, YAngle, 0), 0);
+                    nodeOperator.MoveTo(Position, 0);
                 }
                 else
                 {

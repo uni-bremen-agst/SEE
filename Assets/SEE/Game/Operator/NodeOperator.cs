@@ -41,6 +41,11 @@ namespace SEE.Game.Operator
         private TweenOperation<float> PositionZ;
 
         /// <summary>
+        /// Operation handling node rotation.
+        /// </summary>
+        private TweenOperation<Quaternion> Rotation;
+
+        /// <summary>
         /// Operation handling animated label display.
         /// </summary>
         private TweenOperation<float> LabelAlpha;
@@ -179,6 +184,34 @@ namespace SEE.Game.Operator
                 PositionZ.AnimateTo(newPosition.z, duration)
             }, a => a);
         }
+        
+        /// <summary>
+        /// Rotates the node to the given quaternion <paramref name="newRotation"/>,
+        /// taking <paramref name="duration"/> seconds.
+        /// </summary>
+        /// <param name="newRotation">the desired new target rotation</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> RotateTo(Quaternion newRotation, float duration)
+        {
+            return Rotation.AnimateTo(newRotation, duration);
+        }
+        
+        /// <summary>
+        /// Rotates the node around the given <paramref name="axis"/> by the given <paramref name="angle"/>, taking
+        /// <paramref name="duration"/> seconds.
+        /// </summary>
+        /// <param name="axis">the axis to rotate around</param>
+        /// <param name="angle">the angle to rotate by</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> RotateTo(Vector3 axis, float angle, float duration)
+        {
+            Quaternion rotation = Quaternion.AngleAxis(angle, axis);
+            return RotateTo(rotation, duration);
+        }
 
         /// <summary>
         /// Scales the node to the given <paramref name="newLocalScale"/>, taking <paramref name="duration"/> seconds.
@@ -312,7 +345,7 @@ namespace SEE.Game.Operator
         private void MorphEdges(IEnumerable<Edge> edges, float duration)
         {
             // All game edges corresponding to the graph edges.
-            IList<GameObject> gameEdges = new List<GameObject>(edges.Count());
+            IList<GameObject> gameEdges = new List<GameObject>();
 
             // Gather all gameEdges.
             foreach (Edge edge in edges)
@@ -345,13 +378,16 @@ namespace SEE.Game.Operator
             Material material = GetRenderer(gameObject).material;
             Vector3 currentPosition = transform.position;
             Vector3 currentScale = transform.localScale;
+            Quaternion currentRotation = transform.rotation;
 
             Tween[] AnimateToXAction(float x, float d) => new Tween[] { transform.DOMoveX(x, d).Play() };
             Tween[] AnimateToYAction(float y, float d) => new Tween[] { transform.DOMoveY(y, d).Play() };
             Tween[] AnimateToZAction(float z, float d) => new Tween[] { transform.DOMoveZ(z, d).Play() };
+            Tween[] AnimateToRotationAction(Quaternion r, float d) => new Tween[] { transform.DORotateQuaternion(r, d).Play() };
             PositionX = new TweenOperation<float>(AnimateToXAction, currentPosition.x);
             PositionY = new TweenOperation<float>(AnimateToYAction, currentPosition.y);
             PositionZ = new TweenOperation<float>(AnimateToZAction, currentPosition.z);
+            Rotation = new TweenOperation<Quaternion>(AnimateToRotationAction, currentRotation);
 
             Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] { transform.DOScale(s, d).Play() };
             Scale = new TweenOperation<Vector3>(AnimateToScaleAction, currentScale);
@@ -423,6 +459,8 @@ namespace SEE.Game.Operator
             PositionY = null;
             PositionZ.KillAnimator();
             PositionZ = null;
+            Rotation.KillAnimator();
+            Rotation = null;
             Scale.KillAnimator();
             Scale = null;
             LabelAlpha.KillAnimator();

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using HighlightPlus;
 using SEE.Game;
 using SEE.Game.UI3D;
 using SEE.GO;
@@ -6,6 +7,7 @@ using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Audio;
+using SEE.Game.Operator;
 
 namespace SEE.Controls.Actions
 {
@@ -26,6 +28,10 @@ namespace SEE.Controls.Actions
             /// i.e., is tagged by <see cref="Tags.Node"/>.
             /// </summary>
             internal Transform CityRootNode;
+            /// <summary>
+            /// The node that was hit by the raycast.
+            /// </summary>
+            internal Transform HitNode;
             internal CityCursor Cursor;
             internal UnityEngine.Plane Plane;
         }
@@ -42,6 +48,11 @@ namespace SEE.Controls.Actions
         private float startAngle;
 
         /// <summary>
+        /// The operator for the node that is being rotated.
+        /// </summary>
+        private NodeOperator @operator;
+
+        /// <summary>
         /// Returns a new instance of <see cref="RotateAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="RotateAction"/></returns>
@@ -53,6 +64,8 @@ namespace SEE.Controls.Actions
             originalPosition = Vector3.zero,
             startAngle = 0.0f
         };
+        
+        // FIXME: Action is not reversible!
 
         /// <summary>
         /// Returns a new instance of <see cref="RotateAction"/>.
@@ -87,6 +100,20 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Returns the operator for the given <paramref name="node"/>.
+        /// </summary>
+        /// <param name="node">The node to get the operator for.</param>
+        /// <returns>the operator for the given <paramref name="node"/></returns>
+        private NodeOperator GetOperatorForNode(Component node)
+        {
+            if (@operator == null || @operator.transform != node)
+            {
+                @operator = node.gameObject.AddOrGetComponent<NodeOperator>();
+            }
+            return @operator;
+        }
+
+        /// <summary>
         /// Returns a new instance of <see cref="RotateAction"/>.
         /// <see cref="ReversibleAction.Update"/>.
         /// </summary>
@@ -109,7 +136,9 @@ namespace SEE.Controls.Actions
             {
                 if (rotating)
                 {
-                    Positioner.Set(hit.CityRootNode, position: originalPosition, yAngle: originalEulerAngleY);
+                    NodeOperator nodeOperator = GetOperatorForNode(hit.HitNode);
+                    nodeOperator.RotateTo(Quaternion.Euler(0, originalEulerAngleY, 0), 0);
+                    nodeOperator.MoveTo(originalPosition, 0);
                     foreach (InteractableObject interactable in hit.Cursor.E.GetFocusses())
                     {
                         if (interactable.IsGrabbed)
@@ -133,12 +162,13 @@ namespace SEE.Controls.Actions
                 Vector3 planeHitPoint;
                 if (cityRootNode)
                 {
-                    UnityEngine.Plane plane = new UnityEngine.Plane(Vector3.up, cityRootNode.position);
+                    UnityEngine.Plane plane = new(Vector3.up, cityRootNode.position);
                     if (!rotating && Raycasting.RaycastPlane(plane, out planeHitPoint)) // start rotation
                     {
                         AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND);
                         rotating = true;
                         hit.CityRootNode = cityRootNode;
+                        hit.HitNode = obj.transform;
                         hit.Cursor = cityCursor;
                         hit.Plane = plane;
 
@@ -155,8 +185,7 @@ namespace SEE.Controls.Actions
                         originalEulerAngleY = cityRootNode.rotation.eulerAngles.y;
                         originalPosition = cityRootNode.position;
                         startAngle = AngleMod(cityRootNode.rotation.eulerAngles.y - toHitAngle);
-                        gizmo.StartAngle = Mathf.Deg2Rad * toHitAngle;
-                        gizmo.TargetAngle = Mathf.Deg2Rad * toHitAngle;
+                        gizmo.StartAngle = gizmo.TargetAngle = Mathf.Deg2Rad * toHitAngle;
                     }
                 }
 
@@ -170,7 +199,8 @@ namespace SEE.Controls.Actions
                         angle = AngleMod(Mathf.Round(angle / SnapStepAngle) * SnapStepAngle);
                     }
 
-                    hit.CityRootNode.RotateAround(gizmo.Center, Vector3.up, angle - hit.CityRootNode.rotation.eulerAngles.y);
+                    NodeOperator nodeOperator = GetOperatorForNode(hit.HitNode);
+                    nodeOperator.RotateTo(Quaternion.AngleAxis(angle, Vector3.up), 0);
 
                     float prevAngle = Mathf.Rad2Deg * gizmo.TargetAngle;
                     float currAngle = toHitAngle;
@@ -185,7 +215,7 @@ namespace SEE.Controls.Actions
                     }
                     if (SEEInput.Snap())
                     {
-                        currAngle = Mathf.Round((currAngle + startAngle) / (SnapStepAngle)) * (SnapStepAngle) - startAngle;
+                        currAngle = Mathf.Round((currAngle + startAngle) / SnapStepAngle) * SnapStepAngle - startAngle;
                     }
                     gizmo.TargetAngle = Mathf.Deg2Rad * currAngle;
 
@@ -205,9 +235,8 @@ namespace SEE.Controls.Actions
                     }
                     gizmo.gameObject.SetActive(false);
 
-                    cityRootNode.RotateAround(cityCursor.E.HasFocus() ?
-                          cityCursor.E.ComputeCenter()
-                        : cityRootNode.position, Vector3.up, -cityRootNode.rotation.eulerAngles.y);
+                    NodeOperator nodeOperator = GetOperatorForNode(hit.HitNode);
+                    nodeOperator.RotateTo(Quaternion.AngleAxis(hit.HitNode.rotation.eulerAngles.y, Vector3.up), 0);
                     synchronize = true;
                 }
             }
@@ -217,7 +246,10 @@ namespace SEE.Controls.Actions
 
                 foreach (InteractableObject interactable in hit.Cursor.E.GetFocusses())
                 {
-                    interactable.SetGrab(false, true);
+                    if (interactable.IsGrabbed)
+                    {
+                        interactable.SetGrab(false, true);
+                    }
                 }
                 AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
                 gizmo.gameObject.SetActive(false);
@@ -244,7 +276,7 @@ namespace SEE.Controls.Actions
         /// <returns>The angle in the range [0, 360) degrees.</returns>
         private static float AngleMod(float degrees)
         {
-            return ((degrees % FullCircleDegree) + FullCircleDegree) % FullCircleDegree;
+            return (degrees % FullCircleDegree + FullCircleDegree) % FullCircleDegree;
         }
     }
 }
