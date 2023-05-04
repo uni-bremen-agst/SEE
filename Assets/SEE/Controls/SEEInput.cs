@@ -1,5 +1,4 @@
 ﻿using SEE.Utils;
-using System;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -32,7 +31,7 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Help);
         }
-        
+
         /// <summary>
         /// Toggles voice input (i.e., for voice commands) on/off.
         /// </summary>
@@ -476,30 +475,6 @@ namespace SEE.Controls
         //--------------------------
 
         /// <summary>
-        /// The previous revision is to be shown.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool PreviousRevision()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.PreviousRevision);
-        }
-        /// <summary>
-        /// The next revision is to be shown.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool NextRevision()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.NextRevision);
-        }
-        /// <summary>
-        /// Toggles auto play of the animation.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ToggleAutoPlay()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleAutoPlay);
-        }
-        /// <summary>
         /// Sets a new marker.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
@@ -527,31 +502,33 @@ namespace SEE.Controls
         #endregion
 
         //----------------------------------------------------
-        #region Animation speed (shared by Debugging and Evolution)
+        #region Animation (shared by Debugging and Evolution)
         //----------------------------------------------------
 
         /// <summary>
-        /// Double animation speed.
+        /// The previous revision is to be shown.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool IncreaseAnimationSpeed()
+        public static bool PreviousRevision()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.IncreaseAnimationSpeed);
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.PreviousRevision);
         }
         /// <summary>
-        /// Halve animation speed.
+        /// The next revision is to be shown.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool DecreaseAnimationSpeed()
+        public static bool NextRevision()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.DecreaseAnimationSpeed);
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.NextRevision);
         }
-
-        #endregion
-
-        //--------------------------
-        #region Debugging
-        //--------------------------
+        /// <summary>
+        /// Toggles auto play of the animation.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleAutoPlay()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleAutoPlay);
+        }
 
         /// <summary>
         /// Toggles automatic/manual execution mode.
@@ -569,14 +546,7 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleExecutionOrder);
         }
-        /// <summary>
-        /// Continues execution until next breakpoint is reached.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ExecuteToBreakpoint()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ExecuteToBreakpoint);
-        }
+
         /// <summary>
         /// Executes previous statement.
         /// </summary>
@@ -600,6 +570,39 @@ namespace SEE.Controls
         public static bool FirstStatement()
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.FirstStatement);
+        }
+
+        /// <summary>
+        /// Double animation speed.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool IncreaseAnimationSpeed()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.IncreaseAnimationSpeed);
+        }
+
+        /// <summary>
+        /// Halve animation speed.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool DecreaseAnimationSpeed()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.DecreaseAnimationSpeed);
+        }
+
+        #endregion
+
+        //--------------------------
+        #region Debugging
+        //--------------------------
+
+        /// <summary>
+        /// Continues execution until next breakpoint is reached.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ExecuteToBreakpoint()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ExecuteToBreakpoint);
         }
 
         #endregion
