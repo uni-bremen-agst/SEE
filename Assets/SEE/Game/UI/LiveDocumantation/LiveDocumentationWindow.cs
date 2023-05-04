@@ -137,6 +137,9 @@ namespace SEE.Game.UI.LiveDocumantation
         /// <param name="buffer"></param>
         private void AddClassMember(LiveDocumentationBuffer buffer)
         {
+            if (buffer is LiveDocumentationClassMemberBuffer classMemberBuffer)
+            {
+                
             // Creating a new GameObject and naming it
             GameObject classMem = new GameObject();
             classMem.name = "Item";
@@ -148,6 +151,7 @@ namespace SEE.Game.UI.LiveDocumantation
             //Adding the ClassMember component
             ClassMember cm = classMem.AddComponent<ClassMember>();
             cm.Text = buffer.PrintBuffer();
+            cm.LineNumber = classMemberBuffer.LineNumber;
 
             // Setting the correct anchor point (upper left corner) for the new game object
             classMem.transform.parent = ClassMembersList.transform;
@@ -157,8 +161,29 @@ namespace SEE.Game.UI.LiveDocumantation
             rt.anchorMax = new Vector2(0, 1);
 
             cm.OnLinkClicked += OnLinkClicked;
+            cm.OnClicked.AddListener(OnClickClassMember);
+
+
+
+            }
         }
 
+        private void OnClickClassMember(ClassMember cm)
+        {
+            var method = NodeOfClass.Children().Where(x => x.Type.Equals("Method")).Where(x => x.GetInt("Source.Line") == cm.LineNumber).First();
+
+            if (method != null)
+            {
+                var oldScale = NodeOfClass.GameObject().transform.localScale;
+                if (!cm.HighlightAnimationRunning)
+                {
+                    cm.HighlightAnimationRunning = true;
+                    method.GameObject().transform.DOScale(oldScale * 1.5f, 0.3f).SetEase(Ease.InOutSine)
+                        .SetLoops(2, LoopType.Yoyo).OnComplete(
+                            () => { cm.HighlightAnimationRunning = false; }).Restart();
+                }
+            }
+        }
 
         protected override void StartDesktop()
         {

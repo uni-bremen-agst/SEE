@@ -93,32 +93,35 @@ namespace SEE.Utils.LiveDocumentation
                 var lexer = new CSharpCommentsGrammarLexer(new AntlrInputStream(commentTokens));
                 var tokens = new CommonTokenStream(lexer);
                 tokens.Fill();
-                var parser = new CSharpCommentsGrammarParser(tokens);
-                // var t = parser.start().children;
-                var classComments = parser.docs().summary().comments().comment();
-                // Parse C# Doc line by line and write it in the Buffer
-                foreach (var commentLine in classComments)
+                if (tokens.GetTokens().Count > 1)
                 {
-                    if (commentLine is CSharpCommentsGrammarParser.CommentContext comment)
+                    var parser = new CSharpCommentsGrammarParser(tokens);
+                    // var t = parser.start().children;
+                    var classComments = parser.docs().summary().comments().comment();
+                    // Parse C# Doc line by line and write it in the Buffer
+                    foreach (var commentLine in classComments)
                     {
-                        foreach (var j in comment.children)
+                        if (commentLine is CSharpCommentsGrammarParser.CommentContext comment)
                         {
-                            if (j is ITerminalNode)
+                            foreach (var j in comment.children)
                             {
-                                var text = j.GetText();
-                                // if necessary remove the three slashes at the beginning of the comment.  
-                                var commentString = text.StartsWith("///") ? text[3..].Trim() : text;
-                                buffer.Add(new LiveDocumentationBufferText(commentString.Substring(3).Trim()));
-                            }
-                            else if (j is CSharpCommentsGrammarParser.ClassLinkContext classLink)
-                            {
-                                buffer.Add(new LiveDocumentationLink(classLink.linkID.Text,
-                                    classLink.linkID.Text));
+                                if (j is ITerminalNode)
+                                {
+                                    var text = j.GetText();
+                                    // if necessary remove the three slashes at the beginning of the comment.  
+                                    var commentString = text.StartsWith("///") ? text[3..].Trim() : text;
+                                    buffer.Add(new LiveDocumentationBufferText(commentString.Substring(3).Trim()));
+                                }
+                                else if (j is CSharpCommentsGrammarParser.ClassLinkContext classLink)
+                                {
+                                    buffer.Add(new LiveDocumentationLink(classLink.linkID.Text,
+                                        classLink.linkID.Text));
+                                }
                             }
                         }
-                    }
 
-                    buffer.Add(new LiveDocumentationBufferText("\n"));
+                        buffer.Add(new LiveDocumentationBufferText("\n"));
+                    }
                 }
             }
 
@@ -152,6 +155,7 @@ namespace SEE.Utils.LiveDocumentation
                     .ToList();
                 foreach (var clss in classes)
                 {
+                    // Check the class name
                     if (clss.type_declaration()
                         .class_definition()
                         .identifier()
@@ -159,9 +163,9 @@ namespace SEE.Utils.LiveDocumentation
                         .Equals(className))
                     {
                         var classBody = clss
-                        .type_declaration()
-                        .class_definition()
-                        .class_body();
+                            .type_declaration()
+                            .class_definition()
+                            .class_body();
                         var methods = classBody
                             .class_member_declarations()
                             .class_member_declaration()
@@ -169,7 +173,12 @@ namespace SEE.Utils.LiveDocumentation
                         foreach (var i in methods)
                         {
                             i.GetText();
-                            LiveDocumentationBuffer methodBuffer = new LiveDocumentationBuffer();
+                            LiveDocumentationClassMemberBuffer methodBuffer = new LiveDocumentationClassMemberBuffer();
+
+                   
+                            methodBuffer.LineNumber = i.common_member_declaration().method_declaration()
+                                .method_member_name().Start.Line;
+                            
                             var signature = i.all_member_modifiers().GetText() + " " +
                                             i.common_member_declaration().method_declaration()
                                                 .method_member_name().GetText();
