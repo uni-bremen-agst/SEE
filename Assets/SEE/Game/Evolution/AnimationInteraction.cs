@@ -522,7 +522,7 @@ namespace SEE.Game.Evolution
                 else if (SEEInput.SetMarker())
                 {
                     Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
-                    Vector3 markerPos = new Vector3(handlePos.x, handlePos.y + .08f, handlePos.z);
+                    Vector3 markerPos = new(handlePos.x, handlePos.y + .08f, handlePos.z);
                     if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) == null)
                     {
                         AddMarker(markerPos, null);
