@@ -597,11 +597,11 @@ namespace SEE.Controls.Actions
         // FIXME: parts of this needs to be fixed in the future.
         private bool MoveActionVR()
         {
-            if (VRGrabber.IsGrabbed)
+            if (VrGrabber.IsGrabbed)
             {
                 if (!grabbedObject.IsGrabbed)
                 {
-                    GameObject grabbedObj = VRGrabber.GrabbedObject;
+                    GameObject grabbedObj = VrGrabber.GrabbedObject;
 
                     if (grabbedObj.TryGetNode(out Node node) && !node.IsRoot())
                     {
@@ -624,7 +624,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Is called from OnCollisionEnter() in <see cref="VRGrabber"/>.
+        /// Is called from OnCollisionEnter() in <see cref="VrGrabber"/>.
         /// </summary>
         /// <param name="target"></param>
         public static void ReparentVR(GameObject target)
@@ -633,7 +633,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Is called from OnCollisionExit() in <see cref="VRGrabber"/>.
+        /// Is called from OnCollisionExit() in <see cref="VrGrabber"/>.
         /// FIXME: UnReparenting with collisionexit() has some strange effects on hierarchy. Need to look into this Problem.
         /// </summary>
         public static void UnReparentVR()
@@ -656,7 +656,7 @@ namespace SEE.Controls.Actions
             }
             else if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                return VRGrabber.IsGrabbed;
+                return VrGrabber.IsGrabbed;
             }
             return false;
         }

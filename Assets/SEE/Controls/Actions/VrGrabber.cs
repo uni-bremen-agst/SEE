@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
-    public class VRGrabber : MonoBehaviour
+    public class VrGrabber : MonoBehaviour
     {
         /// <summary>
         /// Left back vector of Portal

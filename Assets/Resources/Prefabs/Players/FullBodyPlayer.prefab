@@ -3044,11 +3044,11 @@ MonoBehaviour:
   devices:
   - deviceNames:
     - Oculus
-    position: {x: 0.04, y: -0.04, z: -0.023}
+    position: {x: 0, y: 0, z: 0}
     rotation: {x: 16, y: 8, z: 8}
   - deviceNames:
     - Windows MR
-    position: {x: 0.003, y: -0.005, z: -0.078}
+    position: {x: 0, y: 0, z: 0}
     rotation: {x: 36, y: -12, z: 2}
   - deviceNames:
     - Vive
@@ -3056,7 +3056,7 @@ MonoBehaviour:
     - Index
     - Cosmos
     - Elite
-    position: {x: 0.035, y: -0.022, z: -0.11}
+    position: {x: 0, y: 0, z: 0}
     rotation: {x: 50, y: -2, z: -11}
 --- !u!114 &6150281781846471092
 MonoBehaviour:
