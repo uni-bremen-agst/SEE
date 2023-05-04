@@ -108,28 +108,10 @@ namespace SEE.Game.Worlds
         {
             int index = numberOfSpawnedPlayers % PlayerSpawns.Count;
 
-            //FIXME: Remove workaround after project day and fix prefab spawn in desktop-mode.
-            //-Workaround start-
-            GameObject playerPrefab = PlayerSpawns[index].PlayerPrefab;
-            // Check if the scene settings contain a VRPlayer
-            SceneSettings sceneSettings = FindObjectOfType<SceneSettings>();
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
-            {
-                // Use the "FullBodyPlayer" prefab instead of "Male1"
-                GameObject FullBodyPlayer = Resources.Load<GameObject>("Prefabs/Avatars/FullBodyPlayer");
-                if (FullBodyPlayer)
-                {
-                    playerPrefab = FullBodyPlayer;
-                }
-                else
-                {
-                    Debug.Log("Should not load Male1 prefab.[PD Workaround]");
-                }
-            }
-            //-Workaround finish-
-            GameObject player = Instantiate(playerPrefab,
+            GameObject player = Instantiate(PlayerSpawns[index].PlayerPrefab,
                 PlayerSpawns[index].Position,
                 Quaternion.Euler(new Vector3(0, PlayerSpawns[index].Rotation, 0)));
+            
             numberOfSpawnedPlayers++;
             player.name = "Player " + numberOfSpawnedPlayers;
             Debug.Log($"Spawned {player.name} (network id: {owner}, local: {IsLocal(owner)}) at position {player.transform.position}.\n");
