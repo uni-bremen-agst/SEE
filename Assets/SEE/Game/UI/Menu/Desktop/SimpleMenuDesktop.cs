@@ -87,7 +87,6 @@ namespace SEE.Game.UI.Menu
         /// Destroys this component if the corresponding menu has been destroyed or was not properly initialized.
         /// </summary>
         protected override void Update()
-
         {
             // destroys the component without a menu
             if (Menu == null)
@@ -103,7 +102,10 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         protected virtual void OnDestroy()
         {
-            if (Menu != null) Destroy(Menu);
+            if (Menu != null)
+            {
+                Destroy(Menu);
+            }
         }
         
         /// <summary>
