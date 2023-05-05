@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using HighlightPlus;
 using SEE.Game;
 using SEE.Game.UI3D;
@@ -28,6 +29,7 @@ namespace SEE.Controls.Actions
             /// i.e., is tagged by <see cref="Tags.Node"/>.
             /// </summary>
             internal Transform CityRootNode;
+
             internal CityCursor Cursor;
             internal UnityEngine.Plane Plane;
         }
@@ -42,6 +44,9 @@ namespace SEE.Controls.Actions
         private float originalEulerAngleY;
         private Vector3 originalPosition;
         private float startAngle;
+        private float rotationAngle;
+        private Dictionary<GameObject, Quaternion> initialRotations = new();
+        private Dictionary<GameObject, Quaternion> finalRotations = new();
 
         /// <summary>
         /// The operator for the node that is being rotated.
@@ -52,29 +57,15 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="RotateAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="RotateAction"/></returns>
-        internal static ReversibleAction CreateReversibleAction() => new RotateAction
-        {
-            rotating = false,
-            hit = new Hit(),
-            originalEulerAngleY = 0.0f,
-            originalPosition = Vector3.zero,
-            startAngle = 0.0f
-        };
-        
+        internal static ReversibleAction CreateReversibleAction() => new RotateAction();
+
         // FIXME: Action is not reversible!
 
         /// <summary>
         /// Returns a new instance of <see cref="RotateAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance() => new RotateAction
-        {
-            rotating = rotating,
-            hit = hit,
-            originalEulerAngleY = originalEulerAngleY,
-            originalPosition = originalPosition,
-            startAngle = startAngle
-        };
+        public override ReversibleAction NewInstance() => new RotateAction();
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
@@ -92,7 +83,7 @@ namespace SEE.Controls.Actions
         /// <returns>empty set because this action does not change anything</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string>();
+            return initialRotations.Keys.Select(x => x.name).ToHashSet();
         }
 
         /// <summary>
@@ -127,34 +118,8 @@ namespace SEE.Controls.Actions
                 cityCursor = cityRootNode.GetComponentInParent<CityCursor>();
             }
 
-            bool synchronize = false;
-
-            if (SEEInput.Cancel()) // cancel rotation
-            {
-                if (rotating)
-                {
-                    foreach (InteractableObject interactable in hit.Cursor.E.GetFocusses())
-                    {
-                        if (interactable.IsGrabbed)
-                        {
-                            interactable.SetGrab(false, true);
-                        }
-                        NodeOperator nodeOperator = GetOperatorForNode(interactable);
-                        nodeOperator.RotateTo(Quaternion.Euler(0, originalEulerAngleY, 0), 0);
-                        nodeOperator.MoveTo(originalPosition, 0);
-                    }
-                    gizmo.gameObject.SetActive(false);
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
-                    rotating = false;
-                    synchronize = true;
-                }
-                else if (obj)
-                {
-                    // TODO(torben): Explanation in MoveAction.cs: @UnselectInWrongPlace
-                    InteractableObject.UnselectAllInGraph(obj.ItsGraph, true);
-                }
-            }
-            else if (SEEInput.Drag()) // start or continue rotation
+            bool isCompleted = true;
+            if (SEEInput.Drag()) // start or continue rotation
             {
                 Vector3 planeHitPoint;
                 if (cityRootNode)
@@ -171,6 +136,7 @@ namespace SEE.Controls.Actions
                         foreach (InteractableObject interactable in hit.Cursor.E.GetFocusses())
                         {
                             interactable.SetGrab(true, true);
+                            initialRotations[interactable.gameObject] = interactable.transform.rotation;
                         }
                         gizmo.gameObject.SetActive(true);
                         gizmo.Center = cityCursor.E.HasFocus() ? hit.Cursor.E.ComputeCenter() : hit.CityRootNode.position;
@@ -189,16 +155,16 @@ namespace SEE.Controls.Actions
                 {
                     Vector2 toHit = planeHitPoint.XZ() - gizmo.Center.XZ();
                     float toHitAngle = toHit.Angle360();
-                    float angle = AngleMod(startAngle + toHitAngle);
+                    rotationAngle = AngleMod(startAngle + toHitAngle);
                     if (SEEInput.Snap())
                     {
-                        angle = AngleMod(Mathf.Round(angle / SnapStepAngle) * SnapStepAngle);
+                        rotationAngle = AngleMod(Mathf.Round(rotationAngle / SnapStepAngle) * SnapStepAngle);
                     }
 
                     foreach (InteractableObject interactable in hit.Cursor.E.GetFocusses())
                     {
                         NodeOperator nodeOperator = GetOperatorForNode(interactable);
-                        nodeOperator.RotateTo(Quaternion.AngleAxis(angle, Vector3.up), 0);
+                        nodeOperator.RotateTo(Quaternion.AngleAxis(rotationAngle, Vector3.up), 0);
                     }
 
                     float prevAngle = Mathf.Rad2Deg * gizmo.TargetAngle;
@@ -217,30 +183,8 @@ namespace SEE.Controls.Actions
                         currAngle = Mathf.Round((currAngle + startAngle) / SnapStepAngle) * SnapStepAngle - startAngle;
                     }
                     gizmo.TargetAngle = Mathf.Deg2Rad * currAngle;
-
-                    synchronize = true;
                 }
-            }
-            else if (SEEInput.Reset()) // reset rotation to identity();
-            {
-                if (obj && !rotating)
-                {
-                    if (cityCursor != null)
-                    {
-                        foreach (InteractableObject interactable in cityCursor.E.GetFocusses())
-                        {
-                            if (interactable.IsGrabbed)
-                            {
-                                interactable.SetGrab(false, true);
-                            }
-                            NodeOperator nodeOperator = GetOperatorForNode(interactable);
-                            nodeOperator.RotateTo(Quaternion.AngleAxis(interactable.transform.rotation.eulerAngles.y, Vector3.up), 0);
-                        }
-                    }
-                    gizmo.gameObject.SetActive(false);
-
-                    synchronize = true;
-                }
+                isCompleted = false;
             }
             else if (rotating) // finalize rotation
             {
@@ -252,15 +196,12 @@ namespace SEE.Controls.Actions
                     {
                         interactable.SetGrab(false, true);
                     }
+                    finalRotations[interactable.gameObject] = interactable.transform.rotation;
                 }
                 AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
                 gizmo.gameObject.SetActive(false);
                 currentState = ReversibleAction.Progress.Completed;
-            }
-
-            if (synchronize)
-            {
-                new RotateNodeNetAction(hit.CityRootNode.name, hit.CityRootNode.position, hit.CityRootNode.eulerAngles.y).Execute();
+                new RotateNodeNetAction(finalRotations.Keys).Execute();
             }
 
             if (currentState != ReversibleAction.Progress.Completed)
@@ -268,7 +209,7 @@ namespace SEE.Controls.Actions
                 currentState = rotating ? ReversibleAction.Progress.InProgress : ReversibleAction.Progress.NoEffect;
             }
 
-            return true;
+            return isCompleted;
         }
 
         /// <summary>
@@ -279,6 +220,30 @@ namespace SEE.Controls.Actions
         private static float AngleMod(float degrees)
         {
             return (degrees % FullCircleDegree + FullCircleDegree) % FullCircleDegree;
+        }
+
+        public override void Undo()
+        {
+            ApplyRotation(initialRotations);
+        }
+
+        public override void Redo()
+        {
+            ApplyRotation(finalRotations);
+        }
+
+        /// <summary>
+        /// Resets all rotations of the gameObjects in <paramref name="rotations"/>
+        /// to their value in <paramref name="rotations"/>.
+        /// </summary>
+        /// <param name="rotations">the gameobjects and their rotations to reset to</param>
+        private static void ApplyRotation(IDictionary<GameObject, Quaternion> rotations)
+        {
+            foreach (var rotation in rotations)
+            {
+                rotation.Key.AddOrGetComponent<NodeOperator>().RotateTo(rotation.Value, 0);
+            }
+            new RotateNodeNetAction(rotations.Keys).Execute();
         }
     }
 }

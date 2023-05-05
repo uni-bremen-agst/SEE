@@ -36,7 +36,7 @@ namespace SEE.Net.Actions
         /// a node or edge that have to be revived</param>
         /// <exception cref="ArgumentNullException">thrown if <paramref name="gameObjectIDs"/>
         /// or any of its elements is null</exception>
-        public ReviveNetAction(List<string> gameObjectIDs) : base()
+        public ReviveNetAction(List<string> gameObjectIDs)
         {
             GameObjectIDList = StringListSerializer.Serialize(gameObjectIDs);
         }
