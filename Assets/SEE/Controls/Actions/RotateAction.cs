@@ -41,8 +41,6 @@ namespace SEE.Controls.Actions
 
         private bool rotating;
         private Hit hit;
-        private float originalEulerAngleY;
-        private Vector3 originalPosition;
         private float startAngle;
         private float rotationAngle;
         private Dictionary<GameObject, Quaternion> initialRotations = new();
@@ -118,7 +116,7 @@ namespace SEE.Controls.Actions
                 cityCursor = cityRootNode.GetComponentInParent<CityCursor>();
             }
 
-            bool isCompleted = true;
+            bool isCompleted = false;
             if (SEEInput.Drag()) // start or continue rotation
             {
                 Vector3 planeHitPoint;
@@ -144,8 +142,6 @@ namespace SEE.Controls.Actions
                         Vector2 toHit = planeHitPoint.XZ() - gizmo.Center.XZ();
                         float toHitAngle = toHit.Angle360();
 
-                        originalEulerAngleY = cityRootNode.rotation.eulerAngles.y;
-                        originalPosition = cityRootNode.position;
                         startAngle = AngleMod(cityRootNode.rotation.eulerAngles.y - toHitAngle);
                         gizmo.StartAngle = gizmo.TargetAngle = Mathf.Deg2Rad * toHitAngle;
                     }
@@ -184,7 +180,6 @@ namespace SEE.Controls.Actions
                     }
                     gizmo.TargetAngle = Mathf.Deg2Rad * currAngle;
                 }
-                isCompleted = false;
             }
             else if (rotating) // finalize rotation
             {
@@ -201,6 +196,7 @@ namespace SEE.Controls.Actions
                 AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
                 gizmo.gameObject.SetActive(false);
                 currentState = ReversibleAction.Progress.Completed;
+                isCompleted = true;
                 new RotateNodeNetAction(finalRotations.Keys).Execute();
             }
 
@@ -233,10 +229,10 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Resets all rotations of the gameObjects in <paramref name="rotations"/>
+        /// Resets all rotations of the game objects in <paramref name="rotations"/>
         /// to their value in <paramref name="rotations"/>.
         /// </summary>
-        /// <param name="rotations">the gameobjects and their rotations to reset to</param>
+        /// <param name="rotations">the game objects and their rotations to reset to</param>
         private static void ApplyRotation(IDictionary<GameObject, Quaternion> rotations)
         {
             foreach (var rotation in rotations)
