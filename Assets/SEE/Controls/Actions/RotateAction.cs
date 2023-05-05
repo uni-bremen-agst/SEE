@@ -28,10 +28,6 @@ namespace SEE.Controls.Actions
             /// i.e., is tagged by <see cref="Tags.Node"/>.
             /// </summary>
             internal Transform CityRootNode;
-            /// <summary>
-            /// The node that was hit by the raycast.
-            /// </summary>
-            internal Transform HitNode;
             internal CityCursor Cursor;
             internal UnityEngine.Plane Plane;
         }
@@ -106,6 +102,7 @@ namespace SEE.Controls.Actions
         /// <returns>the operator for the given <paramref name="node"/></returns>
         private NodeOperator GetOperatorForNode(Component node)
         {
+            // We save the operator in the @operator attribute to avoid calling `AddOrGetComponent` every time.
             if (@operator == null || @operator.transform != node)
             {
                 @operator = node.gameObject.AddOrGetComponent<NodeOperator>();
@@ -136,15 +133,15 @@ namespace SEE.Controls.Actions
             {
                 if (rotating)
                 {
-                    NodeOperator nodeOperator = GetOperatorForNode(hit.HitNode);
-                    nodeOperator.RotateTo(Quaternion.Euler(0, originalEulerAngleY, 0), 0);
-                    nodeOperator.MoveTo(originalPosition, 0);
                     foreach (InteractableObject interactable in hit.Cursor.E.GetFocusses())
                     {
                         if (interactable.IsGrabbed)
                         {
                             interactable.SetGrab(false, true);
                         }
+                        NodeOperator nodeOperator = GetOperatorForNode(interactable);
+                        nodeOperator.RotateTo(Quaternion.Euler(0, originalEulerAngleY, 0), 0);
+                        nodeOperator.MoveTo(originalPosition, 0);
                     }
                     gizmo.gameObject.SetActive(false);
                     AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
@@ -168,7 +165,6 @@ namespace SEE.Controls.Actions
                         AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND);
                         rotating = true;
                         hit.CityRootNode = cityRootNode;
-                        hit.HitNode = obj.transform;
                         hit.Cursor = cityCursor;
                         hit.Plane = plane;
 
@@ -199,8 +195,11 @@ namespace SEE.Controls.Actions
                         angle = AngleMod(Mathf.Round(angle / SnapStepAngle) * SnapStepAngle);
                     }
 
-                    NodeOperator nodeOperator = GetOperatorForNode(hit.HitNode);
-                    nodeOperator.RotateTo(Quaternion.AngleAxis(angle, Vector3.up), 0);
+                    foreach (InteractableObject interactable in hit.Cursor.E.GetFocusses())
+                    {
+                        NodeOperator nodeOperator = GetOperatorForNode(interactable);
+                        nodeOperator.RotateTo(Quaternion.AngleAxis(angle, Vector3.up), 0);
+                    }
 
                     float prevAngle = Mathf.Rad2Deg * gizmo.TargetAngle;
                     float currAngle = toHitAngle;
@@ -226,17 +225,20 @@ namespace SEE.Controls.Actions
             {
                 if (obj && !rotating)
                 {
-                    foreach (InteractableObject interactable in cityCursor.E.GetFocusses())
+                    if (cityCursor != null)
                     {
-                        if (interactable.IsGrabbed)
+                        foreach (InteractableObject interactable in cityCursor.E.GetFocusses())
                         {
-                            interactable.SetGrab(false, true);
+                            if (interactable.IsGrabbed)
+                            {
+                                interactable.SetGrab(false, true);
+                            }
+                            NodeOperator nodeOperator = GetOperatorForNode(interactable);
+                            nodeOperator.RotateTo(Quaternion.AngleAxis(interactable.transform.rotation.eulerAngles.y, Vector3.up), 0);
                         }
                     }
                     gizmo.gameObject.SetActive(false);
 
-                    NodeOperator nodeOperator = GetOperatorForNode(hit.HitNode);
-                    nodeOperator.RotateTo(Quaternion.AngleAxis(hit.HitNode.rotation.eulerAngles.y, Vector3.up), 0);
                     synchronize = true;
                 }
             }
