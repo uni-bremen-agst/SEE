@@ -509,17 +509,17 @@ namespace SEE.Controls
         /// The previous revision is to be shown.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool PreviousRevision()
+        public static bool Previous()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.PreviousRevision);
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Previous);
         }
         /// <summary>
         /// The next revision is to be shown.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool NextRevision()
+        public static bool Next()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.NextRevision);
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Next);
         }
         /// <summary>
         /// Toggles auto play of the animation.
@@ -531,14 +531,6 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Toggles automatic/manual execution mode.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ToggleAutomaticManualMode()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleAutomaticManualMode);
-        }
-        /// <summary>
         /// Toggles execution order (forward/backward).
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
@@ -547,22 +539,6 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleExecutionOrder);
         }
 
-        /// <summary>
-        /// Executes previous statement.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool PreviousStatement()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.PreviousStatement);
-        }
-        /// <summary>
-        /// Executes next statement.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool NextStatement()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.NextStatement);
-        }
         /// <summary>
         /// Execution is back to very first statement.
         /// </summary>

@@ -82,11 +82,11 @@ namespace SEE.Controls
         /// Prints help on the key bindings.
         /// </summary>
         internal static readonly KeyCode Help = Register(KeyCode.H, Scope.Always, "Prints help on the key bindings.");
-        
+
         /// <summary>
         /// Toggles voice input (i.e., for voice commands) on/off.
         /// </summary>
-        internal static readonly KeyCode ToggleVoiceInput = Register(KeyCode.Period, Scope.Always, 
+        internal static readonly KeyCode ToggleVoiceInput = Register(KeyCode.Period, Scope.Always,
                                                                "Toggles voice input on/off.");
 
         #endregion
@@ -237,18 +237,6 @@ namespace SEE.Controls
         //--------------------------
 
         /// <summary>
-        /// The previous revision is to be shown.
-        /// </summary>
-        internal static readonly KeyCode PreviousRevision = Register(KeyCode.LeftArrow, Scope.Evolution, "The previous revision is to be shown.");
-        /// <summary>
-        /// The next revision is to be shown.
-        /// </summary>
-        internal static readonly KeyCode NextRevision = Register(KeyCode.RightArrow, Scope.Evolution, "The next revision is to be shown.");
-        /// <summary>
-        /// Toggles auto play of the animation.
-        /// </summary>
-        internal static readonly KeyCode ToggleAutoPlay = Register(KeyCode.Tab, Scope.Evolution, "Toggles auto play of the animation.");
-        /// <summary>
         /// Sets a new marker.
         /// </summary>
         internal static readonly KeyCode SetMarker = Register(KeyCode.Insert, Scope.Evolution, "Sets a new marker.");
@@ -264,9 +252,21 @@ namespace SEE.Controls
         #endregion
 
         //----------------------------------------------------
-        #region Animation speed (shared by Debugging and Evolution)
+        #region Animation (shared by Debugging and Evolution)
         //----------------------------------------------------
 
+        /// <summary>
+        /// The previous element in the animation is to be shown.
+        /// </summary>
+        internal static readonly KeyCode Previous = Register(KeyCode.LeftArrow, Scope.Animation, "Go to previous element in the animation.");
+        /// <summary>
+        /// The next element in the animation is to be shown.
+        /// </summary>
+        internal static readonly KeyCode Next = Register(KeyCode.RightArrow, Scope.Animation, "Go to next element in the animation.");
+        /// <summary>
+        /// Toggles auto play of the animation.
+        /// </summary>
+        internal static readonly KeyCode ToggleAutoPlay = Register(KeyCode.Tab, Scope.Animation, "Toggles auto play of the animation.");
         /// <summary>
         /// Double animation speed.
         /// </summary>
@@ -283,10 +283,6 @@ namespace SEE.Controls
         //--------------------------
 
         /// <summary>
-        /// Toggles automatic/manual execution mode.
-        /// </summary>
-        internal static readonly KeyCode ToggleAutomaticManualMode = Register(KeyCode.I, Scope.Debugging, "Toggles automatic/manual execution mode.");
-        /// <summary>
         /// Toggles execution order (forward/backward).
         /// </summary>
         internal static readonly KeyCode ToggleExecutionOrder = Register(KeyCode.O, Scope.Debugging, "Toggles execution order (foward/backward).");
@@ -294,14 +290,6 @@ namespace SEE.Controls
         /// Continues execution until next breakpoint is reached.
         /// </summary>
         internal static readonly KeyCode ExecuteToBreakpoint = Register(KeyCode.B, Scope.Debugging, "Continues execution until next breakpoint is reached.");
-        /// <summary>
-        /// Executes previous statement.
-        /// </summary>
-        internal static readonly KeyCode PreviousStatement = Register(KeyCode.PageUp, Scope.Debugging, "Executes previous statement.");
-        /// <summary>
-        /// Executes next statement.
-        /// </summary>
-        internal static readonly KeyCode NextStatement = Register(KeyCode.PageDown, Scope.Debugging, "Executes next statement.");
         /// <summary>
         /// Execution is back to very first statement.
         /// </summary>
