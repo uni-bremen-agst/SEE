@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using HighlightPlus;
 using SEE.Game;
 using SEE.Game.UI3D;
 using SEE.GO;
