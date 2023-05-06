@@ -40,10 +40,26 @@ namespace SEE.Controls.Actions
 
         private bool rotating;
         private Hit hit;
+        /// <summary>
+        /// The angle at the point in time when the first node was grabbed.
+        /// </summary>
         private float startAngle;
+        /// <summary>
+        /// The final rotation angle at the point in time when the first node was ungrabbed.
+        /// </summary>
         private float rotationAngle;
-        private Dictionary<GameObject, Quaternion> initialRotations = new();
-        private Dictionary<GameObject, Quaternion> finalRotations = new();
+        /// <summary>
+        /// A mapping of the objects to be rotated onto their rotations before
+        /// actually being rotated, in other words, their initial rotations.
+        /// These rotations are needed for <see cref="Undo"/>.
+        /// </summary>
+        private readonly Dictionary<GameObject, Quaternion> initialRotations = new();
+        /// <summary>
+        /// A mapping of the objects rotated onto their rotations when the
+        /// rotation actions was completed, in other words, their reached rotations.
+        /// These rotations are needed for <see cref="Redo"/>.
+        /// </summary>
+        private readonly Dictionary<GameObject, Quaternion> finalRotations = new();
 
         /// <summary>
         /// The operator for the node that is being rotated.
