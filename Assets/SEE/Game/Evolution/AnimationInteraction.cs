@@ -23,6 +23,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SEE.Controls;
+using SEE.Game.City;
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
@@ -90,7 +92,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// A dictionary linking markers and comments, needed for saving the comments on application quit and deleting the comments
         /// </summary>
-        private readonly Dictionary<Button, InputField> markerDictionary = new Dictionary<Button, InputField>();
+        private readonly Dictionary<Button, InputField> markerDictionary = new();
 
         /// <summary>
         /// Specifies whether the animation is currently being fast-forwarded
@@ -179,13 +181,9 @@ namespace SEE.Game.Evolution
             animationDataModel.ReverseButton.onClick.AddListener(TaskOnClickReverseButton);
             animationDataModel.FastBackwardButton.onClick.AddListener(TaskOnClickFastBackwardButton);
 
-            if (animationDataModel.Slider.TryGetComponent(out SliderDrag sliderDrag))
+            if (animationDataModel.Slider.gameObject.TryGetComponentOrLog(out SliderDrag sliderDrag))
             {
                 sliderDrag.EvolutionRenderer = evolutionRenderer;
-            }
-            else
-            {
-                Debug.LogError("SliderDrag script could not be loaded.\n");
             }
 
             try
@@ -220,14 +218,13 @@ namespace SEE.Game.Evolution
         private IEnumerator SetAnimationCanvasCamera()
         {
             Canvas canvas = AnimationCanvas.GetComponent<Canvas>();
-            Camera camera = Camera.main;
+            Camera camera = MainCamera.Camera;
 
             while (camera == null)
             {
                 yield return new WaitForSeconds(0.5f);
-                camera = Camera.main;
+                camera = MainCamera.Camera;
             }
-
             canvas.worldCamera = camera;
         }
 
@@ -443,7 +440,7 @@ namespace SEE.Game.Evolution
         {
             string commentName = marker.GetHashCode() + "-comment";
             InputField commentField = Instantiate(animationDataModel.CommentPrefab, marker.transform, false);
-            Vector3 commentPos = new Vector3(1500f, 0, 0);
+            Vector3 commentPos = new(1500f, 0, 0);
             commentField.transform.localScale = new Vector3(16f, 1f, 1f);
             commentField.transform.localPosition = commentPos;
             commentField.name = commentName;
@@ -494,10 +491,10 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Handles the user input as follows:
-        ///   KeyBindings.PreviousRevision => previous graph revision is shown
-        ///   KeyBindings.NextRevision     => next graph revision is shown
-        ///   KeyBindings.SetMarker        => create new marker
+        ///   KeyBindings.Previous         => previous graph revision is shown
+        ///   KeyBindings.Next             => next graph revision is shown
         ///   KeyBindings.ToggleAutoPlay   => auto-play mode is toggled
+        ///   KeyBindings.SetMarker        => create new marker
         ///   KeyBindings.DeleteMarker     => delete selected marker
         ///   KeyBindings.IncreaseAnimationSpeed => double animation speed
         ///   KeyBindings.DecreaseAnimationSpeed => halve animation speed
@@ -505,21 +502,23 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void Update()
         {
+            bool userIsHoveringCity = AbstractSEECity.UserIsHoveringCity(evolutionRenderer.gameObject);
+
             if (!IsRevisionSelectionOpen)
             {
-                if (SEEInput.PreviousRevision())
+                if (userIsHoveringCity && SEEInput.Previous())
                 {
                     evolutionRenderer.ShowPreviousGraph();
                 }
-                else if (SEEInput.NextRevision())
+                else if (userIsHoveringCity && SEEInput.Next())
                 {
                     evolutionRenderer.ShowNextGraph();
                 }
-                else if (SEEInput.ToggleAutoPlay())
+                else if (userIsHoveringCity && SEEInput.ToggleAutoPlay())
                 {
                     evolutionRenderer.ToggleAutoPlay();
                 }
-                else if (SEEInput.SetMarker())
+                else if (userIsHoveringCity && SEEInput.SetMarker())
                 {
                     Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
                     Vector3 markerPos = new(handlePos.x, handlePos.y + .08f, handlePos.z);
@@ -528,22 +527,22 @@ namespace SEE.Game.Evolution
                         AddMarker(markerPos, null);
                     }
                 }
-                else if (SEEInput.DeleteMarker())
+                else if (userIsHoveringCity && SEEInput.DeleteMarker())
                 {
                     RemoveMarker(selectedMarker);
                 }
-                else if (SEEInput.IncreaseAnimationSpeed())
+                else if (userIsHoveringCity && SEEInput.IncreaseAnimationSpeed())
                 {
                     evolutionRenderer.AnimationLag = Mathf.Max(0.25f, evolutionRenderer.AnimationLag / 2);
                     Debug.Log($"new animation lag is {evolutionRenderer.AnimationLag}\n");
                 }
-                else if (SEEInput.DecreaseAnimationSpeed())
+                else if (userIsHoveringCity && SEEInput.DecreaseAnimationSpeed())
                 {
                     evolutionRenderer.AnimationLag = Mathf.Min(16.0f, evolutionRenderer.AnimationLag * 2);
                     Debug.Log($"new animation lag is {evolutionRenderer.AnimationLag}\n");
                 }
             }
-            if (SEEInput.ToggleEvolutionCanvases())
+            if (userIsHoveringCity && SEEInput.ToggleEvolutionCanvases())
             {
                 ToggleMode();
             }
