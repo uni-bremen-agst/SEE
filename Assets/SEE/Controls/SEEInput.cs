@@ -32,7 +32,7 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Help);
         }
-        
+
         /// <summary>
         /// Toggles voice input (i.e., for voice commands) on/off.
         /// </summary>
