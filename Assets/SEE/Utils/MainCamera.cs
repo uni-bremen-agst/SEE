@@ -38,7 +38,12 @@ namespace SEE.Utils
                             return null;
                         case 1:
                             camera = Camera.main;
-                            NotifyAll();
+                            // We have a single enabled camera, but that camera is
+                            // not necessarily tagged as the "MainCamera".
+                            if (camera != null)
+                            {
+                                NotifyAll();
+                            }
                             break;
                         default:
                             // There is more than one camera, but there should be only one that is tagged as the "MainCamera".
