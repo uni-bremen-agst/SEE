@@ -271,29 +271,12 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Returns true if the user is currently hovering over any node of this city.
-        /// </summary>
-        /// <returns>true if user is hovering over this city</returns>
-        private bool UserIsHoveringCity()
-        {
-            if (!TryGetComponent(out GO.Plane clippingPlane) || clippingPlane == null)
-            {
-                Debug.LogError($"Code city {gameObject.FullName()} has no {typeof(GO.Plane)}.\n");
-                return false;
-            }
-
-            Raycasting.RaycastClippingPlane(clippingPlane, out _, out bool hitInsideClippingArea, out Vector3 _);
-            return hitInsideClippingArea;
-        }
-
-        /// <summary>
         /// Reacts to the user's interactions.
         /// </summary>
         protected override void Update()
         {
             base.Update();
 
-            Debug.Log($"UserIsHoveringCity() {UserIsHoveringCity()}\n");
             // Update Visualisation every 'interval' seconds.
             if (Time.time >= nextUpdateTime)
             {
@@ -304,8 +287,9 @@ namespace SEE.Game.City
                 nextUpdateTime += updateInterval;
             }
 
+            bool userIsHoveringCity = UserIsHoveringCity();
             // Controls
-            if (SEEInput.ToggleAutomaticManualMode())
+            if (userIsHoveringCity && SEEInput.ToggleAutoPlay())
             {
                 // Toggling automatic/manual execution mode.
                 inAutomaticMode = !inAutomaticMode;
@@ -336,7 +320,7 @@ namespace SEE.Game.City
                     ActivateNodeTextWindow(clickedGO);
                 }
             }
-            if (SEEInput.ToggleExecutionOrder())
+            if (userIsHoveringCity && SEEInput.ToggleExecutionOrder())
             {
                 // Reversing the order of execution.
                 updateInterval = 1;
@@ -363,13 +347,13 @@ namespace SEE.Game.City
             if (inAutomaticMode)
             {
                 // automatic mode
-                if (SEEInput.IncreaseAnimationSpeed())
+                if (userIsHoveringCity && SEEInput.IncreaseAnimationSpeed())
                 {
                     SpeedUp();
                     showLabelUntil = Time.time + 1f;
                     labelText = "Speed x" + 1f / updateInterval;
                 }
-                if (SEEInput.DecreaseAnimationSpeed())
+                if (userIsHoveringCity && SEEInput.DecreaseAnimationSpeed())
                 {
                     SlowDown();
                     showLabelUntil = Time.time + 1f;
@@ -379,7 +363,7 @@ namespace SEE.Game.City
             else
             {
                 // manual mode
-                if (SEEInput.ExecuteToBreakpoint())
+                if (userIsHoveringCity && SEEInput.ExecuteToBreakpoint())
                 {
                     showLabelUntil = Time.time + 1f;
                     labelText = "Jumping to Breakpoint...";
@@ -394,17 +378,17 @@ namespace SEE.Game.City
                         labelText = "Could not find Breakpoint";
                     }
                 }
-                if (SEEInput.PreviousStatement())
+                if (userIsHoveringCity && SEEInput.Previous())
                 {
                     OneStep(false);
                     lastDirectionWasForward = false;
                 }
-                if (SEEInput.NextStatement())
+                if (userIsHoveringCity && SEEInput.Next())
                 {
                     OneStep(true);
                     lastDirectionWasForward = true;
                 }
-                if (SEEInput.FirstStatement())
+                if (userIsHoveringCity && SEEInput.FirstStatement())
                 {
                     ResetComplete();
                 }
@@ -767,7 +751,7 @@ namespace SEE.Game.City
 
             if (statementCounter.UpperBound())
             {
-                Debug.Log($"End of execution trace reached. Press '{KeyBindings.PreviousStatement}' to start playing backward.\n");
+                Debug.Log($"End of execution trace reached. Press '{KeyBindings.Previous}' to start playing backward.\n");
                 inAutomaticMode = false;
                 playingForward = false;
             }
@@ -793,7 +777,7 @@ namespace SEE.Game.City
 
             if (statementCounter.LowerBound())
             {
-                Debug.Log($"Start of execution trace reached. Press '{KeyBindings.NextStatement}' to start playing forward.\n");
+                Debug.Log($"Start of execution trace reached. Press '{KeyBindings.Next}' to start playing forward.\n");
                 inAutomaticMode = false;
                 playingForward = true;
             }
