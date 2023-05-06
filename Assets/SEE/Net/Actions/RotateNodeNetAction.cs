@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SEE.Game;
 using SEE.Game.Operator;
 using SEE.GO;
-using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -23,6 +21,13 @@ namespace SEE.Net.Actions
         /// </summary>
         public List<Quaternion> RotationList;
 
+        /// <summary>
+        /// Constructor.
+        /// Assumption: The <paramref name="nodes"/> have their final rotation.
+        /// These rotations will be broadcasted.
+        /// </summary>
+        /// <param name="nodes">the nodes whose rotations chould be synchronized
+        /// over the network</param>
         public RotateNodeNetAction(IEnumerable<GameObject> nodes)
         {
             IList<GameObject> gameObjects = nodes.ToList();
