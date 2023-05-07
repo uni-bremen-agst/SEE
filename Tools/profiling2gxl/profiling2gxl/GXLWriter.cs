@@ -1,6 +1,4 @@
-﻿//Copied and modified from SEE.DataModel.DG.IO.GraphWriter
-
-using System.Globalization;
+﻿using System.Globalization;
 using System.Reflection;
 using System.Xml;
 
@@ -15,7 +13,7 @@ namespace profiling2gxl
         /// Saves given <paramref name="functions"/> in GXL format in a file with given <paramref name="filename"/>.
         /// The parent-child relation between nodes is stored as edges with the type <paramref name="hierarchicalEdgeType"/>.
         /// </summary>
-        /// <param name="filename">name of the file where to store the functions</param>
+        /// <param name="filename">name of the file where to store the GXL file</param>
         /// <param name="functions">functions to be stored</param>
         /// <param name="graphname">id to set in the graph node</param>
         /// <param name="hierarchicalEdgeType">edge type for the node hierarchy</param>

@@ -5,14 +5,11 @@ namespace profiling2gxl
     internal static class JLGWriter
     {
         /// <summary>
-        /// Saves given <paramref name="graph"/> in GXL format in a file with given <paramref name="filename"/>.
-        /// The parent-child relation between nodes is stored as edges with the type <paramref name="hierarchicalEdgeType"/>.
-        /// The attributes of the <paramref name="graph"/> itself are not stored to stay compatible
-        /// with the GXL files by Axivion.
+        /// Saves given <paramref name="functions"/> in JLG format in a file with given <paramref name="filename"/>.
         /// </summary>
-        /// <param name="filename"></param>
-        /// <param name="functions"></param>
-        /// <exception cref="Exception"></exception>
+        /// <param name="filename">name of the file where to store the JLG file</param>
+        /// <param name="functions">functions to be stored</param>
+        /// <exception cref="Exception">thrown if the entry function couldn't be found</exception>
         public static void Save(string filename, List<Function> functions)
         {
             using StreamWriter sw = new(filename);
