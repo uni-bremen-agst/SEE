@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace profiling2gxl
 {
@@ -20,6 +21,11 @@ namespace profiling2gxl
         {
             string[] words = Regex.Split(input, @"(?<!^)(?=[A-Z])");
             return string.Join("_", words);
+        }
+
+        public static XDocument loadXML(StreamReader sr)
+        {
+            return XDocument.Load(sr);
         }
     }
 }
