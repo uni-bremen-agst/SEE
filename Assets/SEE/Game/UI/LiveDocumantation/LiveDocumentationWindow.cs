@@ -23,7 +23,7 @@ namespace SEE.Game.UI.LiveDocumantation
     /// 
     /// In this window the Name of the Class, the documentation and all class methods are shown.
     /// 
-    /// 
+    /// <h3> asdjsd </h3>
     /// The following fields must be set:
     /// <ul>
     ///     <li><see cref="ClassName"/> </li>
@@ -38,9 +38,9 @@ namespace SEE.Game.UI.LiveDocumantation
         /// <summary>
         /// Path to the prefab
         /// </summary>
-        private const string PREFAB_NAME = "Prefabs/UI/LiveDocumentation/LiveDocumentation";
+        private const string PrefabName = "Prefabs/UI/LiveDocumentation/LiveDocumentation";
 
-        private const string ClassDocumentationPath = "ClassDocumentation/Viewport/Content/ClassDoc";
+        private const string ClassDocumentationPath = "ClassDocumentation/Viewport/Content";
         private const string ClassMemberListPath = "ClassMembers/Scroll Area/List";
 
         private const string NodeClassType = "Class";
@@ -197,7 +197,7 @@ namespace SEE.Game.UI.LiveDocumantation
             base.StartDesktop();
             var c = Canvas.GetComponent<Camera>();
             GameObject livedoc =
-                PrefabInstantiator.InstantiatePrefab(PREFAB_NAME, Window.transform.Find("Content"), false);
+                PrefabInstantiator.InstantiatePrefab(PrefabName, Window.transform.Find("Content"), false);
             livedoc.name = "LiveDocumentation";
 
 
@@ -313,16 +313,17 @@ namespace SEE.Game.UI.LiveDocumantation
                 //TODO replace using with namespaces.
                 var filePath = item.AbsolutePlatformPath();
                 var input = File.ReadAllText(filePath);
-                var lexer = new CSharpCommentsGrammarLexer(new AntlrInputStream(input));
+                var lexer = new CSharpFullLexer(new AntlrInputStream(input));
                 var tokens = new CommonTokenStream(lexer);
                 tokens.Fill();
 
-                var parser = new CSharpCommentsGrammarParser(tokens);
-                var namespaces = parser.start().namespaceDeclaration();
+                var parser = new CSharpParser(tokens);
+                var namespaces = parser.compilation_unit().namespace_member_declarations()
+                    .namespace_member_declaration();
 
                 foreach (var parsedNamespace in namespaces)
                 {
-                    if (parsedNamespace.nameSpaceName.Text.Equals(@namespace))
+                    if (parsedNamespace.namespace_declaration().qualified_identifier().GetText().Equals(@namespace))
                     {
                         NamespaceCache[@namespace] = item;
                         return item;
