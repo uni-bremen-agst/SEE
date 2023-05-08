@@ -20,48 +20,48 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// A list of all available ActionStateTypes.
         /// </summary>
-        public static List<ActionStateType> AllTypes { get; } = new List<ActionStateType>();
+        public static List<ActionStateType> AllTypes { get; } = new();
 
         #region Static Types
         public static ActionStateType Move { get; } =
-            new ActionStateType(0, "Move", "Move a node within a graph",
-                                Color.red.Darker(), "Materials/Charts/MoveIcon",
-                                MoveAction.CreateReversibleAction);
+            new(0, "Move", "Move a node within a graph",
+                Color.red.Darker(), "Materials/Charts/MoveIcon",
+                MoveAction.CreateReversibleAction);
         public static ActionStateType Rotate { get; } =
-            new ActionStateType(1, "Rotate", "Rotate everything around the selected node within a graph",
-                                Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
-                                RotateAction.CreateReversibleAction);
+            new(1, "Rotate", "Rotate the selected node and its children within a graph",
+                Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
+                RotateAction.CreateReversibleAction);
         public static ActionStateType Hide { get; } =
-            new ActionStateType(2, "Hide", "Hides nodes or edges",
-                       Color.yellow.Darker(), "Materials/ModernUIPack/Eye", HideAction.CreateReversibleAction);
+            new(2, "Hide", "Hides nodes or edges",
+                Color.yellow.Darker(), "Materials/ModernUIPack/Eye", HideAction.CreateReversibleAction);
 
         public static ActionStateType NewEdge { get; } =
-            new ActionStateType(3, "New Edge", "Draw a new edge between two nodes",
-                                Color.green.Darker(), "Materials/ModernUIPack/Minus",
-                                AddEdgeAction.CreateReversibleAction);
+            new(3, "New Edge", "Draw a new edge between two nodes",
+                Color.green.Darker(), "Materials/ModernUIPack/Minus",
+                AddEdgeAction.CreateReversibleAction);
         public static ActionStateType NewNode { get; } =
-            new ActionStateType(4, "New Node", "Create a new node",
-                                Color.green.Darker(), "Materials/ModernUIPack/Plus",
-                                AddNodeAction.CreateReversibleAction);
+            new(4, "New Node", "Create a new node",
+                Color.green.Darker(), "Materials/ModernUIPack/Plus",
+                AddNodeAction.CreateReversibleAction);
         public static ActionStateType EditNode { get; } =
-            new ActionStateType(5, "Edit Node", "Edit a node",
-                                Color.green.Darker(), "Materials/ModernUIPack/Settings",
-                                EditNodeAction.CreateReversibleAction);
+            new(5, "Edit Node", "Edit a node",
+                Color.green.Darker(), "Materials/ModernUIPack/Settings",
+                EditNodeAction.CreateReversibleAction);
         public static ActionStateType ScaleNode { get; } =
-            new ActionStateType(6, "Scale Node", "Scale a node",
-                                Color.green.Darker(), "Materials/ModernUIPack/Crop",
-                                ScaleNodeAction.CreateReversibleAction);
+            new(6, "Scale Node", "Scale a node",
+                Color.green.Darker(), "Materials/ModernUIPack/Crop",
+                ScaleNodeAction.CreateReversibleAction);
         public static ActionStateType Delete { get; } =
-            new ActionStateType(7, "Delete", "Delete a node or an edge",
-                                Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
-                                DeleteAction.CreateReversibleAction);
+            new(7, "Delete", "Delete a node or an edge",
+                Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
+                DeleteAction.CreateReversibleAction);
         public static ActionStateType ShowCode { get; } =
-            new ActionStateType(8, "Show Code", "Display the source code of a node.",
-                                Color.black, "Materials/ModernUIPack/Document", ShowCodeAction.CreateReversibleAction);
+            new(8, "Show Code", "Display the source code of a node.",
+                Color.black, "Materials/ModernUIPack/Document", ShowCodeAction.CreateReversibleAction);
         public static ActionStateType Draw { get; } =
-            new ActionStateType(9, "Draw", "Draw a line",
-                        Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
-                        DrawAction.CreateReversibleAction);
+            new(9, "Draw", "Draw a line",
+                Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                DrawAction.CreateReversibleAction);
         #endregion
 
         /// <summary>
