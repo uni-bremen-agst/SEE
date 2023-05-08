@@ -67,6 +67,8 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         public string ClassName { get; set; }
 
+        public string NamespaceName { get; set; }
+
         /// <summary>
         /// The base path of the folder containing the source code files
         /// </summary>
@@ -76,6 +78,8 @@ namespace SEE.Game.UI.LiveDocumantation
         /// The relative Path
         /// </summary>
         public string RelativePath { get; set; }
+
+        public List<string> ImportedNamespaces { get; set; }
 
         /// <summary>
         /// The graph which the node the user has clicked on belongs to.
@@ -139,38 +143,35 @@ namespace SEE.Game.UI.LiveDocumantation
         {
             if (buffer is LiveDocumentationClassMemberBuffer classMemberBuffer)
             {
-                
-            // Creating a new GameObject and naming it
-            GameObject classMem = new GameObject();
-            classMem.name = "Item";
+                // Creating a new GameObject and naming it
+                GameObject classMem = new GameObject();
+                classMem.name = "Item";
 
-            // Adding some other Components
-            classMem.AddComponent<CanvasRenderer>();
-            RectTransform rt = classMem.AddComponent<RectTransform>();
+                // Adding some other Components
+                classMem.AddComponent<CanvasRenderer>();
+                RectTransform rt = classMem.AddComponent<RectTransform>();
 
-            //Adding the ClassMember component
-            ClassMember cm = classMem.AddComponent<ClassMember>();
-            cm.Text = buffer.PrintBuffer();
-            cm.LineNumber = classMemberBuffer.LineNumber;
+                //Adding the ClassMember component
+                ClassMember cm = classMem.AddComponent<ClassMember>();
+                cm.Text = buffer.PrintBuffer();
+                cm.LineNumber = classMemberBuffer.LineNumber;
 
-            // Setting the correct anchor point (upper left corner) for the new game object
-            classMem.transform.parent = ClassMembersList.transform;
-            rt.localScale = new Vector3(1, 1, 1);
-            // This will set the 
-            rt.anchorMin = new Vector2(0, 1);
-            rt.anchorMax = new Vector2(0, 1);
+                // Setting the correct anchor point (upper left corner) for the new game object
+                classMem.transform.parent = ClassMembersList.transform;
+                rt.localScale = new Vector3(1, 1, 1);
+                // This will set the 
+                rt.anchorMin = new Vector2(0, 1);
+                rt.anchorMax = new Vector2(0, 1);
 
-            cm.OnLinkClicked += OnLinkClicked;
-            cm.OnClicked.AddListener(OnClickClassMember);
-
-
-
+                cm.OnLinkClicked += OnLinkClicked;
+                cm.OnClicked.AddListener(OnClickClassMember);
             }
         }
 
         private void OnClickClassMember(ClassMember cm)
         {
-            var method = NodeOfClass.Children().Where(x => x.Type.Equals("Method")).Where(x => x.GetInt("Source.Line") == cm.LineNumber).First();
+            var method = NodeOfClass.Children().Where(x => x.Type.Equals("Method"))
+                .Where(x => x.GetInt("Source.Line") == cm.LineNumber).First();
 
             if (method != null)
             {
@@ -240,23 +241,24 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         private void OnClickClassName()
         {
-            var marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            //  var m = NodeOfClass.GameObject().GetComponent<Renderer>().materials.First(x => x.name.Contains("SEEMaterial"));
-            // m.color = Color.black;
-            //marker.transform.parent = NodeOfClass.GameObject().transform;
-            //marker.transform.localScale = new Vector3(1f, 1f, 1f);
-            //NodeOfClass.GameObject().transform.localScale += new Vector3(1.3f, 1.3f, 1.3f);
-            var newScale = new Vector3(1.5f, 1.5f, 1.5f);
-            var oldScale = NodeOfClass.GameObject().transform.localScale;
-            if (!HighlightAnomation)
+            if (Input.GetKeyDown(KeyCode.LeftShift))
             {
-                HighlightAnomation = true;
-                NodeOfClass.GameObject().transform.DOScale(oldScale * 1.5f, 0.3f).SetEase(Ease.InOutSine)
-                    .SetLoops(2, LoopType.Yoyo).OnComplete(
-                        () => { HighlightAnomation = false; }).Restart();
+                var marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                //  var m = NodeOfClass.GameObject().GetComponent<Renderer>().materials.First(x => x.name.Contains("SEEMaterial"));
+                // m.color = Color.black;
+                //marker.transform.parent = NodeOfClass.GameObject().transform;
+                //marker.transform.localScale = new Vector3(1f, 1f, 1f);
+                //NodeOfClass.GameObject().transform.localScale += new Vector3(1.3f, 1.3f, 1.3f);
+                var newScale = new Vector3(1.5f, 1.5f, 1.5f);
+                var oldScale = NodeOfClass.GameObject().transform.localScale;
+                if (!HighlightAnomation)
+                {
+                    HighlightAnomation = true;
+                    NodeOfClass.GameObject().transform.DOScale(oldScale * 1.5f, 0.3f).SetEase(Ease.InOutSine)
+                        .SetLoops(2, LoopType.Yoyo).OnComplete(
+                            () => { HighlightAnomation = false; }).Restart();
+                }
             }
-
-
             //  Thread.Sleep(1000);
             // NodeOfClass.GameObject().transform.localScale = oldScale;
         }
@@ -287,6 +289,12 @@ namespace SEE.Game.UI.LiveDocumantation
             public LiveDocumentationValues(string title, string attachedTo = null) : base(title, attachedTo)
             {
             }
+        }
+
+        private Node FindMatchingNode(string className)
+        {
+            var namspaceName = className.Split(".")[..(className.Split(".").Length - 1)]
+                .Aggregate("", (((s, s1) => s1 + s)));
         }
 
         /// <summary>
@@ -338,7 +346,7 @@ namespace SEE.Game.UI.LiveDocumantation
         /// Called when a user has clicked on a link
         /// </summary>
         /// <param name="linkPath"></param>
-        public void OnLinkClicked(string linkPath)
+        private void OnLinkClicked(string linkPath)
         {
             Node nodeOfLink = FindNodeWithPath(linkPath);
             if (nodeOfLink == null)
@@ -373,13 +381,14 @@ namespace SEE.Game.UI.LiveDocumantation
                 newWin.Graph = Graph;
                 newWin.NodeOfClass = nodeOfLink;
                 LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
-
-                buffer = FileParser.ParseClassDoc(nodeOfLink.AbsolutePlatformPath(), nodeOfLink.SourceName);
+                FileParser parser = new FileParser(nodeOfLink.AbsolutePlatformPath());
+                buffer = parser.ParseClassDoc(nodeOfLink.AbsolutePlatformPath(), nodeOfLink.SourceName);
                 newWin.DocumentationBuffer = buffer;
 
                 List<LiveDocumentationBuffer> methods = new List<LiveDocumentationBuffer>();
-                methods = FileParser.ParseClassMethods(nodeOfLink.AbsolutePlatformPath(), nodeOfLink.SourceName);
+                methods = parser.ParseClassMethods(nodeOfLink.AbsolutePlatformPath(), nodeOfLink.SourceName);
 
+                newWin.ImportedNamespaces = parser.ParseNamespaceImports(nodeOfLink.AbsolutePlatformPath());
                 if (buffer == null || methods == null)
                 {
                     return;

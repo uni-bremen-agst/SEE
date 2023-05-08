@@ -37,35 +37,31 @@ public partial class CSharpCommentsGrammarParser : Antlr4.Runtime.Parser {
 	protected static PredictionContextCache sharedContextCache = new PredictionContextCache();
 	public const int
 		T__0=1, T__1=2, T__2=3, T__3=4, T__4=5, T__5=6, T__6=7, T__7=8, T__8=9, 
-		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, WS=15, Namespace=16, 
-		Using=17, SEMICOLON=18, Comment=19, SHORT_COMMENT=20, TEXT=21, EQUALS=22, 
-		LineComment=23, TEXT_SKIP=24, CURLY_BRACKET_OPEN=25, CURLY_BRACKET_CLOSE=26, 
-		PARAMREF=27;
+		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, WS=17, 
+		Namespace=18, Using=19, SEMICOLON=20, Dashes=21, SHORT_COMMENT=22, TEXT=23, 
+		EQUALS=24, LineComment=25, TEXT_SKIP=26, CURLY_BRACKET_OPEN=27, CURLY_BRACKET_CLOSE=28;
 	public const int
-		RULE_classLink = 0, RULE_parameter = 1, RULE_paramref = 2, RULE_summary = 3, 
-		RULE_docs = 4, RULE_returnContent = 5, RULE_return = 6, RULE_comment = 7, 
-		RULE_comments = 8, RULE_line_comment = 9, RULE_methodSignature = 10, RULE_methodScope = 11, 
-		RULE_methodContent = 12, RULE_methodDeclaration = 13, RULE_scope = 14, 
-		RULE_classContent = 15, RULE_classDefinition = 16, RULE_usingClause = 17, 
-		RULE_namespaceDeclaration = 18, RULE_start = 19;
+		RULE_docs = 0, RULE_paramref = 1, RULE_classLink = 2, RULE_parameters = 3, 
+		RULE_parameter = 4, RULE_summary = 5, RULE_exceptionType = 6, RULE_someText = 7, 
+		RULE_exceptionTag = 8, RULE_returnContent = 9, RULE_return = 10, RULE_comments = 11;
 	public static readonly string[] ruleNames = {
-		"classLink", "parameter", "paramref", "summary", "docs", "returnContent", 
-		"return", "comment", "comments", "line_comment", "methodSignature", "methodScope", 
-		"methodContent", "methodDeclaration", "scope", "classContent", "classDefinition", 
-		"usingClause", "namespaceDeclaration", "start"
+		"docs", "paramref", "classLink", "parameters", "parameter", "summary", 
+		"exceptionType", "someText", "exceptionTag", "returnContent", "return", 
+		"comments"
 	};
 
 	private static readonly string[] _LiteralNames = {
-		null, "'<see cref=\"'", "'\"/>'", "'<param name=\"'", "'\">'", "'</param>'", 
-		"'/// <summary>'", "'/// </summary>'", "'/// <returns>'", "'/// </returns>'", 
-		"'</returns>'", "','", "'<'", "'>'", "'class'", null, "'namespace'", "'using'", 
-		"';'", null, null, null, "'='", null, null, "'{'", "'}'"
+		null, "'<paramref name=\"'", "'\"/>'", "'<see cref=\"'", "'/// <param name=\"'", 
+		"'\">'", "'</param>'", "'/// <summary>'", "'/// </summary>'", "'<'", "'>'", 
+		"'/// <exception cref=\"'", "'/// </exception>'", "'</exception>'", "'/// <returns>'", 
+		"'/// </returns>'", "'</returns>'", null, "'namespace'", "'using'", "';'", 
+		"'///'", null, null, "'='", null, null, "'{'", "'}'"
 	};
 	private static readonly string[] _SymbolicNames = {
 		null, null, null, null, null, null, null, null, null, null, null, null, 
-		null, null, null, "WS", "Namespace", "Using", "SEMICOLON", "Comment", 
-		"SHORT_COMMENT", "TEXT", "EQUALS", "LineComment", "TEXT_SKIP", "CURLY_BRACKET_OPEN", 
-		"CURLY_BRACKET_CLOSE", "PARAMREF"
+		null, null, null, null, null, "WS", "Namespace", "Using", "SEMICOLON", 
+		"Dashes", "SHORT_COMMENT", "TEXT", "EQUALS", "LineComment", "TEXT_SKIP", 
+		"CURLY_BRACKET_OPEN", "CURLY_BRACKET_CLOSE"
 	};
 	public static readonly IVocabulary DefaultVocabulary = new Vocabulary(_LiteralNames, _SymbolicNames);
 
@@ -99,6 +95,152 @@ public partial class CSharpCommentsGrammarParser : Antlr4.Runtime.Parser {
 		Interpreter = new ParserATNSimulator(this, _ATN, decisionToDFA, sharedContextCache);
 	}
 
+	public partial class DocsContext : ParserRuleContext {
+		[System.Diagnostics.DebuggerNonUserCode] public SummaryContext summary() {
+			return GetRuleContext<SummaryContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] Dashes() { return GetTokens(CSharpCommentsGrammarParser.Dashes); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Dashes(int i) {
+			return GetToken(CSharpCommentsGrammarParser.Dashes, i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ParametersContext parameters() {
+			return GetRuleContext<ParametersContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ReturnContext @return() {
+			return GetRuleContext<ReturnContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ExceptionTagContext exceptionTag() {
+			return GetRuleContext<ExceptionTagContext>(0);
+		}
+		public DocsContext(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_docs; } }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
+			if (typedListener != null) typedListener.EnterDocs(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
+			if (typedListener != null) typedListener.ExitDocs(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public DocsContext docs() {
+		DocsContext _localctx = new DocsContext(Context, State);
+		EnterRule(_localctx, 0, RULE_docs);
+		int _la;
+		try {
+			EnterOuterAlt(_localctx, 1);
+			{
+			State = 27;
+			ErrorHandler.Sync(this);
+			_la = TokenStream.LA(1);
+			while (_la==Dashes) {
+				{
+				{
+				State = 24;
+				Match(Dashes);
+				}
+				}
+				State = 29;
+				ErrorHandler.Sync(this);
+				_la = TokenStream.LA(1);
+			}
+			State = 30;
+			summary();
+			State = 32;
+			ErrorHandler.Sync(this);
+			switch ( Interpreter.AdaptivePredict(TokenStream,1,Context) ) {
+			case 1:
+				{
+				State = 31;
+				parameters();
+				}
+				break;
+			}
+			State = 35;
+			ErrorHandler.Sync(this);
+			_la = TokenStream.LA(1);
+			if (_la==T__13) {
+				{
+				State = 34;
+				@return();
+				}
+			}
+
+			State = 38;
+			ErrorHandler.Sync(this);
+			_la = TokenStream.LA(1);
+			if (_la==T__10) {
+				{
+				State = 37;
+				exceptionTag();
+				}
+			}
+
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
+	public partial class ParamrefContext : ParserRuleContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode TEXT() { return GetToken(CSharpCommentsGrammarParser.TEXT, 0); }
+		public ParamrefContext(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_paramref; } }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
+			if (typedListener != null) typedListener.EnterParamref(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
+			if (typedListener != null) typedListener.ExitParamref(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public ParamrefContext paramref() {
+		ParamrefContext _localctx = new ParamrefContext(Context, State);
+		EnterRule(_localctx, 2, RULE_paramref);
+		try {
+			EnterOuterAlt(_localctx, 1);
+			{
+			State = 40;
+			Match(T__0);
+			State = 41;
+			Match(TEXT);
+			State = 42;
+			Match(T__1);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
 	public partial class ClassLinkContext : ParserRuleContext {
 		public IToken linkID;
 		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] TEXT() { return GetTokens(CSharpCommentsGrammarParser.TEXT); }
@@ -125,29 +267,88 @@ public partial class CSharpCommentsGrammarParser : Antlr4.Runtime.Parser {
 	[RuleVersion(0)]
 	public ClassLinkContext classLink() {
 		ClassLinkContext _localctx = new ClassLinkContext(Context, State);
-		EnterRule(_localctx, 0, RULE_classLink);
+		EnterRule(_localctx, 4, RULE_classLink);
 		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 40;
-			Match(T__0);
 			State = 44;
+			Match(T__2);
+			State = 48;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			while (_la==TEXT) {
 				{
 				{
-				State = 41;
+				State = 45;
 				_localctx.linkID = Match(TEXT);
 				}
 				}
-				State = 46;
+				State = 50;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 47;
+			State = 51;
 			Match(T__1);
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
+	public partial class ParametersContext : ParserRuleContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ParameterContext[] parameter() {
+			return GetRuleContexts<ParameterContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ParameterContext parameter(int i) {
+			return GetRuleContext<ParameterContext>(i);
+		}
+		public ParametersContext(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_parameters; } }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
+			if (typedListener != null) typedListener.EnterParameters(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
+			if (typedListener != null) typedListener.ExitParameters(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public ParametersContext parameters() {
+		ParametersContext _localctx = new ParametersContext(Context, State);
+		EnterRule(_localctx, 6, RULE_parameters);
+		int _la;
+		try {
+			EnterOuterAlt(_localctx, 1);
+			{
+			State = 56;
+			ErrorHandler.Sync(this);
+			_la = TokenStream.LA(1);
+			while (_la==T__3) {
+				{
+				{
+				State = 53;
+				parameter();
+				}
+				}
+				State = 58;
+				ErrorHandler.Sync(this);
+				_la = TokenStream.LA(1);
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -188,86 +389,45 @@ public partial class CSharpCommentsGrammarParser : Antlr4.Runtime.Parser {
 	[RuleVersion(0)]
 	public ParameterContext parameter() {
 		ParameterContext _localctx = new ParameterContext(Context, State);
-		EnterRule(_localctx, 2, RULE_parameter);
+		EnterRule(_localctx, 8, RULE_parameter);
 		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 49;
-			Match(T__2);
-			State = 53;
+			State = 59;
+			Match(T__3);
+			State = 63;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			while (_la==TEXT) {
 				{
 				{
-				State = 50;
+				State = 60;
 				_localctx.paramName = Match(TEXT);
 				}
 				}
-				State = 55;
+				State = 65;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 56;
-			Match(T__3);
-			State = 60;
+			State = 66;
+			Match(T__4);
+			State = 70;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
 			while (_la==TEXT) {
 				{
 				{
-				State = 57;
+				State = 67;
 				_localctx.paramDescription = Match(TEXT);
 				}
 				}
-				State = 62;
+				State = 72;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 63;
-			Match(T__4);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			ErrorHandler.ReportError(this, re);
-			ErrorHandler.Recover(this, re);
-		}
-		finally {
-			ExitRule();
-		}
-		return _localctx;
-	}
-
-	public partial class ParamrefContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode PARAMREF() { return GetToken(CSharpCommentsGrammarParser.PARAMREF, 0); }
-		public ParamrefContext(ParserRuleContext parent, int invokingState)
-			: base(parent, invokingState)
-		{
-		}
-		public override int RuleIndex { get { return RULE_paramref; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.EnterParamref(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.ExitParamref(this);
-		}
-	}
-
-	[RuleVersion(0)]
-	public ParamrefContext paramref() {
-		ParamrefContext _localctx = new ParamrefContext(Context, State);
-		EnterRule(_localctx, 4, RULE_paramref);
-		try {
-			EnterOuterAlt(_localctx, 1);
-			{
-			State = 65;
-			Match(PARAMREF);
+			State = 73;
+			Match(T__5);
 			}
 		}
 		catch (RecognitionException re) {
@@ -282,8 +442,17 @@ public partial class CSharpCommentsGrammarParser : Antlr4.Runtime.Parser {
 	}
 
 	public partial class SummaryContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public CommentsContext comments() {
-			return GetRuleContext<CommentsContext>(0);
+		[System.Diagnostics.DebuggerNonUserCode] public CommentsContext[] comments() {
+			return GetRuleContexts<CommentsContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public CommentsContext comments(int i) {
+			return GetRuleContext<CommentsContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public SomeTextContext[] someText() {
+			return GetRuleContexts<SomeTextContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public SomeTextContext someText(int i) {
+			return GetRuleContext<SomeTextContext>(i);
 		}
 		public SummaryContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -305,16 +474,45 @@ public partial class CSharpCommentsGrammarParser : Antlr4.Runtime.Parser {
 	[RuleVersion(0)]
 	public SummaryContext summary() {
 		SummaryContext _localctx = new SummaryContext(Context, State);
-		EnterRule(_localctx, 6, RULE_summary);
+		EnterRule(_localctx, 10, RULE_summary);
+		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 67;
-			Match(T__5);
-			State = 68;
-			comments();
-			State = 69;
+			State = 75;
 			Match(T__6);
+			State = 80;
+			ErrorHandler.Sync(this);
+			_la = TokenStream.LA(1);
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__8) | (1L << T__9) | (1L << Dashes) | (1L << TEXT))) != 0)) {
+				{
+				State = 78;
+				ErrorHandler.Sync(this);
+				switch (TokenStream.LA(1)) {
+				case Dashes:
+					{
+					State = 76;
+					comments();
+					}
+					break;
+				case T__8:
+				case T__9:
+				case TEXT:
+					{
+					State = 77;
+					someText();
+					}
+					break;
+				default:
+					throw new NoViableAltException(this);
+				}
+				}
+				State = 82;
+				ErrorHandler.Sync(this);
+				_la = TokenStream.LA(1);
+			}
+			State = 83;
+			Match(T__7);
 			}
 		}
 		catch (RecognitionException re) {
@@ -328,55 +526,220 @@ public partial class CSharpCommentsGrammarParser : Antlr4.Runtime.Parser {
 		return _localctx;
 	}
 
-	public partial class DocsContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public SummaryContext summary() {
-			return GetRuleContext<SummaryContext>(0);
+	public partial class ExceptionTypeContext : ParserRuleContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] TEXT() { return GetTokens(CSharpCommentsGrammarParser.TEXT); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode TEXT(int i) {
+			return GetToken(CSharpCommentsGrammarParser.TEXT, i);
 		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] Comment() { return GetTokens(CSharpCommentsGrammarParser.Comment); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Comment(int i) {
-			return GetToken(CSharpCommentsGrammarParser.Comment, i);
-		}
-		public DocsContext(ParserRuleContext parent, int invokingState)
+		public ExceptionTypeContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
 		{
 		}
-		public override int RuleIndex { get { return RULE_docs; } }
+		public override int RuleIndex { get { return RULE_exceptionType; } }
 		[System.Diagnostics.DebuggerNonUserCode]
 		public override void EnterRule(IParseTreeListener listener) {
 			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.EnterDocs(this);
+			if (typedListener != null) typedListener.EnterExceptionType(this);
 		}
 		[System.Diagnostics.DebuggerNonUserCode]
 		public override void ExitRule(IParseTreeListener listener) {
 			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.ExitDocs(this);
+			if (typedListener != null) typedListener.ExitExceptionType(this);
 		}
 	}
 
 	[RuleVersion(0)]
-	public DocsContext docs() {
-		DocsContext _localctx = new DocsContext(Context, State);
-		EnterRule(_localctx, 8, RULE_docs);
+	public ExceptionTypeContext exceptionType() {
+		ExceptionTypeContext _localctx = new ExceptionTypeContext(Context, State);
+		EnterRule(_localctx, 12, RULE_exceptionType);
 		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 74;
+			State = 86;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			while (_la==Comment) {
+			do {
 				{
 				{
-				State = 71;
-				Match(Comment);
+				State = 85;
+				Match(TEXT);
 				}
 				}
-				State = 76;
+				State = 88;
+				ErrorHandler.Sync(this);
+				_la = TokenStream.LA(1);
+			} while ( _la==TEXT );
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
+	public partial class SomeTextContext : ParserRuleContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] TEXT() { return GetTokens(CSharpCommentsGrammarParser.TEXT); }
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode TEXT(int i) {
+			return GetToken(CSharpCommentsGrammarParser.TEXT, i);
+		}
+		public SomeTextContext(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_someText; } }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
+			if (typedListener != null) typedListener.EnterSomeText(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
+			if (typedListener != null) typedListener.ExitSomeText(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public SomeTextContext someText() {
+		SomeTextContext _localctx = new SomeTextContext(Context, State);
+		EnterRule(_localctx, 14, RULE_someText);
+		int _la;
+		try {
+			int _alt;
+			EnterOuterAlt(_localctx, 1);
+			{
+			State = 91;
+			ErrorHandler.Sync(this);
+			_alt = 1;
+			do {
+				switch (_alt) {
+				case 1:
+					{
+					{
+					State = 90;
+					_la = TokenStream.LA(1);
+					if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__8) | (1L << T__9) | (1L << TEXT))) != 0)) ) {
+					ErrorHandler.RecoverInline(this);
+					}
+					else {
+						ErrorHandler.ReportMatch(this);
+					    Consume();
+					}
+					}
+					}
+					break;
+				default:
+					throw new NoViableAltException(this);
+				}
+				State = 93;
+				ErrorHandler.Sync(this);
+				_alt = Interpreter.AdaptivePredict(TokenStream,11,Context);
+			} while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER );
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			ErrorHandler.ReportError(this, re);
+			ErrorHandler.Recover(this, re);
+		}
+		finally {
+			ExitRule();
+		}
+		return _localctx;
+	}
+
+	public partial class ExceptionTagContext : ParserRuleContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ExceptionTypeContext exceptionType() {
+			return GetRuleContext<ExceptionTypeContext>(0);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public SomeTextContext[] someText() {
+			return GetRuleContexts<SomeTextContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public SomeTextContext someText(int i) {
+			return GetRuleContext<SomeTextContext>(i);
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ParamrefContext[] paramref() {
+			return GetRuleContexts<ParamrefContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public ParamrefContext paramref(int i) {
+			return GetRuleContext<ParamrefContext>(i);
+		}
+		public ExceptionTagContext(ParserRuleContext parent, int invokingState)
+			: base(parent, invokingState)
+		{
+		}
+		public override int RuleIndex { get { return RULE_exceptionTag; } }
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void EnterRule(IParseTreeListener listener) {
+			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
+			if (typedListener != null) typedListener.EnterExceptionTag(this);
+		}
+		[System.Diagnostics.DebuggerNonUserCode]
+		public override void ExitRule(IParseTreeListener listener) {
+			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
+			if (typedListener != null) typedListener.ExitExceptionTag(this);
+		}
+	}
+
+	[RuleVersion(0)]
+	public ExceptionTagContext exceptionTag() {
+		ExceptionTagContext _localctx = new ExceptionTagContext(Context, State);
+		EnterRule(_localctx, 16, RULE_exceptionTag);
+		int _la;
+		try {
+			EnterOuterAlt(_localctx, 1);
+			{
+			State = 95;
+			Match(T__10);
+			State = 96;
+			exceptionType();
+			State = 97;
+			Match(T__4);
+			State = 102;
+			ErrorHandler.Sync(this);
+			_la = TokenStream.LA(1);
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << T__8) | (1L << T__9) | (1L << TEXT))) != 0)) {
+				{
+				State = 100;
+				ErrorHandler.Sync(this);
+				switch (TokenStream.LA(1)) {
+				case T__8:
+				case T__9:
+				case TEXT:
+					{
+					State = 98;
+					someText();
+					}
+					break;
+				case T__0:
+					{
+					State = 99;
+					paramref();
+					}
+					break;
+				default:
+					throw new NoViableAltException(this);
+				}
+				}
+				State = 104;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
-			State = 77;
-			summary();
+			State = 105;
+			_la = TokenStream.LA(1);
+			if ( !(_la==T__11 || _la==T__12) ) {
+			ErrorHandler.RecoverInline(this);
+			}
+			else {
+				ErrorHandler.ReportMatch(this);
+			    Consume();
+			}
 			}
 		}
 		catch (RecognitionException re) {
@@ -391,15 +754,17 @@ public partial class CSharpCommentsGrammarParser : Antlr4.Runtime.Parser {
 	}
 
 	public partial class ReturnContentContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public CommentContext[] comment() {
-			return GetRuleContexts<CommentContext>();
+		[System.Diagnostics.DebuggerNonUserCode] public CommentsContext[] comments() {
+			return GetRuleContexts<CommentsContext>();
 		}
-		[System.Diagnostics.DebuggerNonUserCode] public CommentContext comment(int i) {
-			return GetRuleContext<CommentContext>(i);
+		[System.Diagnostics.DebuggerNonUserCode] public CommentsContext comments(int i) {
+			return GetRuleContext<CommentsContext>(i);
 		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] TEXT() { return GetTokens(CSharpCommentsGrammarParser.TEXT); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode TEXT(int i) {
-			return GetToken(CSharpCommentsGrammarParser.TEXT, i);
+		[System.Diagnostics.DebuggerNonUserCode] public SomeTextContext[] someText() {
+			return GetRuleContexts<SomeTextContext>();
+		}
+		[System.Diagnostics.DebuggerNonUserCode] public SomeTextContext someText(int i) {
+			return GetRuleContext<SomeTextContext>(i);
 		}
 		[System.Diagnostics.DebuggerNonUserCode] public ClassLinkContext[] classLink() {
 			return GetRuleContexts<ClassLinkContext>();
@@ -427,42 +792,57 @@ public partial class CSharpCommentsGrammarParser : Antlr4.Runtime.Parser {
 	[RuleVersion(0)]
 	public ReturnContentContext returnContent() {
 		ReturnContentContext _localctx = new ReturnContentContext(Context, State);
-		EnterRule(_localctx, 10, RULE_returnContent);
+		EnterRule(_localctx, 18, RULE_returnContent);
 		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 84;
+			State = 114;
 			ErrorHandler.Sync(this);
 			_la = TokenStream.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__0) | (1L << Comment) | (1L << TEXT))) != 0)) {
+			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__2) | (1L << T__8) | (1L << T__9) | (1L << Dashes) | (1L << TEXT))) != 0)) {
 				{
-				State = 82;
+				State = 112;
 				ErrorHandler.Sync(this);
 				switch (TokenStream.LA(1)) {
-				case Comment:
+				case Dashes:
 					{
-					State = 79;
-					comment();
+					State = 107;
+					comments();
 					}
 					break;
+				case T__2:
+				case T__8:
+				case T__9:
 				case TEXT:
 					{
-					State = 80;
-					Match(TEXT);
+					State = 110;
+					ErrorHandler.Sync(this);
+					switch (TokenStream.LA(1)) {
+					case T__8:
+					case T__9:
+					case TEXT:
+						{
+						State = 108;
+						someText();
+						}
+						break;
+					case T__2:
+						{
+						State = 109;
+						classLink();
+						}
+						break;
+					default:
+						throw new NoViableAltException(this);
 					}
-					break;
-				case T__0:
-					{
-					State = 81;
-					classLink();
 					}
 					break;
 				default:
 					throw new NoViableAltException(this);
 				}
 				}
-				State = 86;
+				State = 116;
 				ErrorHandler.Sync(this);
 				_la = TokenStream.LA(1);
 			}
@@ -503,18 +883,18 @@ public partial class CSharpCommentsGrammarParser : Antlr4.Runtime.Parser {
 	[RuleVersion(0)]
 	public ReturnContext @return() {
 		ReturnContext _localctx = new ReturnContext(Context, State);
-		EnterRule(_localctx, 12, RULE_return);
+		EnterRule(_localctx, 20, RULE_return);
 		int _la;
 		try {
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 87;
-			Match(T__7);
-			State = 88;
+			State = 117;
+			Match(T__13);
+			State = 118;
 			returnContent();
-			State = 89;
+			State = 119;
 			_la = TokenStream.LA(1);
-			if ( !(_la==T__8 || _la==T__9) ) {
+			if ( !(_la==T__14 || _la==T__15) ) {
 			ErrorHandler.RecoverInline(this);
 			}
 			else {
@@ -534,13 +914,13 @@ public partial class CSharpCommentsGrammarParser : Antlr4.Runtime.Parser {
 		return _localctx;
 	}
 
-	public partial class CommentContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Comment() { return GetToken(CSharpCommentsGrammarParser.Comment, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ParameterContext[] parameter() {
-			return GetRuleContexts<ParameterContext>();
+	public partial class CommentsContext : ParserRuleContext {
+		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Dashes() { return GetToken(CSharpCommentsGrammarParser.Dashes, 0); }
+		[System.Diagnostics.DebuggerNonUserCode] public SomeTextContext[] someText() {
+			return GetRuleContexts<SomeTextContext>();
 		}
-		[System.Diagnostics.DebuggerNonUserCode] public ParameterContext parameter(int i) {
-			return GetRuleContext<ParameterContext>(i);
+		[System.Diagnostics.DebuggerNonUserCode] public SomeTextContext someText(int i) {
+			return GetRuleContext<SomeTextContext>(i);
 		}
 		[System.Diagnostics.DebuggerNonUserCode] public ClassLinkContext[] classLink() {
 			return GetRuleContexts<ClassLinkContext>();
@@ -548,118 +928,11 @@ public partial class CSharpCommentsGrammarParser : Antlr4.Runtime.Parser {
 		[System.Diagnostics.DebuggerNonUserCode] public ClassLinkContext classLink(int i) {
 			return GetRuleContext<ClassLinkContext>(i);
 		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] TEXT() { return GetTokens(CSharpCommentsGrammarParser.TEXT); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode TEXT(int i) {
-			return GetToken(CSharpCommentsGrammarParser.TEXT, i);
-		}
-		public CommentContext(ParserRuleContext parent, int invokingState)
-			: base(parent, invokingState)
-		{
-		}
-		public override int RuleIndex { get { return RULE_comment; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.EnterComment(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.ExitComment(this);
-		}
-	}
-
-	[RuleVersion(0)]
-	public CommentContext comment() {
-		CommentContext _localctx = new CommentContext(Context, State);
-		EnterRule(_localctx, 14, RULE_comment);
-		try {
-			int _alt;
-			EnterOuterAlt(_localctx, 1);
-			{
-			State = 91;
-			Match(Comment);
-			State = 97;
-			ErrorHandler.Sync(this);
-			_alt = Interpreter.AdaptivePredict(TokenStream,7,Context);
-			while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
-				if ( _alt==1 ) {
-					{
-					State = 95;
-					ErrorHandler.Sync(this);
-					switch (TokenStream.LA(1)) {
-					case T__0:
-						{
-						{
-						State = 92;
-						classLink();
-						}
-						}
-						break;
-					case T__2:
-						{
-						State = 93;
-						parameter();
-						}
-						break;
-					case TEXT:
-						{
-						{
-						State = 94;
-						Match(TEXT);
-						}
-						}
-						break;
-					default:
-						throw new NoViableAltException(this);
-					}
-					} 
-				}
-				State = 99;
-				ErrorHandler.Sync(this);
-				_alt = Interpreter.AdaptivePredict(TokenStream,7,Context);
-			}
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			ErrorHandler.ReportError(this, re);
-			ErrorHandler.Recover(this, re);
-		}
-		finally {
-			ExitRule();
-		}
-		return _localctx;
-	}
-
-	public partial class CommentsContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ReturnContext[] @return() {
-			return GetRuleContexts<ReturnContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ReturnContext @return(int i) {
-			return GetRuleContext<ReturnContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public CommentContext[] comment() {
-			return GetRuleContexts<CommentContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public CommentContext comment(int i) {
-			return GetRuleContext<CommentContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ParameterContext[] parameter() {
-			return GetRuleContexts<ParameterContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ParameterContext parameter(int i) {
-			return GetRuleContext<ParameterContext>(i);
-		}
 		[System.Diagnostics.DebuggerNonUserCode] public ParamrefContext[] paramref() {
 			return GetRuleContexts<ParamrefContext>();
 		}
 		[System.Diagnostics.DebuggerNonUserCode] public ParamrefContext paramref(int i) {
 			return GetRuleContext<ParamrefContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] TEXT() { return GetTokens(CSharpCommentsGrammarParser.TEXT); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode TEXT(int i) {
-			return GetToken(CSharpCommentsGrammarParser.TEXT, i);
 		}
 		public CommentsContext(ParserRuleContext parent, int invokingState)
 			: base(parent, invokingState)
@@ -681,1139 +954,52 @@ public partial class CSharpCommentsGrammarParser : Antlr4.Runtime.Parser {
 	[RuleVersion(0)]
 	public CommentsContext comments() {
 		CommentsContext _localctx = new CommentsContext(Context, State);
-		EnterRule(_localctx, 16, RULE_comments);
-		int _la;
-		try {
-			EnterOuterAlt(_localctx, 1);
-			{
-			State = 113;
-			ErrorHandler.Sync(this);
-			_la = TokenStream.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__2) | (1L << T__7) | (1L << Comment) | (1L << PARAMREF))) != 0)) {
-				{
-				State = 111;
-				ErrorHandler.Sync(this);
-				switch ( Interpreter.AdaptivePredict(TokenStream,9,Context) ) {
-				case 1:
-					{
-					State = 100;
-					@return();
-					}
-					break;
-				case 2:
-					{
-					State = 101;
-					comment();
-					}
-					break;
-				case 3:
-					{
-					State = 102;
-					parameter();
-					}
-					break;
-				case 4:
-					{
-					State = 103;
-					@return();
-					}
-					break;
-				case 5:
-					{
-					State = 104;
-					paramref();
-					State = 108;
-					ErrorHandler.Sync(this);
-					_la = TokenStream.LA(1);
-					while (_la==TEXT) {
-						{
-						{
-						State = 105;
-						Match(TEXT);
-						}
-						}
-						State = 110;
-						ErrorHandler.Sync(this);
-						_la = TokenStream.LA(1);
-					}
-					}
-					break;
-				}
-				}
-				State = 115;
-				ErrorHandler.Sync(this);
-				_la = TokenStream.LA(1);
-			}
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			ErrorHandler.ReportError(this, re);
-			ErrorHandler.Recover(this, re);
-		}
-		finally {
-			ExitRule();
-		}
-		return _localctx;
-	}
-
-	public partial class Line_commentContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode LineComment() { return GetToken(CSharpCommentsGrammarParser.LineComment, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ClassLinkContext classLink() {
-			return GetRuleContext<ClassLinkContext>(0);
-		}
-		public Line_commentContext(ParserRuleContext parent, int invokingState)
-			: base(parent, invokingState)
-		{
-		}
-		public override int RuleIndex { get { return RULE_line_comment; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.EnterLine_comment(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.ExitLine_comment(this);
-		}
-	}
-
-	[RuleVersion(0)]
-	public Line_commentContext line_comment() {
-		Line_commentContext _localctx = new Line_commentContext(Context, State);
-		EnterRule(_localctx, 18, RULE_line_comment);
-		int _la;
-		try {
-			EnterOuterAlt(_localctx, 1);
-			{
-			State = 116;
-			Match(LineComment);
-			State = 118;
-			ErrorHandler.Sync(this);
-			_la = TokenStream.LA(1);
-			if (_la==T__0) {
-				{
-				State = 117;
-				classLink();
-				}
-			}
-
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			ErrorHandler.ReportError(this, re);
-			ErrorHandler.Recover(this, re);
-		}
-		finally {
-			ExitRule();
-		}
-		return _localctx;
-	}
-
-	public partial class MethodSignatureContext : ParserRuleContext {
-		public IToken nameAndParameters;
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] TEXT() { return GetTokens(CSharpCommentsGrammarParser.TEXT); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode TEXT(int i) {
-			return GetToken(CSharpCommentsGrammarParser.TEXT, i);
-		}
-		public MethodSignatureContext(ParserRuleContext parent, int invokingState)
-			: base(parent, invokingState)
-		{
-		}
-		public override int RuleIndex { get { return RULE_methodSignature; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.EnterMethodSignature(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.ExitMethodSignature(this);
-		}
-	}
-
-	[RuleVersion(0)]
-	public MethodSignatureContext methodSignature() {
-		MethodSignatureContext _localctx = new MethodSignatureContext(Context, State);
-		EnterRule(_localctx, 20, RULE_methodSignature);
-		int _la;
-		try {
-			EnterOuterAlt(_localctx, 1);
-			{
-			State = 121;
-			ErrorHandler.Sync(this);
-			_la = TokenStream.LA(1);
-			do {
-				{
-				{
-				State = 120;
-				_localctx.nameAndParameters = TokenStream.LT(1);
-				_la = TokenStream.LA(1);
-				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << TEXT))) != 0)) ) {
-					_localctx.nameAndParameters = ErrorHandler.RecoverInline(this);
-				}
-				else {
-					ErrorHandler.ReportMatch(this);
-				    Consume();
-				}
-				}
-				}
-				State = 123;
-				ErrorHandler.Sync(this);
-				_la = TokenStream.LA(1);
-			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << TEXT))) != 0) );
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			ErrorHandler.ReportError(this, re);
-			ErrorHandler.Recover(this, re);
-		}
-		finally {
-			ExitRule();
-		}
-		return _localctx;
-	}
-
-	public partial class MethodScopeContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CURLY_BRACKET_OPEN() { return GetToken(CSharpCommentsGrammarParser.CURLY_BRACKET_OPEN, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CURLY_BRACKET_CLOSE() { return GetToken(CSharpCommentsGrammarParser.CURLY_BRACKET_CLOSE, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] TEXT() { return GetTokens(CSharpCommentsGrammarParser.TEXT); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode TEXT(int i) {
-			return GetToken(CSharpCommentsGrammarParser.TEXT, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] SEMICOLON() { return GetTokens(CSharpCommentsGrammarParser.SEMICOLON); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode SEMICOLON(int i) {
-			return GetToken(CSharpCommentsGrammarParser.SEMICOLON, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] EQUALS() { return GetTokens(CSharpCommentsGrammarParser.EQUALS); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode EQUALS(int i) {
-			return GetToken(CSharpCommentsGrammarParser.EQUALS, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public MethodScopeContext[] methodScope() {
-			return GetRuleContexts<MethodScopeContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public MethodScopeContext methodScope(int i) {
-			return GetRuleContext<MethodScopeContext>(i);
-		}
-		public MethodScopeContext(ParserRuleContext parent, int invokingState)
-			: base(parent, invokingState)
-		{
-		}
-		public override int RuleIndex { get { return RULE_methodScope; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.EnterMethodScope(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.ExitMethodScope(this);
-		}
-	}
-
-	[RuleVersion(0)]
-	public MethodScopeContext methodScope() {
-		MethodScopeContext _localctx = new MethodScopeContext(Context, State);
-		EnterRule(_localctx, 22, RULE_methodScope);
-		int _la;
-		try {
-			EnterOuterAlt(_localctx, 1);
-			{
-			State = 125;
-			Match(CURLY_BRACKET_OPEN);
-			State = 133;
-			ErrorHandler.Sync(this);
-			_la = TokenStream.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__12) | (1L << SEMICOLON) | (1L << TEXT) | (1L << EQUALS) | (1L << CURLY_BRACKET_OPEN))) != 0)) {
-				{
-				State = 131;
-				ErrorHandler.Sync(this);
-				switch (TokenStream.LA(1)) {
-				case TEXT:
-					{
-					State = 126;
-					Match(TEXT);
-					}
-					break;
-				case SEMICOLON:
-					{
-					State = 127;
-					Match(SEMICOLON);
-					}
-					break;
-				case EQUALS:
-					{
-					State = 128;
-					Match(EQUALS);
-					}
-					break;
-				case T__12:
-					{
-					State = 129;
-					Match(T__12);
-					}
-					break;
-				case CURLY_BRACKET_OPEN:
-					{
-					State = 130;
-					methodScope();
-					}
-					break;
-				default:
-					throw new NoViableAltException(this);
-				}
-				}
-				State = 135;
-				ErrorHandler.Sync(this);
-				_la = TokenStream.LA(1);
-			}
-			State = 136;
-			Match(CURLY_BRACKET_CLOSE);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			ErrorHandler.ReportError(this, re);
-			ErrorHandler.Recover(this, re);
-		}
-		finally {
-			ExitRule();
-		}
-		return _localctx;
-	}
-
-	public partial class MethodContentContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] TEXT() { return GetTokens(CSharpCommentsGrammarParser.TEXT); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode TEXT(int i) {
-			return GetToken(CSharpCommentsGrammarParser.TEXT, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] SEMICOLON() { return GetTokens(CSharpCommentsGrammarParser.SEMICOLON); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode SEMICOLON(int i) {
-			return GetToken(CSharpCommentsGrammarParser.SEMICOLON, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] EQUALS() { return GetTokens(CSharpCommentsGrammarParser.EQUALS); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode EQUALS(int i) {
-			return GetToken(CSharpCommentsGrammarParser.EQUALS, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public MethodScopeContext[] methodScope() {
-			return GetRuleContexts<MethodScopeContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public MethodScopeContext methodScope(int i) {
-			return GetRuleContext<MethodScopeContext>(i);
-		}
-		public MethodContentContext(ParserRuleContext parent, int invokingState)
-			: base(parent, invokingState)
-		{
-		}
-		public override int RuleIndex { get { return RULE_methodContent; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.EnterMethodContent(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.ExitMethodContent(this);
-		}
-	}
-
-	[RuleVersion(0)]
-	public MethodContentContext methodContent() {
-		MethodContentContext _localctx = new MethodContentContext(Context, State);
-		EnterRule(_localctx, 24, RULE_methodContent);
-		int _la;
-		try {
-			EnterOuterAlt(_localctx, 1);
-			{
-			State = 145;
-			ErrorHandler.Sync(this);
-			_la = TokenStream.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__12) | (1L << SEMICOLON) | (1L << TEXT) | (1L << EQUALS) | (1L << CURLY_BRACKET_OPEN))) != 0)) {
-				{
-				State = 143;
-				ErrorHandler.Sync(this);
-				switch (TokenStream.LA(1)) {
-				case TEXT:
-					{
-					State = 138;
-					Match(TEXT);
-					}
-					break;
-				case SEMICOLON:
-					{
-					State = 139;
-					Match(SEMICOLON);
-					}
-					break;
-				case EQUALS:
-					{
-					State = 140;
-					Match(EQUALS);
-					}
-					break;
-				case T__12:
-					{
-					State = 141;
-					Match(T__12);
-					}
-					break;
-				case CURLY_BRACKET_OPEN:
-					{
-					State = 142;
-					methodScope();
-					}
-					break;
-				default:
-					throw new NoViableAltException(this);
-				}
-				}
-				State = 147;
-				ErrorHandler.Sync(this);
-				_la = TokenStream.LA(1);
-			}
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			ErrorHandler.ReportError(this, re);
-			ErrorHandler.Recover(this, re);
-		}
-		finally {
-			ExitRule();
-		}
-		return _localctx;
-	}
-
-	public partial class MethodDeclarationContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public MethodSignatureContext methodSignature() {
-			return GetRuleContext<MethodSignatureContext>(0);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CURLY_BRACKET_OPEN() { return GetToken(CSharpCommentsGrammarParser.CURLY_BRACKET_OPEN, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public MethodContentContext methodContent() {
-			return GetRuleContext<MethodContentContext>(0);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CURLY_BRACKET_CLOSE() { return GetToken(CSharpCommentsGrammarParser.CURLY_BRACKET_CLOSE, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public SummaryContext summary() {
-			return GetRuleContext<SummaryContext>(0);
-		}
-		public MethodDeclarationContext(ParserRuleContext parent, int invokingState)
-			: base(parent, invokingState)
-		{
-		}
-		public override int RuleIndex { get { return RULE_methodDeclaration; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.EnterMethodDeclaration(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.ExitMethodDeclaration(this);
-		}
-	}
-
-	[RuleVersion(0)]
-	public MethodDeclarationContext methodDeclaration() {
-		MethodDeclarationContext _localctx = new MethodDeclarationContext(Context, State);
-		EnterRule(_localctx, 26, RULE_methodDeclaration);
-		int _la;
-		try {
-			EnterOuterAlt(_localctx, 1);
-			{
-			State = 149;
-			ErrorHandler.Sync(this);
-			_la = TokenStream.LA(1);
-			if (_la==T__5) {
-				{
-				State = 148;
-				summary();
-				}
-			}
-
-			State = 151;
-			methodSignature();
-			State = 152;
-			Match(CURLY_BRACKET_OPEN);
-			State = 153;
-			methodContent();
-			State = 154;
-			Match(CURLY_BRACKET_CLOSE);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			ErrorHandler.ReportError(this, re);
-			ErrorHandler.Recover(this, re);
-		}
-		finally {
-			ExitRule();
-		}
-		return _localctx;
-	}
-
-	public partial class ScopeContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CURLY_BRACKET_OPEN() { return GetToken(CSharpCommentsGrammarParser.CURLY_BRACKET_OPEN, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CURLY_BRACKET_CLOSE() { return GetToken(CSharpCommentsGrammarParser.CURLY_BRACKET_CLOSE, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ScopeContext[] scope() {
-			return GetRuleContexts<ScopeContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ScopeContext scope(int i) {
-			return GetRuleContext<ScopeContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public MethodDeclarationContext[] methodDeclaration() {
-			return GetRuleContexts<MethodDeclarationContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public MethodDeclarationContext methodDeclaration(int i) {
-			return GetRuleContext<MethodDeclarationContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ClassDefinitionContext[] classDefinition() {
-			return GetRuleContexts<ClassDefinitionContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ClassDefinitionContext classDefinition(int i) {
-			return GetRuleContext<ClassDefinitionContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] TEXT() { return GetTokens(CSharpCommentsGrammarParser.TEXT); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode TEXT(int i) {
-			return GetToken(CSharpCommentsGrammarParser.TEXT, i);
-		}
-		public ScopeContext(ParserRuleContext parent, int invokingState)
-			: base(parent, invokingState)
-		{
-		}
-		public override int RuleIndex { get { return RULE_scope; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.EnterScope(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.ExitScope(this);
-		}
-	}
-
-	[RuleVersion(0)]
-	public ScopeContext scope() {
-		ScopeContext _localctx = new ScopeContext(Context, State);
-		EnterRule(_localctx, 28, RULE_scope);
-		int _la;
-		try {
-			EnterOuterAlt(_localctx, 1);
-			{
-			State = 156;
-			Match(CURLY_BRACKET_OPEN);
-			State = 171;
-			ErrorHandler.Sync(this);
-			switch ( Interpreter.AdaptivePredict(TokenStream,21,Context) ) {
-			case 1:
-				{
-				State = 162;
-				ErrorHandler.Sync(this);
-				_la = TokenStream.LA(1);
-				while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__5) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << TEXT) | (1L << CURLY_BRACKET_OPEN))) != 0)) {
-					{
-					State = 160;
-					ErrorHandler.Sync(this);
-					switch ( Interpreter.AdaptivePredict(TokenStream,18,Context) ) {
-					case 1:
-						{
-						State = 157;
-						scope();
-						}
-						break;
-					case 2:
-						{
-						State = 158;
-						methodDeclaration();
-						}
-						break;
-					case 3:
-						{
-						State = 159;
-						classDefinition();
-						}
-						break;
-					}
-					}
-					State = 164;
-					ErrorHandler.Sync(this);
-					_la = TokenStream.LA(1);
-				}
-				}
-				break;
-			case 2:
-				{
-				State = 168;
-				ErrorHandler.Sync(this);
-				_la = TokenStream.LA(1);
-				while (_la==TEXT) {
-					{
-					{
-					State = 165;
-					Match(TEXT);
-					}
-					}
-					State = 170;
-					ErrorHandler.Sync(this);
-					_la = TokenStream.LA(1);
-				}
-				}
-				break;
-			}
-			State = 173;
-			Match(CURLY_BRACKET_CLOSE);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			ErrorHandler.ReportError(this, re);
-			ErrorHandler.Recover(this, re);
-		}
-		finally {
-			ExitRule();
-		}
-		return _localctx;
-	}
-
-	public partial class ClassContentContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ScopeContext[] scope() {
-			return GetRuleContexts<ScopeContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ScopeContext scope(int i) {
-			return GetRuleContext<ScopeContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public MethodDeclarationContext[] methodDeclaration() {
-			return GetRuleContexts<MethodDeclarationContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public MethodDeclarationContext methodDeclaration(int i) {
-			return GetRuleContext<MethodDeclarationContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public MethodSignatureContext[] methodSignature() {
-			return GetRuleContexts<MethodSignatureContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public MethodSignatureContext methodSignature(int i) {
-			return GetRuleContext<MethodSignatureContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] SEMICOLON() { return GetTokens(CSharpCommentsGrammarParser.SEMICOLON); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode SEMICOLON(int i) {
-			return GetToken(CSharpCommentsGrammarParser.SEMICOLON, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public SummaryContext[] summary() {
-			return GetRuleContexts<SummaryContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public SummaryContext summary(int i) {
-			return GetRuleContext<SummaryContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] TEXT() { return GetTokens(CSharpCommentsGrammarParser.TEXT); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode TEXT(int i) {
-			return GetToken(CSharpCommentsGrammarParser.TEXT, i);
-		}
-		public ClassContentContext(ParserRuleContext parent, int invokingState)
-			: base(parent, invokingState)
-		{
-		}
-		public override int RuleIndex { get { return RULE_classContent; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.EnterClassContent(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.ExitClassContent(this);
-		}
-	}
-
-	[RuleVersion(0)]
-	public ClassContentContext classContent() {
-		ClassContentContext _localctx = new ClassContentContext(Context, State);
-		EnterRule(_localctx, 30, RULE_classContent);
-		int _la;
+		EnterRule(_localctx, 22, RULE_comments);
 		try {
 			int _alt;
 			EnterOuterAlt(_localctx, 1);
 			{
-			State = 189;
+			{
+			State = 121;
+			Match(Dashes);
+			State = 127;
 			ErrorHandler.Sync(this);
-			_la = TokenStream.LA(1);
-			do {
-				{
-				State = 189;
-				ErrorHandler.Sync(this);
-				switch ( Interpreter.AdaptivePredict(TokenStream,24,Context) ) {
-				case 1:
+			_alt = Interpreter.AdaptivePredict(TokenStream,18,Context);
+			while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER ) {
+				if ( _alt==1 ) {
 					{
-					State = 175;
-					scope();
-					}
-					break;
-				case 2:
-					{
-					State = 176;
-					methodDeclaration();
-					}
-					break;
-				case 3:
-					{
-					State = 178;
+					State = 125;
 					ErrorHandler.Sync(this);
-					_la = TokenStream.LA(1);
-					if (_la==T__5) {
+					switch (TokenStream.LA(1)) {
+					case T__8:
+					case T__9:
+					case TEXT:
 						{
-						State = 177;
-						summary();
+						State = 122;
+						someText();
 						}
-					}
-
-					State = 180;
-					methodSignature();
-					State = 181;
-					Match(SEMICOLON);
-					}
-					break;
-				case 4:
-					{
-					State = 184;
-					ErrorHandler.Sync(this);
-					_alt = 1;
-					do {
-						switch (_alt) {
-						case 1:
-							{
-							{
-							State = 183;
-							Match(TEXT);
-							}
-							}
-							break;
-						default:
-							throw new NoViableAltException(this);
+						break;
+					case T__2:
+						{
+						State = 123;
+						classLink();
 						}
-						State = 186;
-						ErrorHandler.Sync(this);
-						_alt = Interpreter.AdaptivePredict(TokenStream,23,Context);
-					} while ( _alt!=2 && _alt!=global::Antlr4.Runtime.Atn.ATN.INVALID_ALT_NUMBER );
+						break;
+					case T__0:
+						{
+						State = 124;
+						paramref();
+						}
+						break;
+					default:
+						throw new NoViableAltException(this);
 					}
-					break;
-				case 5:
-					{
-					State = 188;
-					Match(SEMICOLON);
-					}
-					break;
+					} 
 				}
-				}
-				State = 191;
+				State = 129;
 				ErrorHandler.Sync(this);
-				_la = TokenStream.LA(1);
-			} while ( (((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__5) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << SEMICOLON) | (1L << TEXT) | (1L << CURLY_BRACKET_OPEN))) != 0) );
+				_alt = Interpreter.AdaptivePredict(TokenStream,18,Context);
 			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			ErrorHandler.ReportError(this, re);
-			ErrorHandler.Recover(this, re);
-		}
-		finally {
-			ExitRule();
-		}
-		return _localctx;
-	}
-
-	public partial class ClassDefinitionContext : ParserRuleContext {
-		public IToken className;
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CURLY_BRACKET_OPEN() { return GetToken(CSharpCommentsGrammarParser.CURLY_BRACKET_OPEN, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ClassContentContext classContent() {
-			return GetRuleContext<ClassContentContext>(0);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CURLY_BRACKET_CLOSE() { return GetToken(CSharpCommentsGrammarParser.CURLY_BRACKET_CLOSE, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] TEXT() { return GetTokens(CSharpCommentsGrammarParser.TEXT); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode TEXT(int i) {
-			return GetToken(CSharpCommentsGrammarParser.TEXT, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public SummaryContext summary() {
-			return GetRuleContext<SummaryContext>(0);
-		}
-		public ClassDefinitionContext(ParserRuleContext parent, int invokingState)
-			: base(parent, invokingState)
-		{
-		}
-		public override int RuleIndex { get { return RULE_classDefinition; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.EnterClassDefinition(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.ExitClassDefinition(this);
-		}
-	}
-
-	[RuleVersion(0)]
-	public ClassDefinitionContext classDefinition() {
-		ClassDefinitionContext _localctx = new ClassDefinitionContext(Context, State);
-		EnterRule(_localctx, 32, RULE_classDefinition);
-		int _la;
-		try {
-			EnterOuterAlt(_localctx, 1);
-			{
-			State = 194;
-			ErrorHandler.Sync(this);
-			_la = TokenStream.LA(1);
-			if (_la==T__5) {
-				{
-				State = 193;
-				summary();
-				}
-			}
-
-			State = 199;
-			ErrorHandler.Sync(this);
-			_la = TokenStream.LA(1);
-			while (_la==TEXT) {
-				{
-				{
-				State = 196;
-				Match(TEXT);
-				}
-				}
-				State = 201;
-				ErrorHandler.Sync(this);
-				_la = TokenStream.LA(1);
-			}
-			State = 202;
-			Match(T__13);
-			State = 203;
-			_localctx.className = Match(TEXT);
-			State = 204;
-			Match(CURLY_BRACKET_OPEN);
-			State = 205;
-			classContent();
-			State = 206;
-			Match(CURLY_BRACKET_CLOSE);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			ErrorHandler.ReportError(this, re);
-			ErrorHandler.Recover(this, re);
-		}
-		finally {
-			ExitRule();
-		}
-		return _localctx;
-	}
-
-	public partial class UsingClauseContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Using() { return GetToken(CSharpCommentsGrammarParser.Using, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode SEMICOLON() { return GetToken(CSharpCommentsGrammarParser.SEMICOLON, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] TEXT() { return GetTokens(CSharpCommentsGrammarParser.TEXT); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode TEXT(int i) {
-			return GetToken(CSharpCommentsGrammarParser.TEXT, i);
-		}
-		public UsingClauseContext(ParserRuleContext parent, int invokingState)
-			: base(parent, invokingState)
-		{
-		}
-		public override int RuleIndex { get { return RULE_usingClause; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.EnterUsingClause(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.ExitUsingClause(this);
-		}
-	}
-
-	[RuleVersion(0)]
-	public UsingClauseContext usingClause() {
-		UsingClauseContext _localctx = new UsingClauseContext(Context, State);
-		EnterRule(_localctx, 34, RULE_usingClause);
-		int _la;
-		try {
-			EnterOuterAlt(_localctx, 1);
-			{
-			State = 208;
-			Match(Using);
-			State = 210;
-			ErrorHandler.Sync(this);
-			_la = TokenStream.LA(1);
-			do {
-				{
-				{
-				State = 209;
-				Match(TEXT);
-				}
-				}
-				State = 212;
-				ErrorHandler.Sync(this);
-				_la = TokenStream.LA(1);
-			} while ( _la==TEXT );
-			State = 214;
-			Match(SEMICOLON);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			ErrorHandler.ReportError(this, re);
-			ErrorHandler.Recover(this, re);
-		}
-		finally {
-			ExitRule();
-		}
-		return _localctx;
-	}
-
-	public partial class NamespaceDeclarationContext : ParserRuleContext {
-		public IToken nameSpaceName;
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Namespace() { return GetToken(CSharpCommentsGrammarParser.Namespace, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CURLY_BRACKET_OPEN() { return GetToken(CSharpCommentsGrammarParser.CURLY_BRACKET_OPEN, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CURLY_BRACKET_CLOSE() { return GetToken(CSharpCommentsGrammarParser.CURLY_BRACKET_CLOSE, 0); }
-		[System.Diagnostics.DebuggerNonUserCode] public NamespaceDeclarationContext[] namespaceDeclaration() {
-			return GetRuleContexts<NamespaceDeclarationContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public NamespaceDeclarationContext namespaceDeclaration(int i) {
-			return GetRuleContext<NamespaceDeclarationContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ClassDefinitionContext[] classDefinition() {
-			return GetRuleContexts<ClassDefinitionContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ClassDefinitionContext classDefinition(int i) {
-			return GetRuleContext<ClassDefinitionContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] TEXT() { return GetTokens(CSharpCommentsGrammarParser.TEXT); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode TEXT(int i) {
-			return GetToken(CSharpCommentsGrammarParser.TEXT, i);
-		}
-		public NamespaceDeclarationContext(ParserRuleContext parent, int invokingState)
-			: base(parent, invokingState)
-		{
-		}
-		public override int RuleIndex { get { return RULE_namespaceDeclaration; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.EnterNamespaceDeclaration(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.ExitNamespaceDeclaration(this);
-		}
-	}
-
-	[RuleVersion(0)]
-	public NamespaceDeclarationContext namespaceDeclaration() {
-		NamespaceDeclarationContext _localctx = new NamespaceDeclarationContext(Context, State);
-		EnterRule(_localctx, 36, RULE_namespaceDeclaration);
-		int _la;
-		try {
-			EnterOuterAlt(_localctx, 1);
-			{
-			State = 216;
-			Match(Namespace);
-			State = 218;
-			ErrorHandler.Sync(this);
-			_la = TokenStream.LA(1);
-			do {
-				{
-				{
-				State = 217;
-				_localctx.nameSpaceName = Match(TEXT);
-				}
-				}
-				State = 220;
-				ErrorHandler.Sync(this);
-				_la = TokenStream.LA(1);
-			} while ( _la==TEXT );
-			State = 222;
-			Match(CURLY_BRACKET_OPEN);
-			State = 227;
-			ErrorHandler.Sync(this);
-			_la = TokenStream.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__5) | (1L << T__13) | (1L << Namespace) | (1L << TEXT))) != 0)) {
-				{
-				State = 225;
-				ErrorHandler.Sync(this);
-				switch (TokenStream.LA(1)) {
-				case Namespace:
-					{
-					State = 223;
-					namespaceDeclaration();
-					}
-					break;
-				case T__5:
-				case T__13:
-				case TEXT:
-					{
-					State = 224;
-					classDefinition();
-					}
-					break;
-				default:
-					throw new NoViableAltException(this);
-				}
-				}
-				State = 229;
-				ErrorHandler.Sync(this);
-				_la = TokenStream.LA(1);
-			}
-			State = 230;
-			Match(CURLY_BRACKET_CLOSE);
-			}
-		}
-		catch (RecognitionException re) {
-			_localctx.exception = re;
-			ErrorHandler.ReportError(this, re);
-			ErrorHandler.Recover(this, re);
-		}
-		finally {
-			ExitRule();
-		}
-		return _localctx;
-	}
-
-	public partial class StartContext : ParserRuleContext {
-		[System.Diagnostics.DebuggerNonUserCode] public ClassDefinitionContext[] classDefinition() {
-			return GetRuleContexts<ClassDefinitionContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ClassDefinitionContext classDefinition(int i) {
-			return GetRuleContext<ClassDefinitionContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public NamespaceDeclarationContext[] namespaceDeclaration() {
-			return GetRuleContexts<NamespaceDeclarationContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public NamespaceDeclarationContext namespaceDeclaration(int i) {
-			return GetRuleContext<NamespaceDeclarationContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public MethodDeclarationContext[] methodDeclaration() {
-			return GetRuleContexts<MethodDeclarationContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public MethodDeclarationContext methodDeclaration(int i) {
-			return GetRuleContext<MethodDeclarationContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public UsingClauseContext[] usingClause() {
-			return GetRuleContexts<UsingClauseContext>();
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public UsingClauseContext usingClause(int i) {
-			return GetRuleContext<UsingClauseContext>(i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] CURLY_BRACKET_OPEN() { return GetTokens(CSharpCommentsGrammarParser.CURLY_BRACKET_OPEN); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CURLY_BRACKET_OPEN(int i) {
-			return GetToken(CSharpCommentsGrammarParser.CURLY_BRACKET_OPEN, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] CURLY_BRACKET_CLOSE() { return GetTokens(CSharpCommentsGrammarParser.CURLY_BRACKET_CLOSE); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode CURLY_BRACKET_CLOSE(int i) {
-			return GetToken(CSharpCommentsGrammarParser.CURLY_BRACKET_CLOSE, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] Comment() { return GetTokens(CSharpCommentsGrammarParser.Comment); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode Comment(int i) {
-			return GetToken(CSharpCommentsGrammarParser.Comment, i);
-		}
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode[] EQUALS() { return GetTokens(CSharpCommentsGrammarParser.EQUALS); }
-		[System.Diagnostics.DebuggerNonUserCode] public ITerminalNode EQUALS(int i) {
-			return GetToken(CSharpCommentsGrammarParser.EQUALS, i);
-		}
-		public StartContext(ParserRuleContext parent, int invokingState)
-			: base(parent, invokingState)
-		{
-		}
-		public override int RuleIndex { get { return RULE_start; } }
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void EnterRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.EnterStart(this);
-		}
-		[System.Diagnostics.DebuggerNonUserCode]
-		public override void ExitRule(IParseTreeListener listener) {
-			ICSharpCommentsGrammarListener typedListener = listener as ICSharpCommentsGrammarListener;
-			if (typedListener != null) typedListener.ExitStart(this);
-		}
-	}
-
-	[RuleVersion(0)]
-	public StartContext start() {
-		StartContext _localctx = new StartContext(Context, State);
-		EnterRule(_localctx, 38, RULE_start);
-		int _la;
-		try {
-			EnterOuterAlt(_localctx, 1);
-			{
-			State = 242;
-			ErrorHandler.Sync(this);
-			_la = TokenStream.LA(1);
-			while ((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__5) | (1L << T__10) | (1L << T__11) | (1L << T__12) | (1L << T__13) | (1L << Namespace) | (1L << Using) | (1L << Comment) | (1L << TEXT) | (1L << EQUALS) | (1L << CURLY_BRACKET_OPEN) | (1L << CURLY_BRACKET_CLOSE))) != 0)) {
-				{
-				State = 240;
-				ErrorHandler.Sync(this);
-				switch ( Interpreter.AdaptivePredict(TokenStream,32,Context) ) {
-				case 1:
-					{
-					State = 232;
-					classDefinition();
-					}
-					break;
-				case 2:
-					{
-					State = 233;
-					namespaceDeclaration();
-					}
-					break;
-				case 3:
-					{
-					State = 234;
-					methodDeclaration();
-					}
-					break;
-				case 4:
-					{
-					State = 235;
-					usingClause();
-					}
-					break;
-				case 5:
-					{
-					State = 236;
-					Match(CURLY_BRACKET_OPEN);
-					}
-					break;
-				case 6:
-					{
-					State = 237;
-					Match(CURLY_BRACKET_CLOSE);
-					}
-					break;
-				case 7:
-					{
-					State = 238;
-					Match(Comment);
-					}
-					break;
-				case 8:
-					{
-					State = 239;
-					Match(EQUALS);
-					}
-					break;
-				}
-				}
-				State = 244;
-				ErrorHandler.Sync(this);
-				_la = TokenStream.LA(1);
 			}
 			}
 		}
@@ -1830,226 +1016,113 @@ public partial class CSharpCommentsGrammarParser : Antlr4.Runtime.Parser {
 
 	private static char[] _serializedATN = {
 		'\x3', '\x608B', '\xA72A', '\x8133', '\xB9ED', '\x417C', '\x3BE7', '\x7786', 
-		'\x5964', '\x3', '\x1D', '\xF8', '\x4', '\x2', '\t', '\x2', '\x4', '\x3', 
+		'\x5964', '\x3', '\x1E', '\x85', '\x4', '\x2', '\t', '\x2', '\x4', '\x3', 
 		'\t', '\x3', '\x4', '\x4', '\t', '\x4', '\x4', '\x5', '\t', '\x5', '\x4', 
 		'\x6', '\t', '\x6', '\x4', '\a', '\t', '\a', '\x4', '\b', '\t', '\b', 
 		'\x4', '\t', '\t', '\t', '\x4', '\n', '\t', '\n', '\x4', '\v', '\t', '\v', 
-		'\x4', '\f', '\t', '\f', '\x4', '\r', '\t', '\r', '\x4', '\xE', '\t', 
-		'\xE', '\x4', '\xF', '\t', '\xF', '\x4', '\x10', '\t', '\x10', '\x4', 
-		'\x11', '\t', '\x11', '\x4', '\x12', '\t', '\x12', '\x4', '\x13', '\t', 
-		'\x13', '\x4', '\x14', '\t', '\x14', '\x4', '\x15', '\t', '\x15', '\x3', 
-		'\x2', '\x3', '\x2', '\a', '\x2', '-', '\n', '\x2', '\f', '\x2', '\xE', 
-		'\x2', '\x30', '\v', '\x2', '\x3', '\x2', '\x3', '\x2', '\x3', '\x3', 
-		'\x3', '\x3', '\a', '\x3', '\x36', '\n', '\x3', '\f', '\x3', '\xE', '\x3', 
-		'\x39', '\v', '\x3', '\x3', '\x3', '\x3', '\x3', '\a', '\x3', '=', '\n', 
-		'\x3', '\f', '\x3', '\xE', '\x3', '@', '\v', '\x3', '\x3', '\x3', '\x3', 
-		'\x3', '\x3', '\x4', '\x3', '\x4', '\x3', '\x5', '\x3', '\x5', '\x3', 
-		'\x5', '\x3', '\x5', '\x3', '\x6', '\a', '\x6', 'K', '\n', '\x6', '\f', 
-		'\x6', '\xE', '\x6', 'N', '\v', '\x6', '\x3', '\x6', '\x3', '\x6', '\x3', 
-		'\a', '\x3', '\a', '\x3', '\a', '\a', '\a', 'U', '\n', '\a', '\f', '\a', 
-		'\xE', '\a', 'X', '\v', '\a', '\x3', '\b', '\x3', '\b', '\x3', '\b', '\x3', 
-		'\b', '\x3', '\t', '\x3', '\t', '\x3', '\t', '\x3', '\t', '\a', '\t', 
-		'\x62', '\n', '\t', '\f', '\t', '\xE', '\t', '\x65', '\v', '\t', '\x3', 
-		'\n', '\x3', '\n', '\x3', '\n', '\x3', '\n', '\x3', '\n', '\x3', '\n', 
-		'\a', '\n', 'm', '\n', '\n', '\f', '\n', '\xE', '\n', 'p', '\v', '\n', 
-		'\a', '\n', 'r', '\n', '\n', '\f', '\n', '\xE', '\n', 'u', '\v', '\n', 
-		'\x3', '\v', '\x3', '\v', '\x5', '\v', 'y', '\n', '\v', '\x3', '\f', '\x6', 
-		'\f', '|', '\n', '\f', '\r', '\f', '\xE', '\f', '}', '\x3', '\r', '\x3', 
-		'\r', '\x3', '\r', '\x3', '\r', '\x3', '\r', '\x3', '\r', '\a', '\r', 
-		'\x86', '\n', '\r', '\f', '\r', '\xE', '\r', '\x89', '\v', '\r', '\x3', 
-		'\r', '\x3', '\r', '\x3', '\xE', '\x3', '\xE', '\x3', '\xE', '\x3', '\xE', 
-		'\x3', '\xE', '\a', '\xE', '\x92', '\n', '\xE', '\f', '\xE', '\xE', '\xE', 
-		'\x95', '\v', '\xE', '\x3', '\xF', '\x5', '\xF', '\x98', '\n', '\xF', 
-		'\x3', '\xF', '\x3', '\xF', '\x3', '\xF', '\x3', '\xF', '\x3', '\xF', 
-		'\x3', '\x10', '\x3', '\x10', '\x3', '\x10', '\x3', '\x10', '\a', '\x10', 
-		'\xA3', '\n', '\x10', '\f', '\x10', '\xE', '\x10', '\xA6', '\v', '\x10', 
-		'\x3', '\x10', '\a', '\x10', '\xA9', '\n', '\x10', '\f', '\x10', '\xE', 
-		'\x10', '\xAC', '\v', '\x10', '\x5', '\x10', '\xAE', '\n', '\x10', '\x3', 
-		'\x10', '\x3', '\x10', '\x3', '\x11', '\x3', '\x11', '\x3', '\x11', '\x5', 
-		'\x11', '\xB5', '\n', '\x11', '\x3', '\x11', '\x3', '\x11', '\x3', '\x11', 
-		'\x3', '\x11', '\x6', '\x11', '\xBB', '\n', '\x11', '\r', '\x11', '\xE', 
-		'\x11', '\xBC', '\x3', '\x11', '\x6', '\x11', '\xC0', '\n', '\x11', '\r', 
-		'\x11', '\xE', '\x11', '\xC1', '\x3', '\x12', '\x5', '\x12', '\xC5', '\n', 
-		'\x12', '\x3', '\x12', '\a', '\x12', '\xC8', '\n', '\x12', '\f', '\x12', 
-		'\xE', '\x12', '\xCB', '\v', '\x12', '\x3', '\x12', '\x3', '\x12', '\x3', 
-		'\x12', '\x3', '\x12', '\x3', '\x12', '\x3', '\x12', '\x3', '\x13', '\x3', 
-		'\x13', '\x6', '\x13', '\xD5', '\n', '\x13', '\r', '\x13', '\xE', '\x13', 
-		'\xD6', '\x3', '\x13', '\x3', '\x13', '\x3', '\x14', '\x3', '\x14', '\x6', 
-		'\x14', '\xDD', '\n', '\x14', '\r', '\x14', '\xE', '\x14', '\xDE', '\x3', 
-		'\x14', '\x3', '\x14', '\x3', '\x14', '\a', '\x14', '\xE4', '\n', '\x14', 
-		'\f', '\x14', '\xE', '\x14', '\xE7', '\v', '\x14', '\x3', '\x14', '\x3', 
-		'\x14', '\x3', '\x15', '\x3', '\x15', '\x3', '\x15', '\x3', '\x15', '\x3', 
-		'\x15', '\x3', '\x15', '\x3', '\x15', '\x3', '\x15', '\a', '\x15', '\xF3', 
-		'\n', '\x15', '\f', '\x15', '\xE', '\x15', '\xF6', '\v', '\x15', '\x3', 
-		'\x15', '\x2', '\x2', '\x16', '\x2', '\x4', '\x6', '\b', '\n', '\f', '\xE', 
-		'\x10', '\x12', '\x14', '\x16', '\x18', '\x1A', '\x1C', '\x1E', ' ', '\"', 
-		'$', '&', '(', '\x2', '\x4', '\x3', '\x2', '\v', '\f', '\x4', '\x2', '\r', 
-		'\xF', '\x17', '\x17', '\x2', '\x11B', '\x2', '*', '\x3', '\x2', '\x2', 
-		'\x2', '\x4', '\x33', '\x3', '\x2', '\x2', '\x2', '\x6', '\x43', '\x3', 
-		'\x2', '\x2', '\x2', '\b', '\x45', '\x3', '\x2', '\x2', '\x2', '\n', 'L', 
-		'\x3', '\x2', '\x2', '\x2', '\f', 'V', '\x3', '\x2', '\x2', '\x2', '\xE', 
-		'Y', '\x3', '\x2', '\x2', '\x2', '\x10', ']', '\x3', '\x2', '\x2', '\x2', 
-		'\x12', 's', '\x3', '\x2', '\x2', '\x2', '\x14', 'v', '\x3', '\x2', '\x2', 
-		'\x2', '\x16', '{', '\x3', '\x2', '\x2', '\x2', '\x18', '\x7F', '\x3', 
-		'\x2', '\x2', '\x2', '\x1A', '\x93', '\x3', '\x2', '\x2', '\x2', '\x1C', 
-		'\x97', '\x3', '\x2', '\x2', '\x2', '\x1E', '\x9E', '\x3', '\x2', '\x2', 
-		'\x2', ' ', '\xBF', '\x3', '\x2', '\x2', '\x2', '\"', '\xC4', '\x3', '\x2', 
-		'\x2', '\x2', '$', '\xD2', '\x3', '\x2', '\x2', '\x2', '&', '\xDA', '\x3', 
-		'\x2', '\x2', '\x2', '(', '\xF4', '\x3', '\x2', '\x2', '\x2', '*', '.', 
-		'\a', '\x3', '\x2', '\x2', '+', '-', '\a', '\x17', '\x2', '\x2', ',', 
-		'+', '\x3', '\x2', '\x2', '\x2', '-', '\x30', '\x3', '\x2', '\x2', '\x2', 
-		'.', ',', '\x3', '\x2', '\x2', '\x2', '.', '/', '\x3', '\x2', '\x2', '\x2', 
-		'/', '\x31', '\x3', '\x2', '\x2', '\x2', '\x30', '.', '\x3', '\x2', '\x2', 
-		'\x2', '\x31', '\x32', '\a', '\x4', '\x2', '\x2', '\x32', '\x3', '\x3', 
-		'\x2', '\x2', '\x2', '\x33', '\x37', '\a', '\x5', '\x2', '\x2', '\x34', 
-		'\x36', '\a', '\x17', '\x2', '\x2', '\x35', '\x34', '\x3', '\x2', '\x2', 
-		'\x2', '\x36', '\x39', '\x3', '\x2', '\x2', '\x2', '\x37', '\x35', '\x3', 
-		'\x2', '\x2', '\x2', '\x37', '\x38', '\x3', '\x2', '\x2', '\x2', '\x38', 
-		':', '\x3', '\x2', '\x2', '\x2', '\x39', '\x37', '\x3', '\x2', '\x2', 
-		'\x2', ':', '>', '\a', '\x6', '\x2', '\x2', ';', '=', '\a', '\x17', '\x2', 
-		'\x2', '<', ';', '\x3', '\x2', '\x2', '\x2', '=', '@', '\x3', '\x2', '\x2', 
-		'\x2', '>', '<', '\x3', '\x2', '\x2', '\x2', '>', '?', '\x3', '\x2', '\x2', 
-		'\x2', '?', '\x41', '\x3', '\x2', '\x2', '\x2', '@', '>', '\x3', '\x2', 
-		'\x2', '\x2', '\x41', '\x42', '\a', '\a', '\x2', '\x2', '\x42', '\x5', 
-		'\x3', '\x2', '\x2', '\x2', '\x43', '\x44', '\a', '\x1D', '\x2', '\x2', 
-		'\x44', '\a', '\x3', '\x2', '\x2', '\x2', '\x45', '\x46', '\a', '\b', 
-		'\x2', '\x2', '\x46', 'G', '\x5', '\x12', '\n', '\x2', 'G', 'H', '\a', 
-		'\t', '\x2', '\x2', 'H', '\t', '\x3', '\x2', '\x2', '\x2', 'I', 'K', '\a', 
-		'\x15', '\x2', '\x2', 'J', 'I', '\x3', '\x2', '\x2', '\x2', 'K', 'N', 
-		'\x3', '\x2', '\x2', '\x2', 'L', 'J', '\x3', '\x2', '\x2', '\x2', 'L', 
-		'M', '\x3', '\x2', '\x2', '\x2', 'M', 'O', '\x3', '\x2', '\x2', '\x2', 
-		'N', 'L', '\x3', '\x2', '\x2', '\x2', 'O', 'P', '\x5', '\b', '\x5', '\x2', 
-		'P', '\v', '\x3', '\x2', '\x2', '\x2', 'Q', 'U', '\x5', '\x10', '\t', 
-		'\x2', 'R', 'U', '\a', '\x17', '\x2', '\x2', 'S', 'U', '\x5', '\x2', '\x2', 
-		'\x2', 'T', 'Q', '\x3', '\x2', '\x2', '\x2', 'T', 'R', '\x3', '\x2', '\x2', 
-		'\x2', 'T', 'S', '\x3', '\x2', '\x2', '\x2', 'U', 'X', '\x3', '\x2', '\x2', 
-		'\x2', 'V', 'T', '\x3', '\x2', '\x2', '\x2', 'V', 'W', '\x3', '\x2', '\x2', 
-		'\x2', 'W', '\r', '\x3', '\x2', '\x2', '\x2', 'X', 'V', '\x3', '\x2', 
-		'\x2', '\x2', 'Y', 'Z', '\a', '\n', '\x2', '\x2', 'Z', '[', '\x5', '\f', 
-		'\a', '\x2', '[', '\\', '\t', '\x2', '\x2', '\x2', '\\', '\xF', '\x3', 
-		'\x2', '\x2', '\x2', ']', '\x63', '\a', '\x15', '\x2', '\x2', '^', '\x62', 
-		'\x5', '\x2', '\x2', '\x2', '_', '\x62', '\x5', '\x4', '\x3', '\x2', '`', 
-		'\x62', '\a', '\x17', '\x2', '\x2', '\x61', '^', '\x3', '\x2', '\x2', 
-		'\x2', '\x61', '_', '\x3', '\x2', '\x2', '\x2', '\x61', '`', '\x3', '\x2', 
-		'\x2', '\x2', '\x62', '\x65', '\x3', '\x2', '\x2', '\x2', '\x63', '\x61', 
-		'\x3', '\x2', '\x2', '\x2', '\x63', '\x64', '\x3', '\x2', '\x2', '\x2', 
-		'\x64', '\x11', '\x3', '\x2', '\x2', '\x2', '\x65', '\x63', '\x3', '\x2', 
-		'\x2', '\x2', '\x66', 'r', '\x5', '\xE', '\b', '\x2', 'g', 'r', '\x5', 
-		'\x10', '\t', '\x2', 'h', 'r', '\x5', '\x4', '\x3', '\x2', 'i', 'r', '\x5', 
-		'\xE', '\b', '\x2', 'j', 'n', '\x5', '\x6', '\x4', '\x2', 'k', 'm', '\a', 
-		'\x17', '\x2', '\x2', 'l', 'k', '\x3', '\x2', '\x2', '\x2', 'm', 'p', 
-		'\x3', '\x2', '\x2', '\x2', 'n', 'l', '\x3', '\x2', '\x2', '\x2', 'n', 
-		'o', '\x3', '\x2', '\x2', '\x2', 'o', 'r', '\x3', '\x2', '\x2', '\x2', 
-		'p', 'n', '\x3', '\x2', '\x2', '\x2', 'q', '\x66', '\x3', '\x2', '\x2', 
-		'\x2', 'q', 'g', '\x3', '\x2', '\x2', '\x2', 'q', 'h', '\x3', '\x2', '\x2', 
-		'\x2', 'q', 'i', '\x3', '\x2', '\x2', '\x2', 'q', 'j', '\x3', '\x2', '\x2', 
-		'\x2', 'r', 'u', '\x3', '\x2', '\x2', '\x2', 's', 'q', '\x3', '\x2', '\x2', 
-		'\x2', 's', 't', '\x3', '\x2', '\x2', '\x2', 't', '\x13', '\x3', '\x2', 
-		'\x2', '\x2', 'u', 's', '\x3', '\x2', '\x2', '\x2', 'v', 'x', '\a', '\x19', 
-		'\x2', '\x2', 'w', 'y', '\x5', '\x2', '\x2', '\x2', 'x', 'w', '\x3', '\x2', 
-		'\x2', '\x2', 'x', 'y', '\x3', '\x2', '\x2', '\x2', 'y', '\x15', '\x3', 
-		'\x2', '\x2', '\x2', 'z', '|', '\t', '\x3', '\x2', '\x2', '{', 'z', '\x3', 
-		'\x2', '\x2', '\x2', '|', '}', '\x3', '\x2', '\x2', '\x2', '}', '{', '\x3', 
-		'\x2', '\x2', '\x2', '}', '~', '\x3', '\x2', '\x2', '\x2', '~', '\x17', 
-		'\x3', '\x2', '\x2', '\x2', '\x7F', '\x87', '\a', '\x1B', '\x2', '\x2', 
-		'\x80', '\x86', '\a', '\x17', '\x2', '\x2', '\x81', '\x86', '\a', '\x14', 
-		'\x2', '\x2', '\x82', '\x86', '\a', '\x18', '\x2', '\x2', '\x83', '\x86', 
-		'\a', '\xF', '\x2', '\x2', '\x84', '\x86', '\x5', '\x18', '\r', '\x2', 
-		'\x85', '\x80', '\x3', '\x2', '\x2', '\x2', '\x85', '\x81', '\x3', '\x2', 
-		'\x2', '\x2', '\x85', '\x82', '\x3', '\x2', '\x2', '\x2', '\x85', '\x83', 
-		'\x3', '\x2', '\x2', '\x2', '\x85', '\x84', '\x3', '\x2', '\x2', '\x2', 
-		'\x86', '\x89', '\x3', '\x2', '\x2', '\x2', '\x87', '\x85', '\x3', '\x2', 
-		'\x2', '\x2', '\x87', '\x88', '\x3', '\x2', '\x2', '\x2', '\x88', '\x8A', 
-		'\x3', '\x2', '\x2', '\x2', '\x89', '\x87', '\x3', '\x2', '\x2', '\x2', 
-		'\x8A', '\x8B', '\a', '\x1C', '\x2', '\x2', '\x8B', '\x19', '\x3', '\x2', 
-		'\x2', '\x2', '\x8C', '\x92', '\a', '\x17', '\x2', '\x2', '\x8D', '\x92', 
-		'\a', '\x14', '\x2', '\x2', '\x8E', '\x92', '\a', '\x18', '\x2', '\x2', 
-		'\x8F', '\x92', '\a', '\xF', '\x2', '\x2', '\x90', '\x92', '\x5', '\x18', 
-		'\r', '\x2', '\x91', '\x8C', '\x3', '\x2', '\x2', '\x2', '\x91', '\x8D', 
-		'\x3', '\x2', '\x2', '\x2', '\x91', '\x8E', '\x3', '\x2', '\x2', '\x2', 
-		'\x91', '\x8F', '\x3', '\x2', '\x2', '\x2', '\x91', '\x90', '\x3', '\x2', 
-		'\x2', '\x2', '\x92', '\x95', '\x3', '\x2', '\x2', '\x2', '\x93', '\x91', 
-		'\x3', '\x2', '\x2', '\x2', '\x93', '\x94', '\x3', '\x2', '\x2', '\x2', 
-		'\x94', '\x1B', '\x3', '\x2', '\x2', '\x2', '\x95', '\x93', '\x3', '\x2', 
-		'\x2', '\x2', '\x96', '\x98', '\x5', '\b', '\x5', '\x2', '\x97', '\x96', 
-		'\x3', '\x2', '\x2', '\x2', '\x97', '\x98', '\x3', '\x2', '\x2', '\x2', 
-		'\x98', '\x99', '\x3', '\x2', '\x2', '\x2', '\x99', '\x9A', '\x5', '\x16', 
-		'\f', '\x2', '\x9A', '\x9B', '\a', '\x1B', '\x2', '\x2', '\x9B', '\x9C', 
-		'\x5', '\x1A', '\xE', '\x2', '\x9C', '\x9D', '\a', '\x1C', '\x2', '\x2', 
-		'\x9D', '\x1D', '\x3', '\x2', '\x2', '\x2', '\x9E', '\xAD', '\a', '\x1B', 
-		'\x2', '\x2', '\x9F', '\xA3', '\x5', '\x1E', '\x10', '\x2', '\xA0', '\xA3', 
-		'\x5', '\x1C', '\xF', '\x2', '\xA1', '\xA3', '\x5', '\"', '\x12', '\x2', 
-		'\xA2', '\x9F', '\x3', '\x2', '\x2', '\x2', '\xA2', '\xA0', '\x3', '\x2', 
-		'\x2', '\x2', '\xA2', '\xA1', '\x3', '\x2', '\x2', '\x2', '\xA3', '\xA6', 
-		'\x3', '\x2', '\x2', '\x2', '\xA4', '\xA2', '\x3', '\x2', '\x2', '\x2', 
-		'\xA4', '\xA5', '\x3', '\x2', '\x2', '\x2', '\xA5', '\xAE', '\x3', '\x2', 
-		'\x2', '\x2', '\xA6', '\xA4', '\x3', '\x2', '\x2', '\x2', '\xA7', '\xA9', 
-		'\a', '\x17', '\x2', '\x2', '\xA8', '\xA7', '\x3', '\x2', '\x2', '\x2', 
-		'\xA9', '\xAC', '\x3', '\x2', '\x2', '\x2', '\xAA', '\xA8', '\x3', '\x2', 
-		'\x2', '\x2', '\xAA', '\xAB', '\x3', '\x2', '\x2', '\x2', '\xAB', '\xAE', 
-		'\x3', '\x2', '\x2', '\x2', '\xAC', '\xAA', '\x3', '\x2', '\x2', '\x2', 
-		'\xAD', '\xA4', '\x3', '\x2', '\x2', '\x2', '\xAD', '\xAA', '\x3', '\x2', 
-		'\x2', '\x2', '\xAD', '\xAE', '\x3', '\x2', '\x2', '\x2', '\xAE', '\xAF', 
-		'\x3', '\x2', '\x2', '\x2', '\xAF', '\xB0', '\a', '\x1C', '\x2', '\x2', 
-		'\xB0', '\x1F', '\x3', '\x2', '\x2', '\x2', '\xB1', '\xC0', '\x5', '\x1E', 
-		'\x10', '\x2', '\xB2', '\xC0', '\x5', '\x1C', '\xF', '\x2', '\xB3', '\xB5', 
-		'\x5', '\b', '\x5', '\x2', '\xB4', '\xB3', '\x3', '\x2', '\x2', '\x2', 
-		'\xB4', '\xB5', '\x3', '\x2', '\x2', '\x2', '\xB5', '\xB6', '\x3', '\x2', 
-		'\x2', '\x2', '\xB6', '\xB7', '\x5', '\x16', '\f', '\x2', '\xB7', '\xB8', 
-		'\a', '\x14', '\x2', '\x2', '\xB8', '\xC0', '\x3', '\x2', '\x2', '\x2', 
-		'\xB9', '\xBB', '\a', '\x17', '\x2', '\x2', '\xBA', '\xB9', '\x3', '\x2', 
-		'\x2', '\x2', '\xBB', '\xBC', '\x3', '\x2', '\x2', '\x2', '\xBC', '\xBA', 
-		'\x3', '\x2', '\x2', '\x2', '\xBC', '\xBD', '\x3', '\x2', '\x2', '\x2', 
-		'\xBD', '\xC0', '\x3', '\x2', '\x2', '\x2', '\xBE', '\xC0', '\a', '\x14', 
-		'\x2', '\x2', '\xBF', '\xB1', '\x3', '\x2', '\x2', '\x2', '\xBF', '\xB2', 
-		'\x3', '\x2', '\x2', '\x2', '\xBF', '\xB4', '\x3', '\x2', '\x2', '\x2', 
-		'\xBF', '\xBA', '\x3', '\x2', '\x2', '\x2', '\xBF', '\xBE', '\x3', '\x2', 
-		'\x2', '\x2', '\xC0', '\xC1', '\x3', '\x2', '\x2', '\x2', '\xC1', '\xBF', 
-		'\x3', '\x2', '\x2', '\x2', '\xC1', '\xC2', '\x3', '\x2', '\x2', '\x2', 
-		'\xC2', '!', '\x3', '\x2', '\x2', '\x2', '\xC3', '\xC5', '\x5', '\b', 
-		'\x5', '\x2', '\xC4', '\xC3', '\x3', '\x2', '\x2', '\x2', '\xC4', '\xC5', 
-		'\x3', '\x2', '\x2', '\x2', '\xC5', '\xC9', '\x3', '\x2', '\x2', '\x2', 
-		'\xC6', '\xC8', '\a', '\x17', '\x2', '\x2', '\xC7', '\xC6', '\x3', '\x2', 
-		'\x2', '\x2', '\xC8', '\xCB', '\x3', '\x2', '\x2', '\x2', '\xC9', '\xC7', 
-		'\x3', '\x2', '\x2', '\x2', '\xC9', '\xCA', '\x3', '\x2', '\x2', '\x2', 
-		'\xCA', '\xCC', '\x3', '\x2', '\x2', '\x2', '\xCB', '\xC9', '\x3', '\x2', 
-		'\x2', '\x2', '\xCC', '\xCD', '\a', '\x10', '\x2', '\x2', '\xCD', '\xCE', 
-		'\a', '\x17', '\x2', '\x2', '\xCE', '\xCF', '\a', '\x1B', '\x2', '\x2', 
-		'\xCF', '\xD0', '\x5', ' ', '\x11', '\x2', '\xD0', '\xD1', '\a', '\x1C', 
-		'\x2', '\x2', '\xD1', '#', '\x3', '\x2', '\x2', '\x2', '\xD2', '\xD4', 
-		'\a', '\x13', '\x2', '\x2', '\xD3', '\xD5', '\a', '\x17', '\x2', '\x2', 
-		'\xD4', '\xD3', '\x3', '\x2', '\x2', '\x2', '\xD5', '\xD6', '\x3', '\x2', 
-		'\x2', '\x2', '\xD6', '\xD4', '\x3', '\x2', '\x2', '\x2', '\xD6', '\xD7', 
-		'\x3', '\x2', '\x2', '\x2', '\xD7', '\xD8', '\x3', '\x2', '\x2', '\x2', 
-		'\xD8', '\xD9', '\a', '\x14', '\x2', '\x2', '\xD9', '%', '\x3', '\x2', 
-		'\x2', '\x2', '\xDA', '\xDC', '\a', '\x12', '\x2', '\x2', '\xDB', '\xDD', 
-		'\a', '\x17', '\x2', '\x2', '\xDC', '\xDB', '\x3', '\x2', '\x2', '\x2', 
-		'\xDD', '\xDE', '\x3', '\x2', '\x2', '\x2', '\xDE', '\xDC', '\x3', '\x2', 
-		'\x2', '\x2', '\xDE', '\xDF', '\x3', '\x2', '\x2', '\x2', '\xDF', '\xE0', 
-		'\x3', '\x2', '\x2', '\x2', '\xE0', '\xE5', '\a', '\x1B', '\x2', '\x2', 
-		'\xE1', '\xE4', '\x5', '&', '\x14', '\x2', '\xE2', '\xE4', '\x5', '\"', 
-		'\x12', '\x2', '\xE3', '\xE1', '\x3', '\x2', '\x2', '\x2', '\xE3', '\xE2', 
-		'\x3', '\x2', '\x2', '\x2', '\xE4', '\xE7', '\x3', '\x2', '\x2', '\x2', 
-		'\xE5', '\xE3', '\x3', '\x2', '\x2', '\x2', '\xE5', '\xE6', '\x3', '\x2', 
-		'\x2', '\x2', '\xE6', '\xE8', '\x3', '\x2', '\x2', '\x2', '\xE7', '\xE5', 
-		'\x3', '\x2', '\x2', '\x2', '\xE8', '\xE9', '\a', '\x1C', '\x2', '\x2', 
-		'\xE9', '\'', '\x3', '\x2', '\x2', '\x2', '\xEA', '\xF3', '\x5', '\"', 
-		'\x12', '\x2', '\xEB', '\xF3', '\x5', '&', '\x14', '\x2', '\xEC', '\xF3', 
-		'\x5', '\x1C', '\xF', '\x2', '\xED', '\xF3', '\x5', '$', '\x13', '\x2', 
-		'\xEE', '\xF3', '\a', '\x1B', '\x2', '\x2', '\xEF', '\xF3', '\a', '\x1C', 
-		'\x2', '\x2', '\xF0', '\xF3', '\a', '\x15', '\x2', '\x2', '\xF1', '\xF3', 
-		'\a', '\x18', '\x2', '\x2', '\xF2', '\xEA', '\x3', '\x2', '\x2', '\x2', 
-		'\xF2', '\xEB', '\x3', '\x2', '\x2', '\x2', '\xF2', '\xEC', '\x3', '\x2', 
-		'\x2', '\x2', '\xF2', '\xED', '\x3', '\x2', '\x2', '\x2', '\xF2', '\xEE', 
-		'\x3', '\x2', '\x2', '\x2', '\xF2', '\xEF', '\x3', '\x2', '\x2', '\x2', 
-		'\xF2', '\xF0', '\x3', '\x2', '\x2', '\x2', '\xF2', '\xF1', '\x3', '\x2', 
-		'\x2', '\x2', '\xF3', '\xF6', '\x3', '\x2', '\x2', '\x2', '\xF4', '\xF2', 
-		'\x3', '\x2', '\x2', '\x2', '\xF4', '\xF5', '\x3', '\x2', '\x2', '\x2', 
-		'\xF5', ')', '\x3', '\x2', '\x2', '\x2', '\xF6', '\xF4', '\x3', '\x2', 
-		'\x2', '\x2', '$', '.', '\x37', '>', 'L', 'T', 'V', '\x61', '\x63', 'n', 
-		'q', 's', 'x', '}', '\x85', '\x87', '\x91', '\x93', '\x97', '\xA2', '\xA4', 
-		'\xAA', '\xAD', '\xB4', '\xBC', '\xBF', '\xC1', '\xC4', '\xC9', '\xD6', 
-		'\xDE', '\xE3', '\xE5', '\xF2', '\xF4',
+		'\x4', '\f', '\t', '\f', '\x4', '\r', '\t', '\r', '\x3', '\x2', '\a', 
+		'\x2', '\x1C', '\n', '\x2', '\f', '\x2', '\xE', '\x2', '\x1F', '\v', '\x2', 
+		'\x3', '\x2', '\x3', '\x2', '\x5', '\x2', '#', '\n', '\x2', '\x3', '\x2', 
+		'\x5', '\x2', '&', '\n', '\x2', '\x3', '\x2', '\x5', '\x2', ')', '\n', 
+		'\x2', '\x3', '\x3', '\x3', '\x3', '\x3', '\x3', '\x3', '\x3', '\x3', 
+		'\x4', '\x3', '\x4', '\a', '\x4', '\x31', '\n', '\x4', '\f', '\x4', '\xE', 
+		'\x4', '\x34', '\v', '\x4', '\x3', '\x4', '\x3', '\x4', '\x3', '\x5', 
+		'\a', '\x5', '\x39', '\n', '\x5', '\f', '\x5', '\xE', '\x5', '<', '\v', 
+		'\x5', '\x3', '\x6', '\x3', '\x6', '\a', '\x6', '@', '\n', '\x6', '\f', 
+		'\x6', '\xE', '\x6', '\x43', '\v', '\x6', '\x3', '\x6', '\x3', '\x6', 
+		'\a', '\x6', 'G', '\n', '\x6', '\f', '\x6', '\xE', '\x6', 'J', '\v', '\x6', 
+		'\x3', '\x6', '\x3', '\x6', '\x3', '\a', '\x3', '\a', '\x3', '\a', '\a', 
+		'\a', 'Q', '\n', '\a', '\f', '\a', '\xE', '\a', 'T', '\v', '\a', '\x3', 
+		'\a', '\x3', '\a', '\x3', '\b', '\x6', '\b', 'Y', '\n', '\b', '\r', '\b', 
+		'\xE', '\b', 'Z', '\x3', '\t', '\x6', '\t', '^', '\n', '\t', '\r', '\t', 
+		'\xE', '\t', '_', '\x3', '\n', '\x3', '\n', '\x3', '\n', '\x3', '\n', 
+		'\x3', '\n', '\a', '\n', 'g', '\n', '\n', '\f', '\n', '\xE', '\n', 'j', 
+		'\v', '\n', '\x3', '\n', '\x3', '\n', '\x3', '\v', '\x3', '\v', '\x3', 
+		'\v', '\x5', '\v', 'q', '\n', '\v', '\a', '\v', 's', '\n', '\v', '\f', 
+		'\v', '\xE', '\v', 'v', '\v', '\v', '\x3', '\f', '\x3', '\f', '\x3', '\f', 
+		'\x3', '\f', '\x3', '\r', '\x3', '\r', '\x3', '\r', '\x3', '\r', '\a', 
+		'\r', '\x80', '\n', '\r', '\f', '\r', '\xE', '\r', '\x83', '\v', '\r', 
+		'\x3', '\r', '\x2', '\x2', '\xE', '\x2', '\x4', '\x6', '\b', '\n', '\f', 
+		'\xE', '\x10', '\x12', '\x14', '\x16', '\x18', '\x2', '\x5', '\x4', '\x2', 
+		'\v', '\f', '\x19', '\x19', '\x3', '\x2', '\xE', '\xF', '\x3', '\x2', 
+		'\x11', '\x12', '\x2', '\x8C', '\x2', '\x1D', '\x3', '\x2', '\x2', '\x2', 
+		'\x4', '*', '\x3', '\x2', '\x2', '\x2', '\x6', '.', '\x3', '\x2', '\x2', 
+		'\x2', '\b', ':', '\x3', '\x2', '\x2', '\x2', '\n', '=', '\x3', '\x2', 
+		'\x2', '\x2', '\f', 'M', '\x3', '\x2', '\x2', '\x2', '\xE', 'X', '\x3', 
+		'\x2', '\x2', '\x2', '\x10', ']', '\x3', '\x2', '\x2', '\x2', '\x12', 
+		'\x61', '\x3', '\x2', '\x2', '\x2', '\x14', 't', '\x3', '\x2', '\x2', 
+		'\x2', '\x16', 'w', '\x3', '\x2', '\x2', '\x2', '\x18', '{', '\x3', '\x2', 
+		'\x2', '\x2', '\x1A', '\x1C', '\a', '\x17', '\x2', '\x2', '\x1B', '\x1A', 
+		'\x3', '\x2', '\x2', '\x2', '\x1C', '\x1F', '\x3', '\x2', '\x2', '\x2', 
+		'\x1D', '\x1B', '\x3', '\x2', '\x2', '\x2', '\x1D', '\x1E', '\x3', '\x2', 
+		'\x2', '\x2', '\x1E', ' ', '\x3', '\x2', '\x2', '\x2', '\x1F', '\x1D', 
+		'\x3', '\x2', '\x2', '\x2', ' ', '\"', '\x5', '\f', '\a', '\x2', '!', 
+		'#', '\x5', '\b', '\x5', '\x2', '\"', '!', '\x3', '\x2', '\x2', '\x2', 
+		'\"', '#', '\x3', '\x2', '\x2', '\x2', '#', '%', '\x3', '\x2', '\x2', 
+		'\x2', '$', '&', '\x5', '\x16', '\f', '\x2', '%', '$', '\x3', '\x2', '\x2', 
+		'\x2', '%', '&', '\x3', '\x2', '\x2', '\x2', '&', '(', '\x3', '\x2', '\x2', 
+		'\x2', '\'', ')', '\x5', '\x12', '\n', '\x2', '(', '\'', '\x3', '\x2', 
+		'\x2', '\x2', '(', ')', '\x3', '\x2', '\x2', '\x2', ')', '\x3', '\x3', 
+		'\x2', '\x2', '\x2', '*', '+', '\a', '\x3', '\x2', '\x2', '+', ',', '\a', 
+		'\x19', '\x2', '\x2', ',', '-', '\a', '\x4', '\x2', '\x2', '-', '\x5', 
+		'\x3', '\x2', '\x2', '\x2', '.', '\x32', '\a', '\x5', '\x2', '\x2', '/', 
+		'\x31', '\a', '\x19', '\x2', '\x2', '\x30', '/', '\x3', '\x2', '\x2', 
+		'\x2', '\x31', '\x34', '\x3', '\x2', '\x2', '\x2', '\x32', '\x30', '\x3', 
+		'\x2', '\x2', '\x2', '\x32', '\x33', '\x3', '\x2', '\x2', '\x2', '\x33', 
+		'\x35', '\x3', '\x2', '\x2', '\x2', '\x34', '\x32', '\x3', '\x2', '\x2', 
+		'\x2', '\x35', '\x36', '\a', '\x4', '\x2', '\x2', '\x36', '\a', '\x3', 
+		'\x2', '\x2', '\x2', '\x37', '\x39', '\x5', '\n', '\x6', '\x2', '\x38', 
+		'\x37', '\x3', '\x2', '\x2', '\x2', '\x39', '<', '\x3', '\x2', '\x2', 
+		'\x2', ':', '\x38', '\x3', '\x2', '\x2', '\x2', ':', ';', '\x3', '\x2', 
+		'\x2', '\x2', ';', '\t', '\x3', '\x2', '\x2', '\x2', '<', ':', '\x3', 
+		'\x2', '\x2', '\x2', '=', '\x41', '\a', '\x6', '\x2', '\x2', '>', '@', 
+		'\a', '\x19', '\x2', '\x2', '?', '>', '\x3', '\x2', '\x2', '\x2', '@', 
+		'\x43', '\x3', '\x2', '\x2', '\x2', '\x41', '?', '\x3', '\x2', '\x2', 
+		'\x2', '\x41', '\x42', '\x3', '\x2', '\x2', '\x2', '\x42', '\x44', '\x3', 
+		'\x2', '\x2', '\x2', '\x43', '\x41', '\x3', '\x2', '\x2', '\x2', '\x44', 
+		'H', '\a', '\a', '\x2', '\x2', '\x45', 'G', '\a', '\x19', '\x2', '\x2', 
+		'\x46', '\x45', '\x3', '\x2', '\x2', '\x2', 'G', 'J', '\x3', '\x2', '\x2', 
+		'\x2', 'H', '\x46', '\x3', '\x2', '\x2', '\x2', 'H', 'I', '\x3', '\x2', 
+		'\x2', '\x2', 'I', 'K', '\x3', '\x2', '\x2', '\x2', 'J', 'H', '\x3', '\x2', 
+		'\x2', '\x2', 'K', 'L', '\a', '\b', '\x2', '\x2', 'L', '\v', '\x3', '\x2', 
+		'\x2', '\x2', 'M', 'R', '\a', '\t', '\x2', '\x2', 'N', 'Q', '\x5', '\x18', 
+		'\r', '\x2', 'O', 'Q', '\x5', '\x10', '\t', '\x2', 'P', 'N', '\x3', '\x2', 
+		'\x2', '\x2', 'P', 'O', '\x3', '\x2', '\x2', '\x2', 'Q', 'T', '\x3', '\x2', 
+		'\x2', '\x2', 'R', 'P', '\x3', '\x2', '\x2', '\x2', 'R', 'S', '\x3', '\x2', 
+		'\x2', '\x2', 'S', 'U', '\x3', '\x2', '\x2', '\x2', 'T', 'R', '\x3', '\x2', 
+		'\x2', '\x2', 'U', 'V', '\a', '\n', '\x2', '\x2', 'V', '\r', '\x3', '\x2', 
+		'\x2', '\x2', 'W', 'Y', '\a', '\x19', '\x2', '\x2', 'X', 'W', '\x3', '\x2', 
+		'\x2', '\x2', 'Y', 'Z', '\x3', '\x2', '\x2', '\x2', 'Z', 'X', '\x3', '\x2', 
+		'\x2', '\x2', 'Z', '[', '\x3', '\x2', '\x2', '\x2', '[', '\xF', '\x3', 
+		'\x2', '\x2', '\x2', '\\', '^', '\t', '\x2', '\x2', '\x2', ']', '\\', 
+		'\x3', '\x2', '\x2', '\x2', '^', '_', '\x3', '\x2', '\x2', '\x2', '_', 
+		']', '\x3', '\x2', '\x2', '\x2', '_', '`', '\x3', '\x2', '\x2', '\x2', 
+		'`', '\x11', '\x3', '\x2', '\x2', '\x2', '\x61', '\x62', '\a', '\r', '\x2', 
+		'\x2', '\x62', '\x63', '\x5', '\xE', '\b', '\x2', '\x63', 'h', '\a', '\a', 
+		'\x2', '\x2', '\x64', 'g', '\x5', '\x10', '\t', '\x2', '\x65', 'g', '\x5', 
+		'\x4', '\x3', '\x2', '\x66', '\x64', '\x3', '\x2', '\x2', '\x2', '\x66', 
+		'\x65', '\x3', '\x2', '\x2', '\x2', 'g', 'j', '\x3', '\x2', '\x2', '\x2', 
+		'h', '\x66', '\x3', '\x2', '\x2', '\x2', 'h', 'i', '\x3', '\x2', '\x2', 
+		'\x2', 'i', 'k', '\x3', '\x2', '\x2', '\x2', 'j', 'h', '\x3', '\x2', '\x2', 
+		'\x2', 'k', 'l', '\t', '\x3', '\x2', '\x2', 'l', '\x13', '\x3', '\x2', 
+		'\x2', '\x2', 'm', 's', '\x5', '\x18', '\r', '\x2', 'n', 'q', '\x5', '\x10', 
+		'\t', '\x2', 'o', 'q', '\x5', '\x6', '\x4', '\x2', 'p', 'n', '\x3', '\x2', 
+		'\x2', '\x2', 'p', 'o', '\x3', '\x2', '\x2', '\x2', 'q', 's', '\x3', '\x2', 
+		'\x2', '\x2', 'r', 'm', '\x3', '\x2', '\x2', '\x2', 'r', 'p', '\x3', '\x2', 
+		'\x2', '\x2', 's', 'v', '\x3', '\x2', '\x2', '\x2', 't', 'r', '\x3', '\x2', 
+		'\x2', '\x2', 't', 'u', '\x3', '\x2', '\x2', '\x2', 'u', '\x15', '\x3', 
+		'\x2', '\x2', '\x2', 'v', 't', '\x3', '\x2', '\x2', '\x2', 'w', 'x', '\a', 
+		'\x10', '\x2', '\x2', 'x', 'y', '\x5', '\x14', '\v', '\x2', 'y', 'z', 
+		'\t', '\x4', '\x2', '\x2', 'z', '\x17', '\x3', '\x2', '\x2', '\x2', '{', 
+		'\x81', '\a', '\x17', '\x2', '\x2', '|', '\x80', '\x5', '\x10', '\t', 
+		'\x2', '}', '\x80', '\x5', '\x6', '\x4', '\x2', '~', '\x80', '\x5', '\x4', 
+		'\x3', '\x2', '\x7F', '|', '\x3', '\x2', '\x2', '\x2', '\x7F', '}', '\x3', 
+		'\x2', '\x2', '\x2', '\x7F', '~', '\x3', '\x2', '\x2', '\x2', '\x80', 
+		'\x83', '\x3', '\x2', '\x2', '\x2', '\x81', '\x7F', '\x3', '\x2', '\x2', 
+		'\x2', '\x81', '\x82', '\x3', '\x2', '\x2', '\x2', '\x82', '\x19', '\x3', 
+		'\x2', '\x2', '\x2', '\x83', '\x81', '\x3', '\x2', '\x2', '\x2', '\x15', 
+		'\x1D', '\"', '%', '(', '\x32', ':', '\x41', 'H', 'P', 'R', 'Z', '_', 
+		'\x66', 'h', 'p', 'r', 't', '\x7F', '\x81',
 	};
 
 	public static readonly ATN _ATN =

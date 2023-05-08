@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using SEE.Game.UI.LiveDocumantation;
@@ -7,43 +8,53 @@ namespace SEE.Utils.LiveDocumentation
 {
     public class FileParser
     {
-        [CanBeNull]
-        private static Extractor GetExtractorForFile(string fileName)
+        private Extractor _extractor;
+
+        public FileParser(string fileName)
         {
             if (fileName.EndsWith(".cs"))
             {
-                return new CSharpExtractor();
+                _extractor = new CSharpExtractor(fileName);
+            }
+            else
+            {
+                ShowNotification.Error("Unknown Filetype",
+                    "The file extension is not supported by the LiveDocumentation in SEE");
+            }
+        }
+
+        [CanBeNull]
+        private Extractor GetExtractorForFile(string fileName)
+        {
+            if (fileName.EndsWith(".cs"))
+            {
+                return new CSharpExtractor(fileName);
             }
 
             return null;
         }
 
-        [CanBeNull]
-        public static LiveDocumentationBuffer ParseClassDoc(string fileName, string className)
+        private void ShowUnknownFileTypeErrorMessage()
         {
-            Extractor extractor = GetExtractorForFile(fileName);
-            if (extractor == null)
-            {
-                ShowNotification.Error("Unknown Filetype",
-                    "The file extension is not supported by the LiveDocumentation in SEE");
-                return null;
-            }
-
-            return extractor.ExtractComments(fileName, className);
+            ShowNotification.Error("Unknown Filetype",
+                "The file extension is not supported by the LiveDocumentation in SEE");
         }
-        
-        [CanBeNull]
-        public static List<LiveDocumentationBuffer> ParseClassMethods(string fileName, string className)
-        {
-            Extractor extractor = GetExtractorForFile(fileName);
-            if (extractor == null)
-            {
-                ShowNotification.Error("Unknown Filetype",
-                    "The file extension is not supported by the LiveDocumentation in SEE");
-                return null;
-            }
 
-            return extractor.ExtractMethods(fileName, className);
+        [CanBeNull]
+        public LiveDocumentationBuffer ParseClassDoc(string fileName, string className)
+        {
+            return _extractor.ExtractClassComments(fileName, className);
+        }
+
+        [CanBeNull]
+        public List<LiveDocumentationBuffer> ParseClassMethods(string fileName, string className)
+        {
+            return _extractor.ExtractMethods(fileName, className);
+        }
+
+        public List<string> ParseNamespaceImports(string fileName)
+        {
+            return _extractor.ExtractImportedNamespaces(fileName);
         }
     }
 }

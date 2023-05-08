@@ -11,6 +11,20 @@ namespace SEE.Utils.LiveDocumentation
 {
     public class CSharpExtractor : Extractor
     {
+
+        private CommonTokenStream _tokens;
+        private CSharpParser _parser;
+        
+        public CSharpExtractor(string fileName)
+        {
+            var input = File.ReadAllText(fileName);
+            var lexer = new CSharpFullLexer(new AntlrInputStream(input));
+            _tokens = new CommonTokenStream(lexer);
+            _tokens.Fill();
+            _parser = new CSharpParser(_tokens);
+        }
+        
+        
         /// <summary>
         /// Uses the <see cref="CSharpParser"/> to parse a source file to find a speciffic class.
         /// </summary>
@@ -20,9 +34,10 @@ namespace SEE.Utils.LiveDocumentation
         /// (Context, LineNumberBound)
         /// </returns>
         [CanBeNull]
-        private static (CSharpParser.Type_declarationContext, int) GetClassByName(CSharpParser parser, string className)
+        private (CSharpParser.Type_declarationContext, int) GetClassByName(string className)
         {
-            var namespaces = parser
+            _parser.Reset();
+            var namespaces = _parser
                 .compilation_unit()
                 .namespace_member_declarations()
                 .namespace_member_declaration();
@@ -58,27 +73,28 @@ namespace SEE.Utils.LiveDocumentation
 
             return (null, -1);
         }
-
-        public LiveDocumentationBuffer ExtractComments(string fileName, string className)
+        
+        /// <summary>
+        /// This method will extract the documentation of an given C# Class in a given file.
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="className"></param>
+        /// <returns></returns>
+        public LiveDocumentationBuffer ExtractClassComments(string fileName, string className)
         {
+            _parser.Reset();
             LiveDocumentationBuffer buffer = new();
             var input = File.ReadAllText(fileName);
             // Lexer for getting the comments
             var lexer1 = new CSharpFullLexer(new AntlrInputStream(input));
-            // Lexer for parsing of the class stucture
-            var lexer2 = new CSharpFullLexer(new AntlrInputStream(input));
 
-            var cstoken = new CommonTokenStream(lexer2);
-            cstoken.Fill();
-
+            
             var docTokens = new CommonTokenStream(lexer1, 2);
             docTokens.Fill();
+            
 
 
-            var csFileParser = new CSharpParser(cstoken);
-
-
-            var (classContext, upperLineBound) = GetClassByName(csFileParser, className);
+            var (classContext, upperLineBound) = GetClassByName(className);
 
             if (classContext != null)
             {
@@ -97,26 +113,21 @@ namespace SEE.Utils.LiveDocumentation
                 {
                     var parser = new CSharpCommentsGrammarParser(tokens);
                     // var t = parser.start().children;
-                    var classComments = parser.docs().summary().comments().comment();
+                    var classComments = parser.docs().summary().comments();
                     // Parse C# Doc line by line and write it in the Buffer
                     foreach (var commentLine in classComments)
                     {
-                        if (commentLine is CSharpCommentsGrammarParser.CommentContext comment)
+                        foreach (var j in commentLine.children)
                         {
-                            foreach (var j in comment.children)
+                            if (j is CSharpCommentsGrammarParser.SomeTextContext textContext)
                             {
-                                if (j is ITerminalNode)
-                                {
-                                    var text = j.GetText();
-                                    // if necessary remove the three slashes at the beginning of the comment.  
-                                    var commentString = text.StartsWith("///") ? text[3..].Trim() : text;
-                                    buffer.Add(new LiveDocumentationBufferText(commentString.Substring(3).Trim()));
-                                }
-                                else if (j is CSharpCommentsGrammarParser.ClassLinkContext classLink)
-                                {
-                                    buffer.Add(new LiveDocumentationLink(classLink.linkID.Text,
-                                        classLink.linkID.Text));
-                                }
+                                buffer.Add(new LiveDocumentationBufferText(textContext.TEXT()
+                                    .Aggregate("", (text, word) => text += ((word.GetText()) + " ")).TrimEnd()));
+                            }
+                            else if (j is CSharpCommentsGrammarParser.ClassLinkContext classLink)
+                            {
+                                buffer.Add(new LiveDocumentationLink(classLink.linkID.Text,
+                                    classLink.linkID.Text));
                             }
                         }
 
@@ -128,19 +139,44 @@ namespace SEE.Utils.LiveDocumentation
             return buffer;
         }
 
+        private void ProcessMethodParameters(LiveDocumentationBuffer bufff,
+            CSharpParser.Formal_parameter_listContext parameterList)
+        {
+            
+            bufff.Add(new LiveDocumentationBufferText("("));
+            if (parameterList != null)
+            {
+                var parameters = parameterList
+                    .fixed_parameters()
+                    .fixed_parameter();
+                foreach (var parameter in parameters)
+                {
+                    var pType = parameter.arg_declaration().type_().GetText() + " ";
+                    bufff.Add(new LiveDocumentationLink(pType, pType));
+                    //signature = signature + parameter.arg_declaration().type_().GetText() + " ";
+                    //  signature = signature + parameter.arg_declaration().identifier().GetText();
+                    bufff.Add(
+                        new LiveDocumentationBufferText(parameter.arg_declaration().identifier()
+                            .GetText()));
+                    if (!parameter.Equals(parameters.Last()))
+                    {
+                        bufff.Add(new LiveDocumentationBufferText(", "));
+                    }
+                }
+                //   signature = signature + "(" + i.common_member_declaration().method_declaration()
+                //     .formal_parameter_list().GetText() + ")";
+            }
+
+            bufff.Add(new LiveDocumentationBufferText(")"));
+        }
+
+
         public List<LiveDocumentationBuffer> ExtractMethods(string fileName, string className)
         {
             List<LiveDocumentationBuffer> buffers = new();
-            var input = File.ReadAllText(fileName);
-            var lexer = new CSharpFullLexer(new AntlrInputStream(input));
-            var tokens = new CommonTokenStream(lexer);
-            tokens.Fill();
-            //var parser = new CSharpCommentsGrammarParser(tokens);
-
-
-            var parser = new CSharpParser(tokens);
+            _parser.Reset();
             // Parse all namespaces and iterate over them
-            var namespaces = parser
+            var namespaces = _parser
                 .compilation_unit()
                 .namespace_member_declarations()
                 .namespace_member_declaration();
@@ -166,83 +202,93 @@ namespace SEE.Utils.LiveDocumentation
                             .type_declaration()
                             .class_definition()
                             .class_body();
+                        // Find all Methods
                         var methods = classBody
                             .class_member_declarations()
                             .class_member_declaration()
-                            .Where(x => x.common_member_declaration().method_declaration() != null).ToList();
+                            .Where(x => x.common_member_declaration().method_declaration() != null |
+                                        x.common_member_declaration().constructor_declaration() != null).ToList();
+
+                        var constuctors = classBody
+                            .class_member_declarations()
+                            .class_member_declaration()
+                            .Where(x => x.common_member_declaration().constructor_declaration() != null).ToList();
+
                         foreach (var i in methods)
                         {
                             i.GetText();
                             LiveDocumentationClassMemberBuffer methodBuffer = new LiveDocumentationClassMemberBuffer();
-
-                   
-                            methodBuffer.LineNumber = i.common_member_declaration().method_declaration()
-                                .method_member_name().Start.Line;
-                            
-                            var signature = i.all_member_modifiers().GetText() + " " +
-                                            i.common_member_declaration().method_declaration()
-                                                .method_member_name().GetText();
-                            signature += "(";
-                            methodBuffer.Add(new LiveDocumentationBufferText(signature));
-                            if (i.common_member_declaration()
-                                    .method_declaration()
-                                    .formal_parameter_list() != null)
+                            methodBuffer.LineNumber = i.common_member_declaration().Start.Line;
+                            // Concatenate the Method signature together.
+                            // Starting by the modifiers of the method
+                            var signature = i.all_member_modifiers().GetText() + " ";
+                            // If the current class member is a method
+                            if (i.common_member_declaration().method_declaration() is { } methodDeclarationContext)
                             {
-                                var parameters = i.common_member_declaration()
-                                    .method_declaration()
-                                    .formal_parameter_list()
-                                    .fixed_parameters()
-                                    .fixed_parameter();
-                                foreach (var parameter in parameters)
-                                {
-                                    var pType = parameter.arg_declaration().type_().GetText() + " ";
-                                    methodBuffer.Add(new LiveDocumentationLink(pType, pType));
-                                    //signature = signature + parameter.arg_declaration().type_().GetText() + " ";
-                                    //  signature = signature + parameter.arg_declaration().identifier().GetText();
-                                    methodBuffer.Add(
-                                        new LiveDocumentationBufferText(parameter.arg_declaration().identifier()
-                                            .GetText()));
-                                    if (!parameter.Equals(parameters.Last()))
-                                    {
-                                        methodBuffer.Add(new LiveDocumentationBufferText(", "));
-                                    }
-                                }
+                                // Add the name of the method to the buffer
+                                signature +=
+                                    methodDeclarationContext
+                                        .method_member_name().GetText();
+                                methodBuffer.Add(new LiveDocumentationBufferText(signature));
+
+                                ProcessMethodParameters(methodBuffer,
+                                    i.common_member_declaration().method_declaration().formal_parameter_list());
 
 
-                                //   signature = signature + "(" + i.common_member_declaration().method_declaration()
-                                //     .formal_parameter_list().GetText() + ")";
+                                //  methodBuffer.Add(new LiveDocumentationBufferText(signature));
+                                //signature.children.Select((x) => x.GetText())
+                                //    .Select(x => new LiveDocumentationBufferText(x + " "))
+                                //  .ToList().ForEach(x => methodBuffer.Add(x));
+                                buffers.Add(methodBuffer);
                             }
+                            // If the current class member is a constructor
+                            else if (i.common_member_declaration().constructor_declaration() is
+                                     { } constructorDeclarationContext)
+                            {
+                                signature += constructorDeclarationContext.identifier().GetText();
+                                methodBuffer.Add(new LiveDocumentationBufferText(signature));
 
-                            methodBuffer.Add(new LiveDocumentationBufferText(")"));
-
-
-                            //  methodBuffer.Add(new LiveDocumentationBufferText(signature));
-                            //signature.children.Select((x) => x.GetText())
-                            //    .Select(x => new LiveDocumentationBufferText(x + " "))
-                            //  .ToList().ForEach(x => methodBuffer.Add(x));
-                            buffers.Add(methodBuffer);
+                                ProcessMethodParameters(methodBuffer,
+                                    i.common_member_declaration().constructor_declaration().formal_parameter_list());
+                                buffers.Add(methodBuffer);
+                            }
                         }
                     }
                 }
-
-                // var methods = parser.start().namespaceDeclaration(0).classDefinition(0).classContent().methodDeclaration();
-                // foreach (var i in methods)
-                //  {
-                //      LiveDocumentationBuffer methodBuffer = new LiveDocumentationBuffer();
-                //      var signature = i.methodSignature();
-
-                // methodBuffer.Add(new LiveDocumentationBufferText(signature.accesModifier.Text+ " ")); 
-                //         signature.children.Select((x) => x.GetText()).Select(x => new LiveDocumentationBufferText(x + " "))
-                //            .ToList().ForEach(x => methodBuffer.Add(x));
-                //        buffers.Add(methodBuffer);
             }
 
             return buffers;
         }
 
+        /// <summary>
+        /// Extracts all using directives from a given C# file specified in <paramref name="fileName"/>.
+        ///
+        /// It will accumulate all imported type names in an list and return it.
+        /// If the file doesn't have any using directives an empty list is returned.
+        /// </summary>
+        /// <param name="fileName">The name of the file in which the using directives should be extracted</param>
+        /// <returns>A <see cref="List"/> of imported type names</returns>
         public List<string> ExtractImportedNamespaces(string fileName)
         {
-            throw new NotImplementedException();
+            var input = File.ReadAllText(fileName);
+            var lexer = new CSharpFullLexer(new AntlrInputStream(input));
+            var tokens = new CommonTokenStream(lexer);
+            tokens.Fill();
+            var parser = new CSharpParser(tokens);
+            List<string> ret = new();
+            // If the file doesn't have any using directives an empty list is returned.
+            if (parser.compilation_unit().using_directives() is { } usingDirectivesContext)
+            {
+                foreach (var usingDirective in usingDirectivesContext.using_directive())
+                {
+                    if (usingDirective is CSharpParser.UsingNamespaceDirectiveContext namespaceDirectiveContext)
+                    {
+                        ret.Add(namespaceDirectiveContext.namespace_or_type_name().GetText());
+                    }
+                }
+            }
+
+            return ret;
         }
     }
 }
