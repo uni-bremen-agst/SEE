@@ -291,11 +291,11 @@ namespace SEE.Game.UI.LiveDocumantation
             }
         }
 
-        private Node FindMatchingNode(string className)
-        {
-            var namspaceName = className.Split(".")[..(className.Split(".").Length - 1)]
-                .Aggregate("", (((s, s1) => s1 + s)));
-        }
+  //      private Node FindMatchingNode(string className)
+   //     {
+  //          var namspaceName = className.Split(".")[..(className.Split(".").Length - 1)]
+     //           .Aggregate("", (((s, s1) => s1 + s)));
+   //     }
 
         /// <summary>
         /// Finds a node given from a clicked filename.

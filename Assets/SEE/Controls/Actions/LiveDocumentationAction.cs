@@ -111,12 +111,13 @@ namespace SEE.Controls.Actions
                     documentationWindow.NodeOfClass = selectedNode.Value;
 
                     LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
-                    buffer = FileParser.ParseClassDoc(selectedNode.Value.AbsolutePlatformPath(), selectedNode.Value.SourceName);
+                    FileParser parser = new FileParser(selectedNode.Value.AbsolutePlatformPath());
+                    buffer = parser.ParseClassDoc(selectedNode.Value.AbsolutePlatformPath(), selectedNode.Value.SourceName);
 
 
                     List<LiveDocumentationBuffer> classMembers = new List<LiveDocumentationBuffer>();
                    // LiveDocumentationBuffer b = new LiveDocumentationBuffer();
-                   classMembers = FileParser.ParseClassMethods( selectedNode.Value.AbsolutePlatformPath(), selectedNode.Value.SourceName);
+                   classMembers = parser.ParseClassMethods( selectedNode.Value.AbsolutePlatformPath(), selectedNode.Value.SourceName);
                    if (buffer == null || classMembers == null)
                    {
                        return false;
