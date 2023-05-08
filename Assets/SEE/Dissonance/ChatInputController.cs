@@ -40,7 +40,7 @@ namespace SEE.Dissonance
         #endregion
 
         /// <summary>
-        /// Sets up <see cref="Comms"/>, <see cref="inputField, and <see cref="chatLog"/>.
+        /// Sets up <see cref="Comms"/>, <see cref="inputField"/>, and <see cref="chatLog"/>.
         /// Registers <see cref="OnInputEndEdit(string)"/> to be called when the user
         /// has ended his/her input.
         /// </summary>
