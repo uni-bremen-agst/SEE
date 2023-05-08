@@ -325,7 +325,10 @@ namespace profiling2gxl
                 XmlElement attr = doc.CreateElement("attr");
                 attr.SetAttribute("name", attribute.Key);
                 XmlElement value = doc.CreateElement(type);
-                value.InnerText = AsString(attribute.Value);
+                if (AsString(attribute.Value) != "")
+                {
+                    value.InnerText = AsString(attribute.Value);
+                }
                 attr.AppendChild(value);
                 xmlNode.AppendChild(attr);
             }
