@@ -1,20 +1,22 @@
-﻿using System.Linq;
-using JetBrains.Annotations;
+﻿using SEE.Controls;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Dissonance.Demo
 {
+    /// <summary>
+    /// Controls the text chat provided by Dissonance.
+    /// </summary>
+    /// <remarks>This code stems from a Dissonance demo and was then
+    /// adapted to our needs.</remarks>
     public class ChatInputController
         : MonoBehaviour
     {
         #region fields and properties
-        private bool _isInputtingText;
         private string _targetChannel;
 
         public DissonanceComms Comms;
-        public string Team1Channel = "A";
-        public string Team2Channel = "B";
 
         private InputField _input;
         private ChatLogController _log;
@@ -32,7 +34,7 @@ namespace Dissonance.Demo
             _log = GetComponent<ChatLogController>();
         }
 
-        private void OnInputEndEdit([CanBeNull] string message)
+        private void OnInputEndEdit(string message)
         {
             if (!string.IsNullOrEmpty(message))
             {
@@ -48,35 +50,26 @@ namespace Dissonance.Demo
             //Clear the UI
             _input.text = "";
             _input.gameObject.SetActive(false);
-            _isInputtingText = false;
 
             //Stop forcing the chat visible
-            if (_log!= null)
+            if (_log != null)
+            {
                 _log.ForceShow = false;
+            }
+            SEEInput.KeyboardShortcutsEnabled = true;
         }
 
         public void Update ()
         {
-            //Monitor keyboard keys if we're not inputting text
-            if (!_isInputtingText)
+            if (SEEInput.OpenTextChat())
             {
-                var global = Input.GetKey(KeyCode.Y);
-                var red = Input.GetKey(KeyCode.U);
-                var blue = Input.GetKey(KeyCode.I);
-
-                //If a key is pressed
-                if (global)
-                    ShowTextInput("Global");
-                else if (red)
-                    ShowTextInput(Team1Channel);
-                else if (blue)
-                    ShowTextInput(Team2Channel);
+                ShowTextInput("Global");
             }
         }
 
         private void ShowTextInput(string channel)
         {
-            _isInputtingText = true;
+            SEEInput.KeyboardShortcutsEnabled = false;
             _targetChannel = channel;
             _input.gameObject.SetActive(true);
             _input.ActivateInputField();
