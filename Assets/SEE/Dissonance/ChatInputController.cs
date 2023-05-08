@@ -61,7 +61,7 @@ namespace SEE.Dissonance
         /// the <see cref="inputField"/>, hides the <see cref="chatLog"/>, and
         /// re-enables <see cref="SEEInput.KeyboardShortcutsEnabled"/>.
         ///
-        /// This method is a callback alled when the user has ended his/her input.
+        /// This method is a callback that is called when the user has ended his/her input.
         /// </summary>
         /// <param name="message">the message entered by the user</param>
         private void OnInputEndEdit(string message)
