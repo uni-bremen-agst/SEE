@@ -3,9 +3,6 @@ using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-#if INCLUDE_STEAM_VR
-using Valve.VR.InteractionSystem;
-#endif
 
 namespace SEE.Game.UI.StateIndicator
 {

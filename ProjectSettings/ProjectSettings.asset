@@ -143,6 +143,7 @@ PlayerSettings:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  - {fileID: 2489328711382419796, guid: 1fc620f3d43365f47a0ae74f688e5a96, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -402,7 +403,7 @@ PlayerSettings:
   cameraUsageDescription: Camera
   locationUsageDescription: 
   microphoneUsageDescription: Microphone is needed for Voice Chat
-  bluetoothUsageDescription: Bluetooth is nedded for SEE to run
+  bluetoothUsageDescription: Bluetooth is nedded by Unity for an unknown reason
   switchNMETAOverride: 
   switchNetLibKey: 
   switchSocketMemoryPoolSize: 6144

@@ -3,9 +3,7 @@ using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.GO;
 using UnityEngine;
-#if UNITY_STANDALONE_WIN
-using Valve.VR.InteractionSystem;
-#endif
+
 namespace SEE.Game
 {
     /// <summary>

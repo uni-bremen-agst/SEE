@@ -2,10 +2,7 @@
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
-#if INCLUDE_STEAM_VR
 
-using Valve.VR.InteractionSystem;
-#endif
 namespace SEE.Game.UI.Menu
 {
     /// <summary>
