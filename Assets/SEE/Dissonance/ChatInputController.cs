@@ -1,89 +1,127 @@
-﻿using System.Linq;
-using JetBrains.Annotations;
+﻿using Dissonance;
+using Dissonance.Demo;
+using SEE.Controls;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Dissonance.Demo
+namespace SEE.Dissonance
 {
+    /// <summary>
+    /// Controls the text chat provided by Dissonance.
+    /// </summary>
+    /// <remarks>This code stems from a Dissonance demo and was then
+    /// adapted to our needs.</remarks>
     public class ChatInputController
         : MonoBehaviour
     {
         #region fields and properties
-        private bool _isInputtingText;
-        private string _targetChannel;
 
+        /// <summary>
+        /// The name of the text channel where to send messages.
+        /// </summary>
+        private string targetChannel;
+
+        /// <summary>
+        /// The dissonance network to broadcast the messages.
+        /// </summary>
         public DissonanceComms Comms;
-        public string Team1Channel = "A";
-        public string Team2Channel = "B";
 
-        private InputField _input;
-        private ChatLogController _log;
+        /// <summary>
+        /// The input field of the text chat.
+        /// </summary>
+        private InputField inputField;
+
+        /// <summary>
+        /// The controller for the chat log. The log contains the messages
+        /// being entered so far.
+        /// </summary>
+        private ChatLogController chatLog;
         #endregion
 
-        public void Start ()
+        /// <summary>
+        /// Sets up <see cref="Comms"/>, <see cref="inputField"/>, and <see cref="chatLog"/>.
+        /// Registers <see cref="OnInputEndEdit(string)"/> to be called when the user
+        /// has ended his/her input.
+        /// </summary>
+        private void Start ()
         {
             Comms = Comms ?? FindObjectOfType<DissonanceComms>();
 
-            _input = GetComponentsInChildren<InputField>().Single(a => a.name == "ChatInput");
-            _input.gameObject.SetActive(false);
+            inputField = GetComponentsInChildren<InputField>().Single(a => a.name == "ChatInput");
+            inputField.gameObject.SetActive(false);
 
-            _input.onEndEdit.AddListener(OnInputEndEdit);
+            inputField.onEndEdit.AddListener(OnInputEndEdit);
 
-            _log = GetComponent<ChatLogController>();
+            chatLog = GetComponent<ChatLogController>();
         }
 
-        private void OnInputEndEdit([CanBeNull] string message)
+        /// <summary>
+        /// Broadcasts the <paramref name="message"/> to all clients, then disables
+        /// the <see cref="inputField"/>, hides the <see cref="chatLog"/>, and
+        /// re-enables <see cref="SEEInput.KeyboardShortcutsEnabled"/>.
+        ///
+        /// This method is a callback that is called when the user has ended his/her input.
+        /// </summary>
+        /// <param name="message">the message entered by the user</param>
+        private void OnInputEndEdit(string message)
         {
             if (!string.IsNullOrEmpty(message))
             {
-                //Send the text to dissonance network
+                // Send the text to dissonance network
                 if (Comms != null)
-                    Comms.Text.Send(_targetChannel, message);
+                {
+                    Comms.Text.Send(targetChannel, message);
+                }
 
-                //Display in the local log
-                if (_log != null)
-                    _log.AddMessage(string.Format("Me ({0}): {1}", _targetChannel, message), Color.gray);
+                // Display in the local log
+                if (chatLog != null)
+                {
+                    chatLog.AddMessage(string.Format("Me ({0}): {1}", targetChannel, message), Color.blue);
+                }
             }
 
-            //Clear the UI
-            _input.text = "";
-            _input.gameObject.SetActive(false);
-            _isInputtingText = false;
+            // Clear the UI
+            inputField.text = "";
+            inputField.gameObject.SetActive(false);
 
-            //Stop forcing the chat visible
-            if (_log!= null)
-                _log.ForceShow = false;
-        }
-
-        public void Update ()
-        {
-            //Monitor keyboard keys if we're not inputting text
-            if (!_isInputtingText)
+            // Stop forcing the chat visible
+            if (chatLog != null)
             {
-                var global = Input.GetKey(KeyCode.Y);
-                var red = Input.GetKey(KeyCode.U);
-                var blue = Input.GetKey(KeyCode.I);
+                chatLog.ForceShow = false;
+            }
+            SEEInput.KeyboardShortcutsEnabled = true;
+        }
 
-                //If a key is pressed
-                if (global)
-                    ShowTextInput("Global");
-                else if (red)
-                    ShowTextInput(Team1Channel);
-                else if (blue)
-                    ShowTextInput(Team2Channel);
+        /// <summary>
+        /// If the user requests to open the text chat, we will do so.
+        /// </summary>
+        private void Update ()
+        {
+            if (SEEInput.OpenTextChat())
+            {
+                ShowTextInput("Global");
             }
         }
 
+        /// <summary>
+        /// Disables <see cref="SEEInput.KeyboardShortcutsEnabled"/> and activates
+        /// the <see cref="inputField"/> and <see cref="chatLog"/> so that the user
+        /// can add a message.
+        /// </summary>
+        /// <param name="channel">the name of the Dissonance channel where to send messages</param>
         private void ShowTextInput(string channel)
         {
-            _isInputtingText = true;
-            _targetChannel = channel;
-            _input.gameObject.SetActive(true);
-            _input.ActivateInputField();
+            SEEInput.KeyboardShortcutsEnabled = false;
+            targetChannel = channel;
+            inputField.gameObject.SetActive(true);
+            inputField.ActivateInputField();
 
-            //Force the chat log to show
-            if (_log != null)
-                _log.ForceShow = true;
+            // Force the chat log to show
+            if (chatLog != null)
+            {
+                chatLog.ForceShow = true;
+            }
         }
     }
 }

@@ -628,30 +628,12 @@ namespace SEE.Controls
         //----------------------------------------------------
 
         /// <summary>
-        /// True if the user wants to toggle the global text chat.
+        /// Opens the text chat.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ToggleGlobalChat()
+        public static bool OpenTextChat()
         {
-            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleGlobalChat);
-        }
-
-        /// <summary>
-        /// True if the user wants to toggle the text chat for team 1.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ToggleTeam1Channel()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleTeam1Channel);
-        }
-
-        /// <summary>
-        /// True if the user wants to toggle the text chat for team 2.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ToggleTeam2Channel()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleTeam2Channel);
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.OpenTextChat);
         }
 
         #endregion

@@ -87,7 +87,7 @@ namespace SEE.Controls
         /// Toggles voice input (i.e., for voice commands) on/off.
         /// </summary>
         internal static readonly KeyCode ToggleVoiceInput = Register(KeyCode.Period, Scope.Always,
-                                                               "Toggles voice input on/off.");
+                                                                     "Toggles voice input on/off.");
 
         #endregion
 
@@ -333,19 +333,9 @@ namespace SEE.Controls
         //-----------------------------------------------------
 
         /// <summary>
-        /// Toggles the global chat room.
+        /// Opens the text chat.
         /// </summary>
-        internal static readonly KeyCode ToggleGlobalChat = Register(KeyCode.F2, Scope.Chat, "Toggles the global chat room.");
-
-        /// <summary>
-        /// Toggles the chat room for team 1.
-        /// </summary>
-        internal static readonly KeyCode ToggleTeam1Channel = Register(KeyCode.F3, Scope.Chat, "Toggles the chat room for team 1.");
-
-        /// <summary>
-        /// Toggles the chat room for team 2.
-        /// </summary>
-        internal static readonly KeyCode ToggleTeam2Channel = Register(KeyCode.F4, Scope.Chat, "Toggles the chat room for team 2.");
+        internal static readonly KeyCode OpenTextChat = Register(KeyCode.F2, Scope.Chat, "Opens the text chat.");
 
         #endregion
 
