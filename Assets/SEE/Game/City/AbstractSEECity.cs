@@ -593,6 +593,35 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Returns true if the user is currently hovering over the plane (area) of the code
+        /// city represented by <paramref name="gameObject"/>.
+        ///
+        /// Precondition: <paramref name="gameObject"/> has a <see cref="GO.Plane"/> attached
+        /// to it.
+        /// </summary>
+        /// <returns>true if user is hovering over the code city represented by <paramref name="gameObject"/></returns>
+        public static bool UserIsHoveringCity(GameObject gameObject)
+        {
+            if (!gameObject.TryGetComponent(out GO.Plane clippingPlane) || clippingPlane == null)
+            {
+                Debug.LogError($"Code city {gameObject.FullName()} has no {typeof(GO.Plane)}.\n");
+                return false;
+            }
+
+            Raycasting.RaycastClippingPlane(clippingPlane, out _, out bool hitInsideClippingArea, out Vector3 _);
+            return hitInsideClippingArea;
+        }
+
+        /// <summary>
+        /// Returns true if the user is currently hovering over the plane (area) of this city.
+        /// </summary>
+        /// <returns>true if user is hovering over this city</returns>
+        public bool UserIsHoveringCity()
+        {
+            return UserIsHoveringCity(gameObject);
+        }
+
+        /// <summary>
         /// Dumps the metric names of all node types of the currently loaded graph.
         /// </summary>
         protected abstract void DumpNodeMetrics();
