@@ -48,7 +48,6 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         public Color DisabledColor => EntryColor.WithAlpha(0.2f);
         
-        
         /// <summary>
         /// Instantiates and returns a new MenuEntry.
         /// </summary>
