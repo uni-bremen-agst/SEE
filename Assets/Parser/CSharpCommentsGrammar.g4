@@ -42,9 +42,10 @@ classLink
     
 parameters
     : parameter*;
+
     
 parameter
-    : '/// <param name="' paramName=TEXT* '">' paramDescription=TEXT* '</param>';
+    : '/// <param name="' paramName=TEXT* '">' parameterDescription=tagContent '</param>';
     
 // summary context
 summary
@@ -58,11 +59,11 @@ exceptionTag:
     '/// <exception cref="' exceptionType '">' (someText | paramref)* ('/// </exception>' | '</exception>');
 
 
-returnContent
+tagContent
     : (comments | (someText | classLink) )*;
 
 return
-    : '/// <returns>' returnContent ('/// </returns>' | '</returns>');
+    : '/// <returns>' returnContent=tagContent ('/// </returns>' | '</returns>');
 
 
 comments: 

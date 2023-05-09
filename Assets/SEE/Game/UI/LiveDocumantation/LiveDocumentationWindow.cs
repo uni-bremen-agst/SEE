@@ -35,6 +35,8 @@ namespace SEE.Game.UI.LiveDocumantation
     /// </summary>
     public class LiveDocumentationWindow : BaseWindow
     {
+        #region Constants
+
         /// <summary>
         /// Path to the prefab
         /// </summary>
@@ -44,6 +46,11 @@ namespace SEE.Game.UI.LiveDocumantation
         private const string ClassMemberListPath = "ClassMembers/Scroll Area/List";
 
         private const string NodeClassType = "Class";
+
+        private const string ClassTypeClassMembersTitleText = "ClassMembers";
+        private const string MethodTypeParametersTitleText = "Parameters";
+
+        #endregion
 
         /// <summary>
         /// Text mesh for the (shortened) class name
@@ -61,6 +68,8 @@ namespace SEE.Game.UI.LiveDocumantation
 
         private Dictionary<String, Node> NamespaceCache = new();
 
+
+        public LiveDocumentationWindowType DocumentationWindowType { get; set; }
 
         /// <summary>
         /// The name of the class
@@ -122,7 +131,8 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         public LiveDocumentationBuffer DocumentationBuffer { get; set; }
 
-        public IList<LiveDocumentationBuffer> ClassMembers { get; set; } = new List<LiveDocumentationBuffer>();
+        public List<LiveDocumentationBuffer> ClassMembers { get; set; } =
+            new List<LiveDocumentationBuffer>();
 
 
         /// <summary>
@@ -141,37 +151,75 @@ namespace SEE.Game.UI.LiveDocumantation
         /// <param name="buffer"></param>
         private void AddClassMember(LiveDocumentationBuffer buffer)
         {
+            // Creating a new GameObject and naming it
+            GameObject classMem = new GameObject();
+            classMem.name = "Item";
+
+            // Adding some other Components
+            classMem.AddComponent<CanvasRenderer>();
+            RectTransform rt = classMem.AddComponent<RectTransform>();
+
+            //Adding the ClassMember component
+            ClassMember cm = classMem.AddComponent<ClassMember>();
+
+            cm.MethodsBuffer = buffer;
             if (buffer is LiveDocumentationClassMemberBuffer classMemberBuffer)
             {
-                // Creating a new GameObject and naming it
-                GameObject classMem = new GameObject();
-                classMem.name = "Item";
-
-                // Adding some other Components
-                classMem.AddComponent<CanvasRenderer>();
-                RectTransform rt = classMem.AddComponent<RectTransform>();
-
-                //Adding the ClassMember component
-                ClassMember cm = classMem.AddComponent<ClassMember>();
-                cm.Text = buffer.PrintBuffer();
                 cm.LineNumber = classMemberBuffer.LineNumber;
-
-                // Setting the correct anchor point (upper left corner) for the new game object
-                classMem.transform.parent = ClassMembersList.transform;
-                rt.localScale = new Vector3(1, 1, 1);
-                // This will set the 
-                rt.anchorMin = new Vector2(0, 1);
-                rt.anchorMax = new Vector2(0, 1);
-
-                cm.OnLinkClicked += OnLinkClicked;
-                cm.OnClicked.AddListener(OnClickClassMember);
             }
+
+
+            // Setting the correct anchor point (upper left corner) for the new game object
+            classMem.transform.parent = ClassMembersList.transform;
+            rt.localScale = new Vector3(1, 1, 1);
+            // This will set the 
+            rt.anchorMin = new Vector2(0, 1);
+            rt.anchorMax = new Vector2(0, 1);
+
+            cm.OnLinkClicked += OnLinkClicked;
+            cm.OnClicked.AddListener(OnClickClassMember);
         }
 
         private void OnClickClassMember(ClassMember cm)
         {
             var method = NodeOfClass.Children().Where(x => x.Type.Equals("Method"))
                 .Where(x => x.GetInt("Source.Line") == cm.LineNumber).First();
+
+            if (DocumentationWindowType == LiveDocumentationWindowType.CLASS &&
+                cm.MethodsBuffer is LiveDocumentationClassMemberBuffer classMemberBuffer)
+            {
+                LiveDocumentationWindow newWin = method.GameObject().AddComponent<LiveDocumentationWindow>();
+
+
+                newWin.Title = method.SourceName;
+                string selectedFile = method.Filename();
+                if (!newWin.Title.Replace(".", "").Equals(selectedFile.Split('.').Reverse().Skip(1)
+                        .Aggregate("", (acc, s) => s + acc)))
+                {
+                    newWin.Title += $" ({selectedFile})";
+                }
+
+                newWin.ClassName = newWin.Title;
+                newWin.BasePath = BasePath;
+                newWin.RelativePath = method.Path() + method.Filename();
+                newWin.Graph = Graph;
+                newWin.NodeOfClass = method;
+                newWin.DocumentationWindowType = LiveDocumentationWindowType.METHOD;
+
+                newWin.DocumentationBuffer = classMemberBuffer.Documentation;
+                newWin.ClassMembers = classMemberBuffer.Parameters;
+
+                List<LiveDocumentationBuffer> methods = new List<LiveDocumentationBuffer>();
+
+
+                //  newWin.ClassMembers = methods;
+                //  newWin.DocumentationBuffer = buffer;
+                // Add code window to our space of code window, if it isn't in there yet
+
+
+                spaceManager[WindowSpaceManager.LOCAL_PLAYER].AddWindow(newWin);
+                spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = newWin;
+            }
 
             if (method != null)
             {
@@ -217,10 +265,25 @@ namespace SEE.Game.UI.LiveDocumantation
 
             ClassMembersList = livedoc.transform.Find(ClassMemberListPath).gameObject;
 
+            // Set the right title 
+            GameObject membersListTitle = ClassMembersList.gameObject.transform.Find("Title").gameObject;
+            TextMeshProUGUI textField = membersListTitle.GetComponent<TextMeshProUGUI>();
+            switch (DocumentationWindowType)
+            {
+                case LiveDocumentationWindowType.CLASS:
+                    textField.text = ClassTypeClassMembersTitleText;
+                    break;
+                case LiveDocumentationWindowType.METHOD:
+                    textField.text = MethodTypeParametersTitleText;
+                    break;
+            }
+
+
             // Setting the classname.
             ClassNameField.text = ClassName;
 
-            // Try setting the documentation 
+            // Try setting the actual documentation
+            // If the class has no documentation 
             ClassDocumentation.text = DocumentationBuffer?.PrintBuffer() ?? "NO DOCS AVAILABLE";
             //     GameObject livedoc =
             //         PrefabInstantiator.InstantiatePrefab("Prefabs/UI/LiveDocumentation/ClassMember", ClassMembers.transform, false);
@@ -291,11 +354,11 @@ namespace SEE.Game.UI.LiveDocumantation
             }
         }
 
-  //      private Node FindMatchingNode(string className)
-   //     {
-  //          var namspaceName = className.Split(".")[..(className.Split(".").Length - 1)]
-     //           .Aggregate("", (((s, s1) => s1 + s)));
-   //     }
+        //      private Node FindMatchingNode(string className)
+        //     {
+        //          var namspaceName = className.Split(".")[..(className.Split(".").Length - 1)]
+        //           .Aggregate("", (((s, s1) => s1 + s)));
+        //     }
 
         /// <summary>
         /// Finds a node given from a clicked filename.
@@ -386,7 +449,8 @@ namespace SEE.Game.UI.LiveDocumantation
                 newWin.DocumentationBuffer = buffer;
 
                 List<LiveDocumentationBuffer> methods = new List<LiveDocumentationBuffer>();
-                methods = parser.ParseClassMethods(nodeOfLink.AbsolutePlatformPath(), nodeOfLink.SourceName);
+                parser.ParseClassMethods(nodeOfLink.AbsolutePlatformPath(), nodeOfLink.SourceName)
+                    .ForEach((x) => methods.Add(x));
 
                 newWin.ImportedNamespaces = parser.ParseNamespaceImports(nodeOfLink.AbsolutePlatformPath());
                 if (buffer == null || methods == null)

@@ -19,25 +19,26 @@ namespace SEE.Game.UI.LiveDocumantation
 
         private const string PREFAB_NAME = "Prefabs/UI/LiveDocumentation/ClassMember";
         private const string CLASS_MEMBER_OBJECT_PATH = "Scroll View/Viewport/Content/MemberText";
+        private const string ScrollViewPath = "Scroll View";
 
-        private readonly Color HighlightedColor = new Color(1, 0.2862745f, 0.1490196f, 0.509804f);
+        private static readonly Color HighlightedColor = new Color(1, 0.2862745f, 0.1490196f, 0.509804f);
 
-        private readonly Color UnHighlightedColor = new Color(1, 1, 1, 0.3882353f);
+        private static readonly Color UnHighlightedColor = new Color(1, 1, 1, 0.3882353f);
 
         #endregion
-
-        public string Text { get; set; }
 
         public int LineNumber { get; set; }
 
         public bool HighlightAnimationRunning { get; set; } = false;
+
+        public LiveDocumentationBuffer MethodsBuffer { get; set; }
 
         public delegate void ClickLink(string path);
 
         public delegate void Click(ClassMember cm);
 
         public event ClickLink OnLinkClicked;
-        
+
         public UnityEvent<ClassMember> OnClicked = new UnityEvent<ClassMember>();
 
 
@@ -57,9 +58,9 @@ namespace SEE.Game.UI.LiveDocumantation
             ClassMemberField = classMember;
             Mesh = classMember.transform.Find(CLASS_MEMBER_OBJECT_PATH).gameObject
                 .GetComponent<TextMeshProUGUI>();
-            Mesh.text = Text;
+            Mesh.text = MethodsBuffer.PrintBuffer();
 
-            TextRectTransform = classMember.transform.Find(CLASS_MEMBER_OBJECT_PATH).gameObject
+            TextRectTransform = classMember.transform.Find(ScrollViewPath).gameObject
                 .GetComponent<RectTransform>();
 
             classMember.TryGetComponentOrLog(out ClassMemberImage);
@@ -70,7 +71,7 @@ namespace SEE.Game.UI.LiveDocumantation
             //     rt.anchorMax = new Vector2(1, 1);
             //     rt.pivot = new Vector2(0.5f, 0.5f);
         }
-        
+
 
         public void Update()
         {
@@ -94,7 +95,6 @@ namespace SEE.Game.UI.LiveDocumantation
         public void OnPointerEnter(PointerEventData eventData)
         {
             ClassMemberImage.color = HighlightedColor;
-
         }
 
         public void OnPointerExit(PointerEventData eventData)

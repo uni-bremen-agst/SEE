@@ -47,7 +47,7 @@ namespace SEE.Utils.LiveDocumentation
         }
 
         [CanBeNull]
-        public List<LiveDocumentationBuffer> ParseClassMethods(string fileName, string className)
+        public List<LiveDocumentationClassMemberBuffer> ParseClassMethods(string fileName, string className)
         {
             return _extractor.ExtractMethods(fileName, className);
         }

@@ -8,7 +8,6 @@ using SEE.Net.Actions;
 using SEE.Utils;
 using SEE.Utils.LiveDocumentation;
 using UnityEngine;
-using Extractor = SEE.Game.City.LiveDocumentation.Extractor;
 
 namespace SEE.Controls.Actions
 {
@@ -41,8 +40,7 @@ namespace SEE.Controls.Actions
             syncAction = new SyncWindowSpaceAction();
         }
 
-        
-        
+
         public override bool Update()
         {
             //  SceneQueries.GetCodeCity(selectedNode.transform).gameObject;
@@ -62,11 +60,11 @@ namespace SEE.Controls.Actions
 
                 // Concat the path and the file name to get the relative path of the file in the project
                 string path = selectedNode.Value.Path() + selectedNode.elem.Filename();
-                
-                
+
+
                 // When the node the user has clicked on wasn't a leaf node.
                 // In this case an error message is displayed and the LiveDocumentation windows is not going to open.
-                if ( !selectedNode.Value.Type.Equals("Class") )
+                if (!selectedNode.Value.Type.Equals("Class"))
                 {
                     ShowNotification.Error("Node not supported", "Only leaf nodes can be analysed");
                     return false;
@@ -92,11 +90,12 @@ namespace SEE.Controls.Actions
                             $"Path {absolutePlatformPath} of selected node '{selectedNode.Value.SourceName}' does not exist.");
                         return false;
                     }
+
                     string selectedFile = selectedNode.Value.Filename();
-                    
-                  
+
+
                     documentationWindow = selectedNode.gameObject.AddComponent<LiveDocumentationWindow>();
-                  
+
                     documentationWindow.Title = selectedNode.Value.SourceName;
 
                     if (!documentationWindow.Title.Replace(".", "").Equals(selectedFile.Split('.').Reverse().Skip(1)
@@ -104,6 +103,7 @@ namespace SEE.Controls.Actions
                     {
                         documentationWindow.Title += $" ({selectedFile})";
                     }
+
                     documentationWindow.ClassName = documentationWindow.Title;
                     documentationWindow.BasePath = selectedNode.elem.ItsGraph.BasePath;
                     documentationWindow.RelativePath = path;
@@ -112,17 +112,19 @@ namespace SEE.Controls.Actions
 
                     LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
                     FileParser parser = new FileParser(selectedNode.Value.AbsolutePlatformPath());
-                    buffer = parser.ParseClassDoc(selectedNode.Value.AbsolutePlatformPath(), selectedNode.Value.SourceName);
+                    buffer = parser.ParseClassDoc(selectedNode.Value.AbsolutePlatformPath(),
+                        selectedNode.Value.SourceName);
 
 
                     List<LiveDocumentationBuffer> classMembers = new List<LiveDocumentationBuffer>();
-                   // LiveDocumentationBuffer b = new LiveDocumentationBuffer();
-                   classMembers = parser.ParseClassMethods( selectedNode.Value.AbsolutePlatformPath(), selectedNode.Value.SourceName);
-                   if (buffer == null || classMembers == null)
-                   {
-                       return false;
-                   }
-                  //  classMembers.Add(b);
+                    // LiveDocumentationBuffer b = new LiveDocumentationBuffer();
+                    parser.ParseClassMethods(selectedNode.Value.AbsolutePlatformPath(), selectedNode.Value.SourceName)
+                        .ForEach((x) => classMembers.Add(x));
+                    if (buffer == null || classMembers == null)
+                    {
+                        return false;
+                    }
+                    //  classMembers.Add(b);
 
                     documentationWindow.DocumentationBuffer = buffer;
                     documentationWindow.ClassMembers = classMembers;

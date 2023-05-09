@@ -3,7 +3,6 @@ using SEE.Game.UI.LiveDocumantation;
 
 namespace SEE.Utils.LiveDocumentation
 {
-
     /// <summary>
     /// Represents an general extractor for the LiveDocumentation.
     ///
@@ -25,7 +24,8 @@ namespace SEE.Utils.LiveDocumentation
         /// <param name="fileName"></param>
         /// <param name="className"></param>
         /// <returns></returns>
-        List<LiveDocumentationBuffer> ExtractMethods(string fileName, string className);
+        List<LiveDocumentationClassMemberBuffer> ExtractMethods(string fileName, string className);
+        
 
         /// <summary>
         /// This method should extract all import statements of the source code file.

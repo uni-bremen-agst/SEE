@@ -144,17 +144,17 @@ public partial class CSharpCommentsGrammarBaseListener : ICSharpCommentsGrammarL
 	/// <param name="context">The parse tree.</param>
 	public virtual void ExitExceptionTag([NotNull] CSharpCommentsGrammarParser.ExceptionTagContext context) { }
 	/// <summary>
-	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.returnContent"/>.
+	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.tagContent"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void EnterReturnContent([NotNull] CSharpCommentsGrammarParser.ReturnContentContext context) { }
+	public virtual void EnterTagContent([NotNull] CSharpCommentsGrammarParser.TagContentContext context) { }
 	/// <summary>
-	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.returnContent"/>.
+	/// Exit a parse tree produced by <see cref="CSharpCommentsGrammarParser.tagContent"/>.
 	/// <para>The default implementation does nothing.</para>
 	/// </summary>
 	/// <param name="context">The parse tree.</param>
-	public virtual void ExitReturnContent([NotNull] CSharpCommentsGrammarParser.ReturnContentContext context) { }
+	public virtual void ExitTagContent([NotNull] CSharpCommentsGrammarParser.TagContentContext context) { }
 	/// <summary>
 	/// Enter a parse tree produced by <see cref="CSharpCommentsGrammarParser.return"/>.
 	/// <para>The default implementation does nothing.</para>
