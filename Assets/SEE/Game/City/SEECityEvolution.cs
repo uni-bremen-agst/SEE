@@ -24,6 +24,7 @@ using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
 using SEE.Game.UI.RuntimeConfigMenu;
+using SEE.GO;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -290,11 +291,7 @@ namespace SEE.Game.City
             evolutionRenderer = CreateEvolutionRenderer(graphs);
             DrawGraphs(graphs);
 
-            if (!gameObject.TryGetComponent(out AnimationInteraction animationInteraction))
-            {
-                animationInteraction = gameObject.AddComponent<AnimationInteraction>();
-            }
-            animationInteraction.EvolutionRenderer = evolutionRenderer;
+            gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
 
             evolutionRenderer.ShowGraphEvolution();
         }
