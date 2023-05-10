@@ -57,11 +57,6 @@ namespace SEE.Game.Worlds
         /// <returns>enumerator as to how to continue this co-routine</returns>
         private IEnumerator SpawnPlayerCoroutine()
         {
-            if (XRSettings.enabled)
-            {
-                
-            }
-
             NetworkManager networkManager = NetworkManager.Singleton;
             while (ReferenceEquals(networkManager, null))
             {
