@@ -188,26 +188,25 @@ namespace SEE.Game.UI.Window
     /// Used for serialization when sending a window over the network.
     /// </summary>
     [Serializable]
-    public abstract class WindowValues
+    public class WindowValues
     {
         /// <summary>
         /// Title of the window.
         /// </summary>
-        [field: SerializeField]
-        public string Title { get; private set; }
+        [field: SerializeField] public string Title;
 
         [field: SerializeField]
         /// <summary>
         /// Name of the game object this window was attached to.
         /// </summary>
-        public string AttachedTo { get; private set; }
+        public string AttachedTo;
 
         /// <summary>
         /// Creates a new WindowValues object from the given parameters.
         /// </summary>
         /// <param name="title">The title of the window.</param>
         /// <param name="attachedTo">Name of the game object the code window is attached to.</param>
-        internal WindowValues(string title, string attachedTo = null)
+        public WindowValues(string title, string attachedTo = null)
         {
             AttachedTo = attachedTo;
             Title = title;
