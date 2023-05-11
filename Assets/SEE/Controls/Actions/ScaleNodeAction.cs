@@ -1,10 +1,8 @@
 ﻿using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
-using System;
 using UnityEngine;
 using SEE.Net.Actions;
-using static SEE.Utils.Raycasting;
 using SEE.Game.Operator;
 using SEE.Audio;
 using RTG;
@@ -42,96 +40,6 @@ namespace SEE.Controls.Actions
         {
             return ActionStateType.ScaleNode;
         }
-
-        /// <summary>
-        /// The old position of the top sphere.
-        /// </summary>
-        private Vector3 topOldSpherePos;
-
-        /// <summary>
-        /// The old position of the first corner sphere.
-        /// </summary>
-        private Vector3 firstCornerOldSpherePos;
-
-        /// <summary>
-        /// The old position of the second corner sphere.
-        /// </summary>
-        private Vector3 secondCornerOldSpherePos;
-
-        /// <summary>
-        /// The old position of the third corner sphere.
-        /// </summary>
-        private Vector3 thirdCornerOldSpherePos;
-
-        /// <summary>
-        /// The old position of the forth corner sphere.
-        /// </summary>
-        private Vector3 forthCornerOldSpherePos;
-
-        /// <summary>
-        /// The old position of the first side sphere.
-        /// </summary>
-        private Vector3 firstSideOldSpherePos;
-
-        /// <summary>
-        /// The old position of the second side sphere.
-        /// </summary>
-        private Vector3 secondSideOldSpherePos;
-
-        /// <summary>
-        /// The old position of the third side sphere.
-        /// </summary>
-        private Vector3 thirdSideOldSpherePos;
-
-        /// <summary>
-        /// The old position of the forth side sphere.
-        /// </summary>
-        private Vector3 forthSideOldSpherePos;
-
-        /// <summary>
-        /// The sphere on top of the gameObject to scale.
-        /// </summary>
-        private GameObject topSphere;
-
-        /// <summary>
-        /// The sphere on the first corner of the gameObject to scale.
-        /// </summary>
-        private GameObject firstCornerSphere; //x0 y0
-
-        /// <summary>
-        /// The sphere on the second corner of the gameObject to scale.
-        /// </summary>
-        private GameObject secondCornerSphere; //x1 y0
-
-        /// <summary>
-        /// The sphere on the third corner of the gameObject to scale.
-        /// </summary>
-        private GameObject thirdCornerSphere; //x1 y1
-
-        /// <summary>
-        /// The sphere on the forth corner of the gameObject to scale.
-        /// </summary>
-        private GameObject forthCornerSphere; //x0 y1
-
-        /// <summary>
-        /// The sphere on the first side of the gameObject to scale.
-        /// </summary>
-        private GameObject firstSideSphere; //x0 y0
-
-        /// <summary>
-        /// The sphere on the second side of the gameObject to scale.
-        /// </summary>
-        private GameObject secondSideSphere; //x1 y0
-
-        /// <summary>
-        /// The sphere on the third side of the gameObject to scale.
-        /// </summary>
-        private GameObject thirdSideSphere; //x1 y1
-
-        /// <summary>
-        /// The sphere on the forth side of the gameObject to scale.
-        /// </summary>
-        private GameObject forthSideSphere; //x0 y1
 
         /// <summary>
         /// The gameObject that is currently selected and should be scaled.
@@ -184,7 +92,6 @@ namespace SEE.Controls.Actions
         public override void Stop()
         {
             base.Stop();
-            RemoveSpheres();
         }
 
         /// <summary>
@@ -235,15 +142,10 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// True if the gizmos that allow a user to scale the object in all three dimensions
-        /// are drawn.
-        /// </summary>
-        private bool scalingGizmosAreDrawn = false;
-
-        /// <summary>
         /// Gizmo used for scaling the objects.
         /// </summary>
         private ObjectTransformGizmo _objectScaleGizmo = RTGizmosEngine.Get.CreateObjectScaleGizmo();
+        private GameObject gizmoHidingObject = new GameObject("Gizmo Hiding Object");
 
         /// <summary
         /// See <see cref="ReversibleAction.Update"/>.
@@ -258,70 +160,33 @@ namespace SEE.Controls.Actions
             {
                 HitGraphElement hitGraphElement = Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _);
                 bool isGameObject = hitGraphElement == HitGraphElement.Node;
-                Gizmo hoveredGizmo = RTGizmosEngine.Get.HoveredGizmo;
-                if (!isGameObject || hoveredGizmo != null)
+
+                if (!isGameObject)
                 {
-                    // A gizmo or a Game Object outside the graph was clicked.
-                    return false;
+                    // Object outside the graph was selected, should be ignored.
+                    _objectScaleGizmo.SetTargetObject(gizmoHidingObject);
+                    _objectScaleGizmo.SetEnabled(false);
+                    return true;
+                }
+                Gizmo hoveredGizmo = RTGizmosEngine.Get.HoveredGizmo;
+                if (hoveredGizmo != null && objectToScale != null)
+                {
+                    // Hovered gizmo was selected, create memento
+                    beforeAction = new Memento(objectToScale);
                 }
                 if (objectToScale != raycastHit.collider.gameObject)
                 {
+                    if (objectToScale != null)
+                    {
+                        afterAction = new Memento(objectToScale);
+                    }
                     objectToScale = raycastHit.collider.gameObject;
-                    // todo memento
                     _objectScaleGizmo.SetTargetObject(objectToScale);
                     _objectScaleGizmo.SetEnabled(true);
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, raycastHit.collider.gameObject);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, objectToScale);
                 }
             }
-
             return false;
-        }
-
-        /// <summary>
-        /// Destroys all scaling gizmos. Sets <see cref="scalingGizmosAreDrawn"/> to false.
-        /// </summary>
-        public void RemoveSpheres()
-        {
-            Destroyer.Destroy(topSphere);
-            Destroyer.Destroy(firstCornerSphere);
-            Destroyer.Destroy(secondCornerSphere);
-            Destroyer.Destroy(thirdCornerSphere);
-            Destroyer.Destroy(forthCornerSphere);
-            Destroyer.Destroy(firstSideSphere);
-            Destroyer.Destroy(secondSideSphere);
-            Destroyer.Destroy(thirdSideSphere);
-            Destroyer.Destroy(forthSideSphere);
-            scalingGizmosAreDrawn = false;
-        }
-
-        /// <summary>
-        /// If <paramref name="gameObject"/> is any of our scaling gizmos,
-        /// this gizmo will be returned; otherwise null
-        /// </summary>
-        /// <param name="gameObject">the hit game object</param>
-        /// <returns><paramref name="gameObject"/> if it is one of our scaling gizmos or null</returns>
-        private GameObject SelectedScalingGizmo(GameObject gameObject)
-        {
-            if (!scalingGizmosAreDrawn)
-            {
-                return null;
-            }
-            else if (gameObject == topSphere
-                     || gameObject == firstCornerSphere
-                     || gameObject == secondCornerSphere
-                     || gameObject == thirdCornerSphere
-                     || gameObject == forthCornerSphere
-                     || gameObject == firstSideSphere
-                     || gameObject == secondSideSphere
-                     || gameObject == thirdSideSphere
-                     || gameObject == forthSideSphere)
-            {
-                return gameObject;
-            }
-            else
-            {
-                return null;
-            }
         }
 
         /// <summary>
