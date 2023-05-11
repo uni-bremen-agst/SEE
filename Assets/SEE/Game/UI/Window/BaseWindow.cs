@@ -188,7 +188,7 @@ namespace SEE.Game.UI.Window
     /// Used for serialization when sending a window over the network.
     /// </summary>
     [Serializable]
-    public abstract class WindowValues
+    public class WindowValues
     {
         /// <summary>
         /// Title of the window.
