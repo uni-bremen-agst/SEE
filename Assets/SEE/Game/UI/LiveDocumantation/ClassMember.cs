@@ -59,6 +59,10 @@ namespace SEE.Game.UI.LiveDocumantation
             Mesh = classMember.transform.Find(CLASS_MEMBER_OBJECT_PATH).gameObject
                 .GetComponent<TextMeshProUGUI>();
             Mesh.text = MethodsBuffer.PrintBuffer();
+            if (MethodsBuffer is LiveDocumentationClassMemberBuffer classMemberBuffer)
+            {
+                Mesh.text = Mesh.text +"\n" +classMemberBuffer.Documentation.PrintBuffer();
+            }
 
             TextRectTransform = classMember.transform.Find(ScrollViewPath).gameObject
                 .GetComponent<RectTransform>();

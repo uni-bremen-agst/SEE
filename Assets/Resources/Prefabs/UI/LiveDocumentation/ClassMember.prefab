@@ -544,7 +544,7 @@ MonoBehaviour:
   m_fontSizeMax: 72
   m_fontStyle: 0
   m_HorizontalAlignment: 1
-  m_VerticalAlignment: 512
+  m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -749,7 +749,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 4067257591838390667}
   m_Direction: 0
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9655857
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

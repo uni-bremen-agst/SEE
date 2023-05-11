@@ -175,9 +175,10 @@ namespace SEE.Game.UI.LiveDocumantation
             // This will set the 
             rt.anchorMin = new Vector2(0, 1);
             rt.anchorMax = new Vector2(0, 1);
+            rt.sizeDelta = new Vector2(0, 200);
+
             if (DocumentationWindowType == LiveDocumentationWindowType.METHOD)
             {
-                rt.sizeDelta = new Vector2(0, 250);
             }
 
             cm.OnLinkClicked += OnLinkClicked;
