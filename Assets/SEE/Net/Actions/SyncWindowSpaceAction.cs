@@ -1,16 +1,20 @@
-﻿using SEE.Controls;
+﻿using System;
+using SEE.Controls;
 using SEE.Game.UI.Window;
+using UnityEngine;
 
 namespace SEE.Net.Actions
 {
     /// <summary>
     /// Synchronizes the window spaces across all clients.
     /// </summary>
+    [Serializable]
     public class SyncWindowSpaceAction: AbstractNetAction
     {
         /// <summary>
         /// The value object of the window space which shall be transmitted over the network.
         /// </summary>
+        [field: SerializeField]
         private WindowSpace.WindowSpaceValues Space;
 
         /// <summary>
