@@ -26,8 +26,7 @@ namespace SEE.Controls.Actions
         internal static ReversibleAction CreateReversibleAction() => new MoveAction();
 
         /// <summary>
-        /// Returns a new instance of <see cref="MoveAction"/> that can continue
-        /// with the user interaction so far.
+        /// Returns a new instance of <see cref="MoveAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
         public override ReversibleAction NewInstance() => new MoveAction();
