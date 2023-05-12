@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="CodeFacts" edgeids="true">
+    <!-- A -->
+	<node id="N1">
+      <type xlink:href="Class"/>
+      <!-- <attr name="Metric.LOC"> -->
+        <!-- <int>1</int> -->
+      <!-- </attr> -->
+	  <!-- <attr name="Metric.McCabeComplexity"> -->
+        <!-- <int>1</int> -->
+      <!-- </attr> -->
+      <attr name="Source.Name">
+        <string>A</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>A</string>
+      </attr>
+    </node>
+	<!-- B -->
+    <node id="N2">
+      <type xlink:href="Class"/>
+      <!-- <attr name="Metric.LOC"> -->
+        <!-- <int>1</int> -->
+      <!-- </attr> -->
+	  <!-- <attr name="Metric.McCabeComplexity"> -->
+        <!-- <int>1</int> -->
+      <!-- </attr> -->
+      <attr name="Source.Name">
+        <string>B</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>B</string>
+      </attr>
+    </node>
+	<!-- C -->
+    <node id="N3">
+      <type xlink:href="Class"/>
+      <!-- <attr name="Metric.LOC"> -->
+        <!-- <int>1</int> -->
+      <!-- </attr> -->
+	  <!-- <attr name="Metric.McCabeComplexity"> -->
+        <!-- <int>1</int> -->
+      <!-- </attr>	   -->
+      <attr name="Source.Name">
+        <string>C</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>C</string>
+      </attr>
+    </node>
+	<!-- D -->
+    <node id="N4">
+      <type xlink:href="Class"/>
+      <!-- <attr name="Metric.LOC"> -->
+        <!-- <int>1</int> -->
+      <!-- </attr> -->
+	  <!-- <attr name="Metric.McCabeComplexity"> -->
+        <!-- <int>1</int> -->
+      <!-- </attr>	   -->
+      <attr name="Source.Name">
+        <string>D</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>D</string>
+      </attr>
+    </node>
+	<!-- E -->
+	<node id="N7">
+      <type xlink:href="Class"/>
+      <!-- <attr name="Metric.LOC"> -->
+        <!-- <int>1</int> -->
+      <!-- </attr> -->
+	  <!-- <attr name="Metric.McCabeComplexity"> -->
+        <!-- <int>1</int> -->
+      <!-- </attr>	   -->
+      <attr name="Source.Name">
+        <string>E</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>E</string>
+      </attr>
+    </node>
+	<!-- F -->
+	<node id="N8">
+      <type xlink:href="Class"/>
+      <!-- <attr name="Metric.LOC"> -->
+        <!-- <int>1</int> -->
+      <!-- </attr> -->
+	  <!-- <attr name="Metric.McCabeComplexity"> -->
+        <!-- <int>1</int> -->
+      <!-- </attr>	   -->
+      <attr name="Source.Name">
+        <string>F</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>F</string>
+      </attr>
+    </node>
+	<!-- G -->
+	<node id="N9">
+      <type xlink:href="Class"/>
+      <!-- <attr name="Metric.LOC"> -->
+        <!-- <int>1</int> -->
+      <!-- </attr> -->
+	  <!-- <attr name="Metric.McCabeComplexity"> -->
+        <!-- <int>1</int> -->
+      <!-- </attr>	   -->
+      <attr name="Source.Name">
+        <string>G</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>G</string>
+      </attr>
+    </node>
+    <node id="N6">
+      <type xlink:href="Package"/>
+      <attr name="Source.Name">
+        <string>implementation</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>implementation</string>
+      </attr>
+    </node>
+	<!-- D to A -->
+    <edge id="E2" from="N4" to="N1">
+      <type xlink:href="Call"/>
+    </edge>
+	<!-- D to B -->
+    <edge id="E2" from="N4" to="N2">
+      <type xlink:href="Call"/>
+    </edge>
+	<!-- D to B -->
+    <edge id="E2" from="N4" to="N3">
+      <type xlink:href="Call"/>
+    </edge>
+	<!-- E to D -->
+    <edge id="E3" from="N7" to="N4">
+      <type xlink:href="Call"/>
+    </edge>
+	<!-- F to E -->
+	<edge id="E4" from="N8" to="N7">
+      <type xlink:href="Call"/>
+    </edge>
+    <!-- F to C -->
+	<edge id="E4" from="N8" to="N3">
+      <type xlink:href="Call"/>
+    </edge>
+	<!-- G to F -->
+	<edge id="E4" from="N9" to="N8">
+      <type xlink:href="Call"/>
+    </edge>
+    <!-- package relations -->
+    <edge id="E5" from="N1" to="N6">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E6" from="N2" to="N6">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E7" from="N3" to="N6">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E8" from="N4" to="N6">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E9" from="N7" to="N6">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+	<edge id="E9" from="N8" to="N6">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E9" from="N9" to="N6">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+  </graph>
+</gxl>

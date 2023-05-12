@@ -331,12 +331,12 @@ namespace SEE.Tools.ReflexionAnalysis
                 Unmap(subtree, oldTarget);
             }
 
-            // FIXME: If below operation fails, we are in an inconsistent state.
-            AddToMappingGraph(from, to);
             // adjust explicit mapping
             explicitMapsToTable[from.ID] = to;
             // adjust implicit mapping
             ChangeMap(subtree, to);
+            // FIXME: If below operation fails, we are in an inconsistent state.
+            AddToMappingGraph(from, to);
             Map(subtree, to);
             return from.FromTo(MapsTo(from), MapsToType).Single();
         }

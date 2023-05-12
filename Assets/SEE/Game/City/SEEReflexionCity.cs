@@ -8,6 +8,7 @@ using SEE.Utils;
 using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using Assets.SEE.Tools.ReflexionAnalysis;
 
 namespace SEE.Game.City
 {
@@ -134,6 +135,16 @@ namespace SEE.Game.City
                 LoadedGraph = reflexionGraph;
                 Debug.Log($"Loaded graph {LoadedGraph.Name}.\n");
                 Visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
+                
+                // TODO: right place to register?
+                CandidateRecommendation candidateRecommendation = gameObject.AddOrGetComponent<CandidateRecommendation>();
+                if (candidateRecommendation != null)
+                {
+                    LoadedGraph.Subscribe(candidateRecommendation);
+                    Debug.Log("Registered CandidateRecommendation.");
+                    candidateRecommendation.ReflexionGraph = reflexionGraph;
+                }
+
                 Visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
                 Debug.Log("Initialized Reflexion Analysis.\n");
             }

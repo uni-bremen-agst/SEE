@@ -47,7 +47,8 @@
         "NetworkCommsDotNetComplete.dll",
         "Valve.Newtonsoft.Json.dll",
         "DOTween.dll",
-        "Joveler.Compression.XZ.dll"
+        "Joveler.Compression.XZ.dll",
+		"Accord.Text.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
