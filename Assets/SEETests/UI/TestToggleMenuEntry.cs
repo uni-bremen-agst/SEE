@@ -35,21 +35,23 @@ namespace SEETests.UI
         public void TestExitAction()
         {
             List<bool> testItems = new List<bool>();
+            SelectionMenu selectionMenu = new();
             void ExitAction() => testItems.Add(true);
             ToggleMenuEntry entry = new ToggleMenuEntry(() => {}, ExitAction, "Test");
-            // Assert.IsTrue(entry.Active, "ToggleMenuEntry.Active isn't set correctly!");
+            selectionMenu.AddEntry(entry);
+            Assert.AreNotEqual(entry, selectionMenu.ActiveEntry, "SelectionMenu.ActiveEntry isn't set correctly!");
             Assert.AreEqual(0, testItems.Count, "Entry/ExitAction may not be called during initialization!");
-            // entry.Active = true;
-            // Assert.IsTrue(entry.Active, "ToggleMenuEntry.Active isn't set correctly!");
+            selectionMenu.ActiveEntry = entry;
+            Assert.AreEqual(entry, selectionMenu.ActiveEntry, "SelectionMenu.ActiveEntry isn't set correctly.");
             Assert.AreEqual(0, testItems.Count, "ExitAction isn't called correctly!");
-            // entry.Active = false;
-            // Assert.IsFalse(entry.Active, "ToggleMenuEntry.Active isn't set correctly!");
+            selectionMenu.ActiveEntry = null;
+            Assert.AreNotEqual(entry, selectionMenu.ActiveEntry, "SelectionMenu.ActiveEntry isn't set correctly!");
             Assert.AreEqual(1, testItems.Count, "ExitAction isn't called correctly!");
-            // entry.Active = true;
-            // Assert.IsTrue(entry.Active, "ToggleMenuEntry.Active isn't set correctly!");
+            selectionMenu.ActiveEntry = entry;
+            Assert.AreEqual(entry, selectionMenu.ActiveEntry, "SelectionMenu.ActiveEntry isn't set correctly!");
             Assert.AreEqual(1, testItems.Count, "ExitAction isn't called correctly!");
-            // entry.Active = false;
-            // Assert.IsFalse(entry.Active, "ToggleMenuEntry.Active isn't set correctly!");
+            selectionMenu.ActiveEntry = null;
+            Assert.AreNotEqual(entry, selectionMenu.ActiveEntry, "SelectionMenu.ActiveEntry isn't set correctly!");
             Assert.AreEqual(2, testItems.Count, "ExitAction isn't called correctly!");
         }
     }
