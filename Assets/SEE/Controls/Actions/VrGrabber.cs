@@ -48,7 +48,20 @@ namespace SEE.Controls.Actions
         /// </summary>
         private const int GrabbableLayer = 29;
 
-        private bool IsColliding = false;
+        /// <summary>
+        /// Indicates whether a collision has occurred.
+        /// </summary>
+        private bool HasCollided = false;
+        
+        /// <summary>
+        /// The initial position of the object. 
+        /// </summary>
+        private Vector3 InitialPosition;
+        
+        /// <summary>
+        /// The initial rotation of the object.
+        /// </summary>
+        private Quaternion InitialRotation;
 
         /// <summary>
         /// Adds listeners to the grabbable component for onGrab and onRelease. Also for the distance grabbable
@@ -77,6 +90,10 @@ namespace SEE.Controls.Actions
         /// <param name="grabbable">Grabbable Component.</param>
         private void OnGrab(Hand hand, Grabbable grabbable)
         {
+            //Set the initial position to handle the case when the object is released without being re-parented
+            InitialPosition = grabbable.gameObject.transform.position;
+            InitialRotation = grabbable.gameObject.transform.rotation;
+            
             if (gameObject.TryGetNode(out Node node) && !node.IsRoot())
             {
                 // Set layer of all children to ignore collision with the grabbed parent object (include inactive gameobjects).
@@ -130,6 +147,13 @@ namespace SEE.Controls.Actions
 
                 // Set layer back to normal (Grabbable layer).
                 GameObjectExtensions.SetAllChildLayer(grabbable.gameObject.transform, GrabbableLayer, true);
+                
+                // Reset the position and rotation of the grabbed object to its initial position
+                if (HasCollided == false)
+                {
+                    grabbable.gameObject.transform.position = InitialPosition;
+                    grabbable.gameObject.transform.rotation = InitialRotation;
+                }
             }
         }
 
@@ -139,7 +163,7 @@ namespace SEE.Controls.Actions
         /// <param name="collisionInfo"></param>
         private void OnCollisionEnter(Collision collisionInfo)
         {
-            //IsColliding = true;
+            HasCollided = true;
             if (collisionInfo.gameObject.TryGetNode(out Node node) && IsGrabbed && !node.IsRoot() && GrabbedObject == gameObject)
             {
                 if (GrabbedObject.transform.parent.gameObject != collisionInfo.gameObject)
@@ -156,7 +180,7 @@ namespace SEE.Controls.Actions
         /// <param name="collisionInfo"></param>
         private void OnCollisionExit(Collision collisionInfo)
         {
-            //IsColliding = false;
+            
             if (collisionInfo.gameObject.TryGetNode(out Node node) && IsGrabbed && !node.IsRoot() &&
                     gameObject == GrabbedObject)
                 {
@@ -165,8 +189,8 @@ namespace SEE.Controls.Actions
                         Debug.LogWarning("UnReparenting - exit collision with node: " + collisionInfo.gameObject.name);
                         MoveAction.UnReparentVR();
                     }
-                }
-
+                } 
+            HasCollided = false;
         }
 
         /// <summary>
