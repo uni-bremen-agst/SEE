@@ -1,8 +1,5 @@
 ﻿using SEE.Controls.Actions;
 using SEE.Utils;
-#if INCLUDE_STEAM_VR
-using Valve.VR.InteractionSystem;
-#endif
 
 namespace SEE.Game.UI.StateIndicator
 {
