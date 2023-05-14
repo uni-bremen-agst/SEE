@@ -290,6 +290,10 @@ namespace SEE.Game.UI.LiveDocumantation
             // Try setting the actual documentation
             // If the class has no documentation 
             ClassDocumentation.text = DocumentationBuffer?.PrintBuffer() ?? "NO DOCS AVAILABLE";
+            if (ClassDocumentation.text == "")
+            {
+                ClassDocumentation.text = "NO DOCS AVAILABLE";
+            }
             //     GameObject livedoc =
             //         PrefabInstantiator.InstantiatePrefab("Prefabs/UI/LiveDocumentation/ClassMember", ClassMembers.transform, false);
 

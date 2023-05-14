@@ -11,15 +11,15 @@ namespace mini.Calculator
         /// </summary>
         /// <param name="num1">The first operand</param>
         /// <param name="num2">The seconds operand</param>
-        /// <param name="operator">The operand of the calculation</param>
+        /// <param name="calculationOperator">The operand of the calculation</param>
         /// <returns>The result of the operation, which is also an <see cref="Double"/></returns>
         /// <exception cref="Exception">If the operator in unknown or the <paramref name="num1"/> or <paramref name="num2"/> cant be parsed.</exception>
-        public Double Calculate(string num1, string num2, string @operator)
+        public Double Calculate(string num1, string num2, string calculationOperator)
         {
             Operator op;
             try
             {
-                switch (@operator)
+                switch (calculationOperator)
                 {
                     case "+":
                         op = new Plus(Double.Parse(num1), Double.Parse(num2));
