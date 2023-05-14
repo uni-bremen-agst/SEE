@@ -6,6 +6,7 @@ using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions.AttractFunction;
@@ -25,7 +26,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         [SerializeField]
         private AttractFunctionType attractFunctionType;
-    
+
+        private static float BLINK_EFFECT_DELAY = 0.1f;
+
         public AttractFunctionType AttractFunctionType
         {
             get
@@ -54,6 +57,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// 
         /// /summary>
         public bool useCDA;
+        
+        private Coroutine blinkEffectCoroutine;
 
         public ReflexionGraph ReflexionGraph
         {
@@ -123,10 +128,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     } 
                 }
 
+                List<NodeOperator> nodeOperators = new List<NodeOperator>();
                 foreach (Node cluster in mostAttractedNodes.Keys)
                 {
                     NodeOperator nodeOperator;
-                    List<NodeOperator> nodeOperators = new List<NodeOperator>();
 
                     nodeOperator = cluster.GameObject().AddOrGetComponent<NodeOperator>();
                     nodeOperators.Add(nodeOperator);
@@ -136,9 +141,20 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                         nodeOperators.Add(entity.GameObject().AddOrGetComponent<NodeOperator>());
                     }
 
-                    nodeOperators.ForEach((n) => n.Blink(10, 2));
                 }
+                if(blinkEffectCoroutine != null) StopCoroutine(blinkEffectCoroutine);
+                // TODO: Distinction between different hypothesized entities is required
+                blinkEffectCoroutine = StartCoroutine(StartBlinkEffect(nodeOperators));
             }
+        }
+
+        private IEnumerator StartBlinkEffect(List<NodeOperator> nodeOperators)
+        {
+            // Wait for the delay duration
+            yield return new WaitForSeconds(BLINK_EFFECT_DELAY);
+
+            // Start blink effect
+            nodeOperators.ForEach((n) => n.Blink(10, 2));
         }
     }
 }
