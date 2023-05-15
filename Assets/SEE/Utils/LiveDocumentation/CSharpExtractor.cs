@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Antlr4.Runtime;
-using Antlr4.Runtime.Tree;
 using JetBrains.Annotations;
 using SEE.Game.UI.LiveDocumantation;
 
@@ -198,33 +197,48 @@ namespace SEE.Utils.LiveDocumentation
         }
 
         private List<LiveDocumentationBuffer> ProcessParamaters(
-            CSharpParser.Formal_parameter_listContext parameterListContext, CSharpCommentsGrammarParser parser)
+            [CanBeNull] CSharpParser.Formal_parameter_listContext parameterListContext,
+            CSharpCommentsGrammarParser parser)
         {
             List<LiveDocumentationBuffer> bufferList = new List<LiveDocumentationBuffer>();
 
-            foreach (var parameter in parameterListContext.fixed_parameters().fixed_parameter())
-            {
-                parser.Reset();
-                LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
-                var parameterName = parameter.arg_declaration().identifier().GetText();
-                buffer.Add(new LiveDocumentationBufferText(parameterName + " : "));
-                var parameterType = parameter.arg_declaration().type_().GetText();
-                buffer.Add(new LiveDocumentationLink(parameterType, parameterType));
-                var matchingParamDoc =  parser.docs().parameters()
-                    .parameter().First(x => x.paramName.Text == parameterName);
-                
-                if (matchingParamDoc != null)
+            if (parameterListContext != null)
+                foreach (var parameter in parameterListContext.fixed_parameters().fixed_parameter())
                 {
-                    ProcessTagContent(buffer, matchingParamDoc.parameterDescription);
+                    parser.Reset();
+                    LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
+                    var parameterName = parameter.arg_declaration().identifier().GetText();
+                    buffer.Add(new LiveDocumentationBufferText(parameterName + " : "));
+                    var parameterType = parameter.arg_declaration().type_().GetText();
+                    buffer.Add(new LiveDocumentationLink(parameterType, parameterType));
+                    var matchingParamDoc = parser.docs().parameters()
+                        .parameter().FirstOrDefault(x => x.paramName.Text == parameterName);
+
+                    if (matchingParamDoc != null)
+                    {
+                        ProcessTagContent(buffer, matchingParamDoc.parameterDescription);
+                    }
+
+                    //buffer.Add(new LiveDocumentationBufferText(parser.docs().parameters()
+                    //   .parameter().First(x => x.paramName.Text == parameterName).parameterDescription.GetText()));
+                    bufferList.Add(buffer);
                 }
-                //buffer.Add(new LiveDocumentationBufferText(parser.docs().parameters()
-                 //   .parameter().First(x => x.paramName.Text == parameterName).parameterDescription.GetText()));
-                bufferList.Add(buffer);
-            }
 
             return bufferList;
         }
 
+        private (CSharpCommentsGrammarParser, CommonTokenStream) CreateParserForMethod(int methodUpperLineBound, int methodLowerLineBound)
+        {
+            var commentTokens = String.Join(Environment.NewLine, _commentTokens.GetTokens()
+                .Where(x => x.Type == 2 && x.Line < methodLowerLineBound && x.Line > methodUpperLineBound)
+                .Select(x => x.Text).ToList());
+
+            var lexer = new CSharpCommentsGrammarLexer(new AntlrInputStream(commentTokens));
+            var tokens = new CommonTokenStream(lexer);
+            tokens.Fill();
+            return  (new CSharpCommentsGrammarParser(tokens), tokens);
+        }
+        
         public List<LiveDocumentationClassMemberBuffer> ExtractMethods(string fileName, string className)
         {
             List<LiveDocumentationClassMemberBuffer> buffers = new();
@@ -243,36 +257,20 @@ namespace SEE.Utils.LiveDocumentation
                 methodBuffer.LineNumber = i.common_member_declaration().Start.Line;
                 // Concatenate the Method signature together.
                 // Starting by the modifiers of the method
-                var signature = i.all_member_modifiers().GetText() + " ";
+                var signature = i.all_member_modifiers().all_member_modifier()
+                    .Aggregate("", (test, modi) => test + modi.GetText() + " ");
                 // If the current class member is a method
 
                 // If the class member is a method
                 if (i.common_member_declaration().method_declaration() is { } methodDeclarationContext)
                 {
-                    var commentTokens = String.Join(Environment.NewLine, _commentTokens.GetTokens()
-                        .Where(x => x.Type == 2 && x.Line < i.Start.Line && x.Line > methodUpperLineBound)
-                        .Select(x => x.Text).ToList());
-
-                    var lexer = new CSharpCommentsGrammarLexer(new AntlrInputStream(commentTokens));
-                    var tokens = new CommonTokenStream(lexer);
-                    tokens.Fill();
-                    var parser = new CSharpCommentsGrammarParser(tokens);
+                    var (parser, tokens) = CreateParserForMethod(methodUpperLineBound, i.Start.Line);
                     LiveDocumentationBuffer methodDoc = new LiveDocumentationBuffer();
                     if (tokens.GetTokens().Count > 1)
                     {
                         ProcessSummary(methodDoc, parser.docs().summary());
                         methodBuffer.Documentation = methodDoc;
                         parser.Reset();
-                        List<LiveDocumentationBuffer> methodsDocumentation =
-                            new List<LiveDocumentationBuffer>();
-                        foreach (var methodParameter in parser.docs().parameters().parameter())
-                        {
-                            LiveDocumentationBuffer methodParameterBuffer = new LiveDocumentationBuffer();
-
-                            methodParameterBuffer.Add(
-                                new LiveDocumentationBufferText(methodParameter.paramName.Text + " "));
-                            ProcessTagContent(methodParameterBuffer, methodParameter.parameterDescription);
-                        }
                     }
 
                     methodBuffer.Parameters =
@@ -291,31 +289,15 @@ namespace SEE.Utils.LiveDocumentation
                 else if (i.common_member_declaration().constructor_declaration() is
                          { } constructorDeclarationContext)
                 {
-                    var commentTokens = String.Join(Environment.NewLine, _commentTokens.GetTokens()
-                        .Where(x => x.Type == 2 && x.Line < i.Start.Line && x.Line > methodUpperLineBound)
-                        .Select(x => x.Text).ToList());
-
-                    var lexer = new CSharpCommentsGrammarLexer(new AntlrInputStream(commentTokens));
-                    var tokens = new CommonTokenStream(lexer);
-                    tokens.Fill();
-                    var parser = new CSharpCommentsGrammarParser(tokens);
+                    var (parser, tokens) = CreateParserForMethod(methodUpperLineBound, i.Start.Line);
                     LiveDocumentationBuffer methodDoc = new LiveDocumentationBuffer();
                     if (tokens.GetTokens().Count > 1)
                     {
                         ProcessSummary(methodDoc, parser.docs().summary());
                         methodBuffer.Documentation = methodDoc;
                         parser.Reset();
-                        List<LiveDocumentationBuffer> methodsDocumentation =
-                            new List<LiveDocumentationBuffer>();
-                        foreach (var methodParameter in parser.docs().parameters().parameter())
-                        {
-                            LiveDocumentationBuffer methodParameterBuffer = new LiveDocumentationBuffer();
-
-                            methodParameterBuffer.Add(
-                                new LiveDocumentationBufferText(methodParameter.paramName.Text + " "));
-                            ProcessTagContent(methodParameterBuffer, methodParameter.parameterDescription);
-                        }
                     }
+
                     parser.Reset();
                     methodBuffer.Parameters =
                         ProcessParamaters(constructorDeclarationContext.formal_parameter_list(), parser);
@@ -325,41 +307,36 @@ namespace SEE.Utils.LiveDocumentation
 
                     ProcessMethodParameters(methodBuffer,
                         i.common_member_declaration().constructor_declaration().formal_parameter_list());
-                } else if (i.common_member_declaration().typed_member_declaration() is
-                           { } typedMemberDeclaration)
+                }
+                else if (i.common_member_declaration().typed_member_declaration() is
+                         { } typedMemberDeclaration)
                 {
-                                      var commentTokens = String.Join(Environment.NewLine, _commentTokens.GetTokens()
-                        .Where(x => x.Type == 2 && x.Line < i.Start.Line && x.Line > methodUpperLineBound)
-                        .Select(x => x.Text).ToList());
+                    // Skip C# Properties for now
+                    // TODO Maybe implement them later
+                    if (typedMemberDeclaration.method_declaration() == null)
+                    {
+                        continue;
+                    }
 
-                    var lexer = new CSharpCommentsGrammarLexer(new AntlrInputStream(commentTokens));
-                    var tokens = new CommonTokenStream(lexer);
-                    tokens.Fill();
-                    var parser = new CSharpCommentsGrammarParser(tokens);
+                    var (parser, tokens) = CreateParserForMethod(methodUpperLineBound, i.Start.Line);
                     LiveDocumentationBuffer methodDoc = new LiveDocumentationBuffer();
                     if (tokens.GetTokens().Count > 1)
                     {
                         ProcessSummary(methodDoc, parser.docs().summary());
                         methodBuffer.Documentation = methodDoc;
                         parser.Reset();
-                        List<LiveDocumentationBuffer> methodsDocumentation =
-                            new List<LiveDocumentationBuffer>();
-                        foreach (var methodParameter in parser.docs().parameters().parameter())
-                        {
-                            LiveDocumentationBuffer methodParameterBuffer = new LiveDocumentationBuffer();
-
-                            methodParameterBuffer.Add(
-                                new LiveDocumentationBufferText(methodParameter.paramName.Text + " "));
-                            ProcessTagContent(methodParameterBuffer, methodParameter.parameterDescription);
-                        }
                     }
+
                     parser.Reset();
                     methodBuffer.Parameters =
                         ProcessParamaters(typedMemberDeclaration.method_declaration().formal_parameter_list(), parser);
                     var methodType = typedMemberDeclaration.type_().GetText();
-                    methodBuffer.Add(new LiveDocumentationLink(methodType, methodType));
-                    signature += typedMemberDeclaration.method_declaration().method_member_name().GetText();
                     methodBuffer.Add(new LiveDocumentationBufferText(signature));
+                    methodBuffer.Add(new LiveDocumentationLink(methodType, methodType));
+                    methodBuffer.Add(new LiveDocumentationBufferText(" "));
+                    methodBuffer.Add(new LiveDocumentationBufferText(typedMemberDeclaration.method_declaration()
+                        .method_member_name().GetText()));
+
 
                     ProcessMethodParameters(methodBuffer,
                         typedMemberDeclaration.method_declaration().formal_parameter_list());

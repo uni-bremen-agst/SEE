@@ -96,7 +96,7 @@ namespace SEE.Controls.Actions
 
                     documentationWindow = selectedNode.gameObject.AddComponent<LiveDocumentationWindow>();
 
-                    documentationWindow.Title = selectedNode.Value.SourceName;
+                    documentationWindow.Title = "Doc: " + selectedNode.Value.SourceName;
 
                     if (!documentationWindow.Title.Replace(".", "").Equals(selectedFile.Split('.').Reverse().Skip(1)
                             .Aggregate("", (acc, s) => s + acc)))
@@ -110,9 +110,8 @@ namespace SEE.Controls.Actions
                     documentationWindow.Graph = selectedNode.Value.ItsGraph;
                     documentationWindow.NodeOfClass = selectedNode.Value;
 
-                    LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
                     FileParser parser = new FileParser(selectedNode.Value.AbsolutePlatformPath());
-                    buffer = parser.ParseClassDoc(selectedNode.Value.AbsolutePlatformPath(),
+                    LiveDocumentationBuffer buffer = parser.ParseClassDoc(selectedNode.Value.AbsolutePlatformPath(),
                         selectedNode.Value.SourceName);
 
 
