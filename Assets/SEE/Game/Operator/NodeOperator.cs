@@ -77,6 +77,19 @@ namespace SEE.Game.Operator
         private TweenOperation<Vector3> Scale;
 
         /// <summary>
+        /// The "actual" color of the material. We need this because the material's color
+        /// is being changed by the <see cref="Blinking"/> operation.
+        /// </summary>
+        /// <remarks>
+        /// This is not the optimal way to handle this.
+        /// For example, the color may change in-between or during blinking, which will then be ignored.
+        /// To fix this properly, all places where a node's color is changed must be investigated
+        /// and a Color operation needs to be implemented, as in the EdgeOperator.
+        /// We can then refer to 'Color.TargetValue' and remove this field.
+        /// </remarks>
+        private Color materialColor;
+
+        /// <summary>
         /// The node to which this node operator belongs.
         /// </summary>
         public Node Node
@@ -376,6 +389,7 @@ namespace SEE.Game.Operator
             Node = GetNode(gameObject);
             City = GetCity(gameObject);
             Material material = GetRenderer(gameObject).material;
+            materialColor = material.color;
             Vector3 currentPosition = transform.position;
             Vector3 currentScale = transform.localScale;
             Quaternion currentRotation = transform.rotation;
@@ -400,10 +414,13 @@ namespace SEE.Game.Operator
 
             Tween[] BlinkAction(int count, float duration)
             {
-                Sequence sequence = DOTween.Sequence();
-                sequence.Append(material.DOColor(material.color.Invert(), duration / (2 * count)));
-                sequence.Append(material.DOColor(material.color, duration / (2 * count)));
-                return new Tween[] { sequence.SetLoops(count).Play() };
+                // If we're interrupting another blinking, we need to make sure we start from the correct color.
+                material.color = materialColor;
+
+                return new Tween[]
+                {
+                    material.DOColor(materialColor.Invert(), duration / (2 * count)).SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play(),
+                };
             }
 
             Blinking = new TweenOperation<int>(BlinkAction, 0, equalityComparer: new AlwaysFalseEqualityComparer<int>());
