@@ -68,6 +68,11 @@ namespace SEE.Game.Operator
             /// The target value that we're animating towards.
             /// </summary>
             public V TargetValue { get; private set; }
+            
+            /// <summary>
+            /// Whether the operation is currently running.
+            /// </summary>
+            public abstract bool IsRunning { get; }
 
             /// <summary>
             /// Instantiates a new operation.
@@ -150,6 +155,8 @@ namespace SEE.Game.Operator
         /// <typeparam name="V">The type of the target value</typeparam>
         protected class TweenOperation<V> : Operation<IList<Tween>, V, Action>
         {
+            public override bool IsRunning => Animator?.Any(x => x.IsActive()) ?? false;
+
             public override void KillAnimator(bool complete = false)
             {
                 if (Animator != null)
