@@ -18,6 +18,8 @@ namespace SEE.Game.Operator
         /// </summary>
         protected class MorphismOperation : Operation<SplineMorphism, (BSpline targetSpline, GameObject temporaryGameObject), TweenCallback>
         {
+            public override bool IsRunning => Animator != null && Animator.IsActive();
+
             public override void KillAnimator(bool complete = false)
             {
                 if (Animator != null && Animator.IsActive())

@@ -25,6 +25,21 @@ namespace SEE.Game.City
     [Serializable]
     public abstract partial class AbstractSEECity : SerializedMonoBehaviour
     {
+        protected virtual void Awake()
+        {
+            // Intentionally left blank
+        }
+
+        protected virtual void Start()
+        {
+            // Intentionally left blank
+        }
+
+        protected virtual void Update()
+        {
+            // Intentionally left blank
+        }
+
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
         /// <see cref="AbstractSEECity.Save"/> and
@@ -575,6 +590,35 @@ namespace SEE.Game.City
         private void ListNodeMetrics()
         {
             DumpNodeMetrics();
+        }
+
+        /// <summary>
+        /// Returns true if the user is currently hovering over the plane (area) of the code
+        /// city represented by <paramref name="gameObject"/>.
+        ///
+        /// Precondition: <paramref name="gameObject"/> has a <see cref="GO.Plane"/> attached
+        /// to it.
+        /// </summary>
+        /// <returns>true if user is hovering over the code city represented by <paramref name="gameObject"/></returns>
+        public static bool UserIsHoveringCity(GameObject gameObject)
+        {
+            if (!gameObject.TryGetComponent(out GO.Plane clippingPlane) || clippingPlane == null)
+            {
+                Debug.LogError($"Code city {gameObject.FullName()} has no {typeof(GO.Plane)}.\n");
+                return false;
+            }
+
+            Raycasting.RaycastClippingPlane(clippingPlane, out _, out bool hitInsideClippingArea, out Vector3 _);
+            return hitInsideClippingArea;
+        }
+
+        /// <summary>
+        /// Returns true if the user is currently hovering over the plane (area) of this city.
+        /// </summary>
+        /// <returns>true if user is hovering over this city</returns>
+        public bool UserIsHoveringCity()
+        {
+            return UserIsHoveringCity(gameObject);
         }
 
         /// <summary>

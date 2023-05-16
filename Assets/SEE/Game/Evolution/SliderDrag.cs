@@ -46,7 +46,7 @@ namespace SEE.Game.Evolution
         private bool isDragging = false;
 
         /// <summary>
-        /// True if drag is finished but evolutionRenderer is still animating 
+        /// True if drag is finished but evolutionRenderer is still animating
         /// </summary>
         private bool awaitFinish;
 
@@ -83,7 +83,7 @@ namespace SEE.Game.Evolution
                     FinishDrag();
                 }
                 Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
-                Vector3 textPos = new Vector3(handlePos.x, handlePos.y + 0.05f, handlePos.z);
+                Vector3 textPos = new(handlePos.x, handlePos.y + 0.05f, handlePos.z);
                 HoverText.text = (animationDataModel.Slider.value + 1f).ToString() + "/" + (animationDataModel.Slider.maxValue + 1f);
                 HoverText.rectTransform.position = textPos;
             }
