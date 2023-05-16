@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Antlr4.Runtime;
 using JetBrains.Annotations;
+using SEE.Game.City.LiveDocumentation;
 using SEE.Game.UI.LiveDocumantation;
 
 namespace SEE.Utils.LiveDocumentation
@@ -13,9 +14,21 @@ namespace SEE.Utils.LiveDocumentation
         private CommonTokenStream _tokens;
         private CommonTokenStream _commentTokens;
         private CSharpParser _parser;
+        private string _filePath;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <exception cref="FileNotFoundException">When the source code file doesn't exist.</exception>
         public CSharpExtractor(string fileName)
         {
+            _filePath = fileName;
+            if (!File.Exists(fileName))
+            {
+                throw new FileNotFoundException($"The file {fileName} doesn't exist");
+            }
+
             var input = File.ReadAllText(fileName);
             var lexer = new CSharpFullLexer(new AntlrInputStream(input));
             _tokens = new CommonTokenStream(lexer);
@@ -41,6 +54,10 @@ namespace SEE.Utils.LiveDocumentation
         [CanBeNull]
         private (CSharpParser.Type_declarationContext, int) GetClassByName(string className)
         {
+            //   var classNamePath = className.Split(".");
+            //   var classNameWithoutNS = classNamePath.LastOrDefault();
+            //  var enumerable = classNamePath.Take(classNamePath.Length - 1).ToList();
+            // var strings = classNamePath[..^1];
             _parser.Reset();
             var namespaces = _parser
                 .compilation_unit()
@@ -85,8 +102,9 @@ namespace SEE.Utils.LiveDocumentation
         /// </summary>
         /// <param name="fileName"></param>
         /// <param name="className"></param>
+        /// <exception cref="ClassNotFoundException">Is thrown, when the class cant be found</exception>
         /// <returns></returns>
-        public LiveDocumentationBuffer ExtractClassComments(string fileName, string className)
+        public LiveDocumentationBuffer ExtractClassComments(string className)
         {
             _parser.Reset();
             LiveDocumentationBuffer buffer = new();
@@ -114,10 +132,13 @@ namespace SEE.Utils.LiveDocumentation
                     ProcessSummary(buffer, parser.docs().summary());
                     // Parse C# Doc line by line and write it in the Buffer
                 }
+
+                return buffer;
             }
 
-            return buffer;
+            throw new ClassNotFoundException(className, _filePath);
         }
+
 
         private void ProcessMethodParameters(LiveDocumentationBuffer bufff,
             [CanBeNull] CSharpParser.Formal_parameter_listContext parameterList)
@@ -196,7 +217,7 @@ namespace SEE.Utils.LiveDocumentation
             }
         }
 
-        private List<LiveDocumentationBuffer> ProcessParamaters(
+        private List<LiveDocumentationBuffer> ProcessParamatersDocumentation(
             [CanBeNull] CSharpParser.Formal_parameter_listContext parameterListContext,
             CSharpCommentsGrammarParser parser)
         {
@@ -211,9 +232,9 @@ namespace SEE.Utils.LiveDocumentation
                     buffer.Add(new LiveDocumentationBufferText(parameterName + " : "));
                     var parameterType = parameter.arg_declaration().type_().GetText();
                     buffer.Add(new LiveDocumentationLink(parameterType, parameterType));
-                    var matchingParamDoc = parser.docs().parameters()
-                        .parameter().FirstOrDefault(x => x.paramName.Text == parameterName);
 
+                    var matchingParamDoc = parser.docs().parameters()?.parameter()
+                        .FirstOrDefault(x => x.paramName.Text == parameterName);
                     if (matchingParamDoc != null)
                     {
                         ProcessTagContent(buffer, matchingParamDoc.parameterDescription);
@@ -227,7 +248,8 @@ namespace SEE.Utils.LiveDocumentation
             return bufferList;
         }
 
-        private (CSharpCommentsGrammarParser, CommonTokenStream) CreateParserForMethod(int methodUpperLineBound, int methodLowerLineBound)
+        private (CSharpCommentsGrammarParser, CommonTokenStream) CreateParserForMethod(int methodUpperLineBound,
+            int methodLowerLineBound)
         {
             var commentTokens = String.Join(Environment.NewLine, _commentTokens.GetTokens()
                 .Where(x => x.Type == 2 && x.Line < methodLowerLineBound && x.Line > methodUpperLineBound)
@@ -236,10 +258,10 @@ namespace SEE.Utils.LiveDocumentation
             var lexer = new CSharpCommentsGrammarLexer(new AntlrInputStream(commentTokens));
             var tokens = new CommonTokenStream(lexer);
             tokens.Fill();
-            return  (new CSharpCommentsGrammarParser(tokens), tokens);
+            return (new CSharpCommentsGrammarParser(tokens), tokens);
         }
-        
-        public List<LiveDocumentationClassMemberBuffer> ExtractMethods(string fileName, string className)
+
+        public List<LiveDocumentationClassMemberBuffer> ExtractMethods(string className)
         {
             List<LiveDocumentationClassMemberBuffer> buffers = new();
             _parser.Reset();
@@ -254,6 +276,7 @@ namespace SEE.Utils.LiveDocumentation
             {
                 i.GetText();
                 LiveDocumentationClassMemberBuffer methodBuffer = new LiveDocumentationClassMemberBuffer();
+                methodBuffer.Documentation = new LiveDocumentationBuffer();
                 methodBuffer.LineNumber = i.common_member_declaration().Start.Line;
                 // Concatenate the Method signature together.
                 // Starting by the modifiers of the method
@@ -269,12 +292,13 @@ namespace SEE.Utils.LiveDocumentation
                     if (tokens.GetTokens().Count > 1)
                     {
                         ProcessSummary(methodDoc, parser.docs().summary());
-                        methodBuffer.Documentation = methodDoc;
                         parser.Reset();
                     }
 
+                    methodBuffer.Documentation = methodDoc;
+
                     methodBuffer.Parameters =
-                        ProcessParamaters(methodDeclarationContext.formal_parameter_list(), parser);
+                        ProcessParamatersDocumentation(methodDeclarationContext.formal_parameter_list(), parser);
 
                     // Add the name of the method to the buffer
                     signature +=
@@ -294,13 +318,14 @@ namespace SEE.Utils.LiveDocumentation
                     if (tokens.GetTokens().Count > 1)
                     {
                         ProcessSummary(methodDoc, parser.docs().summary());
-                        methodBuffer.Documentation = methodDoc;
                         parser.Reset();
                     }
 
+                    methodBuffer.Documentation = methodDoc;
+
                     parser.Reset();
                     methodBuffer.Parameters =
-                        ProcessParamaters(constructorDeclarationContext.formal_parameter_list(), parser);
+                        ProcessParamatersDocumentation(constructorDeclarationContext.formal_parameter_list(), parser);
 
                     signature += constructorDeclarationContext.identifier().GetText();
                     methodBuffer.Add(new LiveDocumentationBufferText(signature));
@@ -315,6 +340,7 @@ namespace SEE.Utils.LiveDocumentation
                     // TODO Maybe implement them later
                     if (typedMemberDeclaration.method_declaration() == null)
                     {
+                        methodUpperLineBound = i.Stop.Line;
                         continue;
                     }
 
@@ -323,13 +349,15 @@ namespace SEE.Utils.LiveDocumentation
                     if (tokens.GetTokens().Count > 1)
                     {
                         ProcessSummary(methodDoc, parser.docs().summary());
-                        methodBuffer.Documentation = methodDoc;
                         parser.Reset();
                     }
 
+                    methodBuffer.Documentation = methodDoc;
+
                     parser.Reset();
                     methodBuffer.Parameters =
-                        ProcessParamaters(typedMemberDeclaration.method_declaration().formal_parameter_list(), parser);
+                        ProcessParamatersDocumentation(
+                            typedMemberDeclaration.method_declaration().formal_parameter_list(), parser);
                     var methodType = typedMemberDeclaration.type_().GetText();
                     methodBuffer.Add(new LiveDocumentationBufferText(signature));
                     methodBuffer.Add(new LiveDocumentationLink(methodType, methodType));
@@ -365,16 +393,11 @@ namespace SEE.Utils.LiveDocumentation
         /// </summary>
         /// <param name="fileName">The name of the file in which the using directives should be extracted</param>
         /// <returns>A <see cref="List"/> of imported type names</returns>
-        public List<string> ExtractImportedNamespaces(string fileName)
+        public List<string> ExtractImportedNamespaces()
         {
-            var input = File.ReadAllText(fileName);
-            var lexer = new CSharpFullLexer(new AntlrInputStream(input));
-            var tokens = new CommonTokenStream(lexer);
-            tokens.Fill();
-            var parser = new CSharpParser(tokens);
             List<string> ret = new();
             // If the file doesn't have any using directives an empty list is returned.
-            if (parser.compilation_unit().using_directives() is { } usingDirectivesContext)
+            if (_parser.compilation_unit().using_directives() is { } usingDirectivesContext)
             {
                 foreach (var usingDirective in usingDirectivesContext.using_directive())
                 {

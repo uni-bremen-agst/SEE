@@ -187,54 +187,57 @@ namespace SEE.Game.UI.LiveDocumantation
 
         private void OnClickClassMember(ClassMember cm)
         {
-            var method = NodeOfClass.Children().Where(x => x.Type.Equals("Method"))
-                .Where(x => x.GetInt("Source.Line") == cm.LineNumber).First();
-
-            if (DocumentationWindowType == LiveDocumentationWindowType.CLASS &&
-                cm.MethodsBuffer is LiveDocumentationClassMemberBuffer classMemberBuffer)
+            if (Input.GetKey(KeyCode.LeftShift))
             {
-                LiveDocumentationWindow newWin = method.GameObject().AddComponent<LiveDocumentationWindow>();
+                var method = NodeOfClass.Children().Where(x => x.Type.Equals("Method"))
+                    .Where(x => x.GetInt("Source.Line") == cm.LineNumber).First();
 
-
-                newWin.Title = method.SourceName;
-                string selectedFile = method.Filename();
-                if (!newWin.Title.Replace(".", "").Equals(selectedFile.Split('.').Reverse().Skip(1)
-                        .Aggregate("", (acc, s) => s + acc)))
+                if (DocumentationWindowType == LiveDocumentationWindowType.CLASS &&
+                    cm.MethodsBuffer is LiveDocumentationClassMemberBuffer classMemberBuffer)
                 {
-                    newWin.Title += $" ({selectedFile})";
+                    LiveDocumentationWindow newWin = method.GameObject().AddComponent<LiveDocumentationWindow>();
+
+
+                    newWin.Title = method.SourceName;
+                    string selectedFile = method.Filename();
+                    if (!newWin.Title.Replace(".", "").Equals(selectedFile.Split('.').Reverse().Skip(1)
+                            .Aggregate("", (acc, s) => s + acc)))
+                    {
+                        newWin.Title += $" ({selectedFile})";
+                    }
+
+                    newWin.ClassName = newWin.Title;
+                    newWin.BasePath = BasePath;
+                    newWin.RelativePath = method.Path() + method.Filename();
+                    newWin.Graph = Graph;
+                    newWin.NodeOfClass = method;
+                    newWin.DocumentationWindowType = LiveDocumentationWindowType.METHOD;
+
+                    newWin.DocumentationBuffer = classMemberBuffer.Documentation;
+                    newWin.ClassMembers = classMemberBuffer.Parameters;
+
+                    List<LiveDocumentationBuffer> methods = new List<LiveDocumentationBuffer>();
+
+
+                    //  newWin.ClassMembers = methods;
+                    //  newWin.DocumentationBuffer = buffer;
+                    // Add code window to our space of code window, if it isn't in there yet
+
+
+                    spaceManager[WindowSpaceManager.LOCAL_PLAYER].AddWindow(newWin);
+                    spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = newWin;
                 }
 
-                newWin.ClassName = newWin.Title;
-                newWin.BasePath = BasePath;
-                newWin.RelativePath = method.Path() + method.Filename();
-                newWin.Graph = Graph;
-                newWin.NodeOfClass = method;
-                newWin.DocumentationWindowType = LiveDocumentationWindowType.METHOD;
-
-                newWin.DocumentationBuffer = classMemberBuffer.Documentation;
-                newWin.ClassMembers = classMemberBuffer.Parameters;
-
-                List<LiveDocumentationBuffer> methods = new List<LiveDocumentationBuffer>();
-
-
-                //  newWin.ClassMembers = methods;
-                //  newWin.DocumentationBuffer = buffer;
-                // Add code window to our space of code window, if it isn't in there yet
-
-
-                spaceManager[WindowSpaceManager.LOCAL_PLAYER].AddWindow(newWin);
-                spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = newWin;
-            }
-
-            if (method != null)
-            {
-                var oldScale = NodeOfClass.GameObject().transform.localScale;
-                if (!cm.HighlightAnimationRunning)
+                if (method != null)
                 {
-                    cm.HighlightAnimationRunning = true;
-                    method.GameObject().transform.DOScale(oldScale * 1.5f, 0.3f).SetEase(Ease.InOutSine)
-                        .SetLoops(2, LoopType.Yoyo).OnComplete(
-                            () => { cm.HighlightAnimationRunning = false; }).Restart();
+                    var oldScale = NodeOfClass.GameObject().transform.localScale;
+                    if (!cm.HighlightAnimationRunning)
+                    {
+                        cm.HighlightAnimationRunning = true;
+                        method.GameObject().transform.DOScale(oldScale * 1.5f, 0.3f).SetEase(Ease.InOutSine)
+                            .SetLoops(2, LoopType.Yoyo).OnComplete(
+                                () => { cm.HighlightAnimationRunning = false; }).Restart();
+                    }
                 }
             }
         }
@@ -454,14 +457,14 @@ namespace SEE.Game.UI.LiveDocumantation
                 newWin.NodeOfClass = nodeOfLink;
                 LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
                 FileParser parser = new FileParser(nodeOfLink.AbsolutePlatformPath());
-                buffer = parser.ParseClassDoc(nodeOfLink.AbsolutePlatformPath(), nodeOfLink.SourceName);
+                buffer = parser.ParseClassDoc(nodeOfLink.SourceName);
                 newWin.DocumentationBuffer = buffer;
 
                 List<LiveDocumentationBuffer> methods = new List<LiveDocumentationBuffer>();
-                parser.ParseClassMethods(nodeOfLink.AbsolutePlatformPath(), nodeOfLink.SourceName)
+                parser.ParseClassMethods(nodeOfLink.SourceName)
                     .ForEach((x) => methods.Add(x));
 
-                newWin.ImportedNamespaces = parser.ParseNamespaceImports(nodeOfLink.AbsolutePlatformPath());
+                newWin.ImportedNamespaces = parser.ParseNamespaceImports();
                 if (buffer == null || methods == null)
                 {
                     return;

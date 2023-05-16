@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace SEE.Game.UI.LiveDocumantation
 {
@@ -10,9 +11,9 @@ namespace SEE.Game.UI.LiveDocumantation
     /// </summary>
     public class LiveDocumentationClassMemberBuffer : LiveDocumentationBuffer
     {
-        public LiveDocumentationBuffer Documentation {get; set;}
-        
-        public List<LiveDocumentationBuffer> Parameters { get; set; }
+        [NotNull] public LiveDocumentationBuffer Documentation { get; set; } = new();
+
+        [NotNull] public List<LiveDocumentationBuffer> Parameters { get; set; } = new();
 
         public int LineNumber { get; set; }
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,7 +17,6 @@ namespace SEE.Controls.Actions
         private WindowSpaceManager spaceManager;
 
         public static LiveDocumentationAction CreateAction() => new LiveDocumentationAction();
-
         public override HashSet<string> GetChangedObjects() => new HashSet<string>();
         public override ActionStateType GetActionStateType() => ActionStateType.LiveDocumentation;
 
@@ -110,14 +110,28 @@ namespace SEE.Controls.Actions
                     documentationWindow.Graph = selectedNode.Value.ItsGraph;
                     documentationWindow.NodeOfClass = selectedNode.Value;
 
-                    FileParser parser = new FileParser(selectedNode.Value.AbsolutePlatformPath());
-                    LiveDocumentationBuffer buffer = parser.ParseClassDoc(selectedNode.Value.AbsolutePlatformPath(),
+                    // Try initialise the FileParser 
+                    FileParser parser;
+                    try
+                    {
+                        parser = new FileParser(selectedNode.Value.AbsolutePlatformPath());
+                    }
+                    // If the source code file can't be found display an error and abort the action. 
+                    catch (FileNotFoundException e)
+                    {
+                        ShowNotification.Error("File not found",
+                            $"The file with the name {selectedNode.Value.AbsolutePlatformPath()}");
+                        return false;
+                    }
+
+
+                    LiveDocumentationBuffer buffer = parser.ParseClassDoc(
                         selectedNode.Value.SourceName);
 
 
                     List<LiveDocumentationBuffer> classMembers = new List<LiveDocumentationBuffer>();
                     // LiveDocumentationBuffer b = new LiveDocumentationBuffer();
-                    parser.ParseClassMethods(selectedNode.Value.AbsolutePlatformPath(), selectedNode.Value.SourceName)
+                    parser.ParseClassMethods(selectedNode.Value.SourceName)
                         .ForEach((x) => classMembers.Add(x));
                     if (buffer == null || classMembers == null)
                     {
@@ -127,6 +141,8 @@ namespace SEE.Controls.Actions
 
                     documentationWindow.DocumentationBuffer = buffer;
                     documentationWindow.ClassMembers = classMembers;
+
+                    documentationWindow.ImportedNamespaces = parser.ParseNamespaceImports();
                 }
 
 

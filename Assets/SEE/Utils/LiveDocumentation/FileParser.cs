@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using JetBrains.Annotations;
 using SEE.Game.UI.LiveDocumantation;
 using SEE.Game.UI.Notification;
@@ -10,6 +11,11 @@ namespace SEE.Utils.LiveDocumentation
     {
         private Extractor _extractor;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <exception cref="FileNotFoundException">Is thrown, when the file doesn't exist</exception>
         public FileParser(string fileName)
         {
             if (fileName.EndsWith(".cs"))
@@ -40,21 +46,29 @@ namespace SEE.Utils.LiveDocumentation
                 "The file extension is not supported by the LiveDocumentation in SEE");
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="className"></param>
+        /// <exception cref="ClassNotFoundException">Will be thrown, when the class cant be found</exception>
+        /// <returns></returns>
         [CanBeNull]
-        public LiveDocumentationBuffer ParseClassDoc(string fileName, string className)
+        public LiveDocumentationBuffer ParseClassDoc(string className)
         {
-            return _extractor.ExtractClassComments(fileName, className);
+            return _extractor.ExtractClassComments(className);
         }
 
-        [CanBeNull]
-        public List<LiveDocumentationClassMemberBuffer> ParseClassMethods(string fileName, string className)
+        [NotNull]
+        public List<LiveDocumentationClassMemberBuffer> ParseClassMethods(string className)
         {
-            return _extractor.ExtractMethods(fileName, className);
+            return _extractor.ExtractMethods(className);
         }
 
-        public List<string> ParseNamespaceImports(string fileName)
+        [NotNull]
+        public List<string> ParseNamespaceImports()
         {
-            return _extractor.ExtractImportedNamespaces(fileName);
+            return _extractor.ExtractImportedNamespaces();
         }
     }
 }

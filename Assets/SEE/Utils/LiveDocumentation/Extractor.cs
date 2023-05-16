@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using SEE.Game.UI.LiveDocumantation;
 
 namespace SEE.Utils.LiveDocumentation
@@ -10,28 +11,33 @@ namespace SEE.Utils.LiveDocumentation
     /// </summary>
     public interface Extractor
     {
+
         /// <summary>
         /// This method should extract the comments of an specific class in a specific source code file.
         /// </summary>
         /// <param name="fileName"></param>
         /// <param name="className"></param>
         /// <returns>A new <see cref="LiveDocumentationBuffer"/> containing the documentation </returns>
-        LiveDocumentationBuffer ExtractClassComments(string fileName, string className);
+        [NotNull]
+        public LiveDocumentationBuffer ExtractClassComments(string className);
 
         /// <summary>
         /// This method should extract all methods and their signatures
         /// </summary>
         /// <param name="fileName"></param>
         /// <param name="className"></param>
+        /// <exception cref="ClassNotFoundException">Is thrown, when the class cant be found in the file</exception>
         /// <returns></returns>
-        List<LiveDocumentationClassMemberBuffer> ExtractMethods(string fileName, string className);
-        
+        [NotNull]
+        public List<LiveDocumentationClassMemberBuffer> ExtractMethods(string className);
+
 
         /// <summary>
         /// This method should extract all import statements of the source code file.
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        List<string> ExtractImportedNamespaces(string fileName);
+        [NotNull]
+        public List<string> ExtractImportedNamespaces();
     }
 }
