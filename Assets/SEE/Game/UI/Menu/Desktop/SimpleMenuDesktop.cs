@@ -98,17 +98,6 @@ namespace SEE.Game.UI.Menu
         }
         
         /// <summary>
-        /// Destroying the component also destroys the menu.
-        /// </summary>
-        protected virtual void OnDestroy()
-        {
-            if (Menu != null)
-            {
-                Destroy(Menu);
-            }
-        }
-        
-        /// <summary>
         /// Updates the title.
         /// </summary>
         protected virtual void UpdateTitle()

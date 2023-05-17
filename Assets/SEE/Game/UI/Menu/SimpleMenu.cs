@@ -87,14 +87,20 @@ namespace SEE.Game.UI.Menu
         }
 
         /// <summary>
-        /// Let's <see cref="KeywordListener"/> stop listening.
+        /// Destroying the component also destroys the menu.
+        /// Lets <see cref="KeywordListener"/> stop listening.
         /// </summary>
         /// <remarks>Called by Unity when this object is destroyed.</remarks>
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             KeywordListener?.Stop();
             KeywordListener?.Dispose();
             KeywordListener = null;
+
+            if (Menu != null)
+            {
+                Destroy(Menu);
+            }
         }
 
         /// <summary>
