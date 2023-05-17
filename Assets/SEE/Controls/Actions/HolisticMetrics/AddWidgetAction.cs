@@ -19,12 +19,12 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// action.
         /// </summary>
         private AddWidgetDialog addWidgetDialog;
-        
+
         /// <summary>
         /// Indicates how far this instance has progressed in adding a widget.
         /// </summary>
         private ProgressState progress = ProgressState.GetPosition;
-        
+
         /// <summary>
         /// Saves all the information needed to revert or repeat this action.
         /// </summary>
@@ -39,7 +39,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             GetConfig,
             Finished
         }
-        
+
         /// <summary>
         /// This struct can store all the information needed to revert or repeat an <see cref="AddWidgetAction"/>.
         /// </summary>
@@ -106,7 +106,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     {
                         memento.config.MetricType = metric;
                         memento.config.WidgetName = widget;
-                        
+
                         WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
                         if (widgetsManager != null)
                         {
@@ -118,7 +118,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                             Debug.LogError(
                                 $"No board found with the name {memento.boardName} for adding the widget.\n");
                         }
-                        
+
                         progress = ProgressState.Finished;
                         currentState = ReversibleAction.Progress.Completed;
                         return true;
@@ -157,7 +157,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                 Debug.LogError($"No board found with the name {memento.boardName} for deleting the widget.\n");
             }
         }
-        
+
         /// <summary>
         /// Creates the new widget as configured, on all clients.
         /// </summary>
@@ -184,7 +184,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             return new AddWidgetAction();
         }
-        
+
         /// <summary>
         /// Returns a new instance of <see cref="AddWidgetAction"/>.
         /// </summary>
@@ -210,7 +210,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <returns><see cref="ActionStateType.AddWidget"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.AddWidget;
+            return ActionStateTypes.AddWidget;
         }
     }
 }

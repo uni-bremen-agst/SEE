@@ -26,7 +26,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// The name of the board that will be moved.
             /// </summary>
             internal readonly string boardName;
-        
+
             /// <summary>
             /// The old position of the board so we can revert this action.
             /// </summary>
@@ -46,7 +46,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// The new rotation to which the board will be set.
             /// </summary>
             internal readonly Quaternion newRotation;
-            
+
             /// <summary>
             /// Initializes the fields of this instance.
             /// </summary>
@@ -74,14 +74,14 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             BoardsManager.ToggleMoving(true);
         }
-        
+
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.MoveBoard"/>.
         /// </summary>
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
-            if (BoardsManager.GetMovement(out string boardName, out Vector3 oldPosition, out Vector3 newPosition, 
+            if (BoardsManager.GetMovement(out string boardName, out Vector3 oldPosition, out Vector3 newPosition,
                     out Quaternion oldRotation, out Quaternion newRotation))
             {
                 memento = new Memento(boardName, oldPosition, newPosition, oldRotation, newRotation);
@@ -101,7 +101,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             BoardsManager.ToggleMoving(false);
         }
-        
+
         /// <summary>
         /// Here we revert the moving action by moving the board to the old position on this client and all other
         /// clients. This method should only be called from the history.
@@ -133,7 +133,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             return new MoveBoardAction();
         }
-        
+
         /// <summary>
         /// Returns a new instance of <see cref="MoveBoardAction"/>.
         /// </summary>
@@ -158,7 +158,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <returns><see cref="ActionStateType.MoveBoard"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.MoveBoard;
+            return ActionStateTypes.MoveBoard;
         }
     }
 }

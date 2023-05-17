@@ -26,17 +26,17 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// action.
         /// </summary>
         private AddBoardDialog addBoardDialog;
-        
+
         /// <summary>
         /// Indicates how far this instance has progressed in adding a new metrics board to the scene.
         /// </summary>
         private ProgressState progress = ProgressState.GettingPosition;
-        
+
         /// <summary>
         /// Saves all the information needed to revert or repeat this action.
         /// </summary>
         private Memento memento;
-        
+
         /// <summary>
         /// Represents the different stages of progress of this action.
         /// </summary>
@@ -46,7 +46,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             GettingRotation,
             GettingName
         }
-        
+
         /// <summary>
         /// This struct can store all the information needed to revert or repeat an <see cref="AddBoardAction"/>.
         /// </summary>
@@ -64,9 +64,9 @@ namespace SEE.Controls.Actions.HolisticMetrics
             internal Memento(BoardConfig boardConfig)
             {
                 this.boardConfig = boardConfig;
-            }    
+            }
         }
-        
+
         /// <summary>
         /// Sets up the scene to listen for a mouse click on the floor.
         /// </summary>
@@ -88,7 +88,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     {
                         progress = ProgressState.GettingRotation;
                         memento = new Memento(new BoardConfig { Position = position });
-                        GameObject slider = PrefabInstantiator.InstantiatePrefab(boardRotatorPath, 
+                        GameObject slider = PrefabInstantiator.InstantiatePrefab(boardRotatorPath,
                             GameObject.Find("UI Canvas").transform, false);
                         slider.GetComponent<AddBoardSliderController>().Setup(position);
                     }
@@ -126,7 +126,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     return false;
             }
         }
-        
+
         /// <summary>
         /// Marks the BoardAdder component as "to be deleted".
         /// </summary>
@@ -154,7 +154,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             BoardsManager.Create(memento.boardConfig);
             new CreateBoardNetAction(memento.boardConfig).Execute();
         }
-        
+
         /// <summary>
         /// Returns a new instance of <see cref="AddBoardAction"/>.
         /// </summary>
@@ -163,7 +163,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             return new AddBoardAction();
         }
-        
+
         /// <summary>
         /// Returns a new instance of <see cref="AddBoardAction"/>.
         /// </summary>
@@ -172,7 +172,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             return CreateReversibleAction();
         }
-        
+
         /// <summary>
         /// The name of the new board.
         /// </summary>
@@ -188,7 +188,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <returns><see cref="ActionStateType.AddBoard"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.AddBoard;
+            return ActionStateTypes.AddBoard;
         }
     }
 }

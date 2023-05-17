@@ -30,7 +30,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// action.
         /// </summary>
         private LoadBoardDialog loadBoardDialog;
-        
+
         /// <summary>
         /// The controller of the <see cref="button"/>. We will "ask" this whether the player has clicked the button.
         /// </summary>
@@ -40,7 +40,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Stores the current progress of this action.
         /// </summary>
         private ProgressState progress = ProgressState.WaitingForClick;
-        
+
         /// <summary>
         /// Saves all the information needed to revert or repeat this action.
         /// </summary>
@@ -55,7 +55,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             WaitingForInput,
             Finished
         }
-        
+
         /// <summary>
         /// This struct can store all the information needed to revert or repeat a <see cref="LoadBoardAction"/>.
         /// </summary>
@@ -75,7 +75,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                 this.config = config;
             }
         }
-        
+
         /// <summary>
         /// Adds the <see cref="button"/> to the player's UI.
         /// </summary>
@@ -85,7 +85,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                 false);
             buttonController = button.GetComponent<LoadBoardButtonController>();
         }
-        
+
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.LoadBoard"/>.
         /// </summary>
@@ -100,8 +100,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
                         loadBoardDialog = new LoadBoardDialog();
                         loadBoardDialog.Open();
                         progress = ProgressState.WaitingForInput;
-                    }         
-                    
+                    }
+
                     return false;
                 case ProgressState.WaitingForInput:
                     if (loadBoardDialog.GetFilename(out string filename))
@@ -150,7 +150,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             BoardsManager.Delete(memento.config.Title);
             new DeleteBoardNetAction(memento.config.Title).Execute();
         }
-        
+
         /// <summary>
         /// Repeats this action, i.e., creates the board again.
         /// </summary>
@@ -169,7 +169,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             return new LoadBoardAction();
         }
-        
+
         /// <summary>
         /// Returns a new instance of <see cref="LoadBoardAction"/>.
         /// </summary>
@@ -178,16 +178,16 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             return CreateReversibleAction();
         }
-        
+
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this class.
         /// </summary>
         /// <returns><see cref="ActionStateType.LoadBoard"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.LoadBoard;
+            return ActionStateTypes.LoadBoard;
         }
-        
+
         /// <summary>
         /// Returns the name of the board that was loaded / added to the scene by this action.
         /// </summary>

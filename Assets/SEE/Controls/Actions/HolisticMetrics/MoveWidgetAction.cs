@@ -115,7 +115,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
             if (widgetsManager != null)
             {
-                widgetsManager.Move(memento.widgetID, memento.oldPosition);    
+                widgetsManager.Move(memento.widgetID, memento.oldPosition);
                 new MoveWidgetNetAction(memento.boardName, memento.widgetID, memento.oldPosition).Execute();
             }
             else
@@ -141,7 +141,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                 Debug.LogError($"Could not find the board {memento.boardName} for moving a widget on it.\n");
             }
         }
-        
+
         /// <summary>
         /// Returns a new instance of <see cref="MoveWidgetAction"/>.
         /// </summary>
@@ -150,7 +150,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             return new MoveWidgetAction();
         }
-        
+
         /// <summary>
         /// Returns a new instance of <see cref="MoveWidgetAction"/>.
         /// </summary>
@@ -159,7 +159,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             return CreateReversibleAction();
         }
-        
+
         /// <summary>
         /// Returns a HashSet with one item which is the ID of the widget that was moved in this action.
         /// </summary>
@@ -175,7 +175,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <returns><see cref="ActionStateType.MoveWidget"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.MoveWidget;
+            return ActionStateTypes.MoveWidget;
         }
     }
 }

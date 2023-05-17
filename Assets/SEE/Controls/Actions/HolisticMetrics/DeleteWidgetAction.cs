@@ -44,13 +44,13 @@ namespace SEE.Controls.Actions.HolisticMetrics
         }
 
         /// <summary>
-        /// Add components to the widgets that will listen for mouse clicks. 
+        /// Add components to the widgets that will listen for mouse clicks.
         /// </summary>
         public override void Start()
         {
             BoardsManager.ToggleWidgetDeleting(true);
         }
-        
+
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.DeleteWidget"/>.
         /// </summary>
@@ -65,7 +65,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                 if (widgetsManager != null)
                 {
                     widgetsManager.Delete(memento.widgetConfig.ID);
-                    new DeleteWidgetNetAction(memento.boardName, memento.widgetConfig.ID).Execute();   
+                    new DeleteWidgetNetAction(memento.boardName, memento.widgetConfig.ID).Execute();
                 }
                 else
                 {
@@ -98,7 +98,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             if (widgetsManager != null)
             {
                 widgetsManager.Delete(memento.widgetConfig.ID);
-                new DeleteWidgetNetAction(memento.boardName, memento.widgetConfig.ID).Execute();   
+                new DeleteWidgetNetAction(memento.boardName, memento.widgetConfig.ID).Execute();
             }
             else
             {
@@ -106,7 +106,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                                $"could not be found.\n");
             }
         }
-        
+
         /// <summary>
         /// This method creates the widget again from the saved configuration (on all clients).
         /// </summary>
@@ -118,7 +118,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             if (widgetsManager != null)
             {
                 widgetsManager.Create(memento.widgetConfig);
-                new CreateWidgetNetAction(memento.boardName, memento.widgetConfig).Execute();    
+                new CreateWidgetNetAction(memento.boardName, memento.widgetConfig).Execute();
             }
             else
             {
@@ -135,7 +135,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             return new DeleteWidgetAction();
         }
-        
+
         /// <summary>
         /// Returns a new instance of <see cref="DeleteWidgetAction"/>.
         /// </summary>
@@ -144,7 +144,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             return CreateReversibleAction();
         }
-        
+
         /// <summary>
         /// Returns the ID of the widget that was deleted in this action.
         /// </summary>
@@ -160,7 +160,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <returns><see cref="ActionStateType.DeleteWidget"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.DeleteWidget;
+            return ActionStateTypes.DeleteWidget;
         }
     }
 }

@@ -49,7 +49,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.Move"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.Move;
+            return ActionStateTypes.Move;
         }
 
         /// <summary>

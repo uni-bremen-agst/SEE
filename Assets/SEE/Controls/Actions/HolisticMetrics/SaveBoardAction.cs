@@ -23,7 +23,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// action.
         /// </summary>
         private SaveBoardDialog saveBoardDialog;
-        
+
         /// <summary>
         /// The controller of the button, in the <see cref="Update"/> method we will "ask" this if the button has been
         /// clicked.
@@ -39,7 +39,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Stores the current progress of this action.
         /// </summary>
         private ProgressState progress = ProgressState.WaitingForClick;
-        
+
         /// <summary>
         /// Saves all the information needed to revert or repeat this action.
         /// </summary>
@@ -53,8 +53,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
             WaitingForClick,
             WaitingForInput,
             Finished
-        }        
-        
+        }
+
         /// <summary>
         /// This struct can store all the information needed to revert or repeat a <see cref="SaveBoardAction"/>.
         /// </summary>
@@ -63,8 +63,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <summary>
             /// The name of the file in which the board's config has been written.
             /// </summary>
-            internal readonly string filename; 
-                
+            internal readonly string filename;
+
             /// <summary>
             /// The WidgetsManager of the board of which the configuration was saved here.
             /// </summary>
@@ -81,7 +81,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                 this.widgetsManager = widgetsManager;
             }
         }
-        
+
         /// <summary>
         /// Adds a button to the player's UI. That button opens a dialog that lets the player select a metrics board to
         /// save.
@@ -92,7 +92,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                 .InstantiatePrefab(buttonPath, GameObject.Find("UI Canvas").transform, false)
                 .GetComponent<LoadBoardButtonController>();
         }
-        
+
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.SaveBoard"/>.
         /// </summary>
@@ -106,7 +106,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     {
                         if (BoardsManager.GetNames().Length == 0)
                         {
-                            ShowNotification.Info("No boards in the scene", 
+                            ShowNotification.Info("No boards in the scene",
                                 "There are no boards in the scene that could be saved");
                             return false;
                         }
@@ -126,12 +126,12 @@ namespace SEE.Controls.Actions.HolisticMetrics
                         progress = ProgressState.Finished;
                         return true;
                     }
-                    
+
                     if (saveBoardDialog.WasCanceled())
                     {
                         progress = ProgressState.WaitingForClick;
                     }
-                    
+
                     return false;
                 case ProgressState.Finished:
                     return true;
@@ -156,7 +156,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             base.Undo();
             ConfigManager.DeleteBoard(memento.filename);
         }
-        
+
         /// <summary>
         /// Repeats this action, i.e., saves this board again with the same filename that was given by the player
         /// initially.
@@ -175,7 +175,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             return new SaveBoardAction();
         }
-        
+
         /// <summary>
         /// Returns a new instance of <see cref="SaveBoardAction"/>.
         /// </summary>
@@ -184,16 +184,16 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             return CreateReversibleAction();
         }
-        
+
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this class.
         /// </summary>
         /// <returns><see cref="ActionStateType.SaveBoard"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.SaveBoard;
+            return ActionStateTypes.SaveBoard;
         }
-        
+
         /// <summary>
         /// Returns (in a HashSet) the name of the file into which the config was written.
         /// </summary>

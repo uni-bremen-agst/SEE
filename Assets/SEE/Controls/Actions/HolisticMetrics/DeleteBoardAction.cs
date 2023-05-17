@@ -16,7 +16,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Saves all the information needed to revert or repeat this action.
         /// </summary>
         private Memento memento;
-        
+
         /// <summary>
         /// This struct can store all the information needed to revert or repeat a <see cref="DeleteBoardAction"/>.
         /// </summary>
@@ -42,7 +42,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             if (Input.GetMouseButtonDown(0) && Raycasting.RaycastAnything(out RaycastHit raycastHit))
             {
                 WidgetsManager widgetsManager = raycastHit.transform.GetComponent<WidgetsManager>();
-                if (widgetsManager == null)  
+                if (widgetsManager == null)
                 {
                     // If the clicked object isn't a metrics board, is it maybe a widget? Then we could get its
                     // parent's WidgetsManager
@@ -70,7 +70,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             BoardsManager.Create(memento.boardConfig);
             new CreateBoardNetAction(memento.boardConfig).Execute();
         }
-        
+
         /// <summary>
         /// Deletes the board (again).
         /// </summary>
@@ -80,7 +80,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             BoardsManager.Delete(memento.boardConfig.Title);
             new DeleteBoardNetAction(memento.boardConfig.Title).Execute();
         }
-        
+
         /// <summary>
         /// Returns a new instance of <see cref="DeleteBoardAction"/>.
         /// </summary>
@@ -89,7 +89,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             return new DeleteBoardAction();
         }
-        
+
         /// <summary>
         /// Returns a new instance of <see cref="DeleteBoardAction"/>.
         /// </summary>
@@ -98,7 +98,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         {
             return CreateReversibleAction();
         }
-        
+
         /// <summary>
         /// Returns the ID (name) of the metrics board that has been deleted by this action.
         /// </summary>
@@ -114,7 +114,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <returns><see cref="ActionStateType.DeleteBoard"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.DeleteBoard;
+            return ActionStateTypes.DeleteBoard;
         }
     }
 }
