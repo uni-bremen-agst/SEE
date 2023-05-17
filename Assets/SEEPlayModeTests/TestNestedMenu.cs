@@ -100,7 +100,7 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <param name="menuGO">new game object holding <paramref name="menu"/></param>
         /// <param name="menu">a new menu that can be tested</param>
-        protected override void CreateMenu(out GameObject menuGO, out AbstractMenu<MenuEntry> menu)
+        protected override void CreateMenu(out GameObject menuGO, out SimpleListMenu<MenuEntry> menu)
         {
             menuGO = new GameObject { name = "Container for menu" };
             menu = menuGO.AddComponent<NestedListMenu>();

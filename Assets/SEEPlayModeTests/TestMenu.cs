@@ -26,7 +26,7 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// The menu to be tested.
         /// </summary>
-        protected AbstractMenu<MenuEntry> menu;
+        protected SimpleListMenu<MenuEntry> menu;
 
         /// <summary>
         /// Set up for every test.
@@ -41,20 +41,18 @@ namespace SEE.Game.UI.Menu
         [UnitySetUp]
         public new IEnumerator SetUp()
         {
-            UnityEngine.Debug.Log("TestMenu.SetUp\n");
             selection = 0;
             CreateMenu(out menuGO, out menu);
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
-            UnityEngine.Debug.Log("TestMenu.SetUp finished\n");
         }
 
         /// <summary>
-        /// Creates a new <paramref name="menuGO"/> game object holding a 
+        /// Creates a new <paramref name="menuGO"/> game object holding a
         /// new <paramref name="menu"/>, which is the menu to be tested.
         /// </summary>
         /// <param name="menuGO">new game object holding <paramref name="menu"/></param>
         /// <param name="menu">a new menu that can be tested</param>
-        protected abstract void CreateMenu(out GameObject menuGO, out AbstractMenu<MenuEntry> menu);
+        protected abstract void CreateMenu(out GameObject menuGO, out SimpleListMenu<MenuEntry> menu);
 
         /// <summary>
         /// Tear down after every test.
@@ -68,10 +66,8 @@ namespace SEE.Game.UI.Menu
         [UnityTearDown]
         public new IEnumerator TearDown()
         {
-            UnityEngine.Debug.Log("TestMenu.TearDown\n");
             Destroyer.Destroy(menuGO);
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
-            UnityEngine.Debug.Log("TestMenu.SetUp finished\n");
         }
 
         /// <summary>
