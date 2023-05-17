@@ -100,12 +100,15 @@ namespace SEE.Game.UI.Menu
         /// Adds the titles of the menu entries.
         /// Removes the CloseMenuKeyword if <see cref="AllowNoSelection"/> isn't true.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The keywords.</returns>
         protected override IEnumerable<string> GetKeywords()
         {
             IEnumerable<string> keywords = base.GetKeywords();
             // removes the CloseMenuKeyword if no selection isn't allowed.
-            if (!AllowNoSelection) keywords = keywords.Where(keyword => keyword != CloseMenuKeyword);
+            if (!AllowNoSelection)
+            {
+                keywords = keywords.Where(keyword => keyword != CloseMenuKeyword);
+            }
             // adds the entry titles as keywords
             keywords = keywords.Concat(Entries.Select(entry => entry.Title));
             return keywords;

@@ -56,10 +56,12 @@ namespace SEE.Game.UI.Menu
         {
             if (entry is NestedMenuEntry nestedEntry)
             {
+                // If this contains another menu level, repopulate list with new level after saving the current one
                 AscendLevel(nestedEntry);
             }
             else
             {
+                // Otherwise, we do the same we'd do normally
                 base.SelectEntry(entry);
             }
         }

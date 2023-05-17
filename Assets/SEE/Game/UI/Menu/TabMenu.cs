@@ -4,13 +4,21 @@ using Valve.VR.InteractionSystem;
 
 namespace SEE.Game.UI.Menu
 {
+    /// <summary>
+    /// A tab menu containing <see cref="ToggleMenuEntry"/> entries.
+    /// </summary>
     public class TabMenu : TabMenu<ToggleMenuEntry> {}
 
+    /// <summary>
+    /// Extension of the <see cref="SelectionMenu"/> to open a view through a tab button.
+    /// </summary>
+    /// <typeparam name="T">Menu entry</typeparam>
     public class TabMenu<T> : SelectionMenu<T> where T : ToggleMenuEntry
     {
+        /// <summary>
+        /// Folder for tab menu prefabs.
+        /// </summary>
         protected const string TAB_PREFAB_FOLDER = UI_PREFAB_FOLDER + "TabMenu/";
-        
-        // TODO: The Prefabs don't exist yet
 
         /// <summary>
         /// The prefab for the tab menu.
@@ -62,6 +70,9 @@ namespace SEE.Game.UI.Menu
         /// <returns>The view game object.</returns>
         public virtual GameObject ViewGameObject(T entry) => ViewList.transform.Find(entry.Title).gameObject;
 
+        /// <summary>
+        /// Overrides HideAfterSelection to false.
+        /// </summary>
         public TabMenu()
         {
             HideAfterSelection = false;
