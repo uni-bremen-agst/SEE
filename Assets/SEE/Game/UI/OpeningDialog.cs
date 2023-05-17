@@ -51,43 +51,38 @@ namespace SEE.UI
             Color color = Color.blue;
 
             return new List<ToggleMenuEntry>
-                    { new(
-                                          entryAction: this.StartHost,
-                                          exitAction: null,
-                                          title: "Host",
-                                          description: "Starts a server and local client process.",
-                                          entryColor: NextColor(),
-                                          icon: Resources.Load<Sprite>("Icons/Host")),
-                      new(
-                                          entryAction: this.StartClient,
-                                          exitAction: null,
-                                          title: "Client",
-                                          description: "Starts a local client connection to a server.",
-                                          entryColor: NextColor(),
-                                          icon: Resources.Load<Sprite>("Icons/Client")),
-                      new(
-                                          entryAction: this.ToggleEnvironment,
-                                          exitAction: null,
-                                          title: "Toggle Desktop/VR",
-                                          description: "Toggles between desktop and VR hardware.",
-                                          entryColor: NextColor(),
-                                          icon: Resources.Load<Sprite>("Icons/Client")),
+                    { new(entryAction: this.StartHost,
+                          exitAction: null,
+                          title: "Host",
+                          description: "Starts a server and local client process.",
+                          entryColor: NextColor(),
+                          icon: Resources.Load<Sprite>("Icons/Host")),
+                      new(entryAction: this.StartClient,
+                          exitAction: null,
+                          title: "Client",
+                          description: "Starts a local client connection to a server.",
+                          entryColor: NextColor(),
+                          icon: Resources.Load<Sprite>("Icons/Client")),
+                      new(entryAction: this.ToggleEnvironment,
+                          exitAction: null,
+                          title: "Toggle Desktop/VR",
+                          description: "Toggles between desktop and VR hardware.",
+                          entryColor: NextColor(),
+                          icon: Resources.Load<Sprite>("Icons/Client")),
 
                       // FIXME: Running only a server is currently not working.
-                      //new ToggleMenuEntry(active: false,
-                      //                    entryAction: StartServer,
+                      //new (               entryAction: StartServer,
                       //                    exitAction: null,
                       //                    title: "Server",
                       //                    description: "Starts a dedicated server without local client.",
                       //                    entryColor: NextColor(),
                       //                    icon: Resources.Load<Sprite>("Icons/Server")),
-                      new(
-                                          entryAction: this.Settings,
-                                          exitAction: null,
-                                          title: "Settings",
-                                          description: "Allows to set additional network settings.",
-                                          entryColor: Color.gray,
-                                          icon: Resources.Load<Sprite>("Icons/Settings")),
+                      new(entryAction: this.Settings,
+                          exitAction: null,
+                          title: "Settings",
+                          description: "Allows to set additional network settings.",
+                          entryColor: Color.gray,
+                          icon: Resources.Load<Sprite>("Icons/Settings")),
             };
 
             Color NextColor()
