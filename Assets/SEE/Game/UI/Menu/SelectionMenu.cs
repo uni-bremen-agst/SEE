@@ -1,30 +1,100 @@
 ﻿using System.Linq;
+using Michsky.UI.ModernUIPack;
+using TMPro;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.Serialization;
+using Valve.VR.InteractionSystem;
 
 namespace SEE.Game.UI.Menu
 {
     /// <summary>
+    /// A selection menu containing <see cref="ToggleMenuEntry"/> entries.
+    /// </summary>
+    public class SelectionMenu : SelectionMenu<ToggleMenuEntry> {}
+
+    /// <summary>
     /// A menu in which the user can choose one active selection out of a menu.
     /// It is assumed that only one selection can be active at a time.
     /// </summary>
-    public partial class SelectionMenu: SimpleMenu<ToggleMenuEntry>
+    public class SelectionMenu<T>: SimpleListMenu<T> where T : ToggleMenuEntry
     {
-        protected override void OnEntrySelected(ToggleMenuEntry entry)
+        /// <summary>
+        /// The active entry.
+        /// </summary>
+        private T activeEntry;
+
+        /// <summary>
+        /// The active entry.
+        /// Assigning a new value unselects the old value.
+        /// </summary>
+        public T ActiveEntry
         {
-            // Disable all entries except the selected one, this will automatically call DoExitAction()
-            ActiveEntry = entry;
-            // This will ensure that DoAction() is called on entry
-            base.OnEntrySelected(entry);
+            get => activeEntry;
+            set
+            {
+                T oldActiveEntry = ActiveEntry;
+                activeEntry = value;
+                if (oldActiveEntry != null)
+                {
+                    oldActiveEntry.UnselectAction();
+                    OnEntryUnselected?.Invoke(oldActiveEntry);
+                }
+                OnActiveEntryChanged?.Invoke();
+            }
         }
 
         /// <summary>
-        /// Returns the first active entry in the <see cref="entries"/> list.
-        /// If no entry is active, <c>null</c> will be returned.
-        /// If this value is changed, all other entries will be set inactive.
+        /// Updates the menu and adds listeners.
         /// </summary>
-        public ToggleMenuEntry ActiveEntry
+        protected override void OnStartFinished()
         {
-            get => entries.SingleOrDefault(entry => entry.Active);
-            set => entries.ForEach(entry => entry.Active = entry == value);
+            base.OnStartFinished();
+            // updates menu
+            if (ActiveEntry != null) ActivateButton(ActiveEntry);
+            // adds listeners
+            OnEntrySelected += entry => ActiveEntry = entry;
+            OnEntrySelected += ActivateButton;
+            OnEntryUnselected += DeactivateButton;
+            OnEntryRemoved += entry => { if (entry == ActiveEntry) ActiveEntry = null; };
         }
+
+        /// <summary>
+        /// Activates a button.
+        /// It is assumed that the entry is the active entry.
+        /// </summary>
+        /// <param name="entry">The menu entry.</param>
+        private void ActivateButton(T entry)
+        {
+            GameObject button = EntryGameObject(entry);
+            ButtonManagerBasicWithIcon manager = button.GetComponent<ButtonManagerBasicWithIcon>();
+            manager.buttonText = $"[{entry.Title}]";
+            manager.normalText.fontStyle = FontStyles.UpperCase;
+            manager.normalText.text = manager.buttonText;
+        }
+
+        /// <summary>
+        /// Deactivates a button.
+        /// It is assumed that the entry was the previously active entry.
+        /// </summary>
+        /// <param name="entry">The menu entry.</param>
+        private void DeactivateButton(T entry)
+        {
+            GameObject button = EntryGameObject(entry);
+            ButtonManagerBasicWithIcon manager = button.GetComponent<ButtonManagerBasicWithIcon>();
+            manager.buttonText = entry.Title;
+            manager.normalText.fontStyle = FontStyles.Normal;
+            manager.normalText.text = manager.buttonText;
+        }
+        
+        /// <summary>
+        /// Triggers when the <see cref="ActiveEntry"/> was unselected.
+        /// </summary>
+        public event UnityAction<T> OnEntryUnselected;
+        
+        /// <summary>
+        /// Triggers when <see cref="ActiveEntry"/> was changed.
+        /// </summary>
+        public event UnityAction OnActiveEntryChanged;
     }
 }

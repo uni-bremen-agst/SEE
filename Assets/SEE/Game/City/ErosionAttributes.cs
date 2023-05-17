@@ -40,9 +40,14 @@ namespace SEE.Game.City
         public bool OverrideMetrics = true;
 
         /// <summary>
+        /// The maximal value for <see cref="ErosionScalingFactor"/>.
+        /// </summary>
+        public const float MaxErosionScalingFactor = 5.0f;
+
+        /// <summary>
         /// Factor by which erosion icons shall be scaled.
         /// </summary>
-        [Range(0.0f, float.MaxValue)]
+        [Range(0.0f, MaxErosionScalingFactor)]
         public float ErosionScalingFactor = 1.5f;
 
         /// <summary>

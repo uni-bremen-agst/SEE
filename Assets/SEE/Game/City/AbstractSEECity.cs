@@ -12,6 +12,7 @@ using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using SEE.Game.UI.RuntimeConfigMenu;
 
 namespace SEE.Game.City
 {
@@ -66,7 +67,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The path where the settings (the attributes of this class) are stored.
         /// </summary>
-        [SerializeField, Tooltip("Path of configuration file."), FoldoutGroup(DataFoldoutGroup)]
+        [SerializeField, Tooltip("Path of configuration file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath ConfigurationPath = new();
 
         /// <summary>
@@ -80,7 +81,7 @@ namespace SEE.Game.City
         /// The path to project where the source code can be found. This attribute
         /// is needed to show the source code of nodes and edges.
         /// </summary>
-        [SerializeField, FoldoutGroup(DataFoldoutGroup)]
+        [SerializeField, TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         [PropertyTooltip("Directory where the source code is located")]
         [HideReferenceObjectPicker]
         public DirectoryPath SourceCodeDirectory
@@ -107,13 +108,13 @@ namespace SEE.Game.City
         /// of an IDE for a particular project. Concretely, if the IDE is Visual Studio,
         /// this is the VS solution file.
         /// </summary>
-        [SerializeField, Tooltip("Path of VS solution file."), FoldoutGroup(DataFoldoutGroup)]
+        [SerializeField, Tooltip("Path of VS solution file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath SolutionPath = new();
 
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
-        [OdinSerialize, Tooltip("Edge types of hierarchical edges.")]
+        [OdinSerialize, Tooltip("Edge types of hierarchical edges."), TabGroup(EdgeFoldoutGroup), RuntimeTab(EdgeFoldoutGroup)]
         public HashSet<string> HierarchicalEdges = HierarchicalEdgeTypes();
 
         /// <summary>
@@ -121,7 +122,7 @@ namespace SEE.Game.City
         /// they should be visualized or not and if so, how.
         /// </summary>
         [NonSerialized, OdinSerialize, Tooltip("Visual attributes of nodes."), HideReferenceObjectPicker]
-        [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes", DisplayMode = DictionaryDisplayOptions.CollapsedFoldout)]
+        [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes", DisplayMode = DictionaryDisplayOptions.CollapsedFoldout), TabGroup(NodeFoldoutGroup), RuntimeTab(NodeFoldoutGroup)]
         public NodeTypeVisualsMap NodeTypes = new();
 
         /// <summary>
@@ -145,7 +146,7 @@ namespace SEE.Game.City
         /// <summary>
         /// A mapping of node metric names onto colors.
         /// </summary>
-        [Tooltip("Maps metric names onto colors."), FoldoutGroup(MetricFoldoutGroup), HideReferenceObjectPicker]
+        [Tooltip("Maps metric names onto colors."), TabGroup(MetricFoldoutGroup), RuntimeTab(MetricFoldoutGroup), HideReferenceObjectPicker]
         [NonSerialized, OdinSerialize]
         public ColorMap MetricToColor = new();
 
@@ -180,31 +181,31 @@ namespace SEE.Game.City
         /// Whether ZScore should be used for normalizing node metrics. If false, linear interpolation
         /// for range [0, max-value] is used, where max-value is the maximum value of a metric.
         /// </summary>
-        [Tooltip("Whether metrics should be normalized by Z score."), FoldoutGroup(MetricFoldoutGroup)]
+        [Tooltip("Whether metrics should be normalized by Z score."), TabGroup(MetricFoldoutGroup), RuntimeTab(MetricFoldoutGroup)]
         public bool ZScoreScale = false;
 
         /// <summary>
         /// If true, only the metrics of leaf nodes are scaled.
         /// </summary>
-        [Tooltip("Whether only leaf metrics should be normalized."), FoldoutGroup(MetricFoldoutGroup)]
+        [Tooltip("Whether only leaf metrics should be normalized."), TabGroup(MetricFoldoutGroup), RuntimeTab(MetricFoldoutGroup)]
         public bool ScaleOnlyLeafMetrics = true;
 
         /// <summary>
         /// The node layout settings.
         /// </summary>
-        [Tooltip("Settings for the node layout.")]
+        [Tooltip("Settings for the node layout."), TabGroup(NodeFoldoutGroup), RuntimeTab(NodeFoldoutGroup)]
         public NodeLayoutAttributes NodeLayoutSettings = new();
 
         /// <summary>
         /// The edge layout settings.
         /// </summary>
-        [Tooltip("Settings for the edge layout.")]
+        [Tooltip("Settings for the edge layout."), TabGroup(EdgeFoldoutGroup), RuntimeTab(EdgeFoldoutGroup)]
         public EdgeLayoutAttributes EdgeLayoutSettings = new();
 
         /// <summary>
         /// Attributes regarding the selection of edges.
         /// </summary>
-        [Tooltip("Settings for the selection of edges.")]
+        [Tooltip("Settings for the selection of edges."), TabGroup(EdgeFoldoutGroup), RuntimeTab(EdgeFoldoutGroup)]
         public EdgeSelectionAttributes EdgeSelectionSettings = new();
 
         /// <summary>
@@ -217,7 +218,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The metrics for the visualization of erosions.
         /// </summary>
-        [Tooltip("Settings for the visualization of software erosions.")]
+        [Tooltip("Settings for the visualization of software erosions."), TabGroup(ErosionFoldoutGroup), RuntimeTab(ErosionFoldoutGroup)]
         public ErosionAttributes ErosionSettings = new();
 
         /// <summary>
@@ -247,7 +248,7 @@ namespace SEE.Game.City
         /// Saves the settings of this code city to <see cref="ConfigurationPath"/>.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(ConfigurationButtonsGroup)]
+        [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Save Configuration")]
         [PropertyOrder(ConfigurationButtonsGroupSave)]
         public void SaveConfiguration()
         {
@@ -258,7 +259,7 @@ namespace SEE.Game.City
         /// Loads the settings of this code city from <see cref="ConfigurationPath"/>.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(ConfigurationButtonsGroup)]
+        [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Load Configuration")]
         [PropertyOrder(ConfigurationButtonsGroupLoad)]
         public void LoadConfiguration()
         {
@@ -305,7 +306,7 @@ namespace SEE.Game.City
         /// all game objects created for this city.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
-        [ButtonGroup(ResetButtonsGroup)]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
         [PropertyOrder(ResetButtonsGroupOrderReset)]
         public virtual void Reset()
         {
@@ -316,7 +317,7 @@ namespace SEE.Game.City
         /// Resets the selected node types to be visualized.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Node-Type Settings")]
-        [ButtonGroup(ResetButtonsGroup)]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Node-Type Settings")]
         [PropertyOrder(ResetButtonsGroupOrderReset + 1)]
         public void ResetSelectedNodeTypes()
         {
@@ -328,7 +329,7 @@ namespace SEE.Game.City
         /// Used for debugging.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Dump Map")]
-        [ButtonGroup(ResetButtonsGroup)]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Dump Map")]
         [PropertyOrder(ResetButtonsGroupOrderReset + 2)]
         public void DumpGraphElementIDMap()
         {
@@ -340,7 +341,7 @@ namespace SEE.Game.City
         /// Used for debugging.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Clear Map")]
-        [ButtonGroup(ResetButtonsGroup)]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Clear Map")]
         [PropertyOrder(ResetButtonsGroupOrderReset + 3)]
         public void ClearGraphElementIDMap()
         {
@@ -585,7 +586,7 @@ namespace SEE.Game.City
         /// Lists the metrics for each node type.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "List Node Metrics")]
-        [ButtonGroup(ResetButtonsGroup)]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "List Node Metrics")]
         [PropertyOrder(ResetButtonsGroupOrderReset + 2)]
         private void ListNodeMetrics()
         {
@@ -771,5 +772,21 @@ namespace SEE.Game.City
         /// Name of the Inspector foldout group for the metric setttings.
         /// </summary>
         protected const string MetricFoldoutGroup = "Metric settings";
+
+        /// <summary>
+        /// Name of the Inspector foldout group for the node settings.
+        /// </summary>
+        protected const string NodeFoldoutGroup = "Nodes";
+
+        /// <summary>
+        /// Name of the Inspector foldout group for the edge settings.
+        /// </summary>
+        protected const string EdgeFoldoutGroup = "Edges";
+
+        /// <summary>
+        /// Name of the Inspector foldout group for the erosion settings.
+        /// </summary>
+        protected const string ErosionFoldoutGroup = "Erosion";
+
     }
 }

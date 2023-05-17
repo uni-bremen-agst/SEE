@@ -12,9 +12,9 @@ using UnityEngine.Windows.Speech;
 namespace SEE.Game.UI.Menu
 {
     /// <summary>
-    /// A menu similar to the <see cref="SimpleMenu"/> with buttons which can open other menus.
+    /// A menu similar to the <see cref="SimpleListMenu"/> with buttons which can open other menus.
     /// </summary>
-    public class NestedMenu : SimpleMenu<MenuEntry>
+    public class NestedListMenu : SimpleListMenu<MenuEntry>
     {
         /// <summary>
         /// The menu levels we have ascended through.
@@ -24,7 +24,7 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// Path to the NestedMenu prefab.
         /// </summary>
-        protected override string MENU_PREFAB => "Prefabs/UI/NestedMenu";
+        protected override string MenuPrefab => "Prefabs/UI/NestedMenu";
 
         /// <summary>
         /// The keyword to be used to step back in the menu verbally.
@@ -52,62 +52,36 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         private bool searchActive;
 
-        protected override void OnEntrySelected(MenuEntry entry)
+        public override void SelectEntry(MenuEntry entry)
         {
             if (entry is NestedMenuEntry nestedEntry)
             {
-                // If this contains another menu level, repopulate list with new level after saving the current one
                 AscendLevel(nestedEntry);
             }
             else
             {
-                // Otherwise, we do the same we'd do normally
-                base.OnEntrySelected(entry);
+                base.SelectEntry(entry);
             }
         }
 
         /// <summary>
-        /// Returns the titles of all <see cref="entries"/> plus
-        /// <see cref="CloseMenuCommand"/> appended at the end.
+        /// Appends the <see cref="BackMenuCommand"/> to the keywords.
         /// </summary>
-        /// <returns>titles of all <see cref="entries"/> appended by 
-        /// <see cref="CloseMenuCommand"/></returns>
-        protected override string[] GetMenuEntryTitles()
+        /// <returns></returns>
+        protected override IEnumerable<string> GetKeywords()
         {
-            return entries.Select(x => x.Title).Append(CloseMenuCommand).Append(BackMenuCommand).ToArray();
+            return base.GetKeywords().Append(BackMenuCommand);
         }
 
-        /// <summary>
-        /// Callback registered in <see cref="Listen(bool)"/> to be called when
-        /// one of the menu entry titles was recognized (spoken by the user).
-        /// Triggers the corresponding action of the selected entry if the 
-        /// corresponding entry title was recognized and then closes the menu 
-        /// again. If only <see cref="CloseMenuCommand"/> was recognized, no 
-        /// action will be triggered, yet the menu will be closed, too.
-        /// </summary>
-        /// <param name="args">the phrase recognized</param>
-        protected override void OnMenuEntryTitleRecognized(PhraseRecognizedEventArgs args)
+        protected override void HandleKeyword(PhraseRecognizedEventArgs args)
         {
-            int i = 0;
-            foreach (string keyword in GetMenuEntryTitles())
+            if (args.text == BackMenuCommand)
             {
-                if (args.text == keyword)
-                {
-                    if (args.text == CloseMenuCommand)
-                    {
-                        ToggleMenu();
-                    }
-                    if (args.text == BackMenuCommand)
-                    {
-                        DescendLevel();
-                    }
-                    else
-                    {
-                        SelectEntry(i);
-                    }
-                    break;
-                }
-                i++;
+                DescendLevel();
+            }
+            else
+            {
+                base.HandleKeyword(args);
             }
         }
 
@@ -117,10 +91,10 @@ namespace SEE.Game.UI.Menu
         /// <param name="nestedEntry">The entry from which to construct the new level</param>
         private void AscendLevel(NestedMenuEntry nestedEntry)
         {
-            Levels.Push(new MenuLevel(Title, Description, Icon, entries));
-            while (entries.Count != 0)
+            Levels.Push(new MenuLevel(Title, Description, Icon, Entries));
+            while (Entries.Count != 0)
             {
-                RemoveEntry(entries[0]); // Remove all entries
+                RemoveEntry(Entries[0]); // Remove all entries
             }
             Title = nestedEntry.Title;
             //TODO: Instead of abusing the description for this, use a proper individual text object
@@ -130,9 +104,9 @@ namespace SEE.Game.UI.Menu
             Description = nestedEntry.Description + (breadcrumb.Length > 0 ? $"\n{GetBreadcrumb()}" : "");
             Icon = nestedEntry.Icon;
             nestedEntry.InnerEntries.ForEach(AddEntry);
-            keywordInput.Unregister(OnMenuEntryTitleRecognized);
-            keywordInput.Register(OnMenuEntryTitleRecognized);
-            Tooltip.Hide();
+            KeywordListener.Unregister(HandleKeyword);
+            KeywordListener.Register(HandleKeyword);
+            MenuTooltip.Hide();
         }
 
         /// <summary>
@@ -152,17 +126,17 @@ namespace SEE.Game.UI.Menu
                 Title = level.Title;
                 Description = level.Description;
                 Icon = level.Icon;
-                while (entries.Count != 0)
+                while (Entries.Count != 0)
                 {
-                    RemoveEntry(entries[0]); // Remove all entries
+                    RemoveEntry(Entries[0]); // Remove all entries
                 }
                 level.Entries.ForEach(AddEntry);
             }
             else
             {
-                ShowMenu(false);
+                ShowMenu = false;
             }
-            Tooltip.Hide();
+            MenuTooltip.Hide();
         }
 
         /// <summary>
@@ -182,21 +156,21 @@ namespace SEE.Game.UI.Menu
         {
             base.StartDesktop();
 
-            MenuContent.transform.Find("Search Field").gameObject.TryGetComponentOrLog(out searchInput);
+            Content.transform.Find("Search Field").gameObject.TryGetComponentOrLog(out searchInput);
             
             searchInput.onValueChanged.AddListener(SearchTextEntered);
-            Manager.onCancel.AddListener(DescendLevel); // Go one level higher when clicking "back"
-            Manager.onCancel.AddListener(() =>
+            MenuManager.onCancel.AddListener(DescendLevel); // Go one level higher when clicking "back"
+            MenuManager.onCancel.AddListener(() =>
             {
                 searchActive = false;
                 searchInput.text = string.Empty;
             });
             if (ResetLevelOnClose)
             {
-                Manager.onConfirm.AddListener(ResetToBase); // When closing the menu, its level will be reset to the top
+                MenuManager.onConfirm.AddListener(ResetToBase); // When closing the menu, its level will be reset to the top
             }
             
-            OnMenuToggle.AddListener(shown => SEEInput.KeyboardShortcutsEnabled = !shown);
+            // TODO: OnMenuToggle.AddListener(shown => SEEInput.KeyboardShortcutsEnabled = !shown);
         }
 
         /// <summary>

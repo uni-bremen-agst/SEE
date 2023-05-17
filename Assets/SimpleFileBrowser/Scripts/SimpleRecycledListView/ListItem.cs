@@ -1,24 +1,3 @@
-﻿using UnityEngine;
-
-namespace SimpleFileBrowser
-{
-	[RequireComponent( typeof( RectTransform ) )]
-	public class ListItem : MonoBehaviour
-	{
-		public object Tag { get; set; }
-		public int Position { get; set; }
-
-		private IListViewAdapter adapter;
-
-		internal void SetAdapter( IListViewAdapter listView )
-		{
-			this.adapter = listView;
-		}
-
-		public void OnClick()
-		{
-			if( adapter.OnItemClicked != null )
-				adapter.OnItemClicked( this );
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:e41e9ebb0cebc3908fbce63547f71b2acc04d1c80b84df345db0f30006302112
+size 453

@@ -188,9 +188,9 @@ namespace SEE.Game.UI.HelpSystem
         /// <param name="icon">The icon of the HelpSystem-MainMenu.</param>
         /// <param name="mainMenuEntries">The MenuEntries which are displayed inside of the MainMenu for more hierachy-layers.</param>
         /// <returns>The Main-Menu as a NestedMenu.</returns>
-        public static NestedMenu CreateMainMenu(string title, string description, string icon, List<MenuEntry> mainMenuEntries)
+        public static NestedListMenu CreateMainMenu(string title, string description, string icon, List<MenuEntry> mainMenuEntries)
         {
-            NestedMenu mainMenu = GameObject.Find(HelpSystemName).AddComponent<NestedMenu>();
+            NestedListMenu mainMenu = GameObject.Find(HelpSystemName).AddComponent<NestedListMenu>();
             mainMenu.Title = title;
             mainMenu.Description = description;
             mainMenu.Icon = Resources.Load<Sprite>(icon);
