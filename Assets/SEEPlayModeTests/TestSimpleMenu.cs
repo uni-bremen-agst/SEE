@@ -29,10 +29,11 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <returns><see cref="WaitForEndOfFrame"/></returns>
         [UnityTest]
-        public IEnumerator TestSimpleMenuOption1()
+        [LoadScene()]
+        public IEnumerator TestMenuOption1()
         {
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
-            PressButton(menu.Title, OptionOne);
+            PressButton(MenuTitle, OptionOne);
             yield return new WaitForEndOfFrame();
             Assert.AreEqual(1, selection);
             yield return new WaitForEndOfFrame();
@@ -43,10 +44,11 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <returns><see cref="WaitForEndOfFrame"/></returns>
         [UnityTest]
-        public IEnumerator TestSimpleMenuOption2()
+        [LoadScene()]
+        public IEnumerator TestMenuOption2()
         {
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
-            PressButton(menu.Title, OptionTwo);
+            PressButton(MenuTitle, OptionTwo);
             yield return new WaitForEndOfFrame();
             Assert.AreEqual(2, selection);
             yield return new WaitForEndOfFrame();
@@ -57,10 +59,11 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <returns><see cref="WaitForEndOfFrame"/></returns>
         [UnityTest]
-        public IEnumerator TestSimpleMenuNoOption()
+        [LoadScene()]
+        public IEnumerator TestMenuNoOption()
         {
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
-            PressCloseButton(menu.Title);
+            PressCloseButton(MenuTitle);
             yield return new WaitForEndOfFrame();
             Assert.AreEqual(0, selection);
             yield return new WaitForEndOfFrame();
