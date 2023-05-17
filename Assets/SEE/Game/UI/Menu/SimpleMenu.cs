@@ -87,6 +87,17 @@ namespace SEE.Game.UI.Menu
         }
 
         /// <summary>
+        /// Let's <see cref="KeywordListener"/> stop listening.
+        /// </summary>
+        /// <remarks>Called by Unity when this object is destroyed.</remarks>
+        private void OnDestroy()
+        {
+            KeywordListener?.Stop();
+            KeywordListener?.Dispose();
+            KeywordListener = null;
+        }
+
+        /// <summary>
         /// Whether the menu is shown.
         /// </summary>
         private bool showMenu;
@@ -157,7 +168,10 @@ namespace SEE.Game.UI.Menu
         protected virtual IEnumerable<string> GetKeywords()
         {
             IEnumerable<string> keywords = Enumerable.Empty<string>();
-            if (CloseMenuKeyword != null) keywords = keywords.Append(CloseMenuKeyword);
+            if (CloseMenuKeyword != null)
+            {
+                keywords = keywords.Append(CloseMenuKeyword);
+            }
             return keywords;
         }
     
