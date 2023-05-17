@@ -73,6 +73,18 @@ namespace SEE.Game.UI.Menu
         }
 
         /// <summary>
+        /// Adds all given menu <paramref name="entries"/>.
+        /// </summary>
+        /// <param name="entries">entries to be added</param>
+        public void AddEntries(IEnumerable<T> entries)
+        {
+            foreach (T entry in entries)
+            {
+                AddEntry(entry);
+            }
+        }
+
+        /// <summary>
         /// Removes a menu entry.
         /// It is assumed that the menu contains the entry.
         /// </summary>
