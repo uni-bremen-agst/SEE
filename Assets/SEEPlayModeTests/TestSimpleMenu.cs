@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using SEE.Utils;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,66 +25,13 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         private const string MenuTitle = "Test Menu";
 
-        /// <summary>
-        /// The index of the selected option.
-        /// </summary>
-        private int selection = 0;
-
-        /// <summary>
-        /// The game object holding the <see cref="menu"/>.
-        /// </summary>
-        private GameObject menuGO;
-        /// <summary>
-        /// The menu to be tested.
-        /// </summary>
-        private SimpleListMenu menu;
-
-        /// <summary>
-        /// Set up for every test.
-        /// Resets <see cref="selection"/>.
-        /// Sets up <see cref="menuGO"/> and <see cref="menu"/>.
-        /// </summary>
-        /// <returns>waiting <see cref="TimeUntilMenuIsSetup"/></returns>
-        /// <remarks>
-        /// Will be called after <see cref="TestUI.Setup"/>.
-        /// Method must be public. Otherwise it will not be called by the test framework.
-        /// </remarks>
-        [UnitySetUp]
-        public new IEnumerator Setup()
-        {
-            selection = 0;
-            CreateMenu(out menuGO, out menu);
-            yield return new WaitForSeconds(TimeUntilMenuIsSetup);
-        }
-
-        /// <summary>
-        /// Tear down after every test.
-        /// Destroys <see cref="menuGO"/> and <see cref="menu"/>.
-        /// </summary>
-        /// <returns>waiting <see cref="TimeUntilMenuIsSetup"/></returns>
-        /// <remarks>
-        /// Will be called before <see cref="TestUI.TearDown"/>.
-        /// Method must be public. Otherwise it will not be called by the test framework.
-        /// </remarks>
-        [UnityTearDown]
-        public new IEnumerator TearDown()
-        {
-            Destroyer.Destroy(menuGO);
-            yield return new WaitForSeconds(TimeUntilMenuIsSetup);
-        }
-
-        /// <summary>
-        /// The time it takes until the menu is up and running in seconds.
-        /// </summary>
-        private const float TimeUntilMenuIsSetup = 1f;
-
-        /// <summary>
         /// Test for selecting option 1.
         /// </summary>
         /// <returns><see cref="WaitForEndOfFrame"/></returns>
         [UnityTest]
         public IEnumerator TestSimpleMenuOption1()
         {
+            yield return new WaitForSeconds(TimeUntilMenuIsSetup);
             PressButton(menu.Title, OptionOne);
             yield return new WaitForEndOfFrame();
             Assert.AreEqual(1, selection);
@@ -99,6 +45,7 @@ namespace SEE.Game.UI.Menu
         [UnityTest]
         public IEnumerator TestSimpleMenuOption2()
         {
+            yield return new WaitForSeconds(TimeUntilMenuIsSetup);
             PressButton(menu.Title, OptionTwo);
             yield return new WaitForEndOfFrame();
             Assert.AreEqual(2, selection);
@@ -112,6 +59,7 @@ namespace SEE.Game.UI.Menu
         [UnityTest]
         public IEnumerator TestSimpleMenuNoOption()
         {
+            yield return new WaitForSeconds(TimeUntilMenuIsSetup);
             PressCloseButton(menu.Title);
             yield return new WaitForEndOfFrame();
             Assert.AreEqual(0, selection);
@@ -124,7 +72,7 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <param name="menuGO">new game object holding <paramref name="menu"/></param>
         /// <param name="menu">a new menu that can be tested</param>
-        private void CreateMenu(out GameObject menuGO, out SimpleListMenu menu)
+        protected override void CreateMenu(out GameObject menuGO, out AbstractMenu<MenuEntry> menu)
         {
             menuGO = new GameObject { name = "Container for menu" };
             menu = menuGO.AddComponent<SimpleListMenu>();
