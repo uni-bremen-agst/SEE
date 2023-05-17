@@ -1,10 +1,7 @@
-﻿using System.Linq;
-using Michsky.UI.ModernUIPack;
+﻿using Michsky.UI.ModernUIPack;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
-using Valve.VR.InteractionSystem;
 
 namespace SEE.Game.UI.Menu
 {
@@ -17,7 +14,7 @@ namespace SEE.Game.UI.Menu
     /// A menu in which the user can choose one active selection out of a menu.
     /// It is assumed that only one selection can be active at a time.
     /// </summary>
-    public class SelectionMenu<T>: SimpleListMenu<T> where T : ToggleMenuEntry
+    public class SelectionMenu<T> : NestedListMenu<T> where T : ToggleMenuEntry
     {
         /// <summary>
         /// The active entry.

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using FuzzySharp;
-using SEE.Controls;
 using SEE.GO;
 using SEE.GO.Menu;
 using TMPro;
@@ -12,14 +11,25 @@ using UnityEngine.Windows.Speech;
 namespace SEE.Game.UI.Menu
 {
     /// <summary>
-    /// A menu similar to the <see cref="SimpleListMenu"/> with buttons which can open other menus.
+    /// A nested menu containing a list of <see cref="MenuEntry"/> items.
+    /// The difference between this and the generic menu class <see cref="NestedListMenu{T}"/>
+    /// is that the type parameter doesn't have to be specified here.
     /// </summary>
-    public class NestedListMenu : SimpleListMenu<MenuEntry>
+    public class NestedListMenu : NestedListMenu<MenuEntry>
+    {
+        // Intentionally empty, see class documentation.
+    }
+
+    /// <summary>
+    /// A menu similar to the <see cref="SimpleListMenu"/> with buttons which can open
+    /// other menus, i.e., in other words, a container for other menus.
+    /// </summary>
+    public class NestedListMenu<T> : SimpleListMenu<T> where T : MenuEntry
     {
         /// <summary>
         /// The menu levels we have ascended through.
         /// </summary>
-        private readonly Stack<MenuLevel> Levels = new Stack<MenuLevel>();
+        private readonly Stack<MenuLevel> Levels = new();
 
         /// <summary>
         /// Path to the NestedMenu prefab.
@@ -45,16 +55,16 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// All leaf-entries of the nestedMenu.
         /// </summary>
-        private IDictionary<string, MenuEntry> AllEntries;
+        private IDictionary<string, T> AllEntries;
 
         /// <summary>
         /// True, if the fuzzy-search is active, else false.
         /// </summary>
         private bool searchActive;
 
-        public override void SelectEntry(MenuEntry entry)
+        public override void SelectEntry(T entry)
         {
-            if (entry is NestedMenuEntry nestedEntry)
+            if (entry is NestedMenuEntry<T> nestedEntry)
             {
                 AscendLevel(nestedEntry);
             }
@@ -89,7 +99,7 @@ namespace SEE.Game.UI.Menu
         /// Ascends up in the menu hierarchy by creating a new level from the given <paramref name="nestedEntry"/>.
         /// </summary>
         /// <param name="nestedEntry">The entry from which to construct the new level</param>
-        private void AscendLevel(NestedMenuEntry nestedEntry)
+        private void AscendLevel(NestedMenuEntry<T> nestedEntry)
         {
             Levels.Push(new MenuLevel(Title, Description, Icon, Entries));
             while (Entries.Count != 0)
@@ -177,9 +187,9 @@ namespace SEE.Game.UI.Menu
         /// Gets all leaf-entries - or rather menuEntries (no nestedMenuEntries) of the nestedMenu.
         /// </summary>
         /// <returns>All leaf-entries of the nestedMenu.</returns>
-        private IEnumerable<MenuEntry> GetAllEntries()
+        private IEnumerable<T> GetAllEntries()
         {
-            IList<MenuEntry> allEntries = Levels.LastOrDefault()?.Entries ?? Entries;
+            IList<T> allEntries = Levels.LastOrDefault()?.Entries ?? Entries;
             return GetAllEntries(allEntries);
         }
 
@@ -188,12 +198,12 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <param name="startingEntries">the entries to research.</param>
         /// <returns>All leafEntries of the nestedMenu.</returns>
-        private static IEnumerable<MenuEntry> GetAllEntries(IEnumerable<MenuEntry> startingEntries)
+        private static IEnumerable<T> GetAllEntries(IEnumerable<T> startingEntries)
         {
-            List<MenuEntry> leafEntries = new List<MenuEntry>();
-            foreach (MenuEntry startingEntry in startingEntries)
+            List<T> leafEntries = new();
+            foreach (T startingEntry in startingEntries)
             {
-                if (startingEntry is NestedMenuEntry nestedMenuEntry)
+                if (startingEntry is NestedMenuEntry<T> nestedMenuEntry)
                 {
                     leafEntries.AddRange(GetAllEntries(nestedMenuEntry.InnerEntries));
                 }
@@ -225,15 +235,15 @@ namespace SEE.Game.UI.Menu
             }
             
             AllEntries ??= GetAllEntries().ToDictionary(x => x.Title, x => x);
-            IEnumerable<MenuEntry> results =
+            IEnumerable<T> results =
                 Process.ExtractTop(SearchMenu.FilterString(text), AllEntries.Keys, cutoff: 10)
                        .OrderByDescending(x => x.Score)
                        .Select(x => AllEntries[x.Value])
                        .ToList();
 
-            NestedMenuEntry resultEntry = new NestedMenuEntry(
-                 results, "Results", $"Found {results.Count()} help pages.",default,default, Resources.Load<Sprite>("Materials/Notification/info")
-            ) ;
+            NestedMenuEntry<T> resultEntry 
+                = new (results, "Results", $"Found {results.Count()} help pages.", 
+                       default, default, Resources.Load<Sprite>("Materials/Notification/info"));
             AscendLevel(resultEntry);
         }
 
@@ -246,14 +256,14 @@ namespace SEE.Game.UI.Menu
             public readonly string Title;
             public readonly string Description;
             public readonly Sprite Icon;
-            public readonly List<MenuEntry> Entries;
+            public readonly List<T> Entries;
 
-            public MenuLevel(string title, string description, Sprite icon, IList<MenuEntry> entries)
+            public MenuLevel(string title, string description, Sprite icon, IList<T> entries)
             {
                 Title = title ?? throw new ArgumentNullException(nameof(title));
                 Description = description ?? throw new ArgumentNullException(nameof(description));
                 Icon = icon;
-                Entries = entries != null ? new List<MenuEntry>(entries) : throw new ArgumentNullException(nameof(entries));
+                Entries = entries != null ? new List<T>(entries) : throw new ArgumentNullException(nameof(entries));
             }
         }
     }
