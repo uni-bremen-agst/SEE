@@ -23,6 +23,7 @@ using System.Linq;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
+using SEE.GO;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -280,20 +281,16 @@ namespace SEE.Game.City
         /// Loads all graphs, calculates their layouts, and displays the first graph in the
         /// graph series.
         /// </summary>
-        override protected void Start()
+        protected override void Start()
         {
-            Reset();
             base.Start();
+            Reset();
 
             List<Graph> graphs = LoadDataSeries();
             evolutionRenderer = CreateEvolutionRenderer(graphs);
             DrawGraphs(graphs);
 
-            if (!gameObject.TryGetComponent(out AnimationInteraction animationInteraction))
-            {
-                animationInteraction = gameObject.AddComponent<AnimationInteraction>();
-            }
-            animationInteraction.EvolutionRenderer = evolutionRenderer;
+            gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
 
             evolutionRenderer.ShowGraphEvolution();
         }

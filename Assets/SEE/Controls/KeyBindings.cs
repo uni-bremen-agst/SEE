@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -84,6 +83,12 @@ namespace SEE.Controls
         /// </summary>
         internal static readonly KeyCode Help = Register(KeyCode.H, Scope.Always, "Prints help on the key bindings.");
 
+        /// <summary>
+        /// Toggles voice input (i.e., for voice commands) on/off.
+        /// </summary>
+        internal static readonly KeyCode ToggleVoiceInput = Register(KeyCode.Period, Scope.Always,
+                                                                     "Toggles voice input on/off.");
+
         #endregion
 
         //-----------------------------------------------------------------
@@ -145,40 +150,16 @@ namespace SEE.Controls
 
         #endregion
 
-        //----------------------------------------------------
-        #region Architecture mapping and analysis
-        //----------------------------------------------------
-
-        /// <summary>
-        /// Architecture mapping: maps implementation entity onto architecture entity.
-        /// </summary>
-        internal static KeyCode Mapping = Register(KeyCode.V, Scope.Architecture, "Architecture mapping: maps implementation entity onto architecture entity.");
-
-        /// <summary>
-        /// Architecture mapping: saves the current architecture mapping.
-        /// </summary>
-        //internal static KeyCode SaveArchitectureMapping = Register(KeyCode.F, Scope.Architecture, "Architecture mapping: saves the current architecture mapping.");
-
-        /// <summary>
-        /// Architecture mapping: copies/removes selected implementation node to/from clipboard.
-        /// </summary>
-        //internal static KeyCode AddOrRemoveFromClipboard = Register(KeyCode.C, Scope.Architecture, "Architecture mapping: copies/removes selected implementation node to/from clipboard.");
-
-        /// <summary>
-        /// Architecture mapping: maps all nodes in clipboard onto selected architecture node.
-        /// </summary>
-        //internal static KeyCode PasteClipboard = Register(KeyCode.V, Scope.Architecture, "Architecture mapping: maps all nodes in clipboard onto selected architecture node.");
-
-        /// <summary>
-        /// Architecture mapping: clears clipboard.
-        /// </summary>
-        //internal static KeyCode ClearClipboard = Register(KeyCode.X, Scope.Architecture, "Architecture mapping: clears clipboard.");
-
-        #endregion
 
         //-----------------------------------------------------
         #region Navigation in a code city
         //-----------------------------------------------------
+
+        /// <summary>
+        /// Toggles the visibility of all edges of a hovered code city.
+        /// </summary>
+        internal static KeyCode ToggleEdges = Register(KeyCode.V, Scope.Browsing, "Toggles the visibility of all edges of a hovered code city.");
+
 
         /// <summary>
         /// Forgets all currently selected objects.
@@ -256,18 +237,6 @@ namespace SEE.Controls
         //--------------------------
 
         /// <summary>
-        /// The previous revision is to be shown.
-        /// </summary>
-        internal static readonly KeyCode PreviousRevision = Register(KeyCode.LeftArrow, Scope.Evolution, "The previous revision is to be shown.");
-        /// <summary>
-        /// The next revision is to be shown.
-        /// </summary>
-        internal static readonly KeyCode NextRevision = Register(KeyCode.RightArrow, Scope.Evolution, "The next revision is to be shown.");
-        /// <summary>
-        /// Toggles auto play of the animation.
-        /// </summary>
-        internal static readonly KeyCode ToggleAutoPlay = Register(KeyCode.Tab, Scope.Evolution, "Toggles auto play of the animation.");
-        /// <summary>
         /// Sets a new marker.
         /// </summary>
         internal static readonly KeyCode SetMarker = Register(KeyCode.Insert, Scope.Evolution, "Sets a new marker.");
@@ -283,9 +252,21 @@ namespace SEE.Controls
         #endregion
 
         //----------------------------------------------------
-        #region Animation speed (shared by Debugging and Evolution)
+        #region Animation (shared by Debugging and Evolution)
         //----------------------------------------------------
 
+        /// <summary>
+        /// The previous element in the animation is to be shown.
+        /// </summary>
+        internal static readonly KeyCode Previous = Register(KeyCode.LeftArrow, Scope.Animation, "Go to previous element in the animation.");
+        /// <summary>
+        /// The next element in the animation is to be shown.
+        /// </summary>
+        internal static readonly KeyCode Next = Register(KeyCode.RightArrow, Scope.Animation, "Go to next element in the animation.");
+        /// <summary>
+        /// Toggles auto play of the animation.
+        /// </summary>
+        internal static readonly KeyCode ToggleAutoPlay = Register(KeyCode.Tab, Scope.Animation, "Toggles auto play of the animation.");
         /// <summary>
         /// Double animation speed.
         /// </summary>
@@ -302,10 +283,6 @@ namespace SEE.Controls
         //--------------------------
 
         /// <summary>
-        /// Toggles automatic/manual execution mode.
-        /// </summary>
-        internal static readonly KeyCode ToggleAutomaticManualMode = Register(KeyCode.I, Scope.Debugging, "Toggles automatic/manual execution mode.");
-        /// <summary>
         /// Toggles execution order (forward/backward).
         /// </summary>
         internal static readonly KeyCode ToggleExecutionOrder = Register(KeyCode.O, Scope.Debugging, "Toggles execution order (foward/backward).");
@@ -313,14 +290,6 @@ namespace SEE.Controls
         /// Continues execution until next breakpoint is reached.
         /// </summary>
         internal static readonly KeyCode ExecuteToBreakpoint = Register(KeyCode.B, Scope.Debugging, "Continues execution until next breakpoint is reached.");
-        /// <summary>
-        /// Executes previous statement.
-        /// </summary>
-        internal static readonly KeyCode PreviousStatement = Register(KeyCode.PageUp, Scope.Debugging, "Executes previous statement.");
-        /// <summary>
-        /// Executes next statement.
-        /// </summary>
-        internal static readonly KeyCode NextStatement = Register(KeyCode.PageDown, Scope.Debugging, "Executes next statement.");
         /// <summary>
         /// Execution is back to very first statement.
         /// </summary>
@@ -364,19 +333,9 @@ namespace SEE.Controls
         //-----------------------------------------------------
 
         /// <summary>
-        /// Toggles the global chat room.
+        /// Opens the text chat.
         /// </summary>
-        internal static readonly KeyCode ToggleGlobalChat = Register(KeyCode.F2, Scope.Chat, "Toggles the global chat room.");
-
-        /// <summary>
-        /// Toggles the chat room for team 1.
-        /// </summary>
-        internal static readonly KeyCode ToggleTeam1Channel = Register(KeyCode.F3, Scope.Chat, "Toggles the chat room for team 1.");
-
-        /// <summary>
-        /// Toggles the chat room for team 2.
-        /// </summary>
-        internal static readonly KeyCode ToggleTeam2Channel = Register(KeyCode.F4, Scope.Chat, "Toggles the chat room for team 2.");
+        internal static readonly KeyCode OpenTextChat = Register(KeyCode.F2, Scope.Chat, "Opens the text chat.");
 
         #endregion
 
@@ -390,5 +349,20 @@ namespace SEE.Controls
         internal static readonly KeyCode CloseNotifications = Register(KeyCode.X, Scope.Always, "Clears all notifications.");
 
         #endregion
+
+        #region Holistic Metric Menu
+
+        //-----------------------------------------------------
+        // Holistic metrics menu
+        //-----------------------------------------------------
+
+        /// <summary>
+        /// Toggles the menu for holistic code metrics.
+        /// </summary>
+        internal static readonly KeyCode ToggleHolisticMetricsMenu = Register(KeyCode.C, Scope.Always, 
+                                                                              "Toggles the menu for holistic code metrics");
+
+        #endregion
+
     }
 }

@@ -4,7 +4,6 @@ using SEE.Layout.NodeLayouts.Cose;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts
 {
@@ -48,7 +47,7 @@ namespace SEE.Layout.NodeLayouts
                 // exactly one root
                 ILayoutNode root = roots.FirstOrDefault();
                 float outRadius = PlaceNodes(root);
-                Vector3 position = new Vector3(0.0f, groundLevel, 0.0f);
+                Vector3 position = new(0.0f, groundLevel, 0.0f);
                 layoutResult[root] = new NodeTransform(position,
                                                         GetScale(root, outRadius));
                 MakeGlobal(layoutResult, position, root.Children());

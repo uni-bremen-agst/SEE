@@ -282,7 +282,7 @@ namespace SEE.GO
         {
             Material prefab = Resources.Load<Material>(name);
             Assert.IsNotNull(prefab, $"Material resource '{name}' could not be found!");
-            Material material = new Material(prefab)
+            Material material = new(prefab)
             {
                 renderQueue = prefab.renderQueue + renderQueueOffset,
                 color = color

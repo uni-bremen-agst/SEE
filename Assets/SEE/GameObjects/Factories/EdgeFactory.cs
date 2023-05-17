@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel;
 using SEE.Game;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
@@ -50,7 +49,7 @@ namespace SEE.GO
         /// <returns>new game edge</returns>
         private static GameObject NewGameEdge<T>(LayoutGraphEdge<T> layoutGraphEdge) where T : ILayoutNode
         {
-            GameObject gameEdge = new GameObject
+            GameObject gameEdge = new()
             {
                 tag = Tags.Edge,
                 isStatic = false,
@@ -80,7 +79,7 @@ namespace SEE.GO
         public ICollection<GameObject> DrawEdges<T>(IEnumerable<T> nodes, ICollection<LayoutGraphEdge<T>> edges)
         where T : LayoutGameNode, IHierarchyNode<ILayoutNode>
         {
-            List<GameObject> result = new List<GameObject>(edges.Count);
+            List<GameObject> result = new(edges.Count);
             if (edges.Count == 0)
             {
                 return result;

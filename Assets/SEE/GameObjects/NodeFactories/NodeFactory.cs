@@ -1,5 +1,4 @@
-﻿using SEE.DataModel;
-using SEE.Game;
+﻿using SEE.Game;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -81,7 +80,7 @@ namespace SEE.GO.NodeFactories
         /// <returns>new game object for a node</returns>
         private GameObject CreateBlock(float[] metrics)
         {
-            GameObject gameObject = new GameObject() { tag = Tags.Node };
+            GameObject gameObject = new() { tag = Tags.Node };
             // A MeshFilter is necessary for the gameObject to hold a mesh.
             MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
             meshFilter.sharedMesh = GetMesh(metrics);

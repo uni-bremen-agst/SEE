@@ -2,34 +2,34 @@
 <!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
 <gxl xmlns:xlink="http://www.w3.org/1999/xlink">
   <graph id="Architecture" edgeids="true">
-    <node id="N1">
-      <type xlink:href="Cluster"/>
+    <node id="UI">
+      <type xlink:href="Module"/>
       <attr name="Source.Name">
-        <string>H1</string>
+        <string>UI</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>H1</string>
+        <string>UI</string>
       </attr>
     </node>
-    <node id="N2">
-      <type xlink:href="Cluster"/>
+    <node id="Logic">
+      <type xlink:href="Module"/>
       <attr name="Source.Name">
-        <string>H2</string>
+        <string>Logic</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>H2</string>
+        <string>Logic</string>
       </attr>
     </node>
-    <node id="N3">
-      <type xlink:href="Cluster"/>
+    <node id="HAL">
+      <type xlink:href="Module"/>
       <attr name="Source.Name">
-        <string>H3</string>
+        <string>HAL</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>H3</string>
+        <string>HAL</string>
       </attr>
     </node>
-    <node id="N8">
+    <node id="Architecture">
       <type xlink:href="Architecture_Layer"/>
       <attr name="Source.Name">
         <string>Architecture</string>
@@ -38,19 +38,19 @@
         <string>Architecture</string>
       </attr>
     </node>
-    <edge id="E1" from="N2" to="N1">
+    <edge id="E1" from="UI" to="Logic">
       <type xlink:href="Source_Dependency"/>
     </edge>
-    <edge id="E2" from="N2" to="N3">
+    <edge id="E2" from="Logic" to="HAL">
       <type xlink:href="Source_Dependency"/>
     </edge>
-    <edge id="E8" from="N1" to="N8">
+    <edge id="E8" from="UI" to="Architecture">
       <type xlink:href="Belongs_To"/>
     </edge>
-    <edge id="E9" from="N2" to="N8">
+    <edge id="E9" from="Logic" to="Architecture">
       <type xlink:href="Belongs_To"/>
     </edge>
-    <edge id="E10" from="N3" to="N8">
+    <edge id="E10" from="HAL" to="Architecture">
       <type xlink:href="Belongs_To"/>
     </edge>
   </graph>

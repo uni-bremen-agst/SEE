@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Sirenix.Serialization;
-using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.GO;
@@ -26,13 +25,27 @@ namespace SEE.Game.City
     [Serializable]
     public abstract partial class AbstractSEECity : SerializedMonoBehaviour
     {
+        protected virtual void Awake()
+        {
+            // Intentionally left blank
+        }
+
+        protected virtual void Start()
+        {
+            // Intentionally left blank
+        }
+
+        protected virtual void Update()
+        {
+            // Intentionally left blank
+        }
+
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
         /// <see cref="AbstractSEECity.Save"/> and
         /// <see cref="Restore"/>,
         /// respectively (both declared in AbstractSEECityIO). You should also
         /// extend the test cases in TestConfigIO.
-
         /// <summary>
         /// The graph underlying this code city that was loaded from disk. May be null.
         /// Neither serialized nor saved to the config file.
@@ -215,27 +228,6 @@ namespace SEE.Game.City
 
         /// <summary>
         /// Adds all game objects tagged by <see cref="Tags.Node"/> or <see cref="Tags.Edge"/>
-        /// of this game object including its descendants to <see cref="GraphElementIDMap"/>.
-        /// </summary>
-        protected virtual void Awake()
-        {
-            UpdateGraphElementIDMap(gameObject);
-        }
-
-        /// <summary>
-        /// Called at game start. Sets up additional components.
-        /// </summary>
-        protected virtual void Start()
-        {
-            if (LoadedGraph != null && !gameObject.TryGetComponent(out EdgeMeshScheduler _))
-            {
-                gameObject.AddComponent<EdgeMeshScheduler>()
-                          .Init(EdgeLayoutSettings, EdgeSelectionSettings, LoadedGraph);
-            }
-        }
-
-        /// <summary>
-        /// Adds all game objects tagged by <see cref="Tags.Node"/> or <see cref="Tags.Edge"/>
         /// of <paramref name="parent"/> including its descendants to <see cref="GraphElementIDMap"/>.
         /// </summary>
         /// <param name="parent">root node of the game-object tree to be added to <see cref="GraphElementIDMap"/></param>
@@ -243,7 +235,7 @@ namespace SEE.Game.City
         {
             if (parent.CompareTag(Tags.Node) || parent.CompareTag(Tags.Edge))
             {
-                GraphElementIDMap.Add(parent);
+                GraphElementIDMap.Add(parent, true);
             }
             foreach (Transform child in parent.transform)
             {
@@ -475,7 +467,7 @@ namespace SEE.Game.City
             else
             {
                 ICollection<string> relevantNodeTypes = NodeTypes.Where(pair => pair.Value.IsRelevant)
-                  .Select(pair => pair.Key).ToList();
+                                                                 .Select(pair => pair.Key).ToList();
                 return graph.SubgraphByNodeType(relevantNodeTypes, IgnoreSelfLoopsInLifting);
             }
         }
@@ -486,15 +478,15 @@ namespace SEE.Game.City
         /// <returns>all attribute names of the different kinds of software erosions</returns>
         public IList<string> AllLeafIssues() =>
             new List<string>
-               {
-                  ErosionSettings.ArchitectureIssue,
-                  ErosionSettings.CloneIssue,
-                  ErosionSettings.CycleIssue,
-                  ErosionSettings.Dead_CodeIssue,
-                  ErosionSettings.MetricIssue,
-                  ErosionSettings.StyleIssue,
-                  ErosionSettings.UniversalIssue
-               };
+            {
+                ErosionSettings.ArchitectureIssue,
+                ErosionSettings.CloneIssue,
+                ErosionSettings.CycleIssue,
+                ErosionSettings.Dead_CodeIssue,
+                ErosionSettings.MetricIssue,
+                ErosionSettings.StyleIssue,
+                ErosionSettings.UniversalIssue
+            };
 
         /// <summary>
         /// Returns all attribute names of the different kinds of software erosions for inner
@@ -504,14 +496,14 @@ namespace SEE.Game.City
         public IList<string> AllInnerNodeIssues() =>
             new List<string>
             {
-                  ErosionSettings.ArchitectureIssue_SUM,
-                  ErosionSettings. CloneIssue_SUM,
-                  ErosionSettings.CycleIssue_SUM,
-                  ErosionSettings.Dead_CodeIssue_SUM,
-                  ErosionSettings.MetricIssue_SUM,
-                  ErosionSettings.StyleIssue_SUM,
-                  ErosionSettings.UniversalIssue_SUM
-               };
+                ErosionSettings.ArchitectureIssue_SUM,
+                ErosionSettings.CloneIssue_SUM,
+                ErosionSettings.CycleIssue_SUM,
+                ErosionSettings.Dead_CodeIssue_SUM,
+                ErosionSettings.MetricIssue_SUM,
+                ErosionSettings.StyleIssue_SUM,
+                ErosionSettings.UniversalIssue_SUM
+            };
 
         /// <summary>
         /// Returns the names of all node metrics that truly exist in the underlying
@@ -601,6 +593,35 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Returns true if the user is currently hovering over the plane (area) of the code
+        /// city represented by <paramref name="gameObject"/>.
+        ///
+        /// Precondition: <paramref name="gameObject"/> has a <see cref="GO.Plane"/> attached
+        /// to it.
+        /// </summary>
+        /// <returns>true if user is hovering over the code city represented by <paramref name="gameObject"/></returns>
+        public static bool UserIsHoveringCity(GameObject gameObject)
+        {
+            if (!gameObject.TryGetComponent(out GO.Plane clippingPlane) || clippingPlane == null)
+            {
+                Debug.LogError($"Code city {gameObject.FullName()} has no {typeof(GO.Plane)}.\n");
+                return false;
+            }
+
+            Raycasting.RaycastClippingPlane(clippingPlane, out _, out bool hitInsideClippingArea, out Vector3 _);
+            return hitInsideClippingArea;
+        }
+
+        /// <summary>
+        /// Returns true if the user is currently hovering over the plane (area) of this city.
+        /// </summary>
+        /// <returns>true if user is hovering over this city</returns>
+        public bool UserIsHoveringCity()
+        {
+            return UserIsHoveringCity(gameObject);
+        }
+
+        /// <summary>
         /// Dumps the metric names of all node types of the currently loaded graph.
         /// </summary>
         protected abstract void DumpNodeMetrics();
@@ -612,13 +633,13 @@ namespace SEE.Game.City
         /// <param name="graphs">graphs whose metric names are to be emitted</param>
         protected static void DumpNodeMetrics(ICollection<Graph> graphs)
         {
-            IDictionary<string, HashSet<string>> result = new Dictionary<string, HashSet<string>>();
+            IDictionary<string, ISet<string>> result = new Dictionary<string, ISet<string>>();
 
             foreach (Graph graph in graphs)
             {
                 foreach (Node node in graph.Nodes())
                 {
-                    if (result.TryGetValue(node.Type, out HashSet<string> metrics))
+                    if (result.TryGetValue(node.Type, out ISet<string> metrics))
                     {
                         metrics.UnionWith(node.AllMetrics());
                     }
@@ -629,7 +650,7 @@ namespace SEE.Game.City
                 }
             }
 
-            foreach (KeyValuePair<string, HashSet<string>> item in result)
+            foreach (KeyValuePair<string, ISet<string>> item in result)
             {
                 Debug.Log($"Node type {item.Key}:\n");
                 foreach (string metric in item.Value)
@@ -678,7 +699,7 @@ namespace SEE.Game.City
                 }
 
                 CoseGraphSettings.LoadedForNodeTypes = NodeTypes.Where(type => type.Value.IsRelevant)
-                                                                        .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.IsRelevant);
+                                                                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.IsRelevant);
             }
         }
 
@@ -715,6 +736,11 @@ namespace SEE.Game.City
         /// The order of the Save-Layout button in the button group <see cref="DataButtonsGroup"/>.
         /// </summary>
         protected const float DataButtonsGroupOrderSaveLayout = DataButtonsGroupOrderSave + 1;
+
+        /// <summary>
+        /// The order of the Load-Layout button in the button group <see cref="DataButtonsGroup"/>.
+        /// </summary>
+        protected const float DataButtonsGroupOrderLoadLayout = DataButtonsGroupOrderSaveLayout + 1;
 
         /// <summary>
         /// The name of the group for the Inspector buttons resettting the data.

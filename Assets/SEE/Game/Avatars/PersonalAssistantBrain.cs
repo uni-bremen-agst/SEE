@@ -3,6 +3,7 @@ using Crosstales.RTVoice;
 using Crosstales.RTVoice.Model;
 using System;
 using System.Text;
+using Crosstales.RTVoice.Model.Enum;
 
 namespace SEE.Game.Avatars
 {
@@ -85,7 +86,8 @@ namespace SEE.Game.Avatars
         /// A female US English voice will be used if available.
         /// </summary>
         /// <param name="text">text to be spoken</param>
-        public void Say(string text)
+        /// <param name="onSpeakCompleted">callback to be called when the text has been spoken</param>
+        public void Say(string text, Action onSpeakCompleted = null)
         {
             /// Note: We do not set <see cref="voice"/> in <see cref="Start"/>
             /// because we do not want to rely on the order in which the various
@@ -95,16 +97,36 @@ namespace SEE.Game.Avatars
             /// <see cref="Speaker.Instance.VoiceForGender"/> cannot return any voice.
             if (voice == null)
             {
-                voice = Speaker.Instance.VoiceForGender(Crosstales.RTVoice.Model.Enum.Gender.FEMALE, culture: "en-US");
+                if (Application.platform == RuntimePlatform.LinuxEditor || Application.platform == RuntimePlatform.LinuxPlayer)
+                {
+                    voice = new Voice
+                    {
+                        Name = "en-US+f4"
+                    };
+                }
+                else
+                {
+                    voice = Speaker.Instance.VoiceForGender(Gender.FEMALE, culture: "en-US");
+                }
                 if (voice == null)
                 {
                     Debug.LogError("Requested voice not found. A default voice will be used. The available voices are:\n");
                     DumpVoices();
                 }
             }
-            animator?.SetBool(isTalking, true);
+            if (animator != null)
+            {
+                animator.SetBool(isTalking, true);
+            }
             Speaker.Instance.Speak(text, audioSource, voice: voice);
-            Speaker.Instance.OnSpeakCompleted.AddListener(BackToIdle);
+            Speaker.Instance.OnSpeakCompleted.AddListener(OnSpeakCompleted);
+            
+            void OnSpeakCompleted(string _)
+            {
+                onSpeakCompleted?.Invoke();
+                BackToIdle();
+                Speaker.Instance.OnSpeakCompleted.RemoveListener(OnSpeakCompleted);
+            }
         }
 
         /// <summary>
@@ -112,11 +134,9 @@ namespace SEE.Game.Avatars
         /// be registered by <see cref="Say"/> and be called when the text
         /// if completely spoken.
         /// </summary>
-        /// <param name="message">a message from RT-Voice (currently not used)</param>
-        private void BackToIdle(string message)
+        private void BackToIdle()
         {
             Stop();
-            Speaker.Instance.OnSpeakCompleted.RemoveListener(BackToIdle);
         }
 
         /// <summary>
@@ -252,7 +272,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         private const string aboutText = "I am SEE. "
             + "Myself and all the world you see, was created by Christian, Falko, Jan, Leonard, Lino, Marcel, Moritz, "
-            + "Nick, Rainer, Robin, Simon, Sören, Thore, Thorsten, Torben, and many others. "
+            + "Nick, Rainer, Robin, Simon, SÃ¶ren, Thore, Thorsten, Torben, and many others. "
             + "<emphasis level=\"strong\">Thanks, guys!</emphasis>";
 
         /// <summary>

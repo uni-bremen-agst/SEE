@@ -1,23 +1,3 @@
-﻿using UnityEngine;
-using UnityEditor;
-
-namespace NaughtyAttributes.Editor
-{
-	[CustomPropertyDrawer(typeof(HorizontalLineAttribute))]
-	public class HorizontalLineDecoratorDrawer : DecoratorDrawer
-	{
-		public override float GetHeight()
-		{
-			HorizontalLineAttribute lineAttr = (HorizontalLineAttribute)attribute;
-			return EditorGUIUtility.singleLineHeight + lineAttr.Height;
-		}
-
-		public override void OnGUI(Rect position)
-		{
-			Rect rect = EditorGUI.IndentedRect(position);
-			rect.y += EditorGUIUtility.singleLineHeight / 3.0f;
-			HorizontalLineAttribute lineAttr = (HorizontalLineAttribute)attribute;
-			NaughtyEditorGUI.HorizontalLine(rect, lineAttr.Height, lineAttr.Color.GetColor());
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:37fafba01c2813e5452b3530c7884c237e82a0de5b86cd926a864b2ebf68899e
+size 727

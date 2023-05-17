@@ -49,7 +49,7 @@ namespace SEE.Layout
         /// <summary>
         /// Immediate children of the node.
         /// </summary>
-        private readonly List<ILayoutNode> children = new List<ILayoutNode>();
+        private readonly List<ILayoutNode> children = new();
 
         /// <summary>
         /// Immediate children of the node.
@@ -125,7 +125,7 @@ namespace SEE.Layout
         /// </summary>
         public Vector3 Roof
         {
-            get => centerPosition + Vector3.up * 0.5f * scale.y;
+            get => centerPosition + 0.5f * scale.y * Vector3.up;
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace SEE.Layout
         /// </summary>
         public Vector3 Ground
         {
-            get => centerPosition - Vector3.up * 0.5f * scale.y;
+            get => centerPosition - 0.5f * scale.y * Vector3.up;
         }
 
         /// <summary>

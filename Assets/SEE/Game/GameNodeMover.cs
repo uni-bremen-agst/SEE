@@ -1,11 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using SEE.DataModel.DG;
-using SEE.Game.Operator;
+﻿using SEE.Game.Operator;
 using SEE.GO;
-using SEE.Layout.EdgeLayouts;
-using SEE.Tools.ReflexionAnalysis;
-using TinySpline;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -261,7 +255,7 @@ namespace SEE.Game
         public static void PutOnAndFit(Transform child, GameObject newParent,
             GameObject originalParent, Vector3 originalLocalScale)
         {
-            bool scaleDown = newParent != originalParent.gameObject;
+            bool scaleDown = newParent != originalParent;
             if (!scaleDown)
             {
                 // The gameObject may have already been scaled down, hence,

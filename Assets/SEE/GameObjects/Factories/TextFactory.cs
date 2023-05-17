@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using SEE.DataModel;
+using SEE.Game;
 using TMPro;
 using UnityEngine;
 
@@ -13,8 +13,8 @@ namespace SEE.GO
         /// <summary>
         /// Color of the text.
         /// </summary>
-        private static readonly Color TextColorDefault = Color.black;
-        
+        private static readonly Color TextColorDefault = Color.white;
+
         /// <summary>
         /// Name of the font used for the text.
         /// </summary>
@@ -42,7 +42,7 @@ namespace SEE.GO
             else
             {
                 // Remove outline activation keyword
-                tm.fontSharedMaterial.shaderKeywords = keywords 
+                tm.fontSharedMaterial.shaderKeywords = keywords
                                                        .Where(x => !x.Equals(ShaderUtilities.Keyword_Outline))
                                                        .ToArray();
             }
@@ -51,7 +51,7 @@ namespace SEE.GO
 
         /// <summary>
         /// Returns a game object showing the given <paramref name="text"/> at given <paramref name="position"/>
-        /// with given <paramref name="fontSize"/>. 
+        /// with given <paramref name="fontSize"/>.
         /// The text rotates towards the main camera.
         /// </summary>
         /// <param name="text">the text to be drawn</param>
@@ -61,7 +61,7 @@ namespace SEE.GO
         /// the bottom line (position.y + extents.y)</param>
         /// <param name="textColor">the color of the text (default: black)</param>
         /// <returns>the game object representing the text</returns>
-        public static GameObject GetTextWithSize(string text, Vector3 position, float fontSize, bool lift = true, 
+        public static GameObject GetTextWithSize(string text, Vector3 position, float fontSize, bool lift = true,
                                                  Color? textColor = null)
         {
             CreateText(text, position, textColor, out TextMeshPro tm, out GameObject result);
@@ -85,13 +85,13 @@ namespace SEE.GO
         /// </summary>
         /// <param name="text">the text to be drawn</param>
         /// <param name="position">the center position at which to draw the text</param>
-        /// <param name="width">the width of the rectangle enclosing the text (essentially, 
+        /// <param name="width">the width of the rectangle enclosing the text (essentially,
         /// the text width); the font size will be chosen appropriately</param>
         /// <param name="lift">if true, the text will be lifted up by its extent; that is, its y position is actually
         /// the bottom line (position.y + extents.y)</param>
         /// <param name="textColor">the color of the text (default: <see cref="TextColorDefault"/>)</param>
         /// <returns>the game object representing the text</returns>
-        public static GameObject GetTextWithWidth(string text, Vector3 position, float width, bool lift = true, 
+        public static GameObject GetTextWithWidth(string text, Vector3 position, float width, bool lift = true,
             Color? textColor = null)
         {
             CreateText(text, position, textColor, out TextMeshPro tm, out GameObject result);
@@ -127,7 +127,7 @@ namespace SEE.GO
         /// <param name="tm">the TextMeshPro component which will be attached to <paramref name="result"/></param>
         /// <param name="result">the GameObject containing the TextMeshPro component <paramref name="tm"/></param>
         /// <returns></returns>
-        private static void CreateText(string text, Vector3 position, Color? textColor, out TextMeshPro tm, 
+        private static void CreateText(string text, Vector3 position, Color? textColor, out TextMeshPro tm,
             out GameObject result)
         {
             result = new GameObject("Text " + text)

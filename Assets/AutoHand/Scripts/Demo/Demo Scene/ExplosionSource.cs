@@ -1,24 +1,3 @@
-﻿using UnityEngine;
-
-namespace Autohand.Demo{
-    public class ExplosionSource : MonoBehaviour{
-        public float radius = 1;
-        public float force = 10;
-
-        public void Explode(bool destroy) {
-            var hits = Physics.OverlapSphere(transform.position, radius);
-            foreach(var hit in hits) {
-                var rb = hit.GetComponent<Rigidbody>();
-                if(rb != null)
-                    rb.AddExplosionForce(force, transform.position, radius);
-            }
-            if(destroy)
-                Destroy(gameObject);
-        }
-
-        private void OnDrawGizmosSelected() {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, radius);
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:5a6a52783711bb712522d1a6ab186484652ae14af0020bc9ad3adb22c14a721c
+size 759

@@ -75,6 +75,10 @@ namespace SEE.Game
                 // implementation -> implementation
                 else if (source.IsInImplementation() && target.IsInImplementation())
                 {
+                    if (reflexionCity.ReflexionGraph.IsExplicitlyMapped(source))
+                    {
+                        reflexionCity.ReflexionGraph.RemoveFromMapping(source);
+                    }
                     // TODO (falko17): This branch and the next branch can be merged as soon
                     // as the general Unparent and AddChild methods are implemented.
                     // This changes the node hierarchy in the implementation only.

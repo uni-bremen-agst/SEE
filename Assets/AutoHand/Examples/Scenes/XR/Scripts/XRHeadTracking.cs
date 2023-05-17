@@ -1,20 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.XR;
-
-namespace Autohand.Demo{
-public class XRHeadTracking : MonoBehaviour{
-#if UNITY_2019_3_OR_NEWER
-        public TrackingOriginModeFlags mode = TrackingOriginModeFlags.TrackingReference;
-
-    void Start(){
-        List<XRInputSubsystem> subsystems = new List<XRInputSubsystem>();
-        SubsystemManager.GetInstances(subsystems);
-        for(int i = 0;  i < subsystems.Count; i++){
-            subsystems[i].TrySetTrackingOriginMode(mode);
-        }
-    }
-#endif
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:b51f3a8cb952daa80a2be10a5d8f8eb13effadc81911e2059bad6a9f27a7c96b
+size 592

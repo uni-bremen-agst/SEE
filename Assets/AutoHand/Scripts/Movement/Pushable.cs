@@ -1,10 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Autohand {
-    [HelpURL("https://app.gitbook.com/s/5zKO0EvOjzUDeT2aiFk3/auto-hand/auto-hand-player#pushing")]
-    public class Pushable : MonoBehaviour {
-        public Vector3 strengthScale = Vector3.one;
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:e3a5d8ab1812544bc8b153dca444fbb4fe7aa89c687ce871f444a356d75e4a61
+size 312

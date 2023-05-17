@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 using SEE.Game;
 using SEE.Game.City;
@@ -877,7 +876,6 @@ namespace SEE.Utils
             city.EdgeLayoutSettings.EdgeWidth++;
             city.EdgeLayoutSettings.EdgesAboveBlocks = !city.EdgeLayoutSettings.EdgesAboveBlocks;
             city.EdgeLayoutSettings.Tension = 0;
-            city.EdgeLayoutSettings.RDP = 0;
         }
 
         private static void WipeOutEdgeSelectionSettings(EdgeSelectionAttributes edgeSelectionSettings)
@@ -894,7 +892,6 @@ namespace SEE.Utils
             Assert.AreEqual(expected.EdgeWidth, actual.EdgeWidth);
             Assert.AreEqual(expected.EdgesAboveBlocks, actual.EdgesAboveBlocks);
             Assert.AreEqual(expected.Tension, actual.Tension);
-            Assert.AreEqual(expected.RDP, actual.RDP);
         }
 
         private static void AreEqualEdgeSelectionSettings(EdgeSelectionAttributes expected, EdgeSelectionAttributes actual)

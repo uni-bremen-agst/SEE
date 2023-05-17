@@ -33,27 +33,41 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private readonly string filename;
 
+        /// <summary>
+        /// See <see cref="HierarchicalNodeLayout.Layout()"/>.
+        /// Note: The layout may not only be returned but also applied depending on the implementation
+        /// of <see cref="ILayoutNode"/>.
+        /// </summary>
+        /// <param name="layoutNodes">nodes to be laid out</param>
+        /// <returns>resulting layout</returns>
         public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
         {
-            Dictionary<ILayoutNode, NodeTransform> result = new Dictionary<ILayoutNode, NodeTransform>();
+            Dictionary<ILayoutNode, NodeTransform> result = new();
             if (File.Exists(filename))
             {
                 IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
                 if (Filenames.HasExtension(filename, Filenames.GVLExtension))
                 {
                     new GVLReader(filename, layoutNodeList.Cast<IGameNode>().ToList(), groundLevel, new SEELogger());
+                    // The elements in layoutNodeList will be stacked onto each other starting at groundLevel.
+                }
+                else if (Filenames.HasExtension(filename, Filenames.SLDExtension))
+                {
+                    SLDReader.Read(filename, layoutNodeList.Cast<IGameNode>().ToList());
+                    // The elements in layoutNodeList will have the y position as it was saved in the file.
                 }
                 else
                 {
-                    SLDReader.Read(filename, layoutNodeList.Cast<IGameNode>().ToList());
+                    throw new Exception($"Unknown layout file format for file extension of {filename}.");
                 }
 
+                // Apply the layout for the result.
                 foreach (ILayoutNode node in layoutNodeList)
                 {
                     Vector3 position = node.CenterPosition;
                     Vector3 absoluteScale = node.AbsoluteScale;
-                    // Note: The node transform's y co-ordinate of the position is interpreted as the ground of the object.
-                    // We need to adjust it accordingly.
+                    // Note: The node transform's y co-ordinate of the position is interpreted
+                    // as the ground of the object. We need to adjust it accordingly.
                     position.y -= absoluteScale.y / 2.0f;
                     result[node] = new NodeTransform(position, absoluteScale);
                 }

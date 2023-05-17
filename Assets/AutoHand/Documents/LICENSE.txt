@@ -1,11 +1,3 @@
-
-This asset follows the standard Unity Asset Store License
-https://unity3d.com/legal/as_terms
-
-Most importantly:
- This asset shall not be entitled to distribute or transfer in any way
- other than as integrated components of electronic applications and 
- digital media or in supporting physical marketing materials.
-
- I.E.
-	Do not redistribute this unbuilt code 
+version https://git-lfs.github.com/spec/v1
+oid sha256:510b46b2adea3f6446a222f9d2203d2afb3328b7f9267f1a517073721594e733
+size 373

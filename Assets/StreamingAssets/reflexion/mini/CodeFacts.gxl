@@ -2,7 +2,7 @@
 <!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
 <gxl xmlns:xlink="http://www.w3.org/1999/xlink">
   <graph id="CodeFacts" edgeids="true">
-    <node id="N1">
+    <node id="Dashboard">
       <type xlink:href="Class"/>
       <attr name="Metric.LOC">
         <int>17</int>
@@ -11,98 +11,101 @@
         <int>7</int>
       </attr>
       <attr name="Source.Name">
-        <string>h1</string>
+        <string>Dashboard</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>h1</string>
+        <string>Dashboard</string>
       </attr>
     </node>
-    <node id="N2">
-      <type xlink:href="Class"/>
-      <attr name="Metric.LOC">
-        <int>25</int>
-      </attr>
-	  <attr name="Metric.McCabeComplexity">
-        <int>2</int>
-      </attr>
-      <attr name="Source.Name">
-        <string>h2</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>h2</string>
-      </attr>
-    </node>
-    <node id="N3">
-      <type xlink:href="Class"/>
-      <attr name="Metric.LOC">
-        <int>5</int>
-      </attr>
-	  <attr name="Metric.McCabeComplexity">
-        <int>27</int>
-      </attr>	  
-      <attr name="Source.Name">
-        <string>inner1</string>
-      </attr>
-      <attr name="Linkage.Name">
-        <string>inner1</string>
-      </attr>
-    </node>
-    <node id="N4">
+    <node id="Fusion">
       <type xlink:href="Class"/>
       <attr name="Metric.LOC">
         <int>10</int>
       </attr>
 	  <attr name="Metric.McCabeComplexity">
-        <int>14</int>
+        <int>26</int>
+      </attr>
+      <attr name="Source.Name">
+        <string>Fusion</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Fusion</string>
+      </attr>
+    </node>
+    <node id="BackupSensor">
+      <type xlink:href="Class"/>
+      <attr name="Metric.LOC">
+        <int>5</int>
+      </attr>
+	  <attr name="Metric.McCabeComplexity">
+        <int>5</int>
       </attr>	  
       <attr name="Source.Name">
-        <string>inner2</string>
+        <string>BackupSensor</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>inner2</string>
+        <string>BackupSensor</string>
       </attr>
     </node>
-    <node id="N5">
+    <node id="Sensor">
+      <type xlink:href="Class"/>
+      <attr name="Metric.LOC">
+        <int>8</int>
+      </attr>
+	  <attr name="Metric.McCabeComplexity">
+        <int>11</int>
+      </attr>	  
+      <attr name="Source.Name">
+        <string>Sensor</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Sensor</string>
+      </attr>
+    </node>
+    <node id="Sensors">
       <type xlink:href="Package"/>
       <attr name="Source.Name">
-        <string>h3</string>
+        <string>Sensors</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>h3</string>
+        <string>Sensors</string>
       </attr>
     </node>
-    <node id="N6">
+    <node id="implementation">
       <type xlink:href="Package"/>
       <attr name="Source.Name">
-        <string>implementation</string>
+        <string>Implementation</string>
       </attr>
       <attr name="Linkage.Name">
-        <string>implementation</string>
+        <string>Implementation</string>
       </attr>
     </node>
-    <edge id="E1" from="N1" to="N2">
+    <edge id="E1" from="Dashboard" to="Fusion">
       <type xlink:href="Call"/>
     </edge>
-    <edge id="E2" from="N2" to="N4">
+    <edge id="E2" from="Dashboard" to="BackupSensor">
+      <type xlink:href="Call"/>
+    </edge>	
+    <edge id="E3" from="Fusion" to="Sensor">
       <type xlink:href="Call"/>
     </edge>
-    <edge id="E3" from="N1" to="N6">
-      <type xlink:href="Belongs_To"/>
-    </edge>
-    <edge id="E4" from="N2" to="N6">
-      <type xlink:href="Belongs_To"/>
-    </edge>
-    <edge id="E5" from="N5" to="N6">
-      <type xlink:href="Belongs_To"/>
-    </edge>
-    <edge id="E6" from="N3" to="N5">
-      <type xlink:href="Belongs_To"/>
-    </edge>
-    <edge id="E7" from="N4" to="N5">
-      <type xlink:href="Belongs_To"/>
-    </edge>
-    <edge id="E8" from="N2" to="N3">
+    <edge id="E4" from="Fusion" to="BackupSensor">
       <type xlink:href="Call"/>
+    </edge>	
+    <edge id="E5" from="Dashboard" to="implementation">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E6" from="Fusion" to="implementation">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E7" from="Sensors" to="implementation">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E8" from="BackupSensor" to="Sensors">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E9" from="Sensor" to="Sensors">
+      <type xlink:href="Belongs_To"/>
     </edge>
   </graph>
 </gxl>

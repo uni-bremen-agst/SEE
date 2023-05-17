@@ -1,12 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-namespace Autohand.Demo {
-    public class ToggleAutoMoveFlying : MonoBehaviour {
-        public void ToggleFlying() {
-            var player = FindObjectOfType<AutoHandPlayer>();
-            player.useGrounding = !player.useGrounding;
-        }
-    }
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:59f95378683e92f624472176c2fedb1ba24f45d24d963e43447a9bd754956d76
+size 346

@@ -173,7 +173,7 @@ namespace SEE.Controls.Actions
                 }
             }
         }
-        
+
         /// <summary>
         /// Hides the text label above the object if it exists.
         ///
@@ -181,14 +181,20 @@ namespace SEE.Controls.Actions
         /// <seealso cref="SelectionOn"/>
         private void Off()
         {
-            Operator.FadeLabel(0f, 1.0f);
+            LabelAttributes settings = GetLabelSettings(Operator.Node, Operator.City);
+            Operator.FadeLabel(0f, settings.AnimationDuration);
             DisplayedLabelOperators.Remove(Operator);
         }
 
-        /**
-         * Returns the label attributes for this node using values defined in AbstractSEECity.
-         * <param name="node">The node.</param>
-         */
+        /// <summary>
+        /// Returns the label attributes for <paramref name="node"/> using values
+        /// defined in <paramref name="city"/>.
+        ///
+        /// Assumption: <paramref name="node"/> is "contained" in <paramref name="city"/>.
+        /// </summary>
+        /// <param name="node">node whose label settings are requested</param>
+        /// <param name="city">the city holding the settings</param>
+        /// <returns>label attributes for <paramref name="node"/></returns>
         private static LabelAttributes GetLabelSettings(Node node, AbstractSEECity city)
         {
             return city.NodeTypes[node.Type].LabelSettings;
