@@ -11,7 +11,7 @@ using UnityEngine.UI;
 namespace SEE.Game.UI.Menu
 {
     /// <summary>
-    /// Test cases for <see cref="SimpleMenu"/>.
+    /// Test cases for <see cref="SimpleListMenu"/>.
     /// </summary>
     internal class TestSimpleMenu : TestUI
     {
@@ -40,7 +40,7 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// The menu to be tested.
         /// </summary>
-        private SimpleMenu menu;
+        private SimpleListMenu menu;
 
         /// <summary>
         /// Set up for every test.
@@ -126,14 +126,14 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <param name="menuGO">new game object holding <paramref name="menu"/></param>
         /// <param name="menu">a new menu that can be tested</param>
-        private void CreateMenu(out GameObject menuGO, out SimpleMenu menu)
+        private void CreateMenu(out GameObject menuGO, out SimpleListMenu menu)
         {
             menuGO = new GameObject { name = "Container for menu" };
-            menu = menuGO.AddComponent<SimpleMenu>();
-            menu.AllowNoSelection(true);
+            menu = menuGO.AddComponent<SimpleListMenu>();
+            menu.AllowNoSelection = true;
             menu.Title = MenuTitle;
             menu.Description = "Tests the menu";
-            menu.HideAfterSelection(true);
+            menu.HideAfterSelection = true;
             menu.Icon = GetIcon();
 
             IEnumerable<MenuEntry> menuEntries = new List<MenuEntry>
@@ -153,7 +153,7 @@ namespace SEE.Game.UI.Menu
             };
 
             menu.AddEntries(menuEntries);
-            menu.ShowMenu(true);
+            menu.ShowMenu = true;
         }
 
 
