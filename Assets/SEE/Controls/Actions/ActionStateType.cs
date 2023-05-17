@@ -20,81 +20,96 @@ namespace SEE.Controls.Actions
     public class ActionStateType
     {
         /// <summary>
+        /// The nesting groupings of the actions.
+        /// </summary>
+        public enum Grouping
+        {
+            /// <summary>
+            /// The group of actions that are at the root of the nesting.
+            /// </summary>
+            Root,
+            /// <summary>
+            /// The nested group of actions dealing with the metric board.
+            /// </summary>
+            MetricBoard
+        }
+
+        /// <summary>
         /// A list of all available ActionStateTypes.
         /// </summary>
         public static List<ActionStateType> AllTypes { get; } = new();
 
         #region Static Types
         public static ActionStateType Move { get; } =
-            new("Move", "Move a node within a graph",
+            new("Move", "Move a node within a graph", Grouping.Root,
                 Color.red.Darker(), "Materials/Charts/MoveIcon",
                 MoveAction.CreateReversibleAction);
         public static ActionStateType Rotate { get; } =
-            new("Rotate", "Rotate the selected node and its children within a graph",
+            new("Rotate", "Rotate the selected node and its children within a graph", Grouping.Root,
                 Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
                 RotateAction.CreateReversibleAction);
         public static ActionStateType Hide { get; } =
-            new("Hide", "Hides nodes or edges",
+            new("Hide", "Hides nodes or edges", Grouping.Root,
                 Color.yellow.Darker(), "Materials/ModernUIPack/Eye", HideAction.CreateReversibleAction);
 
         public static ActionStateType NewEdge { get; } =
-            new("New Edge", "Draw a new edge between two nodes",
+            new("New Edge", "Draw a new edge between two nodes", Grouping.Root,
                 Color.green.Darker(), "Materials/ModernUIPack/Minus",
                 AddEdgeAction.CreateReversibleAction);
         public static ActionStateType NewNode { get; } =
-            new("New Node", "Create a new node",
+            new("New Node", "Create a new node", Grouping.Root,
                 Color.green.Darker(), "Materials/ModernUIPack/Plus",
                 AddNodeAction.CreateReversibleAction);
         public static ActionStateType EditNode { get; } =
-            new("Edit Node", "Edit a node",
+            new("Edit Node", "Edit a node", Grouping.Root,
                 Color.green.Darker(), "Materials/ModernUIPack/Settings",
                 EditNodeAction.CreateReversibleAction);
         public static ActionStateType ScaleNode { get; } =
-            new("Scale Node", "Scale a node",
+            new("Scale Node", "Scale a node", Grouping.Root,
                 Color.green.Darker(), "Materials/ModernUIPack/Crop",
                 ScaleNodeAction.CreateReversibleAction);
         public static ActionStateType Delete { get; } =
-            new("Delete", "Delete a node or an edge",
+            new("Delete", "Delete a node or an edge", Grouping.Root,
                 Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
                 DeleteAction.CreateReversibleAction);
         public static ActionStateType ShowCode { get; } =
-            new("Show Code", "Display the source code of a node.",
+            new("Show Code", "Display the source code of a node.", Grouping.Root,
                 Color.black, "Materials/ModernUIPack/Document",
                 ShowCodeAction.CreateReversibleAction);
         public static ActionStateType Draw { get; } =
-            new ("Draw", "Draw a line",
+            new ("Draw", "Draw a line", Grouping.Root,
                  Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                  DrawAction.CreateReversibleAction);
         public static ActionStateType AddBoard { get; } =
-            new ("Add Board", "Add a board",
+            new ("Add Board", "Add a board", Grouping.MetricBoard,
                  Color.green.Darker(), "Materials/ModernUIPack/Plus",
                  AddBoardAction.CreateReversibleAction);
         public static ActionStateType AddWidget { get; } =
-            new ("Add Widget", "Add a widget",
+            new ("Add Widget", "Add a widget", Grouping.MetricBoard,
                 Color.green.Darker(), "Materials/ModernUIPack/Plus",
                 AddWidgetAction.CreateReversibleAction);
         public static ActionStateType MoveBoard { get; } =
-            new ("Move Board", "Move a board",
+            new ("Move Board", "Move a board", Grouping.MetricBoard,
                 Color.yellow.Darker(), "Materials/Charts/MoveIcon",
                 MoveBoardAction.CreateReversibleAction);
         public static ActionStateType MoveWidget { get; } =
-            new ("Move Widget", "Move a widget",
+            new ("Move Widget", "Move a widget", Grouping.MetricBoard,
                 Color.yellow.Darker(), "Materials/Charts/MoveIcon",
                 MoveWidgetAction.CreateReversibleAction);
         public static ActionStateType DeleteBoard { get; } =
-            new ("Delete Board", "Delete a board",
+            new ("Delete Board", "Delete a board", Grouping.MetricBoard,
                 Color.red.Darker(), "Materials/ModernUIPack/Trash",
                 DeleteBoardAction.CreateReversibleAction);
         public static ActionStateType DeleteWidget { get; } =
-            new ("Delete Widget", "Delete a widget",
+            new ("Delete Widget", "Delete a widget", Grouping.MetricBoard,
                 Color.red.Darker(),  "Materials/ModernUIPack/Trash",
                 DeleteWidgetAction.CreateReversibleAction);
         public static ActionStateType LoadBoard { get; } =
-            new ("Load Board", "Load a board",
+            new ("Load Board", "Load a board", Grouping.MetricBoard,
                 Color.blue.Darker(), "Materials/ModernUIPack/Document",
                 LoadBoardAction.CreateReversibleAction);
         public static ActionStateType SaveBoard { get; } =
-            new ("Save Board", "Save a board",
+            new ("Save Board", "Save a board", Grouping.MetricBoard,
                 Color.blue.Darker(), "Materials/ModernUIPack/Document",
                 SaveBoardAction.CreateReversibleAction);
 
@@ -110,6 +125,11 @@ namespace SEE.Controls.Actions
         /// Description for this action.
         /// </summary>
         public string Description { get; }
+
+        /// <summary>
+        /// The group of actions this action belongs to.
+        /// </summary>
+        public Grouping Group { get;  }
 
         /// <summary>
         /// Color for this action.
@@ -151,15 +171,20 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="name">The Name of this ActionStateType. Must be unique.</param>
         /// <param name="description">Description for this ActionStateType.</param>
+        /// <param name="group">The group of actions this action belongs to.</param>
         /// <param name="color">Color for this ActionStateType.</param>
         /// <param name="iconPath">Path to the material of the icon for this ActionStateType.</param>
+        /// <param name="createReversible">Delegate to be called to create a new instance of this kind of action.
+        /// Can be null, in which case no delegate will be called.</param>
         /// <exception cref="ArgumentException">When the given <paramref name="name"/> or <paramref name="value"/>
         /// is not unique, or when the <paramref name="value"/> doesn't fulfill the "must increase by one" criterion.
         /// </exception>
-        private ActionStateType(string name, string description, Color color, string iconPath, CreateReversibleAction createReversible)
+        private ActionStateType(string name, string description, Grouping group,
+            Color color, string iconPath, CreateReversibleAction createReversible)
         {
             Name = name;
             Description = description;
+            Group = group;
             Color = color;
             IconPath = iconPath;
             CreateReversible = createReversible;
