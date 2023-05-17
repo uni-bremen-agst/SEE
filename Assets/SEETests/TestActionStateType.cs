@@ -39,46 +39,15 @@ namespace SEETests
         }
 
         [Test]
-        public void TestValueUnique()
-        {
-            Assert.AreEqual(allTypes.Count, allTypes.Select(x => x.Value).Distinct().Count(),
-                "Values of ActionStateType must be unique!");
-        }
-
-        [Test]
         public void TestNameUnique()
         {
             Assert.AreEqual(allTypes.Count, allTypes.Select(x => x.Name).Distinct().Count(),
                 "Names of ActionStateType must be unique!");
         }
 
-        [Test]
-        public void TestIdIncreasing()
-        {
-            int i = 0;
-            foreach (ActionStateType type in allTypes)
-            {
-                Assert.AreEqual(i++, type.Value, "ActionStateType values must increase by 1!");
-            }
-        }
-
-        [Test]
-        public void TestFromIdInvalid()
-        {
-            Assert.Throws<InvalidOperationException>(() => ActionStateType.FromID(-1));
-            int maxValue = allTypes.Select(x => x.Value).Max();
-            Assert.Throws<InvalidOperationException>(() => ActionStateType.FromID(maxValue+1));
-        }
-
         public static IEnumerable<TestCaseData> AllTypeSupplier()
         {
             return ActionStateType.AllTypes.Select(type => new TestCaseData(type));
-        }
-
-        [Test, TestCaseSource(nameof(AllTypeSupplier))]
-        public void TestFromIdSuccess(ActionStateType type)
-        {
-            Assert.AreSame(type, ActionStateType.FromID(type.Value));
         }
 
         [Test, TestCaseSource(nameof(AllTypeSupplier))]

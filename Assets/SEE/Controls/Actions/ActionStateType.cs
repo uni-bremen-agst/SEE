@@ -26,70 +26,77 @@ namespace SEE.Controls.Actions
 
         #region Static Types
         public static ActionStateType Move { get; } =
-            new(0, "Move", "Move a node within a graph",
+            new("Move", "Move a node within a graph",
                 Color.red.Darker(), "Materials/Charts/MoveIcon",
                 MoveAction.CreateReversibleAction);
         public static ActionStateType Rotate { get; } =
-            new(1, "Rotate", "Rotate the selected node and its children within a graph",
+            new("Rotate", "Rotate the selected node and its children within a graph",
                 Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
                 RotateAction.CreateReversibleAction);
         public static ActionStateType Hide { get; } =
-            new(2, "Hide", "Hides nodes or edges",
+            new("Hide", "Hides nodes or edges",
                 Color.yellow.Darker(), "Materials/ModernUIPack/Eye", HideAction.CreateReversibleAction);
 
         public static ActionStateType NewEdge { get; } =
-            new(3, "New Edge", "Draw a new edge between two nodes",
+            new("New Edge", "Draw a new edge between two nodes",
                 Color.green.Darker(), "Materials/ModernUIPack/Minus",
                 AddEdgeAction.CreateReversibleAction);
         public static ActionStateType NewNode { get; } =
-            new(4, "New Node", "Create a new node",
+            new("New Node", "Create a new node",
                 Color.green.Darker(), "Materials/ModernUIPack/Plus",
                 AddNodeAction.CreateReversibleAction);
         public static ActionStateType EditNode { get; } =
-            new(5, "Edit Node", "Edit a node",
+            new("Edit Node", "Edit a node",
                 Color.green.Darker(), "Materials/ModernUIPack/Settings",
                 EditNodeAction.CreateReversibleAction);
         public static ActionStateType ScaleNode { get; } =
-            new(6, "Scale Node", "Scale a node",
+            new("Scale Node", "Scale a node",
                 Color.green.Darker(), "Materials/ModernUIPack/Crop",
                 ScaleNodeAction.CreateReversibleAction);
         public static ActionStateType Delete { get; } =
-            new(7, "Delete", "Delete a node or an edge",
+            new("Delete", "Delete a node or an edge",
                 Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
                 DeleteAction.CreateReversibleAction);
         public static ActionStateType ShowCode { get; } =
-            new(8, "Show Code", "Display the source code of a node.",
-                Color.black, "Materials/ModernUIPack/Document", ShowCodeAction.CreateReversibleAction);
+            new("Show Code", "Display the source code of a node.",
+                Color.black, "Materials/ModernUIPack/Document",
+                ShowCodeAction.CreateReversibleAction);
         public static ActionStateType Draw { get; } =
-            new (9, "Draw", "Draw a line",
-                        Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
-                        DrawAction.CreateReversibleAction);
+            new ("Draw", "Draw a line",
+                 Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                 DrawAction.CreateReversibleAction);
         public static ActionStateType AddBoard { get; } =
-            new (10, "Add Board", "Add a board", Color.green.Darker(), 
-                "Materials/ModernUIPack/Plus", AddBoardAction.CreateReversibleAction);
+            new ("Add Board", "Add a board",
+                 Color.green.Darker(), "Materials/ModernUIPack/Plus",
+                 AddBoardAction.CreateReversibleAction);
         public static ActionStateType AddWidget { get; } =
-            new (11, "Add Widget", "Add a widget", Color.green.Darker(), 
-                "Materials/ModernUIPack/Plus", AddWidgetAction.CreateReversibleAction);
+            new ("Add Widget", "Add a widget",
+                Color.green.Darker(), "Materials/ModernUIPack/Plus",
+                AddWidgetAction.CreateReversibleAction);
         public static ActionStateType MoveBoard { get; } =
-            new (12, "Move Board", "Move a board", Color.yellow.Darker(), 
-                "Materials/Charts/MoveIcon", 
+            new ("Move Board", "Move a board",
+                Color.yellow.Darker(), "Materials/Charts/MoveIcon",
                 MoveBoardAction.CreateReversibleAction);
         public static ActionStateType MoveWidget { get; } =
-            new (13, "Move Widget", "Move a widget", Color.yellow.Darker(), 
-                "Materials/Charts/MoveIcon",
+            new ("Move Widget", "Move a widget",
+                Color.yellow.Darker(), "Materials/Charts/MoveIcon",
                 MoveWidgetAction.CreateReversibleAction);
         public static ActionStateType DeleteBoard { get; } =
-            new (14, "Delete Board", "Delete a board", Color.red.Darker(), 
-                "Materials/ModernUIPack/Trash", DeleteBoardAction.CreateReversibleAction);
+            new ("Delete Board", "Delete a board",
+                Color.red.Darker(), "Materials/ModernUIPack/Trash",
+                DeleteBoardAction.CreateReversibleAction);
         public static ActionStateType DeleteWidget { get; } =
-            new (15, "Delete Widget", "Delete a widget", Color.red.Darker(), 
-                "Materials/ModernUIPack/Trash", DeleteWidgetAction.CreateReversibleAction);
+            new ("Delete Widget", "Delete a widget",
+                Color.red.Darker(),  "Materials/ModernUIPack/Trash",
+                DeleteWidgetAction.CreateReversibleAction);
         public static ActionStateType LoadBoard { get; } =
-            new (16, "Load Board", "Load a board", Color.blue.Darker(), 
-                "Materials/ModernUIPack/Document", LoadBoardAction.CreateReversibleAction);
+            new ("Load Board", "Load a board",
+                Color.blue.Darker(), "Materials/ModernUIPack/Document",
+                LoadBoardAction.CreateReversibleAction);
         public static ActionStateType SaveBoard { get; } =
-            new (17, "Save Board", "Save a board", Color.blue.Darker(), 
-                "Materials/ModernUIPack/Document", SaveBoardAction.CreateReversibleAction);
+            new ("Save Board", "Save a board",
+                Color.blue.Darker(), "Materials/ModernUIPack/Document",
+                SaveBoardAction.CreateReversibleAction);
 
         #endregion
 
@@ -118,13 +125,6 @@ namespace SEE.Controls.Actions
         public string IconPath { get; }
 
         /// <summary>
-        /// Numeric value of this action.
-        /// Must be unique across all types.
-        /// Must increase by one for each new instantiation of an <see cref="ActionStateType"/>.
-        /// </summary>
-        public int Value { get; }
-
-        /// <summary>
         /// Delegate to be called to create a new instance of this kind of action.
         /// May be null if none needs to be created (in which case this delegate will not be called).
         /// </summary>
@@ -149,7 +149,6 @@ namespace SEE.Controls.Actions
         /// Because this class replaces an enum, values of this class may only be created inside of it,
         /// hence the visibility modifier is set to private.
         /// </summary>
-        /// <param name="value">The ID of this ActionStateType. Must increase by one for each new instantiation.</param>
         /// <param name="name">The Name of this ActionStateType. Must be unique.</param>
         /// <param name="description">Description for this ActionStateType.</param>
         /// <param name="color">Color for this ActionStateType.</param>
@@ -157,9 +156,8 @@ namespace SEE.Controls.Actions
         /// <exception cref="ArgumentException">When the given <paramref name="name"/> or <paramref name="value"/>
         /// is not unique, or when the <paramref name="value"/> doesn't fulfill the "must increase by one" criterion.
         /// </exception>
-        private ActionStateType(int value, string name, string description, Color color, string iconPath, CreateReversibleAction createReversible)
+        private ActionStateType(string name, string description, Color color, string iconPath, CreateReversibleAction createReversible)
         {
-            Value = value;
             Name = name;
             Description = description;
             Color = color;
@@ -167,31 +165,13 @@ namespace SEE.Controls.Actions
             CreateReversible = createReversible;
 
             // Check for duplicates
-            if (AllTypes.Any(x => x.Value == value || x.Name == name))
+            if (AllTypes.Any(x => x.Name == name))
             {
                 throw new ArgumentException("Duplicate ActionStateTypes may not exist!\n");
             }
 
-            // Check whether the ID is always increased by 1. For this, it suffices to check
-            // the most recently added element, as all added elements go through this check.
-            if (value != AllTypes.Select(x => x.Value + 1).DefaultIfEmpty(0).Last())
-            {
-                throw new ArgumentException("ActionStateType IDs must be increasing by one!\n");
-            }
-
             // Add new value to list of all types
             AllTypes.Add(this);
-        }
-
-        /// <summary>
-        /// Returns the ActionStateType whose ID matches the given parameter.
-        /// </summary>
-        /// <param name="ID">The ID of the ActionStateType which shall be returned</param>
-        /// <returns>the ActionStateType whose ID matches the given parameter</returns>
-        /// <exception cref="InvalidOperationException">If no such ActionStateType exists.</exception>
-        public static ActionStateType FromID(int ID)
-        {
-            return AllTypes.Single(x => x.Value == ID);
         }
 
         #region Equality & Comparators
@@ -208,12 +188,12 @@ namespace SEE.Controls.Actions
                 return true;
             }
 
-            return obj.GetType() == GetType() && ((ActionStateType)obj).Value == Value;
+            return obj.GetType() == GetType() && ((ActionStateType)obj).CreateReversible == CreateReversible;
         }
 
         public override int GetHashCode()
         {
-            return Value;
+            return CreateReversible.GetHashCode();
         }
 
         #endregion
