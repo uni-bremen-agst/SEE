@@ -40,7 +40,9 @@ namespace SEE.Net.Actions.RuntimeConfig
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
+            {
                 RuntimeConfigMenu.GetMenuForCity(CityIndex).SyncPath?.Invoke(WidgetPath, Value, IsAbsolute);
+            }
         }
     }
 }

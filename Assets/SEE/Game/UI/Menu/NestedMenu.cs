@@ -170,7 +170,7 @@ namespace SEE.Game.UI.Menu
                 MenuManager.onConfirm.AddListener(ResetToBase); // When closing the menu, its level will be reset to the top
             }
             
-            // TODO: OnMenuToggle.AddListener(shown => SEEInput.KeyboardShortcutsEnabled = !shown);
+            OnShowMenuChanged += () => SEEInput.KeyboardShortcutsEnabled = !ShowMenu;
         }
 
         /// <summary>

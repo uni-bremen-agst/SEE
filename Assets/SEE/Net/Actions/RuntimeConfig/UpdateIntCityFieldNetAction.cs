@@ -3,7 +3,7 @@ using SEE.Game.UI.RuntimeConfigMenu;
 namespace SEE.Net.Actions.RuntimeConfig
 {
     /// <summary>
-    /// Network action when a int was changed. 
+    /// Network action when an int was changed. 
     /// </summary>
     public class UpdateIntCityFieldNetAction : AbstractNetAction
     {
@@ -35,7 +35,9 @@ namespace SEE.Net.Actions.RuntimeConfig
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
+            {
                 RuntimeConfigMenu.GetMenuForCity(CityIndex).SyncField?.Invoke(WidgetPath, Value);
+            }
         }
     }
 }

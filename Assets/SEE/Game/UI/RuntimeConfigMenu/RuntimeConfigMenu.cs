@@ -46,7 +46,10 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         /// </summary>
         private void Update()
         {
-            if (SEEInput.ToggleConfigMenu()) cityMenus[currentCity].ToggleMenu();
+            if (SEEInput.ToggleConfigMenu())
+            {
+                cityMenus[currentCity].ToggleMenu();
+            }
         }
 
         /// <summary>
@@ -55,7 +58,10 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         /// <param name="i">index</param>
         private void SwitchCity(int i)
         {
-            if (i == currentCity) return;
+            if (i == currentCity)
+            {
+                return;
+            }
             cityMenus[currentCity].ShowMenu = false;
             cityMenus[i].ShowMenu = true;
             currentCity = i;

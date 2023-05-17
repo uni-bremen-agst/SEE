@@ -21,7 +21,6 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             OnEndEdit?.Invoke();
         }
 
-
         /// <summary>
         /// Triggers when the pointer is released.
         /// </summary>

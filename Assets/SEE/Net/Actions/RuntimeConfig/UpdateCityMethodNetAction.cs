@@ -30,7 +30,9 @@ namespace SEE.Net.Actions.RuntimeConfig
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
+            {
                 RuntimeConfigMenu.GetMenuForCity(CityIndex).SyncMethod?.Invoke(MethodName);
+            }
         }
     }
 }
