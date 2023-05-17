@@ -38,7 +38,7 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// The menu to be tested.
         /// </summary>
-        private NestedMenu menu;
+        private NestedListMenu menu;
 
         /// <summary>
         /// Set up for every test.
@@ -124,14 +124,14 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <param name="menuGO">new game object holding <paramref name="menu"/></param>
         /// <param name="menu">a new menu that can be tested</param>
-        private void CreateMenu(out GameObject menuGO, out NestedMenu menu)
+        private void CreateMenu(out GameObject menuGO, out NestedListMenu menu)
         {
             menuGO = new GameObject { name = "Container for menu" };
-            menu = menuGO.AddComponent<NestedMenu>();
-            menu.AllowNoSelection(true);
+            menu = menuGO.AddComponent<NestedListMenu>();
+            menu.AllowNoSelection = true;
             menu.Title = MenuTitle;
             menu.Description = "Tests the menu";
-            menu.HideAfterSelection(true);
+            menu.HideAfterSelection = true;
             menu.Icon = GetIcon();
 
             IEnumerable<MenuEntry> menuEntries = new List<MenuEntry>
@@ -151,7 +151,7 @@ namespace SEE.Game.UI.Menu
             };
 
             menu.AddEntries(menuEntries);
-            menu.ShowMenu(true);
+            menu.ShowMenu = true;
         }
     }
 }
