@@ -104,7 +104,7 @@ namespace SEE.Game.UI.Menu
         {
             if (Menu != null)
             {
-                Destroy(Menu);
+                Destroyer.Destroy(Menu);
             }
         }
         
