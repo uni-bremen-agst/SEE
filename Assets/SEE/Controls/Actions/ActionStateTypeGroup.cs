@@ -12,7 +12,7 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class ActionStateTypeGroup : AbstractActionStateType
     {
-        private ActionStateTypeGroup(string name, string description, Color color, string iconPath)
+        public ActionStateTypeGroup(string name, string description, Color color, string iconPath)
             : base(name, description, color, iconPath)
         {
         }
@@ -35,34 +35,5 @@ namespace SEE.Controls.Actions
             actionStateType.Parent = this;
             Children.Add(actionStateType);
         }
-
-        #region Equality & Comparators
-
-        public override bool Equals(object obj)
-        {
-            // FIXME
-            throw new NotImplementedException();
-
-            if (ReferenceEquals(null, obj))
-            {
-                return false;
-            }
-
-            if (ReferenceEquals(this, obj))
-            {
-                return true;
-            }
-
-            // return obj.GetType() == GetType() && ((ActionStateType)obj).CreateReversible == CreateReversible;
-        }
-
-        public override int GetHashCode()
-        {
-            // FIXME
-            throw new NotImplementedException();
-            //return CreateReversible.GetHashCode();
-        }
-
-        #endregion
     }
 }

@@ -70,7 +70,6 @@ namespace SEE.Controls.Actions
         public static ActionStateType Hide { get; } =
             new("Hide", "Hides nodes or edges",
                 Color.yellow.Darker(), "Materials/ModernUIPack/Eye", HideAction.CreateReversibleAction);
-
         public static ActionStateType NewEdge { get; } =
             new("New Edge", "Draw a new edge between two nodes",
                 Color.green.Darker(), "Materials/ModernUIPack/Minus",
@@ -99,38 +98,49 @@ namespace SEE.Controls.Actions
             new("Draw", "Draw a line",
                  Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                  DrawAction.CreateReversibleAction);
+        public static ActionStateTypeGroup MetricBoard { get; } =
+            new("Metric Board", "Manipulate a metric board",
+                 Color.white.Darker(), "Materials/ModernUIPack/Pencil");
         public static ActionStateType AddBoard { get; } =
             new("Add Board", "Add a board",
                  Color.green.Darker(), "Materials/ModernUIPack/Plus",
-                 AddBoardAction.CreateReversibleAction);
+                 AddBoardAction.CreateReversibleAction,
+                 parent: MetricBoard);
         public static ActionStateType AddWidget { get; } =
             new("Add Widget", "Add a widget",
                 Color.green.Darker(), "Materials/ModernUIPack/Plus",
-                AddWidgetAction.CreateReversibleAction);
+                AddWidgetAction.CreateReversibleAction,
+                parent: MetricBoard);
         public static ActionStateType MoveBoard { get; } =
             new("Move Board", "Move a board",
                 Color.yellow.Darker(), "Materials/Charts/MoveIcon",
-                MoveBoardAction.CreateReversibleAction);
+                MoveBoardAction.CreateReversibleAction,
+                parent: MetricBoard);
         public static ActionStateType MoveWidget { get; } =
             new("Move Widget", "Move a widget",
                 Color.yellow.Darker(), "Materials/Charts/MoveIcon",
-                MoveWidgetAction.CreateReversibleAction);
+                MoveWidgetAction.CreateReversibleAction,
+                parent: MetricBoard);
         public static ActionStateType DeleteBoard { get; } =
             new("Delete Board", "Delete a board",
                 Color.red.Darker(), "Materials/ModernUIPack/Trash",
-                DeleteBoardAction.CreateReversibleAction);
+                DeleteBoardAction.CreateReversibleAction,
+                parent: MetricBoard);
         public static ActionStateType DeleteWidget { get; } =
             new("Delete Widget", "Delete a widget",
                 Color.red.Darker(), "Materials/ModernUIPack/Trash",
-                DeleteWidgetAction.CreateReversibleAction);
+                DeleteWidgetAction.CreateReversibleAction,
+                parent: MetricBoard);
         public static ActionStateType LoadBoard { get; } =
             new("Load Board", "Load a board",
                 Color.blue.Darker(), "Materials/ModernUIPack/Document",
-                LoadBoardAction.CreateReversibleAction);
+                LoadBoardAction.CreateReversibleAction,
+                parent: MetricBoard);
         public static ActionStateType SaveBoard { get; } =
             new("Save Board", "Save a board",
                 Color.blue.Darker(), "Materials/ModernUIPack/Document",
-                SaveBoardAction.CreateReversibleAction);
+                SaveBoardAction.CreateReversibleAction,
+                parent: MetricBoard);
 
         #endregion
 
