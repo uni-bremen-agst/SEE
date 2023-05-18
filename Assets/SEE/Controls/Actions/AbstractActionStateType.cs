@@ -48,14 +48,14 @@ namespace SEE.Controls.Actions
         /// <param name="description">Description for this ActionStateType.</param>
         /// <param name="color">Color for this ActionStateType.</param>
         /// <param name="iconPath">Path to the material of the icon for this ActionStateType.</param>
-        /// <exception cref="ArgumentException">When the given <paramref name="name"/> is not unique.
         /// </exception>
-        protected AbstractActionStateType(string name, string description, Color color, string iconPath)
+        protected AbstractActionStateType(string name, string description, Color color, string iconPath, ActionStateTypeGroup parent)
         {
             Name = name;
             Description = description;
             Color = color;
             IconPath = iconPath;
+            parent?.Add(this);
             ActionStateTypes.Add(this);
         }
     }

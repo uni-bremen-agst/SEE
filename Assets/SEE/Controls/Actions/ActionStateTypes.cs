@@ -26,11 +26,6 @@ namespace SEE.Controls.Actions
         /// <param name="actionStateType">to be added</param>
         public static void Add(AbstractActionStateType actionStateType)
         {
-            // Check for duplicates
-            //if (AllTypes.Any(x => x.Name == actionStateType.Name))
-            //{
-            //    throw new ArgumentException($"Duplicate ActionStateTypes {actionStateType.Name} must not exist!");
-            //}
             if (actionStateType.Parent == null)
             {
                 AllRootTypes.AddRoot(actionStateType);
@@ -51,96 +46,146 @@ namespace SEE.Controls.Actions
         /// <remarks><see cref="ActionStateType.Move"/> is the returned default</remarks>
         public static ActionStateType FirstActionStateType()
         {
-            /// Important note: As a side effect of mentioning this <see cref="ActionStateType.Move"/>
-            /// here, its initializer will be executed. C# has a lazy evaluation
-            /// of initializers. This will make sure that it actually has a
-            /// defined value (not <c>null</c>).
             return Move;
         }
 
         #region Static Types
-        public static ActionStateType Move { get; } =
+
+        /// <summary>
+        /// Initializes all action state types and groups.
+        ///
+        /// C# uses lazy evaluation of initializers. That is why we initialize the action state
+        /// types and groups ourselves in this static constructor. This will make sure that they
+        /// actually have defined value (different from null) when used. That is particularly
+        /// important for action state groups which are used in the initialization of all
+        /// action state types and groups contained in them.
+        /// </summary>
+        static ActionStateTypes()
+        {
+            Move =
             new("Move", "Move a node within a graph",
-                Color.red.Darker(), "Materials/Charts/MoveIcon",
-                MoveAction.CreateReversibleAction);
-        public static ActionStateType Rotate { get; } =
+               Color.red.Darker(), "Materials/Charts/MoveIcon",
+               MoveAction.CreateReversibleAction);
+
+            Rotate =
             new("Rotate", "Rotate the selected node and its children within a graph",
                 Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
                 RotateAction.CreateReversibleAction);
-        public static ActionStateType Hide { get; } =
+
+            Hide =
             new("Hide", "Hides nodes or edges",
-                Color.yellow.Darker(), "Materials/ModernUIPack/Eye", HideAction.CreateReversibleAction);
-        public static ActionStateType NewEdge { get; } =
+                Color.yellow.Darker(), "Materials/ModernUIPack/Eye",
+                HideAction.CreateReversibleAction);
+
+            NewEdge =
             new("New Edge", "Draw a new edge between two nodes",
                 Color.green.Darker(), "Materials/ModernUIPack/Minus",
                 AddEdgeAction.CreateReversibleAction);
-        public static ActionStateType NewNode { get; } =
+
+            NewNode =
             new("New Node", "Create a new node",
                 Color.green.Darker(), "Materials/ModernUIPack/Plus",
                 AddNodeAction.CreateReversibleAction);
-        public static ActionStateType EditNode { get; } =
+
+            EditNode =
             new("Edit Node", "Edit a node",
                 Color.green.Darker(), "Materials/ModernUIPack/Settings",
                 EditNodeAction.CreateReversibleAction);
-        public static ActionStateType ScaleNode { get; } =
+
+            ScaleNode =
             new("Scale Node", "Scale a node",
                 Color.green.Darker(), "Materials/ModernUIPack/Crop",
                 ScaleNodeAction.CreateReversibleAction);
-        public static ActionStateType Delete { get; } =
+
+            Delete =
             new("Delete", "Delete a node or an edge",
                 Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
                 DeleteAction.CreateReversibleAction);
-        public static ActionStateType ShowCode { get; } =
+
+            ShowCode =
             new("Show Code", "Display the source code of a node.",
                 Color.black, "Materials/ModernUIPack/Document",
                 ShowCodeAction.CreateReversibleAction);
-        public static ActionStateType Draw { get; } =
+
+            Draw =
             new("Draw", "Draw a line",
                  Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                  DrawAction.CreateReversibleAction);
-        public static ActionStateTypeGroup MetricBoard { get; } =
+
+            // Metric Board actions
+            MetricBoard =
             new("Metric Board", "Manipulate a metric board",
-                 Color.white.Darker(), "Materials/ModernUIPack/Pencil");
-        public static ActionStateType AddBoard { get; } =
+                Color.white.Darker(), "Materials/ModernUIPack/Pencil");
+
+            AddBoard =
             new("Add Board", "Add a board",
-                 Color.green.Darker(), "Materials/ModernUIPack/Plus",
-                 AddBoardAction.CreateReversibleAction,
-                 parent: MetricBoard);
-        public static ActionStateType AddWidget { get; } =
+                Color.green.Darker(), "Materials/ModernUIPack/Plus",
+                AddBoardAction.CreateReversibleAction,
+                parent: MetricBoard);
+
+            AddWidget =
             new("Add Widget", "Add a widget",
                 Color.green.Darker(), "Materials/ModernUIPack/Plus",
                 AddWidgetAction.CreateReversibleAction,
                 parent: MetricBoard);
-        public static ActionStateType MoveBoard { get; } =
+
+            MoveBoard =
             new("Move Board", "Move a board",
                 Color.yellow.Darker(), "Materials/Charts/MoveIcon",
                 MoveBoardAction.CreateReversibleAction,
                 parent: MetricBoard);
-        public static ActionStateType MoveWidget { get; } =
+
+            MoveWidget =
             new("Move Widget", "Move a widget",
                 Color.yellow.Darker(), "Materials/Charts/MoveIcon",
                 MoveWidgetAction.CreateReversibleAction,
                 parent: MetricBoard);
-        public static ActionStateType DeleteBoard { get; } =
+
+            DeleteBoard =
             new("Delete Board", "Delete a board",
                 Color.red.Darker(), "Materials/ModernUIPack/Trash",
                 DeleteBoardAction.CreateReversibleAction,
                 parent: MetricBoard);
-        public static ActionStateType DeleteWidget { get; } =
+
+            DeleteWidget =
             new("Delete Widget", "Delete a widget",
                 Color.red.Darker(), "Materials/ModernUIPack/Trash",
                 DeleteWidgetAction.CreateReversibleAction,
                 parent: MetricBoard);
-        public static ActionStateType LoadBoard { get; } =
+
+            LoadBoard =
             new("Load Board", "Load a board",
-                Color.blue.Darker(), "Materials/ModernUIPack/Document",
-                LoadBoardAction.CreateReversibleAction,
-                parent: MetricBoard);
-        public static ActionStateType SaveBoard { get; } =
+               Color.blue.Darker(), "Materials/ModernUIPack/Document",
+               LoadBoardAction.CreateReversibleAction,
+               parent: MetricBoard);
+
+            SaveBoard =
             new("Save Board", "Save a board",
                 Color.blue.Darker(), "Materials/ModernUIPack/Document",
                 SaveBoardAction.CreateReversibleAction,
                 parent: MetricBoard);
+        }
+
+        public readonly static ActionStateType Move;
+        public readonly static ActionStateType Rotate;
+        public readonly static ActionStateType Hide;
+        public readonly static ActionStateType NewEdge;
+        public readonly static ActionStateType NewNode;
+        public readonly static ActionStateType EditNode;
+        public readonly static ActionStateType ScaleNode;
+        public readonly static ActionStateType Delete;
+        public readonly static ActionStateType ShowCode;
+        public readonly static ActionStateType Draw;
+
+        public readonly static ActionStateTypeGroup MetricBoard;
+        public readonly static ActionStateType AddBoard;
+        public readonly static ActionStateType AddWidget;
+        public readonly static ActionStateType MoveBoard;
+        public readonly static ActionStateType MoveWidget;
+        public readonly static ActionStateType DeleteBoard;
+        public readonly static ActionStateType DeleteWidget;
+        public readonly static ActionStateType LoadBoard;
+        public readonly static ActionStateType SaveBoard;
 
         #endregion
 

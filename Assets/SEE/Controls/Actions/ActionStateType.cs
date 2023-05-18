@@ -34,14 +34,10 @@ namespace SEE.Controls.Actions
         /// <param name="iconPath">Path to the material of the icon for this ActionStateType.</param>
         /// <param name="createReversible">Delegate to be called to create a new instance of this kind of action.
         /// Can be null, in which case no delegate will be called.</param>
-        /// <exception cref="ArgumentException">When the given <paramref name="name"/> or <paramref name="value"/>
-        /// is not unique, or when the <paramref name="value"/> doesn't fulfill the "must increase by one" criterion.
-        /// </exception>
         public ActionStateType(string name, string description,
             Color color, string iconPath, CreateReversibleAction createReversible, ActionStateTypeGroup parent = null)
-            : base(name, description, color, iconPath)
+            : base(name, description, color, iconPath, parent)
         {
-            parent?.Add(this);
             CreateReversible = createReversible;
         }
 

@@ -1,6 +1,4 @@
-﻿using SEE.Utils;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -12,14 +10,18 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class ActionStateTypeGroup : AbstractActionStateType
     {
-        public ActionStateTypeGroup(string name, string description, Color color, string iconPath)
-            : base(name, description, color, iconPath)
+        /// <summary>
+        /// Constructor for <see cref="ActionStateTypeGroup"/>.
+        /// </summary>
+        /// <param name="name">The Name of this <see cref="ActionStateTypeGroup"/>. Must be unique.</param>
+        /// <param name="description">Description for this <see cref="ActionStateTypeGroup"/>.</param>
+        /// <param name="parent">The parent of this action in the nesting hierarchy in the menu.</param>
+        /// <param name="color">Color for this <see cref="ActionStateTypeGroup"/>.</param>
+        /// <param name="iconPath">Path to the material of the icon for this <see cref="ActionStateTypeGroup"/>.</param>
+        public ActionStateTypeGroup(string name, string description, Color color, string iconPath, ActionStateTypeGroup parent = null)
+            : base(name, description, color, iconPath, parent)
         {
         }
-
-        public static ActionStateTypeGroup Hide { get; }
-           = new ActionStateTypeGroup("Hide", "Hides nodes or edges",
-                                      Color.yellow.Darker(), "Materials/ModernUIPack/Eye");
 
         /// <summary>
         /// Ordered list of child action state types.
