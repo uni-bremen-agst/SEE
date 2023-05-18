@@ -22,7 +22,8 @@ namespace SEE.Game.UI.Menu
 
     /// <summary>
     /// A menu similar to the <see cref="SimpleListMenu"/> with buttons which can open
-    /// other menus, i.e., in other words, a container for other menus.
+    /// other menus, i.e., in other words, a container for other menus. In addition
+    /// to nested submenus, this class also offers a search over all buttons.
     /// </summary>
     public class NestedListMenu<T> : SimpleListMenu<T> where T : MenuEntry
     {
@@ -40,9 +41,11 @@ namespace SEE.Game.UI.Menu
         /// The keyword to be used to step back in the menu verbally.
         /// </summary>
         private const string BackMenuCommand = "go back";
-        
+
         /// <summary>
         /// The input-field for the fuzzy-search of the nestedMenu.
+        /// The prefabs for menus of subclasses may or may not have
+        /// this field. If they don't, this field will be null.
         /// </summary>
         private TMP_InputField searchInput;
 
@@ -124,7 +127,7 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <returns>breadcrumb for the current level</returns>
         private string GetBreadcrumb() => string.Join(" / ", Levels.Reverse().Select(x => x.Title));
-        
+
         /// <summary>
         /// Descends down a level in the menu hierarchy and removes the entry from the <see cref="Levels"/>.
         /// </summary>
@@ -155,31 +158,45 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         public void ResetToBase()
         {
-            searchInput.text = String.Empty;
+            if (searchInput)
+            {
+                searchInput.text = String.Empty;
+            }
             while (Levels.Count > 0)
             {
                 DescendLevel();
             }
         }
 
+        /// <summary>
+        /// Sets <see cref="searchInput"/> if it exists. Registers necessary listeners
+        /// to be called when the menu is cancelled or confirmed or when the user
+        /// has changed the content of <see cref="searchInput"/>.
+        /// </summary>
         protected override void StartDesktop()
         {
             base.StartDesktop();
 
-            Content.transform.Find("Search Field").gameObject.TryGetComponentOrLog(out searchInput);
-            
-            searchInput.onValueChanged.AddListener(SearchTextEntered);
-            MenuManager.onCancel.AddListener(DescendLevel); // Go one level higher when clicking "back"
-            MenuManager.onCancel.AddListener(() =>
+            Transform searchField = Content.transform.Find("Search Field");
+            if (searchField)
             {
-                searchActive = false;
-                searchInput.text = string.Empty;
-            });
+                if (searchField.gameObject.TryGetComponentOrLog(out searchInput))
+                {
+                    searchInput.onValueChanged.AddListener(SearchTextEntered);
+                    MenuManager.onCancel.AddListener(() =>
+                    {
+                        searchActive = false;
+                        searchInput.text = string.Empty;
+                    });
+                }
+            }
+            MenuManager.onCancel.AddListener(DescendLevel); // Go one level higher when clicking "back"
             if (ResetLevelOnClose)
             {
-                MenuManager.onConfirm.AddListener(ResetToBase); // When closing the menu, its level will be reset to the top
+                // When closing the menu, its level will be reset to the top.
+                MenuManager.onConfirm.AddListener(ResetToBase);
             }
-            
+
             // TODO: OnMenuToggle.AddListener(shown => SEEInput.KeyboardShortcutsEnabled = !shown);
         }
 
@@ -233,7 +250,7 @@ namespace SEE.Game.UI.Menu
             {
                 return;
             }
-            
+
             AllEntries ??= GetAllEntries().ToDictionary(x => x.Title, x => x);
             IEnumerable<T> results =
                 Process.ExtractTop(SearchMenu.FilterString(text), AllEntries.Keys, cutoff: 10)
@@ -241,8 +258,8 @@ namespace SEE.Game.UI.Menu
                        .Select(x => AllEntries[x.Value])
                        .ToList();
 
-            NestedMenuEntry<T> resultEntry 
-                = new (results, "Results", $"Found {results.Count()} help pages.", 
+            NestedMenuEntry<T> resultEntry
+                = new (results, "Results", $"Found {results.Count()} help pages.",
                        default, default, Resources.Load<Sprite>("Materials/Notification/info"));
             AscendLevel(resultEntry);
         }
