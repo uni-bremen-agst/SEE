@@ -39,7 +39,7 @@ namespace SEE.GO.Menu
             GameObject modeMenuGO = attachTo ? attachTo : new GameObject {name = "Mode Menu"};
 
             ActionStateType firstType = ActionStateTypes.FirstActionStateType();
-            IList<ToggleMenuEntry> entries = MenuEntries(ActionStateTypes.AllRootTypes);
+            IList<MenuEntry> entries = MenuEntries(ActionStateTypes.AllRootTypes);
 
             // Initial state will be the first action state type
             GlobalActionHistory.Execute(firstType);
@@ -54,28 +54,42 @@ namespace SEE.GO.Menu
 
             #region Local Functions
 
-            IList<ToggleMenuEntry> MenuEntries(Forrest<AbstractActionStateType> allTypes)
+            // Sets up the menu structure according to given forrest structure and content.
+            // Returns the list of all MenuEntry instances created for all roots of this forrest.
+            IList<MenuEntry> MenuEntries(Forrest<AbstractActionStateType> allTypes)
             {
-                List<ToggleMenuEntry> result = new();
+                List<MenuEntry> result = new();
+                // A mapping of the action groups created onto their corresponding NestedMenuEntry.
+                // It will be used to add nested actions (atomic or groups) as a child of their
+                // containing NestedMenuEntry (added to the InnerEntries of it).
                 Dictionary<ActionStateTypeGroup, NestedMenuEntry<MenuEntry>> toNestedMenuEntry = new();
                 allTypes.PreorderTraverse(Visit);
                 return result;
 
+                // The callback being called during the pre-order traversal of the forrest
+                // where the traversal passes the currently visited node as parameter 'child'
+                // and the child's parent in parameter 'parent'. The 'parent' will be null
+                // if 'child' is a root.
+                // If 'child' is a atomic ActionStateType, a corresponding
+                // MenuEntry will be created.
+                // If 'child' is an ActionStateTypeGroup, a corresponding NestedMenuEntry will
+                // be created.
+                // If 'parent' is null, thus, 'child' is a root, 'child' will be added to 'result'.
                 bool Visit(AbstractActionStateType child, AbstractActionStateType parent)
                 {
+                    // The menu entry created for child (either a ToggleMenuEntry for an ActionStateType
+                    // or a NestedMenuEntry for an ActionStateTypeGroup).
                     MenuEntry entry;
 
                     if (child is ActionStateType actionStateType)
                     {
-                        ToggleMenuEntry toggleEntry = new(entryAction: () => GlobalActionHistory.Execute(actionStateType),
-                                                          exitAction: null,
-                                                          title: actionStateType.Name,
-                                                          description: actionStateType.Description,
-                                                          entryColor: actionStateType.Color,
-                                                          icon: Resources.Load<Sprite>(actionStateType.IconPath));
-                        // Only ToggleMenuEntries are added to result.
-                        result.Add(toggleEntry);
-                        entry = toggleEntry;
+                        MenuEntry menuEntry = new(selectAction: () => GlobalActionHistory.Execute(actionStateType),
+                                                  unselectAction: null,
+                                                  title: actionStateType.Name,
+                                                  description: actionStateType.Description,
+                                                  entryColor: actionStateType.Color,
+                                                  icon: Resources.Load<Sprite>(actionStateType.IconPath));
+                        entry = menuEntry;
                     }
                     else if (child is ActionStateTypeGroup actionStateTypeGroup)
                     {
@@ -83,7 +97,6 @@ namespace SEE.GO.Menu
                                                                           title: actionStateTypeGroup.Name,
                                                                           description: actionStateTypeGroup.Description,
                                                                           entryColor: actionStateTypeGroup.Color,
-                                                                          enabled: Equals(actionStateTypeGroup, firstType),
                                                                           icon: Resources.Load<Sprite>(actionStateTypeGroup.IconPath));
                         toNestedMenuEntry[actionStateTypeGroup] = nestedMenuEntry;
                         entry = nestedMenuEntry;
@@ -93,6 +106,10 @@ namespace SEE.GO.Menu
                         throw new System.NotImplementedException($"{nameof(child)} not handled.");
                     }
 
+                    // If child is not a root (i.e., has a parent), we will add the entry to
+                    // the InnerEntries of the NestedMenuEntry corresponding to the parent.
+                    // We know that such a NestedMenuEntry must exist, because we are doing a
+                    // preorder traversal.
                     if (parent != null)
                     {
                         if (parent is ActionStateTypeGroup parentGroup)
@@ -101,9 +118,14 @@ namespace SEE.GO.Menu
                         }
                         else
                         {
-                            throw new System.InvalidCastException($"parent is expected to be a {nameof(ActionStateTypeGroup)}.");
+                            throw new System.InvalidCastException($"Parent is expected to be an {nameof(ActionStateTypeGroup)}.");
                         }
                     }
+                    else
+                    {
+                        result.Add(entry);
+                    }
+                    // Continue with the traversal.
                     return true;
                 }
             }
@@ -135,7 +157,7 @@ namespace SEE.GO.Menu
             // Initialize action state indicator to current action state
             SetIndicatorStateToEntry(modeMenu.ActiveEntry);
 
-            void SetIndicatorStateToEntry(ToggleMenuEntry entry)
+            void SetIndicatorStateToEntry(MenuEntry entry)
             {
                 indicator.ChangeState(entry.Title, entry.EntryColor.WithAlpha(0.5f));
             }
