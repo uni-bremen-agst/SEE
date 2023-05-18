@@ -47,7 +47,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Percentage by which the starting color of an edge differs to its end color.
         /// </summary>
-        private const float EDGE_GRADIENT_FACTOR = 1.0f;
+        private const float EDGE_GRADIENT_FACTOR = 0.8f;
 
         /// <summary>
         /// States in which an edge shall be hidden.
