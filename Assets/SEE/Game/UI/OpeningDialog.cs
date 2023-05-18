@@ -30,7 +30,7 @@ namespace SEE.UI
         private SimpleListMenu CreateMenu()
         {
             GameObject actionMenuGO = new() { name = "Network Menu" };
-            IList<ToggleMenuEntry> entries = SelectionEntries();
+            IList<MenuEntry> entries = SelectionEntries();
             SimpleListMenu actionMenu = actionMenuGO.AddComponent<SimpleListMenu>();
             actionMenu.AllowNoSelection = false; // the menu cannot be closed; user must make a decision
             actionMenu.Title = "Network Configuration";
@@ -46,11 +46,11 @@ namespace SEE.UI
         /// Returns the menu entries for this dialog.
         /// </summary>
         /// <returns>menu entries for this dialog</returns>
-        private IList<ToggleMenuEntry> SelectionEntries()
+        private IList<MenuEntry> SelectionEntries()
         {
             Color color = Color.blue;
 
-            return new List<ToggleMenuEntry>
+            return new List<MenuEntry>
                     { new(selectAction: this.StartHost,
                           unselectAction: null,
                           title: "Host",

@@ -220,7 +220,7 @@ namespace SEE.GO.Menu
                 // We cannot use PlayerActionHistory.Current here
                 playerMenu.modeMenu.ActiveEntry = playerMenu.modeMenu.Entries.First(x => x.Title.Equals(actionName));
             }
-            foreach (ToggleMenuEntry toggleMenuEntry in playerMenu.modeMenu.Entries)
+            foreach (MenuEntry toggleMenuEntry in playerMenu.modeMenu.Entries)
             {
                 if (toggleMenuEntry.Title.Equals(actionName))
                 {

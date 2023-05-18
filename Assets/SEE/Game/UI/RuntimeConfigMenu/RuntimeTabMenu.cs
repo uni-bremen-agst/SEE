@@ -26,18 +26,18 @@ namespace SEE.Game.UI.RuntimeConfigMenu
     /// <summary>
     /// Menu for configuring a table/city.
     /// </summary>
-    public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
+    public class RuntimeTabMenu : TabMenu<MenuEntry>
     {
         /// <summary>
-        /// Path which contains the prefabs for the runtime config menu. 
+        /// Path which contains the prefabs for the runtime config menu.
         /// </summary>
         public const string RUNTIME_CONFIG_PREFAB_FOLDER = UI_PREFAB_FOLDER + "RuntimeConfigMenu/";
-        
+
         /// <summary>
         /// Prefab for a setting object.
         /// </summary>
         private const string SETTINGS_OBJECT_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsObject";
-        
+
         /// <summary>
         /// Prefab for a switch.
         /// </summary>
@@ -47,32 +47,32 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         /// Prefab for a slider.
         /// </summary>
         private const string SLIDER_PREFAB = UI_PREFAB_FOLDER + "Input Group - Slider";
-        
+
         /// <summary>
         /// Prefab for a dropdown.
         /// </summary>
         private const string DROPDOWN_PREFAB = UI_PREFAB_FOLDER + "Input Group - Dropdown 2";
-        
+
         /// <summary>
         /// Prefab for a color picker.
         /// </summary>
         private const string COLOR_PICKER_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeColorPicker";
-        
+
         /// <summary>
         /// Prefab for a string field.
         /// </summary>
         private const string STRING_FIELD_PREFAB = UI_PREFAB_FOLDER + "Input Group - String Input Field";
-        
+
         /// <summary>
         /// Prefab for a button.
         /// </summary>
         private const string BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigButton";
-        
+
         /// <summary>
         /// Prefab for a add button.
         /// </summary>
         private const string ADD_ELEMENT_BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeAddButton";
-        
+
         /// <summary>
         /// Prefab for a remove button.
         /// </summary>
@@ -82,7 +82,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         /// The city index
         /// </summary>
         public int CityIndex;
-        
+
         /// <summary>
         /// The city
         /// </summary>
@@ -92,19 +92,19 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         /// The city switcher
         /// </summary>
         private HorizontalSelector citySwitcher;
-        
+
         /// <summary>
         /// The list of configuration buttons which are displayed at the right side of the menu.
         ///
         /// <see cref="RuntimeButtonAttribute"/>
         /// </summary>
         private GameObject configButtonList;
-        
+
         /// <summary>
         /// Whether the city should be immediately redrawn when a setting is changed.
         /// </summary>
         private bool immediateRedraw;
-        
+
         /// <summary>
         /// Triggers when the menu needs to be updated.
         ///
@@ -121,37 +121,37 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         /// Triggers when a field was changed by a different player.
         /// </summary>
         public Action<string, object> SyncField;
-        
+
         /// <summary>
         /// Triggers when a method was used by a different player.
         /// </summary>
         public Action<string> SyncMethod;
-        
+
         /// <summary>
         /// Triggers when a file path was changed by a different player.
         /// </summary>
         public Action<string, string, bool> SyncPath;
-        
+
         /// <summary>
         /// Triggers when a list element was added by a different player.
         /// </summary>
         public Action<string> SyncAddListElement;
-        
+
         /// <summary>
-        /// Triggers when a list element was removed by a different player. 
+        /// Triggers when a list element was removed by a different player.
         /// </summary>
         public Action<string> SyncRemoveListElement;
-        
+
         /// <summary>
         /// Prefab for the menu
         /// </summary>
         protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenu";
-        
+
         /// <summary>
         /// Prefab for a view
         /// </summary>
         protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsView";
-        
+
         /// <summary>
         /// Prefab for a tab button
         /// </summary>
@@ -161,17 +161,17 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         /// Path to the content game object
         /// </summary>
         protected override string ContentPath => "Main Content";
-        
+
         /// <summary>
         /// Path to the view list game object
         /// </summary>
         protected override string ViewListPath => "ViewList";
-        
+
         /// <summary>
         /// Path to the entry list game object
         /// </summary>
         protected override string EntryListPath => "TabButtons/TabObjects";
-        
+
         /// <summary>
         /// Path to game object containing the configuration buttons
         /// </summary>
@@ -226,12 +226,12 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             string GetTabName(MemberInfo memberInfo) =>
                  memberInfo.GetCustomAttributes().OfType<RuntimeTabAttribute>().FirstOrDefault()?.Name;
-            
-            bool IsCityAttribute(MemberInfo memberInfo) => 
-                memberInfo.DeclaringType == typeof(AbstractSEECity) || 
+
+            bool IsCityAttribute(MemberInfo memberInfo) =>
+                memberInfo.DeclaringType == typeof(AbstractSEECity) ||
                 memberInfo.DeclaringType!.IsSubclassOf(typeof(AbstractSEECity));
-            
-            bool HasTabAttribute(MemberInfo memberInfo) => 
+
+            bool HasTabAttribute(MemberInfo memberInfo) =>
                 !memberInfo.GetCustomAttributes().Any(a => a is RuntimeTabAttribute);
 
             float GetOrderOfMemberInfo(MemberInfo memberInfo) =>
@@ -241,7 +241,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             string GetButtonGroup(MemberInfo memberInfo) =>
                 (memberInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault()
                     ?? new RuntimeButtonAttribute(null, null)).Name;
-            
+
             // ordered whether a setting is primitive or has nested settings
             bool SortIsNotNested(MemberInfo memberInfo)
             {
@@ -251,9 +251,9 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     case FieldInfo { IsLiteral: false, IsInitOnly: false } fieldInfo:
                         value = fieldInfo.GetValue(city);
                         break;
-                    case PropertyInfo propertyInfo when !(propertyInfo.GetMethod == null 
-                                                          || propertyInfo.SetMethod == null 
-                                                          || !propertyInfo.CanRead 
+                    case PropertyInfo propertyInfo when !(propertyInfo.GetMethod == null
+                                                          || propertyInfo.SetMethod == null
+                                                          || !propertyInfo.CanRead
                                                           || !propertyInfo.CanWrite
                                                           ):
                         value = propertyInfo.GetValue(city);
@@ -283,7 +283,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             citySwitcher.defaultIndex = CityIndex;
             RuntimeConfigMenu.GetCities().ForEach(c => citySwitcher.CreateNewItem(c.name));
             citySwitcher.SetupSelector();
-            
+
             citySwitcher.selectorEvent.AddListener(index =>
             {
                 OnSwitchCity?.Invoke(index);
@@ -291,7 +291,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 citySwitcher.UpdateUI();
             });
         }
-        
+
         /// <summary>
         /// Creates a configuration button.
         ///
@@ -318,7 +318,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             buttonManager.clickEvent.AddListener(() =>
             {
                 // calls the method and updates the menu
-                methodInfo.Invoke(city, null); 
+                methodInfo.Invoke(city, null);
                 OnUpdateMenuValues?.Invoke();
             });
             buttonManager.clickEvent.AddListener(() =>
@@ -330,14 +330,14 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 };
                 netAction.Execute();
             });
-            
+
             // add network listener
             SyncMethod += methodName =>
             {
                 if (methodName == methodInfo.Name)
                 {
                     // calls the method and updates the menu
-                    methodInfo.Invoke(city, null); 
+                    methodInfo.Invoke(city, null);
                     OnUpdateMenuValues?.Invoke();
                 }
             };
@@ -353,12 +353,12 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         {
             // get the tab attribute
             var tabName = attributes.OfType<RuntimeTabAttribute>().FirstOrDefault()?.Name ?? "Misc";
-            ToggleMenuEntry entry = Entries.FirstOrDefault(entry => entry.Title == tabName);
-            
+            MenuEntry entry = Entries.FirstOrDefault(entry => entry.Title == tabName);
+
             // add an entry (tab + view) if necessary
             if (entry == null)
             {
-                entry = new ToggleMenuEntry(
+                entry = new MenuEntry(
                     () => { },
                     () => { },
                     tabName,
@@ -439,7 +439,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             // nested -> Settings Object with recursion
             // HashSet -> not supported
             object value = getter();
-            // non-instanced settings cannot be edited 
+            // non-instanced settings cannot be edited
             if (value == null) return;
             switch (value)
             {
@@ -538,7 +538,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 // types that shouldn't be in the configuration menu
                 case Graph:
                     break;
-             
+
                 // from here on come nested settings
                 case HashSet<string>:
                     // not supported
@@ -552,7 +552,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     parent = CreateNestedSetting(settingName, parent);
                     CreateList(list, parent);
                     break;
-                
+
                 // confirmed types where the nested fields should be edited
                 case ColorRange:
                 case ColorProperty:
@@ -566,7 +566,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     parent = CreateNestedSetting(settingName, parent);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
-                
+
                 // unconfirmed types where the nested fields should be edited
                 case VisualAttributes:
                 case ConfigIO.PersistentConfigItem:
@@ -576,13 +576,13 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                         && value.GetType() != typeof(LabelAttributes)
                        )
                     {
-                        Debug.LogWarning("Missing: (Maybe)" + settingName + " " + 
+                        Debug.LogWarning("Missing: (Maybe)" + settingName + " " +
                                          value.GetType().GetNiceName() + "\n");
                     }
                     parent = CreateNestedSetting(settingName, parent);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
-                
+
                 default:
                     Debug.LogWarning("Missing: " + settingName + ", " + value.GetType().GetNiceName() + "\n");
                     break;
@@ -618,7 +618,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
         private void CreateSlider(string settingName, RangeAttribute range, UnityAction<float> setter,
-            Func<float> getter, bool useRoundValue, GameObject parent, 
+            Func<float> getter, bool useRoundValue, GameObject parent,
             bool recursive = false, Func<string> getWidgetName = null)
         {
             // use range 0-2 if non provided
@@ -633,7 +633,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             Slider slider = sliderGameObject.GetComponentInChildren<Slider>();
             TextMeshProUGUI text = sliderGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
             text.text = settingName;
-            
+
             // getter of widget name (if not provided)
             getWidgetName ??= () => sliderGameObject.FullName();
 
@@ -646,7 +646,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
 
             // add listeners
             RuntimeSliderManager endEditManager = slider.gameObject.AddComponent<RuntimeSliderManager>();
-            
+
             endEditManager.OnEndEdit += () => setter(slider.value);
             endEditManager.OnEndEdit += () =>
             {
@@ -658,15 +658,15 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 };
                 action.Execute();
             };
-            
+
             endEditManager.OnEndEdit += CheckImmediateRedraw;
-            
+
             OnUpdateMenuValues += () =>
             {
                 slider.value = getter();
                 sliderManager.UpdateUI();
             };
-            
+
             SyncField += (widgetPath, value) =>
             {
                 if (sliderGameObject != null && widgetPath == getWidgetName())
@@ -687,12 +687,12 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
                 };
-                
+
                 OnShowMenuChanged += () =>
                 {
                     if (ShowMenu) smallEditorButton.ShowMenu = false;
                 };
-                
+
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateSlider(settingName, range, setter, getter, useRoundValue, smallEditor, true, getWidgetName);
             }
@@ -718,14 +718,14 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             SwitchManager switchManager = switchGameObject.GetComponentInChildren<SwitchManager>();
             TextMeshProUGUI text = switchGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
             text.text = settingName;
-            
+
             // getter of widget name (if not provided)
             getWidgetName ??= () => switchGameObject.FullName();
 
             // switch settings
             switchManager.isOn = getter();
             switchManager.UpdateUI();
-            
+
             // add listeners
             switchManager.OnEvents.AddListener(() => setter(true));
             switchManager.OnEvents.AddListener(() =>
@@ -738,9 +738,9 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 };
                 action.Execute();
             });
-            
+
             switchManager.OnEvents.AddListener(CheckImmediateRedraw);
-            
+
             switchManager.OffEvents.AddListener(() => setter(false));
             switchManager.OffEvents.AddListener(() =>
             {
@@ -752,15 +752,15 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 };
                 action.Execute();
             });
-            
+
             switchManager.OffEvents.AddListener(CheckImmediateRedraw);
-            
+
             OnUpdateMenuValues += () =>
             {
                 switchManager.isOn = getter();
                 switchManager.UpdateUI();
             };
-            
+
             SyncField += (widgetPath, value) =>
             {
                 if (switchGameObject != null && widgetPath == getWidgetName())
@@ -775,19 +775,19 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             if (!recursive)
             {
                 RuntimeSmallEditorButton smallEditorButton = switchGameObject.AddComponent<RuntimeSmallEditorButton>();
-                
+
                 smallEditorButton.OnShowMenuChanged += () =>
                 {
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
                 };
-                
+
                 OnShowMenuChanged += () =>
                 {
                     if (ShowMenu) smallEditorButton.ShowMenu = false;
                 };
-                
+
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateSwitch(settingName, setter, getter, smallEditor, true, getWidgetName);
             }
@@ -812,18 +812,18 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             AddLayoutElement(stringGameObject);
             TextMeshProUGUI text = stringGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
             text.text = settingName;
-            
+
             // getter of widget name (if not provided)
             getWidgetName ??= () => stringGameObject.FullName();
 
             // string field settings
             TMP_InputField inputField = stringGameObject.GetComponentInChildren<TMP_InputField>();
             inputField.text = getter();
-            
+
             // add listeners
             inputField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
             inputField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
-            
+
             inputField.onEndEdit.AddListener(setter);
             inputField.onEndEdit.AddListener(changedValue =>
             {
@@ -835,7 +835,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 };
                 action.Execute();
             });
-            
+
             inputField.onEndEdit.AddListener(_ => CheckImmediateRedraw());
 
             OnUpdateMenuValues += () => inputField.text = getter();
@@ -848,24 +848,24 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     inputField.text = value as string;
                 }
             };
-            
+
             // add small editor window component
             if (!recursive)
             {
                 RuntimeSmallEditorButton smallEditorButton = stringGameObject.AddComponent<RuntimeSmallEditorButton>();
-                
+
                 smallEditorButton.OnShowMenuChanged += () =>
                 {
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
                 };
-                
+
                 OnShowMenuChanged += () =>
                 {
                     if (ShowMenu) smallEditorButton.ShowMenu = false;
                 };
-                
+
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateStringField(settingName, setter, getter, smallEditor, true, getWidgetName);
             }
@@ -895,10 +895,10 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             TextMeshProUGUI text = dropDownGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
             CustomDropdown dropdown = dropDownGameObject.transform.Find("Dropdown").GetComponent<CustomDropdown>();
             text.text = settingName;
-            
+
             // getter of widget name (if not provided)
             getWidgetName ??= () => dropDownGameObject.FullName();
-            
+
             // dropdown settings
             dropdown.isListItem = true;
             dropdown.listParent = !recursive ? Menu.transform : Canvas.transform;
@@ -918,11 +918,11 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 };
                 action.Execute();
             });
-            
+
             dropdown.dropdownEvent.AddListener(_ => CheckImmediateRedraw());
-            
+
             OnUpdateMenuValues += () => dropdown.ChangeDropdownInfo(Array.IndexOf(valueArray, getter()));
-            
+
             SyncField += (widgetPath, value) =>
             {
                 if (dropDownGameObject != null && widgetPath == getWidgetName())
@@ -931,25 +931,25 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     dropdown.ChangeDropdownInfo((int)value);
                 }
             };
-            
+
             // add small editor window component
             if (!recursive)
             {
                 RuntimeSmallEditorButton smallEditorButton =
                     dropDownGameObject.AddComponent<RuntimeSmallEditorButton>();
-                
+
                 smallEditorButton.OnShowMenuChanged += () =>
                 {
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
                 };
-                
+
                 OnShowMenuChanged += () =>
                 {
                     if (ShowMenu) smallEditorButton.ShowMenu = false;
                 };
-                
+
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateDropDown(settingName, setter, valueArray, getter, smallEditor, true, getWidgetName);
             }
@@ -972,7 +972,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 PrefabInstantiator.InstantiatePrefab(COLOR_PICKER_PREFAB, parent.transform, false);
             colorPickerGameObject.name = settingName;
             AddLayoutElement(colorPickerGameObject);
-            
+
             // Deactivate presets and sliders
             colorPickerGameObject.transform.Find("Presets").gameObject.SetActive(false);
             colorPickerGameObject.transform.Find("Sliders").gameObject.SetActive(false);
@@ -981,19 +981,19 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             ColorPicker colorPicker = colorPickerGameObject.GetComponent<ColorPicker>();
             colorPicker.CurrentColor = getter();
             colorPicker.onValueChanged.AddListener(setter);
-            
+
             // collapse by default
             if (!recursive)
                 colorPickerGameObject.transform.parent.parent.GetComponent<RuntimeConfigMenuCollapse>()
                     .OnClickCollapse();
-            
+
             // getter of widget name (if not provided)
             getWidgetName ??= () => colorPickerGameObject.FullName();
 
             // add listeners to BoxSlider
             BoxSlider boxSlider = colorPickerGameObject.GetComponentInChildren<BoxSlider>();
             RuntimeSliderManager boxEndEditManager = boxSlider.gameObject.AddComponent<RuntimeSliderManager>();
-            
+
             // Add netAction to boxSlider element
             boxEndEditManager.OnEndEdit += () =>
             {
@@ -1010,7 +1010,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             // add listeners to Slider
             Slider hueSlider = colorPickerGameObject.GetComponentInChildren<Slider>();
             RuntimeSliderManager hueEndEditManager = hueSlider.gameObject.AddComponent<RuntimeSliderManager>();
-            
+
             // Add netAction to hueSlider element
             hueEndEditManager.OnEndEdit += () =>
             {
@@ -1028,7 +1028,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             TMP_InputField inputField = colorPickerGameObject.GetComponentInChildren<TMP_InputField>();
             inputField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
             inputField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
-            
+
             // Add netAction to string input element
             inputField.onEndEdit.AddListener(_ =>
             {
@@ -1052,25 +1052,25 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     colorPicker.CurrentColor = getter();
                 }
             };
-            
+
             // add small editor window component
             if (!recursive)
             {
                 RuntimeSmallEditorButton smallEditorButton =
                     colorPickerGameObject.AddComponent<RuntimeSmallEditorButton>();
-                
+
                 smallEditorButton.OnShowMenuChanged += () =>
                 {
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
                 };
-                
+
                 OnShowMenuChanged += () =>
                 {
                     if (ShowMenu) smallEditorButton.ShowMenu = false;
                 };
-                
+
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateColorPicker(settingName, smallEditor, setter, getter, true, getWidgetName);
             }
@@ -1089,7 +1089,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             filePicker.DataPathInstance = dataPath;
             filePicker.Label = settingName;
             filePicker.PickingMode = FileBrowser.PickMode.Files;
-            
+
             // getter of widget name (if not provided)
             string GetWidgetName() => filePicker.gameObject.FullName() + "/" + settingName;
 
@@ -1097,7 +1097,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             OnShowMenuChanged += () => { if (!ShowMenu) filePicker.CloseDropdown();};
             filePicker.OnMenuInitialized +=
                 () => AddLayoutElement(parent.transform.Find(settingName).gameObject);
-            
+
             // listener when the dropdown or path is changed
             filePicker.OnChangedDropdown += () =>
             {
@@ -1156,11 +1156,11 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             ButtonManagerWithIcon removeButtonManager = removeButton.GetComponent<ButtonManagerWithIcon>();
             addButton.name = "AddElementButton";
             ButtonManagerWithIcon addButtonManager = addButton.GetComponent<ButtonManagerWithIcon>();
-            
+
             // list settings
             UpdateListChildren(list, parent);
             buttonContainer.transform.SetAsLastSibling();
-            
+
             // AddButton listener
             addButtonManager.clickEvent.AddListener(() =>
             {
@@ -1208,7 +1208,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                     buttonContainer.transform.SetAsLastSibling();
                 }
             };
-            
+
             // add listener to update list
             OnUpdateMenuValues += () =>
             {
@@ -1230,11 +1230,11 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             {
                 if (int.TryParse(child.name, out int index))
                 {
-                    if (index >= list.Count) 
+                    if (index >= list.Count)
                         Destroyer.Destroy(child.gameObject);
                 }
             }
- 
+
             // create children for new list elements
             for (int i = 0; i < list.Count; i++)
             {
@@ -1265,7 +1265,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 if (!dict.Contains(child.name))
                     Destroyer.Destroy(child);
             }
-            
+
             // create children for new dictionary elements
             foreach (object key in dict.Keys)
             {
@@ -1303,9 +1303,9 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         private void CheckImmediateRedraw()
         {
             if (!immediateRedraw) return;
-            
+
             TriggerImmediateRedraw();
-            
+
             UpdateCityMethodNetAction netAction = new()
             {
                 CityIndex = CityIndex,
@@ -1321,7 +1321,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         {
             // does nothing if no graph is loaded
             if (city.LoadedGraph == null) return;
-            
+
             city.Invoke(nameof(SEECity.LoadData), 0);
             StartCoroutine(DrawNextFrame());
 
@@ -1331,7 +1331,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 city.Invoke(nameof(SEECity.DrawGraph), 0);
             }
         }
-        
+
         /// <summary>
         /// Assigns a color to a tab button.
         ///
@@ -1341,13 +1341,13 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         private Color GetColorForTab()
         {
             int tabCount = ViewList.transform.childCount;
-            
+
             // default base value
             float baseBrightness = 0.5f;
-            
+
             // switch slightly between bright and dark
             baseBrightness *= tabCount % 2 == 1 ? 0.75f : 1.25f;
-            
+
             return Color.Lerp(Color.black, Color.white, baseBrightness);
         }
     }

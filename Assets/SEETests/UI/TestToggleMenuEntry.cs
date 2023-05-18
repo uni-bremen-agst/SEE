@@ -7,9 +7,8 @@ using UnityEngine.Events;
 namespace SEETests.UI
 {
     /// <summary>
-    /// Tests for the <see cref="ToggleMenuEntry"/> class.
-    /// Inherits from <see cref="TestMenuEntry"/>, so all of those tests are executed here (this is because
-    /// <see cref="ToggleMenuEntry"/> is a subclass of <see cref="MenuEntry"/>.)
+    /// Tests for the <see cref="MenuEntry"/> class.
+    /// Checks whether the unselect callbacks are called properly.
     /// </summary>
     [TestFixture]
     internal class TestToggleMenuEntry: TestMenuEntry
@@ -18,14 +17,14 @@ namespace SEETests.UI
                                                      Color entryColor = default, bool enabled = true,
                                                      Sprite icon = null)
         {
-            return new ToggleMenuEntry(action, null, title, description, entryColor, icon, enabled);
+            return new MenuEntry(action, null, title, description, entryColor, enabled, icon);
         }
 
         [Test]
         public void TestDefaultExitAction()
         {
-            ToggleMenuEntry entry1 = new ToggleMenuEntry( () => {}, null, "Test");
-            ToggleMenuEntry entry2 = new ToggleMenuEntry( () => {}, null, "Test");
+            MenuEntry entry1 = new( () => {}, null, "Test");
+            MenuEntry entry2 = new( () => {}, null, "Test");
             Assert.DoesNotThrow(() => entry1.SelectAction());
             Assert.DoesNotThrow(() => entry2.SelectAction());
         }
@@ -33,10 +32,10 @@ namespace SEETests.UI
         [Test]
         public void TestExitAction()
         {
-            List<bool> testItems = new List<bool>();
+            List<bool> testItems = new();
             SelectionMenu selectionMenu = new();
             void ExitAction() => testItems.Add(true);
-            ToggleMenuEntry entry = new ToggleMenuEntry(() => {}, ExitAction, "Test");
+            MenuEntry entry = new(() => {}, ExitAction, "Test");
             selectionMenu.AddEntry(entry);
             Assert.AreNotEqual(entry, selectionMenu.ActiveEntry, "SelectionMenu.ActiveEntry isn't set correctly!");
             Assert.AreEqual(0, testItems.Count, "Entry/ExitAction may not be called during initialization!");

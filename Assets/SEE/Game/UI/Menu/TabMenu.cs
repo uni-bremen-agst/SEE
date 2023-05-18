@@ -1,15 +1,15 @@
 using SEE.Utils;
+using Sirenix.Utilities;
 using UnityEngine;
-using Valve.VR.InteractionSystem;
 
 namespace SEE.Game.UI.Menu
 {
-    public class TabMenu : TabMenu<ToggleMenuEntry> {}
+    public class TabMenu : TabMenu<MenuEntry> {}
 
-    public class TabMenu<T> : SelectionMenu<T> where T : ToggleMenuEntry
+    public class TabMenu<T> : SelectionMenu<T> where T : MenuEntry
     {
         protected const string TAB_PREFAB_FOLDER = UI_PREFAB_FOLDER + "TabMenu/";
-        
+
         // TODO: The Prefabs don't exist yet
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace SEE.Game.UI.Menu
             base.OnStartFinished();
             if (ActiveEntry != null) ActivateView(ActiveEntry);
             Entries.ForEach(AddView);
-            
+
             OnEntryAdded += AddView;
             OnEntrySelected += ActivateView;
             OnEntryUnselected += DeactivateView;
