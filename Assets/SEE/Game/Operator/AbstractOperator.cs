@@ -44,7 +44,7 @@ namespace SEE.Game.Operator
         /// <typeparam name="T">Type of the animator</typeparam>
         /// <typeparam name="V">Type of the value</typeparam>
         /// <typeparam name="C">Type of the callback delegate</typeparam>
-        protected abstract class Operation<T, V, C> : IOperation where C: MulticastDelegate
+        protected abstract class Operation<T, V, C> : IOperation where C : MulticastDelegate
         {
             /// <summary>
             /// The function that is called when the animation shall be constructed and played.
@@ -58,7 +58,7 @@ namespace SEE.Game.Operator
             /// May be <c>null</c> if no animation is running.
             /// </summary>
             protected T Animator { get; set; }
-            
+
             /// <summary>
             /// The equality comparer used to check whether the target value has changed.
             /// </summary>
@@ -68,7 +68,7 @@ namespace SEE.Game.Operator
             /// The target value that we're animating towards.
             /// </summary>
             public V TargetValue { get; private set; }
-            
+
             /// <summary>
             /// Whether the operation is currently running.
             /// </summary>
@@ -83,7 +83,7 @@ namespace SEE.Game.Operator
             /// The equality comparer used to check whether the target value has changed.
             /// If <c>null</c>, the default equality comparer for <typeparamref name="V"/> is used.
             /// </param>
-            protected Operation(Func<V, float, T> animateToAction, V targetValue, 
+            protected Operation(Func<V, float, T> animateToAction, V targetValue,
                                 IEqualityComparer<V> equalityComparer = null)
             {
                 AnimateToAction = animateToAction;
@@ -140,7 +140,7 @@ namespace SEE.Game.Operator
                 // Hence, we create a dummy callback that triggers its respective methods immediately on registration.
                 return duration == 0 ? new DummyOperationCallback<C>() : AnimatorCallback;
             }
-            
+
             /// <summary>
             /// The callback that shall be returned at the end of <see cref="AnimateTo"/>.
             /// </summary>
@@ -186,10 +186,12 @@ namespace SEE.Game.Operator
                 }
             }
 
-            protected override IOperationCallback<Action> AnimatorCallback => new AndCombinedOperationCallback<TweenCallback>(Animator.Select(x => new TweenOperationCallback(x)), x => new TweenCallback(x));
+            protected override IOperationCallback<Action> AnimatorCallback => 
+                new AndCombinedOperationCallback<TweenCallback>(
+                    Animator.Select( x => new TweenOperationCallback(x)), x => new TweenCallback(x));
 
-            public TweenOperation(Func<V, float, IList<Tween>> animateToAction, V targetValue, 
-                                  IEqualityComparer<V> equalityComparer = null) 
+            public TweenOperation(Func<V, float, IList<Tween>> animateToAction, V targetValue,
+                                  IEqualityComparer<V> equalityComparer = null)
                 : base(animateToAction, targetValue, equalityComparer)
             {
             }
