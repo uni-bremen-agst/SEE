@@ -16,7 +16,7 @@ namespace SEE.Game.UI.Menu
     /// </summary>
     /// <typeparam name="T">The type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
     /// <seealso cref="MenuEntry"/>
-    public partial class SimpleListMenu<T> : SimpleMenu where T : MenuEntry
+    public partial class SimpleListMenu<T> : SimpleMenu<T> where T : MenuEntry
     {
         /// <summary>
         /// Whether the menu can be closed by not making any selection.
@@ -102,7 +102,7 @@ namespace SEE.Game.UI.Menu
         /// <param name="entry">The menu entry.</param>
         public virtual void SelectEntry(T entry)
         {
-            entry.DoAction();
+            entry.SelectAction();
             OnEntrySelected?.Invoke(entry);
         }
 
@@ -132,12 +132,12 @@ namespace SEE.Game.UI.Menu
             if (entry != null) SelectEntry(entry);
             base.HandleKeyword(args);
         }
-        
+
         /// <summary>
         /// Triggers when <see cref="AllowNoSelection"/> was changed.
         /// </summary>
         public event UnityAction OnAllowNoSelectionChanged;
-        
+
         /// <summary>
         /// Triggers when <see cref="HideAfterSelection"/> was changed.
         /// </summary>

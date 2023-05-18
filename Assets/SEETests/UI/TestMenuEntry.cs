@@ -42,7 +42,7 @@ namespace SEETests.UI
         protected virtual MenuEntry CreateMenuEntry(UnityAction action, string title, string description = null,
                                                     Color entryColor = default, bool enabled = true, Sprite icon = null)
         {
-            return new MenuEntry(action, title, description, entryColor, enabled, icon);
+            return new MenuEntry(action, null, title, description, entryColor, enabled, icon);
         }
 
         [Test]
@@ -66,7 +66,7 @@ namespace SEETests.UI
             Assert.AreNotEqual(default(Color), entry.DisabledColor, "Entry color must differ from disabled color!");
 
             Assert.AreEqual(0, testItems.Count, "DoAction() may not be called during initialization!");
-            entry.DoAction();
+            entry.SelectAction();
             Assert.AreEqual(1, testItems.Count, "DoAction() must call the given UnityAction!");
         }
 
@@ -78,11 +78,11 @@ namespace SEETests.UI
             // Given action must either be null or NOP for this test
             if (action == null)
             {
-                Assert.IsNull(entry.DoAction);
+                Assert.IsNull(entry.SelectAction);
             }
             else
             {
-                Assert.DoesNotThrow(() => entry.DoAction());
+                Assert.DoesNotThrow(() => entry.SelectAction());
             }
 
             Assert.AreEqual(description, entry.Description);

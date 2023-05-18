@@ -148,7 +148,7 @@ namespace SEE.GO.Menu
             // Entries will be greyed out the further they go.
             resultMenuEntries.ForEach(resultMenu.RemoveEntry); // Clean up previous entries.
             resultMenuEntries.Clear();
-            resultMenuEntries.AddRange(results.Select(x => new MenuEntry(() => MenuEntryAction(x.Item3, x.Item2),
+            resultMenuEntries.AddRange(results.Select(x => new MenuEntry(() => MenuEntryAction(x.Item3, x.Item2), null,
                                                                          x.Item2, entryColor: ScoreColor(x.Item1))));
             resultMenuEntries.ForEach(resultMenu.AddEntry);
             resultMenu.ShowMenu = true;

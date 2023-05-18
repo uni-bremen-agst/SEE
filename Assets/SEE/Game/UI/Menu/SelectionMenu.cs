@@ -6,15 +6,15 @@ using UnityEngine.Events;
 namespace SEE.Game.UI.Menu
 {
     /// <summary>
-    /// A selection menu containing <see cref="ToggleMenuEntry"/> entries.
+    /// A selection menu containing <see cref="MenuEntry"/> entries.
     /// </summary>
-    public class SelectionMenu : SelectionMenu<ToggleMenuEntry> {}
+    public class SelectionMenu : SelectionMenu<MenuEntry> {}
 
     /// <summary>
     /// A menu in which the user can choose one active selection out of a menu.
     /// It is assumed that only one selection can be active at a time.
     /// </summary>
-    public class SelectionMenu<T> : NestedListMenu<T> where T : ToggleMenuEntry
+    public class SelectionMenu<T> : NestedListMenu<T> where T : MenuEntry
     {
         /// <summary>
         /// The active entry.
@@ -83,12 +83,12 @@ namespace SEE.Game.UI.Menu
             manager.normalText.fontStyle = FontStyles.Normal;
             manager.normalText.text = manager.buttonText;
         }
-        
+
         /// <summary>
         /// Triggers when the <see cref="ActiveEntry"/> was unselected.
         /// </summary>
         public event UnityAction<T> OnEntryUnselected;
-        
+
         /// <summary>
         /// Triggers when <see cref="ActiveEntry"/> was changed.
         /// </summary>

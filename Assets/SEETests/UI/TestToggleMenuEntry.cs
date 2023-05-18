@@ -26,8 +26,8 @@ namespace SEETests.UI
         {
             ToggleMenuEntry entry1 = new ToggleMenuEntry( () => {}, null, "Test");
             ToggleMenuEntry entry2 = new ToggleMenuEntry( () => {}, null, "Test");
-            Assert.DoesNotThrow(() => entry1.DoAction());
-            Assert.DoesNotThrow(() => entry2.DoAction());
+            Assert.DoesNotThrow(() => entry1.SelectAction());
+            Assert.DoesNotThrow(() => entry2.SelectAction());
         }
 
         [Test]

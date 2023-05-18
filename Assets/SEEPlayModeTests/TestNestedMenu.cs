@@ -131,7 +131,8 @@ namespace SEE.Game.UI.Menu
 
             IEnumerable<MenuEntry> menuEntries = new List<MenuEntry>
             {
-                new MenuEntry(action: new UnityAction(() => { selection = OptionOneValue; }),
+                new MenuEntry(selectAction: new UnityAction(() => { selection = OptionOneValue; }),
+                              unselectAction: null,
                               title: OptionOne,
                               description: "Select option 1",
                               entryColor: Color.red,
@@ -139,13 +140,15 @@ namespace SEE.Game.UI.Menu
                               icon: GetIcon()),
                 new NestedMenuEntry<MenuEntry>(innerEntries: new List<MenuEntry>()
                                                       {
-                                                         new MenuEntry(action: new UnityAction(() => { selection = NestedOptionOneValue; }),
+                                                         new MenuEntry(selectAction: new UnityAction(() => { selection = NestedOptionOneValue; }),
+                                                                       unselectAction: null,
                                                                        title: NestedOptionOne,
                                                                        description: "Select option 2a",
                                                                        entryColor: Color.green,
                                                                        enabled: true,
                                                                        icon: GetIcon()),
-                                                         new MenuEntry(action: new UnityAction(() => { selection = NestedOptionTwoValue; }),
+                                                         new MenuEntry(selectAction: new UnityAction(() => { selection = NestedOptionTwoValue; }),
+                                                                       unselectAction: null,
                                                                        title: NestedOptionTwo,
                                                                        description: "Select option 2b",
                                                                        entryColor: Color.green,

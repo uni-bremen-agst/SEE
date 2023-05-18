@@ -151,7 +151,8 @@ namespace SEE.Game.UI.HelpSystem
             HelpSystemEntry entry = null)
         {
             return new MenuEntry(
-                action: () => { Execute(entry, title, keywords, videoPath); },
+                selectAction: () => { Execute(entry, title, keywords, videoPath); },
+                unselectAction: null,
                 title: title,
                 description: description,
                 entryColor: entryColor,
