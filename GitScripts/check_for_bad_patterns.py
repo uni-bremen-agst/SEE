@@ -24,7 +24,7 @@ class Level(str, Enum):
 
 
 # Extensions that a pattern will be applied to by default.
-DEFAULT_EXTENSIONS = ["cs"]
+DEFAULT_EXTENSIONS = ("cs",)
 
 
 class BadPattern:
@@ -63,9 +63,17 @@ class BadPattern:
         """
         return (
             f"{filename}\n{line_number}\n{self.level.value}\n{self.message}\n"
-            + f"{suggestion}\n{self.regex.pattern}"
+            + f"{suggestion}\n{self.regex.pattern if self.regex is not None else '(No regex specified)'}"
         )
 
+
+# Special case for missing newline at end of file, as this can't be detected on a per-line basis.
+NO_NEWLINE_BAD_PATTERN = BadPattern(
+    None,
+    "Missing newline at end of file! Files should always end with a single newline character.",
+    level=Level.ERROR,
+    suggestion=r"\n",
+)
 
 # *** MODIFY BELOW TO ADD NEW BAD PATTERNS ***
 
@@ -89,56 +97,111 @@ We should just leave it as a backslash.""",
         re.compile(r"^\s*(\s|Object\.)Destroy\(.*$"),
         "Make sure to use `Destroyer.Destroy` (`Destroyer` class is in `SEE.Utils`) instead of `Object.Destroy`!",
         level=Level.WARN
+    ),
+    BadPattern(
+        # For trailing whitespace
+        re.compile(r"^(.*\S)?\s+$"),
+        "Trailing whitespace detected! Please remove it.",
+        level=Level.WARN,
+        suggestion=r"\1"
     )
 ]
 
 # *** MODIFY ABOVE TO ADD NEW BAD PATTERNS ***
 
 
-def handle_chunk(open_diff, start_line, filename, lines) -> int:
+def handle_added_line(line, filename, linenumber) -> int:
     """
-    Handles a single chunk of a unified diff and checks it against
+    Handles a single added line within a diff hunk, checking it against
     any bad patterns, printing comments for any matches it finds.
     """
     extension = filename.rsplit(".", 1)[1] if "." in filename else ""
     occurrences = 0
-    for i in range(lines):
-        chunk_line = open_diff.readline().rstrip()
-        for pattern in BAD_PATTERNS:
-            if extension in pattern.extensions and pattern.regex.match(
-                # The first character in chunk_line is +. We skip it.
-                chunk_line[1:]
-            ):
-                # We found a bad pattern.
-                occurrences += 1
-                # Try getting suggestion, if one exists.
-                if pattern.suggestion:
-                    suggestion = pattern.regex.sub(pattern.suggestion, chunk_line[1:])
-                else:
-                    suggestion = ""
-                print(pattern.to_comment(filename, start_line + i, suggestion))
+    for pattern in BAD_PATTERNS:
+        if extension in pattern.extensions and pattern.regex.match(line):
+            # We found a bad pattern.
+            occurrences += 1
+            # Try getting suggestion, if one exists.
+            if pattern.suggestion:
+                suggestion = pattern.regex.sub(pattern.suggestion, line)
+            else:
+                suggestion = ""
+            print(pattern.to_comment(filename, linenumber, suggestion))
     return occurrences
+
+
+def warn(message):
+    """
+    Prints a warning message to stderr.
+    """
+    print(f"::warning::{message}", file=sys.stderr)
+
+
+def handle_missing_newline(filename: str, linenumber: int, last_line: str):
+    """
+    Handles a missing newline at the end of a file.
+    :param filename: The name of the file.
+    :param linenumber: The line number of the last line in the file.
+    """
+    print(NO_NEWLINE_BAD_PATTERN.to_comment(filename, linenumber, f"{last_line[1:] if last_line is not None else ''}\\n"))
 
 
 def main():
     occurrences = 0
     with fileinput.input() as diff:
-        current_file = None
-        chunk_indicator = re.compile(r"^@@ -[0-9,]* \+(\d*)(?:,(\d*))? @@.*$")
-        while line := diff.readline().rstrip():
+        filename = None
+        diff_line = 0  # Current line number within a diff hunk.
+        last_line = None  # Last line read.
+        hunk_indicator = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@.*$")
+        missing_newline_at_eof = False
+        while line := diff.readline().rstrip('\n\r'):
             if line.startswith("+++"):
-                # Start of a new file.
-                current_file = line.split("/", 1)[1]
+                # New file here.
+
+                if missing_newline_at_eof:
+                    handle_missing_newline(filename, diff_line-1, last_line)
+                    missing_newline_at_eof = False
+
+                filename = line.split("/", 1)[1]
             elif line.startswith("@@"):
-                # Start of a new chunk.
-                start_line, line_count = chunk_indicator.match(line).group(1, 2)
-                # We pass the diff object so that `handle_chunk` can advance lines.
-                occurrences += handle_chunk(
-                    diff,
-                    int(start_line),
-                    current_file,
-                    1 if line_count is None else int(line_count),
-                )
+                # New diff hunk here.
+
+                if missing_newline_at_eof:
+                    handle_missing_newline(filename, diff_line, last_line)
+                    missing_newline_at_eof = False
+
+                m = hunk_indicator.match(line)
+                if not m:
+                    warn(f"Invalid unified diff hunk in {filename}: {line}")
+                    # Nonetheless, this is not a fatal error, so we can continue.
+                    continue
+                diff_line = int(m.group(1))  # Next line is starting line indicated by this line range
+            elif line.startswith("+"):
+                # This is an actual added line within the hunk denoted by start_line.
+                assert filename is not None
+                # We skip the leading "+" character.
+                occurrences += handle_added_line(line[1:], filename, diff_line)
+                diff_line += 1
+                last_line = line
+                # We need to reset this flag. There were still added lines after the missing newline warning,
+                # so it applied to the version of the file before it was changed and can be ignored.
+                missing_newline_at_eof = False
+            elif line.startswith(" "):
+                # Lines starting with ' ' are just for context.
+                diff_line += 1
+                last_line = line
+            # \ no newline at end of file
+            elif line.startswith("\\ No newline at end of file"):
+                # We can't report this immediately, as this string may occur twice.
+                # Instead, we will report this once the next file / hunk starts.
+                missing_newline_at_eof = True
+            elif line != "" and line[0] not in ("-", "d", "i"):
+                # We ignore empty lines, removed lines, and diff metadata lines (starting with "diff" or "index").
+                warn(f'Unrecognized unified diff line indicator for line "{line}", skipping.')
+
+        if missing_newline_at_eof:
+            handle_missing_newline(filename, diff_line, last_line)
+
     sys.exit(min(occurrences, 255))
 
 
