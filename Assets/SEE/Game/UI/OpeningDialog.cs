@@ -65,14 +65,14 @@ namespace SEE.UI
                     description: "Starts a local client connection to a server.",
                     entryColor: NextColor(),
                     icon: Resources.Load<Sprite>("Icons/Client")),
-#if INCLUDE_STEAM_VR
-                      new(active: false,
-                          entryAction: ToggleEnvironment,
-                          exitAction: null,
-                          title: "Toggle Desktop/VR",
-                          description: "Toggles between desktop and VR hardware.",
-                          entryColor: NextColor(),
-                          icon: Resources.Load<Sprite>("Icons/Client")),
+#if ENABLE_VR
+                new(active: false,
+                    entryAction: ToggleEnvironment,
+                    exitAction: null,
+                    title: "Toggle Desktop/VR",
+                    description: "Toggles between desktop and VR hardware.",
+                    entryColor: NextColor(),
+                    icon: Resources.Load<Sprite>("Icons/Client")),
 #endif
 
                 // FIXME: Running only a server is currently not working.
@@ -246,7 +246,7 @@ namespace SEE.UI
         /// The currently selected player input type.
         /// </summary>
         private PlayerInputType inputType;
-#if INCLUDE_STEAM_VR
+
         /// <summary>
         /// Toggles <see cref="inputType"/> between <see cref="PlayerInputType.VRPlayer"/>
         /// and <see cref="PlayerInputType.DesktopPlayer"/>. The resulting value is saved.
@@ -265,7 +265,6 @@ namespace SEE.UI
             SceneSettings.Save();
             ShowEnvironment();
         }
-#endif
 
         /// <summary>
         /// Notifies the user via <see cref="ShowNotification.Info(string, string, float, bool)"/>
