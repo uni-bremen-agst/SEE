@@ -42,12 +42,11 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         public bool Enabled;
 
-
         /// <summary>
         /// The color of this entry when disabled.
         /// </summary>
         public Color DisabledColor => EntryColor.WithAlpha(0.2f);
-        
+
         /// <summary>
         /// Instantiates and returns a new MenuEntry.
         /// </summary>
