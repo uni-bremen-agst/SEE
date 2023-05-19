@@ -18,7 +18,7 @@ namespace SEE.Game.Operator
     /// Available operations consist of the public methods exported by this class.
     /// Operations can be animated or executed directly, by setting the duration to 0.
     /// </summary>
-    public partial class NodeOperator : AbstractOperator
+    public partial class NodeOperator : GraphElementOperator<Color>
     {
         // We split up movement on the three axes because it makes sense in certain situations.
         // For example, when dragging a node along the XZ-axis, if we want to place it on top
@@ -77,19 +77,6 @@ namespace SEE.Game.Operator
         private TweenOperation<Vector3> Scale;
 
         /// <summary>
-        /// The "actual" color of the material. We need this because the material's color
-        /// is being changed by the <see cref="Blinking"/> operation.
-        /// </summary>
-        /// <remarks>
-        /// This is not the optimal way to handle this.
-        /// For example, the color may change in-between or during blinking, which will then be ignored.
-        /// To fix this properly, all places where a node's color is changed must be investigated
-        /// and a Color operation needs to be implemented, as in the EdgeOperator.
-        /// We can then refer to 'Color.TargetValue' and remove this field.
-        /// </remarks>
-        private Color materialColor;
-
-        /// <summary>
         /// The node to which this node operator belongs.
         /// </summary>
         public Node Node
@@ -117,7 +104,7 @@ namespace SEE.Game.Operator
         /// <summary>
         /// If true, the incoming and outgoing edges will be adjusted, too.
         /// </summary>
-        private bool updateEdges = false;
+        private bool updateEdges;
 
         /// <summary>
         /// The position this node is supposed to be at.
@@ -197,7 +184,7 @@ namespace SEE.Game.Operator
                 PositionZ.AnimateTo(newPosition.z, duration)
             }, a => a);
         }
-        
+
         /// <summary>
         /// Rotates the node to the given quaternion <paramref name="newRotation"/>,
         /// taking <paramref name="duration"/> seconds.
@@ -210,7 +197,7 @@ namespace SEE.Game.Operator
         {
             return Rotation.AnimateTo(newRotation, duration);
         }
-        
+
         /// <summary>
         /// Rotates the node around the given <paramref name="axis"/> by the given <paramref name="angle"/>, taking
         /// <paramref name="duration"/> seconds.
@@ -307,10 +294,11 @@ namespace SEE.Game.Operator
         {
             // We remember the old position and scale, and move the node to the new position and scale so that
             // edge layouts (dependent on position and scale) can be correctly calculated.
-            Vector3 oldPosition = transform.position;
-            transform.position = new Vector3(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
-            Vector3 oldScale = transform.localScale;
-            transform.localScale = Scale.TargetValue;
+            Transform ourTransform = transform; // cache transform for performance
+            Vector3 oldPosition = ourTransform.position;
+            ourTransform.position = new Vector3(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
+            Vector3 oldScale = ourTransform.localScale;
+            ourTransform.localScale = Scale.TargetValue;
             Node node;
             try
             {
@@ -346,8 +334,8 @@ namespace SEE.Game.Operator
             MorphEdges(relevantEdges, duration);
 
             // Once we're done, we reset the gameObject to its original position.
-            transform.position = oldPosition;
-            transform.localScale = oldScale;
+            ourTransform.position = oldPosition;
+            ourTransform.localScale = oldScale;
         }
 
         /// <summary>
@@ -384,12 +372,36 @@ namespace SEE.Game.Operator
             }
         }
 
-        private void OnEnable()
+        protected override TweenOperation<Color> InitializeColorOperation()
+        {
+            Material material = GetRenderer(gameObject).material;
+
+            Tween[] AnimateToColorAction(Color color, float d)
+            {
+                return new Tween[]
+                {
+                    material.DOColor(color, d).Play()
+                };
+            }
+
+            return new TweenOperation<Color>(AnimateToColorAction, material.color);
+        }
+
+        protected override Color ModifyColor(Color color, Func<Color, Color> modifier)
+        {
+            return modifier(color);
+        }
+
+        protected override IEnumerable<Color> AsEnumerable(Color color)
+        {
+            return new[] { color };
+        }
+
+        protected void OnEnable()
         {
             Node = GetNode(gameObject);
             City = GetCity(gameObject);
             Material material = GetRenderer(gameObject).material;
-            materialColor = material.color;
             Vector3 currentPosition = transform.position;
             Vector3 currentScale = transform.localScale;
             Quaternion currentRotation = transform.rotation;
@@ -414,28 +426,24 @@ namespace SEE.Game.Operator
 
             Tween[] BlinkAction(int count, float duration)
             {
-                // If we're interrupting another blinking, we need to make sure we start from the correct color.
-                material.color = materialColor;
+                if (color.IsRunning)
+                {
+                    color.KillAnimator(true);
+                }
+                // If we're interrupting another blinking, we need to make sure the color still has the correct value.
+                material.color = color.TargetValue;
 
                 return new Tween[]
                 {
-                    material.DOColor(materialColor.Invert(), duration / (2 * count)).SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play(),
+                    material.DOColor(color.TargetValue.Invert(), duration / (2 * count)).SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play()
                 };
             }
 
             Blinking = new TweenOperation<int>(BlinkAction, 0, equalityComparer: new AlwaysFalseEqualityComparer<int>());
+            
+            base.OnEnable();
 
             #region Local Methods
-
-            static Renderer GetRenderer(GameObject gameObject)
-            {
-                if (!gameObject.TryGetComponent(out Renderer renderer))
-                {
-                    throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have a Renderer component!");
-                }
-
-                return renderer;
-            }
 
             static Node GetNode(GameObject gameObject)
             {
@@ -468,8 +476,27 @@ namespace SEE.Game.Operator
             #endregion
         }
 
-        private void OnDisable()
+        /// <summary>
+        /// Returns the <see cref="Renderer"/> of the given <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">the <see cref="GameObject"/> whose <see cref="Renderer"/> to return</param>
+        /// <returns>the <see cref="Renderer"/> of the given <paramref name="gameObject"/></returns>
+        /// <exception cref="InvalidOperationException">
+        /// if the <paramref name="gameObject"/> has no <see cref="Renderer"/>
+        /// </exception>
+        private static Renderer GetRenderer(GameObject gameObject)
         {
+            if (!gameObject.TryGetComponent(out Renderer renderer))
+            {
+                throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have a Renderer component!");
+            }
+
+            return renderer;
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
             PositionX.KillAnimator();
             PositionX = null;
             PositionY.KillAnimator();
