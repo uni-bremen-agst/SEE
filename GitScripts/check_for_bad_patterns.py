@@ -152,6 +152,7 @@ def main():
         filename = None
         diff_line = 0  # Current line number within a diff hunk.
         last_line = None  # Last line read.
+        skip_file = False
         hunk_indicator = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@.*$")
         missing_newline_at_eof = False
         while line := diff.readline().rstrip('\n\r'):
@@ -163,6 +164,9 @@ def main():
                     missing_newline_at_eof = False
 
                 filename = line.split("/", 1)[1]
+                skip_file = filename == 'dev/null'
+            elif skip_file:
+                continue
             elif line.startswith("@@"):
                 # New diff hunk here.
 
@@ -190,6 +194,7 @@ def main():
                 # Lines starting with ' ' are just for context.
                 diff_line += 1
                 last_line = line
+                missing_newline_at_eof = False
             # \ no newline at end of file
             elif line.startswith("\\ No newline at end of file"):
                 # We can't report this immediately, as this string may occur twice.
