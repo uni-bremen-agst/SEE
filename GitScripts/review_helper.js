@@ -44,7 +44,12 @@ module.exports = {
                     break;
                 case 4: // suggestion, if there is one.
                     if (patterns[i] !== '') {
-                        comment['body'] += `\n\n\`\`\`suggestion\n${patterns[i]}\n\`\`\``;
+                        var suggestion = patterns[i];
+                        if (suggestion.endsWith("\\n")) {
+                            // There may be a newline at the end, which we need to replace.
+                            suggestion = suggestion.replace(/\\n$/, "\n");
+                        }
+                        comment['body'] += `\n\n\`\`\`suggestion\n${suggestion}\n\`\`\``;
                     }
                     break;
                 case 5: // regex triggering this bad pattern
