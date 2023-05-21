@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &5299679703723339369
+--- !u!1 &6349332999877358928
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,24 +8,23 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 967636300480824607}
-  - component: {fileID: -1372740253387978517}
-  - component: {fileID: 6229196598743385845}
-  - component: {fileID: 2307411547670367046}
+  - component: {fileID: 6349332999877358930}
+  - component: {fileID: 6349332999877358931}
+  - component: {fileID: 6349332999877358925}
   m_Layer: 0
-  m_Name: Network-Test
+  m_Name: NetworkSpawner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &967636300480824607
+--- !u!4 &6349332999877358930
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5299679703723339369}
+  m_GameObject: {fileID: 6349332999877358928}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -33.375, y: 2.4349997, z: 9.483}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -34,25 +33,28 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-1372740253387978517
+--- !u!114 &6349332999877358931
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5299679703723339369}
+  m_GameObject: {fileID: 6349332999877358928}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d4e8b8add3761a24aa6fb06a3341fbc0, type: 3}
+  m_Script: {fileID: 11500000, guid: 7b73b5c154427ab4fa4a3d4c003e6625, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &6229196598743385845
+  PrefabToSpawn: {fileID: 5299679703723339369, guid: 26bfe4b76b9ae3445bcdd0f70edf847b,
+    type: 3}
+  DestroyWithSpawner: 0
+--- !u!114 &6349332999877358925
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5299679703723339369}
+  m_GameObject: {fileID: 6349332999877358928}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
@@ -65,15 +67,3 @@ MonoBehaviour:
   SceneMigrationSynchronization: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 0
---- !u!114 &2307411547670367046
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5299679703723339369}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 58735dc60250f14429964b070851d009, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

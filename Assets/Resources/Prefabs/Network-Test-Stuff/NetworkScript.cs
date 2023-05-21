@@ -1,7 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Unity.Netcode;
+using UnityEngine;
 
 public class NetworkScript : NetworkBehaviour
 {
@@ -9,6 +7,18 @@ public class NetworkScript : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         // Do things
+        if (IsServer)
+        {
+            Debug.Log("IsServer");
+        }
+        else
+        {
+            Debug.Log("IsClient (But not the Server)");
+        }
+        if (IsClient)
+        {
+            Debug.Log("IsClient (Server is a Client too)");
+        }
 
         // Always invoked the base 
         base.OnNetworkSpawn();
@@ -17,7 +27,7 @@ public class NetworkScript : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
