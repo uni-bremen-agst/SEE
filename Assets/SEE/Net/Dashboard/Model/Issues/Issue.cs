@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
-using Valve.Newtonsoft.Json;
-using Valve.Newtonsoft.Json.Converters;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace SEE.Net.Dashboard.Model.Issues
 {

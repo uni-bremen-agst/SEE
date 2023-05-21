@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Valve.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model
 {
@@ -16,31 +16,31 @@ namespace SEE.Net.Dashboard.Model
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public readonly string dashboardVersion;
-        
+
         /// <summary>
         /// Parseable Axivion Dashboard Version.
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public readonly string dashboardVersionNumber;
-        
+
         /// <summary>
         /// Dashboard Server Build date.
         /// </summary>
         [JsonProperty(Required = Required.Always)]
         public readonly string dashboardBuildDate;
-        
+
         /// <summary>
         /// Name of the successfully authenticated user if a dashboard-user is associated with the request.
         /// </summary>
         [JsonProperty(Required = Required.Default)]
         public readonly string username;
-        
+
         /// <summary>
         /// The HTTP-Request Header expected present for all HTTP requests that are not GET, HEAD, OPTIONS or TRACE.
         /// </summary>
         [JsonProperty(Required = Required.Default)]
         public readonly string csrfTokenHeader;
-        
+
         /// <summary>
         /// The value expected to be sent along the <c>csrfTokenHeader</c> for all HTTP requests that are not
         /// GET, HEAD, OPTIONS or TRACE.
@@ -54,7 +54,7 @@ namespace SEE.Net.Dashboard.Model
         /// </remarks>
         [JsonProperty(Required = Required.Default)]
         public readonly string csrfToken;
-        
+
         /// <summary>
         /// A URI that can be used to check credentials via GET. It returns "ok" in case of valid credentials.
         /// </summary>
@@ -73,7 +73,7 @@ namespace SEE.Net.Dashboard.Model
         [JsonProperty(Required = Required.Always)]
         public readonly string userApiTokenUrl;
 
-        public DashboardInfo(string dashboardVersion, string dashboardVersionNumber, string dashboardBuildDate, 
+        public DashboardInfo(string dashboardVersion, string dashboardVersionNumber, string dashboardBuildDate,
                              string username, string csrfTokenHeader, string csrfToken, string checkCredentialsUrl,
                              IList<ProjectReference> projects, string userApiTokenUrl)
         {
