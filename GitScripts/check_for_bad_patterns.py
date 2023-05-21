@@ -7,9 +7,9 @@
 # Note that this script is only run on CI, not as part of the Git hooks,
 # due to it being written in Python rather than as a shell script.
 
-import sys
-import re
 import fileinput
+import re
+import sys
 from enum import Enum
 
 
@@ -33,12 +33,13 @@ class BadPattern:
     """
 
     def __init__(
-        self,
-        regex,
-        message,
-        extensions=DEFAULT_EXTENSIONS,
-        suggestion=None,
-        level=Level.INFO,
+            self,
+            regex,
+            message,
+            extensions=DEFAULT_EXTENSIONS,
+            suggestion=None,
+            level=Level.INFO,
+            see_only=True,
     ):
         """
         Takes a compiled regular expression `regex` that is checked against
@@ -46,12 +47,31 @@ class BadPattern:
         `extensions`, a `message` that shall be displayed to the user in case
         a match has been found, a regex substitution `suggestion` for a found
         bad pattern, and a severity `level`.
+        If `see_only` is set to `True`, the pattern will only be applied to
+        files under `Assets/SEE`.
+
         """
+        if regex is None:
+            # Accept anything.
+            regex = re.compile(r".*")
         self.regex = regex
         self.message = message
         self.extensions = extensions
         self.suggestion = suggestion
         self.level = level
+        self.see_only = see_only
+
+    def applies_to(self, filename: str, line: str = '') -> bool:
+        """
+        Returns whether the given pattern applies to the given filename.
+        A pattern applies to a filename if:
+        * The filename has an extension contained in `extensions`.
+        * The filename starts with `Assets/SEE/` if `see_only` is set to `True`.
+        * The line matches the regular expression `regex`.
+        """
+        extension = filename.rsplit(".", 1)[1] if "." in filename else ""
+        return (not self.see_only or filename.startswith("Assets/SEE/")) \
+            and extension in self.extensions and self.regex.match(line)
 
     def to_comment(self, filename: str, line_number: int, suggestion: str) -> str:
         """
@@ -62,8 +82,8 @@ class BadPattern:
         set regular expression,
         """
         return (
-            f"{filename}\n{line_number}\n{self.level.value}\n{self.message}\n"
-            + f"{suggestion}\n{self.regex.pattern if self.regex is not None else '(No regex specified)'}"
+                f"{filename}\n{line_number}\n{self.level.value}\n{self.message}\n"
+                + f"{suggestion}\n{self.regex.pattern if self.regex is not None else '(No regex specified)'}"
         )
 
 
@@ -85,13 +105,14 @@ BAD_PATTERNS = [
         level=Level.ERROR,
     ),
     BadPattern(
-        re.compile(r"(^\s*ActionManifestFileRelativeFilePath: StreamingAssets)\/SteamVR\/actions\.json(\s*)$"),
+        re.compile(r"(^\s*ActionManifestFileRelativeFilePath: StreamingAssets)/SteamVR/actions\.json(\s*)$"),
         """Slashes were unnecessarily changed to forward slashes.
 This happens on Linux systems automatically, but Windows systems will change this back.
 We should just leave it as a backslash.""",
         suggestion=r"\1\SteamVR\actions.json\2",
         extensions=["asset"],
-        level=Level.WARN
+        level=Level.WARN,
+        see_only=False
     ),
     BadPattern(
         re.compile(r"^\s*(\s|Object\.)Destroy\(.*$"),
@@ -107,6 +128,7 @@ We should just leave it as a backslash.""",
     )
 ]
 
+
 # *** MODIFY ABOVE TO ADD NEW BAD PATTERNS ***
 
 
@@ -115,10 +137,9 @@ def handle_added_line(line, filename, linenumber) -> int:
     Handles a single added line within a diff hunk, checking it against
     any bad patterns, printing comments for any matches it finds.
     """
-    extension = filename.rsplit(".", 1)[1] if "." in filename else ""
     occurrences = 0
     for pattern in BAD_PATTERNS:
-        if extension in pattern.extensions and pattern.regex.match(line):
+        if pattern.applies_to(filename, line):
             # We found a bad pattern.
             occurrences += 1
             # Try getting suggestion, if one exists.
@@ -142,10 +163,11 @@ def handle_missing_newline(filename: str, linenumber: int, last_line: str):
     Handles a missing newline at the end of a file.
     :param filename: The name of the file.
     :param linenumber: The line number of the last line in the file.
+    :param last_line: The last line in the file.
     """
-    extension = filename.rsplit(".", 1)[1] if "." in filename else ""
-    if extension in NO_NEWLINE_BAD_PATTERN.extensions:
-        print(NO_NEWLINE_BAD_PATTERN.to_comment(filename, linenumber, f"{last_line[1:] if last_line is not None else ''}\\n"))
+    if NO_NEWLINE_BAD_PATTERN.applies_to(filename):
+        print(NO_NEWLINE_BAD_PATTERN.to_comment(filename, linenumber,
+                                                f"{last_line[1:] if last_line is not None else ''}\\n"))
 
 
 def main():
@@ -160,11 +182,9 @@ def main():
         while line := diff.readline().rstrip('\n\r'):
             if line.startswith("+++"):
                 # New file here.
-
                 if missing_newline_at_eof:
-                    handle_missing_newline(filename, diff_line-1, last_line)
+                    handle_missing_newline(filename, diff_line - 1, last_line)
                     missing_newline_at_eof = False
-
                 filename = line.split("/", 1)[1]
                 skip_file = filename == 'dev/null'
             elif skip_file:
