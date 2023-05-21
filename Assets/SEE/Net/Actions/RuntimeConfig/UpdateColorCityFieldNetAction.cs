@@ -4,7 +4,9 @@ using UnityEngine;
 namespace SEE.Net.Actions.RuntimeConfig
 {
     /// <summary>
-    /// Network action when a color was changed. 
+    /// Network action when a color was changed.
+    ///
+    /// Color can't be send with a generic class (<see cref="UpdateCityAttributeNetAction{E}"/>).
     /// </summary>
     public class UpdateColorCityFieldNetAction : UpdateCityNetAction
     {
