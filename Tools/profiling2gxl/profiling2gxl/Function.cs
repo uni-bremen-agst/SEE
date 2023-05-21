@@ -3,11 +3,9 @@
     public class Function
     {
         public string Id { get; set; }
-        public float PercentageTime { get; set; }
         public float Self { get; set; }
         public float Descendants { get; set; }
         public int Called { get; set; }
-        public int CalledSelf { get; set; }
         public int CalledTotal { get; set; }
         public string Name { get; set; }
         public string Module { get; set; }
