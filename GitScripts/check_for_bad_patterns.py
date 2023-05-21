@@ -143,7 +143,9 @@ def handle_missing_newline(filename: str, linenumber: int, last_line: str):
     :param filename: The name of the file.
     :param linenumber: The line number of the last line in the file.
     """
-    print(NO_NEWLINE_BAD_PATTERN.to_comment(filename, linenumber, f"{last_line[1:] if last_line is not None else ''}\\n"))
+    extension = filename.rsplit(".", 1)[1] if "." in filename else ""
+    if extension in NO_NEWLINE_BAD_PATTERN.extensions:
+        print(NO_NEWLINE_BAD_PATTERN.to_comment(filename, linenumber, f"{last_line[1:] if last_line is not None else ''}\\n"))
 
 
 def main():
