@@ -652,8 +652,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f20090c2db74fd747ae16d32d6723987, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainContentContainer: {fileID: 7725125712292814367}
-  collapseIcon: {fileID: 3883168754644485073}
+  MainContentContainer: {fileID: 7725125712292814367}
+  CollapseIcon: {fileID: 3883168754644485073}
 --- !u!1 &8434431449910065122
 GameObject:
   m_ObjectHideFlags: 0

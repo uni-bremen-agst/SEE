@@ -5,24 +5,12 @@ namespace SEE.Net.Actions.RuntimeConfig
     /// <summary>
     /// Network action when a city method was called. 
     /// </summary>
-    public class UpdateCityMethodNetAction : AbstractNetAction
+    public class UpdateCityMethodNetAction : UpdateCityNetAction
     {
-        /// <summary>
-        /// City index
-        /// </summary>
-        public int CityIndex;
-        
         /// <summary>
         /// The method name
         /// </summary>
         public string MethodName;
-
-        /// <summary>
-        /// Does nothing on the server.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-        }
 
         /// <summary>
         /// Triggers 'SyncMethod' on <see cref="RuntimeTabMenu"/>.

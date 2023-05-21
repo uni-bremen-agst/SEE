@@ -680,7 +680,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             endEditManager.OnEndEdit += () => setter(slider.value);
             endEditManager.OnEndEdit += () =>
             {
-                UpdateFloatCityFieldNetAction action = new()
+                UpdateCityAttributeNetAction<float> action = new()
                 {
                     CityIndex = CityIndex,
                     WidgetPath = getWidgetName(),
@@ -763,7 +763,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             switchManager.OnEvents.AddListener(() => setter(true));
             switchManager.OnEvents.AddListener(() =>
             {
-                UpdateBoolCityFieldNetAction action = new()
+                UpdateCityAttributeNetAction<bool> action = new()
                 {
                     CityIndex = CityIndex,
                     WidgetPath = getWidgetName(),
@@ -777,7 +777,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             switchManager.OffEvents.AddListener(() => setter(false));
             switchManager.OffEvents.AddListener(() =>
             {
-                UpdateBoolCityFieldNetAction action = new()
+                UpdateCityAttributeNetAction<bool> action = new()
                 {
                     CityIndex = CityIndex,
                     WidgetPath = getWidgetName(),
@@ -863,7 +863,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             inputField.onEndEdit.AddListener(setter);
             inputField.onEndEdit.AddListener(changedValue =>
             {
-                UpdateStringCityFieldNetAction action = new()
+                UpdateCityAttributeNetAction<string> action = new()
                 {
                     CityIndex = CityIndex,
                     WidgetPath = getWidgetName(),
@@ -949,7 +949,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             dropdown.dropdownEvent.AddListener(setter);
             dropdown.dropdownEvent.AddListener(changedValue =>
             {
-                UpdateIntCityFieldNetAction action = new()
+                UpdateCityAttributeNetAction<int> action = new()
                 {
                     CityIndex = CityIndex,
                     WidgetPath = getWidgetName(),
@@ -1077,7 +1077,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             inputField.onEndEdit.AddListener(_ =>
             {
                 CheckImmediateRedraw();
-                UpdateColorCityFieldNetAction action = new()
+                UpdateCityAttributeNetAction<Color> action = new()
                 {
                     CityIndex = CityIndex,
                     WidgetPath = getWidgetName(),
@@ -1154,7 +1154,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
             // listener when the dropdown or path is changed
             filePicker.OnChangedDropdown += () =>
             {
-                UpdateIntCityFieldNetAction netAction = new()
+                UpdateCityAttributeNetAction<int> netAction = new()
                 {
                     Value = (int)dataPath.Root,
                     CityIndex = CityIndex,

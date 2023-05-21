@@ -1,22 +1,13 @@
 using SEE.Game.UI.RuntimeConfigMenu;
+using UnityEngine;
 
 namespace SEE.Net.Actions.RuntimeConfig
 {
     /// <summary>
     /// Network action when a file picker was changed. 
     /// </summary>
-    public class UpdatePathCityFieldNetAction : AbstractNetAction
+    public class UpdatePathCityFieldNetAction : UpdateCityNetAction
     {
-        /// <summary>
-        /// City index
-        /// </summary>
-        public int CityIndex;
-
-        /// <summary>
-        /// Widget path
-        /// </summary>
-        public string WidgetPath;
-        
         /// <summary>
         /// Whether the path is absolute or relative.
         /// </summary>
@@ -26,13 +17,6 @@ namespace SEE.Net.Actions.RuntimeConfig
         /// The changed value
         /// </summary>
         public string Value;
-
-        /// <summary>
-        /// Does nothing on the server.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-        }
 
         /// <summary>
         /// Triggers 'SyncPath' on <see cref="RuntimeTabMenu"/>.
