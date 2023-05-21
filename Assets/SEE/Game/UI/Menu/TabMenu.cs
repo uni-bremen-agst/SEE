@@ -1,6 +1,6 @@
 using SEE.Utils;
+using Sirenix.Utilities;
 using UnityEngine;
-using Valve.VR.InteractionSystem;
 
 namespace SEE.Game.UI.Menu
 {

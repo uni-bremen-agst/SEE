@@ -59,7 +59,7 @@ namespace SEE.UI
                     description: "Starts a server and local client process.",
                     entryColor: NextColor(),
                     icon: Resources.Load<Sprite>("Icons/Host")),
-                new(a
+                new(
                     entryAction: StartClient,
                     exitAction: null,
                     title: "Client",

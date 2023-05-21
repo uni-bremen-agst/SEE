@@ -4,7 +4,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
-using Valve.VR.InteractionSystem;
 
 namespace SEE.Game.UI.Menu
 {
