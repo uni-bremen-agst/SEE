@@ -97,12 +97,17 @@ jobs:
                 await helper.filter_out_existing_comments(github, context, comments);
                 if (comments.length > 0) {
                   console.log("Submitting PR review...");
+                  let limitMessage = '';
+                  if (comments.length > 50) {
+                    limitMessage = `\n\n**NOTE: Only the first 50 (out of ${comments.length}) review comments are included.** `;
+                    limitMessage += 'Remaining comments will appear when the CI is triggered next.';
+                  }
                   github.rest.pulls.createReview({
                     owner: context.repo.owner,
                     repo: context.repo.repo,
                     pull_number: context.issue.number,
                     event: 'REQUEST_CHANGES',
-                    body: 'There are a few bad patterns I found which you should check.',
+                    body: 'There are a few bad patterns I found which you should check.' + limitMessage,
                     comments: comments
                   });
                 } else {

@@ -18,6 +18,12 @@ namespace SEE.DataModel
         private readonly IList<IObserver<T>> Observers = new List<IObserver<T>>();
         
         /// <summary>
+        /// If set to true, no notifications will be sent to observers.
+        /// Note that this only suppresses notifications themselves, not errors or completion.
+        /// </summary>
+        public bool SuppressNotifications { get; set; } = false;
+        
+        /// <summary>
         /// Registers a new subscriber for this observable.
         /// </summary>
         /// <param name="observer">The new observer which shall subscribe to this observable</param>
@@ -73,6 +79,11 @@ namespace SEE.DataModel
         /// <param name="change">information about the change of the state to be passed on to the observers</param>
         protected void Notify(T change)
         {
+            if (SuppressNotifications)
+            {
+                return;
+            }
+            
             foreach (IObserver<T> observer in Observers)
             {
                 observer.OnNext(change);
