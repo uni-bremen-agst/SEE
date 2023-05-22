@@ -637,7 +637,7 @@ namespace SEE.Utils
             Assert.AreEqual(expected.Show, actual.Show);
             Assert.AreEqual(expected.FontSize, actual.FontSize, 0.001f);
             Assert.AreEqual(expected.Distance, actual.Distance, 0.001f);
-            Assert.AreEqual(expected.AnimationDuration, actual.AnimationDuration, 0.001f);
+            Assert.AreEqual(expected.AnimationFactor, actual.AnimationFactor, 0.001f);
         }
 
         /// <summary>
@@ -1011,7 +1011,7 @@ namespace SEE.Utils
         /// <param name="settings">settings whose attributes are to be modified</param>
         private static void WipeOutLabelSettings(ref LabelAttributes settings)
         {
-            settings.AnimationDuration++;
+            settings.AnimationFactor++;
             settings.Show = !settings.Show;
             settings.FontSize++;
             settings.Distance++;

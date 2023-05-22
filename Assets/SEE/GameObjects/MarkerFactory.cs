@@ -91,7 +91,7 @@ namespace SEE.GO
         /// This will be used to remember which materials have already been animated
         /// along with their original color, so that we can restore it.
         /// </summary>
-        private readonly Dictionary<Material, Color> materials = new Dictionary<Material, Color>();
+        private readonly Dictionary<Material, Color> materials = new();
 
         /// <summary>
         /// The duration of an animation cycle in seconds.

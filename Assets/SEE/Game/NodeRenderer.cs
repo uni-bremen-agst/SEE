@@ -23,11 +23,6 @@ namespace SEE.Game
     public partial class GraphRenderer
     {
         /// <summary>
-        /// The duration of an animation in seconds.
-        /// </summary>
-        const float animationDuration = 1.0f;
-
-        /// <summary>
         /// Sets the name (<see cref="Node.ID"/>) and tag (<see cref="Tags.Node"/>)
         /// of given <paramref name="gameNode"/> and lets the node reference
         /// of it refer to <paramref name="node"/>.
@@ -426,7 +421,7 @@ namespace SEE.Game
                         // the node operator's y co-ordinate is meant to be the center
                         nodeTransform.position.y += nodeTransform.scale.y / 2;
                         //Debug.Log($"{node.name} [{node.transform.position}, {node.transform.lossyScale}] => [{nodeTransform.position}), ({nodeTransform.scale}]\n");
-                        nodeOperator.MoveTo(nodeTransform.position, animationDuration);
+                        nodeOperator.MoveTo(nodeTransform.position);
                         // FIXME: Scaling doesn't work yet; likely because nodeTransform.scale is world space
                         // but the node operator expects local scale.
                         //nodeOperator.ScaleTo(nodeTransform.scale, animationDuration);

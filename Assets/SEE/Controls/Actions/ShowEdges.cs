@@ -34,12 +34,6 @@ namespace SEE.Controls.Actions
         private AbstractSEECity codeCity;
 
         /// <summary>
-        /// The duration that the edge appearance/disappearance
-        /// animation takes from start to end if not interrupted.
-        /// </summary>
-        private const float ANIMATION_DURATION = 1f;
-
-        /// <summary>
         /// Registers On() and Off() for the respective hovering and selection events.
         /// </summary>
         protected void OnEnable()
@@ -205,7 +199,7 @@ namespace SEE.Controls.Actions
                 // TODO: Perhaps the node along with its edges should be cached?
                 foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
                 {
-                    edge.Operator().ShowOrHide(show, animationKind, ANIMATION_DURATION);
+                    edge.Operator().ShowOrHide(show, animationKind);
                 }
             }
         }

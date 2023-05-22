@@ -22,9 +22,14 @@ namespace SEE.Game.City
         public EdgeAnimationKind AnimationKind = EdgeAnimationKind.None;
 
         /// <summary>
+        /// The maximal width of an edge.
+        /// </summary>
+        public const float MaxEdgeWidth = 0.1f;
+
+        /// <summary>
         /// The width of an edge (drawn as line).
         /// </summary>
-        [Range(0.0f, float.MaxValue)]
+        [Range(0.0f, MaxEdgeWidth)]
         public float EdgeWidth = 0.01f;
 
         /// <summary>

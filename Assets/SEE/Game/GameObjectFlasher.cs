@@ -8,7 +8,8 @@ namespace SEE.Game
     /// Flashes a game object, that is, animates its color pulsating from its
     /// original color to its inverted color.
     /// </summary>
-    class GameObjectFlasher
+    [System.Obsolete("Use NodeOperator.Blink() instead.")]
+    internal class GameObjectFlasher  // TODO: Usages of this class should be replaced with NodeOperator.Blink()
     {
         /// <summary>
         /// Constructor.
@@ -46,7 +47,7 @@ namespace SEE.Game
         {
             Material material = gameObject.GetComponent<Renderer>().sharedMaterial;
             originalColor = material.color;
-            selectionTween = material.DOColor(material.color.Invert(), animationDuration).SetEase(DG.Tweening.Ease.Flash).SetLoops(-1, LoopType.Yoyo);
+            selectionTween = material.DOColor(material.color.Invert(), animationDuration).SetEase(Ease.Flash).SetLoops(-1, LoopType.Yoyo);
         }
 
         /// <summary>

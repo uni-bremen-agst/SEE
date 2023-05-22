@@ -8,7 +8,7 @@ using UnityEngine;
 namespace SEE.CameraPaths
 {
     /// <summary>
-    /// A script to move a game object, e.g., a camera, programmatically along a recorded path. 
+    /// A script to move a game object, e.g., a camera, programmatically along a recorded path.
     /// </summary>
     public class PathReplay : MonoBehaviour
     {
@@ -120,7 +120,7 @@ namespace SEE.CameraPaths
         private void Start()
         {
             if (MovedObject == null)
-            {               
+            {
                 // We are using the main camera.
                 MovedObject = MainCamera.Camera.gameObject;
                 if (MovedObject == null)

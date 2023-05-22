@@ -51,7 +51,7 @@ namespace SEE.GO.Menu
         /// The menu in which the search results are listed.
         /// The user can select the desired node here.
         /// </summary>
-        private SimpleMenu resultMenu;
+        private SimpleListMenu resultMenu;
 
         /// <summary>
         /// The color of the marker pointing to the found node.
@@ -139,7 +139,7 @@ namespace SEE.GO.Menu
             if (resultMenu == null)
             {
                 // Initialize result menu
-                resultMenu = gameObject.AddComponent<SimpleMenu>();
+                resultMenu = gameObject.AddComponent<SimpleListMenu>();
                 resultMenu.Title = "Search Results";
                 resultMenu.Description = "Please select the node you wish to highlight.";
                 resultMenu.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Search");
@@ -148,16 +148,16 @@ namespace SEE.GO.Menu
             // Entries will be greyed out the further they go.
             resultMenuEntries.ForEach(resultMenu.RemoveEntry); // Clean up previous entries.
             resultMenuEntries.Clear();
-            resultMenuEntries.AddRange(results.Select(x => new MenuEntry(() => MenuEntryAction(x.Item3, x.Item2),
+            resultMenuEntries.AddRange(results.Select(x => new MenuEntry(() => MenuEntryAction(x.Item3, x.Item2), null,
                                                                          x.Item2, entryColor: ScoreColor(x.Item1))));
             resultMenuEntries.ForEach(resultMenu.AddEntry);
-            resultMenu.ShowMenu(true);
+            resultMenu.ShowMenu = true;
 
             // Highlight node and close menu when entry was chosen.
             void MenuEntryAction(GameObject chosen, string chosenName)
             {
                 HighlightNode(chosen, chosenName);
-                resultMenu.ShowMenu(false);
+                resultMenu.ShowMenu = false;
             }
         }
 
