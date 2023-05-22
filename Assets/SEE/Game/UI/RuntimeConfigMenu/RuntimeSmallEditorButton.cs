@@ -51,7 +51,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
                 {
                     return;
                 }
-                
+
                 if (value)
                 {
                     smallEditor = PrefabInstantiator.InstantiatePrefab(SMALL_WINDOW_PREFAB, Canvas.transform, false);

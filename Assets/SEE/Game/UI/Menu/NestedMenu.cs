@@ -30,7 +30,7 @@ namespace SEE.Game.UI.Menu
         /// The keyword to be used to step back in the menu verbally.
         /// </summary>
         private const string BackMenuCommand = "go back";
-        
+
         /// <summary>
         /// The input-field for the fuzzy-search of the nestedMenu.
         /// </summary>
@@ -116,7 +116,7 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         /// <returns>breadcrumb for the current level</returns>
         private string GetBreadcrumb() => string.Join(" / ", Levels.Reverse().Select(x => x.Title));
-        
+
         /// <summary>
         /// Descends down a level in the menu hierarchy and removes the entry from the <see cref="Levels"/>.
         /// </summary>
@@ -159,7 +159,7 @@ namespace SEE.Game.UI.Menu
             base.StartDesktop();
 
             Content.transform.Find("Search Field").gameObject.TryGetComponentOrLog(out searchInput);
-            
+
             searchInput.onValueChanged.AddListener(SearchTextEntered);
             MenuManager.onCancel.AddListener(DescendLevel); // Go one level higher when clicking "back"
             MenuManager.onCancel.AddListener(() =>
@@ -171,7 +171,7 @@ namespace SEE.Game.UI.Menu
             {
                 MenuManager.onConfirm.AddListener(ResetToBase); // When closing the menu, its level will be reset to the top
             }
-            
+
             OnShowMenuChanged += () => SEEInput.KeyboardShortcutsEnabled = !ShowMenu;
         }
 
@@ -225,7 +225,7 @@ namespace SEE.Game.UI.Menu
             {
                 return;
             }
-            
+
             AllEntries ??= GetAllEntries().ToDictionary(x => x.Title, x => x);
             IEnumerable<MenuEntry> results =
                 Process.ExtractTop(SearchMenu.FilterString(text), AllEntries.Keys, cutoff: 10)

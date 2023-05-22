@@ -85,12 +85,12 @@ namespace SEE.Game.UI.Menu
             manager.normalText.fontStyle = FontStyles.Normal;
             manager.normalText.text = manager.buttonText;
         }
-        
+
         /// <summary>
         /// Triggers when the <see cref="ActiveEntry"/> was unselected.
         /// </summary>
         public event UnityAction<T> OnEntryUnselected;
-        
+
         /// <summary>
         /// Triggers when <see cref="ActiveEntry"/> was changed.
         /// </summary>

@@ -29,7 +29,7 @@ namespace SEE.Game.UI.Menu
                 OnTitleChanged?.Invoke();
             }
         }
-    
+
         /// <summary>
         /// The description of this menu.
         /// </summary>
@@ -46,7 +46,7 @@ namespace SEE.Game.UI.Menu
                 OnDescriptionChanged?.Invoke();
             }
         }
-    
+
         /// <summary>
         /// The icon of this menu.
         /// </summary>
@@ -63,12 +63,12 @@ namespace SEE.Game.UI.Menu
                 OnIconChanged?.Invoke();
             }
         }
-    
+
         /// <summary>
         /// The keyword listener.
         /// </summary>
         protected KeywordInput KeywordListener;
-        
+
         /// <summary>
         /// The keyword to close the menu.
         /// </summary>
@@ -121,7 +121,7 @@ namespace SEE.Game.UI.Menu
                 OnParentChanged?.Invoke();
             }
         }
-    
+
         /// <summary>
         /// Toggles the menu.
         /// </summary>
@@ -149,7 +149,7 @@ namespace SEE.Game.UI.Menu
             KeywordListener.Register(HandleKeyword);
             KeywordListener.Start();
         }
-    
+
         /// <summary>
         /// The keywords the menu should listen to.
         /// </summary>
@@ -160,7 +160,7 @@ namespace SEE.Game.UI.Menu
             if (CloseMenuKeyword != null) keywords = keywords.Append(CloseMenuKeyword);
             return keywords;
         }
-    
+
         /// <summary>
         /// Triggers when a keyword was recognized.
         /// Executes a special action depending on the keyword.
@@ -186,7 +186,7 @@ namespace SEE.Game.UI.Menu
         /// Triggers when <see cref="Description"/> was changed.
         /// </summary>
         public event UnityAction OnDescriptionChanged;
-        
+
         /// <summary>
         /// Triggers when <see cref="Icon"/> was changed.
         /// </summary>
@@ -196,17 +196,17 @@ namespace SEE.Game.UI.Menu
         /// Triggers when <see cref="ShowMenu"/> was changed.
         /// </summary>
         public event UnityAction OnShowMenuChanged;
-    
+
         /// <summary>
         /// Triggers when <see cref="CloseMenuKeyword"/> was changed
         /// </summary>
         public event UnityAction OnCloseMenuCommandChanged;
-    
+
         /// <summary>
         /// Triggers when <see cref="Parent"/> was changed.
         /// </summary>
         public event UnityAction OnParentChanged;
-    
+
         /// <summary>
         /// Triggers when a keyword was recognized by the listener. (<see cref="HandleKeyword"/>)
         /// </summary>

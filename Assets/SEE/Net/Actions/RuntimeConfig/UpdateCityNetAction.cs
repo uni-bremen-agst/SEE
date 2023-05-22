@@ -9,13 +9,13 @@ namespace SEE.Net.Actions.RuntimeConfig
         /// City index
         /// </summary>
         public int CityIndex;
-    
+
         /// <summary>
         /// Widget path
         /// </summary>
         public string WidgetPath;
 
-    
+
         /// <summary>
         /// Does nothing on the server.
         /// </summary>

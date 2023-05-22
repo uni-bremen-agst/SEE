@@ -3,7 +3,7 @@ using SEE.Game.UI.RuntimeConfigMenu;
 namespace SEE.Net.Actions.RuntimeConfig
 {
     /// <summary>
-    /// Network action when an attribute was changed. 
+    /// Network action when an attribute was changed.
     /// </summary>
     public class UpdateCityAttributeNetAction<E> : UpdateCityNetAction
     {

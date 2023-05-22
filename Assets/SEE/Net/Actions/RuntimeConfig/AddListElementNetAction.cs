@@ -3,7 +3,7 @@
 namespace SEE.Net.Actions.RuntimeConfig
 {
     /// <summary>
-    /// Network action when a list element was added. 
+    /// Network action when a list element was added.
     /// </summary>
     public class AddListElementNetAction : UpdateCityNetAction
     {

@@ -3,7 +3,7 @@
 namespace SEE.Net.Actions.RuntimeConfig
 {
     /// <summary>
-    /// Network action when a list element was removed. 
+    /// Network action when a list element was removed.
     /// </summary>
     public class RemoveListElementNetAction : UpdateCityNetAction
     {

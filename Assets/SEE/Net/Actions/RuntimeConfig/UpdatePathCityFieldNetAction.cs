@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SEE.Net.Actions.RuntimeConfig
 {
     /// <summary>
-    /// Network action when a file picker was changed. 
+    /// Network action when a file picker was changed.
     /// </summary>
     public class UpdatePathCityFieldNetAction : UpdateCityNetAction
     {
@@ -12,7 +12,7 @@ namespace SEE.Net.Actions.RuntimeConfig
         /// Whether the path is absolute or relative.
         /// </summary>
         public bool IsAbsolute;
-        
+
         /// <summary>
         /// The changed value
         /// </summary>

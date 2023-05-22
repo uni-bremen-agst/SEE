@@ -3,7 +3,7 @@ using SEE.Game.UI.RuntimeConfigMenu;
 namespace SEE.Net.Actions.RuntimeConfig
 {
     /// <summary>
-    /// Network action when a city method was called. 
+    /// Network action when a city method was called.
     /// </summary>
     public class UpdateCityMethodNetAction : UpdateCityNetAction
     {

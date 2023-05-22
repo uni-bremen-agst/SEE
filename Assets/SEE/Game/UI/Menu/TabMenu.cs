@@ -102,7 +102,7 @@ namespace SEE.Game.UI.Menu
             base.OnStartFinished();
             if (ActiveEntry != null) ActivateView(ActiveEntry);
             Entries.ForEach(AddView);
-            
+
             OnEntryAdded += AddView;
             OnEntrySelected += ActivateView;
             OnEntryUnselected += DeactivateView;

@@ -19,7 +19,7 @@ namespace SEE.Game.UI.Menu
         /// Sprite for the icon.
         /// </summary>
         protected virtual string IconSprite => "Materials/ModernUIPack/Settings";
-        
+
         /// <summary>
         /// The menu game object.
         /// </summary>
@@ -32,7 +32,7 @@ namespace SEE.Game.UI.Menu
         /// The menu tooltip.
         /// </summary>
         protected Tooltip.Tooltip MenuTooltip { get; private set; }
-        
+
         /// <summary>
         /// Initializes the menu.
         /// </summary>
@@ -42,24 +42,24 @@ namespace SEE.Game.UI.Menu
             Menu = PrefabInstantiator.InstantiatePrefab(MenuPrefab, Parent, false);
             Menu.name = Title;
             MenuManager = Menu.GetComponent<ModalWindowManager>();
-            
+
             // sets the icon
             Icon = Resources.Load<Sprite>(IconSprite);
-        
+
             // creates the tooltip
             MenuTooltip = Menu.AddComponent<Tooltip.Tooltip>();
         }
-    
+
         /// <summary>
         /// <see cref="StartDesktop"/>
         /// </summary>
         protected override void StartVR() => StartDesktop();
-        
+
         /// <summary>
         /// <see cref="StartDesktop"/>
         /// </summary>
         protected override void StartTouchGamepad() => StartDesktop();
-        
+
         /// <summary>
         /// Updates the menu and adds listeners to events.
         /// </summary>
@@ -96,7 +96,7 @@ namespace SEE.Game.UI.Menu
             }
             base.Update();
         }
-        
+
         /// <summary>
         /// Destroying the component also destroys the menu.
         /// </summary>
@@ -107,7 +107,7 @@ namespace SEE.Game.UI.Menu
                 Destroyer.Destroy(Menu);
             }
         }
-        
+
         /// <summary>
         /// Updates the title.
         /// </summary>

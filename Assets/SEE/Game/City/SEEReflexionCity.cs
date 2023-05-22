@@ -187,7 +187,7 @@ namespace SEE.Game.City
         protected override void InitializeAfterDrawn()
         {
             base.InitializeAfterDrawn();
-            
+
             // We also need to have the ReflexionVisualization apply the correct edge
             // visualization, but we have to wait until all edges have become meshes.
             if (gameObject.TryGetComponentOrLog(out EdgeMeshScheduler scheduler))

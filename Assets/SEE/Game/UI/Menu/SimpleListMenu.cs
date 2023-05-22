@@ -124,12 +124,12 @@ namespace SEE.Game.UI.Menu
             if (entry != null) SelectEntry(entry);
             base.HandleKeyword(args);
         }
-        
+
         /// <summary>
         /// Triggers when <see cref="AllowNoSelection"/> was changed.
         /// </summary>
         public event UnityAction OnAllowNoSelectionChanged;
-        
+
         /// <summary>
         /// Triggers when <see cref="HideAfterSelection"/> was changed.
         /// </summary>

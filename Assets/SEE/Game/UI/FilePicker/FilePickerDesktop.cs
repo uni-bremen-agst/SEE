@@ -83,7 +83,7 @@ namespace SEE.Game.UI.FilePicker
         {
             if (Menu != null) Destroyer.Destroy(Menu);
         }
-        
+
         /// <summary>
         ///     Initializes the menu.
         /// </summary>
@@ -100,7 +100,7 @@ namespace SEE.Game.UI.FilePicker
 
             TMP_InputField inputField = Menu.transform.Find("DropdownCombo/SelectableInput/Input")
                 .GetComponent<TMP_InputField>();
-            
+
             LabelText.text = Label;
 
             // setup dropdown

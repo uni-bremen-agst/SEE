@@ -9,7 +9,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
     /// The primary wrapper script for the <see cref="RuntimeTabMenu"/>.
     /// The runtime config menu allows to configure a <see cref="AbstractSEECity"/> at runtime.
     ///
-    /// Instantiates the <see cref="RuntimeTabMenu"/>s for each table and handles switching between the tables. 
+    /// Instantiates the <see cref="RuntimeTabMenu"/>s for each table and handles switching between the tables.
     /// </summary>
     public class RuntimeConfigMenu : MonoBehaviour
     {
