@@ -31,7 +31,7 @@ public class FaceCam : NetworkBehaviour
     void Start()
     {
         transform.localScale = new Vector3(0.2f, -0.48f, -1); // z = -1 to face away from the player.
-        transform.position = transform.parent.position;
+        //transform.position = transform.parent.position;
     }
 
 
@@ -45,7 +45,7 @@ public class FaceCam : NetworkBehaviour
         }
         // Netcode specific logic executed when spawned.
 
-        transform.parent = transform.parent.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase").transform;
+        //transform.parent = transform.parent.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase").transform;
         Debug.Log("Nose");
 
 
