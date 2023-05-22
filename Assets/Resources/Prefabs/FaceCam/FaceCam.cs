@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class FaceCam : NetworkBehaviour
 {
+    // The eobject with the position where the face of the player is at.
+    GameObject playersFace;
+
     // Called on Network Spawn before Start
     public override void OnNetworkSpawn()
     {
@@ -28,10 +31,12 @@ public class FaceCam : NetworkBehaviour
     void Start()
     {
         transform.localScale = new Vector3(0.2f, -0.48f, -1); // z = -1 to face away from the player.
+        transform.position = transform.parent.position;
     }
 
-    // Update is called once per frame
-    void Update()
+
+        // Update is called once per frame
+        void Update()
     {
         // If the NetworkObject is not yet spawned, exit early.
         if (!IsSpawned)
@@ -40,8 +45,8 @@ public class FaceCam : NetworkBehaviour
         }
         // Netcode specific logic executed when spawned.
 
-
-
+        transform.parent = transform.parent.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase").transform;
+        Debug.Log("Nose");
 
 
 
