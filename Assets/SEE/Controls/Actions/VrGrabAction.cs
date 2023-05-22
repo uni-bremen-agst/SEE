@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
-    public class VrGrabber : MonoBehaviour
+    public class VrGrabAction : MonoBehaviour
     {
         /// <summary>
         /// Left back vector of Portal
@@ -51,7 +51,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Indicates whether a collision has occurred.
         /// </summary>
-        private bool HasCollided = false;
+        private bool collidedState;
         
         /// <summary>
         /// The initial position of the object. 
@@ -62,6 +62,11 @@ namespace SEE.Controls.Actions
         /// The initial rotation of the object.
         /// </summary>
         private Quaternion InitialRotation;
+        
+        /// <summary>
+        /// The initial scale.
+        /// </summary>
+        private Vector3 InitialScale;
 
         /// <summary>
         /// Adds listeners to the grabbable component for onGrab and onRelease. Also for the distance grabbable
@@ -90,9 +95,11 @@ namespace SEE.Controls.Actions
         /// <param name="grabbable">Grabbable Component.</param>
         private void OnGrab(Hand hand, Grabbable grabbable)
         {
-            //Set the initial position to handle the case when the object is released without being re-parented
-            InitialPosition = grabbable.gameObject.transform.position;
-            InitialRotation = grabbable.gameObject.transform.rotation;
+            var currentGameObject = grabbable.gameObject;
+            //Set the initial position and scale to handle the case when the object is released without being re-parented or when being collided but only released afterwards.
+            InitialPosition = currentGameObject.transform.position;
+            InitialRotation = currentGameObject.transform.rotation;
+            InitialScale = currentGameObject.transform.localScale;
             
             if (gameObject.TryGetNode(out Node node) && !node.IsRoot())
             {
@@ -128,33 +135,67 @@ namespace SEE.Controls.Actions
         /// <param name="grabbable">Grabbable Component.</param>
         private void OnRelease(Hand hand, Grabbable grabbable)
         {
-            if (gameObject.TryGetNode(out Node node) && !node.IsRoot())
+            var currentGameObject = grabbable.gameObject;
+            
+                if (gameObject.TryGetNode(out Node node) && !node.IsRoot()) 
+                { 
+                    IsReleased = true;
+                    IsGrabbed = false; 
+                    Rigidbody rigidbody = grabbable.gameObject.GetComponent<Rigidbody>(); 
+                    rigidbody.interpolation = RigidbodyInterpolation.None; 
+                    rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous; 
+                    rigidbody.isKinematic = true;
+                    
+                    Debug.LogWarning("Player released grabbed object: " + GrabbedObject); 
+                    GrabbedObject = null;
+
+                    // Set portal to old values when released
+                    // FIXME: Should remain visible outside the portal when released, or only be able to be moved within the portal.
+                    Portal.SetInfinitePortal(gameObject);
+                    //Portal.SetPortal(gameObject, leftFront, rightBack);
+
+                    // Set layer back to normal (Grabbable layer).
+                    GameObjectExtensions.SetAllChildLayer(grabbable.gameObject.transform, GrabbableLayer, true);
+
+                    // Reset the position and rotation of the grabbed object to its initial position
+                    if (collidedState == false)
+                    { 
+                        currentGameObject.transform.position = InitialPosition; 
+                        currentGameObject.transform.rotation = InitialRotation; 
+                    }
+                    else if (collidedState == true && !IsInCollision()) 
+                    {
+                        currentGameObject.transform.localScale = InitialScale; // Reset the scale only if no longer in collision
+                    } 
+                } 
+        }
+
+        // Check if the grabbed object is currently in collision with any other object
+        private bool IsInCollision()
+        {
+            Collider[] colliders = GrabbedObject.GetComponentsInChildren<Collider>();
+            foreach (Collider collider in colliders)
             {
-                IsReleased = true;
-                IsGrabbed = false;
-                Rigidbody rigidbody = grabbable.gameObject.GetComponent<Rigidbody>();
-                rigidbody.interpolation = RigidbodyInterpolation.None;
-                rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
-                rigidbody.isKinematic = true;
-
-                Debug.LogWarning("Player released grabbed object: " + GrabbedObject);
-                GrabbedObject = null;
-
-                // Set portal to old values when released
-                // FIXME: Should remain visible outside the portal when released, or only be able to be moved within the portal.
-                Portal.SetInfinitePortal(gameObject);
-                //Portal.SetPortal(gameObject, leftFront, rightBack);
-
-                // Set layer back to normal (Grabbable layer).
-                GameObjectExtensions.SetAllChildLayer(grabbable.gameObject.transform, GrabbableLayer, true);
-                
-                // Reset the position and rotation of the grabbed object to its initial position
-                if (HasCollided == false)
+                if (collider.enabled && IsColliding(collider))
                 {
-                    grabbable.gameObject.transform.position = InitialPosition;
-                    grabbable.gameObject.transform.rotation = InitialRotation;
+                    return true; // Object is still in collision
                 }
             }
+            return false; // Object is no longer in collision
+        }
+
+        // Check if a specific collider is currently in collision
+        private bool IsColliding(Collider collider)
+        {
+            Collider[] colliders = Physics.OverlapBox(collider.bounds.center, collider.bounds.extents, collider.transform.rotation);
+            foreach (Collider otherCollider in colliders)
+            {
+                if (otherCollider != collider && otherCollider.enabled && otherCollider.gameObject != GrabbedObject)
+                {
+                    return true; // Collision detected
+                }
+            }
+            return false; // No collision detected
         }
 
         /// <summary>
@@ -163,10 +204,10 @@ namespace SEE.Controls.Actions
         /// <param name="collisionInfo"></param>
         private void OnCollisionEnter(Collision collisionInfo)
         {
-            HasCollided = true;
+            collidedState = true;
             if (collisionInfo.gameObject.TryGetNode(out Node node) && IsGrabbed && !node.IsRoot() && GrabbedObject == gameObject)
             {
-                if (GrabbedObject.transform.parent.gameObject != collisionInfo.gameObject)
+                if (GrabbedObject.transform.parent.gameObject != collisionInfo.gameObject && IsInCollision() ) //FIXME IsInCollision überprüfen
                 {
                     Debug.LogWarning("Collision with node: " + collisionInfo.gameObject.name);
                     MoveAction.ReparentVR(collisionInfo.gameObject);
@@ -180,17 +221,16 @@ namespace SEE.Controls.Actions
         /// <param name="collisionInfo"></param>
         private void OnCollisionExit(Collision collisionInfo)
         {
-            
             if (collisionInfo.gameObject.TryGetNode(out Node node) && IsGrabbed && !node.IsRoot() &&
-                    gameObject == GrabbedObject)
-                {
-                    if (!IsDescendant(GrabbedObject, collisionInfo.gameObject))
-                    {
-                        Debug.LogWarning("UnReparenting - exit collision with node: " + collisionInfo.gameObject.name);
-                        MoveAction.UnReparentVR();
-                    }
-                } 
-            HasCollided = false;
+                gameObject == GrabbedObject) 
+            {
+                if (!IsDescendant(GrabbedObject, collisionInfo.gameObject)) //FIXME Funktion implementieren bei der nur bei "solidem" Kontakt reparenting passiert. Bei ohne loslassen zurück zum anfang.
+                { 
+                    Debug.LogWarning("UnReparenting - exit collision with node: " + collisionInfo.gameObject.name); 
+                    MoveAction.UnReparentVR();
+                }
+            } 
+            collidedState = false;
         }
 
         /// <summary>

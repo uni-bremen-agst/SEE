@@ -53,7 +53,7 @@ namespace SEE.Game
 
                 SetupRigidbody();
                 SetupGrabbable();
-                gameObject.AddOrGetComponent<VrGrabber>();
+                gameObject.AddOrGetComponent<VrGrabAction>();
 
             }
 
