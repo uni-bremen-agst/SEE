@@ -115,8 +115,11 @@ namespace SEE.Game.UI.Menu
             get => showMenu;
             set
             {
-                showMenu = value;
-                OnShowMenuChanged?.Invoke();
+                if (showMenu != value)
+                {
+                    showMenu = value;
+                    OnShowMenuChanged?.Invoke();
+                }
             }
         }
 
@@ -134,8 +137,11 @@ namespace SEE.Game.UI.Menu
             get => parent != null ? parent : Canvas.transform;
             set
             {
-                parent = value;
-                OnParentChanged?.Invoke();
+                if (parent != value)
+                {
+                    parent = value;
+                    OnParentChanged?.Invoke();
+                }
             }
         }
 
@@ -218,7 +224,7 @@ namespace SEE.Game.UI.Menu
         public event UnityAction OnShowMenuChanged;
 
         /// <summary>
-        /// Triggers when <see cref="CloseMenuKeyword"/> was changed
+        /// Triggers when <see cref="CloseMenuKeyword"/> was changed.
         /// </summary>
         public event UnityAction OnCloseMenuCommandChanged;
 
