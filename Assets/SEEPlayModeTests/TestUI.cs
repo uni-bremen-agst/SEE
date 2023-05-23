@@ -10,13 +10,13 @@ using UnityEngine;
 namespace SEE.Game.UI
 {
     /// <summary>
-    /// Abstract super class of all UI tests. It takes for the setup and tear down of
-    /// all tests.
+    /// Abstract super class of all UI tests. It takes care of the setup
+    /// and tear down of all tests.
     /// </summary>
     internal abstract class TestUI
     {
         /// <summary>
-        /// Set up for a test.
+        /// Setup for a test.
         /// The playmode will be entered.
         /// The <see cref="SceneSettings.InputType"/> will be <see cref="SEE.GO.PlayerInputType.DesktopPlayer"/>.
         ///
@@ -78,12 +78,12 @@ namespace SEE.Game.UI
 
             /// <summary>
             /// Makes sure that the given <paramref name="scene"/> is loaded before
-            /// the test is run. The actual scene is loaded from the path 
+            /// the test is run. The actual scene is loaded from the path
             /// <see cref="SceneFolder"/> + <paramref name="scene"/> + <see cref="SceneFileExtension"/>.
-            /// 
+            ///
             /// Assumptions: <paramref name="scene"/> is contained in folder
             /// <see cref="SceneFolder"/> and does not have the <see cref="SceneFileExtension"/>
-            /// (that extension will be added automatically). 
+            /// (that extension will be added automatically).
             /// </summary>
             /// <param name="scene">name of the test scene to be loaded</param>
             public LoadSceneAttribute(string scene = "Empty") => this.scene = SceneFolder + scene + SceneFileExtension;
