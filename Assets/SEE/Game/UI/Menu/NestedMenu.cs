@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FuzzySharp;
+using SEE.Controls;
 using SEE.GO;
 using SEE.GO.Menu;
 using TMPro;
@@ -197,7 +198,13 @@ namespace SEE.Game.UI.Menu
                 MenuManager.onConfirm.AddListener(ResetToBase);
             }
 
-            // TODO: OnMenuToggle.AddListener(shown => SEEInput.KeyboardShortcutsEnabled = !shown);
+            // If the menu is enabled, keybord shortcuts must be disabled and vice versa.
+            OnShowMenuChanged += ToggleKeyboardShortcuts;
+
+            void ToggleKeyboardShortcuts()
+            {
+                SEEInput.KeyboardShortcutsEnabled = !ShowMenu;
+            }
         }
 
         /// <summary>
