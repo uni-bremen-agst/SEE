@@ -7,9 +7,9 @@ namespace SEE.Utils
     /// A delegate that is called during a forrest traversal once for each
     /// visited tree node.
     ///
-    /// If this method returs <c>true</c>, the traversal continues with the
+    /// If this method returns <c>true</c>, the traversal continues with the
     /// next node; otherwise the traversal terminates and none of the remaining
-    /// nodes get visited anymore.
+    /// nodes gets visited anymore.
     /// </summary>
     /// <typeparam name="T">the data type for the node data</typeparam>
     /// <param name="child">the currently visited node</param>
@@ -18,6 +18,11 @@ namespace SEE.Utils
     /// <returns>if <c>true</c>, traversal continues; otherwise it terminates</returns>
     public delegate bool TreeVisitor<T>(T child, T parent);
 
+    /// <summary>
+    /// A representation of a tree with multiple roots, in other words, a
+    /// forrest.
+    /// </summary>
+    /// <typeparam name="T">the data type for the node data</typeparam>
     public class Forrest<T>
     {
         /// <summary>
@@ -100,7 +105,8 @@ namespace SEE.Utils
 
         /// <summary>
         /// The list of roots. Its order corresponds to the order
-        /// in which <see cref="AddRoot(T)"/> was called.
+        /// in which <see cref="AddRoot(T)"/> was called. The earliest root
+        /// added will be the first entry of this list.
         /// </summary>
         private readonly IList<Node> roots = new List<Node>();
 
@@ -134,7 +140,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// Returns the first <see cref="Node"/> having <paramref name="item"/>
-        /// as associated data, i.e, with an item equal to <paramref name="item"/>.
+        /// as associated data, i.e., with an item equal to <paramref name="item"/>.
         /// May be null if none was found. Traversal is in preorder.
         /// </summary>
         /// <param name="item">item to be searched</param>
@@ -164,7 +170,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="child">child to be added</param>
         /// <param name="parent">parent of <paramref name="child"/></param>
-        /// <exception cref="System.Exception">if <paramref name="parent"/> does
+        /// <exception cref="System.Exception">thrown if <paramref name="parent"/> does
         /// not exist in the forrest or if there is another element having the
         /// same item as <paramref name="child"/></exception>
         public void AddChild(T child, T parent)
@@ -188,7 +194,7 @@ namespace SEE.Utils
         /// If the visited element is a root, its parent argument will be <c>null</c>.
         ///
         /// If <paramref name="visitor"/> yields <c>false</c>, the traversal terminates;
-        /// otherwise it continues with next not yet visited node in preorder.
+        /// otherwise it continues with the next not yet visited node in preorder.
         /// </summary>
         /// <param name="visitor">the delegate to be called when a node is visited</param>
         public void PreorderTraverse(TreeVisitor<T> visitor)
@@ -208,7 +214,7 @@ namespace SEE.Utils
         /// If the visited element is a root, its parent argument will be <c>null</c>.
         ///
         /// If <paramref name="visitor"/> yields <c>false</c>, the traversal terminates;
-        /// otherwise it continues with next not yet visited node in preorder.
+        /// otherwise it continues with the next not yet visited node in preorder.
         /// </summary>
         /// <param name="visitor">the delegate to be called when a node is visited</param>
         private void PreorderTraverse(NodeVisitor visitor)
@@ -224,7 +230,8 @@ namespace SEE.Utils
 
         /// <summary>
         /// Returns all roots of this forrest as an ordered list. The order is the
-        /// same as the roots were added via <see cref="AddRoot(T)"/>.
+        /// same as the roots were added via <see cref="AddRoot(T)"/>, that is,
+        /// the first element in the result is the root that was added first.
         /// </summary>
         /// <returns>ordered list of roots</returns>
         /// <remarks>If you want all elements in the forrest, you can use <see cref="AllElements"/>
