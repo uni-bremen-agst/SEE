@@ -15,7 +15,6 @@ namespace SEE.Net.Actions.RuntimeConfig
         /// </summary>
         public string WidgetPath;
 
-
         /// <summary>
         /// Does nothing on the server.
         /// </summary>
