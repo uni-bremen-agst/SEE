@@ -73,7 +73,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
-            if (BoardsManager.GetWidgetMovement(
+            if (BoardsManager.TryGetWidgetMovement(
                     out Vector3 oldPosition,
                     out Vector3 newPosition,
                     out string boardName,

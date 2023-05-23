@@ -186,10 +186,9 @@ namespace SEE.Game.HolisticMetrics
             {
                 foreach (WidgetsManager widgetsManager in widgetsManagers)
                 {
-                    Object.Destroy(widgetsManager.gameObject.GetComponent<WidgetAdder>());
+                    Destroyer.Destroy(widgetsManager.gameObject.GetComponent<WidgetAdder>());
                 }
             }
-
         }
 
         /// <summary>
@@ -198,7 +197,7 @@ namespace SEE.Game.HolisticMetrics
         /// <param name="boardName">The name of the board on which the widget should be added. If there is no such
         /// board, this will be null.</param>
         /// <param name="position">The position at which the widget should be added. If there is no such position, this
-        /// will be some dummy value.</param>
+        /// should be considered undefined.</param>
         /// <returns>Whether a position was fetched successfully</returns>
         internal static bool GetWidgetAdditionPosition(out string boardName, out Vector3 position)
         {
@@ -217,7 +216,7 @@ namespace SEE.Game.HolisticMetrics
         }
 
         /// <summary>
-        /// Toggles the move-ability of all widgets.
+        /// Toggles the moveability of all widgets.
         /// </summary>
         /// <param name="enable">Whether the widgets should be movable</param>
         internal static void ToggleWidgetsMoving(bool enable)
@@ -229,7 +228,7 @@ namespace SEE.Game.HolisticMetrics
         }
 
         /// <summary>
-        /// Check whether one of the widgets on one of the boards managed by this class has a movement that hasn't yet
+        /// Checks whether one of the widgets on one of the boards managed by this class has a movement that hasn't yet
         /// been fetched by the <see cref="MoveWidgetAction"/>.
         /// </summary>
         /// <param name="originalPosition">The position of the widget before the movement</param>
@@ -238,7 +237,7 @@ namespace SEE.Game.HolisticMetrics
         /// <param name="widgetID">The ID of the widget</param>
         /// <returns>whether one of the widgets on one of the boards managed by this class has a movement that hasn't yet
         /// been fetched by the <see cref="MoveWidgetAction"/></returns>
-        internal static bool GetWidgetMovement(
+        internal static bool TryGetWidgetMovement(
             out Vector3 originalPosition,
             out Vector3 newPosition,
             out string containingBoardName,
@@ -246,10 +245,7 @@ namespace SEE.Game.HolisticMetrics
         {
             foreach (WidgetsManager widgetsManager in widgetsManagers)
             {
-                if (widgetsManager.GetWidgetMovement(
-                        out originalPosition,
-                        out newPosition,
-                        out widgetID))
+                if (widgetsManager.GetWidgetMovement(out originalPosition, out newPosition, out widgetID))
                 {
                     containingBoardName = widgetsManager.GetTitle();
                     return true;
@@ -264,7 +260,7 @@ namespace SEE.Game.HolisticMetrics
         }
 
         /// <summary>
-        /// Adds / removes all <see cref="WidgetDeleter"/> components to / from all widgets on all boards.
+        /// Adds/removes all <see cref="WidgetDeleter"/> components to/from all widgets on all boards.
         /// </summary>
         /// <param name="enable">Whether we want to listen for clicks on widgets for deletion</param>
         internal static void ToggleWidgetDeleting(bool enable)
@@ -281,7 +277,7 @@ namespace SEE.Game.HolisticMetrics
         /// <param name="boardName">The name of the board that contains the widget that's to be deleted</param>
         /// <param name="widgetConfig">The configuration of the widget that's to be deleted</param>
         /// <returns>Whether a pending deletion was found</returns>
-        internal static bool GetWidgetDeletion(out string boardName, out WidgetConfig widgetConfig)
+        internal static bool TryGetWidgetDeletion(out string boardName, out WidgetConfig widgetConfig)
         {
             foreach (WidgetsManager widgetsManager in widgetsManagers)
             {

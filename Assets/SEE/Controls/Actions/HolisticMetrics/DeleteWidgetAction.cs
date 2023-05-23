@@ -57,7 +57,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
-            if (BoardsManager.GetWidgetDeletion(out string boardName, out WidgetConfig widgetConfig))
+            if (BoardsManager.TryGetWidgetDeletion(out string boardName, out WidgetConfig widgetConfig))
             {
                 memento = new Memento(boardName, widgetConfig);
                 WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
