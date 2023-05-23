@@ -6,6 +6,7 @@ public class FaceCam : NetworkBehaviour
     // The eobject with the position where the face of the player is at.
     Transform playersFace;
     bool testetForOwner = false;
+    Color mainColor;
 
     // Called on Network Spawn before Start
     public override void OnNetworkSpawn()
@@ -37,6 +38,7 @@ public class FaceCam : NetworkBehaviour
         //transform.position = transform.parent.position;
         playersFace = transform.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase");
         Debug.Log("playersFace: " + playersFace);
+        mainColor = GetComponent<Renderer>().material.color;
     }
 
 
@@ -87,12 +89,43 @@ public class FaceCam : NetworkBehaviour
             }
             testetForOwner = true;
         }
+
+        if (IsOwner) {
+            DisplayLocalVideo();
+        }
     }
+
+    private void DisplayLocalVideo()
+    {
+        //geht davon aus das man Owner ist
+        //Debug.Log("Network Id: " + NetworkManager.Singleton.LocalClientId);
+        switch (NetworkManager.Singleton.LocalClientId)
+        {
+            case 0:
+                mainColor = new Color(Random.Range(100, 255), 0, 0);
+                break;
+            case 1:
+                mainColor = new Color(0, Random.Range(100, 255), 0);
+                break;
+            default:
+                mainColor = new Color(0,0, Random.Range(100, 255));
+                break;
+        }
+    }
+
 
     private void LateUpdate()
     {
-        transform.position = playersFace.position;
-        transform.rotation = playersFace.rotation;
+        FixToNose();
+    }
+
+    // Follow the position of the players nose
+    private void FixToNose() {
+        if (playersFace != null)
+        {
+            transform.position = playersFace.position;
+            transform.rotation = playersFace.rotation;
+        }
     }
 
     // FixedUpdate is normally called 50 times per Second
@@ -105,17 +138,54 @@ public class FaceCam : NetworkBehaviour
         }
         // Netcode specific logic executed when spawned.
 
-        // If local, send video to server (unless this is the server);
-        if (IsOwner && !IsServer)
+        // If local, record and send video to server (only send unless this is the server);
+        if (IsOwner)
         {
-            GetVideoFromClients_ServerRPC(new Color(Random.Range(0, 255), Random.Range(0, 255), Random.Range(0,255)));
-        }
+            // The video Fähig übers netz gesendet zu werden
+            Color videoFrame = CreateNetworkVideoFromSource();
 
+            // Sent to server, unless this is the server
+            if (!IsServer)
+            {
+                GetVideoFromClients_ServerRPC(videoFrame);
+            }
+            else //Falls Server, Rendere eigenes Video, und sende zu allen Clients
+            {
+                //RenderVideoOnFaceCam(videoFrame);
+                SendVideoToClients_ClientRPC(videoFrame);// An Alllle! (auuser immer denm serverclient)
+            }
+        }
+        //else
+        // if not local, get video from server;
+        //{
+        //        SendVideoToClients_ClientRPC(videoFrame);
+        //}
+
+    }
+
+    private Color CreateNetworkVideoFromSource()
+    {
+        return mainColor;
     }
 
 
     [ServerRpc]
     private void GetVideoFromClients_ServerRPC(Color videoFrame)
+    {
+        RenderNetworkVideoOnFaceCam(videoFrame);
+        SendVideoToClients_ClientRPC(videoFrame);
+        //Send to all clients but not the received one (auuser immer denm serverclient den auch nicht natürlich)
+        //erstmal alle
+    }
+
+    [ClientRpc]
+    private void SendVideoToClients_ClientRPC(Color videoFrame)
+    {
+        RenderNetworkVideoOnFaceCam(videoFrame);
+    }
+    
+
+    private void RenderNetworkVideoOnFaceCam(Color videoFrame)
     {
         GetComponent<Renderer>().material.color = videoFrame;
     }
