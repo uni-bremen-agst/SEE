@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -7,6 +8,10 @@ public class FaceCam : NetworkBehaviour
     Transform playersFace;
     bool testetForOwner = false;
     Color mainColor;
+    ulong[] allOtherClientIds; //Not Server Not Owner
+    List<ulong> allClientIdsList = new List<ulong>();
+    ClientRpcParams OtherNetworkIds; // Not Server and not the Owner
+    ulong OwnClientId;
 
     // Called on Network Spawn before Start
     public override void OnNetworkSpawn()
@@ -25,6 +30,13 @@ public class FaceCam : NetworkBehaviour
             Debug.Log("IsClient (Server is a Client too)");
         }
 
+
+        OwnClientId = NetworkManager.Singleton.LocalClientId;
+        if (!IsServer && !IsOwner)
+        {
+            AddClientIdToListServerRPC(OwnClientId);
+        }
+        //UpdateOtherNetworkIDsNoServer();
 
 
         // Always invoked the base 
@@ -99,7 +111,7 @@ public class FaceCam : NetworkBehaviour
     {
         //geht davon aus das man Owner ist
         //Debug.Log("Network Id: " + NetworkManager.Singleton.LocalClientId);
-        switch (NetworkManager.Singleton.LocalClientId)
+        switch (OwnClientId)
         {
             case 0:
                 mainColor = new Color(Random.Range(100, 255), 0, 0);
@@ -108,7 +120,7 @@ public class FaceCam : NetworkBehaviour
                 mainColor = new Color(0, Random.Range(100, 255), 0);
                 break;
             default:
-                mainColor = new Color(0,0, Random.Range(100, 255));
+                mainColor = new Color(0, 0, Random.Range(100, 255));
                 break;
         }
     }
@@ -152,7 +164,7 @@ public class FaceCam : NetworkBehaviour
             else //Falls Server, Rendere eigenes Video, und sende zu allen Clients
             {
                 //RenderVideoOnFaceCam(videoFrame);
-                SendVideoToClients_ClientRPC(videoFrame);// An Alllle! (auuser immer denm serverclient)
+                SendVideoToClients_ClientRPC(videoFrame, OtherNetworkIds);// An Alllle! (auuser immer denm serverclient) und dem server
             }
         }
         //else
@@ -173,17 +185,17 @@ public class FaceCam : NetworkBehaviour
     private void GetVideoFromClients_ServerRPC(Color videoFrame)
     {
         RenderNetworkVideoOnFaceCam(videoFrame);
-        SendVideoToClients_ClientRPC(videoFrame);
+        SendVideoToClients_ClientRPC(videoFrame, OtherNetworkIds);
         //Send to all clients but not the received one (auuser immer denm serverclient den auch nicht natürlich)
         //erstmal alle
     }
 
     [ClientRpc]
-    private void SendVideoToClients_ClientRPC(Color videoFrame)
+    private void SendVideoToClients_ClientRPC(Color videoFrame, ClientRpcParams clientRpcParams = default)
     {
         RenderNetworkVideoOnFaceCam(videoFrame);
     }
-    
+
 
     private void RenderNetworkVideoOnFaceCam(Color videoFrame)
     {
@@ -194,10 +206,53 @@ public class FaceCam : NetworkBehaviour
     public override void OnDestroy()
     {
         // Clean up your NetworkBehaviour
+        if (!IsServer && !IsOwner)
+        {
+            RemoveClientFromListServerRPC(OwnClientId);
+        }
+        //UpdateOtherNetworkIDsNoServer();
 
         // Always invoked the base 
         base.OnDestroy();
     }
+
+    /*
+    ulong[] allNetworkIds;
+    ClientRpcParams otherNetworkIDsNoServer;
+    ulong ServerID;
+    ulong OwnClientId;
+
+    ClientRpcParams otherNetworkIDsNoServer;
+    ulong ServerID;
+    */
+
+    //RPC!
+    [ServerRpc(RequireOwnership = false)]
+    private void AddClientIdToListServerRPC(ulong clientId)
+    {
+        allClientIdsList.Add(clientId);
+        //allNetworkIds = allClientIdsList.ToArray();
+        CreateClientRpcParams();
+    }
+    [ServerRpc(RequireOwnership = false)]
+    private void RemoveClientFromListServerRPC(ulong clientId)
+    {
+        allClientIdsList.Remove(clientId);
+        //allNetworkIds = allClientIdsList.ToArray();
+        CreateClientRpcParams();
+    }
+    private void CreateClientRpcParams()
+    {
+        OtherNetworkIds = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = allOtherClientIds
+            }
+        };
+    }
+
+
 
     private void DoSomethingServerSide(int clientId)
     {
@@ -211,7 +266,7 @@ public class FaceCam : NetworkBehaviour
         {
             Send = new ClientRpcSendParams
             {
-                TargetClientIds = new ulong[] { (ulong)clientId }
+                TargetClientIds = new ulong[] { (ulong)clientId, (ulong)2 }
             }
         };
 
