@@ -24,14 +24,14 @@ public class FaceCam : NetworkBehaviour
             Debug.Log("IsClient (Server is a Client too)");
         }
 
-        
+
 
         // Always invoked the base 
         base.OnNetworkSpawn();
     }
 
     // Start is called before the first frame update
-    void Start()
+    private void Start()
     {
         transform.localScale = new Vector3(0.2f, -0.48f, -1); // z = -1 to face away from the player.
         //transform.position = transform.parent.position;
@@ -40,8 +40,8 @@ public class FaceCam : NetworkBehaviour
     }
 
 
-        // Update is called once per frame
-        void Update()
+    // Update is called once per frame
+    private void Update()
     {
         // If the NetworkObject is not yet spawned, exit early.
         if (!IsSpawned)
@@ -83,6 +83,7 @@ public class FaceCam : NetworkBehaviour
             if (IsOwner)
             {
                 GetComponent<MeshRenderer>().material = Resources.Load<Material>("Materials/LSHMetal/29");
+                //GetComponent<Renderer>().material.color = new Color(255, 0, 0);
             }
             testetForOwner = true;
         }
@@ -95,7 +96,7 @@ public class FaceCam : NetworkBehaviour
     }
 
     // FixedUpdate is normally called 50 times per Second
-    void FixedUpdate()
+    private void FixedUpdate()
     {
         // If the NetworkObject is not yet spawned, exit early.
         if (!IsSpawned)
@@ -103,6 +104,20 @@ public class FaceCam : NetworkBehaviour
             return;
         }
         // Netcode specific logic executed when spawned.
+
+        // If local, send video to server (unless this is the server);
+        if (IsOwner && !IsServer)
+        {
+            GetVideoFromClients_ServerRPC(new Color(Random.Range(0, 255), Random.Range(0, 255), Random.Range(0,255)));
+        }
+
+    }
+
+
+    [ServerRpc]
+    private void GetVideoFromClients_ServerRPC(Color videoFrame)
+    {
+        GetComponent<Renderer>().material.color = videoFrame;
     }
 
     // Happens on destroying
@@ -138,14 +153,14 @@ public class FaceCam : NetworkBehaviour
 
     // RPC Client method which might be invoked, only runs on Clients
     [ClientRpc]
-    void PongClientRpc(int somenumber, string sometext)
+    private void PongClientRpc(int somenumber, string sometext)
     {
         Debug.Log("RPC: " + sometext + " @ Time: " + somenumber);
     }
 
     // RPC Server method which might be invoked, only runs on Server
     [ServerRpc(RequireOwnership = false)]
-    public void MyGlobalServerRpc(ServerRpcParams serverRpcParams = default)
+    private void MyGlobalServerRpc(ServerRpcParams serverRpcParams = default)
     {
         var clientId = serverRpcParams.Receive.SenderClientId;
         if (NetworkManager.ConnectedClients.ContainsKey(clientId))
