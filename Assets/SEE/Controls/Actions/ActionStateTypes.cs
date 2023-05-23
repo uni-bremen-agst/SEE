@@ -209,6 +209,5 @@ namespace SEE.Controls.Actions
                 return type == null ? None : type.Name;
             }
         }
-
     }
 }
