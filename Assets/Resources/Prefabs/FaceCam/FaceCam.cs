@@ -5,6 +5,7 @@ public class FaceCam : NetworkBehaviour
 {
     // The eobject with the position where the face of the player is at.
     Transform playersFace;
+    bool testetForOwner = false;
 
     // Called on Network Spawn before Start
     public override void OnNetworkSpawn()
@@ -74,6 +75,16 @@ public class FaceCam : NetworkBehaviour
             {
                 MyGlobalServerRpc(); // serverRpcParams will be filled in automatically
             }
+        }
+
+        // Mark this network instance as owner on the client it belongs to.
+        if (!testetForOwner)
+        {
+            if (IsOwner)
+            {
+                GetComponent<MeshRenderer>().material = Resources.Load<Material>("Materials/LSHMetal/29");
+            }
+            testetForOwner = true;
         }
     }
 

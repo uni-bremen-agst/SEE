@@ -109,16 +109,16 @@ namespace SEE.Game.Worlds
             if (player.TryGetComponent(out NetworkObject net))
             {
                 net.SpawnAsPlayerObject(owner, destroyWithScene: true);
+
+                // Add the FaceCam to the player.
+                GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam");
+                faceCam.GetComponent<NetworkObject>().SpawnWithOwnership(owner);
+                faceCam.transform.parent = player.transform;
             }
             else
             {
                 Debug.LogError($"Spawned player {player.name} does not have a {typeof(NetworkObject)} component.\n");
             }
-
-                // Add the FaceCam to the player.
-                GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam");
-                faceCam.GetComponent<NetworkObject>().Spawn();
-                faceCam.transform.parent = player.transform;
         }
 
         /// <summary>
