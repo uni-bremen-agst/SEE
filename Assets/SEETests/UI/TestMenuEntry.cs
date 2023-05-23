@@ -63,8 +63,10 @@ namespace SEETests.UI
             Assert.AreEqual(true, entry.Enabled);
             Assert.AreEqual(null, entry.Icon);
             Assert.AreEqual(default(Color), entry.EntryColor);
-            Assert.AreNotEqual(default(Color), entry.DisabledColor, "Entry color must differ from disabled color!");
+#if INCLUDE_STEAM_VR
 
+            Assert.AreNotEqual(default(Color), entry.DisabledColor, "Entry color must differ from disabled color!");
+#endif
             Assert.AreEqual(0, testItems.Count, "DoAction() may not be called during initialization!");
             entry.SelectAction();
             Assert.AreEqual(1, testItems.Count, "DoAction() must call the given UnityAction!");
@@ -90,9 +92,11 @@ namespace SEETests.UI
             Assert.AreEqual(enabled, entry.Enabled);
             Assert.AreEqual(icon, entry.Icon);
             Assert.AreEqual(entryColor, entry.EntryColor);
+#if INCLUDE_STEAM_VR
 
             Debug.Log($"{entryColor}, {entry.DisabledColor}");
             Assert.AreNotEqual(entryColor, entry.DisabledColor, "Disabled color must differ from normal color!");
+#endif
         }
     }
 }

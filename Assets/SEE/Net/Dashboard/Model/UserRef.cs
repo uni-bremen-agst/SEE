@@ -1,5 +1,5 @@
 ﻿using System;
-using Valve.Newtonsoft.Json;
+using Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model
 {

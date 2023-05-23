@@ -51,7 +51,8 @@ namespace SEE.UI
             Color color = Color.blue;
 
             return new List<MenuEntry>
-                    { new(selectAction: this.StartHost,
+                    {
+                      new(selectAction: this.StartHost,
                           unselectAction: null,
                           title: "Host",
                           description: "Starts a server and local client process.",
@@ -63,13 +64,14 @@ namespace SEE.UI
                           description: "Starts a local client connection to a server.",
                           entryColor: NextColor(),
                           icon: Resources.Load<Sprite>("Icons/Client")),
+#if ENABLE_VR
                       new(selectAction: this.ToggleEnvironment,
                           unselectAction: null,
                           title: "Toggle Desktop/VR",
                           description: "Toggles between desktop and VR hardware.",
                           entryColor: NextColor(),
                           icon: Resources.Load<Sprite>("Icons/Client")),
-
+#endif
                       // FIXME: Running only a server is currently not working.
                       //new (               entryAction: StartServer,
                       //                    exitAction: null,
@@ -254,6 +256,7 @@ namespace SEE.UI
             {
                 inputType = PlayerInputType.DesktopPlayer;
             }
+
             SceneSettings.Save();
             ShowEnvironment();
         }
