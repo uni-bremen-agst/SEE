@@ -33,7 +33,7 @@ namespace SEE.Game.UI.Menu
         /// Starts at the <see cref="Content"/> game object. (<seealso cref="ContentPath"/>)
         /// </summary>
         protected virtual string EntryListPath => "Menu Entries/Scroll Area/List";
-        
+
         /// <summary>
         /// The content game object.
         /// </summary>
@@ -42,7 +42,7 @@ namespace SEE.Game.UI.Menu
         /// The entry list game object.
         /// </summary>
         protected GameObject EntryList { get; private set; }
-        
+
         /// <summary>
         /// Returns the game object corresponding to a menu entry.
         /// Assumes that the menu contains the entry.
@@ -108,18 +108,18 @@ namespace SEE.Game.UI.Menu
             ButtonManagerBasicWithIcon buttonManager = button.GetComponent<ButtonManagerBasicWithIcon>();
             buttonManager.buttonText = entry.Title;
             buttonManager.buttonIcon = entry.Icon;
-            
+
             // hover listeners
             PointerHelper pointerHelper = button.GetComponent<PointerHelper>();
             pointerHelper.EnterEvent.AddListener(() => MenuTooltip.Show(entry.Description));
             pointerHelper.ExitEvent.AddListener(MenuTooltip.Hide);
 
             // adds clickEvent listener or show that button is disabled
-            if (entry.Enabled) 
+            if (entry.Enabled)
                 buttonManager.clickEvent.AddListener(() => SelectEntry(entry));
-            else 
+            else
                 buttonManager.useRipple = false;
-            
+
             // colors
             Color color = entry.Enabled ? entry.EntryColor : entry.DisabledColor;
             button.GetComponent<Image>().color = color;
@@ -137,7 +137,7 @@ namespace SEE.Game.UI.Menu
         {
             Destroyer.Destroy(EntryGameObject(entry));
         }
-        
+
         /// <summary>
         /// Updates whether the close button is active.
         /// Only visible if <see cref="AllowNoSelection"/> is true.

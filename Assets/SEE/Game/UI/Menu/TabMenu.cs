@@ -4,14 +4,22 @@ using UnityEngine;
 
 namespace SEE.Game.UI.Menu
 {
+
+    /// <summary>
+    /// A tab menu containing <see cref="MenuEntry"/> entries.
+    /// </summary>
     public class TabMenu : TabMenu<MenuEntry> {}
 
+    /// <summary>
+    /// Extension of the <see cref="SelectionMenu"/> to open a view through a tab button.
+    /// </summary>
+    /// <typeparam name="T">Menu entry</typeparam>
     public class TabMenu<T> : SelectionMenu<T> where T : MenuEntry
     {
+        /// <summary>
+        /// Folder for tab menu prefabs.
+        /// </summary>
         protected const string TAB_PREFAB_FOLDER = UI_PREFAB_FOLDER + "TabMenu/";
-
-        // TODO: The Prefabs don't exist yet
-
         /// <summary>
         /// The prefab for the tab menu.
         /// </summary>
@@ -33,7 +41,6 @@ namespace SEE.Game.UI.Menu
         /// Starts at the content game object.
         /// </summary>
         protected override string EntryListPath => "TabList/Content";
-
         /// <summary>
         /// Where to find the game object containing the views.
         /// Starts at the content game object.
@@ -48,7 +55,6 @@ namespace SEE.Game.UI.Menu
         /// The view prefab for each entry.
         /// </summary>
         protected virtual string ViewPrefab => TAB_PREFAB_FOLDER + "TabView";
-
         /// <summary>
         /// The game object containing the views.
         /// </summary>
@@ -62,6 +68,9 @@ namespace SEE.Game.UI.Menu
         /// <returns>The view game object.</returns>
         public virtual GameObject ViewGameObject(T entry) => ViewList.transform.Find(entry.Title).gameObject;
 
+        /// <summary>
+        /// Overrides HideAfterSelection to false.
+        /// </summary>
         public TabMenu()
         {
             HideAfterSelection = false;

@@ -85,7 +85,7 @@ namespace SEE.UI
                           description: "Allows to set additional network settings.",
                           entryColor: Color.gray,
                           icon: Resources.Load<Sprite>("Icons/Settings")),
-            };
+                    };
 
             Color NextColor()
             {

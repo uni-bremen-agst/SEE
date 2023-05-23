@@ -70,10 +70,12 @@ namespace SEE.Game.UI.Menu
         {
             if (entry is NestedMenuEntry<T> nestedEntry)
             {
+                // If this contains another menu level, repopulate list with new level after saving the current one
                 AscendLevel(nestedEntry);
             }
             else
             {
+                // Otherwise, we do the same we'd do normally
                 base.SelectEntry(entry);
             }
         }
@@ -199,12 +201,7 @@ namespace SEE.Game.UI.Menu
             }
 
             // If the menu is enabled, keybord shortcuts must be disabled and vice versa.
-            OnShowMenuChanged += ToggleKeyboardShortcuts;
-
-            void ToggleKeyboardShortcuts()
-            {
-                SEEInput.KeyboardShortcutsEnabled = !ShowMenu;
-            }
+            OnShowMenuChanged += () => SEEInput.KeyboardShortcutsEnabled = !ShowMenu;
         }
 
         /// <summary>

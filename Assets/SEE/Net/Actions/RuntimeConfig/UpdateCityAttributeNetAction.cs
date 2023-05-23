@@ -3,31 +3,14 @@ using SEE.Game.UI.RuntimeConfigMenu;
 namespace SEE.Net.Actions.RuntimeConfig
 {
     /// <summary>
-    /// Network action when a int was changed. 
+    /// Network action when an attribute was changed.
     /// </summary>
-    public class UpdateIntCityFieldNetAction : AbstractNetAction
+    public class UpdateCityAttributeNetAction<E> : UpdateCityNetAction
     {
-        /// <summary>
-        /// City index
-        /// </summary>
-        public int CityIndex;
-
-        /// <summary>
-        /// Widget path
-        /// </summary>
-        public string WidgetPath;
-        
         /// <summary>
         /// The changed value
         /// </summary>
-        public int Value;
-
-        /// <summary>
-        /// Does nothing on the server.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-        }
+        public E Value;
 
         /// <summary>
         /// Triggers 'SyncField' on <see cref="RuntimeTabMenu"/>.
@@ -35,7 +18,9 @@ namespace SEE.Net.Actions.RuntimeConfig
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
+            {
                 RuntimeConfigMenu.GetMenuForCity(CityIndex).SyncField?.Invoke(WidgetPath, Value);
+            }
         }
     }
 }

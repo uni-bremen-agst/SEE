@@ -154,7 +154,7 @@ namespace SEE.Game.UI
         /// Can be used add listeners and update UI after initialization.
         /// </summary>
         protected virtual void OnStartFinished() { }
-        
+
         /**
          * Triggers when the menu is initialized. (<see cref="Start"/> and <see cref="HasStarted"/>)
          */

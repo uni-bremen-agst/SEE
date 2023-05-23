@@ -122,8 +122,12 @@ MonoBehaviour:
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
   InLocalSpace: 0
   Interpolate: 1
+  SlerpPosition: 0
 --- !u!1 &1720414846122509171
 GameObject:
   m_ObjectHideFlags: 0
@@ -5519,7 +5523,6 @@ GameObject:
   - component: {fileID: 1325778995376249289}
   - component: {fileID: 1666691904679797262}
   - component: {fileID: 7574485320656903852}
-  - component: {fileID: 3583716965914534663}
   m_Layer: 0
   m_Name: Male3
   m_TagString: Untagged
@@ -5979,6 +5982,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 951099334
   AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
 --- !u!114 &7839154548958412722
@@ -6029,8 +6035,12 @@ MonoBehaviour:
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
   InLocalSpace: 0
   Interpolate: 1
+  SlerpPosition: 0
 --- !u!114 &9024856298441555819
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11349,15 +11359,3 @@ MonoBehaviour:
   characterHeight: 2
   characterRadius: 0.25
   characterMass: 50
---- !u!114 &3583716965914534663
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7839154548958412681}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aba136574e7e13048926428ac1eeabd8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

@@ -4,31 +4,16 @@ using UnityEngine;
 namespace SEE.Net.Actions.RuntimeConfig
 {
     /// <summary>
-    /// Network action when a color was changed. 
+    /// Network action when a color was changed.
+    ///
+    /// Color can't be send with a generic class (<see cref="UpdateCityAttributeNetAction{E}"/>).
     /// </summary>
-    public class UpdateColorCityFieldNetAction : AbstractNetAction
+    public class UpdateColorCityFieldNetAction : UpdateCityNetAction
     {
-        /// <summary>
-        /// City index
-        /// </summary>
-        public int CityIndex;
-
-        /// <summary>
-        /// Widget path
-        /// </summary>
-        public string WidgetPath;
-        
         /// <summary>
         /// The changed value
         /// </summary>
         public Color Value;
-
-        /// <summary>
-        /// Does nothing on the server.
-        /// </summary>
-        protected override void ExecuteOnServer()
-        {
-        }
 
         /// <summary>
         /// Triggers 'SyncField' on <see cref="RuntimeTabMenu"/>.
@@ -36,7 +21,9 @@ namespace SEE.Net.Actions.RuntimeConfig
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
+            {
                 RuntimeConfigMenu.GetMenuForCity(CityIndex).SyncField?.Invoke(WidgetPath, Value);
+            }
         }
     }
 }

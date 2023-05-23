@@ -9,7 +9,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
     /// The primary wrapper script for the <see cref="RuntimeTabMenu"/>.
     /// The runtime config menu allows to configure a <see cref="AbstractSEECity"/> at runtime.
     ///
-    /// Instantiates the <see cref="RuntimeTabMenu"/>s for each table and handles switching between the tables. 
+    /// Instantiates the <see cref="RuntimeTabMenu"/>s for each table and handles switching between the tables.
     /// </summary>
     public class RuntimeConfigMenu : MonoBehaviour
     {
@@ -46,7 +46,10 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         /// </summary>
         private void Update()
         {
-            if (SEEInput.ToggleConfigMenu()) cityMenus[currentCity].ToggleMenu();
+            if (SEEInput.ToggleConfigMenu())
+            {
+                cityMenus[currentCity].ToggleMenu();
+            }
         }
 
         /// <summary>
@@ -55,7 +58,10 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         /// <param name="i">index</param>
         private void SwitchCity(int i)
         {
-            if (i == currentCity) return;
+            if (i == currentCity)
+            {
+                return;
+            }
             cityMenus[currentCity].ShowMenu = false;
             cityMenus[i].ShowMenu = true;
             currentCity = i;

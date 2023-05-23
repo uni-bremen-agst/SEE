@@ -33,7 +33,6 @@ GameObject:
   - component: {fileID: 8072183641485959356}
   - component: {fileID: 8449161699526400891}
   - component: {fileID: 991504623262869685}
-  - component: {fileID: 904139327883061318}
   m_Layer: 0
   m_Name: Female2
   m_TagString: Untagged
@@ -446,6 +445,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GlobalObjectIdHash: 951099334
   AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
 --- !u!114 &1056781579854251719
@@ -496,8 +498,12 @@ MonoBehaviour:
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
   InLocalSpace: 0
   Interpolate: 1
+  SlerpPosition: 0
 --- !u!114 &2260400489988359710
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5750,18 +5756,6 @@ MonoBehaviour:
   characterHeight: 2
   characterRadius: 0.25
   characterMass: 50
---- !u!114 &904139327883061318
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1056781579854251772}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aba136574e7e13048926428ac1eeabd8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &3866261022931915610
 GameObject:
   m_ObjectHideFlags: 0
@@ -11132,8 +11126,12 @@ MonoBehaviour:
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
+  UseQuaternionSynchronization: 0
+  UseQuaternionCompression: 0
+  UseHalfFloatPrecision: 0
   InLocalSpace: 0
   Interpolate: 1
+  SlerpPosition: 0
 --- !u!1 &8466785543925987846
 GameObject:
   m_ObjectHideFlags: 0

@@ -13,29 +13,35 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         private bool visibility = true;
 
         /// <summary>
-        /// Parent game object that contains all setting objects
+        /// Parent game object that contains all setting objects.
         /// </summary>
-        public GameObject mainContentContainer;
+        public GameObject MainContentContainer;
 
         /// <summary>
-        /// Collapse icon
+        /// Collapse icon.
         /// </summary>
-        public GameObject collapseIcon;
+        public GameObject CollapseIcon;
 
         /// <summary>
         /// Toggles the visibility of the nested settings.
-        /// </summary>
         /// <see cref="visibility" />
+        /// </summary>
         public void OnClickCollapse()
         {
             visibility = !visibility;
 
             // hide setting objects
-            mainContentContainer.gameObject.SetActive(visibility);
+            MainContentContainer.gameObject.SetActive(visibility);
 
             // change icon rotation when pressed
-            if (visibility) collapseIcon.transform.Rotate(0, 0, -90);
-            else collapseIcon.transform.Rotate(0, 0, 90);
+            if (visibility)
+            {
+                CollapseIcon.transform.Rotate(0, 0, -90);
+            }
+            else
+            {
+                CollapseIcon.transform.Rotate(0, 0, 90);
+            }
         }
     }
 }
