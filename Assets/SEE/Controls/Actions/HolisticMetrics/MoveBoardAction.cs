@@ -81,7 +81,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
-            if (BoardsManager.GetMovement(out string boardName, out Vector3 oldPosition, out Vector3 newPosition,
+            if (BoardsManager.TryGetMovement(out string boardName, out Vector3 oldPosition, out Vector3 newPosition,
                     out Quaternion oldRotation, out Quaternion newRotation))
             {
                 memento = new Memento(boardName, oldPosition, newPosition, oldRotation, newRotation);

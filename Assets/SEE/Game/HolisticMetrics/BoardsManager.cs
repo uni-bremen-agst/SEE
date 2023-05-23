@@ -5,7 +5,6 @@ using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics.ActionHelpers;
 using SEE.Game.UI.Notification;
 using UnityEngine;
-using SEE.Game.HolisticMetrics.ActionHelpers;
 using SEE.Utils;
 using Object = UnityEngine.Object;
 
@@ -101,13 +100,23 @@ namespace SEE.Game.HolisticMetrics
             }
         }
 
-        internal static bool GetMovement(out string boardName, out Vector3 oldPosition, out Vector3 newPosition,
+        /// <summary>
+        /// If any of the widget managers this manager manages has a movement that has not yet been fetched
+        /// by <see cref="MoveBoardAction"/>,
+        /// </summary>
+        /// <param name="boardName">The name of the board; undefined if none was moved</param>
+        /// <param name="oldPosition">The position of the board before the movement; undefined if none was moved</param>
+        /// <param name="newPosition">The new position of the board; undefined if none was moved</param>
+        /// <param name="oldRotation">The rotation of the board before the movement; undefined if none was moved</param>
+        /// <param name="newRotation">The new rotation of the board; undefined if none was moved</param>
+        /// <returns>Whether the any of the boards managed by this manager has a movement that has not yet been fetched by
+        /// <see cref="MoveBoardAction"/></returns>
+        internal static bool TryGetMovement(out string boardName, out Vector3 oldPosition, out Vector3 newPosition,
             out Quaternion oldRotation, out Quaternion newRotation)
         {
             foreach (WidgetsManager widgetsManager in widgetsManagers)
             {
-                if (widgetsManager.GetMovement(out oldPosition, out newPosition, out oldRotation,
-                        out newRotation))
+                if (widgetsManager.TryGetMovement(out oldPosition, out newPosition, out oldRotation, out newRotation))
                 {
                     boardName = widgetsManager.GetTitle();
                     return true;
@@ -180,7 +189,7 @@ namespace SEE.Game.HolisticMetrics
                     Object.Destroy(widgetsManager.gameObject.GetComponent<WidgetAdder>());
                 }
             }
-            
+
         }
 
         /// <summary>
@@ -218,7 +227,7 @@ namespace SEE.Game.HolisticMetrics
                 manager.ToggleWidgetsMoving(enable);
             }
         }
-        
+
         /// <summary>
         /// Check whether one of the widgets on one of the boards managed by this class has a movement that hasn't yet
         /// been fetched by the <see cref="MoveWidgetAction"/>.
@@ -238,8 +247,8 @@ namespace SEE.Game.HolisticMetrics
             foreach (WidgetsManager widgetsManager in widgetsManagers)
             {
                 if (widgetsManager.GetWidgetMovement(
-                        out originalPosition, 
-                        out newPosition, 
+                        out originalPosition,
+                        out newPosition,
                         out widgetID))
                 {
                     containingBoardName = widgetsManager.GetTitle();

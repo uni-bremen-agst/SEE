@@ -5,7 +5,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
 {
     /// <summary>
     /// This class is a component that should be attached to the little button underneath every metrics board. It is
-    /// responsible for moving the board around when the user is dragging the mouse over the button. 
+    /// responsible for moving the board around when the user is dragging the mouse over the button.
     /// </summary>
     public class BoardMover : MonoBehaviour
     {
@@ -13,7 +13,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
         /// Whether this instance has a movement in store that hasn't yet been fetched.
         /// </summary>
         private bool hasMovement;
-        
+
         /// <summary>
         /// The position of the board when the player initially clicks the move button underneath it. This is needed
         /// so we can revert the move action.
@@ -25,7 +25,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
         /// we can revert the move action.
         /// </summary>
         private Quaternion oldRotation;
-        
+
         /// <summary>
         /// This plane represents the floor when calculating the intersection between a ray from the cursor into the
         /// scene and the floor.
@@ -48,7 +48,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
             oldPosition = parentTransform.position;
             oldRotation = parentTransform.rotation;
         }
-        
+
         /// <summary>
         /// When this method is called, we will see where on the floor the player's mouse points and move the board
         /// there. We will also rotate the board so it is facing the camera, but only around the y-axis.
@@ -66,7 +66,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
                 newPosition.y = parentTransform.position.y;
                 newPosition.z = enterPoint.z;
                 parentTransform.position = newPosition;
-                
+
                 // Rotate the board to look in the direction of the player (except on the y-axis - we do not wish to
                 // tilt the board)
                 Vector3 facingDirection = newPosition - MainCamera.Camera.gameObject.transform.position;
@@ -91,7 +91,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
         /// <param name="originalRotation">The rotation of the board prior to the movement</param>
         /// <param name="newRotation">The new rotation of the board</param>
         /// <returns>The value of the <see cref="hasMovement"/> field of this instance</returns>
-        internal bool GetMovement(out Vector3 originalPosition, out Vector3 newPosition, 
+        internal bool TryGetMovement(out Vector3 originalPosition, out Vector3 newPosition,
             out Quaternion originalRotation, out Quaternion newRotation)
         {
             if (hasMovement)

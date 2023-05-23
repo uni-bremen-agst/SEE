@@ -29,7 +29,7 @@ namespace SEE.Game.HolisticMetrics
         /// Path to the house icon used in the dropdown menu on the metrics boards.
         /// </summary>
         private const string houseIconPath = "Materials/40+ Simple Icons - Free/Home_Simple_Icons_UI";
-        
+
         /// <summary>
         /// The dropdown UI element that allows the player to select a code city for which the metrics should be
         /// displayed.
@@ -121,7 +121,7 @@ namespace SEE.Game.HolisticMetrics
         /// <param name="widgetConfiguration">The configuration of the new widget.</param>
         internal void Create(WidgetConfig widgetConfiguration)
         {
-            GameObject widget = Array.Find(widgetPrefabs, 
+            GameObject widget = Array.Find(widgetPrefabs,
                 element => element.name.Equals(widgetConfiguration.WidgetName));
             Type metricType = Array.Find(metricTypes, type => type.Name.Equals(widgetConfiguration.MetricType));
             if (widget is null)
@@ -146,7 +146,7 @@ namespace SEE.Game.HolisticMetrics
                 widgets.Add((widgetController, metricInstance));
                 try
                 {
-                    widgetController.Display(metricInstance.Refresh(GetSelectedCity()));    
+                    widgetController.Display(metricInstance.Refresh(GetSelectedCity()));
                 }
                 catch(Exception exception)
                 {
@@ -179,7 +179,7 @@ namespace SEE.Game.HolisticMetrics
                 foreach ((WidgetController, Metric) tuple in widgets)
                 {
                     tuple.Item1.gameObject.AddComponent<WidgetDeleter>();
-                }     
+                }
             }
             else
             {
@@ -277,11 +277,11 @@ namespace SEE.Game.HolisticMetrics
         /// <param name="newRotation">The new rotation of the board</param>
         /// <returns>Whether the board managed by this manager has a movement that has not yet been fetched by
         /// <see cref="MoveBoardAction"/></returns>
-        internal bool GetMovement(out Vector3 oldPosition, out Vector3 newPosition, out Quaternion oldRotation,
+        internal bool TryGetMovement(out Vector3 oldPosition, out Vector3 newPosition, out Quaternion oldRotation,
             out Quaternion newRotation)
         {
             return boardMover.GetComponent<BoardMover>()
-                .GetMovement(out oldPosition, out newPosition, out oldRotation, out newRotation);
+                .TryGetMovement(out oldPosition, out newPosition, out oldRotation, out newRotation);
         }
 
         /// <summary>
