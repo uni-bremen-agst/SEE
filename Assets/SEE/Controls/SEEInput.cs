@@ -198,11 +198,6 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Whether the left or right shift key was pressed down (and not again released).
-        /// </summary>
-        private static bool isModPressed = false;
-
-        /// <summary>
         /// Returns true if the user wants to toggle the run-time configuration
         /// menu allowing him/her to define the settings for code cities.
         /// </summary>
