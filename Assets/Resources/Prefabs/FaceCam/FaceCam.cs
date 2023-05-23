@@ -4,7 +4,7 @@ using UnityEngine;
 public class FaceCam : NetworkBehaviour
 {
     // The eobject with the position where the face of the player is at.
-    GameObject playersFace;
+    Transform playersFace;
 
     // Called on Network Spawn before Start
     public override void OnNetworkSpawn()
@@ -23,6 +23,8 @@ public class FaceCam : NetworkBehaviour
             Debug.Log("IsClient (Server is a Client too)");
         }
 
+        
+
         // Always invoked the base 
         base.OnNetworkSpawn();
     }
@@ -32,6 +34,8 @@ public class FaceCam : NetworkBehaviour
     {
         transform.localScale = new Vector3(0.2f, -0.48f, -1); // z = -1 to face away from the player.
         //transform.position = transform.parent.position;
+        playersFace = transform.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase");
+        Debug.Log("playersFace: " + playersFace);
     }
 
 
@@ -71,6 +75,12 @@ public class FaceCam : NetworkBehaviour
                 MyGlobalServerRpc(); // serverRpcParams will be filled in automatically
             }
         }
+    }
+
+    private void LateUpdate()
+    {
+        transform.position = playersFace.position;
+        transform.rotation = playersFace.rotation;
     }
 
     // FixedUpdate is normally called 50 times per Second
