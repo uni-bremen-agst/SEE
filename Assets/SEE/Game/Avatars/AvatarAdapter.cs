@@ -224,10 +224,6 @@ namespace SEE.Game.Avatars
 
             gameObject.AddComponent<DesktopPlayerMovement>();
 
-            // Set up the FaceCam Object as child of the desktopPlayer.
-            GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam");
-            faceCam.GetComponent<NetworkObject>().Spawn();
-            faceCam.transform.parent = desktopPlayer.transform.parent;
         }
 
         #region ENABLE_VR

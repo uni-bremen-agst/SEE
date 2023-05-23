@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using SEE.Utils;
 
 namespace SEE.Game.Worlds
 {
@@ -46,6 +47,10 @@ namespace SEE.Game.Worlds
             StartCoroutine(SpawnPlayerCoroutine());
         }
 
+
+        //Gespeichert für eigene Abfrage
+        NetworkManager networkManager = NetworkManager.Singleton;
+
         /// <summary>
         /// This co-routine sets <see cref="dissonanceComms"/>, registers <see cref="Spawn(ulong)"/>
         /// on the <see cref="NetworkManager.Singleton.OnClientConnectedCallback"/> and spawns
@@ -54,7 +59,7 @@ namespace SEE.Game.Worlds
         /// <returns>enumerator as to how to continue this co-routine</returns>
         private IEnumerator SpawnPlayerCoroutine()
         {
-            NetworkManager networkManager = NetworkManager.Singleton;
+            //NetworkManager networkManager = NetworkManager.Singleton;
             while (ReferenceEquals(networkManager, null))
             {
                 networkManager = NetworkManager.Singleton;
@@ -113,6 +118,15 @@ namespace SEE.Game.Worlds
             {
                 Debug.LogError($"Spawned player {player.name} does not have a {typeof(NetworkObject)} component.\n");
             }
+
+            if (networkManager.IsServer)
+            {
+                // Add the FaceCam to the player.
+                GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam");
+                faceCam.GetComponent<NetworkObject>().Spawn();
+                faceCam.transform.parent = player.transform;
+            }
+            
         }
 
         /// <summary>

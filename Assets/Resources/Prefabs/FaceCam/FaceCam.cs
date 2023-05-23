@@ -46,7 +46,7 @@ public class FaceCam : NetworkBehaviour
         // Netcode specific logic executed when spawned.
 
         //transform.parent = transform.parent.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase").transform;
-        Debug.Log("Nose");
+        //Debug.Log("Nose");
 
 
 
