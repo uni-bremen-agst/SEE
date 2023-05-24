@@ -49,6 +49,9 @@ namespace DlibFaceLandmarkDetectorExample
         /// </summary>
         string dlibShapePredictorFilePath;
 
+        private float timer = 0.0f;
+        public float interpolationPeriod = 0.03f;
+
 #if UNITY_WEBGL
         IEnumerator getFilePath_Coroutine;
 #endif
@@ -74,6 +77,7 @@ namespace DlibFaceLandmarkDetectorExample
             dlibShapePredictorFilePath = DlibFaceLandmarkDetector.UnityUtils.Utils.getFilePath(dlibShapePredictorFileName);
             Run();
 #endif
+            //StartCoroutine(SendFrame());
         }
 
         private void Run()
@@ -186,7 +190,44 @@ namespace DlibFaceLandmarkDetectorExample
                 //Imgproc.putText (rgbaMat, "W:" + rgbaMat.width () + " H:" + rgbaMat.height () + " SO:" + Screen.orientation, new Point (5, rgbaMat.rows () - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
 
                 OpenCVForUnity.UnityUtils.Utils.fastMatToTexture2D(rgbaMat, texture);
+
+                SendFrame();
             }
+        }
+
+        IEnumerator SendFrame()
+        {
+            if (webCamTextureToMatHelper.IsPlaying() && webCamTextureToMatHelper.DidUpdateThisFrame() && IsSpawned)
+            { 
+                // Read the screen buffer after rendering is complete
+                yield return new WaitForEndOfFrame();
+
+                byte[] networkTexture = ImageConversion.EncodeToJPG(texture);
+                ImageConversion.LoadImage(texture, networkTexture);
+                Debug.Log("Buffer Size: " + networkTexture.Length);
+                //SendNetworkTexture(texture);
+
+                // Send Images a little less ofter than 30fps
+                yield return new WaitForSeconds(0.03f);
+            }
+        }
+
+        private void SendNetworkTexture(Texture2D texture)
+        {
+            byte[] networkTexture = ImageConversion.EncodeToJPG(texture);
+            ImageConversion.LoadImage(texture, networkTexture);
+            Debug.Log("Buffer Size: " + networkTexture.Length);
+            //if (networkTexture.Length <= 32768)
+            //{
+            //    SendNetworkTextureClientRPC(networkTexture);
+            //}
+        }
+
+        [ClientRpc]
+        private void SendNetworkTextureClientRPC(byte[] networkTexture) {
+            //texture.LoadRawTextureData(networkTexture);
+            //texture.LoadImage(networkTexture);
+            ImageConversion.LoadImage(texture, networkTexture);
         }
 
         /// <summary>

@@ -50,7 +50,7 @@ public class FaceCam : NetworkBehaviour
         //transform.position = transform.parent.position;
         playersFace = transform.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase");
         Debug.Log("playersFace: " + playersFace);
-        mainColor = GetComponent<Renderer>().material.color;
+        //mainColor = GetComponent<Renderer>().material.color;
     }
 
 
@@ -199,7 +199,7 @@ public class FaceCam : NetworkBehaviour
 
     private void RenderNetworkVideoOnFaceCam(Color videoFrame)
     {
-        GetComponent<Renderer>().material.color = videoFrame;
+        //GetComponent<Renderer>().material.color = videoFrame;
     }
 
     // Happens on destroying
