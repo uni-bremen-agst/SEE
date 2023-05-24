@@ -55,14 +55,14 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             const string widgetPrefabsPath = "Prefabs/HolisticMetrics/Widgets";
             widgetPrefabs = Resources.LoadAll<GameObject>(widgetPrefabsPath);
         }
-        
+
         /// <summary>
         /// This method will display this dialog to the player.
         /// </summary>
         internal void Open()
         {
             gotInput = false;
-            
+
             dialog = new GameObject("Add widget dialog");
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
             group.Name = "Add widget dialog";
@@ -82,17 +82,17 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             selectedWidget.AddOptions(widgetOptions);
             selectedWidget.Value = widgetOptions[0];
             group.AddProperty(selectedWidget);
-            
+
             propertyDialog = dialog.AddComponent<PropertyDialog>();
             propertyDialog.Title = "Add widget";
             propertyDialog.Description = "Configure the widget; then hit OK button. Then click on any metrics board" +
                                          "where you want to place the widget.";
             propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Plus");
             propertyDialog.AddGroup(group);
-            
+
             propertyDialog.OnConfirm.AddListener(AddWidget);
             propertyDialog.OnCancel.AddListener(Cancel);
-            
+
             SEEInput.KeyboardShortcutsEnabled = false;
             propertyDialog.DialogShouldBeShown = true;
         }
