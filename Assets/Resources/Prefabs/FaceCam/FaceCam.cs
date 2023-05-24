@@ -13,20 +13,51 @@ using Unity.Netcode;
 
 namespace DlibFaceLandmarkDetectorExample
 {
+    /// <summary>
+    /// This component is assumed to be attached to a game object representing
+    /// an avatar (representing a local or remote player). It can display an 
+    /// WebCam image of the tracked face of the user over the network.
+    /// It Also can be switched off. And it can toggle the position between
+    /// above the player always facing the camera, and the front of the player.
+    /// </summary>
     public class FaceCam : NetworkBehaviour
     {
-        // The eobject with the position where the face of the player is at.
+        /// <summary>
+        /// The object with the position where the face/nose of the player is at.
+        /// </summary>
         Transform playersFace;
-        bool testetForOwner = false;
-        Color mainColor;
+
+        /// <summary>
+        /// All Network Ids, but not the owner (where the video is recordet) or the server.
+        /// </summary>
         List<ulong> allClientIdsList = new List<ulong>();
-        ClientRpcParams OtherNetworkIds; // Not Server and not the Owner
+
+        /// <summary>
+        /// All Network Ids, but not the owner (where the video is recordet) or the server.
+        /// </summary>
+        ClientRpcParams OtherNetworkIds;
+
+        /// <summary>
+        /// Id of this Client.
+        /// </summary>
         ulong OwnClientId;
 
-        // Called on Network Spawn before Start
+        // Called on Network Spawn before Start.
         public override void OnNetworkSpawn()
         {
-            // Do things
+            // Add own ClientId to list of Clients, to which the video should be broadcasted.
+            OwnClientId = NetworkManager.Singleton.LocalClientId;
+            if (!IsServer && !IsOwner)
+            {
+                AddClientIdToList_ServerRPC(OwnClientId);
+            }
+
+            // Always invoked the base.
+            base.OnNetworkSpawn();
+
+            /// /// Network Test Examples - DELETE LATER - /// ///
+            /// /// Network Test Examples - DELETE LATER - /// ///
+            /// /// Network Test Examples - DELETE LATER - /// ///
             if (IsServer)
             {
                 Debug.Log("IsServer");
@@ -40,27 +71,16 @@ namespace DlibFaceLandmarkDetectorExample
                 Debug.Log("IsClient (Server is a Client too)");
             }
 
-
-            OwnClientId = NetworkManager.Singleton.LocalClientId;
-            if (!IsServer && !IsOwner)
-            {
-                AddClientIdToListServerRPC(OwnClientId);
-            }
-            //UpdateOtherNetworkIDsNoServer();
-
-
-            // Always invoked the base 
-            base.OnNetworkSpawn();
         }
 
         // Start is called before the first frame update
         private void Start()
         {
-            transform.localScale = new Vector3(0.2f, -0.48f, -1); // z = -1 to face away from the player.
-            //transform.position = transform.parent.position;
+            // This is the size of the FaceCam at the start
+            transform.localScale = new Vector3(0.2f, -0.48f, -1); // z = -1 to face away from the player. y is negative for simpler calculation later on.
+
+            // For the location of the face of the player we use his his nose. This makes the FaceCam also aprox. centered to his face.
             playersFace = transform.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase");
-            Debug.Log("playersFace: " + playersFace);
-            //mainColor = GetComponent<Renderer>().material.color;
         }
 
 
@@ -74,13 +94,18 @@ namespace DlibFaceLandmarkDetectorExample
             }
             // Netcode specific logic executed when spawned.
 
-            //transform.parent = transform.parent.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase").transform;
-            //Debug.Log("Nose");
+            // Display/Render the video from the Webcam if this is the owner. (For each Player, there is only one owner of the own FaceCam at the time)
+            if (IsOwner) {
+                DisplayLocalVideo();
+            }
 
+            /// /// Network Test Examples - DELETE LATER - /// ///
+            /// /// Network Test Examples - DELETE LATER - /// ///
+            /// /// Network Test Examples - DELETE LATER - /// ///
 
-
-            // Send an RPC
-            if (IsServer) // Only the Server is able to do so even without this if statement
+            // Send an RPC as Server to Clients
+            if (IsServer) // Only the Server is able to do so even without this if statement // really? JA fa nur server normale client rpcs senden kann
+                          //allerdings würden ohne dieses if jeder client/instanz diese nachricht vom server aus senden.
             {
                 if (Input.GetKeyDown(KeyCode.O))
                 {
@@ -89,10 +114,9 @@ namespace DlibFaceLandmarkDetectorExample
                     //Only sent to client number 1
                     DoSomethingServerSide(1);
                 }
-
-
             }
 
+            // Send to Server
             if (IsClient)
             {
                 if (Input.GetKeyDown(KeyCode.L))
@@ -100,23 +124,12 @@ namespace DlibFaceLandmarkDetectorExample
                     MyGlobalServerRpc(); // serverRpcParams will be filled in automatically
                 }
             }
-
-            // Mark this network instance as owner on the client it belongs to.
-            if (!testetForOwner)
-            {
-                if (IsOwner)
-                {
-                    //GetComponent<MeshRenderer>().material = Resources.Load<Material>("Materials/LSHMetal/29");
-                    //GetComponent<Renderer>().material.color = new Color(255, 0, 0);
-                }
-                testetForOwner = true;
-            }
-
-            if (IsOwner) {
-                DisplayLocalVideo();
-            }
         }
 
+        /// <summary>
+        /// This renders the video, means the face captured on the WebCam is displayed onto the FaceCam
+        /// Only used as owner.
+        /// </summary>
         private void DisplayLocalVideo()
         {
             //geht davon aus das man Owner ist
@@ -135,18 +148,24 @@ namespace DlibFaceLandmarkDetectorExample
             }
         }
 
-
+        // Called each frame after the Update() function
         private void LateUpdate()
         {
-            FixToNose();
+            // refresh the position of the FaceCam
+            RefreshFaceCamPosition();
         }
 
-        // Follow the position of the players nose
-        private void FixToNose() {
-            if (playersFace != null)
+        /// <summary>
+        /// Refreshes the position of the FaceCam
+        /// </summary>
+        private void RefreshFaceCamPosition() {
+            if (playersFace != null) // Sometimes the playersFace seems to be null, i can't find out why. Should have nothing to do with this class.
             {
                 transform.position = playersFace.position;
                 transform.rotation = playersFace.rotation;
+                //FIXME
+                //still need to rotate the cam and check which mode (above/front) the FaceCam should be/
+                //Maybe update size here, or maybe direct in the video rendering
             }
         }
 
@@ -163,95 +182,118 @@ namespace DlibFaceLandmarkDetectorExample
             // If local, record and send video to server (only send unless this is the server);
             if (IsOwner)
             {
-                // The video Fähig übers netz gesendet zu werden
-                Color videoFrame = CreateNetworkVideoFromSource();
+                // A frame of the Video, created from the source video already displayed on this owners client.
+                Color videoFrame = CreateNetworkFrameFromVideo();
+                //FIXME
+                // ggf video ausschneiden oder andere infos wie tile/offset auch übermitteln
 
-                // Sent to server, unless this is the server
+                // Send the frame to the to server, unless this is the server.
                 if (!IsServer)
                 {
-                    GetVideoFromClients_ServerRPC(videoFrame);
+                    GetVideoFromClientAndSendItToClientsToRenderIt_ServerRPC(videoFrame);
                 }
-                else //Falls Server, Rendere eigenes Video, und sende zu allen Clients
+                else // the owner (creator of video) and also the server
                 {
-                    //RenderVideoOnFaceCam(videoFrame);
-                    SendVideoToClients_ClientRPC(videoFrame, OtherNetworkIds);// An Alllle! (auuser immer denm serverclient) und dem server
+                    // If this is the server, send the frame to all clients ( but not the server and owner, which in this case, is the server).
+                    SendVideoToClientsToRenderIt_ClientRPC(videoFrame, OtherNetworkIds);
                 }
             }
-            //else
-            // if not local, get video from server;
-            //{
-            //        SendVideoToClients_ClientRPC(videoFrame);
-            //}
-
         }
 
-        private Color CreateNetworkVideoFromSource()
+        /// <summary>
+        /// This creates a frame from the video sourcw.
+        /// The frame can be send over the network and is compressed.
+        /// </summary>
+        private Color CreateNetworkFrameFromVideo()
         {
-            return mainColor;
+            //return mainColor;
+            return new Color(); // is null
+            //FIXME
+            // hier texture zu JPG machen, und als byte[] übergeben, das sollte reichen.
+
         }
 
-
+        /// <summary>
+        /// The owner calls this, to send his video to the server which sends it to all clients.
+        /// Also the server and every client will render this video onto the FaceCam.
+        /// </summary>
         [ServerRpc]
-        private void GetVideoFromClients_ServerRPC(Color videoFrame)
+        private void GetVideoFromClientAndSendItToClientsToRenderIt_ServerRPC(Color videoFrame)
         {
-            RenderNetworkVideoOnFaceCam(videoFrame);
-            SendVideoToClients_ClientRPC(videoFrame, OtherNetworkIds);
-            //Send to all clients but not the received one (auuser immer denm serverclient den auch nicht natürlich)
-            //erstmal alle
+            // The server will render this video onto his instance of the FaceCam.
+            RenderNetworkFrameOnFaceCam(videoFrame);
+
+            // The server will send the video to all other clients (not the owner and server) so they can display it. 
+            SendVideoToClientsToRenderIt_ClientRPC(videoFrame, OtherNetworkIds);
         }
 
+        /// <summary>
+        /// The Server calls this, to send his video  to all clients.
+        /// Also every client will render this video onto the FaceCam.
+        /// </summary>
         [ClientRpc]
-        private void SendVideoToClients_ClientRPC(Color videoFrame, ClientRpcParams clientRpcParams = default)
+        private void SendVideoToClientsToRenderIt_ClientRPC(Color videoFrame, ClientRpcParams clientRpcParams = default)
         {
-            RenderNetworkVideoOnFaceCam(videoFrame);
+            RenderNetworkFrameOnFaceCam(videoFrame);
         }
 
-
-        private void RenderNetworkVideoOnFaceCam(Color videoFrame)
+        /// <summary>
+        /// The received frame will be rendered onto the FaceCam
+        /// </summary>
+        private void RenderNetworkFrameOnFaceCam(Color videoFrame)
         {
             //GetComponent<Renderer>().material.color = videoFrame;
+            //FIXME
+            //Hier den Frame aus JPG zu texture konvertieren, das sollte reichen.
         }
 
         // Happens on destroying
         public override void OnDestroy()
         {
-            // Clean up your NetworkBehaviour
-            if (!IsServer && !IsOwner)
+            // Remove own ClientId from the list of connected ClientIds
+            if (!IsServer && !IsOwner) // Owner and server is not in the list.
             {
-                RemoveClientFromListServerRPC(OwnClientId);
+                RemoveClientFromList_ServerRPC(OwnClientId);
             }
-            //UpdateOtherNetworkIDsNoServer();
 
             // Always invoked the base 
             base.OnDestroy();
         }
 
-        /*
-        ulong[] allNetworkIds;
-        ClientRpcParams otherNetworkIDsNoServer;
-        ulong ServerID;
-        ulong OwnClientId;
 
-        ClientRpcParams otherNetworkIDsNoServer;
-        ulong ServerID;
-        */
-
-        //RPC!
+        /// <summary>
+        /// The clients call this to add their ClientId to the list on the Server.
+        /// </summary>
         [ServerRpc(RequireOwnership = false)]
-        private void AddClientIdToListServerRPC(ulong clientId)
+        private void AddClientIdToList_ServerRPC(ulong clientId)
         {
             allClientIdsList.Add(clientId);
+            // Create the RpcParams to make this list usable.
             CreateClientRpcParams();
         }
+
+        /// <summary>
+        /// The clients call this to remove their ClientId to the list on the Server.
+        /// </summary>
         [ServerRpc(RequireOwnership = false)]
-        private void RemoveClientFromListServerRPC(ulong clientId)
+        private void RemoveClientFromList_ServerRPC(ulong clientId)
         {
             allClientIdsList.Remove(clientId);
+            // Create the RpcParams to make this list usable.
             CreateClientRpcParams();
         }
+
+        /// <summary>
+        /// This creates RpcParams from the list of ClientIds to make it usable.
+        /// Only the server needs to work with this list.
+        /// RpcParams is used to send RPC calls only to few Clients, and not all.
+        /// </summary>
         private void CreateClientRpcParams()
         {
+            // Creates the needed array from the editable list.
             ulong[] allOtherClientIds = allClientIdsList.ToArray();
+
+            // Creates the RpcParams with the array of ClientIds
             OtherNetworkIds = new ClientRpcParams
             {
                 Send = new ClientRpcSendParams
@@ -262,7 +304,10 @@ namespace DlibFaceLandmarkDetectorExample
         }
 
 
-
+        /// /// Network Test Examples - DELETE LATER - /// ///
+        /// /// Network Test Examples - DELETE LATER - /// ///
+        /// /// Network Test Examples - DELETE LATER - /// ///
+        // On the Server send a random value to the client id in the parameter and client id 2
         private void DoSomethingServerSide(int clientId)
         {
             // If isn't the Server/Host then we should early return here!
@@ -285,14 +330,25 @@ namespace DlibFaceLandmarkDetectorExample
             DoSomethingClientRpc(randomInteger, clientRpcParams);
         }
 
+        /// /// Network Test Examples - DELETE LATER - /// ///
+        /// /// Network Test Examples - DELETE LATER - /// ///
+        /// /// Network Test Examples - DELETE LATER - /// ///
         // RPC Client method which might be invoked, only runs on Clients
+        // from Server to all
+        // sends some text and time
         [ClientRpc]
         private void PongClientRpc(int somenumber, string sometext)
         {
             Debug.Log("RPC: " + sometext + " @ Time: " + somenumber);
         }
 
+        /// /// Network Test Examples - DELETE LATER - /// ///
+        /// /// Network Test Examples - DELETE LATER - /// ///
+        /// /// Network Test Examples - DELETE LATER - /// ///
         // RPC Server method which might be invoked, only runs on Server
+        // every client can call this
+        // save client to do something with it
+        // print client id on server
         [ServerRpc(RequireOwnership = false)]
         private void MyGlobalServerRpc(ServerRpcParams serverRpcParams = default)
         {
@@ -307,11 +363,19 @@ namespace DlibFaceLandmarkDetectorExample
             }
         }
 
+        /// /// Network Test Examples - DELETE LATER - /// ///
+        /// /// Network Test Examples - DELETE LATER - /// ///
+        /// /// Network Test Examples - DELETE LATER - /// ///
+        // from server to all clients
+        // On client:
+        //  client tell if it's owner 
+        //  get random number from server
         [ClientRpc]
         private void DoSomethingClientRpc(int randomInteger, ClientRpcParams clientRpcParams = default)
         {
-            //if (IsOwner) return;
+            if (IsOwner) {
             Debug.Log("O W N E R !");
+            }
 
             // Run your client-side logic here!!
             Debug.LogFormat("GameObject: {0} has received a randomInteger with value: {1}", gameObject.name, randomInteger);
