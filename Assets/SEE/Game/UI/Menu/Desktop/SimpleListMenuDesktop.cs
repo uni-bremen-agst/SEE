@@ -7,9 +7,9 @@ using UnityEngine.UI;
 namespace SEE.Game.UI.Menu
 {
     /// <summary>
-    /// Desktop implementation of SimpleListMenu.
+    /// Desktop implementation of <see cref="SimpleListMenu"/>.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">the type of <see cref="MenuEntry"/></typeparam>
     public partial class SimpleListMenu<T> where T : MenuEntry
     {
         /// <summary>
