@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Windows.Speech;
 
@@ -66,7 +65,7 @@ namespace SEE.Game.UI.Menu
         /// <summary>
         /// Adds a menu entry.
         /// </summary>
-        /// <param name="entry">The menu entry.</param>
+        /// <param name="entry">The menu entry to be added.</param>
         public virtual void AddEntry(T entry)
         {
             entries.Add(entry);
@@ -77,7 +76,7 @@ namespace SEE.Game.UI.Menu
         /// Removes a menu entry.
         /// It is assumed that the menu contains the entry.
         /// </summary>
-        /// <param name="entry"></param>
+        /// <param name="entry">The menu entry to be removed.</param>
         public void RemoveEntry(T entry)
         {
             entries.Remove(entry);
@@ -88,7 +87,7 @@ namespace SEE.Game.UI.Menu
         /// Selects a menu entry.
         /// It is assumed that the menu contains the entry.
         /// </summary>
-        /// <param name="entry">The menu entry.</param>
+        /// <param name="entry">The menu entry to be selected.</param>
         public virtual void SelectEntry(T entry)
         {
             entry.DoAction();
@@ -121,7 +120,10 @@ namespace SEE.Game.UI.Menu
         protected override void HandleKeyword(PhraseRecognizedEventArgs args)
         {
             T entry = entries.FirstOrDefault(entry => entry.Title == args.text);
-            if (entry != null) SelectEntry(entry);
+            if (entry != null)
+            {
+                SelectEntry(entry);
+            }
             base.HandleKeyword(args);
         }
 
