@@ -185,7 +185,7 @@ namespace SEE.Game.HolisticMetrics
             {
                 foreach ((WidgetController, Metric) tuple in widgets)
                 {
-                    Destroy(tuple.Item1.gameObject.GetComponent<WidgetDeleter>());
+                    Destroyer.Destroy(tuple.Item1.gameObject.GetComponent<WidgetDeleter>());
                 }
             }
         }
