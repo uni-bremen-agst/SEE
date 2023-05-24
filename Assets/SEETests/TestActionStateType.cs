@@ -23,8 +23,8 @@ namespace SEETests
 
         private static IEnumerable<AbstractActionStateType> GetAbstractActionStateTypes()
         {
-            return typeof(ActionStateTypes).GetProperties(BindingFlags.Public | BindingFlags.Static)
-                                           .Where(f => f.PropertyType.IsSubclassOf(typeof(AbstractActionStateType)))
+            return typeof(ActionStateTypes).GetFields(BindingFlags.Public | BindingFlags.Static)
+                                           .Where(f => f.FieldType.IsSubclassOf(typeof(AbstractActionStateType)))
                                            .Select(x => (AbstractActionStateType)x.GetValue(null));
         }
 
