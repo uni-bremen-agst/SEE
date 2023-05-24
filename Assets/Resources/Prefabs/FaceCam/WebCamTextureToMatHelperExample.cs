@@ -189,9 +189,13 @@ namespace DlibFaceLandmarkDetectorExample
 
                 //Imgproc.putText (rgbaMat, "W:" + rgbaMat.width () + " H:" + rgbaMat.height () + " SO:" + Screen.orientation, new Point (5, rgbaMat.rows () - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
 
-                OpenCVForUnity.UnityUtils.Utils.fastMatToTexture2D(rgbaMat, texture);
+                OpenCVForUnity.UnityUtils.Utils.matToTexture2D(rgbaMat, texture);
 
-                SendFrame();
+                byte[] networkTexture = ImageConversion.EncodeToJPG(texture);
+                //byte[] networkTexture = ImageConversion.EncodeArrayToJPG(texture.GetRawTextureData(), texture.graphicsFormat, (uint)texture.width, (uint)texture.height, default, 100);
+                Debug.Log("IsReadable :" + texture.isReadable);
+                ImageConversion.LoadImage(texture, networkTexture);
+                //SendFrame();
             }
         }
 
