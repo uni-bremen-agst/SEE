@@ -43,7 +43,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             if (!IsRequester())
             {
-                FindWidgetsManager(BoardName).Delete(WidgetID);   
+                FindWidgetsManager(BoardName).Delete(WidgetID);
             }
         }
     }
