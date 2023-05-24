@@ -15,7 +15,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
         /// <see cref="MoveWidgetAction"/>.
         /// </summary>
         private bool hasMovement;
-        
+
         /// <summary>
         /// The old position of the widget, this might be needed later if the movement needs to be reverted.
         /// </summary>
@@ -38,7 +38,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
         {
             hasMovement = false;
         }
-        
+
         /// <summary>
         /// Before the player starts dragging the widget around, we save the old position of the widget so we can
         /// potentially restore it later.
@@ -69,7 +69,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
 
         /// <summary>
         /// When the player releases the left mouse button, we want to finally position the widget at the position
-        /// where it is at. 
+        /// where it is at.
         /// </summary>
         private void OnMouseUp()
         {

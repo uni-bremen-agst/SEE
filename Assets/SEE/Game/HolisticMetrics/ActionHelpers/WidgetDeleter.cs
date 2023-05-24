@@ -12,7 +12,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
     public class WidgetDeleter : MonoBehaviour
     {
         private bool hasDeletion;
-        
+
         /// <summary>
         /// When the mouse is clicked on the widget and then it is released again, we will delete the widget on which
         /// the cursor was clicked and then delete all WidgetDeleter instances.

@@ -21,7 +21,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
         /// <see cref="AddWidgetAction"/>.
         /// </summary>
         private bool positionInStore;
-        
+
         /// <summary>
         /// When the mouse is lifted up after clicking on the metrics board, we get the position of the mouse and then
         /// add the widget there.
