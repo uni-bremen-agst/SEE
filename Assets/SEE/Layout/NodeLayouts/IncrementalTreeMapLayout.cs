@@ -237,7 +237,7 @@ namespace SEE.Layout.NodeLayouts
 
                 TransformRectangles(newTNodes, oldRectangle: oldRectangle, newRectangle: rectangle);
 
-                LocalMoves.CorretNodes(workWith);
+                CorrectAreas.Correct(workWith);
                 foreach(var nodeToBeAdded in nodesToBeAdded)
                 {
                     LocalMoves.AddNode(workWith,nodeToBeAdded);
@@ -259,7 +259,7 @@ namespace SEE.Layout.NodeLayouts
                     Assert.IsTrue(workWith.Contains(node));
                 }
 
-                LocalMoves.CorretNodes(workWith);
+                CorrectAreas.Correct(workWith);
                 LocalMoves.MakeLocalMoves(workWith);
             }
 
