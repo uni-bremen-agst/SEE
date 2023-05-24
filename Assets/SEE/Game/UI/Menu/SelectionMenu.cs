@@ -48,7 +48,10 @@ namespace SEE.Game.UI.Menu
         {
             base.OnStartFinished();
             // updates menu
-            if (ActiveEntry != null) ActivateButton(ActiveEntry);
+            if (ActiveEntry != null)
+            {
+                ActivateButton(ActiveEntry);
+            }
             // adds listeners
             OnEntrySelected += entry => ActiveEntry = entry;
             OnEntrySelected += ActivateButton;
@@ -60,7 +63,7 @@ namespace SEE.Game.UI.Menu
         /// Activates a button.
         /// It is assumed that the entry is the active entry.
         /// </summary>
-        /// <param name="entry">The menu entry.</param>
+        /// <param name="entry">The menu entry to be activated.</param>
         private void ActivateButton(T entry)
         {
             GameObject button = EntryGameObject(entry);
@@ -74,7 +77,7 @@ namespace SEE.Game.UI.Menu
         /// Deactivates a button.
         /// It is assumed that the entry was the previously active entry.
         /// </summary>
-        /// <param name="entry">The menu entry.</param>
+        /// <param name="entry">The menu entry to be deactivated.</param>
         private void DeactivateButton(T entry)
         {
             GameObject button = EntryGameObject(entry);

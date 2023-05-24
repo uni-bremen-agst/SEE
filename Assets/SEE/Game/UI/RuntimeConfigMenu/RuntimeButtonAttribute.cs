@@ -1,6 +1,5 @@
 using System;
 
-
 namespace SEE.Game.UI.RuntimeConfigMenu
 {
     /// <summary>
@@ -25,8 +24,8 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         /// <param name="label">label</param>
         public RuntimeButtonAttribute(string name, string label)
         {
-            this.Name = name;
-            this.Label = label;
+            Name = name;
+            Label = label;
         }
     }
 }

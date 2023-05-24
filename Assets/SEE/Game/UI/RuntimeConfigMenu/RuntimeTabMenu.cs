@@ -175,9 +175,12 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         /// <summary>
         /// Path to game object containing the configuration buttons
         /// </summary>
-        private string ConfigButtonListPath => "ConfigButtons/Content";
+        private const string ConfigButtonListPath = "ConfigButtons/Content";
 
-        private string CitySwitcherPath => "City Switcher";
+        /// <summary>
+        /// Path to game object containing the <see cref="citySwitcher"/>.
+        /// </summary>
+        private const string CitySwitcherPath = "City Switcher";
 
         protected override void StartDesktop()
         {

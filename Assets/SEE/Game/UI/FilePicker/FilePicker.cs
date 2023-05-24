@@ -1,10 +1,12 @@
-﻿using System;
-using SEE.Utils;
+﻿using SEE.Utils;
 using SimpleFileBrowser;
 using UnityEngine.Events;
 
 namespace SEE.Game.UI.FilePicker
 {
+    /// <summary>
+    /// Allows a user to pick a file.
+    /// </summary>
     public partial class FilePicker : PlatformDependentComponent
     {
         /// <summary>
