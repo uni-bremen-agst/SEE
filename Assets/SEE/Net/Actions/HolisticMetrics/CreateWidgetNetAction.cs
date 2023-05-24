@@ -45,7 +45,6 @@ namespace SEE.Net.Actions.HolisticMetrics
             {
                 FindWidgetsManager(BoardName).Create(WidgetConfig);
             }
-
         }
     }
 }
