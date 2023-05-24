@@ -19,7 +19,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         internal void Open()
         {
             gotInput = false;
-            
+
             dialog = new GameObject("Add board dialog");
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
             group.Name = "Add board dialog";
@@ -29,7 +29,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             boardName.Description = "Enter the title of the board. This has to be unique.";
             group.AddProperty(boardName);
             group.GetReady();
-            
+
             propertyDialog = dialog.AddComponent<PropertyDialog>();
             propertyDialog.Title = "Add board";
             propertyDialog.Description = "Configure the board; then hit OK button.";

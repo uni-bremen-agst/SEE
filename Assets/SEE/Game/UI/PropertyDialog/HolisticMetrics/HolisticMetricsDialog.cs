@@ -13,17 +13,17 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// Whether this dialog has some complete user input that hasn't yet been fetched.
         /// </summary>
         protected bool gotInput;
-        
+
         /// <summary>
         /// Whether this dialog was canceled.
         /// </summary>
         private bool wasCanceled;
-        
+
         /// <summary>
         /// The property dialog.
         /// </summary>
         protected PropertyDialog propertyDialog;
-        
+
         /// <summary>
         /// The dialog GameObject.
         /// </summary>
@@ -37,7 +37,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             Destroyer.Destroy(dialog);
             SEEInput.KeyboardShortcutsEnabled = true;
         }
-        
+
         /// <summary>
         /// Gets called when the dialog is canceled.
         /// </summary>
@@ -46,7 +46,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             wasCanceled = true;
             Close();
         }
-        
+
         /// <summary>
         /// Whether this dialog was canceled.
         /// </summary>
