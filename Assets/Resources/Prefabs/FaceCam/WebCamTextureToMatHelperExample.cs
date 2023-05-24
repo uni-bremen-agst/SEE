@@ -50,7 +50,7 @@ namespace DlibFaceLandmarkDetectorExample
         string dlibShapePredictorFilePath;
 
         private float timer = 0.0f;
-        public float interpolationPeriod = 0.03f;
+        private float interpolationPeriod = 0.03f;
 
 #if UNITY_WEBGL
         IEnumerator getFilePath_Coroutine;
