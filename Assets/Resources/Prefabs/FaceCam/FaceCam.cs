@@ -20,6 +20,7 @@ namespace DlibFaceLandmarkDetectorExample
     /// It Also can be switched off. And it can toggle the position between
     /// above the player always facing the camera, and the front of the player.
     /// </summary>
+    [RequireComponent(typeof(WebCamTextureToMatHelper))]
     public class FaceCam : NetworkBehaviour
     {
         /// <summary>
@@ -41,6 +42,40 @@ namespace DlibFaceLandmarkDetectorExample
         /// Id of this Client.
         /// </summary>
         ulong OwnClientId;
+
+        // Code from the FaceCam start
+
+        /// <summary>
+        /// The texture.
+        /// </summary>
+        Texture2D texture;
+
+        /// <summary>
+        /// The webcam texture to mat helper.
+        /// </summary>
+        WebCamTextureToMatHelper webCamTextureToMatHelper;
+
+        /// <summary>
+        /// The face landmark detector.
+        /// </summary>
+        FaceLandmarkDetector faceLandmarkDetector;
+
+        /// <summary>
+        /// The FPS monitor.
+        /// </summary>
+        FpsMonitor fpsMonitor;
+
+        /// <summary>
+        /// The dlib shape predictor file name.
+        /// </summary>
+        string dlibShapePredictorFileName = "DlibFaceLandmarkDetector/sp_human_face_68.dat";
+
+        /// <summary>
+        /// The dlib shape predictor file path.
+        /// </summary>
+        string dlibShapePredictorFilePath;
+
+        // Code from the FaceCam end
 
         // Called on Network Spawn before Start.
         public override void OnNetworkSpawn()
@@ -73,20 +108,191 @@ namespace DlibFaceLandmarkDetectorExample
 
         }
 
+#if UNITY_WEBGL
+        IEnumerator getFilePath_Coroutine;
+#endif
+
+        // Use this for initialization
         // Start is called before the first frame update
-        private void Start()
+        void Start()
         {
+            // Code from the FaceCam end
+
             // This is the size of the FaceCam at the start
             transform.localScale = new Vector3(0.2f, -0.48f, -1); // z = -1 to face away from the player. y is negative for simpler calculation later on.
 
             // For the location of the face of the player we use his his nose. This makes the FaceCam also aprox. centered to his face.
             playersFace = transform.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase");
+
+            // Code from the FaceCam start
+
+            fpsMonitor = GetComponent<FpsMonitor>();
+
+            webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper>();
+
+            dlibShapePredictorFileName = DlibFaceLandmarkDetectorExample.dlibShapePredictorFileName;
+#if UNITY_WEBGL
+            getFilePath_Coroutine = DlibFaceLandmarkDetector.UnityUtils.Utils.getFilePathAsync(dlibShapePredictorFileName, (result) =>
+            {
+                getFilePath_Coroutine = null;
+
+                dlibShapePredictorFilePath = result;
+                Run();
+            });
+            StartCoroutine(getFilePath_Coroutine);
+#else
+            dlibShapePredictorFilePath = DlibFaceLandmarkDetector.UnityUtils.Utils.getFilePath(dlibShapePredictorFileName);
+            Run();
+#endif
         }
 
+        private void Run()
+        {
+            if (string.IsNullOrEmpty(dlibShapePredictorFilePath))
+            {
+                Debug.LogError("shape predictor file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/DlibFaceLandmarkDetector/” to “Assets/StreamingAssets/DlibFaceLandmarkDetector/” folder. ");
+            }
+
+            faceLandmarkDetector = new FaceLandmarkDetector(dlibShapePredictorFilePath);
+
+            webCamTextureToMatHelper.Initialize();
+        }
+
+        /// <summary>
+        /// Raises the web cam texture to mat helper initialized event.
+        /// </summary>
+        public void OnWebCamTextureToMatHelperInitialized()
+        {
+            Debug.Log("OnWebCamTextureToMatHelperInitialized");
+
+            Mat webCamTextureMat = webCamTextureToMatHelper.GetMat();
+
+            texture = new Texture2D(webCamTextureMat.cols(), webCamTextureMat.rows(), TextureFormat.RGBA32, false);
+            OpenCVForUnity.UnityUtils.Utils.fastMatToTexture2D(webCamTextureMat, texture);
+
+            gameObject.GetComponent<Renderer>().material.mainTexture = texture;
+
+            gameObject.transform.localScale = new Vector3(webCamTextureMat.cols(), webCamTextureMat.rows(), 1);
+            Debug.Log("Screen.width " + Screen.width + " Screen.height " + Screen.height + " Screen.orientation " + Screen.orientation);
+
+            if (fpsMonitor != null)
+            {
+                fpsMonitor.Add("dlib shape predictor", dlibShapePredictorFileName);
+                fpsMonitor.Add("width", webCamTextureToMatHelper.GetWidth().ToString());
+                fpsMonitor.Add("height", webCamTextureToMatHelper.GetHeight().ToString());
+                fpsMonitor.Add("orientation", Screen.orientation.ToString());
+            }
+
+
+            //FIXME Maybe not needet? throws null
+            /*
+            float width = webCamTextureMat.width();
+            float height = webCamTextureMat.height();
+
+            float widthScale = (float)Screen.width / width;
+            float heightScale = (float)Screen.height / height;
+            if (widthScale < heightScale)
+            {
+                Camera.main.orthographicSize = (width * (float)Screen.height / (float)Screen.width) / 2;
+            }
+            else
+            {
+                Camera.main.orthographicSize = height / 2;
+            }
+            */
+        }
+
+        /// <summary>
+        /// Raises the web cam texture to mat helper disposed event.
+        /// </summary>
+        public void OnWebCamTextureToMatHelperDisposed()
+        {
+            Debug.Log("OnWebCamTextureToMatHelperDisposed");
+
+            if (texture != null)
+            {
+                Texture2D.Destroy(texture);
+                texture = null;
+            }
+        }
+
+        /// <summary>
+        /// Raises the web cam texture to mat helper error occurred event.
+        /// </summary>
+        /// <param name="errorCode">Error code.</param>
+        public void OnWebCamTextureToMatHelperErrorOccurred(WebCamTextureToMatHelper.ErrorCode errorCode)
+        {
+            Debug.Log("OnWebCamTextureToMatHelperErrorOccurred " + errorCode);
+
+            if (fpsMonitor != null)
+            {
+                fpsMonitor.consoleText = "ErrorCode: " + errorCode;
+            }
+        }
+
+        // Code from the FaceCam end
+
+        // FIXME my Code in FaceCam start
+        public void SendFrame()
+        {
+            byte[] networkTexture = ImageConversion.EncodeToJPG(texture);
+            Debug.Log("Buffer Size: " + networkTexture.Length);
+            if (networkTexture.Length <= 32768)
+            {
+                SendNetworkTextureClientRPC(networkTexture);
+            }
+        }
+
+        [ClientRpc]
+        private void SendNetworkTextureClientRPC(byte[] networkTexture)
+        {
+            //texture.LoadRawTextureData(networkTexture);
+            //texture.LoadImage(networkTexture);
+            ImageConversion.LoadImage(texture, networkTexture);
+        }
+        // FIXME my Code in FaceCam end
 
         // Update is called once per frame
         private void Update()
         {
+            // Code from the FaceCam start
+
+            if (webCamTextureToMatHelper.IsPlaying() && webCamTextureToMatHelper.DidUpdateThisFrame())
+            {
+
+                Mat rgbaMat = webCamTextureToMatHelper.GetMat();
+
+                OpenCVForUnityUtils.SetImage(faceLandmarkDetector, rgbaMat);
+
+                //detect face rects
+                List<UnityEngine.Rect> detectResult = faceLandmarkDetector.Detect();
+
+                foreach (var rect in detectResult)
+                {
+
+                    //detect landmark points
+                    List<Vector2> points = faceLandmarkDetector.DetectLandmark(rect);
+
+                    //draw landmark points
+                    OpenCVForUnityUtils.DrawFaceLandmark(rgbaMat, points, new Scalar(0, 255, 0, 255), 2);
+
+                    //draw face rect
+                    OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(255, 0, 0, 255), 2);
+                }
+
+                //Imgproc.putText (rgbaMat, "W:" + rgbaMat.width () + " H:" + rgbaMat.height () + " SO:" + Screen.orientation, new Point (5, rgbaMat.rows () - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
+
+                OpenCVForUnity.UnityUtils.Utils.matToTexture2D(rgbaMat, texture);
+
+                //FIXME
+                if (IsSpawned)
+                {
+                    SendFrame(); // My method
+                }
+            }
+
+            // Code from the FaceCam end
+
             // If the NetworkObject is not yet spawned, exit early.
             if (!IsSpawned)
             {
@@ -95,7 +301,8 @@ namespace DlibFaceLandmarkDetectorExample
             // Netcode specific logic executed when spawned.
 
             // Display/Render the video from the Webcam if this is the owner. (For each Player, there is only one owner of the own FaceCam at the time)
-            if (IsOwner) {
+            if (IsOwner)
+            {
                 DisplayLocalVideo();
             }
 
@@ -105,7 +312,7 @@ namespace DlibFaceLandmarkDetectorExample
 
             // Send an RPC as Server to Clients
             if (IsServer) // Only the Server is able to do so even without this if statement // really? JA fa nur server normale client rpcs senden kann
-                          //allerdings w�rden ohne dieses if jeder client/instanz diese nachricht vom server aus senden.
+                          //allerdings würden ohne dieses if jeder client/instanz diese nachricht vom server aus senden.
             {
                 if (Input.GetKeyDown(KeyCode.O))
                 {
@@ -158,7 +365,8 @@ namespace DlibFaceLandmarkDetectorExample
         /// <summary>
         /// Refreshes the position of the FaceCam
         /// </summary>
-        private void RefreshFaceCamPosition() {
+        private void RefreshFaceCamPosition()
+        {
             if (playersFace != null) // Sometimes the playersFace seems to be null, i can't find out why. Should have nothing to do with this class.
             {
                 transform.position = playersFace.position;
@@ -185,7 +393,7 @@ namespace DlibFaceLandmarkDetectorExample
                 // A frame of the Video, created from the source video already displayed on this owners client.
                 Color videoFrame = CreateNetworkFrameFromVideo();
                 //FIXME
-                // ggf video ausschneiden oder andere infos wie tile/offset auch �bermitteln
+                // ggf video ausschneiden oder andere infos wie tile/offset auch übermitteln
 
                 // Send the frame to the to server, unless this is the server.
                 if (!IsServer)
@@ -209,7 +417,7 @@ namespace DlibFaceLandmarkDetectorExample
             //return mainColor;
             return new Color(); // is null
             //FIXME
-            // hier texture zu JPG machen, und als byte[] �bergeben, das sollte reichen.
+            // hier texture zu JPG machen, und als byte[] übergeben, das sollte reichen.
 
         }
 
@@ -255,6 +463,24 @@ namespace DlibFaceLandmarkDetectorExample
             {
                 RemoveClientFromList_ServerRPC(OwnClientId);
             }
+
+            // Code from the FaceCam start
+
+            if (webCamTextureToMatHelper != null)
+                webCamTextureToMatHelper.Dispose();
+
+            if (faceLandmarkDetector != null)
+                faceLandmarkDetector.Dispose();
+
+#if UNITY_WEBGL
+            if (getFilePath_Coroutine != null)
+            {
+                StopCoroutine(getFilePath_Coroutine);
+                ((IDisposable)getFilePath_Coroutine).Dispose();
+            }
+#endif
+
+            // Code from the FaceCam end
 
             // Always invoked the base 
             base.OnDestroy();
@@ -373,14 +599,58 @@ namespace DlibFaceLandmarkDetectorExample
         [ClientRpc]
         private void DoSomethingClientRpc(int randomInteger, ClientRpcParams clientRpcParams = default)
         {
-            if (IsOwner) {
-            Debug.Log("O W N E R !");
+            if (IsOwner)
+            {
+                Debug.Log("O W N E R !");
             }
 
             // Run your client-side logic here!!
             Debug.LogFormat("GameObject: {0} has received a randomInteger with value: {1}", gameObject.name, randomInteger);
         }
+
+        // Code from the FaceCam start
+
+        /// <summary>
+        /// Raises the back button click event.
+        /// </summary>
+        public void OnBackButtonClick()
+        {
+            SceneManager.LoadScene("DlibFaceLandmarkDetectorExample");
+        }
+
+        /// <summary>
+        /// Raises the play button click event.
+        /// </summary>
+        public void OnPlayButtonClick()
+        {
+            webCamTextureToMatHelper.Play();
+        }
+
+        /// <summary>
+        /// Raises the pause button click event.
+        /// </summary>
+        public void OnPauseButtonCkick()
+        {
+            webCamTextureToMatHelper.Pause();
+        }
+
+        /// <summary>
+        /// Raises the stop button click event.
+        /// </summary>
+        public void OnStopButtonClick()
+        {
+            webCamTextureToMatHelper.Stop();
+        }
+
+        /// <summary>
+        /// Raises the change camera button click event.
+        /// </summary>
+        public void OnChangeCameraButtonClick()
+        {
+            webCamTextureToMatHelper.requestedIsFrontFacing = !webCamTextureToMatHelper.requestedIsFrontFacing;
+        }
     }
 }
 
 #endif
+// Code from the FaceCam end
