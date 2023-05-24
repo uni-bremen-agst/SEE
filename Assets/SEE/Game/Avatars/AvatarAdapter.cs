@@ -224,10 +224,6 @@ namespace SEE.Game.Avatars
 
             gameObject.AddComponent<DesktopPlayerMovement>();
 
-            GameObject Cam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/Webcam");
-            Cam.GetComponent<NetworkObject>().Spawn();
-            Cam.transform.parent = desktopPlayer.transform.parent.transform;
-
         }
 
         #region ENABLE_VR
