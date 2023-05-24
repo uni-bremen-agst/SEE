@@ -89,7 +89,10 @@ namespace SEE.Game.UI.Menu
             OnEntryRemoved += DestroyButton;
             OnEntrySelected += _ =>
             {
-                if (HideAfterSelection) ShowMenu = false;
+                if (HideAfterSelection)
+                {
+                    ShowMenu = false;
+                }
             };
         }
 
@@ -116,9 +119,13 @@ namespace SEE.Game.UI.Menu
 
             // adds clickEvent listener or show that button is disabled
             if (entry.Enabled)
+            {
                 buttonManager.clickEvent.AddListener(() => SelectEntry(entry));
+            }
             else
+            {
                 buttonManager.useRipple = false;
+            }
 
             // colors
             Color color = entry.Enabled ? entry.EntryColor : entry.DisabledColor;
@@ -144,7 +151,10 @@ namespace SEE.Game.UI.Menu
         /// </summary>
         protected virtual void UpdateCloseButton()
         {
-            if (MenuManager.confirmButton != null) MenuManager.confirmButton.gameObject.SetActive(AllowNoSelection);
+            if (MenuManager.confirmButton != null)
+            {
+                MenuManager.confirmButton.gameObject.SetActive(AllowNoSelection);
+            }
         }
     }
 }
