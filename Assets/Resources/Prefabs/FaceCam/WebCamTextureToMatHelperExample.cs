@@ -191,41 +191,22 @@ namespace DlibFaceLandmarkDetectorExample
 
                 OpenCVForUnity.UnityUtils.Utils.matToTexture2D(rgbaMat, texture);
 
-                byte[] networkTexture = ImageConversion.EncodeToJPG(texture);
-                //byte[] networkTexture = ImageConversion.EncodeArrayToJPG(texture.GetRawTextureData(), texture.graphicsFormat, (uint)texture.width, (uint)texture.height, default, 100);
-                Debug.Log("IsReadable :" + texture.isReadable);
-                ImageConversion.LoadImage(texture, networkTexture);
-                //SendFrame();
+                if (IsSpawned) {
+                    SendFrame();
+                }
             }
         }
 
-        IEnumerator SendFrame()
-        {
-            if (webCamTextureToMatHelper.IsPlaying() && webCamTextureToMatHelper.DidUpdateThisFrame() && IsSpawned)
-            { 
-                // Read the screen buffer after rendering is complete
-                yield return new WaitForEndOfFrame();
-
-                byte[] networkTexture = ImageConversion.EncodeToJPG(texture);
-                ImageConversion.LoadImage(texture, networkTexture);
-                Debug.Log("Buffer Size: " + networkTexture.Length);
-                //SendNetworkTexture(texture);
-
-                // Send Images a little less ofter than 30fps
-                yield return new WaitForSeconds(0.03f);
-            }
-        }
-
-        private void SendNetworkTexture(Texture2D texture)
+        public void SendFrame()
         {
             byte[] networkTexture = ImageConversion.EncodeToJPG(texture);
-            ImageConversion.LoadImage(texture, networkTexture);
             Debug.Log("Buffer Size: " + networkTexture.Length);
-            //if (networkTexture.Length <= 32768)
-            //{
-            //    SendNetworkTextureClientRPC(networkTexture);
-            //}
+            if (networkTexture.Length <= 32768)
+            {
+                SendNetworkTextureClientRPC(networkTexture);
+            }
         }
+
 
         [ClientRpc]
         private void SendNetworkTextureClientRPC(byte[] networkTexture) {
