@@ -1,4 +1,3 @@
-
 namespace SEE.Net.Actions.HolisticMetrics
 {
     /// <summary>
@@ -15,7 +14,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// The name of the city to change the selection to.
         /// </summary>
         public string CityName;
-        
+
         /// <summary>
         /// The constructor. This assigns the parameter values to fields.
         /// </summary>
@@ -26,7 +25,7 @@ namespace SEE.Net.Actions.HolisticMetrics
             BoardName = boardName;
             CityName = cityName;
         }
-        
+
         /// <summary>
         /// This method does nothing.
         /// </summary>

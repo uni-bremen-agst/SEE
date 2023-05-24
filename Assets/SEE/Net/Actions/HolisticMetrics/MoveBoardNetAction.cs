@@ -35,7 +35,7 @@ namespace SEE.Net.Actions.HolisticMetrics
             Position = position;
             Rotation = rotation;
         }
-        
+
         /// <summary>
         /// This method does nothing.
         /// </summary>
@@ -52,7 +52,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             if (!IsRequester())
             {
-                BoardsManager.Move(BoardName, Position, Rotation);    
+                BoardsManager.Move(BoardName, Position, Rotation);
             }
         }
     }

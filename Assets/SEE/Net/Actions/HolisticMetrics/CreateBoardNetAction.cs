@@ -20,7 +20,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             BoardConfig = boardConfig;
         }
-        
+
         /// <summary>
         /// This method does not do anything.
         /// </summary>
@@ -36,7 +36,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             if (!IsRequester())
             {
-                BoardsManager.Create(BoardConfig);   
+                BoardsManager.Create(BoardConfig);
             }
         }
     }

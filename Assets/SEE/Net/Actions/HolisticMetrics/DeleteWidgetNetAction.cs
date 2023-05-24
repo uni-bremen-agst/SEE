@@ -11,12 +11,12 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// The name of the board from which to delete the widget.
         /// </summary>
         public string BoardName;
-        
+
         /// <summary>
         /// The ID of the widget to delete.
         /// </summary>
         public Guid WidgetID;
-        
+
         /// <summary>
         /// The constructor of this class. This only assigns the parameter values to fields.
         /// </summary>
@@ -27,7 +27,7 @@ namespace SEE.Net.Actions.HolisticMetrics
             BoardName = boardName;
             WidgetID = widgetID;
         }
-        
+
         /// <summary>
         /// This method does nothing.
         /// </summary>

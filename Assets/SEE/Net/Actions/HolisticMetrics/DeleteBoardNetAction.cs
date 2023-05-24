@@ -37,7 +37,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             if (!IsRequester())
             {
-                BoardsManager.Delete(BoardName);    
+                BoardsManager.Delete(BoardName);
             }
         }
     }

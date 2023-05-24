@@ -27,7 +27,7 @@ namespace SEE.Net.Actions.HolisticMetrics
             BoardName = boardName;
             WidgetConfig = widgetConfig;
         }
-        
+
         /// <summary>
         /// This method does nothing.
         /// </summary>
@@ -45,7 +45,7 @@ namespace SEE.Net.Actions.HolisticMetrics
             {
                 FindWidgetsManager(BoardName).Create(WidgetConfig);
             }
-            
+
         }
     }
 }

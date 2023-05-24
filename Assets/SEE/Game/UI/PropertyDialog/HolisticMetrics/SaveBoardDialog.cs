@@ -23,7 +23,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// The input field that lets the player select a board from the scene to be saved.
         /// </summary>
         private SelectionProperty selectedBoard;
-        
+
         /// <summary>
         /// The input field that lets the player enter a name for the file in which to save the board configuration.
         /// </summary>
@@ -51,16 +51,16 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
                 "Enter a file name under which to save the configuration. If the file already exists," +
                 "it will be overwritten.";
             group.AddProperty(fileName);
-            
+
             propertyDialog = dialog.AddComponent<PropertyDialog>();
             propertyDialog.Title = "Specify board configuration";
             propertyDialog.Description = "Select the board to save and give the configuration file a name";
             propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
             propertyDialog.AddGroup(group);
-            
+
             propertyDialog.OnConfirm.AddListener(SaveBoardConfiguration);
             propertyDialog.OnCancel.AddListener(Cancel);
-            
+
             SEEInput.KeyboardShortcutsEnabled = false;
             propertyDialog.DialogShouldBeShown = true;
         }
@@ -76,7 +76,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             widgetsManager = BoardsManager.Find(selectedBoard.Value);
             Close();
         }
-        
+
         /// <summary>
         /// Fetches the input the player gave us.
         /// </summary>
