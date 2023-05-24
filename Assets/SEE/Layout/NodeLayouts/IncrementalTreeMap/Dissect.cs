@@ -101,7 +101,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     if( nodes[..i].Sum(x => x.Size) * 3 >= nodes.Sum(x => x.Size))
                     {
                         return i;
-                    }                    
+                    }
                 }
             }
             throw new ArgumentException("We should never arrive here.\n");

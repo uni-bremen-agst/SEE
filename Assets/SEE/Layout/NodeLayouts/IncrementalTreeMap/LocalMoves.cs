@@ -12,6 +12,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             var bestVal = collection.Max(eval);
             return collection.First(x => eval(x) == bestVal);
         }
+        
         private static T ArgMinJ<T>(ICollection<T> collection, Func<T, IComparable> eval)
         {
             var bestVal = collection.Min(eval);
@@ -54,8 +55,6 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             return result;
         }
 
-        public static void CorretNodes(IList<TNode> nodes)
-        {}
         public static void AddNode(IList<TNode> nodes,TNode newNode)
         {
             // ArgMax is shit in c#
@@ -169,7 +168,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 }
             }
         }
+        
         public static void MakeLocalMoves(IList<TNode> nodes)
-        {}
+        {
+        }
     }
 }
