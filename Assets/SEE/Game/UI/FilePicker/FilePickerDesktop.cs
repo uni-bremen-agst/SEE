@@ -9,6 +9,10 @@ using UnityEngine;
 
 namespace SEE.Game.UI.FilePicker
 {
+    /// <summary>
+    /// Allows a user to pick a file.
+    /// Implementation for the desktop environment.
+    /// </summary>
     public partial class FilePicker
     {
         /// <summary>
