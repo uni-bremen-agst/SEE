@@ -96,7 +96,7 @@ public class FaceCam : NetworkBehaviour
         {
             if (IsOwner)
             {
-                GetComponent<MeshRenderer>().material = Resources.Load<Material>("Materials/LSHMetal/29");
+                //GetComponent<MeshRenderer>().material = Resources.Load<Material>("Materials/LSHMetal/29");
                 //GetComponent<Renderer>().material.color = new Color(255, 0, 0);
             }
             testetForOwner = true;
