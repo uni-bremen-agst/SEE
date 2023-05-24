@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Windows.Speech;
@@ -99,7 +100,7 @@ namespace SEE.Game.UI.Menu
 
             if (Menu != null)
             {
-                Destroy(Menu);
+                Destroyer.Destroy(Menu);
             }
         }
 

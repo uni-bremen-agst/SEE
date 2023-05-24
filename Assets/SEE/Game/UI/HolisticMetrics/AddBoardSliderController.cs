@@ -37,7 +37,7 @@ namespace SEE.Game.UI.HolisticMetrics
         /// rotation of the new board.
         /// </summary>
         private GameObject dummyBoard;
-        
+
         /// <summary>
         /// Sets up this component with the board configuration of the new board and a reference to the boards manager.
         /// Also sets up the slider, the window dragger and instantiates the dummy board.
@@ -46,13 +46,13 @@ namespace SEE.Game.UI.HolisticMetrics
         {
 
             windowDragger.dragArea = transform.parent.GetComponent<RectTransform>();
-            
+
             slider.mainSlider.onValueChanged.AddListener(Rotate);
             const string pathToBoard = "Prefabs/HolisticMetrics/SceneComponents/MetricsBoard";
             GameObject boardPrefab = Resources.Load<GameObject>(pathToBoard);
             dummyBoard = Instantiate(boardPrefab, position, Quaternion.identity);
         }
-        
+
         /// <summary>
         /// This method will be called when the slider value changes. It will change the dummy board's rotation to the
         /// slider's value.

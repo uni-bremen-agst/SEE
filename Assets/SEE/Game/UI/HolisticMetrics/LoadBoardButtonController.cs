@@ -12,7 +12,7 @@ namespace SEE.Game.UI.HolisticMetrics
         /// Whether this class has a click in store that wasn't yet fetched.
         /// </summary>
         private bool gotClick;
-        
+
         /// <summary>
         /// When the player clicks the button, we will mark <see cref="gotClick"/> as true.
         /// </summary>
