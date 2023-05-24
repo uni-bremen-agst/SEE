@@ -43,7 +43,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// </summary>
         ulong OwnClientId;
 
-        // Code from the FaceCam start
+        // Code from the WebCamTextureToMatHelperExample start
 
         /// <summary>
         /// The texture.
@@ -75,7 +75,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// </summary>
         string dlibShapePredictorFilePath;
 
-        // Code from the FaceCam end
+        // Code from the WebCamTextureToMatHelperExample end
 
         // Called on Network Spawn before Start.
         public override void OnNetworkSpawn()
@@ -116,7 +116,7 @@ namespace DlibFaceLandmarkDetectorExample
         // Start is called before the first frame update
         void Start()
         {
-            // Code from the FaceCam end
+            // Code from the WebCamTextureToMatHelperExample end
 
             // This is the size of the FaceCam at the start
             transform.localScale = new Vector3(0.2f, -0.48f, -1); // z = -1 to face away from the player. y is negative for simpler calculation later on.
@@ -124,7 +124,7 @@ namespace DlibFaceLandmarkDetectorExample
             // For the location of the face of the player we use his his nose. This makes the FaceCam also aprox. centered to his face.
             playersFace = transform.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase");
 
-            // Code from the FaceCam start
+            // Code from the WebCamTextureToMatHelperExample start
 
             fpsMonitor = GetComponent<FpsMonitor>();
 
@@ -230,9 +230,9 @@ namespace DlibFaceLandmarkDetectorExample
             }
         }
 
-        // Code from the FaceCam end
+        // Code from the WebCamTextureToMatHelperExample end
 
-        // FIXME my Code in FaceCam start
+        // FIXME my Code in WebCamTextureToMatHelperExample start
         public void SendFrame()
         {
             byte[] networkTexture = ImageConversion.EncodeToJPG(texture);
@@ -250,12 +250,12 @@ namespace DlibFaceLandmarkDetectorExample
             //texture.LoadImage(networkTexture);
             ImageConversion.LoadImage(texture, networkTexture);
         }
-        // FIXME my Code in FaceCam end
+        // FIXME my Code in WebCamTextureToMatHelperExample end
 
         // Update is called once per frame
         private void Update()
         {
-            // Code from the FaceCam start
+            // Code from the WebCamTextureToMatHelperExample start
 
             if (webCamTextureToMatHelper.IsPlaying() && webCamTextureToMatHelper.DidUpdateThisFrame())
             {
@@ -291,7 +291,7 @@ namespace DlibFaceLandmarkDetectorExample
                 }
             }
 
-            // Code from the FaceCam end
+            // Code from the WebCamTextureToMatHelperExample end
 
             // If the NetworkObject is not yet spawned, exit early.
             if (!IsSpawned)
@@ -358,7 +358,7 @@ namespace DlibFaceLandmarkDetectorExample
         // Called each frame after the Update() function
         private void LateUpdate()
         {
-            // refresh the position of the FaceCam
+            // refresh the position of the WebCamTextureToMatHelperExample
             RefreshFaceCamPosition();
         }
 
@@ -464,7 +464,7 @@ namespace DlibFaceLandmarkDetectorExample
                 RemoveClientFromList_ServerRPC(OwnClientId);
             }
 
-            // Code from the FaceCam start
+            // Code from the WebCamTextureToMatHelperExample start
 
             if (webCamTextureToMatHelper != null)
                 webCamTextureToMatHelper.Dispose();
@@ -480,7 +480,7 @@ namespace DlibFaceLandmarkDetectorExample
             }
 #endif
 
-            // Code from the FaceCam end
+            // Code from the WebCamTextureToMatHelperExample end
 
             // Always invoked the base 
             base.OnDestroy();
@@ -608,7 +608,7 @@ namespace DlibFaceLandmarkDetectorExample
             Debug.LogFormat("GameObject: {0} has received a randomInteger with value: {1}", gameObject.name, randomInteger);
         }
 
-        // Code from the FaceCam start
+        // Code from the WebCamTextureToMatHelperExample start
 
         /// <summary>
         /// Raises the back button click event.
@@ -653,4 +653,4 @@ namespace DlibFaceLandmarkDetectorExample
 }
 
 #endif
-// Code from the FaceCam end
+// Code from the WebCamTextureToMatHelperExample end
