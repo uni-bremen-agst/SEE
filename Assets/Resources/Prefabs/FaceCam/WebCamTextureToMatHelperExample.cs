@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 namespace DlibFaceLandmarkDetectorExample
 {
@@ -16,7 +17,7 @@ namespace DlibFaceLandmarkDetectorExample
     /// WebCamTextureToMatHelper Example
     /// </summary>
     [RequireComponent(typeof(WebCamTextureToMatHelper))]
-    public class WebCamTextureToMatHelperExample : MonoBehaviour
+    public class WebCamTextureToMatHelperExample : NetworkBehaviour
     {
         /// <summary>
         /// The texture.
