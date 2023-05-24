@@ -6,7 +6,7 @@ using UnityEngine.Events;
 namespace SEE.Game.UI.Menu
 {
     /// <summary>
-    /// This class represents a platform-independent entry in a <see cref="SimpleMenu"/>,
+    /// This class represents a platform-independent entry in a <see cref="SimpleListMenu"/>,
     /// which performs a designated action when it is chosen there.
     /// </summary>
     public class MenuEntry

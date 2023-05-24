@@ -91,7 +91,8 @@ namespace SEE.GO.Menu
             //{
             //    modeMenu.AddEntry(entry);
             //}
-            modeMenu.AddEntries(entries);
+            entries.ForEach(modeMenu.AddEntry);
+            modeMenu.ActiveEntry = entries.Find(entry => entry.Title == firstType.Name);
 
             return modeMenu;
 
@@ -99,7 +100,7 @@ namespace SEE.GO.Menu
 
             // Constructs a toggle menu entry for the mode menu from the given action state type.
             ToggleMenuEntry ToModeMenuEntry(ActionStateType type) =>
-                new ToggleMenuEntry(active: Equals(type, firstType),
+                new ToggleMenuEntry(
                                     entryAction: () => GlobalActionHistory.Execute(type), exitAction: null,
                                     title: type.Name, description: type.Description, entryColor: type.Color,
                                     icon: Resources.Load<Sprite>(type.IconPath));
@@ -128,7 +129,7 @@ namespace SEE.GO.Menu
             ModeMenu = CreateModeMenu(gameObject);
             Indicator = CreateActionStateIndicator(gameObject);
             // Whenever the state is changed, the action state indicator should reflect that
-            ModeMenu.OnMenuEntrySelected.AddListener(SetIndicatorStateToEntry);
+            ModeMenu.OnEntrySelected += SetIndicatorStateToEntry;
             // Initialize action state indicator to current action state
             SetIndicatorStateToEntry(ModeMenu.ActiveEntry);
 
@@ -149,7 +150,7 @@ namespace SEE.GO.Menu
             {
                 if (SEEInput.DigitKeyPressed(i))
                 {
-                    ModeMenu.SelectEntry(i);
+                    ModeMenu.SelectEntry(ModeMenu.Entries[i]);
                     break;
                 }
             }

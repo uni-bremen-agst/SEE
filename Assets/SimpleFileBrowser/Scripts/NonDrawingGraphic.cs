@@ -1,19 +1,3 @@
-﻿using UnityEngine;
-using UnityEngine.UI;
-
-namespace SimpleFileBrowser
-{
-	// Credit: http://answers.unity.com/answers/1157876/view.html
-	[RequireComponent( typeof( CanvasRenderer ) )]
-	public class NonDrawingGraphic : Graphic
-	{
-		public override void SetMaterialDirty() { return; }
-		public override void SetVerticesDirty() { return; }
-
-		protected override void OnPopulateMesh( VertexHelper vh )
-		{
-			vh.Clear();
-			return;
-		}
-	}
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:43ad031ed92cee786f8a441e4300b97e9aeeaa82438688ce3c02ff1d2f5f5c2b
+size 438
