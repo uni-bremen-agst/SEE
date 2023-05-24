@@ -50,7 +50,10 @@ namespace SEE.Game.UI.Menu
         {
             base.OnStartFinished();
             // updates menu
-            if (ActiveEntry != null) ActivateButton(ActiveEntry);
+            if (ActiveEntry != null)
+            {
+                ActivateButton(ActiveEntry);
+            }
             // adds listeners
             OnEntrySelected += entry => ActiveEntry = entry;
             OnEntrySelected += ActivateButton;
