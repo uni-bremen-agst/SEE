@@ -65,7 +65,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
             gotPosition = false;
             GameObject.Find("/DemoWorld/Plane").AddComponent<BoardAdder>();
         }
-        
+
         /// <summary>
         /// This component deletes itself once a left click has been registered by any BoardAdder instance.
         /// </summary>
@@ -96,7 +96,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
             clickPosition = Vector3.zero;
             return false;
         }
-        
+
         /// <summary>
         /// Can be used to mark this class as "to be deleted". That means all instances of this class will destroy
         /// themselves in the next <see cref="Update"/> step.
