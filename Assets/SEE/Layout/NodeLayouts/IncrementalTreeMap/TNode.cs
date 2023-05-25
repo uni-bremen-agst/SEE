@@ -15,7 +15,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         public TNode Parent {get => parent;}
 
         private IList<TNode> children;
-        public IList<TNode> Children {get => Children;}
+        public IList<TNode> Children {get => children;}
         
         private TRectangle rectangle;
         public TRectangle Rectangle 
