@@ -62,6 +62,10 @@ namespace SEE.Controls.Actions
             new(9, "Draw", "Draw a line",
                 Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                 DrawAction.CreateReversibleAction);
+        public static ActionStateType Sync { get; } =
+            new(10, "AcceptDivergence", "Sync from Implementation into Architecture",
+                Color.grey.Darker(), "Materials/ModernUIPack/Arrow Bold",
+                AcceptDivergenceAction.CreateReversibleAction);
         #endregion
 
         /// <summary>
