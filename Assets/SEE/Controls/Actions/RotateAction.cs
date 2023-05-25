@@ -118,14 +118,14 @@ namespace SEE.Controls.Actions
 
             if (SEEInput.Select())
             {
-                if (!(Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node))
+                if (Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.Node)
                 {
                     // Object outside the graph was selected, should be ignored.
                     SaveRotationChanges();
                     DisableGizmo();
                     return true;
                 }
-                if (objectToRotate != raycastHit.collider.gameObject)
+                else if (objectToRotate != raycastHit.collider.gameObject)
                 {
                     // Selected a different object - save changes and change object assigned to gizmo.
                     SaveRotationChanges();
