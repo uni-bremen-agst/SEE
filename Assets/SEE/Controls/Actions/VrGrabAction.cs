@@ -1,4 +1,5 @@
-﻿using Autohand;
+﻿using System.Collections;
+using Autohand;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
@@ -42,7 +43,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Indicates whether a collision has occurred
         /// </summary>
-        private bool collidedState;
+        private bool hasCollided;
 
         /// <summary>
         /// The initial position of the grabbed object
@@ -58,6 +59,17 @@ namespace SEE.Controls.Actions
         /// The initial rotation of the grabbed object
         /// </summary>
         private Vector3 initialLocalScale;
+        
+        /// <summary>
+        /// Indicates whether a collision is allowed to occur
+        /// </summary>
+        private bool allowCollision = true;
+        
+        /// <summary>
+        /// The collision cooldown. Currently on half a second
+        /// </summary>
+        private float collisionCooldownTime = 0.5f;
+
 
         /// <summary>
         /// Adds listeners to the grabbable component for onGrab and onRelease events.
@@ -85,8 +97,9 @@ namespace SEE.Controls.Actions
             initialRotation = currentGameObject.transform.rotation;
             initialLocalScale = currentGameObject.transform.localScale;
 
-            if (gameObject.TryGetNode(out Node node) && !node.IsRoot())
+            if (gameObject.TryGetNode(out Node node) && !node.IsRoot() && currentGameObject != null)
             {
+                IsGrabbed = true;
                 // Set the layer of all children to ignore collision with the grabbed parent object
                 GameObjectExtensions.SetAllChildLayer(grabbable.gameObject.transform, IgnoreChildrenLayer, true);
                 grabbable.gameObject.layer = GrabbableLayer;
@@ -97,11 +110,24 @@ namespace SEE.Controls.Actions
                 rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                 rigidbody.isKinematic = false;
 
-                IsGrabbed = true;
                 GrabbedObject = grabbable.gameObject;
                 //Debug.LogWarning("Player grabbed node: " + GrabbedObject.name);
                 Portal.SetInfinitePortal(gameObject);
+                StartCoroutine(StartCollisionCooldown());
             }
+        }
+        
+        /// <summary>
+        /// Starts a cooldown period during which collisions are disabled.
+        /// </summary>
+        /// <returns>An IEnumerator to be used with StartCoroutine.</returns>
+        private IEnumerator StartCollisionCooldown()
+        {
+            allowCollision = false;
+
+            yield return new WaitForSeconds(collisionCooldownTime);
+
+            allowCollision = true;
         }
 
         /// <summary>
@@ -111,8 +137,6 @@ namespace SEE.Controls.Actions
         /// <param name="grabbable">The Grabbable component of the released object.</param>
         private void OnRelease(Hand hand, Grabbable grabbable)
         {
-            var currentGameObject = grabbable.gameObject;
-
             if (gameObject.TryGetNode(out Node node) && !node.IsRoot() && IsInCollision())
             {
                 isReleased = true;
@@ -123,17 +147,19 @@ namespace SEE.Controls.Actions
                 rigidbody.isKinematic = true;
 
                 //Debug.LogWarning("Player released grabbed object: " + GrabbedObject);
-                GrabbedObject = null;
 
                 Portal.SetInfinitePortal(gameObject);
 
                 // Set the layer of all children back to normal (Grabbable layer)
                 GameObjectExtensions.SetAllChildLayer(grabbable.gameObject.transform, GrabbableLayer, true);
-                
+            }
+
+            if (GrabbedObject != null)
+            {
                 // Reset the position and rotation of the grabbed object to its initial state
-                gameObject.transform.position = initialPosition;
-                gameObject.transform.rotation = initialRotation;
-                gameObject.transform.localScale = initialLocalScale;
+                GrabbedObject.transform.position = initialPosition;
+                GrabbedObject.transform.rotation = initialRotation;
+                GrabbedObject.transform.localScale = initialLocalScale;
             }
         }
 
@@ -162,6 +188,8 @@ namespace SEE.Controls.Actions
         /// <returns>True if a collision is detected, false otherwise.</returns>
         private bool IsColliding(Collider collider)
         {
+            if (!allowCollision) return false;
+            
             Collider[] colliders = Physics.OverlapBox(collider.bounds.center, collider.bounds.extents,
                 collider.transform.rotation);
             foreach (Collider otherCollider in colliders)
@@ -181,8 +209,6 @@ namespace SEE.Controls.Actions
         /// <param name="collisionInfo">Information about the collision.</param>
         private void OnCollisionEnter(Collision collisionInfo)
         {
-            collidedState = true;
-
             // Check if the collided object has a Node, is not the root node, and is the currently grabbed object
             if (collisionInfo.gameObject.TryGetNode(out Node node) && IsGrabbed && !node.IsRoot() &&
                 GrabbedObject == gameObject)
@@ -191,14 +217,10 @@ namespace SEE.Controls.Actions
                 {
                     //Debug.LogWarning("Collision with node: " + collisionInfo.gameObject.name);
                     MoveAction.StartReparentProcess(collisionInfo.gameObject, GrabbedObject);
-
-                    if (GrabbedObject != null)
-                    {
-                        // Set the new initial position and rotation of the object
-                        initialPosition = GrabbedObject.transform.position;
-                        initialRotation = GrabbedObject.transform.rotation;
-                        initialLocalScale = GrabbedObject.transform.localScale;
-                    }
+                    // Set the new initial position and rotation of the object
+                    initialPosition = GrabbedObject.transform.position;
+                    initialRotation = GrabbedObject.transform.rotation;
+                    initialLocalScale = GrabbedObject.transform.localScale;
                 }
             }
         }
@@ -209,7 +231,7 @@ namespace SEE.Controls.Actions
         /// <param name="collisionInfo">Information about the collision.</param>
         private void OnCollisionExit(Collision collisionInfo)
         {
-            collidedState = false;
+            hasCollided = false;
         }
 
         /*
