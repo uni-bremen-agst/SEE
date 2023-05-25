@@ -371,35 +371,36 @@ namespace SEE.Controls.Actions
             /// game-object hierarchy afterwards.
             /// </summary>
             /// <param name="target">the target node of the re-parenting, i.e., the new parent</param>
-            internal void Reparent(GameObject target, GameObject source)
-            {
+            internal void Reparent(GameObject target, GameObject originalBigParent)
+            {                   
+                
+                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND,
+                                     originalBigParent.gameObject);
+                
                 // target must not be a descendant of grabbedObject
-                if (!IsDescendant(target, source))
+                if (!IsDescendant(target, originalBigParent))
                 {
-                    PutOnAndFit(source, target, originalParent.gameObject, originalLocalScale);
+                    PutOnAndFit(originalBigParent, target, originalBigParent.gameObject, originalLocalScale);
                     if (SceneSettings.InputType != PlayerInputType.VRPlayer)
                     {
                         UnmarkAsTarget();
                         MarkAsTarget(target.transform);
                     }
-
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND,
-                        originalParent.gameObject);
-
+                    
                     newParent = target;
 
                     // The mapping is only possible if we are in a reflexion city
                     // and the mapping target is not the root of the graph.
                     if (withinReflexionCity && !target.IsRoot())
                     {
-                        ReflexionMapperSetParent(source, target);
+                        ReflexionMapperSetParent(originalBigParent, target);
                     }
                     else
                     {
-                        GameNodeMoverSetParent(source, target);
+                        GameNodeMoverSetParent(originalBigParent, target);
                     }
 
-                    originalParent = source.transform;
+                    originalParent = originalBigParent.transform;
                 }
 
                 // True if node is a descendant of root in the underlying graph.
@@ -659,9 +660,9 @@ namespace SEE.Controls.Actions
         /// Is called from OnCollisionEnter() in <see cref="VrGrabAction"/>.
         /// </summary>
         /// <param name="target"></param>
-        public static void StartReparentProcess(GameObject target, GameObject source)
+        public static void StartReparentProcess(GameObject newBigParent, GameObject originalBigParent)
         {
-            grabbedObject.Reparent(target, source);
+            grabbedObject.Reparent(newBigParent, originalBigParent);
         }
 
         /// <summary>

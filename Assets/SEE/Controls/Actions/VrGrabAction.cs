@@ -10,16 +10,10 @@ namespace SEE.Controls.Actions
      * The VrGrabAction class is responsible for handling the grabbing and releasing of objects in a VR environment.
      * When an object is grabbed, it adjusts its properties and handles collisions with other objects.
      *
-     * FIXME: If multiple blocks are stacked on each other they are preventde from moving.
      * FIXME: Consider scaling based on something else, or not. It's a matter for discussion among the team.
      */
     public class VrGrabAction : MonoBehaviour
     {
-        /// <summary>
-        /// Indicates whether the grabbed node needs adjustment
-        /// </summary>
-        private bool adjustGrabbedNode = false;
-
         /// <summary>
         /// Indicates whether a game object is currently grabbed
         /// </summary>
@@ -61,6 +55,11 @@ namespace SEE.Controls.Actions
         private Quaternion initialRotation;
 
         /// <summary>
+        /// The initial rotation of the grabbed object
+        /// </summary>
+        private Vector3 initialLocalScale;
+
+        /// <summary>
         /// Adds listeners to the grabbable component for onGrab and onRelease events.
         /// </summary>
         public void Start()
@@ -84,6 +83,7 @@ namespace SEE.Controls.Actions
             // Set the initial position and rotation of the object
             initialPosition = currentGameObject.transform.position;
             initialRotation = currentGameObject.transform.rotation;
+            initialLocalScale = currentGameObject.transform.localScale;
 
             if (gameObject.TryGetNode(out Node node) && !node.IsRoot())
             {
@@ -97,12 +97,9 @@ namespace SEE.Controls.Actions
                 rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                 rigidbody.isKinematic = false;
 
-                adjustGrabbedNode = true;
                 IsGrabbed = true;
                 GrabbedObject = grabbable.gameObject;
-                Debug.LogWarning("Player grabbed node: " + GrabbedObject.name);
-
-
+                //Debug.LogWarning("Player grabbed node: " + GrabbedObject.name);
                 Portal.SetInfinitePortal(gameObject);
             }
         }
@@ -116,26 +113,27 @@ namespace SEE.Controls.Actions
         {
             var currentGameObject = grabbable.gameObject;
 
-            isReleased = true;
-            IsGrabbed = false;
-            Rigidbody rigidbody = grabbable.gameObject.GetComponent<Rigidbody>();
-            rigidbody.interpolation = RigidbodyInterpolation.None;
-            rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
-            rigidbody.isKinematic = true;
-
-            Debug.LogWarning("Player released grabbed object: " + GrabbedObject);
-            GrabbedObject = null;
-
-            Portal.SetInfinitePortal(gameObject);
-
-            // Set the layer of all children back to normal (Grabbable layer)
-            GameObjectExtensions.SetAllChildLayer(grabbable.gameObject.transform, GrabbableLayer, true);
-
-            // Reset the position and rotation of the grabbed object to its initial state
-            if (collidedState == false)
+            if (gameObject.TryGetNode(out Node node) && !node.IsRoot() && IsInCollision())
             {
-                currentGameObject.transform.position = initialPosition;
-                currentGameObject.transform.rotation = initialRotation;
+                isReleased = true;
+                IsGrabbed = false;
+                Rigidbody rigidbody = grabbable.gameObject.GetComponent<Rigidbody>();
+                rigidbody.interpolation = RigidbodyInterpolation.None;
+                rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
+                rigidbody.isKinematic = true;
+
+                //Debug.LogWarning("Player released grabbed object: " + GrabbedObject);
+                GrabbedObject = null;
+
+                Portal.SetInfinitePortal(gameObject);
+
+                // Set the layer of all children back to normal (Grabbable layer)
+                GameObjectExtensions.SetAllChildLayer(grabbable.gameObject.transform, GrabbableLayer, true);
+                
+                // Reset the position and rotation of the grabbed object to its initial state
+                gameObject.transform.position = initialPosition;
+                gameObject.transform.rotation = initialRotation;
+                gameObject.transform.localScale = initialLocalScale;
             }
         }
 
@@ -193,6 +191,14 @@ namespace SEE.Controls.Actions
                 {
                     //Debug.LogWarning("Collision with node: " + collisionInfo.gameObject.name);
                     MoveAction.StartReparentProcess(collisionInfo.gameObject, GrabbedObject);
+
+                    if (GrabbedObject != null)
+                    {
+                        // Set the new initial position and rotation of the object
+                        initialPosition = GrabbedObject.transform.position;
+                        initialRotation = GrabbedObject.transform.rotation;
+                        initialLocalScale = GrabbedObject.transform.localScale;
+                    }
                 }
             }
         }
