@@ -48,15 +48,20 @@ namespace SEE.Controls.Actions
         /// <param name="description">Description for this ActionStateType.</param>
         /// <param name="color">Color for this ActionStateType.</param>
         /// <param name="iconPath">Path to the material of the icon for this ActionStateType.</param>
-        /// </exception>
-        protected AbstractActionStateType(string name, string description, Color color, string iconPath, ActionStateTypeGroup parent)
+        /// <param name="group">The group this action state type belongs to; may be null.</param>
+        /// <param name="register">If true, this action state type will be registered in <see cref="ActionStateTypes"/>.</param>
+        protected AbstractActionStateType
+            (string name, string description, Color color, string iconPath, ActionStateTypeGroup group, bool register)
         {
             Name = name;
             Description = description;
             Color = color;
             IconPath = iconPath;
-            parent?.Add(this);
-            ActionStateTypes.Add(this);
+            group?.Add(this);
+            if (register)
+            {
+                ActionStateTypes.Add(this);
+            }
         }
     }
 }

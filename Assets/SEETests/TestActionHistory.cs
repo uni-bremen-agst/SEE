@@ -15,7 +15,7 @@ namespace SEETests
         /// Shortcut to a constructor of <see cref="ActionStateType"/> that requires
         /// only a name and <see cref="CreateReversibleAction"/>.
         /// </summary>
-        private class TestActionStateType : ActionStateType
+        private abstract class TestActionStateType : ActionStateType
         {
             /// <summary>
             /// Constructor allowing to set the <paramref name="name"/> and <see cref="CreateReversible"/>.
@@ -23,7 +23,8 @@ namespace SEETests
             /// <param name="name">name of the <see cref="ActionStateType"/>; must be unique</param>
             /// <param name="createReversible">value for <see cref="CreateReversible"/></param>
             protected TestActionStateType(string name, CreateReversibleAction createReversible)
-                : base(name: name, description: "", color: UnityEngine.Color.white, iconPath: "", createReversible: createReversible)
+                : base(name: name, description: "", color: UnityEngine.Color.white,
+                       iconPath: "", createReversible: createReversible, register: false)
             {
             }
         }
@@ -184,7 +185,7 @@ namespace SEETests
             /// is initially <see cref="ReversibleAction.Progress.NoEffect"/>
             /// and after the first Update call <see cref="ReversibleAction.Progress.InProgress"/>
             /// for the rest of its life.
-            TestAction c = new TestAction();
+            TestAction c = new();
             CheckCalls(c, value: false, awake: 0, start: 0, update: 0, stop: 0);
             hist.Execute(c);
             CheckCalls(c, value: false, awake: 1, start: 1, update: 0, stop: 0);
@@ -207,10 +208,10 @@ namespace SEETests
         [Test]
         public void MultipleActions()
         {
-            TestAction c1 = new TestAction();
-            TestAction c2 = new TestAction();
-            TestAction c3 = new TestAction();
-            TestAction c4 = new TestAction();
+            TestAction c1 = new();
+            TestAction c2 = new();
+            TestAction c3 = new();
+            TestAction c4 = new();
 
             CheckCalls(c1, value: false, awake: 0, start: 0, update: 0, stop: 0);
             CheckCalls(c2, value: false, awake: 0, start: 0, update: 0, stop: 0);

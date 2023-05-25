@@ -18,8 +18,10 @@ namespace SEE.Controls.Actions
         /// <param name="parent">The parent of this action in the nesting hierarchy in the menu.</param>
         /// <param name="color">Color for this <see cref="ActionStateTypeGroup"/>.</param>
         /// <param name="iconPath">Path to the material of the icon for this <see cref="ActionStateTypeGroup"/>.</param>
-        public ActionStateTypeGroup(string name, string description, Color color, string iconPath, ActionStateTypeGroup parent = null)
-            : base(name, description, color, iconPath, parent)
+        /// <param name="register">If true, this action state type will be registered in <see cref="ActionStateTypes"/>.</param>
+        public ActionStateTypeGroup
+            (string name, string description, Color color, string iconPath, ActionStateTypeGroup parent = null, bool register = true)
+            : base(name, description, color, iconPath, parent, register)
         {
         }
 

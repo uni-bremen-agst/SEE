@@ -1,5 +1,4 @@
-﻿using System;
-using SEE.Utils;
+﻿using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -34,9 +33,10 @@ namespace SEE.Controls.Actions
         /// <param name="iconPath">Path to the material of the icon for this ActionStateType.</param>
         /// <param name="createReversible">Delegate to be called to create a new instance of this kind of action.
         /// Can be null, in which case no delegate will be called.</param>
+        /// <param name="register">If true, this action state type will be registered in <see cref="ActionStateTypes"/>.</param>
         public ActionStateType(string name, string description,
-            Color color, string iconPath, CreateReversibleAction createReversible, ActionStateTypeGroup parent = null)
-            : base(name, description, color, iconPath, parent)
+            Color color, string iconPath, CreateReversibleAction createReversible, ActionStateTypeGroup parent = null, bool register = true)
+            : base(name, description, color, iconPath, parent, register)
         {
             CreateReversible = createReversible;
         }
