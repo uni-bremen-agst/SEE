@@ -208,6 +208,19 @@ namespace SEE.Tools.ReflexionAnalysis
             return state == State.Specified || state == State.Convergent || state == State.Absent || state == State.AllowedAbsent;
         }
 
+        /// <summary>
+        /// Returns true if <paramref name="edge"/> is a specified edge in the architecture (has one of the
+        /// following states: specified, convergent, absent, allowed absent).
+        /// Precondition: <paramref name="edge"/> must be in the architecture graph.
+        /// </summary>
+        /// <param name="edge">architecture dependency</param>
+        /// <returns>true if edge is a specified architecture dependency</returns>
+        public static bool IsDivergent(Edge edge)
+        {
+            // AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
+            State state = edge.State();
+            return state == State.Divergent;
+        }
         #endregion
 
         #region Edge counter attribute
