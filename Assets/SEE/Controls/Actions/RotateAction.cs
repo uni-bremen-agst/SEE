@@ -1,13 +1,11 @@
 using System.Collections.Generic;
-using System.Linq;
-using SEE.Game;
-using SEE.Game.UI3D;
+using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Audio;
-using SEE.Game.Operator;
+using RTG;
 
 namespace SEE.Controls.Actions
 {
@@ -17,68 +15,22 @@ namespace SEE.Controls.Actions
     internal class RotateAction : AbstractPlayerAction
     {
         /// <summary>
-        /// The number of degrees in a full circle.
-        /// </summary>
-        private const float FullCircleDegree = 360.0f;
-
-        private struct Hit
-        {
-            /// <summary>
-            /// The root of the code city. This is the top-most game object representing a node,
-            /// i.e., is tagged by <see cref="Tags.Node"/>.
-            /// </summary>
-            internal Transform CityRootNode;
-
-            internal CityCursor Cursor;
-            internal UnityEngine.Plane Plane;
-        }
-
-        private const float SnapStepCount = 8;
-        private const float SnapStepAngle = FullCircleDegree / SnapStepCount;
-        private const int TextureResolution = 1024;
-        private static readonly RotateGizmo gizmo = RotateGizmo.Create(TextureResolution);
-
-        private bool rotating;
-        private Hit hit;
-        /// <summary>
-        /// The angle at the point in time when the first node was grabbed.
-        /// </summary>
-        private float startAngle;
-        /// <summary>
-        /// The final rotation angle at the point in time when the first node was ungrabbed.
-        /// </summary>
-        private float rotationAngle;
-        /// <summary>
-        /// A mapping of the objects to be rotated onto their rotations before
-        /// actually being rotated, in other words, their initial rotations.
-        /// These rotations are needed for <see cref="Undo"/>.
-        /// </summary>
-        private readonly Dictionary<GameObject, Quaternion> initialRotations = new();
-        /// <summary>
-        /// A mapping of the objects rotated onto their rotations when the
-        /// rotation actions was completed, in other words, their reached rotations.
-        /// These rotations are needed for <see cref="Redo"/>.
-        /// </summary>
-        private readonly Dictionary<GameObject, Quaternion> finalRotations = new();
-
-        /// <summary>
-        /// The operator for the node that is being rotated.
-        /// </summary>
-        private NodeOperator @operator;
-
-        /// <summary>
         /// Returns a new instance of <see cref="RotateAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="RotateAction"/></returns>
-        internal static ReversibleAction CreateReversibleAction() => new RotateAction();
-
-        // FIXME: Action is not reversible!
+        /// <returns>new instance</returns>
+        public static ReversibleAction CreateReversibleAction()
+        {
+            return new RotateAction();
+        }
 
         /// <summary>
         /// Returns a new instance of <see cref="RotateAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance() => new RotateAction();
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
@@ -90,171 +42,153 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns the set of IDs of all game objects changed by this action.
-        /// <see cref="ReversibleAction.GetChangedObjects"/>
+        /// The gameObject that is currently selected and should be rotated.
+        /// Will be null if no object has been selected yet.
         /// </summary>
-        /// <returns>empty set because this action does not change anything</returns>
-        public override HashSet<string> GetChangedObjects()
+        private GameObject objectToRotate;
+
+        /// <summary>
+        /// The rotation of <see cref="objectToRotate"/> before this action actually rotated it,
+        /// i.e., its orginial rotation. This value is needed for <see cref="Undo"/>.
+        /// </summary>
+        private Quaternion originalRotation;
+
+        /// <summary>
+        /// The rotation of <see cref="objectToRotate"/> after this action rotated it,
+        /// i.e., its new rotation. This value is needed for <see cref="Redo"/>.
+        /// </summary>
+        private Quaternion newRotation;
+
+        /// <summary>
+        /// Reverts the position and rotation of <paramref name="gameObject"/> to
+        /// <see cref="Position"/> and <see cref="Rotation"/>.
+        /// </summary>
+        /// <param name="gameObject">object whose position and rotation are to be restored</param>
+        public void Rotate(Quaternion Rotation)
         {
-            return initialRotations.Keys.Select(x => x.name).ToHashSet();
+            NodeOperator nodeOperator = objectToRotate.AddOrGetComponent<NodeOperator>();
+            nodeOperator.RotateTo(Rotation, 0);
+            // TODO: We do not need lists. Only one object can be rotated.
+            new RotateNodeNetAction(new List<GameObject>() { objectToRotate }).Execute();
         }
 
         /// <summary>
-        /// Returns the operator for the given <paramref name="node"/>.
+        /// Undoes this <see cref="RotateAction"/>.
         /// </summary>
-        /// <param name="node">The node to get the operator for.</param>
-        /// <returns>the operator for the given <paramref name="node"/></returns>
-        private NodeOperator GetOperatorForNode(Component node)
-        {
-            // We save the operator in the @operator attribute to avoid calling `AddOrGetComponent` every time.
-            if (@operator == null || @operator.transform != node)
-            {
-                @operator = node.gameObject.AddOrGetComponent<NodeOperator>();
-            }
-            return @operator;
-        }
-
-        /// <summary>
-        /// Returns a new instance of <see cref="RotateAction"/>.
-        /// <see cref="ReversibleAction.Update"/>.
-        /// </summary>
-        /// <returns>always false</returns>
-        public override bool Update()
-        {
-            InteractableObject obj = InteractableObject.HoveredObjectWithWorldFlag;
-            Transform cityRootNode = null;
-            CityCursor cityCursor = null;
-
-            if (obj)
-            {
-                cityRootNode = SceneQueries.GetCityRootTransformUpwards(obj.transform);
-                cityCursor = cityRootNode.GetComponentInParent<CityCursor>();
-            }
-
-            bool isCompleted = false;
-            if (SEEInput.Drag()) // start or continue rotation
-            {
-                Vector3 planeHitPoint;
-                if (cityRootNode)
-                {
-                    UnityEngine.Plane plane = new(Vector3.up, cityRootNode.position);
-                    if (!rotating && Raycasting.RaycastPlane(plane, out planeHitPoint)) // start rotation
-                    {
-                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND);
-                        rotating = true;
-                        hit.CityRootNode = cityRootNode;
-                        hit.Cursor = cityCursor;
-                        hit.Plane = plane;
-
-                        foreach (InteractableObject interactable in hit.Cursor.E.GetFocusses())
-                        {
-                            interactable.SetGrab(true, true);
-                            initialRotations[interactable.gameObject] = interactable.transform.rotation;
-                        }
-                        gizmo.gameObject.SetActive(true);
-                        gizmo.Center = cityCursor.E.HasFocus() ? hit.Cursor.E.ComputeCenter() : hit.CityRootNode.position;
-
-                        Vector2 toHit = planeHitPoint.XZ() - gizmo.Center.XZ();
-                        float toHitAngle = toHit.Angle360();
-
-                        startAngle = AngleMod(cityRootNode.rotation.eulerAngles.y - toHitAngle);
-                        gizmo.StartAngle = gizmo.TargetAngle = Mathf.Deg2Rad * toHitAngle;
-                    }
-                }
-
-                if (rotating && Raycasting.RaycastPlane(hit.Plane, out planeHitPoint)) // continue rotation
-                {
-                    Vector2 toHit = planeHitPoint.XZ() - gizmo.Center.XZ();
-                    float toHitAngle = toHit.Angle360();
-                    rotationAngle = AngleMod(startAngle + toHitAngle);
-                    if (SEEInput.Snap())
-                    {
-                        rotationAngle = AngleMod(Mathf.Round(rotationAngle / SnapStepAngle) * SnapStepAngle);
-                    }
-
-                    foreach (InteractableObject interactable in hit.Cursor.E.GetFocusses())
-                    {
-                        NodeOperator nodeOperator = GetOperatorForNode(interactable);
-                        nodeOperator.RotateTo(Quaternion.AngleAxis(rotationAngle, Vector3.up), 0);
-                    }
-
-                    float prevAngle = Mathf.Rad2Deg * gizmo.TargetAngle;
-                    float currAngle = toHitAngle;
-
-                    while (Mathf.Abs(currAngle + FullCircleDegree - prevAngle) < Mathf.Abs(currAngle - prevAngle))
-                    {
-                        currAngle += FullCircleDegree;
-                    }
-                    while (Mathf.Abs(currAngle - FullCircleDegree - prevAngle) < Mathf.Abs(currAngle - prevAngle))
-                    {
-                        currAngle -= FullCircleDegree;
-                    }
-                    if (SEEInput.Snap())
-                    {
-                        currAngle = Mathf.Round((currAngle + startAngle) / SnapStepAngle) * SnapStepAngle - startAngle;
-                    }
-                    gizmo.TargetAngle = Mathf.Deg2Rad * currAngle;
-                }
-            }
-            else if (rotating) // finalize rotation
-            {
-                rotating = false;
-
-                foreach (InteractableObject interactable in hit.Cursor.E.GetFocusses())
-                {
-                    if (interactable.IsGrabbed)
-                    {
-                        interactable.SetGrab(false, true);
-                    }
-                    finalRotations[interactable.gameObject] = interactable.transform.rotation;
-                }
-                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
-                gizmo.gameObject.SetActive(false);
-                currentState = ReversibleAction.Progress.Completed;
-                isCompleted = true;
-                new RotateNodeNetAction(finalRotations.Keys).Execute();
-            }
-
-            if (currentState != ReversibleAction.Progress.Completed)
-            {
-                currentState = rotating ? ReversibleAction.Progress.InProgress : ReversibleAction.Progress.NoEffect;
-            }
-
-            return isCompleted;
-        }
-
-        /// <summary>
-        /// Converts the given angle in degrees into the range [0, 360) degrees and returns the result.
-        /// </summary>
-        /// <param name="degrees">The angle in degrees.</param>
-        /// <returns>The angle in the range [0, 360) degrees.</returns>
-        private static float AngleMod(float degrees)
-        {
-            return (degrees % FullCircleDegree + FullCircleDegree) % FullCircleDegree;
-        }
-
         public override void Undo()
         {
-            ApplyRotation(initialRotations);
-        }
-
-        public override void Redo()
-        {
-            ApplyRotation(finalRotations);
+            base.Undo();
+            Rotate(originalRotation);
         }
 
         /// <summary>
-        /// Resets all rotations of the game objects in <paramref name="rotations"/>
-        /// to their value in <paramref name="rotations"/>.
+        /// Redoes this <see cref="RotateAction"/>.
         /// </summary>
-        /// <param name="rotations">the game objects and their rotations to reset to</param>
-        private static void ApplyRotation(IDictionary<GameObject, Quaternion> rotations)
+        public override void Redo()
         {
-            foreach (var rotation in rotations)
+            base.Redo();
+            Rotate(newRotation);
+        }
+
+        /// <summary>
+        /// Gizmo used for rotating the objects.
+        /// </summary>
+        private ObjectTransformGizmo _objectRotationGizmo = RTGizmosEngine.Get.CreateObjectRotationGizmo();
+
+        /// <summary>
+        /// The gizmo currently hovered, null unless a gizmo is hovered (updated externally).
+        /// </summary>
+        private Gizmo hoveredGizmo;
+
+        /// <summary
+        /// See <see cref="ReversibleAction.Update"/>.
+        ///
+        /// Note: The action is finalized only if the user selects anything except the
+        /// <see cref="objectToRotate"/> or any of the rotation gizmos.
+        /// </summary>
+        /// <returns>true if completed</returns>
+        public override bool Update()
+        {
+            hoveredGizmo = RTGizmosEngine.Get.HoveredGizmo;
+            if (hoveredGizmo != null && hoveredGizmo.IsHovered)
             {
-                rotation.Key.AddOrGetComponent<NodeOperator>().RotateTo(rotation.Value, 0);
+                // Rotation in progress
+                return false;
             }
-            new RotateNodeNetAction(rotations.Keys).Execute();
+
+            if (SEEInput.Select())
+            {
+                if (!(Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node))
+                {
+                    // Object outside the graph was selected, should be ignored.
+                    SaveRotationChanges();
+                    DisableGizmo();
+                    return true;
+                }
+                if (objectToRotate != raycastHit.collider.gameObject)
+                {
+                    // Selected a different object - save changes and change object assigned to gizmo.
+                    SaveRotationChanges();
+                    objectToRotate = raycastHit.collider.gameObject;
+                    originalRotation = objectToRotate.transform.rotation;
+                    _objectRotationGizmo.SetTargetObject(objectToRotate);
+                    _objectRotationGizmo.SetEnabled(true);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, objectToRotate);
+                }
+            }
+            else if (SEEInput.Drag() || SEEInput.ToggleMenu() || SEEInput.Cancel())
+            {
+                SaveRotationChanges();
+                DisableGizmo();
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Creates a memento after the rotation is done and propagates over network.
+        /// </summary>
+        private void SaveRotationChanges()
+        {
+            newRotation = objectToRotate.transform.rotation;
+        }
+
+        /// <summary>
+        /// Empty game object used for hiding gizmos since they cant be deleted after instantiation.
+        /// </summary>
+        private GameObject gizmoHidingObject;
+
+        /// <summary>
+        /// Disables the rotation gizmo.
+        /// </summary>
+        private void DisableGizmo()
+        {
+            if (gizmoHidingObject == null)
+            {
+                GameObject searchObject = GameObject.Find("Gizmo Hiding Object");
+                if (searchObject == null)
+                {
+                    gizmoHidingObject = new GameObject("Gizmo Hiding Object");
+                }
+                else
+                {
+                    gizmoHidingObject = searchObject;
+                }
+            }
+            _objectRotationGizmo.SetTargetObject(gizmoHidingObject);
+            _objectRotationGizmo.SetEnabled(false);
+        }
+
+        /// <summary>
+        /// Returns all IDs of gameObjects manipulated by this action.
+        /// </summary>
+        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        public override HashSet<string> GetChangedObjects()
+        {
+            return objectToRotate == null ? new HashSet<string>() : new HashSet<string>()
+            {
+                objectToRotate.name
+            };
         }
     }
 }

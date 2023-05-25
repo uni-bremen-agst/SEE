@@ -191,7 +191,7 @@ namespace SEE.Controls.Actions
                 }
             }
             
-            else if (SEEInput.Drag() || SEEInput.ToggleMenu())
+            else if (SEEInput.Drag() || SEEInput.ToggleMenu() || SEEInput.Cancel())
             {
                 SaveScaleChanges();
                 DisableGizmo();
