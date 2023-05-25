@@ -145,7 +145,11 @@ namespace SEE.Controls.Actions
         /// Gizmo used for scaling the objects.
         /// </summary>
         private ObjectTransformGizmo _objectScaleGizmo = RTGizmosEngine.Get.CreateObjectScaleGizmo();
-        private GameObject gizmoHidingObject = new GameObject("Gizmo Hiding Object");
+
+        /// <summary>
+        /// The gizmo currently hovered, null unless a gizmo is hovered (updated externally).
+        /// </summary>
+        private Gizmo hoveredGizmo;
 
         /// <summary
         /// See <see cref="ReversibleAction.Update"/>.
@@ -156,6 +160,13 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
+            hoveredGizmo = RTGizmosEngine.Get.HoveredGizmo;
+            if (hoveredGizmo != null && hoveredGizmo.IsHovered)
+            {
+                // Scaling in progress
+                return false;
+            }
+
             if (SEEInput.Select())
             {
                 HitGraphElement hitGraphElement = Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _);
@@ -164,29 +175,66 @@ namespace SEE.Controls.Actions
                 if (!isGameObject)
                 {
                     // Object outside the graph was selected, should be ignored.
-                    _objectScaleGizmo.SetTargetObject(gizmoHidingObject);
-                    _objectScaleGizmo.SetEnabled(false);
+                    SaveScaleChanges();
+                    DisableGizmo();
                     return true;
-                }
-                Gizmo hoveredGizmo = RTGizmosEngine.Get.HoveredGizmo;
-                if (hoveredGizmo != null && objectToScale != null)
-                {
-                    // Hovered gizmo was selected, create memento
-                    beforeAction = new Memento(objectToScale);
                 }
                 if (objectToScale != raycastHit.collider.gameObject)
                 {
-                    if (objectToScale != null)
-                    {
-                        afterAction = new Memento(objectToScale);
-                    }
+                    // Selected a different object - save changes and change object assigned to gizmo.
+                    SaveScaleChanges();
                     objectToScale = raycastHit.collider.gameObject;
+                    beforeAction = new Memento(objectToScale);
                     _objectScaleGizmo.SetTargetObject(objectToScale);
                     _objectScaleGizmo.SetEnabled(true);
                     AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, objectToScale);
                 }
             }
+            
+            else if (SEEInput.Drag() || SEEInput.ToggleMenu())
+            {
+                SaveScaleChanges();
+                DisableGizmo();
+                return true;
+            }
             return false;
+        }
+
+        /// <summary>
+        /// Creates a memento after the scaling is done and propagates over network.
+        /// </summary>
+        private void SaveScaleChanges()
+        {
+            if (objectToScale != null)
+            {
+                afterAction = new Memento(objectToScale);
+                MoveAndScale();
+            }
+        }
+
+        /// <summary>
+        /// Empty game object used for hiding gizmos since they cant be deleted after instantiation.
+        /// </summary>
+        private GameObject gizmoHidingObject;
+
+        /// <summary>
+        /// Disables the scaling gizmo.
+        /// </summary>
+        private void DisableGizmo()
+        {
+            if (gizmoHidingObject == null)
+            {
+                GameObject searchObject = GameObject.Find("Gizmo Hiding Object");
+                if (searchObject == null)
+                {
+                    gizmoHidingObject = new GameObject("Gizmo Hiding Object");
+                } else
+                {
+                    gizmoHidingObject = searchObject;
+                }
+            }
+            _objectScaleGizmo.SetTargetObject(gizmoHidingObject);
+            _objectScaleGizmo.SetEnabled(false);
         }
 
         /// <summary>
@@ -195,7 +243,7 @@ namespace SEE.Controls.Actions
         /// <returns>all IDs of gameObjects manipulated by this action</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string>()
+            return objectToScale == null ? new HashSet<string>() : new HashSet<string>()
             {
                 objectToScale.name
             };
