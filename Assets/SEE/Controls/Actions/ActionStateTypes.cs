@@ -64,8 +64,8 @@ namespace SEE.Controls.Actions
         {
             Move =
             new("Move", "Move a node within a graph",
-               Color.red.Darker(), "Materials/Charts/MoveIcon",
-               MoveAction.CreateReversibleAction);
+                Color.red.Darker(), "Materials/Charts/MoveIcon",
+                MoveAction.CreateReversibleAction);
 
             Rotate =
             new("Rotate", "Rotate the selected node and its children within a graph",
