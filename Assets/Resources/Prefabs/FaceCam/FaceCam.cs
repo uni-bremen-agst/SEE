@@ -36,12 +36,20 @@ namespace DlibFaceLandmarkDetectorExample
         /// <summary>
         /// All Network Ids, but not the owner (where the video is recordet) or the server.
         /// </summary>
-        ClientRpcParams OtherNetworkIds;
+        ClientRpcParams otherNetworkIds;
 
         /// <summary>
         /// Id of this Client.
         /// </summary>
-        ulong OwnClientId;
+        ulong ownClientId;
+
+        //TEST
+
+        Renderer textureRenderer;
+
+        // Create a new Texture2D to hold the cutout
+        Texture2D cutoutTexture;
+
 
         // Code from the WebCamTextureToMatHelperExample start
 
@@ -81,10 +89,10 @@ namespace DlibFaceLandmarkDetectorExample
         public override void OnNetworkSpawn()
         {
             // Add own ClientId to list of Clients, to which the video should be broadcasted.
-            OwnClientId = NetworkManager.Singleton.LocalClientId;
+            ownClientId = NetworkManager.Singleton.LocalClientId;
             if (!IsServer && !IsOwner)
             {
-                AddClientIdToList_ServerRPC(OwnClientId);
+                AddClientIdToList_ServerRPC(ownClientId);
             }
 
             // Always invoked the base.
@@ -119,7 +127,7 @@ namespace DlibFaceLandmarkDetectorExample
             // Code from the WebCamTextureToMatHelperExample end
 
             // This is the size of the FaceCam at the start
-            transform.localScale = new Vector3(0.2f, -0.48f, -1); // z = -1 to face away from the player. y is negative for simpler calculation later on.
+            transform.localScale = new Vector3(0.2f, -0.2f, -1); // z = -1 to face away from the player. y is negative for simpler calculation later on.
 
             // For the location of the face of the player we use his his nose. This makes the FaceCam also aprox. centered to his face.
             playersFace = transform.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase");
@@ -170,10 +178,17 @@ namespace DlibFaceLandmarkDetectorExample
             texture = new Texture2D(webCamTextureMat.cols(), webCamTextureMat.rows(), TextureFormat.RGBA32, false);
             OpenCVForUnity.UnityUtils.Utils.fastMatToTexture2D(webCamTextureMat, texture);
 
-            gameObject.GetComponent<Renderer>().material.mainTexture = texture;
+            // My Code
+            //cutoutTexture = texture; // ?? referenzen??
+            cutoutTexture = new Texture2D(2, 2, TextureFormat.RGBA32, false); //try 0, 0
+            //textureRenderer = gameObject.GetComponent<Renderer>();
+            //textureRenderer.material.mainTexture = cutoutTexture; // changed from texture to cutoutTexture
+            gameObject.GetComponent<Renderer>().material.mainTexture = cutoutTexture;
+            // My Code End
 
-            gameObject.transform.localScale = new Vector3(webCamTextureMat.cols(), webCamTextureMat.rows(), 1);
-            Debug.Log("Screen.width " + Screen.width + " Screen.height " + Screen.height + " Screen.orientation " + Screen.orientation);
+            //delete gameObject.transform.localScale = new Vector3(webCamTextureMat.cols(), webCamTextureMat.rows(), 1);
+            // damit kann man aber jetzt groesse berechnen
+            //delete Debug.Log("Screen.width " + Screen.width + " Screen.height " + Screen.height + " Screen.orientation " + Screen.orientation);
 
             if (fpsMonitor != null)
             {
@@ -212,6 +227,7 @@ namespace DlibFaceLandmarkDetectorExample
             if (texture != null)
             {
                 Texture2D.Destroy(texture);
+                //Destroy cutouttextuyre?
                 texture = null;
             }
         }
@@ -235,7 +251,7 @@ namespace DlibFaceLandmarkDetectorExample
         // FIXME my Code in WebCamTextureToMatHelperExample start
         public void SendFrame()
         {
-            byte[] networkTexture = ImageConversion.EncodeToJPG(texture);
+            byte[] networkTexture = ImageConversion.EncodeToJPG(cutoutTexture);
             Debug.Log("Buffer Size: " + networkTexture.Length);
             if (networkTexture.Length <= 32768)
             {
@@ -248,7 +264,7 @@ namespace DlibFaceLandmarkDetectorExample
         {
             //texture.LoadRawTextureData(networkTexture);
             //texture.LoadImage(networkTexture);
-            ImageConversion.LoadImage(texture, networkTexture);
+            ImageConversion.LoadImage(cutoutTexture, networkTexture);
         }
         // FIXME my Code in WebCamTextureToMatHelperExample end
 
@@ -267,14 +283,31 @@ namespace DlibFaceLandmarkDetectorExample
                 //detect face rects
                 List<UnityEngine.Rect> detectResult = faceLandmarkDetector.Detect();
 
+                // My Code
+                // This is the Rect which is chosen as the face we want to zoom in.
+                UnityEngine.Rect mainRect = new UnityEngine.Rect(0,0,0,0);
+                
+                // Is there any rect?
+                bool rectFound = false;
+                // My Code end
+                Debug.Log("S1");
                 foreach (var rect in detectResult)
                 {
+                    // My Code
+                    // find biggest = nearest face, this is the face we want to zoom in
+                    Debug.Log("S2");
+                    if (mainRect.height * mainRect.width <= rect.height * rect.width) {
+                        Debug.Log("S3");
+                        mainRect = rect;
+                        rectFound = true;
+                    }
+                    // My Code end
 
                     //detect landmark points
-                    List<Vector2> points = faceLandmarkDetector.DetectLandmark(rect);
+                    //List<Vector2> points = faceLandmarkDetector.DetectLandmark(rect);
 
                     //draw landmark points
-                    OpenCVForUnityUtils.DrawFaceLandmark(rgbaMat, points, new Scalar(0, 255, 0, 255), 2);
+                    //OpenCVForUnityUtils.DrawFaceLandmark(rgbaMat, points, new Scalar(0, 255, 0, 255), 2);
 
                     //draw face rect
                     OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(255, 0, 0, 255), 2);
@@ -282,16 +315,68 @@ namespace DlibFaceLandmarkDetectorExample
 
                 //Imgproc.putText (rgbaMat, "W:" + rgbaMat.width () + " H:" + rgbaMat.height () + " SO:" + Screen.orientation, new Point (5, rgbaMat.rows () - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
 
-                OpenCVForUnity.UnityUtils.Utils.matToTexture2D(rgbaMat, texture);
+                OpenCVForUnity.UnityUtils.Utils.fastMatToTexture2D(rgbaMat, texture);
+
+                // Code from the WebCamTextureToMatHelperExample end
+
+                //Cutour texture?
+
+                // Specify the rectangular region to cut
+                if (rectFound)
+                {
+                    int x = Mathf.RoundToInt(mainRect.x); // Starting x-coordinate of the region
+                    int y = Mathf.RoundToInt(mainRect.y); // Starting y-coordinate of the region
+                    int width = Mathf.RoundToInt(mainRect.width); // Width of the region
+                    int height = Mathf.RoundToInt(mainRect.height); // Height of the region
+
+                    if (y+height <= texture.height && x+width <= texture.width && y > 0 && x > 0) 
+                    {
+                        cutoutTexture = new Texture2D(width, height);
+                        //cutoutTexture.width = width;
+                        //cutoutTexture.height = height;
+
+                        // Copy the pixels from the original texture to the cutout texture
+                        Color[] pixels = texture.GetPixels(x, y, width, height);
+                        cutoutTexture.SetPixels(pixels);
+                        cutoutTexture.Apply();
+                        //cutoutTexture.Apply(false,false);
+                    }
+
+                    
+                }
+
+
+                // Create a new Texture2D to hold the cutout
+                //muss das sein?
+                gameObject.GetComponent<Renderer>().material.mainTexture = cutoutTexture;
+                //textureRenderer.material.mainTexture = cutoutTexture;
+                //OpenCVForUnity.UnityUtils.Utils.matToTexture2D(rgbaMat, cutoutTexture);
+
+                Debug.Log("S6");
+                // Update size if a face is found. Use ratio to make the bigger of height or width 0.2f big but keep aspect ratio.
+                if (rectFound)
+                {
+                    Debug.Log("S7");
+                    if (mainRect.width > mainRect.height)
+                    {
+                        Debug.Log("S8");
+                    //    float ratio = mainRect.width / mainRect.height;
+                    //    transform.localScale = new Vector3(0.2f, (-0.2f / ratio) - 0.06f, -1); // - 0.06f because we cut of a little bit more of the height.
+                    }
+                    else {
+                        Debug.Log("S9");
+                        // is this right?
+                     //   float ratio = mainRect.height / mainRect.width;
+                    //    transform.localScale = new Vector3((0.2f / ratio), -0.2f - 0.06f, -1); // - 0.06f because we cut of a little bit more of the height.
+                    }
+                }
 
                 //FIXME
                 if (IsSpawned)
                 {
-                    SendFrame(); // My method
+                 //   SendFrame(); // My method
                 }
             }
-
-            // Code from the WebCamTextureToMatHelperExample end
 
             // If the NetworkObject is not yet spawned, exit early.
             if (!IsSpawned)
@@ -341,7 +426,7 @@ namespace DlibFaceLandmarkDetectorExample
         {
             //geht davon aus das man Owner ist
             //Debug.Log("Network Id: " + NetworkManager.Singleton.LocalClientId);
-            switch (OwnClientId)
+            switch (ownClientId)
             {
                 case 0:
                     //mainColor = new Color(Random.Range(100, 255), 0, 0);
@@ -403,7 +488,7 @@ namespace DlibFaceLandmarkDetectorExample
                 else // the owner (creator of video) and also the server
                 {
                     // If this is the server, send the frame to all clients ( but not the server and owner, which in this case, is the server).
-                    SendVideoToClientsToRenderIt_ClientRPC(videoFrame, OtherNetworkIds);
+                    SendVideoToClientsToRenderIt_ClientRPC(videoFrame, otherNetworkIds);
                 }
             }
         }
@@ -416,6 +501,8 @@ namespace DlibFaceLandmarkDetectorExample
         {
             //return mainColor;
             return new Color(); // is null
+            //Texture2D webtexture = new Texture2D(webCamTextureMat.cols(), webCamTextureMat.rows(), TextureFormat.RGBA32, false);
+
             //FIXME
             // hier texture zu JPG machen, und als byte[] übergeben, das sollte reichen.
 
@@ -432,7 +519,7 @@ namespace DlibFaceLandmarkDetectorExample
             RenderNetworkFrameOnFaceCam(videoFrame);
 
             // The server will send the video to all other clients (not the owner and server) so they can display it. 
-            SendVideoToClientsToRenderIt_ClientRPC(videoFrame, OtherNetworkIds);
+            SendVideoToClientsToRenderIt_ClientRPC(videoFrame, otherNetworkIds);
         }
 
         /// <summary>
@@ -461,7 +548,7 @@ namespace DlibFaceLandmarkDetectorExample
             // Remove own ClientId from the list of connected ClientIds
             if (!IsServer && !IsOwner) // Owner and server is not in the list.
             {
-                RemoveClientFromList_ServerRPC(OwnClientId);
+                RemoveClientFromList_ServerRPC(ownClientId);
             }
 
             // Code from the WebCamTextureToMatHelperExample start
@@ -520,7 +607,7 @@ namespace DlibFaceLandmarkDetectorExample
             ulong[] allOtherClientIds = allClientIdsList.ToArray();
 
             // Creates the RpcParams with the array of ClientIds
-            OtherNetworkIds = new ClientRpcParams
+            otherNetworkIds = new ClientRpcParams
             {
                 Send = new ClientRpcSendParams
                 {
