@@ -26,11 +26,6 @@ namespace SEE.Controls.Actions
         public static GameObject GrabbedObject { get; private set; }
 
         /// <summary>
-        /// Indicates whether the grabbed object is being released
-        /// </summary>
-        private bool isReleased;
-
-        /// <summary>
         /// Layer to ignore collision between parent and children
         /// </summary>
         private const int IgnoreChildrenLayer = 10;
@@ -39,11 +34,6 @@ namespace SEE.Controls.Actions
         /// The original layer of grabbable objects
         /// </summary>
         private const int GrabbableLayer = 29;
-
-        /// <summary>
-        /// Indicates whether a collision has occurred
-        /// </summary>
-        private bool hasCollided;
 
         /// <summary>
         /// The initial position of the grabbed object
@@ -139,7 +129,6 @@ namespace SEE.Controls.Actions
         {
             if (gameObject.TryGetNode(out Node node) && !node.IsRoot() && IsInCollision())
             {
-                isReleased = true;
                 IsGrabbed = false;
                 Rigidbody rigidbody = grabbable.gameObject.GetComponent<Rigidbody>();
                 rigidbody.interpolation = RigidbodyInterpolation.None;
@@ -222,6 +211,14 @@ namespace SEE.Controls.Actions
                     initialRotation = GrabbedObject.transform.rotation;
                     initialLocalScale = GrabbedObject.transform.localScale;
                 }
+
+                if ( GrabbedObject.transform.parent.gameObject == collisionInfo.gameObject && IsInCollision())
+                {
+                    // Set the new initial position and rotation of the object
+                    initialPosition = GrabbedObject.transform.position;
+                    initialRotation = GrabbedObject.transform.rotation;
+                    initialLocalScale = GrabbedObject.transform.localScale;
+                }
             }
         }
 
@@ -231,7 +228,6 @@ namespace SEE.Controls.Actions
         /// <param name="collisionInfo">Information about the collision.</param>
         private void OnCollisionExit(Collision collisionInfo)
         {
-            hasCollided = false;
         }
 
         /*
