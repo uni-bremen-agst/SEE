@@ -6,171 +6,143 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
+    /*
+     * The VrGrabAction class is responsible for handling the grabbing and releasing of objects in a VR environment.
+     * When an object is grabbed, it adjusts its properties and handles collisions with other objects.
+     *
+     * FIXME: If multiple blocks are stacked on each other they are preventde from moving.
+     * FIXME: Consider scaling based on something else, or not. It's a matter for discussion among the team.
+     */
     public class VrGrabAction : MonoBehaviour
     {
         /// <summary>
-        /// Left back vector of Portal
+        /// Indicates whether the grabbed node needs adjustment
         /// </summary>
-        private Vector2 leftFront;
+        private bool adjustGrabbedNode = false;
 
         /// <summary>
-        /// Right back vector of Portal.
+        /// Indicates whether a game object is currently grabbed
         /// </summary>
-        private Vector2 rightBack;
+        public static bool IsGrabbed { get; private set; } = false;
 
         /// <summary>
-        ///
-        /// </summary>
-        private bool AdjustGrabbedNode = false;
-
-        /// <summary>
-        /// Is gameobject grabbed.
-        /// </summary>
-        public static bool IsGrabbed { get; private set; }= false;
-
-        /// <summary>
-        /// The grabbed gameobject.
+        /// The currently grabbed game object
         /// </summary>
         public static GameObject GrabbedObject { get; private set; }
 
         /// <summary>
-        /// Is the grabbed object being released.
+        /// Indicates whether the grabbed object is being released
         /// </summary>
-        private bool IsReleased = false;
+        private bool isReleased;
 
         /// <summary>
-        /// Layer to ignore collision of parent with its children while grabbed.
+        /// Layer to ignore collision between parent and children
         /// </summary>
         private const int IgnoreChildrenLayer = 10;
 
         /// <summary>
-        /// Original layer.
+        /// The original layer of grabbable objects
         /// </summary>
         private const int GrabbableLayer = 29;
 
         /// <summary>
-        /// Indicates whether a collision has occurred.
+        /// Indicates whether a collision has occurred
         /// </summary>
         private bool collidedState;
-        
-        /// <summary>
-        /// The initial position of the object. 
-        /// </summary>
-        private Vector3 InitialPosition;
-        
-        /// <summary>
-        /// The initial rotation of the object.
-        /// </summary>
-        private Quaternion InitialRotation;
-        
-        /// <summary>
-        /// The initial scale.
-        /// </summary>
-        private Vector3 InitialScale;
 
         /// <summary>
-        /// Adds listeners to the grabbable component for onGrab and onRelease. Also for the distance grabbable
-        /// component for on pull.
+        /// The initial position of the grabbed object
+        /// </summary>
+        private Vector3 initialPosition;
+
+        /// <summary>
+        /// The initial rotation of the grabbed object
+        /// </summary>
+        private Quaternion initialRotation;
+
+        /// <summary>
+        /// Adds listeners to the grabbable component for onGrab and onRelease events.
         /// </summary>
         public void Start()
         {
             Grabbable grabbable = gameObject.GetComponent<Grabbable>();
-
             grabbable.onGrab = new UnityHandGrabEvent();
             grabbable.onRelease = new UnityHandGrabEvent();
-
             grabbable.onGrab.AddListener(OnGrab);
             grabbable.onRelease.AddListener(OnRelease);
-
-            // FIXME: Distance grabbing not working properly right now.
-            DistanceGrabbable distanceGrabbable = gameObject.GetComponent<DistanceGrabbable>();
-            distanceGrabbable.OnPull = new UnityHandGrabEvent();
-            distanceGrabbable.OnPull.AddListener(OnPull);
         }
 
         /// <summary>
-        /// This function is executed when a node is grabbed.
+        /// Called when the object is grabbed.
         /// </summary>
-        /// <param name="hand">Hand object.</param>
-        /// <param name="grabbable">Grabbable Component.</param>
+        /// <param name="hand">The hand that grabbed the object.</param>
+        /// <param name="grabbable">The Grabbable component of the grabbed object.</param>
         private void OnGrab(Hand hand, Grabbable grabbable)
         {
             var currentGameObject = grabbable.gameObject;
-            //Set the initial position and scale to handle the case when the object is released without being re-parented or when being collided but only released afterwards.
-            InitialPosition = currentGameObject.transform.position;
-            InitialRotation = currentGameObject.transform.rotation;
-            InitialScale = currentGameObject.transform.localScale;
-            
+
+            // Set the initial position and rotation of the object
+            initialPosition = currentGameObject.transform.position;
+            initialRotation = currentGameObject.transform.rotation;
+
             if (gameObject.TryGetNode(out Node node) && !node.IsRoot())
             {
-                // Set layer of all children to ignore collision with the grabbed parent object (include inactive gameobjects).
+                // Set the layer of all children to ignore collision with the grabbed parent object
                 GameObjectExtensions.SetAllChildLayer(grabbable.gameObject.transform, IgnoreChildrenLayer, true);
                 grabbable.gameObject.layer = GrabbableLayer;
 
+                // Rigidbody Setup
                 Rigidbody rigidbody = grabbable.gameObject.GetComponent<Rigidbody>();
                 rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
                 rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                 rigidbody.isKinematic = false;
 
-                AdjustGrabbedNode = true;
+                adjustGrabbedNode = true;
                 IsGrabbed = true;
-
                 GrabbedObject = grabbable.gameObject;
                 Debug.LogWarning("Player grabbed node: " + GrabbedObject.name);
 
-                // Get portal of node and save values.
-                Portal.GetPortal(gameObject, out Vector2 leftFront, out Vector2 rightBack);
-                this.leftFront = leftFront;
-                this.rightBack = rightBack;
 
-                // Set portal to infinite while moving the node.
                 Portal.SetInfinitePortal(gameObject);
             }
         }
 
         /// <summary>
-        /// This function is executed when the player releases the object.
+        /// Called when the object is released.
         /// </summary>
-        /// <param name="hand">Hand object.</param>
-        /// <param name="grabbable">Grabbable Component.</param>
+        /// <param name="hand">The hand that released the object.</param>
+        /// <param name="grabbable">The Grabbable component of the released object.</param>
         private void OnRelease(Hand hand, Grabbable grabbable)
         {
             var currentGameObject = grabbable.gameObject;
-            
-                if (gameObject.TryGetNode(out Node node) && !node.IsRoot()) 
-                { 
-                    IsReleased = true;
-                    IsGrabbed = false; 
-                    Rigidbody rigidbody = grabbable.gameObject.GetComponent<Rigidbody>(); 
-                    rigidbody.interpolation = RigidbodyInterpolation.None; 
-                    rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous; 
-                    rigidbody.isKinematic = true;
-                    
-                    Debug.LogWarning("Player released grabbed object: " + GrabbedObject); 
-                    GrabbedObject = null;
 
-                    // Set portal to old values when released
-                    // FIXME: Should remain visible outside the portal when released, or only be able to be moved within the portal.
-                    Portal.SetInfinitePortal(gameObject);
-                    //Portal.SetPortal(gameObject, leftFront, rightBack);
+            isReleased = true;
+            IsGrabbed = false;
+            Rigidbody rigidbody = grabbable.gameObject.GetComponent<Rigidbody>();
+            rigidbody.interpolation = RigidbodyInterpolation.None;
+            rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
+            rigidbody.isKinematic = true;
 
-                    // Set layer back to normal (Grabbable layer).
-                    GameObjectExtensions.SetAllChildLayer(grabbable.gameObject.transform, GrabbableLayer, true);
+            Debug.LogWarning("Player released grabbed object: " + GrabbedObject);
+            GrabbedObject = null;
 
-                    // Reset the position and rotation of the grabbed object to its initial position
-                    if (collidedState == false)
-                    { 
-                        currentGameObject.transform.position = InitialPosition; 
-                        currentGameObject.transform.rotation = InitialRotation; 
-                    }
-                    else if (collidedState == true && !IsInCollision()) 
-                    {
-                        currentGameObject.transform.localScale = InitialScale; // Reset the scale only if no longer in collision
-                    } 
-                } 
+            Portal.SetInfinitePortal(gameObject);
+
+            // Set the layer of all children back to normal (Grabbable layer)
+            GameObjectExtensions.SetAllChildLayer(grabbable.gameObject.transform, GrabbableLayer, true);
+
+            // Reset the position and rotation of the grabbed object to its initial state
+            if (collidedState == false)
+            {
+                currentGameObject.transform.position = initialPosition;
+                currentGameObject.transform.rotation = initialRotation;
+            }
         }
 
-        // Check if the grabbed object is currently in collision with any other object
+        /// <summary>
+        /// Checks if the grabbed object is currently in collision with any other object.
+        /// </summary>
+        /// <returns>True if the object is still in collision, false otherwise.</returns>
         private bool IsInCollision()
         {
             Collider[] colliders = GrabbedObject.GetComponentsInChildren<Collider>();
@@ -181,13 +153,19 @@ namespace SEE.Controls.Actions
                     return true; // Object is still in collision
                 }
             }
+
             return false; // Object is no longer in collision
         }
 
-        // Check if a specific collider is currently in collision
+        /// <summary>
+        /// Checks if a specific collider is currently in collision.
+        /// </summary>
+        /// <param name="collider">The collider to check.</param>
+        /// <returns>True if a collision is detected, false otherwise.</returns>
         private bool IsColliding(Collider collider)
         {
-            Collider[] colliders = Physics.OverlapBox(collider.bounds.center, collider.bounds.extents, collider.transform.rotation);
+            Collider[] colliders = Physics.OverlapBox(collider.bounds.center, collider.bounds.extents,
+                collider.transform.rotation);
             foreach (Collider otherCollider in colliders)
             {
                 if (otherCollider != collider && otherCollider.enabled && otherCollider.gameObject != GrabbedObject)
@@ -195,60 +173,59 @@ namespace SEE.Controls.Actions
                     return true; // Collision detected
                 }
             }
+
             return false; // No collision detected
         }
 
         /// <summary>
-        /// Reparent on collision.
+        /// Called when a collision occurs with another object.
         /// </summary>
-        /// <param name="collisionInfo"></param>
+        /// <param name="collisionInfo">Information about the collision.</param>
         private void OnCollisionEnter(Collision collisionInfo)
         {
             collidedState = true;
-            if (collisionInfo.gameObject.TryGetNode(out Node node) && IsGrabbed && !node.IsRoot() && GrabbedObject == gameObject)
+
+            // Check if the collided object has a Node, is not the root node, and is the currently grabbed object
+            if (collisionInfo.gameObject.TryGetNode(out Node node) && IsGrabbed && !node.IsRoot() &&
+                GrabbedObject == gameObject)
             {
-                if (GrabbedObject.transform.parent.gameObject != collisionInfo.gameObject && IsInCollision() ) //FIXME IsInCollision überprüfen
+                if (GrabbedObject.transform.parent.gameObject != collisionInfo.gameObject && IsInCollision())
                 {
-                    Debug.LogWarning("Collision with node: " + collisionInfo.gameObject.name);
-                    MoveAction.ReparentVR(collisionInfo.gameObject);
+                    //Debug.LogWarning("Collision with node: " + collisionInfo.gameObject.name);
+                    MoveAction.StartReparentProcess(collisionInfo.gameObject, GrabbedObject);
                 }
             }
         }
 
         /// <summary>
-        /// UnReparent on exit collision.
+        /// Called when the object exits a collision with another object.
         /// </summary>
-        /// <param name="collisionInfo"></param>
+        /// <param name="collisionInfo">Information about the collision.</param>
         private void OnCollisionExit(Collision collisionInfo)
         {
-            if (collisionInfo.gameObject.TryGetNode(out Node node) && IsGrabbed && !node.IsRoot() &&
-                gameObject == GrabbedObject) 
-            {
-                if (!IsDescendant(GrabbedObject, collisionInfo.gameObject)) //FIXME Funktion implementieren bei der nur bei "solidem" Kontakt reparenting passiert. Bei ohne loslassen zurück zum anfang.
-                { 
-                    Debug.LogWarning("UnReparenting - exit collision with node: " + collisionInfo.gameObject.name); 
-                    MoveAction.UnReparentVR();
-                }
-            } 
             collidedState = false;
         }
 
+        /*
+        private bool IsDescendant(GameObject node, GameObject root)
+        {
+            return node.GetNode().IsDescendantOf(root.GetNode());
+        }
+        
+        //FIXME not working properly
         /// <summary>
         /// We will use FixedUpdate when working with rigidbodys.
         /// FixedUpdate occurs at a measured time step that typically does not coincide with MonoBehaviour.Update.
         /// </summary>
-/*
         public void FixedUpdate()
         {
-
             Rigidbody rigidbody = gameObject.GetComponent<Rigidbody>();
-
+        
             if (IsColliding)
             {
                 rigidbody.velocity = new Vector3(0, 0, 0);
             }
-
-            /*
+        
             // Adjust grabbed node only once.
             if (AdjustGrabbedNode)
             {
@@ -262,19 +239,17 @@ namespace SEE.Controls.Actions
             {
                 // IsColliding = false;
                 IsGrabbed = false;
-
+        
                 rigidbody.interpolation = RigidbodyInterpolation.None;
                 rigidbody.collisionDetectionMode = CollisionDetectionMode.Continuous;
                 rigidbody.isKinematic = true;
-
+        
                 IsReleased = false;
             }
-
         }
-    */
-
+        
         /// <summary>
-        /// This function is called when the object is grabbed from a distance. //FIXME not working properly
+        /// This function is called when the object is grabbed from a distance. 
         /// Currently has the same functionality as <see cref="OnGrab"/>
         /// </summary>
         /// <param name="hand">Hand object.</param>
@@ -286,27 +261,22 @@ namespace SEE.Controls.Actions
                 // Set layer of all children to ignore collision with the grabbed parent object (include inactive gameobjects).
                 GameObjectExtensions.SetAllChildLayer(grabbable.gameObject.transform, IgnoreChildrenLayer, true);
                 grabbable.gameObject.layer = GrabbableLayer;
-
+        
                 AdjustGrabbedNode = true;
                 IsGrabbed = true;
-
+        
                 GrabbedObject = grabbable.gameObject;
                 Debug.LogWarning("Player grabbed node: " + GrabbedObject.name);
-
+        
                 // Get portal of node and save values.
                 Portal.GetPortal(gameObject, out Vector2 leftFront, out Vector2 rightBack);
                 this.leftFront = leftFront;
                 this.rightBack = rightBack;
-
+        
                 // Set portal to infinite while moving the node.
                 Portal.SetInfinitePortal(gameObject);
             }
         }
-
-        // True if node is a descendant of root in the underlying graph.
-        private bool IsDescendant(GameObject node, GameObject root)
-        {
-            return node.GetNode().IsDescendantOf(root.GetNode());
-        }
+        */
     }
 }

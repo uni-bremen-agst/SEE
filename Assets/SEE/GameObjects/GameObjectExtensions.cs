@@ -652,6 +652,7 @@ namespace SEE.GO
             }
             else
             {
+                //FIXME Beim ersten Mal in VR wird hier eine Exception geworfen.
                 throw new NullReferenceException($"Game object {gameObject.name} has no NodeRef.");
             }
         }

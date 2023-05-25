@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using SEE.Audio;
+using SEE.DataModel.DG;
 using SEE.Game;
-using SEE.Game.Charts.VR;
 using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.Game.UI.Notification;
@@ -11,7 +11,6 @@ using SEE.Net.Actions;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
-using Node = SEE.DataModel.DG.Node;
 
 namespace SEE.Controls.Actions
 {
@@ -41,8 +40,9 @@ namespace SEE.Controls.Actions
         /// the empty set</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return grabbedObject.IsGrabbed ? new HashSet<string> { grabbedObject.Name }
-                                           : new HashSet<string>();
+            return grabbedObject.IsGrabbed
+                ? new HashSet<string> { grabbedObject.Name }
+                : new HashSet<string>();
         }
 
         /// <summary>
@@ -78,12 +78,20 @@ namespace SEE.Controls.Actions
             private bool withinReflexionCity;
 
             /// <summary>
+            // Variable to store the last position of the grabbed object
+            /// </summary>
+            private Vector3 lastPosition;
+
+            /// <summary>
             /// Grabs the given <paramref name="gameObject"/>.
             /// </summary>
             /// <param name="gameObject">object to be grabbed</param>
             /// <exception cref="ArgumentNullException">thrown if <paramref name="gameObject"/> is null</exception>
             public void Grab(GameObject gameObject)
             {
+                // Store the initial position of the grabbed object
+                lastPosition = gameObject.transform.position;
+
                 if (gameObject != null)
                 {
                     grabbedObject = gameObject;
@@ -120,6 +128,18 @@ namespace SEE.Controls.Actions
             /// grabbed</exception>
             public void UnGrab()
             {
+                // Check if the grabbed object has moved from its initial position
+                if (Vector3.Distance(grabbedObject.transform.position, lastPosition) > 0.01f)
+                {
+                    // Object has moved, don't reset its position
+                    Debug.Log("Object has moved, position will not be reset");
+                }
+                else
+                {
+                    // Object has not moved, reset its position
+                    grabbedObject.transform.position = originalWorldPosition;
+                }
+
                 if (!IsGrabbed || grabbedObject == null)
                 {
                     throw new InvalidOperationException("No object is being grabbed.");
@@ -133,7 +153,7 @@ namespace SEE.Controls.Actions
 
                     if (grabbedObject.TryGetComponent(out InteractableObject interactableObject))
                     {
-                        interactableObject.SetGrab(grab: false, isInitiator: true) ;
+                        interactableObject.SetGrab(grab: false, isInitiator: true);
                     }
 
                     if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
@@ -285,7 +305,8 @@ namespace SEE.Controls.Actions
                 {
                     Highlighter.SetHighlight(markedGameObject, false);
                     new HighlightNetAction(markedGameObject.name, false).Execute();
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, this.originalParent.gameObject);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND,
+                        this.originalParent.gameObject);
                 }
             }
 
@@ -335,7 +356,7 @@ namespace SEE.Controls.Actions
             internal void Redo()
             {
                 MoveToLastUserRequestedPosition();
-                Reparent(newParent);
+                Reparent(newParent, grabbedObject);
             }
 
             /// <summary>
@@ -350,31 +371,35 @@ namespace SEE.Controls.Actions
             /// game-object hierarchy afterwards.
             /// </summary>
             /// <param name="target">the target node of the re-parenting, i.e., the new parent</param>
-            internal void Reparent(GameObject target)
+            internal void Reparent(GameObject target, GameObject source)
             {
                 // target must not be a descendant of grabbedObject
-                if (!IsDescendant(target, grabbedObject))
+                if (!IsDescendant(target, source))
                 {
-                    PutOnAndFit(grabbedObject, target, originalParent.gameObject, originalLocalScale);
+                    PutOnAndFit(source, target, originalParent.gameObject, originalLocalScale);
                     if (SceneSettings.InputType != PlayerInputType.VRPlayer)
                     {
                         UnmarkAsTarget();
                         MarkAsTarget(target.transform);
                     }
 
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, originalParent.gameObject);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND,
+                        originalParent.gameObject);
 
                     newParent = target;
+
                     // The mapping is only possible if we are in a reflexion city
                     // and the mapping target is not the root of the graph.
                     if (withinReflexionCity && !target.IsRoot())
                     {
-                        ReflexionMapperSetParent(grabbedObject, target);
+                        ReflexionMapperSetParent(source, target);
                     }
                     else
                     {
-                        GameNodeMoverSetParent(grabbedObject, target);
+                        GameNodeMoverSetParent(source, target);
                     }
+
+                    originalParent = source.transform;
                 }
 
                 // True if node is a descendant of root in the underlying graph.
@@ -410,6 +435,7 @@ namespace SEE.Controls.Actions
                         GameNodeMoverSetParent(grabbedObject, originalParent.gameObject);
                     }
                 }
+
                 RestoreOriginalAppearance();
             }
 
@@ -449,7 +475,8 @@ namespace SEE.Controls.Actions
             /// <param name="newParent">new parent of <paramref name="child"/></param>
             /// <param name="originalParent">original parent of <paramref name="child"/></param>
             /// <param name="originalLocalScale">original local scale of <paramref name="child"/></param>
-            private static void PutOnAndFit(GameObject child, GameObject newParent, GameObject originalParent, Vector3 originalLocalScale)
+            private static void PutOnAndFit(GameObject child, GameObject newParent, GameObject originalParent,
+                Vector3 originalLocalScale)
             {
                 GameNodeMover.PutOnAndFit(child.transform, newParent, originalParent, originalLocalScale);
                 new PutOnAndFitNetAction(child.name, newParent.name, originalParent.name, originalLocalScale).Execute();
@@ -470,7 +497,8 @@ namespace SEE.Controls.Actions
                 }
                 catch (ArchitectureAnalysisException e)
                 {
-                    ShowNotification.Error("Reflexion Mapping", $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
+                    ShowNotification.Error("Reflexion Mapping",
+                        $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
                 }
             }
 
@@ -491,7 +519,8 @@ namespace SEE.Controls.Actions
                 }
                 catch (ArchitectureAnalysisException e)
                 {
-                    ShowNotification.Error("Re-parenting", $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
+                    ShowNotification.Error("Re-parenting",
+                        $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
                 }
             }
 
@@ -549,6 +578,7 @@ namespace SEE.Controls.Actions
             {
                 return MoveActionVR();
             }
+
             return false;
         }
 
@@ -591,6 +621,7 @@ namespace SEE.Controls.Actions
                 currentState = ReversibleAction.Progress.Completed;
                 return true;
             }
+
             return false;
         }
 
@@ -611,7 +642,7 @@ namespace SEE.Controls.Actions
                         //currentState = ReversibleAction.Progress.InProgress;
                     }
                 }
-                // UpdateHierarchy() (with collision)
+                //UpdateHierarchy();
             }
             else if (grabbedObject.IsGrabbed)
             {
@@ -620,6 +651,7 @@ namespace SEE.Controls.Actions
                 // currentState = ReversibleAction.Progress.Completed;
                 return true;
             }
+
             return false;
         }
 
@@ -627,18 +659,9 @@ namespace SEE.Controls.Actions
         /// Is called from OnCollisionEnter() in <see cref="VrGrabAction"/>.
         /// </summary>
         /// <param name="target"></param>
-        public static void ReparentVR(GameObject target)
+        public static void StartReparentProcess(GameObject target, GameObject source)
         {
-            grabbedObject.Reparent(target);
-        }
-
-        /// <summary>
-        /// Is called from OnCollisionExit() in <see cref="VrGrabAction"/>.
-        /// FIXME: UnReparenting with collisionexit() has some strange effects on hierarchy. Need to look into this Problem.
-        /// </summary>
-        public static void UnReparentVR()
-        {
-            grabbedObject.UnReparent();
+            grabbedObject.Reparent(target, source);
         }
 
         /// <summary>
@@ -658,6 +681,7 @@ namespace SEE.Controls.Actions
             {
                 return VrGrabAction.IsGrabbed;
             }
+
             return false;
         }
 
@@ -679,7 +703,7 @@ namespace SEE.Controls.Actions
                     if (raycastHit.HasValue)
                     {
                         // The user is currently aiming at a node. The grabbed node is reparented onto this aimed node.
-                        grabbedObject.Reparent(raycastHit.Value.transform.gameObject);
+                        StartReparentProcess(raycastHit.Value.transform.gameObject, grabbedObject.Node.gameObject);
                     }
                     else
                     {
