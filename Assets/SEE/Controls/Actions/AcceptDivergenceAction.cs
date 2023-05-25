@@ -10,19 +10,26 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Action to create a new node for a selected city.
+    /// Action to solve a Divergence between Implementation and
+    /// Architecture by adding the Edge to the Architecture that
+    /// solves the Divergence.
     /// </summary>
     internal class AcceptDivergenceAction : AbstractPlayerAction
     {
         /// <summary>
+        /// The edge that was hit by the user to be accepted
+        /// into the ArchitectureGraph. Set in <see cref="Update"/>.
         /// </summary>
-        private GameObject hitGraphElement;
+        private GameObject selectedDivergenceEdge;
 
         /// <summary>
-        /// </summary>
+        /// Contains all Edges that were explicitly added to
+        /// solve Divergences.
+        ///</summary>
         private ISet<GameObject> syncedGameObjects;
 
         /// <summary>
+        /// See <see cref="ReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
@@ -31,27 +38,18 @@ namespace SEE.Controls.Actions
             if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.None)
             {
+                // Find the edge representing the specific Divergence that should be solved.
+                selectedDivergenceEdge = raycastHit.collider.gameObject;
 
-                // Syncing:
-                //      Get Selected Edge
-                hitGraphElement = raycastHit.collider.gameObject;
-
-                Debug.Log("1");
-                // Check if Edge
-                if (hitGraphElement.TryGetEdge(out Edge selectedEdge))
+                // Check whether the object selected is actually an edge.
+                if (selectedDivergenceEdge.TryGetEdge(out Edge selectedEdge))
                 {
-
                     // FIXME: This is a stupid workaround until the Diversion Edge can be selected
                     var graph = (ReflexionGraph)selectedEdge.ItsGraph;
                     foreach (Edge edge in graph.Edges())
                     {
                         if (ReflexionGraph.IsDivergent(edge))
                         {
-                            graph.Transition(edge, State.Convergent);
-
-                            // Insert Edge into Architecture
-                            graph.Transition(edge, State.Allowed);
-
                             // Find Node in ArchitectureGraph the
                             // divergence's Source is explicitly or
                             // implicitly mapped to.
@@ -70,43 +68,63 @@ namespace SEE.Controls.Actions
                             if (graph.Edges().Any(x => x.Source == edge.Source && x.Target == edge.Target))
                             {
                                 // add new edge to node
-                                graph.AddToArchitecture(source, target, edge.Type);
+                                Edge newArchitectureEdge = graph.AddToArchitecture(source, target, edge.Type);
                             }
                         }
                     }
 
-                    // // Check if Edge is within architecture
-                    // if (ReflexionGraph.IsDivergent(edge))
+                    // FIXME: this is the actual solution which should
+                    // work using edge selection:
+
+                    // Check if Edge represents a Divergence
+                    // if (ReflexionGraph.IsDivergent(selectedEdge))
                     // {
-                    //     // Syncing over Network
-                    //     new AcceptDivergenceNetAction(hitGraphElement.name).Execute();
+                    //     // get the containing ReflexionGraph
+                    //     var graph = (ReflexionGraph)selectedEdge.ItsGraph;
+
+                    //     // Find Node in ArchitectureGraph the
+                    //     // divergence's Source is explicitly or
+                    //     // implicitly mapped to.
+                    //     Node source = graph.MapsTo(selectedEdge.Source);
+
+                    //     // Find Node in ArchitectureGraph the
+                    //     // divergence's Target is explicitly or
+                    //     // implicitly mapped to.
+                    //     Node target = graph.MapsTo(selectedEdge.Target);
+
+                    //     // Create a new Edge that will solve the Divergence
+                    //     Edge newArchitectureEdge = graph.AddToArchitecture(source, target, selectedEdge.Type);
+
+                    //     // Sync the Solution of the Divergence via Network
+                    //     new AcceptDivergenceNetAction(selectedDivergenceEdge.name).Execute();
                     //     return true; // the selected object is synced and this action is done
                     // }
                 }
                 else
                 {
-                    Debug.LogWarning($"Selected Element {hitGraphElement.name} is not a reflexion edge.\n");
+                    Debug.LogWarning($"Selected Element {selectedDivergenceEdge.name} is not an edge.\n");
                 }
             }
             return false;
         }
 
+
         /// <summary>
-        /// Undoes this AddNodeAction.
+        /// Undoes this AcceptDivergenceAction.
         /// </summary>
         public override void Undo()
         {
         }
 
         /// <summary>
-        /// Redoes this AddNodeAction.
+        /// Redoes this AcceptDivergenceAction.
         /// </summary>
         public override void Redo()
         {
         }
 
         /// <summary>
-        /// Returns a new instance of <see cref="AddNodeAction"/>.
+        /// Returns a new instance of <see cref="AcceptDivergenceAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
         public static ReversibleAction CreateReversibleAction()
@@ -115,7 +133,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns a new instance of <see cref="AddNodeAction"/>.
+        /// Returns a new instance of <see cref="AcceptDivergenceAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
         public override ReversibleAction NewInstance()
