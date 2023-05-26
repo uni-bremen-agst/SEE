@@ -10,7 +10,7 @@ namespace SEE.GO
     /// </summary>
     public class EdgeRef : GraphElementRef
     {
-        [NonSerialized] private static Dictionary<Edge, EdgeRef> edgeToEdgeRefDict = new Dictionary<Edge, EdgeRef>();
+        [NonSerialized] private static readonly Dictionary<Edge, EdgeRef> edgeToEdgeRefDict = new();
 
         /// <summary>
 		/// The graph edge this edge reference is referring to. It will be set either

@@ -1,4 +1,7 @@
-﻿using SEE.Game;
+﻿using System.Collections.Generic;
+using System.Linq;
+using SEE.Game.Operator;
+using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -9,25 +12,27 @@ namespace SEE.Net.Actions
     internal class RotateNodeNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The unique name of the gameObject of a node that needs to be rotated.
+        /// The unique names of the gameObjects of a node that need to be rotated.
         /// </summary>
-        public string GameObjectID;
+        public List<string> GameObjectIDs;
 
         /// <summary>
-        /// Where the game object should be placed in world space.
+        /// The rotation of the game object.
         /// </summary>
-        public Vector3 Position;
+        public List<Quaternion> RotationList;
 
         /// <summary>
-        /// The rotation of the game object around the y axis in degrees.
+        /// Constructor.
+        /// Assumption: The <paramref name="nodes"/> have their final rotation.
+        /// These rotations will be broadcasted.
         /// </summary>
-        public float YAngle;
-
-        public RotateNodeNetAction(string nodeID, Vector3 position, float yAngle) : base()
+        /// <param name="nodes">the nodes whose rotations chould be synchronized
+        /// over the network</param>
+        public RotateNodeNetAction(IEnumerable<GameObject> nodes)
         {
-            GameObjectID = nodeID;
-            Position = position;
-            YAngle = yAngle;
+            IList<GameObject> gameObjects = nodes.ToList();
+            GameObjectIDs = gameObjects.Select(x => x.name).ToList();
+            RotationList = gameObjects.Select(x => x.transform.rotation).ToList();
         }
 
         /// <summary>
@@ -37,14 +42,12 @@ namespace SEE.Net.Actions
         {
             if (!IsRequester())
             {
-                GameObject gameObject = GraphElementIDMap.Find(GameObjectID);
-                if (gameObject != null)
+                int index = 0;
+                foreach (string id in GameObjectIDs)
                 {
-                    Positioner.Set(gameObject.transform, position: Position, yAngle: YAngle);
-                }
-                else
-                {
-                    throw new System.Exception($"There is no game object with the ID {GameObjectID}.");
+                    GameObject gameObject = Find(id);
+                    NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+                    nodeOperator.RotateTo(RotationList[index++], 0);
                 }
             }
         }

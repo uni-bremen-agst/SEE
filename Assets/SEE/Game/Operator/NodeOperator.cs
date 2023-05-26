@@ -18,7 +18,7 @@ namespace SEE.Game.Operator
     /// Available operations consist of the public methods exported by this class.
     /// Operations can be animated or executed directly, by setting the duration to 0.
     /// </summary>
-    public partial class NodeOperator : AbstractOperator
+    public partial class NodeOperator : GraphElementOperator<Color>
     {
         // We split up movement on the three axes because it makes sense in certain situations.
         // For example, when dragging a node along the XZ-axis, if we want to place it on top
@@ -39,6 +39,11 @@ namespace SEE.Game.Operator
         /// Operation handling Z-axis movement in world space.
         /// </summary>
         private TweenOperation<float> PositionZ;
+
+        /// <summary>
+        /// Operation handling node rotation.
+        /// </summary>
+        private TweenOperation<Quaternion> Rotation;
 
         /// <summary>
         /// Operation handling animated label display.
@@ -99,7 +104,7 @@ namespace SEE.Game.Operator
         /// <summary>
         /// If true, the incoming and outgoing edges will be adjusted, too.
         /// </summary>
-        private bool updateEdges = false;
+        private bool updateEdges;
 
         /// <summary>
         /// The position this node is supposed to be at.
@@ -178,6 +183,34 @@ namespace SEE.Game.Operator
                 PositionY.AnimateTo(newPosition.y, duration),
                 PositionZ.AnimateTo(newPosition.z, duration)
             }, a => a);
+        }
+
+        /// <summary>
+        /// Rotates the node to the given quaternion <paramref name="newRotation"/>,
+        /// taking <paramref name="duration"/> seconds.
+        /// </summary>
+        /// <param name="newRotation">the desired new target rotation</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> RotateTo(Quaternion newRotation, float duration)
+        {
+            return Rotation.AnimateTo(newRotation, duration);
+        }
+
+        /// <summary>
+        /// Rotates the node around the given <paramref name="axis"/> by the given <paramref name="angle"/>, taking
+        /// <paramref name="duration"/> seconds.
+        /// </summary>
+        /// <param name="axis">the axis to rotate around</param>
+        /// <param name="angle">the angle to rotate by</param>
+        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
+        /// that is, the value is set before control is returned to the caller.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> RotateTo(Vector3 axis, float angle, float duration)
+        {
+            Quaternion rotation = Quaternion.AngleAxis(angle, axis);
+            return RotateTo(rotation, duration);
         }
 
         /// <summary>
@@ -261,10 +294,11 @@ namespace SEE.Game.Operator
         {
             // We remember the old position and scale, and move the node to the new position and scale so that
             // edge layouts (dependent on position and scale) can be correctly calculated.
-            Vector3 oldPosition = transform.position;
-            transform.position = new Vector3(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
-            Vector3 oldScale = transform.localScale;
-            transform.localScale = Scale.TargetValue;
+            Transform ourTransform = transform; // cache transform for performance
+            Vector3 oldPosition = ourTransform.position;
+            ourTransform.position = new Vector3(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
+            Vector3 oldScale = ourTransform.localScale;
+            ourTransform.localScale = Scale.TargetValue;
             Node node;
             try
             {
@@ -300,8 +334,8 @@ namespace SEE.Game.Operator
             MorphEdges(relevantEdges, duration);
 
             // Once we're done, we reset the gameObject to its original position.
-            transform.position = oldPosition;
-            transform.localScale = oldScale;
+            ourTransform.position = oldPosition;
+            ourTransform.localScale = oldScale;
         }
 
         /// <summary>
@@ -312,7 +346,7 @@ namespace SEE.Game.Operator
         private void MorphEdges(IEnumerable<Edge> edges, float duration)
         {
             // All game edges corresponding to the graph edges.
-            IList<GameObject> gameEdges = new List<GameObject>(edges.Count());
+            IList<GameObject> gameEdges = new List<GameObject>();
 
             // Gather all gameEdges.
             foreach (Edge edge in edges)
@@ -338,20 +372,48 @@ namespace SEE.Game.Operator
             }
         }
 
-        private void OnEnable()
+        protected override TweenOperation<Color> InitializeColorOperation()
+        {
+            Material material = GetRenderer(gameObject).material;
+
+            Tween[] AnimateToColorAction(Color color, float d)
+            {
+                return new Tween[]
+                {
+                    material.DOColor(color, d).Play()
+                };
+            }
+
+            return new TweenOperation<Color>(AnimateToColorAction, material.color);
+        }
+
+        protected override Color ModifyColor(Color color, Func<Color, Color> modifier)
+        {
+            return modifier(color);
+        }
+
+        protected override IEnumerable<Color> AsEnumerable(Color color)
+        {
+            return new[] { color };
+        }
+
+        protected void OnEnable()
         {
             Node = GetNode(gameObject);
             City = GetCity(gameObject);
             Material material = GetRenderer(gameObject).material;
             Vector3 currentPosition = transform.position;
             Vector3 currentScale = transform.localScale;
+            Quaternion currentRotation = transform.rotation;
 
             Tween[] AnimateToXAction(float x, float d) => new Tween[] { transform.DOMoveX(x, d).Play() };
             Tween[] AnimateToYAction(float y, float d) => new Tween[] { transform.DOMoveY(y, d).Play() };
             Tween[] AnimateToZAction(float z, float d) => new Tween[] { transform.DOMoveZ(z, d).Play() };
+            Tween[] AnimateToRotationAction(Quaternion r, float d) => new Tween[] { transform.DORotateQuaternion(r, d).Play() };
             PositionX = new TweenOperation<float>(AnimateToXAction, currentPosition.x);
             PositionY = new TweenOperation<float>(AnimateToYAction, currentPosition.y);
             PositionZ = new TweenOperation<float>(AnimateToZAction, currentPosition.z);
+            Rotation = new TweenOperation<Quaternion>(AnimateToRotationAction, currentRotation);
 
             Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] { transform.DOScale(s, d).Play() };
             Scale = new TweenOperation<Vector3>(AnimateToScaleAction, currentScale);
@@ -364,25 +426,24 @@ namespace SEE.Game.Operator
 
             Tween[] BlinkAction(int count, float duration)
             {
-                Sequence sequence = DOTween.Sequence();
-                sequence.Append(material.DOColor(material.color.Invert(), duration / (2 * count)));
-                sequence.Append(material.DOColor(material.color, duration / (2 * count)));
-                return new Tween[] { sequence.SetLoops(count).Play() };
+                if (color.IsRunning)
+                {
+                    color.KillAnimator(true);
+                }
+                // If we're interrupting another blinking, we need to make sure the color still has the correct value.
+                material.color = color.TargetValue;
+
+                return new Tween[]
+                {
+                    material.DOColor(color.TargetValue.Invert(), duration / (2 * count)).SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play()
+                };
             }
 
             Blinking = new TweenOperation<int>(BlinkAction, 0, equalityComparer: new AlwaysFalseEqualityComparer<int>());
+            
+            base.OnEnable();
 
             #region Local Methods
-
-            static Renderer GetRenderer(GameObject gameObject)
-            {
-                if (!gameObject.TryGetComponent(out Renderer renderer))
-                {
-                    throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have a Renderer component!");
-                }
-
-                return renderer;
-            }
 
             static Node GetNode(GameObject gameObject)
             {
@@ -415,14 +476,35 @@ namespace SEE.Game.Operator
             #endregion
         }
 
-        private void OnDisable()
+        /// <summary>
+        /// Returns the <see cref="Renderer"/> of the given <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">the <see cref="GameObject"/> whose <see cref="Renderer"/> to return</param>
+        /// <returns>the <see cref="Renderer"/> of the given <paramref name="gameObject"/></returns>
+        /// <exception cref="InvalidOperationException">
+        /// if the <paramref name="gameObject"/> has no <see cref="Renderer"/>
+        /// </exception>
+        private static Renderer GetRenderer(GameObject gameObject)
         {
+            if (!gameObject.TryGetComponent(out Renderer renderer))
+            {
+                throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have a Renderer component!");
+            }
+
+            return renderer;
+        }
+
+        protected override void OnDisable()
+        {
+            base.OnDisable();
             PositionX.KillAnimator();
             PositionX = null;
             PositionY.KillAnimator();
             PositionY = null;
             PositionZ.KillAnimator();
             PositionZ = null;
+            Rotation.KillAnimator();
+            Rotation = null;
             Scale.KillAnimator();
             Scale = null;
             LabelAlpha.KillAnimator();

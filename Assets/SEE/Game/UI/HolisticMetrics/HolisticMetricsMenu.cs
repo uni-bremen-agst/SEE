@@ -7,6 +7,7 @@ using SEE.Game.UI.Menu;
 using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
+using Sirenix.Utilities;
 using UnityEngine;
 
 namespace SEE.Game.UI.HolisticMetrics
@@ -22,7 +23,7 @@ namespace SEE.Game.UI.HolisticMetrics
         /// <summary>
         /// The menu instance that represents the holistic metrics menu
         /// </summary>
-        private SimpleMenu menu;
+        private SimpleListMenu menu;
 
         /// <summary>
         /// When this component starts, it will instantiate the menu with all the menu entries and everything.
@@ -31,7 +32,7 @@ namespace SEE.Game.UI.HolisticMetrics
         {
             menu = CreateMenu();
         }
-        
+
         /// <summary>
         /// In every Update step, we want to check whether the player has pressed the key for toggling the holistic
         /// metrics menu. In that case, we toggle the menu.
@@ -48,16 +49,16 @@ namespace SEE.Game.UI.HolisticMetrics
         /// This method returns a new holistic metrics menu with all the menu entries and everything.
         /// </summary>
         /// <returns>A new holistic metrics menu</returns>
-        private SimpleMenu CreateMenu()
+        private SimpleListMenu CreateMenu()
         {
             GameObject actionMenuGO = new GameObject { name = "Holistic metrics menu" };
             IList<MenuEntry> entries = SelectionEntries();
-            SimpleMenu actionMenu = actionMenuGO.AddComponent<SimpleMenu>();
-            actionMenu.AllowNoSelection(true);
+            SimpleListMenu actionMenu = actionMenuGO.AddComponent<SimpleListMenu>();
+            actionMenu.AllowNoSelection = true;
             actionMenu.Title = "Holistic metrics menu";
             actionMenu.Description = "Add / change the metrics board(s).";
-            actionMenu.AddEntries(entries);
-            actionMenu.HideAfterSelection(true);
+            entries.ForEach(actionMenu.AddEntry);
+            actionMenu.HideAfterSelection = true;
             return actionMenu;
         }
 
@@ -140,7 +141,7 @@ namespace SEE.Game.UI.HolisticMetrics
             menu.ToggleMenu();
             HolisticMetricsActionHistory.Redo();
         }
-        
+
         /// <summary>
         /// This method reverts the last holistic metrics action and closes the menu.
         /// </summary>
@@ -149,7 +150,7 @@ namespace SEE.Game.UI.HolisticMetrics
             menu.ToggleMenu();
             HolisticMetricsActionHistory.Undo();
         }
-        
+
         /// <summary>
         /// This method gets called when the player clicks on the "New board" button. It will close the menu and open
         /// the dialog for adding a new board to the scene.
@@ -159,7 +160,7 @@ namespace SEE.Game.UI.HolisticMetrics
             menu.ToggleMenu();
             new AddBoardDialog().Open();
         }
-        
+
         /// <summary>
         /// This method gets called when the player clicks on the "Move boards" button. If there are any boards in the
         /// scene, it will toggle the moving option for the boards which means that there will be orange buttons under
@@ -177,7 +178,7 @@ namespace SEE.Game.UI.HolisticMetrics
                     ShowNotification.Info(
                         "Move the boards around as desired",
                         "Click the button under a board to move that board around. Don't forget to " +
-                        " deactivate this mode when done.");   
+                        " deactivate this mode when done.");
                 }
             }
             else
@@ -208,7 +209,7 @@ namespace SEE.Game.UI.HolisticMetrics
                     "There are no metrics boards in the scene");
             }
         }
-        
+
         /// <summary>
         /// This method will be called when the player clicks on the "Add widget" button. It will check whether there
         /// are any metrics boards in the scene. If so, then it will show the dialog for adding a new widget to a board.
@@ -303,7 +304,7 @@ namespace SEE.Game.UI.HolisticMetrics
         private void LoadBoardConfiguration()
         {
             menu.ToggleMenu();
-            
+
             if (ConfigManager.GetSavedFileNames().Any())
             {
                 new LoadBoardConfigurationDialog().Open();
