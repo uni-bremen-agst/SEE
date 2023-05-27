@@ -238,14 +238,12 @@ namespace SEE.Layout.NodeLayouts
                     TSegment newSegment = new TSegment(segment.IsConst, segment.IsVertical);
                     foreach(var oldTNode in segment.Side1Nodes)
                     {
-                        TNode newNode =  tNodes[oldTNode.RepresentLayoutNode.ID];
-                        //TNode newNode = workWith.Where(x => x.RepresentLayoutNode.ID == oldTNode.RepresentLayoutNode.ID).First();
+                        TNode newNode = workWith.Where(x => x.RepresentLayoutNode.ID == oldTNode.RepresentLayoutNode.ID).First();
                         newNode.registerSegment(newSegment, newSegment.IsVertical ? Direction.Right : Direction.Upper);
                     }
                     foreach(var oldTNode in segment.Side2Nodes)
                     {
-                        TNode newNode =  tNodes[oldTNode.RepresentLayoutNode.ID];
-                        //TNode newNode = workWith.Where(x => x.RepresentLayoutNode.ID == oldTNode.RepresentLayoutNode.ID).First();
+                        TNode newNode = workWith.Where(x => x.RepresentLayoutNode.ID == oldTNode.RepresentLayoutNode.ID).First();
                         newNode.registerSegment(newSegment, newSegment.IsVertical ? Direction.Left : Direction.Lower);
                     }
                 }
