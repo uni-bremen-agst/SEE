@@ -37,6 +37,11 @@ namespace SEE.Game.Evolution
             = new List<Dictionary<string, ILayoutEdge<ILayoutNode>>>();
 
         /// <summary>
+        /// The last calculated <see cref="NodeLayout"/> used for <see cref="IncrementalTreeMapLayout"/>.
+        /// </summary>
+        private NodeLayout oldLayout = null;
+
+        /// <summary>
         /// Creates and saves the node and edge layouts for all given <paramref name="graphs"/>. This will
         /// also create all necessary game nodes and game edges-- even those game nodes and game edges
         /// that are not present in the first graph in <see cref="graphs"/>.
@@ -105,12 +110,19 @@ namespace SEE.Game.Evolution
                 gameObjects.Add(gameNode);
             }
 
+            /// IncrementalTreeMapLayout must should know the last layout, till its used to calculate the 
+            /// new one
+            if( nodeLayout is IncrementalTreeMapLayout && oldLayout is IncrementalTreeMapLayout)
+            {
+                ((IncrementalTreeMapLayout) nodeLayout).OldLayout = (IncrementalTreeMapLayout) oldLayout;
+            }
             // Calculate and apply the node layout
             ICollection<LayoutGraphNode> layoutNodes = GraphRenderer.ToAbstractLayoutNodes(gameObjects);
             // Note: Apply applies its results only on the layoutNodes but not on the game objects
             // these layoutNodes represent. Here, we leave the game objects untouched. The layout
             // must be later applied when we render a city. Here, we only store the layout for later use.
             nodeLayout.Apply(layoutNodes);
+            oldLayout = nodeLayout;
             GraphRenderer.Fit(gameObject, layoutNodes);
             GraphRenderer.Stack(gameObject, layoutNodes);
 
