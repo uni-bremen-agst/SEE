@@ -11,7 +11,6 @@ using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
 using Node = SEE.DataModel.DG.Node;
-using RTG;
 
 namespace SEE.Controls.Actions
 {
