@@ -2,7 +2,6 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     static class Dissect{
@@ -10,6 +9,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         {
             TNode[] nodesArray = nodes.ToArray();
             Array.Sort(nodesArray,(x,y) => (x.Size.CompareTo(y.Size)));
+
+            if(Math.Abs(nodesArray.Sum(x => x.Size) - rectangle.area()) >= rectangle.area() * Math.Pow(10, -3)
+                && nodesArray.Length > 1)
+            {
+                Debug.LogWarning("Dissect: nodes doesnt fit in rectangle");
+            }
+
             dissect(rectangle,
                     nodesArray,
                     leftBound : new TSegment(true, true),
@@ -52,7 +58,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     rectangle_1.width *= ratio;
                     rectangle_2.width *= (1 - ratio);
                     rectangle_2.x = rectangle_1.x + rectangle_1.width;
-                    TSegment newSegment = new TSegment(false,false);
+                    TSegment newSegment = new TSegment(false,true);
 
                     Dissect.dissect(rectangle_1, nodes_1,
                                     leftBound : leftBound,
@@ -71,7 +77,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     rectangle_1.depth *= ratio;
                     rectangle_2.depth *= (1 - ratio);
                     rectangle_2.z = rectangle_1.z + rectangle_1.depth;
-                    TSegment newSegment = new TSegment(false,true);
+                    TSegment newSegment = new TSegment(false,false);
 
                     Dissect.dissect(rectangle_1, nodes_1,
                                     leftBound : leftBound,

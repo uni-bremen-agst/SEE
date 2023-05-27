@@ -2,9 +2,9 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 using MathNet.Numerics.LinearAlgebra;
+using MathNet.Numerics.Distributions;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
@@ -22,12 +22,15 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             Dictionary<TSegment,int> mapSegmentIndex 
                 = segments.ToDictionary(s => s, s => i++);
 
-
+            double distance = 0;
             for(int j = 0; j < 10; j++)
             {
-                var distance = CalculateOneStep(nodes, mapSegmentIndex);
-                //TODO
-                Debug.Log("Distance["+j.ToString()+"] : " + distance.ToString());
+                distance = CalculateOneStep(nodes, mapSegmentIndex);
+                if(distance <= 0.01) break;
+            }
+            if(distance >= 0.01)
+            {
+                Debug.LogWarning("layout correction bad result ["+distance.ToString()+"]");
             }
         }
 
@@ -72,13 +75,38 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             Dictionary<TSegment, int> mapSegmentIndex)
         {
             Matrix<float> matrix = JacobianMatrix(nodes,mapSegmentIndex);
+            
             Vector<float> nodes_sizes_wanted = 
                 Vector<float>.Build.DenseOfArray(nodes.Select(node => node.Size).ToArray());
-            Vector<float> segmentShift = matrix.PseudoInverse() * nodes_sizes_wanted;
+            Vector<float> nodes_sizes_current = 
+                Vector<float>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.area()).ToArray());
+            var diff = nodes_sizes_wanted - nodes_sizes_current;
+            Matrix<float> pinv;
+            try
+            {
+                pinv = matrix.PseudoInverse();
+            }
+            catch
+            {
+                try
+                {
+                    Matrix<float> bias = Matrix<float>.Build.Random(nodes.Count,mapSegmentIndex.Count, new ContinuousUniform(-.1,0.1));
+                    pinv = (matrix + bias).PseudoInverse();
+                    Debug.LogWarning("layout correction needs bias");
+                }
+                catch
+                {
+                    Debug.LogWarning("layout correction failed");
+                    pinv = Matrix<float>.Build.Dense(mapSegmentIndex.Count,nodes.Count,0);
+                }
+            }
+
+            Vector<float> segmentShift = pinv * diff;
+
             applyShift(segmentShift, nodes, mapSegmentIndex);
+            
             Vector<float> nodes_sizes_afterStep = 
                 Vector<float>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.area()).ToArray());
-
             return (nodes_sizes_afterStep - nodes_sizes_wanted).Norm(2);
         }
 
@@ -96,10 +124,23 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     var segment = segments[dir];
                     if(segment.IsConst) continue;
                     var value = shift[mapSegmentIndex[segment]];
-                    if(dir == Direction.Left) node.Rectangle.x += value;
-                    if(dir == Direction.Right) node.Rectangle.width += value;
-                    if(dir == Direction.Lower) node.Rectangle.z += value;
-                    if(dir == Direction.Upper) node.Rectangle.depth += value;
+                    switch(dir)
+                    {
+                        case Direction.Left:
+                            node.Rectangle.x += value;
+                            node.Rectangle.width -= value;
+                            break;
+                        case Direction.Right:
+                            node.Rectangle.width += value;
+                            break;
+                        case Direction.Lower:
+                            node.Rectangle.z += value;
+                            node.Rectangle.depth -= value;
+                            break;
+                        case Direction.Upper:
+                            node.Rectangle.depth += value;
+                            break;
+                    }
                 }
             }
         }

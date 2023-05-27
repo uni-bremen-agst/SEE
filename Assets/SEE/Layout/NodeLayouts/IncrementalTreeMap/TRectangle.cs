@@ -1,6 +1,6 @@
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
-    public class TRectangle
+    public class TRectangle : System.ICloneable
     {
         public TRectangle(float x, float z, float width, float depth)
         {
@@ -23,6 +23,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         {
             return width*depth;
         }
-
+        public object Clone()
+        {
+            return new TRectangle(x:x,z:z,width:width,depth:depth);
+        }
     }
 }

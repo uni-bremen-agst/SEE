@@ -1,7 +1,9 @@
 using System.Collections.Generic;
-using UnityEngine;
+using System.Diagnostics;
+
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
+    [DebuggerDisplay("{DebuggerDisplay}")]
     public class TNode
     {
         public TNode(ILayoutNode layoutNode, TNode parent)
@@ -89,6 +91,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                  {Direction.Right, this.rightBoundingSegment},
                  {Direction.Lower, this.lowerBoundingSegment},
                  {Direction.Upper, this.upperBoundingSegment}};
+        }
+        private string DebuggerDisplay
+        {
+            get
+            {
+                return representLayoutNode == null ? "null" : representLayoutNode.ID;
+            }
         }
     }
 }

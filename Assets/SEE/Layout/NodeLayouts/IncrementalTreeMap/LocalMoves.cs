@@ -10,13 +10,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         private static T ArgMaxJ<T>(ICollection<T> collection, Func<T, IComparable> eval)
         {
             var bestVal = collection.Max(eval);
-            return collection.First(x => eval(x) == bestVal);
+            return collection.First(x => eval(x).CompareTo(bestVal) == 0);
         }
         
         private static T ArgMinJ<T>(ICollection<T> collection, Func<T, IComparable> eval)
         {
             var bestVal = collection.Min(eval);
-            return collection.First(x => eval(x) == bestVal);
+            return collection.First(x => eval(x).CompareTo(bestVal) == 0);
         }
 
         private static IList<LocalMove> findLocalMoves(TSegment segment)
@@ -71,7 +71,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             if(bestNode.Rectangle.width >= bestNode.Rectangle.depth)
             {
                 // [bestNode]|[newNode]
-                TSegment newSegment = new TSegment(isConst: false, isVertical: false);
+                TSegment newSegment = new TSegment(isConst: false, isVertical: true);
                 newNode.registerSegment(newSegment, Direction.Left);
                 bestNode.registerSegment(newSegment, Direction.Right);
                 bestNode.Rectangle.width *= 0.5f;
@@ -83,7 +83,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 // [newNode]
                 // ---------
                 // [bestNode]
-                TSegment newSegment = new TSegment(isConst: false, isVertical: true);
+                TSegment newSegment = new TSegment(isConst: false, isVertical: false);
                 newNode.registerSegment(newSegment, Direction.Lower);
                 bestNode.registerSegment(newSegment, Direction.Upper);
                 bestNode.Rectangle.depth *= 0.5f;
@@ -97,22 +97,22 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             // check wether node is grounded
             var segments = obsoleteNode.getAllSegments();
             bool isGrounded = false;
-            if(segments[Direction.Left].Side2Nodes.Count == 1)
+            if(segments[Direction.Left].Side2Nodes.Count == 1 && !segments[Direction.Left].IsConst)
             {
                 isGrounded = true;
                 //[E][O]
-                var expandingNodes = segments[Direction.Left].Side1Nodes;
+                var expandingNodes = segments[Direction.Left].Side1Nodes.ToArray();
                 foreach(var node in expandingNodes)
                 {
                     node.Rectangle.width += obsoleteNode.Rectangle.width;
                     node.registerSegment(segments[Direction.Right], Direction.Right);
                 }
             }
-            else if(segments[Direction.Right].Side1Nodes.Count == 1)
+            else if(segments[Direction.Right].Side1Nodes.Count == 1 && !segments[Direction.Right].IsConst)
             {
                 isGrounded = true;
                 //[O][E]
-                var expandingNodes = segments[Direction.Right].Side2Nodes;
+                var expandingNodes = segments[Direction.Right].Side2Nodes.ToArray();
                 foreach(var node in expandingNodes)
                 {
                     node.Rectangle.x = obsoleteNode.Rectangle.x;
@@ -120,24 +120,24 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     node.registerSegment(segments[Direction.Left], Direction.Left);
                 }
             }
-            else if(segments[Direction.Lower].Side2Nodes.Count == 1)
+            else if(segments[Direction.Lower].Side2Nodes.Count == 1 && !segments[Direction.Lower].IsConst)
             {
                 isGrounded = true;
                 //[O]
                 //[E]
-                var expandingNodes = segments[Direction.Lower].Side1Nodes;
+                var expandingNodes = segments[Direction.Lower].Side1Nodes.ToArray();
                 foreach(var node in expandingNodes)
                 {
                     node.Rectangle.depth += obsoleteNode.Rectangle.depth;
                     node.registerSegment(segments[Direction.Upper], Direction.Upper);
                 }
             }
-            else if(segments[Direction.Upper].Side1Nodes.Count == 1)
+            else if(segments[Direction.Upper].Side1Nodes.Count == 1 && !segments[Direction.Upper].IsConst)
             {  
                 isGrounded = true;
                 //[E]
                 //[O]
-                var expandingNodes = segments[Direction.Upper].Side2Nodes;
+                var expandingNodes = segments[Direction.Upper].Side2Nodes.ToArray();
                 foreach(var node in expandingNodes)
                 {
                     node.Rectangle.z = obsoleteNode.Rectangle.z;
@@ -164,8 +164,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     {
                         move.apply();
                         DeleteNode(obsoleteNode);
+                        return;
                     }
                 }
+                // We should never arrive here
+                Assert.IsFalse(true);
             }
         }
         
