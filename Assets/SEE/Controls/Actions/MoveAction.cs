@@ -64,6 +64,18 @@ namespace SEE.Controls.Actions
             private GameObject grabbedObject;
 
             /// <summary>
+            /// Get the game object that is grabbed.
+            /// @return the game object which is grabbed.
+            /// </summary>
+            public GameObject GetGameObject
+            {
+                get
+                {
+                    return this.grabbedObject;
+                }
+            }
+
+            /// <summary>
             /// The duration of any animation to move the grabbed object for Undo/Redo
             /// in seconds.
             /// </summary>
@@ -274,7 +286,6 @@ namespace SEE.Controls.Actions
                 {
                     Highlighter.SetHighlight(markedGameObject, false);
                     new HighlightNetAction(markedGameObject.name, false).Execute();
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, this.originalParent.gameObject);
                 }
             }
 
@@ -347,7 +358,6 @@ namespace SEE.Controls.Actions
                     PutOnAndFit(grabbedObject, target, originalParent.gameObject, originalLocalScale);
                     UnmarkAsTarget();
                     MarkAsTarget(target.transform);
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, originalParent.gameObject);
 
                     newParent = target;
                     // The mapping is only possible if we are in a reflexion city
@@ -446,7 +456,6 @@ namespace SEE.Controls.Actions
                 try
                 {
                     ReflexionMapper.SetParent(child, parent);
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, parent.gameObject);
                     new SetParentNetAction(child.name, parent.name, true).Execute();
                 }
                 catch (ArchitectureAnalysisException e)
@@ -532,6 +541,7 @@ namespace SEE.Controls.Actions
                     if (hoveredObject && hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot())
                     {
                         grabbedObject.Grab(hoveredObject.gameObject);
+                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, hoveredObject.gameObject);
                         // Remember the current distance from the pointing device to the grabbed object.
                         distanceToUser = Vector3.Distance(Raycasting.UserPointsTo().origin, grabbedObject.Position);
                         currentState = ReversibleAction.Progress.InProgress;
@@ -554,6 +564,10 @@ namespace SEE.Controls.Actions
             else if (grabbedObject.IsGrabbed) // dragging has ended
             {
                 // Finalize the action with the grabbed object.
+                if (grabbedObject.GetGameObject != null)
+                {
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, grabbedObject.GetGameObject);
+                }
                 grabbedObject.UnGrab();
                 // Action is finished.
                 currentState = ReversibleAction.Progress.Completed;
