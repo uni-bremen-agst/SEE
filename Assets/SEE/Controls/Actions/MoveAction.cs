@@ -67,7 +67,7 @@ namespace SEE.Controls.Actions
             /// Get the game object that is grabbed.
             /// @return the game object which is grabbed.
             /// </summary>
-            public GameObject GetGameObject
+            public GameObject GrabbedGameObject
             {
                 get
                 {
@@ -564,9 +564,9 @@ namespace SEE.Controls.Actions
             else if (grabbedObject.IsGrabbed) // dragging has ended
             {
                 // Finalize the action with the grabbed object.
-                if (grabbedObject.GetGameObject != null)
+                if (grabbedObject.GrabbedGameObject != null)
                 {
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, grabbedObject.GetGameObject);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, grabbedObject.GrabbedGameObject);
                 }
                 grabbedObject.UnGrab();
                 // Action is finished.
