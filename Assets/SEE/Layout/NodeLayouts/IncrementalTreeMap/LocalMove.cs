@@ -12,8 +12,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         protected TNode node2;
 
         public TNode Node2{get => this.node2;}
-        abstract public void apply();
-        // 
+        abstract public void Apply();
+
+        abstract public LocalMove Clone(Dictionary<string,TNode> mapOriginalClone);
     }
 
     public class FlipMove : LocalMove
@@ -25,7 +26,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
         
         override 
-        public void apply()
+        public void Apply()
         {
             var segmentsNode1 = node1.getAllSegments();
             var segmentsNode2 = node2.getAllSegments();
@@ -56,6 +57,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             {
                     throw new ArgumentException("Cant apply flip move");
             }
+        }
+
+        override
+        public LocalMove Clone(Dictionary<string,TNode> mapOriginalClone)
+        {
+            return new FlipMove(mapOriginalClone[node1.RepresentLayoutNode.ID],mapOriginalClone[node2.RepresentLayoutNode.ID],clockwise);
         }
 
         private void apply_flipOnVerticalSegment(TNode leftNode, TNode rightNode)
@@ -160,7 +167,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         override 
-        public void apply()
+        public void Apply()
         {
             var segmentsNode1 = node1.getAllSegments();
             var segmentsNode2 = node2.getAllSegments();
@@ -192,8 +199,14 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
             else
             {
-                throw new ArgumentException("Cant apply flip move");
+                throw new ArgumentException("Cant apply stretch move");
             }
+        }
+
+        override
+        public LocalMove Clone(Dictionary<string,TNode> mapOriginalClone)
+        {
+            return new StretchMove(mapOriginalClone[node1.RepresentLayoutNode.ID],mapOriginalClone[node2.RepresentLayoutNode.ID]);
         }
 
         private void apply_StretchLeftOverVertical(TNode leftNode, TNode rightNode)
@@ -305,7 +318,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             {
                 lowerNode.registerSegment(segmentsUpperNode[Direction.Left],Direction.Right);
             }
-        }        
+        }
     }
 }
 

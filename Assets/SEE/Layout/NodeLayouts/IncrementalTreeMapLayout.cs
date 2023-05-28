@@ -49,17 +49,19 @@ namespace SEE.Layout.NodeLayouts
         /// Some padding will be added between nodes. That padding depends upon the minimum
         /// of the width and depth of a node, multiplied by this factor.
         /// </summary>
-        private const float PaddingFactor = 0.05f;
+        private const float PaddingFactor = 0.025f;
 
         /// <summary>
         /// The minimal padding between nodes in absolute (world space) terms.
         /// </summary>
-        private const float MinimimalAbsolutePadding = 0.01f;
+        private const float MinimimalAbsolutePadding = 0.005f;
 
         /// <summary>
         /// The maximal padding between nodes in absolute (world space) terms.
         /// </summary>
         private const float MaximalAbsolutePadding = 0.1f;
+
+        private const int NumberOfLocalMoves = 3;
 
         private IDictionary<string,TNode> tNodes;
 
@@ -180,7 +182,7 @@ namespace SEE.Layout.NodeLayouts
         {
             // GetNodes can be done before if then else
             if(    this.oldLayout == null
-                || NumberOfOccurrencesInOldGraph(siblings) <= 1
+                || NumberOfOccurrencesInOldGraph(siblings) <= 4
                 || ParentsInOldGraph(siblings).Count != 1)
             {
                 IList<TNode> nodes = GetTNodes(siblings);
@@ -284,7 +286,8 @@ namespace SEE.Layout.NodeLayouts
                 }
 
                 CorrectAreas.Correct(workWith);
-                LocalMoves.MakeLocalMoves(workWith);
+                LocalMoves.MakeLocalMoves(workWith, NumberOfLocalMoves);
+                CheckCons(workWith);
             }
 
             AddToLayout(GetTNodes(siblings));
@@ -410,12 +413,11 @@ namespace SEE.Layout.NodeLayouts
             {
                 ILayoutNode o = node.RepresentLayoutNode;
                 TRectangle rect = node.Rectangle;
-                
                 Vector3 position = new Vector3(rect.x + rect.width / 2.0f, groundLevel, rect.z + rect.depth / 2.0f);
                 Vector3 scale = new Vector3(
-                    rect.width - 2 * padding,
+                    rect.width - 2 * padding > 0 ? rect.width - 2 * padding : rect.width,
                     o.LocalScale.y,
-                    rect.depth - 2 * padding);
+                    rect.depth - 2 * padding > 0 ? rect.depth - 2 * padding : rect.depth);
                 Assert.AreEqual(o.AbsoluteScale, o.LocalScale, $"{o.ID}: {o.AbsoluteScale} != {o.LocalScale}");
                 layout_result[o] = new NodeTransform(position, scale);
             }

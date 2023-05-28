@@ -10,7 +10,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     static class CorrectAreas
     {
-        public static void Correct(IList<TNode> nodes)
+        public static bool Correct(IList<TNode> nodes)
         {
             HashSet<TSegment> segments = new HashSet<TSegment>();
             foreach(var node in nodes)
@@ -23,15 +23,42 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 = segments.ToDictionary(s => s, s => i++);
 
             double distance = 0;
-            for(int j = 0; j < 10; j++)
+            for(int j = 0; j < 50; j++)
             {
                 distance = CalculateOneStep(nodes, mapSegmentIndex);
-                if(distance <= 0.01) break;
+                if(distance <= 0.00001) break;
             }
-            if(distance >= 0.01)
+            if(distance <= 0.00001)
             {
-                Debug.LogWarning("layout correction bad result ["+distance.ToString()+"]");
+                Debug.LogWarning("++++ layout correction .00001");
             }
+            else if(distance <= 0.0001)
+            {
+                Debug.LogWarning("-+++ layout correction .0001");
+            }
+            else if(distance <= 0.001)
+            {
+                Debug.LogWarning("--++ layout correction .001");
+            }
+            else if(distance <= 0.01)
+            {
+                Debug.LogWarning("---+ layout correction .01");
+            }
+            else if(distance <= 0.1)
+            {
+                Debug.LogWarning("---- layout correction .1");
+            }
+            else
+            {
+                Debug.LogWarning("<<>> layout correction >.1");
+            }
+            bool cons = CheckCons(nodes);
+            if(!cons)
+            {
+                Debug.LogWarning("layout correction failed negative rec");
+            }
+            //Debug.LogWarning("layout correction bad result ["+distance.ToString()+"]");
+            return (cons && distance <= 0.001);
         }
 
         private static Matrix<float> JacobianMatrix(
@@ -39,7 +66,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             Dictionary<TSegment, int> mapSegmentIndex)
         {
             int n = nodes.Count;
-            var matrix = Matrix<float>.Build.Dense(n,n-1);
+            var matrix = Matrix<float>.Build.Sparse(n,n-1);
             foreach(var node in nodes)
             {
                 var segments = node.getAllSegments();
@@ -49,21 +76,23 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     var segment = segments[dir];
                     if(!segment.IsConst)
                     {
-                        int index_segment = mapSegmentIndex[segment];
-                        float value;
-                        if(dir == Direction.Left || dir == Direction.Right)
+                        float value = 0;
+                        switch(dir)
                         {
-                            value = node.Rectangle.depth;
+                            case Direction.Left:
+                                value = - node.Rectangle.depth;
+                                break;
+                            case Direction.Right:
+                                value = node.Rectangle.depth;
+                                break;
+                            case Direction.Lower:
+                                value = - node.Rectangle.width;
+                                break;
+                            case Direction.Upper:
+                                value = node.Rectangle.width;
+                                break;
                         }
-                        else
-                        {
-                            value = node.Rectangle.width;
-                        }
-                        if(dir == Direction.Left || dir == Direction.Lower)
-                        {
-                            value *= -1;
-                        }
-                        matrix[index_node,index_segment] = value;
+                        matrix[index_node,mapSegmentIndex[segment]] = value;
                     }
                 }                   
             }
@@ -103,7 +132,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
             Vector<float> segmentShift = pinv * diff;
 
-            applyShift(segmentShift, nodes, mapSegmentIndex);
+            ApplyShift(segmentShift, nodes, mapSegmentIndex);
             
             Vector<float> nodes_sizes_afterStep = 
                 Vector<float>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.area()).ToArray());
@@ -111,7 +140,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
 
-        private static void applyShift(
+        private static void ApplyShift(
             Vector<float> shift,
             IList<TNode> nodes,
             Dictionary<TSegment, int> mapSegmentIndex)
@@ -144,5 +173,15 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 }
             }
         }
+
+        private static bool CheckCons(IList<TNode> nodes)
+        {
+            foreach(var node in nodes)
+            {
+                if(node.Rectangle.width <= 0 || node.Rectangle.depth <= 0) return false;
+            }
+            return true;
+        }
+
     }
 }

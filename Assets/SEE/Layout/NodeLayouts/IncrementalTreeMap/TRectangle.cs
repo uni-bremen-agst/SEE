@@ -14,7 +14,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         public float width;  // width
         public float depth;  // depth
 
-        public float aspect_ratio()
+        public float AspectRatio()
         {
             return width >= depth ? width / depth : depth / width;
         }
