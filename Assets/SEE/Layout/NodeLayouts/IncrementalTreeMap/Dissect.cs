@@ -10,7 +10,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             TNode[] nodesArray = nodes.ToArray();
             Array.Sort(nodesArray,(x,y) => (x.Size.CompareTo(y.Size)));
 
-            if(Math.Abs(nodesArray.Sum(x => x.Size) - rectangle.area()) >= rectangle.area() * Math.Pow(10, -3)
+            if(Math.Abs(nodesArray.Sum(x => x.Size) - rectangle.Area()) >= rectangle.Area() * Math.Pow(10, -3)
                 && nodesArray.Length > 1)
             {
                 Debug.LogWarning("Dissect: nodes doesnt fit in rectangle");

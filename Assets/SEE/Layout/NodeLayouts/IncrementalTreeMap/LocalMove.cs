@@ -62,7 +62,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         override
         public LocalMove Clone(Dictionary<string,TNode> mapOriginalClone)
         {
-            return new FlipMove(mapOriginalClone[node1.RepresentLayoutNode.ID],mapOriginalClone[node2.RepresentLayoutNode.ID],clockwise);
+            return new FlipMove(mapOriginalClone[node1.ID],mapOriginalClone[node2.ID],clockwise);
         }
 
         private void apply_flipOnVerticalSegment(TNode leftNode, TNode rightNode)
@@ -73,7 +73,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
             // adjust rectangles
             float width = leftNode.Rectangle.width + rightNode.Rectangle.width;
-            float ratio = leftNode.Rectangle.area() / (leftNode.Rectangle.area() + rightNode.Rectangle.area());
+            float ratio = leftNode.Rectangle.Area() / (leftNode.Rectangle.Area() + rightNode.Rectangle.Area());
             
             leftNode.Rectangle.width = width;
             rightNode.Rectangle.width = width;
@@ -119,7 +119,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
             // adjust rectangles
             float depth = lowerNode.Rectangle.depth + upperNode.Rectangle.depth;
-            float ratio = lowerNode.Rectangle.area() / (lowerNode.Rectangle.area() + upperNode.Rectangle.area());
+            float ratio = lowerNode.Rectangle.Area() / (lowerNode.Rectangle.Area() + upperNode.Rectangle.Area());
             
             lowerNode.Rectangle.depth = depth;
             upperNode.Rectangle.depth = depth;
@@ -206,7 +206,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         override
         public LocalMove Clone(Dictionary<string,TNode> mapOriginalClone)
         {
-            return new StretchMove(mapOriginalClone[node1.RepresentLayoutNode.ID],mapOriginalClone[node2.RepresentLayoutNode.ID]);
+            return new StretchMove(mapOriginalClone[node1.ID],mapOriginalClone[node2.ID]);
         }
 
         private void apply_StretchLeftOverVertical(TNode leftNode, TNode rightNode)

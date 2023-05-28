@@ -19,7 +19,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             return width >= depth ? width / depth : depth / width;
         }
 
-        public float area()
+        public float Area()
         {
             return width*depth;
         }

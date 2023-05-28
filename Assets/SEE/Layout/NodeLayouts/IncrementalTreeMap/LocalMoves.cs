@@ -200,13 +200,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             //nextIteration.Schedule(possibleMoves.Count,32);
             //var allResults = nextIteration.result;
 
-            var startNodes = nodes.ToDictionary(node => node.RepresentLayoutNode.ID, node => node);
+            var startNodes = nodes.ToDictionary(node => node.ID, node => node);
             var allResults = RecursiveMakeMoves(startNodes,amount);
             allResults.Add(new Tuple<Dictionary<string, TNode>, double>(startNodes,AspectRatiosPNorm(nodes)));
             var bestResult = ArgMinJ(allResults, x => x.Item2).Item1;
             foreach(var node in nodes)
             {
-                var resultNode = bestResult[node.RepresentLayoutNode.ID];
+                var resultNode = bestResult[node.ID];
                 node.Rectangle = resultNode.Rectangle;
             }
             HashSet<TSegment> resultSegments = new HashSet<TSegment>();
@@ -219,12 +219,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 var newSegment = new TSegment(resultSegment.IsConst,resultSegment.IsVertical);
                 foreach(var resultNode in resultSegment.Side1Nodes.ToArray())
                 {
-                    startNodes[resultNode.RepresentLayoutNode.ID].registerSegment(newSegment, 
+                    startNodes[resultNode.ID].registerSegment(newSegment, 
                         newSegment.IsVertical ? Direction.Right : Direction.Upper);
                 }
                 foreach(var resultNode in resultSegment.Side2Nodes.ToArray())
                 {
-                    startNodes[resultNode.RepresentLayoutNode.ID].registerSegment(newSegment, 
+                    startNodes[resultNode.ID].registerSegment(newSegment, 
                         newSegment.IsVertical ? Direction.Left : Direction.Lower);
                 }
             }
@@ -294,9 +294,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         {
             Dictionary<string,TNode> mapOriginalClone = 
             nodes.ToDictionary(
-                node => node.RepresentLayoutNode.ID,
+                node => node.ID,
                 node => {
-                            var nodeClone = new TNode(node.RepresentLayoutNode,null);
+                            var nodeClone = new TNode(node.ID);
                             nodeClone.Rectangle = (TRectangle) node.Rectangle.Clone();
                             nodeClone.Size = node.Size;
                             return nodeClone;
@@ -307,12 +307,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 var segmentClone = new TSegment(segment.IsConst, segment.IsVertical);
                 foreach(var node in segment.Side1Nodes.ToArray())
                 {
-                    mapOriginalClone[node.RepresentLayoutNode.ID].registerSegment(segmentClone, 
+                    mapOriginalClone[node.ID].registerSegment(segmentClone, 
                         segmentClone.IsVertical ? Direction.Right : Direction.Upper);
                 }
                 foreach(var node in segment.Side2Nodes.ToArray())
                 {
-                    mapOriginalClone[node.RepresentLayoutNode.ID].registerSegment(segmentClone, 
+                    mapOriginalClone[node.ID].registerSegment(segmentClone, 
                         segmentClone.IsVertical ? Direction.Left : Direction.Lower);
                 }
             }

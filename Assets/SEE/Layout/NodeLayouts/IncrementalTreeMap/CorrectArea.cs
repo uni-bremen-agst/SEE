@@ -108,7 +108,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             Vector<float> nodes_sizes_wanted = 
                 Vector<float>.Build.DenseOfArray(nodes.Select(node => node.Size).ToArray());
             Vector<float> nodes_sizes_current = 
-                Vector<float>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.area()).ToArray());
+                Vector<float>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.Area()).ToArray());
             var diff = nodes_sizes_wanted - nodes_sizes_current;
             Matrix<float> pinv;
             try
@@ -135,7 +135,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             ApplyShift(segmentShift, nodes, mapSegmentIndex);
             
             Vector<float> nodes_sizes_afterStep = 
-                Vector<float>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.area()).ToArray());
+                Vector<float>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.Area()).ToArray());
             return (nodes_sizes_afterStep - nodes_sizes_wanted).Norm(2);
         }
 

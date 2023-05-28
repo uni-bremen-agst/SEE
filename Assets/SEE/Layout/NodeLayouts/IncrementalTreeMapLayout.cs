@@ -63,7 +63,9 @@ namespace SEE.Layout.NodeLayouts
 
         private const int NumberOfLocalMoves = 3;
 
-        private IDictionary<string,TNode> tNodes;
+        private IDictionary<string,TNode> TNodeMap;
+
+        private IDictionary<string,ILayoutNode> ILayoutNodeMap;
 
         private IncrementalTreeMapLayout oldLayout;
 
@@ -110,20 +112,21 @@ namespace SEE.Layout.NodeLayouts
 
         private void InitTNodes()
         {
-            tNodes = new Dictionary<string,TNode>();
+            TNodeMap = new Dictionary<string,TNode>();
+            ILayoutNodeMap = new Dictionary<string,ILayoutNode>();
             float totalLocalScale = 0;
             foreach(ILayoutNode node in roots)
             {
-                totalLocalScale += InitTNode(node, null);
+                totalLocalScale += InitTNode(node);
             }
             // adjust size 
             float adjustFactor = (width*depth) / totalLocalScale;
-            foreach(var node in tNodes.Values)
+            foreach(var node in TNodeMap.Values)
             {
                 node.Size *= adjustFactor;
             }
         }
-        private float InitTNode(ILayoutNode node, TNode parent)
+        private float InitTNode(ILayoutNode node)
         {
             if (node.IsLeaf)
             {
@@ -131,19 +134,21 @@ namespace SEE.Layout.NodeLayouts
                 Vector3 size = node.LocalScale;
                 // x and z lengths may differ; we need to consider the larger value
                 float result = Mathf.Max(size.x, size.z);
-                TNode newTNode = new TNode(node,parent);
+                TNode newTNode = new TNode(node.ID);
                 newTNode.Size = result;
-                tNodes.Add(node.ID, newTNode);
+                TNodeMap.Add(node.ID, newTNode);
+                ILayoutNodeMap.Add(node.ID,node);
                 return result;
             }
             else
             {
-                TNode newTNode = new TNode(node, parent);
-                tNodes.Add(node.ID, newTNode);
+                TNode newTNode = new TNode(node.ID);
+                TNodeMap.Add(node.ID, newTNode);
+                ILayoutNodeMap.Add(node.ID,node);
                 float total_size = 0.0f;
                 foreach (ILayoutNode child in node.Children())
                 {
-                    total_size += InitTNode(child, newTNode);
+                    total_size += InitTNode(child);
                 }
                 newTNode.Size = total_size;
                 return total_size;
@@ -211,10 +216,10 @@ namespace SEE.Layout.NodeLayouts
                 // get nodes form old layout .. over take their rectangles
                 foreach(var oldTNode in oldTNodes)
                 {
-                    TNode newTNode = ((List<TNode>) newTNodes).Find(x => x.RepresentLayoutNode.ID.Equals(oldTNode.RepresentLayoutNode.ID));
+                    TNode newTNode = ((List<TNode>) newTNodes).Find(x => x.ID.Equals(oldTNode.ID));
                     if(newTNode == null)
                     {   
-                        newTNode = new TNode(oldTNode.RepresentLayoutNode,null);
+                        newTNode = new TNode(oldTNode.ID);
                         nodesToBeDeleted.Add(newTNode);
                         workWith.Add(newTNode);
                     }
@@ -240,24 +245,19 @@ namespace SEE.Layout.NodeLayouts
                     TSegment newSegment = new TSegment(segment.IsConst, segment.IsVertical);
                     foreach(var oldTNode in segment.Side1Nodes)
                     {
-                        TNode newNode = workWith.Where(x => x.RepresentLayoutNode.ID == oldTNode.RepresentLayoutNode.ID).First();
+                        TNode newNode = workWith.Where(x => x.ID == oldTNode.ID).First();
                         newNode.registerSegment(newSegment, newSegment.IsVertical ? Direction.Right : Direction.Upper);
                     }
                     foreach(var oldTNode in segment.Side2Nodes)
                     {
-                        TNode newNode = workWith.Where(x => x.RepresentLayoutNode.ID == oldTNode.RepresentLayoutNode.ID).First();
+                        TNode newNode = workWith.Where(x => x.ID == oldTNode.ID).First();
                         newNode.registerSegment(newSegment, newSegment.IsVertical ? Direction.Left : Direction.Lower);
                     }
                 }
 
-                TRectangle oldRectangle = (oldTNodes[0].Parent == null || oldTNodes[0].Parent.Rectangle == null)
-                    ? new TRectangle(
-                        x: -oldLayout.width / 2.0f,
-                        z: -oldLayout.depth / 2.0f,
-                        width: oldLayout.width,
-                        depth: oldLayout.depth)
-                    : oldTNodes[0].Parent.Rectangle;
 
+                TRectangle oldRectangle = oldLayout.GetParentTRectangle(oldTNodes[0]);
+                
                 TransformRectangles(workWith, oldRectangle: oldRectangle, newRectangle: rectangle);
 
                 CheckCons(workWith);
@@ -302,7 +302,7 @@ namespace SEE.Layout.NodeLayouts
 
                     Assert.AreEqual(node.AbsoluteScale, node.LocalScale);
                     NodeTransform nodeTransform = layout_result[node];
-                    TRectangle childRectangle = tNodes[node.ID].Rectangle;
+                    TRectangle childRectangle = TNodeMap[node.ID].Rectangle;
                     CalculateLayout(children, childRectangle);
                 }
             }
@@ -383,7 +383,7 @@ namespace SEE.Layout.NodeLayouts
             List<TNode> result = new List<TNode>();
             foreach( ILayoutNode layoutNode in layoutNodes)
             {
-                result.Add(this.tNodes[layoutNode.ID]);
+                result.Add(this.TNodeMap[layoutNode.ID]);
             }
             return result;
         }
@@ -406,12 +406,12 @@ namespace SEE.Layout.NodeLayouts
         private void AddToLayout (IList<TNode> nodes)
         {
             float aspect_ratio = Math.Max(depth/width, width/depth);
-            float padding = (float) (Math.Min(depth,width) / ( (1f / PaddingFactor) * Math.Pow(tNodes.Count / aspect_ratio,0.5f)));
+            float padding = (float) (Math.Min(depth,width) / ( (1f / PaddingFactor) * Math.Pow(TNodeMap.Count / aspect_ratio,0.5f)));
             padding = Mathf.Clamp(padding, MinimimalAbsolutePadding, MaximalAbsolutePadding);
 
             foreach (TNode node in nodes)
             {
-                ILayoutNode o = node.RepresentLayoutNode;
+                ILayoutNode o = ILayoutNodeMap[node.ID];
                 TRectangle rect = node.Rectangle;
                 Vector3 position = new Vector3(rect.x + rect.width / 2.0f, groundLevel, rect.z + rect.depth / 2.0f);
                 Vector3 scale = new Vector3(
@@ -442,6 +442,23 @@ namespace SEE.Layout.NodeLayouts
                 node.Rectangle.depth *= scale_z;
             }
         }
+
+        private TRectangle GetParentTRectangle(TNode node)
+        {
+            var layoutNode = ILayoutNodeMap[node.ID];
+            TRectangle result;
+            try
+            {
+                var parentTNode = TNodeMap[layoutNode.Parent.ID];
+                result = (TRectangle) parentTNode.Rectangle.Clone();
+            }
+            catch
+            {   
+                result = new TRectangle(-.5f * width,-.5f * depth, width, depth);
+            }
+            return result;
+        }
+
         private void CheckCons(IList<TNode> nodes)
         {
             foreach(var node in nodes)

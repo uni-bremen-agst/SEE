@@ -3,21 +3,13 @@ using System.Diagnostics;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
-    [DebuggerDisplay("{DebuggerDisplay}")]
+    [DebuggerDisplay("{NodeID}")]
     public class TNode
     {
-        public TNode(ILayoutNode layoutNode, TNode parent)
+        public TNode(string nodeID)
         {
-            this.representLayoutNode = layoutNode;
-            this.parent = parent;
+            this.nodeID = nodeID;
         }
-
-        // do i rly need parent?
-        private TNode parent;
-        public TNode Parent {get => parent;}
-
-        private IList<TNode> children;
-        public IList<TNode> Children {get => children;}
         
         private TRectangle rectangle;
         public TRectangle Rectangle 
@@ -29,11 +21,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         public float Size 
         {   get => size;
             set {size = value;}}
-        
-        private ILayoutNode representLayoutNode;
-        public ILayoutNode RepresentLayoutNode 
-        {   get => representLayoutNode;}
-        
+
+        private string nodeID;
+        public string ID 
+        {   get => nodeID;}
+
         private TSegment leftBoundingSegment;
         private TSegment rightBoundingSegment;
         private TSegment upperBoundingSegment;
@@ -92,12 +84,6 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                  {Direction.Lower, this.lowerBoundingSegment},
                  {Direction.Upper, this.upperBoundingSegment}};
         }
-        private string DebuggerDisplay
-        {
-            get
-            {
-                return representLayoutNode == null ? "null" : representLayoutNode.ID;
-            }
-        }
+
     }
 }
