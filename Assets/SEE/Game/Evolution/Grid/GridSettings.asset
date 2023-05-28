@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9283cecb9d29e6d4a9e7c68455bc622f, type: 3}
-  m_Name: Add Programatically Settings
+  m_Name: GridSettings
   m_EditorClassIdentifier: 
   Key: DefaultGrid
   Width: 10
@@ -105,5 +105,5 @@ MonoBehaviour:
     RuntimePlatform: 17
     GridInputDefinition: {fileID: 0}
   PreventInputThroughUI: 1
-  DisplayInEditor: 0
+  DisplayInEditor: 1
   SizingOption: 0
