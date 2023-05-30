@@ -126,6 +126,7 @@ jobs:
       matrix:
         os: [self-hosted]
     needs: [setup, gitscripts, static]
+    permissions: write-all
     steps:
       - uses: actions/cache@v3
         name: Cache Library
