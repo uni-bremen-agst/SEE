@@ -17,7 +17,7 @@ namespace SEE.Controls.Actions
         /// derived at once via <see cref="AllRootTypes.Elements()"/>.
         /// </summary>
         public static Forrest<AbstractActionStateType> AllRootTypes { get; }
-            = new Forrest<AbstractActionStateType>();
+            = new();
 
         /// <summary>
         /// Adds <paramref name="actionStateType"/> to the list of all action state
