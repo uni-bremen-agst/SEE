@@ -163,7 +163,7 @@ namespace SEE.Game.UI.Menu
         {
             if (searchInput)
             {
-                searchInput.text = String.Empty;
+                searchInput.text = string.Empty;
             }
             while (Levels.Count > 0)
             {
