@@ -76,7 +76,7 @@ namespace SEE.Utils
             }
 
             /// <summary>
-            /// Traverses the forrest in preorder an calls <paramref name="visitor"/>
+            /// Traverses the forrest in preorder and calls <paramref name="visitor"/>
             /// for each visited node. If <paramref name="visitor"/> yields <c>true</c>,
             /// the traversal continues with the next node in the preorder not yet visited;
             /// otherwise the traversal terminates.
