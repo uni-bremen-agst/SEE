@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using SEE.Game.HolisticMetrics;
 using SEE.Game.UI.HolisticMetrics;
+using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
@@ -95,7 +96,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             switch (progress)
             {
                 case ProgressState.WaitingForClick:
-                    if (buttonController.GetClick())
+                    if (buttonController.IsClicked())
                     {
                         loadBoardDialog = new LoadBoardDialog();
                         loadBoardDialog.Open();
@@ -104,7 +105,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
 
                     return false;
                 case ProgressState.WaitingForInput:
-                    if (loadBoardDialog.GetFilename(out string filename))
+                    if (loadBoardDialog.TryGetFilename(out string filename))
                     {
                         try
                         {
@@ -117,7 +118,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
                         }
                         catch (Exception exception)
                         {
-                            Debug.LogError(exception);
+                            ShowNotification.Error("Loading failure", $"Could not load board from {filename}: {exception.Message}");
+                            throw exception;
                         }
                     }
                     else if (loadBoardDialog.WasCanceled())

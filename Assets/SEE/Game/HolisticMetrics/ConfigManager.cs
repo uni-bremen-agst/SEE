@@ -73,9 +73,8 @@ namespace SEE.Game.HolisticMetrics
             }
             catch (Exception e)
             {
-                string description = $"Could not load settings from {path.Path}: {e.Message}";
-                ShowNotification.Error("Error loading board", description);
-                Debug.LogError(description);
+                ShowNotification.Error("Error loading board", $"Could not load settings from {path.Path}: {e.Message}");
+                throw e;
             }
             return config;
         }

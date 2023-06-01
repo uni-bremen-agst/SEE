@@ -11,6 +11,9 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
     /// </summary>
     public class WidgetDeleter : MonoBehaviour
     {
+        /// <summary>
+        /// Whether the user has clicked on the widget with the mouse.
+        /// </summary>
         private bool hasDeletion;
 
         /// <summary>
@@ -19,6 +22,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
         /// </summary>
         private void OnMouseUp()
         {
+            // TODO: We need an interaction for VR, too.
             if (!Raycasting.IsMouseOverGUI())
             {
                 hasDeletion = true;

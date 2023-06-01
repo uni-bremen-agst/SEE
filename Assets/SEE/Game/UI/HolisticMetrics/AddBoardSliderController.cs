@@ -83,7 +83,7 @@ namespace SEE.Game.UI.HolisticMetrics
         /// </summary>
         /// <param name="rotation">The rotation the player confirmed, if that doesn't exist, some dummy value</param>
         /// <returns><see cref="gotRotation"/></returns>
-        internal static bool GetRotation(out Quaternion rotation)
+        internal static bool TryGetRotation(out Quaternion rotation)
         {
             if (gotRotation)
             {

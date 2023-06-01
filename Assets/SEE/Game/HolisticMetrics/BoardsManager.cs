@@ -199,7 +199,7 @@ namespace SEE.Game.HolisticMetrics
         /// <param name="position">The position at which the widget should be added. If there is no such position, this
         /// should be considered undefined.</param>
         /// <returns>Whether a position was fetched successfully</returns>
-        internal static bool GetWidgetAdditionPosition(out string boardName, out Vector3 position)
+        internal static bool TryGetWidgetAdditionPosition(out string boardName, out Vector3 position)
         {
             foreach (WidgetsManager widgetsManager in widgetsManagers)
             {
@@ -245,7 +245,7 @@ namespace SEE.Game.HolisticMetrics
         {
             foreach (WidgetsManager widgetsManager in widgetsManagers)
             {
-                if (widgetsManager.GetWidgetMovement(out originalPosition, out newPosition, out widgetID))
+                if (widgetsManager.TryGetWidgetMovement(out originalPosition, out newPosition, out widgetID))
                 {
                     containingBoardName = widgetsManager.GetTitle();
                     return true;

@@ -83,7 +83,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
         /// restore it later on.</param>
         /// <param name="newPosition">The <see cref="Vector3"/> of where the widget has been moved to</param>
         /// <returns>The value of <see cref="hasMovement"/> at the time this method is called</returns>
-        internal bool GetMovement(out Vector3 originalPosition, out Vector3 newPosition)
+        internal bool TryGetMovement(out Vector3 originalPosition, out Vector3 newPosition)
         {
             if (hasMovement)
             {

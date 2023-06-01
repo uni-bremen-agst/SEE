@@ -85,9 +85,9 @@ namespace SEE.Controls.Actions.HolisticMetrics
             switch (progress)
             {
                 case ProgressState.GetPosition:
-                    if (BoardsManager.GetWidgetAdditionPosition(out string boardName, out Vector3 position))
+                    if (BoardsManager.TryGetWidgetAdditionPosition(out string boardName, out Vector3 position))
                     {
-                        WidgetConfig config = new WidgetConfig { Position = position, ID = Guid.NewGuid() };
+                        WidgetConfig config = new() { Position = position, ID = Guid.NewGuid() };
                         memento = new Memento(boardName, config);
                         addWidgetDialog = new AddWidgetDialog();
                         addWidgetDialog.Open();
@@ -102,7 +102,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                         progress = ProgressState.GetPosition;
                         return false;
                     }
-                    if (addWidgetDialog.GetConfig(out string metric, out string widget))
+                    if (addWidgetDialog.TryGetConfig(out string metric, out string widget))
                     {
                         memento.config.MetricType = metric;
                         memento.config.WidgetName = widget;

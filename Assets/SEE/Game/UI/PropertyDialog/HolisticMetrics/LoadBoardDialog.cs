@@ -67,7 +67,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// <param name="nameOfFile">If given and not yet fetched, this will be the filename the player selected.
         /// </param>
         /// <returns>The value of <see cref="HolisticMetricsDialog.gotInput"/></returns>
-        internal bool GetFilename(out string nameOfFile)
+        internal bool TryGetFilename(out string nameOfFile)
         {
             if (gotInput)
             {

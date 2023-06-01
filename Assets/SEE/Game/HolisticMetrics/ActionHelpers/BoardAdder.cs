@@ -84,7 +84,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
         /// <paramref name="clickPosition"/> will be set to that. Otherwise, it will be set to
         /// <see cref="Vector3.zero"/>.</param>
         /// <returns>The value of <see cref="gotPosition"/> at the time this method is called</returns>
-        internal static bool GetPosition(out Vector3 clickPosition)
+        internal static bool TryGetPosition(out Vector3 clickPosition)
         {
             if (gotPosition)
             {

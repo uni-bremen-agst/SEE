@@ -102,7 +102,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             switch (progress)
             {
                 case ProgressState.WaitingForClick:
-                    if (buttonController.GetClick())
+                    if (buttonController.IsClicked())
                     {
                         if (BoardsManager.GetNames().Length == 0)
                         {

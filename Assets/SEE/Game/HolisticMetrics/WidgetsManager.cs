@@ -8,6 +8,7 @@ using SEE.Game.City;
 using SEE.Game.HolisticMetrics.ActionHelpers;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
+using SEE.Game.UI.Notification;
 using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
@@ -126,15 +127,17 @@ namespace SEE.Game.HolisticMetrics
             Type metricType = Array.Find(metricTypes, type => type.Name.Equals(widgetConfiguration.MetricType));
             if (widget is null)
             {
-                Debug.LogError("Could not load widget because the widget name from the configuration " +
-                               "file matches no existing widget prefab. This could be because the configuration " +
-                               "file was manually changed.\n");
+                ShowNotification.Error("Metric-board error",
+                                       "Could not load widget because the widget name from the configuration " +
+                                       "file matches no existing widget prefab. This could be because the configuration " +
+                                       "file was manually changed.\n");
             }
             else if (metricType is null)
             {
-                Debug.LogError("Could not load metric because the metric type from the configuration " +
-                               "file matches no existing metric type. This could be because the configuration " +
-                               "file was manually changed.\n");
+                ShowNotification.Error("Metric-board error",
+                                       "Could not load metric because the metric type from the configuration " +
+                                       "file matches no existing metric type. This could be because the configuration " +
+                                       "file was manually changed.\n");
             }
             else
             {
@@ -150,8 +153,10 @@ namespace SEE.Game.HolisticMetrics
                 }
                 catch (Exception exception)
                 {
-                    Debug.LogError($"There was an error when displaying the metric on the newly created " +
-                                   $"widget, this is the exception: {exception}");
+                    ShowNotification.Error("Metric-board error",
+                                           "There was an error when displaying the metric on the newly created "
+                                           + $"widget, this is the exception: {exception.Message}");
+                    throw exception;
                 }
             }
         }
@@ -297,17 +302,17 @@ namespace SEE.Game.HolisticMetrics
         }
 
         /// <summary>
-        /// Fetches widget movements (one at a time).
+        /// Returns the first widget movement.
         /// </summary>
         /// <param name="originalPosition">The position of the widget before the movement</param>
         /// <param name="newPosition">The position to which the widget was moved</param>
         /// <param name="widgetID">The ID of the widget that was moved.</param>
         /// <returns>Whether a widget movement was found</returns>
-        internal bool GetWidgetMovement(out Vector3 originalPosition, out Vector3 newPosition, out Guid widgetID)
+        internal bool TryGetWidgetMovement(out Vector3 originalPosition, out Vector3 newPosition, out Guid widgetID)
         {
             foreach ((WidgetController, Metric) widget in widgets)
             {
-                if (widget.Item1.GetComponent<WidgetMover>().GetMovement(out originalPosition, out newPosition))
+                if (widget.Item1.GetComponent<WidgetMover>().TryGetMovement(out originalPosition, out newPosition))
                 {
                     widgetID = widget.Item1.ID;
                     return true;

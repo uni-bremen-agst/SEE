@@ -84,7 +84,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             switch (progress)
             {
                 case ProgressState.GettingPosition:
-                    if (BoardAdder.GetPosition(out Vector3 position))
+                    if (BoardAdder.TryGetPosition(out Vector3 position))
                     {
                         progress = ProgressState.GettingRotation;
                         memento = new Memento(new BoardConfig { Position = position });
@@ -95,7 +95,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
 
                     return false;
                 case ProgressState.GettingRotation:
-                    if (AddBoardSliderController.GetRotation(out Quaternion rotation))
+                    if (AddBoardSliderController.TryGetRotation(out Quaternion rotation))
                     {
                         memento.boardConfig.Rotation = rotation;
                         BoardAdder.Stop();
@@ -106,7 +106,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
 
                     return false;
                 case ProgressState.GettingName:
-                    if (addBoardDialog.GetName(out string name))
+                    if (addBoardDialog.TryGetName(out string name))
                     {
                         memento.boardConfig.Title = name;
                         BoardsManager.Create(memento.boardConfig);
