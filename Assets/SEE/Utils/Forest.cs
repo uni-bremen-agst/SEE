@@ -4,7 +4,7 @@ using System.Linq;
 namespace SEE.Utils
 {
     /// <summary>
-    /// A delegate that is called during a forrest traversal once for each
+    /// A delegate that is called during a forest traversal once for each
     /// visited tree node.
     ///
     /// If this method returns <c>true</c>, the traversal continues with the
@@ -20,13 +20,13 @@ namespace SEE.Utils
 
     /// <summary>
     /// A representation of a tree with multiple roots, in other words, a
-    /// forrest.
+    /// forest.
     /// </summary>
     /// <typeparam name="T">the data type for the node data</typeparam>
-    public class Forrest<T>
+    public class Forest<T>
     {
         /// <summary>
-        /// A delegate to be called whenever an element in the forrest is visited.
+        /// A delegate to be called whenever an element in the forest is visited.
         /// If it yields <c>true</c>, the treversal is continued, otherwise terminated.
         /// </summary>
         /// <param name="child">the currently visited node</param>
@@ -35,7 +35,7 @@ namespace SEE.Utils
         private delegate bool NodeVisitor(Node child, Node parent);
 
         /// <summary>
-        /// Represents a node in the forrest.
+        /// Represents a node in the forest.
         /// </summary>
         private class Node
         {
@@ -45,7 +45,7 @@ namespace SEE.Utils
             internal readonly T item;
             /// <summary>
             /// The parent of this node. May be null, in which case it is considered
-            /// a root of the forrest.
+            /// a root of the forest.
             /// </summary>
             private Node parent;
             /// <summary>
@@ -76,7 +76,7 @@ namespace SEE.Utils
             }
 
             /// <summary>
-            /// Traverses the forrest in preorder and calls <paramref name="visitor"/>
+            /// Traverses the forest in preorder and calls <paramref name="visitor"/>
             /// for each visited node. If <paramref name="visitor"/> yields <c>true</c>,
             /// the traversal continues with the next node in the preorder not yet visited;
             /// otherwise the traversal terminates.
@@ -97,7 +97,7 @@ namespace SEE.Utils
         private readonly IList<Node> roots = new List<Node>();
 
         /// <summary>
-        /// The total number of elements in this forrest (not just roots).
+        /// The total number of elements in this forest (not just roots).
         /// </summary>
         public int Count
         {
@@ -116,7 +116,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Adds <paramref name="root"/> as a root to this forrest.
+        /// Adds <paramref name="root"/> as a root to this forest.
         /// </summary>
         /// <param name="root">root to be added</param>
         public void AddRoot(T root)
@@ -150,31 +150,31 @@ namespace SEE.Utils
 
         /// <summary>
         /// Adds <paramref name="child"/> as a child of <paramref name="parent"/> to
-        /// this forrest. There may no other element in this forrest holding the
+        /// this forest. There may no other element in this forest holding the
         /// same item as <paramref name="child"/>. The <paramref name="parent"/>
-        /// must already exist in the forrest.
+        /// must already exist in the forest.
         /// </summary>
         /// <param name="child">child to be added</param>
         /// <param name="parent">parent of <paramref name="child"/></param>
         /// <exception cref="System.Exception">thrown if <paramref name="parent"/> does
-        /// not exist in the forrest or if there is another element having the
+        /// not exist in the forest or if there is another element having the
         /// same item as <paramref name="child"/></exception>
         public void AddChild(T child, T parent)
         {
             if (Find(child) != null)
             {
-                throw new System.Exception($"[{nameof(Forrest<T>)}] Child exists already");
+                throw new System.Exception($"[{nameof(Forest<T>)}] Child exists already");
             }
             Node parentNode = Find(parent);
             if (parentNode == null)
             {
-                throw new System.Exception($"[{nameof(Forrest<T>)}] Parent not found");
+                throw new System.Exception($"[{nameof(Forest<T>)}] Parent not found");
             }
             parentNode.AddChild(child);
         }
 
         /// <summary>
-        /// Traverses this forrest in preorder and calls <paramref name="visitor"/> for each
+        /// Traverses this forest in preorder and calls <paramref name="visitor"/> for each
         /// visited element. The arguments passed to <paramref name="visitor"/> are the
         /// visited element and the parent of this visited element (as second parameter).
         /// If the visited element is a root, its parent argument will be <c>null</c>.
@@ -194,7 +194,7 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Traverses this forrest in preorder and calls <paramref name="visitor"/> for each
+        /// Traverses this forest in preorder and calls <paramref name="visitor"/> for each
         /// visited element. The arguments passed to <paramref name="visitor"/> are the
         /// visited element and the parent of this visited element (as second parameter).
         /// If the visited element is a root, its parent argument will be <c>null</c>.
@@ -215,12 +215,12 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Returns all roots of this forrest as an ordered list. The order is the
+        /// Returns all roots of this forest as an ordered list. The order is the
         /// same as the roots were added via <see cref="AddRoot(T)"/>, that is,
         /// the first element in the result is the root that was added first.
         /// </summary>
         /// <returns>ordered list of roots</returns>
-        /// <remarks>If you want all elements in the forrest, you can use <see cref="AllElements"/>
+        /// <remarks>If you want all elements in the forest, you can use <see cref="AllElements"/>
         /// instead. As an alternative, you can use <see cref="PreorderTraverse(TreeVisitor{T})"/>.
         /// </remarks>
         public IList<T> ToList()
@@ -229,9 +229,9 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Returns all elements in the forrest (not only the roots) in preorder.
+        /// Returns all elements in the forest (not only the roots) in preorder.
         /// </summary>
-        /// <returns>all elements in the forrest</returns>
+        /// <returns>all elements in the forest</returns>
         public IList<T> AllElements()
         {
             List<T> result = new();

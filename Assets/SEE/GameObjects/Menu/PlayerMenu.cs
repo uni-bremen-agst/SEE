@@ -54,9 +54,9 @@ namespace SEE.GO.Menu
 
             #region Local Functions
 
-            // Sets up the menu structure according to given forrest structure and content.
-            // Returns the list of all MenuEntry instances created for all roots of this forrest.
-            IList<MenuEntry> MenuEntries(Forrest<AbstractActionStateType> allTypes)
+            // Sets up the menu structure according to given forest structure and content.
+            // Returns the list of all MenuEntry instances created for all roots of this forest.
+            IList<MenuEntry> MenuEntries(Forest<AbstractActionStateType> allTypes)
             {
                 List<MenuEntry> result = new();
                 // A mapping of the action groups created onto their corresponding NestedMenuEntry.
@@ -66,7 +66,7 @@ namespace SEE.GO.Menu
                 allTypes.PreorderTraverse(Visit);
                 return result;
 
-                // The callback being called during the pre-order traversal of the forrest
+                // The callback being called during the pre-order traversal of the forest
                 // where the traversal passes the currently visited node as parameter 'child'
                 // and the child's parent in parameter 'parent'. The 'parent' will be null
                 // if 'child' is a root.

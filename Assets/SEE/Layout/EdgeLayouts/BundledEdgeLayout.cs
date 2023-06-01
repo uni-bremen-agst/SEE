@@ -199,7 +199,7 @@ namespace SEE.Layout.EdgeLayouts
             {
                 // This should never occur if we have a single root node, but may happen if
                 // there are multiple roots, in which case nodes in different trees of this
-                // forrest do not have a common ancestor.
+                // forest do not have a common ancestor.
                 Debug.LogWarning($"Undefined lowest common ancestor for {source.ID} and {target.ID}\n");
                 return BetweenTrees(source, target);
             }

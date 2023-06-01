@@ -13,7 +13,7 @@ namespace SEETests
     /// </summary>
     internal class TestActionStateType
     {
-        private Forrest<AbstractActionStateType> allRootTypes;
+        private Forest<AbstractActionStateType> allRootTypes;
 
         [SetUp]
         public void SetUp()

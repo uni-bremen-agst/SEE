@@ -12,11 +12,11 @@ namespace SEE.Controls.Actions
     {
         /// <summary>
         /// A list of all available ActionStateTypes as a tree. This list contains
-        /// the roots of the forrest only. The descendants can be retrieved from
+        /// the roots of the forest only. The descendants can be retrieved from
         /// those roots by traversing the tree. All elements in the tree can be
         /// derived at once via <see cref="AllRootTypes.Elements()"/>.
         /// </summary>
-        public static Forrest<AbstractActionStateType> AllRootTypes { get; }
+        public static Forest<AbstractActionStateType> AllRootTypes { get; }
             = new();
 
         /// <summary>
