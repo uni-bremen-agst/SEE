@@ -70,7 +70,7 @@ namespace SEE.GO.Menu
                 // where the traversal passes the currently visited node as parameter 'child'
                 // and the child's parent in parameter 'parent'. The 'parent' will be null
                 // if 'child' is a root.
-                // If 'child' is a atomic ActionStateType, a corresponding
+                // If 'child' is an atomic ActionStateType, a corresponding
                 // MenuEntry will be created.
                 // If 'child' is an ActionStateTypeGroup, a corresponding NestedMenuEntry will
                 // be created.
