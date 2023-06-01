@@ -8,9 +8,12 @@
 # due to it being written in Python rather than as a shell script.
 
 import fileinput
+import json
 import re
 import sys
 from enum import Enum
+
+from typing import Optional, List, Dict, Union
 
 
 class Level(str, Enum):
@@ -25,6 +28,9 @@ class Level(str, Enum):
 
 # Extensions that a pattern will be applied to by default.
 DEFAULT_EXTENSIONS = ("cs",)
+
+# List of matches to be printed as a JSON array at the end of the script.
+collected_matches: List[Dict[str, Union[str, int]]] = []
 
 
 class BadPattern:
@@ -73,18 +79,20 @@ class BadPattern:
         return (not self.see_only or filename.startswith("Assets/SEE/")) \
             and extension in self.extensions and self.regex.match(line)
 
-    def to_comment(self, filename: str, line_number: int, suggestion: str) -> str:
+    def to_json(self, filename: str, line_number: int, suggestion: Optional[str]) -> Dict[str, Union[str, int]]:
         """
-        Turns this bad pattern match into a string containing the following
-        components, separated by newlines:
-        Filename of matched file, line number where match occurred,
-        set level, set message, substituted suggestion (may be empty),
-        set regular expression,
+        Turns this bad pattern match into a dictionary representing a GitHub comment.
         """
-        return (
-                f"{filename}\n{line_number}\n{self.level.value}\n{self.message}\n"
-                + f"{suggestion}\n{self.regex.pattern if self.regex is not None else '(No regex specified)'}"
-        )
+        body_text = f"{self.level.value} {self.message}"
+        if suggestion is not None:
+            body_text += f"\n\n```suggestion\n{suggestion}\n```"
+        if self.regex is not None:
+            body_text += f"\n> This bad pattern was detected by the following regular expression:\n> ```regex\n> {self.regex.pattern}\n> ```"
+        return {
+            "path": filename,
+            "line": line_number,
+            "body": body_text,
+        }
 
 
 # Special case for missing newline at end of file, as this can't be detected on a per-line basis.
@@ -135,7 +143,7 @@ We should just leave it as a backslash.""",
 def handle_added_line(line, filename, linenumber) -> int:
     """
     Handles a single added line within a diff hunk, checking it against
-    any bad patterns, printing comments for any matches it finds.
+    any bad patterns, collecting comments for any matches it finds.
     """
     occurrences = 0
     for pattern in BAD_PATTERNS:
@@ -146,8 +154,8 @@ def handle_added_line(line, filename, linenumber) -> int:
             if pattern.suggestion:
                 suggestion = pattern.regex.sub(pattern.suggestion, line)
             else:
-                suggestion = ""
-            print(pattern.to_comment(filename, linenumber, suggestion))
+                suggestion = None
+            collected_matches.append(pattern.to_json(filename, linenumber, suggestion))
     return occurrences
 
 
@@ -158,7 +166,7 @@ def warn(message):
     print(f"::warning::{message}", file=sys.stderr)
 
 
-def handle_missing_newline(filename: str, linenumber: int, last_line: str):
+def handle_missing_newline(filename: str, linenumber: int, last_line: Optional[str]):
     """
     Handles a missing newline at the end of a file.
     :param filename: The name of the file.
@@ -166,8 +174,8 @@ def handle_missing_newline(filename: str, linenumber: int, last_line: str):
     :param last_line: The last line in the file.
     """
     if NO_NEWLINE_BAD_PATTERN.applies_to(filename):
-        print(NO_NEWLINE_BAD_PATTERN.to_comment(filename, linenumber,
-                                                f"{last_line[1:] if last_line is not None else ''}\\n"))
+        collected_matches.append(NO_NEWLINE_BAD_PATTERN.to_json(filename, linenumber,
+                                                                f"{last_line[1:] if last_line is not None else ''}\n"))
 
 
 def main():
@@ -222,13 +230,14 @@ def main():
                 # We can't report this immediately, as this string may occur twice.
                 # Instead, we will report this once the next file / hunk starts.
                 missing_newline_at_eof = True
-            elif line != "" and line[0] not in ("-", "d", "i"):
-                # We ignore empty lines, removed lines, and diff metadata lines (starting with "diff" or "index").
+            elif line != "" and line[0] not in ("-", "d", "i", "n", "o", "r", "B"):
+                # We ignore empty lines, removed lines, and diff metadata lines (starting with "diff" or "index" etc).
                 warn(f'Unrecognized unified diff line indicator for line "{line}", skipping.')
 
         if missing_newline_at_eof:
             handle_missing_newline(filename, diff_line, last_line)
 
+    print(json.dumps(collected_matches))
     sys.exit(min(occurrences, 255))
 
 
