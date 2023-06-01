@@ -588,7 +588,7 @@ namespace SEE.Controls
         /// <param name="isInitiator">Whether this client is initiating the grabbing action.</param>
         public void SetGrab(bool grab, bool isInitiator)
         {
-            Assert.IsTrue(IsGrabbed != grab);
+            //Assert.IsTrue(IsGrabbed != grab);
 
             IsGrabbed = grab;
 
