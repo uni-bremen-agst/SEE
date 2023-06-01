@@ -28,13 +28,10 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
         /// </summary>
         private void OnMouseUp()
         {
-            if (MainCamera.Camera != null)
+            if (MainCamera.Camera != null && !Raycasting.IsMouseOverGUI() && Raycasting.RaycastAnything(out RaycastHit hit))
             {
-                if (!Raycasting.IsMouseOverGUI() && Raycasting.RaycastAnything(out RaycastHit hit))
-                {
-                    position = transform.InverseTransformPoint(hit.point);
-                    positionInStore = true;
-                }
+                position = transform.InverseTransformPoint(hit.point);
+                positionInStore = true;
             }
         }
 
