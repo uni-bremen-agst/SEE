@@ -13,7 +13,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Constructor for <see cref="ActionStateTypeGroup"/>.
         /// </summary>
-        /// <param name="name">The Name of this <see cref="ActionStateTypeGroup"/>. Must be unique.</param>
+        /// <param name="name">The name of this <see cref="ActionStateTypeGroup"/>. Must be unique.</param>
         /// <param name="description">Description for this <see cref="ActionStateTypeGroup"/>.</param>
         /// <param name="parent">The parent of this action in the nesting hierarchy in the menu.</param>
         /// <param name="color">Color for this <see cref="ActionStateTypeGroup"/>.</param>
