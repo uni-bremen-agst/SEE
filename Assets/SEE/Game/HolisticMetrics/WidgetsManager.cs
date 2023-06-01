@@ -176,9 +176,9 @@ namespace SEE.Game.HolisticMetrics
         {
             if (enable)
             {
-                foreach ((WidgetController, Metric) tuple in widgets)
+                foreach ((WidgetController controller, Metric) tuple in widgets)
                 {
-                    tuple.Item1.gameObject.AddComponent<WidgetDeleter>();
+                    tuple.controller.gameObject.AddComponent<WidgetDeleter>();
                 }
             }
             else
