@@ -63,107 +63,107 @@ namespace SEE.Controls.Actions
         static ActionStateTypes()
         {
             Move =
-            new("Move", "Move a node within a graph",
-                Color.red.Darker(), "Materials/Charts/MoveIcon",
-                MoveAction.CreateReversibleAction);
+              new("Move", "Move a node within a graph",
+                  Color.red.Darker(), "Materials/Charts/MoveIcon",
+                  MoveAction.CreateReversibleAction);
 
             Rotate =
-            new("Rotate", "Rotate the selected node and its children within a graph",
-                Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
-                RotateAction.CreateReversibleAction);
+              new("Rotate", "Rotate the selected node and its children within a graph",
+                  Color.blue.Darker(), "Materials/ModernUIPack/Refresh",
+                  RotateAction.CreateReversibleAction);
 
             Hide =
-            new("Hide", "Hides nodes or edges",
-                Color.yellow.Darker(), "Materials/ModernUIPack/Eye",
-                HideAction.CreateReversibleAction);
+              new("Hide", "Hides nodes or edges",
+                  Color.yellow.Darker(), "Materials/ModernUIPack/Eye",
+                  HideAction.CreateReversibleAction);
 
             NewEdge =
-            new("New Edge", "Draw a new edge between two nodes",
-                Color.green.Darker(), "Materials/ModernUIPack/Minus",
-                AddEdgeAction.CreateReversibleAction);
+              new("New Edge", "Draw a new edge between two nodes",
+                  Color.green.Darker(), "Materials/ModernUIPack/Minus",
+                  AddEdgeAction.CreateReversibleAction);
 
             NewNode =
-            new("New Node", "Create a new node",
-                Color.green.Darker(), "Materials/ModernUIPack/Plus",
-                AddNodeAction.CreateReversibleAction);
+              new("New Node", "Create a new node",
+                  Color.green.Darker(), "Materials/ModernUIPack/Plus",
+                  AddNodeAction.CreateReversibleAction);
 
             EditNode =
-            new("Edit Node", "Edit a node",
-                Color.green.Darker(), "Materials/ModernUIPack/Settings",
-                EditNodeAction.CreateReversibleAction);
+              new("Edit Node", "Edit a node",
+                  Color.green.Darker(), "Materials/ModernUIPack/Settings",
+                  EditNodeAction.CreateReversibleAction);
 
             ScaleNode =
-            new("Scale Node", "Scale a node",
-                Color.green.Darker(), "Materials/ModernUIPack/Crop",
-                ScaleNodeAction.CreateReversibleAction);
+              new("Scale Node", "Scale a node",
+                  Color.green.Darker(), "Materials/ModernUIPack/Crop",
+                  ScaleNodeAction.CreateReversibleAction);
 
             Delete =
-            new("Delete", "Delete a node or an edge",
-                Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
-                DeleteAction.CreateReversibleAction);
+              new("Delete", "Delete a node or an edge",
+                  Color.yellow.Darker(), "Materials/ModernUIPack/Trash",
+                  DeleteAction.CreateReversibleAction);
 
             ShowCode =
-            new("Show Code", "Display the source code of a node.",
-                Color.black, "Materials/ModernUIPack/Document",
-                ShowCodeAction.CreateReversibleAction);
+              new("Show Code", "Display the source code of a node.",
+                  Color.black, "Materials/ModernUIPack/Document",
+                  ShowCodeAction.CreateReversibleAction);
 
             Draw =
-            new("Draw", "Draw a line",
-                 Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
-                 DrawAction.CreateReversibleAction);
+              new("Draw", "Draw a line",
+                  Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                  DrawAction.CreateReversibleAction);
 
             // Metric Board actions
             MetricBoard =
-            new("Metric Board", "Manipulate a metric board",
-                Color.white.Darker(), "Materials/ModernUIPack/Pencil");
+              new("Metric Board", "Manipulate a metric board",
+                  Color.white.Darker(), "Materials/ModernUIPack/Pencil");
 
             AddBoard =
-            new("Add Board", "Add a board",
-                Color.green.Darker(), "Materials/ModernUIPack/Plus",
-                AddBoardAction.CreateReversibleAction,
-                parent: MetricBoard);
+              new("Add Board", "Add a board",
+                  Color.green.Darker(), "Materials/ModernUIPack/Plus",
+                  AddBoardAction.CreateReversibleAction,
+                  parent: MetricBoard);
 
             AddWidget =
-            new("Add Widget", "Add a widget",
-                Color.green.Darker(), "Materials/ModernUIPack/Plus",
-                AddWidgetAction.CreateReversibleAction,
-                parent: MetricBoard);
+              new("Add Widget", "Add a widget",
+                  Color.green.Darker(), "Materials/ModernUIPack/Plus",
+                  AddWidgetAction.CreateReversibleAction,
+                  parent: MetricBoard);
 
             MoveBoard =
-            new("Move Board", "Move a board",
-                Color.yellow.Darker(), "Materials/Charts/MoveIcon",
-                MoveBoardAction.CreateReversibleAction,
-                parent: MetricBoard);
+              new("Move Board", "Move a board",
+                  Color.yellow.Darker(), "Materials/Charts/MoveIcon",
+                  MoveBoardAction.CreateReversibleAction,
+                  parent: MetricBoard);
 
             MoveWidget =
-            new("Move Widget", "Move a widget",
-                Color.yellow.Darker(), "Materials/Charts/MoveIcon",
-                MoveWidgetAction.CreateReversibleAction,
-                parent: MetricBoard);
+              new("Move Widget", "Move a widget",
+                  Color.yellow.Darker(), "Materials/Charts/MoveIcon",
+                  MoveWidgetAction.CreateReversibleAction,
+                  parent: MetricBoard);
 
             DeleteBoard =
-            new("Delete Board", "Delete a board",
-                Color.red.Darker(), "Materials/ModernUIPack/Trash",
-                DeleteBoardAction.CreateReversibleAction,
-                parent: MetricBoard);
+              new("Delete Board", "Delete a board",
+                  Color.red.Darker(), "Materials/ModernUIPack/Trash",
+                  DeleteBoardAction.CreateReversibleAction,
+                  parent: MetricBoard);
 
             DeleteWidget =
-            new("Delete Widget", "Delete a widget",
-                Color.red.Darker(), "Materials/ModernUIPack/Trash",
-                DeleteWidgetAction.CreateReversibleAction,
-                parent: MetricBoard);
+              new("Delete Widget", "Delete a widget",
+                  Color.red.Darker(), "Materials/ModernUIPack/Trash",
+                  DeleteWidgetAction.CreateReversibleAction,
+                  parent: MetricBoard);
 
             LoadBoard =
-            new("Load Board", "Load a board",
-               Color.blue.Darker(), "Materials/ModernUIPack/Document",
-               LoadBoardAction.CreateReversibleAction,
-               parent: MetricBoard);
+              new("Load Board", "Load a board",
+                  Color.blue.Darker(), "Materials/ModernUIPack/Document",
+                  LoadBoardAction.CreateReversibleAction,
+                  parent: MetricBoard);
 
             SaveBoard =
-            new("Save Board", "Save a board",
-                Color.blue.Darker(), "Materials/ModernUIPack/Document",
-                SaveBoardAction.CreateReversibleAction,
-                parent: MetricBoard);
+              new("Save Board", "Save a board",
+                  Color.blue.Darker(), "Materials/ModernUIPack/Document",
+                  SaveBoardAction.CreateReversibleAction,
+                  parent: MetricBoard);
         }
 
         public readonly static ActionStateType Move;
