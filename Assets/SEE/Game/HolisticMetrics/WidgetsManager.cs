@@ -148,7 +148,7 @@ namespace SEE.Game.HolisticMetrics
                 {
                     widgetController.Display(metricInstance.Refresh(GetSelectedCity()));
                 }
-                catch(Exception exception)
+                catch (Exception exception)
                 {
                     Debug.LogError($"There was an error when displaying the metric on the newly created " +
                                    $"widget, this is the exception: {exception}");
