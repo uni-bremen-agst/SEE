@@ -190,7 +190,6 @@ namespace SEE.Controls.Actions
                     AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, objectToScale);
                 }
             }
-            
             else if (SEEInput.Drag() || SEEInput.ToggleMenu() || SEEInput.Cancel())
             {
                 SaveScaleChanges();
