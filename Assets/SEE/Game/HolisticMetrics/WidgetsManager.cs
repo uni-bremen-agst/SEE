@@ -198,9 +198,9 @@ namespace SEE.Game.HolisticMetrics
         /// <returns>Whether one of the widgets that this manager manages is marked as "to be deleted".</returns>
         internal bool GetWidgetDeletion(out WidgetConfig widgetConfig)
         {
-            foreach ((WidgetController, Metric) widget in widgets)
+            foreach ((WidgetController controller, Metric) widget in widgets)
             {
-                if (widget.Item1.GetComponent<WidgetDeleter>().GetDeletion(out widgetConfig))
+                if (widget.controller.GetComponent<WidgetDeleter>().GetDeletion(out widgetConfig))
                 {
                     return true;
                 }
