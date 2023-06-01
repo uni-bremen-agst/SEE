@@ -85,21 +85,7 @@ namespace SEE.Utils
             /// <returns><c>true</c> if and only if the traversal is to be continued</returns>
             internal bool PreorderTraverse(NodeVisitor visitor)
             {
-                if (visitor(this, parent))
-                {
-                    foreach (Node child in children)
-                    {
-                        if (!child.PreorderTraverse(visitor))
-                        {
-                            return false;
-                        }
-                    }
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return visitor(this, parent) && children.All(child => child.PreorderTraverse(visitor));
             }
         }
 
