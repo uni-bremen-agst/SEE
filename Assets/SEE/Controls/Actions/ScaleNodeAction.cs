@@ -47,7 +47,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject objectToScale;
 
-        
 
 
         /// <summary>
