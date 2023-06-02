@@ -70,7 +70,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="gameObject">object whose position and rotation are to be restored</param>
         public void Rotate(Quaternion Rotation)
-        {            
+        {
             nodeOperator.RotateTo(Rotation, 0);
             // TODO: We do not need lists. Only one object can be rotated.
             new RotateNodeNetAction(new List<GameObject>() { objectToRotate }).Execute();
