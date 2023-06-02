@@ -132,8 +132,8 @@ namespace SEE.Controls.Actions
                 else if (objectToRotate != raycastHit.collider.gameObject)
                 {
                     // Selected a different object - save changes and change object assigned to gizmo.
-                    SaveRotationChanges();
                     objectToRotate = raycastHit.collider.gameObject;
+                    SaveRotationChanges();
                     nodeOperator = objectToRotate.AddOrGetComponent<NodeOperator>();
                     originalRotation = objectToRotate.transform.rotation;
                     objectRotationGizmo.SetTargetObject(objectToRotate);
