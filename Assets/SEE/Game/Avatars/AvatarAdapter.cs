@@ -28,13 +28,6 @@ namespace SEE.Game.Avatars
     /// </summary>
     internal class AvatarAdapter : NetworkBehaviour
     {
-        [Header("VR specific settings (relevant only for VR players)")]
-        [Tooltip("Whether the VR controllers should be hidden.")]
-        public bool HideVRControllers = false;
-
-        [Tooltip("Whether hints should be shown for controllers.")]
-        public bool ShowControllerHints = false;
-
         /// <summary>
         /// The distance from the top of the player's height to his eyes.
         /// </summary>

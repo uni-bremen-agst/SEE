@@ -1,22 +1,20 @@
-﻿using System.Linq;
-using Michsky.UI.ModernUIPack;
+﻿using Michsky.UI.ModernUIPack;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Serialization;
 
 namespace SEE.Game.UI.Menu
 {
     /// <summary>
-    /// A selection menu containing <see cref="ToggleMenuEntry"/> entries.
+    /// A selection menu containing <see cref="MenuEntry"/> entries.
     /// </summary>
-    public class SelectionMenu : SelectionMenu<ToggleMenuEntry> {}
+    public class SelectionMenu : SelectionMenu<MenuEntry> {}
 
     /// <summary>
     /// A menu in which the user can choose one active selection out of a menu.
     /// It is assumed that only one selection can be active at a time.
     /// </summary>
-    public class SelectionMenu<T>: SimpleListMenu<T> where T : ToggleMenuEntry
+    public class SelectionMenu<T> : NestedListMenu<T> where T : MenuEntry
     {
         /// <summary>
         /// The active entry.

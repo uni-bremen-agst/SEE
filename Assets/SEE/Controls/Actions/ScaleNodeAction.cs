@@ -38,7 +38,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.ScaleNode"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.ScaleNode;
+            return ActionStateTypes.ScaleNode;
         }
 
         /// <summary>

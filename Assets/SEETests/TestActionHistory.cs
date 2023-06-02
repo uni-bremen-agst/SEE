@@ -12,6 +12,24 @@ namespace SEETests
     class TestActionHistory
     {
         /// <summary>
+        /// Shortcut to a constructor of <see cref="ActionStateType"/> that requires
+        /// only a name and <see cref="CreateReversibleAction"/>.
+        /// </summary>
+        private abstract class TestActionStateType : ActionStateType
+        {
+            /// <summary>
+            /// Constructor allowing to set the <paramref name="name"/> and <see cref="CreateReversible"/>.
+            /// </summary>
+            /// <param name="name">name of the <see cref="ActionStateType"/>; must be unique</param>
+            /// <param name="createReversible">value for <see cref="CreateReversible"/></param>
+            protected TestActionStateType(string name, CreateReversibleAction createReversible)
+                : base(name: name, description: "", color: UnityEngine.Color.white,
+                       iconPath: "", createReversible: createReversible, register: false)
+            {
+            }
+        }
+
+        /// <summary>
         /// A substitute reversible action for testing.
         /// </summary>
         private class TestAction : ReversibleAction
@@ -19,7 +37,7 @@ namespace SEETests
             public bool IsOn = false;
 
             public int AwakeCalls = 0;
-            public int StartCalls = 0;            
+            public int StartCalls = 0;
             public int UpdateCalls = 0;
             public int StopCalls = 0;
 
@@ -93,8 +111,8 @@ namespace SEETests
             }
 
             /// <summary>
-            /// Returns <see cref="ReversibleAction.Progress.InProgress"/> if this action has 
-            /// had an effect, that is, if <see cref="Update"/> has been called before; 
+            /// Returns <see cref="ReversibleAction.Progress.InProgress"/> if this action has
+            /// had an effect, that is, if <see cref="Update"/> has been called before;
             /// otherwise <see cref="ReversibleAction.Progress.NoEffect"/> is returned.
             /// It will never return <see cref="ReversibleAction.Progress.Completed"/>
             /// because <see cref="Update"/> always yields false.
@@ -112,13 +130,13 @@ namespace SEETests
                 }
             }
 
-            private class TestActionStateType : ActionStateType 
+            private class MyTestActionStateType : TestActionStateType
             {
-                public TestActionStateType() : base(TestAction.CreateReversibleAction)
+                public MyTestActionStateType() : base(nameof(MyTestActionStateType), TestAction.CreateReversibleAction)
                 { }
             }
 
-            private static ActionStateType actionStateType = new TestActionStateType();
+            private static ActionStateType actionStateType = new MyTestActionStateType();
 
             private static ReversibleAction CreateReversibleAction()
             {
@@ -142,7 +160,7 @@ namespace SEETests
             private readonly string id = Guid.NewGuid().ToString();
 
             public string GetId()
-            {                
+            {
                 return id;
             }
         }
@@ -159,7 +177,7 @@ namespace SEETests
             Counter.Reset();
         }
 
-        [Test]        
+        [Test]
         public void OneAction()
         {
             /// Note: TestAction is an action that continues forever, that is,
@@ -167,7 +185,7 @@ namespace SEETests
             /// is initially <see cref="ReversibleAction.Progress.NoEffect"/>
             /// and after the first Update call <see cref="ReversibleAction.Progress.InProgress"/>
             /// for the rest of its life.
-            TestAction c = new TestAction();
+            TestAction c = new();
             CheckCalls(c, value: false, awake: 0, start: 0, update: 0, stop: 0);
             hist.Execute(c);
             CheckCalls(c, value: false, awake: 1, start: 1, update: 0, stop: 0);
@@ -190,10 +208,10 @@ namespace SEETests
         [Test]
         public void MultipleActions()
         {
-            TestAction c1 = new TestAction();
-            TestAction c2 = new TestAction();
-            TestAction c3 = new TestAction();
-            TestAction c4 = new TestAction();
+            TestAction c1 = new();
+            TestAction c2 = new();
+            TestAction c3 = new();
+            TestAction c4 = new();
 
             CheckCalls(c1, value: false, awake: 0, start: 0, update: 0, stop: 0);
             CheckCalls(c2, value: false, awake: 0, start: 0, update: 0, stop: 0);
@@ -234,7 +252,7 @@ namespace SEETests
             CheckCalls(c3, value: true, awake: 1, start: 1, update: 1, stop: 1);
             CheckCalls(c4, value: true, awake: 1, start: 1, update: 1, stop: 0);
 
-            // c4 is undone; execution will resume with c3, because c3 is still 
+            // c4 is undone; execution will resume with c3, because c3 is still
             // in progress (TestAction.Update() always yields false).
             hist.Undo();
             Assert.AreEqual(3, hist.UndoCount());
@@ -454,7 +472,7 @@ namespace SEETests
             {
                 return currentProgress;
             }
-            
+
             public abstract ReversibleAction NewInstance();
             public abstract void Redo();
             public abstract void Undo();
@@ -502,9 +520,9 @@ namespace SEETests
                 return true;
             }
 
-            private class IncrementActionStateType : ActionStateType
+            private class IncrementActionStateType : TestActionStateType
             {
-                public IncrementActionStateType() : base(CreateReversibleAction)
+                public IncrementActionStateType() : base(nameof(IncrementActionStateType), CreateReversibleAction)
                 { }
             }
 
@@ -552,9 +570,9 @@ namespace SEETests
                 return true;
             }
 
-            private class DecrementActionStateType : ActionStateType
+            private class DecrementActionStateType : TestActionStateType
             {
-                public DecrementActionStateType() : base(CreateReversibleAction)
+                public DecrementActionStateType() : base(nameof(DecrementActionStateType), CreateReversibleAction)
                 { }
             }
 
@@ -582,13 +600,13 @@ namespace SEETests
         /// and after the first Update call <see cref="ReversibleAction.Progress.Completed"/>
         /// for the rest of their life.
         /// </summary>
-        [Test]        
+        [Test]
         public void TestCounterAction()
-        {            
+        {
             hist.Execute(new Increment());
             Assert.AreEqual(0, Counter.Value);
             Assert.AreEqual(1, hist.UndoCount());
-            Assert.AreEqual(0, hist.RedoCount());            
+            Assert.AreEqual(0, hist.RedoCount());
             hist.Update();
             Assert.AreEqual(1, Counter.Value);
             Assert.AreEqual(2, hist.UndoCount());
@@ -602,7 +620,7 @@ namespace SEETests
             Assert.AreEqual(4, hist.UndoCount());
             Assert.AreEqual(0, hist.RedoCount());
             // Because Increment.Update yields true every time it is called,
-            // the execution will always continue with a new instance of 
+            // the execution will always continue with a new instance of
             // Increment. We have had three calls to Update. Including the
             // first Execute, we should have four actions on the UndoStack.
             Assert.AreEqual(4, hist.UndoCount());
@@ -610,7 +628,7 @@ namespace SEETests
             Assert.AreEqual(2, Counter.Value);
             // Undo will remove one completed action and then resume with
             // a new instance of Increment.
-            Assert.AreEqual(3, hist.UndoCount()); 
+            Assert.AreEqual(3, hist.UndoCount());
             Assert.AreEqual(1, hist.RedoCount());
             hist.Undo();
             Assert.AreEqual(1, Counter.Value);
@@ -629,7 +647,7 @@ namespace SEETests
             hist.Redo();
             Assert.AreEqual(1, Counter.Value);
             // Redo moves an action from the RedoStack to the UndoStack.
-            // Because that action was completed, a new instance of 
+            // Because that action was completed, a new instance of
             // Increment will be put onto the UndoStack that will be used
             // to resume.
             Assert.AreEqual(2, hist.UndoCount());
@@ -661,7 +679,7 @@ namespace SEETests
             Assert.AreEqual(4, hist.UndoCount());
             Assert.AreEqual(0, hist.RedoCount());
             // Undo without prior Update for the Increment just added; that means we are actually
-            // undoing Decrement. The Increment will be popped off the UndoStack. Then the 
+            // undoing Decrement. The Increment will be popped off the UndoStack. Then the
             // Decrement will be undone and moved from the UndoStack to the RedoStack.
             // Now a completed Increment will be at the top of the stack. Because it is
             // completed, a new instance of Increment will be added.
@@ -696,6 +714,6 @@ namespace SEETests
             Assert.AreEqual(1, Counter.Value);
             Assert.AreEqual(4, hist.UndoCount());
             Assert.AreEqual(0, hist.RedoCount());
-        } 
-    } 
+        }
+    }
 }

@@ -785,7 +785,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.Hide"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.Hide;
+            return ActionStateTypes.Hide;
         }
 
         /// <summary>

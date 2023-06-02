@@ -2,22 +2,35 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Michsky.UI.ModernUIPack;
+using SEE.Controls.Actions.HolisticMetrics;
 using SEE.DataModel;
 using SEE.Game.City;
+using SEE.Game.HolisticMetrics.ActionHelpers;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
+using SEE.Game.UI.Notification;
 using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace SEE.Game.HolisticMetrics.Components
+namespace SEE.Game.HolisticMetrics
 {
     /// <summary>
     /// This class manages a holistic metrics board.
     /// </summary>
     internal class WidgetsManager : MonoBehaviour, IObserver<ChangeEvent>
     {
+        /// <summary>
+        /// Path to the widget prefabs.
+        /// </summary>
+        private const string widgetsPath = "Prefabs/HolisticMetrics/Widgets";
+
+        /// <summary>
+        /// Path to the house icon used in the dropdown menu on the metrics boards.
+        /// </summary>
+        private const string houseIconPath = "Materials/40+ Simple Icons - Free/Home_Simple_Icons_UI";
+
         /// <summary>
         /// The dropdown UI element that allows the player to select a code city for which the metrics should be
         /// displayed.
@@ -33,7 +46,7 @@ namespace SEE.Game.HolisticMetrics.Components
         /// This contains references to all widgets on the board each represented by one WidgetController and one
         /// Metric. This list is needed so we can refresh the metrics.
         /// </summary>
-        internal readonly List<(WidgetController, Metric)> widgets = new List<(WidgetController, Metric)>();
+        internal readonly List<(WidgetController, Metric)> widgets = new();
 
         /// <summary>
         /// The title of the board that this controller controls.
@@ -66,28 +79,22 @@ namespace SEE.Game.HolisticMetrics.Components
         /// <summary>
         /// This will be used to unsubscribe from the graph we currently listen to.
         /// </summary>
-        private IDisposable graphUnsubscriber;
+        private IDisposable graphDisposable;
 
         /// <summary>
         /// Instantiates the metricTypes and widgetPrefabs arrays.
         /// </summary>
         private void Awake()
         {
-            widgetPrefabs =
-                Resources.LoadAll<GameObject>("Prefabs/HolisticMetrics/Widgets");
-
-            metricTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(domainAssembly => domainAssembly.GetTypes())
-                .Where(type => type.IsSubclassOf(typeof(Metric)))
-                .ToArray();
-
-            houseIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/Home_Simple_Icons_UI");
+            houseIcon = Resources.Load<Sprite>(houseIconPath);
+            widgetPrefabs = Resources.LoadAll<GameObject>(widgetsPath);
+            metricTypes = Metric.GetTypes();
 
             citySelection.dropdownEvent.AddListener(Redraw);
             citySelection.dropdownEvent.AddListener(CitySelectionChanged);
             OnCitySelectionClick();
 
-            graphUnsubscriber = GetSelectedCity().LoadedGraph?.Subscribe(this);
+            graphDisposable = GetSelectedCity().LoadedGraph?.Subscribe(this);
         }
 
         /// <summary>
@@ -117,19 +124,20 @@ namespace SEE.Game.HolisticMetrics.Components
         {
             GameObject widget = Array.Find(widgetPrefabs,
                 element => element.name.Equals(widgetConfiguration.WidgetName));
-            Type metricType = Array.Find(metricTypes,
-                type => type.Name.Equals(widgetConfiguration.MetricType));
+            Type metricType = Array.Find(metricTypes, type => type.Name.Equals(widgetConfiguration.MetricType));
             if (widget is null)
             {
-                Debug.LogError("Could not load widget because the widget name from the configuration " +
-                               "file matches no existing widget prefab. This could be because the configuration " +
-                               "file was manually changed.\n");
+                ShowNotification.Error("Metric-board error",
+                                       "Could not load widget because the widget name from the configuration " +
+                                       "file matches no existing widget prefab. This could be because the configuration " +
+                                       "file was manually changed.\n");
             }
             else if (metricType is null)
             {
-                Debug.LogError("Could not load metric because the metric type from the configuration " +
-                               "file matches no existing metric type. This could be because the configuration " +
-                               "file was manually changed.\n");
+                ShowNotification.Error("Metric-board error",
+                                       "Could not load metric because the metric type from the configuration " +
+                                       "file matches no existing metric type. This could be because the configuration " +
+                                       "file was manually changed.\n");
             }
             else
             {
@@ -139,7 +147,17 @@ namespace SEE.Game.HolisticMetrics.Components
                 Metric metricInstance = (Metric)widgetInstance.AddComponent(metricType);
                 widgetController.ID = widgetConfiguration.ID;
                 widgets.Add((widgetController, metricInstance));
-                widgetController.Display(metricInstance.Refresh(GetSelectedCity()));
+                try
+                {
+                    widgetController.Display(metricInstance.Refresh(GetSelectedCity()));
+                }
+                catch (Exception exception)
+                {
+                    ShowNotification.Error("Metric-board error",
+                                           "There was an error when displaying the metric on the newly created "
+                                           + $"widget, this is the exception: {exception.Message}");
+                    throw exception;
+                }
             }
         }
 
@@ -150,23 +168,51 @@ namespace SEE.Game.HolisticMetrics.Components
         /// <param name="position">The position to which the widget should be moved</param>
         internal void Move(Guid widgetID, Vector3 position)
         {
-            WidgetController controller =
-                widgets
-                .Find(widget => widget.Item1.ID.Equals(widgetID))
-                .Item1;
+            WidgetController controller = widgets
+                .Find(widget => widget.Item1.ID.Equals(widgetID)).Item1;
             controller.transform.position = position;
         }
 
         /// <summary>
-        /// Adds a WidgetDeleter component to all widgets managed by this manager.
+        /// Adds / removes a WidgetDeleter component to / from all widgets managed by this manager.
         /// </summary>
-        internal void AddWidgetDeleters()
+        /// <param name="enable">Whether we want to listen for clicks on the widgets for deletion</param>
+        internal void ToggleWidgetDeleting(bool enable)
         {
-            WidgetDeleter.Setup();
-            foreach ((WidgetController, Metric) tuple in widgets)
+            if (enable)
             {
-                tuple.Item1.gameObject.AddComponent<WidgetDeleter>();
+                foreach ((WidgetController controller, Metric) tuple in widgets)
+                {
+                    tuple.controller.gameObject.AddComponent<WidgetDeleter>();
+                }
             }
+            else
+            {
+                foreach ((WidgetController controller, Metric) tuple in widgets)
+                {
+                    Destroyer.Destroy(tuple.controller.gameObject.GetComponent<WidgetDeleter>());
+                }
+            }
+        }
+
+        /// <summary>
+        /// Determines whether one of the widgets that this manager manages is marked as "to be deleted".
+        /// </summary>
+        /// <param name="widgetConfig">If there is a widget that is to be deleted, that widget's configuration will be
+        /// assigned to this parameter.</param>
+        /// <returns>Whether one of the widgets that this manager manages is marked as "to be deleted".</returns>
+        internal bool GetWidgetDeletion(out WidgetConfig widgetConfig)
+        {
+            foreach ((WidgetController controller, Metric) widget in widgets)
+            {
+                if (widget.controller.GetComponent<WidgetDeleter>().GetDeletion(out widgetConfig))
+                {
+                    return true;
+                }
+            }
+
+            widgetConfig = null;
+            return false;
         }
 
         /// <summary>
@@ -189,11 +235,8 @@ namespace SEE.Game.HolisticMetrics.Components
         public void OnCitySelectionClick()
         {
             cities = FindObjectsOfType<SEECity>();
-
             string oldSelection = citySelection.selectedText.text;
-
             citySelection.dropdownItems.Clear();
-
             foreach (SEECity city in cities)
             {
                 citySelection.CreateNewItem(city.name, houseIcon);
@@ -203,15 +246,12 @@ namespace SEE.Game.HolisticMetrics.Components
             // might change as soon as the player first clicks the dropdown to expand it.
             if (cities.Any(city => city.name.Equals(oldSelection)))
             {
-                citySelection.selectedItemIndex =
-                    citySelection.dropdownItems.IndexOf(
-                        citySelection.dropdownItems.Find(item => item.itemName.Equals(oldSelection)));
+                citySelection.selectedItemIndex = citySelection.dropdownItems.IndexOf(
+                    citySelection.dropdownItems.Find(item => item.itemName.Equals(oldSelection)));
             }
 
             citySelection.SetupDropdown();
-
-            // Refresh the widgets because the selected city could have changed already
-            Redraw();
+            Redraw();  // Refresh the widgets because the selected city could have changed already
         }
 
         /// <summary>
@@ -233,6 +273,23 @@ namespace SEE.Game.HolisticMetrics.Components
         }
 
         /// <summary>
+        /// Determines whether the board managed by this manager has a movement that has not yet been fetched
+        /// by <see cref="MoveBoardAction"/>
+        /// </summary>
+        /// <param name="oldPosition">The position of the board before the movement</param>
+        /// <param name="newPosition">The new position of the board</param>
+        /// <param name="oldRotation">The rotation of the board before the movement</param>
+        /// <param name="newRotation">The new rotation of the board</param>
+        /// <returns>Whether the board managed by this manager has a movement that has not yet been fetched by
+        /// <see cref="MoveBoardAction"/></returns>
+        internal bool TryGetMovement(out Vector3 oldPosition, out Vector3 newPosition, out Quaternion oldRotation,
+            out Quaternion newRotation)
+        {
+            return boardMover.GetComponent<BoardMover>()
+                .TryGetMovement(out oldPosition, out newPosition, out oldRotation, out newRotation);
+        }
+
+        /// <summary>
         /// This method can be invoked to toggle the move-ability of the widgets.
         /// </summary>
         /// <param name="enable">Whether or not the widgets should be move-able now</param>
@@ -245,6 +302,30 @@ namespace SEE.Game.HolisticMetrics.Components
         }
 
         /// <summary>
+        /// Returns the first widget movement.
+        /// </summary>
+        /// <param name="originalPosition">The position of the widget before the movement</param>
+        /// <param name="newPosition">The position to which the widget was moved</param>
+        /// <param name="widgetID">The ID of the widget that was moved.</param>
+        /// <returns>Whether a widget movement was found</returns>
+        internal bool TryGetWidgetMovement(out Vector3 originalPosition, out Vector3 newPosition, out Guid widgetID)
+        {
+            foreach ((WidgetController, Metric) widget in widgets)
+            {
+                if (widget.Item1.GetComponent<WidgetMover>().TryGetMovement(out originalPosition, out newPosition))
+                {
+                    widgetID = widget.Item1.ID;
+                    return true;
+                }
+            }
+
+            originalPosition = Vector3.zero;
+            newPosition = Vector3.zero;
+            widgetID = Guid.NewGuid();
+            return false;
+        }
+
+        /// <summary>
         /// This method will be called when the player selects a different city in the dropdown. In that case, we want
         /// to send a message to all other clients so the selection changes on their boards too.
         /// </summary>
@@ -254,8 +335,8 @@ namespace SEE.Game.HolisticMetrics.Components
             SEECity selectedCity = GetSelectedCity();
             string cityName = selectedCity.name;
             new SwitchCityNetAction(title, cityName).Execute();
-            graphUnsubscriber?.Dispose();
-            graphUnsubscriber = selectedCity.LoadedGraph?.Subscribe(this);
+            graphDisposable?.Dispose();
+            graphDisposable = selectedCity.LoadedGraph?.Subscribe(this);
         }
 
         /// <summary>
@@ -265,12 +346,11 @@ namespace SEE.Game.HolisticMetrics.Components
         /// <param name="cityName">The name of the city to select</param>
         internal void SwitchCity(string cityName)
         {
-            // Update the values on the list so they hopefully are synchronous to the list on the requester's machine
+            // Update the values on the list so they hopefully are synchronous to the list on the machine of the
+            // requester
             OnCitySelectionClick();
 
-            // Try to find the index of the cityName to select
-            int indexInDropdown = citySelection
-                .dropdownItems
+            int indexInDropdown = citySelection.dropdownItems
                 .FindIndex(city => city.itemName.Equals(cityName));
             if (indexInDropdown == -1)  // The return value if it was not found
             {
@@ -279,15 +359,12 @@ namespace SEE.Game.HolisticMetrics.Components
                 return;
             }
 
-            // Select the new city
             citySelection.selectedItemIndex = indexInDropdown;
-
-            // Redraw the board
             Redraw();
 
             // Start listening to changes in the newly selected city
-            graphUnsubscriber?.Dispose();
-            graphUnsubscriber = GetSelectedCity().LoadedGraph?.Subscribe(this);
+            graphDisposable?.Dispose();
+            graphDisposable = GetSelectedCity().LoadedGraph?.Subscribe(this);
         }
 
         /// <summary>
@@ -295,9 +372,9 @@ namespace SEE.Game.HolisticMetrics.Components
         /// </summary>
         internal void OnGraphDraw()
         {
-            graphUnsubscriber?.Dispose();
-            OnCitySelectionClick();  // regenerates list of cities
-            graphUnsubscriber = GetSelectedCity().LoadedGraph?.Subscribe(this);
+            graphDisposable?.Dispose();
+            graphDisposable = GetSelectedCity().LoadedGraph?.Subscribe(this);
+            Redraw();
         }
 
         /// <summary>
@@ -310,10 +387,7 @@ namespace SEE.Game.HolisticMetrics.Components
         {
             foreach ((WidgetController, Metric) tuple in widgets)
             {
-                // Recalculate the metric
                 MetricValue metricValue = tuple.Item2.Refresh(GetSelectedCity());
-
-                // Display the new value on the widget
                 tuple.Item1.Display(metricValue);
             }
         }

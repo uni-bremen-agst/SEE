@@ -16,7 +16,7 @@ namespace SEE.Game.UI.Menu
     /// </summary>
     /// <typeparam name="T">The type of entries used. Must be derived from <see cref="MenuEntry"/>.</typeparam>
     /// <seealso cref="MenuEntry"/>
-    public partial class SimpleListMenu<T> : SimpleMenu where T : MenuEntry
+    public partial class SimpleListMenu<T> : SimpleMenu<T> where T : MenuEntry
     {
         /// <summary>
         /// Whether the menu can be closed by not making any selection.
@@ -73,6 +73,18 @@ namespace SEE.Game.UI.Menu
         }
 
         /// <summary>
+        /// Adds all given menu <paramref name="entries"/>.
+        /// </summary>
+        /// <param name="entries">entries to be added</param>
+        public void AddEntries(IEnumerable<T> entries)
+        {
+            foreach (T entry in entries)
+            {
+                AddEntry(entry);
+            }
+        }
+
+        /// <summary>
         /// Removes a menu entry.
         /// It is assumed that the menu contains the entry.
         /// </summary>
@@ -90,7 +102,7 @@ namespace SEE.Game.UI.Menu
         /// <param name="entry">The menu entry to be selected.</param>
         public virtual void SelectEntry(T entry)
         {
-            entry.DoAction();
+            entry.SelectAction();
             OnEntrySelected?.Invoke(entry);
         }
 
