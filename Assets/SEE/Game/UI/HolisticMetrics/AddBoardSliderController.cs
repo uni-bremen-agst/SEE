@@ -1,7 +1,4 @@
 using Michsky.UI.ModernUIPack;
-using SEE.Controls.Actions.HolisticMetrics;
-using SEE.Game.HolisticMetrics;
-using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 
@@ -25,34 +22,37 @@ namespace SEE.Game.UI.HolisticMetrics
         [SerializeField] private WindowDragger windowDragger;
 
         /// <summary>
-        /// The board configuration of the board to be created. So far it should already have a title and a position. In
-        /// this component, we will add the rotation to it and then create it.
+        /// Whether this class has a rotation in store that wasn't yet fetched.
         /// </summary>
-        private BoardConfig boardConfiguration;
+        private static bool gotRotation;
+
+        /// <summary>
+        /// If <see cref="gotRotation"/> is true, this contains the board rotation this slider controller got from the
+        /// player.
+        /// </summary>
+        private static Quaternion boardRotation;
 
         /// <summary>
         /// The dummy board GameObject that we will instantiate from this component. Its rotation will determine the
         /// rotation of the new board.
         /// </summary>
         private GameObject dummyBoard;
-        
+
         /// <summary>
         /// Sets up this component with the board configuration of the new board and a reference to the boards manager.
         /// Also sets up the slider, the window dragger and instantiates the dummy board.
         /// </summary>
-        /// <param name="boardConfigurationReference">The BoardConfiguration for the board to be created</param>
-        internal void Setup(BoardConfig boardConfigurationReference)
+        internal void Setup(Vector3 position)
         {
-            boardConfiguration = boardConfigurationReference;
 
             windowDragger.dragArea = transform.parent.GetComponent<RectTransform>();
-            
+
             slider.mainSlider.onValueChanged.AddListener(Rotate);
             const string pathToBoard = "Prefabs/HolisticMetrics/SceneComponents/MetricsBoard";
             GameObject boardPrefab = Resources.Load<GameObject>(pathToBoard);
-            dummyBoard = Instantiate(boardPrefab, boardConfiguration.Position, Quaternion.identity);
+            dummyBoard = Instantiate(boardPrefab, position, Quaternion.identity);
         }
-        
+
         /// <summary>
         /// This method will be called when the slider value changes. It will change the dummy board's rotation to the
         /// slider's value.
@@ -71,12 +71,29 @@ namespace SEE.Game.UI.HolisticMetrics
         /// </summary>
         public void CreateBoard()
         {
-            boardConfiguration.Rotation = dummyBoard.transform.rotation;
+            boardRotation = dummyBoard.transform.rotation;
+            gotRotation = true;
             Destroyer.Destroy(dummyBoard);
-            
-            new CreateBoardAction(boardConfiguration).Execute();
-            
             Destroyer.Destroy(gameObject);
+        }
+
+        /// <summary>
+        /// If <see cref="gotRotation"/> is true, the <paramref name="rotation"/> will be the rotation given by the
+        /// player. Otherwise it will be some dummy value.
+        /// </summary>
+        /// <param name="rotation">The rotation the player confirmed, if that doesn't exist, some dummy value</param>
+        /// <returns><see cref="gotRotation"/></returns>
+        internal static bool TryGetRotation(out Quaternion rotation)
+        {
+            if (gotRotation)
+            {
+                rotation = boardRotation;
+                gotRotation = false;
+                return true;
+            }
+
+            rotation = Quaternion.identity;
+            return false;
         }
     }
 }

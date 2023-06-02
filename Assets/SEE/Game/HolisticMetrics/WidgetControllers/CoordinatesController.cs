@@ -116,5 +116,4 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
             }
         }
     }
-
 }

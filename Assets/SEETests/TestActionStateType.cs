@@ -1,93 +1,85 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
 using SEE.Controls.Actions;
+using SEE.Utils;
 
 namespace SEETests
 {
     /// <summary>
-    /// Tests for the <see cref="ActionStateType"/> class.
+    /// Tests for the <see cref="AbstractActionStateType"/> class and its subclasses
+    /// <see cref="ActionStateType"/> and <see cref="ActionStateTypeGroup"/>.
     /// </summary>
     internal class TestActionStateType
     {
-        private IList<ActionStateType> allTypes;
+        private Forest<AbstractActionStateType> allRootTypes;
 
         [SetUp]
         public void SetUp()
         {
-            allTypes = ActionStateType.AllTypes;
+            allRootTypes = ActionStateTypes.AllRootTypes;
+        }
+
+        private static IEnumerable<AbstractActionStateType> GetAbstractActionStateTypes()
+        {
+            return typeof(ActionStateTypes).GetFields(BindingFlags.Public | BindingFlags.Static)
+                                           .Where(f => f.FieldType.IsSubclassOf(typeof(AbstractActionStateType)))
+                                           .Select(x => (AbstractActionStateType)x.GetValue(null));
+        }
+
+        private static List<AbstractActionStateType> GetAllRootTypes()
+        {
+            return GetAbstractActionStateTypes().Where(a => a.Parent == null).ToList();
+        }
+
+        private static List<AbstractActionStateType> GetAllTypes()
+        {
+            return GetAbstractActionStateTypes().ToList();
         }
 
         [Test]
-        public void AllTypesJustContainsAllTypes()
+        public void AllActionsPresent()
         {
-            IList<ActionStateType> actualTypes =
-                typeof(ActionStateType).GetProperties(BindingFlags.Public | BindingFlags.Static)
-                                       .Where(f => f.PropertyType == typeof(ActionStateType))
-                                       .Select(x => (ActionStateType) x.GetValue(null)).ToList();
-            Assert.AreEqual(actualTypes, allTypes, "ActionStateType.AllTypes must contain all of its types "
-                                                   + "(and only those)!");
+            Assert.AreEqual(GetAllTypes(), allRootTypes.AllElements(),
+                            "ActionStateTypes.AllRootTypes.AllElements() must contain all action types and only those!"
+                            + " And the order must be preserved.");
+        }
+
+        [Test]
+        public void ActionStateTypesAllRootTypesJustContainsAllRoots()
+        {
+            Assert.AreEqual(GetAllRootTypes(), allRootTypes.ToList(),
+                            "ActionStateTypes.AllRootTypes must contain all of its root types and only those!"
+                            + " And the order must be preserved.");
         }
 
         [Test]
         public void TestNoAttributeNull()
         {
-            Assert.IsEmpty(allTypes.Where(x => x.Description == null || x.Name == null || x.IconPath == null),
-                "No attribute of an ActionStateType may be null!");
-        }
-
-        [Test]
-        public void TestValueUnique()
-        {
-            Assert.AreEqual(allTypes.Count, allTypes.Select(x => x.Value).Distinct().Count(),
-                "Values of ActionStateType must be unique!");
+            Assert.IsEmpty(allRootTypes.AllElements().Where(x => x.Description == null || x.Name == null || x.IconPath == null),
+                "No attribute of an AbstractActionStateType may be null!");
         }
 
         [Test]
         public void TestNameUnique()
         {
-            Assert.AreEqual(allTypes.Count, allTypes.Select(x => x.Name).Distinct().Count(),
-                "Names of ActionStateType must be unique!");
-        }
-
-        [Test]
-        public void TestIdIncreasing()
-        {
-            int i = 0;
-            foreach (ActionStateType type in allTypes)
-            {
-                Assert.AreEqual(i++, type.Value, "ActionStateType values must increase by 1!");
-            }
-        }
-
-        [Test]
-        public void TestFromIdInvalid()
-        {
-            Assert.Throws<InvalidOperationException>(() => ActionStateType.FromID(-1));
-            int maxValue = allTypes.Select(x => x.Value).Max();
-            Assert.Throws<InvalidOperationException>(() => ActionStateType.FromID(maxValue+1));
+            Assert.AreEqual(allRootTypes.AllElements().Count, allRootTypes.AllElements().Select(x => x.Name).Distinct().Count(),
+                            "Names of AbstractActionStateType must be unique!");
         }
 
         public static IEnumerable<TestCaseData> AllTypeSupplier()
         {
-            return ActionStateType.AllTypes.Select(type => new TestCaseData(type));
+            return ActionStateTypes.AllRootTypes.AllElements().Select(type => new TestCaseData(type));
         }
 
         [Test, TestCaseSource(nameof(AllTypeSupplier))]
-        public void TestFromIdSuccess(ActionStateType type)
-        {
-            Assert.AreSame(type, ActionStateType.FromID(type.Value));
-        }
-
-        [Test, TestCaseSource(nameof(AllTypeSupplier))]
-        public void TestEquality(ActionStateType type)
+        public void TestEquality(AbstractActionStateType type)
         {
             Assert.IsTrue(type.Equals(type));
             Assert.IsFalse(type.Equals(null));
-            Assert.AreEqual(1, allTypes.Where(type.Equals).Count(),
-                "An ActionStateType must only be equal to itself!");
+            Assert.AreEqual(1, allRootTypes.AllElements().Where(type.Equals).Count(),
+                            "An ActionStateType must only be equal to itself!");
         }
     }
 }

@@ -198,11 +198,6 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Whether the left or right shift key was pressed down (and not again released).
-        /// </summary>
-        private static bool isModPressed = false;
-
-        /// <summary>
         /// Returns true if the user wants to toggle the run-time configuration
         /// menu allowing him/her to define the settings for code cities.
         /// </summary>
@@ -643,14 +638,5 @@ namespace SEE.Controls
         }
 
         #endregion
-
-        /// <summary>
-        /// Whether the user wants to toggle the menu for the metric boards.
-        /// </summary>
-        /// <returns>true if the user wants to toggle the menu for the metric boards</returns>
-        public static bool ToggleHolisticMetricsMenu()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleHolisticMetricsMenu);
-        }
     }
 }

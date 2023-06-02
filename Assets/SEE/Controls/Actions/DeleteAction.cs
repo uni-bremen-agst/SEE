@@ -40,7 +40,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.Delete"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.Delete;
+            return ActionStateTypes.Delete;
         }
 
         /// <summary>

@@ -38,7 +38,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.Rotate"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.Rotate;
+            return ActionStateTypes.Rotate;
         }
 
         /// <summary>
@@ -46,6 +46,11 @@ namespace SEE.Controls.Actions
         /// Will be null if no object has been selected yet.
         /// </summary>
         private GameObject objectToRotate;
+
+        /// <summary>
+        /// The <see cref="NodeOperator"/> of <see cref="objectToRotate"/>.
+        /// </summary>
+        private NodeOperator nodeOperator;
 
         /// <summary>
         /// The rotation of <see cref="objectToRotate"/> before this action actually rotated it,
@@ -65,8 +70,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="gameObject">object whose position and rotation are to be restored</param>
         public void Rotate(Quaternion Rotation)
-        {
-            NodeOperator nodeOperator = objectToRotate.AddOrGetComponent<NodeOperator>();
+        {            
             nodeOperator.RotateTo(Rotation, 0);
             // TODO: We do not need lists. Only one object can be rotated.
             new RotateNodeNetAction(new List<GameObject>() { objectToRotate }).Execute();
@@ -93,7 +97,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Gizmo used for rotating the objects.
         /// </summary>
-        private ObjectTransformGizmo _objectRotationGizmo = RTGizmosEngine.Get.CreateObjectRotationGizmo();
+        private ObjectTransformGizmo objectRotationGizmo = RTGizmosEngine.Get.CreateObjectRotationGizmo();
 
         /// <summary>
         /// The gizmo currently hovered, null unless a gizmo is hovered (updated externally).
@@ -130,9 +134,10 @@ namespace SEE.Controls.Actions
                     // Selected a different object - save changes and change object assigned to gizmo.
                     SaveRotationChanges();
                     objectToRotate = raycastHit.collider.gameObject;
+                    nodeOperator = objectToRotate.AddOrGetComponent<NodeOperator>();
                     originalRotation = objectToRotate.transform.rotation;
-                    _objectRotationGizmo.SetTargetObject(objectToRotate);
-                    _objectRotationGizmo.SetEnabled(true);
+                    objectRotationGizmo.SetTargetObject(objectToRotate);
+                    objectRotationGizmo.SetEnabled(true);
                     AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, objectToRotate);
                 }
             }
@@ -175,8 +180,8 @@ namespace SEE.Controls.Actions
                     gizmoHidingObject = searchObject;
                 }
             }
-            _objectRotationGizmo.SetTargetObject(gizmoHidingObject);
-            _objectRotationGizmo.SetEnabled(false);
+            objectRotationGizmo.SetTargetObject(gizmoHidingObject);
+            objectRotationGizmo.SetEnabled(false);
         }
 
         /// <summary>

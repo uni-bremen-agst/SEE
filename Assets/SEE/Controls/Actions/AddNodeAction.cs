@@ -145,7 +145,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.NewNode"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.NewNode;
+            return ActionStateTypes.NewNode;
         }
 
         /// <summary>

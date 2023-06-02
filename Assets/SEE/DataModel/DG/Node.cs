@@ -596,7 +596,7 @@ namespace SEE.DataModel.DG
         /// type and attributes. The hierarchy information (parent, level,
         /// and children) are not copied. Instead the copy will become a
         /// node without parent and children at level 0. If we copied the
-        /// hierarchy information, the hierarchy were no longer a forrest.
+        /// hierarchy information, the hierarchy were no longer a forest.
         /// </summary>
         /// <param name="clone">the clone receiving the copied attributes</param>
         protected override void HandleCloned(object clone)

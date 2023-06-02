@@ -10,20 +10,56 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     internal abstract class HolisticMetricsDialog
     {
         /// <summary>
+        /// Whether this dialog has some complete user input that hasn't yet been fetched.
+        /// </summary>
+        protected bool gotInput;
+
+        /// <summary>
+        /// Whether this dialog was canceled.
+        /// </summary>
+        private bool wasCanceled;
+
+        /// <summary>
+        /// The property dialog.
+        /// </summary>
+        protected PropertyDialog propertyDialog;
+
+        /// <summary>
         /// The dialog GameObject.
         /// </summary>
         internal GameObject dialog;
-        
+
         /// <summary>
-        /// This method needs to be called when the dialog should be closed. It will close the dialog and reenable the
-        /// keyboard shortcuts.
+        /// Can be invoked to properly close the dialog.
         /// </summary>
-        internal void EnableKeyboardShortcuts()
+        protected void Close()
         {
-            // Destroy the dialog GameObject
             Destroyer.Destroy(dialog);
-            
             SEEInput.KeyboardShortcutsEnabled = true;
+        }
+
+        /// <summary>
+        /// Gets called when the dialog is canceled.
+        /// </summary>
+        protected void Cancel()
+        {
+            wasCanceled = true;
+            Close();
+        }
+
+        /// <summary>
+        /// Whether this dialog was canceled.
+        /// </summary>
+        /// <returns>Whether this dialog was canceled</returns>
+        internal bool WasCanceled()
+        {
+            if (wasCanceled)
+            {
+                wasCanceled = false;
+                return true;
+            }
+
+            return false;
         }
     }
 }

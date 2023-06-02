@@ -38,7 +38,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.ScaleNode"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.ScaleNode;
+            return ActionStateTypes.ScaleNode;
         }
 
         /// <summary>
@@ -46,6 +46,9 @@ namespace SEE.Controls.Actions
         /// Will be null if no object has been selected yet.
         /// </summary>
         private GameObject objectToScale;
+
+        
+
 
         /// <summary>
         /// A memento of the position and scale of <see cref="objectToScale"/> before
@@ -64,6 +67,11 @@ namespace SEE.Controls.Actions
             public readonly Vector3 Position;
 
             /// <summary>
+            /// The <see cref="NodeOperator"/> of the game object to be scaled.
+            /// </summary>
+            private readonly NodeOperator nodeOperator;
+
+            /// <summary>
             /// Constructor taking a snapshot of the position and scale of <paramref name="gameObject"/>.
             /// </summary>
             /// <param name="gameObject">object whose position and scale are to be captured</param>
@@ -71,6 +79,7 @@ namespace SEE.Controls.Actions
             {
                 Position = gameObject.transform.position;
                 Scale = gameObject.transform.lossyScale;
+                nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
             }
 
             /// <summary>
@@ -80,7 +89,6 @@ namespace SEE.Controls.Actions
             /// <param name="gameObject">object whose position and scale are to be restored</param>
             public void Revert(GameObject gameObject)
             {
-                NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
                 nodeOperator.ScaleTo(Scale, 0);
                 nodeOperator.MoveTo(Position, 0);
             }
@@ -144,7 +152,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Gizmo used for scaling the objects.
         /// </summary>
-        private ObjectTransformGizmo _objectScaleGizmo = RTGizmosEngine.Get.CreateObjectScaleGizmo();
+        private ObjectTransformGizmo objectScaleGizmo = RTGizmosEngine.Get.CreateObjectScaleGizmo();
 
         /// <summary>
         /// The gizmo currently hovered, null unless a gizmo is hovered (updated externally).
@@ -170,9 +178,9 @@ namespace SEE.Controls.Actions
             if (SEEInput.Select())
             {
                 HitGraphElement hitGraphElement = Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _);
-                bool isGameObject = hitGraphElement == HitGraphElement.Node;
+                bool isGameNode = hitGraphElement == HitGraphElement.Node;
 
-                if (!isGameObject)
+                if (!isGameNode)
                 {
                     // Object outside the graph was selected, should be ignored.
                     SaveScaleChanges();
@@ -185,8 +193,8 @@ namespace SEE.Controls.Actions
                     SaveScaleChanges();
                     objectToScale = raycastHit.collider.gameObject;
                     beforeAction = new Memento(objectToScale);
-                    _objectScaleGizmo.SetTargetObject(objectToScale);
-                    _objectScaleGizmo.SetEnabled(true);
+                    objectScaleGizmo.SetTargetObject(objectToScale);
+                    objectScaleGizmo.SetEnabled(true);
                     AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, objectToScale);
                 }
             }
@@ -232,8 +240,8 @@ namespace SEE.Controls.Actions
                     gizmoHidingObject = searchObject;
                 }
             }
-            _objectScaleGizmo.SetTargetObject(gizmoHidingObject);
-            _objectScaleGizmo.SetEnabled(false);
+            objectScaleGizmo.SetTargetObject(gizmoHidingObject);
+            objectScaleGizmo.SetEnabled(false);
         }
 
         /// <summary>

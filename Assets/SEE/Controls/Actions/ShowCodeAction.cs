@@ -35,7 +35,7 @@ namespace SEE.Controls.Actions
             return new HashSet<string>();
         }
 
-        public override ActionStateType GetActionStateType() => ActionStateType.ShowCode;
+        public override ActionStateType GetActionStateType() => ActionStateTypes.ShowCode;
 
         /// <summary>
         /// Returns a new instance of <see cref="ShowCodeAction"/>.
@@ -200,7 +200,7 @@ namespace SEE.Controls.Actions
                 return codeWindow;
             }
 
-            // Returns a CodeWindow showing the code range of graphElement 
+            // Returns a CodeWindow showing the code range of graphElement
             // retrieved from a file. The path of the file is retrieved from
             // the absolute path as specified by the graphElements source location
             // attributes.

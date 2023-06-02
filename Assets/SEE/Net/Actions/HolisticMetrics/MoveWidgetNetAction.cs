@@ -13,7 +13,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         public Guid WidgetID;
 
         public Vector3 Position;
-            
+
         /// <summary>
         /// Saves the parameter values in fields of this class.
         /// </summary>
@@ -26,7 +26,7 @@ namespace SEE.Net.Actions.HolisticMetrics
             WidgetID = widgetID;
             Position = position;
         }
-        
+
         /// <summary>
         /// This method does nothing.
         /// </summary>
@@ -42,7 +42,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             if (!IsRequester())
             {
-                Find(BoardName).Move(WidgetID, Position);
+                FindWidgetsManager(BoardName).Move(WidgetID, Position);
             }
         }
     }
