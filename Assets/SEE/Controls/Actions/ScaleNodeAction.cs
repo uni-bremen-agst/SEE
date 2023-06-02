@@ -47,8 +47,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject objectToScale;
 
-
-
         /// <summary>
         /// A memento of the position and scale of <see cref="objectToScale"/> before
         /// or after, respectively, it was scaled.
@@ -61,11 +59,6 @@ namespace SEE.Controls.Actions
             public readonly Vector3 Scale;
 
             /// <summary>
-            /// The position at the point in time when the memento was created (in world space).
-            /// </summary>
-            public readonly Vector3 Position;
-
-            /// <summary>
             /// The <see cref="NodeOperator"/> of the game object to be scaled.
             /// </summary>
             private readonly NodeOperator nodeOperator;
@@ -76,7 +69,6 @@ namespace SEE.Controls.Actions
             /// <param name="gameObject">object whose position and scale are to be captured</param>
             public Memento(GameObject gameObject)
             {
-                Position = gameObject.transform.position;
                 Scale = gameObject.transform.lossyScale;
                 nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
             }
@@ -89,7 +81,6 @@ namespace SEE.Controls.Actions
             public void Revert(GameObject gameObject)
             {
                 nodeOperator.ScaleTo(Scale, 0);
-                nodeOperator.MoveTo(Position, 0);
             }
         }
 
@@ -120,16 +111,15 @@ namespace SEE.Controls.Actions
         {
             base.Undo();
             beforeAction.Revert(objectToScale);
-            MoveAndScale();
+            BroadcastScale();
         }
 
         /// <summary>
-        /// Scales and moves <see cref="objectToScale"/> in all clients to its current localScale and position.
+        /// Scales <see cref="objectToScale"/> in all clients to its current localScale.
         /// </summary>
-        private void MoveAndScale()
+        private void BroadcastScale()
         {
             new ScaleNodeNetAction(objectToScale.name, objectToScale.transform.localScale, 0).Execute();
-            new MoveNetAction(objectToScale.name, objectToScale.transform.position, 0).Execute();
         }
 
         /// <summary>
@@ -144,7 +134,7 @@ namespace SEE.Controls.Actions
                 // we need to re-do the action.
                 base.Redo();
                 afterAction.Revert(objectToScale);
-                MoveAndScale();
+                BroadcastScale();
             }
         }
 
@@ -214,7 +204,7 @@ namespace SEE.Controls.Actions
             if (objectToScale != null)
             {
                 afterAction = new Memento(objectToScale);
-                MoveAndScale();
+                BroadcastScale();
             }
         }
 
