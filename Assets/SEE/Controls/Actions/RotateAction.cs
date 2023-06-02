@@ -86,7 +86,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.Rotate"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.Rotate;
+            return ActionStateTypes.Rotate;
         }
 
         /// <summary>

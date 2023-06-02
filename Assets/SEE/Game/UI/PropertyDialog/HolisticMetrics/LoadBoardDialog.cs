@@ -1,23 +1,19 @@
-using System;
 using SEE.Controls;
-using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics;
-using SEE.Game.UI.Notification;
-using SEE.Utils;
 using UnityEngine;
-using Object = UnityEngine.Object;
+using SEE.Utils;
 
 namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
 {
     /// <summary>
     /// This class manages the dialog for loading a board from a configuration file.
     /// </summary>
-    internal class LoadBoardConfigurationDialog : HolisticMetricsDialog
+    internal class LoadBoardDialog : HolisticMetricsDialog
     {
         /// <summary>
-        /// The property dialog.
+        /// The name of the file which the player selected.
         /// </summary>
-        private PropertyDialog propertyDialog;
+        private static string filename;
 
         /// <summary>
         /// This input field lets the player pick a file from which to load the board configuration.
@@ -46,40 +42,42 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
             propertyDialog.AddGroup(group);
 
-            propertyDialog.OnConfirm.AddListener(LoadBoardConfiguration);
-            propertyDialog.OnCancel.AddListener(EnableKeyboardShortcuts);
+            propertyDialog.OnConfirm.AddListener(OnConfirm);
+            propertyDialog.OnCancel.AddListener(Cancel);
 
             SEEInput.KeyboardShortcutsEnabled = false;
             propertyDialog.DialogShouldBeShown = true;
         }
 
         /// <summary>
-        /// This method gets called when the player confirms the dialog. It will load the selected board and create it
-        /// in the scene.
+        /// This method gets called when the player confirms the dialog. It will save the selected filename in a
+        /// variable and set <see cref="HolisticMetricsDialog.gotInput"/> to true.
         /// </summary>
-        private void LoadBoardConfiguration()
+        private void OnConfirm()
         {
             SEEInput.KeyboardShortcutsEnabled = true;
-            
-            // Load the board configuration from the file
-            BoardConfig boardConfiguration;
-            try
-            {
-                boardConfiguration = ConfigManager.LoadBoard(selectedFile.Value);
-            }
-            catch (Exception exception)
-            {
-                ShowNotification.Error(
-                    "Problem loading the metrics board configuration, reason:", 
-                    exception.Message);
-                return;
-            }
-            
-            // Destroy the dialog GameObject
+            filename = selectedFile.Value;
+            gotInput = true;
             Destroyer.Destroy(dialog);
-            
-            // Create a new board from the loaded configuration
-            new CreateBoardAction(boardConfiguration).Execute();
+        }
+
+        /// <summary>
+        /// Fetches the filename given by the player.
+        /// </summary>
+        /// <param name="nameOfFile">If given and not yet fetched, this will be the filename the player selected.
+        /// </param>
+        /// <returns>The value of <see cref="HolisticMetricsDialog.gotInput"/></returns>
+        internal bool TryGetFilename(out string nameOfFile)
+        {
+            if (gotInput)
+            {
+                nameOfFile = filename;
+                gotInput = false;
+                return true;
+            }
+
+            nameOfFile = null;
+            return false;
         }
     }
 }

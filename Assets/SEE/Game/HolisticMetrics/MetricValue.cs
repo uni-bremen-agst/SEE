@@ -28,18 +28,18 @@ namespace SEE.Game.HolisticMetrics
         /// The worst possible value for this metric.
         /// </summary>
         internal float Lower;
-        
+
         /// <summary>
         /// The best possible value for this metric.
         /// </summary>
         internal float Higher;
-        
+
         /// <summary>
         /// The concrete value.
         /// </summary>
         internal float Value;
     }
-    
+
     /// <summary>
     /// A collection of metric values. This can, for example, be useful when displaying multiple metric values on a bar
     /// chart.

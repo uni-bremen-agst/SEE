@@ -6,9 +6,9 @@ using UnityEngine.UI;
 namespace SEE.Game.UI.Menu
 {
     /// <summary>
-    /// Desktop implementation of SimpleMenu.
+    /// Desktop implementation of <see cref="SimpleMenu"/>.
     /// </summary>
-    public partial class SimpleMenu
+    public partial class SimpleMenu<T>
     {
         /// <summary>
         /// Prefab for the menu.
@@ -95,17 +95,6 @@ namespace SEE.Game.UI.Menu
                 return;
             }
             base.Update();
-        }
-
-        /// <summary>
-        /// Destroying the component also destroys the menu.
-        /// </summary>
-        protected virtual void OnDestroy()
-        {
-            if (Menu != null)
-            {
-                Destroyer.Destroy(Menu);
-            }
         }
 
         /// <summary>

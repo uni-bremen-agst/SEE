@@ -1,7 +1,4 @@
 using SEE.Controls;
-using SEE.Game.HolisticMetrics;
-using SEE.Game.UI.Notification;
-using SEE.Game.HolisticMetrics.Components;
 using UnityEngine;
 
 namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
@@ -12,11 +9,6 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     internal class AddBoardDialog : HolisticMetricsDialog
     {
         /// <summary>
-        /// The property dialog.
-        /// </summary>
-        private PropertyDialog propertyDialog;
-
-        /// <summary>
         /// The input field where the player can enter a name for the new board.
         /// </summary>
         private StringProperty boardName;
@@ -26,6 +18,8 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         internal void Open()
         {
+            gotInput = false;
+
             dialog = new GameObject("Add board dialog");
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
             group.Name = "Add board dialog";
@@ -34,7 +28,8 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             boardName.Name = "Enter name (unique)";
             boardName.Description = "Enter the title of the board. This has to be unique.";
             group.AddProperty(boardName);
-            
+            group.GetReady();
+
             propertyDialog = dialog.AddComponent<PropertyDialog>();
             propertyDialog.Title = "Add board";
             propertyDialog.Description = "Configure the board; then hit OK button.";
@@ -42,7 +37,7 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             propertyDialog.AddGroup(group);
 
             propertyDialog.OnConfirm.AddListener(AddBoard);
-            propertyDialog.OnCancel.AddListener(EnableKeyboardShortcuts);
+            propertyDialog.OnCancel.AddListener(Cancel);
 
             SEEInput.KeyboardShortcutsEnabled = false;
             propertyDialog.DialogShouldBeShown = true;
@@ -56,17 +51,26 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         private void AddBoard()
         {
-            BoardConfig boardConfiguration = new()
-            {
-                Title = boardName.Value
-            };
-            EnableKeyboardShortcuts();
-            GameObject.Find("/DemoWorld/Plane").AddComponent<BoardAdder>();
-            BoardAdder.Setup(boardConfiguration);
+            gotInput = true;
+            Close();
+        }
 
-            ShowNotification.Info(
-                "Position the board",
-                "Left click on the ground where you want to add the board");
+        /// <summary>
+        /// Fetches the name given by the player.
+        /// </summary>
+        /// <param name="name">The name given by the player, if present and not yet fetched. Otherwise a dummy value.
+        /// </param>
+        /// <returns>The value of <see cref="HolisticMetricsDialog.gotInput"/></returns>
+        internal bool TryGetName(out string name)
+        {
+            if (gotInput)
+            {
+                name = boardName.Value;
+                return true;
+            }
+
+            name = null;
+            return false;
         }
     }
 }
