@@ -95,6 +95,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Disables the gizmo.
+        /// </summary>
+        public override void Stop()
+        {
+            base.Stop();
+            DisableGizmo();
+        }
+
+        /// <summary>
         /// Gizmo used for rotating the objects.
         /// </summary>
         private ObjectTransformGizmo objectRotationGizmo = RTGizmosEngine.Get.CreateObjectRotationGizmo();
