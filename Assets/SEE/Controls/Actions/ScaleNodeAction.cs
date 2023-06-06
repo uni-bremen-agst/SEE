@@ -22,7 +22,6 @@ namespace SEE.Controls.Actions
         /// <param name="gameNodeToBeContinuedWith">the game node selected already</param>
         private ScaleNodeAction(GameObject gameNodeToBeContinuedWith) : base()
         {
-            Debug.Log($"ScaleNodeAction({gameNodeToBeContinuedWith})\n");
             currentState = ReversibleAction.Progress.NoEffect;
             StartWith(gameNodeToBeContinuedWith);
         }
@@ -33,7 +32,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         private ScaleNodeAction() : base()
         {
-            Debug.Log($"ScaleNodeAction()\n");
             currentState = ReversibleAction.Progress.NoEffect;
         }
 
@@ -152,7 +150,6 @@ namespace SEE.Controls.Actions
 
             private void Set(Vector3 localScale)
             {
-                Debug.Log($"Set({nodeOperator.name}, {localScale})\n");
                 // FIXME: If a duration > 0 is used, the node operator does not scale the object.
                 nodeOperator.ScaleTo(localScale, 0);
                 BroadcastScale(localScale);
@@ -230,7 +227,6 @@ namespace SEE.Controls.Actions
                     {
                         // An object to be manipulated was selected already and it was changed.
                         // The action is finished.
-                        Debug.Log($"Last click hit no node. {gameNodeSelected.name} has had changes.\n");
                         Finalize();
                         return true;
                     }
@@ -238,13 +234,11 @@ namespace SEE.Controls.Actions
                     {
                         // No game node has been selected yet or the previously selected game node
                         // has had no changes. The action is continued.
-                        Debug.Log("Last click hit no node. No node selected previously or no changes.\n");
                         return false;
                     }
                 }
                 else
                 {
-                    Debug.Log($"Last click hit node {raycastHit.collider.gameObject.name}.\n");
                     // A game node was selected by the user.
                     // Has the user already selected a game node in a previous iteration?
                     if (gameNodeSelected)
@@ -253,15 +247,12 @@ namespace SEE.Controls.Actions
                         // Are the two game nodes different?
                         if (gameNodeSelected != raycastHit.collider.gameObject)
                         {
-                            Debug.Log($"Previously selected {gameNodeSelected.name} and newly selected {raycastHit.collider.gameObject.name} are different.\n");
-
                             // The newly and previously selected nodes are different.
 
                             // Have we had any changes yet? If not, we assume the user wants
                             // to manipulate the newly game node instead.
                             if (!HasChanges())
                             {
-                                Debug.Log($"Previously selected {gameNodeSelected.name} has had no changes. Continuing with {raycastHit.collider.gameObject.name}.\n");
                                 StartWith(raycastHit.collider.gameObject);
                                 return false;
                             }
@@ -269,7 +260,6 @@ namespace SEE.Controls.Actions
                             {
                                 // This action is considered finished and a different action should
                                 // be started to continue with the newly selected node.
-                                Debug.Log($"Previously selected {gameNodeSelected.name} has had changes. Continuing with a new action with {raycastHit.collider.gameObject.name}.\n");
                                 Finalize();
                                 gameNodeToBeContinuedInNextAction = raycastHit.collider.gameObject;
                                 return true;
@@ -277,8 +267,6 @@ namespace SEE.Controls.Actions
                         }
                         else
                         {
-                            Debug.Log($"Previously selected {gameNodeSelected.name} selected again.\n");
-
                             // The user has selected the same node again.
                             // Nothing to be done.
                             return false;
@@ -286,7 +274,6 @@ namespace SEE.Controls.Actions
                     }
                     else
                     {
-                        Debug.Log($"No previously selected node. Starting with {raycastHit.collider.gameObject.name}.\n");
                         // It's the first time, a game node was selected. The action starts.
                         StartWith(raycastHit.collider.gameObject);
                         return false;
@@ -304,7 +291,6 @@ namespace SEE.Controls.Actions
             void Finalize()
             {
                 UnityEngine.Assertions.Assert.IsNotNull(gameNodeSelected);
-                Debug.Log($"Finalize({gameNodeSelected.name}).\n");
                 memento.Finalize(gameNodeSelected.transform.localScale);
                 gizmo.Disable();
                 currentState = ReversibleAction.Progress.Completed;
@@ -327,7 +313,6 @@ namespace SEE.Controls.Actions
         /// <param name="gameNode">game node to start the manipulation with</param>
         void StartWith(GameObject gameNode)
         {
-            Debug.Log($"StartWith({gameNode.name}).\n");
             gameNodeSelected = gameNode;
             memento = new Memento(gameNodeSelected);
             gizmo.Enable(gameNodeSelected);
