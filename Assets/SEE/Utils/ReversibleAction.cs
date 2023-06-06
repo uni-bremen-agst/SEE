@@ -11,11 +11,11 @@ namespace SEE.Utils
 
     /// <summary>
     /// Defines the expected operations and their protocol for actions that
-    /// can be reversed (have Undo() and Redo()). Their protocol resembles 
+    /// can be reversed (have Undo() and Redo()). Their protocol resembles
     /// Unity's protocol for MonoBehaviours regarding <see cref="Awake"/>,
     /// <see cref="Start"/>, and <see cref="Update"/>.
-    /// 
-    /// See also the test cases in <seealso cref="SEETests.TestActionHistory"/> for 
+    ///
+    /// See also the test cases in <seealso cref="SEETests.TestActionHistory"/> for
     /// additional information.
     /// </summary>
     public interface ReversibleAction
@@ -50,20 +50,30 @@ namespace SEE.Utils
         /// <summary>
         /// The state of an action. Whether Undo/Redo can be called depends
         /// upon this state as follows:
-        /// 
+        ///
         /// <see cref="NoEffect"/>   => neither Undo nor Redo
         /// <see cref="InProgress"/> => only Undo
         /// <see cref="Completed"/>  => both Undo and Redo
         /// </summary>
         enum Progress
         {
-            NoEffect = 0,   // The action has not had any effect whatsoever yet.
-            InProgress = 1, // The action has had a preliminary effect that needs to be undone, but is not yet complete.
-            Completed = 2   // The action has had an effect and is completed.
+            /// <summary>
+            /// The action has not had any effect whatsoever yet.
+            /// </summary>
+            NoEffect = 0,
+            /// <summary>
+            /// The action has had a preliminary effect that needs to be undone,
+            /// but is not yet complete.
+            /// </summary>
+            InProgress = 1,
+            /// <summary>
+            /// The action has had an effect and is completed.
+            /// </summary>
+            Completed = 2
         }
 
         /// <summary>
-        /// Returns the current state of the action indicating whether it has had an effect 
+        /// Returns the current state of the action indicating whether it has had an effect
         /// that may need to be undone and whether it is still ongoing.
         /// </summary>
         /// <returns>the current state of the action</returns>
@@ -79,10 +89,10 @@ namespace SEE.Utils
         /// Will be called whenever the action is to start its execution.
         /// There are two different situations in which this is the case:
         /// (1) upon its intial start and (2) when it is resumed.
-        /// Situation (1): <see cref="Start"/> will be called once after 
-        /// <see cref="Awake"/> when it is executed the first time. 
-        /// Situation (2): Then it will be called again each time it gets 
-        /// re-activated because a previously executed action having superseding 
+        /// Situation (1): <see cref="Start"/> will be called once after
+        /// <see cref="Awake"/> when it is executed the first time.
+        /// Situation (2): Then it will be called again each time it gets
+        /// re-activated because a previously executed action having superseding
         /// it gets undone.
         /// Invariant: The first call to <see cref="Start"/> will take place
         /// before <see cref="Update"/> and after <see cref="Awake"/>.
@@ -99,7 +109,7 @@ namespace SEE.Utils
         bool Update();
 
         /// <summary>
-        /// Will be called when the action is to stop executing. This is 
+        /// Will be called when the action is to stop executing. This is
         /// generally the case when another action is superseding it.
         /// Invariant: A <see cref="Start"/> message has been received before.
         /// </summary>
