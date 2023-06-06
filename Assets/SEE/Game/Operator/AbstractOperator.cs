@@ -13,12 +13,17 @@ namespace SEE.Game.Operator
     /// Operations can be animated or executed directly, by setting the duration to 0.
     /// </summary>
     /// <remarks>
-    /// Operator classes may also expose several "target" values, which are values the object is supposed to have. 
+    /// Operator classes may also expose several "target" values, which are values the object is supposed to have.
     /// "Supposed" means the object might have this value already, but it also might still animate towards it.
     /// </remarks>
     [DisallowMultipleComponent]
     public abstract class AbstractOperator : MonoBehaviour
     {
+        /// <summary>
+        /// The default duration of animations in seconds.
+        /// </summary>
+        public const float DefaultAnimationDuration = 1.0f;
+
         /// <summary>
         /// Interface for <see cref="Operation{T,V}"/> which collects all non-generic methods.
         /// <see cref="Operation{T,V}"/> should be preferred over this if generic parameters can be used.
@@ -114,7 +119,7 @@ namespace SEE.Game.Operator
             /// <summary>
             /// Animate to the new <paramref name="target"/> value, taking <paramref name="duration"/> seconds.
             /// If the target value should be set immediately (without an animation),
-            /// set the <paramref name="duration"/> to 0. 
+            /// set the <paramref name="duration"/> to 0.
             /// </summary>
             /// <param name="target">The new target value that shall be animated towards.</param>
             /// <param name="duration">The desired length of the animation.</param>
@@ -186,7 +191,7 @@ namespace SEE.Game.Operator
                 }
             }
 
-            protected override IOperationCallback<Action> AnimatorCallback => 
+            protected override IOperationCallback<Action> AnimatorCallback =>
                 new AndCombinedOperationCallback<TweenCallback>(
                     Animator.Select( x => new TweenOperationCallback(x)), x => new TweenCallback(x));
 
