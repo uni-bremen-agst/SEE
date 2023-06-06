@@ -64,9 +64,6 @@ namespace SEE.Controls
             }
         }
 
-        [Tooltip("The factor by which code cities should be scaled on startup."), OdinSerialize, Min(0.01f)]
-        public float CityScalingFactor = 1f;
-
         /// <summary>
         /// The name of the game object holding the unique <see cref="SceneSettings"/>
         /// component.
