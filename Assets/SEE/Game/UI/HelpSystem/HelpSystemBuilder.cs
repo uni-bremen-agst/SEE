@@ -151,7 +151,8 @@ namespace SEE.Game.UI.HelpSystem
             HelpSystemEntry entry = null)
         {
             return new MenuEntry(
-                action: () => { Execute(entry, title, keywords, videoPath); },
+                selectAction: () => { Execute(entry, title, keywords, videoPath); },
+                unselectAction: null,
                 title: title,
                 description: description,
                 entryColor: entryColor,
@@ -168,9 +169,9 @@ namespace SEE.Game.UI.HelpSystem
         /// <param name="description">The description of the RefEntry, displayed as a tooltip.</param>
         /// <param name="entryColor">The color of the Ref-Entry.</param>
         /// <returns>A new NestedMenuEntry.</returns>
-        public static NestedMenuEntry CreateNewRefEntry(List<MenuEntry> innerEntries, string title, string description, Color entryColor)
+        public static NestedMenuEntry<MenuEntry> CreateNewRefEntry(List<MenuEntry> innerEntries, string title, string description, Color entryColor)
         {
-            return new NestedMenuEntry(
+            return new NestedMenuEntry<MenuEntry>(
                 innerEntries: innerEntries,
                 title: title,
                 description: description,

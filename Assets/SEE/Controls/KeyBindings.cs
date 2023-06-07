@@ -355,6 +355,8 @@ namespace SEE.Controls
 
         #endregion
 
+        #region Holistic Metric Menu
+
         //-----------------------------------------------------
         // Holistic metrics menu
         //-----------------------------------------------------
@@ -362,6 +364,10 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles the menu for holistic code metrics.
         /// </summary>
-        internal static readonly KeyCode ToggleHolisticMetricsMenu = Register(KeyCode.C, Scope.Always, "Toggles the menu for holistic code metrics");
+        internal static readonly KeyCode ToggleHolisticMetricsMenu = Register(KeyCode.C, Scope.Always,
+                                                                              "Toggles the menu for holistic code metrics");
+
+        #endregion
+
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Windows.Speech;
@@ -11,7 +12,7 @@ namespace SEE.Game.UI.Menu
     /// A platform dependent menu.
     /// Contains a title, description, icon and listens to specific keywords.
     /// </summary>
-    public partial class SimpleMenu : PlatformDependentComponent
+    public partial class SimpleMenu<T> : PlatformDependentComponent where T : MenuEntry
     {
         /// <summary>
         /// The title of this menu.
@@ -87,6 +88,23 @@ namespace SEE.Game.UI.Menu
         }
 
         /// <summary>
+        /// Destroying the component also destroys the menu.
+        /// Lets <see cref="KeywordListener"/> stop listening.
+        /// </summary>
+        /// <remarks>Called by Unity when this object is destroyed.</remarks>
+        protected virtual void OnDestroy()
+        {
+            KeywordListener?.Stop();
+            KeywordListener?.Dispose();
+            KeywordListener = null;
+
+            if (Menu != null)
+            {
+                Destroyer.Destroy(Menu);
+            }
+        }
+
+        /// <summary>
         /// Whether the menu is shown.
         /// </summary>
         private bool showMenu;
@@ -98,8 +116,11 @@ namespace SEE.Game.UI.Menu
             get => showMenu;
             set
             {
-                showMenu = value;
-                OnShowMenuChanged?.Invoke();
+                if (showMenu != value)
+                {
+                    showMenu = value;
+                    OnShowMenuChanged?.Invoke();
+                }
             }
         }
 
@@ -117,8 +138,11 @@ namespace SEE.Game.UI.Menu
             get => parent != null ? parent : Canvas.transform;
             set
             {
-                parent = value;
-                OnParentChanged?.Invoke();
+                if (parent != value)
+                {
+                    parent = value;
+                    OnParentChanged?.Invoke();
+                }
             }
         }
 
@@ -157,7 +181,10 @@ namespace SEE.Game.UI.Menu
         protected virtual IEnumerable<string> GetKeywords()
         {
             IEnumerable<string> keywords = Enumerable.Empty<string>();
-            if (CloseMenuKeyword != null) keywords = keywords.Append(CloseMenuKeyword);
+            if (CloseMenuKeyword != null)
+            {
+                keywords = keywords.Append(CloseMenuKeyword);
+            }
             return keywords;
         }
 
@@ -198,7 +225,7 @@ namespace SEE.Game.UI.Menu
         public event UnityAction OnShowMenuChanged;
 
         /// <summary>
-        /// Triggers when <see cref="CloseMenuKeyword"/> was changed
+        /// Triggers when <see cref="CloseMenuKeyword"/> was changed.
         /// </summary>
         public event UnityAction OnCloseMenuCommandChanged;
 

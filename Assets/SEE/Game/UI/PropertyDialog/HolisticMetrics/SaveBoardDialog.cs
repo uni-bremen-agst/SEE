@@ -1,6 +1,5 @@
 using SEE.Controls;
 using SEE.Game.HolisticMetrics;
-using SEE.Game.HolisticMetrics.Components;
 using UnityEngine;
 
 namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
@@ -8,12 +7,17 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     /// <summary>
     /// This class manages the dialog for saving a board from the scene to a configuration file.
     /// </summary>
-    internal class SaveBoardConfigurationDialog : HolisticMetricsDialog
+    internal class SaveBoardDialog : HolisticMetricsDialog
     {
         /// <summary>
-        /// The property dialog.
+        /// The name of the file in which to store the <see cref="BoardConfig"/>.
         /// </summary>
-        private PropertyDialog propertyDialog;
+        private string filename;
+
+        /// <summary>
+        /// The <see cref="widgetsManager"/> of the board to save to disk.
+        /// </summary>
+        private WidgetsManager widgetsManager;
 
         /// <summary>
         /// The input field that lets the player select a board from the scene to be saved.
@@ -47,29 +51,53 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
                 "Enter a file name under which to save the configuration. If the file already exists," +
                 "it will be overwritten.";
             group.AddProperty(fileName);
-            
+
             propertyDialog = dialog.AddComponent<PropertyDialog>();
             propertyDialog.Title = "Specify board configuration";
             propertyDialog.Description = "Select the board to save and give the configuration file a name";
             propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
             propertyDialog.AddGroup(group);
-            
+
             propertyDialog.OnConfirm.AddListener(SaveBoardConfiguration);
-            propertyDialog.OnCancel.AddListener(EnableKeyboardShortcuts);
-            
+            propertyDialog.OnCancel.AddListener(Cancel);
+
             SEEInput.KeyboardShortcutsEnabled = false;
             propertyDialog.DialogShouldBeShown = true;
         }
 
         /// <summary>
         /// This method gets called when the player confirms the dialog. It will save the selected board under the given
-        /// name and then closes the dialog and reenables the keyboard shortcuts.
+        /// name and then closes the dialog and re-enables the keyboard shortcuts.
         /// </summary>
         private void SaveBoardConfiguration()
         {
-            WidgetsManager boardsManager = BoardsManager.Find(selectedBoard.Value);
-            ConfigManager.SaveBoard(boardsManager, fileName.Value);
-            EnableKeyboardShortcuts();
+            gotInput = true;
+            filename = fileName.Value;
+            widgetsManager = BoardsManager.Find(selectedBoard.Value);
+            Close();
+        }
+
+        /// <summary>
+        /// Fetches the input the player gave us.
+        /// </summary>
+        /// <param name="filenameOut">If <see cref="HolisticMetricsDialog.gotInput"/>, this will be the
+        /// <see cref="filename"/>. Otherwise null.</param>
+        /// <param name="widgetsManagerOut">If <see cref="HolisticMetricsDialog.gotInput"/>, this will be the
+        /// <see cref="widgetsManager"/>. Otherwise null.</param>
+        /// <returns><see cref="HolisticMetricsDialog.gotInput"/></returns>
+        internal bool GetUserInput(out string filenameOut, out WidgetsManager widgetsManagerOut)
+        {
+            if (gotInput)
+            {
+                gotInput = false;
+                filenameOut = filename;
+                widgetsManagerOut = widgetsManager;
+                return true;
+            }
+
+            filenameOut = null;
+            widgetsManagerOut = null;
+            return false;
         }
     }
 }

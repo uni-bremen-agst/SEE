@@ -1,12 +1,8 @@
 using System;
 using System.Linq;
 using SEE.Controls;
-using SEE.Game.HolisticMetrics;
 using SEE.Game.HolisticMetrics.Metrics;
-using SEE.Game.UI.Notification;
-using SEE.Utils;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
 {
@@ -16,9 +12,14 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
     internal class AddWidgetDialog : HolisticMetricsDialog
     {
         /// <summary>
-        /// The property dialog of this dialog.
+        /// The metric type the player selected.
         /// </summary>
-        private PropertyDialog propertyDialog;
+        private string metricType;
+
+        /// <summary>
+        /// The widget type the player selected.
+        /// </summary>
+        private string widgetName;
 
         /// <summary>
         /// The selection allowing the player to select the metric that should be displayed by the new widget.
@@ -54,12 +55,14 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             const string widgetPrefabsPath = "Prefabs/HolisticMetrics/Widgets";
             widgetPrefabs = Resources.LoadAll<GameObject>(widgetPrefabsPath);
         }
-        
+
         /// <summary>
         /// This method will display this dialog to the player.
         /// </summary>
         internal void Open()
         {
+            gotInput = false;
+
             dialog = new GameObject("Add widget dialog");
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
             group.Name = "Add widget dialog";
@@ -79,17 +82,17 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
             selectedWidget.AddOptions(widgetOptions);
             selectedWidget.Value = widgetOptions[0];
             group.AddProperty(selectedWidget);
-            
+
             propertyDialog = dialog.AddComponent<PropertyDialog>();
             propertyDialog.Title = "Add widget";
             propertyDialog.Description = "Configure the widget; then hit OK button. Then click on any metrics board" +
                                          "where you want to place the widget.";
             propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Plus");
             propertyDialog.AddGroup(group);
-            
+
             propertyDialog.OnConfirm.AddListener(AddWidget);
-            propertyDialog.OnCancel.AddListener(EnableKeyboardShortcuts);
-            
+            propertyDialog.OnCancel.AddListener(Cancel);
+
             SEEInput.KeyboardShortcutsEnabled = false;
             propertyDialog.DialogShouldBeShown = true;
         }
@@ -101,26 +104,33 @@ namespace SEE.Game.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         private void AddWidget()
         {
-            // Create a widget configuration
-            WidgetConfig widgetConfiguration = new()
+            gotInput = true;
+            metricType = selectedMetric.Value;
+            widgetName = selectedWidget.Value;
+            Close();
+        }
+
+        /// <summary>
+        /// Fetches the configuration for the new widget given by the player.
+        /// </summary>
+        /// <param name="metric">If given and not yet fetched, this will be the metric type selected by the player.
+        /// </param>
+        /// <param name="widget">If given and not yet fetched, this will be the widget type selected by the player.
+        /// </param>
+        /// <returns>The value of <see cref="HolisticMetricsDialog.gotInput"/></returns>
+        internal bool TryGetConfig(out string metric, out string widget)
+        {
+            if (gotInput)
             {
-                ID = Guid.NewGuid(),
-                MetricType = selectedMetric.Value,
-                WidgetName = selectedWidget.Value
-            };
-            
-            // Add WidgetPositionGetters to all boards
-            BoardsManager.AddWidgetAdders(widgetConfiguration);
+                metric = metricType;
+                widget = widgetName;
+                gotInput = false;
+                return true;
+            }
 
-            // Ensure they all get deleted once one of them gets a click (that should probably not be done here)
-            
-            // Close the dialog
-            Destroyer.Destroy(dialog);
-            SEEInput.KeyboardShortcutsEnabled = true;
-
-            ShowNotification.Info(
-                "Position the widget",
-                "Click on a metrics board where you want to position the widget.");
+            metric = null;
+            widget = null;
+            return false;
         }
     }
 }

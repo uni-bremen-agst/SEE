@@ -1,7 +1,3 @@
-using SEE.Game.HolisticMetrics;
-using SEE.Game.HolisticMetrics.Components;
-using UnityEngine;
-
 namespace SEE.Net.Actions.HolisticMetrics
 {
     /// <summary>
@@ -18,7 +14,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// The name of the city to change the selection to.
         /// </summary>
         public string CityName;
-        
+
         /// <summary>
         /// The constructor. This assigns the parameter values to fields.
         /// </summary>
@@ -29,7 +25,7 @@ namespace SEE.Net.Actions.HolisticMetrics
             BoardName = boardName;
             CityName = cityName;
         }
-        
+
         /// <summary>
         /// This method does nothing.
         /// </summary>
@@ -46,7 +42,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             if (!IsRequester())
             {
-                Find(BoardName).SwitchCity(CityName);
+                FindWidgetsManager(BoardName).SwitchCity(CityName);
             }
         }
     }

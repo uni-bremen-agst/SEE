@@ -9,7 +9,6 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
     /// </summary>
     internal class PercentageController : WidgetController
     {
-
         /// <summary>
         /// The image that goes around the widget. We will only display a certain percentage of this that correlates to
         /// the percentage of the metric value.

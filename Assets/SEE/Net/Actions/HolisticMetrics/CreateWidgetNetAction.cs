@@ -1,6 +1,4 @@
 using SEE.Game.HolisticMetrics;
-using SEE.Game.HolisticMetrics.Components;
-using UnityEngine;
 
 namespace SEE.Net.Actions.HolisticMetrics
 {
@@ -29,7 +27,7 @@ namespace SEE.Net.Actions.HolisticMetrics
             BoardName = boardName;
             WidgetConfig = widgetConfig;
         }
-        
+
         /// <summary>
         /// This method does nothing.
         /// </summary>
@@ -45,9 +43,8 @@ namespace SEE.Net.Actions.HolisticMetrics
         {
             if (!IsRequester())
             {
-                Find(BoardName).Create(WidgetConfig);
+                FindWidgetsManager(BoardName).Create(WidgetConfig);
             }
-            
         }
     }
 }
