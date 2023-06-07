@@ -82,9 +82,6 @@ namespace SEE.Controls.Actions
 
         /// <summary
         /// See <see cref="ReversibleAction.Update"/>.
-        ///
-        /// Note: The action is finalized only if the user selects anything except the
-        /// <see cref="gameNodeSelected"/> or any of the scaling gizmos.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
