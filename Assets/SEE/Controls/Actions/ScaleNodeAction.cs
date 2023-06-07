@@ -117,7 +117,7 @@ namespace SEE.Controls.Actions
             }
 
             /// <summary>
-            /// Broadcasts the <paramref name="localScale"/> to call clients.
+            /// Broadcasts the <paramref name="localScale"/> to all clients.
             /// </summary>
             /// <param name="localScale">local scale to be broadcast</param>
             protected override void BroadcastState(Vector3 localScale)
@@ -156,10 +156,13 @@ namespace SEE.Controls.Actions
         #region Gizmo
 
         /// <summary>
-        /// Manages the gizmo to manipulate the selected game node.
+        /// Manages the gizmo to scale the selected game node.
         /// </summary>
         private class ScaleGizmo : Gizmo
         {
+            /// <summary>
+            /// Constructor setting up <see cref="objectTransformGizmo"/>.
+            /// </summary>
             public ScaleGizmo()
             {
                 objectTransformationGizmo = RTGizmosEngine.Get.CreateObjectScaleGizmo();

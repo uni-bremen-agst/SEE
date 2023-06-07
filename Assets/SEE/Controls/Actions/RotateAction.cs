@@ -62,7 +62,14 @@ namespace SEE.Controls.Actions
         /// <returns>new instance</returns>
         public override ReversibleAction NewInstance()
         {
-            return CreateReversibleAction();
+            if (gameNodeToBeContinuedInNextAction)
+            {
+                return new RotateAction(gameNodeToBeContinuedInNextAction);
+            }
+            else
+            {
+                return CreateReversibleAction();
+            }
         }
 
         /// <summary>
@@ -108,7 +115,7 @@ namespace SEE.Controls.Actions
             }
 
             /// <summary>
-            /// Broadcasts the <paramref name="rotation"/> to call clients.
+            /// Broadcasts the <paramref name="rotation"/> to all clients.
             /// </summary>
             /// <param name="rotation">rotation to be broadcast</param>
             protected override void BroadcastState(Quaternion rotation)
@@ -147,10 +154,13 @@ namespace SEE.Controls.Actions
         #region Gizmo
 
         /// <summary>
-        /// Manages the gizmo to manipulate the selected game node.
+        /// Manages the gizmo to rotate the selected game node.
         /// </summary>
         private class RotateGizmo : Gizmo
         {
+            /// <summary>
+            /// Constructor setting up <see cref="objectTransformGizmo"/>.
+            /// </summary>
             public RotateGizmo()
             {
                 objectTransformationGizmo = RTGizmosEngine.Get.CreateObjectRotationGizmo();
