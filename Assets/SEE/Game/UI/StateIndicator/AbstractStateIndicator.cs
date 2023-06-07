@@ -3,9 +3,6 @@ using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-#if INCLUDE_STEAM_VR
-using Valve.VR.InteractionSystem;
-#endif
 
 namespace SEE.Game.UI.StateIndicator
 {
@@ -51,13 +48,12 @@ namespace SEE.Game.UI.StateIndicator
         /// Background image (color) of the mode panel.
         /// </summary>
         protected Image ModePanelImage;
-        
+
         /// <summary>
         /// The color of the state indicator after it has been instantiated.
         /// </summary>
         protected Color StartColor = Color.gray.WithAlpha(0.5f);
 
-  
         /// <summary>
         /// The text of the state indicator after it has been instantiated.
         /// </summary>

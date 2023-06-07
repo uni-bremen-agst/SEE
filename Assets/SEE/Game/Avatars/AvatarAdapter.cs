@@ -3,19 +3,19 @@ using System.Collections;
 using CrazyMinnow.SALSA;
 using Dissonance;
 using Dissonance.Audio.Playback;
-using RootMotion.FinalIK;
 using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
-using SEE.XR;
 using Unity.Netcode;
 using UnityEngine;
+
+#if ENABLE_VR
 using UnityEngine.Assertions;
-#if INCLUDE_STEAM_VR
-using Valve.VR.InteractionSystem;
-#endif
+using SEE.XR;
 using ViveSR.anipal;
 using ViveSR.anipal.Lip;
+using RootMotion.FinalIK;
+#endif
 
 namespace SEE.Game.Avatars
 {
@@ -28,13 +28,6 @@ namespace SEE.Game.Avatars
     /// </summary>
     internal class AvatarAdapter : NetworkBehaviour
     {
-        [Header("VR specific settings (relevant only for VR players)")]
-        [Tooltip("Whether the VR controllers should be hidden.")]
-        public bool HideVRControllers = false;
-
-        [Tooltip("Whether hints should be shown for controllers.")]
-        public bool ShowControllerHints = false;
-
         /// <summary>
         /// The distance from the top of the player's height to his eyes.
         /// </summary>
@@ -61,9 +54,7 @@ namespace SEE.Game.Avatars
                         PrepareLocalPlayerForDesktop();
                         break;
                     case PlayerInputType.VRPlayer:
-#if INCLUDE_STEAM_VR
                         PrepareLocalPlayerForXR();
-#endif
                         break;
                     default:
                         throw new NotImplementedException($"Unhandled case {SceneSettings.InputType}");
@@ -209,7 +200,39 @@ namespace SEE.Game.Avatars
                 return gameObject.transform.lossyScale.y;
             }
         }
-#if INCLUDE_STEAM_VR
+
+        /// <summary>
+        /// Prepares the avatar for a desktop environment by adding a DesktopPlayer prefab
+        /// as a child and a <see cref="DesktopPlayerMovement"/> component.
+        /// </summary>
+        private void PrepareLocalPlayerForDesktop()
+        {
+            // Set up the desktop player at the top of the player just in front of it.
+            GameObject desktopPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/DesktopPlayer");
+            desktopPlayer.name = PlayerInputType.DesktopPlayer.ToString();
+            desktopPlayer.transform.SetParent(gameObject.transform);
+            desktopPlayer.transform.localPosition =
+                new Vector3(0, DesktopAvatarHeight() - PlayerTopToEyeDistance, 0.3f);
+            desktopPlayer.transform.localRotation = Quaternion.Euler(30, 0, 0);
+
+            if (gameObject.TryGetComponentOrLog(out AvatarAimingSystem aaSystem))
+            {
+                // Note: the two components LookAtIK and AimIK are managed by AvatarAimingSystem;
+                // we do not turn these on here.
+                aaSystem.enabled = true;
+            }
+
+            gameObject.AddComponent<DesktopPlayerMovement>();
+        }
+
+        #region ENABLE_VR
+
+#if !ENABLE_VR
+        private void PrepareLocalPlayerForXR()
+        {
+            // intentionally left blank
+        }
+#else
         /// <summary>
         /// Prepares the avatar for a virtual reality environment by adding a VRPlayer prefab
         /// as a child and an <see cref="XRPlayerMovement"/> component.
@@ -218,7 +241,7 @@ namespace SEE.Game.Avatars
         {
             StartCoroutine(StartXRCoroutine());
         }
-#endif
+
         /// <summary>
         /// The path to the animator controller that should be used when the avatar
         /// is set up for VR. This controller will be assigned to the UMA avatar
@@ -236,7 +259,7 @@ namespace SEE.Game.Avatars
         /// representing the head for VRIK.
         /// </summary>
         private const string VRPlayerHeadForVRIK = "Camera Offset/Main Camera/Head";
-#if INCLUDE_STEAM_VR
+
         /// <summary>
         /// The composite name of the child within <see cref="VRPlayerRigPrefab"/>
         /// representing the left hand for VRIK.
@@ -248,8 +271,7 @@ namespace SEE.Game.Avatars
         /// representing the right hand for VRIK.
         /// </summary>
         private const string VRPlayerRightHandForVRIK = XRCameraRigManager.RightControllerName + "/RightHand";
-#endif
-#if INCLUDE_STEAM_VR
+
         public IEnumerator StartXRCoroutine()
         {
 
@@ -282,9 +304,9 @@ namespace SEE.Game.Avatars
             VRIKActions.AddComponents(gameObject, IsLocalPlayer);
             VRIKActions.TurnOffAvatarAimingSystem(gameObject);
             VRIKActions.ReplaceAnimator(gameObject, AnimatorForVRIK);
-#if INCLUDE_STEAM_VR
+
             SetupVRIK();
-#endif
+
             PrepareLipTracker();
             InitializeVrikRemote();
 
@@ -307,21 +329,6 @@ namespace SEE.Game.Avatars
                 }
                 else
                 {
-                    // Create Teleporting game object
-                    PrefabInstantiator.InstantiatePrefab("Prefabs/Players/Teleporting").name = "Teleporting";
-                    {
-                        // Attach TeleportArea to floor
-                        // The TeleportArea replaces the material of the game object it is attached to
-                        // into a transparent material. This way the game object becomes invisible.
-                        // For this reason, we will clone the floor and move the cloned floor slightly above
-                        // its origin and then attach the TeleportArea to the cloned floor.
-                        Vector3 position = ground.transform.position;
-                        position.y += 0.01f;
-                        GameObject clonedFloor = Instantiate(ground, position, ground.transform.rotation);
-#if INCLUDE_STEAM_VR
-                        clonedFloor.AddComponent<TeleportArea>();
-#endif
-                    }
                     // FIXME: This needs to work again for our metric charts.
                     //{
                     //    // Assign the VR camera to the chart manager so that charts can move along with the camera.
@@ -353,11 +360,11 @@ namespace SEE.Game.Avatars
             {
                 gameObject.AddComponent<VRIKSynchronizer>();
             }
-#if INCLUDE_STEAM_VR
+
             // Set up FinalIK's VR IK on the avatar.
             void SetupVRIK()
             {
-                
+
                 VRIK vrIK = gameObject.AddOrGetComponent<VRIK>();
 
                 vrIK.solver.spine.headTarget = rig.transform.Find(VRPlayerHeadForVRIK);
@@ -367,7 +374,6 @@ namespace SEE.Game.Avatars
                 vrIK.solver.rightArm.target = rig.transform.Find(VRPlayerRightHandForVRIK);
                 Assert.IsNotNull(vrIK.solver.rightArm.target);
             }
-#endif
 
             // Prepare HTC Facial Tracker
             void PrepareLipTracker()
@@ -426,88 +432,6 @@ namespace SEE.Game.Avatars
             }
         }
 #endif
-
-#if INCLUDE_STEAM_VR
-        /// <summary>
-        /// Turns off VR controller hints if <see cref="ShowControllerHints"/> is <c>false</c>.
-        /// </summary>
-        private void TurnOffControllerHintsIfRequested()
-        {
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer && !ShowControllerHints)
-            {
-                if (Player.instance != null)
-                {
-                    foreach (Hand hand in Player.instance.hands)
-                    {
-                        ControllerButtonHints.HideAllButtonHints(hand);
-                        ControllerButtonHints.HideAllTextHints(hand);
-                    }
-                }
-                else
-                {
-                    Debug.LogError($"{nameof(Player)}.instance is null. Is VR running?\n");
-                }
-
-                if (Teleport.instance != null)
-                {
-                    Teleport.instance.CancelTeleportHint();
-                }
-                else
-                {
-                    Debug.LogWarning($"{nameof(Teleport)}.instance is null. Is there no teleport area in the scene?\n");
-                }
-            }
-        }
-#endif
-
-        /// <summary>
-        /// Prepares the avatar for a desktop environment by adding a DesktopPlayer prefab
-        /// as a child and a <see cref="DesktopPlayerMovement"/> component.
-        /// </summary>
-        private void PrepareLocalPlayerForDesktop()
-        {
-            // Set up the desktop player at the top of the player just in front of it.
-            GameObject desktopPlayer = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/DesktopPlayer");
-            desktopPlayer.name = PlayerInputType.DesktopPlayer.ToString();
-            desktopPlayer.transform.SetParent(gameObject.transform);
-            desktopPlayer.transform.localPosition =
-                new Vector3(0, DesktopAvatarHeight() - PlayerTopToEyeDistance, 0.3f);
-            desktopPlayer.transform.localRotation = Quaternion.Euler(30, 0, 0);
-
-            if (gameObject.TryGetComponentOrLog(out AvatarAimingSystem aaSystem))
-            {
-                // Note: the two components LookAtIK and AimIK are managed by AvatarAimingSystem;
-                // we do not turn these on here.
-                aaSystem.enabled = true;
-            }
-
-            gameObject.AddComponent<DesktopPlayerMovement>();
-        }
-
-        /// <summary>
-        /// If and only if HideControllers is true (when a VR player is playing), the VR controllers
-        /// will not be visualized together with the hands of the player. Apparently, this
-        /// hiding/showing must be run at each frame and, hence, we need to put this code into
-        /// an Update() method.
-        /// </summary>
-        //private void Update()
-        //{
-        //    if (SceneSettings.InputType == PlayerInputType.VRPlayer && Player.instance != null)
-        //    {
-        //        foreach (Hand hand in Player.instance.hands)
-        //        {
-        //            if (HideVRControllers)
-        //            {
-        //                hand.HideController();
-        //                hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithoutController);
-        //            }
-        //            else
-        //            {
-        //                hand.ShowController();
-        //                hand.SetSkeletonRangeOfMotion(EVRSkeletalMotionRange.WithController);
-        //            }
-        //        }
-        //    }
-        //}
+        #endregion ENABLE_VR
     }
 }

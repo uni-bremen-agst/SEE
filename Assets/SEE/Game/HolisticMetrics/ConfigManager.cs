@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using System.IO;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
-using SEE.Game.HolisticMetrics.Components;
 using SEE.Game.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
+using System;
 
 namespace SEE.Game.HolisticMetrics
 {
@@ -59,14 +59,22 @@ namespace SEE.Game.HolisticMetrics
         /// <returns>The GameObject that represents the metrics displays</returns>
         internal static BoardConfig LoadBoard(FilePath path)
         {
-            using ConfigReader stream = new(path.Path);
-            Dictionary<string, object> attributes = stream.Read();
-            BoardConfig config = new BoardConfig();
-            if (!config.Restore(attributes))
+            BoardConfig config = new();
+            try
             {
-                ShowNotification.Warn(
-                    "Error loading board",
-                    "Not all board attributes were loaded correctly");
+                using ConfigReader stream = new(path.Path);
+                Dictionary<string, object> attributes = stream.Read();
+                if (!config.Restore(attributes))
+                {
+                    ShowNotification.Warn(
+                        "Error loading board",
+                        "Not all board attributes were loaded correctly.");
+                }
+            }
+            catch (Exception e)
+            {
+                ShowNotification.Error("Error loading board", $"Could not load settings from {path.Path}: {e.Message}");
+                throw e;
             }
             return config;
         }
@@ -95,6 +103,17 @@ namespace SEE.Game.HolisticMetrics
             BoardConfig config = GetBoardConfig(widgetsManager);
             config.Save(writer);
             Debug.Log($"Saved metric-board configuration to file {filePath}.\n");
+        }
+
+        /// <summary>
+        /// Deletes the <see cref="BoardConfig"/> file with the given <paramref name="filename"/>.
+        /// </summary>
+        /// <param name="filename">The name of the file to delete</param>
+        internal static void DeleteBoard(string filename)
+        {
+            EnsureBoardsDirectoryExists();
+            string filePath = metricsBoardsPath + filename + Filenames.ConfigExtension;
+            File.Delete(filePath);
         }
 
         /// <summary>

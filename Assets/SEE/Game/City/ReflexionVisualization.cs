@@ -47,7 +47,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Percentage by which the starting color of an edge differs to its end color.
         /// </summary>
-        private const float EDGE_GRADIENT_FACTOR = 1.0f;
+        private const float EDGE_GRADIENT_FACTOR = 0.8f;
 
         /// <summary>
         /// States in which an edge shall be hidden.
@@ -312,7 +312,7 @@ namespace SEE.Game.City
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge);
                 EdgeOperator edgeOperator = edge.AddOrGetComponent<EdgeOperator>();
                 edgeOperator.ShowOrHide(!edgeChange.Edge.HasToggle(Edge.IsHiddenToggle), City.EdgeLayoutSettings.AnimationKind, ANIMATION_DURATION);
-                edgeOperator.ChangeColorsTo(newColors.start, newColors.end, ANIMATION_DURATION, false);
+                edgeOperator.ChangeColorsTo((newColors.start, newColors.end), ANIMATION_DURATION, false);
 
                 if (!PreviousEdgeStates.TryGetValue(edgeChange.Edge.ID, out State previous) || previous != edgeChange.NewState)
                 {

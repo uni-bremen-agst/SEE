@@ -150,7 +150,7 @@ namespace SEE.Game.Avatars
         {
             if (string.IsNullOrEmpty(OpenAiApiKey))
             {
-                Debug.LogError("OpenAI API key is not defined.\n");
+                Debug.LogWarning("OpenAI API key is not defined.\n");
                 return false;
             }
 

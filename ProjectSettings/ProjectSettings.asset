@@ -3,7 +3,7 @@
 --- !u!129 &1
 PlayerSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 24
+  serializedVersion: 26
   productGUID: 6b64409e355ce74418b254810b5b0f06
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
@@ -50,14 +50,15 @@ PlayerSettings:
   defaultScreenHeightWeb: 600
   m_StereoRenderingPath: 0
   m_ActiveColorSpace: 1
+  m_SpriteBatchVertexThreshold: 300
   m_MTRendering: 1
   mipStripping: 0
   numberOfMipsStripped: 0
+  numberOfMipsStrippedPerMipmapLimitGroup: {}
   m_StackTraceTypes: 010000000100000001000000010000000100000001000000
   iosShowActivityIndicatorOnLoading: -1
   androidShowActivityIndicatorOnLoading: -1
   iosUseCustomAppBackgroundBehavior: 0
-  iosAllowHTTPDownload: 1
   allowedAutorotateToPortrait: 1
   allowedAutorotateToPortraitUpsideDown: 1
   allowedAutorotateToLandscapeRight: 1
@@ -121,8 +122,11 @@ PlayerSettings:
   switchNVNShaderPoolsGranularity: 33554432
   switchNVNDefaultPoolsGranularity: 16777216
   switchNVNOtherPoolsGranularity: 16777216
+  switchGpuScratchPoolGranularity: 2097152
+  switchAllowGpuScratchShrinking: 0
   switchNVNMaxPublicTextureIDCount: 0
   switchNVNMaxPublicSamplerIDCount: 0
+  switchNVNGraphicsFirmwareMemory: 32
   stadiaPresentMode: 0
   stadiaTargetFramerate: 0
   vulkanNumSwapchainBuffers: 3
@@ -130,19 +134,11 @@ PlayerSettings:
   vulkanEnablePreTransform: 0
   vulkanEnableLateAcquireNextImage: 0
   vulkanEnableCommandBufferRecycling: 1
-  m_SupportedAspectRatios:
-    4:3: 1
-    5:4: 1
-    16:10: 1
-    16:9: 1
-    Others: 1
+  loadStoreDebugModeEnabled: 0
   bundleVersion: 0.9
   preloadedAssets:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 3133245131686726631, guid: ab503467b672b944faf19db21f3c55cc, type: 2}
+  - {fileID: 2489328711382419796, guid: 1fc620f3d43365f47a0ae74f688e5a96, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
   m_HolographicPauseOnTrackingLoss: 1
@@ -154,7 +150,7 @@ PlayerSettings:
   enableFrameTimingStats: 0
   enableOpenGLProfilerGPURecorders: 1
   useHDRDisplay: 0
-  D3DHDRBitDepth: 0
+  hdrBitDepth: 0
   m_ColorGamuts: 00000000
   targetPixelDensity: 30
   resolutionScalingMode: 0
@@ -186,12 +182,13 @@ PlayerSettings:
   APKExpansionFiles: 0
   keepLoadedShadersAlive: 0
   StripUnusedMeshComponents: 1
+  strictShaderVariantMatching: 0
   VertexChannelCompressionMask: 214
   iPhoneSdkVersion: 988
-  iOSTargetOSVersionString: 11.0
+  iOSTargetOSVersionString: 12.0
   tvOSSdkVersion: 0
   tvOSRequireExtendedGameController: 0
-  tvOSTargetOSVersionString: 11.0
+  tvOSTargetOSVersionString: 12.0
   uIPrerenderedIcon: 0
   uIRequiresPersistentWiFi: 0
   uIRequiresFullScreen: 1
@@ -255,6 +252,7 @@ PlayerSettings:
   useCustomLauncherGradleManifest: 0
   useCustomBaseGradleTemplate: 0
   useCustomGradlePropertiesTemplate: 0
+  useCustomGradleSettingsTemplate: 0
   useCustomProguardFile: 0
   AndroidTargetArchitectures: 7
   AndroidTargetDevices: 0
@@ -262,6 +260,7 @@ PlayerSettings:
   androidSplashScreen: {fileID: 0}
   AndroidKeystoreName: 
   AndroidKeyaliasName: 
+  AndroidEnableArmv9SecurityFeatures: 0
   AndroidBuildApkPerCpuArchitecture: 0
   AndroidTVCompatibility: 1
   AndroidIsGame: 1
@@ -275,7 +274,6 @@ PlayerSettings:
     banner: {fileID: 0}
   androidGamepadSupportLevel: 0
   chromeosInputEmulation: 1
-  AndroidMinifyWithR8: 0
   AndroidMinifyRelease: 0
   AndroidMinifyDebug: 0
   AndroidValidateAppBundleSize: 1
@@ -390,7 +388,9 @@ PlayerSettings:
     m_EncodingQuality: 1
   - m_BuildTarget: PS4
     m_EncodingQuality: 1
+  m_BuildTargetGroupHDRCubemapEncodingQuality: []
   m_BuildTargetGroupLightmapSettings: []
+  m_BuildTargetGroupLoadStoreDebugModeSettings: []
   m_BuildTargetNormalMapEncoding: []
   m_BuildTargetDefaultTextureCompressionFormat: []
   playModeTestRunnerEnabled: 0
@@ -402,7 +402,8 @@ PlayerSettings:
   cameraUsageDescription: Camera
   locationUsageDescription: 
   microphoneUsageDescription: Microphone is needed for Voice Chat
-  bluetoothUsageDescription: Bluetooth is nedded for SEE to run
+  bluetoothUsageDescription: Bluetooth is nedded by Unity for an unknown reason
+  macOSTargetOSVersion: 10.13.0
   switchNMETAOverride: 
   switchNetLibKey: 
   switchSocketMemoryPoolSize: 6144
@@ -414,6 +415,7 @@ PlayerSettings:
   switchLTOSetting: 0
   switchApplicationID: 0x01004b9000490000
   switchNSODependencies: 
+  switchCompilerFlags: 
   switchTitleNames_0: 
   switchTitleNames_1: 
   switchTitleNames_2: 
@@ -630,6 +632,7 @@ PlayerSettings:
   webGLMemorySize: 256
   webGLExceptionSupport: 1
   webGLNameFilesAsHashes: 0
+  webGLShowDiagnostics: 0
   webGLDataCaching: 0
   webGLDebugSymbols: 0
   webGLEmscriptenArgs: 
@@ -642,6 +645,12 @@ PlayerSettings:
   webGLLinkerTarget: 1
   webGLThreadsSupport: 0
   webGLDecompressionFallback: 0
+  webGLInitialMemorySize: 32
+  webGLMaximumMemorySize: 2048
+  webGLMemoryGrowthMode: 2
+  webGLMemoryLinearGrowthStep: 16
+  webGLMemoryGeometricGrowthStep: 0.2
+  webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
     1: CMS_SALSA;UNITY_POST_PROCESSING_STACK_V2;CT_PROC;UNITY_CCU;CT_RTV;AMPLIFY_SHADER_EDITOR;ODIN_INSPECTOR;ODIN_INSPECTOR_3;CURVEDUI_STEAMVR_INT;CURVEDUI_TMP;CURVEDUI_UNITY_XR;ODIN_INSPECTOR_3_1;ODIN_VALIDATOR;ODIN_VALIDATOR_3_1
@@ -658,17 +667,20 @@ PlayerSettings:
     33: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
     4: CT_PROC;CT_RTV
     7: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
-    Android: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    Android: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV;USE_INPUT_SYSTEM_POSE_CONTROL
     EmbeddedLinux: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    GameCoreScarlett: CT_RTV;UNITY_POST_PROCESSING_STACK_V2;CT_PROC
     GameCoreXboxOne: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    LinuxHeadlessSimulation: CT_RTV;UNITY_POST_PROCESSING_STACK_V2;CT_PROC
     Lumin: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
     Nintendo Switch: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
     PS4: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
     PS5: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    QNX: CT_RTV;UNITY_POST_PROCESSING_STACK_V2;CT_PROC
     Stadia: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
-    Standalone: CMS_SALSA;UNITY_POST_PROCESSING_STACK_V2;CT_PROC;UNITY_CCU;CT_RTV;ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ODIN_VALIDATOR;ODIN_VALIDATOR_3_1;AMPLIFY_SHADER_EDITOR;CURVEDUI_STEAMVR_INT;CURVEDUI_TMP;CURVEDUI_UNITY_XR
-    WebGL: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
-    Windows Store Apps: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
+    Standalone: CMS_SALSA;UNITY_POST_PROCESSING_STACK_V2;CT_PROC;UNITY_CCU;CT_RTV;ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ODIN_VALIDATOR;ODIN_VALIDATOR_3_1;AMPLIFY_SHADER_EDITOR;CURVEDUI_STEAMVR_INT;CURVEDUI_TMP;CURVEDUI_UNITY_XR;USE_INPUT_SYSTEM_POSE_CONTROL
+    WebGL: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV;CMS_SALSA;UNITY_CCU;ODIN_INSPECTOR;ODIN_INSPECTOR_3;ODIN_INSPECTOR_3_1;ODIN_VALIDATOR;ODIN_VALIDATOR_3_1;AMPLIFY_SHADER_EDITOR;CURVEDUI_STEAMVR_INT;CURVEDUI_TMP;CURVEDUI_UNITY_XR
+    Windows Store Apps: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV;USE_INPUT_SYSTEM_POSE_CONTROL
     XboxOne: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
     iPhone: CT_PROC;CT_RTV
     tvOS: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
@@ -683,17 +695,16 @@ PlayerSettings:
     Windows Store Apps: 2
     iPhone: 1
   il2cppCompilerConfiguration: {}
+  il2cppCodeGeneration: {}
   managedStrippingLevel: {}
   incrementalIl2cppBuild: {}
   suppressCommonWarnings: 1
   allowUnsafeCode: 0
   useDeterministicCompilation: 1
-  enableRoslynAnalyzers: 1
   selectedPlatform: 0
   additionalIl2CppArgs: 
   scriptingRuntimeVersion: 1
   gcIncremental: 0
-  assemblyVersionValidation: 1
   gcWBarrierValidation: 0
   apiCompatibilityLevelPerPlatform: {}
   m_RenderingPath: 1
@@ -765,6 +776,11 @@ PlayerSettings:
   luminVersion:
     m_VersionCode: 1
     m_VersionName: 
+  hmiPlayerDataPath: 
+  hmiForceSRGBBlit: 1
+  embeddedLinuxEnableGamepadInput: 1
+  hmiLogStartupTiming: 0
+  hmiCpuConfiguration: 
   apiCompatibilityLevel: 6
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
@@ -775,6 +791,7 @@ PlayerSettings:
   organizationId: 
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 1
-  playerDataPath: 
-  forceSRGBBlit: 1
+  hmiLoadingImage: {fileID: 0}
+  platformRequiresReadableAssets: 0
   virtualTexturingSupportEnabled: 0
+  insecureHttpOption: 0

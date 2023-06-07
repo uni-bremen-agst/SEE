@@ -6,9 +6,7 @@ using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
-#if INCLUDE_STEAM_VR
-using Valve.VR.InteractionSystem;
-#endif
+
 
 namespace SEE.Game.Operator
 {
