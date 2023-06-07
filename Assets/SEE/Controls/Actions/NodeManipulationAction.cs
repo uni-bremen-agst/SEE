@@ -88,7 +88,7 @@ namespace SEE.Controls.Actions
         {
             if (gizmo.IsHovered())
             {
-                // Scaling in progress
+                // Transformation via the gizmo is in progress.
                 if (gameNodeSelected && HasChanges())
                 {
                     currentState = ReversibleAction.Progress.InProgress;
@@ -101,7 +101,6 @@ namespace SEE.Controls.Actions
                 if (Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.Node)
                 {
                     // An object different from a graph node was selected.
-
                     if (gameNodeSelected && HasChanges())
                     {
                         // An object to be manipulated was selected already and it was changed.
@@ -127,7 +126,6 @@ namespace SEE.Controls.Actions
                         if (gameNodeSelected != raycastHit.collider.gameObject)
                         {
                             // The newly and previously selected nodes are different.
-
                             // Have we had any changes yet? If not, we assume the user wants
                             // to manipulate the newly game node instead.
                             if (!HasChanges())
@@ -159,9 +157,8 @@ namespace SEE.Controls.Actions
                     }
                 }
             }
-            else if (SEEInput.Drag() || SEEInput.ToggleMenu() || SEEInput.Cancel())
+            else if (SEEInput.ToggleMenu() || SEEInput.Cancel())
             {
-                // TODO: Should we do really react to these interactions?
                 FinalizeAction();
                 return true;
             }
@@ -171,7 +168,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Starts the manipulation with the given <paramref name="gameNode"/> considered
         /// as the <see cref="gameNodeSelected"/>. Saves its initial state for later <see cref="Undo"/>
-        /// and enables the gizmo.
+        /// and enables the gizmo. Plays a sound as a feedback to the user.
         /// </summary>
         /// <param name="gameNode">game node to start the manipulation with</param>
         protected void StartAction(GameObject gameNode)
@@ -269,7 +266,7 @@ namespace SEE.Controls.Actions
             /// Transforms the object using <see cref="nodeOperator"/> to the given
             /// <paramref name="value"/>. Broadcasts this state to all clients.
             /// </summary>
-            /// <param name="value"></param>
+            /// <param name="value">the value the object should be transformed to</param>
             protected virtual void Transform(T value)
             {
                 BroadcastState(value);
@@ -283,6 +280,7 @@ namespace SEE.Controls.Actions
 
             /// <summary>
             /// The local scale at the point in time when the memento was created.
+            /// Required for <see cref="Undo"/>.
             /// </summary>
             public T InitialState;
 
@@ -294,6 +292,7 @@ namespace SEE.Controls.Actions
 
             /// <summary>
             /// The <see cref="NodeOperator"/> of the game object to be transformed.
+            /// It will be used for the transformation.
             /// </summary>
             protected NodeOperator nodeOperator;
         }
@@ -307,6 +306,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected Gizmo gizmo;
 
+        /// <summary>
+        /// Common superclass to manage the RTG gizmos for transforming the object.
+        /// </summary>
         protected abstract class Gizmo
         {
             /// <summary>
