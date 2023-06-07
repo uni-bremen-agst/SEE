@@ -3,6 +3,7 @@ using SEE.Audio;
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Utils;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -13,6 +14,22 @@ namespace SEE.Controls.Actions
     /// <typeparam name="T">type of the state that is transformed</typeparam>
     internal abstract class NodeManipulationAction<T> : AbstractPlayerAction
     {
+        #region ReversibleAction Overrides
+
+        /// <summary>
+        /// Returns all IDs of gameObjects manipulated by this action.
+        /// </summary>
+        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        public override HashSet<string> GetChangedObjects()
+        {
+            return gameNodeSelected == null ? new HashSet<string>() : new HashSet<string>()
+            {
+                gameNodeSelected.name
+            };
+        }
+
+        #endregion ReversibleAction Overrides
+
         #region Undo Redo
 
         /// <summary>
