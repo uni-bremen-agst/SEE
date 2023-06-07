@@ -113,7 +113,7 @@ namespace SEE.Controls.Actions
             /// <param name="rotation">rotation to be broadcast</param>
             protected override void BroadcastState(Quaternion rotation)
             {
-                new RotateNetAction(nodeOperator.name, rotation).Execute();
+                new RotateNodeNetAction(nodeOperator.name, rotation).Execute();
             }
         }
 

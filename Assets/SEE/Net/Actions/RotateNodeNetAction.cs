@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using SEE.Game.Operator;
+﻿using SEE.Game.Operator;
 using SEE.GO;
 using UnityEngine;
 
@@ -12,27 +10,27 @@ namespace SEE.Net.Actions
     internal class RotateNodeNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The unique names of the gameObjects of a node that need to be rotated.
+        /// The unique name of the game object that needs to be rotated.
         /// </summary>
-        public List<string> GameObjectIDs;
+        public string GameObjectID;
 
         /// <summary>
         /// The rotation of the game object.
         /// </summary>
-        public List<Quaternion> RotationList;
+        public Quaternion Rotation;
 
         /// <summary>
         /// Constructor.
         /// Assumption: The <paramref name="nodes"/> have their final rotation.
         /// These rotations will be broadcasted.
         /// </summary>
-        /// <param name="nodes">the nodes whose rotations chould be synchronized
-        /// over the network</param>
-        public RotateNodeNetAction(IEnumerable<GameObject> nodes)
+        /// <param name="ID">the unique ID of the game object to be rotated</param>
+        /// <param name="rotation">the rotation by which to rotate the game object</param>
+
+        public RotateNodeNetAction(string ID, Quaternion rotation)
         {
-            IList<GameObject> gameObjects = nodes.ToList();
-            GameObjectIDs = gameObjects.Select(x => x.name).ToList();
-            RotationList = gameObjects.Select(x => x.transform.rotation).ToList();
+            GameObjectID = ID;
+            Rotation = rotation;
         }
 
         /// <summary>
@@ -42,13 +40,9 @@ namespace SEE.Net.Actions
         {
             if (!IsRequester())
             {
-                int index = 0;
-                foreach (string id in GameObjectIDs)
-                {
-                    GameObject gameObject = Find(id);
-                    NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
-                    nodeOperator.RotateTo(RotationList[index++], 0);
-                }
+                GameObject gameObject = Find(GameObjectID);
+                NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+                nodeOperator.RotateTo(Rotation, 0);
             }
         }
 
