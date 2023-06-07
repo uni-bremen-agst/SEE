@@ -1,8 +1,6 @@
 using UnityEngine;
 using RTG;
-using UnityEngine.SceneManagement;
 using SEE.Utils;
-using System;
 using SEE.GO;
 
 namespace SEE.Game
@@ -15,29 +13,45 @@ namespace SEE.Game
     /// named <see cref="RTGAppName"/> managing the RTG gizmos. That game object
     /// has a <see cref="RTGApp"/> component attachted to it and a child named
     /// <see cref="RTGFocusCameraName"/> with a <see cref="RTFocusCamera"/> component
-    /// attached to it.
+    /// attached to it. The child <see cref="RTGApp"/> is assumed to be set inactive initially.
+    /// This component will set it active and set the current camera RTG requires. Because
+    /// the camera becomes available only later at runtime, we need to set it here.
     /// </summary>
     public class RTGInitializer : MonoBehaviour
     {
-
+        /// <summary>
+        /// Name of the game object representing RTG. This object will be added if
+        /// a developer selectes the menu entry
+        /// "Tools/Runtime Configuration Gizmo/Initialize" in the Unity editor.
+        /// </summary>
         private const string RTGAppName = "RTGApp";
 
+        /// <summary>
+        /// The name of game object that is an immediate child of <see cref="RTGApp"/>
+        /// holding a component <see cref="RTFocusCamera"/> requiring the camera
+        /// to be set.
+        /// </summary>
         private const string RTGFocusCameraName = "RTFocusCamera";
 
+        /// <summary>
+        /// Sets the <see cref="RTFocusCamera"/> to the <see cref="MainCamera"/>.
+        /// If the main camera is available, RTG will be inialized.
+        /// The setting and initialization may be postponed until that camera is available.
+
+        /// </summary>
         private void Awake()
         {
-            Camera camera = MainCamera.GetCameraNowOrLater(OnCameraAvailable);
+            Camera camera = MainCamera.GetCameraNowOrLater(Initialize);
             if (camera != null)
             {
                 Initialize(camera);
             }
         }
 
-        private void OnCameraAvailable(Camera camera)
-        {
-            Initialize(camera);
-        }
-
+        /// <summary>
+        /// Sets the <see cref="RTFocusCamera"/> to the <paramref name="camera"/> and
+        /// activates <see cref="RTGApp"/>.
+        /// </summary>
         private void Initialize(Camera camera)
         {
             UnityEngine.Assertions.Assert.IsNotNull(camera);
@@ -61,7 +75,6 @@ namespace SEE.Game
                 focusCamera.Settings.CanProcessInput = false;
                 focusCamera.SetTargetCamera(camera);
                 rtgApp.gameObject.SetActive(true);
-                //RTGApp.Initialize();
             }
         }
     }
