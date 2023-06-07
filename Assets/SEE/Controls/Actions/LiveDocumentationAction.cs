@@ -16,12 +16,14 @@ namespace SEE.Controls.Actions
     {
         private WindowSpaceManager spaceManager;
 
-        public static LiveDocumentationAction CreateAction() => new LiveDocumentationAction();
+        public static ReversibleAction CreateAction() => new LiveDocumentationAction();
         public override HashSet<string> GetChangedObjects() => new HashSet<string>();
-        public override ActionStateType GetActionStateType() => ActionStateType.LiveDocumentation;
+        public override ActionStateType GetActionStateType() => ActionStateTypes.LiveDocumentation;
 
         public override ReversibleAction NewInstance() => CreateAction();
 
+        
+        
         private SyncWindowSpaceAction syncAction;
 
         public override void Awake()

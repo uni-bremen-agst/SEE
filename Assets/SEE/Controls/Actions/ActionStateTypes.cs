@@ -110,6 +110,11 @@ namespace SEE.Controls.Actions
               new("Draw", "Draw a line",
                   Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                   DrawAction.CreateReversibleAction);
+            
+            LiveDocumentation =
+                new("LiveDocumentation", "Displays the documentation of a node",
+                Color.magenta.Lighter(), "Materials/ModernUIPack/Document", 
+                LiveDocumentationAction.CreateAction);
 
             // Metric Board actions
             MetricBoard =
@@ -175,6 +180,7 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType Delete;
         public readonly static ActionStateType ShowCode;
         public readonly static ActionStateType Draw;
+        public readonly static ActionStateType LiveDocumentation;
 
         public readonly static ActionStateTypeGroup MetricBoard;
         public readonly static ActionStateType AddBoard;
@@ -185,6 +191,7 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType DeleteWidget;
         public readonly static ActionStateType LoadBoard;
         public readonly static ActionStateType SaveBoard;
+        
 
         #endregion
 

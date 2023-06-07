@@ -76,8 +76,6 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         public string ClassName { get; set; }
 
-        public string NamespaceName { get; set; }
-
         /// <summary>
         /// The base path of the folder containing the source code files
         /// </summary>
@@ -119,12 +117,6 @@ namespace SEE.Game.UI.LiveDocumantation
             return true;
         }
 
-        /// <summary>
-        /// Enables and disables automatic line breaks in the LiveDocumentation window text fields.
-        ///
-        /// TODO: Needs to be implemented
-        /// </summary>
-        public bool AutoLineBreaksEnabled { get; set; } = true;
 
         /// <summary>
         /// The <see cref="LiveDocumentationBuffer"/> which contains the documentation of the class including links
@@ -319,11 +311,7 @@ namespace SEE.Game.UI.LiveDocumantation
             if (Input.GetKeyDown(KeyCode.LeftShift))
             {
                 var marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                //  var m = NodeOfClass.GameObject().GetComponent<Renderer>().materials.First(x => x.name.Contains("SEEMaterial"));
-                // m.color = Color.black;
-                //marker.transform.parent = NodeOfClass.GameObject().transform;
-                //marker.transform.localScale = new Vector3(1f, 1f, 1f);
-                //NodeOfClass.GameObject().transform.localScale += new Vector3(1.3f, 1.3f, 1.3f);
+
                 var newScale = new Vector3(1.5f, 1.5f, 1.5f);
                 var oldScale = NodeOfClass.GameObject().transform.localScale;
                 if (!HighlightAnomation)
@@ -334,8 +322,6 @@ namespace SEE.Game.UI.LiveDocumantation
                             () => { HighlightAnomation = false; }).Restart();
                 }
             }
-            //  Thread.Sleep(1000);
-            // NodeOfClass.GameObject().transform.localScale = oldScale;
         }
 
 
@@ -417,13 +403,62 @@ namespace SEE.Game.UI.LiveDocumantation
             return null;
         }
 
+        private Node TraverseForNamespace(List<string> splitedNamespace, Node currentNode)
+        {
+            string nextNamespaceElement = splitedNamespace.FirstOrDefault();
+            if (nextNamespaceElement == null)
+            {
+                return currentNode;
+            }
+
+            foreach (var node in currentNode.Children())
+            {
+                if (node.SourceName.Equals(nextNamespaceElement))
+                {
+                    return TraverseForNamespace(splitedNamespace.Skip(1).ToList(), node);
+                }
+            }
+
+            return null;
+        }
+
+        private Node TraverseForNamespace(string namespaceName) =>
+            TraverseForNamespace(namespaceName.Split(".").ToList(),
+                NodeOfClass.ItsGraph.Nodes().First(x => x.IsRoot()));
+
+
+        /// <summary>
+        /// This method looks for a Node corresponding to a specific class.
+        /// </summary>
+        /// <param name="className"></param>
+        /// <returns></returns>
+        [CanBeNull]
+        private Node FindNodeOfClass(string className)
+        {
+            // Iterate over each element in the same namespace
+            foreach (var node in NodeOfClass.Parent.Children().Where((x) => x.Type.Equals("Class")))
+            {
+                if (node.SourceName.Equals(className))
+                {
+                    return node;
+                }
+            }
+
+            foreach (var namespaceName in ImportedNamespaces)
+            {
+                Node traversedNamespace = TraverseForNamespace(namespaceName);
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Called when a user has clicked on a link
         /// </summary>
         /// <param name="linkPath"></param>
         private void OnLinkClicked(string linkPath)
         {
-            Node nodeOfLink = FindNodeWithPath(linkPath);
+            Node nodeOfLink = FindNodeOfClass(linkPath);
             if (nodeOfLink == null)
             {
                 ShowNotification.Error("Cant open link", "The class can't be found");
