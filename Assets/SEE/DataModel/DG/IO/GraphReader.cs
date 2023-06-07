@@ -153,7 +153,7 @@ namespace SEE.DataModel.DG.IO
                 }
                 // Under Linux native plugins aren't stored inside a architecture subdir (e.G. x86_64).
                 // They are stored directly in the Plugins dir.
-                // So under Linux we need to skip this subdir.
+                // So under Linux when constructing the path, it is necessary to omit this subdirectory specifically for Linux builds.
                 else
                 {
                     libPath = Path.Combine(Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins"), "liblzma.so");
