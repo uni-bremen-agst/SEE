@@ -17563,6 +17563,97 @@ Transform:
   m_Father: {fileID: 171471903}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1360065019
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1360065023}
+  - component: {fileID: 1360065020}
+  - component: {fileID: 1360065022}
+  - component: {fileID: 1360065021}
+  m_Layer: 0
+  m_Name: UMAContext
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1360065020
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1360065019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5fd2661724b5ab24ea2d5da16a31cb27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1360065021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1360065019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b41d019fd27682f4fa2cadfe47b38e0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fitAtlas: 1
+  textureMerge: {fileID: 0}
+  convertRenderTexture: 0
+  convertMipMaps: 0
+  atlasResolution: 0
+  editorAtlasResolution: 1024
+  AtlasOverflowFitMethod: 1
+  FitPercentageDecrease: 0.5
+  SharperFitTextures: 1
+  defaultOverlayAsset: {fileID: 0}
+  ignoreTag: UMAIgnore
+  SaveAndRestoreIgnoredItems: 0
+  meshCombiner: {fileID: 0}
+  InitialScaleFactor: 2
+  editorInitialScaleFactor: 4
+  IterationCount: 1
+  fastGeneration: 1
+  processAllPending: 0
+  garbageCollectionRate: 8
+  collectGarbage: 0
+  NoCoroutines: 1
+--- !u!114 &1360065022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1360065019}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 10a9eb5309083c449ab447538c71855e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1360065023
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1360065019}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: -1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1369914722
 GameObject:
   m_ObjectHideFlags: 0
@@ -18608,18 +18699,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b41d019fd27682f4fa2cadfe47b38e0a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1459640389 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4081856601081741352, guid: fe29e3c90ef88194184c6f3656db5ec5,
-    type: 3}
-  m_PrefabInstance: {fileID: 1459640387}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5fd2661724b5ab24ea2d5da16a31cb27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1464252960
@@ -24237,7 +24316,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 1
   warnOnNullRefs: 1
-  inspSalsaLinked: 1
+  inspSalsaLinked: 0
   inspStateFoldoutProcessing: 0
   inspStateFoldoutSettings: 0
   inspStateFoldoutEmotes: 0
@@ -27226,7 +27305,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcffb0a198605474c8a4d1c67c1515fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  context: {fileID: 1459640389}
+  context: {fileID: 1360065020}
   umaData: {fileID: 0}
   defaultRendererAsset: {fileID: 0}
   umaRecipe: {fileID: 11400000, guid: 30e5e8eaf5d2b434cbe238cda80a8fac, type: 2}
@@ -28374,7 +28453,7 @@ MonoBehaviour:
       _text: Scale gizmo
     - _tooltip: Allows you to change universal gizmo settings.
       _text: Universal gizmo
-    _activeTabIndex: 0
+    _activeTabIndex: 3
   _settings:
     _canBeDisplayed: 1
     _isExpanded: 1
@@ -29293,7 +29372,7 @@ MonoBehaviour:
     _transformableLayers: -1
   _rotationGizmoSettings3D:
     _canBeDisplayed: 1
-    _isExpanded: 0
+    _isExpanded: 1
     _camRightSnapStep: 15
     _camUpSnapStep: 15
     _sliderSettings:
@@ -29365,8 +29444,8 @@ MonoBehaviour:
       _scaleSensitivity: 1
   _rotationGizmoLookAndFeel3D:
     _canBeDisplayed: 1
-    _isExpanded: 0
-    _isMidCapVisible: 1
+    _isExpanded: 1
+    _isMidCapVisible: 0
     _midCapLookAndFeel:
       _capType: 3
       _fillMode: 0
@@ -29385,12 +29464,12 @@ MonoBehaviour:
       _trPrismWidth: 1
       _trPrismHeight: 1
       _trPrismDepth: 1
-      _isSphereBorderVisible: 1
+      _isSphereBorderVisible: 0
       _sphereBorderColor: {r: 1, g: 1, b: 1, a: 1}
       _numSphereBorderPoints: 100
       _color: {r: 0.3, g: 0.3, b: 0.3, a: 0.12}
       _hoveredColor: {r: 0.3, g: 0.3, b: 0.3, a: 0.12}
-    _axesVis: 010101
+    _axesVis: 000100
     _axesLookAndFeel:
     - _planeType: 2
       _scale: 1
@@ -29402,7 +29481,7 @@ MonoBehaviour:
       _circleRadius: 6.5
       _borderBoxHeight: 0.18
       _borderBoxDepth: 0.18
-      _borderTorusThickness: 0.18
+      _borderTorusThickness: 1
       _numBorderTorusWireAxialSlices: 2
       _borderCylTorusWidth: 0.18
       _borderCylTorusHeight: 0.18
@@ -29416,7 +29495,7 @@ MonoBehaviour:
       _borderFillMode: 0
       _quadBorderType: 0
       _raTriangleBorderType: 0
-      _circleBorderType: 0
+      _circleBorderType: 1
       _isRotationArcVisible: 1
       _rotationArcLookAndFeel:
         _useShortestRotation: 1
@@ -29433,7 +29512,7 @@ MonoBehaviour:
       _circleRadius: 6.5
       _borderBoxHeight: 0.18
       _borderBoxDepth: 0.18
-      _borderTorusThickness: 0.18
+      _borderTorusThickness: 1
       _numBorderTorusWireAxialSlices: 2
       _borderCylTorusWidth: 0.18
       _borderCylTorusHeight: 0.18
@@ -29447,7 +29526,7 @@ MonoBehaviour:
       _borderFillMode: 0
       _quadBorderType: 0
       _raTriangleBorderType: 0
-      _circleBorderType: 0
+      _circleBorderType: 1
       _isRotationArcVisible: 1
       _rotationArcLookAndFeel:
         _useShortestRotation: 1
@@ -29464,7 +29543,7 @@ MonoBehaviour:
       _circleRadius: 6.5
       _borderBoxHeight: 0.18
       _borderBoxDepth: 0.18
-      _borderTorusThickness: 0.18
+      _borderTorusThickness: 1
       _numBorderTorusWireAxialSlices: 2
       _borderCylTorusWidth: 0.18
       _borderCylTorusHeight: 0.18
@@ -29478,14 +29557,14 @@ MonoBehaviour:
       _borderFillMode: 0
       _quadBorderType: 0
       _raTriangleBorderType: 0
-      _circleBorderType: 0
+      _circleBorderType: 1
       _isRotationArcVisible: 1
       _rotationArcLookAndFeel:
         _useShortestRotation: 1
         _fillFlags: 3
         _color: {r: 0.5, g: 0.5, b: 0.5, a: 0.1}
         _borderColor: {r: 0.8, g: 0.8, b: 0.8, a: 0.8}
-    _isCamLookSliderVisible: 1
+    _isCamLookSliderVisible: 0
     _camLookSliderRadiusOffset: 0.65
     _camLookSliderLookAndFeel:
       _fillMode: 2
@@ -29510,7 +29589,7 @@ MonoBehaviour:
       _borderPolyThickness: 4
   _rotationGizmoHotkeys:
     _canBeDisplayed: 1
-    _isExpanded: 0
+    _isExpanded: 1
     _enableSnapping:
       _isEnabled: 1
       _key: 0
@@ -29528,7 +29607,7 @@ MonoBehaviour:
         CanHaveMouseButtons: 0
   _objectRotationGizmoSettings:
     _canBeDisplayed: 1
-    _isExpanded: 0
+    _isExpanded: 1
     _transformableLayers: -1
   _scaleGizmoSettings3D:
     _canBeDisplayed: 1
