@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
+using UnityEngine.Serialization;
 
 namespace DlibFaceLandmarkDetectorExample
 {
@@ -42,14 +43,11 @@ namespace DlibFaceLandmarkDetectorExample
         /// Id of this Client.
         /// </summary>
         ulong ownClientId;
-
-        //TEST
-
-        Renderer textureRenderer;
-
-        // Create a new Texture2D to hold the cutout
+        
+        /// <summary>
+        /// Texture2D to hold the cutout of the Face
+        /// </summary>
         Texture2D cutoutTexture;
-
 
         // Code from the WebCamTextureToMatHelperExample start
 
@@ -76,7 +74,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// <summary>
         /// The dlib shape predictor file name.
         /// </summary>
-        string dlibShapePredictorFileName = "DlibFaceLandmarkDetector/sp_human_face_68.dat";
+        string dlibShapePredictorFileName = "DlibFaceLandmarkDetector/sp_human_face_6.dat";
 
         /// <summary>
         /// The dlib shape predictor file path.
@@ -84,6 +82,38 @@ namespace DlibFaceLandmarkDetectorExample
         string dlibShapePredictorFilePath;
 
         // Code from the WebCamTextureToMatHelperExample end
+
+        /// <summary>
+        /// A timer used to ensure the frame rate of the video transmitted over the network.
+        /// It counts the seconds until the video is transmitted. Then it resets.
+        /// </summary>
+        private float networkVideoTimer;
+
+        /// <summary>
+        /// A delay used to ensure the frame rate of the video transmitted over the network.
+        /// Seconds until the video is transmitted.
+        /// </summary>
+        private float networkVideoDelay;
+
+        /// <summary>
+        /// Set the frame rate of video network transmission.
+        /// </summary>
+        [SerializeField, FormerlySerializedAs("Network FPS"), TooltipAttribute("Set the frame rate of Video which will be transmitted over the Network.")]
+        protected float _networkFPS = 24f;
+
+        public virtual float networkFPS
+        {
+            get { return _networkFPS; }
+            set
+            {
+                float _value = Mathf.Clamp(value, 1, float.MaxValue);
+                if (_networkFPS != _value)
+                {
+                    _networkFPS = _value;
+                }
+            }
+        }
+
 
         // Called on Network Spawn before Start.
         public override void OnNetworkSpawn()
@@ -97,23 +127,6 @@ namespace DlibFaceLandmarkDetectorExample
 
             // Always invoked the base.
             base.OnNetworkSpawn();
-
-            /// /// Network Test Examples - DELETE LATER - /// ///
-            /// /// Network Test Examples - DELETE LATER - /// ///
-            /// /// Network Test Examples - DELETE LATER - /// ///
-            if (IsServer)
-            {
-                Debug.Log("IsServer");
-            }
-            else
-            {
-                Debug.Log("IsClient (But not the Server)");
-            }
-            if (IsClient)
-            {
-                Debug.Log("IsClient (Server is a Client too)");
-            }
-
         }
 
 #if UNITY_WEBGL
@@ -126,8 +139,11 @@ namespace DlibFaceLandmarkDetectorExample
         {
             // Code from the WebCamTextureToMatHelperExample end
 
+            // The Network FPS is used to calculate everything needet to send the video at the specified frame rate.
+            networkVideoDelay = 1f / networkFPS;
+
             // This is the size of the FaceCam at the start
-            transform.localScale = new Vector3(0.2f, -0.2f, -1); // z = -1 to face away from the player. y is negative for simpler calculation later on.
+            transform.localScale = new Vector3(0.2f, 0.2f, -1); // z = -1 to face away from the player.
 
             // For the location of the face of the player we use his his nose. This makes the FaceCam also aprox. centered to his face.
             playersFace = transform.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase");
@@ -179,16 +195,8 @@ namespace DlibFaceLandmarkDetectorExample
             OpenCVForUnity.UnityUtils.Utils.fastMatToTexture2D(webCamTextureMat, texture);
 
             // My Code
-            //cutoutTexture = texture; // ?? referenzen??
-            cutoutTexture = new Texture2D(2, 2, TextureFormat.RGBA32, false); //try 0, 0
-            //textureRenderer = gameObject.GetComponent<Renderer>();
-            //textureRenderer.material.mainTexture = cutoutTexture; // changed from texture to cutoutTexture
-            gameObject.GetComponent<Renderer>().material.mainTexture = cutoutTexture;
+            cutoutTexture = new Texture2D(0, 0, TextureFormat.RGBA32, false); //try 0, 0
             // My Code End
-
-            //delete gameObject.transform.localScale = new Vector3(webCamTextureMat.cols(), webCamTextureMat.rows(), 1);
-            // damit kann man aber jetzt groesse berechnen
-            //delete Debug.Log("Screen.width " + Screen.width + " Screen.height " + Screen.height + " Screen.orientation " + Screen.orientation);
 
             if (fpsMonitor != null)
             {
@@ -197,24 +205,6 @@ namespace DlibFaceLandmarkDetectorExample
                 fpsMonitor.Add("height", webCamTextureToMatHelper.GetHeight().ToString());
                 fpsMonitor.Add("orientation", Screen.orientation.ToString());
             }
-
-
-            //FIXME Maybe not needet? throws null
-            /*
-            float width = webCamTextureMat.width();
-            float height = webCamTextureMat.height();
-
-            float widthScale = (float)Screen.width / width;
-            float heightScale = (float)Screen.height / height;
-            if (widthScale < heightScale)
-            {
-                Camera.main.orthographicSize = (width * (float)Screen.height / (float)Screen.width) / 2;
-            }
-            else
-            {
-                Camera.main.orthographicSize = height / 2;
-            }
-            */
         }
 
         /// <summary>
@@ -227,8 +217,12 @@ namespace DlibFaceLandmarkDetectorExample
             if (texture != null)
             {
                 Texture2D.Destroy(texture);
-                //Destroy cutouttextuyre?
                 texture = null;
+            }
+            if (cutoutTexture != null)
+            {
+                Texture2D.Destroy(cutoutTexture);
+                cutoutTexture = null;
             }
         }
 
@@ -239,40 +233,37 @@ namespace DlibFaceLandmarkDetectorExample
         public void OnWebCamTextureToMatHelperErrorOccurred(WebCamTextureToMatHelper.ErrorCode errorCode)
         {
             Debug.Log("OnWebCamTextureToMatHelperErrorOccurred " + errorCode);
-
-            if (fpsMonitor != null)
-            {
-                fpsMonitor.consoleText = "ErrorCode: " + errorCode;
-            }
         }
 
         // Code from the WebCamTextureToMatHelperExample end
 
-        // FIXME my Code in WebCamTextureToMatHelperExample start
-        public void SendFrame()
-        {
-            byte[] networkTexture = ImageConversion.EncodeToJPG(cutoutTexture);
-            Debug.Log("Buffer Size: " + networkTexture.Length);
-            if (networkTexture.Length <= 32768)
-            {
-                SendNetworkTextureClientRPC(networkTexture);
-            }
-        }
-
-        [ClientRpc]
-        private void SendNetworkTextureClientRPC(byte[] networkTexture)
-        {
-            //texture.LoadRawTextureData(networkTexture);
-            //texture.LoadImage(networkTexture);
-            ImageConversion.LoadImage(cutoutTexture, networkTexture);
-        }
-        // FIXME my Code in WebCamTextureToMatHelperExample end
-
         // Update is called once per frame
         private void Update()
         {
-            // Code from the WebCamTextureToMatHelperExample start
+            // If the NetworkObject is not yet spawned, exit early.
+            if (!IsSpawned)
+            {
+                return;
+            }
+            // Netcode specific logic executed when spawned.
 
+            // Display/Render the video from the Webcam if this is the owner. (For each Player, the Player is the owner of the local FaceCam)
+            if (IsOwner)
+            {
+                DisplayLocalVideo();
+            }
+        }
+
+        /// <summary>
+        /// This renders the video, means the face captured on the WebCam is displayed onto the FaceCam
+        /// Only used as owner.
+        /// </summary>
+        private void DisplayLocalVideo()
+        {
+            // Used to send video only at specified frame rate.
+            networkVideoTimer += Time.deltaTime;
+
+            // Code from the WebCamTextureToMatHelperExample start
             if (webCamTextureToMatHelper.IsPlaying() && webCamTextureToMatHelper.DidUpdateThisFrame())
             {
 
@@ -285,8 +276,8 @@ namespace DlibFaceLandmarkDetectorExample
 
                 // My Code
                 // This is the Rect which is chosen as the face we want to zoom in.
-                UnityEngine.Rect mainRect = new UnityEngine.Rect(0,0,0,0);
-                
+                UnityEngine.Rect mainRect = new UnityEngine.Rect(0, 0, 0, 0);
+
                 // Is there any rect?
                 bool rectFound = false;
                 // My Code end
@@ -296,7 +287,8 @@ namespace DlibFaceLandmarkDetectorExample
                     // My Code
                     // find biggest = nearest face, this is the face we want to zoom in
                     Debug.Log("S2");
-                    if (mainRect.height * mainRect.width <= rect.height * rect.width) {
+                    if (mainRect.height * mainRect.width <= rect.height * rect.width)
+                    {
                         Debug.Log("S3");
                         mainRect = rect;
                         rectFound = true;
@@ -313,130 +305,91 @@ namespace DlibFaceLandmarkDetectorExample
                     OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(255, 0, 0, 255), 2);
                 }
 
-                //Imgproc.putText (rgbaMat, "W:" + rgbaMat.width () + " H:" + rgbaMat.height () + " SO:" + Screen.orientation, new Point (5, rgbaMat.rows () - 10), Imgproc.FONT_HERSHEY_SIMPLEX, 0.5, new Scalar (255, 255, 255, 255), 1, Imgproc.LINE_AA, false);
 
+                /// FIXME NOT FAST IF SEND OVER NETWORTK , ODER? da coutout neu vieliecht geht so
                 OpenCVForUnity.UnityUtils.Utils.fastMatToTexture2D(rgbaMat, texture);
 
                 // Code from the WebCamTextureToMatHelperExample end
 
-                //Cutour texture?
 
-                // Specify the rectangular region to cut
-                if (rectFound)
+                // Specify the rectangular region to cutout the face.
+
+                int cutoutTextureHeight = 0; //standartwert für plausible größe damit webcam not found angezeigt wird
+                int cutoutTextureY;
+                int _width =0;
+                //int _cutoutTextureHeight = 0;
+                int _height = 0;
+
+                if (rectFound) // SONST MUSS ALTES GENUZTZ WERDEN
                 {
-                    int x = Mathf.RoundToInt(mainRect.x); // Starting x-coordinate of the region
-                    int y = Mathf.RoundToInt(mainRect.y); // Starting y-coordinate of the region
-                    int width = Mathf.RoundToInt(mainRect.width); // Width of the region
-                    int height = Mathf.RoundToInt(mainRect.height); // Height of the region
-
-                    if (y+height <= texture.height && x+width <= texture.width && y > 0 && x > 0) 
+                    int x = Mathf.RoundToInt(mainRect.x);
+                    int y = Mathf.RoundToInt(mainRect.y);
+                    int width = Mathf.RoundToInt(mainRect.width);
+                    int height = Mathf.RoundToInt(mainRect.height);
+                    _width = width;
+                    
+                    // If rect is inside the texture.
+                    if (y + height <= texture.height && x + width <= texture.width && y > 0 && x > 0)
                     {
-                        cutoutTexture = new Texture2D(width, height);
-                        //cutoutTexture.width = width;
-                        //cutoutTexture.height = height;
-
+                        
+                        _height = height;
+                        // Add a little over and under the rect of the head to make it fully visible
+                        cutoutTextureHeight = height + height / 2 + (height / 6); // etwas addieren für unten und etwas für oben; so erstamal nur oben?
+                        cutoutTextureY = texture.height - y - height - (height/6); // Because texture and rect do not both use y the same way, it needs to be converted. etwas nach oben verschieben um unten was hionzuzufügen
                         // Copy the pixels from the original texture to the cutout texture
-                        Color[] pixels = texture.GetPixels(x, y, width, height);
+                        Color[] pixels = texture.GetPixels(x, cutoutTextureY, width, cutoutTextureHeight); // Because texture and rect do not both use y the same way, it needs to be converted.
+                        cutoutTexture = new Texture2D(width, cutoutTextureHeight);
                         cutoutTexture.SetPixels(pixels);
                         cutoutTexture.Apply();
-                        //cutoutTexture.Apply(false,false);
                     }
-
-                    
-                }
+                } //FIXME SONST ALLTES NEHMEN
 
 
-                // Create a new Texture2D to hold the cutout
-                //muss das sein?
+                // Renders the cutout texture onto the FaceCam
                 gameObject.GetComponent<Renderer>().material.mainTexture = cutoutTexture;
-                //textureRenderer.material.mainTexture = cutoutTexture;
-                //OpenCVForUnity.UnityUtils.Utils.matToTexture2D(rgbaMat, cutoutTexture);
 
-                Debug.Log("S6");
+
+                if (rectFound)
+                {
+                    transform.localScale = new Vector3(((float)_width)/ (float)1000,((float) cutoutTextureHeight + ((float)_height / (float)4))/ (float)1000, -1); // without '(float)' there seems to bee rounding errors and the result is just '0'.
+                }
+                // quatsch ,für rechteckanpassungder höhe und breite..
+
+                /*
+                
                 // Update size if a face is found. Use ratio to make the bigger of height or width 0.2f big but keep aspect ratio.
                 if (rectFound)
                 {
-                    Debug.Log("S7");
-                    if (mainRect.width > mainRect.height)
+                    Debug.Log("NEW SIZE");
+                    if (mainRect.width > cutoutTexture.height)
                     {
-                        Debug.Log("S8");
-                    //    float ratio = mainRect.width / mainRect.height;
-                    //    transform.localScale = new Vector3(0.2f, (-0.2f / ratio) - 0.06f, -1); // - 0.06f because we cut of a little bit more of the height.
+                        float ratio = cutoutTexture.height / mainRect.width;
+                        //transform.localScale = new Vector3(0.2f, (-0.2f / ratio) - 0.06f, -1); // - 0.06f because we cut of a little bit more of the height.
+                        transform.localScale = new Vector3(0.2f, (0.2f * ratio), -1);
                     }
-                    else {
-                        Debug.Log("S9");
-                        // is this right?
-                     //   float ratio = mainRect.height / mainRect.width;
-                    //    transform.localScale = new Vector3((0.2f / ratio), -0.2f - 0.06f, -1); // - 0.06f because we cut of a little bit more of the height.
+                    else
+                    {
+                         float ratio = mainRect.width / cutoutTexture.height;
+                         transform.localScale = new Vector3((0.2f * ratio), 0.2f, -1); // - 0.06f because we cut of a little bit more of the height.
                     }
                 }
+                
+                */
 
-                //FIXME
-                if (IsSpawned)
-                {
-                 //   SendFrame(); // My method
-                }
-            }
 
-            // If the NetworkObject is not yet spawned, exit early.
-            if (!IsSpawned)
-            {
-                return;
-            }
-            // Netcode specific logic executed when spawned.
 
-            // Display/Render the video from the Webcam if this is the owner. (For each Player, there is only one owner of the own FaceCam at the time)
-            if (IsOwner)
-            {
-                DisplayLocalVideo();
-            }
 
-            /// /// Network Test Examples - DELETE LATER - /// ///
-            /// /// Network Test Examples - DELETE LATER - /// ///
-            /// /// Network Test Examples - DELETE LATER - /// ///
-
-            // Send an RPC as Server to Clients
-            if (IsServer) // Only the Server is able to do so even without this if statement // really? JA fa nur server normale client rpcs senden kann
-                          //allerdings würden ohne dieses if jeder client/instanz diese nachricht vom server aus senden.
-            {
-                if (Input.GetKeyDown(KeyCode.O))
-                {
-                    PongClientRpc(Time.frameCount, "hello clients, this is server"); // Server -> Client (To all Clients including Server)
-
-                    //Only sent to client number 1
-                    DoSomethingServerSide(1);
-                }
-            }
-
-            // Send to Server
-            if (IsClient)
-            {
-                if (Input.GetKeyDown(KeyCode.L))
-                {
-                    MyGlobalServerRpc(); // serverRpcParams will be filled in automatically
-                }
-            }
-        }
-
-        /// <summary>
-        /// This renders the video, means the face captured on the WebCam is displayed onto the FaceCam
-        /// Only used as owner.
-        /// </summary>
-        private void DisplayLocalVideo()
-        {
-            //geht davon aus das man Owner ist
-            //Debug.Log("Network Id: " + NetworkManager.Singleton.LocalClientId);
-            switch (ownClientId)
-            {
-                case 0:
-                    //mainColor = new Color(Random.Range(100, 255), 0, 0);
-                    break;
-                case 1:
-                    //mainColor = new Color(0, Random.Range(100, 255), 0);
-                    break;
-                default:
-                    //mainColor = new Color(0, 0, Random.Range(100, 255));
-                    break;
+                // 30 times per second
+                if (networkVideoTimer >= networkVideoDelay)
+                    {
+                        // Perform your action here
+                        // This code will execute approximately 30 times per second
+                      //  Debug.Log("Time = " + timer);
+                        Debug.Log("FPS = " + 1/networkVideoTimer);
+                        //DisplayVideoOnAllOtherClients();
+                        networkVideoTimer = 0f; // Reset the timer
+                    }
+                
             }
         }
 
@@ -456,55 +409,51 @@ namespace DlibFaceLandmarkDetectorExample
             {
                 transform.position = playersFace.position;
                 transform.rotation = playersFace.rotation;
+                transform.Rotate(0, -90, -90); // To face away from the avatars face.
                 //FIXME
                 //still need to rotate the cam and check which mode (above/front) the FaceCam should be/
                 //Maybe update size here, or maybe direct in the video rendering
             }
         }
 
-        // FixedUpdate is normally called 50 times per Second
-        private void FixedUpdate()
+        /// <summary>
+        /// 
+        /// </summary>
+        private void DisplayVideoOnAllOtherClients()
         {
-            // If the NetworkObject is not yet spawned, exit early.
-            if (!IsSpawned)
+            // A frame of the Video, created from the source video already displayed on this owners client.
+            byte[] videoFrame = CreateNetworkFrameFromVideo();
+
+            // videoframe is null if the file size is too big.
+            if (videoFrame == null)
             {
                 return;
             }
-            // Netcode specific logic executed when spawned.
-
-            // If local, record and send video to server (only send unless this is the server);
-            if (IsOwner)
+            // Send the frame to the to server, unless this is the server.
+            if (!IsServer)
             {
-                // A frame of the Video, created from the source video already displayed on this owners client.
-                Color videoFrame = CreateNetworkFrameFromVideo();
-                //FIXME
-                // ggf video ausschneiden oder andere infos wie tile/offset auch übermitteln
-
-                // Send the frame to the to server, unless this is the server.
-                if (!IsServer)
-                {
-                    GetVideoFromClientAndSendItToClientsToRenderIt_ServerRPC(videoFrame);
-                }
-                else // the owner (creator of video) and also the server
-                {
-                    // If this is the server, send the frame to all clients ( but not the server and owner, which in this case, is the server).
-                    SendVideoToClientsToRenderIt_ClientRPC(videoFrame, otherNetworkIds);
-                }
+                GetVideoFromClientAndSendItToClientsToRenderIt_ServerRPC(videoFrame);
+            }
+            else // the owner (creator of video) and also the server
+            {
+                // If this is the server, send the frame to all clients ( but not the server and owner, which in this case, is the server).
+                SendVideoToClientsToRenderIt_ClientRPC(videoFrame, otherNetworkIds);
             }
         }
 
         /// <summary>
-        /// This creates a frame from the video sourcw.
+        /// This creates a frame from the video source.
         /// The frame can be send over the network and is compressed.
         /// </summary>
-        private Color CreateNetworkFrameFromVideo()
+        private byte[] CreateNetworkFrameFromVideo()
         {
-            //return mainColor;
-            return new Color(); // is null
-            //Texture2D webtexture = new Texture2D(webCamTextureMat.cols(), webCamTextureMat.rows(), TextureFormat.RGBA32, false);
-
-            //FIXME
-            // hier texture zu JPG machen, und als byte[] übergeben, das sollte reichen.
+            byte[] networkTexture = ImageConversion.EncodeToJPG(cutoutTexture);
+            Debug.Log("Buffer Size: " + networkTexture.Length);
+            if (networkTexture.Length <= 32768)
+            {
+                return networkTexture;
+            }
+            return null;
 
         }
 
@@ -513,7 +462,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// Also the server and every client will render this video onto the FaceCam.
         /// </summary>
         [ServerRpc]
-        private void GetVideoFromClientAndSendItToClientsToRenderIt_ServerRPC(Color videoFrame)
+        private void GetVideoFromClientAndSendItToClientsToRenderIt_ServerRPC(byte[] videoFrame)
         {
             // The server will render this video onto his instance of the FaceCam.
             RenderNetworkFrameOnFaceCam(videoFrame);
@@ -527,7 +476,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// Also every client will render this video onto the FaceCam.
         /// </summary>
         [ClientRpc]
-        private void SendVideoToClientsToRenderIt_ClientRPC(Color videoFrame, ClientRpcParams clientRpcParams = default)
+        private void SendVideoToClientsToRenderIt_ClientRPC(byte[] videoFrame, ClientRpcParams clientRpcParams = default)
         {
             RenderNetworkFrameOnFaceCam(videoFrame);
         }
@@ -535,11 +484,10 @@ namespace DlibFaceLandmarkDetectorExample
         /// <summary>
         /// The received frame will be rendered onto the FaceCam
         /// </summary>
-        private void RenderNetworkFrameOnFaceCam(Color videoFrame)
+        private void RenderNetworkFrameOnFaceCam(byte[] videoFrame)
         {
-            //GetComponent<Renderer>().material.color = videoFrame;
-            //FIXME
-            //Hier den Frame aus JPG zu texture konvertieren, das sollte reichen.
+            ImageConversion.LoadImage(cutoutTexture, videoFrame);
+            gameObject.GetComponent<Renderer>().material.mainTexture = cutoutTexture;
         }
 
         // Happens on destroying
