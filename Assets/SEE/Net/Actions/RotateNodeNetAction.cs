@@ -26,7 +26,6 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="ID">the unique ID of the game object to be rotated</param>
         /// <param name="rotation">the rotation by which to rotate the game object</param>
-
         public RotateNodeNetAction(string ID, Quaternion rotation)
         {
             GameObjectID = ID;
