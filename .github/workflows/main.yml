@@ -120,7 +120,7 @@ jobs:
   test:
     name: Run editmode tests
     runs-on: ${{ needs.setup.outputs.runner }}
-    needs: [setup, gitscripts, static]
+    needs: [setup, gitscripts]
     if: ${{ ! github.event.pull_request.draft && github.event_name != 'workflow_dispatch' }}
     permissions: write-all
     steps:
@@ -188,7 +188,7 @@ jobs:
   build:
     name: Build release
     runs-on: ${{ needs.setup.outputs.runner }}
-    needs: [setup, setup_build_targets, test, static, gitscripts]
+    needs: [setup, setup_build_targets, test, gitscripts]
     strategy:
       matrix:
         targetPlatform: ${{ fromJson(needs.setup_build_targets.outputs.targetPlatforms) }}
