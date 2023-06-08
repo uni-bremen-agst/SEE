@@ -147,7 +147,17 @@ namespace SEE.DataModel.DG.IO
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                libPath = Path.Combine(libDir, "liblzma.so");
+                if (Application.isEditor)
+                {
+                    libPath = Path.Combine(libDir, "liblzma.so");
+                }
+                // Under Linux native plugins aren't stored inside a architecture subdir (e.g. x86_64).
+                // They are stored directly in the Plugins dir.
+                // So under Linux when constructing the path, it is necessary to omit this subdirectory specifically for Linux builds.
+                else
+                {
+                    libPath = Path.Combine(Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins"), "liblzma.so");
+                }
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
