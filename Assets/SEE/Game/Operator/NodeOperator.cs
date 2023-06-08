@@ -189,7 +189,7 @@ namespace SEE.Game.Operator
         /// Rotates the node to the given quaternion <paramref name="newRotation"/>,
         /// taking <paramref name="duration"/> seconds.
         /// </summary>
-        /// <param name="newRotation">the desired new target rotation</param>
+        /// <param name="newRotation">the desired new target rotation in world space</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
