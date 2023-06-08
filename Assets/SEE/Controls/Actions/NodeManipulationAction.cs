@@ -9,7 +9,7 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// Abstract superclass of actions transforming a game node by way of a RTG gizmo.
+    /// Abstract superclass of actions transforming a game node by way of an RTG gizmo.
     /// </summary>
     /// <typeparam name="T">type of the state that is transformed</typeparam>
     internal abstract class NodeManipulationAction<T> : AbstractPlayerAction
