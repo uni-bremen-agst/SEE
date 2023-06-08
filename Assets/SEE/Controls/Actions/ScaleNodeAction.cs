@@ -112,8 +112,8 @@ namespace SEE.Controls.Actions
 
             protected override void Transform(Vector3 localScale)
             {
-                // FIXME: If a duration > 0 is used, the node operator does not scale the object.
-                nodeOperator.ScaleTo(localScale, 0);
+                base.Transform(localScale);
+                nodeOperator.ScaleTo(localScale);
             }
 
             /// <summary>

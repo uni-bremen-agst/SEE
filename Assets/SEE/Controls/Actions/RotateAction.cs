@@ -92,7 +92,7 @@ namespace SEE.Controls.Actions
         private class RotateMemento : Memento<Quaternion>
         {
             /// <summary>
-            /// Constructor taking a snapshot of the rotation of <paramref name="gameObject"/>.
+            /// Constructor taking a snapshot of the world-space rotation of <paramref name="gameObject"/>.
             /// </summary>
             /// <param name="gameObject">object whose rotation is to be captured</param>
             public RotateMemento(GameObject gameObject) : base(gameObject)
@@ -108,10 +108,14 @@ namespace SEE.Controls.Actions
                 throw new System.NotImplementedException();
             }
 
+            /// <summary>
+            /// Rotates the game object by the given world-space <paramref name="rotation"/>.
+            /// </summary>
+            /// <param name="rotation">world-space rotation</param>
             protected override void Transform(Quaternion rotation)
             {
-                // FIXME: If a duration > 0 is used, the node operator does not rotate the object.
-                nodeOperator.RotateTo(rotation, 0);
+                base.Transform(rotation);
+                nodeOperator.RotateTo(rotation);
             }
 
             /// <summary>
