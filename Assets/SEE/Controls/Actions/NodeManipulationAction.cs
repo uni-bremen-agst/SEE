@@ -266,6 +266,9 @@ namespace SEE.Controls.Actions
             /// Transforms the object using <see cref="nodeOperator"/> to the given
             /// <paramref name="value"/>. Broadcasts this state to all clients.
             /// </summary>
+            /// <remarks>This method is expected to be used by <see cref="Undo"/> and
+            /// <see cref="Redo"/> only. The gizmo itself will already transform
+            /// the game object while the user is interacting with it.</remarks>
             /// <param name="value">the value the object should be transformed to</param>
             protected virtual void Transform(T value)
             {
