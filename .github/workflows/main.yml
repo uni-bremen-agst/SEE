@@ -2,10 +2,10 @@ name: Tests
 
 on:
   push:
-    branches: master
+    branches: [master]
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
-    branches: master
+    branches: [master]
 
 concurrency:
   group: ${{ github.ref }}
@@ -16,11 +16,7 @@ permissions: read-all
 jobs:
   setup:
     name: Setup Repository
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [self-hosted]
+    runs-on: self-hosted
     outputs:
       runner: ${{ steps.remember.outputs.runner }}
     steps:
@@ -49,26 +45,18 @@ jobs:
   gitscripts:
     name: Run GitScript checks
     runs-on: ${{ needs.setup.outputs.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [self-hosted]
     needs: [setup]
     steps:
       - name: Run GitScripts checks
         run: ./GitScripts/run_all
   static:
     name: Run static checks
-    runs-on: ${{ matrix.os }}
+    runs-on: self-hosted
     if: '! github.event.pull_request.draft'
     permissions:
       contents: read
       issues: read
       pull-requests: write
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [self-hosted]
     steps:
       - name: Collect bad patterns
         run: |
@@ -121,11 +109,8 @@ jobs:
   test:
     name: Run editmode tests
     runs-on: ${{ needs.setup.outputs.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [self-hosted]
     needs: [setup, gitscripts, static]
+    if: '! github.event.pull_request.draft'
     permissions: write-all
     steps:
       - uses: actions/cache@v3
@@ -163,15 +148,41 @@ jobs:
           name: Coverage results
           path: ${{ steps.tests.outputs.coveragePath }}
 
+  build:
+    name: Build release
+    runs-on: ${{ needs.setup.outputs.runner }}
+    strategy:
+      fail-fast: true
+      matrix:
+        targetPlatform: [StandaloneWindows64, StandaloneLinux64]
+    needs: [setup, static, gitscripts, test]
+    if: '! github.event.pull_request.draft'
+    steps:
+      - run: git reset --hard ${{ github.sha }}  # Test or previous build may have changed files
+      - run: rm -rf build  # Delete previous build
+      - uses: game-ci/unity-builder@v2
+        timeout-minutes: 45
+        name: Build project
+        id: build
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          targetPlatform: ${{ matrix.targetPlatform }}
+      - uses: actions/upload-artifact@v3
+        name: Upload build
+        # Upload only if on master
+        if: ${{ !cancelled() && github.ref == 'refs/heads/master' }}
+        with:
+          name: SEE-${{ matrix.targetPlatform }}-${{ github.sha }}
+          path: build
+
   cleanup:
     name: Cleanup
     runs-on: ${{ needs.setup.outputs.runner }}
     if: ${{ always() }}
-    needs: [setup, static, gitscripts, test]
+    needs: [setup, static, gitscripts, test, build]
     strategy:
       fail-fast: false
-      matrix:
-        os: [self-hosted]
     steps:
       - name: Kill Unity
         if: always()
@@ -182,45 +193,3 @@ jobs:
         shell: bash
         run: sudo /mnt/scripts/set-work-permissions.sh
 
-# TODO: Implement build generation.
-#
-# build:
-#   name: Build release
-#   runs-on: ${{ needs.setup.outputs.runner }}
-#   strategy:
-#     fail-fast: false
-#     matrix:
-#       os: [self-hosted]
-#   needs: [setup, gitscripts, static]
-#   steps:
-#     - uses: actions/cache@v3
-#       name: Cache Library
-#       env:
-#         SEGMENT_DOWNLOAD_TIMEOUT_MINS: 11
-#       with:
-#         path: ./Library
-#         key: Library-SEE-Tests-${{ hashFiles('./ProjectSettings/ProjectVersion.txt') }}
-#         restore-keys: |
-#           Library-SEE-Tests
-#           Library-SEE
-#     - uses: game-ci/unity-builder@v2
-#       timeout-minutes: 45
-#       name: Build project
-#       id: build
-#       env:
-#         UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-#       with:
-#         githubToken: ${{ secrets.GITHUB_TOKEN }}
-#         targetPlatform: StandaloneLinux64
-#     - uses: actions/upload-artifact@v3
-#       name: Upload test results
-#       if: ${{ !cancelled() }}
-#       with:
-#         name: Test results for ${{ matrix.os }}
-#         path: ${{ steps.build.outputs.artifactsPath }}
-#     - uses: actions/upload-artifact@v3
-#       name: Upload coverage results
-#       if: github.ref == 'refs/heads/master'
-#       with:
-#         name: Coverage results
-#         path: ${{ steps.tests.outputs.coveragePath }}
