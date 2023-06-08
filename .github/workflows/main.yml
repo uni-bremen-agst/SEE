@@ -221,7 +221,7 @@ jobs:
     name: Cleanup
     runs-on: ${{ needs.setup.outputs.runner }}
     if: ${{ always() }}
-    needs: [test, build]   # These two use docker and sometimes mess up permissions.
+    needs: [setup, test, build]   # "test" and "build" two use docker and sometimes mess up permissions.
     strategy:
       fail-fast: false
     steps:
