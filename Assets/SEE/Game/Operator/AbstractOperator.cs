@@ -132,12 +132,12 @@ namespace SEE.Game.Operator
                     throw new ArgumentOutOfRangeException(nameof(duration), "Duration must be greater than zero!");
                 }
 
-                if (EqualityComparer.Equals(target, TargetValue) && duration > 0)
-                {
-                    // Nothing to be done, we're already where we want to be.
-                    // If duration is 0, however, we must trigger the change immediately.
-                    return new DummyOperationCallback<C>();
-                }
+                //if (EqualityComparer.Equals(target, TargetValue) && duration > 0)
+                //{
+                //    // Nothing to be done, we're already where we want to be.
+                //    // If duration is 0, however, we must trigger the change immediately.
+                //    return new DummyOperationCallback<C>();
+                //}
 
                 ChangeAnimatorTarget(target, duration);
                 TargetValue = target;
