@@ -1,5 +1,6 @@
 ﻿using RTG;
 using SEE.Audio;
+using SEE.Game;
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Utils;
@@ -14,6 +15,14 @@ namespace SEE.Controls.Actions
     /// <typeparam name="T">type of the state that is transformed</typeparam>
     internal abstract class NodeManipulationAction<T> : AbstractPlayerAction
     {
+        /// <summary>
+        /// Constructor enabling the Runtime Transformation Gizmo (RTG) App.
+        /// </summary>
+        public NodeManipulationAction() : base()
+        {
+            RTGInitializer.Enable();
+        }
+
         #region ReversibleAction Overrides
 
         /// <summary>
@@ -26,6 +35,25 @@ namespace SEE.Controls.Actions
             {
                 gameNodeSelected.name
             };
+        }
+
+        /// <summary>
+        /// Enables the RTG App and the transformation gizmo.
+        /// </summary>
+        public override void Start()
+        {
+            base.Start();
+            RTGInitializer.Enable();
+        }
+
+        /// <summary>
+        /// Disables the RTG App and the transformation gizmo.
+        /// </summary>
+        public override void Stop()
+        {
+            base.Stop();
+            RTGInitializer.Disable();
+            gizmo.Disable();
         }
 
         #endregion ReversibleAction Overrides
@@ -48,15 +76,6 @@ namespace SEE.Controls.Actions
         {
             base.Redo();
             memento.Redo();
-        }
-
-        /// <summary>
-        /// Disables the transformation gizmo.
-        /// </summary>
-        public override void Stop()
-        {
-            base.Stop();
-            gizmo.Disable();
         }
 
         #endregion Undo Redo
@@ -221,8 +240,8 @@ namespace SEE.Controls.Actions
         /// A memento of the intial and final state of the game object being transformed.
         /// It will be used for <see cref="Undo"/> and <see cref="Redo"/>.
         /// </summary>
-        /// <typeparam name="T">the type of the state being memorized</typeparam>
-        protected abstract class Memento<T>
+        /// <typeparam name="S">the type of the state being memorized</typeparam>
+        protected abstract class Memento<S>
         {
             /// <summary>
             /// Constructors setting up the <see cref="nodeOperator"/>.
@@ -244,7 +263,7 @@ namespace SEE.Controls.Actions
 
             /// <summary>
             /// Sets the state of the game object that was passed to the
-            /// constructor to the state passed by <see cref="Finalize(Vector3)"/>.
+            /// constructor to the state passed by <see cref="Finalize(S)"/>.
             /// </summary>
             public void Redo()
             {
@@ -253,13 +272,18 @@ namespace SEE.Controls.Actions
 
             /// <summary>
             /// Sets the final state of the manipulated game object to given
-            /// <paramref name="finalState"/>. Broadcasts this value to all clients.
+            /// <paramref name="finalState"/>. Transforms the object to the
+            /// <paramref name="finalState"/> and broadcasts this value to all clients.
             /// </summary>
             /// <param name="finalState">the final state when the action has completed</param>
-            public void Finalize(T finalState)
+            public void Finalize(S finalState)
             {
                 this.finalState = finalState;
-                BroadcastState(finalState);
+                // Even though the gizmo has transformed the object already to the final
+                // state to be reached, we want the NodeOperator attached to the game node
+                // to know the new state of the object. That is why we are here calling
+                // Transform.
+                Transform(finalState);
             }
 
             /// <summary>
@@ -270,7 +294,7 @@ namespace SEE.Controls.Actions
             /// <see cref="Redo"/> only. The gizmo itself will already transform
             /// the game object while the user is interacting with it.</remarks>
             /// <param name="value">the value the object should be transformed to</param>
-            protected virtual void Transform(T value)
+            protected virtual void Transform(S value)
             {
                 BroadcastState(value);
             }
@@ -279,19 +303,19 @@ namespace SEE.Controls.Actions
             /// Broadcasts the <paramref name="state"/> to all clients.
             /// </summary>
             /// <param name="state">state to be broadcast</param>
-            protected abstract void BroadcastState(T state);
+            protected abstract void BroadcastState(S state);
 
             /// <summary>
             /// The local scale at the point in time when the memento was created.
             /// Required for <see cref="Undo"/>.
             /// </summary>
-            public T InitialState;
+            public S InitialState;
 
             /// <summary>
             /// The local scale at the point in time when the action has completed.
             /// Required for <see cref="Redo"/>.
             /// </summary>
-            protected T finalState;
+            protected S finalState;
 
             /// <summary>
             /// The <see cref="NodeOperator"/> of the game object to be transformed.
