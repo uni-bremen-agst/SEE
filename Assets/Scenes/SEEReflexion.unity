@@ -19283,7 +19283,7 @@ MonoBehaviour:
   _settings:
     _canBeDisplayed: 1
     _isExpanded: 1
-    _physicsMode: 2
+    _physicsMode: 1
 --- !u!1001 &1562544004
 PrefabInstance:
   m_ObjectHideFlags: 0
