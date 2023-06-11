@@ -1,11 +1,21 @@
-name: Tests
+name: Test and build SEE
 
 on:
   push:
-    branches: master
+    branches: [master]
   pull_request:
     types: [opened, reopened, synchronize, ready_for_review]
-    branches: master
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      windows:
+        description: 'Create Windows build?'
+        default: true
+        type: boolean
+      linux:
+        description: 'Create Linux build?'
+        default: true
+        type: boolean
 
 concurrency:
   group: ${{ github.ref }}
@@ -16,11 +26,7 @@ permissions: read-all
 jobs:
   setup:
     name: Setup Repository
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [self-hosted]
+    runs-on: self-hosted
     outputs:
       runner: ${{ steps.remember.outputs.runner }}
     steps:
@@ -49,26 +55,19 @@ jobs:
   gitscripts:
     name: Run GitScript checks
     runs-on: ${{ needs.setup.outputs.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [self-hosted]
     needs: [setup]
+    if: ${{ github.event_name != 'workflow_dispatch' }}
     steps:
       - name: Run GitScripts checks
         run: ./GitScripts/run_all
   static:
     name: Run static checks
-    runs-on: ${{ matrix.os }}
-    if: '! github.event.pull_request.draft'
+    runs-on: self-hosted
+    if: ${{ !github.event.pull_request.draft && github.event_name != 'workflow_dispatch' &&  github.ref != 'refs/heads/master' }}
     permissions:
       contents: read
       issues: read
       pull-requests: write
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [self-hosted]
     steps:
       - name: Collect bad patterns
         run: |
@@ -121,11 +120,8 @@ jobs:
   test:
     name: Run editmode tests
     runs-on: ${{ needs.setup.outputs.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [self-hosted]
-    needs: [setup, gitscripts, static]
+    needs: [setup, gitscripts]
+    if: ${{ ! github.event.pull_request.draft && github.event_name != 'workflow_dispatch' }}
     permissions: write-all
     steps:
       - uses: actions/cache@v3
@@ -163,15 +159,71 @@ jobs:
           name: Coverage results
           path: ${{ steps.tests.outputs.coveragePath }}
 
+  setup_build_targets:
+    name: Setup build targets
+    if: ${{ ! github.event.pull_request.draft }}
+    runs-on: self-hosted
+    outputs:
+      targetPlatforms: ${{ steps.rememberPlatforms.outputs.targetPlatforms }}
+    steps:
+      - id: rememberPlatforms
+        name: Choose platforms for which to create builds
+        run: |
+          if ${{ github.event_name != 'workflow_dispatch' }}; then
+            # Include all target platforms.
+            echo 'targetPlatforms=["StandaloneWindows64", "StandaloneLinux64"]' >> $GITHUB_OUTPUT
+          else
+            # Set targetPlatform based on inputs.
+            targetPlatforms=()
+            if ${{ github.event.inputs.windows == true }}; then
+                targetPlatforms+=("StandaloneWindows64")
+            fi
+            if ${{ github.event.inputs.linux == true }}; then
+                targetPlatforms+=("StandaloneLinux64")
+            fi
+            echo "targetPlatforms=$(jq --compact-output --null-input '$ARGS.positional' --args -- ${targetPlatforms[@]})" >> $GITHUB_OUTPUT
+          fi
+
+
+  build:
+    name: Build release
+    runs-on: ${{ needs.setup.outputs.runner }}
+    needs: [setup, setup_build_targets, test, gitscripts]
+    strategy:
+      matrix:
+        targetPlatform: ${{ fromJson(needs.setup_build_targets.outputs.targetPlatforms) }}
+    if: ${{ ! github.event.pull_request.draft }}
+    steps:
+      - name: Cleanup any modifications
+        run: |
+          sudo /mnt/scripts/set-work-permissions.sh  # Permissions may be messed up here
+          git reset --hard ${{ github.sha }}  # Test or previous build may have changed files
+          git clean -fd
+          rm -rf build || true  # Try deleting any previous build
+      - uses: game-ci/unity-builder@v2
+        timeout-minutes: 45
+        name: Build project
+        id: build
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          targetPlatform: ${{ matrix.targetPlatform }}
+          buildName: ${{ matrix.targetPlatform }}
+      - uses: actions/upload-artifact@v3
+        name: Upload build
+        # Upload only if on master or if manually triggered
+        if: ${{ github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
+        with:
+          name: SEE-${{ matrix.targetPlatform }}-${{ github.sha }}
+          path: build/${{ matrix.targetPlatform}}
+
   cleanup:
     name: Cleanup
     runs-on: ${{ needs.setup.outputs.runner }}
     if: ${{ always() }}
-    needs: [setup, static, gitscripts, test]
+    needs: [setup, test, build]   # "test" and "build" two use docker and sometimes mess up permissions.
     strategy:
       fail-fast: false
-      matrix:
-        os: [self-hosted]
     steps:
       - name: Kill Unity
         if: always()
@@ -182,45 +234,3 @@ jobs:
         shell: bash
         run: sudo /mnt/scripts/set-work-permissions.sh
 
-# TODO: Implement build generation.
-#
-# build:
-#   name: Build release
-#   runs-on: ${{ needs.setup.outputs.runner }}
-#   strategy:
-#     fail-fast: false
-#     matrix:
-#       os: [self-hosted]
-#   needs: [setup, gitscripts, static]
-#   steps:
-#     - uses: actions/cache@v3
-#       name: Cache Library
-#       env:
-#         SEGMENT_DOWNLOAD_TIMEOUT_MINS: 11
-#       with:
-#         path: ./Library
-#         key: Library-SEE-Tests-${{ hashFiles('./ProjectSettings/ProjectVersion.txt') }}
-#         restore-keys: |
-#           Library-SEE-Tests
-#           Library-SEE
-#     - uses: game-ci/unity-builder@v2
-#       timeout-minutes: 45
-#       name: Build project
-#       id: build
-#       env:
-#         UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-#       with:
-#         githubToken: ${{ secrets.GITHUB_TOKEN }}
-#         targetPlatform: StandaloneLinux64
-#     - uses: actions/upload-artifact@v3
-#       name: Upload test results
-#       if: ${{ !cancelled() }}
-#       with:
-#         name: Test results for ${{ matrix.os }}
-#         path: ${{ steps.build.outputs.artifactsPath }}
-#     - uses: actions/upload-artifact@v3
-#       name: Upload coverage results
-#       if: github.ref == 'refs/heads/master'
-#       with:
-#         name: Coverage results
-#         path: ${{ steps.tests.outputs.coveragePath }}
