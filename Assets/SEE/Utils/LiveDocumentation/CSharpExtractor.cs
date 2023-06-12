@@ -396,6 +396,7 @@ namespace SEE.Utils.LiveDocumentation
         public List<string> ExtractImportedNamespaces()
         {
             List<string> ret = new();
+            _parser.Reset();
             // If the file doesn't have any using directives an empty list is returned.
             if (_parser.compilation_unit().using_directives() is { } usingDirectivesContext)
             {

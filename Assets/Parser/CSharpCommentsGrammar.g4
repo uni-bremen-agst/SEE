@@ -17,7 +17,7 @@ fragment LinkText
 
 Dashes : '///';
 SHORT_COMMENT: '//' TEXT* -> skip;
-TEXT: [/a-zA-Z0-9&#_,.=()+|-]+;
+TEXT: [/a-zA-Z0-9&#_,.=:()+|-]+;
 
 
 EQUALS: '=';
