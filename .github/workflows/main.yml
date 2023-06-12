@@ -147,12 +147,14 @@ jobs:
           customParameters: -testCategory "!NonDeterministic"
           coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;assemblyFilters:+SEE'
       - uses: actions/upload-artifact@v3
+        continue-on-error: true
         name: Upload test results
         if: ${{ !cancelled() }}
         with:
           name: Test results for ${{ matrix.os }}
           path: ${{ steps.tests.outputs.artifactsPath }}
       - uses: actions/upload-artifact@v3
+        continue-on-error: true
         name: Upload coverage results
         if: github.ref == 'refs/heads/master'
         with:
@@ -210,6 +212,7 @@ jobs:
           targetPlatform: ${{ matrix.targetPlatform }}
           buildName: ${{ matrix.targetPlatform }}
       - uses: actions/upload-artifact@v3
+        continue-on-error: true
         name: Upload build
         # Upload only if on master or if manually triggered
         if: ${{ github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
