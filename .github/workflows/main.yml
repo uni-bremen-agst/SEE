@@ -216,6 +216,7 @@ jobs:
         with:
           name: SEE-${{ matrix.targetPlatform }}-${{ github.sha }}
           path: build/${{ matrix.targetPlatform}}
+          retention-days: 7  # Due to high space usage.
 
   cleanup:
     name: Cleanup
