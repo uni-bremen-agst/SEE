@@ -86,7 +86,7 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         public string RelativePath { get; set; }
 
-        public List<string> ImportedNamespaces { get; set; }
+        public List<string> ImportedNamespaces { get; set; } = new();
 
         /// <summary>
         /// The graph which the node the user has clicked on belongs to.
@@ -204,7 +204,7 @@ namespace SEE.Game.UI.LiveDocumantation
                     newWin.Graph = Graph;
                     newWin.NodeOfClass = method;
                     newWin.DocumentationWindowType = LiveDocumentationWindowType.METHOD;
-
+                    newWin.ImportedNamespaces = ImportedNamespaces;
                     newWin.DocumentationBuffer = classMemberBuffer.Documentation;
                     newWin.ClassMembers = classMemberBuffer.Parameters;
 
@@ -406,16 +406,23 @@ namespace SEE.Game.UI.LiveDocumantation
         private Node TraverseForNamespace(List<string> splitedNamespace, Node currentNode)
         {
             string nextNamespaceElement = splitedNamespace.FirstOrDefault();
-            if (nextNamespaceElement == null)
+            if (splitedNamespace.Count == 1 && currentNode.SourceName.Equals(splitedNamespace.First()))
             {
                 return currentNode;
             }
+        //    if (nextNamespaceElement == null)
+     //       {
+     //           return currentNode;
+     //       }
 
-            foreach (var node in currentNode.Children())
+            if (currentNode.SourceName.Equals(nextNamespaceElement))
             {
-                if (node.SourceName.Equals(nextNamespaceElement))
+                foreach (var node in currentNode.Children().Where(x => x.Type.Equals("Namespace")).ToList())
                 {
-                    return TraverseForNamespace(splitedNamespace.Skip(1).ToList(), node);
+                    if (TraverseForNamespace(splitedNamespace.Skip(1).ToList(), node) is { } found)
+                    {
+                        return found;
+                    }
                 }
             }
 
@@ -447,6 +454,19 @@ namespace SEE.Game.UI.LiveDocumantation
             foreach (var namespaceName in ImportedNamespaces)
             {
                 Node traversedNamespace = TraverseForNamespace(namespaceName);
+                // Skip all namespaces which don't belong to the CodeCity.
+                if (traversedNamespace == null)
+                {
+                    continue;
+                }
+
+                foreach (var node in traversedNamespace.Children().Where((x) => x.Type.Equals("Class")).ToList())
+                {
+                    if (node.SourceName.Equals(className))
+                    {
+                        return node;
+                    }
+                }
             }
 
             return null;
