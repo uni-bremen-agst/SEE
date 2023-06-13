@@ -312,69 +312,44 @@ namespace DlibFaceLandmarkDetectorExample
                 // Code from the WebCamTextureToMatHelperExample end
 
 
-                // Specify the rectangular region to cutout the face.
 
-                int cutoutTextureHeight = 0; //standartwert für plausible größe damit webcam not found angezeigt wird
-                int cutoutTextureY;
-                int _width =0;
-                //int _cutoutTextureHeight = 0;
-                int _height = 0;
+                int cutoutTextureX = 0;
+                int cutoutTextureY = 0;
+                int cutoutTextureWidth = 480; // am anfang die größe der Webcam? sobald webcam gefunden wurde! vorher größé von texture not found bild
+                int cutoutTextureHeight = 480; //standartwert für plausible größe damit webcam not found angezeigt wird
+
 
                 if (rectFound) // SONST MUSS ALTES GENUZTZ WERDEN
                 {
-                    int x = Mathf.RoundToInt(mainRect.x);
-                    int y = Mathf.RoundToInt(mainRect.y);
-                    int width = Mathf.RoundToInt(mainRect.width);
-                    int height = Mathf.RoundToInt(mainRect.height);
-                    _width = width;
-                    
+                    cutoutTextureX = Mathf.RoundToInt(mainRect.x);
+                    cutoutTextureY = Mathf.RoundToInt(mainRect.y);
+                    cutoutTextureWidth = Mathf.RoundToInt(mainRect.width);
+                    cutoutTextureHeight = Mathf.RoundToInt(mainRect.height); // Right now it is just the size of the cutout face, not yet the cutout texture height.
+
                     // If rect is inside the texture.
-                    if (y + height <= texture.height && x + width <= texture.width && y > 0 && x > 0)
+                    if (cutoutTextureY + cutoutTextureHeight <= texture.height && cutoutTextureX + cutoutTextureWidth <= texture.width && cutoutTextureY > 0 && cutoutTextureX > 0)
                     {
-                        
-                        _height = height;
-                        // Add a little over and under the rect of the head to make it fully visible
-                        cutoutTextureHeight = height + height / 2 + (height / 6); // etwas addieren für unten und etwas für oben; so erstamal nur oben?
-                        cutoutTextureY = texture.height - y - height - (height/6); // Because texture and rect do not both use y the same way, it needs to be converted. etwas nach oben verschieben um unten was hionzuzufügen
-                        // Copy the pixels from the original texture to the cutout texture
-                        Color[] pixels = texture.GetPixels(x, cutoutTextureY, width, cutoutTextureHeight); // Because texture and rect do not both use y the same way, it needs to be converted.
-                        cutoutTexture = new Texture2D(width, cutoutTextureHeight);
+                        // Add a little space over and under the detected head to make it fully visible.
+                        int SpaceAbove = cutoutTextureHeight / 2;
+                        int SpaceBelow = cutoutTextureHeight / 6;
+                        // Add space below for the y position.
+                        cutoutTextureY = texture.height - cutoutTextureY - cutoutTextureHeight - SpaceBelow; // Because texture and rect do not both use y the same way, it needs to be converted.
+                        // Add space to the height.
+                        cutoutTextureHeight = cutoutTextureHeight + SpaceAbove + SpaceBelow; // Now 'cutoutTextureHeight' is the size it should be.
+                        // Copy the pixels from the original texture to the cutout texture.
+                        Color[] pixels = texture.GetPixels(cutoutTextureX, cutoutTextureY, cutoutTextureWidth, cutoutTextureHeight);
+                        cutoutTexture = new Texture2D(cutoutTextureWidth, cutoutTextureHeight);
                         cutoutTexture.SetPixels(pixels);
                         cutoutTexture.Apply();
-                    }
-                } //FIXME SONST ALLTES NEHMEN
+                        // Apply the cutout texture size onto the FacCam
+                        // the size is way to big, so it needs to be reduced.
+                        transform.localScale = new Vector3(((float)cutoutTextureWidth) / 1000, (float)cutoutTextureHeight / 1000, -1); // without '(float)' the result is just '0'.
 
+                    }
+                }
 
                 // Renders the cutout texture onto the FaceCam
                 gameObject.GetComponent<Renderer>().material.mainTexture = cutoutTexture;
-
-
-                if (rectFound)
-                {
-                    transform.localScale = new Vector3(((float)_width)/ (float)1000,((float) cutoutTextureHeight + ((float)_height / (float)4))/ (float)1000, -1); // without '(float)' there seems to bee rounding errors and the result is just '0'.
-                }
-                // quatsch ,für rechteckanpassungder höhe und breite..
-
-                /*
-                
-                // Update size if a face is found. Use ratio to make the bigger of height or width 0.2f big but keep aspect ratio.
-                if (rectFound)
-                {
-                    Debug.Log("NEW SIZE");
-                    if (mainRect.width > cutoutTexture.height)
-                    {
-                        float ratio = cutoutTexture.height / mainRect.width;
-                        //transform.localScale = new Vector3(0.2f, (-0.2f / ratio) - 0.06f, -1); // - 0.06f because we cut of a little bit more of the height.
-                        transform.localScale = new Vector3(0.2f, (0.2f * ratio), -1);
-                    }
-                    else
-                    {
-                         float ratio = mainRect.width / cutoutTexture.height;
-                         transform.localScale = new Vector3((0.2f * ratio), 0.2f, -1); // - 0.06f because we cut of a little bit more of the height.
-                    }
-                }
-                
-                */
 
 
 
