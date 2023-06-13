@@ -107,9 +107,6 @@ namespace SEE.Controls.Actions
                     }
 
                     documentationWindow.ClassName = documentationWindow.Title;
-                    documentationWindow.BasePath = selectedNode.elem.ItsGraph.BasePath;
-                    documentationWindow.RelativePath = path;
-                    documentationWindow.Graph = selectedNode.Value.ItsGraph;
                     documentationWindow.NodeOfClass = selectedNode.Value;
 
                     // Try initialise the FileParser 

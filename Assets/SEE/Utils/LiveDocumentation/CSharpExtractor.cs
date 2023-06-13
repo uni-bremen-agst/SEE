@@ -260,7 +260,22 @@ namespace SEE.Utils.LiveDocumentation
             tokens.Fill();
             return (new CSharpCommentsGrammarParser(tokens), tokens);
         }
-
+ 
+        /// <summary>
+        /// Process the return tag of a method, if there is any
+        /// </summary>
+        /// <param name="buffer"></param>
+        /// <param name="returnContext"></param>
+        private void ProcessReturnTag(LiveDocumentationBuffer buffer, [CanBeNull] CSharpCommentsGrammarParser.ReturnContext returnContext)
+        {
+        
+        }
+        
+        /// <summary>
+        /// Extracting
+        /// </summary>
+        /// <param name="className"></param>
+        /// <returns></returns>
         public List<LiveDocumentationClassMemberBuffer> ExtractMethods(string className)
         {
             List<LiveDocumentationClassMemberBuffer> buffers = new();
@@ -292,6 +307,8 @@ namespace SEE.Utils.LiveDocumentation
                     if (tokens.GetTokens().Count > 1)
                     {
                         ProcessSummary(methodDoc, parser.docs().summary());
+                        parser.Reset();
+                        ProcessReturnTag(methodBuffer, parser.docs().@return());
                         parser.Reset();
                     }
 

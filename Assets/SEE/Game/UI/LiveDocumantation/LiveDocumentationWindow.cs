@@ -23,12 +23,10 @@ namespace SEE.Game.UI.LiveDocumantation
     /// 
     /// In this window the Name of the Class, the documentation and all class methods are shown.
     /// 
-    /// <h3> asdjsd </h3>
     /// The following fields must be set:
     /// <ul>
     ///     <li><see cref="ClassName"/> </li>
-    ///     <li><see cref="BasePath"/> </li>
-    ///     <li><see cref="RelativePath"/> </li>
+    ///     <li> <see cref="NodeOfClass"/> </li>
     /// </ul>
     /// Otherwise an error is displayed and the window is not rendereed.
     /// 
@@ -75,16 +73,7 @@ namespace SEE.Game.UI.LiveDocumantation
         /// The name of the class
         /// </summary>
         public string ClassName { get; set; }
-
-        /// <summary>
-        /// The base path of the folder containing the source code files
-        /// </summary>
-        public string BasePath { get; set; }
-
-        /// <summary>
-        /// The relative Path
-        /// </summary>
-        public string RelativePath { get; set; }
+        
 
         public List<string> ImportedNamespaces { get; set; } = new();
 
@@ -100,6 +89,7 @@ namespace SEE.Game.UI.LiveDocumantation
 
         private WindowSpaceManager spaceManager;
 
+        /*
         private bool SpaceManagerContainsWindow(string filePath, out BaseWindow win)
         {
             List<LiveDocumentationWindow> matchingWindows = spaceManager[WindowSpaceManager.LOCAL_PLAYER].Windows
@@ -115,7 +105,7 @@ namespace SEE.Game.UI.LiveDocumantation
 
             win = matchingWindows[0];
             return true;
-        }
+        }*/
 
 
         /// <summary>
@@ -132,7 +122,7 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         /// <returns>Returns true when all fields are set. Otherwise false</returns>
         private bool CheckNecessaryFields() =>
-            ClassName != null && BasePath != null && RelativePath != null && Graph != null && NodeOfClass != null;
+            ClassName != null  && NodeOfClass != null;
 
         /// <summary>
         /// Adds a new Class member to the ClassMember section in the LiveDocumentation Window.
@@ -199,8 +189,6 @@ namespace SEE.Game.UI.LiveDocumantation
                     }
 
                     newWin.ClassName = newWin.Title;
-                    newWin.BasePath = BasePath;
-                    newWin.RelativePath = method.Path() + method.Filename();
                     newWin.Graph = Graph;
                     newWin.NodeOfClass = method;
                     newWin.DocumentationWindowType = LiveDocumentationWindowType.METHOD;
@@ -405,16 +393,12 @@ namespace SEE.Game.UI.LiveDocumantation
 
         private Node TraverseForNamespace(List<string> splitedNamespace, Node currentNode)
         {
-            string nextNamespaceElement = splitedNamespace.FirstOrDefault();
+           // Base case
             if (splitedNamespace.Count == 1 && currentNode.SourceName.Equals(splitedNamespace.First()))
             {
                 return currentNode;
             }
-        //    if (nextNamespaceElement == null)
-     //       {
-     //           return currentNode;
-     //       }
-
+            string nextNamespaceElement = splitedNamespace.FirstOrDefault();
             if (currentNode.SourceName.Equals(nextNamespaceElement))
             {
                 foreach (var node in currentNode.Children().Where(x => x.Type.Equals("Namespace")).ToList())
@@ -491,7 +475,7 @@ namespace SEE.Game.UI.LiveDocumantation
 
             // If the Space manager don't contains a LiveDocumentationWindow of the same file a new one is created
             // Otherwise the old one is set as the active window
-            if (!SpaceManagerContainsWindow(nodeOfLink.Path() + nodeOfLink.Filename(), out BaseWindow w))
+            if (!nodeOfLink.GameObject().TryGetComponent(out LiveDocumentationWindow ldocWin))
             {
                 LiveDocumentationWindow newWin = nodeOfLink.GameObject().AddComponent<LiveDocumentationWindow>();
 
@@ -506,8 +490,6 @@ namespace SEE.Game.UI.LiveDocumantation
                 }
 
                 newWin.ClassName = newWin.Title;
-                newWin.BasePath = BasePath;
-                newWin.RelativePath = nodeOfLink.Path() + nodeOfLink.Filename();
                 newWin.Graph = Graph;
                 newWin.NodeOfClass = nodeOfLink;
                 LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
@@ -535,7 +517,7 @@ namespace SEE.Game.UI.LiveDocumantation
             }
             else
             {
-                spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = w;
+                spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = ldocWin;
             }
         }
 
