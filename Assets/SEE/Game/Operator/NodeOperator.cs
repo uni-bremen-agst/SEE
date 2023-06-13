@@ -128,7 +128,7 @@ namespace SEE.Game.Operator
         /// that is, the value is set before control is returned to the caller.</param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveXTo(float newXPosition, float duration, bool updateEdges = true)
+        public IOperationCallback<Action> MoveXTo(float newXPosition, float duration = DefaultAnimationDuration, bool updateEdges = true)
         {
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
@@ -143,7 +143,7 @@ namespace SEE.Game.Operator
         /// that is, the value is set before control is returned to the caller.</param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveYTo(float newYPosition, float duration, bool updateEdges = true)
+        public IOperationCallback<Action> MoveYTo(float newYPosition, float duration = DefaultAnimationDuration, bool updateEdges = true)
         {
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
@@ -158,7 +158,7 @@ namespace SEE.Game.Operator
         /// that is, the value is set before control is returned to the caller.</param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveZTo(float newZPosition, float duration, bool updateEdges = true)
+        public IOperationCallback<Action> MoveZTo(float newZPosition, float duration = DefaultAnimationDuration, bool updateEdges = true)
         {
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
@@ -173,7 +173,7 @@ namespace SEE.Game.Operator
         /// that is, the value is set before control is returned to the caller.</param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveTo(Vector3 newPosition, float duration, bool updateEdges = true)
+        public IOperationCallback<Action> MoveTo(Vector3 newPosition, float duration = DefaultAnimationDuration, bool updateEdges = true)
         {
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
@@ -189,11 +189,11 @@ namespace SEE.Game.Operator
         /// Rotates the node to the given quaternion <paramref name="newRotation"/>,
         /// taking <paramref name="duration"/> seconds.
         /// </summary>
-        /// <param name="newRotation">the desired new target rotation</param>
+        /// <param name="newRotation">the desired new target rotation in world space</param>
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> RotateTo(Quaternion newRotation, float duration)
+        public IOperationCallback<Action> RotateTo(Quaternion newRotation, float duration = DefaultAnimationDuration)
         {
             return Rotation.AnimateTo(newRotation, duration);
         }
@@ -207,7 +207,7 @@ namespace SEE.Game.Operator
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> RotateTo(Vector3 axis, float angle, float duration)
+        public IOperationCallback<Action> RotateTo(Vector3 axis, float angle, float duration = DefaultAnimationDuration)
         {
             Quaternion rotation = Quaternion.AngleAxis(angle, axis);
             return RotateTo(rotation, duration);
@@ -222,7 +222,7 @@ namespace SEE.Game.Operator
         /// that is, the value is set before control is returned to the caller.</param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> ScaleTo(Vector3 newLocalScale, float duration, bool updateEdges = true)
+        public IOperationCallback<Action> ScaleTo(Vector3 newLocalScale, float duration = DefaultAnimationDuration, bool updateEdges = true)
         {
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
@@ -236,7 +236,7 @@ namespace SEE.Game.Operator
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the blinking is stopped before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> Blink(int blinkCount, float duration)
+        public IOperationCallback<Action> Blink(int blinkCount, float duration = DefaultAnimationDuration)
         {
             return Blinking.AnimateTo(blinkCount, duration);
         }
@@ -249,7 +249,7 @@ namespace SEE.Game.Operator
         /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
         /// that is, the value is set before control is returned to the caller.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> FadeLabel(float alpha, float duration) =>
+        public IOperationCallback<Action> FadeLabel(float alpha, float duration = DefaultAnimationDuration) =>
             new AndCombinedOperationCallback<Action>(new[]
             {
                 // NOTE: Order is important, because the line's end position target depends on the text position target,
@@ -440,7 +440,7 @@ namespace SEE.Game.Operator
             }
 
             Blinking = new TweenOperation<int>(BlinkAction, 0, equalityComparer: new AlwaysFalseEqualityComparer<int>());
-            
+
             base.OnEnable();
 
             #region Local Methods

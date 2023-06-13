@@ -111,12 +111,19 @@ namespace SEE.Audio
         /// <returns>True, if the queue is empty, else false.</returns>
         public bool EmptyQueue()
         {
-            bool emptyQueue = effectsQueue.Count == 0 && !AttachedObject.GetComponent<AudioSource>().isPlaying;
-            if (emptyQueue)
+            if (!AttachedObject.TryGetComponent(out AudioSource audioSource))
             {
-                Destroyer.Destroy(AttachedObject.GetComponent<AudioSource>());
+                return true;
             }
-            return emptyQueue;
+            else
+            {
+                bool emptyQueue = effectsQueue.Count == 0 && !audioSource.isPlaying;
+                if (emptyQueue)
+                {
+                    Destroyer.Destroy(audioSource);
+                }
+                return emptyQueue;
+            }
         }
     }
 }

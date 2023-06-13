@@ -210,7 +210,7 @@ namespace SEE.Controls.Actions
             /// Returns the grabbed object to its original position when it was grabbed.
             /// This method will be called for Undo.
             /// </summary>
-            internal void MoveToOrigin()
+            private void MoveToOrigin()
             {
                 if (GrabbedGameObject)
                 {
