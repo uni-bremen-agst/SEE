@@ -212,6 +212,8 @@ jobs:
           targetPlatform: ${{ matrix.targetPlatform }}
           buildName: ${{ matrix.targetPlatform }}
       - name: Compress build
+        # Compress only if manually triggered or merged into master, otherwise we won't upload.
+        if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.merged }}
         run: zip -r build-${{ matrix.targetPlatform }}.zip build/${{ matrix.targetPlatform }}
       - uses: actions/upload-artifact@v3
         continue-on-error: true
