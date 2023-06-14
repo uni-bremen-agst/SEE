@@ -1,0 +1,43 @@
+name: Remove old artifacts
+
+on:
+  schedule:
+    - cron: '0 4 * * 1'  # every Monday at 04:00 AM
+  workflow_dispatch:
+    inputs:
+      age:
+        description: 'Remove artifacts older than'
+        required: true
+        type: string
+        default: '1 day'
+      keepLast:
+        description: 'Keep most recent artifacts'
+        required: true
+        type: number
+        default: 4
+
+
+
+jobs:
+  remove-old-artifacts:
+    name: Remove old artifacts
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Configure artifact removal parameters
+        id: parameters
+        run: |
+          if ${{ github.event_name != 'workflow_dispatch' }}; then
+            echo "AGE=1 day" >> "$GITHUB_OUTPUT"
+            echo "KEEP_LAST=4" >> "$GITHUB_OUTPUT"
+          else
+            echo "AGE=${{ inputs.age }}" >> "$GITHUB_OUTPUT"
+            echo "KEEP_LAST=${{ inputs.keepLast }}" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Remove artifacts older than ${{ steps.parameters.outputs.AGE }}
+        uses: c-hive/gha-remove-artifacts@v1
+        with:
+          age: ${{ steps.parameters.outputs.AGE }}
+          skip-recent: ${{ steps.parameters.outputs.KEEP_LAST }}
+          skip-tags: true

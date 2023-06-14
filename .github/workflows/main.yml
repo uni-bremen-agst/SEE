@@ -1,10 +1,8 @@
 name: Test and build SEE
 
 on:
-  push:
-    branches: [master]
   pull_request:
-    types: [opened, reopened, synchronize, ready_for_review]
+    types: [opened, reopened, synchronize, ready_for_review, closed]
     branches: [master]
   workflow_dispatch:
     inputs:
@@ -26,6 +24,8 @@ permissions: read-all
 jobs:
   setup:
     name: Setup Repository
+    # The following condition filters out pull requests that are closed, but not merged.
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.state != 'closed' || github.event.pull_request.merged }}
     runs-on: self-hosted
     outputs:
       runner: ${{ steps.remember.outputs.runner }}
@@ -147,12 +147,14 @@ jobs:
           customParameters: -testCategory "!NonDeterministic"
           coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;assemblyFilters:+SEE'
       - uses: actions/upload-artifact@v3
+        continue-on-error: true
         name: Upload test results
         if: ${{ !cancelled() }}
         with:
           name: Test results for ${{ matrix.os }}
           path: ${{ steps.tests.outputs.artifactsPath }}
       - uses: actions/upload-artifact@v3
+        continue-on-error: true
         name: Upload coverage results
         if: github.ref == 'refs/heads/master'
         with:
@@ -209,19 +211,55 @@ jobs:
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
           buildName: ${{ matrix.targetPlatform }}
+      - name: Compress build
+        run: zip -r build-${{ matrix.targetPlatform }}.zip build/${{ matrix.targetPlatform }}
       - uses: actions/upload-artifact@v3
+        continue-on-error: true
         name: Upload build
-        # Upload only if on master or if manually triggered
-        if: ${{ github.ref == 'refs/heads/master' || github.event_name == 'workflow_dispatch' }}
+        # Upload only if manually triggered, because for master merges we create a release below anyway.
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         with:
-          name: SEE-${{ matrix.targetPlatform }}-${{ github.sha }}
-          path: build/${{ matrix.targetPlatform}}
+          name: SEE-${{ matrix.targetPlatform }}-${{ github.sha }}.zip
+          path: build-${{ matrix.targetPlatform }}.zip
+          retention-days: 7  # Due to high space usage.
+
+  release:
+    name: Release
+    runs-on: ${{ needs.setup.outputs.runner }}
+    needs: [build]
+    # We only want to create a release after merging a PR into master.
+    if: ${{ github.event.pull_request.merged }}
+    steps:
+      - name: Create release tag
+        uses: rickstaa/action-create-tag@v1
+        with:
+          tag: pr-${{ github.event.pull_request.number }}
+          message: ${{ github.event.pull_request.title }}
+      - name: Publish release
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          name: ${{ github.event.pull_request.title }}
+          tag_name: pr-${{ github.event.pull_request.number }}
+          fail_on_unmatched_files: true
+          files: |
+            build-*.zip
+          body: |
+            This release incorporates the changes by @${{ github.event.pull_request.user.login }} from pull request #${{ github.event.pull_request.number }}.
+            
+            ## Details
+            ${{ github.event.pull_request.body }}
+            
+            ---
+            
+            > [See original pull request for details.](${{ github.event.pull_request.html_url }})
+
 
   cleanup:
     name: Cleanup
     runs-on: ${{ needs.setup.outputs.runner }}
     if: ${{ always() }}
-    needs: [setup, test, build]   # "test" and "build" two use docker and sometimes mess up permissions.
+    needs: [setup, test, build, release]   # "test", "build" and "release" use docker and sometimes mess up permissions.
     strategy:
       fail-fast: false
     steps:
