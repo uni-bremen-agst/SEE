@@ -200,8 +200,9 @@ jobs:
         run: |
           sudo /mnt/scripts/set-work-permissions.sh  # Permissions may be messed up here
           git reset --hard ${{ github.sha }}  # Test or previous build may have changed files
-          git clean -fd
-          rm -rf build || true  # Try deleting any previous build
+          # Try deleting any previous build, but not other zip files that we may need later.
+          git clean -fd -e 'build-*.zip'
+          rm -rf build "build-${{ matrix.targetPlatform }}.zip" || true
       - uses: game-ci/unity-builder@v2
         timeout-minutes: 45
         name: Build project
@@ -211,7 +212,10 @@ jobs:
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
           buildName: ${{ matrix.targetPlatform }}
+          allowDirtyBuild: true
       - name: Compress build
+        # Compress only if manually triggered or merged into master, otherwise we won't upload.
+        if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.merged }}
         run: zip -r build-${{ matrix.targetPlatform }}.zip build/${{ matrix.targetPlatform }}
       - uses: actions/upload-artifact@v3
         continue-on-error: true
@@ -226,7 +230,8 @@ jobs:
   release:
     name: Release
     runs-on: ${{ needs.setup.outputs.runner }}
-    needs: [build]
+    permissions: write-all
+    needs: [setup, build]
     # We only want to create a release after merging a PR into master.
     if: ${{ github.event.pull_request.merged }}
     steps:
@@ -246,6 +251,7 @@ jobs:
             build-*.zip
           body: |
             This release incorporates the changes by @${{ github.event.pull_request.user.login }} from pull request #${{ github.event.pull_request.number }}.
+            Builds for Windows and Linux are available below.
             
             ## Details
             ${{ github.event.pull_request.body }}
