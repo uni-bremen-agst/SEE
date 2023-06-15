@@ -320,48 +320,33 @@ namespace DlibFaceLandmarkDetectorExample
 
                 if (rectFound) // SONST MUSS ALTES GENUZTZ WERDEN
                 {
-                    int newCutoutTextureX = Mathf.RoundToInt(mainRect.x);
-                    int newCutoutTextureY = Mathf.RoundToInt(mainRect.y); // !!!!!!! HIER Y schon umrechnen zu komatiblen wert zwischen TEXTURE und RECT auch danach dann einfachere berechnung
-                    int newCutoutTextureWidth = Mathf.RoundToInt(mainRect.width);
-                    int newCutoutTextureHeight = Mathf.RoundToInt(mainRect.height); // Right now it is just the size of the cutout face, not yet the cutout texture height.
+                    cutoutTextureX = Mathf.RoundToInt(mainRect.x);
+                    cutoutTextureY = Mathf.RoundToInt(mainRect.y); // !!!!!!! HIER Y schon umrechnen zu komatiblen wert zwischen TEXTURE und RECT auch danach dann einfachere berechnung
+                    cutoutTextureWidth = Mathf.RoundToInt(mainRect.width);
+                    cutoutTextureHeight = Mathf.RoundToInt(mainRect.height); // Right now it is just the size of the cutout face, not yet the cutout texture height.
 
-                    // If rect is inside the texture.
-                    //if ((texture.height - newCutoutTextureY - newCutoutTextureHeight) + newCutoutTextureHeight <= texture.height && newCutoutTextureX + newCutoutTextureWidth <= texture.width && newCutoutTextureY >= 0 && newCutoutTextureX >= 0)
-                    //{
-                        /*
-                        Debug.Log("Rect x = " + newCutoutTextureX);
-                        Debug.Log("Texture x =  should be 0");
-                        Debug.Log("Rect y = " + newCutoutTextureY);
-                        Debug.Log("Texture y = should be 0");
-                        Debug.Log("Rect width = " + newCutoutTextureWidth);
-                        Debug.Log("Texture width= " + texture.width);
-                        Debug.Log("Rect height = " + newCutoutTextureHeight);
-                        Debug.Log("Texture height = " + texture.height);
-                        */
-                        cutoutTextureX = newCutoutTextureX;
-                        cutoutTextureY = newCutoutTextureY;
-                        cutoutTextureWidth = newCutoutTextureWidth;
-                        cutoutTextureHeight = newCutoutTextureHeight;
-                        // Add a little space over and under the detected head to make it fully visible.
-                        int SpaceAbove = cutoutTextureHeight / 2;
-                        int SpaceBelow = cutoutTextureHeight / 6;
-                        // Add space below for the y position.
-                        cutoutTextureY = texture.height - cutoutTextureY - cutoutTextureHeight - SpaceBelow; // Because texture and rect do not both use y the same way, it needs to be converted.
-                        // Add space to the height.
-                        cutoutTextureHeight = cutoutTextureHeight + SpaceAbove + SpaceBelow; // Now 'cutoutTextureHeight' is the size it should be.
-                        // because of addet space, it could be outside
-                        cutoutTextureY = Math.Max(0, cutoutTextureY);
-                        cutoutTextureX = Math.Max(0, cutoutTextureX);
-                        //cutoutTextureHeight = Math.Min(cutoutTextureY + cutoutTextureHeight, texture.height);
-                        if (cutoutTextureY + cutoutTextureHeight > texture.height) { cutoutTextureHeight = texture.height - cutoutTextureY; } // falls herausragt über texture, wird abgeschnitten bis rand der textur
-                        if (cutoutTextureX + cutoutTextureWidth > texture.width) { cutoutTextureWidth = texture.width - cutoutTextureX; }
-                        //cutoutTextureWidth = Math.Min(cutoutTextureX + cutoutTextureWidth, texture.width);
+                    // Add a little space over and under the detected head to make it fully visible.
+                    int SpaceAbove = cutoutTextureHeight / 2;
+                    int SpaceBelow = cutoutTextureHeight / 6;
+                    // Add space below for the y position.
+                    cutoutTextureY = texture.height - cutoutTextureY - cutoutTextureHeight - SpaceBelow; // Because texture and rect do not both use y the same way, it needs to be converted.
+                    // Add space to the height.
+                    cutoutTextureHeight = cutoutTextureHeight + SpaceAbove + SpaceBelow; // Now 'cutoutTextureHeight' is the size it should be.
+                    // because of addet space, it could be outside
+                    cutoutTextureY = Math.Max(0, cutoutTextureY);
+                    cutoutTextureX = Math.Max(0, cutoutTextureX);
+                    //cutoutTextureHeight = Math.Min(cutoutTextureY + cutoutTextureHeight, texture.height);
+                    if (cutoutTextureY + cutoutTextureHeight > texture.height) { cutoutTextureHeight = texture.height - cutoutTextureY; } // falls herausragt über texture, wird abgeschnitten bis rand der textur
+                    if (cutoutTextureX + cutoutTextureWidth > texture.width) { cutoutTextureWidth = texture.width - cutoutTextureX; }
+                    //cutoutTextureWidth = Math.Min(cutoutTextureX + cutoutTextureWidth, texture.width);
 
-                        // Apply the cutout texture size onto the FacCam
-                        // the size is way to big, so it needs to be reduced.
-                        transform.localScale = new Vector3(((float)cutoutTextureWidth) / 1000, (float)cutoutTextureHeight / 1000, -1); // without '(float)' the result is just '0'.
+                    // Apply the cutout texture size onto the FacCam
+                    // the size is way to big, so it needs to be reduced.
+                    float maxHeight = 0.24f;
+                    float divisor = cutoutTextureHeight / maxHeight;
+                    transform.localScale = new Vector3(((float)cutoutTextureWidth) / divisor, (float)cutoutTextureHeight / divisor, -1); // without '(float)' the result is just '0'.
 
-                    //}
+
                 }
                 // Copy the pixels from the original texture to the cutout texture.
 
