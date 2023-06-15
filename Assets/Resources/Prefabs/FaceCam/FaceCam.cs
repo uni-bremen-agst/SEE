@@ -83,6 +83,12 @@ namespace DlibFaceLandmarkDetectorExample
 
         // Code from the WebCamTextureToMatHelperExample end
 
+        int cutoutTextureX = 0;
+        int cutoutTextureY = 0;
+        int cutoutTextureWidth = 480; // am anfang die größe der Webcam? sobald webcam gefunden wurde! vorher größé von texture not found bild
+        int cutoutTextureHeight = 480; //standartwert für plausible größe damit webcam not found angezeigt wird
+
+
         /// <summary>
         /// A timer used to ensure the frame rate of the video transmitted over the network.
         /// It counts the seconds until the video is transmitted. Then it resets.
@@ -281,15 +287,15 @@ namespace DlibFaceLandmarkDetectorExample
                 // Is there any rect?
                 bool rectFound = false;
                 // My Code end
-                Debug.Log("S1");
+                //Debug.Log("S1");
                 foreach (var rect in detectResult)
                 {
                     // My Code
                     // find biggest = nearest face, this is the face we want to zoom in
-                    Debug.Log("S2");
+                    //Debug.Log("S2");
                     if (mainRect.height * mainRect.width <= rect.height * rect.width)
                     {
-                        Debug.Log("S3");
+                        //Debug.Log("S3");
                         mainRect = rect;
                         rectFound = true;
                     }
@@ -312,23 +318,30 @@ namespace DlibFaceLandmarkDetectorExample
                 // Code from the WebCamTextureToMatHelperExample end
 
 
-
-                int cutoutTextureX = 0;
-                int cutoutTextureY = 0;
-                int cutoutTextureWidth = 480; // am anfang die größe der Webcam? sobald webcam gefunden wurde! vorher größé von texture not found bild
-                int cutoutTextureHeight = 480; //standartwert für plausible größe damit webcam not found angezeigt wird
-
-
                 if (rectFound) // SONST MUSS ALTES GENUZTZ WERDEN
                 {
-                    cutoutTextureX = Mathf.RoundToInt(mainRect.x);
-                    cutoutTextureY = Mathf.RoundToInt(mainRect.y);
-                    cutoutTextureWidth = Mathf.RoundToInt(mainRect.width);
-                    cutoutTextureHeight = Mathf.RoundToInt(mainRect.height); // Right now it is just the size of the cutout face, not yet the cutout texture height.
+                    int newCutoutTextureX = Mathf.RoundToInt(mainRect.x);
+                    int newCutoutTextureY = Mathf.RoundToInt(mainRect.y); // !!!!!!! HIER Y schon umrechnen zu komatiblen wert zwischen TEXTURE und RECT auch danach dann einfachere berechnung
+                    int newCutoutTextureWidth = Mathf.RoundToInt(mainRect.width);
+                    int newCutoutTextureHeight = Mathf.RoundToInt(mainRect.height); // Right now it is just the size of the cutout face, not yet the cutout texture height.
 
                     // If rect is inside the texture.
-                    if (cutoutTextureY + cutoutTextureHeight <= texture.height && cutoutTextureX + cutoutTextureWidth <= texture.width && cutoutTextureY > 0 && cutoutTextureX > 0)
-                    {
+                    //if ((texture.height - newCutoutTextureY - newCutoutTextureHeight) + newCutoutTextureHeight <= texture.height && newCutoutTextureX + newCutoutTextureWidth <= texture.width && newCutoutTextureY >= 0 && newCutoutTextureX >= 0)
+                    //{
+                        /*
+                        Debug.Log("Rect x = " + newCutoutTextureX);
+                        Debug.Log("Texture x =  should be 0");
+                        Debug.Log("Rect y = " + newCutoutTextureY);
+                        Debug.Log("Texture y = should be 0");
+                        Debug.Log("Rect width = " + newCutoutTextureWidth);
+                        Debug.Log("Texture width= " + texture.width);
+                        Debug.Log("Rect height = " + newCutoutTextureHeight);
+                        Debug.Log("Texture height = " + texture.height);
+                        */
+                        cutoutTextureX = newCutoutTextureX;
+                        cutoutTextureY = newCutoutTextureY;
+                        cutoutTextureWidth = newCutoutTextureWidth;
+                        cutoutTextureHeight = newCutoutTextureHeight;
                         // Add a little space over and under the detected head to make it fully visible.
                         int SpaceAbove = cutoutTextureHeight / 2;
                         int SpaceBelow = cutoutTextureHeight / 6;
@@ -336,18 +349,31 @@ namespace DlibFaceLandmarkDetectorExample
                         cutoutTextureY = texture.height - cutoutTextureY - cutoutTextureHeight - SpaceBelow; // Because texture and rect do not both use y the same way, it needs to be converted.
                         // Add space to the height.
                         cutoutTextureHeight = cutoutTextureHeight + SpaceAbove + SpaceBelow; // Now 'cutoutTextureHeight' is the size it should be.
-                        // Copy the pixels from the original texture to the cutout texture.
-                        Color[] pixels = texture.GetPixels(cutoutTextureX, cutoutTextureY, cutoutTextureWidth, cutoutTextureHeight);
-                        cutoutTexture = new Texture2D(cutoutTextureWidth, cutoutTextureHeight);
-                        cutoutTexture.SetPixels(pixels);
-                        cutoutTexture.Apply();
+                        // because of addet space, it could be outside
+                        cutoutTextureY = Math.Max(0, cutoutTextureY);
+                        cutoutTextureX = Math.Max(0, cutoutTextureX);
+                        //cutoutTextureHeight = Math.Min(cutoutTextureY + cutoutTextureHeight, texture.height);
+                        if (cutoutTextureY + cutoutTextureHeight > texture.height) { cutoutTextureHeight = texture.height - cutoutTextureY; } // falls herausragt über texture, wird abgeschnitten bis rand der textur
+                        if (cutoutTextureX + cutoutTextureWidth > texture.width) { cutoutTextureWidth = texture.width - cutoutTextureX; }
+                        //cutoutTextureWidth = Math.Min(cutoutTextureX + cutoutTextureWidth, texture.width);
+
                         // Apply the cutout texture size onto the FacCam
                         // the size is way to big, so it needs to be reduced.
                         transform.localScale = new Vector3(((float)cutoutTextureWidth) / 1000, (float)cutoutTextureHeight / 1000, -1); // without '(float)' the result is just '0'.
 
-                    }
+                    //}
                 }
+                // Copy the pixels from the original texture to the cutout texture.
 
+                Debug.Log("Rect Width = " + (cutoutTextureX + cutoutTextureWidth));
+                Debug.Log("Text Width = " + texture.width);
+                Debug.Log("Rect Height= " + (cutoutTextureY + cutoutTextureHeight));
+                Debug.Log("Text Height= " + texture.height);
+                Color[] pixels = texture.GetPixels(cutoutTextureX, cutoutTextureY, cutoutTextureWidth, cutoutTextureHeight);
+                
+                cutoutTexture = new Texture2D(cutoutTextureWidth, cutoutTextureHeight);
+                cutoutTexture.SetPixels(pixels);
+                cutoutTexture.Apply();
                 // Renders the cutout texture onto the FaceCam
                 gameObject.GetComponent<Renderer>().material.mainTexture = cutoutTexture;
 
@@ -360,7 +386,7 @@ namespace DlibFaceLandmarkDetectorExample
                         // Perform your action here
                         // This code will execute approximately 30 times per second
                       //  Debug.Log("Time = " + timer);
-                        Debug.Log("FPS = " + 1/networkVideoTimer);
+                        //Debug.Log("FPS = " + 1/networkVideoTimer);
                         //DisplayVideoOnAllOtherClients();
                         networkVideoTimer = 0f; // Reset the timer
                     }
