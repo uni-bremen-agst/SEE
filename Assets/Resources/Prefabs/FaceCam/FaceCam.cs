@@ -87,7 +87,19 @@ namespace DlibFaceLandmarkDetectorExample
         int cutoutTextureY = 0;
         int cutoutTextureWidth = 480; // am anfang die größe der Webcam? sobald webcam gefunden wurde! vorher größé von texture not found bild
         int cutoutTextureHeight = 480; //standartwert für plausible größe damit webcam not found angezeigt wird
+        float step = 0.0001F;
+        [SerializeField]
+        float moveStartSpeed = 1F;
+        [SerializeField]
+        float moveAccelerationSpeed = 0F;
 
+        int lastFrameNextCutoutTextureX;
+         int lastFrameNextCutoutTextureY;
+            int        lastFrameNextCutoutTextureWidth;
+            int        lastFrameNextCutoutTextureHeight;
+
+
+        float interpolationFactor = 0;
 
         /// <summary>
         /// A timer used to ensure the frame rate of the video transmitted over the network.
@@ -298,6 +310,10 @@ namespace DlibFaceLandmarkDetectorExample
                         //Debug.Log("S3");
                         mainRect = rect;
                         rectFound = true;
+                        OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(255, 0, 0, 255), 2);
+                    }
+                    else {
+                        OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(0, 0, 255, 255), 2);
                     }
                     // My Code end
 
@@ -308,7 +324,7 @@ namespace DlibFaceLandmarkDetectorExample
                     //OpenCVForUnityUtils.DrawFaceLandmark(rgbaMat, points, new Scalar(0, 255, 0, 255), 2);
 
                     //draw face rect
-                    OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(255, 0, 0, 255), 2);
+                    //OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(255, 0, 0, 255), 2);
                 }
 
 
@@ -318,27 +334,102 @@ namespace DlibFaceLandmarkDetectorExample
                 // Code from the WebCamTextureToMatHelperExample end
 
 
-                if (rectFound) // SONST MUSS ALTES GENUZTZ WERDEN
+                if (rectFound) // einfach immer ausführen? damit nicht immer gestoppt wird bei der bewegung
                 {
-                    cutoutTextureX = Mathf.RoundToInt(mainRect.x);
-                    cutoutTextureY = Mathf.RoundToInt(mainRect.y); // !!!!!!! HIER Y schon umrechnen zu komatiblen wert zwischen TEXTURE und RECT auch danach dann einfachere berechnung
-                    cutoutTextureWidth = Mathf.RoundToInt(mainRect.width);
-                    cutoutTextureHeight = Mathf.RoundToInt(mainRect.height); // Right now it is just the size of the cutout face, not yet the cutout texture height.
+
+                    int NextRectX = Mathf.RoundToInt(mainRect.x);
+                    int NextRectY = Mathf.RoundToInt(mainRect.y);
+                    int NextRectWidth = Mathf.RoundToInt(mainRect.width);
+                    int NextRectHeight = Mathf.RoundToInt(mainRect.height);
 
                     // Add a little space over and under the detected head to make it fully visible.
-                    int SpaceAbove = cutoutTextureHeight / 2;
-                    int SpaceBelow = cutoutTextureHeight / 6;
-                    // Add space below for the y position.
-                    cutoutTextureY = texture.height - cutoutTextureY - cutoutTextureHeight - SpaceBelow; // Because texture and rect do not both use y the same way, it needs to be converted.
-                    // Add space to the height.
-                    cutoutTextureHeight = cutoutTextureHeight + SpaceAbove + SpaceBelow; // Now 'cutoutTextureHeight' is the size it should be.
-                    // because of addet space, it could be outside
-                    cutoutTextureY = Math.Max(0, cutoutTextureY);
-                    cutoutTextureX = Math.Max(0, cutoutTextureX);
-                    //cutoutTextureHeight = Math.Min(cutoutTextureY + cutoutTextureHeight, texture.height);
-                    if (cutoutTextureY + cutoutTextureHeight > texture.height) { cutoutTextureHeight = texture.height - cutoutTextureY; } // falls herausragt über texture, wird abgeschnitten bis rand der textur
-                    if (cutoutTextureX + cutoutTextureWidth > texture.width) { cutoutTextureWidth = texture.width - cutoutTextureX; }
-                    //cutoutTextureWidth = Math.Min(cutoutTextureX + cutoutTextureWidth, texture.width);
+                    int SpaceAbove = NextRectHeight / 2;
+                    int SpaceBelow = NextRectHeight / 6;
+
+                    //cutoutTextureX = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureX, mainRect.x, interpolationFactor));
+                    //cutoutTextureY = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureY, mainRect.y, interpolationFactor));
+                    //cutoutTextureWidth = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureWidth, mainRect.width, interpolationFactor));
+                    //cutoutTextureHeight = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureHeight, mainRect.height, interpolationFactor));
+
+                    int nextCutoutTextureX = NextRectX;
+                    int nextCutoutTextureY = Math.Max(0, texture.height - NextRectY - NextRectHeight - SpaceBelow);  // Because texture and rect do not both use y the same way, it needs to be converted.
+                    int nextCutoutTextureWidth = NextRectWidth;
+                    int nextCutoutTextureHeight = NextRectHeight + SpaceAbove + SpaceBelow;
+
+
+                    if (nextCutoutTextureY + nextCutoutTextureHeight > texture.height) { nextCutoutTextureHeight = texture.height - nextCutoutTextureY; } // falls herausragt über texture, wird abgeschnitten bis rand der textur
+                    if (nextCutoutTextureX + nextCutoutTextureWidth > texture.width) { nextCutoutTextureWidth = texture.width - nextCutoutTextureX; }
+
+                    
+                    int rectOffset = NextRectWidth/11; // wenn ein Quadat soweit entfernt ist zählt es noch als gleiches
+                    if (nextCutoutTextureX > cutoutTextureX + rectOffset
+                        || nextCutoutTextureX < cutoutTextureX - rectOffset
+                        || nextCutoutTextureY > cutoutTextureY + rectOffset
+                        || nextCutoutTextureY < cutoutTextureY - rectOffset
+                        || nextCutoutTextureWidth > cutoutTextureWidth + rectOffset
+                        || nextCutoutTextureWidth < cutoutTextureWidth - rectOffset
+                        || nextCutoutTextureHeight > cutoutTextureHeight + rectOffset
+                        || nextCutoutTextureHeight < cutoutTextureHeight - rectOffset)
+                    {
+                        //interpolationFactor = 0; Debug.Log("NEW RECT interpolationFactor reset");
+                    }
+                    else {
+                        interpolationFactor = 0;  Debug.Log("GOAL interpolationFactor reset");
+                    }
+
+                     rectOffset = NextRectWidth;
+                    if (nextCutoutTextureX > lastFrameNextCutoutTextureX + rectOffset
+                       || nextCutoutTextureX < lastFrameNextCutoutTextureX - rectOffset
+                       || nextCutoutTextureY > lastFrameNextCutoutTextureY + rectOffset
+                       || nextCutoutTextureY < lastFrameNextCutoutTextureY - rectOffset
+                       || nextCutoutTextureWidth > lastFrameNextCutoutTextureWidth + rectOffset
+                       || nextCutoutTextureWidth < lastFrameNextCutoutTextureWidth - rectOffset
+                       || nextCutoutTextureHeight > lastFrameNextCutoutTextureHeight + rectOffset
+                       || nextCutoutTextureHeight < lastFrameNextCutoutTextureHeight - rectOffset)
+                    {
+                        interpolationFactor = 0; Debug.Log("NEW RECT interpolationFactor reset");
+                    }
+
+
+                    lastFrameNextCutoutTextureX = nextCutoutTextureX;
+                    lastFrameNextCutoutTextureY = nextCutoutTextureY;
+                    lastFrameNextCutoutTextureWidth = nextCutoutTextureWidth;
+                    lastFrameNextCutoutTextureHeight = nextCutoutTextureHeight;
+
+                    cutoutTextureX = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureX, nextCutoutTextureX, interpolationFactor));
+                    cutoutTextureY = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureY,nextCutoutTextureY, interpolationFactor));
+                    cutoutTextureWidth = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureWidth,nextCutoutTextureWidth, interpolationFactor));
+                    cutoutTextureHeight = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureHeight,nextCutoutTextureHeight, interpolationFactor));
+
+                    //if (interpolationFactor >= 0.99f) { interpolationFactor = 0; Debug.Log("GOAL interpolationFactor reset"); } // falls ziel erreicht, steze zurück
+                    float distancePosition = Vector2.Distance(new Vector2(cutoutTextureX, cutoutTextureY), mainRect.position);
+                    float distanceSize = Vector2.Distance(new Vector2(cutoutTextureWidth, cutoutTextureHeight), mainRect.size);
+
+
+                    //Falls ca. (z.B ein Quadrat entfernt) oder (z.B ca. Hälfter der Größe Weggezoomt)  
+                    if (distancePosition >= NextRectWidth / 2 || distanceSize >= NextRectWidth / 2) // Werte gerschätzt ggf. nicht sinvoll, und weiter Berechnung notwendig
+                    {
+                        //step = 0.001F;
+                        step = step + moveAccelerationSpeed * Time.deltaTime; // Geschwindigeit der Bewegung zum Gesicht wenn es woanders(weit genug weg) erkannt wird // geschätzt. // Geschwindigkeit wird pro frame erhöht
+                    }
+                    else { step = moveStartSpeed; }
+                    interpolationFactor = interpolationFactor + step * Time.deltaTime;
+                    Debug.Log("interpolationFactor = " + interpolationFactor);
+
+
+                   
+
+
+
+                    //cutoutTextureX = Mathf.RoundToInt(mainRect.x);
+                    //cutoutTextureY = Mathf.RoundToInt(mainRect.y); // !!!!!!! HIER Y schon umrechnen zu komatiblen wert zwischen TEXTURE und RECT auch danach dann einfachere berechnung
+                    //cutoutTextureWidth = Mathf.RoundToInt(mainRect.width);
+                    //cutoutTextureHeight = Mathf.RoundToInt(mainRect.height); // Right now it is just the size of the cutout face, not yet the cutout texture height.
+
+                      
+
+                    
+
 
                     // Apply the cutout texture size onto the FacCam
                     // the size is way to big, so it needs to be reduced.
@@ -350,10 +441,10 @@ namespace DlibFaceLandmarkDetectorExample
                 }
                 // Copy the pixels from the original texture to the cutout texture.
 
-                Debug.Log("Rect Width = " + (cutoutTextureX + cutoutTextureWidth));
-                Debug.Log("Text Width = " + texture.width);
-                Debug.Log("Rect Height= " + (cutoutTextureY + cutoutTextureHeight));
-                Debug.Log("Text Height= " + texture.height);
+                //Debug.Log("Rect Width = " + (cutoutTextureX + cutoutTextureWidth));
+                //Debug.Log("Text Width = " + texture.width);
+                //Debug.Log("Rect Height= " + (cutoutTextureY + cutoutTextureHeight));
+                //Debug.Log("Text Height= " + texture.height);
                 Color[] pixels = texture.GetPixels(cutoutTextureX, cutoutTextureY, cutoutTextureWidth, cutoutTextureHeight);
                 
                 cutoutTexture = new Texture2D(cutoutTextureWidth, cutoutTextureHeight);
