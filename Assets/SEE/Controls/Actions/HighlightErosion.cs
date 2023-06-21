@@ -182,7 +182,7 @@ namespace SEE.Controls.Actions
         private float AnimationDuration(Node node, AbstractSEECity city = null)
         {
             city ??= City();
-            return city == null ? DefaultAnimationDuration : city.NodeTypes[node.Type].LabelSettings.AnimationDuration;
+            return city == null ? DefaultAnimationDuration : city.NodeTypes[node.Type].LabelSettings.AnimationFactor;
         }
 
         private void On()

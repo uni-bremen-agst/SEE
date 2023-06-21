@@ -426,8 +426,8 @@ namespace SEE.Game.UI.ConfigMenu
             SliderBuilder.Init(parent)
                 .SetLabel("Label anim. duration")
                 .SetMode(SliderMode.Float)
-                .SetDefaultValue(labelSettings.AnimationDuration)
-                .SetOnChangeHandler(f => labelSettings.AnimationDuration = f)
+                .SetDefaultValue(labelSettings.AnimationFactor)
+                .SetOnChangeHandler(f => labelSettings.AnimationFactor = f)
                 .SetRange((0, 2))
                 .Build();
         }

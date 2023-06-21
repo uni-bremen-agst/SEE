@@ -40,11 +40,6 @@ namespace SEE.Game.City
         private SEEReflexionCity City;
 
         /// <summary>
-        /// Duration of any animation (edge movement, color change...) in seconds.
-        /// </summary>
-        private const float ANIMATION_DURATION = 2f;
-
-        /// <summary>
         /// Percentage by which the starting color of an edge differs to its end color.
         /// </summary>
         private const float EDGE_GRADIENT_FACTOR = 0.8f;
@@ -157,7 +152,7 @@ namespace SEE.Game.City
                         if (gameEdge != null)
                         {
                             EdgeOperator edgeOperator = gameEdge.AddOrGetComponent<EdgeOperator>();
-                            edgeOperator.ShowOrHide(allDivergencesAreShown, City.EdgeLayoutSettings.AnimationKind, ANIMATION_DURATION);
+                            edgeOperator.ShowOrHide(allDivergencesAreShown, City.EdgeLayoutSettings.AnimationKind);
                         }
                     }
                 }
@@ -265,7 +260,7 @@ namespace SEE.Game.City
                     EdgeOperator edgeOperator = HighlightedEdgeOperators.Dequeue();
                     if (edgeOperator != null)
                     {
-                        edgeOperator.GlowOut(ANIMATION_DURATION);
+                        edgeOperator.GlowOut();
                     }
                 }
             }
@@ -311,14 +306,14 @@ namespace SEE.Game.City
             {
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge);
                 EdgeOperator edgeOperator = edge.AddOrGetComponent<EdgeOperator>();
-                edgeOperator.ShowOrHide(!edgeChange.Edge.HasToggle(Edge.IsHiddenToggle), City.EdgeLayoutSettings.AnimationKind, ANIMATION_DURATION);
-                edgeOperator.ChangeColorsTo((newColors.start, newColors.end), ANIMATION_DURATION, false);
+                edgeOperator.ShowOrHide(!edgeChange.Edge.HasToggle(Edge.IsHiddenToggle), City.EdgeLayoutSettings.AnimationKind);
+                edgeOperator.ChangeColorsTo((newColors.start, newColors.end), useAlpha: false);
 
                 if (!PreviousEdgeStates.TryGetValue(edgeChange.Edge.ID, out State previous) || previous != edgeChange.NewState)
                 {
                     // Mark changed edges compared to previous version.
-                    edgeOperator.GlowIn(ANIMATION_DURATION);
-                    edgeOperator.HitEffect(ANIMATION_DURATION);
+                    edgeOperator.GlowIn();
+                    edgeOperator.HitEffect();
                     HighlightedEdgeOperators.Enqueue(edgeOperator);
                 }
             }

@@ -91,11 +91,6 @@ namespace SEE.Game.UI.Notification
         private const string NOTIFICATION_PREFAB = "Prefabs/UI/Notification";
 
         /// <summary>
-        /// Time it takes the notification to move along the y axis.
-        /// </summary>
-        private const float ANIMATION_DURATION = 1f;
-
-        /// <summary>
         /// The number of frames this notification has been active.
         /// </summary>
         private int frames;
@@ -177,7 +172,7 @@ namespace SEE.Game.UI.Notification
             }
             else
             {
-                return Operator.MoveToY(Operator.TargetPositionY - y, ANIMATION_DURATION);
+                return Operator.MoveToY(Operator.TargetPositionY - y);
             }
         }
 

@@ -82,6 +82,10 @@ namespace SEE.Game.City
         /// Label in the configuration file for <see cref="AntennaWidth"/>.
         /// </summary>
         private const string AntennaWidthLabel = "AntennaWidth";
+        /// <summary>
+        /// Label in the configuration file for <see cref="BaseAnimationDuration"/>.
+        /// </summary>
+        private const string BaseAnimationDurationLabel = "BaseAnimationDuration";
 
         #endregion
 
@@ -101,6 +105,7 @@ namespace SEE.Game.City
             writer.Save(IgnoreSelfLoopsInLifting, IgnoreSelfLoopsInLiftingLabel);
             writer.Save(MaximalAntennaSegmentHeight, MaximalAntennaSegmentHeightLabel);
             writer.Save(AntennaWidth, AntennaWidthLabel);
+            writer.Save(BaseAnimationDuration, BaseAnimationDurationLabel);
             MetricToColor.Save(writer, MetricToColorLabel);
             writer.Save(ZScoreScale, ZScoreScaleLabel);
             writer.Save(ScaleOnlyLeafMetrics, ScaleOnlyLeafMetricsLabel);
@@ -127,6 +132,7 @@ namespace SEE.Game.City
             ConfigIO.Restore(attributes, IgnoreSelfLoopsInLiftingLabel, ref IgnoreSelfLoopsInLifting);
             ConfigIO.Restore(attributes, MaximalAntennaSegmentHeightLabel, ref MaximalAntennaSegmentHeight);
             ConfigIO.Restore(attributes, AntennaWidthLabel, ref AntennaWidth);
+            ConfigIO.Restore(attributes, BaseAnimationDurationLabel, ref BaseAnimationDuration);
             MetricToColor.Restore(attributes, MetricToColorLabel);
             ConfigIO.Restore(attributes, ZScoreScaleLabel, ref ZScoreScale);
             ConfigIO.Restore(attributes, ScaleOnlyLeafMetricsLabel, ref ScaleOnlyLeafMetrics);

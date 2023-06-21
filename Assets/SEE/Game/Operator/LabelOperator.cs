@@ -39,7 +39,7 @@ namespace SEE.Game.Operator
         /// Updates the position of the attached label, including its text and line.
         /// </summary>
         /// <param name="duration"></param>
-        private void UpdateLabelLayout(float duration)
+        private static void UpdateLabelLayout(float duration)
         {
             // Assumption: There are only very few active labels, compared to all active and inactive labels
             //             that may exist in the descendants of this node. Hence, we go through all active ones.

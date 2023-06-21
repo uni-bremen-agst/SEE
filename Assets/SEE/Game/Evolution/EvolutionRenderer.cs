@@ -136,6 +136,9 @@ namespace SEE.Game.Evolution
         /// </summary>
         public bool IsStillAnimating { get; private set; }
 
+        // FIXME: The below needs to be adjusted to use animation factors instead of durations.
+        //        However, I'm not sure what I have to look out for here, as the value is used extensively.
+        
         /// <summary>
         /// The default time for the complete graph transition animation.
         /// </summary>

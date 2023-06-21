@@ -28,11 +28,6 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The duration of the showing/hiding animation in seconds.
-        /// </summary>
-        private const float ANIMATION_DURATION = 1.0f;
-
-        /// <summary>
         /// Shows or hides all edges of the code city the <paramref name="hoveredGraphElement"/> belongs to.
         /// </summary>
         /// <param name="hoveredGraphElement">the graph element currently being hovered</param>
@@ -49,12 +44,12 @@ namespace SEE.Controls.Actions
                         if (edge.HasToggle(Edge.IsHiddenToggle))
                         {
                             edge.UnsetToggle(Edge.IsHiddenToggle);
-                            edgeOperator.Show(codeCity.EdgeLayoutSettings.AnimationKind, ANIMATION_DURATION);
+                            edgeOperator.Show(codeCity.EdgeLayoutSettings.AnimationKind);
                         }
                         else
                         {
                             edge.SetToggle(Edge.IsHiddenToggle);
-                            edgeOperator.Hide(codeCity.EdgeLayoutSettings.AnimationKind, ANIMATION_DURATION);
+                            edgeOperator.Hide(codeCity.EdgeLayoutSettings.AnimationKind);
                         }
                     }
                 }
