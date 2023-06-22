@@ -155,7 +155,6 @@ namespace SEE.Game.Operator
             // Assigned so that the expensive getter isn't called everytime.
             GameObject go = gameObject;
             go.MustGetComponent(out spline);
-            
             base.OnEnable();
 
             SplineMorphism AnimateToMorphismAction((BSpline targetSpline, GameObject temporaryGameObject) s, float d)
