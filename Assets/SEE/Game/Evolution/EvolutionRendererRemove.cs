@@ -95,13 +95,13 @@ namespace SEE.Game.Evolution
                 if (gameObject.IsNode())
                 {
                     gameObject.AddOrGetComponent<NodeOperator>()
-                              .MoveTo(newPosition, AnimationLagPerPhase(), updateEdges: false)
+                              .MoveTo(newPosition, AnimationLagFactor, updateEdges: false)
                               .SetOnComplete(() => OnRemoveFinishedAnimation(gameObject));
                 }
                 else if (gameObject.IsEdge())
                 {
                     gameObject.AddOrGetComponent<EdgeOperator>()
-                        .FadeTo(0, AnimationLagPerPhase())
+                        .FadeTo(0, AnimationLagFactor)
                         .SetOnComplete(() => OnRemoveFinishedAnimation(gameObject));
                 }
                 else

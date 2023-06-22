@@ -30,6 +30,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace SEE.Game.Evolution
 {
@@ -136,31 +137,29 @@ namespace SEE.Game.Evolution
         /// </summary>
         public bool IsStillAnimating { get; private set; }
 
-        // FIXME: The below needs to be adjusted to use animation factors instead of durations.
-        //        However, I'm not sure what I have to look out for here, as the value is used extensively.
-        
         /// <summary>
-        /// The default time for the complete graph transition animation.
+        /// The default factor for the complete graph transition animation.
         /// </summary>
-        private const float DefaultAnimationTime = 5.0f;
+        private const float DefaultAnimationFactor = 1.0f;
 
         /// <summary>
-        /// The duration of an animation. This value can be controlled by the user.
+        /// A factor controlling the speed of an animation (higher = slower). This value can be controlled by the user.
         /// </summary>
+        [FormerlySerializedAs("animationDuration")]
         [SerializeField]
-        private float animationDuration = DefaultAnimationTime;
+        private float animationFactor = DefaultAnimationFactor;
 
         /// <summary>
-        /// The time in seconds for showing a single graph revision during auto-play animation.
+        /// The animation factor for showing a single graph revision during auto-play.
         /// </summary>
-        public float AnimationLag
+        public float AnimationLagFactor
         {
-            get => animationDuration;
+            get => animationFactor;
             set
             {
                 if (value >= 0)
                 {
-                    animationDuration = value;
+                    animationFactor = value;
                     shownGraphHasChangedEvent.Invoke();
                 }
             }
@@ -178,18 +177,7 @@ namespace SEE.Game.Evolution
         ///
         /// This constant is the number of phases.
         /// </summary>
-        private const int NumberOfPhases = 5;
-
-        /// <summary>
-        /// Returns the time for the animation for each individual animation phase
-        /// in seconds, i.e., the total <see cref="AnimationLag"/> divided by
-        /// <see cref="NumberOfPhases"/>.
-        /// </summary>
-        /// <returns>time for the animation for each individual animation phase</returns>
-        private float AnimationLagPerPhase()
-        {
-            return AnimationLag / NumberOfPhases;
-        }
+        private const int NumberOfPhases = 5;  // TODO: Do we still need this constant?
 
         /// <summary>
         /// The city (graph + layout) currently shown.
@@ -755,8 +743,8 @@ namespace SEE.Game.Evolution
                     // We are re-using the existing plane, hence, we animate its change
                     // (new position and new scale).
                     objectManager.GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale);
-                    Tweens.Scale(plane, scale, AnimationLag);
-                    Tweens.Move(plane, centerPosition, AnimationLag / 2);
+                    Tweens.Scale(plane, scale, AnimationLagFactor);
+                    Tweens.Move(plane, centerPosition, AnimationLagFactor / 2);
                 }
             }
         }
