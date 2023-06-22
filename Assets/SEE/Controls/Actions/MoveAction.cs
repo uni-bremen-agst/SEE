@@ -292,7 +292,7 @@ namespace SEE.Controls.Actions
             /// triggered by the reflexion analysis; all of these are reverted).
             ///
             /// Important note: Some of these changes do not come into effect immediately.
-            /// They may be delayed by an animation duration.
+            /// They may be delayed by an animation.
             /// </summary>
             internal void Undo()
             {
@@ -316,7 +316,7 @@ namespace SEE.Controls.Actions
             /// all of these are in place).
             ///
             /// Important note: Some of these changes do not come into effect immediately.
-            /// They may be delayed by an animation duration.
+            /// They may be delayed by an animation.
             /// </summary>
             internal void Redo()
             {

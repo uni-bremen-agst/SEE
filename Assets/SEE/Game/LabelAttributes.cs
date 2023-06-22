@@ -49,7 +49,7 @@ namespace SEE.Game
         private const string ShowLabel = "Show";
         private const string DistanceLabel = "Distance";
         private const string FontSizeLabel = "FontSize";
-        private const string AnimationDurationLabel = "AnimationDuration";
+        private const string AnimationFactorLabel = "AnimationDuration";
         private const string LabelAlphaLabel = "LabelAlpha";
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace SEE.Game
             writer.Save(Show, ShowLabel);
             writer.Save(Distance, DistanceLabel);
             writer.Save(FontSize, FontSizeLabel);
-            writer.Save(AnimationFactor, AnimationDurationLabel);
+            writer.Save(AnimationFactor, AnimationFactorLabel);
             writer.Save(LabelAlpha, LabelAlphaLabel);
             writer.EndGroup();
         }
@@ -84,7 +84,7 @@ namespace SEE.Game
                     ConfigIO.Restore(values, ShowLabel, ref Show);
                     ConfigIO.Restore(values, DistanceLabel, ref Distance);
                     ConfigIO.Restore(values, FontSizeLabel, ref FontSize);
-                    ConfigIO.Restore(values, AnimationDurationLabel, ref AnimationFactor);
+                    ConfigIO.Restore(values, AnimationFactorLabel, ref AnimationFactor);
                     ConfigIO.Restore(values, LabelAlphaLabel, ref LabelAlpha);
                 }
             }

@@ -37,7 +37,7 @@ namespace SEE.Game.UI.Notification
         /// <summary>
         /// Notifications managed by this component along with their respective height.
         /// </summary>
-        private readonly List<NotificationData> Notifications = new List<NotificationData>();
+        private readonly List<NotificationData> Notifications = new();
 
         /// <summary>
         /// Creates and immediately displays a notification using the given parameters.
@@ -50,7 +50,7 @@ namespace SEE.Game.UI.Notification
         /// <returns>The created notification. Will be <c>null</c> as soon it's done playing.</returns>
         public Notification Show(string title, string description, Sprite icon, Color color, float duration)
         {
-            GameObject notificationGameObject = new GameObject { name = $"Notification '{title}'" };
+            GameObject notificationGameObject = new() { name = $"Notification '{title}'" };
             Notification notification = notificationGameObject.AddComponent<Notification>();
             notification.Title = title;
             notification.Text = description;
@@ -76,7 +76,7 @@ namespace SEE.Game.UI.Notification
             {
                 float? height = notification.GetHeight();
                 // We've reached a final height if it's non-null (implicit), non-zero, and stable (doesn't change).
-                bool finalHeightReached = height > 0 && height == finalHeight;
+                bool finalHeightReached = height is > 0 && Mathf.Approximately(height.Value, finalHeight);
                 finalHeight = height ?? 0;
                 return finalHeightReached;
             });
@@ -96,7 +96,7 @@ namespace SEE.Game.UI.Notification
                 Notifications[i].Token.Cancel();
             }
 
-            CancellationTokenSource token = new CancellationTokenSource();
+            CancellationTokenSource token = new();
             Notifications.Add(new NotificationData(notification, finalHeight + MARGIN, token));
 
             StartTimer(notification, token.Token).Forget();

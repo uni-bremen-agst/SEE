@@ -80,7 +80,7 @@ namespace SEE.Game
 
             if (scaleDown)
             {
-                // ScaleTo with animation duration = 0 has immediate effect.
+                // ScaleTo with animation factor = 0 has immediate effect.
                 nodeOperator.ScaleTo(ShrinkedWorldSpaceScale(child, parent), 0);
             }
 
@@ -211,7 +211,7 @@ namespace SEE.Game
                         childExtent *= factor;
                     }
                 }
-                // ScaleTo with animation duration = 0 has immediate effect.
+                // ScaleTo with animation factor = 0 has immediate effect.
                 nodeOperator.ScaleTo(2 * childExtent, 0);
             }
 

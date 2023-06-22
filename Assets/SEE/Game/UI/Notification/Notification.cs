@@ -156,8 +156,7 @@ namespace SEE.Game.UI.Notification
         }
 
         /// <summary>
-        /// Moves this notification down by the given amount <paramref name="y"/>, 
-        /// taking <see cref="ANIMATION_DURATION"/> seconds.
+        /// Moves this notification down by the given amount <paramref name="y"/>.
         /// If the notification has not been created yet (i.e., Start() has not been called), the y position will
         /// be set immediately upon creation.
         /// </summary>

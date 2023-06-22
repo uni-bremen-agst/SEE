@@ -168,21 +168,22 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The default animation duration in case we cannot derive a city for the
-        /// interactable object.
+        /// The default animation duration in case we cannot derive a city for the interactable object.
         /// </summary>
         private const float DefaultAnimationDuration = 1.0f;
 
-        /**
-         * Returns the animation duration using values defined in AbstractSEECity.
-         * <param name="node">The node.</param>
-         * <param name="city">The city object from which to retrieve the duration.
-         * If <code>null</code>, the city object will be retrieved by a call to <see cref="City"/>.</param>
-         */
+        /// <summary>
+        /// Returns the animation duration using values defined in AbstractSEECity.
+        /// <param name="node">The node.</param>
+        /// <param name="city">The city object from which to retrieve the duration.
+        /// If <code>null</code>, the city object will be retrieved by a call to <see cref="City"/>.</param>
+        /// </summary>
         private float AnimationDuration(Node node, AbstractSEECity city = null)
         {
             city ??= City();
-            return city == null ? DefaultAnimationDuration : city.NodeTypes[node.Type].LabelSettings.AnimationFactor;
+            float baseDuration = city == null ? DefaultAnimationDuration : city.BaseAnimationDuration;
+            float factor = city == null ? 1f : city.NodeTypes[node.Type].LabelSettings.AnimationFactor;
+            return baseDuration * factor;
         }
 
         private void On()
@@ -201,20 +202,20 @@ namespace SEE.Controls.Actions
                 {
                     float duration = AnimationDuration(nodeRef.Value);
                     const float SCALING_FACTOR = 1.3f;
-                    ForEachErosion((sprite, textMesh, layoutGroup) =>
+                    ForEachErosion((sprite, textMesh, _) =>
                     {
                         // We have to delete the text first to animate it more nicely, so we save it here before that.
                         string metricText = textMesh.text;
                         // This will enlarge the sprite, make it more opaque, and fade in the text.
                         sequence.Insert(0, DOTween.To(() => textMesh.text, t => textMesh.text = t, string.Empty, 0.01f))
-                                    .InsertCallback(0.02f, () => textMesh.gameObject.SetActive(!sequence.isBackwards))
-                                                       .Insert(0.03f, DOTween.To(() => sprite.transform.localScale,
-                                                                             s => sprite.transform.localScale = s,
-                                                                             sprite.transform.localScale * SCALING_FACTOR, duration))
-                                                       .Insert(0.03f, DOTween.ToAlpha(() => sprite.color, color => sprite.color = color,
-                                                                                  1f, duration))
-                                                       .Insert(0.03f, DOTween.To(() => textMesh.text, t => textMesh.text = t,
-                                                                             metricText, duration));
+                                .InsertCallback(0.02f, () => textMesh.gameObject.SetActive(!sequence.isBackwards))
+                                .Insert(0.03f, DOTween.To(() => sprite.transform.localScale,
+                                                          s => sprite.transform.localScale = s,
+                                                          sprite.transform.localScale * SCALING_FACTOR, duration))
+                                .Insert(0.03f, DOTween.ToAlpha(() => sprite.color, color => sprite.color = color,
+                                                               1f, duration))
+                                .Insert(0.03f, DOTween.To(() => textMesh.text, t => textMesh.text = t,
+                                                          metricText, duration));
                     });
                     sequence.PlayForward();
                 }

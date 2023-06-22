@@ -22,7 +22,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// The factor by which the movement animation duration is multiplied.
         /// </summary>
-        public float Factor;
+        public float AnimationFactor;
 
         /// <summary>
         /// Constructor.
@@ -30,12 +30,12 @@ namespace SEE.Net.Actions
         /// <param name="gameObjectID">the unique game-object name of the game object to be moved;
         /// must be known to <see cref="GraphElementIDMap"/></param>
         /// <param name="targetPosition">the new position of the game object in world space</param>
-        /// <param name="animationDuration">the factor by which the animation duration is multiplied</param>
-        public MoveNetAction(string gameObjectID, Vector3 targetPosition, float factor)
+        /// <param name="animationFactor">the factor by which the animation duration is multiplied</param>
+        public MoveNetAction(string gameObjectID, Vector3 targetPosition, float animationFactor)
         {
             GameObjectID = gameObjectID;
             TargetPosition = targetPosition;
-            Factor = factor;
+            AnimationFactor = animationFactor;
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace SEE.Net.Actions
         {
             if (!IsRequester())
             {
-                GameNodeMover.MoveTo(Find(GameObjectID), TargetPosition, Factor);
+                GameNodeMover.MoveTo(Find(GameObjectID), TargetPosition, AnimationFactor);
             }
         }
 
