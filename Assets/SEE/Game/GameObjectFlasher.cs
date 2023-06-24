@@ -8,6 +8,7 @@ namespace SEE.Game
     /// Flashes a game object, that is, animates its color pulsating from its
     /// original color to its inverted color.
     /// </summary>
+    [System.Obsolete("Use NodeOperator.Blink() instead.")]
     internal class GameObjectFlasher  // TODO: Usages of this class should be replaced with NodeOperator.Blink()
     {
         /// <summary>
