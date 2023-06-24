@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using DG.Tweening;
 using UnityEngine;
@@ -20,9 +21,37 @@ namespace SEE.Game.Operator
     public abstract class AbstractOperator : MonoBehaviour
     {
         /// <summary>
-        /// The default duration of animations in seconds.
+        /// The duration of the animation in seconds to use as a basis.
+        /// Operator methods will apply factors to this value to determine the actual duration.
         /// </summary>
-        public const float DefaultAnimationDuration = 1.0f;
+        protected abstract float BaseAnimationDuration
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Converts the given <paramref name="factor"/> to the effective duration an animation
+        /// with this factor would take.
+        /// </summary>
+        /// <param name="factor">The factor to convert</param>
+        /// <returns>The effective duration</returns>
+        [Pure]
+        public float ToDuration(float factor)
+        {
+            return factor * BaseAnimationDuration;
+        }
+
+        /// <summary>
+        /// Converts the given <paramref name="duration"/> to the factor that would be used
+        /// for an animation of this duration.
+        /// </summary>
+        /// <param name="duration">The duration to convert</param>
+        /// <returns>The factor that would be used for an animation of this duration</returns>
+        [Pure]
+        public float ToFactor(float duration)
+        {
+            return BaseAnimationDuration > 0 ? duration / BaseAnimationDuration : 0;
+        }
 
         /// <summary>
         /// Interface for <see cref="Operation{T,V}"/> which collects all non-generic methods.
@@ -192,8 +221,7 @@ namespace SEE.Game.Operator
             }
 
             protected override IOperationCallback<Action> AnimatorCallback =>
-                new AndCombinedOperationCallback<TweenCallback>(
-                    Animator.Select( x => new TweenOperationCallback(x)), x => new TweenCallback(x));
+                new AndCombinedOperationCallback<TweenCallback>(Animator.Select(x => new TweenOperationCallback(x)), x => new TweenCallback(x));
 
             public TweenOperation(Func<V, float, IList<Tween>> animateToAction, V targetValue,
                                   IEqualityComparer<V> equalityComparer = null)

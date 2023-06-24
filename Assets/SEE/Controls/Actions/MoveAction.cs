@@ -68,12 +68,6 @@ namespace SEE.Controls.Actions
             }
 
             /// <summary>
-            /// The duration of any animation to move the grabbed object for Undo/Redo
-            /// in seconds.
-            /// </summary>
-            private const float AnimationTime = 1.0f;
-
-            /// <summary>
             /// Whether the currently grabbed node is contained in a <see cref="SEEReflexionCity"/>.
             /// This needs to be known to interpret the re-parenting of a node properly.
             /// </summary>
@@ -214,7 +208,7 @@ namespace SEE.Controls.Actions
             {
                 if (GrabbedGameObject)
                 {
-                    MoveTo(GrabbedGameObject, originalWorldPosition, AnimationTime);
+                    MoveTo(GrabbedGameObject, originalWorldPosition);
                 }
             }
 
@@ -227,7 +221,7 @@ namespace SEE.Controls.Actions
             {
                 if (GrabbedGameObject)
                 {
-                    MoveTo(GrabbedGameObject, currentPositionOfGrabbedObject, AnimationTime);
+                    MoveTo(GrabbedGameObject, currentPositionOfGrabbedObject);
                 }
             }
 
@@ -298,7 +292,7 @@ namespace SEE.Controls.Actions
             /// triggered by the reflexion analysis; all of these are reverted).
             ///
             /// Important note: Some of these changes do not come into effect immediately.
-            /// They may be delayed by an animation duration.
+            /// They may be delayed by an animation.
             /// </summary>
             internal void Undo()
             {
@@ -322,7 +316,7 @@ namespace SEE.Controls.Actions
             /// all of these are in place).
             ///
             /// Important note: Some of these changes do not come into effect immediately.
-            /// They may be delayed by an animation duration.
+            /// They may be delayed by an animation.
             /// </summary>
             internal void Redo()
             {
@@ -413,13 +407,12 @@ namespace SEE.Controls.Actions
             /// </summary>
             /// <param name="targetPosition">the position where the grabbed object
             /// should be moved in world space</param>
-            /// <param name="duration">the duration of the animation for moving the grabbed
-            /// object in seconds</param>
+            /// <param name="factor">the factor of the animation for moving the grabbed object</param>
             /// <remarks>This is only a movement, not a change to any hierarchy.</remarks>
-            private static void MoveTo(GameObject grabbedObject, Vector3 targetPosition, float duration)
+            private static void MoveTo(GameObject grabbedObject, Vector3 targetPosition, float factor = 1)
             {
-                GameNodeMover.MoveTo(grabbedObject, targetPosition, duration);
-                new MoveNetAction(grabbedObject.name, targetPosition, duration).Execute();
+                GameNodeMover.MoveTo(grabbedObject, targetPosition, factor);
+                new MoveNetAction(grabbedObject.name, targetPosition, factor).Execute();
             }
 
             /// <summary>
@@ -490,16 +483,15 @@ namespace SEE.Controls.Actions
             {
                 UnmarkAsTarget();
                 MoveToOrigin();
-                float animationTime = AnimationTime;
-                GrabbedGameObject.AddOrGetComponent<NodeOperator>().ScaleTo(originalLocalScale, animationTime);
-                new ScaleNodeNetAction(GrabbedGameObject.name, originalLocalScale, animationTime).Execute();
+                GrabbedGameObject.AddOrGetComponent<NodeOperator>().ScaleTo(originalLocalScale);
+                new ScaleNodeNetAction(GrabbedGameObject.name, originalLocalScale).Execute();
             }
         }
 
         /// <summary>
         /// The currently grabbed object if any.
         /// </summary>
-        private GrabbedObject grabbedObject = new GrabbedObject();
+        private GrabbedObject grabbedObject;
 
         /// <summary>
         /// The distance from the the position of <see cref="grabbedObject"/> when it was grabbed to
