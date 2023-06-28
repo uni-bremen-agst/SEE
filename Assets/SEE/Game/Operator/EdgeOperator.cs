@@ -225,6 +225,8 @@ namespace SEE.Game.Operator
             base.OnDisable();
             morphism.KillAnimator();
             morphism = null;
+            construction.KillAnimator();
+            construction = null;
         }
     }
 }

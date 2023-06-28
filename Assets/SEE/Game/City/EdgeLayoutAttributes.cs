@@ -22,6 +22,12 @@ namespace SEE.Game.City
         public EdgeAnimationKind AnimationKind = EdgeAnimationKind.None;
 
         /// <summary>
+        /// Whether to animate edges of inner nodes as well when hovering over nodes.
+        /// </summary>
+        [Tooltip("When hovering over nodes, animate edges of inner nodes too.")]
+        public bool AnimateInnerEdges = true;
+
+        /// <summary>
         /// The maximal width of an edge.
         /// </summary>
         public const float MaxEdgeWidth = 0.1f;
@@ -52,6 +58,7 @@ namespace SEE.Game.City
             writer.BeginGroup(label);
             writer.Save(Kind.ToString(), EdgeLayoutLabel);
             writer.Save(AnimationKind.ToString(), AnimationKindLabel);
+            writer.Save(AnimateInnerEdges, AnimateInnerEdgesLabel);
             writer.Save(EdgeWidth, EdgeWidthLabel);
             writer.Save(EdgesAboveBlocks, EdgesAboveBlocksLabel);
             writer.Save(Tension, TensionLabel);
@@ -66,6 +73,7 @@ namespace SEE.Game.City
 
                 ConfigIO.RestoreEnum(values, EdgeLayoutLabel, ref Kind);
                 ConfigIO.RestoreEnum(values, AnimationKindLabel, ref AnimationKind);
+                ConfigIO.Restore(values, AnimateInnerEdgesLabel, ref AnimateInnerEdges);
                 ConfigIO.Restore(values, EdgeWidthLabel, ref EdgeWidth);
                 ConfigIO.Restore(values, EdgesAboveBlocksLabel, ref EdgesAboveBlocks);
                 ConfigIO.Restore(values, TensionLabel, ref Tension);
@@ -77,5 +85,6 @@ namespace SEE.Game.City
         private const string EdgesAboveBlocksLabel = "EdgesAboveBlocks";
         private const string TensionLabel = "Tension";
         private const string AnimationKindLabel = "AnimationKind";
+        private const string AnimateInnerEdgesLabel = "AnimateInnerEdges";
     }
 }
