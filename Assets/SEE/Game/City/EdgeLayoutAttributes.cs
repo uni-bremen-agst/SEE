@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SEE.Utils;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -25,7 +26,15 @@ namespace SEE.Game.City
         /// Whether to animate edges of inner nodes as well when hovering over nodes.
         /// </summary>
         [Tooltip("When hovering over nodes, animate edges of inner nodes too.")]
+        [InfoBox("Be aware that animating inner edges may cause heavy performance issues when "
+                 + "combined with the 'Buildup' animation.", InfoMessageType.Warning,
+                 nameof(WarnAboutInnerEdgeAnimation))]
         public bool AnimateInnerEdges = true;
+
+        /// <summary>
+        /// True if the user should be warned about animating inner edges due to performance issues.
+        /// </summary>
+        private bool WarnAboutInnerEdgeAnimation => AnimateInnerEdges && AnimationKind == EdgeAnimationKind.Buildup;
 
         /// <summary>
         /// The maximal width of an edge.
