@@ -538,10 +538,7 @@ namespace SEE.GO
         /// <returns>The spline to be rendered.</returns>
         private BSpline CreateSubSpline()
         {
-            if (chordLengths == null)
-            {
-                chordLengths = spline.ChordLengths();
-            }
+            chordLengths ??= spline.ChordLengths();
 
             double lowerKnot = chordLengths.TToKnot(subsplineStartT);
             double upperKnot = chordLengths.TToKnot(subsplineEndT);
@@ -583,11 +580,18 @@ namespace SEE.GO
         /// attached to <see cref="Component.gameObject"/>; see
         /// <see cref="CreateMesh"/> for more details).
         /// </summary>
-        public void UpdateMesh()
+        private void UpdateMesh()
         {
             if (gameObject.TryGetComponent(out MeshFilter _))
             {
-                CreateOrUpdateMesh();
+                if (needsColorUpdate)
+                {
+                    UpdateMaterial();
+                }
+                else
+                {
+                    CreateOrUpdateMesh();
+                }
             }
             needsUpdate = false;
         }
