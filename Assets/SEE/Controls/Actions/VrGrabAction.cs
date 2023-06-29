@@ -11,7 +11,6 @@ namespace SEE.Controls.Actions
      * The VrGrabAction class is responsible for handling the grabbing and releasing of objects in a VR environment.
      * When an object is grabbed, it adjusts its properties and handles collisions with other objects.
      *
-     * FIXME: Consider scaling based on something else, or not. It's a matter for discussion among the team.
      */
     public class VrGrabAction : MonoBehaviour
     {
@@ -39,6 +38,11 @@ namespace SEE.Controls.Actions
         /// The initial position of the grabbed object
         /// </summary>
         private Vector3 initialPosition;
+        
+        /// <summary>
+        /// The initial with parent position of the grabbed object
+        /// </summary>
+        private Vector3 initialWithParentPosition;
 
         /// <summary>
         /// The initial rotation of the grabbed object
@@ -46,14 +50,26 @@ namespace SEE.Controls.Actions
         private Quaternion initialRotation;
 
         /// <summary>
+        /// The initial with parent rotation of the grabbed object
+        /// </summary>
+        private Quaternion initialWithParentRotation;
+        
+        /// <summary>
         /// The initial rotation of the grabbed object
         /// </summary>
         private Vector3 initialLocalScale;
         
         /// <summary>
+        /// The initial with parent rotation of the grabbed object
+        /// </summary>
+        private Vector3 initialWithParentLocalScale;
+        
+        /// <summary>
         /// Indicates whether a collision is allowed to occur
         /// </summary>
         private bool allowCollision = true;
+        
+        private bool reparentHappend = false;
         
         /// <summary>
         /// The collision cooldown. Currently on half a second
@@ -82,10 +98,15 @@ namespace SEE.Controls.Actions
         {
             var currentGameObject = grabbable.gameObject;
 
-            // Set the initial position and rotation of the object
+            // Set the to be modified initial position and rotation of the object
             initialPosition = currentGameObject.transform.position;
             initialRotation = currentGameObject.transform.rotation;
             initialLocalScale = currentGameObject.transform.localScale;
+            
+            // Set the initial with parent position and rotation of the object
+            initialWithParentPosition = currentGameObject.transform.position;
+            initialWithParentRotation = currentGameObject.transform.rotation;
+            initialWithParentLocalScale = currentGameObject.transform.localScale;
 
             if (gameObject.TryGetNode(out Node node) && !node.IsRoot() && currentGameObject != null)
             {
@@ -143,12 +164,21 @@ namespace SEE.Controls.Actions
                 GameObjectExtensions.SetAllChildLayer(grabbable.gameObject.transform, GrabbableLayer, true);
             }
 
-            if (GrabbedObject != null)
+            if (GrabbedObject != null && !IsInCollision())
             {
                 // Reset the position and rotation of the grabbed object to its initial state
-                GrabbedObject.transform.position = initialPosition;
-                GrabbedObject.transform.rotation = initialRotation;
-                GrabbedObject.transform.localScale = initialLocalScale;
+                ResetPositionAndRotation(GrabbedObject);
+            }else if (GrabbedObject != null && !IsInCollision() && reparentHappend)
+            {
+                GrabbedObject.transform.position = initialWithParentPosition;
+                GrabbedObject.transform.localScale = initialWithParentLocalScale;
+                GrabbedObject.transform.rotation = initialWithParentRotation;
+                //Hier wird dann ge unparented.
+                reparentHappend = false;
+            }
+            else if(GrabbedObject != null && IsInCollision())
+            {
+                ResetPositionAndRotation(GrabbedObject);
             }
         }
 
@@ -206,22 +236,42 @@ namespace SEE.Controls.Actions
                 {
                     //Debug.LogWarning("Collision with node: " + collisionInfo.gameObject.name);
                     MoveAction.StartReparentProcess(collisionInfo.gameObject, GrabbedObject);
+                    reparentHappend = true;
                     // Set the new initial position and rotation of the object
-                    initialPosition = GrabbedObject.transform.position;
-                    initialRotation = GrabbedObject.transform.rotation;
-                    initialLocalScale = GrabbedObject.transform.localScale;
+                    SetNewInitialPositionAndRotation(GrabbedObject);
                 }
 
                 if ( GrabbedObject.transform.parent.gameObject == collisionInfo.gameObject && IsInCollision())
                 {
                     // Set the new initial position and rotation of the object
-                    initialPosition = GrabbedObject.transform.position;
-                    initialRotation = GrabbedObject.transform.rotation;
-                    initialLocalScale = GrabbedObject.transform.localScale;
+                    SetNewInitialPositionAndRotation(GrabbedObject);
                 }
             }
         }
 
+        /// <summary>
+        /// Called when the object is reset to initial position and rotation.
+        /// </summary>
+        /// <param name="grabbedObject">The grabbed object.</param>
+        private void ResetPositionAndRotation(GameObject grabbedObject)
+        {
+            grabbedObject.transform.position = initialPosition;
+            grabbedObject.transform.localScale = initialLocalScale;
+            grabbedObject.transform.rotation = initialRotation;
+        }
+        
+        /// <summary>
+        /// Set the new initial position and rotation of the object
+        /// </summary>
+        /// <param name="grabbedObject">The grabbed object.</param>
+        private void SetNewInitialPositionAndRotation(GameObject grabbedObject)
+        {
+            // Set the new initial position and rotation of the object
+            initialPosition = grabbedObject.transform.position;
+            initialRotation = grabbedObject.transform.rotation;
+            initialLocalScale = grabbedObject.transform.localScale;
+        }
+        
         /// <summary>
         /// Called when the object exits a collision with another object.
         /// </summary>
