@@ -189,7 +189,7 @@ jobs:
 
 
   build:
-    name: Build release
+    name: Create build
     runs-on: ${{ needs.setup.outputs.runner }}
     needs: [setup, setup_build_targets, test, gitscripts]
     strategy:
@@ -234,7 +234,9 @@ jobs:
     permissions: write-all
     needs: [setup, build]
     # We only want to create a release after merging a PR into master.
-    if: ${{ github.event.pull_request.merged }}
+    # Note that we will not create a release if the PR is labelled 'no release'.
+    # This label should be set when a PR does not lead to a noticeable change in the build.
+    if: ${{ github.event.pull_request.merged && !contains(github.event.pull_request.labels.*.name, 'no release') }}
     steps:
       - name: Create release tag
         uses: rickstaa/action-create-tag@v1
