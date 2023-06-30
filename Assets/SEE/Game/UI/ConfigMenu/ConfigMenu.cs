@@ -395,42 +395,42 @@ namespace SEE.Game.UI.ConfigMenu
             //}
         }
 
-        private void CreateLabelSettingsInputs(Transform parent, LabelAttributes labelSettings)
-        {
-            // Show labels
-            SwitchBuilder.Init(parent)
-                .SetLabel("Show labels")
-                .SetDefaultValue(labelSettings.Show)
-                .SetOnChangeHandler(b => labelSettings.Show = b)
-                .Build();
-
-            // Label distance
-            SliderBuilder.Init(parent)
-                .SetLabel("Label distance")
-                .SetMode(SliderMode.Float)
-                .SetDefaultValue(labelSettings.Distance)
-                .SetOnChangeHandler(f => labelSettings.Distance = f)
-                .SetRange((0, 2))
-                .Build();
-
-            // Label font size
-            SliderBuilder.Init(parent)
-                .SetLabel("Label font size")
-                .SetMode(SliderMode.Float)
-                .SetDefaultValue(labelSettings.FontSize)
-                .SetOnChangeHandler(f => labelSettings.FontSize = f)
-                .SetRange((0, 2))
-                .Build();
-
-            // Label animation duration
-            SliderBuilder.Init(parent)
-                .SetLabel("Label anim. duration")
-                .SetMode(SliderMode.Float)
-                .SetDefaultValue(labelSettings.AnimationDuration)
-                .SetOnChangeHandler(f => labelSettings.AnimationDuration = f)
-                .SetRange((0, 2))
-                .Build();
-        }
+        // private void CreateLabelSettingsInputs(Transform parent, LabelAttributes labelSettings)
+        // {
+        //     // Show labels
+        //     SwitchBuilder.Init(parent)
+        //         .SetLabel("Show labels")
+        //         .SetDefaultValue(labelSettings.Show)
+        //         .SetOnChangeHandler(b => labelSettings.Show = b)
+        //         .Build();
+        //
+        //     // Label distance
+        //     SliderBuilder.Init(parent)
+        //         .SetLabel("Label distance")
+        //         .SetMode(SliderMode.Float)
+        //         .SetDefaultValue(labelSettings.Distance)
+        //         .SetOnChangeHandler(f => labelSettings.Distance = f)
+        //         .SetRange((0, 2))
+        //         .Build();
+        //
+        //     // Label font size
+        //     SliderBuilder.Init(parent)
+        //         .SetLabel("Label font size")
+        //         .SetMode(SliderMode.Float)
+        //         .SetDefaultValue(labelSettings.FontSize)
+        //         .SetOnChangeHandler(f => labelSettings.FontSize = f)
+        //         .SetRange((0, 2))
+        //         .Build();
+        //
+        //     // Label animation factor
+        //     SliderBuilder.Init(parent)
+        //         .SetLabel("Label animation factor")
+        //         .SetMode(SliderMode.Float)
+        //         .SetDefaultValue(labelSettings.AnimationFactor)
+        //         .SetOnChangeHandler(f => labelSettings.AnimationFactor = f)
+        //         .SetRange((0, 2))
+        //         .Build();
+        // }
 
         private void SetupNodesLayoutPage()
         {

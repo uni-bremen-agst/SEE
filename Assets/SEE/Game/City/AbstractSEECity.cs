@@ -144,6 +144,14 @@ namespace SEE.Game.City
         public float AntennaWidth = 0.1f;
 
         /// <summary>
+        /// The base duration of an animation.
+        /// Animations will only apply factors to this base duration.
+        /// </summary>
+        [Tooltip("The base duration for all animations.")]
+        [Range(0.0f, 5.0f)]
+        public float BaseAnimationDuration = 1.0f;
+
+        /// <summary>
         /// A mapping of node metric names onto colors.
         /// </summary>
         [Tooltip("Maps metric names onto colors."), TabGroup(MetricFoldoutGroup), RuntimeTab(MetricFoldoutGroup), HideReferenceObjectPicker]

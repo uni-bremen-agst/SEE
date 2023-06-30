@@ -59,11 +59,13 @@ namespace SEE.Audio
         /// </summary>
         private void CheckMusicPlayer()
         {
-            AudioSource audioSource = AttachedObject.GetComponent<AudioSource>();
-            if (!audioSource.isPlaying && effectsQueue.Count == 1)
+            if (AttachedObject.TryGetComponent(out audioSource))
             {
-                audioSource.clip = effectsQueue.Dequeue();
-                audioSource.Play();
+                if (!audioSource.isPlaying && effectsQueue.Count == 1)
+                {
+                    audioSource.clip = effectsQueue.Dequeue();
+                    audioSource.Play();
+                }
             }
         }
 

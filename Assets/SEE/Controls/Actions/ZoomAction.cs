@@ -144,9 +144,9 @@ namespace SEE.Controls.Actions
         private readonly Dictionary<Transform, NodeOperator> rootTransformToOperator = new Dictionary<Transform, NodeOperator>();
 
         /// <summary>
-        /// Duration of the animation.
+        /// Factor to apply to the animation.
         /// </summary>
-        public const float ANIMATION_DURATION = 0.5f;
+        public const float ANIMATION_FACTOR = 0.5f;
 
         /// <summary>
         /// Executes every active zoom command. Logic is done in fixed time steps to ensure
@@ -194,8 +194,8 @@ namespace SEE.Controls.Actions
                     Vector3 cityCenterToHitPoint = averagePosition - rootTransform.position;
                     Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(rootTransform.localScale);
 
-                    Operator.ScaleTo(zoomState.currentZoomFactor * zoomState.originalScale, ANIMATION_DURATION);
-                    Operator.MoveTo(rootTransform.position + cityCenterToHitPoint - Vector3.Scale(cityCenterToHitPointUnscaled, Operator.TargetScale), ANIMATION_DURATION);
+                    Operator.ScaleTo(zoomState.currentZoomFactor * zoomState.originalScale, ANIMATION_FACTOR);
+                    Operator.MoveTo(rootTransform.position + cityCenterToHitPoint - Vector3.Scale(cityCenterToHitPointUnscaled, Operator.TargetScale), ANIMATION_FACTOR);
 
                     new ZoomNetAction(rootTransform.name, Operator.TargetPosition, Operator.TargetScale).Execute();
                 }
@@ -205,7 +205,7 @@ namespace SEE.Controls.Actions
                     zoomState.currentZoomFactor = ConvertZoomStepsToZoomFactor(zoomState.currentTargetZoomSteps);
                     if (!Mathf.Approximately(lastZoomFactor, zoomState.currentZoomFactor))
                     {
-                        Operator.ScaleTo(zoomState.currentZoomFactor * zoomState.originalScale, ANIMATION_DURATION);
+                        Operator.ScaleTo(zoomState.currentZoomFactor * zoomState.originalScale, ANIMATION_FACTOR);
                     }
                 }
             }

@@ -5,9 +5,11 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using HighlightPlus;
 using SEE.DataModel;
+using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
+using ArgumentException = System.ArgumentException;
 
 namespace SEE.Game.Operator
 {
@@ -44,7 +46,18 @@ namespace SEE.Game.Operator
         /// The highlight effect of the element.
         /// </summary>
         private HighlightEffect highlightEffect;
-        
+
+        /// <summary>
+        /// The city to which the element belongs.
+        /// </summary>
+        public AbstractSEECity City
+        {
+            get;
+            private set;
+        }
+
+        protected override float BaseAnimationDuration => City.BaseAnimationDuration;
+
         #region Abstract Methods
 
         /// <summary>
@@ -69,22 +82,24 @@ namespace SEE.Game.Operator
         /// <param name="color">the color to enumerate</param>
         /// <returns>an enumerable of all colors contained in the given <paramref name="color"/></returns>
         protected abstract IEnumerable<Color> AsEnumerable(C color);
-        
+
         #endregion
-        
+
         #region Public API
 
         /// <summary>
         /// Change the color of the element to the given <paramref name="targetColor"/>.
         /// </summary>
         /// <param name="targetColor">The target color this element should animate towards.</param>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <returns>An operation callback for the requested animation</returns>
         /// <param name="useAlpha">Whether to incorporate the alpha values from the given colors.
         /// If set to false, the alpha values of the current color will be used instead.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> ChangeColorsTo(C targetColor, float duration, bool useAlpha = true)
+        public IOperationCallback<Action> ChangeColorsTo(C targetColor, float factor = 1, bool useAlpha = true)
         {
             if (!useAlpha)
             {
@@ -96,7 +111,7 @@ namespace SEE.Game.Operator
                     return c.WithAlpha(alphas.Current);
                 });
             }
-            return color.AnimateTo(targetColor, duration);
+            return color.AnimateTo(targetColor, ToDuration(factor));
         }
 
         /// <summary>
@@ -104,12 +119,14 @@ namespace SEE.Game.Operator
         /// Note that this will affect highlights as well.
         /// </summary>
         /// <param name="alpha">The new alpha value for the element. Must be in interval [0; 1]</param>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <returns>An operation callback for the requested animation</returns>
         /// <exception cref="ArgumentException">If the given <paramref name="alpha"/> value is outside the
         /// range of [0; 1].</exception>
-        public IOperationCallback<Action> FadeTo(float alpha, float duration)
+        public IOperationCallback<Action> FadeTo(float alpha, float factor = 1)
         {
             if (alpha is < 0 or > 1)
             {
@@ -120,6 +137,7 @@ namespace SEE.Game.Operator
             // Elements being faded should also lead to highlights being faded.
             float targetGlow = GetTargetGlow(glowEnabled ? fullGlow : 0, alpha);
 
+            float duration = ToDuration(factor);
             return new AndCombinedOperationCallback<Action>(new[]
             {
                 color.AnimateTo(targetColor, duration),
@@ -130,44 +148,51 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Fade in the glow effect on this element.
         /// </summary>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> GlowIn(float duration)
+        public IOperationCallback<Action> GlowIn(float factor = 1)
         {
             float targetGlow = GetTargetGlow(fullGlow, AsEnumerable(color.TargetValue).Max(x => x.a));
             glowEnabled = true;
-            return glow.AnimateTo(targetGlow, duration);
+            return glow.AnimateTo(targetGlow, ToDuration(factor));
         }
 
         /// <summary>
         /// Fade out the glow effect on this element.
         /// </summary>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> GlowOut(float duration)
+        public IOperationCallback<Action> GlowOut(float factor = 1)
         {
             glowEnabled = false;
-            return glow.AnimateTo(0, duration);
+            return glow.AnimateTo(0, ToDuration(factor));
         }
 
         /// <summary>
-        /// Flashes an element in its inverted color for a short <paramref name="duration"/>.
+        /// Flashes an element in its inverted color for a short time based on the given <paramref name="factor"/>.
         /// Note that this animation is not controlled by an operation and thus not necessarily synchronized.
         /// </summary>
-        /// <param name="duration">Amount of time the flashed color shall fade out for.</param>
-        public void HitEffect(float duration = 0.5f)
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
+        public void HitEffect(float factor = 0.5f)
         {
             // NOTE: This is not controlled by an operation. HighlightEffect itself controls the animation.
             //       Should be alright because overlapping animations aren't a big problem here.
-            highlightEffect.hitFxFadeOutDuration = duration;
+            highlightEffect.hitFxFadeOutDuration = ToDuration(factor);
 
             Color targetColor = AsEnumerable(color.TargetValue).Aggregate((c1, c2) => Color.Lerp(c1, c2, 0.5f)).Invert();
             highlightEffect.hitFxColor = targetColor;
             highlightEffect.HitFX();
         }
-        
+
         #endregion
 
         /// <summary>
@@ -239,8 +264,33 @@ namespace SEE.Game.Operator
             return Mathf.Min(glowTarget / fullGlow, alphaTarget) * fullGlow;
         }
 
+        /// <summary>
+        /// Determines the <see cref="AbstractSEECity"/> this <paramref name="gameObject"/> belongs to and returns it.
+        /// </summary>
+        /// <param name="gameObject">The object to get the city for</param>
+        /// <returns>The city this object belongs to</returns>
+        /// <exception cref="InvalidOperationException">If the object doesn't belong to a city</exception>
+        private static AbstractSEECity GetCity(GameObject gameObject)
+        {
+            GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
+            if (codeCityObject == null || !codeCityObject.TryGetComponent(out AbstractSEECity city))
+            {
+                throw new InvalidOperationException($"GraphElementOperator-operated object {gameObject.FullName()}"
+                                                    + $" in code city {CodeCityName(codeCityObject)}"
+                                                    + $" must have an {nameof(AbstractSEECity)} component!");
+            }
+
+            return city;
+
+            static string CodeCityName(GameObject codeCityObject)
+            {
+                return codeCityObject ? codeCityObject.FullName() : "<null>";
+            }
+        }
+
         protected virtual void OnEnable()
         {
+            City = GetCity(gameObject);
             color = InitializeColorOperation();
 
             if (TryGetComponent(out highlightEffect))
@@ -262,7 +312,7 @@ namespace SEE.Game.Operator
                 elementRef.elem.Subscribe(this);
             }
         }
-        
+
         protected virtual void OnDisable()
         {
             color.KillAnimator();

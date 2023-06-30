@@ -2,7 +2,7 @@
   "dependencies": {
     "com.cakeslice.outline-effect": "https://github.com/cakeslice/Outline-Effect.git",
     "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask#2.2.5",
-    "com.openai.unity": "4.8.7",
+    "com.openai.unity": "5.0.3",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.2d.tilemap": "1.0.0",
     "com.unity.ai.navigation": "1.1.4",
@@ -18,7 +18,7 @@
     "com.unity.test-framework": "1.1.33",
     "com.unity.testtools.codecoverage": "1.2.4",
     "com.unity.textmeshpro": "3.0.6",
-    "com.unity.timeline": "1.7.4",
+    "com.unity.timeline": "1.7.5",
     "com.unity.toolchain.linux-x86_64": "2.0.5",
     "com.unity.ugui": "1.0.0",
     "com.unity.xr.interaction.toolkit": "2.4.0",

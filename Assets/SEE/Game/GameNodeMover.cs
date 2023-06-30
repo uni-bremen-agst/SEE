@@ -80,7 +80,7 @@ namespace SEE.Game
 
             if (scaleDown)
             {
-                // ScaleTo with animation duration = 0 has immediate effect.
+                // ScaleTo with animation factor = 0 has immediate effect.
                 nodeOperator.ScaleTo(ShrinkedWorldSpaceScale(child, parent), 0);
             }
 
@@ -211,7 +211,7 @@ namespace SEE.Game
                         childExtent *= factor;
                     }
                 }
-                // ScaleTo with animation duration = 0 has immediate effect.
+                // ScaleTo with animation factor = 0 has immediate effect.
                 nodeOperator.ScaleTo(2 * childExtent, 0);
             }
 
@@ -271,10 +271,10 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameObject">game node to be moved</param>
         /// <param name="targetPosition">target position in world space</param>
-        /// <param name="duration">the duration of the animation in seconds</param>
-        internal static void MoveTo(GameObject gameObject, Vector3 targetPosition, float duration)
+        /// <param name="factor">the factor by which the animation duration is multiplied</param>
+        internal static void MoveTo(GameObject gameObject, Vector3 targetPosition, float factor)
         {
-            gameObject.AddOrGetComponent<NodeOperator>().MoveTo(targetPosition, duration);
+            gameObject.AddOrGetComponent<NodeOperator>().MoveTo(targetPosition, factor);
         }
     }
 }
