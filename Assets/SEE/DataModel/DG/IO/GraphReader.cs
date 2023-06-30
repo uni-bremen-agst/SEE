@@ -68,7 +68,7 @@ namespace SEE.DataModel.DG.IO
         /// <exception cref="PlatformNotSupportedException">If the system platform is not supported</exception>
         private static string GetLiblzmaPath()
         {
-            // The library liblzma.dll is located in Assets/Native/LZMA/<arch>/native/liblzma.dll
+            // The library liblzma.dll is located in Assets/Plugins/Native/LZMA/<arch>/native/liblzma.dll
             // where <arch> specifies the operating system the Unity editor is currently running on
             // and the hardware architecture (e.g., win-x64).
             //
@@ -81,7 +81,7 @@ namespace SEE.DataModel.DG.IO
             // https://docs.unity3d.com/Manual/PluginInspector.html).
 
             string libDir = Application.isEditor ?
-                                Path.Combine(Path.GetFullPath(Application.dataPath), "Native", "LZMA")
+                                Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins", "Native", "LZMA")
                               : Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins");
 
             if (Application.isEditor)

@@ -6,7 +6,8 @@
     "includes": [],
     "excludes": [
         "Temp/",
-        "External/"
+        "External/",
+        "Plugins/"
     ],
     "baseScore": 100,
     "options": {
