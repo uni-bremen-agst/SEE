@@ -7,17 +7,23 @@ using SEE.Game.UI.Notification;
 
 namespace SEE.Utils.LiveDocumentation
 {
+    /// <summary>
+    /// This class is used as an abstraction for documentation parsers for diffrent file types.
+    ///
+    /// To add a new supported file type extend a class from <see cref="Extractor"/> and append the file extension check in the constructor.
+    /// </summary>
     public class FileParser
     {
         private Extractor _extractor;
 
         /// <summary>
-        /// 
+        /// Constructs a new instance of a parser, which parses the file at the given file: <paramref name="fileName"/>.
         /// </summary>
-        /// <param name="fileName"></param>
+        /// <param name="fileName">The name of the file which should be passed</param>
         /// <exception cref="FileNotFoundException">Is thrown, when the file doesn't exist</exception>
         public FileParser(string fileName)
         {
+            // Check file extension and load the corresponding parser.
             if (fileName.EndsWith(".cs"))
             {
                 _extractor = new CSharpExtractor(fileName);
@@ -29,28 +35,10 @@ namespace SEE.Utils.LiveDocumentation
             }
         }
 
-        [CanBeNull]
-        private Extractor GetExtractorForFile(string fileName)
-        {
-            if (fileName.EndsWith(".cs"))
-            {
-                return new CSharpExtractor(fileName);
-            }
-
-            return null;
-        }
-
-        private void ShowUnknownFileTypeErrorMessage()
-        {
-            ShowNotification.Error("Unknown Filetype",
-                "The file extension is not supported by the LiveDocumentation in SEE");
-        }
-
         /// <summary>
-        /// 
+        /// Parses the documentation of a speciffic class
         /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="className"></param>
+        /// <param name="className">The name of the class</param>
         /// <exception cref="ClassNotFoundException">Will be thrown, when the class cant be found</exception>
         /// <returns></returns>
         [CanBeNull]
@@ -59,12 +47,21 @@ namespace SEE.Utils.LiveDocumentation
             return _extractor.ExtractClassComments(className);
         }
 
+        /// <summary>
+        /// Parses the methods of a class
+        /// </summary>
+        /// <param name="className">The name of the class</param>
+        /// <returns></returns>
         [NotNull]
         public List<LiveDocumentationClassMemberBuffer> ParseClassMethods(string className)
         {
             return _extractor.ExtractMethods(className);
         }
 
+        /// <summary>
+        /// Parses the names of all imported namespaces/packages in the file.
+        /// </summary>
+        /// <returns></returns>
         [NotNull]
         public List<string> ParseNamespaceImports()
         {
