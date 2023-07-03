@@ -55,6 +55,10 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         private TextMeshProUGUI ClassNameField;
 
+        /// <summary>
+        /// GameObject for the ListView containing the class methods (when <see cref="DocumentationWindowType"/> is set to <see cref="LiveDocumentationWindowType.CLASS"/>).
+        /// When set to  <see cref="LiveDocumentationWindowType.METHOD"/> the parameters are displayed there.
+        /// </summary>
         private GameObject ClassMembersList;
 
         /// <summary>
@@ -63,17 +67,17 @@ namespace SEE.Game.UI.LiveDocumantation
         /// The Path inside the prefab should be "LiveDocumentation/ClassDocumentation/Viewport/Content/ClassDoc"
         /// </summary>
         private TextMeshProUGUI ClassDocumentation;
-
-        private Dictionary<String, Node> NamespaceCache = new();
-
-
+        
+        /// <summary>
+        /// The type of the LiveDocumentation window  
+        /// </summary>
         public LiveDocumentationWindowType DocumentationWindowType { get; set; }
 
         /// <summary>
         /// The name of the class
-        /// </summary>
+        /// </su  mmary>
         public string ClassName { get; set; }
-        
+
 
         public List<string> ImportedNamespaces { get; set; } = new();
 
@@ -89,25 +93,6 @@ namespace SEE.Game.UI.LiveDocumantation
 
         private WindowSpaceManager spaceManager;
 
-        /*
-        private bool SpaceManagerContainsWindow(string filePath, out BaseWindow win)
-        {
-            List<LiveDocumentationWindow> matchingWindows = spaceManager[WindowSpaceManager.LOCAL_PLAYER].Windows
-                .OfType<LiveDocumentationWindow>()
-                .Where(x => x.RelativePath == filePath).ToList();
-
-
-            if (matchingWindows.Count == 0)
-            {
-                win = null;
-                return false;
-            }
-
-            win = matchingWindows[0];
-            return true;
-        }*/
-
-
         /// <summary>
         /// The <see cref="LiveDocumentationBuffer"/> which contains the documentation of the class including links
         /// </summary>
@@ -122,7 +107,7 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         /// <returns>Returns true when all fields are set. Otherwise false</returns>
         private bool CheckNecessaryFields() =>
-            ClassName != null  && NodeOfClass != null;
+            ClassName != null && NodeOfClass != null;
 
         /// <summary>
         /// Adds a new Class member to the ClassMember section in the LiveDocumentation Window.
@@ -346,58 +331,59 @@ namespace SEE.Game.UI.LiveDocumantation
         //           .Aggregate("", (((s, s1) => s1 + s)));
         //     }
 
-        /// <summary>
-        /// Finds a node given from a clicked filename.
-        /// </summary>
-        /// <param name="filename">The filename to find a corresponding node for.</param>
-        /// <returns>The node or null if none could be found.</returns>
-        [CanBeNull]
-        private Node FindNodeWithPath(string @namespace)
-        {
-            //See if an item was found in the cache.
-            if (NamespaceCache.ContainsKey(@namespace))
-            {
-                return NamespaceCache[@namespace];
-            }
-
-            // Iterate through each node in the code city.
-            foreach (var item in Graph.Nodes())
-            {
-                // Only check for leaf nodes and classes.
-                if (!(item.IsLeaf() || item.Type.Equals(NodeClassType)))
-                    continue;
-                //Collect all namespaces
-                //TODO replace using with namespaces.
-                var filePath = item.AbsolutePlatformPath();
-                var input = File.ReadAllText(filePath);
-                var lexer = new CSharpFullLexer(new AntlrInputStream(input));
-                var tokens = new CommonTokenStream(lexer);
-                tokens.Fill();
-
-                var parser = new CSharpParser(tokens);
-                var namespaces = parser.compilation_unit().namespace_member_declarations()
-                    .namespace_member_declaration();
-
-                foreach (var parsedNamespace in namespaces)
-                {
-                    if (parsedNamespace.namespace_declaration().qualified_identifier().GetText().Equals(@namespace))
-                    {
-                        NamespaceCache[@namespace] = item;
-                        return item;
-                    }
-                }
-            }
-
-            return null;
-        }
+        // /// <summary>
+        // /// Finds a node given from a clicked filename.
+        // /// </summary>
+        // /// <param name="filename">The filename to find a corresponding node for.</param>
+        // /// <returns>The node or null if none could be found.</returns>
+        // [CanBeNull]
+        // private Node FindNodeWithPath(string @namespace)
+        // {
+        //     //See if an item was found in the cache.
+        //     if (NamespaceCache.ContainsKey(@namespace))
+        //     {
+        //         return NamespaceCache[@namespace];
+        //     }
+        //
+        //     // Iterate through each node in the code city.
+        //     foreach (var item in Graph.Nodes())
+        //     {
+        //         // Only check for leaf nodes and classes.
+        //         if (!(item.IsLeaf() || item.Type.Equals(NodeClassType)))
+        //             continue;
+        //         //Collect all namespaces
+        //         //TODO replace using with namespaces.
+        //         var filePath = item.AbsolutePlatformPath();
+        //         var input = File.ReadAllText(filePath);
+        //         var lexer = new CSharpFullLexer(new AntlrInputStream(input));
+        //         var tokens = new CommonTokenStream(lexer);
+        //         tokens.Fill();
+        //
+        //         var parser = new CSharpParser(tokens);
+        //         var namespaces = parser.compilation_unit().namespace_member_declarations()
+        //             .namespace_member_declaration();
+        //
+        //         foreach (var parsedNamespace in namespaces)
+        //         {
+        //             if (parsedNamespace.namespace_declaration().qualified_identifier().GetText().Equals(@namespace))
+        //             {
+        //                 NamespaceCache[@namespace] = item;
+        //                 return item;
+        //             }
+        //         }
+        //     }
+        //
+        //     return null;
+        // }
 
         private Node TraverseForNamespace(List<string> splitedNamespace, Node currentNode)
         {
-           // Base case
+            // Base case
             if (splitedNamespace.Count == 1 && currentNode.SourceName.Equals(splitedNamespace.First()))
             {
                 return currentNode;
             }
+
             string nextNamespaceElement = splitedNamespace.FirstOrDefault();
             if (currentNode.SourceName.Equals(nextNamespaceElement))
             {

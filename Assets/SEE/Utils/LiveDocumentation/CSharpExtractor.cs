@@ -9,6 +9,9 @@ using SEE.Game.UI.LiveDocumantation;
 
 namespace SEE.Utils.LiveDocumentation
 {
+    /// <summary>
+    /// Extractor class for CSharp source code
+    /// </summary>
     public class CSharpExtractor : Extractor
     {
         private CommonTokenStream _tokens;
@@ -117,7 +120,7 @@ namespace SEE.Utils.LiveDocumentation
                 // Combining the Type 2 Tokens (C# Class Documentation) between the start of the class and the
                 // start of the namespace, if the class is the first in the file, or between the start of the class and the
                 // end of the last type declaration
-                var commentTokens = String.Join(Environment.NewLine, _commentTokens.GetTokens()
+                var commentTokens = String.Join(Environment.NewLine, _commentTokens.GetTokens() 
                     .Where(x => x.Type == 2 && x.Line < classContext.Start.Line && x.Line > upperLineBound)
                     .Select(x => x.Text).ToList());
 
