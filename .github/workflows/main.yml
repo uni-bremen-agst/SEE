@@ -103,14 +103,22 @@ jobs:
                     limitMessage += 'Remaining comments will appear when the CI is triggered next.';
                     comments.splice(50);
                   }
-                  github.rest.pulls.createReview({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    pull_number: context.issue.number,
-                    event: 'COMMENT',
-                    body: 'There are a few bad patterns I found which you should check.' + limitMessage,
-                    comments: comments
-                  });
+                  try {
+                    github.rest.pulls.createReview({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      pull_number: context.issue.number,
+                      event: 'COMMENT',
+                      body: 'There are a few bad patterns I found which you should check.' + limitMessage,
+                      comments: comments
+                    });
+                  } catch (error) {
+                    console.error("Could not submit review for pull request. Please check the error message and, below it, the comments for this PR.\n" + error);
+                    console.log("Original comments:");
+                    for (let comment of comments) {
+                      console.warn(`${comment['path']}, line ${comment['line']}: ${comment['body']}`);
+                    }
+                  }
                 } else {
                   console.log("After filtering, no new comments are left. Not submitting a review.");
                 }
@@ -189,7 +197,7 @@ jobs:
 
 
   build:
-    name: Build release
+    name: Create build
     runs-on: ${{ needs.setup.outputs.runner }}
     needs: [setup, setup_build_targets, test, gitscripts]
     strategy:
@@ -234,7 +242,9 @@ jobs:
     permissions: write-all
     needs: [setup, build]
     # We only want to create a release after merging a PR into master.
-    if: ${{ github.event.pull_request.merged }}
+    # Note that we will not create a release if the PR is labelled 'no release'.
+    # This label should be set when a PR does not lead to a noticeable change in the build.
+    if: ${{ github.event.pull_request.merged && !contains(github.event.pull_request.labels.*.name, 'no release') }}
     steps:
       - name: Create release tag
         uses: rickstaa/action-create-tag@v1

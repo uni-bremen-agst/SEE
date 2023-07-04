@@ -5,7 +5,7 @@
 # documentation of `git-fsck`.
 
 if [ -n "$CI" ]; then
-    set -ex
+    set -x
 else
     # This check takes too long to execute.
     # We do not want to run it locally on every commit.
