@@ -67,10 +67,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// </summary>
         FaceLandmarkDetector faceLandmarkDetector;
 
-        /// <summary>
-        /// The FPS monitor.
-        /// </summary>
-        FpsMonitor fpsMonitor;
+
 
         /// <summary>
         /// The dlib shape predictor file name.
@@ -106,6 +103,10 @@ namespace DlibFaceLandmarkDetectorExample
             int        lastFrameNextCutoutTextureWidth;
             int        lastFrameNextCutoutTextureHeight;
 
+        Boolean FaceCamOn = false;
+        Boolean FaceCamOnFront = true;
+
+        public MeshRenderer meshRenderer;
 
         float interpolationFactor = 0;
 
@@ -180,7 +181,6 @@ namespace DlibFaceLandmarkDetectorExample
         /// </summary>
         private void StartupCodeFromWebCamTextureToMatHelperExample()
         {
-            fpsMonitor = GetComponent<FpsMonitor>();
 
             webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper>();
 
@@ -221,20 +221,11 @@ namespace DlibFaceLandmarkDetectorExample
         /// </summary>
         public void OnWebCamTextureToMatHelperInitialized()
         {
-            //Debug.Log("OnWebCamTextureToMatHelperInitialized");
-
             Mat webCamTextureMat = webCamTextureToMatHelper.GetMat();
 
             texture = new Texture2D(webCamTextureMat.cols(), webCamTextureMat.rows(), TextureFormat.RGBA32, false);
             OpenCVForUnity.UnityUtils.Utils.fastMatToTexture2D(webCamTextureMat, texture);
 
-            //if (fpsMonitor != null)
-            //{
-            //    fpsMonitor.Add("dlib shape predictor", dlibShapePredictorFileName);
-            //    fpsMonitor.Add("width", webCamTextureToMatHelper.GetWidth().ToString());
-            //    fpsMonitor.Add("height", webCamTextureToMatHelper.GetHeight().ToString());
-            //    fpsMonitor.Add("orientation", Screen.orientation.ToString());
-            //}
         }
 
         /// <summary>
@@ -282,14 +273,33 @@ namespace DlibFaceLandmarkDetectorExample
             // Display/Render the video from the Webcam if this is the owner. (For each Player, the Player is the owner of the local FaceCam)
             if (IsOwner)
             {
-                DisplayLocalVideo();
-                // Used to send video only at specified frame rate.
-                networkVideoTimer += Time.deltaTime;
-                // Check if this is a Frame in which the video should be transmitted
-                if (networkVideoTimer >= networkVideoDelay)
+                // Switch the FaceCam on or off.
+                if (Input.GetKeyDown(KeyCode.I))
                 {
-                    DisplayVideoOnAllOtherClients();
-                    networkVideoTimer = 0f;
+                    Debug.Log("FaceCam On/OFF");
+                    FaceCamOn = !FaceCamOn;
+                    if (FaceCamOn)
+                    {
+                        webCamTextureToMatHelper.Play();
+                    }
+                    else
+                    {
+                        webCamTextureToMatHelper.Stop();
+                    }
+                    meshRenderer.enabled = FaceCamOn;
+                }
+
+                if (FaceCamOn)
+                {
+                    DisplayLocalVideo();
+                    // Used to send video only at specified frame rate.
+                    networkVideoTimer += Time.deltaTime;
+                    // Check if this is a Frame in which the video should be transmitted
+                    if (networkVideoTimer >= networkVideoDelay)
+                    {
+                        DisplayVideoOnAllOtherClients();
+                        networkVideoTimer = 0f;
+                    }
                 }
             }
         }
@@ -445,22 +455,41 @@ namespace DlibFaceLandmarkDetectorExample
         private void LateUpdate()
         {
             // Refresh the position of the FaceCam.
-            RefreshFaceCamPosition();
+            if (FaceCamOn)
+            {
+                RefreshFaceCamPosition();
+            }
         }
 
         /// <summary>
-        /// Refreshes the position of the FaceCam.
+        /// Refresh the position of the FaceCam.
         /// </summary>
         private void RefreshFaceCamPosition()
         {
-            ///FIXME
-            ///Still need to rotate the cam and check which mode (above/front) the FaceCam should be.
-            
+            // Switch the position of the FaceCam
+            if (Input.GetKeyDown(KeyCode.O))
+            {
+                FaceCamOnFront = !FaceCamOnFront;
+            }
+
             if (playersFace != null) // Sometimes the playersFace seems to be null, i can't find out why. Seems to have nothing to do with this class.
             {
                 transform.position = playersFace.position;
                 transform.rotation = playersFace.rotation;
-                transform.Rotate(0, -90, -90); // To face away from the avatars face.
+                if (FaceCamOnFront)
+                {
+                    transform.Rotate(0, -90, -90); // To face away from the avatars face.
+                    transform.position += transform.forward * 0.025f;
+                    transform.position += transform.up * 0.03f;
+                }
+                else
+                {
+                    transform.Rotate(0, -90, -90); // To face away from the avatars face.
+                    transform.position -= transform.forward * 0.08f;
+                    transform.position += transform.up * 0.3f;
+                    transform.LookAt(UnityEditor.SceneView.lastActiveSceneView.camera.transform);
+                }
+
             }
         }
 
@@ -601,7 +630,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// </summary>
         private void CreateClientRpcParams()
         {
-            // Creates the needed array from the editable list.
+            // Creates the needet array from the editable list.
             ulong[] allOtherClientIds = allClientIdsList.ToArray();
 
             // Creates the RpcParams with the array of ClientIds
@@ -612,132 +641,6 @@ namespace DlibFaceLandmarkDetectorExample
                     TargetClientIds = allOtherClientIds
                 }
             };
-        }
-
-
-        /// /// Network Test Examples - DELETE LATER - /// ///
-        /// /// Network Test Examples - DELETE LATER - /// ///
-        /// /// Network Test Examples - DELETE LATER - /// ///
-        // On the Server send a random value to the client id in the parameter and client id 2
-        private void DoSomethingServerSide(int clientId)
-        {
-            // If isn't the Server/Host then we should early return here!
-            if (!IsServer) return;
-
-
-            // NOTE! In case you know a list of ClientId's ahead of time, that does not need change,
-            // Then please consider caching this (as a member variable), to avoid Allocating Memory every time you run this function
-            ClientRpcParams clientRpcParams = new ClientRpcParams
-            {
-                Send = new ClientRpcSendParams
-                {
-                    TargetClientIds = new ulong[] { (ulong)clientId, (ulong)2 }
-                }
-            };
-
-            // Let's imagine that you need to compute a Random integer and want to send that to a client
-            const int maxValue = 4;
-            int randomInteger = UnityEngine.Random.Range(0, maxValue);
-            DoSomethingClientRpc(randomInteger, clientRpcParams);
-        }
-
-        /// /// Network Test Examples - DELETE LATER - /// ///
-        /// /// Network Test Examples - DELETE LATER - /// ///
-        /// /// Network Test Examples - DELETE LATER - /// ///
-        // RPC Client method which might be invoked, only runs on Clients
-        // from Server to all
-        // sends some text and time
-        [ClientRpc]
-        private void PongClientRpc(int somenumber, string sometext)
-        {
-            Debug.Log("RPC: " + sometext + " @ Time: " + somenumber);
-        }
-
-        /// /// Network Test Examples - DELETE LATER - /// ///
-        /// /// Network Test Examples - DELETE LATER - /// ///
-        /// /// Network Test Examples - DELETE LATER - /// ///
-        // RPC Server method which might be invoked, only runs on Server
-        // every client can call this
-        // save client to do something with it
-        // print client id on server
-        [ServerRpc(RequireOwnership = false)]
-        private void MyGlobalServerRpc(ServerRpcParams serverRpcParams = default)
-        {
-            var clientId = serverRpcParams.Receive.SenderClientId;
-            if (NetworkManager.ConnectedClients.ContainsKey(clientId))
-            {
-                var client = NetworkManager.ConnectedClients[clientId];
-                // Do things for this client
-
-                // On Server only, display Client
-                Debug.Log("RPC: This is Client: " + clientId);
-            }
-        }
-
-        /// /// Network Test Examples - DELETE LATER - /// ///
-        /// /// Network Test Examples - DELETE LATER - /// ///
-        /// /// Network Test Examples - DELETE LATER - /// ///
-        // from server to all clients
-        // On client:
-        //  client tell if it's owner 
-        //  get random number from server
-        [ClientRpc]
-        private void DoSomethingClientRpc(int randomInteger, ClientRpcParams clientRpcParams = default)
-        {
-            if (IsOwner)
-            {
-                Debug.Log("O W N E R !");
-            }
-
-            // Run your client-side logic here!!
-            Debug.LogFormat("GameObject: {0} has received a randomInteger with value: {1}", gameObject.name, randomInteger);
-        }
-
-        ///FIXME please use Buttons to do these things or don't do some of them.
-
-        /// <summary>
-        /// Code from the WebCamTextureToMatHelperExample.
-        /// Raises the back button click event.
-        /// </summary>
-        public void OnBackButtonClick()
-        {
-            SceneManager.LoadScene("DlibFaceLandmarkDetectorExample");
-        }
-
-        /// <summary>
-        /// Code from the WebCamTextureToMatHelperExample.
-        /// Raises the play button click event.
-        /// </summary>
-        public void OnPlayButtonClick()
-        {
-            webCamTextureToMatHelper.Play();
-        }
-
-        /// <summary>
-        /// Code from the WebCamTextureToMatHelperExample.
-        /// Raises the pause button click event.
-        /// </summary>
-        public void OnPauseButtonCkick()
-        {
-            webCamTextureToMatHelper.Pause();
-        }
-
-        /// <summary>
-        /// Code from the WebCamTextureToMatHelperExample.
-        /// Raises the stop button click event.
-        /// </summary>
-        public void OnStopButtonClick()
-        {
-            webCamTextureToMatHelper.Stop();
-        }
-
-        /// <summary>
-        /// Code from the WebCamTextureToMatHelperExample.
-        /// Raises the change camera button click event.
-        /// </summary>
-        public void OnChangeCameraButtonClick()
-        {
-            webCamTextureToMatHelper.requestedIsFrontFacing = !webCamTextureToMatHelper.requestedIsFrontFacing;
         }
     }
 }

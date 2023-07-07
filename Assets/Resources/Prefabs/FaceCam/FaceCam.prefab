@@ -429,7 +429,6 @@ GameObject:
   - component: {fileID: 7436555913008548297}
   - component: {fileID: 7436555913008548301}
   - component: {fileID: 7436555913008548300}
-  - component: {fileID: 7436555913008548291}
   - component: {fileID: 3910539528829103858}
   m_Layer: 0
   m_Name: FaceCam
@@ -469,7 +468,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7436555913008548298}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -518,6 +517,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveStartSpeed: 0.1
   moveAcceleration: 0.1
+  meshRenderer: {fileID: 7436555913008548297}
   _networkFPS: 24
 --- !u!114 &7436555913008548300
 MonoBehaviour:
@@ -587,26 +587,6 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   avoidAndroidFrontCameraLowLightIssue: 0
---- !u!114 &7436555913008548291
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7436555913008548298}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d1d59e7be9d1244da331cf04b8ee610, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  alignment: 1
-  offset: {x: 10, y: 10}
-  boxVisible: 1
-  boxWidth: 200
-  boxHeight: 170
-  padding: {x: 8, y: 5}
-  consoleHeight: 50
-  consoleText: 
 --- !u!114 &3910539528829103858
 MonoBehaviour:
   m_ObjectHideFlags: 0
