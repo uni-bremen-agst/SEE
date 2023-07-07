@@ -1,4 +1,4 @@
-#if !(PLATFORM_LUMIN && !UNITY_EDITOR)
+#if !(PLATFORM_LUMIN && !UNITY_EDITOR) // This Line of code is from the WebCamTextureToMatHelperExample.
 
 using DlibFaceLandmarkDetector;
 using OpenCVForUnity.CoreModule;
@@ -11,6 +11,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using Unity.Netcode;
 using UnityEngine.Serialization;
+using System.Linq;
 
 namespace DlibFaceLandmarkDetectorExample
 {
@@ -19,7 +20,7 @@ namespace DlibFaceLandmarkDetectorExample
     /// an avatar (representing a local or remote player). It can display an 
     /// WebCam image of the tracked face of the user over the network.
     /// It Also can be switched off. And it can toggle the position between
-    /// above the player always facing the camera, and the front of the player.
+    /// above the player always facing the camera, and the front of the players face.
     /// </summary>
     [RequireComponent(typeof(WebCamTextureToMatHelper))]
     public class FaceCam : NetworkBehaviour
@@ -81,6 +82,13 @@ namespace DlibFaceLandmarkDetectorExample
         /// </summary>
         string dlibShapePredictorFilePath;
 
+        /// <summary>
+        /// The WebGL coroutine to get the dlib shape predictor file path.
+        /// </summary>
+#if UNITY_WEBGL
+        IEnumerator getFilePath_Coroutine;
+#endif
+
         // Code from the WebCamTextureToMatHelperExample end
 
         int cutoutTextureX = 0;
@@ -89,9 +97,9 @@ namespace DlibFaceLandmarkDetectorExample
         int cutoutTextureHeight = 480; //standartwert für plausible größe damit webcam not found angezeigt wird
         float step = 0.0001F;
         [SerializeField]
-        float moveStartSpeed = 1F;
+        float moveStartSpeed;
         [SerializeField]
-        float moveAccelerationSpeed = 0F;
+        float moveAcceleration;
 
         int lastFrameNextCutoutTextureX;
          int lastFrameNextCutoutTextureY;
@@ -117,7 +125,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// Set the frame rate of video network transmission.
         /// </summary>
         [SerializeField, FormerlySerializedAs("Network FPS"), TooltipAttribute("Set the frame rate of Video which will be transmitted over the Network.")]
-        protected float _networkFPS = 24f;
+        protected float _networkFPS;
 
         public virtual float networkFPS
         {
@@ -147,15 +155,9 @@ namespace DlibFaceLandmarkDetectorExample
             base.OnNetworkSpawn();
         }
 
-#if UNITY_WEBGL
-        IEnumerator getFilePath_Coroutine;
-#endif
-
-        // Use this for initialization
-        // Start is called before the first frame update
+        // Start is called before the first frame update.
         void Start()
         {
-            // Code from the WebCamTextureToMatHelperExample end
 
             // The Network FPS is used to calculate everything needet to send the video at the specified frame rate.
             networkVideoDelay = 1f / networkFPS;
@@ -166,8 +168,18 @@ namespace DlibFaceLandmarkDetectorExample
             // For the location of the face of the player we use his his nose. This makes the FaceCam also aprox. centered to his face.
             playersFace = transform.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase");
 
-            // Code from the WebCamTextureToMatHelperExample start
+            // The startup Code from the WebCamTextureToMatHelperExample.
+            StartupCodeFromWebCamTextureToMatHelperExample();
 
+            // New texture for the cropped texture only displaying the face, resp. the final texture.
+            cutoutTexture = new Texture2D(0, 0, TextureFormat.RGBA32, false);
+        }
+
+        /// <summary>
+        /// The startup Code from the WebCamTextureToMatHelperExample.
+        /// </summary>
+        private void StartupCodeFromWebCamTextureToMatHelperExample()
+        {
             fpsMonitor = GetComponent<FpsMonitor>();
 
             webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper>();
@@ -188,6 +200,9 @@ namespace DlibFaceLandmarkDetectorExample
 #endif
         }
 
+        /// <summary>
+        /// Code from the WebCamTextureToMatHelperExample.
+        /// </summary>
         private void Run()
         {
             if (string.IsNullOrEmpty(dlibShapePredictorFilePath))
@@ -201,28 +216,25 @@ namespace DlibFaceLandmarkDetectorExample
         }
 
         /// <summary>
+        /// Code from the WebCamTextureToMatHelperExample.
         /// Raises the web cam texture to mat helper initialized event.
         /// </summary>
         public void OnWebCamTextureToMatHelperInitialized()
         {
-            Debug.Log("OnWebCamTextureToMatHelperInitialized");
+            //Debug.Log("OnWebCamTextureToMatHelperInitialized");
 
             Mat webCamTextureMat = webCamTextureToMatHelper.GetMat();
 
             texture = new Texture2D(webCamTextureMat.cols(), webCamTextureMat.rows(), TextureFormat.RGBA32, false);
             OpenCVForUnity.UnityUtils.Utils.fastMatToTexture2D(webCamTextureMat, texture);
 
-            // My Code
-            cutoutTexture = new Texture2D(0, 0, TextureFormat.RGBA32, false); //try 0, 0
-            // My Code End
-
-            if (fpsMonitor != null)
-            {
-                fpsMonitor.Add("dlib shape predictor", dlibShapePredictorFileName);
-                fpsMonitor.Add("width", webCamTextureToMatHelper.GetWidth().ToString());
-                fpsMonitor.Add("height", webCamTextureToMatHelper.GetHeight().ToString());
-                fpsMonitor.Add("orientation", Screen.orientation.ToString());
-            }
+            //if (fpsMonitor != null)
+            //{
+            //    fpsMonitor.Add("dlib shape predictor", dlibShapePredictorFileName);
+            //    fpsMonitor.Add("width", webCamTextureToMatHelper.GetWidth().ToString());
+            //    fpsMonitor.Add("height", webCamTextureToMatHelper.GetHeight().ToString());
+            //    fpsMonitor.Add("orientation", Screen.orientation.ToString());
+            //}
         }
 
         /// <summary>
@@ -230,7 +242,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// </summary>
         public void OnWebCamTextureToMatHelperDisposed()
         {
-            Debug.Log("OnWebCamTextureToMatHelperDisposed");
+            //Debug.Log("OnWebCamTextureToMatHelperDisposed");
 
             if (texture != null)
             {
@@ -245,6 +257,7 @@ namespace DlibFaceLandmarkDetectorExample
         }
 
         /// <summary>
+        /// Code from the WebCamTextureToMatHelperExample.
         /// Raises the web cam texture to mat helper error occurred event.
         /// </summary>
         /// <param name="errorCode">Error code.</param>
@@ -253,9 +266,10 @@ namespace DlibFaceLandmarkDetectorExample
             Debug.Log("OnWebCamTextureToMatHelperErrorOccurred " + errorCode);
         }
 
-        // Code from the WebCamTextureToMatHelperExample end
-
-        // Update is called once per frame
+        /// <summary>
+        /// Once per Frame, the local Video is displayed.
+        /// It also checks whether the video should be sent to the clients in this frame based on the specified network FPS.
+        /// </summary>
         private void Update()
         {
             // If the NetworkObject is not yet spawned, exit early.
@@ -269,53 +283,55 @@ namespace DlibFaceLandmarkDetectorExample
             if (IsOwner)
             {
                 DisplayLocalVideo();
+                // Used to send video only at specified frame rate.
+                networkVideoTimer += Time.deltaTime;
+                // Check if this is a Frame in which the video should be transmitted
+                if (networkVideoTimer >= networkVideoDelay)
+                {
+                    DisplayVideoOnAllOtherClients();
+                    networkVideoTimer = 0f;
+                }
             }
         }
 
         /// <summary>
-        /// This renders the video, means the face captured on the WebCam is displayed onto the FaceCam
-        /// Only used as owner.
+        /// Render the video.
+        /// The face captured on the WebCam is displayed onto the FaceCam.
+        /// (Only used as owner.)
         /// </summary>
         private void DisplayLocalVideo()
         {
-            // Used to send video only at specified frame rate.
-            networkVideoTimer += Time.deltaTime;
-
-            // Code from the WebCamTextureToMatHelperExample start
+            // Code from the WebCamTextureToMatHelperExample.
             if (webCamTextureToMatHelper.IsPlaying() && webCamTextureToMatHelper.DidUpdateThisFrame())
             {
-
+                // Code from the WebCamTextureToMatHelperExample.
                 Mat rgbaMat = webCamTextureToMatHelper.GetMat();
 
+                // Code from the WebCamTextureToMatHelperExample.
                 OpenCVForUnityUtils.SetImage(faceLandmarkDetector, rgbaMat);
 
-                //detect face rects
+                // Code from the WebCamTextureToMatHelperExample.
+                // Detect all face rectangles
                 List<UnityEngine.Rect> detectResult = faceLandmarkDetector.Detect();
 
-                // My Code
-                // This is the Rect which is chosen as the face we want to zoom in.
+                // This is the rectangle which is selected to be the face we want to zoom in.
                 UnityEngine.Rect mainRect = new UnityEngine.Rect(0, 0, 0, 0);
 
-                // Is there any rect?
+                // Boolean, if there is there any rectangle found.
                 bool rectFound = false;
-                // My Code end
-                //Debug.Log("S1");
+
+                // Find the biggest, resp. closest Face
                 foreach (var rect in detectResult)
                 {
-                    // My Code
-                    // find biggest = nearest face, this is the face we want to zoom in
-                    //Debug.Log("S2");
                     if (mainRect.height * mainRect.width <= rect.height * rect.width)
                     {
-                        //Debug.Log("S3");
                         mainRect = rect;
                         rectFound = true;
-                        OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(255, 0, 0, 255), 2);
+                        //OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(255, 0, 0, 255), 2);
                     }
-                    else {
-                        OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(0, 0, 255, 255), 2);
-                    }
-                    // My Code end
+                    //else {
+                    //    OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(0, 0, 255, 255), 2);
+                    //}
 
                     //detect landmark points
                     //List<Vector2> points = faceLandmarkDetector.DetectLandmark(rect);
@@ -327,174 +343,129 @@ namespace DlibFaceLandmarkDetectorExample
                     //OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(255, 0, 0, 255), 2);
                 }
 
-
+                // Code from the WebCamTextureToMatHelperExample.
+                // Convert the material to a 2D texture.
                 /// FIXME NOT FAST IF SEND OVER NETWORTK , ODER? da coutout neu vieliecht geht so
                 OpenCVForUnity.UnityUtils.Utils.fastMatToTexture2D(rgbaMat, texture);
 
-                // Code from the WebCamTextureToMatHelperExample end
-
-
-                if (rectFound) // einfach immer ausführen? damit nicht immer gestoppt wird bei der bewegung
+                // If a face is found, calculate the area of the texture which should be displayed.
+                // This should be the face with a little bit extra space.
+                if (rectFound)
                 {
-
+                    // Dimensions of the new found face.
+                    /// FIXME: Do i need to clamp to the textures size? The rectangle might maybe be out of the texture.
                     int NextRectX = Mathf.RoundToInt(mainRect.x);
                     int NextRectY = Mathf.RoundToInt(mainRect.y);
                     int NextRectWidth = Mathf.RoundToInt(mainRect.width);
                     int NextRectHeight = Mathf.RoundToInt(mainRect.height);
 
-                    // Add a little space over and under the detected head to make it fully visible.
+                    // calculate the space over and under the detected head to make it fully visible.
                     int SpaceAbove = NextRectHeight / 2;
                     int SpaceBelow = NextRectHeight / 6;
 
-                    //cutoutTextureX = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureX, mainRect.x, interpolationFactor));
-                    //cutoutTextureY = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureY, mainRect.y, interpolationFactor));
-                    //cutoutTextureWidth = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureWidth, mainRect.width, interpolationFactor));
-                    //cutoutTextureHeight = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureHeight, mainRect.height, interpolationFactor));
-
+                    // Add the Space above and below to the dimension of the cropped texture.
                     int nextCutoutTextureX = NextRectX;
                     int nextCutoutTextureY = Math.Max(0, texture.height - NextRectY - NextRectHeight - SpaceBelow);  // Because texture and rect do not both use y the same way, it needs to be converted.
                     int nextCutoutTextureWidth = NextRectWidth;
                     int nextCutoutTextureHeight = NextRectHeight + SpaceAbove + SpaceBelow;
 
-
-                    if (nextCutoutTextureY + nextCutoutTextureHeight > texture.height) { nextCutoutTextureHeight = texture.height - nextCutoutTextureY; } // falls herausragt über texture, wird abgeschnitten bis rand der textur
+                    // If the new texture is outside of the original webcam texture, remove the extra space.
+                    if (nextCutoutTextureY + nextCutoutTextureHeight > texture.height) { nextCutoutTextureHeight = texture.height - nextCutoutTextureY; }
                     if (nextCutoutTextureX + nextCutoutTextureWidth > texture.width) { nextCutoutTextureWidth = texture.width - nextCutoutTextureX; }
 
-                    
-                    int rectOffset = NextRectWidth/11; // wenn ein Quadat soweit entfernt ist zählt es noch als gleiches
-                    if (nextCutoutTextureX > cutoutTextureX + rectOffset
-                        || nextCutoutTextureX < cutoutTextureX - rectOffset
-                        || nextCutoutTextureY > cutoutTextureY + rectOffset
-                        || nextCutoutTextureY < cutoutTextureY - rectOffset
-                        || nextCutoutTextureWidth > cutoutTextureWidth + rectOffset
-                        || nextCutoutTextureWidth < cutoutTextureWidth - rectOffset
-                        || nextCutoutTextureHeight > cutoutTextureHeight + rectOffset
-                        || nextCutoutTextureHeight < cutoutTextureHeight - rectOffset)
+                    // This is the distance which will be ignored, if a face moves.
+                    int rectMoveOffset = NextRectWidth/11;
+                    // This is the distance which means the face is at a completely new position.
+                    int rectPositionOffset = NextRectWidth;
+
+                    // Reset the interpolation factor if the cropped texture already is at the face,
+                    // or oterhwise if the face moves a significant amount.
+                    if (// Reset the interpolation factor if the rectangle of the face is already at the cropped texture.
+                        Math.Abs(nextCutoutTextureX - cutoutTextureX) <= rectMoveOffset &&
+                        Math.Abs(nextCutoutTextureY - cutoutTextureY) <= rectMoveOffset &&
+                        Math.Abs(nextCutoutTextureWidth - cutoutTextureWidth) <= rectMoveOffset &&
+                        Math.Abs(nextCutoutTextureHeight - cutoutTextureHeight) <= rectMoveOffset ||
+                        // Or reset the interpolation factor if the rectangle of the face gets a new position.
+                        Math.Abs(nextCutoutTextureX - lastFrameNextCutoutTextureX) > rectPositionOffset ||
+                        Math.Abs(nextCutoutTextureY - lastFrameNextCutoutTextureY) > rectPositionOffset ||
+                        Math.Abs(nextCutoutTextureWidth - lastFrameNextCutoutTextureWidth) > rectPositionOffset ||
+                        Math.Abs(nextCutoutTextureHeight - lastFrameNextCutoutTextureHeight) > rectPositionOffset)
                     {
-                        //interpolationFactor = 0; Debug.Log("NEW RECT interpolationFactor reset");
-                    }
-                    else {
-                        interpolationFactor = 0;  Debug.Log("GOAL interpolationFactor reset");
+                        interpolationFactor = 0;
                     }
 
-                     rectOffset = NextRectWidth;
-                    if (nextCutoutTextureX > lastFrameNextCutoutTextureX + rectOffset
-                       || nextCutoutTextureX < lastFrameNextCutoutTextureX - rectOffset
-                       || nextCutoutTextureY > lastFrameNextCutoutTextureY + rectOffset
-                       || nextCutoutTextureY < lastFrameNextCutoutTextureY - rectOffset
-                       || nextCutoutTextureWidth > lastFrameNextCutoutTextureWidth + rectOffset
-                       || nextCutoutTextureWidth < lastFrameNextCutoutTextureWidth - rectOffset
-                       || nextCutoutTextureHeight > lastFrameNextCutoutTextureHeight + rectOffset
-                       || nextCutoutTextureHeight < lastFrameNextCutoutTextureHeight - rectOffset)
-                    {
-                        interpolationFactor = 0; Debug.Log("NEW RECT interpolationFactor reset");
-                    }
-
-
+                    // Remember the position of the cropped texture of the last frame, resp. the position right now for the next frame.
                     lastFrameNextCutoutTextureX = nextCutoutTextureX;
                     lastFrameNextCutoutTextureY = nextCutoutTextureY;
                     lastFrameNextCutoutTextureWidth = nextCutoutTextureWidth;
                     lastFrameNextCutoutTextureHeight = nextCutoutTextureHeight;
 
+                    // Calculate the position, if necessary moving towards the new found face with the interpolation factor.
                     cutoutTextureX = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureX, nextCutoutTextureX, interpolationFactor));
                     cutoutTextureY = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureY,nextCutoutTextureY, interpolationFactor));
                     cutoutTextureWidth = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureWidth,nextCutoutTextureWidth, interpolationFactor));
                     cutoutTextureHeight = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureHeight,nextCutoutTextureHeight, interpolationFactor));
 
-                    //if (interpolationFactor >= 0.99f) { interpolationFactor = 0; Debug.Log("GOAL interpolationFactor reset"); } // falls ziel erreicht, steze zurück
+                    // Calculate the distance and size difference from the new cropped texture towards the actual rectangle of the face. (There will always be some distance, but more if the face is further away)
                     float distancePosition = Vector2.Distance(new Vector2(cutoutTextureX, cutoutTextureY), mainRect.position);
                     float distanceSize = Vector2.Distance(new Vector2(cutoutTextureWidth, cutoutTextureHeight), mainRect.size);
 
-
-                    //Falls ca. (z.B ein Quadrat entfernt) oder (z.B ca. Hälfter der Größe Weggezoomt)  
-                    if (distancePosition >= NextRectWidth / 2 || distanceSize >= NextRectWidth / 2) // Werte gerschätzt ggf. nicht sinvoll, und weiter Berechnung notwendig
+                    // Calculate the interpolation factor for the next frame.
+                    // If the new rectangle is further aways than the actual cropped texture plus half the size of the rectangle, move faster towards the rectangle.
+                    if (distancePosition >= NextRectWidth / 2 || distanceSize >= NextRectWidth / 2)
                     {
-                        //step = 0.001F;
-                        step = step + moveAccelerationSpeed * Time.deltaTime; // Geschwindigeit der Bewegung zum Gesicht wenn es woanders(weit genug weg) erkannt wird // geschätzt. // Geschwindigkeit wird pro frame erhöht
+                        step = step + moveAcceleration * Time.deltaTime;
                     }
+                    // Otherwise reset the acceleration.
                     else { step = moveStartSpeed; }
+
+                    // Move towards the rectangle of the face.
+                    // Resp. update the interpolation factor which might be reset to 0.
                     interpolationFactor = interpolationFactor + step * Time.deltaTime;
-                    Debug.Log("interpolationFactor = " + interpolationFactor);
 
-
-                   
-
-
-
-                    //cutoutTextureX = Mathf.RoundToInt(mainRect.x);
-                    //cutoutTextureY = Mathf.RoundToInt(mainRect.y); // !!!!!!! HIER Y schon umrechnen zu komatiblen wert zwischen TEXTURE und RECT auch danach dann einfachere berechnung
-                    //cutoutTextureWidth = Mathf.RoundToInt(mainRect.width);
-                    //cutoutTextureHeight = Mathf.RoundToInt(mainRect.height); // Right now it is just the size of the cutout face, not yet the cutout texture height.
-
-                      
-
-                    
-
-
-                    // Apply the cutout texture size onto the FacCam
-                    // the size is way to big, so it needs to be reduced.
+                    // Apply the cutout texture size to the FacCam prefab.
+                    // The size is way to big, so it needs to be reduced. A maximum height is used.
                     float maxHeight = 0.24f;
                     float divisor = cutoutTextureHeight / maxHeight;
-                    transform.localScale = new Vector3(((float)cutoutTextureWidth) / divisor, (float)cutoutTextureHeight / divisor, -1); // without '(float)' the result is just '0'.
-
-
+                    transform.localScale = new Vector3(((float)cutoutTextureWidth) / divisor, (float)cutoutTextureHeight / divisor, -1); // Without '(float)' the result is just '0'.
                 }
-                // Copy the pixels from the original texture to the cutout texture.
 
-                //Debug.Log("Rect Width = " + (cutoutTextureX + cutoutTextureWidth));
-                //Debug.Log("Text Width = " + texture.width);
-                //Debug.Log("Rect Height= " + (cutoutTextureY + cutoutTextureHeight));
-                //Debug.Log("Text Height= " + texture.height);
+                // Copy the pixels from the original texture to the cutout texture.
                 Color[] pixels = texture.GetPixels(cutoutTextureX, cutoutTextureY, cutoutTextureWidth, cutoutTextureHeight);
-                
                 cutoutTexture = new Texture2D(cutoutTextureWidth, cutoutTextureHeight);
                 cutoutTexture.SetPixels(pixels);
                 cutoutTexture.Apply();
-                // Renders the cutout texture onto the FaceCam
+
+                // Renders the cutout texture onto the FaceCam.
                 gameObject.GetComponent<Renderer>().material.mainTexture = cutoutTexture;
-
-
-
-
-                // 30 times per second
-                if (networkVideoTimer >= networkVideoDelay)
-                    {
-                        // Perform your action here
-                        // This code will execute approximately 30 times per second
-                      //  Debug.Log("Time = " + timer);
-                        //Debug.Log("FPS = " + 1/networkVideoTimer);
-                        //DisplayVideoOnAllOtherClients();
-                        networkVideoTimer = 0f; // Reset the timer
-                    }
-                
             }
         }
 
         // Called each frame after the Update() function
         private void LateUpdate()
         {
-            // refresh the position of the WebCamTextureToMatHelperExample
+            // Refresh the position of the FaceCam.
             RefreshFaceCamPosition();
         }
 
         /// <summary>
-        /// Refreshes the position of the FaceCam
+        /// Refreshes the position of the FaceCam.
         /// </summary>
         private void RefreshFaceCamPosition()
         {
-            if (playersFace != null) // Sometimes the playersFace seems to be null, i can't find out why. Should have nothing to do with this class.
+            ///FIXME
+            ///Still need to rotate the cam and check which mode (above/front) the FaceCam should be.
+            
+            if (playersFace != null) // Sometimes the playersFace seems to be null, i can't find out why. Seems to have nothing to do with this class.
             {
                 transform.position = playersFace.position;
                 transform.rotation = playersFace.rotation;
                 transform.Rotate(0, -90, -90); // To face away from the avatars face.
-                //FIXME
-                //still need to rotate the cam and check which mode (above/front) the FaceCam should be/
-                //Maybe update size here, or maybe direct in the video rendering
             }
         }
 
         /// <summary>
-        /// 
+        /// Displays the video on any other Client.
         /// </summary>
         private void DisplayVideoOnAllOtherClients()
         {
@@ -511,9 +482,9 @@ namespace DlibFaceLandmarkDetectorExample
             {
                 GetVideoFromClientAndSendItToClientsToRenderIt_ServerRPC(videoFrame);
             }
-            else // the owner (creator of video) and also the server
+            else // If this is the owner (creator of video) and also the server.
             {
-                // If this is the server, send the frame to all clients ( but not the server and owner, which in this case, is the server).
+                // Send the frame to all clients. (But not the server and owner, which in this case, is the server.)
                 SendVideoToClientsToRenderIt_ClientRPC(videoFrame, otherNetworkIds);
             }
         }
@@ -524,14 +495,15 @@ namespace DlibFaceLandmarkDetectorExample
         /// </summary>
         private byte[] CreateNetworkFrameFromVideo()
         {
+            // Converts the Texture to an byte array containing an JPG.
             byte[] networkTexture = ImageConversion.EncodeToJPG(cutoutTexture);
-            Debug.Log("Buffer Size: " + networkTexture.Length);
+            ///Debug.Log("Buffer Size: " + networkTexture.Length);
+            // Only return the array if it's not too big.
             if (networkTexture.Length <= 32768)
             {
                 return networkTexture;
             }
             return null;
-
         }
 
         /// <summary>
@@ -567,7 +539,9 @@ namespace DlibFaceLandmarkDetectorExample
             gameObject.GetComponent<Renderer>().material.mainTexture = cutoutTexture;
         }
 
-        // Happens on destroying
+        /// <summary>
+        /// If the FaceCam should be destroyed (player disconnects), clean everything up.
+        /// </summary>
         public override void OnDestroy()
         {
             // Remove own ClientId from the list of connected ClientIds
@@ -576,14 +550,15 @@ namespace DlibFaceLandmarkDetectorExample
                 RemoveClientFromList_ServerRPC(ownClientId);
             }
 
-            // Code from the WebCamTextureToMatHelperExample start
-
+            // Code from the WebCamTextureToMatHelperExample.
             if (webCamTextureToMatHelper != null)
                 webCamTextureToMatHelper.Dispose();
 
+            // Code from the WebCamTextureToMatHelperExample.
             if (faceLandmarkDetector != null)
                 faceLandmarkDetector.Dispose();
 
+            // Code from the WebCamTextureToMatHelperExample.
 #if UNITY_WEBGL
             if (getFilePath_Coroutine != null)
             {
@@ -591,10 +566,8 @@ namespace DlibFaceLandmarkDetectorExample
                 ((IDisposable)getFilePath_Coroutine).Dispose();
             }
 #endif
-
-            // Code from the WebCamTextureToMatHelperExample end
-
-            // Always invoked the base 
+            // Code from the WebCamTextureToMatHelperExample.
+            // Always invoke the base.
             base.OnDestroy();
         }
 
@@ -720,9 +693,10 @@ namespace DlibFaceLandmarkDetectorExample
             Debug.LogFormat("GameObject: {0} has received a randomInteger with value: {1}", gameObject.name, randomInteger);
         }
 
-        // Code from the WebCamTextureToMatHelperExample start
+        ///FIXME please use Buttons to do these things or don't do some of them.
 
         /// <summary>
+        /// Code from the WebCamTextureToMatHelperExample.
         /// Raises the back button click event.
         /// </summary>
         public void OnBackButtonClick()
@@ -731,6 +705,7 @@ namespace DlibFaceLandmarkDetectorExample
         }
 
         /// <summary>
+        /// Code from the WebCamTextureToMatHelperExample.
         /// Raises the play button click event.
         /// </summary>
         public void OnPlayButtonClick()
@@ -739,6 +714,7 @@ namespace DlibFaceLandmarkDetectorExample
         }
 
         /// <summary>
+        /// Code from the WebCamTextureToMatHelperExample.
         /// Raises the pause button click event.
         /// </summary>
         public void OnPauseButtonCkick()
@@ -747,6 +723,7 @@ namespace DlibFaceLandmarkDetectorExample
         }
 
         /// <summary>
+        /// Code from the WebCamTextureToMatHelperExample.
         /// Raises the stop button click event.
         /// </summary>
         public void OnStopButtonClick()
@@ -755,6 +732,7 @@ namespace DlibFaceLandmarkDetectorExample
         }
 
         /// <summary>
+        /// Code from the WebCamTextureToMatHelperExample.
         /// Raises the change camera button click event.
         /// </summary>
         public void OnChangeCameraButtonClick()
@@ -764,5 +742,4 @@ namespace DlibFaceLandmarkDetectorExample
     }
 }
 
-#endif
-// Code from the WebCamTextureToMatHelperExample end
+#endif // This Line of code is from the WebCamTextureToMatHelperExample.
