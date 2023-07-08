@@ -44,7 +44,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// Id of this Client.
         /// </summary>
         ulong ownClientId;
-        
+
         /// <summary>
         /// Texture2D to hold the cutout of the Face
         /// </summary>
@@ -99,12 +99,13 @@ namespace DlibFaceLandmarkDetectorExample
         float moveAcceleration;
 
         int lastFrameNextCutoutTextureX;
-         int lastFrameNextCutoutTextureY;
-            int        lastFrameNextCutoutTextureWidth;
-            int        lastFrameNextCutoutTextureHeight;
+        int lastFrameNextCutoutTextureY;
+        int lastFrameNextCutoutTextureWidth;
+        int lastFrameNextCutoutTextureHeight;
 
         Boolean FaceCamOn = false;
         Boolean FaceCamOnFront = true;
+        Transform MainCamera;
 
         public MeshRenderer meshRenderer;
 
@@ -174,6 +175,11 @@ namespace DlibFaceLandmarkDetectorExample
 
             // New texture for the cropped texture only displaying the face, resp. the final texture.
             cutoutTexture = new Texture2D(0, 0, TextureFormat.RGBA32, false);
+
+            if (!IsOwner) {
+                GetFaceCamStatusServerRpc();
+            }
+
         }
 
         /// <summary>
@@ -276,18 +282,7 @@ namespace DlibFaceLandmarkDetectorExample
                 // Switch the FaceCam on or off.
                 if (Input.GetKeyDown(KeyCode.I))
                 {
-                    Debug.Log("FaceCam On/OFF");
-                    FaceCamOn = !FaceCamOn;
-                    if (FaceCamOn)
-                    {
-                        webCamTextureToMatHelper.Play();
-                    }
-                    else
-                    {
-                        webCamTextureToMatHelper.Stop();
-                    }
-                    // Hide the FaceCam if it's deactivated.
-                    meshRenderer.enabled = FaceCamOn;
+                    FaceCamOnOffServerRpc(FaceCamOn);
                 }
 
                 if (FaceCamOn)
@@ -385,7 +380,7 @@ namespace DlibFaceLandmarkDetectorExample
                     if (nextCutoutTextureX + nextCutoutTextureWidth > texture.width) { nextCutoutTextureWidth = texture.width - nextCutoutTextureX; }
 
                     // This is the distance which will be ignored, if a face moves.
-                    int rectMoveOffset = NextRectWidth/11;
+                    int rectMoveOffset = NextRectWidth / 11;
                     // This is the distance which means the face is at a completely new position.
                     int rectPositionOffset = NextRectWidth;
 
@@ -413,9 +408,9 @@ namespace DlibFaceLandmarkDetectorExample
 
                     // Calculate the position, if necessary moving towards the new found face with the interpolation factor.
                     cutoutTextureX = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureX, nextCutoutTextureX, interpolationFactor));
-                    cutoutTextureY = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureY,nextCutoutTextureY, interpolationFactor));
-                    cutoutTextureWidth = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureWidth,nextCutoutTextureWidth, interpolationFactor));
-                    cutoutTextureHeight = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureHeight,nextCutoutTextureHeight, interpolationFactor));
+                    cutoutTextureY = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureY, nextCutoutTextureY, interpolationFactor));
+                    cutoutTextureWidth = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureWidth, nextCutoutTextureWidth, interpolationFactor));
+                    cutoutTextureHeight = Mathf.RoundToInt(Mathf.Lerp(cutoutTextureHeight, nextCutoutTextureHeight, interpolationFactor));
 
                     // Calculate the distance and size difference from the new cropped texture towards the actual rectangle of the face. (There will always be some distance, but more if the face is further away)
                     float distancePosition = Vector2.Distance(new Vector2(cutoutTextureX, cutoutTextureY), mainRect.position);
@@ -470,7 +465,7 @@ namespace DlibFaceLandmarkDetectorExample
             // Switch the position of the FaceCam
             if (Input.GetKeyDown(KeyCode.O))
             {
-                FaceCamOnFront = !FaceCamOnFront;
+                FaceCamOnFrontToggleServerRpc(FaceCamOnFront);
             }
 
             if (playersFace != null) // Sometimes the playersFace seems to be null, i can't find out why. Seems to have nothing to do with this class.
@@ -488,11 +483,80 @@ namespace DlibFaceLandmarkDetectorExample
                     transform.Rotate(0, -90, -90); // To face away from the avatars face.
                     transform.position -= transform.forward * 0.08f;
                     transform.position += transform.up * 0.3f;
-                    transform.LookAt(UnityEditor.SceneView.lastActiveSceneView.camera.transform);
+                    if (!IsOwner) // If this is the owner the FaceCam should just face forwars and not down to the own camera.
+                    {
+                        if (MainCamera != null)
+                        {
+                            transform.LookAt(MainCamera);
+                        }
+                        else if (Camera.main.transform != null)
+                        {
+                            MainCamera = Camera.main.transform;
+                        }
+                    }
                 }
-
             }
         }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void FaceCamOnOffServerRpc(Boolean NetworkFaceCamOn) {
+            FaceCamOnOffClientRpc(NetworkFaceCamOn);
+        }
+
+        [ClientRpc]
+        private void FaceCamOnOffClientRpc(Boolean NetworkFaceCamOn)
+        {
+            // NetworkFaceCamOn, resp. FaceCamOn has the value which should be inverted.
+            if (FaceCamOn == NetworkFaceCamOn)
+            {
+                FaceCamOn = !FaceCamOn;
+                FaceCamOnOffToggle();
+            }
+        }
+
+        private void FaceCamOnOffToggle() {
+            if (FaceCamOn)
+            {
+                webCamTextureToMatHelper.Play();
+            }
+            else
+            {
+                webCamTextureToMatHelper.Stop();
+            }
+            // Hide the FaceCam if it's deactivated.
+            meshRenderer.enabled = FaceCamOn;
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void FaceCamOnFrontToggleServerRpc(Boolean NetworkFaceCamOnFront)
+        {
+            FaceCamOnFrontToggleClientRpc(NetworkFaceCamOnFront);
+        }
+
+        [ClientRpc]
+        private void FaceCamOnFrontToggleClientRpc(Boolean NetworkFaceCamOnFront)
+        {
+            if (FaceCamOnFront == NetworkFaceCamOnFront)
+            {
+                FaceCamOnFront = !FaceCamOnFront;
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void GetFaceCamStatusServerRpc()
+        {
+            SetFaceCamStatusClientRpc(FaceCamOn, FaceCamOnFront);
+        }
+
+        [ClientRpc]
+        private void SetFaceCamStatusClientRpc(Boolean FaceCamOn, Boolean FaceCamOnFront) {
+            this.FaceCamOn = FaceCamOn;
+            this.FaceCamOnFront = FaceCamOnFront;
+            // Make the FaceCam visible/invisible and/or start/stop it.
+            FaceCamOnOffToggle();
+        }
+
+
 
         /// <summary>
         /// Displays the video on any other Client.
@@ -540,7 +604,8 @@ namespace DlibFaceLandmarkDetectorExample
         /// The owner calls this, to send his video to the server which sends it to all clients.
         /// Also the server and every client will render this video onto the FaceCam.
         /// </summary>
-        [ServerRpc(Delivery = RpcDelivery.Unreliable)]
+        //[ServerRpc(Delivery = RpcDelivery.Unreliable)] // Large files not supported
+        [ServerRpc]
         private void GetVideoFromClientAndSendItToClientsToRenderIt_ServerRPC(byte[] videoFrame)
         {
             // The server will render this video onto his instance of the FaceCam.
@@ -554,7 +619,8 @@ namespace DlibFaceLandmarkDetectorExample
         /// The Server calls this, to send his video  to all clients.
         /// Also every client will render this video onto the FaceCam.
         /// </summary>
-        [ClientRpc(Delivery = RpcDelivery.Unreliable)]
+        //[ClientRpc(Delivery = RpcDelivery.Unreliable)]  // Large files not supported
+        [ClientRpc]
         private void SendVideoToClientsToRenderIt_ClientRPC(byte[] videoFrame, ClientRpcParams clientRpcParams = default)
         {
             RenderNetworkFrameOnFaceCam(videoFrame);
