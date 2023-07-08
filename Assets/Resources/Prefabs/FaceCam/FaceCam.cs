@@ -2,16 +2,12 @@
 
 using DlibFaceLandmarkDetector;
 using OpenCVForUnity.CoreModule;
-using OpenCVForUnity.ImgprocModule;
 using OpenCVForUnity.UnityUtils.Helper;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using Unity.Netcode;
+using UnityEngine;
 using UnityEngine.Serialization;
-using System.Linq;
 
 namespace DlibFaceLandmarkDetectorExample
 {
@@ -28,56 +24,52 @@ namespace DlibFaceLandmarkDetectorExample
         /// <summary>
         /// The object with the position where the face/nose of the player is at.
         /// </summary>
-        Transform playersFace;
+        private Transform playersFace;
 
         /// <summary>
         /// All Network Ids, but not the owner (where the video is recordet) or the server.
         /// </summary>
-        List<ulong> allClientIdsList = new List<ulong>();
+        private List<ulong> allClientIdsList = new List<ulong>();
 
         /// <summary>
         /// All Network Ids, but not the owner (where the video is recordet) or the server.
         /// </summary>
-        ClientRpcParams otherNetworkIds;
+        private ClientRpcParams otherNetworkIds;
 
         /// <summary>
         /// Id of this Client.
         /// </summary>
-        ulong ownClientId;
+        private ulong ownClientId;
 
         /// <summary>
         /// Texture2D to hold the cutout of the Face
         /// </summary>
-        Texture2D cutoutTexture;
-
-        // Code from the WebCamTextureToMatHelperExample start
+        private Texture2D cutoutTexture;
 
         /// <summary>
         /// The texture.
         /// </summary>
-        Texture2D texture;
+        private Texture2D texture;
 
         /// <summary>
         /// The webcam texture to mat helper.
         /// </summary>
-        WebCamTextureToMatHelper webCamTextureToMatHelper;
+        private WebCamTextureToMatHelper webCamTextureToMatHelper;
 
         /// <summary>
         /// The face landmark detector.
         /// </summary>
-        FaceLandmarkDetector faceLandmarkDetector;
-
-
+        private FaceLandmarkDetector faceLandmarkDetector;
 
         /// <summary>
         /// The dlib shape predictor file name.
         /// </summary>
-        string dlibShapePredictorFileName = "DlibFaceLandmarkDetector/sp_human_face_6.dat";
+        private string dlibShapePredictorFileName = "DlibFaceLandmarkDetector/sp_human_face_6.dat";
 
         /// <summary>
         /// The dlib shape predictor file path.
         /// </summary>
-        string dlibShapePredictorFilePath;
+        private string dlibShapePredictorFilePath;
 
         /// <summary>
         /// The WebGL coroutine to get the dlib shape predictor file path.
@@ -86,30 +78,29 @@ namespace DlibFaceLandmarkDetectorExample
         IEnumerator getFilePath_Coroutine;
 #endif
 
-        // Code from the WebCamTextureToMatHelperExample end
-
-        int cutoutTextureX = 0;
-        int cutoutTextureY = 0;
-        int cutoutTextureWidth = 480; // am anfang die größe der Webcam? sobald webcam gefunden wurde! vorher größé von texture not found bild
-        int cutoutTextureHeight = 480; //standartwert für plausible größe damit webcam not found angezeigt wird
-        float step = 0.0001F;
+        private int cutoutTextureX = 0;
+        private int cutoutTextureY = 0;
+        private int cutoutTextureWidth = 480; // 480 is a reasonable size to display the 'webcam not found' image.
+        private int cutoutTextureHeight = 480; // 480 is a reasonable size to display the 'webcam not found' image.
+        
         [SerializeField]
-        float moveStartSpeed;
+        public float moveStartSpeed;
         [SerializeField]
-        float moveAcceleration;
+        public float moveAcceleration;
+        private float step;
 
-        int lastFrameNextCutoutTextureX;
-        int lastFrameNextCutoutTextureY;
-        int lastFrameNextCutoutTextureWidth;
-        int lastFrameNextCutoutTextureHeight;
+        private int lastFrameNextCutoutTextureX;
+        private int lastFrameNextCutoutTextureY;
+        private int lastFrameNextCutoutTextureWidth;
+        private int lastFrameNextCutoutTextureHeight;
 
-        Boolean FaceCamOn = false;
-        Boolean FaceCamOnFront = true;
-        Transform MainCamera;
+        private Boolean FaceCamOn = false;
+        private Boolean FaceCamOnFront = true;
+        private Transform MainCamera;
 
         public MeshRenderer meshRenderer;
 
-        float interpolationFactor = 0;
+        private float interpolationFactor = 0;
 
         /// <summary>
         /// A timer used to ensure the frame rate of the video transmitted over the network.
@@ -180,6 +171,7 @@ namespace DlibFaceLandmarkDetectorExample
                 GetFaceCamStatusServerRpc();
             }
 
+            step = moveStartSpeed;
         }
 
         /// <summary>
@@ -333,25 +325,11 @@ namespace DlibFaceLandmarkDetectorExample
                     {
                         mainRect = rect;
                         rectFound = true;
-                        //OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(255, 0, 0, 255), 2);
                     }
-                    //else {
-                    //    OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(0, 0, 255, 255), 2);
-                    //}
-
-                    //detect landmark points
-                    //List<Vector2> points = faceLandmarkDetector.DetectLandmark(rect);
-
-                    //draw landmark points
-                    //OpenCVForUnityUtils.DrawFaceLandmark(rgbaMat, points, new Scalar(0, 255, 0, 255), 2);
-
-                    //draw face rect
-                    //OpenCVForUnityUtils.DrawFaceRect(rgbaMat, rect, new Scalar(255, 0, 0, 255), 2);
                 }
 
                 // Code from the WebCamTextureToMatHelperExample.
                 // Convert the material to a 2D texture.
-                /// FIXME NOT FAST IF SEND OVER NETWORTK , ODER? da coutout neu vieliecht geht so
                 OpenCVForUnity.UnityUtils.Utils.fastMatToTexture2D(rgbaMat, texture);
 
                 // If a face is found, calculate the area of the texture which should be displayed.
@@ -359,7 +337,6 @@ namespace DlibFaceLandmarkDetectorExample
                 if (rectFound)
                 {
                     // Dimensions of the new found face.
-                    /// FIXME: Do i need to clamp to the textures size? The rectangle might maybe be out of the texture.
                     int NextRectX = Mathf.RoundToInt(mainRect.x);
                     int NextRectY = Mathf.RoundToInt(mainRect.y);
                     int NextRectWidth = Mathf.RoundToInt(mainRect.width);
