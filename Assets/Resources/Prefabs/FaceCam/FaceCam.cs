@@ -286,6 +286,7 @@ namespace DlibFaceLandmarkDetectorExample
                     {
                         webCamTextureToMatHelper.Stop();
                     }
+                    // Hide the FaceCam if it's deactivated.
                     meshRenderer.enabled = FaceCamOn;
                 }
 
@@ -539,7 +540,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// The owner calls this, to send his video to the server which sends it to all clients.
         /// Also the server and every client will render this video onto the FaceCam.
         /// </summary>
-        [ServerRpc]
+        [ServerRpc(Delivery = RpcDelivery.Unreliable)]
         private void GetVideoFromClientAndSendItToClientsToRenderIt_ServerRPC(byte[] videoFrame)
         {
             // The server will render this video onto his instance of the FaceCam.
@@ -553,7 +554,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// The Server calls this, to send his video  to all clients.
         /// Also every client will render this video onto the FaceCam.
         /// </summary>
-        [ClientRpc]
+        [ClientRpc(Delivery = RpcDelivery.Unreliable)]
         private void SendVideoToClientsToRenderIt_ClientRPC(byte[] videoFrame, ClientRpcParams clientRpcParams = default)
         {
             RenderNetworkFrameOnFaceCam(videoFrame);
