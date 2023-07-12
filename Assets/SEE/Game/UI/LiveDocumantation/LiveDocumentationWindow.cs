@@ -22,13 +22,9 @@ namespace SEE.Game.UI.LiveDocumantation
     /// This class represents a LiveDocumentation window.
     /// 
     /// In this window the Name of the Class, the documentation and all class methods are shown.
-    /// 
-    /// The following fields must be set:
-    /// <ul>
-    ///     <li><see cref="ClassName"/> </li>
-    ///     <li> <see cref="NodeOfClass"/> </li>
-    /// </ul>
-    /// Otherwise an error is displayed and the window is not rendereed.
+    /// In addition: the <see cref="LiveDocumentationWindow"/> has two modes: 'CLASS' and 'METHOD'.
+    ///
+    /// 'CLASS' is used for displaying documentation of classes.
     /// 
     /// </summary>
     public class LiveDocumentationWindow : BaseWindow
@@ -67,7 +63,7 @@ namespace SEE.Game.UI.LiveDocumantation
         /// The Path inside the prefab should be "LiveDocumentation/ClassDocumentation/Viewport/Content/ClassDoc"
         /// </summary>
         private TextMeshProUGUI ClassDocumentation;
-        
+
         /// <summary>
         /// The type of the LiveDocumentation window  
         /// </summary>
@@ -78,19 +74,20 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </su  mmary>
         public string ClassName { get; set; }
 
-
+        /// <summary>
+        /// A list of all imported namespaces/packages
+        /// </summary>
         public List<string> ImportedNamespaces { get; set; } = new();
 
-        /// <summary>
-        /// The graph which the node the user has clicked on belongs to.
-        /// This node is the node which documentation is displayed in this window.
-        ///
-        /// The Graph is needed to find a corresponding node when the user clicked on a link
-        /// </summary>
-        public Graph Graph;
 
+        /// <summary>
+        /// The node of the CodeCity where the class or method belongs to.
+        /// </summary>
         public Node NodeOfClass;
 
+        /// <summary>
+        /// An instance of a <see cref="WindowSpaceManager"/>
+        /// </summary>
         private WindowSpaceManager spaceManager;
 
         /// <summary>
@@ -98,6 +95,11 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         public LiveDocumentationBuffer DocumentationBuffer { get; set; }
 
+        /// <summary>
+        /// A List of buffers which are displayed in the ListView.
+        ///
+        /// Not that in 'Class-Mode' the type of the elements might differ (<see cref="LiveDocumentationClassMemberBuffer"/>)
+        /// </summary>
         public List<LiveDocumentationBuffer> ClassMembers { get; set; } =
             new List<LiveDocumentationBuffer>();
 
@@ -110,12 +112,12 @@ namespace SEE.Game.UI.LiveDocumantation
             ClassName != null && NodeOfClass != null;
 
         /// <summary>
-        /// Adds a new Class member to the ClassMember section in the LiveDocumentation Window.
+        /// Adds a new class member to the ClassMember section in the LiveDocumentation Window.
         ///
         /// Currently ClassMembers are represented by a <see cref="LiveDocumentationBuffer"/>.
         /// In this buffer all information and links of the method signature is stored. 
         /// </summary>
-        /// <param name="buffer"></param>
+        /// <param name="buffer">The documentation of the class member</param>
         private void AddClassMember(LiveDocumentationBuffer buffer)
         {
             // Creating a new GameObject and naming it
@@ -135,7 +137,6 @@ namespace SEE.Game.UI.LiveDocumantation
                 cm.LineNumber = classMemberBuffer.LineNumber;
             }
 
-
             // Setting the correct anchor point (upper left corner) for the new game object
             classMem.transform.parent = ClassMembersList.transform;
             rt.localScale = new Vector3(1, 1, 1);
@@ -144,26 +145,28 @@ namespace SEE.Game.UI.LiveDocumantation
             rt.anchorMax = new Vector2(0, 1);
             rt.sizeDelta = new Vector2(0, 200);
 
-            if (DocumentationWindowType == LiveDocumentationWindowType.METHOD)
-            {
-            }
-
             cm.OnLinkClicked += OnLinkClicked;
             cm.OnClicked.AddListener(OnClickClassMember);
         }
 
+        /// <summary>
+        /// Is called, when the user clicked on a class member.
+        /// </summary>
+        /// <param name="cm">The <see cref="ClassMember"/> the user has clicked on</param>
         private void OnClickClassMember(ClassMember cm)
         {
+            // Clicks should only be handled, when left shift is pressed.
             if (Input.GetKey(KeyCode.LeftShift))
             {
                 var method = NodeOfClass.Children().Where(x => x.Type.Equals("Method"))
                     .Where(x => x.GetInt("Source.Line") == cm.LineNumber).First();
 
+                // When the class member is the documentation of a method.
+                // In this case a new LiveDocumentation window with the method is opened.
                 if (DocumentationWindowType == LiveDocumentationWindowType.CLASS &&
                     cm.MethodsBuffer is LiveDocumentationClassMemberBuffer classMemberBuffer)
                 {
                     LiveDocumentationWindow newWin = method.GameObject().AddComponent<LiveDocumentationWindow>();
-
 
                     newWin.Title = method.SourceName;
                     string selectedFile = method.Filename();
@@ -174,7 +177,6 @@ namespace SEE.Game.UI.LiveDocumantation
                     }
 
                     newWin.ClassName = newWin.Title;
-                    newWin.Graph = Graph;
                     newWin.NodeOfClass = method;
                     newWin.DocumentationWindowType = LiveDocumentationWindowType.METHOD;
                     newWin.ImportedNamespaces = ImportedNamespaces;
@@ -183,33 +185,20 @@ namespace SEE.Game.UI.LiveDocumantation
 
                     List<LiveDocumentationBuffer> methods = new List<LiveDocumentationBuffer>();
 
-
-                    //  newWin.ClassMembers = methods;
-                    //  newWin.DocumentationBuffer = buffer;
-                    // Add code window to our space of code window, if it isn't in there yet
-
-
+                    // Add code window to our space of code window.
                     spaceManager[WindowSpaceManager.LOCAL_PLAYER].AddWindow(newWin);
                     spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = newWin;
-                }
-
-                if (method != null)
-                {
-                    var oldScale = NodeOfClass.GameObject().transform.localScale;
-                    if (!cm.HighlightAnimationRunning)
-                    {
-                        cm.HighlightAnimationRunning = true;
-                        method.GameObject().transform.DOScale(oldScale * 1.5f, 0.3f).SetEase(Ease.InOutSine)
-                            .SetLoops(2, LoopType.Yoyo).OnComplete(
-                                () => { cm.HighlightAnimationRunning = false; }).Restart();
-                    }
                 }
             }
         }
 
+        /// <summary>
+        /// Is called when the window is opened on a desktop instance of SEE
+        /// </summary>
         protected override void StartDesktop()
         {
             spaceManager = WindowSpaceManager.ManagerInstance;
+            // Check if all required fields are set.
             if (!CheckNecessaryFields())
             {
                 Debug.LogError("Some fields are not set; cant load LiveDocumentation");
@@ -217,25 +206,17 @@ namespace SEE.Game.UI.LiveDocumantation
             }
 
             base.StartDesktop();
-            var c = Canvas.GetComponent<Camera>();
             GameObject livedoc =
                 PrefabInstantiator.InstantiatePrefab(PrefabName, Window.transform.Find("Content"), false);
             livedoc.name = "LiveDocumentation";
-
-
             Window.transform.Find("Dragger/Title").gameObject.GetComponent<TextMeshProUGUI>().text =
                 "LiveDocumentation";
-
 
             // Initializing Unity Components 
             ClassNameField = livedoc.transform.Find("ClassName/Viewport/Content/ClassName").gameObject
                 .GetComponent<TextMeshProUGUI>();
-
-
             ClassDocumentation =
                 livedoc.transform.Find(ClassDocumentationPath).gameObject.GetComponent<TextMeshProUGUI>();
-
-
             ClassMembersList = livedoc.transform.Find(ClassMemberListPath).gameObject;
 
             // Set the right title 
@@ -262,38 +243,13 @@ namespace SEE.Game.UI.LiveDocumantation
             {
                 ClassDocumentation.text = "NO DOCS AVAILABLE";
             }
-            //     GameObject livedoc =
-            //         PrefabInstantiator.InstantiatePrefab("Prefabs/UI/LiveDocumentation/ClassMember", ClassMembers.transform, false);
 
             ClassDocumentation.ForceMeshUpdate();
 
+            // Adding the class members
             foreach (var item in ClassMembers)
             {
                 AddClassMember(item);
-            }
-        }
-
-        private bool HighlightAnomation = false;
-
-        /// <summary>
-        /// Is called when the user clicked on a Text segment in the class name field.
-        /// If the user technically clicked on the field, but hasn't hit any text the function isn't called.
-        /// </summary>
-        private void OnClickClassName()
-        {
-            if (Input.GetKeyDown(KeyCode.LeftShift))
-            {
-                var marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-
-                var newScale = new Vector3(1.5f, 1.5f, 1.5f);
-                var oldScale = NodeOfClass.GameObject().transform.localScale;
-                if (!HighlightAnomation)
-                {
-                    HighlightAnomation = true;
-                    NodeOfClass.GameObject().transform.DOScale(oldScale * 1.5f, 0.3f).SetEase(Ease.InOutSine)
-                        .SetLoops(2, LoopType.Yoyo).OnComplete(
-                            () => { HighlightAnomation = false; }).Restart();
-                }
             }
         }
 
@@ -315,66 +271,29 @@ namespace SEE.Game.UI.LiveDocumantation
 
         public override WindowValues ToValueObject()
         {
-            return new LiveDocumentationValues("Live doc", gameObject.name);
+            return new LiveDocumentationValues(Title, NodeOfClass, DocumentationWindowType, DocumentationBuffer, ClassMembers, gameObject.name);
         }
 
+        [Serializable]
         public class LiveDocumentationValues : WindowValues
         {
-            public LiveDocumentationValues(string title, string attachedTo = null) : base(title, attachedTo)
+            [field: SerializeField] public Node Node { get; set; }
+
+            [field: SerializeField] public LiveDocumentationWindowType Type { get; set; }
+
+            [field: SerializeField] public LiveDocumentationBuffer DocumentationBuffer { get; set; }
+
+            [field: SerializeField] public List<LiveDocumentationBuffer> Members { get; set; }
+
+            public LiveDocumentationValues(string title,  Node node, LiveDocumentationWindowType type, LiveDocumentationBuffer buffer, List<LiveDocumentationBuffer> members,string attachedTo = null) : base(title, attachedTo)
             {
+         
+                Node = node;
+                type = type;
+                buffer = buffer;
+                members = members;
             }
         }
-
-        //      private Node FindMatchingNode(string className)
-        //     {
-        //          var namspaceName = className.Split(".")[..(className.Split(".").Length - 1)]
-        //           .Aggregate("", (((s, s1) => s1 + s)));
-        //     }
-
-        // /// <summary>
-        // /// Finds a node given from a clicked filename.
-        // /// </summary>
-        // /// <param name="filename">The filename to find a corresponding node for.</param>
-        // /// <returns>The node or null if none could be found.</returns>
-        // [CanBeNull]
-        // private Node FindNodeWithPath(string @namespace)
-        // {
-        //     //See if an item was found in the cache.
-        //     if (NamespaceCache.ContainsKey(@namespace))
-        //     {
-        //         return NamespaceCache[@namespace];
-        //     }
-        //
-        //     // Iterate through each node in the code city.
-        //     foreach (var item in Graph.Nodes())
-        //     {
-        //         // Only check for leaf nodes and classes.
-        //         if (!(item.IsLeaf() || item.Type.Equals(NodeClassType)))
-        //             continue;
-        //         //Collect all namespaces
-        //         //TODO replace using with namespaces.
-        //         var filePath = item.AbsolutePlatformPath();
-        //         var input = File.ReadAllText(filePath);
-        //         var lexer = new CSharpFullLexer(new AntlrInputStream(input));
-        //         var tokens = new CommonTokenStream(lexer);
-        //         tokens.Fill();
-        //
-        //         var parser = new CSharpParser(tokens);
-        //         var namespaces = parser.compilation_unit().namespace_member_declarations()
-        //             .namespace_member_declaration();
-        //
-        //         foreach (var parsedNamespace in namespaces)
-        //         {
-        //             if (parsedNamespace.namespace_declaration().qualified_identifier().GetText().Equals(@namespace))
-        //             {
-        //                 NamespaceCache[@namespace] = item;
-        //                 return item;
-        //             }
-        //         }
-        //     }
-        //
-        //     return null;
-        // }
 
         private Node TraverseForNamespace(List<string> splitedNamespace, Node currentNode)
         {
@@ -465,8 +384,6 @@ namespace SEE.Game.UI.LiveDocumantation
             {
                 LiveDocumentationWindow newWin = nodeOfLink.GameObject().AddComponent<LiveDocumentationWindow>();
 
-                string path = nodeOfLink.Path() + nodeOfLink.Filename();
-                var filenames = linkPath.Split("\\");
                 newWin.Title = nodeOfLink.SourceName;
                 string selectedFile = nodeOfLink.Filename();
                 if (!newWin.Title.Replace(".", "").Equals(selectedFile.Split('.').Reverse().Skip(1)
@@ -476,7 +393,6 @@ namespace SEE.Game.UI.LiveDocumantation
                 }
 
                 newWin.ClassName = newWin.Title;
-                newWin.Graph = Graph;
                 newWin.NodeOfClass = nodeOfLink;
                 LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
                 FileParser parser = new FileParser(nodeOfLink.AbsolutePlatformPath());
@@ -494,10 +410,7 @@ namespace SEE.Game.UI.LiveDocumantation
                 }
 
                 newWin.ClassMembers = methods;
-                //  newWin.DocumentationBuffer = buffer;
                 // Add code window to our space of code window, if it isn't in there yet
-
-
                 spaceManager[WindowSpaceManager.LOCAL_PLAYER].AddWindow(newWin);
                 spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = newWin;
             }
@@ -514,21 +427,13 @@ namespace SEE.Game.UI.LiveDocumantation
             {
                 int classDoclink =
                     TMP_TextUtilities.FindIntersectingLink(ClassDocumentation, Input.mousePosition, null);
-                int clickedWordInClassName =
-                    TMP_TextUtilities.FindIntersectingWord(ClassNameField, Input.mousePosition, null);
 
-                // ShowNotification.Warn("sdsd", a.ToString());
 
-                // If the point the user has clicked really is a link
+                // If the point the user has clicked on a valid link
                 if (classDoclink != -1)
                 {
                     string linkId = ClassDocumentation.textInfo.linkInfo[classDoclink].GetLinkID().ToString();
                     OnLinkClicked(linkId);
-                }
-
-                if (clickedWordInClassName != -1)
-                {
-                    OnClickClassName();
                 }
             }
         }
