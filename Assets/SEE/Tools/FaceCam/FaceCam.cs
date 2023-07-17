@@ -1,8 +1,8 @@
 #if !(PLATFORM_LUMIN && !UNITY_EDITOR) // This Line of code is from the WebCamTextureToMatHelperExample.
-
 using DlibFaceLandmarkDetector;
 using OpenCVForUnity.CoreModule;
 using OpenCVForUnity.UnityUtils.Helper;
+using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -75,36 +75,50 @@ namespace DlibFaceLandmarkDetectorExample
         /// X position of the cropped texture of the last frame.
         /// </summary>
         private int lastFrameCutoutTextureX;
+
         /// <summary>
         /// Y position of the cropped texture of the last frame.
         /// </summary>
         private int lastFrameCutoutTextureY;
+
         /// <summary>
         /// Width of the cropped texture of the last frame.
         /// </summary>
         private int lastFrameCutoutTextureWidth;
+
         /// <summary>
         /// Height of the cropped texture of the last frame.
         /// </summary>
         private int lastFrameCutoutTextureHeight;
 
         /// <summary>
-        /// The webcam texture to mat helper.
+        /// This is the final maximum height of the FaceCam.
+        /// </summary>
+        private const float MaxHeight = 0.24f;
+
+        /// <summary>
+        /// This seems to be the maximum size for files in bytes to be sent over the network.
+        /// (No documentation found regarding this limitation).
+        /// </summary>
+        private int MaximumNetworkByteSize = 32768;
+
+        /// <summary>
+        /// The webcam texture to mat helper from the WebCamTextureToMatHelperExample.
         /// </summary>
         private WebCamTextureToMatHelper webCamTextureToMatHelper;
 
         /// <summary>
-        /// The face landmark detector.
+        /// The face landmark detector from the WebCamTextureToMatHelperExample.
         /// </summary>
         private FaceLandmarkDetector faceLandmarkDetector;
 
         /// <summary>
-        /// The dlib shape predictor file name.
+        /// The dlib shape predictor file name from the WebCamTextureToMatHelperExample.
         /// </summary>
         private string dlibShapePredictorFileName = "DlibFaceLandmarkDetector/sp_human_face_6.dat";
 
         /// <summary>
-        /// The dlib shape predictor file path.
+        /// The dlib shape predictor complete file path from the WebCamTextureToMatHelperExample.
         /// </summary>
         private string dlibShapePredictorFilePath;
 
@@ -119,17 +133,14 @@ namespace DlibFaceLandmarkDetectorExample
         /// The speed which the face tracking will use to follow the face if it detects one.
         /// </summary>
         [SerializeField, FormerlySerializedAs("Face tracking speed"), TooltipAttribute("Set the speed which the face tracking will use to follow the face if it detects one.")]
-        public float _moveStartSpeed;
-        public virtual float moveStartSpeed
+        public float _MoveStartSpeed;
+        public float MoveStartSpeed
         {
-            get { return _moveStartSpeed; }
+            get => _moveStartSpeed;
             set
             {
                 float _value = Mathf.Abs(value);
-                if (_moveStartSpeed != _value)
-                {
-                    _moveStartSpeed = _value;
-                }
+                _MoveStartSpeed = _value;
             }
         }
 
@@ -137,18 +148,14 @@ namespace DlibFaceLandmarkDetectorExample
         /// The acceleration which occours after the face tracking found a face.
         /// </summary>
         [SerializeField, FormerlySerializedAs("Face tracking acceleration"), TooltipAttribute("Set the acceleration which occours after the face tracking found a face.")]
-        public float _moveAcceleration;
-        public virtual float moveAcceleration
+        public float _MoveAcceleration;
+        public float MoveAcceleration
         {
-            get { return _moveAcceleration; }
+            get => _MoveAcceleration;
             set
             {
-                Math.Abs(_moveAcceleration);
                 float _value = Mathf.Abs(value);
-                if (_moveAcceleration != _value)
-                {
-                    _moveAcceleration = _value;
-                }
+                _MoveAcceleration = _value;
             }
         }
 
@@ -167,23 +174,18 @@ namespace DlibFaceLandmarkDetectorExample
         /// <summary>
         /// The on off state of the FaceCam
         /// </summary>
-        private Boolean FaceCamOn = false;
+        private bool FaceCamOn = false;
 
         /// <summary>
-        /// The position of the FaceCam.
+        /// The state of the position of the FaceCam.
         /// Can be on front of the face or above the face, tilted to the observer.
         /// </summary>
-        private Boolean FaceCamOnFront = true;
-
-        /// <summary>
-        /// The positon of the main camera, used to tilt the FaceCam towards the observer.
-        /// </summary>
-        private Transform MainCamera;
+        private bool FaceCamOnFront = true;
 
         /// <summary>
         /// The mesh renderer of the FaceCam, used to hide it.
         /// </summary>
-        public MeshRenderer meshRenderer;
+        public MeshRenderer MeshRenderer;
 
         /// <summary>
         /// A timer used to ensure the frame rate of the video transmitted over the network.
@@ -201,17 +203,14 @@ namespace DlibFaceLandmarkDetectorExample
         /// Set the frame rate of video network transmission.
         /// </summary>
         [SerializeField, FormerlySerializedAs("Network FPS"), TooltipAttribute("Set the frame rate of Video which will be transmitted over the Network.")]
-        protected float _networkFPS;
-        public virtual float networkFPS
+        protected float _NetworkFPS;
+        public float NetworkFPS
         {
-            get { return _networkFPS; }
+            get => _NetworkFPS;
             set
             {
                 float _value = Mathf.Clamp(value, 1, float.MaxValue);
-                if (_networkFPS != _value)
-                {
-                    _networkFPS = _value;
-                }
+                _NetworkFPS = _value;
             }
         }
 
@@ -223,7 +222,7 @@ namespace DlibFaceLandmarkDetectorExample
             ownClientId = NetworkManager.Singleton.LocalClientId;
             if (!IsServer && !IsOwner)
             {
-                AddClientIdToList_ServerRPC(ownClientId);
+                AddClientIdToListServerRPC(ownClientId);
             }
 
             // Always invoked the base.
@@ -243,7 +242,7 @@ namespace DlibFaceLandmarkDetectorExample
         {
 
             // The network FPS is used to calculate everything needet to send the video at the specified frame rate.
-            networkVideoDelay = 1f / networkFPS;
+            networkVideoDelay = 1f / NetworkFPS;
 
             // This is the size of the FaceCam at the start
             transform.localScale = new Vector3(0.2f, 0.2f, -1); // z = -1 to face away from the player.
@@ -263,7 +262,7 @@ namespace DlibFaceLandmarkDetectorExample
             }
 
             // Set the speed of the face tracking.
-            faceTrackingSpeed = moveStartSpeed;
+            faceTrackingSpeed = MoveStartSpeed;
         }
 
         /// <summary>
@@ -297,7 +296,7 @@ namespace DlibFaceLandmarkDetectorExample
         {
             if (string.IsNullOrEmpty(dlibShapePredictorFilePath))
             {
-                Debug.LogError("shape predictor file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/DlibFaceLandmarkDetector/” to “Assets/StreamingAssets/DlibFaceLandmarkDetector/” folder. ");
+                throw new InvalidOperationException("shape predictor file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/DlibFaceLandmarkDetector/” to “Assets/StreamingAssets/DlibFaceLandmarkDetector/” folder. ");
             }
 
             faceLandmarkDetector = new FaceLandmarkDetector(dlibShapePredictorFilePath);
@@ -411,11 +410,11 @@ namespace DlibFaceLandmarkDetectorExample
                 // This is the rectangle which is selected to be the face we want to zoom in.
                 UnityEngine.Rect mainRect = new UnityEngine.Rect(0, 0, 0, 0);
 
-                // Boolean, true if there is there any rectangle found.
+                // bool, true if there is there any rectangle found.
                 bool rectFound = false;
 
                 // Find the biggest, resp. closest Face
-                foreach (var rect in detectResult)
+                foreach (Rect rect in detectResult)
                 {
                     if (mainRect.height * mainRect.width <= rect.height * rect.width)
                     {
@@ -449,8 +448,14 @@ namespace DlibFaceLandmarkDetectorExample
                     int nextCutoutTextureHeight = NextRectHeight + SpaceAbove + SpaceBelow;
 
                     // If the new texture is outside of the original webcam texture, remove the extra space.
-                    if (nextCutoutTextureY + nextCutoutTextureHeight > texture.height) { nextCutoutTextureHeight = texture.height - nextCutoutTextureY; }
-                    if (nextCutoutTextureX + nextCutoutTextureWidth > texture.width) { nextCutoutTextureWidth = texture.width - nextCutoutTextureX; }
+                    if (nextCutoutTextureY + nextCutoutTextureHeight > texture.height)
+                    {
+                        nextCutoutTextureHeight = texture.height - nextCutoutTextureY;
+                    }
+                    if (nextCutoutTextureX + nextCutoutTextureWidth > texture.width)
+                    {
+                        nextCutoutTextureWidth = texture.width - nextCutoutTextureX;
+                    }
 
                     // This is the distance which will be ignored, if a face moves.
                     int rectMoveOffset = NextRectWidth / 11;
@@ -493,10 +498,13 @@ namespace DlibFaceLandmarkDetectorExample
                     // If the new rectangle is further aways than the actual cropped texture plus half the size of the rectangle, move faster towards the rectangle.
                     if (distancePosition >= NextRectWidth / 2 || distanceSize >= NextRectWidth / 2)
                     {
-                        faceTrackingSpeed = faceTrackingSpeed + moveAcceleration * Time.deltaTime;
+                        faceTrackingSpeed = faceTrackingSpeed + MoveAcceleration * Time.deltaTime;
                     }
                     // Otherwise reset the acceleration.
-                    else { faceTrackingSpeed = moveStartSpeed; }
+                    else
+                    {
+                        faceTrackingSpeed = MoveStartSpeed;
+                    }
 
                     // Move towards the rectangle of the face.
                     // Resp. update the interpolation factor which might be reset to 0.
@@ -504,8 +512,7 @@ namespace DlibFaceLandmarkDetectorExample
 
                     // Apply the cutout texture size to the FacCam prefab.
                     // The size is way to big, so it needs to be reduced. A maximum height is used.
-                    float maxHeight = 0.24f;
-                    float divisor = croppedTextureHeight / maxHeight;
+                    float divisor = croppedTextureHeight / MaxHeight;
                     transform.localScale = new Vector3(((float)croppedTextureWidth) / divisor, (float)croppedTextureHeight / divisor, -1); // Without '(float)' the result is just '0'.
                 }
 
@@ -532,7 +539,8 @@ namespace DlibFaceLandmarkDetectorExample
 
         /// <summary>
         /// Refresh the position of the FaceCam.
-        /// The position can toggle with the Key 'O'
+        /// The position can toggle with the Key 'O'.
+        /// This means switching the postion between above the avatars face and in front of it.
         /// </summary>
         private void RefreshFaceCamPosition()
         {
@@ -563,14 +571,10 @@ namespace DlibFaceLandmarkDetectorExample
                     transform.position += transform.up * 0.3f;
                     if (!IsOwner) // If this is the owner the FaceCam should just face forward and not down to the own camera.
                     {
-                        // check if there is any main camera, set it and use it to face towards it.
+                        // check if there is any main camera, and face towards it.
                         if (MainCamera != null)
                         {
                             transform.LookAt(MainCamera);
-                        }
-                        else if (Camera.main.transform != null)
-                        {
-                            MainCamera = Camera.main.transform;
                         }
                     }
                 }
@@ -581,7 +585,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// Tell the server to toggle the FaceCam on off state of all clients.
         /// </summary>
         [ServerRpc(RequireOwnership = false)]
-        private void FaceCamOnOffServerRpc(Boolean NetworkFaceCamOn) {
+        private void FaceCamOnOffServerRpc(bool NetworkFaceCamOn) {
             // Toggle the FaceCam on off state of all clients.
             FaceCamOnOffClientRpc(NetworkFaceCamOn);
         }
@@ -591,7 +595,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// (Can only be used by the server).
         /// </summary>
         [ClientRpc]
-        private void FaceCamOnOffClientRpc(Boolean NetworkFaceCamOn)
+        private void FaceCamOnOffClientRpc(bool NetworkFaceCamOn)
         {
             // NetworkFaceCamOn, resp. FaceCamOn has the value which should be inverted.
             if (FaceCamOn == NetworkFaceCamOn)
@@ -614,14 +618,14 @@ namespace DlibFaceLandmarkDetectorExample
                 webCamTextureToMatHelper.Stop();
             }
             // Hide the FaceCam if it's deactivated.
-            meshRenderer.enabled = FaceCamOn;
+            MeshRenderer.enabled = FaceCamOn;
         }
 
         /// <summary>
         /// Tell the server to toggle the FaceCam position of all clients.
         /// </summary>
         [ServerRpc(RequireOwnership = false)]
-        private void FaceCamOnFrontToggleServerRpc(Boolean NetworkFaceCamOnFront)
+        private void FaceCamOnFrontToggleServerRpc(bool NetworkFaceCamOnFront)
         {
             FaceCamOnFrontToggleClientRpc(NetworkFaceCamOnFront);
         }
@@ -631,7 +635,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// (Can only be used by the server).
         /// </summary
         [ClientRpc]
-        private void FaceCamOnFrontToggleClientRpc(Boolean NetworkFaceCamOnFront)
+        private void FaceCamOnFrontToggleClientRpc(bool NetworkFaceCamOnFront)
         {
             if (FaceCamOnFront == NetworkFaceCamOnFront)
             {
@@ -653,7 +657,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// (Can only be used by the server).
         /// </summary
         [ClientRpc]
-        private void SetFaceCamStatusClientRpc(Boolean FaceCamOn, Boolean FaceCamOnFront) {
+        private void SetFaceCamStatusClientRpc(bool FaceCamOn, bool FaceCamOnFront) {
             this.FaceCamOn = FaceCamOn;
             this.FaceCamOnFront = FaceCamOnFront;
             // Make the FaceCam visible/invisible and/or start/stop it.
@@ -676,12 +680,12 @@ namespace DlibFaceLandmarkDetectorExample
             // Send the frame to the to server, unless this is the server.
             if (!IsServer)
             {
-                GetVideoFromClientAndSendItToClientsToRenderIt_ServerRPC(videoFrame);
+                GetVideoFromClientAndSendItToClientsToRenderItServerRPC(videoFrame);
             }
             else // If this is the owner (creator of video) and also the server.
             {
                 // Send the frame to all clients. (But not the server and owner, which in this case, is the server.)
-                SendVideoToClientsToRenderIt_ClientRPC(videoFrame, clientsIdsRpcParams);
+                SendVideoToClientsToRenderItClientRPC(videoFrame, clientsIdsRpcParams);
             }
         }
 
@@ -694,7 +698,7 @@ namespace DlibFaceLandmarkDetectorExample
             // Converts the texture to an byte array containing an JPG.
             byte[] networkTexture = ImageConversion.EncodeToJPG(croppedTexture);
             // Only return the array if it's not too big.
-            if (networkTexture.Length <= 32768) // 32768 bytes seems to be the maximum size for files to be sent over the network. (No documentation found regarding this limitation).
+            if (networkTexture.Length <= MaximumNetworkByteSize)
             {
                 return networkTexture;
             }
@@ -707,13 +711,13 @@ namespace DlibFaceLandmarkDetectorExample
         /// </summary>
         //[ServerRpc(Delivery = RpcDelivery.Unreliable)] // Large files not supported by unreliable Rpc. (No documentation found regarding this limitation).
         [ServerRpc]
-        private void GetVideoFromClientAndSendItToClientsToRenderIt_ServerRPC(byte[] videoFrame)
+        private void GetVideoFromClientAndSendItToClientsToRenderItServerRPC(byte[] videoFrame)
         {
             // The server will render this video onto his instance of the FaceCam.
             RenderNetworkFrameOnFaceCam(videoFrame);
 
             // The server will send the video to all other clients (not the owner and server) so they can render it. 
-            SendVideoToClientsToRenderIt_ClientRPC(videoFrame, clientsIdsRpcParams);
+            SendVideoToClientsToRenderItClientRPC(videoFrame, clientsIdsRpcParams);
         }
 
         /// <summary>
@@ -722,7 +726,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// </summary>
         //[ClientRpc(Delivery = RpcDelivery.Unreliable)]  // Large files not supported by unreliable Rpc. (No documentation found regarding this limitation).
         [ClientRpc]
-        private void SendVideoToClientsToRenderIt_ClientRPC(byte[] videoFrame, ClientRpcParams clientRpcParams = default)
+        private void SendVideoToClientsToRenderItClientRPC(byte[] videoFrame, ClientRpcParams clientRpcParams = default)
         {
             RenderNetworkFrameOnFaceCam(videoFrame);
         }
@@ -744,16 +748,20 @@ namespace DlibFaceLandmarkDetectorExample
             // Remove own ClientId from the list of connected ClientIds
             if (!IsServer && !IsOwner) // Owner and server is not in the list.
             {
-                RemoveClientFromList_ServerRPC(ownClientId);
+                RemoveClientFromListServerRPC(ownClientId);
             }
 
             // Code from the WebCamTextureToMatHelperExample.
             if (webCamTextureToMatHelper != null)
+            {
                 webCamTextureToMatHelper.Dispose();
+            }
 
             // Code from the WebCamTextureToMatHelperExample.
             if (faceLandmarkDetector != null)
+            {
                 faceLandmarkDetector.Dispose();
+            }
 
             // Code from the WebCamTextureToMatHelperExample.
 #if UNITY_WEBGL
@@ -773,7 +781,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// The clients call this to add their ClientId to the list on the Server.
         /// </summary>
         [ServerRpc(RequireOwnership = false)]
-        private void AddClientIdToList_ServerRPC(ulong clientId)
+        private void AddClientIdToListServerRPC(ulong clientId)
         {
             clientsIdsList.Add(clientId);
             // Create the RpcParams from the list to make the list usable as RpcParams.
@@ -784,7 +792,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// The clients call this to remove their ClientId to the list on the Server.
         /// </summary>
         [ServerRpc(RequireOwnership = false)]
-        private void RemoveClientFromList_ServerRPC(ulong clientId)
+        private void RemoveClientFromListServerRPC(ulong clientId)
         {
             clientsIdsList.Remove(clientId);
             // Create the RpcParams to make this list usable.

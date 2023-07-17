@@ -119,6 +119,7 @@ namespace SEE.Game.Worlds
             {
                 Debug.LogError($"Spawned player {player.name} does not have a {typeof(NetworkObject)} component.\n");
             }
+#if !(PLATFORM_LUMIN && !UNITY_EDITOR)
             if (networkManager.IsServer)
             {
                 // Add the FaceCam to the player.
@@ -126,6 +127,7 @@ namespace SEE.Game.Worlds
                 faceCam.GetComponent<NetworkObject>().Spawn();
                 faceCam.transform.parent = player.transform;
             }
+#endif
         }
 
         /// <summary>
