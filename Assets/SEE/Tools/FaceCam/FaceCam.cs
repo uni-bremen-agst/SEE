@@ -13,7 +13,7 @@ namespace DlibFaceLandmarkDetectorExample
 {
     /// <summary>
     /// This component is assumed to be attached to a game object representing
-    /// an avatar (a local or remote player). It can display an 
+    /// an avatar (a local or remote player). It can display an
     /// WebCam image of the tracked face of the user over the network.
     /// It Also can be switched off. And it can toggle the position between
     /// above the player always facing the camera, and the front of the players face.
