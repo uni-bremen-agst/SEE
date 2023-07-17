@@ -238,7 +238,6 @@ namespace DlibFaceLandmarkDetectorExample
         /// The startup code from the WebCamTextureToMatHelperExample is executed.
         /// The status of the FaceCam is received it this is not the owner.
         /// </summary>
-        // Start is
         void Start()
         {
 
