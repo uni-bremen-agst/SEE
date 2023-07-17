@@ -48,6 +48,11 @@ namespace SEE.Game.Worlds
         }
 
         /// <summary>
+        /// The NetworkManager, used to spawn the FaceCam.
+        /// </summary>
+        NetworkManager networkManager = NetworkManager.Singleton;
+
+        /// <summary>
         /// This co-routine sets <see cref="dissonanceComms"/>, registers <see cref="Spawn(ulong)"/>
         /// on the <see cref="NetworkManager.Singleton.OnClientConnectedCallback"/> and spawns
         /// the first local client.
@@ -109,15 +114,17 @@ namespace SEE.Game.Worlds
             if (player.TryGetComponent(out NetworkObject net))
             {
                 net.SpawnAsPlayerObject(owner, destroyWithScene: true);
-
-                // Add the FaceCam to the player.
-                GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam");
-                faceCam.GetComponent<NetworkObject>().SpawnWithOwnership(owner);
-                faceCam.transform.parent = player.transform;
             }
             else
             {
                 Debug.LogError($"Spawned player {player.name} does not have a {typeof(NetworkObject)} component.\n");
+            }
+            if (networkManager.IsServer)
+            {
+                // Add the FaceCam to the player.
+                GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam");
+                faceCam.GetComponent<NetworkObject>().Spawn();
+                faceCam.transform.parent = player.transform;
             }
         }
 

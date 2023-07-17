@@ -223,7 +223,6 @@ namespace SEE.Game.Avatars
             }
 
             gameObject.AddComponent<DesktopPlayerMovement>();
-
         }
 
         #region ENABLE_VR
