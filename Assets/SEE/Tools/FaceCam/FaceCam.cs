@@ -1,4 +1,4 @@
-#if !(PLATFORM_LUMIN && !UNITY_EDITOR) // This Line of code is from the WebCamTextureToMatHelperExample.
+#if !PLATFORM_LUMIN || UNITY_EDITOR // This line of code is from the WebCamTextureToMatHelperExample.
 
 using DlibFaceLandmarkDetector;
 using OpenCVForUnity.CoreModule;
