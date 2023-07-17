@@ -165,7 +165,7 @@ namespace DlibFaceLandmarkDetectorExample
         private float interpolationFactor = 0;
 
         /// <summary>
-        /// The on off state of the FaceCam
+        /// The on/off state of the FaceCam.
         /// </summary>
         private Boolean FaceCamOn = false;
 
