@@ -578,7 +578,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// Tell the server to toggle the FaceCam on off state of all clients.
         /// </summary>
         [ServerRpc(RequireOwnership = false)]
-        private void FaceCamOnOffServerRpc(Boolean NetworkFaceCamOn) {
+        private void FaceCamOnOffServerRpc(bool NetworkFaceCamOn) {
             // Toggle the FaceCam on off state of all clients.
             FaceCamOnOffClientRpc(NetworkFaceCamOn);
         }
