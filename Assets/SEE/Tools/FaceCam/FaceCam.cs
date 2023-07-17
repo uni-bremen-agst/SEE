@@ -406,7 +406,7 @@ namespace DlibFaceLandmarkDetectorExample
                 List<UnityEngine.Rect> detectResult = faceLandmarkDetector.Detect();
 
                 // This is the rectangle which is selected to be the face we want to zoom in.
-                UnityEngine.Rect mainRect = new UnityEngine.Rect(0, 0, 0, 0);
+                UnityEngine.Rect mainRect = new(0, 0, 0, 0);
 
                 // Boolean, true if there is there any rectangle found.
                 bool rectFound = false;
