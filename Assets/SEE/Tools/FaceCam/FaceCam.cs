@@ -712,7 +712,7 @@ namespace DlibFaceLandmarkDetectorExample
             // The server will render this video onto his instance of the FaceCam.
             RenderNetworkFrameOnFaceCam(videoFrame);
 
-            // The server will send the video to all other clients (not the owner and server) so they can render it. 
+            // The server will send the video to all other clients (not the owner and server) so they can render it.
             SendVideoToClientsToRenderIt_ClientRPC(videoFrame, clientsIdsRpcParams);
         }
 
