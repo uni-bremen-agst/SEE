@@ -200,7 +200,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// <summary>
         /// Set the frame rate of video network transmission.
         /// </summary>
-        [SerializeField, FormerlySerializedAs("Network FPS"), TooltipAttribute("Set the frame rate of Video which will be transmitted over the Network.")]
+        [SerializeField, FormerlySerializedAs("Network FPS"), TooltipAttribute("Set the frame rate of the video which will be transmitted over the Network.")]
         protected float _networkFPS;
         public virtual float networkFPS
         {
