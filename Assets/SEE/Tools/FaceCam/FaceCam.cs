@@ -29,7 +29,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// <summary>
         /// All Network Ids, but not the owner (where the video is recorded) or the server.
         /// </summary>
-        private List<ulong> clientsIdsList = new List<ulong>();
+        private readonly List<ulong> clientsIdsList = new();
 
         /// <summary>
         /// All Network Ids, but not the owner (where the video is recorded) or the server.
