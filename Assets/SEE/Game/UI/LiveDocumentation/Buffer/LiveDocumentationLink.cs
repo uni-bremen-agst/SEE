@@ -1,4 +1,4 @@
-namespace SEE.Game.UI.LiveDocumantation
+namespace SEE.Game.UI.LiveDocumentation.Buffer
 {
     /// <summary>
     /// Representing a link to another class in the LiveDocumentation
@@ -17,7 +17,11 @@ namespace SEE.Game.UI.LiveDocumantation
         /// </summary>
         public string LinkName { get; set; }
         
-
+        /// <summary>
+        /// Constructs a new instance of a <see cref="LiveDocumentationLink"/>
+        /// </summary>
+        /// <param name="targetPath">The path the link should point to</param>
+        /// <param name="linkName">The name of the link which should be displayed</param>
         public LiveDocumentationLink(string targetPath, string linkName)
         {
             this.TargetPath = targetPath;

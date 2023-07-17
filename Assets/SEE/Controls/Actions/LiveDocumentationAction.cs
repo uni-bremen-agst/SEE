@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using SEE.Game.UI.LiveDocumantation;
+using SEE.Game.UI.LiveDocumentation;
+using SEE.Game.UI.LiveDocumentation.Buffer;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions;

@@ -1,9 +1,7 @@
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Text;
 
-namespace SEE.Game.UI.LiveDocumantation
+namespace SEE.Game.UI.LiveDocumentation.Buffer
 {
     /// <summary>
     /// LiveDocumentationBuffer contains the documentation of a class including links as chunks of <see cref="ILiveDocumentationBufferItem"/>.
@@ -26,39 +24,26 @@ namespace SEE.Game.UI.LiveDocumantation
     /// </example>
     public class LiveDocumentationBuffer
     {
-        private IList<ILiveDocumentationBufferItem> BufferItems;
+        /// <summary>
+        /// All elements in the buffer
+        /// </summary>
+        private IList<ILiveDocumentationBufferItem> BufferItems { get; set; }
 
-
+        /// <summary>
+        /// Constructor for the <see cref="LiveDocumentationBuffer"/>
+        /// </summary>
         public LiveDocumentationBuffer()
         {
-            this.BufferItems = new List<ILiveDocumentationBufferItem>();
+            BufferItems = new List<ILiveDocumentationBufferItem>();
         }
 
 
         /// <summary>
         /// Adds a new Link to the documentation buffer.
-        /// According to the Unity documentation https://docs.unity3d.com/Packages/com.unity.textmeshpro@3.2/manual/RichTextLink.html the ID tag of the link-id should be unique.
-        ///
-        /// Hence, this function will check if multiple links of the same class exists.
-        /// If so, then a incremental number is appended
-        ///
-        /// The Link that should be added shall not have a counter suffix yet.
-        /// This function will calculate the right counter and append it
-        /// TODO: Maybe this is not necessary: try out later without this 
         /// </summary>
         /// <param name="link">The Link which should be added</param>
         public void Add(LiveDocumentationLink link)
         {
-//            int linkCounter = 1;
-
-            // Find and count all Links with the same target
-            //int amountOfLinks = BufferItems
-             //   .Where(x => x is LiveDocumentationLink)
-              //  .Cast<LiveDocumentationLink>()
-               // .Count(x => x.TargetPath.StartsWith(link.TargetPath + "::"));
-
-            // link.TargetPath += "::" + (amountOfLinks + 1);
-
             BufferItems.Add(link);
         }
 
@@ -68,7 +53,11 @@ namespace SEE.Game.UI.LiveDocumantation
         /// <param name="text">The Text that should be added</param>
         public void Add(LiveDocumentationBufferText text) => BufferItems.Add(text);
 
-        
+
+        /// <summary>
+        /// Prints the entire buffer with all it's elements concatenated together.
+        /// </summary>
+        /// <returns>The buffer as one string</returns>
         public string PrintBuffer()
         {
             StringBuilder builder = new StringBuilder();

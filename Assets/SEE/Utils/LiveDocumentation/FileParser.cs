@@ -1,8 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using JetBrains.Annotations;
-using SEE.Game.UI.LiveDocumantation;
+using SEE.Game.UI.LiveDocumentation;
+using SEE.Game.UI.LiveDocumentation.Buffer;
 using SEE.Game.UI.Notification;
 
 namespace SEE.Utils.LiveDocumentation

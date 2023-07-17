@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 
-namespace SEE.Game.UI.LiveDocumantation
+namespace SEE.Game.UI.LiveDocumentation.Buffer
 {
     /// <summary>
     /// <see cref="LiveDocumentationBuffer"/> variant for class members

@@ -1,5 +1,8 @@
-namespace SEE.Game.UI.LiveDocumantation
+namespace SEE.Game.UI.LiveDocumentation.Buffer
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class LiveDocumentationBufferText : ILiveDocumentationBufferItem
     {
         public string Text { get; set; }

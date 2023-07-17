@@ -1,22 +1,18 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Threading;
-using Antlr4.Runtime;
-using DG.Tweening;
 using JetBrains.Annotations;
 using SEE.Controls;
 using SEE.DataModel.DG;
+using SEE.Game.UI.LiveDocumentation.Buffer;
 using SEE.Game.UI.Notification;
 using SEE.Game.UI.Window;
-using SEE.GO;
 using SEE.Utils;
 using SEE.Utils.LiveDocumentation;
 using TMPro;
 using UnityEngine;
 
-namespace SEE.Game.UI.LiveDocumantation
+namespace SEE.Game.UI.LiveDocumentation
 {
     /// <summary>
     /// This class represents a LiveDocumentation window.
@@ -145,7 +141,7 @@ namespace SEE.Game.UI.LiveDocumantation
             rt.anchorMax = new Vector2(0, 1);
             rt.sizeDelta = new Vector2(0, 200);
 
-            cm.OnLinkClicked += OnLinkClicked;
+            cm.OnLinkClicked.AddListener(OnLinkClicked);
             cm.OnClicked.AddListener(OnClickClassMember);
         }
 
@@ -295,6 +291,15 @@ namespace SEE.Game.UI.LiveDocumantation
             }
         }
 
+        /// <summary>
+        /// Traverses the CodeCity graph to look for a specific namespace using recursion.
+        ///
+        /// Use <see cref="TraverseForNamespace(String)"/> when calling
+        /// </summary>
+        /// <param name="splitedNamespace">The namespace name split by '.'</param>
+        /// <param name="currentNode">The current node</param>
+        /// <returns>The CodeCity node of the namespace. Is null if the namespace cant be found</returns>
+        [CanBeNull]
         private Node TraverseForNamespace(List<string> splitedNamespace, Node currentNode)
         {
             // Base case
@@ -318,16 +323,27 @@ namespace SEE.Game.UI.LiveDocumantation
             return null;
         }
 
+        /// <summary>
+        /// Traverses the CodeCity graph to look for a specific namespace using recursion.
+        ///
+        /// This is the correct method to call when using this method
+        /// </summary>
+        /// <param name="namespaceName">The full name of the Namespace you're looking for.</param>
+        /// <returns>The CodeCity node of the namespace. Is null if the namespace cant be found</returns>
+        [CanBeNull]
         private Node TraverseForNamespace(string namespaceName) =>
             TraverseForNamespace(namespaceName.Split(".").ToList(),
                 NodeOfClass.ItsGraph.Nodes().First(x => x.IsRoot()));
 
 
         /// <summary>
-        /// This method looks for a Node corresponding to a specific class.
+        /// This method looks for a node corresponding to a specific class which is visible to the class of the LiveDocumentation window (e.g. via. using).
+        ///
+        /// This method first tries to search for the class in the namespace of the current class.
+        /// If <paramref name="className"/> can't be found there all imported namespaces are searched.
         /// </summary>
-        /// <param name="className"></param>
-        /// <returns></returns>
+        /// <param name="className">The name of the class</param>
+        /// <returns>The CodeCity node of the class. Is null if the class can't be found (can be caused by a missing import)</returns>
         [CanBeNull]
         private Node FindNodeOfClass(string className)
         {
@@ -340,6 +356,7 @@ namespace SEE.Game.UI.LiveDocumantation
                 }
             }
 
+            // Search in all imported namespaces
             foreach (var namespaceName in ImportedNamespaces)
             {
                 Node traversedNamespace = TraverseForNamespace(namespaceName);
@@ -362,9 +379,11 @@ namespace SEE.Game.UI.LiveDocumantation
         }
 
         /// <summary>
-        /// Called when a user has clicked on a link
+        /// Called when a user has clicked on a link.
+        ///
+        /// In that case the corresponding class should be opened (If the class belongs to the CodeCity).
         /// </summary>
-        /// <param name="linkPath"></param>
+        /// <param name="linkPath">The path/ID of the link</param>
         private void OnLinkClicked(string linkPath)
         {
             Node nodeOfLink = FindNodeOfClass(linkPath);
@@ -373,11 +392,7 @@ namespace SEE.Game.UI.LiveDocumantation
                 ShowNotification.Error("Cant open link", "The class can't be found");
                 return;
             }
-            else
-            {
-                ShowNotification.Info("Link found", nodeOfLink.AbsolutePlatformPath());
-            }
-
+            
             // If the Space manager don't contains a LiveDocumentationWindow of the same file a new one is created
             // Otherwise the old one is set as the active window
             if (!nodeOfLink.GameObject().TryGetComponent(out LiveDocumentationWindow ldocWin))
@@ -420,6 +435,9 @@ namespace SEE.Game.UI.LiveDocumantation
             }
         }
 
+        /// <summary>
+        /// Update method of the LiveDocumentation Window
+        /// </summary>
         protected override void UpdateDesktop()
         {
             // When the user clicked in the LiveDocumentation window
@@ -427,8 +445,7 @@ namespace SEE.Game.UI.LiveDocumantation
             {
                 int classDoclink =
                     TMP_TextUtilities.FindIntersectingLink(ClassDocumentation, Input.mousePosition, null);
-
-
+                
                 // If the point the user has clicked on a valid link
                 if (classDoclink != -1)
                 {

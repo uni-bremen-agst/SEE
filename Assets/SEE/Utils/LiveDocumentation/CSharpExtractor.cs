@@ -4,8 +4,9 @@ using System.IO;
 using System.Linq;
 using Antlr4.Runtime;
 using JetBrains.Annotations;
-using SEE.Game.City.LiveDocumentation;
-using SEE.Game.UI.LiveDocumantation;
+using SEE.Game.UI.LiveDocumentation;
+using SEE.Game.UI.LiveDocumentation.Buffer;
+
 
 namespace SEE.Utils.LiveDocumentation
 {

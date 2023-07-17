@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using SEE.Game.UI.LiveDocumantation;
+using SEE.Game.UI.LiveDocumentation;
+using SEE.Game.UI.LiveDocumentation.Buffer;
 
 namespace SEE.Utils.LiveDocumentation
 {
@@ -11,7 +12,6 @@ namespace SEE.Utils.LiveDocumentation
     /// </summary>
     public interface Extractor
     {
-
         /// <summary>
         /// This method should extract the comments of an specific class in a specific source code file.
         /// </summary>
