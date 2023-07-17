@@ -325,7 +325,7 @@ namespace DlibFaceLandmarkDetectorExample
         {
             if (texture != null)
             {
-                Texture2D.Destroy(texture);
+                Destroy(texture);
                 texture = null;
             }
             if (croppedTexture != null)
