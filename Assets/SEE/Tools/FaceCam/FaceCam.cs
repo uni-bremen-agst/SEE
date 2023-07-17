@@ -490,7 +490,7 @@ namespace DlibFaceLandmarkDetectorExample
                     // If the new rectangle is further aways than the actual cropped texture plus half the size of the rectangle, move faster towards the rectangle.
                     if (distancePosition >= NextRectWidth / 2.0 || distanceSize >= NextRectWidth / 2.0)
                     {
-                        faceTrackingSpeed = faceTrackingSpeed + moveAcceleration * Time.deltaTime;
+                        faceTrackingSpeed += moveAcceleration * Time.deltaTime;
                     }
                     // Otherwise reset the acceleration.
                     else { faceTrackingSpeed = moveStartSpeed; }
