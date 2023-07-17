@@ -323,8 +323,6 @@ namespace DlibFaceLandmarkDetectorExample
         /// </summary>
         public void OnWebCamTextureToMatHelperDisposed()
         {
-            //Debug.Log("OnWebCamTextureToMatHelperDisposed");
-
             if (texture != null)
             {
                 Texture2D.Destroy(texture);
