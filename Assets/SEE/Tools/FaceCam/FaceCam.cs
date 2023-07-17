@@ -798,7 +798,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// </summary>
         private void CreateClientRpcParams()
         {
-            // Creates the needet array from the editable list.
+            // Creates the needed array from the editable list.
             ulong[] allOtherClientIds = clientsIdsList.ToArray();
 
             // Creates the RpcParams with the array of ClientIds
