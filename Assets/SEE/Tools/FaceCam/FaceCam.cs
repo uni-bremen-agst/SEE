@@ -529,7 +529,7 @@ namespace DlibFaceLandmarkDetectorExample
 
         /// <summary>
         /// Refresh the position of the FaceCam.
-        /// The position can toggle with the Key 'O'
+        /// The position can be toggled with the Key 'O'.
         /// </summary>
         private void RefreshFaceCamPosition()
         {
