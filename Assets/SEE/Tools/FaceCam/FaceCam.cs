@@ -176,7 +176,7 @@ namespace DlibFaceLandmarkDetectorExample
         private Boolean FaceCamOnFront = true;
 
         /// <summary>
-        /// The positon of the main camera, used to tilt the FaceCam towards the observer.
+        /// The transform of the main camera, used to tilt the FaceCam towards the observer.
         /// </summary>
         private Transform MainCamera;
 
