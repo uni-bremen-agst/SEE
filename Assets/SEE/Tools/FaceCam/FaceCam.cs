@@ -54,7 +54,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// <summary>
         /// X position of the cropped texture.
         /// </summary>
-        private int croppedTextureX = 0;
+        private int croppedTextureX;
 
         /// <summary>
         /// Y position of the cropped texture.
