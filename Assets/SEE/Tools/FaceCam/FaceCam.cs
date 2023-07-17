@@ -588,7 +588,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// (Can only be used by the server).
         /// </summary>
         [ClientRpc]
-        private void FaceCamOnOffClientRpc(Boolean NetworkFaceCamOn)
+        private void FaceCamOnOffClientRpc(bool NetworkFaceCamOn)
         {
             // NetworkFaceCamOn, resp. FaceCamOn has the value which should be inverted.
             if (FaceCamOn == NetworkFaceCamOn)
