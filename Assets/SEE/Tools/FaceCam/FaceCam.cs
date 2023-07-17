@@ -342,7 +342,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// <param name="errorCode">Error code.</param>
         public void OnWebCamTextureToMatHelperErrorOccurred(WebCamTextureToMatHelper.ErrorCode errorCode)
         {
-            Debug.Log("OnWebCamTextureToMatHelperErrorOccurred " + errorCode);
+            Debug.LogError("OnWebCamTextureToMatHelperErrorOccurred " + errorCode);
         }
 
         /// <summary>
