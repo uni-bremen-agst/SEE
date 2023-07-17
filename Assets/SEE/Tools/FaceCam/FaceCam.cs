@@ -497,7 +497,7 @@ namespace DlibFaceLandmarkDetectorExample
 
                     // Move towards the rectangle of the face.
                     // Resp. update the interpolation factor which might be reset to 0.
-                    interpolationFactor = interpolationFactor + faceTrackingSpeed * Time.deltaTime;
+                    interpolationFactor += faceTrackingSpeed * Time.deltaTime;
 
                     // Apply the cutout texture size to the FacCam prefab.
                     // The size is way to big, so it needs to be reduced. A maximum height is used.
