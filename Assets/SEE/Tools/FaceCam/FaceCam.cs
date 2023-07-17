@@ -455,7 +455,7 @@ namespace DlibFaceLandmarkDetectorExample
                     int rectPositionOffset = NextRectWidth;
 
                     // Reset the interpolation factor if the cropped texture already is at the face,
-                    // or oterhwise if the face moves a significant amount.
+                    // or otherwise if the face moves a significant amount.
                     if (// Reset the interpolation factor if the rectangle of the face is already at the cropped texture.
                         Math.Abs(nextCutoutTextureX - croppedTextureX) <= rectMoveOffset &&
                         Math.Abs(nextCutoutTextureY - croppedTextureY) <= rectMoveOffset &&
