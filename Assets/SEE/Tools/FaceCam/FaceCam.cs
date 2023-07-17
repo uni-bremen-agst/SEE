@@ -729,7 +729,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// </summary>
         private void RenderNetworkFrameOnFaceCam(byte[] videoFrame)
         {
-            ImageConversion.LoadImage(croppedTexture, videoFrame);
+            croppedTexture.LoadImage(videoFrame);
             gameObject.GetComponent<Renderer>().material.mainTexture = croppedTexture;
         }
 
