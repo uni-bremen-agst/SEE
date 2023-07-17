@@ -167,7 +167,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// <summary>
         /// The on/off state of the FaceCam.
         /// </summary>
-        private Boolean FaceCamOn = false;
+        private bool FaceCamOn = false;
 
         /// <summary>
         /// The position of the FaceCam.
