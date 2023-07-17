@@ -241,7 +241,7 @@ namespace DlibFaceLandmarkDetectorExample
         private void Start()
         {
 
-            // The network FPS is used to calculate everything needet to send the video at the specified frame rate.
+            // The network FPS is used to calculate everything needed to send the video at the specified frame rate.
             networkVideoDelay = 1f / networkFPS;
 
             // This is the size of the FaceCam at the start
