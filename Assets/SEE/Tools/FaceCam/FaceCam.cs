@@ -134,7 +134,7 @@ namespace DlibFaceLandmarkDetectorExample
         }
 
         /// <summary>
-        /// The acceleration which occours after the face tracking found a face.
+        /// The acceleration which occurs after the face tracking found a face.
         /// </summary>
         [SerializeField, FormerlySerializedAs("Face tracking acceleration"), TooltipAttribute("Set the acceleration which occours after the face tracking found a face.")]
         public float _moveAcceleration;
