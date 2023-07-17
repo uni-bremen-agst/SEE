@@ -781,7 +781,7 @@ namespace DlibFaceLandmarkDetectorExample
         }
 
         /// <summary>
-        /// The clients call this to remove their ClientId to the list on the Server.
+        /// The clients call this to remove their ClientId from the list on the Server.
         /// </summary>
         [ServerRpc(RequireOwnership = false)]
         private void RemoveClientFromList_ServerRPC(ulong clientId)
