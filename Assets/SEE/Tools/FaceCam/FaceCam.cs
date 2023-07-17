@@ -238,7 +238,7 @@ namespace DlibFaceLandmarkDetectorExample
         /// The startup code from the WebCamTextureToMatHelperExample is executed.
         /// The status of the FaceCam is received it this is not the owner.
         /// </summary>
-        void Start()
+        private void Start()
         {
 
             // The network FPS is used to calculate everything needet to send the video at the specified frame rate.
