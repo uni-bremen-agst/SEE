@@ -102,7 +102,7 @@ namespace SEE.Tools.FaceCam
         /// This seems to be the maximum size for files in bytes to be sent over the network.
         /// (No documentation found regarding this limitation).
         /// </summary>
-        private int MaximumNetworkByteSize = 32768;
+        private const int MaximumNetworkByteSize = 32768;
 
         /// <summary>
         /// The webcam texture to mat helper from the WebCamTextureToMatHelperExample.
@@ -171,12 +171,12 @@ namespace SEE.Tools.FaceCam
         /// If it is 0 it is just our position on the webcam frame.
         /// If it is 1 our position is exactly the same as the detected face.
         /// </summary>
-        private float interpolationFactor = 0;
+        private float interpolationFactor;
 
         /// <summary>
         /// The on/off state of the FaceCam.
         /// </summary>
-        private bool FaceCamOn = false;
+        private bool FaceCamOn;
 
         /// <summary>
         /// The state of the position of the FaceCam.
@@ -404,10 +404,10 @@ namespace SEE.Tools.FaceCam
 
                 // Code from the WebCamTextureToMatHelperExample.
                 // Detect all face rectangles
-                List<UnityEngine.Rect> detectResult = faceLandmarkDetector.Detect();
+                List<Rect> detectResult = faceLandmarkDetector.Detect();
 
                 // This is the rectangle which is selected to be the face we want to zoom in.
-                UnityEngine.Rect mainRect = new(0, 0, 0, 0);
+                Rect mainRect = new(0, 0, 0, 0);
 
                 // bool, true if there is there any rectangle found.
                 bool rectFound = false;
