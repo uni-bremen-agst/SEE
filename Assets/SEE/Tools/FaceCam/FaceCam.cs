@@ -182,6 +182,11 @@ namespace SEE.Tools.FaceCam
         public MeshRenderer MeshRenderer;
 
         /// <summary>
+        /// The material of the FaceCam, its texture displaying a default picture, or the face of the user.
+        /// </summary>
+        private Material MainMaterial;
+
+        /// <summary>
         /// A timer used to ensure the frame rate of the video transmitted over the network.
         /// It counts the seconds until the video is transmitted. Then it resets.
         /// </summary>
@@ -251,6 +256,9 @@ namespace SEE.Tools.FaceCam
 
             // Set the speed of the face tracking.
             faceTrackingSpeed = MoveStartSpeed;
+
+            // Cache the material of the FaceCam to change its texture later. (Display a default picture or the face of the user).
+            MainMaterial = MeshRenderer.material;
         }
 
         /// <summary>
@@ -509,7 +517,7 @@ namespace SEE.Tools.FaceCam
                 croppedTexture.Apply();
 
                 // Renders the cutout texture onto the FaceCam.
-                gameObject.GetComponent<Renderer>().material.mainTexture = croppedTexture;
+                MainMaterial.mainTexture = croppedTexture;
             }
         }
 
@@ -723,7 +731,7 @@ namespace SEE.Tools.FaceCam
         private void RenderNetworkFrameOnFaceCam(byte[] videoFrame)
         {
             croppedTexture.LoadImage(videoFrame);
-            gameObject.GetComponent<Renderer>().material.mainTexture = croppedTexture;
+            MainMaterial.mainTexture = croppedTexture;
         }
 
         /// <summary>
