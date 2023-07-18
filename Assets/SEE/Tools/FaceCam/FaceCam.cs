@@ -5,11 +5,13 @@ using OpenCVForUnity.UnityUtils.Helper;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
+using FaceMaskExample;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Rect = UnityEngine.Rect;
 
-namespace DlibFaceLandmarkDetectorExample
+namespace SEE.Tools.FaceCam
 {
     /// <summary>
     /// This component is assumed to be attached to a game object representing
@@ -132,11 +134,11 @@ namespace DlibFaceLandmarkDetectorExample
         /// <summary>
         /// The speed which the face tracking will use to follow the face if it detects one.
         /// </summary>
-        [SerializeField, FormerlySerializedAs("Face tracking speed"), TooltipAttribute("Set the speed which the face tracking will use to follow the face if it detects one.")]
+        [SerializeField, FormerlySerializedAs("Face tracking speed"), Tooltip("Set the speed which the face tracking will use to follow the face if it detects one.")]
         public float _MoveStartSpeed;
         public float MoveStartSpeed
         {
-            get => _moveStartSpeed;
+            get => _MoveStartSpeed;
             set
             {
                 float _value = Mathf.Abs(value);
@@ -147,8 +149,8 @@ namespace DlibFaceLandmarkDetectorExample
         /// <summary>
         /// The acceleration which occurs after the face tracking found a face.
         /// </summary>
-        [SerializeField, FormerlySerializedAs("Face tracking acceleration"), TooltipAttribute("Set the acceleration which occours after the face tracking found a face.")]
-        public float _moveAcceleration;
+        [SerializeField, FormerlySerializedAs("Face tracking acceleration"), Tooltip("Set the acceleration which occours after the face tracking found a face.")]
+        public float _MoveAcceleration;
         public float moveAcceleration
         {
             get => _MoveAcceleration;
@@ -202,8 +204,8 @@ namespace DlibFaceLandmarkDetectorExample
         /// <summary>
         /// Set the frame rate of video network transmission.
         /// </summary>
-        [SerializeField, FormerlySerializedAs("Network FPS"), TooltipAttribute("Set the frame rate of Video which will be transmitted over the Network.")]
-        protected float _networkFPS;
+        [SerializeField, FormerlySerializedAs("Network FPS"), Tooltip("Set the frame rate of Video which will be transmitted over the Network.")]
+        protected float _NetworkFPS;
         public float networkFPS
         {
             get => _NetworkFPS;
@@ -272,7 +274,7 @@ namespace DlibFaceLandmarkDetectorExample
 
             webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper>();
 
-            dlibShapePredictorFileName = DlibFaceLandmarkDetectorExample.dlibShapePredictorFileName;
+            dlibShapePredictorFileName = DlibFaceLandmarkDetectorExample.DlibFaceLandmarkDetectorExample.dlibShapePredictorFileName;
 #if UNITY_WEBGL
             getFilePath_Coroutine = DlibFaceLandmarkDetector.UnityUtils.Utils.getFilePathAsync(dlibShapePredictorFileName, (result) =>
             {
@@ -569,9 +571,9 @@ namespace DlibFaceLandmarkDetectorExample
                     if (!IsOwner) // If this is the owner the FaceCam should just face forward and not down to the own camera.
                     {
                         // check if there is any main camera, and face towards it.
-                        if (MainCamera != null)
+                        if (MainCamera.Camera != null)
                         {
-                            transform.LookAt(MainCamera);
+                            transform.LookAt(MainCamera.Camera.transform);
                         }
                     }
                 }
