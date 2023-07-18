@@ -507,7 +507,7 @@ namespace SEE.Tools.FaceCam
                     // Apply the cutout texture size to the FacCam prefab.
                     // The size is way to big, so it needs to be reduced. A maximum height is used.
                     float divisor = croppedTextureHeight / MaxHeight;
-                    transform.localScale = new Vector3((croppedTextureWidth) / divisor, croppedTextureHeight / divisor, -1);
+                    transform.localScale = new Vector3(croppedTextureWidth / divisor, croppedTextureHeight / divisor, -1);
                 }
 
                 // Copy the pixels from the original texture to the cutout texture.
