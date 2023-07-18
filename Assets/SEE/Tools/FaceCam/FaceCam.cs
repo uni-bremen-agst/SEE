@@ -1,4 +1,4 @@
-#if !(PLATFORM_LUMIN && !UNITY_EDITOR) // This Line of code is from the WebCamTextureToMatHelperExample.
+#if !PLATFORM_LUMIN || UNITY_EDITOR // This Line of code is from the WebCamTextureToMatHelperExample.
 using DlibFaceLandmarkDetector;
 using OpenCVForUnity.CoreModule;
 using OpenCVForUnity.UnityUtils.Helper;
@@ -139,26 +139,18 @@ namespace SEE.Tools.FaceCam
         public float MoveStartSpeed
         {
             get => _MoveStartSpeed;
-            set
-            {
-                float _value = Mathf.Abs(value);
-                _MoveStartSpeed = _value;
-            }
+            set => _MoveStartSpeed = Mathf.Abs(value);
         }
 
         /// <summary>
         /// The acceleration which occurs after the face tracking found a face.
         /// </summary>
-        [SerializeField, FormerlySerializedAs("Face tracking acceleration"), Tooltip("Set the acceleration which occours after the face tracking found a face.")]
+        [SerializeField, FormerlySerializedAs("Face tracking acceleration"), Tooltip("Set the acceleration which occurs after the face tracking found a face.")]
         public float _MoveAcceleration;
-        public float moveAcceleration
+        public float MoveAcceleration
         {
             get => _MoveAcceleration;
-            set
-            {
-                float _value = Mathf.Abs(value);
-                _MoveAcceleration = _value;
-            }
+            set => _MoveAcceleration = Mathf.Abs(value);
         }
 
         /// <summary>
@@ -204,16 +196,12 @@ namespace SEE.Tools.FaceCam
         /// <summary>
         /// Set the frame rate of video network transmission.
         /// </summary>
-        [SerializeField, FormerlySerializedAs("Network FPS"), Tooltip("Set the frame rate of Video which will be transmitted over the Network.")]
+        [SerializeField, FormerlySerializedAs("Network FPS"), Tooltip("Set the frame rate of the video which will be transmitted over the Network.")]
         protected float _NetworkFPS;
         public float networkFPS
         {
             get => _NetworkFPS;
-            set
-            {
-                float _value = Mathf.Clamp(value, 1, float.MaxValue);
-                _NetworkFPS = _value;
-            }
+            set => _NetworkFPS = Mathf.Clamp(value, 1, float.MaxValue);
         }
 
 
@@ -241,8 +229,7 @@ namespace SEE.Tools.FaceCam
         /// </summary>
         private void Start()
         {
-
-            // The network FPS is used to calculate everything needet to send the video at the specified frame rate.
+            // The network FPS is used to calculate everything needed to send the video at the specified frame rate.
             networkVideoDelay = 1f / networkFPS;
 
             // This is the size of the FaceCam at the start
@@ -494,10 +481,10 @@ namespace SEE.Tools.FaceCam
                     float distanceSize = Vector2.Distance(new Vector2(croppedTextureWidth, croppedTextureHeight), mainRect.size);
 
                     // Calculate the interpolation factor for the next frame.
-                    // If the new rectangle is further aways than the actual cropped texture plus half the size of the rectangle, move faster towards the rectangle.
+                    // If the new rectangle is further away than the actual cropped texture plus half the size of the rectangle, move faster towards the rectangle.
                     if (distancePosition >= NextRectWidth / 2.0 || distanceSize >= NextRectWidth / 2.0)
                     {
-                        faceTrackingSpeed += moveAcceleration * Time.deltaTime;
+                        faceTrackingSpeed += MoveAcceleration * Time.deltaTime;
                     }
                     // Otherwise reset the acceleration.
                     else
@@ -538,8 +525,8 @@ namespace SEE.Tools.FaceCam
 
         /// <summary>
         /// Refresh the position of the FaceCam.
-        /// The position can toggle with the Key 'O'
-        /// This means switching the postion between above the avatars face and in front of it.
+        /// The position can be toggled with the Key 'O'.
+        /// This means switching the position between above the avatars face and in front of it.
         /// </summary>
         private void RefreshFaceCamPosition()
         {
@@ -695,7 +682,7 @@ namespace SEE.Tools.FaceCam
         private byte[] CreateNetworkFrameFromVideo()
         {
             // Converts the texture to an byte array containing an JPG.
-            byte[] networkTexture = ImageConversion.EncodeToJPG(croppedTexture);
+            byte[] networkTexture = croppedTexture.EncodeToJPG();
             // Only return the array if it's not too big.
             if (networkTexture.Length <= MaximumNetworkByteSize)
             {
@@ -715,7 +702,7 @@ namespace SEE.Tools.FaceCam
             // The server will render this video onto his instance of the FaceCam.
             RenderNetworkFrameOnFaceCam(videoFrame);
 
-            // The server will send the video to all other clients (not the owner and server) so they can render it. 
+            // The server will send the video to all other clients (not the owner and server) so they can render it.
             SendVideoToClientsToRenderItClientRPC(videoFrame, clientsIdsRpcParams);
         }
 
