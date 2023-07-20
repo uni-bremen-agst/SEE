@@ -28,13 +28,14 @@ TEXT_SKIP: [/a-zA-Z0-9#_".!-][/a-zA-Z0-9.()_#!-]+ -> skip;
 CURLY_BRACKET_OPEN: '{';
 CURLY_BRACKET_CLOSE: '}';
 
-// Startrule for parsing the comments
-docs : Dashes* summary parameters? return? exceptionTag?;
+// Start rule for parsing the comments
+docs 
+    : Dashes* summary parameters? return? exceptionTag?;
 
+// Rule for paramref tags
+paramref
+    : '<paramref name="' TEXT '"/>';
 
-paramref: '<paramref name="' TEXT '"/>';
-
-//Language specific
 
 // Rule for class links
 classLink
@@ -43,7 +44,6 @@ classLink
 parameters
     : parameter*;
 
-    
 parameter
     : '/// <param name="' paramName=TEXT* '">' parameterDescription=tagContent '</param>';
     
@@ -53,10 +53,11 @@ summary
     
 exceptionType: TEXT+;
 
-someText : (TEXT | '<' | '>')+;
+someText 
+    : (TEXT | '<' | '>')+;
 
-exceptionTag:
-    '/// <exception cref="' exceptionType '">' (someText | paramref)* ('/// </exception>' | '</exception>');
+exceptionTag
+    : '/// <exception cref="' exceptionType '">' (someText | paramref)* ('/// </exception>' | '</exception>');
 
 
 tagContent
@@ -66,8 +67,8 @@ return
     : '/// <returns>' returnContent=tagContent ('/// </returns>' | '</returns>');
 
 
-comments: 
-        (Dashes (someText
+comments
+    : (Dashes (someText
         | classLink
         | paramref
         //| param

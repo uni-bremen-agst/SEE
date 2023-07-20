@@ -14,43 +14,69 @@ namespace SEE.Controls.Actions
 {
     public class LiveDocumentationAction : AbstractPlayerAction
     {
+        /// <summary>
+        /// Instance of <see cref="WindowSpaceManager"/> for managing the UI
+        /// </summary>
         private WindowSpaceManager spaceManager;
 
-        public static ReversibleAction CreateAction() => new LiveDocumentationAction();
-        public override HashSet<string> GetChangedObjects() => new HashSet<string>();
+        /// <summary>
+        /// Creates a new instance of <see cref="LiveDocumentationAction"/>
+        /// </summary>
+        /// <returns>The new created instance</returns>
+        public static ReversibleAction CreateAction()
+        {
+            return new LiveDocumentationAction();
+        }
+
+        /// <summary>
+        /// Override of method from <see cref="AbstractPlayerAction"/>.
+        ///
+        /// Always returns an empty list. 
+        /// </summary>
+        /// <returns>An empty list of strings</returns>
+        public override HashSet<string> GetChangedObjects() => new();
+
+        /// <summary>
+        /// Returns the ActionStateType of this action
+        /// </summary>
+        /// <returns>The ActionStateType (<see cref="ActionStateTypes.LiveDocumentation"/>)</returns>
         public override ActionStateType GetActionStateType() => ActionStateTypes.LiveDocumentation;
 
+        /// <summary>
+        /// Creates a new instance of the action
+        /// </summary>
+        /// <returns>The new instance</returns>
         public override ReversibleAction NewInstance() => CreateAction();
 
-        
-        
-        private SyncWindowSpaceAction syncAction;
-
+        /// <summary>
+        /// Awake method
+        ///
+        /// Copied from <see cref="ShowCodeAction"/> works the same way.
+        /// </summary>
         public override void Awake()
         {
             // In case we do not have an ID yet, we request one.
-            if (ICRDT.GetLocalID() == 0)
-            {
-                new NetCRDT().RequestID();
-            }
+            if (ICRDT.GetLocalID() == 0) new NetCRDT().RequestID();
 
             spaceManager = WindowSpaceManager.ManagerInstance;
         }
 
         public override void Start()
         {
-            syncAction = new SyncWindowSpaceAction();
+           // Do nothing because nothing has to be done here
         }
 
-
+        /// <summary>
+        /// Update method
+        /// </summary>
+        /// <returns></returns>
         public override bool Update()
         {
-            //  SceneQueries.GetCodeCity(selectedNode.transform).gameObject;
             // Only allow local player to open new code windows
             if (Input.GetMouseButtonDown(0) &&
-                Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef g) == HitGraphElement.Node)
+                Raycasting.RaycastGraphElement(out var hit, out var g) == HitGraphElement.Node)
             {
-                NodeRef selectedNode = hit.collider.gameObject.GetComponent<NodeRef>();
+                var selectedNode = hit.collider.gameObject.GetComponent<NodeRef>();
 
                 // When the node the user has clicked on has no file attached.
                 // In this case an error is displayed.
@@ -61,7 +87,7 @@ namespace SEE.Controls.Actions
                 }
 
                 // Concat the path and the file name to get the relative path of the file in the project
-                string path = selectedNode.Value.Path() + selectedNode.elem.Filename();
+                var path = selectedNode.Value.Path() + selectedNode.elem.Filename();
 
 
                 // When the node the user has clicked on wasn't a leaf node.
@@ -75,7 +101,7 @@ namespace SEE.Controls.Actions
 
                 if (!selectedNode.TryGetComponent(out LiveDocumentationWindow documentationWindow))
                 {
-                    string fileName = selectedNode.Value.Filename();
+                    var fileName = selectedNode.Value.Filename();
 
                     // Copied from ShowCodeAction
                     if (fileName == null)
@@ -85,7 +111,7 @@ namespace SEE.Controls.Actions
                         return false;
                     }
 
-                    string absolutePlatformPath = selectedNode.Value.AbsolutePlatformPath();
+                    var absolutePlatformPath = selectedNode.Value.AbsolutePlatformPath();
                     if (!File.Exists(absolutePlatformPath))
                     {
                         ShowNotification.Warn("File does not exist",
@@ -93,7 +119,7 @@ namespace SEE.Controls.Actions
                         return false;
                     }
 
-                    string selectedFile = selectedNode.Value.Filename();
+                    var selectedFile = selectedNode.Value.Filename();
 
 
                     documentationWindow = selectedNode.gameObject.AddComponent<LiveDocumentationWindow>();
@@ -102,9 +128,7 @@ namespace SEE.Controls.Actions
 
                     if (!documentationWindow.Title.Replace(".", "").Equals(selectedFile.Split('.').Reverse().Skip(1)
                             .Aggregate("", (acc, s) => s + acc)))
-                    {
                         documentationWindow.Title += $" ({selectedFile})";
-                    }
 
                     documentationWindow.ClassName = documentationWindow.Title;
                     documentationWindow.NodeOfClass = selectedNode.Value;
@@ -124,19 +148,14 @@ namespace SEE.Controls.Actions
                     }
 
 
-                    LiveDocumentationBuffer buffer = parser.ParseClassDoc(
+                    var buffer = parser.ParseClassDoc(
                         selectedNode.Value.SourceName);
 
 
-                    List<LiveDocumentationBuffer> classMembers = new List<LiveDocumentationBuffer>();
-                    // LiveDocumentationBuffer b = new LiveDocumentationBuffer();
+                    var classMembers = new List<LiveDocumentationBuffer>();
                     parser.ParseClassMethods(selectedNode.Value.SourceName)
-                        .ForEach((x) => classMembers.Add(x));
-                    if (buffer == null || classMembers == null)
-                    {
-                        return false;
-                    }
-                    //  classMembers.Add(b);
+                        .ForEach(x => classMembers.Add(x));
+                    if (buffer == null || classMembers == null) return false;
 
                     documentationWindow.DocumentationBuffer = buffer;
                     documentationWindow.ClassMembers = classMembers;
@@ -147,9 +166,7 @@ namespace SEE.Controls.Actions
 
                 // Add code window to our space of code window, if it isn't in there yet
                 if (!spaceManager[WindowSpaceManager.LOCAL_PLAYER].Windows.Contains(documentationWindow))
-                {
                     spaceManager[WindowSpaceManager.LOCAL_PLAYER].AddWindow(documentationWindow);
-                }
 
                 spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = documentationWindow;
             }
