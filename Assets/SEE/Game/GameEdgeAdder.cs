@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SEE.Game
 {
     /// <summary>
-    /// Creates new game objects representing graph edges or deleting these again,
+    /// Creates new game objects representing graph edges or deletes these again,
     /// respectively.
     /// </summary>
     public class GameEdgeAdder
