@@ -312,7 +312,7 @@ namespace DlibFaceLandmarkDetectorExample
                             detectionResult.Clear();
                             foreach (var opencvRect in opencvDetectResult)
                             {
-                                detectionResult.Add(new UnityEngine.Rect((float)opencvRect.x, (float)opencvRect.y + (float)(opencvRect.height * 0.1f), (float)opencvRect.width, (float)opencvRect.height));
+                                detectionResult.Add(new UnityEngine.Rect((float)(opencvRect.x*0.8f), (float)(opencvRect.y*0.8f) + (float)(opencvRect.height * 0.1f), (float)(opencvRect.width*0.8f), (float)(opencvRect.height*0.8f)));
                             }
                         }
 
