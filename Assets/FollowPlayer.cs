@@ -117,9 +117,9 @@ public class FollowPlayer : MonoBehaviour
         
 
         /// nach vorne bewegen:
-        transform.position += transform.forward * 0.025f;
+        transform.position += transform.forward * 0.01f;
         //mittig machen 
-        transform.position -= transform.forward * 0.11f;
+        transform.position -= transform.forward * 0.1f;
         //camera Anschauen
         transform.LookAt(UnityEditor.SceneView.lastActiveSceneView.camera.transform);
         //vorwärts bewegen
