@@ -50,8 +50,8 @@ namespace SEE.Net.Actions
                 if (gameObject != null)
                 {
                     NodeOperator Operator = gameObject.AddOrGetComponent<NodeOperator>();
-                    Operator.MoveTo(Position, ZoomAction.ANIMATION_DURATION);
-                    Operator.ScaleTo(LocalScale, ZoomAction.ANIMATION_DURATION);
+                    Operator.MoveTo(Position, ZoomAction.ANIMATION_FACTOR);
+                    Operator.ScaleTo(LocalScale, ZoomAction.ANIMATION_FACTOR);
                 }
                 else
                 {

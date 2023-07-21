@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using DG.Tweening;
 using UnityEngine;
@@ -13,12 +14,45 @@ namespace SEE.Game.Operator
     /// Operations can be animated or executed directly, by setting the duration to 0.
     /// </summary>
     /// <remarks>
-    /// Operator classes may also expose several "target" values, which are values the object is supposed to have. 
+    /// Operator classes may also expose several "target" values, which are values the object is supposed to have.
     /// "Supposed" means the object might have this value already, but it also might still animate towards it.
     /// </remarks>
     [DisallowMultipleComponent]
     public abstract class AbstractOperator : MonoBehaviour
     {
+        /// <summary>
+        /// The duration of the animation in seconds to use as a basis.
+        /// Operator methods will apply factors to this value to determine the actual duration.
+        /// </summary>
+        protected abstract float BaseAnimationDuration
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Converts the given <paramref name="factor"/> to the effective duration an animation
+        /// with this factor would take.
+        /// </summary>
+        /// <param name="factor">The factor to convert</param>
+        /// <returns>The effective duration</returns>
+        [Pure]
+        public float ToDuration(float factor)
+        {
+            return factor * BaseAnimationDuration;
+        }
+
+        /// <summary>
+        /// Converts the given <paramref name="duration"/> to the factor that would be used
+        /// for an animation of this duration.
+        /// </summary>
+        /// <param name="duration">The duration to convert</param>
+        /// <returns>The factor that would be used for an animation of this duration</returns>
+        [Pure]
+        public float ToFactor(float duration)
+        {
+            return BaseAnimationDuration > 0 ? duration / BaseAnimationDuration : 0;
+        }
+
         /// <summary>
         /// Interface for <see cref="Operation{T,V}"/> which collects all non-generic methods.
         /// <see cref="Operation{T,V}"/> should be preferred over this if generic parameters can be used.
@@ -114,7 +148,7 @@ namespace SEE.Game.Operator
             /// <summary>
             /// Animate to the new <paramref name="target"/> value, taking <paramref name="duration"/> seconds.
             /// If the target value should be set immediately (without an animation),
-            /// set the <paramref name="duration"/> to 0. 
+            /// set the <paramref name="duration"/> to 0.
             /// </summary>
             /// <param name="target">The new target value that shall be animated towards.</param>
             /// <param name="duration">The desired length of the animation.</param>
@@ -186,9 +220,8 @@ namespace SEE.Game.Operator
                 }
             }
 
-            protected override IOperationCallback<Action> AnimatorCallback => 
-                new AndCombinedOperationCallback<TweenCallback>(
-                    Animator.Select( x => new TweenOperationCallback(x)), x => new TweenCallback(x));
+            protected override IOperationCallback<Action> AnimatorCallback =>
+                new AndCombinedOperationCallback<TweenCallback>(Animator.Select(x => new TweenOperationCallback(x)), x => new TweenCallback(x));
 
             public TweenOperation(Func<V, float, IList<Tween>> animateToAction, V targetValue,
                                   IEqualityComparer<V> equalityComparer = null)

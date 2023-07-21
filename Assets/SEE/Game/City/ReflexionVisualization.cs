@@ -40,11 +40,6 @@ namespace SEE.Game.City
         private SEEReflexionCity City;
 
         /// <summary>
-        /// Duration of any animation (edge movement, color change...) in seconds.
-        /// </summary>
-        private const float ANIMATION_DURATION = 2f;
-
-        /// <summary>
         /// Percentage by which the starting color of an edge differs to its end color.
         /// </summary>
         private const float EDGE_GRADIENT_FACTOR = 0.8f;
@@ -120,6 +115,7 @@ namespace SEE.Game.City
             {
                 OnNext(UnhandledEvents.Dequeue());
             }
+            // TODO: Why is the below commented out? Do we still need it?
             //if (SEEInput.ShowAllDivergences())
             //{
             //    ShowAllDivergences(true);
@@ -133,7 +129,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Whether all divergent implementation dependencies are currently shown.
         /// </summary>
-        private bool allDivergencesAreShown = false;
+        private bool allDivergencesAreShown;
 
         /// <summary>
         /// If <paramref name="show"/>, all divergent implementation dependencies will
@@ -157,7 +153,7 @@ namespace SEE.Game.City
                         if (gameEdge != null)
                         {
                             EdgeOperator edgeOperator = gameEdge.AddOrGetComponent<EdgeOperator>();
-                            edgeOperator.ShowOrHide(allDivergencesAreShown, City.EdgeLayoutSettings.AnimationKind, ANIMATION_DURATION);
+                            edgeOperator.ShowOrHide(allDivergencesAreShown, City.EdgeLayoutSettings.AnimationKind);
                         }
                     }
                 }
@@ -265,7 +261,7 @@ namespace SEE.Game.City
                     EdgeOperator edgeOperator = HighlightedEdgeOperators.Dequeue();
                     if (edgeOperator != null)
                     {
-                        edgeOperator.GlowOut(ANIMATION_DURATION);
+                        edgeOperator.GlowOut();
                     }
                 }
             }
@@ -311,14 +307,14 @@ namespace SEE.Game.City
             {
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge);
                 EdgeOperator edgeOperator = edge.AddOrGetComponent<EdgeOperator>();
-                edgeOperator.ShowOrHide(!edgeChange.Edge.HasToggle(Edge.IsHiddenToggle), City.EdgeLayoutSettings.AnimationKind, ANIMATION_DURATION);
-                edgeOperator.ChangeColorsTo((newColors.start, newColors.end), ANIMATION_DURATION, false);
+                edgeOperator.ShowOrHide(!edgeChange.Edge.HasToggle(Edge.IsHiddenToggle), City.EdgeLayoutSettings.AnimationKind);
+                edgeOperator.ChangeColorsTo((newColors.start, newColors.end), useAlpha: false);
 
                 if (!PreviousEdgeStates.TryGetValue(edgeChange.Edge.ID, out State previous) || previous != edgeChange.NewState)
                 {
                     // Mark changed edges compared to previous version.
-                    edgeOperator.GlowIn(ANIMATION_DURATION);
-                    edgeOperator.HitEffect(ANIMATION_DURATION);
+                    edgeOperator.GlowIn();
+                    edgeOperator.HitEffect();
                     HighlightedEdgeOperators.Enqueue(edgeOperator);
                 }
             }
@@ -342,29 +338,7 @@ namespace SEE.Game.City
                 case (ChangeType.Addition, ReflexionSubgraph.Mapping):
                     HandleNewMapping(edgeEvent.Edge);
                     break;
-                case (ChangeType.Removal, ReflexionSubgraph.Mapping):
-                    HandleRemovedMapping(edgeEvent.Edge);
-                    break;
             }
-        }
-
-        /// <summary>
-        /// Handles the given removed <paramref name="mapsToEdge"/> by modifying the scene accordingly.
-        /// </summary>
-        /// <param name="mapsToEdge">The edge which has been removed.</param>
-        private static void HandleRemovedMapping(Edge mapsToEdge)
-        {
-            // FIXME: This code is currently commented out. If we are confident that it is really
-            // not needed, we need to remove it.
-
-            //Node implNode = mapsToEdge.Source;
-            //GameObject implGameNode = implNode.RetrieveGameNode();
-
-            // Node's original parent should be restored.
-            //implGameNode.transform.SetParent(implNode.Parent.RetrieveGameNode().transform);
-
-            // The layout of all attached edges need to be updated as well.
-            //implGameNode.AddOrGetComponent<NodeOperator>().TriggerLayoutUpdate(ANIMATION_DURATION);
         }
 
         /// <summary>
@@ -375,24 +349,6 @@ namespace SEE.Game.City
         {
             // Maps-To edges must not be drawn, as we will visualize mappings differently.
             mapsToEdge.SetToggle(GraphElement.IsVirtualToggle);
-
-            // FIXME: This code is currently commented out. If we are confident that it is really
-            // not needed, we need to remove it.
-
-            //Node implNode = mapsToEdge.Source;
-            //GameObject archGameNode = mapsToEdge.Target.RetrieveGameNode();
-            //GameObject implGameNode = implNode.RetrieveGameNode();
-
-            //Vector3 oldPosition = implGameNode.transform.position;
-
-            //Vector3 oldScale = GameNodeMover.PutOn(implGameNode.transform, archGameNode, scaleDown: true, topPadding: 0.3f);
-            //Vector3 newPosition = implGameNode.transform.position;
-            //Vector3 newScale = implGameNode.transform.localScale;
-            //implGameNode.transform.position = oldPosition;
-            //implGameNode.transform.localScale = oldScale;
-            //NodeOperator nodeOperator = implGameNode.AddOrGetComponent<NodeOperator>();
-            //nodeOperator.MoveYTo(newPosition.y, ANIMATION_DURATION);
-            //nodeOperator.ScaleTo(newScale, ANIMATION_DURATION);
         }
     }
 }

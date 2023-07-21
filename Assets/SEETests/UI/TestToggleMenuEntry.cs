@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
 using SEE.Game.UI.Menu;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -33,7 +34,10 @@ namespace SEETests.UI
         public void TestExitAction()
         {
             List<bool> testItems = new();
-            SelectionMenu selectionMenu = new();
+            // It is not allowed to create a MonoBehaviour with new. SelectionMenu derives from MonoBehaviour.
+            // That is why we create a component and add a SelectionMenu to it.
+            GameObject go = new("Test");
+            SelectionMenu selectionMenu = go.AddComponent<SelectionMenu>();
             void ExitAction() => testItems.Add(true);
             MenuEntry entry = new(() => {}, ExitAction, "Test");
             selectionMenu.AddEntry(entry);
@@ -51,6 +55,7 @@ namespace SEETests.UI
             selectionMenu.ActiveEntry = null;
             Assert.AreNotEqual(entry, selectionMenu.ActiveEntry, "SelectionMenu.ActiveEntry isn't set correctly!");
             Assert.AreEqual(2, testItems.Count, "ExitAction isn't called correctly!");
+            Destroyer.Destroy(go);
         }
     }
 }

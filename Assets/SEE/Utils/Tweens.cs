@@ -39,7 +39,7 @@ namespace SEE.Utils
         {
             if (gameObject.HasNodeRef())
             {
-                Debug.Log($"[Tweens.Move({gameObject.name})] When moving nodes, use the NodeOperator instead.\n");
+                Debug.LogWarning($"[Tweens.Move({gameObject.name})] When moving nodes, use the NodeOperator instead.\n");
             }
             if (callback != null)
             {
@@ -72,7 +72,7 @@ namespace SEE.Utils
         {
             if (gameObject.HasNodeRef())
             {
-                Debug.Log($"[Tweens.Scale({gameObject.name})] When moving nodes, use the NodeOperator instead.\n");
+                Debug.LogWarning($"[Tweens.Scale({gameObject.name})] When scaling nodes, use the NodeOperator instead.\n");
             }
             if (callback != null)
             {

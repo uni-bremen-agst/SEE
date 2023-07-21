@@ -137,7 +137,6 @@ PlayerSettings:
   loadStoreDebugModeEnabled: 0
   bundleVersion: 0.9
   preloadedAssets:
-  - {fileID: 3133245131686726631, guid: ab503467b672b944faf19db21f3c55cc, type: 2}
   - {fileID: 2489328711382419796, guid: 1fc620f3d43365f47a0ae74f688e5a96, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
@@ -164,6 +163,7 @@ PlayerSettings:
     iPhone: com.enoxsoftware.facemaskexample
     tvOS: com.enoxsoftware.facemaskexample
   buildNumber:
+    Bratwurst: 0
     Standalone: 0
     iPhone: 0
     tvOS: 0
@@ -189,6 +189,8 @@ PlayerSettings:
   tvOSSdkVersion: 0
   tvOSRequireExtendedGameController: 0
   tvOSTargetOSVersionString: 12.0
+  bratwurstSdkVersion: 0
+  bratwurstTargetOSVersionString: 16.4
   uIPrerenderedIcon: 0
   uIRequiresPersistentWiFi: 0
   uIRequiresFullScreen: 1
@@ -236,8 +238,10 @@ PlayerSettings:
   appleDeveloperTeamID: 
   iOSManualSigningProvisioningProfileID: 
   tvOSManualSigningProvisioningProfileID: 
+  bratwurstManualSigningProvisioningProfileID: 
   iOSManualSigningProvisioningProfileType: 0
   tvOSManualSigningProvisioningProfileType: 0
+  bratwurstManualSigningProvisioningProfileType: 0
   appleEnableAutomaticSigning: 0
   iOSRequireARKit: 0
   iOSAutomaticallyDetectAndAddCapabilities: 1
@@ -668,6 +672,7 @@ PlayerSettings:
     4: CT_PROC;CT_RTV
     7: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
     Android: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV;USE_INPUT_SYSTEM_POSE_CONTROL
+    Bratwurst: CT_RTV;UNITY_POST_PROCESSING_STACK_V2;CT_PROC
     EmbeddedLinux: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
     GameCoreScarlett: CT_RTV;UNITY_POST_PROCESSING_STACK_V2;CT_PROC
     GameCoreXboxOne: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
@@ -701,7 +706,6 @@ PlayerSettings:
   suppressCommonWarnings: 1
   allowUnsafeCode: 0
   useDeterministicCompilation: 1
-  selectedPlatform: 0
   additionalIl2CppArgs: 
   scriptingRuntimeVersion: 1
   gcIncremental: 0
@@ -794,4 +798,4 @@ PlayerSettings:
   hmiLoadingImage: {fileID: 0}
   platformRequiresReadableAssets: 0
   virtualTexturingSupportEnabled: 0
-  insecureHttpOption: 0
+  insecureHttpOption: 1
