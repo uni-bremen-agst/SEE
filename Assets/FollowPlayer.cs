@@ -112,9 +112,9 @@ public class FollowPlayer : MonoBehaviour
     {
         // falls gefunden, klemme deine Position an den Spieler..
         //Debug.Log("Player found, player:     " + player);
-        transform.position = player.transform.position;
+        transform.position = player.transform.position-new Vector3(-0.1f,0.15f,-0.2f);
         transform.rotation = player.transform.rotation;
-        transform.Rotate(0, -90, -90);
+        
 
         /// nach vorne bewegen:
         transform.position += transform.forward * 0.025f;
