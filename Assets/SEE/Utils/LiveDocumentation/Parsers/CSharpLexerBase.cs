@@ -7,8 +7,7 @@ using System.Text.RegularExpressions;
     
 namespace Parser
 {
-
-
+    
 public abstract class CSharpLexerBase : Lexer
 {
     public CSharpLexerBase(ICharStream input)
