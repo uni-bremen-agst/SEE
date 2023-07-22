@@ -44,10 +44,9 @@ namespace SEE.Utils.LiveDocumentation
         /// <summary>
         ///     This method will extract the documentation of an given C# Class in a given file.
         /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="className"></param>
+        /// <param name="className">The name of the class</param>
         /// <exception cref="ClassNotFoundException">Is thrown, when the class cant be found</exception>
-        /// <returns></returns>
+        /// <returns>The documentation of the class</returns>
         public LiveDocumentationBuffer ExtractClassComments(string className)
         {
             _parser.Reset();
@@ -84,10 +83,10 @@ namespace SEE.Utils.LiveDocumentation
         }
 
         /// <summary>
-        ///     Extracting
+        ///     Extracting the methods (and their documentation) from a given class
         /// </summary>
-        /// <param name="className"></param>
-        /// <returns></returns>
+        /// <param name="className">The name of the class</param>
+        /// <returns>The methods as a list of <see cref="LiveDocumentationClassMemberBuffer" /></returns>
         public List<LiveDocumentationClassMemberBuffer> ExtractMethods(string className)
         {
             List<LiveDocumentationClassMemberBuffer> buffers = new();
@@ -127,7 +126,7 @@ namespace SEE.Utils.LiveDocumentation
                     methodBuffer.Documentation = methodDoc;
 
                     methodBuffer.Parameters =
-                        ProcessParamatersDocumentation(methodDeclarationContext.formal_parameter_list(), parser);
+                        ProcessParametersDocumentation(methodDeclarationContext.formal_parameter_list(), parser);
 
                     // Add the name of the method to the buffer
                     signature +=
@@ -154,7 +153,7 @@ namespace SEE.Utils.LiveDocumentation
 
                     parser.Reset();
                     methodBuffer.Parameters =
-                        ProcessParamatersDocumentation(constructorDeclarationContext.formal_parameter_list(), parser);
+                        ProcessParametersDocumentation(constructorDeclarationContext.formal_parameter_list(), parser);
 
                     signature += constructorDeclarationContext.identifier().GetText();
                     methodBuffer.Add(new LiveDocumentationBufferText(signature));
@@ -185,7 +184,7 @@ namespace SEE.Utils.LiveDocumentation
 
                     parser.Reset();
                     methodBuffer.Parameters =
-                        ProcessParamatersDocumentation(
+                        ProcessParametersDocumentation(
                             typedMemberDeclaration.method_declaration().formal_parameter_list(), parser);
                     var methodType = typedMemberDeclaration.type_().GetText();
                     methodBuffer.Add(new LiveDocumentationBufferText(signature));
@@ -285,11 +284,18 @@ namespace SEE.Utils.LiveDocumentation
             return (null, -1);
         }
 
-
-        private void ProcessMethodParameters(LiveDocumentationBuffer bufff,
+        /// <summary>
+        ///     Processes the parameters of a method signature
+        /// </summary>
+        /// <param name="buff">
+        ///     The methods signature (<see cref="LiveDocumentationBuffer" />) where the parameters should be
+        ///     appended to
+        /// </param>
+        /// <param name="parameterList">The parameter list of the method</param>
+        private void ProcessMethodParameters(LiveDocumentationBuffer buff,
             [CanBeNull] CSharpParser.Formal_parameter_listContext parameterList)
         {
-            bufff.Add(new LiveDocumentationBufferText("("));
+            buff.Add(new LiveDocumentationBufferText("("));
             if (parameterList != null)
             {
                 var parameters = parameterList
@@ -298,21 +304,23 @@ namespace SEE.Utils.LiveDocumentation
                 foreach (var parameter in parameters)
                 {
                     var pType = parameter.arg_declaration().type_().GetText() + " ";
-                    bufff.Add(new LiveDocumentationLink(pType, pType));
-                    //signature = signature + parameter.arg_declaration().type_().GetText() + " ";
-                    //  signature = signature + parameter.arg_declaration().identifier().GetText();
-                    bufff.Add(
+                    buff.Add(new LiveDocumentationLink(pType, pType));
+                    buff.Add(
                         new LiveDocumentationBufferText(parameter.arg_declaration().identifier()
                             .GetText()));
-                    if (!parameter.Equals(parameters.Last())) bufff.Add(new LiveDocumentationBufferText(", "));
+                    // If this wasn't the last parameter append a comma
+                    if (!parameter.Equals(parameters.Last())) buff.Add(new LiveDocumentationBufferText(", "));
                 }
-                //   signature = signature + "(" + i.common_member_declaration().method_declaration()
-                //     .formal_parameter_list().GetText() + ")";
             }
 
-            bufff.Add(new LiveDocumentationBufferText(")"));
+            buff.Add(new LiveDocumentationBufferText(")"));
         }
 
+        /// <summary>
+        ///     Processes the summary tag of csharp documentation and appending the content to <paramref name="buffer" />
+        /// </summary>
+        /// <param name="buffer">The buffer where the summary tag should be appended to</param>
+        /// <param name="summaryContext">The summary which should be parsed</param>
         private void ProcessSummary(LiveDocumentationBuffer buffer,
             [CanBeNull] CSharpCommentsGrammarParser.SummaryContext summaryContext)
         {
@@ -325,6 +333,11 @@ namespace SEE.Utils.LiveDocumentation
                 }
         }
 
+        /// <summary>
+        ///     Processes a single comment line and appends the contents to <paramref name="buffer" />.
+        /// </summary>
+        /// <param name="buffer">The buffer the comment line should be appended to.</param>
+        /// <param name="commentsContext">The comment line which should be parsed</param>
         private void ProcessComment(LiveDocumentationBuffer buffer,
             CSharpCommentsGrammarParser.CommentsContext commentsContext)
         {
@@ -337,6 +350,11 @@ namespace SEE.Utils.LiveDocumentation
                         classLinkContext.linkID.Text));
         }
 
+        /// <summary>
+        ///     Process the contents of a XML tag and appends the contents to <paramref name="buffer" />
+        /// </summary>
+        /// <param name="buffer">The buffer where the documentation should be appended</param>
+        /// <param name="tagContentContext">The XML tag which should be parsed</param>
         private void ProcessTagContent(LiveDocumentationBuffer buffer,
             CSharpCommentsGrammarParser.TagContentContext tagContentContext)
         {
@@ -348,7 +366,13 @@ namespace SEE.Utils.LiveDocumentation
                     ProcessComment(buffer, commentsContext);
         }
 
-        private List<LiveDocumentationBuffer> ProcessParamatersDocumentation(
+        /// <summary>
+        ///     Process the documentation of a methods parameters
+        /// </summary>
+        /// <param name="parameterListContext">The parameters of the method which should be parsed</param>
+        /// <param name="parser">The parser which should be used for parsing</param>
+        /// <returns>The documentation of all parameters as a list</returns>
+        private List<LiveDocumentationBuffer> ProcessParametersDocumentation(
             [CanBeNull] CSharpParser.Formal_parameter_listContext parameterListContext,
             CSharpCommentsGrammarParser parser)
         {
@@ -360,22 +384,29 @@ namespace SEE.Utils.LiveDocumentation
                     parser.Reset();
                     var buffer = new LiveDocumentationBuffer();
                     var parameterName = parameter.arg_declaration().identifier().GetText();
-                    buffer.Add(new LiveDocumentationBufferText(parameterName + " : "));
                     var parameterType = parameter.arg_declaration().type_().GetText();
                     buffer.Add(new LiveDocumentationLink(parameterType, parameterType));
+                    buffer.Add(new LiveDocumentationBufferText(" " + parameterName));
+                    buffer.Add(new LiveDocumentationBufferText(" "));
 
                     var matchingParamDoc = parser.docs().parameters()?.parameter()
                         .FirstOrDefault(x => x.paramName.Text == parameterName);
                     if (matchingParamDoc != null) ProcessTagContent(buffer, matchingParamDoc.parameterDescription);
-
-                    //buffer.Add(new LiveDocumentationBufferText(parser.docs().parameters()
-                    //   .parameter().First(x => x.paramName.Text == parameterName).parameterDescription.GetText()));
                     bufferList.Add(buffer);
                 }
 
             return bufferList;
         }
 
+        /// <summary>
+        ///     Creates a documentation parser for a method.
+        ///     This method will search between the lines <paramref name="methodUpperLineBound" /> and
+        ///     <paramref name="methodLowerLineBound" /> in the source code file for any CSharp documentation and will create a new
+        ///     parser with the contents.
+        /// </summary>
+        /// <param name="methodUpperLineBound">The upper most position where the CSharp doc can be</param>
+        /// <param name="methodLowerLineBound">The lower most position where the CSharp doc can be</param>
+        /// <returns>The new created parser and a token stream as a tuple</returns>
         private (CSharpCommentsGrammarParser, CommonTokenStream) CreateParserForMethod(int methodUpperLineBound,
             int methodLowerLineBound)
         {
@@ -387,16 +418,6 @@ namespace SEE.Utils.LiveDocumentation
             var tokens = new CommonTokenStream(lexer);
             tokens.Fill();
             return (new CSharpCommentsGrammarParser(tokens), tokens);
-        }
-
-        /// <summary>
-        ///     Process the return tag of a method, if there is any
-        /// </summary>
-        /// <param name="buffer"></param>
-        /// <param name="returnContext"></param>
-        private void ProcessReturnTag(LiveDocumentationBuffer buffer,
-            [CanBeNull] CSharpCommentsGrammarParser.ReturnContext returnContext)
-        {
         }
     }
 }
