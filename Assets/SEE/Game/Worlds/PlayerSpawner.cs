@@ -50,7 +50,7 @@ namespace SEE.Game.Worlds
         /// <summary>
         /// The NetworkManager, used to spawn the FaceCam.
         /// </summary>
-        NetworkManager networkManager = NetworkManager.Singleton;
+        private NetworkManager networkManager = NetworkManager.Singleton;
 
         /// <summary>
         /// This co-routine sets <see cref="dissonanceComms"/>, registers <see cref="Spawn(ulong)"/>
