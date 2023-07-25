@@ -714,11 +714,15 @@ namespace SEE.Net
                 }
                 if (NetworkManager.Singleton.IsConnectedClient)
                 {
-                    callBack(true, $"Client is connected to server {ServerIP4Address}:{ServerPort}.");
+                    string message = $"Client is connected to server {ServerIP4Address}:{ServerPort}.";
+                    Debug.Log(message + "\n");
+                    callBack(true, message);
                 }
                 else
                 {
-                    callBack(false, $"Could not connect to server {ServerIP4Address}:{ServerPort}.");
+                    string message = $"Could not connect to server {ServerIP4Address}:{ServerPort}.";
+                    Debug.LogError(message + "\n");
+                    callBack(false, message);
                     throw new NoServerConnection($"Could not connect to server {ServerIP4Address}:{ServerPort}");
                 }
             }
