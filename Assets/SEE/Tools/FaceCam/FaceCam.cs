@@ -66,12 +66,14 @@ namespace SEE.Tools.FaceCam
         /// <summary>
         /// Width of the cropped texture.
         /// </summary>
-        private int croppedTextureWidth = 480; // 480 is a reasonable size to display the 'webcam not found' image.
+        private int croppedTextureWidth = 480; // 480 is a reasonable size to
+                                               // display the 'webcam not found' image.
 
         /// <summary>
         /// Height of the cropped texture.
         /// </summary>
-        private int croppedTextureHeight = 480; // 480 is a reasonable size to display the 'webcam not found' image.
+        private int croppedTextureHeight = 480; // 480 is a reasonable size to display
+                                                // the 'webcam not found' image.
 
         /// <summary>
         /// X position of the cropped texture of the last frame.
@@ -134,7 +136,8 @@ namespace SEE.Tools.FaceCam
         /// <summary>
         /// The speed which the face tracking will use to follow the face if it detects one.
         /// </summary>
-        [SerializeField, FormerlySerializedAs("Face tracking speed"), Tooltip("Set the speed which the face tracking will use to follow the face if it detects one.")]
+        [SerializeField, FormerlySerializedAs("Face tracking speed"),
+            Tooltip("Set the speed which the face tracking will use to follow the face if it detects one.")]
         public float _MoveStartSpeed;
         public float MoveStartSpeed
         {
@@ -145,7 +148,8 @@ namespace SEE.Tools.FaceCam
         /// <summary>
         /// The acceleration which occurs after the face tracking found a face.
         /// </summary>
-        [SerializeField, FormerlySerializedAs("Face tracking acceleration"), Tooltip("Set the acceleration which occurs after the face tracking found a face.")]
+        [SerializeField, FormerlySerializedAs("Face tracking acceleration"),
+            Tooltip("Set the acceleration which occurs after the face tracking found a face.")]
         public float _MoveAcceleration;
         public float MoveAcceleration
         {
@@ -159,7 +163,8 @@ namespace SEE.Tools.FaceCam
         private float faceTrackingSpeed;
 
         /// <summary>
-        /// An interpolation factor, determining how close our position (cropped texture) is to the detected face.
+        /// An interpolation factor, determining how close our position (cropped texture)
+        /// is to the detected face.
         /// If it is 0 it is just our position on the webcam frame.
         /// If it is 1 our position is exactly the same as the detected face.
         /// </summary>
@@ -182,7 +187,8 @@ namespace SEE.Tools.FaceCam
         public MeshRenderer MeshRenderer;
 
         /// <summary>
-        /// The material of the FaceCam, its texture displaying a default picture, or the face of the user.
+        /// The material of the FaceCam, its texture displaying a default picture, or
+        /// the face of the user.
         /// </summary>
         private Material MainMaterial;
 
@@ -201,7 +207,8 @@ namespace SEE.Tools.FaceCam
         /// <summary>
         /// Set the frame rate of video network transmission.
         /// </summary>
-        [SerializeField, FormerlySerializedAs("Network FPS"), Tooltip("Set the frame rate of the video which will be transmitted over the Network.")]
+        [SerializeField, FormerlySerializedAs("Network FPS"),
+            Tooltip("Set the frame rate of the video which will be transmitted over the Network.")]
         protected float _NetworkFPS;
         public float networkFPS
         {
@@ -234,13 +241,15 @@ namespace SEE.Tools.FaceCam
         /// </summary>
         private void Start()
         {
-            // The network FPS is used to calculate everything needed to send the video at the specified frame rate.
+            // The network FPS is used to calculate everything needed to send the video
+            // at the specified frame rate.
             networkVideoDelay = 1f / networkFPS;
 
             // This is the size of the FaceCam at the start
             transform.localScale = new Vector3(0.2f, 0.2f, -1); // z = -1 to face away from the player.
 
-            // For the location of the face of the player we use his his nose. This makes the FaceCam also aprox. centered to his face.
+            // For the location of the face of the player we use his his nose. This makes
+            // the FaceCam also aprox. centered to his face.
             playersFace = transform.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase");
 
             // The startup code from the WebCamTextureToMatHelperExample.
@@ -257,7 +266,8 @@ namespace SEE.Tools.FaceCam
             // Set the speed of the face tracking.
             faceTrackingSpeed = MoveStartSpeed;
 
-            // Cache the material of the FaceCam to change its texture later. (Display a default picture or the face of the user).
+            // Cache the material of the FaceCam to change its texture later. (Display a default
+            // picture or the face of the user).
             MainMaterial = MeshRenderer.material;
         }
 
@@ -292,7 +302,8 @@ namespace SEE.Tools.FaceCam
         {
             if (string.IsNullOrEmpty(dlibShapePredictorFilePath))
             {
-                throw new InvalidOperationException("shape predictor file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/DlibFaceLandmarkDetector/” to “Assets/StreamingAssets/DlibFaceLandmarkDetector/” folder. ");
+                throw new InvalidOperationException
+                    ("shape predictor file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/DlibFaceLandmarkDetector/” to “Assets/StreamingAssets/DlibFaceLandmarkDetector/” folder. ");
             }
 
             faceLandmarkDetector = new FaceLandmarkDetector(dlibShapePredictorFilePath);
@@ -344,7 +355,8 @@ namespace SEE.Tools.FaceCam
         /// <summary>
         /// Once per frame, the local video is displayed.
         /// Switches the FaceCam on and off, if the 'I' key is pressed.
-        /// It also checks whether the video should be sent to the clients in this frame based on the specified network FPS, and transmit it.
+        /// It also checks whether the video should be sent to the clients in this frame based
+        /// on the specified network FPS, and transmit it.
         /// </summary>
         private void Update()
         {
@@ -355,7 +367,8 @@ namespace SEE.Tools.FaceCam
             }
             // Netcode specific logic executed when spawned.
 
-            // Display/render the video from the Webcam if this is the owner. (For each player, the player is the owner of the local FaceCam)
+            // Display/render the video from the Webcam if this is the owner. (For each player,
+            // the player is the owner of the local FaceCam)
             if (IsOwner)
             {
                 // Switch the FaceCam on or off.
@@ -437,7 +450,8 @@ namespace SEE.Tools.FaceCam
 
                     // Add the Space above and below to the dimension of the cropped texture.
                     int nextCutoutTextureX = NextRectX;
-                    int nextCutoutTextureY = Math.Max(0, texture.height - NextRectY - NextRectHeight - SpaceBelow);  // Because texture and rect do not both use y the same way, it needs to be converted.
+                    // Because texture and rect do not both use y the same way, it needs to be converted.
+                    int nextCutoutTextureY = Math.Max(0, texture.height - NextRectY - NextRectHeight - SpaceBelow);
                     int nextCutoutTextureWidth = NextRectWidth;
                     int nextCutoutTextureHeight = NextRectHeight + SpaceAbove + SpaceBelow;
 
@@ -484,12 +498,14 @@ namespace SEE.Tools.FaceCam
                     croppedTextureWidth = Mathf.RoundToInt(Mathf.Lerp(croppedTextureWidth, nextCutoutTextureWidth, interpolationFactor));
                     croppedTextureHeight = Mathf.RoundToInt(Mathf.Lerp(croppedTextureHeight, nextCutoutTextureHeight, interpolationFactor));
 
-                    // Calculate the distance and size difference from the new cropped texture towards the actual rectangle of the face. (There will always be some distance, but more if the face is further away)
+                    // Calculate the distance and size difference from the new cropped texture towards the actual
+                    // rectangle of the face. (There will always be some distance, but more if the face is further away)
                     float distancePosition = Vector2.Distance(new Vector2(croppedTextureX, croppedTextureY), mainRect.position);
                     float distanceSize = Vector2.Distance(new Vector2(croppedTextureWidth, croppedTextureHeight), mainRect.size);
 
                     // Calculate the interpolation factor for the next frame.
-                    // If the new rectangle is further away than the actual cropped texture plus half the size of the rectangle, move faster towards the rectangle.
+                    // If the new rectangle is further away than the actual cropped texture plus half the size of the rectangle,
+                    // move faster towards the rectangle.
                     if (distancePosition >= NextRectWidth / 2.0 || distanceSize >= NextRectWidth / 2.0)
                     {
                         faceTrackingSpeed += MoveAcceleration * Time.deltaTime;
@@ -545,11 +561,11 @@ namespace SEE.Tools.FaceCam
             }
 
             // Calculate the position of the FaceCam
-            if (playersFace != null) // Sometimes the playersFace seems to be null, i can't find out why. Seems to have nothing to do with this class.
+            if (playersFace != null) // Sometimes the playersFace seems to be null, i can't find out why.
+                                     // Seems to have nothing to do with this class.
             {
                 // Put it where the players face is.
-                transform.position = playersFace.position;
-                transform.rotation = playersFace.rotation;
+                transform.SetPositionAndRotation(playersFace.position, playersFace.rotation);
                 if (FaceCamOnFront)
                 {
                     // Rotate and move it a bit up and a bit forward.
@@ -563,7 +579,8 @@ namespace SEE.Tools.FaceCam
                     transform.Rotate(0, -90, -90); // To face away from the avatars face.
                     transform.position -= transform.forward * 0.08f;
                     transform.position += transform.up * 0.3f;
-                    if (!IsOwner) // If this is the owner the FaceCam should just face forward and not down to the own camera.
+                    if (!IsOwner) // If this is the owner the FaceCam should just face forward and
+                                  // not down to the own camera.
                     {
                         // check if there is any main camera, and face towards it.
                         if (MainCamera.Camera != null)
@@ -663,7 +680,8 @@ namespace SEE.Tools.FaceCam
         /// </summary>
         private void DisplayVideoOnAllOtherClients()
         {
-            // A frame of the video, created from the source video already displayed on this owners client.
+            // A frame of the video, created from the source video already displayed on
+            // this owners client.
             byte[] videoFrame = CreateNetworkFrameFromVideo();
 
             // videoframe is null if the file size is too big.
@@ -678,8 +696,9 @@ namespace SEE.Tools.FaceCam
             }
             else // If this is the owner (creator of video) and also the server.
             {
-                // Send the frame to all clients. (But not the server and owner, which in this case, is the server.)
-                SendVideoToClientsToRenderItClientRPC(videoFrame, clientsIdsRpcParams);
+                // Send the frame to all clients. (But not the server and owner, which in
+                // this case, is the server.)
+                SendVideoToClientsToRenderItClientRPC(videoFrame);
             }
         }
 
@@ -703,24 +722,27 @@ namespace SEE.Tools.FaceCam
         /// The owner calls this, to send his video to the server which sends it to all clients.
         /// Also the server and every client will render this video onto the FaceCam.
         /// </summary>
-        //[ServerRpc(Delivery = RpcDelivery.Unreliable)] // Large files not supported by unreliable Rpc. (No documentation found regarding this limitation).
+        //[ServerRpc(Delivery = RpcDelivery.Unreliable)]
+        // Large files not supported by unreliable Rpc. (No documentation found regarding this limitation).
         [ServerRpc]
         private void GetVideoFromClientAndSendItToClientsToRenderItServerRPC(byte[] videoFrame)
         {
             // The server will render this video onto his instance of the FaceCam.
             RenderNetworkFrameOnFaceCam(videoFrame);
 
-            // The server will send the video to all other clients (not the owner and server) so they can render it.
-            SendVideoToClientsToRenderItClientRPC(videoFrame, clientsIdsRpcParams);
+            // The server will send the video to all other clients (not the owner and server)
+            // so they can render it.
+            SendVideoToClientsToRenderItClientRPC(videoFrame);
         }
 
         /// <summary>
         /// The Server calls this, to send his video to all clients.
         /// Also every client will render this video onto the FaceCam.
         /// </summary>
-        //[ClientRpc(Delivery = RpcDelivery.Unreliable)]  // Large files not supported by unreliable Rpc. (No documentation found regarding this limitation).
+        //[ClientRpc(Delivery = RpcDelivery.Unreliable)]
+        // Large files not supported by unreliable Rpc. (No documentation found regarding this limitation).
         [ClientRpc]
-        private void SendVideoToClientsToRenderItClientRPC(byte[] videoFrame, ClientRpcParams clientRpcParams = default)
+        private void SendVideoToClientsToRenderItClientRPC(byte[] videoFrame)
         {
             RenderNetworkFrameOnFaceCam(videoFrame);
         }
@@ -817,4 +839,5 @@ namespace SEE.Tools.FaceCam
 
 #endif // This Line of code is from the WebCamTextureToMatHelperExample.
 
-// Autor of WebCamTextureToMatHelperExample.cs: Enox Software, enoxsoftware.com/, enox.software@gmail.com
+// Author of WebCamTextureToMatHelperExample.cs: Enox Software,
+// enoxsoftware.com/, enox.software@gmail.com
