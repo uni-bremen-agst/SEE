@@ -338,7 +338,7 @@ namespace SEE.Tools.FaceCam
         /// <param name="errorCode">Error code.</param>
         public void OnWebCamTextureToMatHelperErrorOccurred(WebCamTextureToMatHelper.ErrorCode errorCode)
         {
-            Debug.LogError("OnWebCamTextureToMatHelperErrorOccurred " + errorCode);
+            Debug.LogError($"OnWebCamTextureToMatHelperErrorOccurred {errorCode}\n");
         }
 
         /// <summary>
@@ -692,7 +692,7 @@ namespace SEE.Tools.FaceCam
             // Converts the texture to an byte array containing an JPG.
             byte[] networkTexture = croppedTexture.EncodeToJPG();
             // Only return the array if it's not too big.
-            if (networkTexture.Length <= MaximumNetworkByteSize)
+            if (networkTexture != null && networkTexture.Length <= MaximumNetworkByteSize)
             {
                 return networkTexture;
             }
