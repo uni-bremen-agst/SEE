@@ -163,6 +163,23 @@ namespace SEE.Controls.Actions
                   Color.blue.Darker(), "Materials/ModernUIPack/Document",
                   SaveBoardAction.CreateReversibleAction,
                   parent: MetricBoard);
+
+            // Whiteboard actions
+            Whiteboard =
+              new("Whiteboard", "Please select the whiteboard mode you want to activate.",
+                  Color.blue, "Materials/ModernUIPack/Pencil");
+
+            DrawOnWhiteboard =
+                new("Draw on Whiteboard", "Draw a line on a whiteboard",
+                        Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                        DrawOnWhiteboardAction.CreateReversibleAction,
+                        parent: Whiteboard);
+
+            EraserOnWhiteboard =
+                new("Erase on Whiteboard", "Erase a line on a whiteboard",
+                Color.red.Darker(), "Materials/ModernUIPack/Pencil",
+                EraserWhiteboardAction.CreateReversibleAction,
+                parent: Whiteboard);
         }
 
         public readonly static ActionStateType Move;
@@ -185,6 +202,10 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType DeleteWidget;
         public readonly static ActionStateType LoadBoard;
         public readonly static ActionStateType SaveBoard;
+
+        public readonly static ActionStateTypeGroup Whiteboard;
+        public readonly static ActionStateType DrawOnWhiteboard;
+        public readonly static ActionStateType EraserOnWhiteboard;
 
         #endregion
 

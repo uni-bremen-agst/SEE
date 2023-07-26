@@ -23,6 +23,14 @@ TagManager:
   - Erosion
   - ChartContainer
   - Chart
+  - CCAnimation
+  - TabButton
+  - Tooltip
+  - UMAIgnore
+  - videoCollider
+  - VideoPlayer
+  - Drawable
+  - Line
   layers:
   - Default
   - TransparentFX
