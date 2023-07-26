@@ -690,6 +690,7 @@ namespace SEE.Net
                 }
                 catch (Exception exception)
                 {
+                    Debug.LogError($"Could not connect to server {ServerIP4Address}:{ServerPort}. Details: {exception.Message}\n");
                     callBack(false, exception.Message);
                     throw;
                 }
@@ -704,7 +705,7 @@ namespace SEE.Net
 
                 while (!NetworkManager.Singleton.IsConnectedClient)
                 {
-                    Debug.Log($"Client is waiting for connection {waitingTime}/{MaxWaitingTime}...\n");
+                    Debug.Log($"Client is waiting for connection to server {ServerIP4Address}:{ServerPort} {waitingTime}/{MaxWaitingTime}...\n");
                     yield return new WaitForSeconds(waitingTimePerIteration);
                     waitingTime += waitingTimePerIteration;
                     if (waitingTime > MaxWaitingTime)
