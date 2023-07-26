@@ -22,7 +22,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The path to the GXL file containing the architecture graph data.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of GXL file for the architecture"), 
+        [SerializeField, ShowInInspector, Tooltip("Path of GXL file for the architecture"),
          TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath GxlArchitecturePath = new();
 

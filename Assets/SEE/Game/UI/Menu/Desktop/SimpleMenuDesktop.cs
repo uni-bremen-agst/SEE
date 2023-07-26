@@ -141,7 +141,7 @@ namespace SEE.Game.UI.Menu
             {
                 MenuManager.CloseWindow();
                 MenuTooltip.Hide();
-                
+
                 // We cannot disable the menu immediately, otherwise the animation will be cut short.
                 DisableSoon().Forget();
 
