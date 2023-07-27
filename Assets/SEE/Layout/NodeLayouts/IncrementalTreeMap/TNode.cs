@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
+using System;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
-    [DebuggerDisplay("{NodeID}")]
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class TNode
     {
         public TNode(string nodeID)
@@ -84,6 +85,20 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                  {Direction.Lower, this.lowerBoundingSegment},
                  {Direction.Upper, this.upperBoundingSegment}};
         }
+
+        private string DebuggerDisplay
+        {
+            get {
+                return string.Format(
+                    "{0,15} x=[{1,-6}, {2,-6}] y=[{3,-6}, {4,-6}]",
+                    ID,
+                    Math.Round(rectangle.x,3),
+                    Math.Round(rectangle.x + rectangle.width, 3),
+                    Math.Round(rectangle.z, 3),
+                    Math.Round(rectangle.z + rectangle.depth, 3));
+            }
+        }
+
 
     }
 }

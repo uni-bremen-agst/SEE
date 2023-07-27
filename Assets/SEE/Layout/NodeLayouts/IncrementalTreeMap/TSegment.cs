@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class TSegment
     {
         public TSegment(bool isConst, bool isVertical)
@@ -21,5 +23,22 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         private bool isVertical;
         public bool IsVertical {get => isVertical; set {this.isVertical = value;}}
 
+        private string DebuggerDisplay
+        {
+            get {
+                string s = "[";
+                foreach (var node in side1Nodes)
+                {
+                    s += node.ID + ",";
+                }
+                s += "][";
+                foreach (var node in side2Nodes)
+                {
+                    s += node.ID + ",";
+                }
+                s += "]";
+                return s;
+            }
+        }
     }
 }
