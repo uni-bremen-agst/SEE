@@ -36,7 +36,9 @@ namespace SEE.Controls.Actions
         {
             // FIXME: Needs adaptation for VR where no mouse is available.
             if (Input.GetMouseButtonDown(0)
-                && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.None)
+                && Raycasting.RaycastGraphElement(
+                    out RaycastHit raycastHit,
+                    out GraphElementRef _) != HitGraphElement.None)
             {
                 // Find the edge representing the specific Divergence that should be solved.
                 selectedDivergenceEdge = raycastHit.collider.gameObject;
@@ -63,7 +65,7 @@ namespace SEE.Controls.Actions
                         Edge newArchitectureEdge = graph.AddToArchitecture(source, target, selectedEdge.Type);
 
                         // Sync the Solution of the Divergence via Network
-                        new AcceptDivergenceNetAction(selectedDivergenceEdge.name).Execute();
+                        // new AcceptDivergenceNetAction(selectedDivergenceEdge.name).Execute();
                         return true; // the selected object is synced and this action is done
                     }
                 }
