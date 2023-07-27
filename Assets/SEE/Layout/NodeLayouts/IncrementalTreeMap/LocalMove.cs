@@ -232,7 +232,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
             else
             {
-                rightNode.registerSegment(segmentsLeftNode[Direction.Lower],Direction.Lower);
+                rightNode.registerSegment(segmentsLeftNode[Direction.Lower],Direction.Upper);
             }
         }
         
@@ -260,7 +260,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
             else
             {
-                leftNode.registerSegment(segmentsRightNode[Direction.Lower],Direction.Lower);
+                leftNode.registerSegment(segmentsRightNode[Direction.Lower],Direction.Upper);
             }
         }
 
