@@ -126,7 +126,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             upperNode.Rectangle.z = lowerNode.Rectangle.z;         
             
             lowerNode.Rectangle.width *= ratio;
-            lowerNode.Rectangle.width *= (1-ratio);
+            upperNode.Rectangle.width *= (1-ratio);
             if(clockwise)
             {
                 upperNode.Rectangle.x = lowerNode.Rectangle.x  + lowerNode.Rectangle.width;
