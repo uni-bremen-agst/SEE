@@ -175,7 +175,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 || segmentsNode1[Direction.Left] == segmentsNode2[Direction.Right])
             {
                 var (leftNode, rightNode) = (segmentsNode1[Direction.Right] == segmentsNode2[Direction.Left]) ? (node1,node2) : (node2, node1);
-                if(leftNode.Rectangle.width >= rightNode.Rectangle.width)
+                if(leftNode.Rectangle.depth >= rightNode.Rectangle.depth)
                 {
                     apply_StretchRightOverVertical(leftNode: leftNode, rightNode: rightNode);
                 }
@@ -188,7 +188,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                      || segmentsNode1[Direction.Lower] == segmentsNode2[Direction.Upper])
             {
                 var (lowerNode, upperNode) = (segmentsNode1[Direction.Upper] == segmentsNode2[Direction.Lower]) ? (node1,node2) : (node2, node1);
-                if(lowerNode.Rectangle.depth >= upperNode.Rectangle.depth)
+                if(lowerNode.Rectangle.width >= upperNode.Rectangle.width)
                 {
                     apply_StretchUpperOverHorizontal(lowerNode: lowerNode, upperNode: upperNode);
                 }
