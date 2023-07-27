@@ -142,6 +142,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Redo()
         {
+            base.Redo();
+            // CreateEdge();
+            // recreate edge from memento
         }
 
         /// <summary>
