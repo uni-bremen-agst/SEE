@@ -164,7 +164,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
             else
             {
-                TSegment bestSegment = ArgMaxJ<TSegment>(segments.Values, x => x.Side1Nodes.Count + x.Side2Nodes.Count);
+                TSegment bestSegment = ArgMinJ<TSegment>(segments.Values, x => x.Side1Nodes.Count + x.Side2Nodes.Count);
                 
                 var moves = findLocalMoves(bestSegment);
                 Assert.IsTrue(moves.All(x => x is (StretchMove)));
