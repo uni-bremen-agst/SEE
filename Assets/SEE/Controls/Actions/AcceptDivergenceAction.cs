@@ -62,11 +62,13 @@ namespace SEE.Controls.Actions
                         // or implicitly mapped to.
                         Node target = graph.MapsTo(selectedEdge.Target);
 
-                        // Create a new Edge that will solve the Divergence
-                        Edge newArchitectureEdge = graph.AddToArchitecture(source, target, selectedEdge.Type);
                         // We have both source and target of the edge
                         // and use a memento struct to remember which
                         // edge we have added.
+                        memento = new Memento(source, target);
+
+                        createdEdge = CreateEdge(graph, memento);
+                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NEW_EDGE_SOUND);
 
                         // Sync the Solution of the Divergence via Network
                         // new AcceptDivergenceNetAction(selectedDivergenceEdge.name).Execute();
@@ -159,6 +161,43 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// The information we need to (re-)create an edge.
+        /// </summary>
+        private struct Memento
+        {
+            /// <summary>
+            /// The source of the edge.
+            /// </summary>
+            public Node from;
+            /// <summary>
+            /// The target of the edge.
+            /// </summary>
+            public Node to;
+            /// <summary>
+            /// The type of the edge.
+            /// </summary>
+            public Memento(Node source, Node target)
+            {
+                this.from = source;
+                this.to = target;
+            }
+        }
+
+        /// <summary>
+        /// The information needed to re-create the synced edge after undo.
+        /// </summary>
+        private Memento memento;
+
+        /// <summary>
+        /// The edge created by this action. Can be null if no edge
+        /// has been created yet or whether an Undo was called. The
+        /// created edge is stored only to delete it again if Undo is
+        /// called. All information to create the edge is kept in
+        /// <see cref="memento"/>.
+        /// </summary>
+        private Edge createdEdge;
+
+        /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
         /// <returns><see cref="ActionStateType.NewNode"/></returns>
@@ -181,7 +220,6 @@ namespace SEE.Controls.Actions
             {
                 return new HashSet<string>(syncedGameObjects.Select(x => x.name));
             }
-
         }
     }
 }
