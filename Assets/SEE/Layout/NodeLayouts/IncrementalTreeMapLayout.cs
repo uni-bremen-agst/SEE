@@ -286,7 +286,7 @@ namespace SEE.Layout.NodeLayouts
                 }
 
                 CorrectAreas.Correct(workWith);
-                LocalMoves.MakeLocalMoves(workWith, NumberOfLocalMoves);
+                LocalMoves.MakeLocalMoves(workWith.ToList(), NumberOfLocalMoves);
                 CheckCons(workWith);
             }
 

@@ -11,6 +11,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     static class LocalMoves
     {
         static double pNorm = double.PositiveInfinity;
+
+        static int RecursionBoundToBestSelection = 4;
         private static T ArgMaxJ<T>(ICollection<T> collection, Func<T, IComparable> eval)
         {
             var bestVal = collection.Max(eval);
@@ -180,37 +182,18 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
         }
         
-        public static void MakeLocalMoves(IList<TNode> nodes, int amount)
+        public static void MakeLocalMoves(List<TNode> nodes, int amount)
         {
-            //var startNodes = nodes.ToDictionary(node => node.RepresentLayoutNode.ID, node => node);
-            //HashSet<TSegment> segments = new HashSet<TSegment>();
-            //foreach(var node in nodes)
-            //{
-            //    segments.UnionWith(node.getAllSegments().Values);
-            //}
-            //List<LocalMove> possibleMoves = new List<LocalMove>();
-            //foreach(var segment in segments)
-            //{
-            //    possibleMoves.AddRange(findLocalMoves(segment));
-            //}
-            //var nextIteration = new ParallelMovesJob();
-            //nextIteration.amount = amount;
-            //nextIteration.nodes = startNodes.Values.ToList();
-            //nextIteration.moves = possibleMoves;
-            //nextIteration.Schedule(possibleMoves.Count,32);
-            //var allResults = nextIteration.result;
-
-            var startNodes = nodes.ToDictionary(node => node.ID, node => node);
-            var allResults = RecursiveMakeMoves(startNodes,amount);
-            allResults.Add(new Tuple<Dictionary<string, TNode>, double>(startNodes,AspectRatiosPNorm(nodes)));
+            var allResults = RecursiveMakeMoves(nodes,amount);
+            allResults.Add(new Tuple<List<TNode>, double>(nodes,AspectRatiosPNorm(nodes)));
             var bestResult = ArgMinJ(allResults, x => x.Item2).Item1;
             foreach(var node in nodes)
             {
-                var resultNode = bestResult[node.ID];
+                var resultNode = bestResult.Find(n => n.ID == node.ID);
                 node.Rectangle = resultNode.Rectangle;
             }
             HashSet<TSegment> resultSegments = new HashSet<TSegment>();
-            foreach(var resultNode in bestResult.Values)
+            foreach(var resultNode in bestResult)
             {
                 resultSegments.UnionWith(resultNode.getAllSegments().Values);
             }
@@ -219,69 +202,60 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 var newSegment = new TSegment(resultSegment.IsConst,resultSegment.IsVertical);
                 foreach(var resultNode in resultSegment.Side1Nodes.ToArray())
                 {
-                    startNodes[resultNode.ID].registerSegment(newSegment, 
+                    var node = nodes.Find(n => n.ID == resultNode.ID);
+                    node.registerSegment(newSegment, 
                         newSegment.IsVertical ? Direction.Right : Direction.Upper);
                 }
                 foreach(var resultNode in resultSegment.Side2Nodes.ToArray())
                 {
-                    startNodes[resultNode.ID].registerSegment(newSegment, 
+                    var node = nodes.Find(n => n.ID == resultNode.ID);
+                    node.registerSegment(newSegment, 
                         newSegment.IsVertical ? Direction.Left : Direction.Lower);
                 }
             }
         }
 
-        private static List<Tuple<Dictionary<string,TNode>,double>> RecursiveMakeMoves(
-            Dictionary<string,TNode> nodesMap,
+        private static List<Tuple<List<TNode>,double>> RecursiveMakeMoves(
+            List<TNode> nodes,
             int amount)
         {
-            List<TNode> nodes = nodesMap.Values.ToList();
-            //nodes.Sort((x,y) => y.Rectangle.AspectRatio().CompareTo(x.Rectangle.AspectRatio()));
-            List<Tuple<Dictionary<string,TNode>,double>> result = new List<Tuple<Dictionary<string,TNode>,double>>();
-            if(amount <= 0)
-            {   
-                var x = new Tuple<Dictionary<string,TNode>,double> (nodesMap, AspectRatiosPNorm(nodes));
-                result.Add(x);
-                return result;
-            }
-            amount--;
+            var result_ThisRecursion = new List<Tuple<List<TNode>,double>>();
+            
+            if(amount <= 0) return result_ThisRecursion;
+
             HashSet<TSegment> segments = new HashSet<TSegment>();
-            HashSet<TSegment> segmentsForMoves = new HashSet<TSegment>();
-            int i = 5;
             foreach(var node in nodes)
             {
                 segments.UnionWith(node.getAllSegments().Values);
-                //if(i <= 0) continue;
-                segmentsForMoves.UnionWith(node.getAllSegments().Values);
-                i--;
             }
             List<LocalMove> possibleMoves = new List<LocalMove>();
-            foreach(var segment in segmentsForMoves)
+            foreach(var segment in segments)
             {
                 possibleMoves.AddRange(findLocalMoves(segment));
             }
 
-            var possibleResults = new List<Tuple<Dictionary<string,TNode>,double>>();
             foreach(var move in possibleMoves)
             {
-                var nodeCloneMap = CloneGraph(nodes,segments);
-                var moveClone = move.Clone(nodeCloneMap);
+                var nodeClones = CloneGraph(nodes,segments);
+                var moveClone = move.Clone(nodeClones);
                 moveClone.Apply();
-                var works = CorrectAreas.Correct(nodeCloneMap.Values.ToList());
+                var works = CorrectAreas.Correct(nodeClones.Values.ToList());
                 if(!works) continue;
-                possibleResults.Add(
-                    new Tuple<Dictionary<string, TNode>, double>(nodeCloneMap,AspectRatiosPNorm(nodeCloneMap.Values.ToList())));
+                result_ThisRecursion.Add(
+                    new Tuple<List<TNode>, double>(nodeClones.Values.ToList(),AspectRatiosPNorm(nodeClones.Values.ToList())));
             }
-            possibleResults.Sort((x,y) => x.Item2.CompareTo(y.Item2));
-            i = 3;
-            foreach(var possibleResult in possibleResults)
+            result_ThisRecursion.Sort((x,y) => x.Item2.CompareTo(y.Item2));
+            while(result_ThisRecursion.Count > RecursionBoundToBestSelection)
             {
-                if(i <= 0) break;
-                i--;
-                result.Add(possibleResult);
-                var outcome = RecursiveMakeMoves(possibleResult.Item1, amount-1);
-                result.AddRange(outcome);
+                result_ThisRecursion.RemoveAt(RecursionBoundToBestSelection);
             }
-            return result;
+
+            var results_NextRecursions = new List<Tuple<List<TNode>,double>>(); 
+            foreach(var result in result_ThisRecursion)
+            {
+                results_NextRecursions.AddRange(RecursiveMakeMoves(result.Item1, amount-1));
+            }
+            return result_ThisRecursion.Concat(results_NextRecursions).ToList();
         }
 
         private static double AspectRatiosPNorm(IList<TNode> nodes)
