@@ -44,39 +44,6 @@ namespace SEE.Controls.Actions
                 // Check whether the object selected is actually an edge.
                 if (selectedDivergenceEdge.TryGetEdge(out Edge selectedEdge))
                 {
-                    // // FIXME: This is a stupid workaround until the Diversion Edge can be selected
-                    // var graph = (ReflexionGraph)selectedEdge.ItsGraph;
-                    // foreach (Edge edge in graph.Edges())
-                    // {
-                    //     if (ReflexionGraph.IsDivergent(edge))
-                    //     {
-                    //         // Find Node in ArchitectureGraph the
-                    //         // divergence's Source is explicitly or
-                    //         // implicitly mapped to.
-                    //         Node source = graph.MapsTo(edge.Source);
-
-                    //         // Find Node in ArchitectureGraph the
-                    //         // divergence's Target is explicitly or
-                    //         // implicitly mapped to.
-                    //         Node target = graph.MapsTo(edge.Target);
-
-                    //         // Ensure the required Edge has not
-                    //         // already been added (shouldn't be
-                    //         // necessary outside of this workaround
-                    //         // due to Incremental nature of
-                    //         // ReflexionGraph)
-                    //         if (graph.Edges().Any(x => x.Source == edge.Source && x.Target == edge.Target))
-                    //         {
-                    //             // add new edge to node
-                    //             Edge newArchitectureEdge = graph.AddToArchitecture(source, target, edge.Type);
-                    //         }
-                    //     }
-                    // }
-
-                    // FIXME: this is the actual solution which should
-                    // work using edge selection:
-
-                    // Check if Edge represents a Divergence
                     if (ReflexionGraph.IsDivergent(selectedEdge))
                     {
                         // get the containing ReflexionGraph
