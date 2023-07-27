@@ -40,29 +40,33 @@ namespace SEE.Controls.Actions
                     out RaycastHit raycastHit,
                     out GraphElementRef _) != HitGraphElement.None)
             {
-                // Find the edge representing the specific Divergence that should be solved.
+                // Find the edge representing the divergence that should be solved.
                 selectedDivergenceEdge = raycastHit.collider.gameObject;
 
-                // Check whether the object selected is actually an edge.
+                // Check whether the object selected is an edge.
                 if (selectedDivergenceEdge.TryGetEdge(out Edge selectedEdge))
                 {
+                    // Check if the selected edge represents a divergence
                     if (ReflexionGraph.IsDivergent(selectedEdge))
                     {
-                        // get the containing ReflexionGraph
+                        // acquire the containing ReflexionGraph
                         var graph = (ReflexionGraph)selectedEdge.ItsGraph;
 
-                        // Find Node in ArchitectureGraph the
-                        // divergence's Source is explicitly or
-                        // implicitly mapped to.
+                        // Find that node in the ArchitectureGraph,
+                        // which the divergence's source node is
+                        // explicitly or implicitly mapped to.
                         Node source = graph.MapsTo(selectedEdge.Source);
 
-                        // Find Node in ArchitectureGraph the
-                        // divergence's Target is explicitly or
-                        // implicitly mapped to.
+                        // Find that node in the ArchitectureGraph,
+                        // which the divergence's target is explicitly
+                        // or implicitly mapped to.
                         Node target = graph.MapsTo(selectedEdge.Target);
 
                         // Create a new Edge that will solve the Divergence
                         Edge newArchitectureEdge = graph.AddToArchitecture(source, target, selectedEdge.Type);
+                        // We have both source and target of the edge
+                        // and use a memento struct to remember which
+                        // edge we have added.
 
                         // Sync the Solution of the Divergence via Network
                         // new AcceptDivergenceNetAction(selectedDivergenceEdge.name).Execute();
@@ -77,12 +81,56 @@ namespace SEE.Controls.Actions
             return false;
         }
 
+        /// <summary>
+        /// Creates a new edge using the given <paramref name="memento"/>.
+        /// In case of any error, null will be returned.
+        /// </summary>
+        /// <param name="memento">information needed to create the edge</param>
+        /// <returns>a new edge or null</returns>
+        private static Edge CreateEdge(ReflexionGraph graph, Memento memento)
+        {
+            try
+            {
+                // Create a new Edge that will solve the Divergence
+                var newArchitectureEdge = graph.AddToArchitecture(
+                    memento.from,
+                    memento.to,
+                    "Architecture");
+
+                // Sync the Solution of the Divergence via Network
+                // new AcceptDivergenceNetAction().Execute();
+                return newArchitectureEdge;
+            }
+            catch (Exception e)
+            {
+                ShowNotification.Error("New edge", $"An edge could not be created: {e.Message}.");
+                Debug.LogException(e);
+                return null;
+            }
+        }
 
         /// <summary>
         /// Undoes this AcceptDivergenceAction.
         /// </summary>
         public override void Undo()
         {
+            base.Undo();
+
+            // remove the synced edge (info is saved in memento)
+            var graph = (ReflexionGraph)createdEdge.ItsGraph;
+
+            if (graph != null)
+            {
+                graph.RemoveEdge(createdEdge);
+                // use netaction to remove synced edge over net
+            }
+            else
+            {
+                throw new Exception($"Edge {createdEdge.ID} to be removed is not contained in a graph.");
+            }
+
+            // set any edge references back to null
+            createdEdge = null;
         }
 
         /// <summary>
