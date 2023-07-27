@@ -247,7 +247,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             // adjust rectangles
             rightNode.Rectangle.width += leftNode.Rectangle.width;
             rightNode.Rectangle.x = leftNode.Rectangle.x;
-            leftNode.Rectangle.depth -= leftNode.Rectangle.depth;
+            leftNode.Rectangle.depth -= rightNode.Rectangle.depth;
             if(alongLowerSegment)
             {
                 leftNode.Rectangle.z = rightNode.Rectangle.z + rightNode.Rectangle.depth;
