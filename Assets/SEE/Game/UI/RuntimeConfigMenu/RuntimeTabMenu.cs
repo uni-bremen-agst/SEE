@@ -26,7 +26,7 @@ namespace SEE.Game.UI.RuntimeConfigMenu
     /// <summary>
     /// Menu for configuring a table/city.
     /// </summary>
-    public class RuntimeTabMenu : TabMenu<ToggleMenuEntry>
+    public class RuntimeTabMenu : TabMenu<MenuEntry>
     {
         /// <summary>
         /// Path which contains the prefabs for the runtime config menu.
@@ -366,12 +366,12 @@ namespace SEE.Game.UI.RuntimeConfigMenu
         {
             // get the tab attribute
             string tabName = attributes.OfType<RuntimeTabAttribute>().FirstOrDefault()?.Name ?? "Misc";
-            ToggleMenuEntry entry = Entries.FirstOrDefault(entry => entry.Title == tabName);
+            MenuEntry entry = Entries.FirstOrDefault(entry => entry.Title == tabName);
 
             // add an entry (tab + view) if necessary
             if (entry == null)
             {
-                entry = new ToggleMenuEntry(
+                entry = new MenuEntry(
                     () => { },
                     () => { },
                     tabName,

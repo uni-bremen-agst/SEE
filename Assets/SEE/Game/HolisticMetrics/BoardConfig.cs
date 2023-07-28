@@ -16,7 +16,7 @@ namespace SEE.Game.HolisticMetrics
         /// The title that will be displayed in the top left corner of this display.
         /// </summary>
         public string Title;
-        
+
         /// <summary>
         /// The coordinates of where this board should be placed in the scene.
         /// </summary>
@@ -26,12 +26,12 @@ namespace SEE.Game.HolisticMetrics
         /// The orientation of this board.
         /// </summary>
         public Quaternion Rotation;
-        
+
         /// <summary>
         /// All the widgets that should be displayed on this board.
         /// </summary>
         public List<WidgetConfig> WidgetConfigs = new List<WidgetConfig>();
-        
+
         /// <summary>
         /// Label in the configuration file for the title of a metrics board.
         /// </summary>
@@ -41,12 +41,12 @@ namespace SEE.Game.HolisticMetrics
         /// Label in the configuration file for the x coordinate of a metrics board.
         /// </summary>
         private const string BoardPositionXLabel = "BoardPositionX";
-        
+
         /// <summary>
         /// Label in the configuration file for the y coordinate of a metrics board.
         /// </summary>
         private const string BoardPositionYLabel = "BoardPositionY";
-        
+
         /// <summary>
         /// Label in the configuration file for the z coordinate of a metrics board.
         /// </summary>
@@ -56,17 +56,17 @@ namespace SEE.Game.HolisticMetrics
         /// Label in the configuration file for the rotation w component of a metrics board.
         /// </summary>
         private const string BoardRotationWLabel = "BoardRotationW";
-        
+
         /// <summary>
         /// Label in the configuration file for the rotation x component of a metrics board.
         /// </summary>
         private const string BoardRotationXLabel = "BoardRotationX";
-        
+
         /// <summary>
         /// Label in the configuration file for the rotation y component of a metrics board.
         /// </summary>
         private const string BoardRotationYLabel = "BoardRotationY";
-        
+
         /// <summary>
         /// Label in the configuration file for the rotation z component of a metrics board.
         /// </summary>
@@ -98,7 +98,7 @@ namespace SEE.Game.HolisticMetrics
             }
             writer.EndList();
         }
-        
+
         /// <summary>
         /// Loads the given attributes into this instance of the class <see cref="BoardConfig"/>.
         /// </summary>
@@ -129,7 +129,7 @@ namespace SEE.Game.HolisticMetrics
                 Position = Vector3.zero;
                 errorFree = false;
             }
-            
+
             if (attributes.TryGetValue(BoardRotationWLabel, out object boardRotationW) &&
                 attributes.TryGetValue(BoardRotationXLabel, out object boardRotationX) &&
                 attributes.TryGetValue(BoardRotationYLabel, out object boardRotationY) &&
@@ -157,7 +157,7 @@ namespace SEE.Game.HolisticMetrics
                     WidgetConfigs.Add(config);
                 }
             }
-            
+
             return errorFree;
         }
     }
@@ -172,12 +172,12 @@ namespace SEE.Game.HolisticMetrics
         /// The unique ID of this widget.
         /// </summary>
         public Guid ID;
-        
+
         /// <summary>
         /// The x and y coordinate of this widget.
         /// </summary>
         public Vector3 Position;
-        
+
         /// <summary>
         /// The metric type that should be displayed.
         /// </summary>
@@ -193,12 +193,12 @@ namespace SEE.Game.HolisticMetrics
         /// The label in the configuration file for the x coordinate of a widget.
         /// </summary>
         private const string WidgetPositionXLabel = "WidgetPositionX";
-        
+
         /// <summary>
         /// The label in the configuration file for the y coordinate of a widget.
         /// </summary>
         private const string WidgetPositionYLabel = "WidgetPositionY";
-        
+
         /// <summary>
         /// The label in the configuration file for the z coordinate of a widget.
         /// </summary>
@@ -230,7 +230,7 @@ namespace SEE.Game.HolisticMetrics
             writer.Save(WidgetName, WidgetNameLabel);
             writer.EndGroup();
         }
-        
+
         /// <summary>
         /// Given the representation of a <see cref="WidgetConfig"/> as created by the <see cref="ConfigWriter"/>, this
         /// method parses the attributes from that representation and puts them into this <see cref="WidgetConfig"/>
@@ -244,7 +244,7 @@ namespace SEE.Game.HolisticMetrics
         {
             bool errors = false;
             ID = Guid.NewGuid();
-            
+
             if (attributes.TryGetValue(WidgetPositionXLabel, out object widgetPositionX) &&
                 attributes.TryGetValue(WidgetPositionYLabel, out object widgetPositionY) &&
                 attributes.TryGetValue(WidgetPositionZLabel, out object widgetPositionZ))
@@ -256,7 +256,7 @@ namespace SEE.Game.HolisticMetrics
                 Position = Vector3.zero;
                 errors = true;
             }
-            
+
             if (attributes.TryGetValue(MetricTypeLabel, out object metricType))
             {
                 MetricType = (string)metricType;

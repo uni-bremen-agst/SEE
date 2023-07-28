@@ -55,16 +55,9 @@ namespace SEE.Net.Actions
         {
             if (!IsRequester())
             {
-                Node node = GraphElementIDMap.Find(NodeID)?.GetNode();
-                if (node != null)
-                {
-                    node.SourceName = SourceName;
-                    node.Type = NodeType;
-                }
-                else
-                {
-                    Debug.LogError($"Found no gameObject: {NodeID}.\n");
-                }
+                Node node = Find(NodeID).GetNode();
+                node.SourceName = SourceName;
+                node.Type = NodeType;
             }
         }
     }

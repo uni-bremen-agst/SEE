@@ -1,16 +1,15 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
-using SEE.Game.UI;
 using SEE.Game.UI.Menu;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace SEETests.UI
 {
     /// <summary>
-    /// Tests for the <see cref="ToggleMenuEntry"/> class.
-    /// Inherits from <see cref="TestMenuEntry"/>, so all of those tests are executed here (this is because
-    /// <see cref="ToggleMenuEntry"/> is a subclass of <see cref="MenuEntry"/>.)
+    /// Tests for the <see cref="MenuEntry"/> class.
+    /// Checks whether the unselect callbacks are called properly.
     /// </summary>
     [TestFixture]
     internal class TestToggleMenuEntry: TestMenuEntry
@@ -19,25 +18,28 @@ namespace SEETests.UI
                                                      Color entryColor = default, bool enabled = true,
                                                      Sprite icon = null)
         {
-            return new ToggleMenuEntry(action, null, title, description, entryColor, icon, enabled);
+            return new MenuEntry(action, null, title, description, entryColor, enabled, icon);
         }
 
         [Test]
         public void TestDefaultExitAction()
         {
-            ToggleMenuEntry entry1 = new ToggleMenuEntry( () => {}, null, "Test");
-            ToggleMenuEntry entry2 = new ToggleMenuEntry( () => {}, null, "Test");
-            Assert.DoesNotThrow(() => entry1.DoAction());
-            Assert.DoesNotThrow(() => entry2.DoAction());
+            MenuEntry entry1 = new( () => {}, null, "Test");
+            MenuEntry entry2 = new( () => {}, null, "Test");
+            Assert.DoesNotThrow(() => entry1.SelectAction());
+            Assert.DoesNotThrow(() => entry2.SelectAction());
         }
 
         [Test]
         public void TestExitAction()
         {
-            List<bool> testItems = new List<bool>();
-            SelectionMenu selectionMenu = new();
+            List<bool> testItems = new();
+            // It is not allowed to create a MonoBehaviour with new. SelectionMenu derives from MonoBehaviour.
+            // That is why we create a component and add a SelectionMenu to it.
+            GameObject go = new("Test");
+            SelectionMenu selectionMenu = go.AddComponent<SelectionMenu>();
             void ExitAction() => testItems.Add(true);
-            ToggleMenuEntry entry = new ToggleMenuEntry(() => {}, ExitAction, "Test");
+            MenuEntry entry = new(() => {}, ExitAction, "Test");
             selectionMenu.AddEntry(entry);
             Assert.AreNotEqual(entry, selectionMenu.ActiveEntry, "SelectionMenu.ActiveEntry isn't set correctly!");
             Assert.AreEqual(0, testItems.Count, "Entry/ExitAction may not be called during initialization!");
@@ -53,6 +55,7 @@ namespace SEETests.UI
             selectionMenu.ActiveEntry = null;
             Assert.AreNotEqual(entry, selectionMenu.ActiveEntry, "SelectionMenu.ActiveEntry isn't set correctly!");
             Assert.AreEqual(2, testItems.Count, "ExitAction isn't called correctly!");
+            Destroyer.Destroy(go);
         }
     }
 }

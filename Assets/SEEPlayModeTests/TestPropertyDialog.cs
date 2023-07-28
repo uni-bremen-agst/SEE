@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Michsky.UI.ModernUIPack;
 using NUnit.Framework;
-using SEE.Controls;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -15,16 +14,8 @@ namespace SEE.Game.UI.PropertyDialog
     /// <summary>
     /// Test cases for <see cref="PropertyDialog"/>.
     /// </summary>
-    internal class TestPropertyDialog
+    internal class TestPropertyDialog : TestUI
     {
-        [UnitySetUp]
-        public IEnumerator Setup()
-        {
-            LogAssert.ignoreFailingMessages = true;
-            SceneSettings.InputType = GO.PlayerInputType.DesktopPlayer;
-            yield return null;
-        }
-
         [UnityTest]
         public IEnumerator TestDialog()
         {

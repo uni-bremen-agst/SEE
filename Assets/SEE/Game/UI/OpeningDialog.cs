@@ -30,7 +30,7 @@ namespace SEE.UI
         private SimpleListMenu CreateMenu()
         {
             GameObject actionMenuGO = new() { name = "Network Menu" };
-            IList<ToggleMenuEntry> entries = SelectionEntries();
+            IList<MenuEntry> entries = SelectionEntries();
             SimpleListMenu actionMenu = actionMenuGO.AddComponent<SimpleListMenu>();
             actionMenu.AllowNoSelection = false; // the menu cannot be closed; user must make a decision
             actionMenu.Title = "Network Configuration";
@@ -46,52 +46,46 @@ namespace SEE.UI
         /// Returns the menu entries for this dialog.
         /// </summary>
         /// <returns>menu entries for this dialog</returns>
-        private IList<ToggleMenuEntry> SelectionEntries()
+        private IList<MenuEntry> SelectionEntries()
         {
             Color color = Color.blue;
 
-            return new List<ToggleMenuEntry>
-            {
-                new(
-                    entryAction: StartHost,
-                    exitAction: null,
-                    title: "Host",
-                    description: "Starts a server and local client process.",
-                    entryColor: NextColor(),
-                    icon: Resources.Load<Sprite>("Icons/Host")),
-                new(
-                    entryAction: StartClient,
-                    exitAction: null,
-                    title: "Client",
-                    description: "Starts a local client connection to a server.",
-                    entryColor: NextColor(),
-                    icon: Resources.Load<Sprite>("Icons/Client")),
+            return new List<MenuEntry>
+                    {
+                      new(selectAction: this.StartHost,
+                          unselectAction: null,
+                          title: "Host",
+                          description: "Starts a server and local client process.",
+                          entryColor: NextColor(),
+                          icon: Resources.Load<Sprite>("Icons/Host")),
+                      new(selectAction: this.StartClient,
+                          unselectAction: null,
+                          title: "Client",
+                          description: "Starts a local client connection to a server.",
+                          entryColor: NextColor(),
+                          icon: Resources.Load<Sprite>("Icons/Client")),
 #if ENABLE_VR
-                new(
-                    entryAction: ToggleEnvironment,
-                    exitAction: null,
-                    title: "Toggle Desktop/VR",
-                    description: "Toggles between desktop and VR hardware.",
-                    entryColor: NextColor(),
-                    icon: Resources.Load<Sprite>("Icons/Client")),
+                      new(selectAction: this.ToggleEnvironment,
+                          unselectAction: null,
+                          title: "Toggle Desktop/VR",
+                          description: "Toggles between desktop and VR hardware.",
+                          entryColor: NextColor(),
+                          icon: Resources.Load<Sprite>("Icons/Client")),
 #endif
-
-                // FIXME: Running only a server is currently not working.
-                //new ToggleMenuEntry(active: false,
-                //                    entryAction: StartServer,
-                //                    exitAction: null,
-                //                    title: "Server",
-                //                    description: "Starts a dedicated server without local client.",
-                //                    entryColor: NextColor(),
-                //                    icon: Resources.Load<Sprite>("Icons/Server")),
-                new(
-                    entryAction: Settings,
-                    exitAction: null,
-                    title: "Settings",
-                    description: "Allows to set additional network settings.",
-                    entryColor: Color.gray,
-                    icon: Resources.Load<Sprite>("Icons/Settings")),
-            };
+                      // FIXME: Running only a server is currently not working.
+                      //new (               entryAction: StartServer,
+                      //                    exitAction: null,
+                      //                    title: "Server",
+                      //                    description: "Starts a dedicated server without local client.",
+                      //                    entryColor: NextColor(),
+                      //                    icon: Resources.Load<Sprite>("Icons/Server")),
+                      new(selectAction: this.Settings,
+                          unselectAction: null,
+                          title: "Settings",
+                          description: "Allows to set additional network settings.",
+                          entryColor: Color.gray,
+                          icon: Resources.Load<Sprite>("Icons/Settings")),
+                    };
 
             Color NextColor()
             {

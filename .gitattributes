@@ -13,11 +13,10 @@
 # These should not show up in diffs or language statistics.
 # We exclude Assets by default, then whitelist all SEE-specific stuff.
 /Assets/** linguist-generated=true
-/Assets/Animations/** linguist-generated=false
+/Assets/Plugins/Animations/** linguist-generated=false
 /Assets/Editor/** linguist-generated=false
 /Assets/Native/** linguist-generated=false
-/Assets/Parser/** linguist-generated=false
-/Assets/Prefabs/** linguist-generated=false
+/Assets/Plugins/Parser/** linguist-generated=false
 /Assets/Resources/** linguist-generated=false
 /Assets/Scenes/** linguist-generated=false
 /Assets/SEE/** linguist-generated=false
@@ -25,77 +24,9 @@
 /Assets/SEETests/** linguist-generated=false
 /Assets/StreamingAssets/** linguist-generated=false
 /Assets/Trailer/** linguist-generated=false
-Assets/ANGRY[[:space:]]MESH/** filter=lfs diff=lfs merge=lfs -text
-Assets/Alstrainfinite/** filter=lfs diff=lfs merge=lfs -text
-Assets/AmplifyShaderEditor.meta filter=lfs diff=lfs merge=lfs -text
-Assets/AmplifyShaderEditor/** filter=lfs diff=lfs merge=lfs -text
-Assets/Asset[[:space:]]Cleaner filter=lfs diff=lfs merge=lfs -text
-Assets/Asset[[:space:]]Cleaner.meta filter=lfs diff=lfs merge=lfs -text
-Assets/Antlr4.Runtime.Standard.dll filter=lfs diff=lfs merge=lfs -text
-Assets/AutoHand.meta filter=lfs diff=lfs merge=lfs -text
-Assets/AutoHand/** filter=lfs diff=lfs merge=lfs -text
-Assets/BigFurniturePack/** filter=lfs diff=lfs merge=lfs -text
-Assets/BlockDecorationsPSD/** filter=lfs diff=lfs merge=lfs -text
-Assets/Cartoon_Texture_Pack/** filter=lfs diff=lfs merge=lfs -text
-Assets/Crazy[[:space:]]Minnow[[:space:]]Studio/** filter=lfs diff=lfs merge=lfs -text
-Assets/CurvedUI/** filter=lfs diff=lfs merge=lfs -text
-Assets/Dissonance/** filter=lfs diff=lfs merge=lfs -text
-Assets/DlibFaceLandmarkDetector.meta filter=lfs diff=lfs merge=lfs -text
-Assets/DlibFaceLandmarkDetector/** filter=lfs diff=lfs merge=lfs -text
-Assets/DynamicPanels/** filter=lfs diff=lfs merge=lfs -text
-Assets/FaceMaskExample.meta filter=lfs diff=lfs merge=lfs -text
-Assets/FaceMaskExample/** filter=lfs diff=lfs merge=lfs -text
-Assets/FinalIK_UMA2/** filter=lfs diff=lfs merge=lfs -text
-Assets/Gizmos/** filter=lfs diff=lfs merge=lfs -text
-Assets/HighlightPlus.meta filter=lfs diff=lfs merge=lfs -text
-Assets/HighlightPlus/** filter=lfs diff=lfs merge=lfs -text
-Assets/HighlightPlusBundle.meta filter=lfs diff=lfs merge=lfs -text
-Assets/HighlightPlusBundle/** filter=lfs diff=lfs merge=lfs -text
-Assets/HypertonicGames.meta filter=lfs diff=lfs merge=lfs -text
-Assets/HypertonicGames/** filter=lfs diff=lfs merge=lfs -text
-Assets/InControl/** filter=lfs diff=lfs merge=lfs -text
-Assets/JailBreak/** filter=lfs diff=lfs merge=lfs -text
-Assets/Kevin[[:space:]]Iglesias/** filter=lfs diff=lfs merge=lfs -text
-Assets/Library[[:space:]]Interior[[:space:]]Archviz/** filter=lfs diff=lfs merge=lfs -text
-Assets/Modern[[:space:]]UI[[:space:]]Pack/** filter=lfs diff=lfs merge=lfs -text
-Assets/Multiple[[:space:]]Data[[:space:]]Visualization[[:space:]]Resources/** filter=lfs diff=lfs merge=lfs -text
-Assets/Native/** filter=lfs diff=lfs merge=lfs -text
-Assets/Nesalis[[:space:]]Games/** filter=lfs diff=lfs merge=lfs -text
-Assets/Odin[[:space:]]Inspector/** filter=lfs diff=lfs merge=lfs -text
-Assets/OfficeArchviz.meta filter=lfs diff=lfs merge=lfs -text
-Assets/OfficeArchviz/** filter=lfs diff=lfs merge=lfs -text
-Assets/OpenCVForUnity/** filter=lfs diff=lfs merge=lfs -text
-Assets/OpenCVForUnity/OpenCVForUnity.meta filter=lfs diff=lfs merge=lfs -text
 Assets/Plugins filter=lfs diff=lfs merge=lfs -text
 Assets/Plugins/** filter=lfs diff=lfs merge=lfs -text
-Assets/Plugins/Sirenix/Odin[[:space:]]Validator.meta filter=lfs diff=lfs merge=lfs -text
-Assets/Plugins/Sirenix/Odin[[:space:]]Validator/** filter=lfs diff=lfs merge=lfs -text
-Assets/Runtime[[:space:]]Transform[[:space:]]Gizmos/** filter=lfs diff=lfs merge=lfs -text
-Assets/Runtime[[:space:]]Transform[[:space:]]Gizmos.meta filter=lfs diff=lfs merge=lfs -text
-Assets/SteamVR.meta filter=lfs diff=lfs merge=lfs -text
-Assets/SteamVR/** filter=lfs diff=lfs merge=lfs -text
-Assets/SteamVR_Input/** filter=lfs diff=lfs merge=lfs -text
-Assets/VRIK-Steam[[:space:]]VR/** filter=lfs diff=lfs merge=lfs -text
 Assets/StreamingAssets/Videos.meta filter=lfs diff=lfs merge=lfs -text
 Assets/StreamingAssets/Videos/** filter=lfs diff=lfs merge=lfs -text
-Assets/TextMesh[[:space:]]Pro/** filter=lfs diff=lfs merge=lfs -text
-Assets/TinySpline.dll filter=lfs diff=lfs merge=lfs -text
 Assets/Trailer/** filter=lfs diff=lfs merge=lfs -text
-Assets/Tubular/** filter=lfs diff=lfs merge=lfs -text
-Assets/UMA/** filter=lfs diff=lfs merge=lfs -text
-Assets/UMotionEditor/** filter=lfs diff=lfs merge=lfs -text
-Assets/UMotionExamples/** filter=lfs diff=lfs merge=lfs -text
-Assets/UnityTechnologies.meta filter=lfs diff=lfs merge=lfs -text
-Assets/UnityTechnologies/** filter=lfs diff=lfs merge=lfs -text
-Assets/ViveSR.meta filter=lfs diff=lfs merge=lfs -text
-Assets/ViveSR/** filter=lfs diff=lfs merge=lfs -text
-Assets/Vivox/** filter=lfs diff=lfs merge=lfs -text
-Assets/Winter[[:space:]]Zone[[:space:]]Mini[[:space:]]1.0/** filter=lfs diff=lfs merge=lfs -text
-Assets/WispySky/** filter=lfs diff=lfs merge=lfs -text
 Assets/XR/** filter=lfs diff=lfs merge=lfs -text
-Assets/XRI/** filter=lfs diff=lfs merge=lfs -text
-Assets/YughuesFreeMetalMaterials/** filter=lfs diff=lfs merge=lfs -text
-Assets/o3n/** filter=lfs diff=lfs merge=lfs -text
-Assets/waste[[:space:]]bin/** filter=lfs diff=lfs merge=lfs -text
-Assets/SimpleFileBrowser.meta filter=lfs diff=lfs merge=lfs -text
-Assets/SimpleFileBrowser/** filter=lfs diff=lfs merge=lfs -text

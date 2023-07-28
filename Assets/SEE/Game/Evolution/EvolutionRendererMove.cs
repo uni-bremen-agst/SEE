@@ -84,7 +84,7 @@ namespace SEE.Game.Evolution
                         if (next.EdgeLayout.TryGetValue(edge.ID, out ILayoutEdge<ILayoutNode> newLayoutEdge))
                         {
                             objectManager.GetEdge(edge, out GameObject gameEdge);
-                            gameEdge.AddOrGetComponent<EdgeOperator>().MorphTo(newLayoutEdge.Spline, AnimationLagPerPhase())
+                            gameEdge.AddOrGetComponent<EdgeOperator>().MorphTo(newLayoutEdge.Spline, AnimationLagFactor)
                                 .SetOnComplete(animationWatchDog.Finished);
                         }
                         else
@@ -126,7 +126,7 @@ namespace SEE.Game.Evolution
             {
                 // currentGameNode is shifted to its new position through the animator.
                 gameNode.AddOrGetComponent<NodeOperator>()
-                         .MoveTo(layoutNode.CenterPosition, AnimationLagPerPhase(), updateEdges: false)
+                         .MoveTo(layoutNode.CenterPosition, AnimationLagFactor, updateEdges: false)
                          .SetOnComplete(animationWatchDog.Finished);
             }
         }

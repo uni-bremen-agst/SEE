@@ -178,7 +178,7 @@ namespace SEE.Controls.Actions
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
         /// <returns><see cref="ActionStateType.EditNode"/></returns>
-        public override ActionStateType GetActionStateType() => ActionStateType.EditNode;
+        public override ActionStateType GetActionStateType() => ActionStateTypes.EditNode;
 
         /// <summary>
         /// Returns all IDs of gameObjects manipulated by this action.
