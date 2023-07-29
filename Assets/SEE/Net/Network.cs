@@ -625,6 +625,11 @@ namespace SEE.Net
         public delegate void CallBack(bool success, string message);
 
         /// <summary>
+        /// The IP4 address, port, and protocol.
+        /// </summary>
+        private string ServerAddress => $"{ServerIP4Address}:{ServerPort} (UDP)";
+
+        /// <summary>
         /// Starts a host process, i.e., a server and a local client.
         ///
         /// Note: This method starts a co-routine and then returns to the caller immediately.
@@ -639,8 +644,8 @@ namespace SEE.Net
 
             void InternalStartHost()
             {
-                Debug.Log($"Server is starting to listen at {ServerIP4Address}:{ServerPort}...\n");
-                Debug.Log($"Local client is trying to connect to server {ServerIP4Address}:{ServerPort}...\n");
+                Debug.Log($"Server is starting to listen at {ServerAddress}...\n");
+                Debug.Log($"Local client is trying to connect to server {ServerAddress}...\n");
                 try
                 {
                     if (NetworkManager.Singleton.StartHost())
@@ -649,7 +654,7 @@ namespace SEE.Net
                     }
                     else
                     {
-                        throw new CannotStartServer($"Could not start host {ServerIP4Address}:{ServerPort}");
+                        throw new CannotStartServer($"Could not start host {ServerAddress}");
                     }
                 }
                 catch (Exception exception)
@@ -657,7 +662,7 @@ namespace SEE.Net
                     callBack(false, exception.Message);
                     throw;
                 }
-                callBack(true, $"Host started at {ServerIP4Address}:{ServerPort}.");
+                callBack(true, $"Host started at {ServerAddress}.");
             }
         }
 
@@ -676,7 +681,7 @@ namespace SEE.Net
 
             void InternalStartClient()
             {
-                Debug.Log($"Client is trying to connect to server {ServerIP4Address}:{ServerPort}...\n");
+                Debug.Log($"Client is trying to connect to server {ServerAddress}...\n");
                 try
                 {
                     if (NetworkManager.Singleton.StartClient())
@@ -685,11 +690,12 @@ namespace SEE.Net
                     }
                     else
                     {
-                        throw new NoServerConnection($"Could not connect to server {ServerIP4Address}:{ServerPort}");
+                        throw new NoServerConnection($"Could not connect to server {ServerAddress}");
                     }
                 }
                 catch (Exception exception)
                 {
+                    Debug.LogError($"Could not connect to server {ServerAddress}. Details: {exception.Message}\n");
                     callBack(false, exception.Message);
                     throw;
                 }
@@ -704,7 +710,7 @@ namespace SEE.Net
 
                 while (!NetworkManager.Singleton.IsConnectedClient)
                 {
-                    Debug.Log($"Client is waiting for connection {waitingTime}/{MaxWaitingTime}...\n");
+                    Debug.Log($"Client is waiting for connection to server {ServerAddress} {waitingTime}/{MaxWaitingTime}...\n");
                     yield return new WaitForSeconds(waitingTimePerIteration);
                     waitingTime += waitingTimePerIteration;
                     if (waitingTime > MaxWaitingTime)
@@ -714,16 +720,12 @@ namespace SEE.Net
                 }
                 if (NetworkManager.Singleton.IsConnectedClient)
                 {
-                    string message = $"Client is connected to server {ServerIP4Address}:{ServerPort}.";
-                    Debug.Log(message + "\n");
-                    callBack(true, message);
+                    callBack(true, $"Client is connected to server {ServerAddress}.");
                 }
                 else
                 {
-                    string message = $"Could not connect to server {ServerIP4Address}:{ServerPort}.";
-                    Debug.LogError(message + "\n");
-                    callBack(false, message);
-                    throw new NoServerConnection($"Could not connect to server {ServerIP4Address}:{ServerPort}");
+                    callBack(false, $"Could not connect to server {ServerAddress}.");
+                    throw new NoServerConnection($"Could not connect to server {ServerAddress}");
                 }
             }
         }
@@ -749,7 +751,7 @@ namespace SEE.Net
 
             void InternalStartServer()
             {
-                Debug.Log($"Server is starting to listening at {ServerIP4Address}:{ServerPort}...\n");
+                Debug.Log($"Server is starting to listening at {ServerAddress}...\n");
                 try
                 {
                     if (NetworkManager.Singleton.StartServer())
@@ -758,7 +760,7 @@ namespace SEE.Net
                     }
                     else
                     {
-                        throw new CannotStartServer($"Could not start server {ServerIP4Address}:{ServerPort}");
+                        throw new CannotStartServer($"Could not start server {ServerAddress}");
                     }
                 }
                 catch (Exception exception)
@@ -766,7 +768,7 @@ namespace SEE.Net
                     callBack(false, exception.Message);
                     throw;
                 }
-                callBack(true, $"Server is listening at {ServerIP4Address}:{ServerPort}.");
+                callBack(true, $"Server is listening at {ServerAddress}.");
             }
         }
 
