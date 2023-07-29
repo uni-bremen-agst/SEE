@@ -10,6 +10,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Rect = UnityEngine.Rect;
+using SEE.Controls;
 
 namespace SEE.Tools.FaceCam
 {
@@ -372,7 +373,7 @@ namespace SEE.Tools.FaceCam
             if (IsOwner)
             {
                 // Switch the FaceCam on or off.
-                if (Input.GetKeyDown(KeyCode.I))
+                if (SEEInput.ToggleFaceCam())
                 {
                     FaceCamOnOffServerRpc(FaceCamOn);
                 }
@@ -554,8 +555,8 @@ namespace SEE.Tools.FaceCam
         /// </summary>
         private void RefreshFaceCamPosition()
         {
-            // Switch the position of the FaceCam, if 'O' is pressed.
-            if (Input.GetKeyDown(KeyCode.O))
+            // Switch the position of the FaceCam.
+            if (SEEInput.ToggleFaceCamPosition())
             {
                 FaceCamOnFrontToggleServerRpc(FaceCamOnFront);
             }
