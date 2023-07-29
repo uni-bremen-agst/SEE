@@ -116,6 +116,11 @@ namespace SEE.Controls
         /// </summary>
         internal static readonly KeyCode Redo = Register(KeyCode.Y, Scope.Always, "Re-does the last action.");
 
+        /// <summary>
+        /// Opens/Closes the configuration menu.
+        /// </summary>
+        internal static readonly KeyCode ConfigMenu = Register(KeyCode.K, Scope.Always, "Opens/Closes the configuration menu.");
+
         #endregion
 
         //-----------------------------------------------------
@@ -350,6 +355,8 @@ namespace SEE.Controls
 
         #endregion
 
+        #region Holistic Metric Menu
+
         //-----------------------------------------------------
         // Holistic metrics menu
         //-----------------------------------------------------
@@ -357,6 +364,10 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles the menu for holistic code metrics.
         /// </summary>
-        internal static readonly KeyCode ToggleHolisticMetricsMenu = Register(KeyCode.C, Scope.Always, "Toggles the menu for holistic code metrics");
+        internal static readonly KeyCode ToggleHolisticMetricsMenu = Register(KeyCode.C, Scope.Always,
+                                                                              "Toggles the menu for holistic code metrics");
+
+        #endregion
+
     }
 }

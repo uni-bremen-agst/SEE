@@ -59,7 +59,7 @@ namespace SEE.Game.Evolution
                 gameNode.transform.SetParent(gameObject.transform);
 
                 gameNode.AddOrGetComponent<NodeOperator>()
-                    .MoveTo(layoutNode.CenterPosition, AnimationLagPerPhase(), updateEdges: false)
+                    .MoveTo(layoutNode.CenterPosition, AnimationLagFactor, updateEdges: false)
                     .SetOnComplete(animationWatchDog.Finished);
             }
         }

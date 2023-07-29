@@ -1,5 +1,5 @@
 ﻿using SEE.Controls.Actions;
-using Valve.VR.InteractionSystem;
+using SEE.Utils;
 
 namespace SEE.Game.UI.StateIndicator
 {
@@ -16,7 +16,7 @@ namespace SEE.Game.UI.StateIndicator
         {
             if (newState != null)
             {
-                ChangeState(newState.Name, newState.Color.ColorWithAlpha(0.5f));
+                ChangeState(newState.Name, newState.Color.WithAlpha(0.5f));
             }
         }
     }

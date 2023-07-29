@@ -178,7 +178,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.Draw"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.Draw;
+            return ActionStateTypes.Draw;
         }
 
         /// <summary>

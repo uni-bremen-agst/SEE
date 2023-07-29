@@ -158,7 +158,6 @@ namespace SEE.Game.UI.ConfigMenu
             });
 
             SetupInstanceSwitch();
-            SetupEnvironment();
             LoadPrefabs();
             SetupActions();
             SetupPages();
@@ -191,42 +190,6 @@ namespace SEE.Game.UI.ConfigMenu
                 EditableInstance newInstance = EditableInstances.Find(instance => instance.DisplayValue == displayValue);
                 OnInstanceChangeRequest.Invoke(newInstance);
             });
-        }
-
-        private void SetupEnvironment()
-        {
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
-            {
-                // Attach the pointer to the appropriate hand.
-                Transform attachmentPoint = GameObject
-                    .Find("VRPlayer/SteamVRObjects/RightHand/ObjectAttachmentPoint").transform;
-                GameObject pointer =
-                    PrefabInstantiator.InstantiatePrefab(PointerPrefabPath, parent: attachmentPoint);
-                Camera pointerCamera = pointer.GetComponent<Camera>();
-
-                // Replace the default input system with our VR input system.
-                GameObject vrEventSystem = GameObject.FindWithTag("VREventSystem");
-                vrEventSystem.GetComponent<StandaloneInputModule>().enabled = false;
-                VRInputModule vrInputModule = vrEventSystem.AddComponent<VRInputModule>();
-                vrInputModule.PointerCamera = pointerCamera;
-                pointer.GetComponent<Pointer>().InputModule = vrInputModule;
-
-                // Set the canvas to world space and adjust its positition.
-                MustGetComponentInChild("Canvas", out RectTransform rectTransform);
-                canvas.renderMode = RenderMode.WorldSpace;
-                canvas.worldCamera = pointerCamera;
-                rectTransform.anchoredPosition3D = Vector3.zero;
-                rectTransform.localScale = Vector3.one;
-
-                // Make the color picker slightly rotated towards the user.
-                colorPickerControl.gameObject.transform.Rotate(0f, 45f, 0f);
-
-                // Place the menu as a whole in front of the 'table'.
-                // FIXME: Do not use absolute positioning. Instead, it may better to use
-                // positioning relative to the table or to the player, since the absolute
-                // position of the table may change in the future (or on other platforms).
-                gameObject.transform.position = new Vector3(-0.36f, 1.692f, -0.634f);
-            }
         }
 
         private void LoadPrefabs()
@@ -432,42 +395,42 @@ namespace SEE.Game.UI.ConfigMenu
             //}
         }
 
-        private void CreateLabelSettingsInputs(Transform parent, LabelAttributes labelSettings)
-        {
-            // Show labels
-            SwitchBuilder.Init(parent)
-                .SetLabel("Show labels")
-                .SetDefaultValue(labelSettings.Show)
-                .SetOnChangeHandler(b => labelSettings.Show = b)
-                .Build();
-
-            // Label distance
-            SliderBuilder.Init(parent)
-                .SetLabel("Label distance")
-                .SetMode(SliderMode.Float)
-                .SetDefaultValue(labelSettings.Distance)
-                .SetOnChangeHandler(f => labelSettings.Distance = f)
-                .SetRange((0, 2))
-                .Build();
-
-            // Label font size
-            SliderBuilder.Init(parent)
-                .SetLabel("Label font size")
-                .SetMode(SliderMode.Float)
-                .SetDefaultValue(labelSettings.FontSize)
-                .SetOnChangeHandler(f => labelSettings.FontSize = f)
-                .SetRange((0, 2))
-                .Build();
-
-            // Label animation duration
-            SliderBuilder.Init(parent)
-                .SetLabel("Label anim. duration")
-                .SetMode(SliderMode.Float)
-                .SetDefaultValue(labelSettings.AnimationDuration)
-                .SetOnChangeHandler(f => labelSettings.AnimationDuration = f)
-                .SetRange((0, 2))
-                .Build();
-        }
+        // private void CreateLabelSettingsInputs(Transform parent, LabelAttributes labelSettings)
+        // {
+        //     // Show labels
+        //     SwitchBuilder.Init(parent)
+        //         .SetLabel("Show labels")
+        //         .SetDefaultValue(labelSettings.Show)
+        //         .SetOnChangeHandler(b => labelSettings.Show = b)
+        //         .Build();
+        //
+        //     // Label distance
+        //     SliderBuilder.Init(parent)
+        //         .SetLabel("Label distance")
+        //         .SetMode(SliderMode.Float)
+        //         .SetDefaultValue(labelSettings.Distance)
+        //         .SetOnChangeHandler(f => labelSettings.Distance = f)
+        //         .SetRange((0, 2))
+        //         .Build();
+        //
+        //     // Label font size
+        //     SliderBuilder.Init(parent)
+        //         .SetLabel("Label font size")
+        //         .SetMode(SliderMode.Float)
+        //         .SetDefaultValue(labelSettings.FontSize)
+        //         .SetOnChangeHandler(f => labelSettings.FontSize = f)
+        //         .SetRange((0, 2))
+        //         .Build();
+        //
+        //     // Label animation factor
+        //     SliderBuilder.Init(parent)
+        //         .SetLabel("Label animation factor")
+        //         .SetMode(SliderMode.Float)
+        //         .SetDefaultValue(labelSettings.AnimationFactor)
+        //         .SetOnChangeHandler(f => labelSettings.AnimationFactor = f)
+        //         .SetRange((0, 2))
+        //         .Build();
+        // }
 
         private void SetupNodesLayoutPage()
         {

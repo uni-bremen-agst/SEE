@@ -21,21 +21,21 @@ namespace SEE.Net.Actions
         public Vector3 LocalScale;
 
         /// <summary>
-        /// The duration of the animation in seconds.
+        /// The factor by which the animation should be sped up or slowed down.
         /// </summary>
-        public float AnimationDuration;
+        public float AnimationFactor;
 
         /// <summary>
         /// Constructs a ScaleNodeNetAction
         /// </summary>
         /// <param name="gameObjectID">The unique name of the GameObject that should be scaled through the network</param>
         /// <param name="localScale">The new local scale of the GameObject</param>
-        /// <param name="duration">The duration of the animation in seconds</param>
-        public ScaleNodeNetAction(string gameObjectID, Vector3 localScale, float duration = 0) : base()
+        /// <param name="factor">The factor by which the animation should be sped up or slowed down</param>
+        public ScaleNodeNetAction(string gameObjectID, Vector3 localScale, float factor = 1)
         {
             GameObjectID = gameObjectID;
             LocalScale = localScale;
-            AnimationDuration = duration;
+            AnimationFactor = factor;
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace SEE.Net.Actions
         {
             if (!IsRequester())
             {
-                Find(GameObjectID).AddOrGetComponent<NodeOperator>().ScaleTo(LocalScale, AnimationDuration);
+                Find(GameObjectID).AddOrGetComponent<NodeOperator>().ScaleTo(LocalScale, AnimationFactor);
             }
         }
     }

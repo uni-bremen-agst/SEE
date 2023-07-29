@@ -2,10 +2,11 @@ using System.Linq;
 using DG.Tweening;
 using SEE.Controls.Actions;
 using SEE.GO;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
-using Valve.VR.InteractionSystem;
+
 
 namespace SEE.Game.Operator
 {
@@ -37,8 +38,8 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Updates the position of the attached label, including its text and line.
         /// </summary>
-        /// <param name="duration"></param>
-        private void UpdateLabelLayout(float duration)
+        /// <param name="duration">The duration of the animation.</param>
+        private static void UpdateLabelLayout(float duration)
         {
             // Assumption: There are only very few active labels, compared to all active and inactive labels
             //             that may exist in the descendants of this node. Hence, we go through all active ones.
@@ -96,8 +97,8 @@ namespace SEE.Game.Operator
                 if (nodeLabel.TryGetComponentOrLog(out labelText) && line.TryGetComponentOrLog(out labelLineRenderer))
                 {
                     labelText.alpha = 0f;
-                    labelLineRenderer.startColor = lineColor.ColorWithAlpha(0f);
-                    labelLineRenderer.endColor = lineColor.ColorWithAlpha(0f);
+                    labelLineRenderer.startColor = labelLineRenderer.startColor.WithAlpha(0f);
+                    labelLineRenderer.endColor = labelLineRenderer.endColor.WithAlpha(0f);
                 }
             }
         }
@@ -169,12 +170,14 @@ namespace SEE.Game.Operator
 
         private Tween[] AnimateLabelStartLinePositionAction(Vector3 startPosition, float duration) => new Tween[]
         {
-            DOTween.To(() => labelLineRenderer.GetPosition(0), p => labelLineRenderer.SetPosition(0, p), startPosition, duration).Play()
+            DOTween.To(() => labelLineRenderer.GetPosition(0), p => labelLineRenderer.SetPosition(0, p), startPosition,
+                duration).Play()
         };
 
         private Tween[] AnimateLabelEndLinePositionAction(Vector3 endPosition, float duration) => new Tween[]
         {
-            DOTween.To(() => labelLineRenderer.GetPosition(1), p => labelLineRenderer.SetPosition(1, p), endPosition, duration).Play()
+            DOTween.To(() => labelLineRenderer.GetPosition(1), p => labelLineRenderer.SetPosition(1, p), endPosition,
+                duration).Play()
         };
 
         private Tween[] AnimateLabelTextPositionAction(Vector3 position, float duration) => new Tween[]

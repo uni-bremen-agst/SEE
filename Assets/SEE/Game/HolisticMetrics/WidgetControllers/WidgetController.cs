@@ -1,5 +1,5 @@
 using System;
-using SEE.Game.HolisticMetrics.Components;
+using SEE.Game.HolisticMetrics.ActionHelpers;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,22 +16,22 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// While the widget can be moved, there will be a reference to the responsible WidgetMover in this field.
         /// </summary>
         private WidgetMover mover;
-        
+
         /// <summary>
         /// The title text stating what metric is being displayed by the widget.
         /// </summary>
         [SerializeField] protected Text titleText;
-        
+
         /// <summary>
         /// The text showing the value of the metric.
         /// </summary>
         [SerializeField] protected Text valueText;
-        
+
         /// <summary>
         /// The field that saves the ID of this widget.
         /// </summary>
         private Guid? id;
-        
+
         /// <summary>
         /// The unique ID of this widget. It can be set once, then it is fixed.
         /// </summary>
@@ -40,7 +40,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
             get => id.GetValueOrDefault();
             set => id ??= value;  // In C# 9 this could be replaced by "init;".
         }
-        
+
         /// <summary>
         /// Calling this method will display the given MetricValue on the widget that the WidgetController is attached
         /// to.

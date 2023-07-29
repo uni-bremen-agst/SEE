@@ -242,7 +242,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.NewEdge"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.NewEdge;
+            return ActionStateTypes.NewEdge;
         }
 
         /// <summary>

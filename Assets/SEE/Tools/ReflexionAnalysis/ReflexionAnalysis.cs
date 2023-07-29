@@ -143,7 +143,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// If this is false, incremental events like <see cref="AddNode"/> will only modify the graph
         /// and not run the reflexion analysis.
         /// </summary>
-        public bool AnalysisInitialized = false;
+        public bool AnalysisInitialized { get; private set; }
 
         #region State Edge Attribute
 

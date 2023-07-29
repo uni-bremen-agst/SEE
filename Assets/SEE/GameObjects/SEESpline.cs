@@ -419,20 +419,21 @@ namespace SEE.GO
             // Set up the mesh components.
             Mesh mesh; // The mesh to work on.
             bool updateMaterial = false; // Whether to call `UpdateMaterial'.
-            if (!gameObject.TryGetComponent(out MeshFilter filter))
-            {
-                filter = gameObject.AddComponent<MeshFilter>();
-                if (!gameObject.TryGetComponent(out MeshCollider collider))
-                {
-                    collider = gameObject.AddComponent<MeshCollider>();
-                }
+
+            if (gameObject.TryGetComponent(out MeshFilter filter))
+            { // Does this game object already have a mesh which we can reuse?
+                mesh = filter.mesh;
+            }
+            else
+            { // Create a new mesh for this game object.
                 mesh = new Mesh();
                 mesh.MarkDynamic(); // May improve performance.
+                filter = gameObject.AddComponent<MeshFilter>();
                 filter.sharedMesh = mesh;
-                collider.sharedMesh = mesh;
                 updateMaterial = true;
             }
-            mesh = filter.mesh;
+
+            // IMPORTANT: Set mesh vertices, normals, tangents etc. before updating the shared mesh of the collider.
             updateMaterial = updateMaterial // Implies new mesh.
                              || // Or the geometrics of the mesh have changed.
                              mesh.vertices.Length != vertices.Count ||
@@ -440,7 +441,6 @@ namespace SEE.GO
                              mesh.tangents.Length != tangents.Count ||
                              mesh.uv.Length != uvs.Count ||
                              needsColorUpdate; // Or the color of the mesh has been changed.
-
             if (updateMaterial)
             {
                 mesh.Clear();
@@ -450,34 +450,24 @@ namespace SEE.GO
             mesh.tangents = tangents.ToArray();
             mesh.uv = uvs.ToArray();
             mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
-            if (!gameObject.TryGetComponent(out meshRenderer))
-            {
-                meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            }
+
+            // IMPORTANT: Null the shared mesh of the collider before assigning the updated mesh.
+            MeshCollider collider = gameObject.AddOrGetComponent<MeshCollider>();
+            collider.sharedMesh = null; // https://forum.unity.com/threads/how-to-update-a-mesh-collider.32467/
+            collider.sharedMesh = mesh;
+
+            meshRenderer = gameObject.AddOrGetComponent<MeshRenderer>();
             if (updateMaterial)
-            {
+            { // Needs the meshRenderer.
                 UpdateMaterial();
             }
 
-            SetCookingOptions();
-
-            // Remove line meshRenderer.
             if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
-            {
+            { // Remove line meshRenderer.
                 Destroyer.Destroy(lineRenderer);
             }
 
             return mesh;
-
-            void SetCookingOptions()
-            {
-                if (gameObject.TryGetComponentOrLog(out MeshCollider collider))
-                {
-                    collider.cookingOptions = MeshColliderCookingOptions.EnableMeshCleaning
-                                            | MeshColliderCookingOptions.WeldColocatedVertices
-                                            | MeshColliderCookingOptions.CookForFasterSimulation;
-                }
-            }
         }
 
         /// <summary>

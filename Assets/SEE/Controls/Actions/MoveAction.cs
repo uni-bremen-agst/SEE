@@ -49,7 +49,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.Move"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.Move;
+            return ActionStateTypes.Move;
         }
 
         /// <summary>
@@ -59,15 +59,13 @@ namespace SEE.Controls.Actions
         private struct GrabbedObject
         {
             /// <summary>
-            /// The game object that was grabbed. May be null.
+            /// The game object that is currently grabbed.
             /// </summary>
-            private GameObject grabbedObject;
-
-            /// <summary>
-            /// The duration of any animation to move the grabbed object for Undo/Redo
-            /// in seconds.
-            /// </summary>
-            private const float AnimationTime = 1.0f;
+            public GameObject GrabbedGameObject
+            {
+                get;
+                private set;
+            }
 
             /// <summary>
             /// Whether the currently grabbed node is contained in a <see cref="SEEReflexionCity"/>.
@@ -84,7 +82,7 @@ namespace SEE.Controls.Actions
             {
                 if (gameObject != null)
                 {
-                    grabbedObject = gameObject;
+                    GrabbedGameObject = gameObject;
                     originalParent = gameObject.transform.parent;
                     originalLocalScale = gameObject.transform.localScale;
                     originalWorldPosition = gameObject.transform.position;
@@ -118,18 +116,18 @@ namespace SEE.Controls.Actions
             /// grabbed</exception>
             public void UnGrab()
             {
-                if (!IsGrabbed || grabbedObject == null)
+                if (!IsGrabbed || GrabbedGameObject == null)
                 {
                     throw new InvalidOperationException("No object is being grabbed.");
                 }
                 else
                 {
                     UnmarkAsTarget();
-                    if (grabbedObject.TryGetComponent(out InteractableObject interactableObject))
+                    if (GrabbedGameObject.TryGetComponent(out InteractableObject interactableObject))
                     {
                         interactableObject.SetGrab(grab: false, isInitiator: true) ;
                     }
-                    ShowLabel.Off(grabbedObject);
+                    ShowLabel.Off(GrabbedGameObject);
                     IsGrabbed = false;
                     // Note: We do not set grabbedObject to null because we may need its
                     // value later for Undo/Redo.
@@ -163,7 +161,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The name of the grabbed object if any was grabbed; otherwise the empty string.
             /// </summary>
-            internal string Name => grabbedObject != null ? grabbedObject.name : string.Empty;
+            internal string Name => GrabbedGameObject != null ? GrabbedGameObject.name : string.Empty;
 
             /// <summary>
             /// The position of the grabbed object in world space.
@@ -173,9 +171,9 @@ namespace SEE.Controls.Actions
             {
                 get
                 {
-                    if (IsGrabbed && grabbedObject != null)
+                    if (IsGrabbed && GrabbedGameObject != null)
                     {
-                        return grabbedObject.transform.position;
+                        return GrabbedGameObject.transform.position;
                     }
                     else
                     {
@@ -188,7 +186,7 @@ namespace SEE.Controls.Actions
             /// The node reference associated with the grabbed object. May be null if no
             /// node is associated with the grabbed object.
             /// </summary>
-            public NodeRef Node => grabbedObject.TryGetNodeRef(out NodeRef result) ? result : null;
+            public NodeRef Node => GrabbedGameObject.TryGetNodeRef(out NodeRef result) ? result : null;
 
             /// <summary>
             /// The original position of <see cref="grabbedObject"/> when it was grabbed.
@@ -206,11 +204,11 @@ namespace SEE.Controls.Actions
             /// Returns the grabbed object to its original position when it was grabbed.
             /// This method will be called for Undo.
             /// </summary>
-            internal void MoveToOrigin()
+            private void MoveToOrigin()
             {
-                if (grabbedObject)
+                if (GrabbedGameObject)
                 {
-                    MoveTo(grabbedObject, originalWorldPosition, AnimationTime);
+                    MoveTo(GrabbedGameObject, originalWorldPosition);
                 }
             }
 
@@ -221,9 +219,9 @@ namespace SEE.Controls.Actions
             /// </summary>
             private void MoveToLastUserRequestedPosition()
             {
-                if (grabbedObject)
+                if (GrabbedGameObject)
                 {
-                    MoveTo(grabbedObject, currentPositionOfGrabbedObject, AnimationTime);
+                    MoveTo(GrabbedGameObject, currentPositionOfGrabbedObject);
                 }
             }
 
@@ -235,10 +233,10 @@ namespace SEE.Controls.Actions
             /// should be moved in world space</param>
             internal void MoveTo(Vector3 targetPosition)
             {
-                if (grabbedObject)
+                if (GrabbedGameObject)
                 {
                     currentPositionOfGrabbedObject = targetPosition;
-                    MoveTo(grabbedObject, targetPosition, 0);
+                    MoveTo(GrabbedGameObject, targetPosition, 0);
                 }
             }
 
@@ -274,7 +272,6 @@ namespace SEE.Controls.Actions
                 {
                     Highlighter.SetHighlight(markedGameObject, false);
                     new HighlightNetAction(markedGameObject.name, false).Execute();
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, this.originalParent.gameObject);
                 }
             }
 
@@ -295,7 +292,7 @@ namespace SEE.Controls.Actions
             /// triggered by the reflexion analysis; all of these are reverted).
             ///
             /// Important note: Some of these changes do not come into effect immediately.
-            /// They may be delayed by an animation duration.
+            /// They may be delayed by an animation.
             /// </summary>
             internal void Undo()
             {
@@ -319,7 +316,7 @@ namespace SEE.Controls.Actions
             /// all of these are in place).
             ///
             /// Important note: Some of these changes do not come into effect immediately.
-            /// They may be delayed by an animation duration.
+            /// They may be delayed by an animation.
             /// </summary>
             internal void Redo()
             {
@@ -342,23 +339,22 @@ namespace SEE.Controls.Actions
             internal void Reparent(GameObject target)
             {
                 // target must not be a descendant of grabbedObject
-                if (!IsDescendant(target, grabbedObject))
+                if (!IsDescendant(target, GrabbedGameObject))
                 {
-                    PutOnAndFit(grabbedObject, target, originalParent.gameObject, originalLocalScale);
+                    PutOnAndFit(GrabbedGameObject, target, originalParent.gameObject, originalLocalScale);
                     UnmarkAsTarget();
                     MarkAsTarget(target.transform);
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, originalParent.gameObject);
 
                     newParent = target;
                     // The mapping is only possible if we are in a reflexion city
                     // and the mapping target is not the root of the graph.
                     if (withinReflexionCity && !target.IsRoot())
                     {
-                        ReflexionMapperSetParent(grabbedObject, target);
+                        ReflexionMapperSetParent(GrabbedGameObject, target);
                     }
                     else
                     {
-                        GameNodeMoverSetParent(grabbedObject, target);
+                        GameNodeMoverSetParent(GrabbedGameObject, target);
                     }
                 }
 
@@ -380,15 +376,15 @@ namespace SEE.Controls.Actions
             internal void UnReparent()
             {
                 UnmarkAsTarget();
-                if (grabbedObject.transform.parent.gameObject != originalParent.gameObject)
+                if (GrabbedGameObject.transform.parent.gameObject != originalParent.gameObject)
                 {
                     if (withinReflexionCity)
                     {
-                        ReflexionMapperSetParent(grabbedObject, originalParent.gameObject);
+                        ReflexionMapperSetParent(GrabbedGameObject, originalParent.gameObject);
                     }
                     else
                     {
-                        GameNodeMoverSetParent(grabbedObject, originalParent.gameObject);
+                        GameNodeMoverSetParent(GrabbedGameObject, originalParent.gameObject);
                     }
                 }
                 RestoreOriginalAppearance();
@@ -411,13 +407,12 @@ namespace SEE.Controls.Actions
             /// </summary>
             /// <param name="targetPosition">the position where the grabbed object
             /// should be moved in world space</param>
-            /// <param name="duration">the duration of the animation for moving the grabbed
-            /// object in seconds</param>
+            /// <param name="factor">the factor of the animation for moving the grabbed object</param>
             /// <remarks>This is only a movement, not a change to any hierarchy.</remarks>
-            private static void MoveTo(GameObject grabbedObject, Vector3 targetPosition, float duration)
+            private static void MoveTo(GameObject grabbedObject, Vector3 targetPosition, float factor = 1)
             {
-                GameNodeMover.MoveTo(grabbedObject, targetPosition, duration);
-                new MoveNetAction(grabbedObject.name, targetPosition, duration).Execute();
+                GameNodeMover.MoveTo(grabbedObject, targetPosition, factor);
+                new MoveNetAction(grabbedObject.name, targetPosition, factor).Execute();
             }
 
             /// <summary>
@@ -446,7 +441,6 @@ namespace SEE.Controls.Actions
                 try
                 {
                     ReflexionMapper.SetParent(child, parent);
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, parent.gameObject);
                     new SetParentNetAction(child.name, parent.name, true).Execute();
                 }
                 catch (ArchitectureAnalysisException e)
@@ -489,16 +483,15 @@ namespace SEE.Controls.Actions
             {
                 UnmarkAsTarget();
                 MoveToOrigin();
-                float animationTime = AnimationTime;
-                grabbedObject.AddOrGetComponent<NodeOperator>().ScaleTo(originalLocalScale, animationTime);
-                new ScaleNodeNetAction(grabbedObject.name, originalLocalScale, animationTime).Execute();
+                GrabbedGameObject.AddOrGetComponent<NodeOperator>().ScaleTo(originalLocalScale);
+                new ScaleNodeNetAction(GrabbedGameObject.name, originalLocalScale).Execute();
             }
         }
 
         /// <summary>
         /// The currently grabbed object if any.
         /// </summary>
-        private GrabbedObject grabbedObject = new GrabbedObject();
+        private GrabbedObject grabbedObject;
 
         /// <summary>
         /// The distance from the the position of <see cref="grabbedObject"/> when it was grabbed to
@@ -532,6 +525,7 @@ namespace SEE.Controls.Actions
                     if (hoveredObject && hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot())
                     {
                         grabbedObject.Grab(hoveredObject.gameObject);
+                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, hoveredObject.gameObject);
                         // Remember the current distance from the pointing device to the grabbed object.
                         distanceToUser = Vector3.Distance(Raycasting.UserPointsTo().origin, grabbedObject.Position);
                         currentState = ReversibleAction.Progress.InProgress;
@@ -554,6 +548,10 @@ namespace SEE.Controls.Actions
             else if (grabbedObject.IsGrabbed) // dragging has ended
             {
                 // Finalize the action with the grabbed object.
+                if (grabbedObject.GrabbedGameObject != null)
+                {
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, grabbedObject.GrabbedGameObject);
+                }
                 grabbedObject.UnGrab();
                 // Action is finished.
                 currentState = ReversibleAction.Progress.Completed;
