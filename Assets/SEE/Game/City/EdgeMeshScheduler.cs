@@ -96,11 +96,7 @@ namespace SEE.Game.City
         private static GameObject GetGameEdge(Edge edge)
         {
             GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
-            if (gameEdge == null)
-            {
-                Debug.LogWarning($"No GameObject for Spline {edge.ToShortString()}. Ignoring.\n");
-            }
-            else if (!gameEdge.TryGetComponent(out MeshFilter _))
+            if (gameEdge != null && !gameEdge.TryGetComponent(out MeshFilter _))
             {
                 return gameEdge;
             }

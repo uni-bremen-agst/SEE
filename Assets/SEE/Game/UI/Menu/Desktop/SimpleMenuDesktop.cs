@@ -1,4 +1,5 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using Cysharp.Threading.Tasks;
+using Michsky.UI.ModernUIPack;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
@@ -132,6 +133,7 @@ namespace SEE.Game.UI.Menu
         {
             if (ShowMenu)
             {
+                Menu.SetActive(true);
                 Menu.transform.SetAsLastSibling();
                 MenuManager.OpenWindow();
             }
@@ -139,6 +141,18 @@ namespace SEE.Game.UI.Menu
             {
                 MenuManager.CloseWindow();
                 MenuTooltip.Hide();
+
+                // We cannot disable the menu immediately, otherwise the animation will be cut short.
+                DisableSoon().Forget();
+
+                async UniTaskVoid DisableSoon()
+                {
+                    await UniTask.Delay(1000);
+                    if (Menu != null && !ShowMenu)
+                    {
+                        Menu.SetActive(false);
+                    }
+                }
             }
         }
 
