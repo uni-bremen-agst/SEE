@@ -376,7 +376,6 @@ namespace SEE.GO
             BSpline subSpline = CreateSubSpline();
             IList<double> rv = subSpline.UniformKnotSeq((uint)tubularSegments + 1);
             FrameSeq frames = subSpline.ComputeRMF(rv);
-            
             // Precalculated values for the loops later on.
             float radialSegmentsInv = 1f / radialSegments;
             float tubularSegmentsInv = 1f / tubularSegments;
@@ -388,7 +387,6 @@ namespace SEE.GO
             uint indexIndex = 0;
             // Additionally, the index of the current vertex in the vertex-based arrays
             int index = 0;
-            
             // Pre-calculate sin and cos values.
             float[] sinValues = new float[radialSegments + 1];
             float[] cosValues = new float[radialSegments + 1];
@@ -399,7 +397,6 @@ namespace SEE.GO
                 sinValues[j] = Mathf.Sin(V);
                 cosValues[j] = Mathf.Cos(V);
             }
-            
             // TODO: This loop is the main culprit for the performance issues when splines are modified.
             //       I have already tried optimizing it (see PR #622), which resulted in promising improvements, more
             //       than doubling FPS from 5 to 13, but we should strive for at least 30. Looking at the profiler,
@@ -441,7 +438,6 @@ namespace SEE.GO
                 {
                     frBinormal = Vector3.zero;
                 }
-                
                 Vector3 radiusNormal = frNormal * radius;
                 Vector3 radiusBinormal = frBinormal * radius;
 
@@ -450,12 +446,10 @@ namespace SEE.GO
                     // Generate radial segment of frame `i` for segment `j`.
                     Vector3 normal = cosValues[j] * radiusNormal + sinValues[j] * radiusBinormal;
                     vertices[index] = frPosition + normal;
-                    normals[index] = normal; // TODO: Is it fine not to normalize this? 
+                    normals[index] = normal; // TODO: Is it fine not to normalize this?
                     tangents[index] = frTangent;
-                    
                     // U-v-vectors
                     uvs[index] = new Vector2(j * radialSegmentsInv, i * tubularSegmentsInv);
-                    
                     // Indices (faces)
                     if (i >= 1 && j >= 1)
                     {
