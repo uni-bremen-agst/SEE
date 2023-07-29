@@ -120,7 +120,7 @@ namespace SEE.Game.Worlds
                 Debug.LogError($"Spawned player {player.name} does not have a {typeof(NetworkObject)} component.\n");
             }
 #if !PLATFORM_LUMIN || UNITY_EDITOR
-            //if (networkManager.IsServer)
+            if (networkManager.IsServer)
             {
                 // Add the FaceCam to the player.
                 GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam");
