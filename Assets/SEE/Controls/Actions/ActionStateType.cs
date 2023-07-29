@@ -1,7 +1,9 @@
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
+
     /// <summary>
     /// The type of a state-based action.
     /// Implemented using the "Enumeration" (not enum) or "type safe enum" pattern.
@@ -11,6 +13,7 @@ namespace SEE.Controls.Actions
     /// <li>https://ardalis.com/enum-alternatives-in-c/</li>
     /// </ul>
     /// </summary>
+    public class ActionStateType : AbstractActionStateType
     {
         /// <summary>
         /// Delegate to be called to create a new instance of this kind of action.
@@ -25,8 +28,15 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="name">The Name of this ActionStateType. Must be unique.</param>
         /// <param name="description">Description for this ActionStateType.</param>
+        /// <param name="parent">The parent of this action in the nesting hierarchy in the menu.</param>
         /// <param name="color">Color for this ActionStateType.</param>
         /// <param name="iconPath">Path to the material of the icon for this ActionStateType.</param>
+        /// <param name="createReversible">Delegate to be called to create a new instance of this kind of action.
+        /// Can be null, in which case no delegate will be called.</param>
+        /// <param name="register">If true, this action state type will be registered in <see cref="ActionStateTypes"/>.</param>
+        public ActionStateType(string name, string description,
+            Color color, string iconPath, CreateReversibleAction createReversible, ActionStateTypeGroup parent = null, bool register = true)
+            : base(name, description, color, iconPath, parent, register)
         {
             CreateReversible = createReversible;
         }
@@ -45,10 +55,12 @@ namespace SEE.Controls.Actions
                 return true;
             }
 
+            return obj.GetType() == GetType() && ((ActionStateType)obj).CreateReversible == CreateReversible;
         }
 
         public override int GetHashCode()
         {
+            return CreateReversible.GetHashCode();
         }
 
         #endregion
