@@ -54,14 +54,14 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// The minimal padding between nodes in absolute (world space) terms.
         /// </summary>
-        private const float MinimimalAbsolutePadding = 0.005f;
+        private const float MinimalAbsolutePadding = 0.002f;
 
         /// <summary>
         /// The maximal padding between nodes in absolute (world space) terms.
         /// </summary>
         private const float MaximalAbsolutePadding = 0.1f;
 
-        private const int NumberOfLocalMoves = 3;
+        private const int NumberOfLocalMoves = 1;
 
         private IDictionary<string,TNode> TNodeMap;
 
@@ -107,6 +107,19 @@ namespace SEE.Layout.NodeLayouts
                     break;
                 }
             }
+            //DEBUG 
+            string s = "Data = [\n";
+            foreach(var l in layout_result.Keys)
+            {
+                s += "(\"" + l.ID + "\", ";
+                s += (layout_result[l].position.x - .5 * layout_result[l].scale.x).ToString() + ", ";
+                s += (layout_result[l].scale.x).ToString() + ", ";
+                s += (layout_result[l].position.z - .5 * layout_result[l].scale.z).ToString() + ", ";
+                s += (layout_result[l].scale.z).ToString() + "),\n";
+            }
+            s += "]";
+            Debug.Log(s);
+
             return layout_result;
         }    
 
@@ -260,18 +273,18 @@ namespace SEE.Layout.NodeLayouts
                 
                 TransformRectangles(workWith, oldRectangle: oldRectangle, newRectangle: rectangle);
 
+                foreach(var obsoleteNode in nodesToBeDeleted)
+                {
+                    LocalMoves.DeleteNode(obsoleteNode);
+                    workWith.Remove(obsoleteNode);
+                    CheckCons(workWith);
+                }
                 CheckCons(workWith);
                 CorrectAreas.Correct(workWith);
                 foreach(var nodeToBeAdded in nodesToBeAdded)
                 {
                     LocalMoves.AddNode(workWith,nodeToBeAdded);
                     workWith.Add(nodeToBeAdded);
-                    CheckCons(workWith);
-                }
-                foreach(var obsoleteNode in nodesToBeDeleted)
-                {
-                    LocalMoves.DeleteNode(obsoleteNode);
-                    workWith.Remove(obsoleteNode);
                     CheckCons(workWith);
                 }
 
@@ -407,12 +420,16 @@ namespace SEE.Layout.NodeLayouts
         {
             float aspect_ratio = Math.Max(depth/width, width/depth);
             float padding = (float) (Math.Min(depth,width) / ( (1f / PaddingFactor) * Math.Pow(TNodeMap.Count / aspect_ratio,0.5f)));
-            padding = Mathf.Clamp(padding, MinimimalAbsolutePadding, MaximalAbsolutePadding);
+            padding = MinimalAbsolutePadding; //Mathf.Clamp(padding, MinimalAbsolutePadding, MaximalAbsolutePadding);
 
             foreach (TNode node in nodes)
             {
                 ILayoutNode o = ILayoutNodeMap[node.ID];
                 TRectangle rect = node.Rectangle;
+                if(rect.width <= 2 * padding || rect.depth <= 2* padding)
+                {
+                    Debug.LogWarning("Rectangle to small for padding");
+                }
                 Vector3 position = new Vector3(rect.x + rect.width / 2.0f, groundLevel, rect.z + rect.depth / 2.0f);
                 Vector3 scale = new Vector3(
                     rect.width - 2 * padding > 0 ? rect.width - 2 * padding : rect.width,
@@ -484,11 +501,44 @@ namespace SEE.Layout.NodeLayouts
                     {
                         Assert.IsTrue(!seg.IsVertical);
                     }
+
+                    if(dir == Direction.Left)
+                    {
+                        foreach(TNode neighborNode in seg.Side1Nodes)
+                        {
+                            Assert.IsTrue(neighborNode.getAllSegments()[Direction.Right] == seg);
+                        }
+                    }
+                    if(dir == Direction.Right)
+                    {
+                        foreach(TNode neighborNode in seg.Side2Nodes)
+                        {
+                            Assert.IsTrue(neighborNode.getAllSegments()[Direction.Left] == seg);
+                        }
+                    }
+                    if(dir == Direction.Lower)
+                    {
+                        foreach(TNode neighborNode in seg.Side1Nodes)
+                        {
+                            Assert.IsTrue(neighborNode.getAllSegments()[Direction.Upper] == seg);
+                        }
+                    }
+                    if(dir == Direction.Upper)
+                    {
+                        foreach(TNode neighborNode in seg.Side2Nodes)
+                        {
+                            Assert.IsTrue(neighborNode.getAllSegments()[Direction.Lower] == seg);
+                        }
+                    }
+
                 }
                 Assert.IsTrue(segs[Direction.Left].Side2Nodes.Contains(node));
                 Assert.IsTrue(segs[Direction.Right].Side1Nodes.Contains(node));
                 Assert.IsTrue(segs[Direction.Lower].Side2Nodes.Contains(node));
                 Assert.IsTrue(segs[Direction.Upper].Side1Nodes.Contains(node));
+
+                Assert.IsTrue(node.Rectangle.width > 0);
+                Assert.IsTrue(node.Rectangle.depth > 0);
             }
         }
     }
