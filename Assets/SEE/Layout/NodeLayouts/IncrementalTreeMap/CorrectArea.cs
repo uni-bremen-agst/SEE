@@ -10,6 +10,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     static class CorrectAreas
     {
+
+        static double precision = 0.00001; 
         public static bool Correct(IList<TNode> nodes)
         {
             HashSet<TSegment> segments = new HashSet<TSegment>();
@@ -26,31 +28,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             for(int j = 0; j < 50; j++)
             {
                 distance = CalculateOneStep(nodes, mapSegmentIndex);
-                if(distance <= 0.00001) break;
+                if(distance <= precision) break;
             }
-            if(distance <= 0.00001)
+            if(distance > precision)
             {
-                Debug.LogWarning("++++ layout correction .00001");
-            }
-            else if(distance <= 0.0001)
-            {
-                Debug.LogWarning("-+++ layout correction .0001");
-            }
-            else if(distance <= 0.001)
-            {
-                Debug.LogWarning("--++ layout correction .001");
-            }
-            else if(distance <= 0.01)
-            {
-                Debug.LogWarning("---+ layout correction .01");
-            }
-            else if(distance <= 0.1)
-            {
-                Debug.LogWarning("---- layout correction .1");
-            }
-            else
-            {
-                Debug.LogWarning("<<>> layout correction >.1");
+                Debug.LogWarning(" layout correction > " + precision.ToString());
             }
             bool cons = CheckCons(nodes);
             if(!cons)
@@ -58,7 +40,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 Debug.LogWarning("layout correction failed negative rec");
             }
             //Debug.LogWarning("layout correction bad result ["+distance.ToString()+"]");
-            return (cons && distance <= 0.001);
+            return (cons && distance < precision);
         }
 
         private static Matrix<float> JacobianMatrix(
