@@ -43,7 +43,9 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// The node layout we compute as a result.
         /// </summary>
-        private Dictionary<ILayoutNode, NodeTransform> layout_result;
+        private Dictionary<ILayoutNode, NodeTransform> layout_result         = new Dictionary<ILayoutNode, NodeTransform>();
+        private Dictionary<string,TNode>               TNodeMap              = new Dictionary<string, TNode>();
+        private Dictionary<string,ILayoutNode>         ILayoutNodeMap        = new Dictionary<string, ILayoutNode>();
 
         /// <summary>
         /// Some padding will be added between nodes. That padding depends upon the minimum
@@ -63,10 +65,6 @@ namespace SEE.Layout.NodeLayouts
 
         private const int NumberOfLocalMoves = 1;
 
-        private IDictionary<string,TNode> TNodeMap;
-
-        private IDictionary<string,ILayoutNode> ILayoutNodeMap;
-
         private IncrementalTreeMapLayout oldLayout;
 
         public IncrementalTreeMapLayout OldLayout
@@ -74,9 +72,7 @@ namespace SEE.Layout.NodeLayouts
 
         public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
         {
-            layout_result = new Dictionary<ILayoutNode, NodeTransform>();
-
-            IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
+            List<ILayoutNode> layoutNodeList = layoutNodes.ToList();
             switch (layoutNodeList.Count)
             {
                 case 0:
@@ -107,26 +103,11 @@ namespace SEE.Layout.NodeLayouts
                     break;
                 }
             }
-            //DEBUG 
-            string s = "Data = [\n";
-            foreach(var l in layout_result.Keys)
-            {
-                s += "(\"" + l.ID + "\", ";
-                s += (layout_result[l].position.x - .5 * layout_result[l].scale.x).ToString() + ", ";
-                s += (layout_result[l].scale.x).ToString() + ", ";
-                s += (layout_result[l].position.z - .5 * layout_result[l].scale.z).ToString() + ", ";
-                s += (layout_result[l].scale.z).ToString() + "),\n";
-            }
-            s += "]";
-            Debug.Log(s);
-
             return layout_result;
         }    
 
         private void InitTNodes()
         {
-            TNodeMap = new Dictionary<string,TNode>();
-            ILayoutNodeMap = new Dictionary<string,ILayoutNode>();
             float totalLocalScale = 0;
             foreach(ILayoutNode node in roots)
             {
@@ -326,8 +307,7 @@ namespace SEE.Layout.NodeLayouts
             HashSet<ILayoutNode> parents = new HashSet<ILayoutNode>();
             foreach(ILayoutNode node in nodes)
             {
-                ILayoutNode oldNode = oldLayout.findILayoutNodeByID(node.ID);
-                if(oldNode != null)
+                if(oldLayout.ILayoutNodeMap.TryGetValue(node.ID, out var oldNode))
                 {
                     parents.Add(oldNode.Parent);
                 }
@@ -340,7 +320,7 @@ namespace SEE.Layout.NodeLayouts
             int counter = 0;
             foreach (ILayoutNode node in nodes)
             {
-                if(oldLayout.findILayoutNodeByID(node.ID) != null)
+                if(oldLayout.ILayoutNodeMap.TryGetValue(node.ID, out var _))
                 {
                     counter ++;
                 }
@@ -358,37 +338,6 @@ namespace SEE.Layout.NodeLayouts
         public override bool UsesEdgesAndSublayoutNodes()
         {
             return false;
-        }
-
-        internal ILayoutNode findILayoutNodeByID(string ID)
-        {
-            // TODO mach das hier doch mit ein dict, zb mit tnodes 
-
-            foreach(ILayoutNode node in roots)
-            {
-                ILayoutNode result = findILayoutNodeByID(node, ID);
-                if( result != null)
-                {
-                    return result;
-                }
-            }
-            return null;
-            ILayoutNode findILayoutNodeByID(ILayoutNode node, string ID)
-            {
-                if(node.ID.Equals(ID))
-                {
-                    return node;
-                }
-                foreach(ILayoutNode child in node.Children())
-                {
-                    ILayoutNode result = findILayoutNodeByID(child, ID);
-                    if( result != null)
-                    {
-                        return result;
-                    }
-                }
-                return null;
-            }
         }
 
         internal IList<TNode> GetTNodes(ICollection<ILayoutNode> layoutNodes)
@@ -446,7 +395,7 @@ namespace SEE.Layout.NodeLayouts
             // linear transform line   x1<---->x2
             //               to line       y1<------->y2
             // f  : [x1,x2] -> [y1,y2]
-            // f  : x   mapsto (x - x1) * ((y2-y1)/(x2-x1)) + y1
+            // f  : x   maps to (x - x1) * ((y2-y1)/(x2-x1)) + y1
 
             float scale_x = newRectangle.width / oldRectangle.width;
             float scale_z = newRectangle.depth / oldRectangle.depth;
