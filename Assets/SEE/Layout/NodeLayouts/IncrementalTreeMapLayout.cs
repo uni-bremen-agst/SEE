@@ -239,12 +239,12 @@ namespace SEE.Layout.NodeLayouts
                     TSegment newSegment = new TSegment(segment.IsConst, segment.IsVertical);
                     foreach(var oldTNode in segment.Side1Nodes)
                     {
-                        TNode newNode = workWith.Where(x => x.ID == oldTNode.ID).First();
+                        TNode newNode = TNodeMap[oldTNode.ID]; //workWith.Where(x => x.ID == oldTNode.ID).First();
                         newNode.registerSegment(newSegment, newSegment.IsVertical ? Direction.Right : Direction.Upper);
                     }
                     foreach(var oldTNode in segment.Side2Nodes)
                     {
-                        TNode newNode = workWith.Where(x => x.ID == oldTNode.ID).First();
+                        TNode newNode = TNodeMap[oldTNode.ID]; //workWith.Where(x => x.ID == oldTNode.ID).First();
                         newNode.registerSegment(newSegment, newSegment.IsVertical ? Direction.Left : Direction.Lower);
                     }
                 }
@@ -311,10 +311,7 @@ namespace SEE.Layout.NodeLayouts
             int counter = 0;
             foreach (ILayoutNode node in nodes)
             {
-                if(oldLayout.ILayoutNodeMap.TryGetValue(node.ID, out var _))
-                {
-                    counter ++;
-                }
+                counter += oldLayout.ILayoutNodeMap.ContainsKey(node.ID) ? 1 : 0;
             }
             return counter;
         }
