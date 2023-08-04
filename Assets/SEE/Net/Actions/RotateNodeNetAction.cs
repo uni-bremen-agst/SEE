@@ -35,7 +35,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Rotation of node in all clients except the requesting client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
             if (!IsRequester())
             {
@@ -45,7 +45,7 @@ namespace SEE.Net.Actions
             }
         }
 
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }

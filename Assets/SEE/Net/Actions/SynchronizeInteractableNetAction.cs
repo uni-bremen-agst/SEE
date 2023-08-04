@@ -54,7 +54,7 @@ namespace SEE.Net.Actions
             }
         }
 
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
         }
 
@@ -62,7 +62,7 @@ namespace SEE.Net.Actions
         /// Updates position, rotation and potentially local scale of the interactable
         /// object of given id.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
             if (!IsRequester())
             {

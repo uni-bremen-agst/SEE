@@ -10,7 +10,7 @@ namespace SEE.Net.Actions.RuntimeConfig
         /// <summary>
         /// Triggers 'SyncRemoveListElement' on <see cref="RuntimeTabMenu"/>.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
             if (!IsRequester())
             {

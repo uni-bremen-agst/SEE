@@ -18,7 +18,7 @@ namespace SEE.Net.Actions.RuntimeConfig
         /// <summary>
         /// Triggers 'SyncField' on <see cref="RuntimeTabMenu"/>.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
             if (!IsRequester())
             {

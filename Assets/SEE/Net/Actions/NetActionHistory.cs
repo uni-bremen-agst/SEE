@@ -81,7 +81,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Stuff to execute on the server. Nothing to be done here.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }
@@ -89,7 +89,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Syncs the GlobalActionHistory on each client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
             if (!IsRequester())
             {

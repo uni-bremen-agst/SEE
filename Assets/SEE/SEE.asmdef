@@ -44,9 +44,9 @@
         "Sirenix.Utilities.dll",
         "Sirenix.OdinInspector.Attributes.dll",
         "Antlr4.Runtime.Standard.dll",
-        "NetworkCommsDotNetComplete.dll",
         "DOTween.dll",
-        "Joveler.Compression.XZ.dll"
+        "Joveler.Compression.XZ.dll",
+        "NetworkCommsDotNetComplete.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

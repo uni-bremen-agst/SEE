@@ -45,9 +45,10 @@ namespace SEE.Net.Actions
         /// Adds/removes the interactable objects of given id to
         /// <see cref="GrabbedObjects"/>.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
-            if (grab)
+            return; //todo fix
+            /*if (grab)
             {
                 InteractableObject interactable = InteractableObject.Get(id);
                 if (interactable)
@@ -76,13 +77,13 @@ namespace SEE.Net.Actions
                         }
                     }
                 }
-            }
+            }*/
         }
 
         /// <summary>
         /// Sets the grab value for the interactable object of given id.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
             if (!IsRequester())
             {

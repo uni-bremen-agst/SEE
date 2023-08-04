@@ -78,11 +78,11 @@ namespace SEE.Net.Actions
         /// Things to execute on the server.
         /// Generates a ID for each client.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             if (State == RemoteAction.RequestID)
             {
-                new NetCRDT().SetID(GetRequester(), ICRDT.RequestID());
+                //new NetCRDT().SetID(GetRequester(), ICRDT.RequestID()); TODO FIX
                 State = RemoteAction.Init;
             }
         }
@@ -90,7 +90,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Adds or deletes characters on each client to synchronize the code window or sets the siteId for a user.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
             if (!IsRequester())
             {

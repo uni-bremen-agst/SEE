@@ -33,7 +33,7 @@ namespace SEE.Audio
         /// <summary>
         /// Action executed on clients.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
             if (!IsRequester())
             {
@@ -46,7 +46,7 @@ namespace SEE.Audio
         /// <summary>
         /// Action executed on server.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left empty
         }

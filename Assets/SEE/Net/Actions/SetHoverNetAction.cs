@@ -45,9 +45,10 @@ namespace SEE.Net.Actions
         /// Adds/removes the interactable objects of given id to
         /// <see cref="HoveredObjects"/>.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
-            if (hoverFlags != 0)
+            return; //todo fix
+            /*if (hoverFlags != 0)
             {
                 InteractableObject interactable = InteractableObject.Get(id);
                 if (interactable)
@@ -76,13 +77,13 @@ namespace SEE.Net.Actions
                         }
                     }
                 }
-            }
+            }*/
         }
 
         /// <summary>
         /// Sets the hover value for the interactable object of given id.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
             if (!IsRequester())
             {

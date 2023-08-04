@@ -42,7 +42,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Zooming in all clients except the requesting client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
             if (!IsRequester())
             {
@@ -63,7 +63,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Does not do anything.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }

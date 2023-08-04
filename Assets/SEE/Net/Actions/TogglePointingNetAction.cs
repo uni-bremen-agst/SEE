@@ -35,7 +35,7 @@ namespace SEE.Net.Actions
         /// If executed by the initiating client, nothing happens. Otherwise the pointing
         /// mode of the avatar identified by <see cref="NetworkObjectID"/> will be toggled.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
             if (!IsRequester())
             {
@@ -65,7 +65,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Nothing will happen.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }

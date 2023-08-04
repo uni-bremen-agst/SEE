@@ -38,14 +38,15 @@ namespace SEE.Net.Actions
             }
         }
 
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Nothing needs to be done on the server
         }
 
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            return; // TODO FIX
+            /*if (!IsRequester())
             {
                 if (!WindowSpaceManager.ManagerInstance)
                 {
@@ -54,7 +55,7 @@ namespace SEE.Net.Actions
                 }
 
                 WindowSpaceManager.ManagerInstance.UpdateSpaceFromValueObject(RequesterIPAddress, Space);
-            }
+            }*/
         }
     }
 }

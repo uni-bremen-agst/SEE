@@ -7,10 +7,9 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using Dissonance;
-using NetworkCommsDotNet;
-using NetworkCommsDotNet.Connections;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.Net.Actions;
 using SEE.Net.Util;
 using SEE.Utils;
 using Sirenix.OdinInspector;
@@ -74,7 +73,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Returns the underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/>.
+        /// Returns the underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/>. TODO CHANGE DOC 
         /// This information is retrieved differently depending upon whether we are running
         /// in the editor or in game play because <see cref="NetworkManager.Singleton"/> is
         /// available only during run-time.
@@ -196,12 +195,6 @@ namespace SEE.Net
 #endif
 
         /// <summary>
-        /// Submitted packets, that will be sent in the next <see cref="LateUpdate"/>.
-        /// </summary>
-        private readonly Dictionary<Connection, List<string>> submittedSerializedPackets
-            = new Dictionary<Connection, List<string>>();
-
-        /// <summary>
         /// True if we are running a host or server.
         /// </summary>
         public static bool HostServer => NetworkManager.Singleton != null
@@ -253,12 +246,6 @@ namespace SEE.Net
             }
         }
 
-        /// <summary>
-        /// List of dead connections. If packets cannot be sent, this list is searched
-        /// to reduce the frequency of warning messages.
-        /// </summary>
-        private static readonly List<Connection> deadConnections = new List<Connection>();
-
         private void Awake()
         {
             /// The field <see cref="MainThread"/> is supposed to denote Unity's main thread.
@@ -289,28 +276,27 @@ namespace SEE.Net
         }
 
         /// <summary>
+        /// todo doc
+        /// </summary>
+        public static void BroadcastAction(String serializedAction)
+        {
+            NetworkClient client = NetworkManager.Singleton.LocalClient;
+            
+            ClientServerNetwork clientServerNetwork = client.PlayerObject.GetComponent<ClientServerNetwork>();
+            clientServerNetwork.BroadcastActionServerRpc(serializedAction);
+        }
+
+        /// <summary>
         /// Initializes the server, client and game.
         /// </summary>
         private void StartUp()
         {
-#if UNITY_EDITOR
-            if (networkCommsLoggingEnabled)
-            {
-                NetworkComms.EnableLogging(new NetworkCommsLogger(minimalSeverity));
-            }
-            else
-            {
-                NetworkComms.DisableLogging();
-            }
-#else
-                NetworkComms.DisableLogging();
-#endif
 
-            if (HostServer)
-            {
-                Server.Initialize();
-            }
-            Client.Initialize();
+            //if (HostServer)
+            //{
+            //    Server.Initialize();
+            //}
+            //Client.Initialize();
 
             InitializeGame();
         }
@@ -411,44 +397,6 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Sends all pending packets.
-        /// </summary>
-        private void LateUpdate()
-        {
-            if (HostServer)
-            {
-                Server.Update();
-            }
-            Client.Update();
-
-            if (submittedSerializedPackets.Count != 0)
-            {
-                foreach (Connection connection in submittedSerializedPackets.Keys)
-                {
-                    List<string> serializedObjects = submittedSerializedPackets[connection];
-
-                    if (serializedObjects.Count != 0)
-                    {
-                        ulong id = ulong.MaxValue;
-                        if (HostServer && Server.Connections.Contains(connection))
-                        {
-                            id = Server.outgoingPacketSequenceIDs[connection]++;
-                        }
-                        else if (Client.Connection.Equals(connection))
-                        {
-                            id = Client.outgoingPacketID++;
-                        }
-                        Assert.IsTrue(id != ulong.MaxValue);
-
-                        PacketSequencePacket packet = new PacketSequencePacket(id, serializedObjects.ToArray());
-                        Send(connection, PacketSerializer.Serialize(packet));
-                        serializedObjects.Clear();
-                    }
-                }
-            }
-        }
-
-        /// <summary>
         /// Shuts down the server and the client.
         /// This method is called only when this component is destroyed, which
         /// may be at the very end of the game.
@@ -460,8 +408,8 @@ namespace SEE.Net
 
         private void ShutdownNetwork()
         {
-            Server.Shutdown();
-            Client.Shutdown();
+            ///Server.Shutdown();
+            ///Client.Shutdown();
 
             // FIXME there must be a better way to stop the logging spam!
             string currentDirectory = Directory.GetCurrentDirectory();
@@ -490,72 +438,6 @@ namespace SEE.Net
             }
             SceneManager.sceneLoaded -= OnSceneLoaded;
             Debug.Log("Network is shut down.\n");
-        }
-
-        /// <summary>
-        /// Submits a packet for dispatch.
-        /// </summary>
-        /// <param name="connection">The connection the packet should be sent through.
-        /// </param>
-        /// <param name="packet">The packet to be sent.</param>
-        internal static void SubmitPacket(Connection connection, AbstractPacket packet)
-        {
-            Assert.IsNotNull(connection);
-            Assert.IsNotNull(packet);
-
-            SubmitPacket(connection, PacketSerializer.Serialize(packet));
-        }
-
-        /// <summary>
-        /// Submits a packet for dispatch.
-        /// </summary>
-        /// <param name="connection">The connecting, the packet should be sent through.
-        /// </param>
-        /// <param name="packet">The serialized packet to be sent.</param>
-        internal static void SubmitPacket(Connection connection, string serializedPacket)
-        {
-            bool result = Instance.submittedSerializedPackets.TryGetValue(connection, out List<string> serializedPackets);
-            if (!result)
-            {
-                serializedPackets = new List<string>();
-                Instance.submittedSerializedPackets.Add(connection, serializedPackets);
-            }
-            serializedPackets.Add(serializedPacket);
-        }
-
-        /// <summary>
-        /// Sends a serialized packet via given connection.
-        /// </summary>
-        /// <param name="connection">The connection.</param>
-        /// <param name="serializedPacket">The serialized packet to be sent.</param>
-        private void Send(Connection connection, string serializedPacket)
-        {
-            string packetType = Client.Connection.Equals(connection) ? Server.PacketType : Client.PacketType;
-
-            try
-            {
-                connection.SendObject(packetType, serializedPacket);
-            }
-            catch (Exception)
-            {
-                lock (deadConnections)
-                {
-                    if (!deadConnections.Contains(connection))
-                    {
-                        deadConnections.Add(connection);
-                        Invoker.Invoke((Connection c) => { deadConnections.Remove(c); }, 1.0f, connection);
-                        Util.Logger.LogWarning(
-                            "Packet could not be sent to '" +
-                            connection.ConnectionInfo.RemoteEndPoint.ToString() +
-                            "'! Destination may not be listening or connection timed out. Closing connection!"
-                        );
-                        if (HostServer)
-                        {
-                            connection.CloseConnection(true);
-                        }
-                    }
-                }
-            }
         }
 
         /// <summary>
@@ -1058,7 +940,7 @@ namespace SEE.Net
             VivoxClient = new VivoxUnity.Client();
             VivoxClient.Initialize(config);
 
-            string userName = "u-" + Client.LocalEndPoint.Address.ToString().Replace(':', '.') + '-' + Client.LocalEndPoint.Port;
+            string userName = "u-" + NetworkManager.Singleton.LocalClientId.ToString().Replace(':', '.');
             VivoxAccountID = new VivoxUnity.AccountId(VivoxIssuer, userName, VivoxDomain);
             VivoxLoginSession = VivoxClient.GetLoginSession(VivoxAccountID);
             VivoxLoginSession.PropertyChanged += VivoxOnLoginSessionPropertyChanged;

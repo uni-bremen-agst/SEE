@@ -30,7 +30,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// <summary>
         /// This method does nothing.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }
@@ -38,7 +38,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// <summary>
         /// Moves the widget on all clients except the requester.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
             if (!IsRequester())
             {
