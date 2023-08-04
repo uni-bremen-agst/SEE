@@ -258,30 +258,21 @@ namespace SEE.Layout.NodeLayouts
                 {
                     LocalMoves.DeleteNode(obsoleteNode);
                     workWith.Remove(obsoleteNode);
-                    CheckCons(workWith);
+                    CheckConsistent(workWith);
                 }
-                CheckCons(workWith);
                 CorrectAreas.Correct(workWith);
+                CheckConsistent(workWith);
                 foreach(var nodeToBeAdded in nodesToBeAdded)
                 {
                     LocalMoves.AddNode(workWith,nodeToBeAdded);
                     workWith.Add(nodeToBeAdded);
-                    CheckCons(workWith);
+                    CheckConsistent(workWith);
                 }
-
-                // TODO DEBUG CHECK IF WORKIF == NEWTNODES
-                foreach(var node in workWith)
-                {
-                    Assert.IsTrue(newTNodes.Contains(node));
-                }
-                foreach(var node in newTNodes)
-                {
-                    Assert.IsTrue(workWith.Contains(node));
-                }
+                CheckEqualNodeSets(workWith, newTNodes);
 
                 CorrectAreas.Correct(workWith);
                 LocalMoves.MakeLocalMoves(workWith.ToList(), NumberOfLocalMoves);
-                CheckCons(workWith);
+                CheckConsistent(workWith);
             }
 
             AddToLayout(GetTNodes(siblings));
@@ -425,7 +416,7 @@ namespace SEE.Layout.NodeLayouts
             return result;
         }
 
-        private void CheckCons(IList<TNode> nodes)
+        private void CheckConsistent(IList<TNode> nodes)
         {
             foreach(var node in nodes)
             {
@@ -490,5 +481,18 @@ namespace SEE.Layout.NodeLayouts
                 Assert.IsTrue(node.Rectangle.depth > 0);
             }
         }
+    
+        private void CheckEqualNodeSets(IList<TNode> nodes1, IList<TNode> nodes2)
+        {
+            foreach(var node in nodes1)
+            {
+                Assert.IsTrue(nodes2.Contains(node));
+            }
+            foreach(var node in nodes2)
+            {
+                Assert.IsTrue(nodes1.Contains(node));
+            }
+        }
+    
     }
 }
