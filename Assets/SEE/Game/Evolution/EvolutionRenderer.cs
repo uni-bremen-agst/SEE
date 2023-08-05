@@ -932,6 +932,11 @@ namespace SEE.Game.Evolution
             return Renderer.DrawNode(node, city);
         }
 
+        public GameObject DrawEdge(Edge edge, GameObject source = null, GameObject target = null)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Returns an edge layout for the given <paramref name="gameEdges"/>.
         ///
