@@ -5,9 +5,8 @@ using System.Linq;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
-using SEE.Audio;
 using System;
-using SEE.Game.UI.Notification;
+using SEE.Game;
 
 namespace SEE.Controls.Actions
 {
@@ -70,7 +69,10 @@ namespace SEE.Controls.Actions
                         memento = new Memento(source, target);
 
                         createdEdge = CreateEdge(graph, memento);
-                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NEW_EDGE_SOUND);
+                        createdEdge.UnsetToggle(Edge.IsVirtualToggle);
+
+                        // Audio
+                        // AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NEW_EDGE_SOUND);
 
                         // Sync the Solution of the Divergence via Network
                         // new AcceptDivergenceNetAction(selectedDivergenceEdge.name).Execute();
@@ -93,24 +95,19 @@ namespace SEE.Controls.Actions
         /// <returns>a new edge or null</returns>
         private static Edge CreateEdge(ReflexionGraph graph, Memento memento)
         {
-            try
-            {
-                // Create a new Edge that will solve the Divergence
-                var newArchitectureEdge = graph.AddToArchitecture(
-                    memento.from,
-                    memento.to,
-                    "Architecture");
+            // Add the new Edge to the ArhcitectureGraph
+            var newArchitectureEdge = graph.ActuallyAddToArchitecture(
+                memento.from,
+                memento.to,
+                "Source_Dependency");
 
-                // Sync the Solution of the Divergence via Network
-                // new AcceptDivergenceNetAction().Execute();
-                return newArchitectureEdge;
-            }
-            catch (Exception e)
-            {
-                ShowNotification.Error("New edge", $"An edge could not be created: {e.Message}.");
-                Debug.LogException(e);
-                return null;
-            }
+            // Add the new Edge to the Game
+            GameObject result = GameEdgeAdder.Draw(newArchitectureEdge);
+
+            // Sync the Solution of the Divergence via Network
+            // new AcceptDivergenceNetAction().Execute();
+
+            return newArchitectureEdge;
         }
 
         /// <summary>
@@ -208,7 +205,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.NewNode"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.Sync;
+            return ActionStateTypes.AcceptDivergence;
         }
 
         /// <summary>
