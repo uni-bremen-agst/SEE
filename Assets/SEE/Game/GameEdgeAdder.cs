@@ -54,6 +54,29 @@ namespace SEE.Game
             return result;
         }
 
+        // TODO Write docstring
+        public static GameObject Draw(Edge edge)
+        {
+            Transform cityObject = SceneQueries.GetCodeCity(GraphElementIDMap.Find(edge.Source.ID).transform);
+            GameObject result;
+            if (cityObject != null)
+            {
+                if (cityObject.TryGetComponent(out AbstractSEECity city))
+                {
+                    result = city.Renderer.DrawEdge(edge, cityObject.gameObject);
+                }
+                else
+                {
+                    throw new Exception($"The code city for the new edge {edge.ToShortString()} cannot be determined.\n");
+                }
+            }
+            else
+            {
+                throw new Exception($"Could not determine the code city for the new edge {edge.ToShortString()}.\n");
+            }
+            return result;
+        }
+
         /// <summary>
         /// Inverse operation of <see cref="Add(GameObject, GameObject, string)"/>.
         /// Removes the given <paramref name="gameEdge"/> from the scene and its associated
