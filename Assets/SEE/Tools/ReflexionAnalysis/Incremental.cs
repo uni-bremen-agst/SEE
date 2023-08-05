@@ -169,6 +169,14 @@ namespace SEE.Tools.ReflexionAnalysis
             return edge;
         }
 
+        public Edge ActuallyAddToArchitecture(Node from, Node to, string type)
+        {
+            // Preconditions are checked in AddToArchitecture.
+            Edge edge = AddEdge(from, to, type, false, false);
+            AddToArchitecture(edge);
+            return edge;
+        }
+
         /// <summary>
         /// Adds the given <paramref name="edge"/> to the implementation graph,
         /// adjusting the reflexion analysis incrementally.
