@@ -57,13 +57,14 @@ namespace SEE.Game
         // TODO Write docstring
         public static GameObject Draw(Edge edge)
         {
-            Transform cityObject = SceneQueries.GetCodeCity(GraphElementIDMap.Find(edge.Source.ID).transform);
+            GameObject source = GraphElementIDMap.Find(edge.Source.ID);
+            Transform cityObject = SceneQueries.GetCodeCity(source.transform);
             GameObject result;
             if (cityObject != null)
             {
                 if (cityObject.TryGetComponent(out AbstractSEECity city))
                 {
-                    result = city.Renderer.DrawEdge(edge, cityObject.gameObject);
+                    result = city.Renderer.DrawEdge(edge, source: source);
                 }
                 else
                 {
