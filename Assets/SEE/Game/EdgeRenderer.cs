@@ -155,7 +155,7 @@ namespace SEE.Game
             Assert.IsNotNull(toLayoutNode, $"Target node {edge.Target.ID} does not have a layout node.\n");
             // The single layout edge between source and target. We want the layout only for this edge.
             ICollection<LayoutGraphEdge<LayoutGameNode>> layoutEdges = new List<LayoutGraphEdge<LayoutGameNode>>
-                { new LayoutGraphEdge<LayoutGameNode>(fromLayoutNode, toLayoutNode, edge) };
+                { new(fromLayoutNode, toLayoutNode, edge) };
 
 
             // Calculate the edge layout (for the single edge only).
