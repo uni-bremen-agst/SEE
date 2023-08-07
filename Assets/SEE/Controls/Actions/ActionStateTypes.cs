@@ -1,6 +1,7 @@
 ﻿using SEE.Utils;
 using UnityEngine;
 using SEE.Controls.Actions.HolisticMetrics;
+using Assets.SEE.Controls.Actions.Whiteboard;
 
 namespace SEE.Controls.Actions
 {
@@ -169,16 +170,40 @@ namespace SEE.Controls.Actions
               new("Whiteboard", "Please select the whiteboard mode you want to activate.",
                   Color.blue, "Materials/ModernUIPack/Pencil");
 
-            DrawOnWhiteboard =
-                new("Draw on Whiteboard", "Draw a line on a whiteboard",
+            DrawOn =
+                new("Draw on", "Draw a line on a drawable",
                         Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
-                        DrawOnWhiteboardAction.CreateReversibleAction,
+                        DrawOnAction.CreateReversibleAction,
                         parent: Whiteboard);
 
-            EraserOnWhiteboard =
-                new("Erase on Whiteboard", "Erase a line on a whiteboard",
+            ColorPicker =
+                new("Color picker", "Picks a color",
+                        Color.yellow.Darker(), "Materials/ModernUIPack/Pencil",
+                        ColorPickerAction.CreateReversibleAction,
+                        parent: Whiteboard);
+
+            EditLine =
+                new("Edit line", "Edit the selected line.",
+                        Color.green.Darker(), "Materials/ModernUIPack/Pencil",
+                        LayerChangerAction.CreateReversibleAction,
+                        parent: Whiteboard);
+
+            LayerChanger =
+                new("Change the sorting layer", "Left mouse click to increase, right mouse click to decrease",
+                        Color.green.Darker(), "Materials/ModernUIPack/Pencil",
+                        LayerChangerAction.CreateReversibleAction,
+                        parent: Whiteboard);
+
+            LineErase =
+                new("Line erase", "Erase a complete line on a drawable",
+                Color.red, "Materials/ModernUIPack/Pencil",
+                LineEraseAction.CreateReversibleAction,
+                parent: Whiteboard);
+
+            Cleaner =
+                new("Cleaner", "Cleans a complete drawable",
                 Color.red.Darker(), "Materials/ModernUIPack/Pencil",
-                EraserWhiteboardAction.CreateReversibleAction,
+                CleanerAction.CreateReversibleAction,
                 parent: Whiteboard);
         }
 
@@ -204,8 +229,12 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType SaveBoard;
 
         public readonly static ActionStateTypeGroup Whiteboard;
-        public readonly static ActionStateType DrawOnWhiteboard;
-        public readonly static ActionStateType EraserOnWhiteboard;
+        public readonly static ActionStateType DrawOn;
+        public readonly static ActionStateType ColorPicker;
+        public readonly static ActionStateType LineErase;
+        public readonly static ActionStateType Cleaner;
+        public readonly static ActionStateType LayerChanger;
+        public readonly static ActionStateType EditLine;
 
         #endregion
 

@@ -22,7 +22,8 @@ namespace SEE.GO
             Opaque = 0,          // fully drawn with no transparency
             TransparentLine = 1, // for lines with transparency
             OpaqueMetallic = 2,  // for opaque meshes with a more realistic metallic effect
-            PortalFree = 3       // not limited by a portal (seen everywhere)
+            PortalFree = 3,       // not limited by a portal (seen everywhere)
+            DrawableLine = 4
         }
 
         /// <summary>
@@ -42,6 +43,11 @@ namespace SEE.GO
         /// (located in folder Resources).
         /// </summary>
         private const string PortalFreeMaterialName = "Materials/PortalFreeMaterial";
+        /// <summary>
+        /// Name of the material for materials seen everywhere, i.e., not only within a portal
+        /// (located in folder Resources).
+        /// </summary>
+        private const string DrawableLineMaterialName = "Materials/DrawableLineMaterial";
 
         /// <summary>
         /// The id of the shader property for the texture.
@@ -320,6 +326,9 @@ namespace SEE.GO
                     break;
                 case ShaderType.PortalFree:
                     name = PortalFreeMaterialName;
+                    break;
+                case ShaderType.DrawableLine: 
+                    name = DrawableLineMaterialName;
                     break;
                 default:
                     Assertions.InvalidCodePath();
