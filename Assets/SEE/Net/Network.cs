@@ -8,6 +8,7 @@ using System.Net;
 using System.Threading;
 using Dissonance;
 using SEE.Game.City;
+using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Net.Util;
@@ -15,6 +16,7 @@ using SEE.Utils;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
@@ -273,6 +275,15 @@ namespace SEE.Net
             Instance = this;
 
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
+
+            string[] arguments = Environment.GetCommandLineArgs();
+            foreach(string argument in arguments)
+            {
+                if(argument == "-launch-as-server")
+                {
+                    StartServer(null);
+                }
+            }
         }
 
         /// <summary>
@@ -280,25 +291,8 @@ namespace SEE.Net
         /// </summary>
         public static void BroadcastAction(String serializedAction)
         {
-            NetworkClient client = NetworkManager.Singleton.LocalClient;
-            
-            ClientServerNetwork clientServerNetwork = client.PlayerObject.GetComponent<ClientServerNetwork>();
+            ServerActionNetwork clientServerNetwork = GameObject.Find("Server").GetComponent<ServerActionNetwork>();
             clientServerNetwork.BroadcastActionServerRpc(serializedAction);
-        }
-
-        /// <summary>
-        /// Initializes the server, client and game.
-        /// </summary>
-        private void StartUp()
-        {
-
-            //if (HostServer)
-            //{
-            //    Server.Initialize();
-            //}
-            //Client.Initialize();
-
-            InitializeGame();
         }
 
         /// <summary>
@@ -507,6 +501,42 @@ namespace SEE.Net
         public delegate void CallBack(bool success, string message);
 
         /// <summary>
+        /// Starts a server process.
+        ///
+        /// Note: This method starts a co-routine and then returns to the caller immediately.
+        /// The <paramref name="callBack"/> tells the caller that the co-routine has come to
+        /// an end.
+        /// </summary>
+        /// <param name="callBack">a callback to be called when done; its parameter will be true
+        /// in case of success or otherwise false</param>
+        public void StartServer(CallBack callBack)
+        {
+            StartCoroutine(ShutdownNetwork(InternalStartServer));
+
+            void InternalStartServer()
+            {
+                Debug.Log($"Server is starting to listen at {ServerIP4Address}:{ServerPort}...\n");
+                try
+                {
+                    if (NetworkManager.Singleton.StartServer())
+                    {
+                        InitializeGame();
+                    }
+                    else
+                    {
+                        throw new CannotStartServer($"Could not start host {ServerIP4Address}:{ServerPort}");
+                    }
+                }
+                catch (Exception exception)
+                {
+                    callBack(false, exception.Message);
+                    throw;
+                }
+                callBack(true, $"Server started at {ServerIP4Address}:{ServerPort}.");
+            }
+        }
+
+        /// <summary>
         /// Starts a host process, i.e., a server and a local client.
         ///
         /// Note: This method starts a co-routine and then returns to the caller immediately.
@@ -527,7 +557,7 @@ namespace SEE.Net
                 {
                     if (NetworkManager.Singleton.StartHost())
                     {
-                        StartUp();
+                        InitializeGame();
                     }
                     else
                     {
@@ -563,7 +593,7 @@ namespace SEE.Net
                 {
                     if (NetworkManager.Singleton.StartClient())
                     {
-                        StartUp();
+                        InitializeGame();
                     }
                     else
                     {
@@ -611,42 +641,6 @@ namespace SEE.Net
         /// can be established.
         /// </summary>
         private const float MaxWaitingTime = 5 * 60;
-
-        /// <summary>
-        /// Starts a dedicated server without client.
-        ///
-        /// Note: This method starts a co-routine and then returns to the caller immediately.
-        /// The <paramref name="callBack"/> tells the caller that the co-routine has come to
-        /// an end.
-        /// </summary>
-        /// <param name="callBack">a callback to be called when done; its parameter will be true
-        /// in case of success or otherwise false</param>
-        public void StartServer(CallBack callBack)
-        {
-            StartCoroutine(ShutdownNetwork(InternalStartServer));
-
-            void InternalStartServer()
-            {
-                Debug.Log($"Server is starting to listening at {ServerIP4Address}:{ServerPort}...\n");
-                try
-                {
-                    if (NetworkManager.Singleton.StartServer())
-                    {
-                        StartUp();
-                    }
-                    else
-                    {
-                        throw new CannotStartServer($"Could not start server {ServerIP4Address}:{ServerPort}");
-                    }
-                }
-                catch (Exception exception)
-                {
-                    callBack(false, exception.Message);
-                    throw;
-                }
-                callBack(true, $"Server is listening at {ServerIP4Address}:{ServerPort}.");
-            }
-        }
 
         /// <summary>
         /// A delegate that will be called in <see cref="ShutdownNetwork(OnShutdownFinished)"/> when

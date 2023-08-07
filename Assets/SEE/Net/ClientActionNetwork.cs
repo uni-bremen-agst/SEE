@@ -13,23 +13,8 @@ namespace SEE.Net
     /// <summary>
     /// DOC
     /// </summary>
-    public class ClientServerNetwork : NetworkBehaviour
+    public class ClientActionNetwork : NetworkBehaviour
     {
-        private void Update()
-        {
-            if (!IsOwner)
-            {
-                return;
-            }
-        }
-
-        [ServerRpc]
-        public void BroadcastActionServerRpc(string serializedAction)
-        {
-            Debug.Log("Broadcast action");
-            ExecuteActionClientRpc(serializedAction);
-        }
-
         [ClientRpc]
         public void ExecuteActionClientRpc(string serializedAction)
         {
