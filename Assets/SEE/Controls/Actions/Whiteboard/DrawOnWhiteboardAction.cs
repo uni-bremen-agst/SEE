@@ -96,7 +96,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void SetUpRenderer()
         {
-            line = new GameObject("line");
+            line = new("line");
             line.tag = Tags.Line;
             renderer = line.AddComponent<LineRenderer>();
             meshCollider = line.AddComponent<MeshCollider>();
@@ -116,11 +116,15 @@ namespace SEE.Controls.Actions
             if (!Raycasting.IsMouseOverGUI())
             {
                 GameObject[] paintingReceivers;
-                paintingReceivers = GameObject.FindGameObjectsWithTag("Drawable");
-                ArrayList paintingReceiversList = new ArrayList(paintingReceivers);
+                // FIXME: GameObject.FindGameObjectsWithTag is a very expensive operation
+                // and must not be used within Update() as it would otherwise be called
+                // for each frame. That will decrease our framerate a lot!
+                paintingReceivers = GameObject.FindGameObjectsWithTag("Drawable"); // FIXME: Avoid magic literals.
+                ArrayList paintingReceiversList = new(paintingReceivers);
 
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
-                    Raycasting.RaycastAnything(out RaycastHit raycastHit) && paintingReceiversList.Contains(raycastHit.collider.gameObject))
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
+                    && Raycasting.RaycastAnything(out RaycastHit raycastHit)
+                    && paintingReceiversList.Contains(raycastHit.collider.gameObject))
                 {
                     drawing = true;
                     // We create the line on demand so that there is no left-over
@@ -141,18 +145,22 @@ namespace SEE.Controls.Actions
 
                     DrawLine();
                     // The line has been continued so this action has had a visible effect.
-                    currentState = ReversibleAction.Progress.Completed;
-                    
+                    currentState = ReversibleAction.Progress.InProgress;
                 }
                 // The action is considered complete if the mouse button is no longer pressed.
-                if (Input.GetMouseButtonUp(0) && drawing)
+                bool isMouseButtonUp = Input.GetMouseButtonUp(0);
+                if (isMouseButtonUp && drawing)
                 {
                     drawing = false;
-                    Mesh mesh = new Mesh();
+                    Mesh mesh = new();
                     renderer.BakeMesh(mesh, true);
                     meshCollider.sharedMesh = mesh;
                 }
-                return Input.GetMouseButtonUp(0);
+                if (isMouseButtonUp)
+                {
+                    currentState = ReversibleAction.Progress.Completed;
+                }
+                return isMouseButtonUp;
             }
             return false;
         }
@@ -188,7 +196,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Redraws the drawn line (setting up <see cref="line"/> and adds <see cref="renderer"/> 
+        /// Redraws the drawn line (setting up <see cref="line"/> and adds <see cref="renderer"/>
         /// before that).
         /// See <see cref="ReversibleAction.Undo()"/>.
         /// </summary>
@@ -211,7 +219,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
-        /// Because this action does not actually change any game object, 
+        /// Because this action does not actually change any game object,
         /// an empty set is always returned.
         /// </summary>
         /// <returns>an empty set</returns>
