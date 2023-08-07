@@ -340,13 +340,21 @@ namespace SEE.GO
             needsUpdate = false;
         }
 
+        /// <summary>
+        /// Updates the start and end color of the line renderer attached
+        /// to the gameObject using the values of <see cref="gradientColors"/>
+        /// in case there is a line renderer. Otherwise (if <see cref="meshRenderer"/>
+        /// is different from <c>null</c>, updates the material via
+        /// <see cref="UpdateMaterial"/>.
+        /// </summary>
         private void UpdateColor()
         {
             if (gameObject.TryGetComponent(out LineRenderer lr))
             {
                 lr.startColor = gradientColors.start;
                 lr.endColor = gradientColors.end;
-            } else if (meshRenderer != null)
+            }
+            else if (meshRenderer != null)
             {
                 UpdateMaterial();
             }
@@ -480,7 +488,8 @@ namespace SEE.GO
                                  mesh.tangents.Length != tangents.Length ||
                                  mesh.uv.Length != uvs.Length ||
                                  needsColorUpdate; // Or the color of the mesh has been changed.
-            } else
+            }
+            else
             { // Create a new mesh for this game object.
                 mesh = new Mesh();
                 mesh.MarkDynamic(); // May improve performance.
