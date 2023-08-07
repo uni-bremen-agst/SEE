@@ -190,6 +190,13 @@ namespace SEE.GO.Menu
 
                 if (GlobalActionHistory.IsEmpty())
                 {
+                    // The first/default action is assumed to be at top level of the
+                    // player menu hierarchy. If the last action is undone and we create
+                    // a new first action to be pushed onto the action history, it could
+                    // happen that we are currently in a submenu, in which case the
+                    // first/default would not exist in this submenu level; hence we
+                    // need to reset the menu to the top level.
+                    modeMenu.ResetToBase();
                     // We always want to have an action running.
                     // The default action will be the first action state type.
                     GlobalActionHistory.Execute(ActionStateTypes.FirstActionStateType());
