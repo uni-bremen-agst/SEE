@@ -91,23 +91,21 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            switch (Mode)
             {
-                switch(Mode){
-                    case ModeKind.Push:
-                        GlobalActionHistory.Push(new GlobalHistoryEntry(false, Type, ActionId, new HashSet<string>(NewChangedObjects)));
-                        break;
-                    case ModeKind.Delete:
-                        GlobalActionHistory.RemoveAction(ActionId);
-                        break;
-                    case ModeKind.Replace:
-                        GlobalActionHistory.Replace(new GlobalHistoryEntry(false, OldItemType, ID, new HashSet<string>(OldChangedObjects)),
-                                                    new GlobalHistoryEntry(false, NewItemType, ID, new HashSet<string>(NewChangedObjects)),
-                                                    true);
-                        break;
-                }
-                Mode = ModeKind.Init;
+                case ModeKind.Push:
+                    GlobalActionHistory.Push(new GlobalHistoryEntry(false, Type, ActionId, new HashSet<string>(NewChangedObjects)));
+                    break;
+                case ModeKind.Delete:
+                    GlobalActionHistory.RemoveAction(ActionId);
+                    break;
+                case ModeKind.Replace:
+                    GlobalActionHistory.Replace(new GlobalHistoryEntry(false, OldItemType, ID, new HashSet<string>(OldChangedObjects)),
+                                                new GlobalHistoryEntry(false, NewItemType, ID, new HashSet<string>(NewChangedObjects)),
+                                                true);
+                    break;
             }
+            Mode = ModeKind.Init;
         }
 
         /// <summary>

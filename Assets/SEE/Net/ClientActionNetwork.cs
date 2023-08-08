@@ -20,8 +20,11 @@ namespace SEE.Net
         {
             if (IsOwner) return;
             AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
-            Debug.Log("Execute action on client: " + action.ToString());
-            action.ExecuteOnClient();
+            if(action.Requester != NetworkManager.Singleton.LocalClientId)
+            {
+                Debug.Log("Execute action on client: " + action.ToString());
+                action.ExecuteOnClient();
+            }
         }
     }
 }

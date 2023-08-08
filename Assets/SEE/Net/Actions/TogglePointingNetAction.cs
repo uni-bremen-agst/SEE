@@ -37,28 +37,25 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            NetworkManager networkManager = NetworkManager.Singleton;
+            if (networkManager != null)
             {
-                NetworkManager networkManager = NetworkManager.Singleton;
-                if (networkManager != null)
+                NetworkSpawnManager networkSpawnManager = networkManager.SpawnManager;
+                if (networkSpawnManager.SpawnedObjects.TryGetValue(NetworkObjectID, out NetworkObject networkObject))
                 {
-                    NetworkSpawnManager networkSpawnManager = networkManager.SpawnManager;
-                    if (networkSpawnManager.SpawnedObjects.TryGetValue(NetworkObjectID, out NetworkObject networkObject))
+                    if (networkObject.gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
                     {
-                        if (networkObject.gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
-                        {
-                            aimingSystem.SetPointing(Activate);
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError($"There is no network object with ID {NetworkObjectID}.\n");
+                        aimingSystem.SetPointing(Activate);
                     }
                 }
                 else
                 {
-                    Debug.LogError($"There is no component {typeof(NetworkManager)} in the scene.\n");
+                    Debug.LogError($"There is no network object with ID {NetworkObjectID}.\n");
                 }
+            }
+            else
+            {
+                Debug.LogError($"There is no component {typeof(NetworkManager)} in the scene.\n");
             }
         }
 

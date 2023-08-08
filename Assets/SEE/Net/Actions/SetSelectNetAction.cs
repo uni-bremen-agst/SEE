@@ -15,8 +15,8 @@ namespace SEE.Net.Actions
         /// Every selected object of the end point of every client. This is only used by
         /// the server.
         /// </summary>
-        internal static readonly Dictionary<IPEndPoint, HashSet<InteractableObject>> SelectedObjects
-            = new Dictionary<IPEndPoint, HashSet<InteractableObject>>();
+        internal static readonly Dictionary<ulong, HashSet<InteractableObject>> SelectedObjects
+            = new Dictionary<ulong, HashSet<InteractableObject>>();
 
         /// <summary>
         /// The id of the interactable.
@@ -47,13 +47,12 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnServer()
         {
-            return; //TODO FIX
-            /*if (select)
+            if (select)
             {
                 InteractableObject interactable = InteractableObject.Get(id);
                 if (interactable)
                 {
-                    IPEndPoint requester = GetRequester();
+                    ulong requester = Requester;
                     if (!SelectedObjects.TryGetValue(requester, out HashSet<InteractableObject> interactables))
                     {
                         interactables = new HashSet<InteractableObject>();
@@ -67,7 +66,7 @@ namespace SEE.Net.Actions
                 InteractableObject interactable = InteractableObject.Get(id);
                 if (interactable)
                 {
-                    IPEndPoint requester = GetRequester();
+                    ulong requester = Requester;
                     if (SelectedObjects.TryGetValue(requester, out HashSet<InteractableObject> interactables))
                     {
                         interactables.Remove(interactable);
@@ -77,7 +76,7 @@ namespace SEE.Net.Actions
                         }
                     }
                 }
-            }*/
+            }
         }
 
         /// <summary>
@@ -85,13 +84,10 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            InteractableObject interactable = InteractableObject.Get(id);
+            if (interactable)
             {
-                InteractableObject interactable = InteractableObject.Get(id);
-                if (interactable)
-                {
-                    interactable.SetSelect(select, false);
-                }
+                interactable.SetSelect(select, false);
             }
         }
     }

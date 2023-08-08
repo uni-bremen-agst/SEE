@@ -53,12 +53,9 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                Node node = Find(NodeID).GetNode();
-                node.SourceName = SourceName;
-                node.Type = NodeType;
-            }
+            Node node = Find(NodeID).GetNode();
+            node.SourceName = SourceName;
+            node.Type = NodeType;
         }
     }
 }

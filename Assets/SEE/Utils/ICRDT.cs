@@ -43,11 +43,11 @@ namespace SEE.Utils
         /// <summary>
         /// Synchronizes all CodeWindows to a new client.
         /// </summary>
-        public static void SyncCodeWindows(IPEndPoint[] recipient)
+        public static void SyncCodeWindows(ulong recipient)
         {
             foreach (KeyValuePair<string, CRDT> elm in crdts)
             {
-                elm.Value.SyncCodeWindows(recipient);
+                elm.Value.SyncCodeWindows(new ulong[] { recipient });
             }
         }
 

@@ -34,10 +34,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                BoardsManager.Create(BoardConfig);
-            }
+            BoardsManager.Create(BoardConfig);
         }
     }
 }

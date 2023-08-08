@@ -77,48 +77,45 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                NetworkManager networkManager = NetworkManager.Singleton;
+            NetworkManager networkManager = NetworkManager.Singleton;
 
-                if (networkManager != null)
+            if (networkManager != null)
+            {
+                NetworkSpawnManager networkSpawnManager = networkManager.SpawnManager;
+                if (networkSpawnManager.SpawnedObjects.TryGetValue(NetworkObjectID,
+                        out NetworkObject networkObject))
                 {
-                    NetworkSpawnManager networkSpawnManager = networkManager.SpawnManager;
-                    if (networkSpawnManager.SpawnedObjects.TryGetValue(NetworkObjectID,
-                            out NetworkObject networkObject))
+                    if (networkObject.gameObject.TryGetComponent(out UMAExpressionPlayer expressionPlayer))
                     {
-                        if (networkObject.gameObject.TryGetComponent(out UMAExpressionPlayer expressionPlayer))
-                        {
-                            expressionPlayer.jawOpen_Close = JawOpenClose;
-                            expressionPlayer.jawForward_Back = JawForwardBackward;
-                            expressionPlayer.jawLeft_Right = JawLeftRight;
-                            expressionPlayer.mouthLeft_Right = MouthLeftRight;
-                            expressionPlayer.mouthUp_Down = MouthUpDown;
-                            expressionPlayer.mouthNarrow_Pucker = MouthNarrowPucker;
-                            expressionPlayer.leftMouthSmile_Frown = LeftMouthSmileFrown;
-                            expressionPlayer.rightMouthSmile_Frown = RightMouthSmileFrown;
-                            expressionPlayer.leftLowerLipUp_Down = LeftLowerLipUpDown;
-                            expressionPlayer.rightLowerLipUp_Down = RightLowerLipUpDown;
-                            expressionPlayer.leftUpperLipUp_Down = LeftUpperLipUpDown;
-                            expressionPlayer.rightUpperLipUp_Down = RightUpperLipUpDown;
-                            expressionPlayer.leftCheekPuff_Squint = LeftCheekPuffSquint;
-                            expressionPlayer.rightCheekPuff_Squint = RightCheekPuffSquint;
-                            expressionPlayer.tongueOut = TongueOut;
-                            expressionPlayer.tongueCurl = TongueCurl;
-                            expressionPlayer.tongueUp_Down = TongueUpDown;
-                            expressionPlayer.tongueLeft_Right = TongueLeftRight;
-                            expressionPlayer.tongueWide_Narrow = TongueWideNarror;
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError($"There is no network object with ID {NetworkObjectID}.\n");
+                        expressionPlayer.jawOpen_Close = JawOpenClose;
+                        expressionPlayer.jawForward_Back = JawForwardBackward;
+                        expressionPlayer.jawLeft_Right = JawLeftRight;
+                        expressionPlayer.mouthLeft_Right = MouthLeftRight;
+                        expressionPlayer.mouthUp_Down = MouthUpDown;
+                        expressionPlayer.mouthNarrow_Pucker = MouthNarrowPucker;
+                        expressionPlayer.leftMouthSmile_Frown = LeftMouthSmileFrown;
+                        expressionPlayer.rightMouthSmile_Frown = RightMouthSmileFrown;
+                        expressionPlayer.leftLowerLipUp_Down = LeftLowerLipUpDown;
+                        expressionPlayer.rightLowerLipUp_Down = RightLowerLipUpDown;
+                        expressionPlayer.leftUpperLipUp_Down = LeftUpperLipUpDown;
+                        expressionPlayer.rightUpperLipUp_Down = RightUpperLipUpDown;
+                        expressionPlayer.leftCheekPuff_Squint = LeftCheekPuffSquint;
+                        expressionPlayer.rightCheekPuff_Squint = RightCheekPuffSquint;
+                        expressionPlayer.tongueOut = TongueOut;
+                        expressionPlayer.tongueCurl = TongueCurl;
+                        expressionPlayer.tongueUp_Down = TongueUpDown;
+                        expressionPlayer.tongueLeft_Right = TongueLeftRight;
+                        expressionPlayer.tongueWide_Narrow = TongueWideNarror;
                     }
                 }
                 else
                 {
-                    Debug.LogError($"There is no component {typeof(NetworkManager)} in the scene.\n");
+                    Debug.LogError($"There is no network object with ID {NetworkObjectID}.\n");
                 }
+            }
+            else
+            {
+                Debug.LogError($"There is no component {typeof(NetworkManager)} in the scene.\n");
             }
         }
 

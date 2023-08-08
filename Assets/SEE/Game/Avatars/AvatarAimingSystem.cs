@@ -123,7 +123,8 @@ namespace SEE.Game.Avatars
             {
                 if (gameObject.TryGetComponentOrLog(out networkObject))
                 {
-                    new TogglePointingNetAction(networkObject.NetworkObjectId, IsPointing).Execute();
+                    //FIXME: TogglePointingNetAction.ExecuteOnClient calls SetPointing which causes an infinite loop, is this intended?
+                    new TogglePointingNetAction(networkObject.NetworkObjectId, IsPointing).Execute(); 
                 }
             }
         }

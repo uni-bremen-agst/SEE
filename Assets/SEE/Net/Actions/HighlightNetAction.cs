@@ -38,10 +38,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                Highlighter.SetHighlight(Find(GameObjectID), Highlight);
-            }
+            Highlighter.SetHighlight(Find(GameObjectID), Highlight);
         }
 
         /// <summary>

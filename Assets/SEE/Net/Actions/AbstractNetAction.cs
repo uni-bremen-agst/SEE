@@ -32,7 +32,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// The Client ID of the requester.
         /// </summary>
-        public ulong? Requester;
+        public ulong Requester;
 
         /// <summary>
         /// Constructs an abstract action.
@@ -51,28 +51,12 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="recipients">The recipients of this action. If <code>null</code>,
         /// this actions will be executed everywhere.</param>
-        public void Execute(IPEndPoint[] recipients = null)
+        public void Execute(ulong[] recipients = null)
         {
 #if UNITY_EDITOR
             DebugAssertCanBeSerialized();
 #endif
-            Network.BroadcastAction(ActionSerializer.Serialize(this));
-        }
-
-        /// <summary>
-        /// Checks, if the executing client is the one that requested this action.
-        /// </summary>
-        /// <returns><code>true</code> if this client requested this action, <code>false</code>
-        /// otherwise.</returns>
-        protected bool IsRequester()
-        {
-            return false; //TODO REMOVE
-            if (Requester == null)
-            {
-                return true;
-            }
-
-            return NetworkManager.Singleton.LocalClientId == Requester;
+            Network.BroadcastAction(ActionSerializer.Serialize(this), recipients);
         }
 
         /// <summary>

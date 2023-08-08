@@ -22,10 +22,7 @@ namespace SEE.Net.Actions.RuntimeConfig
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                RuntimeConfigMenu.GetMenuForCity(CityIndex).SyncPath?.Invoke(WidgetPath, Value, IsAbsolute);
-            }
+            RuntimeConfigMenu.GetMenuForCity(CityIndex).SyncPath?.Invoke(WidgetPath, Value, IsAbsolute);
         }
     }
 }

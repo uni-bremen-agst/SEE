@@ -40,10 +40,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                FindWidgetsManager(BoardName).SwitchCity(CityName);
-            }
+            FindWidgetsManager(BoardName).SwitchCity(CityName);
         }
     }
 }

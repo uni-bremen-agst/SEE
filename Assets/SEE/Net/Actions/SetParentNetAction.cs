@@ -49,16 +49,13 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            if (Reflexion)
             {
-                if (Reflexion)
-                {
-                    ReflexionMapper.SetParent(Find(ChildID), Find(NewParentID));
-                }
-                else
-                {
-                    GameNodeMover.SetParent(Find(ChildID), Find(NewParentID));
-                }
+                ReflexionMapper.SetParent(Find(ChildID), Find(NewParentID));
+            }
+            else
+            {
+                GameNodeMover.SetParent(Find(ChildID), Find(NewParentID));
             }
         }
 

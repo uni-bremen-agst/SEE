@@ -58,13 +58,10 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                GameObject child = Find(ChildID);
-                GameObject newParent = Find(NewParentID);
-                GameObject originalParent = Find(OriginalParentID);
-                GameNodeMover.PutOnAndFit(child.transform, newParent, originalParent, OriginalLocalScale);
-            }
+            GameObject child = Find(ChildID);
+            GameObject newParent = Find(NewParentID);
+            GameObject originalParent = Find(OriginalParentID);
+            GameNodeMover.PutOnAndFit(child.transform, newParent, originalParent, OriginalLocalScale);
         }
 
         /// <summary>

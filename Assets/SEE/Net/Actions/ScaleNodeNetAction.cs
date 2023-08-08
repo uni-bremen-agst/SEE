@@ -51,10 +51,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                Find(GameObjectID).AddOrGetComponent<NodeOperator>().ScaleTo(LocalScale, AnimationFactor);
-            }
+            Find(GameObjectID).AddOrGetComponent<NodeOperator>().ScaleTo(LocalScale, AnimationFactor);
         }
     }
 }

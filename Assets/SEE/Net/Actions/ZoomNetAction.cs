@@ -44,19 +44,16 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            GameObject gameObject = GraphElementIDMap.Find(GameObjectID);
+            if (gameObject != null)
             {
-                GameObject gameObject = GraphElementIDMap.Find(GameObjectID);
-                if (gameObject != null)
-                {
-                    NodeOperator Operator = gameObject.AddOrGetComponent<NodeOperator>();
-                    Operator.MoveTo(Position, ZoomAction.ANIMATION_FACTOR);
-                    Operator.ScaleTo(LocalScale, ZoomAction.ANIMATION_FACTOR);
-                }
-                else
-                {
-                    throw new System.Exception($"There is no game object with the ID {GameObjectID}.");
-                }
+                NodeOperator Operator = gameObject.AddOrGetComponent<NodeOperator>();
+                Operator.MoveTo(Position, ZoomAction.ANIMATION_FACTOR);
+                Operator.ScaleTo(LocalScale, ZoomAction.ANIMATION_FACTOR);
+            }
+            else
+            {
+                throw new System.Exception($"There is no game object with the ID {GameObjectID}.");
             }
         }
 

@@ -55,12 +55,9 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                ISet<string> gameObjectIDs = new HashSet<string>(StringListSerializer.Unserialize(GameObjectIDList));
-                ISet<GameObject> gameObjects = SceneQueries.Find(gameObjectIDs);
-                GameElementDeleter.Revive(gameObjects);
-            }
+            ISet<string> gameObjectIDs = new HashSet<string>(StringListSerializer.Unserialize(GameObjectIDList));
+            ISet<GameObject> gameObjects = SceneQueries.Find(gameObjectIDs);
+            GameElementDeleter.Revive(gameObjects);
         }
     }
 }

@@ -29,10 +29,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                GameNodeMover.NewMovementVersion(Find(GameObjectID));
-            }
+            GameNodeMover.NewMovementVersion(Find(GameObjectID));
         }
 
         /// <summary>

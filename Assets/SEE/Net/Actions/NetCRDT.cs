@@ -82,7 +82,7 @@ namespace SEE.Net.Actions
         {
             if (State == RemoteAction.RequestID)
             {
-                //new NetCRDT().SetID(GetRequester(), ICRDT.RequestID()); TODO FIX
+                new NetCRDT().SetID(Requester, ICRDT.RequestID());
                 State = RemoteAction.Init;
             }
         }
@@ -92,26 +92,23 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            switch (State)
             {
-                switch (State)
-                {
-                    case RemoteAction.AddChar:
-                        ICRDT.RemoteAddChar(Character, ICRDT.StringToPosition(Position, File), File);
-                        break;
-                    case RemoteAction.SyncWithNewClient:
-                        ICRDT.SingleRemoteAddChar(Character, ICRDT.StringToPosition(Position, File), File);
+                case RemoteAction.AddChar:
+                    ICRDT.RemoteAddChar(Character, ICRDT.StringToPosition(Position, File), File);
+                    break;
+                case RemoteAction.SyncWithNewClient:
+                    ICRDT.SingleRemoteAddChar(Character, ICRDT.StringToPosition(Position, File), File);
 
-                       break;
+                    break;
 
-                    case RemoteAction.DeleteChar:
-                        ICRDT.RemoteDeleteChar(ICRDT.StringToPosition(Position, File), File);
+                case RemoteAction.DeleteChar:
+                    ICRDT.RemoteDeleteChar(ICRDT.StringToPosition(Position, File), File);
 
-                        break;
-                    case RemoteAction.AddString:
-                        ICRDT.RemoteAddString(Text, File);
-                        break;
-                }
+                    break;
+                case RemoteAction.AddString:
+                    ICRDT.RemoteAddString(Text, File);
+                    break;
             }
 
             if (State.Equals(RemoteAction.SetID))
@@ -156,7 +153,7 @@ namespace SEE.Net.Actions
         /// <param name="position">The position at which it should be added.</param>
         /// <param name="file">The filename of the crdt in which it should be added.</param>
         /// <param name="recipient">The recipient that should receive the cahnge.</param>
-        public void SingleAddChar(char c, Identifier[] position, string file, IPEndPoint[] recipient)
+        public void SingleAddChar(char c, Identifier[] position, string file, ulong[] recipient)
         {
             this.File = file;
             this.Character = c;
@@ -190,13 +187,13 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Sets the local id of a client.
         /// </summary>
-        /// <param name="player">The client who should receive the id.</param>
+        /// <param name="player">The network id of the client that should receive the id</param> TODO: Is this necessary when clients already get an id assigned automatically by unity?
         /// <param name="id">The id that should be set.</param>
-        public void SetID(IPEndPoint player, int id)
+        public void SetID(ulong clientID, int id)
         {
             this.ID = id;
             State = RemoteAction.SetID;
-            Execute(new IPEndPoint[] { player });
+            Execute(new ulong[] { clientID });
         }
     }
 }

@@ -81,7 +81,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            VRIKActions.ExecuteOnClient(IsRequester(), NetworkObjectID, AnimatorForVrik,
+            VRIKActions.ExecuteOnClient(NetworkObjectID, AnimatorForVrik,
                 RemoteHeadPosition, RemoteRightHandPosition, RemoteLeftHandPosition,
                 RemoteHeadRotation, RemoteRightHandRotation, RemoteLeftHandRotation);
         }

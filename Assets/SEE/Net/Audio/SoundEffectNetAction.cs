@@ -35,12 +35,9 @@ namespace SEE.Audio
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                GameObject targetGameObject = Find(this.TargetGameObjectName);
-                SoundEffect soundEffect = (SoundEffect)System.Enum.Parse(typeof(SoundEffect), this.SoundEffectName);
-                AudioManagerImpl.EnqueueSoundEffect(soundEffect, targetGameObject, true);
-            }
+            GameObject targetGameObject = Find(this.TargetGameObjectName);
+            SoundEffect soundEffect = (SoundEffect)System.Enum.Parse(typeof(SoundEffect), this.SoundEffectName);
+            AudioManagerImpl.EnqueueSoundEffect(soundEffect, targetGameObject, true);
         }
 
         /// <summary>

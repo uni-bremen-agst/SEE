@@ -43,10 +43,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                GameNodeMover.MoveTo(Find(GameObjectID), TargetPosition, AnimationFactor);
-            }
+            GameNodeMover.MoveTo(Find(GameObjectID), TargetPosition, AnimationFactor);
         }
 
         /// <summary>

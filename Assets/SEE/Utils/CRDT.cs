@@ -1055,7 +1055,7 @@ namespace SEE.Utils
         /// For a new client later in the network to synchronize it to the current state.
         /// </summary>
         /// <param name="recipient"></param>
-        public void SyncCodeWindows(IPEndPoint[] recipient)
+        public void SyncCodeWindows(ulong[] recipient)
         {
             int idx = 0;
             foreach (CharObj c in crdt)

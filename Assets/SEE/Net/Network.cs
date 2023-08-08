@@ -30,11 +30,6 @@ namespace SEE.Net
     public class Network : MonoBehaviour
     {
         /// <summary>
-        /// The default severity of the native logger of <see cref="NetworkCommsDotNet"/>.
-        /// </summary>
-        private const NetworkCommsLogger.Severity DefaultSeverity = NetworkCommsLogger.Severity.High;
-
-        /// <summary>
         /// The single unique instance of the network.
         /// </summary>
         public static Network Instance { get; private set; }
@@ -75,12 +70,12 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Returns the underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/>. TODO CHANGE DOC 
+        /// Returns the underlying <see cref="UnityTransport"/> of the <see cref="NetworkManager"/>.
         /// This information is retrieved differently depending upon whether we are running
         /// in the editor or in game play because <see cref="NetworkManager.Singleton"/> is
         /// available only during run-time.
         /// </summary>
-        /// <returns>underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/></returns>
+        /// <returns>underlying <see cref="UnityTransport"/> of the <see cref="NetworkManager"/></returns>
         private UnityTransport GetNetworkTransport()
         {
             NetworkManager networkManager = GetNetworkManager();
@@ -180,20 +175,6 @@ namespace SEE.Net
         [PropertyTooltip("Whether the network logging should be enabled.")]
         private bool internalLoggingEnabled = true;
 
-        /// <summary>
-        /// The minimal logged severity.
-        /// </summary>
-        [SerializeField, FoldoutGroup(LoggingFoldoutGroup)]
-        [PropertyTooltip("The minimal logged severity.")]
-        private NetworkCommsLogger.Severity minimalSeverity = DefaultSeverity;
-
-        /// <summary>
-        /// Whether the logging of NetworkComms should be enabled.
-        /// </summary>
-        [SerializeField, FoldoutGroup(LoggingFoldoutGroup), LabelText("NetworkComms Logging")]
-        [PropertyTooltip("Whether the NetworkComms logging should be enabled. NetworkComms is the third-party network component used by SEE.")]
-        private bool networkCommsLoggingEnabled = false;
-
 #endif
 
         /// <summary>
@@ -287,12 +268,15 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// todo doc
+        /// Broadcasts a serialized action.
         /// </summary>
-        public static void BroadcastAction(String serializedAction)
+        /// <param name="serializedAction">Serialized action to be broadcast</param>
+        /// <param name="recipients">List of recipients to broadcast to, will broadcast to all if this is null.</param>
+
+        public static void BroadcastAction(String serializedAction, ulong[] recipients)
         {
             ServerActionNetwork clientServerNetwork = GameObject.Find("Server").GetComponent<ServerActionNetwork>();
-            clientServerNetwork.BroadcastActionServerRpc(serializedAction);
+            clientServerNetwork.BroadcastActionServerRpc(serializedAction, recipients);
         }
 
         /// <summary>
@@ -402,9 +386,6 @@ namespace SEE.Net
 
         private void ShutdownNetwork()
         {
-            ///Server.Shutdown();
-            ///Client.Shutdown();
-
             // FIXME there must be a better way to stop the logging spam!
             string currentDirectory = Directory.GetCurrentDirectory();
             DirectoryInfo directoryInfo = new DirectoryInfo(currentDirectory);

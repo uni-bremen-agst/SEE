@@ -46,7 +46,7 @@
         "Antlr4.Runtime.Standard.dll",
         "DOTween.dll",
         "Joveler.Compression.XZ.dll",
-        "NetworkCommsDotNetComplete.dll"
+        "Newtonsoft.Json.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

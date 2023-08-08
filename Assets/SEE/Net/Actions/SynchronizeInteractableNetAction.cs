@@ -64,18 +64,15 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            InteractableObject interactable = InteractableObject.Get(id);
+            if (interactable)
             {
-                InteractableObject interactable = InteractableObject.Get(id);
-                if (interactable)
+                interactable.InteractableSynchronizer?.NotifyJustReceivedUpdate();
+                interactable.transform.position = position;
+                interactable.transform.rotation = rotation;
+                if (localScale.HasValue)
                 {
-                    interactable.InteractableSynchronizer?.NotifyJustReceivedUpdate();
-                    interactable.transform.position = position;
-                    interactable.transform.rotation = rotation;
-                    if (localScale.HasValue)
-                    {
-                        interactable.transform.localScale = localScale.Value;
-                    }
+                    interactable.transform.localScale = localScale.Value;
                 }
             }
         }

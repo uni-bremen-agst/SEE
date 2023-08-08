@@ -66,10 +66,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                GameNodeAdder.AddChild(Find(ParentID), Position, Scale, NewNodeID);
-            }
+            GameNodeAdder.AddChild(Find(ParentID), Position, Scale, NewNodeID);
         }
     }
 }

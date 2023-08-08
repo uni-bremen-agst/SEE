@@ -50,10 +50,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                BoardsManager.Move(BoardName, Position, Rotation);
-            }
+            BoardsManager.Move(BoardName, Position, Rotation);
         }
     }
 }

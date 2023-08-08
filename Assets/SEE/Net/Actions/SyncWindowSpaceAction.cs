@@ -1,6 +1,7 @@
 ﻿using System;
 using SEE.Controls;
 using SEE.Game.UI.Window;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -45,17 +46,12 @@ namespace SEE.Net.Actions
 
         public override void ExecuteOnClient()
         {
-            return; // TODO FIX
-            /*if (!IsRequester())
+            if (!WindowSpaceManager.ManagerInstance)
             {
-                if (!WindowSpaceManager.ManagerInstance)
-                {
-                    // If no space manager exists, there is nothing we can (or should) do.
-                    return;
-                }
-
-                WindowSpaceManager.ManagerInstance.UpdateSpaceFromValueObject(RequesterIPAddress, Space);
-            }*/
+                // If no space manager exists, there is nothing we can (or should) do.
+                return;
+            }
+            WindowSpaceManager.ManagerInstance.UpdateSpaceFromValueObject(Requester.ToString(), Space);
         }
     }
 }

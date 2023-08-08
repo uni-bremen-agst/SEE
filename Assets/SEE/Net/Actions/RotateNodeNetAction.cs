@@ -37,12 +37,9 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                GameObject gameObject = Find(GameObjectID);
-                NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
-                nodeOperator.RotateTo(Rotation, 0);
-            }
+            GameObject gameObject = Find(GameObjectID);
+            NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+            nodeOperator.RotateTo(Rotation, 0);
         }
 
         public override void ExecuteOnServer()
