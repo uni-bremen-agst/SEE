@@ -932,6 +932,11 @@ namespace SEE.Game.Evolution
             return Renderer.DrawNode(node, city);
         }
 
+        /// <summary>
+        /// Placeholder to satisfy the compiler. This method is not
+        /// called anywhere as of yet, but was required in <see
+        /// cref="EdgeRenderer"/>.
+        /// </summary>
         public GameObject DrawEdge(Edge edge, GameObject source = null, GameObject target = null)
         {
             throw new NotImplementedException();

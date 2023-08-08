@@ -9,26 +9,21 @@ namespace SEE.Net.Actions
     /// </summary>
     public class AcceptDivergenceNetAction : AbstractNetAction
     {
-        // Note: All attributes are made public so that they will be serialized
-        // for the network transfer.
-
         /// <summary>
-        /// The id of the gameObject from which the edge should be drawn (source node).
+        /// The ID of the GameObject from which the edge should be drawn (source node).
         /// </summary>
         public string FromId;
 
         /// <summary>
-        /// The id of the gameObject to which the edge should be drawn (target node).
+        /// The ID of the GameObject to which the edge should be drawn (target node).
         /// </summary>
         public string ToId;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="parentID">unique ID of the parent in which to add the new node</param>
-        /// <param name="newNodeID">id for the new node</param>
-        /// <param name="position">the position for the new node</param>
-        /// <param name="scale">the scale of the new node in world space</param>
+        /// <param name="fromID">ID of the source node of the edge</param>
+        /// <param name="toID">ID for target node of the edge</param>
         public AcceptDivergenceNetAction(string fromId, string toId)
             : base()
         {
@@ -37,8 +32,9 @@ namespace SEE.Net.Actions
         }
 
         /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
+        /// Things to execute on the server (none for this
+        /// class). Necessary because it is abstract in the
+        /// superclass.
         /// </summary>
         protected override void ExecuteOnServer()
         {
