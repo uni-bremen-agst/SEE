@@ -20,6 +20,24 @@ namespace SEE.Controls.Actions
     internal class AcceptDivergenceAction : AbstractPlayerAction
     {
         /// <summary>
+        /// Returns a new instance of <see cref="AcceptDivergenceAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public static ReversibleAction CreateReversibleAction()
+        {
+            return new AcceptDivergenceAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="AcceptDivergenceAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            return CreateReversibleAction();
+        }
+
+        /// <summary>
         /// The edge that was hit by the user to be accepted
         /// into the ArchitectureGraph. Set in <see cref="Update"/>.
         /// </summary>
@@ -30,6 +48,75 @@ namespace SEE.Controls.Actions
         /// solve Divergences.
         ///</summary>
         private ISet<GameObject> syncedGameObjects;
+
+        /// <summary>
+        /// The information we need to (re-)create an edge.
+        /// </summary>
+        private struct Memento
+        {
+            /// <summary>
+            /// The source of the edge.
+            /// </summary>
+            public Node from;
+            /// <summary>
+            /// The target of the edge.
+            /// </summary>
+            public Node to;
+            /// <summary>
+            /// The type of the edge.
+            /// </summary>
+            public Memento(Node source, Node target)
+            {
+                this.from = source;
+                this.to = target;
+            }
+        }
+
+        /// <summary>
+        /// The information needed to re-create the synced edge after
+        /// undo.
+        /// </summary>
+        private Memento memento;
+
+        /// <summary>
+        /// The edge created by this action. Can be null if no edge
+        /// has been created yet or whether an Undo was called. The
+        /// created edge is stored only to delete it again if Undo is
+        /// called. All information to create the edge is kept in
+        /// <see cref="memento"/>.
+        /// </summary>
+        private Edge createdEdgeDataModel;
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        private GameObject createdEdgeGameObject;
+
+        /// <summary>
+        /// Registers itself at <see cref="InteractableObject"/> to
+        /// listen for hovering events.
+        /// </summary>
+        public override void Start()
+        {
+            InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
+            InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
+        }
+
+        /// <summary>
+        /// Unregisters itself from <see
+        /// cref="InteractableObject"/>. Does no longer listen for
+        /// hovering events.
+        /// </summary>
+        public override void Stop()
+        {
+            InteractableObject.LocalAnyHoverIn -= LocalAnyHoverIn;
+            InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
+        }
+
+        /// <summary>
+        /// The default type of an added edge.
+        /// </summary>
+        private const string DefaultEdgeType = "Source_Dependency";
 
         /// <summary>
         /// See <see cref="ReversibleAction.Update"/>.
@@ -70,8 +157,11 @@ namespace SEE.Controls.Actions
                         // edge we have added.
                         memento = new Memento(source, target);
 
-                        createdEdge = CreateEdge(graph, memento);
-                        createdEdge.UnsetToggle(Edge.IsVirtualToggle);
+                        // The Edge in the DataModel and it's
+                        // GameObject are created separately
+                        var createdEdgeParts = CreateEdge(graph, memento);
+                        createdEdgeDataModel = createdEdgeParts.edgeDataModel;
+                        createdEdgeGameObject = createdEdgeParts.edgeGameObject;
 
                         // Add audio cue to the appearance of the new architecture edge
                         AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NEW_EDGE_SOUND);
@@ -88,29 +178,6 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Creates a new edge using the given <paramref name="memento"/>.
-        /// In case of any error, null will be returned.
-        /// </summary>
-        /// <param name="memento">information needed to create the edge</param>
-        /// <returns>a new edge or null</returns>
-        private static Edge CreateEdge(ReflexionGraph graph, Memento memento)
-        {
-            // Add the new Edge to the ArhcitectureGraph
-            var newArchitectureEdge = graph.ActuallyAddToArchitecture(
-                memento.from,
-                memento.to,
-                "Source_Dependency");
-
-            // Add the new Edge to the Game
-            GameObject result = GameEdgeAdder.Draw(newArchitectureEdge);
-
-            // Sync the Solution of the Divergence via Network
-            // new AcceptDivergenceNetAction().Execute();
-
-            return newArchitectureEdge;
-        }
-
-        /// <summary>
         /// Undoes this AcceptDivergenceAction.
         /// </summary>
         public override void Undo()
@@ -118,20 +185,29 @@ namespace SEE.Controls.Actions
             base.Undo();
 
             // remove the synced edge (info is saved in memento)
-            var graph = (ReflexionGraph)createdEdge.ItsGraph;
+            var graph = (ReflexionGraph)createdEdgeDataModel.ItsGraph;
+
+            Debug.Log($"Trying to delete edge {createdEdgeDataModel.ID}");
 
             if (graph != null)
             {
-                graph.RemoveEdge(createdEdge);
-                // use netaction to remove synced edge over net
+                // Remove the edge from the data model locally and on the network
+                graph.RemoveFromArchitecture(createdEdgeDataModel);
+                new DeleteNetAction(createdEdgeGameObject.name).Execute();
+
+                // Remove the edge's GameObject locally and on the network
+                GameEdgeAdder.Remove(createdEdgeGameObject);
+                new DeleteNetAction(createdEdgeGameObject.name).Execute();
+                Destroyer.Destroy(createdEdgeGameObject);
             }
             else
             {
-                throw new Exception($"Edge {createdEdge.ID} to be removed is not contained in a graph.");
+                throw new Exception($"Edge {createdEdgeDataModel.ID} to be removed is not contained in a graph.");
             }
 
             // set any edge references back to null
-            createdEdge = null;
+            createdEdgeDataModel = null;
+            createdEdgeGameObject = null;
         }
 
         /// <summary>
@@ -140,64 +216,33 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            // CreateEdge();
-            // recreate edge from memento
+            var createdEdgeParts = CreateEdge((ReflexionGraph)createdEdgeDataModel.ItsGraph, memento);
+            createdEdgeDataModel = createdEdgeParts.edgeDataModel;
+            createdEdgeGameObject = createdEdgeParts.edgeGameObject;
         }
 
         /// <summary>
-        /// Returns a new instance of <see cref="AcceptDivergenceAction"/>.
+        /// Creates a new edge using the given <paramref name="memento"/>.
+        /// In case of any error, null will be returned.
         /// </summary>
-        /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        /// <param name="memento">information needed to create the edge</param>
+        /// <returns>a new edge or null</returns>
+        private static (Edge edgeDataModel, GameObject edgeGameObject) CreateEdge(ReflexionGraph graph, Memento memento)
         {
-            return new AcceptDivergenceAction();
+            // Add the new Edge to the ArhcitectureGraph
+            var edgeDataModel = graph.ActuallyAddToArchitecture(
+                memento.from,
+                memento.to,
+                "Source_Dependency");
+
+            // Add the new Edge to the Game
+            GameObject edgeGameObject = GameEdgeAdder.Draw(edgeDataModel);
+
+            // Sync the Solution of the Divergence via Network
+            new AcceptDivergenceNetAction(memento.from.SourceName, memento.to.SourceName).Execute();
+
+            return (edgeDataModel, edgeGameObject);
         }
-
-        /// <summary>
-        /// Returns a new instance of <see cref="AcceptDivergenceAction"/>.
-        /// </summary>
-        /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
-        {
-            return CreateReversibleAction();
-        }
-
-        /// <summary>
-        /// The information we need to (re-)create an edge.
-        /// </summary>
-        private struct Memento
-        {
-            /// <summary>
-            /// The source of the edge.
-            /// </summary>
-            public Node from;
-            /// <summary>
-            /// The target of the edge.
-            /// </summary>
-            public Node to;
-            /// <summary>
-            /// The type of the edge.
-            /// </summary>
-            public Memento(Node source, Node target)
-            {
-                this.from = source;
-                this.to = target;
-            }
-        }
-
-        /// <summary>
-        /// The information needed to re-create the synced edge after undo.
-        /// </summary>
-        private Memento memento;
-
-        /// <summary>
-        /// The edge created by this action. Can be null if no edge
-        /// has been created yet or whether an Undo was called. The
-        /// created edge is stored only to delete it again if Undo is
-        /// called. All information to create the edge is kept in
-        /// <see cref="memento"/>.
-        /// </summary>
-        private Edge createdEdge;
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
@@ -214,13 +259,18 @@ namespace SEE.Controls.Actions
         /// <returns>all IDs of gameObjects manipulated by this action</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (syncedGameObjects == null)
+            if (createdEdgeDataModel == null | createdEdgeGameObject == null)
             {
                 return new HashSet<string>();
             }
             else
             {
-                return new HashSet<string>(syncedGameObjects.Select(x => x.name));
+                return new HashSet<string>
+                {
+                    memento.from.ID,
+                    memento.to.ID,
+                    createdEdgeDataModel.ID,
+                    createdEdgeGameObject.name };
             }
         }
     }
