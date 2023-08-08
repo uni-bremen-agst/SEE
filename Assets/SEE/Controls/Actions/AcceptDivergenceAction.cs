@@ -7,6 +7,8 @@ using SEE.Utils;
 using UnityEngine;
 using System;
 using SEE.Game;
+using SEE.Net.Actions;
+using SEE.Audio;
 
 namespace SEE.Controls.Actions
 {
@@ -71,11 +73,9 @@ namespace SEE.Controls.Actions
                         createdEdge = CreateEdge(graph, memento);
                         createdEdge.UnsetToggle(Edge.IsVirtualToggle);
 
-                        // Audio
-                        // AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NEW_EDGE_SOUND);
+                        // Add audio cue to the appearance of the new architecture edge
+                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NEW_EDGE_SOUND);
 
-                        // Sync the Solution of the Divergence via Network
-                        // new AcceptDivergenceNetAction(selectedDivergenceEdge.name).Execute();
                         return true; // the selected object is synced and this action is done
                     }
                 }
