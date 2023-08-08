@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
-using System.Linq;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -41,7 +40,7 @@ namespace SEE.Controls.Actions
         /// The edge that was hit by the user to be accepted
         /// into the ArchitectureGraph. Set in <see cref="Update"/>.
         /// </summary>
-        private GameObject selectedDivergenceEdge;
+        private ReflexionGraph graph;
 
         /// <summary>
         /// Contains all Edges that were explicitly added to
@@ -124,6 +123,8 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
+            bool result = false;
+
             // FIXME: Needs adaptation for VR where no mouse is available.
             if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(
@@ -131,7 +132,7 @@ namespace SEE.Controls.Actions
                     out GraphElementRef _) != HitGraphElement.None)
             {
                 // Find the edge representing the divergence that should be solved.
-                selectedDivergenceEdge = raycastHit.collider.gameObject;
+                GameObject selectedDivergenceEdge = raycastHit.collider.gameObject;
 
                 // Check whether the object selected is an edge.
                 if (selectedDivergenceEdge.TryGetEdge(out Edge selectedEdge))
@@ -139,8 +140,9 @@ namespace SEE.Controls.Actions
                     // Check if the selected edge represents a divergence
                     if (ReflexionGraph.IsDivergent(selectedEdge))
                     {
+
                         // acquire the containing ReflexionGraph
-                        var graph = (ReflexionGraph)selectedEdge.ItsGraph;
+                        graph = (ReflexionGraph)selectedEdge.ItsGraph;
 
                         // Find that node in the ArchitectureGraph,
                         // which the divergence's source node is
@@ -159,12 +161,18 @@ namespace SEE.Controls.Actions
 
                         // The Edge in the DataModel and it's
                         // GameObject are created separately
-                        var createdEdgeParts = CreateEdge(graph, memento);
+                        var createdEdgeParts = CreateEdge(memento);
                         createdEdgeDataModel = createdEdgeParts.edgeDataModel;
                         createdEdgeGameObject = createdEdgeParts.edgeGameObject;
 
+                        // Check whether edge creation was successfull
+                        result = (createdEdgeDataModel != null && createdEdgeGameObject != null);
+
                         // Add audio cue to the appearance of the new architecture edge
                         AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NEW_EDGE_SOUND);
+
+                        // Update the curent state
+                        currentState = result ? ReversibleAction.Progress.Completed : ReversibleAction.Progress.NoEffect;
 
                         return true; // the selected object is synced and this action is done
                     }
@@ -187,18 +195,16 @@ namespace SEE.Controls.Actions
             // remove the synced edge (info is saved in memento)
             var graph = (ReflexionGraph)createdEdgeDataModel.ItsGraph;
 
-            Debug.Log($"Trying to delete edge {createdEdgeDataModel.ID}");
-
             if (graph != null)
             {
-                // Remove the edge from the data model locally and on the network
-                graph.RemoveFromArchitecture(createdEdgeDataModel);
-                new DeleteNetAction(createdEdgeGameObject.name).Execute();
-
                 // Remove the edge's GameObject locally and on the network
                 GameEdgeAdder.Remove(createdEdgeGameObject);
                 new DeleteNetAction(createdEdgeGameObject.name).Execute();
                 Destroyer.Destroy(createdEdgeGameObject);
+
+                // Remove the edge from the data model locally and on the network
+                // graph.RemoveFromArchitecture(createdEdgeDataModel);
+                // new DeleteNetAction(createdEdgeGameObject.name).Execute();
             }
             else
             {
@@ -216,7 +222,7 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            var createdEdgeParts = CreateEdge((ReflexionGraph)createdEdgeDataModel.ItsGraph, memento);
+            var createdEdgeParts = CreateEdge(memento);
             createdEdgeDataModel = createdEdgeParts.edgeDataModel;
             createdEdgeGameObject = createdEdgeParts.edgeGameObject;
         }
@@ -227,7 +233,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="memento">information needed to create the edge</param>
         /// <returns>a new edge or null</returns>
-        private static (Edge edgeDataModel, GameObject edgeGameObject) CreateEdge(ReflexionGraph graph, Memento memento)
+        private (Edge edgeDataModel, GameObject edgeGameObject) CreateEdge(Memento memento)
         {
             // Add the new Edge to the ArhcitectureGraph
             var edgeDataModel = graph.ActuallyAddToArchitecture(
