@@ -240,7 +240,7 @@ namespace SEE.Controls.Actions
         private (Edge edgeDataModel, GameObject edgeGameObject) CreateEdge(Memento memento)
         {
             // add the new edge to the architecture graph
-            var edgeDataModel = graph.ActuallyAddToArchitecture(
+            var edgeDataModel = graph.AddToArchitectureNonVirtual(
                 memento.from,
                 memento.to,
                 "Source_Dependency");
