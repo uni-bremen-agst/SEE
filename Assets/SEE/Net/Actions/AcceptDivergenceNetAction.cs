@@ -1,3 +1,4 @@
+using SEE.Game;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -12,24 +13,14 @@ namespace SEE.Net.Actions
         // for the network transfer.
 
         /// <summary>
-        /// The ID of the parent gameObject of the new GameObject.
+        /// The id of the gameObject from which the edge should be drawn (source node).
         /// </summary>
-        public string ParentID;
+        public string FromId;
 
         /// <summary>
-        /// The id of the new node.
+        /// The id of the gameObject to which the edge should be drawn (target node).
         /// </summary>
-        public string NewNodeID;
-
-        /// <summary>
-        /// The position of the new node.
-        /// </summary>
-        public Vector3 Position;
-
-        /// <summary>
-        /// The scale of the new node.
-        /// </summary>
-        public Vector3 Scale;
+        public string ToId;
 
         /// <summary>
         /// Constructor.
@@ -38,9 +29,11 @@ namespace SEE.Net.Actions
         /// <param name="newNodeID">id for the new node</param>
         /// <param name="position">the position for the new node</param>
         /// <param name="scale">the scale of the new node in world space</param>
-        public AcceptDivergenceNetAction(string gameObjectID)
+        public AcceptDivergenceNetAction(string fromId, string toId)
             : base()
         {
+            FromId = fromId;
+            ToId = toId;
         }
 
         /// <summary>
@@ -57,6 +50,26 @@ namespace SEE.Net.Actions
         /// </summary>
         protected override void ExecuteOnClient()
         {
+            if (!IsRequester())
+            {
+                GameObject fromGO = GraphElementIDMap.Find(FromId);
+                if (fromGO)
+                {
+                    GameObject toGO = GraphElementIDMap.Find(ToId);
+                    if (toGO)
+                    {
+                        GameEdgeAdder.Add(fromGO, toGO, "Source_Dependency");
+                    }
+                    else
+                    {
+                        Debug.LogError($"There is no game node named {ToId} for the target.\n");
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"There is no game node named {FromId} for the source.\n");
+                }
+            }
         }
     }
 }
