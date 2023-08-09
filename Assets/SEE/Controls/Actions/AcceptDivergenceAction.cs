@@ -60,14 +60,19 @@ namespace SEE.Controls.Actions
             /// </summary>
             public Node to;
             /// <summary>
+            /// The type of the edge.
+            /// </summary>
+            public string type;
+            /// <summary>
             /// Construct a new memento.
             /// </summary>
             /// <param name="source">the source node of the edge in the architecture graph</param>
             /// <param name="target">the target node of the edge in the architecture grpah</param>
-            public Memento(Node source, Node target)
+            public Memento(Node source, Node target, string type)
             {
                 this.from = source;
                 this.to = target;
+                this.type = type;
             }
         }
 
@@ -83,7 +88,7 @@ namespace SEE.Controls.Actions
         /// an Undo was called. The created edge is stored only to delete it again if Undo is
         /// called. All information to create the edge is kept in <see cref="memento"/>.
         /// </summary>
-        private Edge createdEdgeDataModel;
+        private Edge createdEdge;
 
 
         /// <summary>
@@ -92,7 +97,7 @@ namespace SEE.Controls.Actions
         /// delete it again if Undo is called. All information to create the edge is kept in <see
         /// cref="memento"/>.
         /// </summary>
-        private GameObject createdEdgeGameObject;
+        // private GameObject createdEdgeGameObject;
 
 
         /// <summary>
@@ -162,15 +167,13 @@ namespace SEE.Controls.Actions
 
                         // we have both source and target of the edge and use a memento struct
                         // to remember which edge we have added
-                        memento = new Memento(source, target);
+                        memento = new Memento(source, target, "Source_Dependency");
 
-                        // the Edge in the DataModel and it's GameObject are created separately
-                        var createdEdgeParts = CreateEdge(memento);
-                        createdEdgeDataModel = createdEdgeParts.edgeDataModel;
-                        createdEdgeGameObject = createdEdgeParts.edgeGameObject;
+                        // create the edge
+                        createdEdge = CreateEdge(memento);
 
                         // check whether edge creation was successfull
-                        result = (createdEdgeDataModel != null && createdEdgeGameObject != null);
+                        result = createdEdge != null;
 
                         // add audio cue to the appearance of the new architecture edge
                         AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NEW_EDGE_SOUND);
@@ -199,23 +202,30 @@ namespace SEE.Controls.Actions
             base.Undo();
 
             // remove the synced edge (its info is saved in memento)
-            var graph = (ReflexionGraph)createdEdgeDataModel.ItsGraph;
+            ReflexionGraph graph = (ReflexionGraph)createdEdge.ItsGraph;
 
             if (graph != null)
             {
+                // find the corresponding GameObject
+                GameObject createdEdgeGO = GraphElementIDMap.Find(createdEdge.ID);
                 // remove the edge's GameObject and graph representation locally and on the network
-                GameEdgeAdder.Remove(createdEdgeGameObject);
-                new DeleteNetAction(createdEdgeGameObject.name).Execute();
-                Destroyer.Destroy(createdEdgeGameObject);
+                GameEdgeAdder.Remove(createdEdgeGO);
+
+                // synthesize the remote ID ourselves
+                // string remoteID = createdEdge.Type + "#" + createdEdge.Source.ID + "#" + createdEdge.Target.ID;
+                new DeleteNetAction(createdEdge.ID).Execute();
+
+                // this way doesn't work - because fkin unique ID requirement
+                // new DeleteNetAction(createdEdgeGO.name).Execute();
+                Destroyer.Destroy(createdEdgeGO);
             }
             else
             {
-                throw new Exception($"Edge {createdEdgeDataModel.ID} to be removed is not contained in a graph.");
+                throw new Exception($"Edge {createdEdge.ID} to be removed is not contained in a graph.");
             }
 
             // set any edge references back to null
-            createdEdgeDataModel = null;
-            createdEdgeGameObject = null;
+            createdEdge = null;
         }
 
         /// <summary>
@@ -225,33 +235,31 @@ namespace SEE.Controls.Actions
         {
             base.Redo();
             // recreate the edge
-            var createdEdgeParts = CreateEdge(memento);
-            // save the references for later use
-            createdEdgeDataModel = createdEdgeParts.edgeDataModel;
-            createdEdgeGameObject = createdEdgeParts.edgeGameObject;
+            createdEdge = CreateEdge(memento);
         }
 
         /// <summary>
-        /// Creates a new edge using the given <paramref name="memento"/>.  In case of any error,
-        /// null will be returned.
+        /// Creates a new edge using the given <paramref
+        /// name="memento"/>.  In case of any error, null will be
+        /// returned.
         /// </summary>
         /// <param name="memento">information needed to create the edge</param>
         /// <returns>the new edge's GameObject and a reference to itself, or both null</returns>
-        private (Edge edgeDataModel, GameObject edgeGameObject) CreateEdge(Memento memento)
+        private Edge CreateEdge(Memento memento)
         {
-            // add the new edge to the architecture graph
-            var edgeDataModel = graph.AddToArchitectureNonVirtual(
-                memento.from,
-                memento.to,
-                "Source_Dependency");
+            // create the edge beforehand
+            Edge newEdge = new Edge(memento.from, memento.to, memento.type);
 
-            // add the new edge to the (game)
-            GameObject edgeGameObject = GameEdgeAdder.Draw(edgeDataModel);
+            // add the already created edge to the architecture graph
+            graph.AddToArchitecture(newEdge);
 
-            // sync the solution of the divergence via network
-            new AcceptDivergenceNetAction(memento.from.SourceName, memento.to.SourceName).Execute();
+            // (re)draw the new edge
+            GameEdgeAdder.Draw(newEdge);
 
-            return (edgeDataModel, edgeGameObject);
+            // propagate the edge (including matching ID) over network
+            new AcceptDivergenceNetAction(memento.from.ID, memento.to.ID, newEdge.ID, newEdge.Type).Execute();
+
+            return newEdge;
         }
 
         /// <summary>
@@ -269,7 +277,7 @@ namespace SEE.Controls.Actions
         /// <returns>all IDs of GameObjects manipulated by this action</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (createdEdgeDataModel == null | createdEdgeGameObject == null)
+            if (createdEdge == null)
             {
                 return new HashSet<string>();
             }
@@ -277,10 +285,13 @@ namespace SEE.Controls.Actions
             {
                 return new HashSet<string>
                 {
-                    memento.from.ID,
-                    memento.to.ID,
-                    createdEdgeDataModel.ID,
-                    createdEdgeGameObject.name };
+                    GraphElementIDMap.Find(memento.from.ID).name,
+                    // memento.from.ID,
+                    GraphElementIDMap.Find(memento.to.ID).name,
+                    // memento.to.ID,
+                    // createdEdgeDataModel.ID,
+                    GraphElementIDMap.Find(createdEdge.ID).name,
+                };
             }
         }
     }

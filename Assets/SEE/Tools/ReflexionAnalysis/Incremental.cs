@@ -169,38 +169,6 @@ namespace SEE.Tools.ReflexionAnalysis
             return edge;
         }
 
-        /// <summary>
-        /// Creates an edge of given <paramref name="type"/> from the given node <paramref name="from"/>
-        /// to the given node <paramref name="to"/> and adds it to the architecture graph,
-        /// adjusting the reflexion analysis incrementally.
-        /// This edge will be considered as a specified dependency.
-        /// It may not be redundant.
-        /// It will also be non-virtual and be drawn immediatly.
-        ///
-        /// Preconditions:
-        /// <ul>
-        /// <li><paramref name="from"/> is contained in the architecture graph.</li>
-        /// <li><paramref name="to"/> is contained in the architecture graph.</li>
-        /// <li>The newly created specified edge will not be redundant.</li>
-        /// </ul>
-        /// Postcondition: A new edge from <paramref name="from"/> to <paramref name="to"/> is contained in the
-        ///   architecture graph and the reflexion data is updated; all observers are informed of the change.
-        /// </summary>
-        /// <param name="from">source node of the new edge</param>
-        /// <param name="to">target node of the new edge</param>
-        /// <param name="type">type of the new edge</param>
-        /// <exception cref="NotInSubgraphException">When <paramref name="from"/> or <paramref name="to"/>
-        /// is not contained in the architecture graph.</exception>
-        /// <exception cref="RedundantSpecifiedEdgeException">When the edge from <paramref name="from"/> to
-        /// <paramref name="to"/> would be redundant to another specified edge.</exception>
-        /// <returns>The newly created specified edge</returns>
-        public Edge AddToArchitectureNonVirtual(Node from, Node to, string type)
-        {
-            // Preconditions are checked in AddToArchitecture.
-            Edge edge = AddEdge(from, to, type, false, false);
-            AddToArchitecture(edge);
-            return edge;
-        }
 
         /// <summary>
         /// Adds the given <paramref name="edge"/> to the implementation graph,
