@@ -70,22 +70,21 @@ namespace SEE.Net.Actions
             if (!IsRequester())
             {
                 GameObject fromGO = GraphElementIDMap.Find(FromId);
-                if (fromGO)
+                fromGO.TryGetNode(out Node fromNode);
+                if (fromGO && fromNode)
                 {
                     GameObject toGO = GraphElementIDMap.Find(ToId);
-                    if (toGO)
+                    toGO.TryGetNode(out Node toNode);
+                    if (toGO && toNode)
                     {
-                        fromGO.TryGetNode(out Node fromDM);
-                        toGO.TryGetNode(out Node toDM);
-
                         // create the edge beforehand (to change its ID)
-                        Edge edgeToPropagate = new Edge(fromDM, toDM, Type);
+                        Edge edgeToPropagate = new Edge(fromNode, toNode, Type);
 
                         // change the edges ID before adding it to a graph
                         edgeToPropagate.ID = EdgeId;
 
                         // add the already created edge to the architecture graph
-                        if (fromDM.ItsGraph is ReflexionGraph graph)
+                        if (fromNode.ItsGraph is ReflexionGraph graph)
                             graph.AddToArchitecture(edgeToPropagate);
 
                         // (re)draw the new edge
