@@ -7,36 +7,42 @@ using SEE.Tools.ReflexionAnalysis;
 namespace SEE.Net.Actions
 {
     /// <summary>
-    /// This class is responsible for adding a node via network from one client to all others and
-    /// to the server.
+    /// This class is responsible for adding a node via network from
+    /// one client to all others and to the server.
     /// </summary>
     public class AcceptDivergenceNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The ID of the GameObject from which the edge should be drawn (source node).
+        /// The ID of the GameObject from which the edge should be
+        /// drawn (source node).
         /// </summary>
         public string FromId;
 
         /// <summary>
-        /// The ID of the GameObject to which the edge should be drawn (target node).
+        /// The ID of the GameObject to which the edge should be drawn
+        /// (target node).
         /// </summary>
         public string ToId;
 
         /// <summary>
-        /// The ID of the GameObject to which the edge should be drawn (target node).
+        /// The ID of the server-based edge to ensure they match
+        /// between server and clients.
         /// </summary>
         public string EdgeId;
 
         /// <summary>
-        /// The ID of the GameObject to which the edge should be drawn (target node).
+        /// The type of the edge that should be created in order to
+        /// solve the divergence.
         /// </summary>
         public string Type;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="fromID">ID of the source node of the edge</param>
-        /// <param name="toID">ID for target node of the edge</param>
+        /// <param name="fromId">ID of the source node of the edge</param>
+        /// <param name="toId">ID for target node of the edge</param>
+        /// <param name="edgeId">ID of the edge to be propagated to the clients</param>
+        /// <param name="type">the type of the created edge</param>
         public AcceptDivergenceNetAction(string fromId, string toId, string edgeId, string type)
             : base()
         {
@@ -72,15 +78,17 @@ namespace SEE.Net.Actions
                         fromGO.TryGetNode(out Node fromDM);
                         toGO.TryGetNode(out Node toDM);
 
-                        // create edge
-                        var edgeToPropagate = new Edge(fromDM, toDM, Type);
+                        // create the edge beforehand (to change its ID)
+                        Edge edgeToPropagate = new Edge(fromDM, toDM, Type);
+
+                        // change the edges ID before adding it to a graph
                         edgeToPropagate.ID = EdgeId;
 
-                        // add the new edge to the architecture graph
+                        // add the already created edge to the architecture graph
                         if (fromDM.ItsGraph is ReflexionGraph graph)
                             graph.AddToArchitecture(edgeToPropagate);
 
-                        // add the new edge to the (game)
+                        // (re)draw the new edge
                         GameObject edgeGameObject = GameEdgeAdder.Draw(edgeToPropagate);
                     }
                     else
