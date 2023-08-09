@@ -13,19 +13,19 @@ namespace SEE.Net.Actions
     public class AcceptDivergenceNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The ID of the GameObject from which the edge should be
+        /// The ID of the Node's GameObject from which the edge should be
         /// drawn (source node).
         /// </summary>
         public string FromId;
 
         /// <summary>
-        /// The ID of the GameObject to which the edge should be drawn
+        /// The ID of the Node's GameObject to which the edge should be drawn
         /// (target node).
         /// </summary>
         public string ToId;
 
         /// <summary>
-        /// The ID of the server-based edge to ensure they match
+        /// The ID of the server's edge to ensure they match
         /// between server and clients.
         /// </summary>
         public string EdgeId;
