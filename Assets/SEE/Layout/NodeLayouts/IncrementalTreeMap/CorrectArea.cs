@@ -14,6 +14,40 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         static double precision = 0.00001; 
         public static bool Correct(IList<TNode> nodes)
         {
+            if(IsSliceable( nodes, out TSegment slicingSegment))
+            {
+                Split(nodes, slicingSegment, 
+                    out IList<TNode> partition1, 
+                    out IList<TNode> partition2);
+                
+                
+                // adjust slicing segment
+
+                slicingSegment.IsConst = true;
+                bool works1 = Correct(partition1);
+                bool works2 = Correct(partition2);
+                slicingSegment.IsConst = false;
+                return works1 && works2;
+            }
+            else
+            {
+                return GradientDecrease(nodes);
+            }
+
+        }
+        
+        private static bool IsSliceable(IList<TNode> nodes, out TSegment slicingSegment)
+        {
+        }
+
+        private static void Split(IList<TNode> nodes, TSegment slicingSegment,
+            out IList<TNode> partition1, out IList<TNode> partition2)
+        {
+        }
+        
+        
+        private static bool GradientDecrease(IList<TNode> nodes)
+        {
             HashSet<TSegment> segments = new HashSet<TSegment>();
             foreach(var node in nodes)
             {
