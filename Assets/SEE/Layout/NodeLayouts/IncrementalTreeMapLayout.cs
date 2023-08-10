@@ -43,9 +43,9 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// The node layout we compute as a result.
         /// </summary>
-        private Dictionary<ILayoutNode, NodeTransform> layout_result         = new Dictionary<ILayoutNode, NodeTransform>();
-        private Dictionary<string,TNode>               TNodeMap              = new Dictionary<string, TNode>();
-        private Dictionary<string,ILayoutNode>         ILayoutNodeMap        = new Dictionary<string, ILayoutNode>();
+        private Dictionary<ILayoutNode, NodeTransform> layout_result  = new Dictionary<ILayoutNode, NodeTransform>();
+        private Dictionary<string,TNode>               TNodeMap       = new Dictionary<string, TNode>();
+        private Dictionary<string,ILayoutNode>         ILayoutNodeMap = new Dictionary<string, ILayoutNode>();
 
         /// <summary>
         /// Some padding will be added between nodes. That padding depends upon the minimum
@@ -200,11 +200,11 @@ namespace SEE.Layout.NodeLayouts
             }
             else
             {
-                // here can be done some improvment
+                // here can be done some improvement
 
                 //  [         oldTNodes           ]--------------   <- nodes of old Layout, do not edit them
                 //  [         workWith            ]--------------   <- nodes of new Layout, designed to be changed over time to newTNodes
-                //  --------------[           newTNodes         ]   <- nodes of new Lauout 
+                //  --------------[           newTNodes         ]   <- nodes of new Layout 
                 //  [ toBeDeleted ]---------------[  toBeAdded  ]   <- nodes of new Layout
 
                 // not only the siblings that are in the old graph and in the new one, but all siblings in old graph
@@ -214,7 +214,7 @@ namespace SEE.Layout.NodeLayouts
                 IList<TNode> oldTNodes = oldLayout.GetTNodes(oldILayoutSiblings);
                 IList<TNode> newTNodes = GetTNodes(siblings);
 
-                IList<TNode> workWith = new List<TNode>();
+                IList<TNode> workWith          = new List<TNode>();
                 IList<TNode> nodesToBeDeleted  = new List<TNode>();
                 IList<TNode> nodesToBeAdded    = new List<TNode>();
 
@@ -297,7 +297,6 @@ namespace SEE.Layout.NodeLayouts
                     // CalculateLayout assumes co-ordinates x and z as the left front corner
 
                     Assert.AreEqual(node.AbsoluteScale, node.LocalScale);
-                    NodeTransform nodeTransform = layout_result[node];
                     TRectangle childRectangle = TNodeMap[node.ID].Rectangle;
                     CalculateLayout(children, childRectangle);
                 }
@@ -374,15 +373,19 @@ namespace SEE.Layout.NodeLayouts
             {
                 ILayoutNode o = ILayoutNodeMap[node.ID];
                 TRectangle rect = node.Rectangle;
-                if(rect.width <= 2 * padding || rect.depth <= 2* padding)
+                if (rect.width <= 2 * padding || rect.depth <= 2 * padding)
                 {
                     Debug.LogWarning("Rectangle to small for padding");
                 }
-                Vector3 position = new Vector3(rect.x + rect.width / 2.0f, groundLevel, rect.z + rect.depth / 2.0f);
+
+                Vector3 position = new Vector3((float)(rect.x + rect.width / 2.0d),
+                    groundLevel,
+                    (float)(rect.z + rect.depth / 2.0d));
                 Vector3 scale = new Vector3(
-                    rect.width - 2 * padding > 0 ? rect.width - 2 * padding : rect.width,
+                    rect.width - 2 * padding > 0 ?
+                        (float) (rect.width - 2 * padding) : (float) rect.width,
                     o.LocalScale.y,
-                    rect.depth - 2 * padding > 0 ? rect.depth - 2 * padding : rect.depth);
+                    rect.depth - 2 * padding > 0 ? (float) (rect.depth - 2 * padding) : (float) rect.depth);
                 Assert.AreEqual(o.AbsoluteScale, o.LocalScale, $"{o.ID}: {o.AbsoluteScale} != {o.LocalScale}");
                 layout_result[o] = new NodeTransform(position, scale);
             }
@@ -396,8 +399,8 @@ namespace SEE.Layout.NodeLayouts
             // f  : [x1,x2] -> [y1,y2]
             // f  : x   maps to (x - x1) * ((y2-y1)/(x2-x1)) + y1
 
-            float scale_x = newRectangle.width / oldRectangle.width;
-            float scale_z = newRectangle.depth / oldRectangle.depth;
+            double scale_x = newRectangle.width / oldRectangle.width;
+            double scale_z = newRectangle.depth / oldRectangle.depth;
 
             foreach( var node in nodes)
             {
@@ -502,5 +505,22 @@ namespace SEE.Layout.NodeLayouts
             }
         }
     
+        private void PrintGraphForDebugDebug ()
+        {
+            string msg = "data = [";
+            foreach(var node in TNodeMap.Values)
+            {
+                if(node == null || node.Rectangle == null) continue;
+                msg += "\n";
+                msg += "(" + node.ID + ", " ;
+                msg += node.Rectangle.x.ToString() + ", ";
+                msg += node.Rectangle.width.ToString() + ", ";
+                msg += node.Rectangle.z.ToString() + ", ";
+                msg += node.Rectangle.depth.ToString() + "),";
+            }
+            msg += "]";
+            Debug.Log(msg);
+        }
+
     }
 }

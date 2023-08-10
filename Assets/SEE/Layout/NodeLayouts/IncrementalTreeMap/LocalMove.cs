@@ -72,8 +72,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             // [l][r]    [rrr]      [l][r]    [lll]
 
             // adjust rectangles
-            float width = leftNode.Rectangle.width + rightNode.Rectangle.width;
-            float ratio = leftNode.Rectangle.Area() / (leftNode.Rectangle.Area() + rightNode.Rectangle.Area());
+            double width = leftNode.Rectangle.width + rightNode.Rectangle.width;
+            double ratio = leftNode.Rectangle.Area() / (leftNode.Rectangle.Area() + rightNode.Rectangle.Area());
             
             leftNode.Rectangle.width = width;
             rightNode.Rectangle.width = width;
@@ -118,8 +118,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             // [lll]      [l][u]        [lll]      [u][l]
 
             // adjust rectangles
-            float depth = lowerNode.Rectangle.depth + upperNode.Rectangle.depth;
-            float ratio = lowerNode.Rectangle.Area() / (lowerNode.Rectangle.Area() + upperNode.Rectangle.Area());
+            double depth = lowerNode.Rectangle.depth + upperNode.Rectangle.depth;
+            double ratio = lowerNode.Rectangle.Area() / (lowerNode.Rectangle.Area() + upperNode.Rectangle.Area());
             
             lowerNode.Rectangle.depth = depth;
             upperNode.Rectangle.depth = depth;

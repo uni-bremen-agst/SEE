@@ -247,7 +247,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         private static double AspectRatiosPNorm(IList<TNode> nodes)
         {
-            Vector<float> aspectRatios = Vector<float>.Build.DenseOfEnumerable(nodes.Select(n => n.Rectangle.AspectRatio()));
+            Vector<double> aspectRatios = Vector<double>.Build.DenseOfEnumerable(nodes.Select(n => n.Rectangle.AspectRatio()));
             return aspectRatios.Norm(pNorm);
         }
 

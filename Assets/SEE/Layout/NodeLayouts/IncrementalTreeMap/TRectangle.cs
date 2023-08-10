@@ -2,24 +2,24 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     public class TRectangle : System.ICloneable
     {
-        public TRectangle(float x, float z, float width, float depth)
+        public TRectangle(double x, double z, double width, double depth)
         {
             this.x = x;
             this.z = z;
             this.width = width;
             this.depth = depth;
         }
-        public float x;      // x co-ordinate at corner
-        public float z;      // z co-ordinate at corner
-        public float width;  // width
-        public float depth;  // depth
+        public double x;      // x co-ordinate at corner
+        public double z;      // z co-ordinate at corner
+        public double width;  // width
+        public double depth;  // depth
 
-        public float AspectRatio()
+        public double AspectRatio()
         {
             return width >= depth ? width / depth : depth / width;
         }
 
-        public float Area()
+        public double Area()
         {
             return width*depth;
         }

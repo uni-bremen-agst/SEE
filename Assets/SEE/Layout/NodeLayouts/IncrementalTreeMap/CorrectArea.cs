@@ -39,16 +39,15 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             {
                 Debug.LogWarning("layout correction failed negative rec");
             }
-            //Debug.LogWarning("layout correction bad result ["+distance.ToString()+"]");
             return (cons && distance < precision);
         }
 
-        private static Matrix<float> JacobianMatrix(
+        private static Matrix<double> JacobianMatrix(
             IList<TNode> nodes, 
             Dictionary<TSegment, int> mapSegmentIndex)
         {
             int n = nodes.Count;
-            var matrix = Matrix<float>.Build.Sparse(n,n-1);
+            var matrix = Matrix<double>.Build.Sparse(n,n-1);
             foreach(var node in nodes)
             {
                 var segments = node.SegmentsDictionary();
@@ -58,7 +57,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     var segment = segments[dir];
                     if(!segment.IsConst)
                     {
-                        float value = 0;
+                        double value = 0;
                         switch(dir)
                         {
                             case Direction.Left:
@@ -85,14 +84,14 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             IList<TNode> nodes, 
             Dictionary<TSegment, int> mapSegmentIndex)
         {
-            Matrix<float> matrix = JacobianMatrix(nodes,mapSegmentIndex);
+            Matrix<double> matrix = JacobianMatrix(nodes,mapSegmentIndex);
             
-            Vector<float> nodes_sizes_wanted = 
-                Vector<float>.Build.DenseOfArray(nodes.Select(node => node.Size).ToArray());
-            Vector<float> nodes_sizes_current = 
-                Vector<float>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.Area()).ToArray());
+            Vector<double> nodes_sizes_wanted = 
+                Vector<double>.Build.DenseOfArray(nodes.Select(node => (double) node.Size).ToArray());
+            Vector<double> nodes_sizes_current = 
+                Vector<double>.Build.DenseOfArray(nodes.Select(node => (double) node.Rectangle.Area()).ToArray());
             var diff = nodes_sizes_wanted - nodes_sizes_current;
-            Matrix<float> pinv;
+            Matrix<double> pinv;
             try
             {
                 pinv = matrix.PseudoInverse();
@@ -101,29 +100,29 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             {
                 try
                 {
-                    Matrix<float> bias = Matrix<float>.Build.Random(nodes.Count,mapSegmentIndex.Count, new ContinuousUniform(-.1,0.1));
+                    Matrix<double> bias = Matrix<double>.Build.Random(nodes.Count,mapSegmentIndex.Count, new ContinuousUniform(-.1,0.1));
                     pinv = (matrix + bias).PseudoInverse();
                     Debug.LogWarning("layout correction needs bias");
                 }
                 catch
                 {
                     Debug.LogWarning("layout correction failed");
-                    pinv = Matrix<float>.Build.Dense(mapSegmentIndex.Count,nodes.Count,0);
+                    pinv = Matrix<double>.Build.Dense(mapSegmentIndex.Count,nodes.Count,0);
                 }
             }
 
-            Vector<float> segmentShift = pinv * diff;
+            Vector<double> segmentShift = pinv * diff;
 
             ApplyShift(segmentShift, nodes, mapSegmentIndex);
             
-            Vector<float> nodes_sizes_afterStep = 
-                Vector<float>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.Area()).ToArray());
+            Vector<double> nodes_sizes_afterStep = 
+                Vector<double>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.Area()).ToArray());
             return (nodes_sizes_afterStep - nodes_sizes_wanted).Norm(2);
         }
 
 
         private static void ApplyShift(
-            Vector<float> shift,
+            Vector<double> shift,
             IList<TNode> nodes,
             Dictionary<TSegment, int> mapSegmentIndex)
         {
