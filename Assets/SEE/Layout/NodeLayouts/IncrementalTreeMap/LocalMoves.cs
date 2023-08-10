@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
@@ -165,10 +166,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
         }
         
-        public static void MakeLocalMoves(List<Node> nodes, int amount)
+        public static void IncreaseAspectRatioWithLocalMoves(List<Node> nodes, int numberOfMoves)
         {
-            var allResults = RecursiveMakeMoves(nodes,amount);
-            allResults.Add(new Tuple<List<Node>, double>(nodes,AspectRatiosPNorm(nodes)));
+            var allResults = RecursiveMakeMoves(nodes,numberOfMoves, new List<LocalMove>());
+            allResults.Add(new Tuple<List<Node>, double, IList<LocalMove>>
+                (nodes,AspectRatiosPNorm(nodes), new List<LocalMove>()));
             var bestResult = Utils.ArgMin(allResults, x => x.Item2).Item1;
             foreach(var node in nodes)
             {
@@ -198,84 +200,51 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
         }
 
-        private static List<Tuple<List<Node>,double>> RecursiveMakeMoves(
-            List<Node> nodes,
-            int amount)
+        private static List<Tuple<List<Node>,double,IList<LocalMove>>> RecursiveMakeMoves(
+            IList<Node> nodes,
+            int numberOfMoves,
+            IList<LocalMove> movesTillNow)
         {
-            var resultThisRecursion = new List<Tuple<List<Node>,double>>();
-            
-            if(amount <= 0) return resultThisRecursion;
-
-            HashSet<Segment> segments = new HashSet<Segment>();
-            foreach(var node in nodes)
-            {
-                segments.UnionWith(node.SegmentsDictionary().Values);
-            }
-            List<LocalMove> possibleMoves = new List<LocalMove>();
-            foreach(var segment in segments)
-            {
-                possibleMoves.AddRange(FindLocalMoves(segment));
-            }
-
+            var resultThisRecursion = new List<Tuple<List<Node>,double, IList<LocalMove>>>();
+            if(numberOfMoves <= 0) return resultThisRecursion;
+            var segments = nodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
+            var possibleMoves = segments.SelectMany(FindLocalMoves);
             foreach(var move in possibleMoves)
             {
-                var nodeClones = CloneGraph(nodes,segments);
-                var moveClone = move.Clone(nodeClones);
+                var nodeClonesDictionary = Utils.CloneGraph(nodes,segments);
+                var nodeClonesList = nodeClonesDictionary.Values.ToList();
+                var moveClone = move.Clone(nodeClonesDictionary);
                 moveClone.Apply();
-                var works = CorrectAreas.Correct(nodeClones.Values.ToList());
+                var works = CorrectAreas.Correct(nodeClonesList);
                 if(!works) continue;
+
+                var newMovesList = new List<LocalMove>(movesTillNow) {moveClone};
                 resultThisRecursion.Add(
-                    new Tuple<List<Node>, double>(nodeClones.Values.ToList(),AspectRatiosPNorm(nodeClones.Values.ToList())));
+                    new Tuple<List<Node>, double, IList<LocalMove>>
+                        (nodeClonesList,AspectRatiosPNorm(nodeClonesList),newMovesList));
             }
             resultThisRecursion.Sort((x,y) => x.Item2.CompareTo(y.Item2));
             while(resultThisRecursion.Count > Parameters.RecursionBoundToBestSelection)
             {
                 resultThisRecursion.RemoveAt(Parameters.RecursionBoundToBestSelection);
             }
-
-            var resultsNextRecursions = new List<Tuple<List<Node>,double>>(); 
+            var resultsNextRecursions = new List<Tuple<List<Node>,double, IList<LocalMove>>>(); 
             foreach(var result in resultThisRecursion)
             {
-                resultsNextRecursions.AddRange(RecursiveMakeMoves(result.Item1, amount-1));
+                resultsNextRecursions.AddRange(
+                    RecursiveMakeMoves(
+                                     result.Item1, 
+                        numberOfMoves-1,
+                                     result.Item3));
             }
             return resultThisRecursion.Concat(resultsNextRecursions).ToList();
         }
 
         private static double AspectRatiosPNorm(IList<Node> nodes)
         {
-            Vector<double> aspectRatios = Vector<double>.Build.DenseOfEnumerable(nodes.Select(n => n.Rectangle.AspectRatio()));
+            Vector<double> aspectRatios =
+                Vector<double>.Build.DenseOfEnumerable(nodes.Select(n => n.Rectangle.AspectRatio()));
             return aspectRatios.Norm(Parameters.PNorm);
-        }
-
-        private static Dictionary<string,Node> CloneGraph(IList<Node> nodes, HashSet<Segment> segments)
-        {
-            Dictionary<string,Node> mapOriginalClone = 
-            nodes.ToDictionary(
-                node => node.ID,
-                node => {
-                            var nodeClone = new Node(node.ID)
-                            {
-                                Rectangle = (Rectangle) node.Rectangle.Clone(),
-                                Size = node.Size
-                            };
-                            return nodeClone;
-                        });
-
-            foreach(var segment in segments)
-            {
-                var segmentClone = new Segment(segment.IsConst, segment.IsVertical);
-                foreach(var node in segment.Side1Nodes.ToArray())
-                {
-                    mapOriginalClone[node.ID].RegisterSegment(segmentClone, 
-                        segmentClone.IsVertical ? Direction.Right : Direction.Upper);
-                }
-                foreach(var node in segment.Side2Nodes.ToArray())
-                {
-                    mapOriginalClone[node.ID].RegisterSegment(segmentClone, 
-                        segmentClone.IsVertical ? Direction.Left : Direction.Lower);
-                }
-            }
-            return mapOriginalClone;
         }
     }
 }

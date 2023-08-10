@@ -46,5 +46,34 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 node.Rectangle.depth *= scaleZ;
             }
         }
+        
+        public static IDictionary<string,Node> CloneGraph(IList<Node> nodes, HashSet<Segment> segments)
+        {
+            // clones the nodes only partially: does NOT clone the segment
+            IDictionary<string,Node> clonesMap = nodes.ToDictionary(node => node.ID,
+                node => new Node(node.ID)
+                    {
+                        Rectangle = (Rectangle) node.Rectangle.Clone(), Size = node.Size
+                    }
+                );
+            
+            // segments are here cloned separately 
+            foreach(var segment in segments)
+            {
+                var segmentClone = new Segment(segment.IsConst, segment.IsVertical);
+                foreach(var node in segment.Side1Nodes.ToArray())
+                {
+                    clonesMap[node.ID].RegisterSegment(segmentClone, 
+                        segmentClone.IsVertical ? Direction.Right : Direction.Upper);
+                }
+                foreach(var node in segment.Side2Nodes.ToArray())
+                {
+                    clonesMap[node.ID].RegisterSegment(segmentClone, 
+                        segmentClone.IsVertical ? Direction.Left : Direction.Lower);
+                }
+            }
+            return clonesMap;
+        }
+        
     }
 }

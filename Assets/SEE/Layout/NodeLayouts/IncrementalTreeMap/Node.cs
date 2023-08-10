@@ -7,9 +7,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class Node
     {
-        public Node(string nodeID)
+        public Node(string ID)
         {
-            this.ID = nodeID;
+            this.ID = ID;
         }
 
         public Rectangle Rectangle { get; set; }
@@ -76,7 +76,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                  {Direction.Lower, this.lowerBoundingSegment},
                  {Direction.Upper, this.upperBoundingSegment}};
         }
-
+        
         private string DebuggerDisplay =>
             string.Format(
                 "{0,15} x=[{1,-6}, {2,-6}] y=[{3,-6}, {4,-6}]",

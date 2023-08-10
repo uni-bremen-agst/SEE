@@ -257,7 +257,7 @@ namespace SEE.Layout.NodeLayouts
                 CheckEqualNodeSets(workWith, newTNodes);
 
                 CorrectAreas.Correct(workWith);
-                LocalMoves.MakeLocalMoves(workWith.ToList(), Parameters.NumberOfLocalMoves);
+                LocalMoves.IncreaseAspectRatioWithLocalMoves(workWith.ToList(), Parameters.NumberOfLocalMoves);
                 CheckConsistent(workWith);
             }
 

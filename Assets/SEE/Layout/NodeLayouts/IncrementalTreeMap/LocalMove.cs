@@ -7,13 +7,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     public abstract class LocalMove
     {
         protected Node node1;
-        public Node Node1{get => this.node1;}
+        public Node Node1 => this.node1;
         protected Node node2;
 
-        public Node Node2{get => this.node2;}
+        public Node Node2 => this.node2;
         public abstract void Apply();
 
-        public abstract LocalMove Clone(Dictionary<string,Node> mapOriginalClone);
+        public abstract LocalMove Clone(IDictionary<string,Node> mapOriginalClone);
     }
 
     public class FlipMove : LocalMove
@@ -59,7 +59,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         override
-        public LocalMove Clone(Dictionary<string,Node> mapOriginalClone)
+        public LocalMove Clone(IDictionary<string,Node> mapOriginalClone)
         {
             return new FlipMove(mapOriginalClone[node1.ID],mapOriginalClone[node2.ID],clockwise);
         }
@@ -203,7 +203,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         override
-        public LocalMove Clone(Dictionary<string,Node> mapOriginalClone)
+        public LocalMove Clone(IDictionary<string,Node> mapOriginalClone)
         {
             return new StretchMove(mapOriginalClone[node1.ID],mapOriginalClone[node2.ID]);
         }
