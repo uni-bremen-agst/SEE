@@ -250,12 +250,12 @@ namespace SEE.Layout.NodeLayouts
                     TSegment newSegment = new TSegment(segment.IsConst, segment.IsVertical);
                     foreach(var oldTNode in segment.Side1Nodes)
                     {
-                        TNode newNode = TNodeMap[oldTNode.ID]; //workWith.Where(x => x.ID == oldTNode.ID).First();
+                        TNode newNode = workWith.Where(x => x.ID == oldTNode.ID).First();
                         newNode.registerSegment(newSegment, newSegment.IsVertical ? Direction.Right : Direction.Upper);
                     }
                     foreach(var oldTNode in segment.Side2Nodes)
                     {
-                        TNode newNode = TNodeMap[oldTNode.ID]; //workWith.Where(x => x.ID == oldTNode.ID).First();
+                        TNode newNode = workWith.Where(x => x.ID == oldTNode.ID).First();
                         newNode.registerSegment(newSegment, newSegment.IsVertical ? Direction.Left : Direction.Lower);
                     }
                 }
