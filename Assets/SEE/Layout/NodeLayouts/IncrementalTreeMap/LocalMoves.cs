@@ -1,14 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System;
-using UnityEngine.Assertions;
 using MathNet.Numerics.LinearAlgebra;
+using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     static class LocalMoves
     {
-        private static IList<LocalMove> findLocalMoves(TSegment segment)
+        private static IList<LocalMove> FindLocalMoves(TSegment segment)
         {
             List<LocalMove> result = new List<LocalMove>();
             if(segment.IsConst)
@@ -23,24 +23,24 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
             if(segment.IsVertical)
             {
-                TNode upperNode1 = Utils.ArgMaxJ<TNode>(segment.Side1Nodes, x => x.Rectangle.z);
-                TNode upperNode2 = Utils.ArgMaxJ<TNode>(segment.Side2Nodes, x => x.Rectangle.z);
+                TNode upperNode1 = Utils.ArgMaxJ(segment.Side1Nodes, x => x.Rectangle.z);
+                TNode upperNode2 = Utils.ArgMaxJ(segment.Side2Nodes, x => x.Rectangle.z);
                 Assert.IsTrue(upperNode1.SegmentsDictionary()[Direction.Upper] == upperNode2.SegmentsDictionary()[Direction.Upper]);
 
-                TNode lowerNode1 = Utils.ArgMinJ<TNode>(segment.Side1Nodes, x => x.Rectangle.z);
-                TNode lowerNode2 = Utils.ArgMinJ<TNode>(segment.Side2Nodes, x => x.Rectangle.z);
+                TNode lowerNode1 = Utils.ArgMinJ(segment.Side1Nodes, x => x.Rectangle.z);
+                TNode lowerNode2 = Utils.ArgMinJ(segment.Side2Nodes, x => x.Rectangle.z);
                 Assert.IsTrue(lowerNode1.SegmentsDictionary()[Direction.Lower] == lowerNode2.SegmentsDictionary()[Direction.Lower]);
 
                 result.Add(new StretchMove(upperNode1,upperNode2));
                 result.Add(new StretchMove(lowerNode1,lowerNode2));
                 return result;
             }
-            TNode rightNode1 = Utils.ArgMaxJ<TNode>(segment.Side1Nodes, x => x.Rectangle.x);
-            TNode rightNode2 = Utils.ArgMaxJ<TNode>(segment.Side2Nodes, x => x.Rectangle.x);
+            TNode rightNode1 = Utils.ArgMaxJ(segment.Side1Nodes, x => x.Rectangle.x);
+            TNode rightNode2 = Utils.ArgMaxJ(segment.Side2Nodes, x => x.Rectangle.x);
             Assert.IsTrue(rightNode1.SegmentsDictionary()[Direction.Right] == rightNode2.SegmentsDictionary()[Direction.Right]);
 
-            TNode leftNode1 = Utils.ArgMinJ<TNode>(segment.Side1Nodes, x => x.Rectangle.x);
-            TNode leftNode2 = Utils.ArgMinJ<TNode>(segment.Side2Nodes, x => x.Rectangle.x);
+            TNode leftNode1 = Utils.ArgMinJ(segment.Side1Nodes, x => x.Rectangle.x);
+            TNode leftNode2 = Utils.ArgMinJ(segment.Side2Nodes, x => x.Rectangle.x);
             Assert.IsTrue(leftNode1.SegmentsDictionary()[Direction.Left] == leftNode2.SegmentsDictionary()[Direction.Left]);
 
             result.Add(new StretchMove(rightNode1,rightNode2));
@@ -52,7 +52,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         {
             // ArgMax is shit in c#
             // node with rectangle with highest aspect ratio
-            TNode bestNode = Utils.ArgMaxJ<TNode>(nodes, x => x.Rectangle.AspectRatio());
+            TNode bestNode = Utils.ArgMaxJ(nodes, x => x.Rectangle.AspectRatio());
 
             newNode.Rectangle = new TRectangle(x: bestNode.Rectangle.x, z: bestNode.Rectangle.z,
                                                width: bestNode.Rectangle.width, depth: bestNode.Rectangle.depth);
@@ -87,7 +87,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         public static void DeleteNode(TNode obsoleteNode)
         {
-            // check wether node is grounded
+            // check whether node is grounded
             var segments = obsoleteNode.SegmentsDictionary();
             bool isGrounded = false;
             if(segments[Direction.Left].Side2Nodes.Count == 1 && !segments[Direction.Left].IsConst)
@@ -147,9 +147,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
             else
             {
-                TSegment bestSegment = Utils.ArgMinJ<TSegment>(segments.Values, x => x.Side1Nodes.Count + x.Side2Nodes.Count);
+                TSegment bestSegment = Utils.ArgMinJ(segments.Values, x => x.Side1Nodes.Count + x.Side2Nodes.Count);
                 
-                var moves = findLocalMoves(bestSegment);
+                var moves = FindLocalMoves(bestSegment);
                 Assert.IsTrue(moves.All(x => x is (StretchMove)));
                 foreach(var move in moves)
                 {
@@ -202,9 +202,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             List<TNode> nodes,
             int amount)
         {
-            var result_ThisRecursion = new List<Tuple<List<TNode>,double>>();
+            var resultThisRecursion = new List<Tuple<List<TNode>,double>>();
             
-            if(amount <= 0) return result_ThisRecursion;
+            if(amount <= 0) return resultThisRecursion;
 
             HashSet<TSegment> segments = new HashSet<TSegment>();
             foreach(var node in nodes)
@@ -214,7 +214,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             List<LocalMove> possibleMoves = new List<LocalMove>();
             foreach(var segment in segments)
             {
-                possibleMoves.AddRange(findLocalMoves(segment));
+                possibleMoves.AddRange(FindLocalMoves(segment));
             }
 
             foreach(var move in possibleMoves)
@@ -224,21 +224,21 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 moveClone.Apply();
                 var works = CorrectAreas.Correct(nodeClones.Values.ToList());
                 if(!works) continue;
-                result_ThisRecursion.Add(
+                resultThisRecursion.Add(
                     new Tuple<List<TNode>, double>(nodeClones.Values.ToList(),AspectRatiosPNorm(nodeClones.Values.ToList())));
             }
-            result_ThisRecursion.Sort((x,y) => x.Item2.CompareTo(y.Item2));
-            while(result_ThisRecursion.Count > Parameters.RecursionBoundToBestSelection)
+            resultThisRecursion.Sort((x,y) => x.Item2.CompareTo(y.Item2));
+            while(resultThisRecursion.Count > Parameters.RecursionBoundToBestSelection)
             {
-                result_ThisRecursion.RemoveAt(Parameters.RecursionBoundToBestSelection);
+                resultThisRecursion.RemoveAt(Parameters.RecursionBoundToBestSelection);
             }
 
-            var results_NextRecursions = new List<Tuple<List<TNode>,double>>(); 
-            foreach(var result in result_ThisRecursion)
+            var resultsNextRecursions = new List<Tuple<List<TNode>,double>>(); 
+            foreach(var result in resultThisRecursion)
             {
-                results_NextRecursions.AddRange(RecursiveMakeMoves(result.Item1, amount-1));
+                resultsNextRecursions.AddRange(RecursiveMakeMoves(result.Item1, amount-1));
             }
-            return result_ThisRecursion.Concat(results_NextRecursions).ToList();
+            return resultThisRecursion.Concat(resultsNextRecursions).ToList();
         }
 
         private static double AspectRatiosPNorm(IList<TNode> nodes)
@@ -253,9 +253,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             nodes.ToDictionary(
                 node => node.ID,
                 node => {
-                            var nodeClone = new TNode(node.ID);
-                            nodeClone.Rectangle = (TRectangle) node.Rectangle.Clone();
-                            nodeClone.Size = node.Size;
+                            var nodeClone = new TNode(node.ID)
+                            {
+                                Rectangle = (TRectangle) node.Rectangle.Clone(),
+                                Size = node.Size
+                            };
                             return nodeClone;
                         });
 
