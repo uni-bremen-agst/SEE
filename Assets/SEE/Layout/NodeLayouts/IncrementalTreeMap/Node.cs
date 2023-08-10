@@ -11,12 +11,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         {
             this.ID = nodeID;
         }
-        
-        private Rectangle rectangle;
-        public Rectangle Rectangle 
-        {   get => rectangle; 
-            set => rectangle = value;
-        }
+
+        public Rectangle Rectangle { get; set; }
 
         public float Size { get; set; }
 
@@ -85,9 +81,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             string.Format(
                 "{0,15} x=[{1,-6}, {2,-6}] y=[{3,-6}, {4,-6}]",
                 ID,
-                Math.Round(rectangle.x,3),
-                Math.Round(rectangle.x + rectangle.width, 3),
-                Math.Round(rectangle.z, 3),
-                Math.Round(rectangle.z + rectangle.depth, 3));
+                Math.Round(Rectangle.x,3),
+                Math.Round(Rectangle.x + Rectangle.width, 3),
+                Math.Round(Rectangle.z, 3),
+                Math.Round(Rectangle.z + Rectangle.depth, 3));
     }
 }
