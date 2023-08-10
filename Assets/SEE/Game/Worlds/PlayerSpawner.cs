@@ -98,6 +98,10 @@ namespace SEE.Game.Worlds
         /// <param name="owner">the network ID of the owner</param>
         private void Spawn(ulong owner)
         {
+            if (owner == NetworkManager.Singleton.LocalClientId && NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost)
+            {
+                return;
+            }
             int index = numberOfSpawnedPlayers % PlayerSpawns.Count;
             GameObject player = Instantiate(PlayerSpawns[index].PlayerPrefab,
                                             PlayerSpawns[index].Position,
