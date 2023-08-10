@@ -42,10 +42,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 TNode upperNode1 = ArgMaxJ<TNode>(segment.Side1Nodes, x => x.Rectangle.z);
                 TNode upperNode2 = ArgMaxJ<TNode>(segment.Side2Nodes, x => x.Rectangle.z);
                 Assert.IsTrue(upperNode1.getAllSegments()[Direction.Upper] == upperNode2.getAllSegments()[Direction.Upper]);
+                Assert.IsTrue(upperNode1.SegmentsDictionary()[Direction.Upper] == upperNode2.SegmentsDictionary()[Direction.Upper]);
 
                 TNode lowerNode1 = ArgMinJ<TNode>(segment.Side1Nodes, x => x.Rectangle.z);
                 TNode lowerNode2 = ArgMinJ<TNode>(segment.Side2Nodes, x => x.Rectangle.z);
                 Assert.IsTrue(lowerNode1.getAllSegments()[Direction.Lower] == lowerNode2.getAllSegments()[Direction.Lower]);
+                Assert.IsTrue(lowerNode1.SegmentsDictionary()[Direction.Lower] == lowerNode2.SegmentsDictionary()[Direction.Lower]);
 
                 result.Add(new StretchMove(upperNode1,upperNode2));
                 result.Add(new StretchMove(lowerNode1,lowerNode2));
@@ -54,10 +56,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             TNode rightNode1 = ArgMaxJ<TNode>(segment.Side1Nodes, x => x.Rectangle.x);
             TNode rightNode2 = ArgMaxJ<TNode>(segment.Side2Nodes, x => x.Rectangle.x);
             Assert.IsTrue(rightNode1.getAllSegments()[Direction.Right] == rightNode2.getAllSegments()[Direction.Right]);
+            Assert.IsTrue(rightNode1.SegmentsDictionary()[Direction.Right] == rightNode2.SegmentsDictionary()[Direction.Right]);
 
             TNode leftNode1 = ArgMinJ<TNode>(segment.Side1Nodes, x => x.Rectangle.x);
             TNode leftNode2 = ArgMinJ<TNode>(segment.Side2Nodes, x => x.Rectangle.x);
             Assert.IsTrue(leftNode1.getAllSegments()[Direction.Left] == leftNode2.getAllSegments()[Direction.Left]);
+            Assert.IsTrue(leftNode1.SegmentsDictionary()[Direction.Left] == leftNode2.SegmentsDictionary()[Direction.Left]);
 
             result.Add(new StretchMove(rightNode1,rightNode2));
             result.Add(new StretchMove(leftNode1,leftNode2));
@@ -72,7 +76,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
             newNode.Rectangle = new TRectangle(x: bestNode.Rectangle.x, z: bestNode.Rectangle.z,
                                                width: bestNode.Rectangle.width, depth: bestNode.Rectangle.depth);
-            IDictionary<Direction,TSegment> segments = bestNode.getAllSegments();
+            IDictionary<Direction,TSegment> segments = bestNode.SegmentsDictionary();
             foreach(Direction dir in Enum.GetValues(typeof(Direction)))
             {
                 newNode.registerSegment(segments[dir],dir);
@@ -104,7 +108,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         public static void DeleteNode(TNode obsoleteNode)
         {
             // check wether node is grounded
-            var segments = obsoleteNode.getAllSegments();
+            var segments = obsoleteNode.SegmentsDictionary();
             bool isGrounded = false;
             if(segments[Direction.Left].Side2Nodes.Count == 1 && !segments[Direction.Left].IsConst)
             {
@@ -194,7 +198,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             HashSet<TSegment> resultSegments = new HashSet<TSegment>();
             foreach(var resultNode in bestResult)
             {
-                resultSegments.UnionWith(resultNode.getAllSegments().Values);
+                resultSegments.UnionWith(resultNode.SegmentsDictionary().Values);
             }
             foreach(var resultSegment in resultSegments)
             {
@@ -225,7 +229,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             HashSet<TSegment> segments = new HashSet<TSegment>();
             foreach(var node in nodes)
             {
-                segments.UnionWith(node.getAllSegments().Values);
+                segments.UnionWith(node.SegmentsDictionary().Values);
             }
             List<LocalMove> possibleMoves = new List<LocalMove>();
             foreach(var segment in segments)

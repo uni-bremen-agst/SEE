@@ -28,8 +28,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         override 
         public void Apply()
         {
-            var segmentsNode1 = node1.getAllSegments();
-            var segmentsNode2 = node2.getAllSegments();
+            var segmentsNode1 = node1.SegmentsDictionary();
+            var segmentsNode2 = node2.SegmentsDictionary();
 
             if(segmentsNode1[Direction.Right] == segmentsNode2[Direction.Left])
             {
@@ -91,9 +91,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
 
             // switch segments
-            TSegment newRightSegmentForLeftNode = rightNode.getAllSegments()[Direction.Right];
-            TSegment newLeftSegmentForRightNode  = leftNode.getAllSegments()[Direction.Left];
-            TSegment middle = leftNode.getAllSegments()[Direction.Right];
+            TSegment newRightSegmentForLeftNode = rightNode.SegmentsDictionary()[Direction.Right];
+            TSegment newLeftSegmentForRightNode  = leftNode.SegmentsDictionary()[Direction.Left];
+            TSegment middle = leftNode.SegmentsDictionary()[Direction.Right];
             middle.IsVertical = false;
 
             leftNode.registerSegment(newRightSegmentForLeftNode, Direction.Right);
@@ -137,9 +137,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
 
             // switch segments
-            TSegment newUpperSegmentForLowerNode = upperNode.getAllSegments()[Direction.Upper];
-            TSegment newLowerSegmentForUpperNode = lowerNode.getAllSegments()[Direction.Lower];
-            TSegment middle = lowerNode.getAllSegments()[Direction.Upper];
+            TSegment newUpperSegmentForLowerNode = upperNode.SegmentsDictionary()[Direction.Upper];
+            TSegment newLowerSegmentForUpperNode = lowerNode.SegmentsDictionary()[Direction.Lower];
+            TSegment middle = lowerNode.SegmentsDictionary()[Direction.Upper];
             middle.IsVertical = true;
 
             lowerNode.registerSegment(newUpperSegmentForLowerNode, Direction.Upper);
@@ -169,8 +169,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         override 
         public void Apply()
         {
-            var segmentsNode1 = node1.getAllSegments();
-            var segmentsNode2 = node2.getAllSegments();
+            var segmentsNode1 = node1.SegmentsDictionary();
+            var segmentsNode2 = node2.SegmentsDictionary();
             if(    segmentsNode1[Direction.Right] == segmentsNode2[Direction.Left]
                 || segmentsNode1[Direction.Left] == segmentsNode2[Direction.Right])
             {
@@ -214,8 +214,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             // along lower           along upper   
             //    [r]         [r]    [l][r]  ->  [llll]
             // [l][r]  ->  [llll]       [r]         [r]
-            var segmentsLeftNode = leftNode.getAllSegments();
-            var segmentsRightNode = rightNode.getAllSegments();
+            var segmentsLeftNode = leftNode.SegmentsDictionary();
+            var segmentsRightNode = rightNode.SegmentsDictionary();
             bool alongLowerSegment = segmentsLeftNode[Direction.Lower] == segmentsRightNode[Direction.Lower];
             // adjust rectangles
             leftNode.Rectangle.width += rightNode.Rectangle.width;
@@ -241,8 +241,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             // along lower           along upper   
             // [l]         [l]       [l][r]  ->  [r][r]
             // [l][r]  ->  [r][r]    [l]         [l]
-            var segmentsLeftNode = leftNode.getAllSegments();
-            var segmentsRightNode = rightNode.getAllSegments();
+            var segmentsLeftNode = leftNode.SegmentsDictionary();
+            var segmentsRightNode = rightNode.SegmentsDictionary();
             bool alongLowerSegment = segmentsLeftNode[Direction.Lower] == segmentsRightNode[Direction.Lower];
             // adjust rectangles
             rightNode.Rectangle.width += leftNode.Rectangle.width;
@@ -269,8 +269,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             // along left           along right   
             // [uuuu] ->  [l][u]    [uuuu]  ->  [u][l]
             // [l]        [l]          [l]         [l]
-            var segmentsLowerNode = lowerNode.getAllSegments();
-            var segmentsUpperNode = upperNode.getAllSegments();
+            var segmentsLowerNode = lowerNode.SegmentsDictionary();
+            var segmentsUpperNode = upperNode.SegmentsDictionary();
             bool alongLeftSegment = segmentsLowerNode[Direction.Left] == segmentsUpperNode[Direction.Left];
             // adjust rectangles
             lowerNode.Rectangle.depth += upperNode.Rectangle.depth;
@@ -296,8 +296,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             // along left           along right
             // [u]    ->  [u]          [u]  ->      [u]
             // [llll]     [u][l]    [llll]       [l][u]
-            var segmentsLowerNode = lowerNode.getAllSegments();
-            var segmentsUpperNode = upperNode.getAllSegments();
+            var segmentsLowerNode = lowerNode.SegmentsDictionary();
+            var segmentsUpperNode = upperNode.SegmentsDictionary();
             bool alongLeftSegment = segmentsLowerNode[Direction.Left] == segmentsUpperNode[Direction.Left];
             // adjust rectangles
             upperNode.Rectangle.depth += lowerNode.Rectangle.depth;

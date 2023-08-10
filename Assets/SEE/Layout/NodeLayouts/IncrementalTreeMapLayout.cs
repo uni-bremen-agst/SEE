@@ -354,7 +354,7 @@ namespace SEE.Layout.NodeLayouts
             HashSet<TSegment> result = new HashSet<TSegment>();
             foreach(TNode node in nodes)
             {
-                ICollection<TSegment> boundingSegments = node.getAllSegments().Values;
+                ICollection<TSegment> boundingSegments = node.SegmentsDictionary().Values;
                 foreach(TSegment segment in boundingSegments)
                 {
                     Assert.IsNotNull(segment);
@@ -428,7 +428,7 @@ namespace SEE.Layout.NodeLayouts
         {
             foreach(var node in nodes)
             {
-                var segs = node.getAllSegments(); 
+                var segs = node.SegmentsDictionary(); 
                 foreach(Direction dir in Enum.GetValues(typeof(Direction)))
                 {
                     var seg = segs[dir];
@@ -454,28 +454,28 @@ namespace SEE.Layout.NodeLayouts
                     {
                         foreach(TNode neighborNode in seg.Side1Nodes)
                         {
-                            Assert.IsTrue(neighborNode.getAllSegments()[Direction.Right] == seg);
+                            Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Right] == seg);
                         }
                     }
                     if(dir == Direction.Right)
                     {
                         foreach(TNode neighborNode in seg.Side2Nodes)
                         {
-                            Assert.IsTrue(neighborNode.getAllSegments()[Direction.Left] == seg);
+                            Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Left] == seg);
                         }
                     }
                     if(dir == Direction.Lower)
                     {
                         foreach(TNode neighborNode in seg.Side1Nodes)
                         {
-                            Assert.IsTrue(neighborNode.getAllSegments()[Direction.Upper] == seg);
+                            Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Upper] == seg);
                         }
                     }
                     if(dir == Direction.Upper)
                     {
                         foreach(TNode neighborNode in seg.Side2Nodes)
                         {
-                            Assert.IsTrue(neighborNode.getAllSegments()[Direction.Lower] == seg);
+                            Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Lower] == seg);
                         }
                     }
 

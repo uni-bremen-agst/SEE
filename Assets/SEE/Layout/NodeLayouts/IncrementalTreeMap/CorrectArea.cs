@@ -17,7 +17,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             HashSet<TSegment> segments = new HashSet<TSegment>();
             foreach(var node in nodes)
             {
-                segments.UnionWith(node.getAllSegments().Values);
+                segments.UnionWith(node.SegmentsDictionary().Values);
             }
             segments.RemoveWhere(s => s.IsConst);
             int i = 0;
@@ -51,7 +51,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             var matrix = Matrix<float>.Build.Sparse(n,n-1);
             foreach(var node in nodes)
             {
-                var segments = node.getAllSegments();
+                var segments = node.SegmentsDictionary();
                 int index_node = nodes.IndexOf(node);    
                 foreach(Direction dir in Enum.GetValues(typeof(Direction)))
                 {
@@ -129,7 +129,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         {
             foreach(var node in nodes)
             {
-                var segments = node.getAllSegments();
+                var segments = node.SegmentsDictionary();
                 foreach(Direction dir in Enum.GetValues(typeof(Direction)))
                 {
                     var segment = segments[dir];

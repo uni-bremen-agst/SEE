@@ -77,7 +77,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
         }
 
-        public IDictionary<Direction,TSegment> getAllSegments()
+        public IDictionary<Direction,TSegment> SegmentsDictionary()
         {
             return new Dictionary<Direction,TSegment>{
                  {Direction.Left,  this.leftBoundingSegment},
