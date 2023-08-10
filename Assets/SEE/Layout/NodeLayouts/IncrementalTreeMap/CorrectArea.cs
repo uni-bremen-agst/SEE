@@ -38,6 +38,31 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         
         private static bool IsSliceable(IList<TNode> nodes, out TSegment slicingSegment)
         {
+            slicingSegment = null;
+            var segments = nodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
+            foreach (var segment in segments)
+            {
+                slicingSegment = segment;
+                if (segment.IsConst) return false;
+                if (segment.IsVertical)
+                {
+                    var nodeLowerEnd = Utils.ArgMinJ(segment.Side1Nodes, node => node.Rectangle.z);
+                    var nodeUpperEnd = Utils.ArgMaxJ(segment.Side1Nodes,
+                        node => node.Rectangle.z + node.Rectangle.depth);
+                    return (nodeLowerEnd.SegmentsDictionary()[Direction.Lower].IsConst &&
+                            nodeUpperEnd.SegmentsDictionary()[Direction.Upper].IsConst);
+                }
+                else
+                {
+                    var nodeLeftEnd = Utils.ArgMinJ(segment.Side1Nodes, node => node.Rectangle.x);
+                    var nodeRightEnd = Utils.ArgMaxJ(segment.Side1Nodes,
+                        node => node.Rectangle.x + node.Rectangle.width);
+                    return (nodeLeftEnd.SegmentsDictionary()[Direction.Left].IsConst &&
+                            nodeRightEnd.SegmentsDictionary()[Direction.Right].IsConst);
+                }
+            }
+
+            return false;
         }
 
         private static void Split(IList<TNode> nodes, TSegment slicingSegment,
