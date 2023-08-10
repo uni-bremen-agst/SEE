@@ -15,7 +15,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         private bool isConst;
-        public bool IsConst {get => isConst;}
+        public bool IsConst {get => isConst; set {this.isConst = value;}}
         private IList<TNode> side1Nodes;
         public IList<TNode> Side1Nodes{get => side1Nodes;}
         private IList<TNode> side2Nodes;
