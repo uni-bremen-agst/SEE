@@ -27,6 +27,24 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             return new TRectangle(x, z, width, depth);
         }
         
-        
+        public static void TransformRectangles(IList<TNode> nodes, TRectangle newRectangle ,TRectangle oldRectangle)
+        {
+
+            // linear transform line   x1<---->x2
+            //               to line       y1<------->y2
+            // f  : [x1,x2] -> [y1,y2]
+            // f  : x   maps to (x - x1) * ((y2-y1)/(x2-x1)) + y1
+
+            double scaleX = newRectangle.width / oldRectangle.width;
+            double scaleZ = newRectangle.depth / oldRectangle.depth;
+
+            foreach( var node in nodes)
+            {
+                node.Rectangle.x = (node.Rectangle.x - oldRectangle.x) * scaleX + newRectangle.x;
+                node.Rectangle.z = (node.Rectangle.z - oldRectangle.z) * scaleZ + newRectangle.z;
+                node.Rectangle.width *= scaleX;
+                node.Rectangle.depth *= scaleZ;
+            }
+        }
     }
 }

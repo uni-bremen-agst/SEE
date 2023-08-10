@@ -263,7 +263,9 @@ namespace SEE.Layout.NodeLayouts
 
                 TRectangle oldRectangle = oldLayout.GetParentTRectangle(oldTNodes[0]);
                 
-                TransformRectangles(workWith, oldRectangle: oldRectangle, newRectangle: rectangle);
+                IncrementalTreeMap.Utils.TransformRectangles(workWith, 
+                    oldRectangle: oldRectangle, 
+                    newRectangle: rectangle);
 
                 foreach(var obsoleteNode in nodesToBeDeleted)
                 {
@@ -390,27 +392,7 @@ namespace SEE.Layout.NodeLayouts
                 layout_result[o] = new NodeTransform(position, scale);
             }
         }
-
-        private void TransformRectangles(IList<TNode> nodes, TRectangle newRectangle ,TRectangle oldRectangle)
-        {
-
-            // linear transform line   x1<---->x2
-            //               to line       y1<------->y2
-            // f  : [x1,x2] -> [y1,y2]
-            // f  : x   maps to (x - x1) * ((y2-y1)/(x2-x1)) + y1
-
-            double scale_x = newRectangle.width / oldRectangle.width;
-            double scale_z = newRectangle.depth / oldRectangle.depth;
-
-            foreach( var node in nodes)
-            {
-                node.Rectangle.x = (node.Rectangle.x - oldRectangle.x) * scale_x + newRectangle.x;
-                node.Rectangle.z = (node.Rectangle.z - oldRectangle.z) * scale_z + newRectangle.z;
-                node.Rectangle.width *= scale_x;
-                node.Rectangle.depth *= scale_z;
-            }
-        }
-
+        
         private TRectangle GetParentTRectangle(TNode node)
         {
             var layoutNode = ILayoutNodeMap[node.ID];
