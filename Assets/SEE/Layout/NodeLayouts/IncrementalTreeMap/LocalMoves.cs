@@ -3,14 +3,13 @@ using System.Linq;
 using System;
 using UnityEngine.Assertions;
 using MathNet.Numerics.LinearAlgebra;
-using Unity.Jobs;
 using Unity.Collections;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     static class LocalMoves
     {
-        static double pNorm = double.PositiveInfinity;
+        static double pNorm = 2d; // double.PositiveInfinity;
 
         static int RecursionBoundToBestSelection = 4;
         private static T ArgMaxJ<T>(ICollection<T> collection, Func<T, IComparable> eval)
