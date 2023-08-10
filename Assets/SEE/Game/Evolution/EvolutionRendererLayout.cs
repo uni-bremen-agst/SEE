@@ -110,12 +110,14 @@ namespace SEE.Game.Evolution
                 gameObjects.Add(gameNode);
             }
 
-            /// IncrementalTreeMapLayout must should know the last layout, till its used to calculate the 
-            /// new one
-            if( nodeLayout is IncrementalTreeMapLayout && oldLayout is IncrementalTreeMapLayout)
+            // Since incremental layouts must know the layout of the last revision
+            // but are also bound to the function calls of NodeLayout
+            // we must hand over this argument here separately 
+            if( nodeLayout is IIncrementalNodeLayout && oldLayout is IIncrementalNodeLayout)
             {
-                ((IncrementalTreeMapLayout) nodeLayout).OldLayout = (IncrementalTreeMapLayout) oldLayout;
+                ((IIncrementalNodeLayout) nodeLayout).OldLayout = (IIncrementalNodeLayout) oldLayout;
             }
+
             // Calculate and apply the node layout
             ICollection<LayoutGraphNode> layoutNodes = GraphRenderer.ToAbstractLayoutNodes(gameObjects);
             // Note: Apply applies its results only on the layoutNodes but not on the game objects

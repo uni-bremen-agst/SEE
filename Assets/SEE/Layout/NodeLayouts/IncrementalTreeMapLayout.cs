@@ -11,7 +11,7 @@ namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// </summary>
-    public class IncrementalTreeMapLayout : HierarchicalNodeLayout
+    public class IncrementalTreeMapLayout : HierarchicalNodeLayout, IIncrementalNodeLayout
     {
         /// <summary>
         /// Constructor. The width and depth are assumed to be in Unity units.
@@ -67,8 +67,19 @@ namespace SEE.Layout.NodeLayouts
 
         private IncrementalTreeMapLayout oldLayout;
 
-        public IncrementalTreeMapLayout OldLayout
-        {get => OldLayout; set {this.oldLayout = value;}}
+        public IIncrementalNodeLayout OldLayout
+        {   set {
+                    if(value is IncrementalTreeMapLayout)
+                    {
+                        this.oldLayout = (IncrementalTreeMapLayout) value;
+                    }
+                    else
+                    {
+                        this.oldLayout = null;
+                        Debug.LogWarning("Incremental layout was not of same type");
+                    }
+                }
+        }
 
         public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
         {
