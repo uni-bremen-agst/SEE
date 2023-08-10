@@ -10,8 +10,6 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     static class CorrectAreas
     {
-
-        static double precision = 0.00001; 
         public static bool Correct(IList<TNode> nodes)
         {
             if (nodes.Count == 1) return true;
@@ -98,12 +96,6 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     }
                 }
             }
-            
-            
-            foreach (var node in nodes)
-            {
-                
-            }
         }
 
         private static void AdjustSliced(IList<TNode> partition1, 
@@ -146,18 +138,18 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             for(int j = 0; j < 50; j++)
             {
                 distance = CalculateOneStep(nodes, mapSegmentIndex);
-                if(distance <= precision) break;
+                if(distance <= Parameters.Precision) break;
             }
-            if(distance > precision)
+            if(distance > Parameters.Precision)
             {
-                Debug.LogWarning($" layout correction > {precision}");
+                Debug.LogWarning($" layout correction > {Parameters.Precision}");
             }
             bool cons = CheckCons(nodes);
             if(!cons)
             {
                 Debug.LogWarning("layout correction failed negative rec");
             }
-            return (cons && distance < precision);
+            return (cons && distance < Parameters.Precision);
         }
 
         private static Matrix<double> JacobianMatrix(

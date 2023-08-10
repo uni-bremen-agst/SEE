@@ -8,10 +8,6 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     static class LocalMoves
     {
-        static double pNorm = 2d; // double.PositiveInfinity;
-
-        static int RecursionBoundToBestSelection = 4;
-        
         private static IList<LocalMove> findLocalMoves(TSegment segment)
         {
             List<LocalMove> result = new List<LocalMove>();
@@ -232,9 +228,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     new Tuple<List<TNode>, double>(nodeClones.Values.ToList(),AspectRatiosPNorm(nodeClones.Values.ToList())));
             }
             result_ThisRecursion.Sort((x,y) => x.Item2.CompareTo(y.Item2));
-            while(result_ThisRecursion.Count > RecursionBoundToBestSelection)
+            while(result_ThisRecursion.Count > Parameters.RecursionBoundToBestSelection)
             {
-                result_ThisRecursion.RemoveAt(RecursionBoundToBestSelection);
+                result_ThisRecursion.RemoveAt(Parameters.RecursionBoundToBestSelection);
             }
 
             var results_NextRecursions = new List<Tuple<List<TNode>,double>>(); 
@@ -248,7 +244,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         private static double AspectRatiosPNorm(IList<TNode> nodes)
         {
             Vector<double> aspectRatios = Vector<double>.Build.DenseOfEnumerable(nodes.Select(n => n.Rectangle.AspectRatio()));
-            return aspectRatios.Norm(pNorm);
+            return aspectRatios.Norm(Parameters.PNorm);
         }
 
         private static Dictionary<string,TNode> CloneGraph(IList<TNode> nodes, HashSet<TSegment> segments)

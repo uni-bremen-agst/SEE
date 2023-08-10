@@ -46,25 +46,7 @@ namespace SEE.Layout.NodeLayouts
         private Dictionary<ILayoutNode, NodeTransform> layout_result  = new Dictionary<ILayoutNode, NodeTransform>();
         private Dictionary<string,TNode>               TNodeMap       = new Dictionary<string, TNode>();
         private Dictionary<string,ILayoutNode>         ILayoutNodeMap = new Dictionary<string, ILayoutNode>();
-
-        /// <summary>
-        /// Some padding will be added between nodes. That padding depends upon the minimum
-        /// of the width and depth of a node, multiplied by this factor.
-        /// </summary>
-        private const float PaddingFactor = 0.025f;
-
-        /// <summary>
-        /// The minimal padding between nodes in absolute (world space) terms.
-        /// </summary>
-        private const float MinimalAbsolutePadding = 0.002f;
-
-        /// <summary>
-        /// The maximal padding between nodes in absolute (world space) terms.
-        /// </summary>
-        private const float MaximalAbsolutePadding = 0.1f;
-
-        private const int NumberOfLocalMoves = 1;
-
+        
         private IncrementalTreeMapLayout oldLayout;
 
         public IIncrementalNodeLayout OldLayout
@@ -285,7 +267,7 @@ namespace SEE.Layout.NodeLayouts
                 CheckEqualNodeSets(workWith, newTNodes);
 
                 CorrectAreas.Correct(workWith);
-                LocalMoves.MakeLocalMoves(workWith.ToList(), NumberOfLocalMoves);
+                LocalMoves.MakeLocalMoves(workWith.ToList(), Parameters.NumberOfLocalMoves);
                 CheckConsistent(workWith);
             }
 
@@ -353,29 +335,20 @@ namespace SEE.Layout.NodeLayouts
         
         private void AddToLayout (IList<TNode> nodes)
         {
-            float aspect_ratio = Math.Max(depth/width, width/depth);
-            float padding = (float) (Math.Min(depth,width) / ( (1f / PaddingFactor) * Math.Pow(TNodeMap.Count / aspect_ratio,0.5f)));
-            padding = MinimalAbsolutePadding; //Mathf.Clamp(padding, MinimalAbsolutePadding, MaximalAbsolutePadding);
-
             foreach (TNode node in nodes)
             {
-                ILayoutNode o = ILayoutNodeMap[node.ID];
-                TRectangle rect = node.Rectangle;
-                if (rect.width <= 2 * padding || rect.depth <= 2 * padding)
-                {
-                    Debug.LogWarning("Rectangle to small for padding");
-                }
-
-                Vector3 position = new Vector3((float)(rect.x + rect.width / 2.0d),
+                var layoutNode = ILayoutNodeMap[node.ID];
+                Vector3 position = new Vector3(
+                    (float)(node.Rectangle.x + node.Rectangle.width / 2.0d),
                     groundLevel,
-                    (float)(rect.z + rect.depth / 2.0d));
+                    (float)(node.Rectangle.z + node.Rectangle.depth / 2.0d));
                 Vector3 scale = new Vector3(
-                    rect.width - 2 * padding > 0 ?
-                        (float) (rect.width - 2 * padding) : (float) rect.width,
-                    o.LocalScale.y,
-                    rect.depth - 2 * padding > 0 ? (float) (rect.depth - 2 * padding) : (float) rect.depth);
-                Assert.AreEqual(o.AbsoluteScale, o.LocalScale, $"{o.ID}: {o.AbsoluteScale} != {o.LocalScale}");
-                layout_result[o] = new NodeTransform(position, scale);
+                    node.Rectangle.width - 2 * Parameters.Padding > 0 ? 
+                        (float) (node.Rectangle.width - 2 * Parameters.Padding) : (float) node.Rectangle.width,
+                    layoutNode.LocalScale.y,
+                    node.Rectangle.depth - 2 * Parameters.Padding > 0 ? 
+                        (float) (node.Rectangle.depth - 2 * Parameters.Padding) : (float) node.Rectangle.depth);
+                layout_result[layoutNode] = new NodeTransform(position, scale);
             }
         }
         
