@@ -68,6 +68,44 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         private static void Split(IList<TNode> nodes, TSegment slicingSegment,
             out IList<TNode> partition1, out IList<TNode> partition2)
         {
+            partition1 = new List<TNode>();
+            partition2 = new List<TNode>();
+            if (slicingSegment.IsVertical)
+            {
+                double xPosSegment = slicingSegment.Side2Nodes.First().Rectangle.x;
+                foreach (var node in nodes)
+                {
+                    if (node.Rectangle.x < xPosSegment)
+                    {
+                        partition1.Add(node);
+                    }
+                    else
+                    {
+                        partition2.Add(node);
+                    }
+                }
+            }
+            else
+            {
+                double zPosSegment = slicingSegment.Side2Nodes.First().Rectangle.z;
+                foreach (var node in nodes)
+                {
+                    if (node.Rectangle.z < zPosSegment)
+                    {
+                        partition1.Add(node);
+                    }
+                    else
+                    {
+                        partition2.Add(node);
+                    }
+                }
+            }
+            
+            
+            foreach (var node in nodes)
+            {
+                
+            }
         }
         
         
