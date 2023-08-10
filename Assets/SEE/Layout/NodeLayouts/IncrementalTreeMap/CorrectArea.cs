@@ -14,15 +14,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         static double precision = 0.00001; 
         public static bool Correct(IList<TNode> nodes)
         {
+            if (nodes.Count == 1) return true;
             if(IsSliceable( nodes, out TSegment slicingSegment))
             {
                 Split(nodes, slicingSegment, 
                     out IList<TNode> partition1, 
                     out IList<TNode> partition2);
-                
-                
-                // adjust slicing segment
-
+                AdjustSliced(partition1,partition2,slicingSegment);
                 slicingSegment.IsConst = true;
                 bool works1 = Correct(partition1);
                 bool works2 = Correct(partition2);
@@ -106,6 +104,33 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             {
                 
             }
+        }
+
+        private static void AdjustSliced(IList<TNode> partition1, 
+            IList<TNode> partition2,
+            TSegment slicingSegment)
+        {
+            TRectangle rectangle1Old = Utils.CreateParentRectangle(partition1);
+            TRectangle rectangle2Old = Utils.CreateParentRectangle(partition2);
+            double size1 = partition1.Sum(n => n.Size);
+            double size2 = partition2.Sum(n => n.Size);
+            TRectangle rectangle1New = (TRectangle) rectangle1Old.Clone();
+            TRectangle rectangle2New = (TRectangle) rectangle2Old.Clone();
+
+            if (slicingSegment.IsVertical)
+            {
+                rectangle1New.width = size1 / rectangle1New.depth;
+                rectangle2New.width = size2 / rectangle2New.depth;
+                rectangle2New.x = rectangle1New.x + rectangle1New.width;
+            }
+            else
+            {
+                rectangle1New.depth = size1 / rectangle1New.width;
+                rectangle2New.depth = size2 / rectangle2New.width;
+                rectangle2New.z = rectangle1New.z + rectangle1New.depth;
+            }
+            Utils.TransformRectangles(partition1, newRectangle: rectangle1New, oldRectangle: rectangle1Old);
+            Utils.TransformRectangles(partition2, newRectangle: rectangle2New, oldRectangle: rectangle2Old);
         }
         
         
