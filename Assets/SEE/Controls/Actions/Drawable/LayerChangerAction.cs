@@ -48,7 +48,7 @@ namespace SEE.Controls.Actions
                             result = GameLayerChanger.Increase(DrawableTypes.Line, hittedObject, newOrder);
                             if (result)
                             {
-                                memento = new Memento(drawable, LayerChangerStates.Increase, DrawableTypes.Line,
+                                memento = new Memento(drawable, GameLayerChanger.LayerChangerStates.Increase, DrawableTypes.Line,
                                     hittedObject, oldOrder, newOrder);
                                 new LayerChangerNetAction(memento.drawable.name, memento.drawable.transform.parent.name,
                                     memento.obj.name, memento.state, memento.type, memento.newOrder).Execute();
@@ -75,7 +75,7 @@ namespace SEE.Controls.Actions
                             result = GameLayerChanger.Decrease(DrawableTypes.Line, hittedObject, newOrder);
                             if (result)
                             {
-                                memento = new Memento(drawable, LayerChangerStates.Decrease, DrawableTypes.Line,
+                                memento = new Memento(drawable, GameLayerChanger.LayerChangerStates.Decrease, DrawableTypes.Line,
                                 hittedObject, oldOrder, newOrder);
                                 new LayerChangerNetAction(memento.drawable.name, memento.drawable.transform.parent.name,
                                     memento.obj.name, memento.state, memento.type, memento.newOrder).Execute();
@@ -99,13 +99,13 @@ namespace SEE.Controls.Actions
         private struct Memento
         {
             public readonly GameObject drawable;
-            public readonly LayerChangerStates state;
+            public readonly GameLayerChanger.LayerChangerStates state;
             public readonly DrawableTypes type;
             public readonly GameObject obj;
             public readonly int oldOrder;
             public readonly int newOrder;
 
-            public Memento(GameObject drawable, LayerChangerStates state, DrawableTypes type, GameObject obj, int oldOrder, int newOrder)
+            public Memento(GameObject drawable, GameLayerChanger.LayerChangerStates state, DrawableTypes type, GameObject obj, int oldOrder, int newOrder)
             {
                 this.drawable = drawable;
                 this.state = state;
@@ -125,10 +125,10 @@ namespace SEE.Controls.Actions
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             switch(memento.state)
             {
-                case LayerChangerStates.Increase:
+                case GameLayerChanger.LayerChangerStates.Increase:
                     GameLayerChanger.Decrease(memento.type, memento.obj, memento.oldOrder);
                     break;
-                case LayerChangerStates.Decrease:
+                case GameLayerChanger.LayerChangerStates.Decrease:
                     GameLayerChanger.Increase(memento.type, memento.obj, memento.oldOrder);
                     break;
             }
@@ -145,10 +145,10 @@ namespace SEE.Controls.Actions
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             switch (memento.state)
             {
-                case LayerChangerStates.Increase:
+                case GameLayerChanger.LayerChangerStates.Increase:
                     GameLayerChanger.Increase(memento.type, memento.obj, memento.newOrder);
                     break;
-                case LayerChangerStates.Decrease:
+                case GameLayerChanger.LayerChangerStates.Decrease:
                     GameLayerChanger.Decrease(memento.type, memento.obj, memento.newOrder);
                     break;
             }

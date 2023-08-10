@@ -2,6 +2,7 @@
 using UnityEngine;
 using SEE.Controls.Actions.HolisticMetrics;
 using Assets.SEE.Controls.Actions.Whiteboard;
+using Assets.SEE.Controls.Actions.Drawable;
 
 namespace SEE.Controls.Actions
 {
@@ -185,7 +186,7 @@ namespace SEE.Controls.Actions
             EditLine =
                 new("Edit line", "Edit the selected line.",
                         Color.green.Darker(), "Materials/ModernUIPack/Pencil",
-                        LayerChangerAction.CreateReversibleAction,
+                        EditLineAction.CreateReversibleAction,
                         parent: Whiteboard);
 
             LayerChanger =

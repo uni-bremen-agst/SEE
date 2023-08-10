@@ -37,7 +37,9 @@ namespace SEE.Game
             line.transform.parent = drawable.transform;
             renderer = line.AddComponent<LineRenderer>();
             meshCollider = line.AddComponent<MeshCollider>();
+            meshCollider.convex = true;
             renderer.sharedMaterial = GetMaterial(color);
+            renderer.alignment = LineAlignment.TransformZ;
             renderer.startWidth = thickness;
             renderer.endWidth = renderer.startWidth;
             renderer.useWorldSpace = true;

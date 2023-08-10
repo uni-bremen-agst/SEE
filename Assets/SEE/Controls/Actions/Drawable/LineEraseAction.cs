@@ -46,11 +46,16 @@ namespace SEE.Controls.Actions
 
                         new LineEraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.id).Execute();
                         Destroyer.Destroy(hittedObject);
-                        currentState = ReversibleAction.Progress.Completed;
                     }
                 }
+                bool isMouseButtonUp = Input.GetMouseButtonUp(0);
                 // The action is considered complete if the mouse button is no longer pressed.
-                return Input.GetMouseButtonUp(0);
+                if (isMouseButtonUp)
+                {
+                    currentState = ReversibleAction.Progress.Completed;
+                }
+                // The action is considered complete if the mouse button is no longer pressed.
+                return isMouseButtonUp;
             }
             return false;
         }

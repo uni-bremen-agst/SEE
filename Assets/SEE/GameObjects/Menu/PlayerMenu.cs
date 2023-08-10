@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.Game.UI.Menu;
@@ -235,6 +236,11 @@ namespace SEE.GO.Menu
                     break;
                 }
             }
+        }
+
+        public ActionStateIndicator GetActionStateIndicator()
+        {
+            return indicator;
         }
     }
 }

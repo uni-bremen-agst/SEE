@@ -14,7 +14,7 @@ namespace SEE.Net.Actions
         public string DrawableID;
         public string ParentDrawableID;
         public string ObjectName;
-        public LayerChangerStates State;
+        public GameLayerChanger.LayerChangerStates State;
         public DrawableTypes Type;
         public int Order;
 
@@ -24,7 +24,7 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="gameObjectID">the unique name of the gameObject of a line
         /// that has to be deleted</param>
-        public LayerChangerNetAction(string drawableID, string parentDrawableID, string objectName, LayerChangerStates state, DrawableTypes type, int order) : base()
+        public LayerChangerNetAction(string drawableID, string parentDrawableID, string objectName, GameLayerChanger.LayerChangerStates state, DrawableTypes type, int order) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
@@ -62,11 +62,11 @@ namespace SEE.Net.Actions
                 }
 
                 switch (State) {
-                    case LayerChangerStates.Increase:
+                    case GameLayerChanger.LayerChangerStates.Increase:
                         GameLayerChanger.Increase(Type, obj, Order);
                         break;
 
-                    case LayerChangerStates.Decrease:
+                    case GameLayerChanger.LayerChangerStates.Decrease:
                         GameLayerChanger.Decrease(Type, obj, Order);
                         break;
                 }

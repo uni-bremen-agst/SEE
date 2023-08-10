@@ -11,6 +11,7 @@ using static RootMotion.FinalIK.HitReaction;
 using Assets.SEE.Net.Actions.Whiteboard;
 using SEE.Net.Actions;
 using Assets.SEE.Game.Drawable;
+using Assets.SEE.Game;
 
 namespace SEE.Controls.Actions
 {
@@ -137,12 +138,13 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            if (line != null)
+            if (line == null)
             {
-                new LineEraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.id).Execute();
-                Destroyer.Destroy(line);
-                line = null;
+                line = GameDrawableIDFinder.FindChild(memento.drawable, memento.id);
             }
+            new LineEraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.id).Execute();
+            Destroyer.Destroy(line);
+            line = null;
         }
 
         /// <summary>

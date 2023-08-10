@@ -8,6 +8,11 @@ namespace Assets.SEE.Game.Drawable
 {
     public static class GameLayerChanger
     {
+        public enum LayerChangerStates
+        {
+            Increase,
+            Decrease
+        }
         public static bool Increase(DrawableTypes type, GameObject obj, int order)
         {
             bool result = false;
@@ -17,7 +22,7 @@ namespace Assets.SEE.Game.Drawable
                     LineRenderer lineRenderer = obj.GetComponent<LineRenderer>();
                     if (lineRenderer.sortingOrder >= DrawableConfigurator.orderInLayer)
                     {
-                        ShowNotification.Warn("Maximum layer order", lineRenderer.sortingOrder + " has reached.");
+                        ShowNotification.Warn("Maximum layer order", obj.name + " has reached the maximum layer order: " + lineRenderer.sortingOrder);
                     }
                     else
                     {
@@ -41,7 +46,7 @@ namespace Assets.SEE.Game.Drawable
                     LineRenderer lineRenderer = obj.GetComponent<LineRenderer>();
                     if (lineRenderer.sortingOrder == 0)
                     {
-                        ShowNotification.Warn("Minimum layer order", lineRenderer.sortingOrder + " has reached.");
+                        ShowNotification.Warn("Minimum layer order", obj.name + " has reached the minimum layer order: " + lineRenderer.sortingOrder);
                     }
                     else
                     {
