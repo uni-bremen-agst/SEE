@@ -18,16 +18,16 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             return collection.First(x => eval(x).CompareTo(bestVal) == 0);
         }
 
-        public static TRectangle CreateParentRectangle(IList<TNode> nodes)
+        public static Rectangle CreateParentRectangle(IList<Node> nodes)
         {
             double x = nodes.Min(node => node.Rectangle.x);
             double z = nodes.Min(node => node.Rectangle.z);
             double width = nodes.Max(node => node.Rectangle.x + node.Rectangle.width) - x;
             double depth = nodes.Max(node => node.Rectangle.z + node.Rectangle.depth) - z;
-            return new TRectangle(x, z, width, depth);
+            return new Rectangle(x, z, width, depth);
         }
         
-        public static void TransformRectangles(IList<TNode> nodes, TRectangle newRectangle ,TRectangle oldRectangle)
+        public static void TransformRectangles(IList<Node> nodes, Rectangle newRectangle ,Rectangle oldRectangle)
         {
 
             // linear transform line   x1<---->x2

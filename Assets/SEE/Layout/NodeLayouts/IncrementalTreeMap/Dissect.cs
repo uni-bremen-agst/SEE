@@ -5,9 +5,9 @@ using UnityEngine;
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     static class Dissect{
-        static public void dissect(TRectangle rectangle, IEnumerable<TNode> nodes)
+        public static void Apply(Rectangle rectangle, IEnumerable<Node> nodes)
         {
-            TNode[] nodesArray = nodes.ToArray();
+            Node[] nodesArray = nodes.ToArray();
             Array.Sort(nodesArray,(x,y) => (x.Size.CompareTo(y.Size)));
 
             if(Math.Abs(nodesArray.Sum(x => x.Size) - rectangle.Area()) >= rectangle.Area() * Math.Pow(10, -3)
@@ -16,57 +16,56 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 Debug.LogWarning("Dissect: nodes doesnt fit in rectangle");
             }
 
-            dissect(rectangle,
+            Apply(rectangle,
                     nodesArray,
-                    leftBound : new TSegment(true, true),
-                    rightBound: new TSegment(true, true), 
-                    upperBound: new TSegment(true, false),
-                    lowerBound: new TSegment(true, false));
+                    leftBound : new Segment(true, true),
+                    rightBound: new Segment(true, true), 
+                    upperBound: new Segment(true, false),
+                    lowerBound: new Segment(true, false));
         }
 
-        static private void dissect( TRectangle rectangle, 
-                                TNode[] nodes,
-                                TSegment leftBound,
-                                TSegment rightBound,
-                                TSegment upperBound, 
-                                TSegment lowerBound)
+        private static void Apply( Rectangle rectangle, 
+                                Node[] nodes,
+                                Segment leftBound,
+                                Segment rightBound,
+                                Segment upperBound, 
+                                Segment lowerBound)
         {
             if(nodes.Length == 1)
             {
-                TNode node = nodes[0];
+                Node node = nodes[0];
                 node.Rectangle = rectangle;
-                node.registerSegment(leftBound, Direction.Left);
-                node.registerSegment(rightBound,Direction.Right);
-                node.registerSegment(lowerBound,Direction.Lower);
-                node.registerSegment(upperBound,Direction.Upper);
-                return;
+                node.RegisterSegment(leftBound, Direction.Left);
+                node.RegisterSegment(rightBound,Direction.Right);
+                node.RegisterSegment(lowerBound,Direction.Lower);
+                node.RegisterSegment(upperBound,Direction.Upper);
             }
             else
             {
-                int splitIndex = getSplitIndex(nodes);
-                TNode[] nodes_1 = nodes[..splitIndex];
-                TNode[] nodes_2 = nodes[splitIndex..];
+                int splitIndex = GetSplitIndex(nodes);
+                Node[] nodes1 = nodes[..splitIndex];
+                Node[] nodes2 = nodes[splitIndex..];
                 
-                float ratio = nodes_1.Sum(x => x.Size) / nodes.Sum(x => x.Size);
+                float ratio = nodes1.Sum(x => x.Size) / nodes.Sum(x => x.Size);
 
-                TRectangle rectangle_1 = new TRectangle(x : rectangle.x, z : rectangle.z,
+                Rectangle rectangle1 = new Rectangle(x : rectangle.x, z : rectangle.z,
                     width : rectangle.width, depth : rectangle.depth);
-                TRectangle rectangle_2 = new TRectangle(x : rectangle.x, z : rectangle.z,
+                Rectangle rectangle2 = new Rectangle(x : rectangle.x, z : rectangle.z,
                     width : rectangle.width, depth : rectangle.depth);
                 if(rectangle.width >= rectangle.depth)
                 {
-                    rectangle_1.width *= ratio;
-                    rectangle_2.width *= (1 - ratio);
-                    rectangle_2.x = rectangle_1.x + rectangle_1.width;
-                    TSegment newSegment = new TSegment(false,true);
+                    rectangle1.width *= ratio;
+                    rectangle2.width *= (1 - ratio);
+                    rectangle2.x = rectangle1.x + rectangle1.width;
+                    Segment newSegment = new Segment(false,true);
 
-                    Dissect.dissect(rectangle_1, nodes_1,
+                    Dissect.Apply(rectangle1, nodes1,
                                     leftBound : leftBound,
                                     rightBound: newSegment,
                                     upperBound: upperBound,
                                     lowerBound: lowerBound);
 
-                    Dissect.dissect(rectangle_2, nodes_2,
+                    Dissect.Apply(rectangle2, nodes2,
                                     leftBound :  newSegment,
                                     rightBound: rightBound,
                                     upperBound: upperBound,
@@ -74,18 +73,18 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 }
                 else
                 {
-                    rectangle_1.depth *= ratio;
-                    rectangle_2.depth *= (1 - ratio);
-                    rectangle_2.z = rectangle_1.z + rectangle_1.depth;
-                    TSegment newSegment = new TSegment(false,false);
+                    rectangle1.depth *= ratio;
+                    rectangle2.depth *= (1 - ratio);
+                    rectangle2.z = rectangle1.z + rectangle1.depth;
+                    Segment newSegment = new Segment(false,false);
 
-                    Dissect.dissect(rectangle_1, nodes_1,
+                    Dissect.Apply(rectangle1, nodes1,
                                     leftBound : leftBound,
                                     rightBound: rightBound,
                                     upperBound: newSegment,
                                     lowerBound: lowerBound);
 
-                    Dissect.dissect(rectangle_2, nodes_2,
+                    Dissect.Apply(rectangle2, nodes2,
                                     leftBound :  leftBound,
                                     rightBound: rightBound,
                                     upperBound: upperBound,
@@ -94,7 +93,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
         }
 
-        internal static int getSplitIndex(TNode[] nodes)
+        private static int GetSplitIndex(Node[] nodes)
         {
             if(nodes.Sum( x => x.Size)  <=  nodes.Last().Size * 3)
             {

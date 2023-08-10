@@ -1,26 +1,25 @@
 using System.Collections.Generic;
-using System.Linq;
+
 using System;
-using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
-    abstract public class LocalMove
+    public abstract class LocalMove
     {
-        protected TNode node1;
-        public TNode Node1{get => this.node1;}
-        protected TNode node2;
+        protected Node node1;
+        public Node Node1{get => this.node1;}
+        protected Node node2;
 
-        public TNode Node2{get => this.node2;}
-        abstract public void Apply();
+        public Node Node2{get => this.node2;}
+        public abstract void Apply();
 
-        abstract public LocalMove Clone(Dictionary<string,TNode> mapOriginalClone);
+        public abstract LocalMove Clone(Dictionary<string,Node> mapOriginalClone);
     }
 
     public class FlipMove : LocalMove
     {
-        bool clockwise;
-        public FlipMove(TNode node1, TNode node2, bool clockwise)
+        private bool clockwise;
+        public FlipMove(Node node1, Node node2, bool clockwise)
         {
             this.node1 = node1; this.node2 = node2; this.clockwise = clockwise;
         }
@@ -60,12 +59,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         override
-        public LocalMove Clone(Dictionary<string,TNode> mapOriginalClone)
+        public LocalMove Clone(Dictionary<string,Node> mapOriginalClone)
         {
             return new FlipMove(mapOriginalClone[node1.ID],mapOriginalClone[node2.ID],clockwise);
         }
 
-        private void apply_flipOnVerticalSegment(TNode leftNode, TNode rightNode)
+        private void apply_flipOnVerticalSegment(Node leftNode, Node rightNode)
         {
             // clockwise            anticlockwise
             // [l][r] -> [lll]      [l][r] -> [rrr]
@@ -91,27 +90,27 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
 
             // switch segments
-            TSegment newRightSegmentForLeftNode = rightNode.SegmentsDictionary()[Direction.Right];
-            TSegment newLeftSegmentForRightNode  = leftNode.SegmentsDictionary()[Direction.Left];
-            TSegment middle = leftNode.SegmentsDictionary()[Direction.Right];
+            Segment newRightSegmentForLeftNode = rightNode.SegmentsDictionary()[Direction.Right];
+            Segment newLeftSegmentForRightNode  = leftNode.SegmentsDictionary()[Direction.Left];
+            Segment middle = leftNode.SegmentsDictionary()[Direction.Right];
             middle.IsVertical = false;
 
-            leftNode.registerSegment(newRightSegmentForLeftNode, Direction.Right);
-            rightNode.registerSegment(newLeftSegmentForRightNode, Direction.Left);
+            leftNode.RegisterSegment(newRightSegmentForLeftNode, Direction.Right);
+            rightNode.RegisterSegment(newLeftSegmentForRightNode, Direction.Left);
 
             if(clockwise)
             {
-                leftNode.registerSegment(middle, Direction.Lower);
-                rightNode.registerSegment(middle, Direction.Upper);
+                leftNode.RegisterSegment(middle, Direction.Lower);
+                rightNode.RegisterSegment(middle, Direction.Upper);
             }
             else
             {
-                leftNode.registerSegment(middle, Direction.Upper);
-                rightNode.registerSegment(middle, Direction.Lower);
+                leftNode.RegisterSegment(middle, Direction.Upper);
+                rightNode.RegisterSegment(middle, Direction.Lower);
             }   
         }
 
-        private void apply_flipOnHorizontalSegment(TNode lowerNode, TNode upperNode)
+        private void apply_flipOnHorizontalSegment(Node lowerNode, Node upperNode)
         {
             // clockwise                anticlockwise
             // [uuu]  ->  [l][u]        [uuu]  ->  [u][l]
@@ -137,23 +136,23 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
 
             // switch segments
-            TSegment newUpperSegmentForLowerNode = upperNode.SegmentsDictionary()[Direction.Upper];
-            TSegment newLowerSegmentForUpperNode = lowerNode.SegmentsDictionary()[Direction.Lower];
-            TSegment middle = lowerNode.SegmentsDictionary()[Direction.Upper];
+            Segment newUpperSegmentForLowerNode = upperNode.SegmentsDictionary()[Direction.Upper];
+            Segment newLowerSegmentForUpperNode = lowerNode.SegmentsDictionary()[Direction.Lower];
+            Segment middle = lowerNode.SegmentsDictionary()[Direction.Upper];
             middle.IsVertical = true;
 
-            lowerNode.registerSegment(newUpperSegmentForLowerNode, Direction.Upper);
-            upperNode.registerSegment(newLowerSegmentForUpperNode, Direction.Lower);
+            lowerNode.RegisterSegment(newUpperSegmentForLowerNode, Direction.Upper);
+            upperNode.RegisterSegment(newLowerSegmentForUpperNode, Direction.Lower);
 
             if(clockwise)
             {
-                lowerNode.registerSegment(middle, Direction.Right);
-                upperNode.registerSegment(middle, Direction.Left);
+                lowerNode.RegisterSegment(middle, Direction.Right);
+                upperNode.RegisterSegment(middle, Direction.Left);
             }
             else
             {
-                lowerNode.registerSegment(middle, Direction.Left);
-                upperNode.registerSegment(middle, Direction.Right);
+                lowerNode.RegisterSegment(middle, Direction.Left);
+                upperNode.RegisterSegment(middle, Direction.Right);
             }
         }
     }
@@ -161,7 +160,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     public class StretchMove : LocalMove
     {
 
-        public StretchMove(TNode node1, TNode node2)
+        public StretchMove(Node node1, Node node2)
         {
             this.node1 = node1; this.node2 = node2;
         }
@@ -204,12 +203,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         override
-        public LocalMove Clone(Dictionary<string,TNode> mapOriginalClone)
+        public LocalMove Clone(Dictionary<string,Node> mapOriginalClone)
         {
             return new StretchMove(mapOriginalClone[node1.ID],mapOriginalClone[node2.ID]);
         }
 
-        private void apply_StretchLeftOverVertical(TNode leftNode, TNode rightNode)
+        private void apply_StretchLeftOverVertical(Node leftNode, Node rightNode)
         {
             // along lower           along upper   
             //    [r]         [r]    [l][r]  ->  [llll]
@@ -225,18 +224,18 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 rightNode.Rectangle.z = leftNode.Rectangle.z + leftNode.Rectangle.depth;
             }
             // switch segments
-            leftNode.registerSegment(segmentsRightNode[Direction.Right], Direction.Right);
+            leftNode.RegisterSegment(segmentsRightNode[Direction.Right], Direction.Right);
             if(alongLowerSegment)
             {
-                rightNode.registerSegment(segmentsLeftNode[Direction.Upper], Direction.Lower);
+                rightNode.RegisterSegment(segmentsLeftNode[Direction.Upper], Direction.Lower);
             }
             else
             {
-                rightNode.registerSegment(segmentsLeftNode[Direction.Lower],Direction.Upper);
+                rightNode.RegisterSegment(segmentsLeftNode[Direction.Lower],Direction.Upper);
             }
         }
         
-        private void apply_StretchRightOverVertical(TNode leftNode, TNode rightNode)
+        private void apply_StretchRightOverVertical(Node leftNode, Node rightNode)
         {
             // along lower           along upper   
             // [l]         [l]       [l][r]  ->  [r][r]
@@ -253,18 +252,18 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 leftNode.Rectangle.z = rightNode.Rectangle.z + rightNode.Rectangle.depth;
             } 
             // switch segments
-            rightNode.registerSegment(segmentsLeftNode[Direction.Left], Direction.Left);
+            rightNode.RegisterSegment(segmentsLeftNode[Direction.Left], Direction.Left);
             if(alongLowerSegment)
             {
-                leftNode.registerSegment(segmentsRightNode[Direction.Upper], Direction.Lower);
+                leftNode.RegisterSegment(segmentsRightNode[Direction.Upper], Direction.Lower);
             }
             else
             {
-                leftNode.registerSegment(segmentsRightNode[Direction.Lower],Direction.Upper);
+                leftNode.RegisterSegment(segmentsRightNode[Direction.Lower],Direction.Upper);
             }
         }
 
-        private void apply_StretchLowerOverHorizontal(TNode lowerNode, TNode upperNode)
+        private void apply_StretchLowerOverHorizontal(Node lowerNode, Node upperNode)
         {
             // along left           along right   
             // [uuuu] ->  [l][u]    [uuuu]  ->  [u][l]
@@ -280,18 +279,18 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 upperNode.Rectangle.x = lowerNode.Rectangle.x + lowerNode.Rectangle.width;
             }
             // switch segments
-            lowerNode.registerSegment(segmentsUpperNode[Direction.Upper], Direction.Upper);
+            lowerNode.RegisterSegment(segmentsUpperNode[Direction.Upper], Direction.Upper);
             if(alongLeftSegment)
             {
-                upperNode.registerSegment(segmentsLowerNode[Direction.Right], Direction.Left);
+                upperNode.RegisterSegment(segmentsLowerNode[Direction.Right], Direction.Left);
             }
             else
             {
-                upperNode.registerSegment(segmentsLowerNode[Direction.Left],Direction.Right);
+                upperNode.RegisterSegment(segmentsLowerNode[Direction.Left],Direction.Right);
             }
         }
         
-        private void apply_StretchUpperOverHorizontal(TNode lowerNode, TNode upperNode)
+        private void apply_StretchUpperOverHorizontal(Node lowerNode, Node upperNode)
         {
             // along left           along right
             // [u]    ->  [u]          [u]  ->      [u]
@@ -309,14 +308,14 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 lowerNode.Rectangle.x = upperNode.Rectangle.x + upperNode.Rectangle.width;
             }
             // switch segments
-            upperNode.registerSegment(segmentsLowerNode[Direction.Lower], Direction.Lower);
+            upperNode.RegisterSegment(segmentsLowerNode[Direction.Lower], Direction.Lower);
             if(alongLeftSegment)
             {
-                lowerNode.registerSegment(segmentsUpperNode[Direction.Right], Direction.Left);
+                lowerNode.RegisterSegment(segmentsUpperNode[Direction.Right], Direction.Left);
             }
             else
             {
-                lowerNode.registerSegment(segmentsUpperNode[Direction.Left],Direction.Right);
+                lowerNode.RegisterSegment(segmentsUpperNode[Direction.Left],Direction.Right);
             }
         }
     }

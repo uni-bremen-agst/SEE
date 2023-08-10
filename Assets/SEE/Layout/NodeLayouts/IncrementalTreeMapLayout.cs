@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Node = SEE.Layout.NodeLayouts.IncrementalTreeMap.Node;
 
 namespace SEE.Layout.NodeLayouts
 {
@@ -43,9 +44,9 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// The node layout we compute as a result.
         /// </summary>
-        private Dictionary<ILayoutNode, NodeTransform> layout_result  = new Dictionary<ILayoutNode, NodeTransform>();
-        private Dictionary<string,TNode>               TNodeMap       = new Dictionary<string, TNode>();
-        private Dictionary<string,ILayoutNode>         ILayoutNodeMap = new Dictionary<string, ILayoutNode>();
+        private readonly Dictionary<ILayoutNode, NodeTransform> layout_result  = new Dictionary<ILayoutNode, NodeTransform>();
+        private readonly Dictionary<string,Node>                NodeMap       = new Dictionary<string, Node>();
+        private readonly Dictionary<string,ILayoutNode>         ILayoutNodeMap = new Dictionary<string, ILayoutNode>();
         
         private IncrementalTreeMapLayout oldLayout;
 
@@ -73,20 +74,9 @@ namespace SEE.Layout.NodeLayouts
                     throw new ArgumentException("No nodes to be laid out.");
                 case 1:
                 {
-                    using IEnumerator<ILayoutNode> enumerator = layoutNodeList.GetEnumerator();
-                    if (enumerator.MoveNext())
-                    {
-                        // MoveNext() must be called before we can call Current.
-                        ILayoutNode gameNode = enumerator.Current;
-                        UnityEngine.Assertions.Assert.AreEqual(gameNode.AbsoluteScale, gameNode.LocalScale);
-                        layout_result[gameNode] = new NodeTransform(Vector3.zero,
-                            new Vector3(width, gameNode.LocalScale.y, depth));
-                    }
-                    else
-                    {
-                        Assert.IsTrue(false, "We should never arrive here.\n");
-                    }
-
+                    ILayoutNode gameNode = layoutNodeList.First();
+                    layout_result[gameNode] = new NodeTransform(Vector3.zero,
+                        new Vector3(width, gameNode.LocalScale.y, depth));
                     break;
                 }
                 default:
@@ -109,7 +99,7 @@ namespace SEE.Layout.NodeLayouts
             }
             // adjust size 
             float adjustFactor = (width*depth) / totalLocalScale;
-            foreach(var node in TNodeMap.Values)
+            foreach(var node in NodeMap.Values)
             {
                 node.Size *= adjustFactor;
             }
@@ -122,24 +112,24 @@ namespace SEE.Layout.NodeLayouts
                 Vector3 size = node.LocalScale;
                 // x and z lengths may differ; we need to consider the larger value
                 float result = Mathf.Max(size.x, size.z);
-                TNode newTNode = new TNode(node.ID);
+                Node newTNode = new Node(node.ID);
                 newTNode.Size = result;
-                TNodeMap.Add(node.ID, newTNode);
+                NodeMap.Add(node.ID, newTNode);
                 ILayoutNodeMap.Add(node.ID,node);
                 return result;
             }
             else
             {
-                TNode newTNode = new TNode(node.ID);
-                TNodeMap.Add(node.ID, newTNode);
+                Node newTNode = new Node(node.ID);
+                NodeMap.Add(node.ID, newTNode);
                 ILayoutNodeMap.Add(node.ID,node);
-                float total_size = 0.0f;
+                float totalSize = 0.0f;
                 foreach (ILayoutNode child in node.Children())
                 {
-                    total_size += InitTNode(child);
+                    totalSize += InitTNode(child);
                 }
-                newTNode.Size = total_size;
-                return total_size;
+                newTNode.Size = totalSize;
+                return totalSize;
             }
         }
 
@@ -151,12 +141,12 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private void CalculateLayout()
         {
-            /// Our "logical" rectangle in which to put the whole treemap is assumed to have its
-            /// center at Vector3.zero here. <see cref="CalculateLayout(ICollection{ILayoutNode}, float, float, float, float)"/>
-            /// assumes the rectangle's location be specified by its left front corner.
-            /// Hence, we need to transform the center of the "logical" rectangle to the left front
-            /// corner of the rectangle by -width/2 and -depth/2, respectively.
-            TRectangle rectangle = new TRectangle(x: -width / 2.0f, z: -depth / 2.0f, width, depth);
+            // Our "logical" rectangle in which to put the whole treemap is assumed to have its
+            // center at Vector3.zero here. <see cref="CalculateLayout(ICollection{ILayoutNode}, float, float, float, float)"/>
+            // assumes the rectangle's location be specified by its left front corner.
+            // Hence, we need to transform the center of the "logical" rectangle to the left front
+            // corner of the rectangle by -width/2 and -depth/2, respectively.
+            Rectangle rectangle = new Rectangle(x: -width / 2.0f, z: -depth / 2.0f, width, depth);
             if (roots.Count == 1)
             {
                 ILayoutNode root = roots[0];
@@ -171,15 +161,15 @@ namespace SEE.Layout.NodeLayouts
             }
         }
 
-        private void CalculateLayout(ICollection<ILayoutNode> siblings,TRectangle rectangle)
+        private void CalculateLayout(ICollection<ILayoutNode> siblings,Rectangle rectangle)
         {
             // GetNodes can be done before if then else
             if(    this.oldLayout == null
                 || NumberOfOccurrencesInOldGraph(siblings) <= 4
                 || ParentsInOldGraph(siblings).Count != 1)
             {
-                IList<TNode> nodes = GetTNodes(siblings);
-                Dissect.dissect(rectangle, nodes);
+                IList<Node> nodes = GetNodes(siblings);
+                Dissect.Apply(rectangle, nodes);
             }
             else
             {
@@ -194,20 +184,20 @@ namespace SEE.Layout.NodeLayouts
                 // note that there is exact one single parent (because of if-clause), but can be null if children == roots
                 ILayoutNode oldILayoutParent = ParentsInOldGraph(siblings).First();
                 ICollection<ILayoutNode> oldILayoutSiblings = oldILayoutParent == null ? oldLayout.roots : oldILayoutParent.Children();
-                IList<TNode> oldTNodes = oldLayout.GetTNodes(oldILayoutSiblings);
-                IList<TNode> newTNodes = GetTNodes(siblings);
+                IList<Node> oldTNodes = oldLayout.GetNodes(oldILayoutSiblings);
+                IList<Node> newTNodes = GetNodes(siblings);
 
-                IList<TNode> workWith          = new List<TNode>();
-                IList<TNode> nodesToBeDeleted  = new List<TNode>();
-                IList<TNode> nodesToBeAdded    = new List<TNode>();
+                IList<Node> workWith          = new List<Node>();
+                IList<Node> nodesToBeDeleted  = new List<Node>();
+                IList<Node> nodesToBeAdded    = new List<Node>();
 
                 // get nodes form old layout .. over take their rectangles
                 foreach(var oldTNode in oldTNodes)
                 {
-                    TNode newTNode = ((List<TNode>) newTNodes).Find(x => x.ID.Equals(oldTNode.ID));
+                    Node newTNode = ((List<Node>) newTNodes).Find(x => x.ID.Equals(oldTNode.ID));
                     if(newTNode == null)
                     {   
-                        newTNode = new TNode(oldTNode.ID);
+                        newTNode = new Node(oldTNode.ID);
                         nodesToBeDeleted.Add(newTNode);
                         workWith.Add(newTNode);
                     }
@@ -215,7 +205,7 @@ namespace SEE.Layout.NodeLayouts
                     {
                         workWith.Add(newTNode);
                     }
-                    newTNode.Rectangle = (TRectangle) oldTNode.Rectangle.Clone();
+                    newTNode.Rectangle = (Rectangle) oldTNode.Rectangle.Clone();
                 }
 
                 foreach(var newTNode in newTNodes)
@@ -230,21 +220,21 @@ namespace SEE.Layout.NodeLayouts
                 var oldSegments = oldTNodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
                 foreach(var segment in oldSegments)
                 {
-                    TSegment newSegment = new TSegment(segment.IsConst, segment.IsVertical);
+                    Segment newSegment = new Segment(segment.IsConst, segment.IsVertical);
                     foreach(var oldTNode in segment.Side1Nodes)
                     {
-                        TNode newNode = workWith.First(x => x.ID == oldTNode.ID);
-                        newNode.registerSegment(newSegment, newSegment.IsVertical ? Direction.Right : Direction.Upper);
+                        Node newNode = workWith.First(x => x.ID == oldTNode.ID);
+                        newNode.RegisterSegment(newSegment, newSegment.IsVertical ? Direction.Right : Direction.Upper);
                     }
                     foreach(var oldTNode in segment.Side2Nodes)
                     {
-                        TNode newNode = workWith.First(x => x.ID == oldTNode.ID);
-                        newNode.registerSegment(newSegment, newSegment.IsVertical ? Direction.Left : Direction.Lower);
+                        Node newNode = workWith.First(x => x.ID == oldTNode.ID);
+                        newNode.RegisterSegment(newSegment, newSegment.IsVertical ? Direction.Left : Direction.Lower);
                     }
                 }
 
 
-                TRectangle oldRectangle = oldLayout.GetParentTRectangle(oldTNodes[0]);
+                Rectangle oldRectangle = oldLayout.GetParentTRectangle(oldTNodes[0]);
                 
                 IncrementalTreeMap.Utils.TransformRectangles(workWith, 
                     oldRectangle: oldRectangle, 
@@ -271,7 +261,7 @@ namespace SEE.Layout.NodeLayouts
                 CheckConsistent(workWith);
             }
 
-            AddToLayout(GetTNodes(siblings));
+            AddToLayout(GetNodes(siblings));
 
             foreach (ILayoutNode node in siblings)
             {
@@ -282,7 +272,7 @@ namespace SEE.Layout.NodeLayouts
                     // CalculateLayout assumes co-ordinates x and z as the left front corner
 
                     Assert.AreEqual(node.AbsoluteScale, node.LocalScale);
-                    TRectangle childRectangle = TNodeMap[node.ID].Rectangle;
+                    Rectangle childRectangle = NodeMap[node.ID].Rectangle;
                     CalculateLayout(children, childRectangle);
                 }
             }
@@ -323,19 +313,19 @@ namespace SEE.Layout.NodeLayouts
             return false;
         }
 
-        internal IList<TNode> GetTNodes(ICollection<ILayoutNode> layoutNodes)
+        private IList<Node> GetNodes(ICollection<ILayoutNode> layoutNodes)
         {
-            List<TNode> result = new List<TNode>();
+            List<Node> result = new List<Node>();
             foreach( ILayoutNode layoutNode in layoutNodes)
             {
-                result.Add(this.TNodeMap[layoutNode.ID]);
+                result.Add(this.NodeMap[layoutNode.ID]);
             }
             return result;
         }
         
-        private void AddToLayout (IList<TNode> nodes)
+        private void AddToLayout (IList<Node> nodes)
         {
-            foreach (TNode node in nodes)
+            foreach (Node node in nodes)
             {
                 var layoutNode = ILayoutNodeMap[node.ID];
                 Vector3 position = new Vector3(
@@ -352,23 +342,23 @@ namespace SEE.Layout.NodeLayouts
             }
         }
         
-        private TRectangle GetParentTRectangle(TNode node)
+        private Rectangle GetParentTRectangle(Node node)
         {
             var layoutNode = ILayoutNodeMap[node.ID];
-            TRectangle result;
+            Rectangle result;
             try
             {
-                var parentTNode = TNodeMap[layoutNode.Parent.ID];
-                result = (TRectangle) parentTNode.Rectangle.Clone();
+                var parentTNode = NodeMap[layoutNode.Parent.ID];
+                result = (Rectangle) parentTNode.Rectangle.Clone();
             }
             catch
             {   
-                result = new TRectangle(-.5f * width,-.5f * depth, width, depth);
+                result = new Rectangle(-.5f * width,-.5f * depth, width, depth);
             }
             return result;
         }
 
-        private void CheckConsistent(IList<TNode> nodes)
+        private void CheckConsistent(IList<Node> nodes)
         {
             foreach(var node in nodes)
             {
@@ -396,28 +386,28 @@ namespace SEE.Layout.NodeLayouts
 
                     if(dir == Direction.Left)
                     {
-                        foreach(TNode neighborNode in seg.Side1Nodes)
+                        foreach(Node neighborNode in seg.Side1Nodes)
                         {
                             Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Right] == seg);
                         }
                     }
                     if(dir == Direction.Right)
                     {
-                        foreach(TNode neighborNode in seg.Side2Nodes)
+                        foreach(Node neighborNode in seg.Side2Nodes)
                         {
                             Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Left] == seg);
                         }
                     }
                     if(dir == Direction.Lower)
                     {
-                        foreach(TNode neighborNode in seg.Side1Nodes)
+                        foreach(Node neighborNode in seg.Side1Nodes)
                         {
                             Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Upper] == seg);
                         }
                     }
                     if(dir == Direction.Upper)
                     {
-                        foreach(TNode neighborNode in seg.Side2Nodes)
+                        foreach(Node neighborNode in seg.Side2Nodes)
                         {
                             Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Lower] == seg);
                         }
@@ -433,35 +423,18 @@ namespace SEE.Layout.NodeLayouts
                 Assert.IsTrue(node.Rectangle.depth > 0);
             }
         }
-    
-        private void CheckEqualNodeSets(IList<TNode> nodes1, IList<TNode> nodes2)
+
+        private void CheckEqualNodeSets(IList<Node> nodes1, IList<Node> nodes2)
         {
-            foreach(var node in nodes1)
+            foreach (var node in nodes1)
             {
                 Assert.IsTrue(nodes2.Contains(node));
             }
-            foreach(var node in nodes2)
+
+            foreach (var node in nodes2)
             {
                 Assert.IsTrue(nodes1.Contains(node));
             }
         }
-    
-        private void PrintGraphForDebugDebug ()
-        {
-            string msg = "data = [";
-            foreach(var node in TNodeMap.Values)
-            {
-                if(node == null || node.Rectangle == null) continue;
-                msg += "\n";
-                msg += "(" + node.ID + ", " ;
-                msg += node.Rectangle.x.ToString() + ", ";
-                msg += node.Rectangle.width.ToString() + ", ";
-                msg += node.Rectangle.z.ToString() + ", ";
-                msg += node.Rectangle.depth.ToString() + "),";
-            }
-            msg += "]";
-            Debug.Log(msg);
-        }
-
     }
 }

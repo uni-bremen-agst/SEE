@@ -5,36 +5,31 @@ using System;
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class TNode
+    public class Node
     {
-        public TNode(string nodeID)
+        public Node(string nodeID)
         {
-            this.nodeID = nodeID;
+            this.ID = nodeID;
         }
         
-        private TRectangle rectangle;
-        public TRectangle Rectangle 
+        private Rectangle rectangle;
+        public Rectangle Rectangle 
         {   get => rectangle; 
-            set   {rectangle = value;}
+            set => rectangle = value;
         }
 
-        private float size;
-        public float Size 
-        {   get => size;
-            set {size = value;}}
+        public float Size { get; set; }
 
-        private string nodeID;
-        public string ID 
-        {   get => nodeID;}
+        public string ID { get; }
 
-        private TSegment leftBoundingSegment;
-        private TSegment rightBoundingSegment;
-        private TSegment upperBoundingSegment;
-        private TSegment lowerBoundingSegment;
+        private Segment leftBoundingSegment;
+        private Segment rightBoundingSegment;
+        private Segment upperBoundingSegment;
+        private Segment lowerBoundingSegment;
 
-        public void registerSegment(TSegment segment, Direction dir)
+        public void RegisterSegment(Segment segment, Direction dir)
         {
-            this.deregisterSegment(dir);    
+            this.DeregisterSegment(dir);    
             if( dir == Direction.Left)
             {
                 this.leftBoundingSegment = segment;
@@ -57,7 +52,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
         }
 
-        public void deregisterSegment(Direction dir)
+        public void DeregisterSegment(Direction dir)
         {
             if( dir == Direction.Left)
             {
@@ -77,28 +72,22 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
         }
 
-        public IDictionary<Direction,TSegment> SegmentsDictionary()
+        public IDictionary<Direction,Segment> SegmentsDictionary()
         {
-            return new Dictionary<Direction,TSegment>{
+            return new Dictionary<Direction,Segment>{
                  {Direction.Left,  this.leftBoundingSegment},
                  {Direction.Right, this.rightBoundingSegment},
                  {Direction.Lower, this.lowerBoundingSegment},
                  {Direction.Upper, this.upperBoundingSegment}};
         }
 
-        private string DebuggerDisplay
-        {
-            get {
-                return string.Format(
-                    "{0,15} x=[{1,-6}, {2,-6}] y=[{3,-6}, {4,-6}]",
-                    ID,
-                    Math.Round(rectangle.x,3),
-                    Math.Round(rectangle.x + rectangle.width, 3),
-                    Math.Round(rectangle.z, 3),
-                    Math.Round(rectangle.z + rectangle.depth, 3));
-            }
-        }
-
-
+        private string DebuggerDisplay =>
+            string.Format(
+                "{0,15} x=[{1,-6}, {2,-6}] y=[{3,-6}, {4,-6}]",
+                ID,
+                Math.Round(rectangle.x,3),
+                Math.Round(rectangle.x + rectangle.width, 3),
+                Math.Round(rectangle.z, 3),
+                Math.Round(rectangle.z + rectangle.depth, 3));
     }
 }

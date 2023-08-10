@@ -10,14 +10,14 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     static class CorrectAreas
     {
-        public static bool Correct(IList<TNode> nodes)
+        public static bool Correct(IList<Node> nodes)
         {
             if (nodes.Count == 1) return true;
-            if(IsSliceable( nodes, out TSegment slicingSegment))
+            if(IsSliceable( nodes, out Segment slicingSegment))
             {
                 Split(nodes, slicingSegment, 
-                    out IList<TNode> partition1, 
-                    out IList<TNode> partition2);
+                    out IList<Node> partition1, 
+                    out IList<Node> partition2);
                 AdjustSliced(partition1,partition2,slicingSegment);
                 slicingSegment.IsConst = true;
                 bool works1 = Correct(partition1);
@@ -32,7 +32,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         }
         
-        private static bool IsSliceable(IList<TNode> nodes, out TSegment slicingSegment)
+        private static bool IsSliceable(IList<Node> nodes, out Segment slicingSegment)
         {
             slicingSegment = null;
             var segments = nodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
@@ -61,11 +61,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             return false;
         }
 
-        private static void Split(IList<TNode> nodes, TSegment slicingSegment,
-            out IList<TNode> partition1, out IList<TNode> partition2)
+        private static void Split(IList<Node> nodes, Segment slicingSegment,
+            out IList<Node> partition1, out IList<Node> partition2)
         {
-            partition1 = new List<TNode>();
-            partition2 = new List<TNode>();
+            partition1 = new List<Node>();
+            partition2 = new List<Node>();
             if (slicingSegment.IsVertical)
             {
                 double xPosSegment = slicingSegment.Side2Nodes.First().Rectangle.x;
@@ -98,16 +98,16 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
         }
 
-        private static void AdjustSliced(IList<TNode> partition1, 
-            IList<TNode> partition2,
-            TSegment slicingSegment)
+        private static void AdjustSliced(IList<Node> partition1, 
+            IList<Node> partition2,
+            Segment slicingSegment)
         {
-            TRectangle rectangle1Old = Utils.CreateParentRectangle(partition1);
-            TRectangle rectangle2Old = Utils.CreateParentRectangle(partition2);
+            Rectangle rectangle1Old = Utils.CreateParentRectangle(partition1);
+            Rectangle rectangle2Old = Utils.CreateParentRectangle(partition2);
             double size1 = partition1.Sum(n => n.Size);
             double size2 = partition2.Sum(n => n.Size);
-            TRectangle rectangle1New = (TRectangle) rectangle1Old.Clone();
-            TRectangle rectangle2New = (TRectangle) rectangle2Old.Clone();
+            Rectangle rectangle1New = (Rectangle) rectangle1Old.Clone();
+            Rectangle rectangle2New = (Rectangle) rectangle2Old.Clone();
 
             if (slicingSegment.IsVertical)
             {
@@ -126,12 +126,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
         
         
-        private static bool GradientDecrease(IList<TNode> nodes)
+        private static bool GradientDecrease(IList<Node> nodes)
         {
             var segments = nodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
             segments.RemoveWhere(s => s.IsConst);
             int i = 0;
-            Dictionary<TSegment,int> mapSegmentIndex 
+            Dictionary<Segment,int> mapSegmentIndex 
                 = segments.ToDictionary(s => s, s => i++);
 
             double distance = 0;
@@ -153,8 +153,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         private static Matrix<double> JacobianMatrix(
-            IList<TNode> nodes, 
-            Dictionary<TSegment, int> mapSegmentIndex)
+            IList<Node> nodes, 
+            Dictionary<Segment, int> mapSegmentIndex)
         {
             int n = nodes.Count;
             var matrix = Matrix<double>.Build.Sparse(n,n-1);
@@ -191,15 +191,15 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         private static double CalculateOneStep(
-            IList<TNode> nodes, 
-            Dictionary<TSegment, int> mapSegmentIndex)
+            IList<Node> nodes, 
+            Dictionary<Segment, int> mapSegmentIndex)
         {
             Matrix<double> matrix = JacobianMatrix(nodes,mapSegmentIndex);
             
             Vector<double> nodes_sizes_wanted = 
                 Vector<double>.Build.DenseOfArray(nodes.Select(node => (double) node.Size).ToArray());
             Vector<double> nodes_sizes_current = 
-                Vector<double>.Build.DenseOfArray(nodes.Select(node => (double) node.Rectangle.Area()).ToArray());
+                Vector<double>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.Area()).ToArray());
             var diff = nodes_sizes_wanted - nodes_sizes_current;
             Matrix<double> pinv;
             try
@@ -233,8 +233,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         private static void ApplyShift(
             Vector<double> shift,
-            IList<TNode> nodes,
-            Dictionary<TSegment, int> mapSegmentIndex)
+            IList<Node> nodes,
+            Dictionary<Segment, int> mapSegmentIndex)
         {
             foreach(var node in nodes)
             {
@@ -265,7 +265,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
         }
 
-        private static bool CheckCons(IList<TNode> nodes)
+        private static bool CheckCons(IList<Node> nodes)
         {
             foreach(var node in nodes)
             {

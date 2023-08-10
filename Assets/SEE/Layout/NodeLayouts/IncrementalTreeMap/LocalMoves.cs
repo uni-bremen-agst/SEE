@@ -8,7 +8,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     static class LocalMoves
     {
-        private static IList<LocalMove> FindLocalMoves(TSegment segment)
+        private static IList<LocalMove> FindLocalMoves(Segment segment)
         {
             List<LocalMove> result = new List<LocalMove>();
             if(segment.IsConst)
@@ -23,24 +23,24 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
             if(segment.IsVertical)
             {
-                TNode upperNode1 = Utils.ArgMax(segment.Side1Nodes, x => x.Rectangle.z);
-                TNode upperNode2 = Utils.ArgMax(segment.Side2Nodes, x => x.Rectangle.z);
+                Node upperNode1 = Utils.ArgMax(segment.Side1Nodes, x => x.Rectangle.z);
+                Node upperNode2 = Utils.ArgMax(segment.Side2Nodes, x => x.Rectangle.z);
                 Assert.IsTrue(upperNode1.SegmentsDictionary()[Direction.Upper] == upperNode2.SegmentsDictionary()[Direction.Upper]);
 
-                TNode lowerNode1 = Utils.ArgMin(segment.Side1Nodes, x => x.Rectangle.z);
-                TNode lowerNode2 = Utils.ArgMin(segment.Side2Nodes, x => x.Rectangle.z);
+                Node lowerNode1 = Utils.ArgMin(segment.Side1Nodes, x => x.Rectangle.z);
+                Node lowerNode2 = Utils.ArgMin(segment.Side2Nodes, x => x.Rectangle.z);
                 Assert.IsTrue(lowerNode1.SegmentsDictionary()[Direction.Lower] == lowerNode2.SegmentsDictionary()[Direction.Lower]);
 
                 result.Add(new StretchMove(upperNode1,upperNode2));
                 result.Add(new StretchMove(lowerNode1,lowerNode2));
                 return result;
             }
-            TNode rightNode1 = Utils.ArgMax(segment.Side1Nodes, x => x.Rectangle.x);
-            TNode rightNode2 = Utils.ArgMax(segment.Side2Nodes, x => x.Rectangle.x);
+            Node rightNode1 = Utils.ArgMax(segment.Side1Nodes, x => x.Rectangle.x);
+            Node rightNode2 = Utils.ArgMax(segment.Side2Nodes, x => x.Rectangle.x);
             Assert.IsTrue(rightNode1.SegmentsDictionary()[Direction.Right] == rightNode2.SegmentsDictionary()[Direction.Right]);
 
-            TNode leftNode1 = Utils.ArgMin(segment.Side1Nodes, x => x.Rectangle.x);
-            TNode leftNode2 = Utils.ArgMin(segment.Side2Nodes, x => x.Rectangle.x);
+            Node leftNode1 = Utils.ArgMin(segment.Side1Nodes, x => x.Rectangle.x);
+            Node leftNode2 = Utils.ArgMin(segment.Side2Nodes, x => x.Rectangle.x);
             Assert.IsTrue(leftNode1.SegmentsDictionary()[Direction.Left] == leftNode2.SegmentsDictionary()[Direction.Left]);
 
             result.Add(new StretchMove(rightNode1,rightNode2));
@@ -48,25 +48,25 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             return result;
         }
 
-        public static void AddNode(IList<TNode> nodes,TNode newNode)
+        public static void AddNode(IList<Node> nodes,Node newNode)
         {
             // ArgMax is shit in c#
             // node with rectangle with highest aspect ratio
-            TNode bestNode = Utils.ArgMax(nodes, x => x.Rectangle.AspectRatio());
+            Node bestNode = Utils.ArgMax(nodes, x => x.Rectangle.AspectRatio());
 
-            newNode.Rectangle = new TRectangle(x: bestNode.Rectangle.x, z: bestNode.Rectangle.z,
+            newNode.Rectangle = new Rectangle(x: bestNode.Rectangle.x, z: bestNode.Rectangle.z,
                                                width: bestNode.Rectangle.width, depth: bestNode.Rectangle.depth);
-            IDictionary<Direction,TSegment> segments = bestNode.SegmentsDictionary();
+            IDictionary<Direction,Segment> segments = bestNode.SegmentsDictionary();
             foreach(Direction dir in Enum.GetValues(typeof(Direction)))
             {
-                newNode.registerSegment(segments[dir],dir);
+                newNode.RegisterSegment(segments[dir],dir);
             }
             if(bestNode.Rectangle.width >= bestNode.Rectangle.depth)
             {
                 // [bestNode]|[newNode]
-                TSegment newSegment = new TSegment(isConst: false, isVertical: true);
-                newNode.registerSegment(newSegment, Direction.Left);
-                bestNode.registerSegment(newSegment, Direction.Right);
+                Segment newSegment = new Segment(isConst: false, isVertical: true);
+                newNode.RegisterSegment(newSegment, Direction.Left);
+                bestNode.RegisterSegment(newSegment, Direction.Right);
                 bestNode.Rectangle.width *= 0.5f;
                 newNode.Rectangle.width *= 0.5f;
                 newNode.Rectangle.x = bestNode.Rectangle.x + bestNode.Rectangle.width;
@@ -76,16 +76,16 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 // [newNode]
                 // ---------
                 // [bestNode]
-                TSegment newSegment = new TSegment(isConst: false, isVertical: false);
-                newNode.registerSegment(newSegment, Direction.Lower);
-                bestNode.registerSegment(newSegment, Direction.Upper);
+                Segment newSegment = new Segment(isConst: false, isVertical: false);
+                newNode.RegisterSegment(newSegment, Direction.Lower);
+                bestNode.RegisterSegment(newSegment, Direction.Upper);
                 bestNode.Rectangle.depth *= 0.5f;
                 newNode.Rectangle.depth *= 0.5f;
                 newNode.Rectangle.z = bestNode.Rectangle.z + bestNode.Rectangle.depth;
             }
         }
 
-        public static void DeleteNode(TNode obsoleteNode)
+        public static void DeleteNode(Node obsoleteNode)
         {
             // check whether node is grounded
             var segments = obsoleteNode.SegmentsDictionary();
@@ -98,7 +98,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 foreach(var node in expandingNodes)
                 {
                     node.Rectangle.width += obsoleteNode.Rectangle.width;
-                    node.registerSegment(segments[Direction.Right], Direction.Right);
+                    node.RegisterSegment(segments[Direction.Right], Direction.Right);
                 }
             }
             else if(segments[Direction.Right].Side1Nodes.Count == 1 && !segments[Direction.Right].IsConst)
@@ -110,7 +110,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 {
                     node.Rectangle.x = obsoleteNode.Rectangle.x;
                     node.Rectangle.width += obsoleteNode.Rectangle.width;
-                    node.registerSegment(segments[Direction.Left], Direction.Left);
+                    node.RegisterSegment(segments[Direction.Left], Direction.Left);
                 }
             }
             else if(segments[Direction.Lower].Side2Nodes.Count == 1 && !segments[Direction.Lower].IsConst)
@@ -122,7 +122,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 foreach(var node in expandingNodes)
                 {
                     node.Rectangle.depth += obsoleteNode.Rectangle.depth;
-                    node.registerSegment(segments[Direction.Upper], Direction.Upper);
+                    node.RegisterSegment(segments[Direction.Upper], Direction.Upper);
                 }
             }
             else if(segments[Direction.Upper].Side1Nodes.Count == 1 && !segments[Direction.Upper].IsConst)
@@ -135,19 +135,19 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 {
                     node.Rectangle.z = obsoleteNode.Rectangle.z;
                     node.Rectangle.depth += obsoleteNode.Rectangle.depth;
-                    node.registerSegment(segments[Direction.Lower], Direction.Lower);
+                    node.RegisterSegment(segments[Direction.Lower], Direction.Lower);
                 }
             }
             if(isGrounded)
             {
                 foreach(Direction dir in Enum.GetValues(typeof(Direction)))
                 {
-                    obsoleteNode.deregisterSegment(dir);
+                    obsoleteNode.DeregisterSegment(dir);
                 }
             }
             else
             {
-                TSegment bestSegment = Utils.ArgMin(segments.Values, x => x.Side1Nodes.Count + x.Side2Nodes.Count);
+                Segment bestSegment = Utils.ArgMin(segments.Values, x => x.Side1Nodes.Count + x.Side2Nodes.Count);
                 
                 var moves = FindLocalMoves(bestSegment);
                 Assert.IsTrue(moves.All(x => x is (StretchMove)));
@@ -165,48 +165,48 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
         }
         
-        public static void MakeLocalMoves(List<TNode> nodes, int amount)
+        public static void MakeLocalMoves(List<Node> nodes, int amount)
         {
             var allResults = RecursiveMakeMoves(nodes,amount);
-            allResults.Add(new Tuple<List<TNode>, double>(nodes,AspectRatiosPNorm(nodes)));
+            allResults.Add(new Tuple<List<Node>, double>(nodes,AspectRatiosPNorm(nodes)));
             var bestResult = Utils.ArgMin(allResults, x => x.Item2).Item1;
             foreach(var node in nodes)
             {
                 var resultNode = bestResult.Find(n => n.ID == node.ID);
                 node.Rectangle = resultNode.Rectangle;
             }
-            HashSet<TSegment> resultSegments = new HashSet<TSegment>();
+            HashSet<Segment> resultSegments = new HashSet<Segment>();
             foreach(var resultNode in bestResult)
             {
                 resultSegments.UnionWith(resultNode.SegmentsDictionary().Values);
             }
             foreach(var resultSegment in resultSegments)
             {
-                var newSegment = new TSegment(resultSegment.IsConst,resultSegment.IsVertical);
+                var newSegment = new Segment(resultSegment.IsConst,resultSegment.IsVertical);
                 foreach(var resultNode in resultSegment.Side1Nodes.ToArray())
                 {
                     var node = nodes.Find(n => n.ID == resultNode.ID);
-                    node.registerSegment(newSegment, 
+                    node.RegisterSegment(newSegment, 
                         newSegment.IsVertical ? Direction.Right : Direction.Upper);
                 }
                 foreach(var resultNode in resultSegment.Side2Nodes.ToArray())
                 {
                     var node = nodes.Find(n => n.ID == resultNode.ID);
-                    node.registerSegment(newSegment, 
+                    node.RegisterSegment(newSegment, 
                         newSegment.IsVertical ? Direction.Left : Direction.Lower);
                 }
             }
         }
 
-        private static List<Tuple<List<TNode>,double>> RecursiveMakeMoves(
-            List<TNode> nodes,
+        private static List<Tuple<List<Node>,double>> RecursiveMakeMoves(
+            List<Node> nodes,
             int amount)
         {
-            var resultThisRecursion = new List<Tuple<List<TNode>,double>>();
+            var resultThisRecursion = new List<Tuple<List<Node>,double>>();
             
             if(amount <= 0) return resultThisRecursion;
 
-            HashSet<TSegment> segments = new HashSet<TSegment>();
+            HashSet<Segment> segments = new HashSet<Segment>();
             foreach(var node in nodes)
             {
                 segments.UnionWith(node.SegmentsDictionary().Values);
@@ -225,7 +225,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 var works = CorrectAreas.Correct(nodeClones.Values.ToList());
                 if(!works) continue;
                 resultThisRecursion.Add(
-                    new Tuple<List<TNode>, double>(nodeClones.Values.ToList(),AspectRatiosPNorm(nodeClones.Values.ToList())));
+                    new Tuple<List<Node>, double>(nodeClones.Values.ToList(),AspectRatiosPNorm(nodeClones.Values.ToList())));
             }
             resultThisRecursion.Sort((x,y) => x.Item2.CompareTo(y.Item2));
             while(resultThisRecursion.Count > Parameters.RecursionBoundToBestSelection)
@@ -233,7 +233,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 resultThisRecursion.RemoveAt(Parameters.RecursionBoundToBestSelection);
             }
 
-            var resultsNextRecursions = new List<Tuple<List<TNode>,double>>(); 
+            var resultsNextRecursions = new List<Tuple<List<Node>,double>>(); 
             foreach(var result in resultThisRecursion)
             {
                 resultsNextRecursions.AddRange(RecursiveMakeMoves(result.Item1, amount-1));
@@ -241,21 +241,21 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             return resultThisRecursion.Concat(resultsNextRecursions).ToList();
         }
 
-        private static double AspectRatiosPNorm(IList<TNode> nodes)
+        private static double AspectRatiosPNorm(IList<Node> nodes)
         {
             Vector<double> aspectRatios = Vector<double>.Build.DenseOfEnumerable(nodes.Select(n => n.Rectangle.AspectRatio()));
             return aspectRatios.Norm(Parameters.PNorm);
         }
 
-        private static Dictionary<string,TNode> CloneGraph(IList<TNode> nodes, HashSet<TSegment> segments)
+        private static Dictionary<string,Node> CloneGraph(IList<Node> nodes, HashSet<Segment> segments)
         {
-            Dictionary<string,TNode> mapOriginalClone = 
+            Dictionary<string,Node> mapOriginalClone = 
             nodes.ToDictionary(
                 node => node.ID,
                 node => {
-                            var nodeClone = new TNode(node.ID)
+                            var nodeClone = new Node(node.ID)
                             {
-                                Rectangle = (TRectangle) node.Rectangle.Clone(),
+                                Rectangle = (Rectangle) node.Rectangle.Clone(),
                                 Size = node.Size
                             };
                             return nodeClone;
@@ -263,15 +263,15 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
             foreach(var segment in segments)
             {
-                var segmentClone = new TSegment(segment.IsConst, segment.IsVertical);
+                var segmentClone = new Segment(segment.IsConst, segment.IsVertical);
                 foreach(var node in segment.Side1Nodes.ToArray())
                 {
-                    mapOriginalClone[node.ID].registerSegment(segmentClone, 
+                    mapOriginalClone[node.ID].RegisterSegment(segmentClone, 
                         segmentClone.IsVertical ? Direction.Right : Direction.Upper);
                 }
                 foreach(var node in segment.Side2Nodes.ToArray())
                 {
-                    mapOriginalClone[node.ID].registerSegment(segmentClone, 
+                    mapOriginalClone[node.ID].RegisterSegment(segmentClone, 
                         segmentClone.IsVertical ? Direction.Left : Direction.Lower);
                 }
             }
