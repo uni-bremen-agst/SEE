@@ -136,11 +136,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         
         private static bool GradientDecrease(IList<TNode> nodes)
         {
-            HashSet<TSegment> segments = new HashSet<TSegment>();
-            foreach(var node in nodes)
-            {
-                segments.UnionWith(node.SegmentsDictionary().Values);
-            }
+            var segments = nodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
             segments.RemoveWhere(s => s.IsConst);
             int i = 0;
             Dictionary<TSegment,int> mapSegmentIndex 
@@ -154,7 +150,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
             if(distance > precision)
             {
-                Debug.LogWarning(" layout correction > " + precision.ToString());
+                Debug.LogWarning($" layout correction > {precision}");
             }
             bool cons = CheckCons(nodes);
             if(!cons)
