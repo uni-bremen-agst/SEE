@@ -68,17 +68,18 @@ namespace SEE.Layout.NodeLayouts
         private IncrementalTreeMapLayout oldLayout;
 
         public IIncrementalNodeLayout OldLayout
-        {   set {
-                    if(value is IncrementalTreeMapLayout)
-                    {
-                        this.oldLayout = (IncrementalTreeMapLayout) value;
-                    }
-                    else
-                    {
-                        this.oldLayout = null;
-                        Debug.LogWarning("Incremental layout was not of same type");
-                    }
+        {   set 
+            {
+                if(value is IncrementalTreeMapLayout layout)
+                {
+                    this.oldLayout = layout;
                 }
+                else
+                {
+                    this.oldLayout = null;
+                    Debug.LogWarning("Incremental layout was not of same type");
+                }
+            }
         }
 
         public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
@@ -244,18 +245,18 @@ namespace SEE.Layout.NodeLayouts
                 }
 
                 // get segments from old layout
-                var debugSegments = oldLayout.ExtractSegments(oldTNodes);
-                foreach(var segment in debugSegments)
+                var oldSegments = oldTNodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
+                foreach(var segment in oldSegments)
                 {
                     TSegment newSegment = new TSegment(segment.IsConst, segment.IsVertical);
                     foreach(var oldTNode in segment.Side1Nodes)
                     {
-                        TNode newNode = workWith.Where(x => x.ID == oldTNode.ID).First();
+                        TNode newNode = workWith.First(x => x.ID == oldTNode.ID);
                         newNode.registerSegment(newSegment, newSegment.IsVertical ? Direction.Right : Direction.Upper);
                     }
                     foreach(var oldTNode in segment.Side2Nodes)
                     {
-                        TNode newNode = workWith.Where(x => x.ID == oldTNode.ID).First();
+                        TNode newNode = workWith.First(x => x.ID == oldTNode.ID);
                         newNode.registerSegment(newSegment, newSegment.IsVertical ? Direction.Left : Direction.Lower);
                     }
                 }
@@ -349,22 +350,7 @@ namespace SEE.Layout.NodeLayouts
             }
             return result;
         }
-
-        internal HashSet<TSegment> ExtractSegments(ICollection<TNode> nodes)
-        {
-            HashSet<TSegment> result = new HashSet<TSegment>();
-            foreach(TNode node in nodes)
-            {
-                ICollection<TSegment> boundingSegments = node.SegmentsDictionary().Values;
-                foreach(TSegment segment in boundingSegments)
-                {
-                    Assert.IsNotNull(segment);
-                    result.Add(segment);
-                }
-            }
-            return result;
-        }
-
+        
         private void AddToLayout (IList<TNode> nodes)
         {
             float aspect_ratio = Math.Max(depth/width, width/depth);
