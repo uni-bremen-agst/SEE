@@ -42,16 +42,16 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 if (segment.IsConst) return false;
                 if (segment.IsVertical)
                 {
-                    var nodeLowerEnd = Utils.ArgMinJ(segment.Side1Nodes, node => node.Rectangle.z);
-                    var nodeUpperEnd = Utils.ArgMaxJ(segment.Side1Nodes,
+                    var nodeLowerEnd = Utils.ArgMin(segment.Side1Nodes, node => node.Rectangle.z);
+                    var nodeUpperEnd = Utils.ArgMax(segment.Side1Nodes,
                         node => node.Rectangle.z + node.Rectangle.depth);
                     return (nodeLowerEnd.SegmentsDictionary()[Direction.Lower].IsConst &&
                             nodeUpperEnd.SegmentsDictionary()[Direction.Upper].IsConst);
                 }
                 else
                 {
-                    var nodeLeftEnd = Utils.ArgMinJ(segment.Side1Nodes, node => node.Rectangle.x);
-                    var nodeRightEnd = Utils.ArgMaxJ(segment.Side1Nodes,
+                    var nodeLeftEnd = Utils.ArgMin(segment.Side1Nodes, node => node.Rectangle.x);
+                    var nodeRightEnd = Utils.ArgMax(segment.Side1Nodes,
                         node => node.Rectangle.x + node.Rectangle.width);
                     return (nodeLeftEnd.SegmentsDictionary()[Direction.Left].IsConst &&
                             nodeRightEnd.SegmentsDictionary()[Direction.Right].IsConst);

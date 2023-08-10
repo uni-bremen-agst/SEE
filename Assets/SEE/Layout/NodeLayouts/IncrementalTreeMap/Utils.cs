@@ -6,13 +6,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     public static class Utils
     {
-        public static T ArgMaxJ<T>(ICollection<T> collection, Func<T, IComparable> eval)
+        public static T ArgMax<T>(ICollection<T> collection, Func<T, IComparable> eval)
         {
             var bestVal = collection.Max(eval);
             return collection.First(x => eval(x).CompareTo(bestVal) == 0);
         }
         
-        public static T ArgMinJ<T>(ICollection<T> collection, Func<T, IComparable> eval)
+        public static T ArgMin<T>(ICollection<T> collection, Func<T, IComparable> eval)
         {
             var bestVal = collection.Min(eval);
             return collection.First(x => eval(x).CompareTo(bestVal) == 0);
