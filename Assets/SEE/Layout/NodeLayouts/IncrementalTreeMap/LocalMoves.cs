@@ -27,33 +27,22 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
             if(segment.IsVertical)
             {
-                TNode upperNode1 = ArgMaxJ<TNode>(segment.Side1Nodes, x => x.Rectangle.z);
-                TNode upperNode2 = ArgMaxJ<TNode>(segment.Side2Nodes, x => x.Rectangle.z);
-                Assert.IsTrue(upperNode1.getAllSegments()[Direction.Upper] == upperNode2.getAllSegments()[Direction.Upper]);
                 TNode upperNode1 = Utils.ArgMaxJ<TNode>(segment.Side1Nodes, x => x.Rectangle.z);
                 TNode upperNode2 = Utils.ArgMaxJ<TNode>(segment.Side2Nodes, x => x.Rectangle.z);
                 Assert.IsTrue(upperNode1.SegmentsDictionary()[Direction.Upper] == upperNode2.SegmentsDictionary()[Direction.Upper]);
 
-                TNode lowerNode1 = ArgMinJ<TNode>(segment.Side1Nodes, x => x.Rectangle.z);
-                TNode lowerNode2 = ArgMinJ<TNode>(segment.Side2Nodes, x => x.Rectangle.z);
-                Assert.IsTrue(lowerNode1.getAllSegments()[Direction.Lower] == lowerNode2.getAllSegments()[Direction.Lower]);
                 TNode lowerNode1 = Utils.ArgMinJ<TNode>(segment.Side1Nodes, x => x.Rectangle.z);
+                TNode lowerNode2 = Utils.ArgMinJ<TNode>(segment.Side2Nodes, x => x.Rectangle.z);
                 Assert.IsTrue(lowerNode1.SegmentsDictionary()[Direction.Lower] == lowerNode2.SegmentsDictionary()[Direction.Lower]);
 
                 result.Add(new StretchMove(upperNode1,upperNode2));
                 result.Add(new StretchMove(lowerNode1,lowerNode2));
                 return result;
             }
-            TNode rightNode1 = ArgMaxJ<TNode>(segment.Side1Nodes, x => x.Rectangle.x);
-            TNode rightNode2 = ArgMaxJ<TNode>(segment.Side2Nodes, x => x.Rectangle.x);
-            Assert.IsTrue(rightNode1.getAllSegments()[Direction.Right] == rightNode2.getAllSegments()[Direction.Right]);
             TNode rightNode1 = Utils.ArgMaxJ<TNode>(segment.Side1Nodes, x => x.Rectangle.x);
             TNode rightNode2 = Utils.ArgMaxJ<TNode>(segment.Side2Nodes, x => x.Rectangle.x);
             Assert.IsTrue(rightNode1.SegmentsDictionary()[Direction.Right] == rightNode2.SegmentsDictionary()[Direction.Right]);
 
-            TNode leftNode1 = ArgMinJ<TNode>(segment.Side1Nodes, x => x.Rectangle.x);
-            TNode leftNode2 = ArgMinJ<TNode>(segment.Side2Nodes, x => x.Rectangle.x);
-            Assert.IsTrue(leftNode1.getAllSegments()[Direction.Left] == leftNode2.getAllSegments()[Direction.Left]);
             TNode leftNode1 = Utils.ArgMinJ<TNode>(segment.Side1Nodes, x => x.Rectangle.x);
             TNode leftNode2 = Utils.ArgMinJ<TNode>(segment.Side2Nodes, x => x.Rectangle.x);
             Assert.IsTrue(leftNode1.SegmentsDictionary()[Direction.Left] == leftNode2.SegmentsDictionary()[Direction.Left]);
@@ -162,7 +151,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
             else
             {
-                TSegment bestSegment = ArgMinJ<TSegment>(segments.Values, x => x.Side1Nodes.Count + x.Side2Nodes.Count);
+                TSegment bestSegment = Utils.ArgMinJ<TSegment>(segments.Values, x => x.Side1Nodes.Count + x.Side2Nodes.Count);
                 
                 var moves = findLocalMoves(bestSegment);
                 Assert.IsTrue(moves.All(x => x is (StretchMove)));
