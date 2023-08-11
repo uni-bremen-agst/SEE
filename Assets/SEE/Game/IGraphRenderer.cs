@@ -41,8 +41,8 @@ namespace SEE.Game
         /// Note: The default edge layout <see cref="IGraphRenderer.EdgeLayoutDefault"/> will be used if no edge layout,
         /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
         ///
-        /// Precondition: <paramref name="source"/> and <paramref name="target"/> must have a valid
-        /// node reference. The corresponding graph nodes must be in the same graph.
+        /// Precondition: <paramref name="source"/> and <paramref name="target"/> must either have a valid
+        /// node reference or be <c>null</c>. The corresponding graph nodes must be in the same graph.
         /// </summary>
         /// <param name="edge">the edge to be drawn</param>
         /// <param name="sourceNode">GameObject of source of the new edge</param>
