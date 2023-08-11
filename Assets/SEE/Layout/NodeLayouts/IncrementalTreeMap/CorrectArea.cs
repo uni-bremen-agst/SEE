@@ -5,6 +5,7 @@ using UnityEngine;
 
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Distributions;
+using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
@@ -18,6 +19,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 Split(nodes, slicingSegment, 
                     out IList<Node> partition1, 
                     out IList<Node> partition2);
+                Assert.AreEqual(partition1.Count + partition2.Count, nodes.Count);
                 AdjustSliced(partition1,partition2,slicingSegment);
                 slicingSegment.IsConst = true;
                 bool works1 = Correct(partition1);
@@ -71,7 +73,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 double xPosSegment = slicingSegment.Side2Nodes.First().Rectangle.x;
                 foreach (var node in nodes)
                 {
-                    if (node.Rectangle.x < xPosSegment)
+                    if (node.Rectangle.x + .5*node.Rectangle.width < xPosSegment)
                     {
                         partition1.Add(node);
                     }
@@ -86,7 +88,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 double zPosSegment = slicingSegment.Side2Nodes.First().Rectangle.z;
                 foreach (var node in nodes)
                 {
-                    if (node.Rectangle.z < zPosSegment)
+                    if (node.Rectangle.z + .5*node.Rectangle.depth < zPosSegment)
                     {
                         partition1.Add(node);
                     }
