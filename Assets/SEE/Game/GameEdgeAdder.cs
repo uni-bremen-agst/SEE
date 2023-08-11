@@ -63,23 +63,18 @@ namespace SEE.Game
         {
             GameObject source = GraphElementIDMap.Find(edge.Source.ID);
             Transform cityObject = SceneQueries.GetCodeCity(source.transform);
-            GameObject result;
-            if (cityObject != null)
+
+            if (!cityObject)
             {
-                if (cityObject.TryGetComponent(out AbstractSEECity city))
-                {
-                    result = city.Renderer.DrawEdge(edge, source: source);
-                }
-                else
-                {
-                    throw new Exception($"The code city for the new edge {edge.ToShortString()} cannot be determined.\n");
-                }
+                throw new Exception($"The code city for the new edge {edge.ToShortString()} cannot be determined.\n");
             }
-            else
+
+            if (!cityObject.TryGetComponent(out AbstractSEECity city))
             {
                 throw new Exception($"Could not determine the code city for the new edge {edge.ToShortString()}.\n");
             }
-            return result;
+
+            return city.Renderer.DrawEdge(edge, source: source);
         }
 
         /// <summary>
