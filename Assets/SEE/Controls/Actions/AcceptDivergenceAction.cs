@@ -117,7 +117,7 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             // indicates whether the divergence has been solved ("true" means "solved")
-            bool result = false;
+            bool divergenceSolved = false;
 
             // FIXME: Needs adaptation for VR where no mouse is available.
             if (Input.GetMouseButtonDown(0)
@@ -156,14 +156,14 @@ namespace SEE.Controls.Actions
                         createdEdge = CreateEdge(memento);
 
                         // check whether edge creation was successfull
-                        result = createdEdge != null;
+                        divergenceSolved = createdEdge != null;
 
                         // add audio cue to the appearance of the new architecture edge
                         AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NEW_EDGE_SOUND);
 
                         // update the current state depending on whether the divergence has been solved
                         // (required in order to register as an undo-able action)
-                        currentState = result ? ReversibleAction.Progress.Completed : ReversibleAction.Progress.NoEffect;
+                        currentState = divergenceSolved ? ReversibleAction.Progress.Completed : ReversibleAction.Progress.NoEffect;
 
                         // the selected object is synced and this action is done
                         return true;
