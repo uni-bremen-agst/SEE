@@ -220,11 +220,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 var nodeClonesDictionary = Utils.CloneGraph(nodes);
                 var nodeClonesList = nodeClonesDictionary.Values.ToList();
                 var moveClone = move.Clone(nodeClonesDictionary);
+                Utils.CheckConsistent(nodeClonesList);
                 moveClone.Apply();
                 var works = CorrectAreas.Correct(nodeClonesList);
                 if(!works) continue;
 
-                IncrementalTreeMap.Utils.CheckConsistent(nodeClonesList);
+                Utils.CheckConsistent(nodeClonesList);
                 
                 var newMovesList = new List<LocalMove>(movesTillNow) {moveClone};
                 resultThisRecursion.Add(
