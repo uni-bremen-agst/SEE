@@ -209,11 +209,17 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         {
             var resultThisRecursion = new List<Tuple<List<Node>,double, IList<LocalMove>>>();
             if(numberOfMoves <= 0) return resultThisRecursion;
-
-            var relevantNodes = movesTillNow.IsNullOrEmpty() ? 
-                nodes : movesTillNow.SelectMany(m => new Collection<Node>(){m.Node1, m.Node2});
-            var relevantSegments = relevantNodes.SelectMany(
-                n => n.SegmentsDictionary().Values).ToHashSet();
+            ICollection<Segment> relevantSegments;
+            if (movesTillNow.Count == 0)
+            {
+                relevantSegments = nodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
+            }
+            else
+            {
+                var relevantNodes = movesTillNow.SelectMany(m => new[] { m.Node1.ID, m.Node2.ID }).ToHashSet()
+                    .Select(id => nodes.First(n => n.ID == id));
+                relevantSegments = relevantNodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
+            }
             var possibleMoves = relevantSegments.SelectMany(FindLocalMoves);
             foreach(var move in possibleMoves)
             {
