@@ -246,11 +246,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             var resultsNextRecursions = new List<Tuple<List<Node>,double, IList<LocalMove>>>(); 
             foreach(var result in resultThisRecursion)
             {
-                resultsNextRecursions.AddRange(
-                    RecursiveMakeMoves(
-                                     result.Item1, 
-                        numberOfMoves-1,
-                                     result.Item3));
+                resultsNextRecursions.AddRange(RecursiveMakeMoves(  result.Item1, 
+                                                                    numberOfMoves-1,
+                                                                    result.Item3));
             }
             return resultThisRecursion.Concat(resultsNextRecursions).ToList();
         }
