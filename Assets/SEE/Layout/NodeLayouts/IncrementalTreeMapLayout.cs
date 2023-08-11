@@ -244,21 +244,21 @@ namespace SEE.Layout.NodeLayouts
                 {
                     LocalMoves.DeleteNode(obsoleteNode);
                     workWith.Remove(obsoleteNode);
-                    CheckConsistent(workWith);
+                    IncrementalTreeMap.Utils.CheckConsistent(workWith);
                 }
                 CorrectAreas.Correct(workWith);
-                CheckConsistent(workWith);
+                IncrementalTreeMap.Utils.CheckConsistent(workWith);
                 foreach(var nodeToBeAdded in nodesToBeAdded)
                 {
                     LocalMoves.AddNode(workWith,nodeToBeAdded);
                     workWith.Add(nodeToBeAdded);
-                    CheckConsistent(workWith);
+                    IncrementalTreeMap.Utils.CheckConsistent(workWith);
                 }
-                CheckEqualNodeSets(workWith, newTNodes);
+                IncrementalTreeMap.Utils.CheckEqualNodeSets(workWith, newTNodes);
 
                 CorrectAreas.Correct(workWith);
                 LocalMoves.IncreaseAspectRatioWithLocalMoves(workWith.ToList(), Parameters.NumberOfLocalMoves);
-                CheckConsistent(workWith);
+                IncrementalTreeMap.Utils.CheckConsistent(workWith);
             }
 
             AddToLayout(GetNodes(siblings));
@@ -356,85 +356,6 @@ namespace SEE.Layout.NodeLayouts
                 result = new Rectangle(-.5f * width,-.5f * depth, width, depth);
             }
             return result;
-        }
-
-        private void CheckConsistent(IList<Node> nodes)
-        {
-            foreach(var node in nodes)
-            {
-                var segs = node.SegmentsDictionary(); 
-                foreach(Direction dir in Enum.GetValues(typeof(Direction)))
-                {
-                    var seg = segs[dir];
-                    Assert.IsNotNull(seg);
-                    if(seg.IsConst)
-                    {
-                        Assert.IsTrue(seg.Side1Nodes.Count == 0 || seg.Side2Nodes.Count == 0);
-                    }
-                    else
-                    {
-                        Assert.IsTrue(seg.Side1Nodes.Count != 0 && seg.Side2Nodes.Count != 0);
-                    }
-                    if(dir == Direction.Left || dir == Direction.Right)
-                    {
-                        Assert.IsTrue(seg.IsVertical);
-                    }
-                    else
-                    {
-                        Assert.IsTrue(!seg.IsVertical);
-                    }
-
-                    if(dir == Direction.Left)
-                    {
-                        foreach(Node neighborNode in seg.Side1Nodes)
-                        {
-                            Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Right] == seg);
-                        }
-                    }
-                    if(dir == Direction.Right)
-                    {
-                        foreach(Node neighborNode in seg.Side2Nodes)
-                        {
-                            Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Left] == seg);
-                        }
-                    }
-                    if(dir == Direction.Lower)
-                    {
-                        foreach(Node neighborNode in seg.Side1Nodes)
-                        {
-                            Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Upper] == seg);
-                        }
-                    }
-                    if(dir == Direction.Upper)
-                    {
-                        foreach(Node neighborNode in seg.Side2Nodes)
-                        {
-                            Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Lower] == seg);
-                        }
-                    }
-
-                }
-                Assert.IsTrue(segs[Direction.Left].Side2Nodes.Contains(node));
-                Assert.IsTrue(segs[Direction.Right].Side1Nodes.Contains(node));
-                Assert.IsTrue(segs[Direction.Lower].Side2Nodes.Contains(node));
-                Assert.IsTrue(segs[Direction.Upper].Side1Nodes.Contains(node));
-
-                Assert.IsTrue(node.Rectangle.width > 0);
-                Assert.IsTrue(node.Rectangle.depth > 0);
-            }
-        }
-
-        private void CheckEqualNodeSets(IList<Node> nodes1, IList<Node> nodes2)
-        {
-            foreach (var node in nodes1)
-            {
-                Assert.IsTrue(nodes2.Contains(node));
-            }
-
-            foreach (var node in nodes2)
-            {
-                Assert.IsTrue(nodes1.Contains(node));
-            }
         }
     }
 }
