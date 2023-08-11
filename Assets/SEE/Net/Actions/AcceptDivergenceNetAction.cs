@@ -70,12 +70,10 @@ namespace SEE.Net.Actions
             if (!IsRequester())
             {
                 GameObject fromGO = GraphElementIDMap.Find(FromId);
-                fromGO.TryGetNode(out Node fromNode);
-                if (fromGO && fromNode)
+                if (fromGO && fromGO.TryGetNode(out Node fromNode))
                 {
                     GameObject toGO = GraphElementIDMap.Find(ToId);
-                    toGO.TryGetNode(out Node toNode);
-                    if (toGO && toNode)
+                    if (toGO && toGO.TryGetNode(out Node toNode))
                     {
                         // create the edge beforehand (to change its ID)
                         Edge edgeToPropagate = new Edge(fromNode, toNode, Type);
