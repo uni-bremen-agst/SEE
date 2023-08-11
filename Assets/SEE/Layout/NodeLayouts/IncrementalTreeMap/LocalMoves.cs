@@ -1,8 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
+using Sirenix.Utilities;
 using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
@@ -171,7 +172,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             var allResults = RecursiveMakeMoves(nodes,numberOfMoves, new List<LocalMove>());
             allResults.Add(new Tuple<List<Node>, double, IList<LocalMove>>
                 (nodes,AspectRatiosPNorm(nodes), new List<LocalMove>()));
-            var bestResult = Utils.ArgMin(allResults, x => x.Item2).Item1;
+            var bestResult = Utils.ArgMin(allResults, 
+                x => x.Item2 * 10 - x.Item3.Count).Item1;
             foreach(var node in nodes)
             {
                 var resultNode = bestResult.Find(n => n.ID == node.ID);
@@ -185,13 +187,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             foreach(var resultSegment in resultSegments)
             {
                 var newSegment = new Segment(resultSegment.IsConst,resultSegment.IsVertical);
-                foreach(var resultNode in resultSegment.Side1Nodes.ToArray())
+                foreach(var resultNode in resultSegment.Side1Nodes)
                 {
                     var node = nodes.Find(n => n.ID == resultNode.ID);
                     node.RegisterSegment(newSegment, 
                         newSegment.IsVertical ? Direction.Right : Direction.Upper);
                 }
-                foreach(var resultNode in resultSegment.Side2Nodes.ToArray())
+                foreach(var resultNode in resultSegment.Side2Nodes)
                 {
                     var node = nodes.Find(n => n.ID == resultNode.ID);
                     node.RegisterSegment(newSegment, 
@@ -207,11 +209,15 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         {
             var resultThisRecursion = new List<Tuple<List<Node>,double, IList<LocalMove>>>();
             if(numberOfMoves <= 0) return resultThisRecursion;
-            var segments = nodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
-            var possibleMoves = segments.SelectMany(FindLocalMoves);
+
+            var relevantNodes = movesTillNow.IsNullOrEmpty() ? 
+                nodes : movesTillNow.SelectMany(m => new Collection<Node>(){m.Node1, m.Node2});
+            var relevantSegments = relevantNodes.SelectMany(
+                n => n.SegmentsDictionary().Values).ToHashSet();
+            var possibleMoves = relevantSegments.SelectMany(FindLocalMoves);
             foreach(var move in possibleMoves)
             {
-                var nodeClonesDictionary = Utils.CloneGraph(nodes,segments);
+                var nodeClonesDictionary = Utils.CloneGraph(nodes);
                 var nodeClonesList = nodeClonesDictionary.Values.ToList();
                 var moveClone = move.Clone(nodeClonesDictionary);
                 moveClone.Apply();
