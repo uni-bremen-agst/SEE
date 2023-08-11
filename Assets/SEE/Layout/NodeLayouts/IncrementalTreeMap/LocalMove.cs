@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-
+using System.Diagnostics;
 using System;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
@@ -16,6 +16,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         public abstract LocalMove Clone(IDictionary<string,Node> mapOriginalClone);
     }
 
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class FlipMove : LocalMove
     {
         private bool clockwise;
@@ -155,8 +156,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 upperNode.RegisterSegment(middle, Direction.Right);
             }
         }
+        
+        private string DebuggerDisplay => "flip "+node1.ID+" "+node2.ID+" {clockwise}";
     }
 
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class StretchMove : LocalMove
     {
 
@@ -318,6 +322,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 lowerNode.RegisterSegment(segmentsUpperNode[Direction.Left],Direction.Right);
             }
         }
+        
+        private string DebuggerDisplay => "flip "+node1.ID+" "+node2.ID;
     }
 }
 
