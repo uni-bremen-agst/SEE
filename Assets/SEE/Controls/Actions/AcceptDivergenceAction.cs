@@ -27,7 +27,6 @@ namespace SEE.Controls.Actions
             return new AcceptDivergenceAction();
         }
 
-
         /// <summary>
         /// Returns a new instance of <see cref="AcceptDivergenceAction"/> as a <see
         /// cref="ReversibleAction"/>.
@@ -37,7 +36,6 @@ namespace SEE.Controls.Actions
         {
             return CreateReversibleAction();
         }
-
 
         /// <summary>
         /// The graph that the edge which was hit by the user to be accepted into the graph is
@@ -76,12 +74,10 @@ namespace SEE.Controls.Actions
             }
         }
 
-
         /// <summary>
         /// The information required to (re-)create the edge that solves the divergence.
         /// </summary>
         private Memento memento;
-
 
         /// <summary>
         /// The edge created by this action. Can be null if no edge has been created yet or whether
@@ -89,16 +85,6 @@ namespace SEE.Controls.Actions
         /// called. All information to create the edge is kept in <see cref="memento"/>.
         /// </summary>
         private Edge createdEdge;
-
-
-        /// <summary>
-        /// The edge created by this action's GameObject representation. Can be null if no edge has
-        /// been created yet or whether an Undo was called. The created edge is stored only to
-        /// delete it again if Undo is called. All information to create the edge is kept in <see
-        /// cref="memento"/>.
-        /// </summary>
-        // private GameObject createdEdgeGameObject;
-
 
         /// <summary>
         /// Registers itself at <see cref="InteractableObject"/> to listen for hovering events.
@@ -108,7 +94,6 @@ namespace SEE.Controls.Actions
             InteractableObject.LocalAnyHoverIn += LocalAnyHoverIn;
             InteractableObject.LocalAnyHoverOut += LocalAnyHoverOut;
         }
-
 
         /// <summary>
         /// Unregisters itself from <see cref="InteractableObject"/>. Does no longer listen for
@@ -120,12 +105,10 @@ namespace SEE.Controls.Actions
             InteractableObject.LocalAnyHoverOut -= LocalAnyHoverOut;
         }
 
-
         /// <summary>
         /// The default type of an added edge.
         /// </summary>
         private const string DefaultEdgeType = "Source_Dependency";
-
 
         /// <summary>
         /// See <see cref="ReversibleAction.Update"/>.
