@@ -132,9 +132,8 @@ namespace SEE.Controls.Actions
                 if (selectedDivergenceEdge.TryGetEdge(out Edge selectedEdge))
                 {
                     // check if the selected edge represents a divergence
-                    if (selectedEdge.IsInArchitecture() && ReflexionGraph.IsDivergent(selectedEdge))
+                    if (selectedEdge.IsInImplementation() && ReflexionGraph.IsDivergent(selectedEdge))
                     {
-
                         // acquire the containing ReflexionGraph
                         graph = (ReflexionGraph)selectedEdge.ItsGraph;
 
