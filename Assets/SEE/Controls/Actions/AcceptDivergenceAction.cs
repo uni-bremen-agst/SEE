@@ -266,12 +266,9 @@ namespace SEE.Controls.Actions
             {
                 return new HashSet<string>
                 {
-                    GraphElementIDMap.Find(memento.from.ID).name,
-                    // memento.from.ID,
-                    GraphElementIDMap.Find(memento.to.ID).name,
-                    // memento.to.ID,
-                    // createdEdgeDataModel.ID,
-                    GraphElementIDMap.Find(createdEdge.ID).name,
+                    memento.from.ID,
+                    memento.to.ID,
+                    createdEdge.ID
                 };
             }
         }
