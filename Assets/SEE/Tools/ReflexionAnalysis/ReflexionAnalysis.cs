@@ -216,8 +216,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>true if edge is a divergent architecture dependency</returns>
         public static bool IsDivergent(Edge edge)
         {
-            State state = edge.State();
-            return state == State.Divergent;
+            AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
+            return edge.State() == State.Divergent;
         }
         #endregion
 
