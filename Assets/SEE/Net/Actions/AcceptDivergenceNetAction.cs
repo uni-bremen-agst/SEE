@@ -85,7 +85,9 @@ namespace SEE.Net.Actions
 
                         // add the already created edge to the architecture graph
                         if (fromNode.ItsGraph is ReflexionGraph graph)
+                        {
                             graph.AddToArchitecture(edgeToPropagate);
+                        }
 
                         // (re)draw the new edge
                         GameObject edgeGameObject = GameEdgeAdder.Draw(edgeToPropagate);
