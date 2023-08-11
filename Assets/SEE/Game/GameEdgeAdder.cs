@@ -55,9 +55,7 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// (Re)draws an edge in those cases where the
-        /// ReflexionAnalysis isn't run after adding it, and so it
-        /// will not be drawn before after the next change.
+        /// Simply (re)draws an edge.
         /// </summary>
         /// <param name="edge">the edge that should be (re)drawn</param>
         /// <returns>the GameObject of the drawn edge</returns>
