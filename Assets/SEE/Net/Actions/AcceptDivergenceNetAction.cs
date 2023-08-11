@@ -7,8 +7,9 @@ using SEE.Tools.ReflexionAnalysis;
 namespace SEE.Net.Actions
 {
     /// <summary>
-    /// This class is responsible for adding a node via network from
-    /// one client to all others and to the server.
+    /// This class is responsible for adding a specific edge via
+    /// network from one client to all others and to the server, in
+    /// order to solve an occuring divergence.
     /// </summary>
     public class AcceptDivergenceNetAction : AbstractNetAction
     {
