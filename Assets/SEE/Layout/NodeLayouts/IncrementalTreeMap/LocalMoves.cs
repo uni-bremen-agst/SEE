@@ -173,7 +173,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             allResults.Add(new Tuple<List<Node>, double, IList<LocalMove>>
                 (nodes,AspectRatiosPNorm(nodes), new List<LocalMove>()));
             var bestResult = Utils.ArgMin(allResults, 
-                x => x.Item2 * 10 - x.Item3.Count).Item1;
+                x => x.Item2 * 10 + x.Item3.Count).Item1;
             foreach(var node in nodes)
             {
                 var resultNode = bestResult.Find(n => n.ID == node.ID);
@@ -224,6 +224,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 var works = CorrectAreas.Correct(nodeClonesList);
                 if(!works) continue;
 
+                IncrementalTreeMap.Utils.CheckConsistent(nodeClonesList);
+                
                 var newMovesList = new List<LocalMove>(movesTillNow) {moveClone};
                 resultThisRecursion.Add(
                     new Tuple<List<Node>, double, IList<LocalMove>>
