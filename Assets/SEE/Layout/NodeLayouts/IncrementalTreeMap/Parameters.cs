@@ -4,7 +4,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     {
         public const double PNorm = 2d; // double.PositiveInfinity;
 
-        public const int NumberOfLocalMoves = 1;
+        public const int NumberOfLocalMoves = 3;
 
         public const int RecursionBoundToBestSelection = 4;
 
