@@ -187,13 +187,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             foreach(var resultSegment in resultSegments)
             {
                 var newSegment = new Segment(resultSegment.IsConst,resultSegment.IsVertical);
-                foreach(var resultNode in resultSegment.Side1Nodes)
+                foreach(var resultNode in resultSegment.Side1Nodes.ToList())
                 {
                     var node = nodes.Find(n => n.ID == resultNode.ID);
                     node.RegisterSegment(newSegment, 
                         newSegment.IsVertical ? Direction.Right : Direction.Upper);
                 }
-                foreach(var resultNode in resultSegment.Side2Nodes)
+                foreach(var resultNode in resultSegment.Side2Nodes.ToList())
                 {
                     var node = nodes.Find(n => n.ID == resultNode.ID);
                     node.RegisterSegment(newSegment, 
