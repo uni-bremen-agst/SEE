@@ -194,8 +194,7 @@ namespace SEE.Controls.Actions
                 // remove the edge's GameObject and graph representation locally and on the network
                 GameEdgeAdder.Remove(createdEdgeGO);
 
-                // synthesize the remote ID ourselves
-                // string remoteID = createdEdge.Type + "#" + createdEdge.Source.ID + "#" + createdEdge.Target.ID;
+                // propagate the new edge via network
                 new DeleteNetAction(createdEdge.ID).Execute();
 
                 // this way doesn't work - because fkin unique ID requirement
