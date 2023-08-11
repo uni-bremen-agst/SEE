@@ -197,8 +197,7 @@ namespace SEE.Controls.Actions
                 // propagate the new edge via network
                 new DeleteNetAction(createdEdge.ID).Execute();
 
-                // this way doesn't work - because fkin unique ID requirement
-                // new DeleteNetAction(createdEdgeGO.name).Execute();
+                // ensure the edge's GameObject gets destroyed properly
                 Destroyer.Destroy(createdEdgeGO);
             }
             else
