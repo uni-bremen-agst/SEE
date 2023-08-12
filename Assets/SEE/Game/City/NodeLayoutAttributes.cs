@@ -17,6 +17,11 @@ namespace SEE.Game.City
         public NodeLayoutKind Kind = NodeLayoutKind.Balloon;
 
         /// <summary>
+        /// Settings for the <see cref="SEE.Layout.NodeLayouts.IncrementalTreeMapLayout"/>.
+        /// </summary>
+        public IncrementalTreeMapSetting incrementalTreeMapSetting = new();
+
+        /// <summary>
         /// The path for the layout file containing the node layout information.
         /// If the file extension is <see cref="Filenames.GVLExtension"/>, the layout is expected
         /// to be stored in Axivion's Gravis layout (GVL) with 2D co-ordinates.
@@ -33,6 +38,7 @@ namespace SEE.Game.City
             writer.BeginGroup(label);
             writer.Save(Kind.ToString(), NodeLayoutLabel);
             LayoutPath.Save(writer, LayoutPathLabel);
+            incrementalTreeMapSetting.Save(writer,IncrementalTreeMapLabel);
             writer.EndGroup();
         }
 
@@ -44,9 +50,12 @@ namespace SEE.Game.City
 
                 ConfigIO.RestoreEnum(values, NodeLayoutLabel, ref Kind);
                 LayoutPath.Restore(values, LayoutPathLabel);
+                incrementalTreeMapSetting.Restore(values, IncrementalTreeMapLabel);
             }
         }
 
+        private const string IncrementalTreeMapLabel = "IncrementalTreeMap";
+        
         private const string NodeLayoutLabel = "NodeLayout";
     }
 }
