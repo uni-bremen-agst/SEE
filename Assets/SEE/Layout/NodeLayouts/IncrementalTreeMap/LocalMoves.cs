@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using MathNet.Numerics.LinearAlgebra;
-using Sirenix.Utilities;
+using SEE.Game.City;
 using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
@@ -167,11 +166,14 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
         }
         
-        public static void IncreaseAspectRatioWithLocalMoves(List<Node> nodes, int numberOfMoves)
+        public static void IncreaseAspectRatioWithLocalMoves(List<Node> nodes, IncrementalTreeMapSetting settings)
         {
-            var allResults = RecursiveMakeMoves(nodes,numberOfMoves, new List<LocalMove>());
+            var allResults = RecursiveMakeMoves(
+                nodes, 
+                new List<LocalMove>(),
+                settings);
             allResults.Add(new Tuple<List<Node>, double, IList<LocalMove>>
-                (nodes,AspectRatiosPNorm(nodes), new List<LocalMove>()));
+                (nodes,AspectRatiosPNorm(nodes, settings.PNorm), new List<LocalMove>()));
             var bestResult = Utils.ArgMin(allResults, 
                 x => x.Item2 * 10 + x.Item3.Count).Item1;
             foreach(var node in nodes)
@@ -204,11 +206,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         private static List<Tuple<List<Node>,double,IList<LocalMove>>> RecursiveMakeMoves(
             IList<Node> nodes,
-            int numberOfMoves,
-            IList<LocalMove> movesTillNow)
+            IList<LocalMove> movesTillNow,
+            IncrementalTreeMapSetting settings)
         {
             var resultThisRecursion = new List<Tuple<List<Node>,double, IList<LocalMove>>>();
-            if(numberOfMoves <= 0) return resultThisRecursion;
+            if(movesTillNow.Count >= settings.NumberOfLocalMoves) return resultThisRecursion;
             ICollection<Segment> relevantSegments;
             if (movesTillNow.Count == 0)
             {
@@ -228,7 +230,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 var moveClone = move.Clone(nodeClonesDictionary);
                 Utils.CheckConsistent(nodeClonesList);
                 moveClone.Apply();
-                var works = CorrectAreas.Correct(nodeClonesList);
+                var works = CorrectAreas.Correct(nodeClonesList, settings);
                 if(!works) continue;
 
                 Utils.CheckConsistent(nodeClonesList);
@@ -236,28 +238,26 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 var newMovesList = new List<LocalMove>(movesTillNow) {moveClone};
                 resultThisRecursion.Add(
                     new Tuple<List<Node>, double, IList<LocalMove>>
-                        (nodeClonesList,AspectRatiosPNorm(nodeClonesList),newMovesList));
+                        (nodeClonesList,AspectRatiosPNorm(nodeClonesList, settings.PNorm),newMovesList));
             }
             resultThisRecursion.Sort((x,y) => x.Item2.CompareTo(y.Item2));
-            while(resultThisRecursion.Count > Parameters.RecursionBoundToBestSelection)
+            while(resultThisRecursion.Count > settings.BranchingLimit)
             {
-                resultThisRecursion.RemoveAt(Parameters.RecursionBoundToBestSelection);
+                resultThisRecursion.RemoveAt(settings.BranchingLimit);
             }
             var resultsNextRecursions = new List<Tuple<List<Node>,double, IList<LocalMove>>>(); 
             foreach(var result in resultThisRecursion)
             {
-                resultsNextRecursions.AddRange(RecursiveMakeMoves(  result.Item1, 
-                                                                    numberOfMoves-1,
-                                                                    result.Item3));
+                resultsNextRecursions.AddRange(RecursiveMakeMoves(  result.Item1, result.Item3, settings));
             }
             return resultThisRecursion.Concat(resultsNextRecursions).ToList();
         }
 
-        private static double AspectRatiosPNorm(IList<Node> nodes)
+        private static double AspectRatiosPNorm(IList<Node> nodes,double p)
         {
             Vector<double> aspectRatios =
                 Vector<double>.Build.DenseOfEnumerable(nodes.Select(n => n.Rectangle.AspectRatio()));
-            return aspectRatios.Norm(Parameters.PNorm);
+            return aspectRatios.Norm(p);
         }
     }
 }

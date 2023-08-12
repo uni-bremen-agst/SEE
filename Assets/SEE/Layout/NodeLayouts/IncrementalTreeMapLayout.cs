@@ -4,9 +4,11 @@ using SEE.Layout.NodeLayouts.IncrementalTreeMap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Game.City;
 using UnityEngine;
 using UnityEngine.Assertions;
 using Node = SEE.Layout.NodeLayouts.IncrementalTreeMap.Node;
+using Object = UnityEngine.Object;
 
 namespace SEE.Layout.NodeLayouts
 {
@@ -29,7 +31,11 @@ namespace SEE.Layout.NodeLayouts
             name = "IncrementalTreeMap";
             this.width = width;
             this.depth = depth;
+
+            settings  = Object.FindObjectOfType<AbstractSEECity>().NodeLayoutSettings.incrementalTreeMapSetting;
         }
+
+        private IncrementalTreeMapSetting settings;
 
         /// <summary>
         /// The width of the rectangle in which to place all nodes in Unity units.
@@ -246,7 +252,7 @@ namespace SEE.Layout.NodeLayouts
                     workWith.Remove(obsoleteNode);
                     IncrementalTreeMap.Utils.CheckConsistent(workWith);
                 }
-                CorrectAreas.Correct(workWith);
+                CorrectAreas.Correct(workWith, settings);
                 IncrementalTreeMap.Utils.CheckConsistent(workWith);
                 foreach(var nodeToBeAdded in nodesToBeAdded)
                 {
@@ -256,8 +262,9 @@ namespace SEE.Layout.NodeLayouts
                 }
                 IncrementalTreeMap.Utils.CheckEqualNodeSets(workWith, newTNodes);
 
-                CorrectAreas.Correct(workWith);
-                LocalMoves.IncreaseAspectRatioWithLocalMoves(workWith.ToList(), Parameters.NumberOfLocalMoves);
+                CorrectAreas.Correct(workWith, settings);
+                
+                LocalMoves.IncreaseAspectRatioWithLocalMoves(workWith.ToList(), settings);
                 IncrementalTreeMap.Utils.CheckConsistent(workWith);
             }
 
@@ -333,11 +340,11 @@ namespace SEE.Layout.NodeLayouts
                     groundLevel,
                     (float)(node.Rectangle.z + node.Rectangle.depth / 2.0d));
                 Vector3 scale = new Vector3(
-                    node.Rectangle.width - 2 * Parameters.Padding > 0 ? 
-                        (float) (node.Rectangle.width - 2 * Parameters.Padding) : (float) node.Rectangle.width,
+                    node.Rectangle.width - 2 * settings.Padding > 0 ? 
+                        (float) (node.Rectangle.width - 2 * settings.Padding) : (float) node.Rectangle.width,
                     layoutNode.LocalScale.y,
-                    node.Rectangle.depth - 2 * Parameters.Padding > 0 ? 
-                        (float) (node.Rectangle.depth - 2 * Parameters.Padding) : (float) node.Rectangle.depth);
+                    node.Rectangle.depth - 2 * settings.Padding > 0 ? 
+                        (float) (node.Rectangle.depth - 2 * settings.Padding) : (float) node.Rectangle.depth);
                 layout_result[layoutNode] = new NodeTransform(position, scale);
             }
         }

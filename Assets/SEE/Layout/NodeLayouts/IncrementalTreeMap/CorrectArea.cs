@@ -5,13 +5,14 @@ using UnityEngine;
 
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Distributions;
+using SEE.Game.City;
 using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     static class CorrectAreas
     {
-        public static bool Correct(IList<Node> nodes)
+        public static bool Correct(IList<Node> nodes, IncrementalTreeMapSetting settings)
         {
             if (nodes.Count == 1) return true;
             if(IsSliceable( nodes, out Segment slicingSegment))
@@ -22,14 +23,14 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 Assert.AreEqual(partition1.Count + partition2.Count, nodes.Count);
                 AdjustSliced(partition1,partition2,slicingSegment);
                 slicingSegment.IsConst = true;
-                bool works1 = Correct(partition1);
-                bool works2 = Correct(partition2);
+                bool works1 = Correct(partition1, settings);
+                bool works2 = Correct(partition2, settings);
                 slicingSegment.IsConst = false;
                 return works1 && works2;
             }
             else
             {
-                return GradientDecrease(nodes);
+                return GradientDecrease(nodes, settings);
             }
 
         }
@@ -128,7 +129,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
         
         
-        private static bool GradientDecrease(IList<Node> nodes)
+        private static bool GradientDecrease(IList<Node> nodes, IncrementalTreeMapSetting settings)
         {
             var segments = nodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
             segments.RemoveWhere(s => s.IsConst);
@@ -140,18 +141,18 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             for(int j = 0; j < 50; j++)
             {
                 distance = CalculateOneStep(nodes, mapSegmentIndex);
-                if(distance <= Parameters.Precision) break;
+                if(distance <= settings.GradientPrecision) break;
             }
-            if(distance > Parameters.Precision)
+            if(distance > settings.GradientPrecision)
             {
-                Debug.LogWarning($" layout correction > {Parameters.Precision}");
+                Debug.LogWarning($" layout correction > {settings.GradientPrecision}");
             }
             bool cons = CheckCons(nodes);
             if(!cons)
             {
                 Debug.LogWarning("layout correction failed negative rec");
             }
-            return (cons && distance < Parameters.Precision);
+            return (cons && distance < settings.GradientPrecision);
         }
 
         private static Matrix<double> JacobianMatrix(
