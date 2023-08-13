@@ -209,7 +209,9 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
-        /// Returns true if <paramref name="edge"/> is a divergent edge in the architecture.
+        /// Returns true if <paramref name="edge"/> is a divergent
+        /// edge (present in the implementation graph, but missing in
+        /// the architecture graph).
         /// Precondition: <paramref name="edge"/> must be in the architecture graph.
         /// </summary>
         /// <param name="edge">architecture dependency</param>
