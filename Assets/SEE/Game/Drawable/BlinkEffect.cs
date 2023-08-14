@@ -1,28 +1,22 @@
-﻿using System.Collections;
+﻿using Assets.SEE.Controls.Actions.Drawable;
+using SEE.Controls.Actions;
+using SEE.Utils;
+using System.Collections;
 using UnityEngine;
 
 namespace Assets.SEE.Game.Drawable
 {
     public class BlinkEffect : MonoBehaviour
     {
-        public GameObject line;
         private bool loopOn;
-        new LineRenderer renderer;
-        public BlinkEffect(GameObject line)
+        private ActionStateType allowedState;
+        new Renderer renderer;
+
+
+        public void SetAllowedActionStateType(ActionStateType allowedState)
         {
-            this.line = line;
+            this.allowedState = allowedState;
         }
-        // Use this for initialization
-        /*
-        public void Start()
-        {
-            if (renderer == null)
-            {
-                renderer = line.GetComponent<LineRenderer>();
-            }
-            loopOn = true;
-            StartCoroutine(Blink());
-        }*/
 
         IEnumerator Blink()
         {
@@ -32,6 +26,19 @@ namespace Assets.SEE.Game.Drawable
                 yield return new WaitForSeconds(0.2f);
                 renderer.enabled = true;
                 yield return new WaitForSeconds(0.5f);
+                
+                if (GlobalActionHistory.Current() != allowedState)
+                {
+                    Deactivate();
+                }
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (GlobalActionHistory.Current() != ActionStateTypes.EditLine)
+            {
+                Destroy(GameEditLine.editMenuInstance);
             }
         }
 
@@ -39,6 +46,7 @@ namespace Assets.SEE.Game.Drawable
         {
             loopOn = false;
             renderer.enabled = true;
+            Destroy(this);
         }
 
         public void LoopReverse()
@@ -58,13 +66,19 @@ namespace Assets.SEE.Game.Drawable
             return loopOn;
         }
 
-        public void Activate()
+        public void Activate(GameObject line)
         {
-            // Start();
             if (renderer == null)
             {
                 renderer = line.GetComponent<LineRenderer>();
             }
+            loopOn = true;
+            StartCoroutine(Blink());
+        }
+
+        private void Activate()
+        {
+            renderer = gameObject.GetComponent<LineRenderer>();
             loopOn = true;
             StartCoroutine(Blink());
         }

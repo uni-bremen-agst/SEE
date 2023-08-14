@@ -2505,7 +2505,7 @@ GameObject:
   - component: {fileID: 114932488821670980}
   - component: {fileID: 114517942113022666}
   m_Layer: 5
-  m_Name: DrawableEdit
+  m_Name: DrawableLineMenu
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10205,6 +10205,7 @@ GameObject:
   - component: {fileID: 3584950246243488924}
   - component: {fileID: 8789071362946870479}
   - component: {fileID: 6758970411911548091}
+  - component: {fileID: 2272310281624708991}
   m_Layer: 5
   m_Name: InputField (TMP)
   m_TagString: Untagged
@@ -10383,6 +10384,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hsvpicker: {fileID: 11423364}
   displayAlpha: 0
+--- !u!114 &2272310281624708991
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8531705016514483191}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 803a2c08c9d53d146bf740ad6088c765, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8549833580104342591
 GameObject:
   m_ObjectHideFlags: 0

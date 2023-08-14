@@ -9,23 +9,32 @@ namespace Assets.SEE.Game.Drawable
 
         public static GameObject oldLine;
 
-        public static GameObject editInstance;
+        public static GameObject editMenuInstance;
+
+        //public static Hashtable tableValueHolder = new();
 
         public static ValueHolder oldValueHolder;
 
         public static ValueHolder newValueHolder;
 
+        public static ValueHolder newValueHolderForOldLine;
+        
         public class ValueHolder
         {
-            public readonly Color color;
-            public readonly int layer;
-            public readonly float thickness;
+            public Color color;
+            public int layer;
+            public float thickness;
 
             public ValueHolder(Color color, int layer, float thickness)
             {
                 this.color = color;
                 this.layer = layer;
                 this.thickness = thickness;
+            }
+
+            public bool CheckEquals(ValueHolder holder)
+            {
+                return color.Equals(holder.color) && layer.Equals(holder.layer) && thickness.Equals(holder.thickness);
             }
         }
 

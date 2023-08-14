@@ -12,6 +12,9 @@ using Assets.SEE.Net.Actions.Whiteboard;
 using SEE.Net.Actions;
 using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game;
+using Assets.SEE.Net.Actions.Drawable;
+using RTG;
+using Assets.SEE.Game.UI.Drawable;
 
 namespace SEE.Controls.Actions
 {
@@ -22,6 +25,63 @@ namespace SEE.Controls.Actions
     /// </summary>
     class DrawOnAction : AbstractPlayerAction
     {
+        private enum ProgressState
+        {
+            StartDrawing,
+            Drawing,
+            FinishDrawing
+        }
+
+        private ProgressState progressState;
+
+        /// <summary>
+        /// The object holding the line renderer.
+        /// </summary>
+        private GameObject line;
+
+        /// <summary>
+        /// The positions of the line in world space.
+        /// </summary>
+        private Vector3[] positions = new Vector3[1];
+
+        private Memento memento;
+
+        private const string drawableMenu = "Prefabs/UI/DrawableLineMenu";
+        private HSVPicker.ColorPicker picker;
+        private ThicknessSliderController thicknessSlider;
+        private GameObject menuInstance;
+
+        public override void Start()
+        {
+            progressState = ProgressState.StartDrawing;
+        }
+
+        public override void Awake()
+        {
+            base.Awake();
+            menuInstance = PrefabInstantiator.InstantiatePrefab(drawableMenu,
+                            GameObject.Find("UI Canvas").transform, false);
+
+            DrawableLineMenuDestroyer destroyer = menuInstance.AddOrGetComponent<DrawableLineMenuDestroyer>();
+            destroyer.SetAllowedState(GetActionStateType());
+
+            thicknessSlider = menuInstance.GetComponentInChildren<ThicknessSliderController>();
+            thicknessSlider.AssignValue(DrawableConfigurator.currentThickness);
+            thicknessSlider.onValueChanged.AddListener(thickness =>
+            {
+                DrawableConfigurator.currentThickness = thickness;
+            });
+
+            menuInstance.transform.Find("Layer").gameObject.SetActive(false);
+
+            picker = menuInstance.GetComponent<HSVPicker.ColorPicker>();
+            picker.AssignColor(DrawableConfigurator.currentColor);
+            picker.onValueChanged.AddListener(color =>
+            {
+                DrawableConfigurator.currentColor = color;
+            });
+        }
+
         /// <summary>
         /// Continues the line at the point of the mouse position and draws it.
         /// </summary>
@@ -39,72 +99,65 @@ namespace SEE.Controls.Actions
                     (raycastHit.collider.gameObject.transform.parent != null && 
                         raycastHit.collider.gameObject.transform.parent.gameObject.CompareTag(Tags.Drawable))))
                 {
-                    // drawing is active
-                    drawing = true;
-
                     GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ? 
                         raycastHit.collider.gameObject : raycastHit.collider.gameObject.transform.parent.gameObject;
 
-                    if (line == null)
+                    switch (progressState)
                     {
-                        line = GameDrawer.StartDrawing(drawable, positions, DrawableConfigurator.currentColor, 
-                            DrawableConfigurator.currentThickness);
-                    }
-                   
-                    // The position at which to continue the line.
-                    Vector3 newPosition = raycastHit.point;
+                        case ProgressState.StartDrawing:
+                            progressState = ProgressState.Drawing;
+                            positions[0] = raycastHit.point;
+                            line = GameDrawer.StartDrawing(drawable, positions, DrawableConfigurator.currentColor, DrawableConfigurator.currentThickness);
+                            break;
 
-                    // Add newPosition to the line renderer.
-                    Vector3[] newPositions = new Vector3[positions.Length + 1];
-                    Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
-                    newPositions[newPositions.Length - 1] = newPosition;
-                    positions = newPositions;
+                        case ProgressState.Drawing:
+                            // The position at which to continue the line.
+                            Vector3 newPosition = raycastHit.point;
 
-                    if (line != null && GameDrawer.DifferentPositionCounter(positions) > 3 )
-                    {
-                        GameDrawer.Drawing(positions);
-                        memento = new Memento(drawable, positions, DrawableConfigurator.currentColor, 
-                            DrawableConfigurator.currentThickness, line.GetComponent<LineRenderer>().sortingOrder);
-                        memento.id = line.name;
-                        new DrawOnNetAction(memento.drawable.name, memento.drawable.transform.parent.name, 
-                            memento.id, memento.positions, memento.color, memento.thickness).Execute();
-                        currentState = ReversibleAction.Progress.InProgress;
+                            // Add newPosition to the line renderer.
+                            Vector3[] newPositions = new Vector3[positions.Length + 1];
+                            Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
+                            newPositions[newPositions.Length - 1] = newPosition;
+                            positions = newPositions;
+
+                            if (GameDrawer.DifferentPositionCounter(positions) > 3)
+                            {
+                                GameDrawer.Drawing(positions);
+                                memento = new Memento(drawable, positions, DrawableConfigurator.currentColor,
+                                    DrawableConfigurator.currentThickness, line.GetComponent<LineRenderer>().sortingOrder);
+                                memento.id = line.name;
+                                new DrawOnNetAction(memento.drawable.name, memento.drawable.transform.parent.name,
+                                    memento.id, memento.positions, memento.color, memento.thickness).Execute();
+                                currentState = ReversibleAction.Progress.InProgress;
+                            }
+                            break;
                     }
                 }
                 bool isMouseButtonUp = Input.GetMouseButtonUp(0);
-                // The action is considered complete if the mouse button is no longer pressed.
-                if (isMouseButtonUp && drawing && line != null && GameDrawer.DifferentPositionCounter(positions) > 3)
+                if (isMouseButtonUp)
                 {
-                    drawing = false;
-                    memento.positions = positions;
-                    GameDrawer.FinishDrawing();
-                    new DrawOnNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.id, 
-                        memento.positions, memento.color, memento.thickness).Execute();
-                    result = true;
-                    currentState = ReversibleAction.Progress.Completed;
-                } else if (isMouseButtonUp && drawing && line != null && GameDrawer.DifferentPositionCounter(positions) <= 3)
+                    progressState = ProgressState.FinishDrawing;
+                }
+
+                if (progressState == ProgressState.FinishDrawing)
                 {
-                    drawing = false;
-                    Destroyer.Destroy(line);
+                    if (GameDrawer.DifferentPositionCounter(positions) > 3)
+                    {
+                        memento.positions = positions;
+                        GameDrawer.FinishDrawing();
+                        new DrawOnNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.id,
+                            memento.positions, memento.color, memento.thickness).Execute();
+                        result = true;
+                        currentState = ReversibleAction.Progress.Completed;
+                    } else
+                    {
+                        Destroyer.Destroy(line);
+                    }
                 }
                 return isMouseButtonUp;
             }
             return result;
         }
-
-        /// <summary>
-        /// The object holding the line renderer.
-        /// </summary>
-        private GameObject line;
-
-        /// <summary>
-        /// The positions of the line in world space.
-        /// </summary>
-        private Vector3[] positions = new Vector3[0];
-
-        private bool drawing = false;
-
-        private Memento memento;
 
         private struct Memento
         {
