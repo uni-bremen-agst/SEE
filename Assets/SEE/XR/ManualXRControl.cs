@@ -70,6 +70,8 @@ namespace SEE.XR
             if (XRGeneralSettings.Instance.Manager.activeLoader == null)
             {
                 Debug.LogError("[XR] Initializing XR Failed. Check Editor or Player log for details.\n");
+                Debug.LogError("[XR] Please check in \"Project Settings/XR Plug-in Management\" whether "
+                    + "a Plug-in Provider (OpenXR) has been turned on.\n");
             }
             else
             {
