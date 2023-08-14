@@ -664,14 +664,6 @@ namespace SEE.Controls.Actions
         {
             grabbedObject.Reparent(newBigParent, originalBigParent);
         }
-        
-        /// <summary>
-        /// Is called from OnCollisionExit() in <see cref="VrGrabAction"/>.
-        /// </summary>
-        public static void StartUnReparentProcess()
-        {
-            grabbedObject.UnReparent();
-        }
 
         /// <summary>
         /// Returns true if the user is currently grabbing in VR or Desktop mode.
