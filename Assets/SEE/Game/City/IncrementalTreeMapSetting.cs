@@ -19,7 +19,7 @@ namespace SEE.Game.City
         [Range(0, 5)]
         [Tooltip("The maximal depth for local moves algorithm")]
         public int localMovesDepth = 3;
-        
+
         /// <summary>
         /// The maximal branching of the local moves search.
         /// </summary>
@@ -27,7 +27,7 @@ namespace SEE.Game.City
         [Range(1, 10)]
         [Tooltip("The maximal branching factor for local moves algorithm")]
         public int localMovesBranchingLimit = 4;
-        
+
         /// <summary>
         /// Defines the specific p norm used in the local moves algorithm. See here:
         /// <see cref="Layout.NodeLayouts.IncrementalTreeMap.LocalMoves.AspectRatiosPNorm"/>.
@@ -38,7 +38,7 @@ namespace SEE.Game.City
         [Tooltip("Norm for the visual quality of a set of nodes, " +
                  "Larger p values lead to stronger penalties for larger deviations in aspect ratio of single nodes.")]
         private PNormRange pNorm = PNormRange.P2Euclidean;
-        
+
         /// <summary>
         /// The absolute padding between neighboring nodes so that they can be distinguished (in millimeter).  
         /// </summary>
@@ -47,7 +47,7 @@ namespace SEE.Game.City
         [LabelText("Padding (mm)")]
         [Tooltip("The distance between two neighbour nodes in mm")]
         public float paddingMm = 5f;
-        
+
         /// <summary>
         /// The maximal error for the method
         /// <see cref="Layout.NodeLayouts.IncrementalTreeMap.CorrectAreas.GradientDecent"/> as power of 10.
@@ -57,12 +57,14 @@ namespace SEE.Game.City
         [LabelText("Gradient Descent Precision (10^n)")]
         [Tooltip("The maximal error for the gradient descent method as power of 10")]
         public int gradientDescentPrecisionExponent = -4;
-        
+
         /// <summary>
         /// Maps <see cref="pNorm"/> to a double.
         /// </summary>
-        public double PNorm {
-            get {
+        public double PNorm
+        {
+            get
+            {
                 return pNorm switch
                 {
                     (PNormRange.P1Manhattan) => 1d,
@@ -74,7 +76,7 @@ namespace SEE.Game.City
                 };
             }
         }
-        
+
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
@@ -85,7 +87,7 @@ namespace SEE.Game.City
             writer.Save(paddingMm, PaddingLabel);
             writer.EndGroup();
         }
-        
+
         public bool Restore(Dictionary<string, object> attributes, string label)
         {
             if (!attributes.TryGetValue(label, out object dictionary)) return false;
@@ -104,7 +106,7 @@ namespace SEE.Game.City
         private const string GradientDescentPrecisionLabel = "GradientDescentPrecision";
         private const string PaddingLabel = "Padding";
     }
-    
+
     /// <summary>
     /// Selection of possible PNorms. Used for better access in Unity Editor for the serialized field
     /// <see cref="IncrementalTreeMapSetting.pNorm"/>.
