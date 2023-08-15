@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     static class Dissect{
-        public static void Apply(Rectangle rectangle, IEnumerable<Node> nodes)
+        public static void Apply(IEnumerable<Node> nodes, Rectangle rectangle)
         {
             Node[] nodesArray = nodes.ToArray();
             Array.Sort(nodesArray,(x,y) => (x.Size.CompareTo(y.Size)));
