@@ -26,8 +26,8 @@ class Level(str, Enum):
     ERROR = ":x:"
 
 
-# Extensions that a pattern will be applied to by default.
-DEFAULT_EXTENSIONS = ("cs",)
+# Filenames that a pattern will be applied to by default.
+DEFAULT_FILENAMES = (r".*\.cs$",)
 
 # List of matches to be printed as a JSON array at the end of the script.
 collected_matches: List[Dict[str, Union[str, int]]] = []
@@ -42,15 +42,15 @@ class BadPattern:
         self,
         regex,
         message,
-        extensions=DEFAULT_EXTENSIONS,
+        filenames=DEFAULT_FILENAMES,
         suggestion=None,
         level=Level.INFO,
         see_only=True,
     ):
         """
         Takes a compiled regular expression `regex` that is checked against
-        every line within changed files having an extension contained in
-        `extensions`, a `message` that shall be displayed to the user in case
+        every line within changed files having a filename matched by a regex contained in
+        `filenames`, a `message` that shall be displayed to the user in case
         a match has been found, a regex substitution `suggestion` for a found
         bad pattern, and a severity `level`.
         If `see_only` is set to `True`, the pattern will only be applied to
@@ -62,7 +62,7 @@ class BadPattern:
             regex = re.compile(r".*")
         self.regex = regex
         self.message = message
-        self.extensions = extensions
+        self.filenames = [re.compile(x) for x in filenames]
         self.suggestion = suggestion
         self.level = level
         self.see_only = see_only
@@ -71,14 +71,13 @@ class BadPattern:
         """
         Returns whether the given pattern applies to the given filename.
         A pattern applies to a filename if:
-        * The filename has an extension contained in `extensions`.
+        * The filename matches one of the regexes in `filenames`.
         * The filename starts with `Assets/SEE/` if `see_only` is set to `True`.
         * The line matches the regular expression `regex`.
         """
-        extension = filename.rsplit(".", 1)[1] if "." in filename else ""
         return (
             (not self.see_only or filename.startswith("Assets/SEE/"))
-            and extension in self.extensions
+            and any(x.match(filename) is not None for x in self.filenames)
             and self.regex.match(line) is not None
         )
 
@@ -126,7 +125,7 @@ BAD_PATTERNS = [
 This happens on Linux systems automatically, but Windows systems will change this back.
 We should just leave it as a backslash.""",
         suggestion=r"\1\SteamVR\actions.json\2",
-        extensions=["asset"],
+        filenames=[r".*\.asset$"],
         level=Level.WARN,
         see_only=False,
     ),
