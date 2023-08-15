@@ -92,7 +92,7 @@ namespace SEE.Game.City
             Dictionary<string, object> values = dictionary as Dictionary<string, object>;
             var result = ConfigIO.Restore(values, LocalMovesDepthLabel, ref localMovesDepth);
             result |= ConfigIO.Restore(values, LocalMovesBranchingLimitLabel, ref localMovesBranchingLimit);
-            result |= ConfigIO.Restore(values, PNormLabel, ref pNorm);
+            result |= ConfigIO.RestoreEnum(values, PNormLabel, ref pNorm);
             result |= ConfigIO.Restore(values, GradientDescentPrecisionLabel, ref gradientDescentPrecisionExponent);
             result |= ConfigIO.Restore(values, PaddingLabel, ref paddingMm);
             return result;
