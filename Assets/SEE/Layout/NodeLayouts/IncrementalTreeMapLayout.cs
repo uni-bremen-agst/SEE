@@ -38,7 +38,8 @@ namespace SEE.Layout.NodeLayouts
             // This is actually not a good solution to get the settings for the layout.
             // Because it only works reliably when the SEECityEvolution is the only AbstractSEECity in the scene.
             // However the architecture provides no good way to set the parameters of an layout. 
-            _settings = UnityEngine.Object.FindObjectOfType<AbstractSEECity>().NodeLayoutSettings.incrementalTreeMapSetting;
+            _settings = UnityEngine.Object.FindObjectOfType<AbstractSEECity>().NodeLayoutSettings
+                .incrementalTreeMapSetting;
         }
 
         /// <summary>
@@ -163,7 +164,7 @@ namespace SEE.Layout.NodeLayouts
         private void CalculateLayout(ICollection<ILayoutNode> siblings, Rectangle rectangle)
         {
             // the nodes of the 
-            var nodes =  siblings.Select(n => _nodeMap[n.ID]).ToList();
+            var nodes = siblings.Select(n => _nodeMap[n.ID]).ToList();
             // check if the old layout can be used for to lay out siblings.
             if (_oldLayout == null
                 || NumberOfOccurrencesInOldGraph(nodes) <= 4
@@ -177,7 +178,7 @@ namespace SEE.Layout.NodeLayouts
             }
 
             AddToLayout(nodes);
-            
+
             foreach (ILayoutNode node in siblings)
             {
                 ICollection<ILayoutNode> children = node.Children();
@@ -194,45 +195,45 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="rectangle">rectangle in that the nodes should be laid out</param>
         private void ApplyIncrementalLayout(List<Node> nodes, Rectangle rectangle)
         {
-                // oldNodes are not only the siblings that are in the old graph and in the new one,
-                // but all siblings in old graph. Note that there is exact one single parent (because of if-clause),
-                // but this parent can be null if children == roots
-                var oldILayoutParent = ParentsInOldGraph(nodes).First();
-                var oldILayoutSiblings = oldILayoutParent == null ? _oldLayout.roots : oldILayoutParent.Children();
-                var oldNodes = oldILayoutSiblings.Select(n => _oldLayout._nodeMap[n.ID]).ToList();
+            // oldNodes are not only the siblings that are in the old graph and in the new one,
+            // but all siblings in old graph. Note that there is exact one single parent (because of if-clause),
+            // but this parent can be null if children == roots
+            var oldILayoutParent = ParentsInOldGraph(nodes).First();
+            var oldILayoutSiblings = oldILayoutParent == null ? _oldLayout.roots : oldILayoutParent.Children();
+            var oldNodes = oldILayoutSiblings.Select(n => _oldLayout._nodeMap[n.ID]).ToList();
 
-                SetupNodeLists(nodes, oldNodes,
-                    out var workWith,
-                    out var nodesToBeDeleted,
-                    out var nodesToBeAdded);
+            SetupNodeLists(nodes, oldNodes,
+                out var workWith,
+                out var nodesToBeDeleted,
+                out var nodesToBeAdded);
 
-                Rectangle oldRectangle = _oldLayout.ParentRectangle(oldNodes.First());
-                IncrementalTreeMap.Utils.TransformRectangles(workWith,
-                    oldRectangle: oldRectangle,
-                    newRectangle: rectangle);
+            Rectangle oldRectangle = _oldLayout.ParentRectangle(oldNodes.First());
+            IncrementalTreeMap.Utils.TransformRectangles(workWith,
+                oldRectangle: oldRectangle,
+                newRectangle: rectangle);
 
-                foreach (var obsoleteNode in nodesToBeDeleted)
-                {
-                    LocalMoves.DeleteNode(obsoleteNode);
-                    workWith.Remove(obsoleteNode);
-                    IncrementalTreeMap.Utils.CheckConsistent(workWith);
-                }
-
-                CorrectAreas.Correct(workWith, _settings);
+            foreach (var obsoleteNode in nodesToBeDeleted)
+            {
+                LocalMoves.DeleteNode(obsoleteNode);
+                workWith.Remove(obsoleteNode);
                 IncrementalTreeMap.Utils.CheckConsistent(workWith);
-                foreach (var nodeToBeAdded in nodesToBeAdded)
-                {
-                    LocalMoves.AddNode(workWith, nodeToBeAdded);
-                    workWith.Add(nodeToBeAdded);
-                    IncrementalTreeMap.Utils.CheckConsistent(workWith);
-                }
+            }
 
-                IncrementalTreeMap.Utils.CheckEqualNodeSets(workWith, nodes);
-
-                CorrectAreas.Correct(workWith, _settings);
-
-                LocalMoves.LocalMovesSearch(workWith, _settings);
+            CorrectAreas.Correct(workWith, _settings);
+            IncrementalTreeMap.Utils.CheckConsistent(workWith);
+            foreach (var nodeToBeAdded in nodesToBeAdded)
+            {
+                LocalMoves.AddNode(workWith, nodeToBeAdded);
+                workWith.Add(nodeToBeAdded);
                 IncrementalTreeMap.Utils.CheckConsistent(workWith);
+            }
+
+            IncrementalTreeMap.Utils.CheckEqualNodeSets(workWith, nodes);
+
+            CorrectAreas.Correct(workWith, _settings);
+
+            LocalMoves.LocalMovesSearch(workWith, _settings);
+            IncrementalTreeMap.Utils.CheckConsistent(workWith);
         }
 
         /// <summary>
@@ -245,10 +246,10 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="nodesToBeDeleted">artificial nodes with no equivalent ILayoutNode, part of workWith</param>
         /// <param name="nodesToBeAdded">nodes that are not in workWith, but in nodes</param>
         private void SetupNodeLists(
-            List<Node> nodes, 
-            List<Node> oldNodes, 
-            out List<Node> workWith, 
-            out List<Node> nodesToBeDeleted, 
+            List<Node> nodes,
+            List<Node> oldNodes,
+            out List<Node> workWith,
+            out List<Node> nodesToBeDeleted,
             out List<Node> nodesToBeAdded)
         {
             //  [         oldNodes            ]--------------   <- nodes of OLD layout
@@ -256,7 +257,7 @@ namespace SEE.Layout.NodeLayouts
             //  [ toBeDeleted ]---------------[  toBeAdded  ]   <- nodes of new layout
             //  [         workWith            ]--------------   <- nodes of new layout
             //                                                     designed to be changed over time to nodes
-            
+
             // get nodes form old layout .. copy their rectangles
             // setup workWith and nodesToBeDeleted
             workWith = new List<Node>();
@@ -303,7 +304,7 @@ namespace SEE.Layout.NodeLayouts
             var withWithCopy = workWith;
             nodesToBeAdded = nodes.Where(n => !withWithCopy.Contains(n)).ToList();
         }
-        
+
         /// <summary>
         /// Collection all nodes of <see cref="_oldLayout"/> that are parent to a node,
         /// with same id as a node in <paramref name="nodes"/>. The result will contain null
@@ -313,7 +314,7 @@ namespace SEE.Layout.NodeLayouts
         /// <returns></returns>
         private ICollection<ILayoutNode> ParentsInOldGraph(IEnumerable<Node> nodes)
         {
-            HashSet<ILayoutNode> parents = new ();
+            HashSet<ILayoutNode> parents = new();
             foreach (var node in nodes)
             {
                 if (_oldLayout._iLayoutNodeMap.TryGetValue(node.ID, out var oldNode))
@@ -333,7 +334,7 @@ namespace SEE.Layout.NodeLayouts
         {
             return nodes.Sum(n => _oldLayout._iLayoutNodeMap.ContainsKey(n.ID) ? 1 : 0);
         }
-        
+
         /// <summary>
         /// Adds the result of layout calculation to <see cref="_layoutResult"/>.
         /// </summary>
@@ -345,22 +346,22 @@ namespace SEE.Layout.NodeLayouts
                 float absolutePadding = _settings.paddingMm / 1000;
                 var rectangle = node.Rectangle;
                 var layoutNode = _iLayoutNodeMap[node.ID];
-                
+
                 if (rectangle.width - absolutePadding <= 0 ||
                     rectangle.depth - absolutePadding <= 0)
                 {
                     absolutePadding = 0;
                 }
-                
+
                 var position = new Vector3(
                     (float)(rectangle.x + rectangle.width / 2.0d),
                     groundLevel,
                     (float)(rectangle.z + rectangle.depth / 2.0d));
                 var scale = new Vector3(
-                        (float)(rectangle.width - absolutePadding),
-                        layoutNode.LocalScale.y,
-                        (float)(rectangle.depth - absolutePadding));
-                
+                    (float)(rectangle.width - absolutePadding),
+                    layoutNode.LocalScale.y,
+                    (float)(rectangle.depth - absolutePadding));
+
                 _layoutResult[layoutNode] = new NodeTransform(position, scale);
             }
         }
@@ -381,11 +382,11 @@ namespace SEE.Layout.NodeLayouts
             else
             {
                 var parentNode = _nodeMap[iLayoutNode.Parent.ID];
-                result = (Rectangle) parentNode.Rectangle.Clone();
+                result = (Rectangle)parentNode.Rectangle.Clone();
             }
             return result;
         }
-        
+
         public override Dictionary<ILayoutNode, NodeTransform> Layout
         (ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges,
             ICollection<SublayoutLayoutNode> sublayouts)
