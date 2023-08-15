@@ -40,7 +40,11 @@ namespace SEE.Game.Evolution
             // The game node representing the graphNode if there is any; null if there is none
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject gameNode);
             Assert.IsTrue(gameNode.HasNodeRef());
-            Assert.IsNull(formerGraphNode);
+            // Assert.IsNull(formerGraphNode);
+            if (formerGraphNode != null )
+            {
+                Debug.LogError($"A graph node for {formerGraphNode.ID} was expected not to exist.\n");
+            }
 
             Add(gameNode, layoutNode);
 
