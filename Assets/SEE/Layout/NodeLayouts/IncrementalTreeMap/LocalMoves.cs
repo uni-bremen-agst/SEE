@@ -166,7 +166,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
         }
         
-        public static void IncreaseAspectRatioWithLocalMoves(List<Node> nodes, IncrementalTreeMapSetting settings)
+        public static void LocalMovesSearch(List<Node> nodes, IncrementalTreeMapSetting settings)
         {
             var allResults = RecursiveMakeMoves(
                 nodes, 
