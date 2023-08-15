@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SEE.Layout
+﻿namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// Defines the interface for incremental node layouts.
