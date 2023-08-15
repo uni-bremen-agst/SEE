@@ -141,6 +141,13 @@ We should just leave it as a backslash.""",
         level=Level.WARN,
         suggestion=r"\1",
     ),
+    BadPattern(
+        re.compile(r"^\s*m_Loaders:(?! \[\])"),
+        "You must not enable OpenXR on any PR that is planned to be merged, otherwise Linux builds will break!",
+        filenames=[r".*\.asset$"],
+        level=Level.ERROR,
+        see_only=False,
+    ),
 ]
 
 
