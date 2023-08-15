@@ -210,7 +210,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             IncrementalTreeMapSetting settings)
         {
             var resultThisRecursion = new List<Tuple<List<Node>,double, IList<LocalMove>>>();
-            if(movesTillNow.Count >= settings.NumberOfLocalMoves) return resultThisRecursion;
+            if(movesTillNow.Count >= settings.localMovesDepth) return resultThisRecursion;
             ICollection<Segment> relevantSegments;
             if (movesTillNow.Count == 0)
             {
@@ -241,9 +241,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                         (nodeClonesList,AspectRatiosPNorm(nodeClonesList, settings.PNorm),newMovesList));
             }
             resultThisRecursion.Sort((x,y) => x.Item2.CompareTo(y.Item2));
-            while(resultThisRecursion.Count > settings.BranchingLimit)
+            while(resultThisRecursion.Count > settings.localMovesBranchingLimit)
             {
-                resultThisRecursion.RemoveAt(settings.BranchingLimit);
+                resultThisRecursion.RemoveAt(settings.localMovesBranchingLimit);
             }
             var resultsNextRecursions = new List<Tuple<List<Node>,double, IList<LocalMove>>>(); 
             foreach(var result in resultThisRecursion)
@@ -253,6 +253,19 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             return resultThisRecursion.Concat(resultsNextRecursions).ToList();
         }
 
+        /// <summary>
+        /// A p norm is a class of vector norms, that is used in the local moves search algorithm
+        /// to assess the visual quality of a list of <paramref name="nodes"/>,
+        /// by considering the vector of aspect ratios of the <paramref name="nodes"/>.
+        /// The kind of p norm changes what layout would be considered the best.
+        /// For example with <paramref name="p"/>=1 (Manhattan Norm) the algorithm would
+        /// minimize the sum of aspect ratios, while with <paramref name="p"/>=infinity (Chebyshev Norm)
+        /// the algorithm would minimize the maximal aspect ratio over the <paramref name="nodes"/>.
+        /// The other p norms range between these extremes.
+        /// </summary>
+        /// <param name="nodes">The nodes the should be assessed.</param>
+        /// <param name="p">Determines the specific norm.</param>
+        /// <returns>A measure for the visual quality of the nodes.</returns>
         private static double AspectRatiosPNorm(IList<Node> nodes,double p)
         {
             Vector<double> aspectRatios =

@@ -2,7 +2,6 @@ using System.Linq;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.Distributions;
 using SEE.Game.City;
@@ -30,7 +29,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
             else
             {
-                return GradientDecrease(nodes, settings);
+                return GradientDecent(nodes, settings);
             }
 
         }
@@ -129,7 +128,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
         
         
-        private static bool GradientDecrease(IList<Node> nodes, IncrementalTreeMapSetting settings)
+        private static bool GradientDecent(IList<Node> nodes, IncrementalTreeMapSetting settings)
         {
             var segments = nodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
             segments.RemoveWhere(s => s.IsConst);
@@ -138,21 +137,22 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 = segments.ToDictionary(s => s, s => i++);
 
             double distance = 0;
+            double maximalError = Math.Pow(10, settings.gradientDescentPrecisionExponent);
             for(int j = 0; j < 50; j++)
             {
                 distance = CalculateOneStep(nodes, mapSegmentIndex);
-                if(distance <= settings.GradientPrecision) break;
+                if(distance <= maximalError) break;
             }
-            if(distance > settings.GradientPrecision)
+            if(distance > maximalError)
             {
-                Debug.LogWarning($" layout correction > {settings.GradientPrecision}");
+                Debug.LogWarning($" layout correction > {maximalError}");
             }
             bool cons = CheckCons(nodes);
             if(!cons)
             {
                 Debug.LogWarning("layout correction failed negative rec");
             }
-            return (cons && distance < settings.GradientPrecision);
+            return (cons && distance < maximalError);
         }
 
         private static Matrix<double> JacobianMatrix(

@@ -334,17 +334,18 @@ namespace SEE.Layout.NodeLayouts
         {
             foreach (Node node in nodes)
             {
+                float absolutePadding = settings.paddingMm / 1000;
                 var layoutNode = ILayoutNodeMap[node.ID];
                 Vector3 position = new Vector3(
                     (float)(node.Rectangle.x + node.Rectangle.width / 2.0d),
                     groundLevel,
                     (float)(node.Rectangle.z + node.Rectangle.depth / 2.0d));
                 Vector3 scale = new Vector3(
-                    node.Rectangle.width - 2 * settings.Padding > 0 ? 
-                        (float) (node.Rectangle.width - 2 * settings.Padding) : (float) node.Rectangle.width,
+                    node.Rectangle.width - 2 * absolutePadding > 0 ? 
+                        (float) (node.Rectangle.width - 2 * absolutePadding) : (float) node.Rectangle.width,
                     layoutNode.LocalScale.y,
-                    node.Rectangle.depth - 2 * settings.Padding > 0 ? 
-                        (float) (node.Rectangle.depth - 2 * settings.Padding) : (float) node.Rectangle.depth);
+                    node.Rectangle.depth - 2 * absolutePadding > 0 ? 
+                        (float) (node.Rectangle.depth - 2 * absolutePadding) : (float) node.Rectangle.depth);
                 layout_result[layoutNode] = new NodeTransform(position, scale);
             }
         }
