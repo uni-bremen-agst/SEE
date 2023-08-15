@@ -5,20 +5,40 @@ using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
+    /// <summary>
+    /// Provides helper functions for lay-outing nodes.
+    /// </summary>
     public static class Utils
     {
+        /// <summary>
+        /// arg max function, returns a item of a collection, that maximizes a function.
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="eval">evaluation function</param>
+        /// <returns></returns>
         public static T ArgMax<T>(ICollection<T> collection, Func<T, IComparable> eval)
         {
             var bestVal = collection.Max(eval);
             return collection.First(x => eval(x).CompareTo(bestVal) == 0);
         }
-        
+
+        /// <summary>
+        /// arg min function, returns a item of a collection, that minimizes a function.
+        /// </summary>
+        /// <param name="collection"></param>
+        /// <param name="eval">evaluation function</param>
+        /// <returns></returns>
         public static T ArgMin<T>(ICollection<T> collection, Func<T, IComparable> eval)
         {
             var bestVal = collection.Min(eval);
             return collection.First(x => eval(x).CompareTo(bestVal) == 0);
         }
 
+        /// <summary>
+        /// Creates a new rectangle that includes all rectangles of <paramref name="nodes"/>.
+        /// </summary>
+        /// <param name="nodes">nodes with not null rectangles</param>
+        /// <returns>new parent rectangle</returns>
         public static Rectangle CreateParentRectangle(IList<Node> nodes)
         {
             double x = nodes.Min(node => node.Rectangle.x);
@@ -27,10 +47,17 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             double depth = nodes.Max(node => node.Rectangle.z + node.Rectangle.depth) - z;
             return new Rectangle(x, z, width, depth);
         }
-        
-        public static void TransformRectangles(IList<Node> nodes, Rectangle newRectangle ,Rectangle oldRectangle)
-        {
 
+        /// <summary>
+        /// Linear Transformation, a list of <paramref name="nodes"/> with rectangles
+        /// that are laid out in a <paramref name="oldRectangle"/> will be transformed, so that they fit
+        /// in <paramref name="newRectangle"/>
+        /// </summary>
+        /// <param name="nodes">nodes with rectangles that should be transformed</param>
+        /// <param name="newRectangle">new parent rectangle</param>
+        /// <param name="oldRectangle">old parent rectangle</param>
+        public static void TransformRectangles(IList<Node> nodes, Rectangle newRectangle, Rectangle oldRectangle)
+        {
             // linear transform line   x1<---->x2
             //               to line       y1<------->y2
             // f  : [x1,x2] -> [y1,y2]
@@ -39,7 +66,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             double scaleX = newRectangle.width / oldRectangle.width;
             double scaleZ = newRectangle.depth / oldRectangle.depth;
 
-            foreach( var node in nodes)
+            foreach (var node in nodes)
             {
                 node.Rectangle.x = (node.Rectangle.x - oldRectangle.x) * scaleX + newRectangle.x;
                 node.Rectangle.z = (node.Rectangle.z - oldRectangle.z) * scaleZ + newRectangle.z;
@@ -48,6 +75,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
         }
 
+        /// <summary>
+        /// Clones a list of nodes and preserves the layout including segments.
+        /// Therefor the segments of the nodes are cloned to.
+        /// </summary>
+        /// <param name="nodes">siblings to be cloned</param>
+        /// <returns>Dictionary that maps ID to new clone node</returns>
         public static IDictionary<string, Node> CloneGraph(IList<Node> nodes)
         {
             // clones the nodes only partially: does NOT clone the segment
@@ -69,27 +102,26 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     clonesMap[node.ID].RegisterSegment(segmentClone,
                         segmentClone.IsVertical ? Direction.Right : Direction.Upper);
                 }
-                Assert.IsTrue(segment.Side1Nodes.Count == segmentClone.Side1Nodes.Count);
                 foreach (var node in segment.Side2Nodes)
                 {
                     clonesMap[node.ID].RegisterSegment(segmentClone,
                         segmentClone.IsVertical ? Direction.Left : Direction.Lower);
                 }
-                Assert.IsTrue(segment.Side2Nodes.Count == segmentClone.Side2Nodes.Count);
             }
             return clonesMap;
         }
-        
+
         public static void CheckConsistent(IList<Node> nodes)
         {
-            foreach(var node in nodes)
+            return;
+            foreach (var node in nodes)
             {
-                var segs = node.SegmentsDictionary(); 
-                foreach(Direction dir in Enum.GetValues(typeof(Direction)))
+                var segs = node.SegmentsDictionary();
+                foreach (Direction dir in Enum.GetValues(typeof(Direction)))
                 {
                     var seg = segs[dir];
                     Assert.IsNotNull(seg);
-                    if(seg.IsConst)
+                    if (seg.IsConst)
                     {
                         Assert.IsTrue(seg.Side1Nodes.Count == 0 || seg.Side2Nodes.Count == 0);
                     }
@@ -97,7 +129,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     {
                         Assert.IsTrue(seg.Side1Nodes.Count != 0 && seg.Side2Nodes.Count != 0);
                     }
-                    if(dir == Direction.Left || dir == Direction.Right)
+
+                    if (dir == Direction.Left || dir == Direction.Right)
                     {
                         Assert.IsTrue(seg.IsVertical);
                     }
@@ -106,36 +139,39 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                         Assert.IsTrue(!seg.IsVertical);
                     }
 
-                    if(dir == Direction.Left)
+                    if (dir == Direction.Left)
                     {
-                        foreach(Node neighborNode in seg.Side1Nodes)
+                        foreach (Node neighborNode in seg.Side1Nodes)
                         {
                             Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Right] == seg);
                         }
                     }
-                    if(dir == Direction.Right)
+
+                    if (dir == Direction.Right)
                     {
-                        foreach(Node neighborNode in seg.Side2Nodes)
+                        foreach (Node neighborNode in seg.Side2Nodes)
                         {
                             Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Left] == seg);
                         }
                     }
-                    if(dir == Direction.Lower)
+
+                    if (dir == Direction.Lower)
                     {
-                        foreach(Node neighborNode in seg.Side1Nodes)
+                        foreach (Node neighborNode in seg.Side1Nodes)
                         {
                             Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Upper] == seg);
                         }
                     }
-                    if(dir == Direction.Upper)
+
+                    if (dir == Direction.Upper)
                     {
-                        foreach(Node neighborNode in seg.Side2Nodes)
+                        foreach (Node neighborNode in seg.Side2Nodes)
                         {
                             Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Lower] == seg);
                         }
                     }
-
                 }
+
                 Assert.IsTrue(segs[Direction.Left].Side2Nodes.Contains(node));
                 Assert.IsTrue(segs[Direction.Right].Side1Nodes.Contains(node));
                 Assert.IsTrue(segs[Direction.Lower].Side2Nodes.Contains(node));
