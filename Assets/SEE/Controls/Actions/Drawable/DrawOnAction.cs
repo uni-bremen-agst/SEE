@@ -15,6 +15,7 @@ using Assets.SEE.Game;
 using Assets.SEE.Net.Actions.Drawable;
 using RTG;
 using Assets.SEE.Game.UI.Drawable;
+using DynamicPanels;
 
 namespace SEE.Controls.Actions
 {
@@ -50,6 +51,7 @@ namespace SEE.Controls.Actions
         private HSVPicker.ColorPicker picker;
         private ThicknessSliderController thicknessSlider;
         private GameObject menuInstance;
+        private bool drawing = false;
 
         public override void Start()
         {
@@ -59,6 +61,7 @@ namespace SEE.Controls.Actions
         public override void Awake()
         {
             base.Awake();
+            Debug.Log("Awake von DrawOn wird aufgerufen");
             menuInstance = PrefabInstantiator.InstantiatePrefab(drawableMenu,
                             GameObject.Find("UI Canvas").transform, false);
 
@@ -99,18 +102,48 @@ namespace SEE.Controls.Actions
                     (raycastHit.collider.gameObject.transform.parent != null && 
                         raycastHit.collider.gameObject.transform.parent.gameObject.CompareTag(Tags.Drawable))))
                 {
+                    Debug.Log(DateTime.Now + " - Before Switch");
                     GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ? 
                         raycastHit.collider.gameObject : raycastHit.collider.gameObject.transform.parent.gameObject;
+                    drawing = true;
+
+                    Ray ray = Raycasting.UserPointsTo();
+                    /*
+                     * Direction z fast 1 zu z sub
+                     * direction z fast -1 zu z add
+                     * direction x fast 1 zu x sub
+                     * direction x fast -1 zu x add
+                     **/
+                    if (ray.direction.z < -0.80)
+                    {
+                        raycastHit.point = raycastHit.point + DrawableConfigurator.distanceZ;
+                    }
+                    if (ray.direction.z > 0.80)
+                    {
+                        raycastHit.point = raycastHit.point - DrawableConfigurator.distanceZ;
+                    }
+                    if (ray.direction.x < -0.80)
+                    {
+                        raycastHit.point = raycastHit.point + DrawableConfigurator.distanceX;
+                    }
+                    if (ray.direction.x > 0.80)
+                    {
+                        raycastHit.point = raycastHit.point - DrawableConfigurator.distanceX;
+                    }
+                     
+                     
 
                     switch (progressState)
                     {
                         case ProgressState.StartDrawing:
+                            Debug.Log(DateTime.Now + " - Start Drawing");
                             progressState = ProgressState.Drawing;
                             positions[0] = raycastHit.point;
                             line = GameDrawer.StartDrawing(drawable, positions, DrawableConfigurator.currentColor, DrawableConfigurator.currentThickness);
                             break;
 
                         case ProgressState.Drawing:
+                            Debug.Log(DateTime.Now + " - Drawing");
                             // The position at which to continue the line.
                             Vector3 newPosition = raycastHit.point;
 
@@ -133,28 +166,34 @@ namespace SEE.Controls.Actions
                             break;
                     }
                 }
-                bool isMouseButtonUp = Input.GetMouseButtonUp(0);
-                if (isMouseButtonUp)
-                {
-                    progressState = ProgressState.FinishDrawing;
-                }
 
-                if (progressState == ProgressState.FinishDrawing)
+                bool isMouseButtonUp = Input.GetMouseButtonUp(0);
+                if (isMouseButtonUp || (!Input.GetMouseButton(0) && drawing))
                 {
-                    if (GameDrawer.DifferentPositionCounter(positions) > 3)
+                    Debug.Log(DateTime.Now + " - Set Finish Drawing");
+                    progressState = ProgressState.FinishDrawing;
+                    drawing = false;
+
+                    if (progressState == ProgressState.FinishDrawing)
                     {
-                        memento.positions = positions;
-                        GameDrawer.FinishDrawing();
-                        new DrawOnNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.id,
-                            memento.positions, memento.color, memento.thickness).Execute();
-                        result = true;
-                        currentState = ReversibleAction.Progress.Completed;
-                    } else
-                    {
-                        Destroyer.Destroy(line);
+                        Debug.Log(DateTime.Now + " - Finish Drawing");
+                        if (GameDrawer.DifferentPositionCounter(positions) > 3)
+                        {
+                            memento.positions = positions;
+                            GameDrawer.FinishDrawing();
+                            new DrawOnNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.id,
+                                memento.positions, memento.color, memento.thickness).Execute();
+                            result = true;
+                            currentState = ReversibleAction.Progress.Completed;
+                            progressState = ProgressState.StartDrawing;
+                        }
+                        else
+                        {
+                            Destroyer.Destroy(line);
+                        }
                     }
+                    return isMouseButtonUp;
                 }
-                return isMouseButtonUp;
             }
             return result;
         }

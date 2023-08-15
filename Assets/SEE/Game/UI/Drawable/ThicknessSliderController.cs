@@ -27,8 +27,8 @@ public class ThicknessSliderController : MonoBehaviour
         slider = GetComponentInChildren<Slider>();
         tmpText = GetComponentsInChildren<TMP_Text>()[1];
         slider.onValueChanged.AddListener(SliderChanged);
-        slider.minValue = 0.005f;
-        slider.maxValue = 0.05f;
+        slider.minValue = 0.001f;
+        slider.maxValue = 0.04f;
     }
 
     private void OnDestroy()
@@ -38,7 +38,7 @@ public class ThicknessSliderController : MonoBehaviour
 
     private void SliderChanged(float newValue)
     {
-        newValue = slider.normalizedValue;
+        newValue = slider.value;
         tmpText.text = newValue.ToString("F2");
         onValueChanged.Invoke(newValue);
     }

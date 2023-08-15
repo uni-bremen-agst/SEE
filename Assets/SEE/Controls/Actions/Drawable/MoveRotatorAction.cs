@@ -18,14 +18,12 @@ using UnityEngine;
 
 namespace Assets.SEE.Controls.Actions.Drawable
 {
-    public class EditLineAction : AbstractPlayerAction
+    public class MoveRotatorAction : AbstractPlayerAction
     {
-        private const string editPrefabPath = "Prefabs/UI/DrawableLineMenu";
-        private HSVPicker.ColorPicker picker;
-        private LayerSliderController layerSlider;
-        private ThicknessSliderController thicknessSlider;
         private Memento memento;
         private bool isActive = false;
+        GameObject selectedLine;
+        GameObject oldLine;
 
         /// <summary>
         /// 
@@ -34,26 +32,28 @@ namespace Assets.SEE.Controls.Actions.Drawable
         public override bool Update()
         {
             bool result = false;
+            selectedLine = GameMoveRotator.selectedLine;
             if (!Raycasting.IsMouseOverGUI())
             {
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && isActive == false &&
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     raycastHit.collider.gameObject.CompareTag(Tags.Line))
                 {
-                    GameObject selectedLine = raycastHit.collider.gameObject;
-                    GameObject oldLine = GameEditLine.selectedLine;
+                    selectedLine = raycastHit.collider.gameObject;
+                    oldLine = GameMoveRotator.selectedLine;
 
+                    /*
                     if (oldLine != null && !GameEditLine.oldValueHolder.CheckEquals(GameEditLine.newValueHolder))
                     {
                        memento = new Memento(oldLine, oldLine, GameEditLine.oldValueHolder, GameEditLine.newValueHolder,
                                     oldLine.transform.parent.gameObject, oldLine.name);
                        currentState = ReversibleAction.Progress.Completed;
                     }
-
+                    *
                     LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
                     GameEditLine.oldValueHolder = new(renderer.material.color, renderer.sortingOrder, renderer.startWidth);
                     GameEditLine.newValueHolder = new(renderer.material.color, renderer.sortingOrder, renderer.startWidth);
-
+                    */
                     isActive = true;
                     BlinkEffect effect = selectedLine.AddOrGetComponent<BlinkEffect>();
                     effect.SetAllowedActionStateType(GetActionStateType());
@@ -63,28 +63,73 @@ namespace Assets.SEE.Controls.Actions.Drawable
                         if (selectedLine.name.Equals(oldLine.name))
                         {
                             effect.LoopReverse();
-                            GameEditLine.selectedLine = null;
+                            GameMoveRotator.selectedLine = null;
+                            /*
                             if (!effect.GetLoopStatus())
                             {
                                 Destroyer.Destroy(GameEditLine.editMenuInstance);
-                            }
-                        } else
+                            }*/
+                        }
+                        else
                         {
                             if (oldLine.GetComponent<BlinkEffect>() != null)
                             {
                                 oldLine.GetComponent<BlinkEffect>().Deactivate();
-                                Destroyer.Destroy(GameEditLine.editMenuInstance);
+                                // Destroyer.Destroy(GameEditLine.editMenuInstance);
                             }
                         }
                     }
                     if (oldLine == null || !selectedLine.name.Equals(oldLine.name))
                     {
                         effect.Activate(selectedLine);
-                        GameEditLine.selectedLine = selectedLine;
+                        GameMoveRotator.selectedLine = selectedLine;
                     }
+                }
 
-                    if (selectedLine.GetComponent<BlinkEffect>() != null && selectedLine.GetComponent<BlinkEffect>().GetLoopStatus())
+                if (selectedLine != null && selectedLine.GetComponent<BlinkEffect>() != null && selectedLine.GetComponent<BlinkEffect>().GetLoopStatus())
+                {
+                    if (Raycasting.RaycastAnything(out RaycastHit hit))
                     {
+                        Debug.Log("Hit game object: " + hit.collider.gameObject);
+                        if (hit.collider.gameObject.CompareTag(Tags.Drawable))
+                        {
+                            Debug.Log(DateTime.Now + " - Hitposition: " + hit.point);
+                            LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
+                            Vector3[] positions = new Vector3[renderer.positionCount];
+                            renderer.GetPositions(positions);
+                            if ((Input.GetMouseButton(0) || Input.GetMouseButtonDown(0)) && isActive == false)
+                            {
+                                isActive = true;
+                                Debug.Log("Positionsize: " + positions.Length + " - Render size: " + renderer.positionCount);
+                                for (int i = 0; i < renderer.positionCount; i++)
+                                {
+                                    
+                                    Vector3 position = positions[i];
+                                    float x = position.x;
+                                    float y = position.y;
+
+                                    float hitX = hit.point.x;
+                                    float hitY = hit.point.y;
+
+                                    Vector3 moveOffset = new(hitX - x, hitY - y, 0);
+                                    
+                                    positions[i] = position + moveOffset;
+                                }
+                                renderer.SetPositions(positions);
+                                Mesh mesh = new();
+                                MeshCollider meshCollider = selectedLine.GetComponent<MeshCollider>();
+                                Destroyer.Destroy(meshCollider);
+                                MeshCollider newMeshCollider = selectedLine.AddComponent<MeshCollider>(); 
+                                renderer.BakeMesh(mesh, false);
+                                newMeshCollider.sharedMesh = mesh;
+                            }
+                        }
+                    }
+                            //Debug.Log("Rotate");
+                            //Vector3 newRotation = new Vector3(0, 0, 0);
+                            //selectedLine.transform.localEulerAngles = newRotation;
+
+                        /*
                         GameEditLine.editMenuInstance = PrefabInstantiator.InstantiatePrefab(editPrefabPath,
                             GameObject.Find("UI Canvas").transform, false);
                         GameObject drawable = selectedLine.transform.parent.gameObject;
@@ -94,12 +139,9 @@ namespace Assets.SEE.Controls.Actions.Drawable
                         thicknessSlider.AssignValue(renderer.startWidth);
                         thicknessSlider.onValueChanged.AddListener(thickness =>
                         {
-                            if (thickness > 0.0f)
-                            {
-                                GameEditLine.ChangeThickness(selectedLine, thickness);
-                                GameEditLine.newValueHolder.thickness = thickness;
-                                new EditLineThicknessNetAction(drawable.name, drawableParent.name, selectedLine.name, thickness).Execute();
-                            }
+                            GameEditLine.ChangeThickness(selectedLine, thickness);
+                            GameEditLine.newValueHolder.thickness = thickness;
+                            new EditLineThicknessNetAction(drawable.name, drawableParent.name, selectedLine.name, thickness).Execute();
                         });
 
                         layerSlider = GameEditLine.editMenuInstance.GetComponentInChildren<LayerSliderController>();
@@ -118,12 +160,12 @@ namespace Assets.SEE.Controls.Actions.Drawable
                             GameEditLine.ChangeColor(selectedLine, color);
                             GameEditLine.newValueHolder.color = color;
                             new EditLineColorNetAction(drawable.name, drawableParent.name, selectedLine.name, color).Execute();
-                        });
+                        });*/
                     }
 
 
                     result = true;
-                }
+                
                 if (Input.GetMouseButtonUp(0) && isActive)
                 {
                     isActive = false;
@@ -244,7 +286,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
         /// <returns>new instance of <see cref="EditLineAction"/></returns>
         public static ReversibleAction CreateReversibleAction()
         {
-            return new EditLineAction();
+            return new MoveRotatorAction();
         }
 
         /// <summary>
@@ -258,7 +300,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
         }
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateTypes.EditLine;
+            return ActionStateTypes.MoveRotator;
         }
 
         public override HashSet<string> GetChangedObjects()

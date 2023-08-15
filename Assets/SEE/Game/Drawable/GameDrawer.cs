@@ -35,14 +35,15 @@ namespace SEE.Game
             line = new (name);
             line.tag = Tags.Line;
             line.transform.parent = drawable.transform;
+            //FIXME klappt nicht so
+            //line.transform.position = line.transform.position - DrawableConfigurator.distanceToDrawable;
             renderer = line.AddComponent<LineRenderer>();
             meshCollider = line.AddComponent<MeshCollider>();
-            meshCollider.convex = true;
             renderer.sharedMaterial = GetMaterial(color);
-            renderer.alignment = LineAlignment.TransformZ;
+            //renderer.alignment = LineAlignment.TransformZ;
             renderer.startWidth = thickness;
             renderer.endWidth = renderer.startWidth;
-            renderer.useWorldSpace = true;
+            renderer.useWorldSpace = false;
             renderer.positionCount = positions.Length;
         }
 
