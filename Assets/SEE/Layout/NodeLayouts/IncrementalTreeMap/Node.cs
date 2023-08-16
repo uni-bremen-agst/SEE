@@ -5,7 +5,6 @@ using static SEE.Layout.NodeLayouts.IncrementalTreeMap.Direction;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
-    
     /// <summary>
     /// A core element in the Layout, each entity that should be laid out
     /// has a corresponding node.
@@ -41,17 +40,17 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// the adjacent segment on the <see cref="Direction.Left"/> side of the node
         /// </summary>
         private Segment _leftBoundingSegment;
-        
+
         /// <summary>
         ///the adjacent segment on the <see cref="Direction.Right"/> side of the node
         /// </summary>
         private Segment _rightBoundingSegment;
-        
+
         /// <summary>
         ///the adjacent segment on the <see cref="Direction.Upper"/> side of the node
         /// </summary>
         private Segment _upperBoundingSegment;
-        
+
         /// <summary>
         /// the adjacent segment on the <see cref="Direction.Lower"/> side of the node
         /// </summary>
@@ -65,7 +64,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <param name="dir">the side of the new adjacent segment</param>
         public void RegisterSegment(Segment segment, Direction dir)
         {
-            DeregisterSegment(dir);    
+            DeregisterSegment(dir);
             switch (dir)
             {
                 case Left:
@@ -77,7 +76,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     segment.Side1Nodes.Add(this);
                     break;
                 case Lower:
-                    _lowerBoundingSegment= segment;
+                    _lowerBoundingSegment = segment;
                     segment.Side2Nodes.Add(this);
                     break;
                 case Upper:
@@ -118,15 +117,17 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// Get all adjacent segments
         /// </summary>
         /// <returns>dictionary direction -> segment in this direction</returns>
-        public IDictionary<Direction,Segment> SegmentsDictionary()
+        public IDictionary<Direction, Segment> SegmentsDictionary()
         {
-            return new Dictionary<Direction,Segment>{
-                 {Left,  _leftBoundingSegment},
-                 {Right, _rightBoundingSegment},
-                 {Lower, _lowerBoundingSegment},
-                 {Upper, _upperBoundingSegment}};
+            return new Dictionary<Direction, Segment>
+            {
+                { Left, _leftBoundingSegment },
+                { Right, _rightBoundingSegment },
+                { Lower, _lowerBoundingSegment },
+                { Upper, _upperBoundingSegment }
+            };
         }
-        
+
         /// <summary>
         /// Method for easy overview in debugger
         /// </summary>
@@ -134,7 +135,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             string.Format(
                 "{0,15} x=[{1,-6}, {2,-6}] y=[{3,-6}, {4,-6}]",
                 ID,
-                Math.Round(Rectangle.X,3),
+                Math.Round(Rectangle.X, 3),
                 Math.Round(Rectangle.X + Rectangle.Width, 3),
                 Math.Round(Rectangle.Z, 3),
                 Math.Round(Rectangle.Z + Rectangle.Depth, 3));
