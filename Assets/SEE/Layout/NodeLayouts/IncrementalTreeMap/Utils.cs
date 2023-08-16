@@ -109,12 +109,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             foreach (var segment in segments)
             {
                 var segmentClone = new Segment(segment.IsConst, segment.IsVertical);
-                foreach (var node in segment.Side1Nodes)
+                foreach (var node in segment.Side1Nodes.ToList())
                 {
                     to[node.ID].RegisterSegment(segmentClone,
                         segmentClone.IsVertical ? Right : Upper);
                 }
-                foreach (var node in segment.Side2Nodes)
+                foreach (var node in segment.Side2Nodes.ToList())
                 {
                     to[node.ID].RegisterSegment(segmentClone,
                         segmentClone.IsVertical ? Left : Lower);

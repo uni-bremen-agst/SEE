@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using SEE.Game.City;
 using UnityEngine;
-using static SEE.Layout.NodeLayouts.IncrementalTreeMap.Direction;
 using Node = SEE.Layout.NodeLayouts.IncrementalTreeMap.Node;
 
 namespace SEE.Layout.NodeLayouts
@@ -268,7 +267,7 @@ namespace SEE.Layout.NodeLayouts
                 if (newNode == null)
                 {
                     // create a artificial node, that has no corresponding ILayoutNode in this layout
-                    // will be deleted later
+                    // they are designed to be deleted but necessary to copy the layout of oldNodes 
                     newNode = new Node(oldNode.ID);
                     nodesToBeDeleted.Add(newNode);
                     workWith.Add(newNode);
@@ -277,32 +276,14 @@ namespace SEE.Layout.NodeLayouts
                 {
                     workWith.Add(newNode);
                 }
-
                 newNode.Rectangle = (Rectangle)oldNode.Rectangle.Clone();
             }
-
-            // get segments from old layout
-            var oldSegments = oldNodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
-            foreach (var segment in oldSegments)
-            {
-                Segment newSegment = new Segment(segment.IsConst, segment.IsVertical);
-                foreach (var oldNode in segment.Side1Nodes)
-                {
-                    Node newNode = workWith.First(x => x.ID == oldNode.ID);
-                    newNode.RegisterSegment(newSegment, newSegment.IsVertical ? Right : Upper);
-                }
-
-                foreach (var oldNode in segment.Side2Nodes)
-                {
-                    Node newNode = workWith.First(x => x.ID == oldNode.ID);
-                    newNode.RegisterSegment(newSegment, newSegment.IsVertical ? Left : Lower);
-                }
-            }
-            // now workWith is equivalent to oldNodes / the nodes from the last layout
-
-            // setup nodesToBeAdded
-            var withWithCopy = workWith;
-            nodesToBeAdded = nodes.Where(n => !withWithCopy.Contains(n)).ToList();
+            IncrementalTreeMap.Utils.CloneSegments(
+                from: oldNodes,
+                to : workWith.ToDictionary(n => n.ID, n=>n));
+            
+            var workWithAlias = workWith;
+            nodesToBeAdded = nodes.Where(n => !workWithAlias.Contains(n)).ToList();
         }
 
         /// <summary>

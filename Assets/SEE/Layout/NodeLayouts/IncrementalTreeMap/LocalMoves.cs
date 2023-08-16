@@ -176,32 +176,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 (nodes,AspectRatiosPNorm(nodes, settings.PNorm), new List<LocalMove>()));
             var bestResult = Utils.ArgMin(allResults, 
                 x => x.Item2 * 10 + x.Item3.Count).Item1;
-            foreach(var node in nodes)
-            {
-                var resultNode = bestResult.Find(n => n.ID == node.ID);
-                node.Rectangle = resultNode.Rectangle;
-            }
-            HashSet<Segment> resultSegments = new HashSet<Segment>();
+            
+            var nodesDictionary = nodes.ToDictionary(n => n.ID, n => n);
             foreach(var resultNode in bestResult)
             {
-                resultSegments.UnionWith(resultNode.SegmentsDictionary().Values);
+                nodesDictionary[resultNode.ID].Rectangle = resultNode.Rectangle;
             }
-            foreach(var resultSegment in resultSegments)
-            {
-                var newSegment = new Segment(resultSegment.IsConst,resultSegment.IsVertical);
-                foreach(var resultNode in resultSegment.Side1Nodes.ToList())
-                {
-                    var node = nodes.Find(n => n.ID == resultNode.ID);
-                    node.RegisterSegment(newSegment, 
-                        newSegment.IsVertical ? Direction.Right : Direction.Upper);
-                }
-                foreach(var resultNode in resultSegment.Side2Nodes.ToList())
-                {
-                    var node = nodes.Find(n => n.ID == resultNode.ID);
-                    node.RegisterSegment(newSegment, 
-                        newSegment.IsVertical ? Direction.Left : Direction.Lower);
-                }
-            }
+            Utils.CloneSegments(from: bestResult, to : nodesDictionary);
         }
 
         private static List<Tuple<List<Node>,double,IList<LocalMove>>> RecursiveMakeMoves(
