@@ -218,7 +218,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>true if edge is a divergent architecture dependency</returns>
         public static bool IsDivergent(Edge edge)
         {
-            AssertOrThrow(edge.IsInImplementation(), () => new NotInSubgraphException(Implementation, edge));
+            AssertOrThrow(edge.IsInReflexion(), () => new NotInSubgraphException(Implementation, edge));
             return edge.State() == State.Divergent;
         }
         #endregion
