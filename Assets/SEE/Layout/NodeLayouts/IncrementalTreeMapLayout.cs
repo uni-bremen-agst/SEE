@@ -276,7 +276,7 @@ namespace SEE.Layout.NodeLayouts
                 {
                     workWith.Add(newNode);
                 }
-                newNode.Rectangle = (Rectangle)oldNode.Rectangle.Clone();
+                newNode.Rectangle = oldNode.Rectangle.Clone();
             }
             IncrementalTreeMap.Utils.CloneSegments(
                 from: oldNodes,
@@ -328,20 +328,20 @@ namespace SEE.Layout.NodeLayouts
                 var rectangle = node.Rectangle;
                 var layoutNode = _iLayoutNodeMap[node.ID];
 
-                if (rectangle.width - absolutePadding <= 0 ||
-                    rectangle.depth - absolutePadding <= 0)
+                if (rectangle.Width - absolutePadding <= 0 ||
+                    rectangle.Depth - absolutePadding <= 0)
                 {
                     absolutePadding = 0;
                 }
 
                 var position = new Vector3(
-                    (float)(rectangle.x + rectangle.width / 2.0d),
+                    (float)(rectangle.X + rectangle.Width / 2.0d),
                     groundLevel,
-                    (float)(rectangle.z + rectangle.depth / 2.0d));
+                    (float)(rectangle.Z + rectangle.Depth / 2.0d));
                 var scale = new Vector3(
-                    (float)(rectangle.width - absolutePadding),
+                    (float)(rectangle.Width - absolutePadding),
                     layoutNode.LocalScale.y,
-                    (float)(rectangle.depth - absolutePadding));
+                    (float)(rectangle.Depth - absolutePadding));
 
                 _layoutResult[layoutNode] = new NodeTransform(position, scale);
             }
@@ -363,7 +363,7 @@ namespace SEE.Layout.NodeLayouts
             else
             {
                 var parentNode = _nodeMap[iLayoutNode.Parent.ID];
-                result = (Rectangle)parentNode.Rectangle.Clone();
+                result = parentNode.Rectangle.Clone();
             }
             return result;
         }

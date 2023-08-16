@@ -81,9 +81,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             string.Format(
                 "{0,15} x=[{1,-6}, {2,-6}] y=[{3,-6}, {4,-6}]",
                 ID,
-                Math.Round(Rectangle.x,3),
-                Math.Round(Rectangle.x + Rectangle.width, 3),
-                Math.Round(Rectangle.z, 3),
-                Math.Round(Rectangle.z + Rectangle.depth, 3));
+                Math.Round(Rectangle.X,3),
+                Math.Round(Rectangle.X + Rectangle.Width, 3),
+                Math.Round(Rectangle.Z, 3),
+                Math.Round(Rectangle.Z + Rectangle.Depth, 3));
     }
 }

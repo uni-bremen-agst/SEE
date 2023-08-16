@@ -36,12 +36,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
             if (segment.IsVertical)
             {
-                Node upperNode1 = Utils.ArgMax(segment.Side1Nodes, x => x.Rectangle.z);
-                Node upperNode2 = Utils.ArgMax(segment.Side2Nodes, x => x.Rectangle.z);
+                Node upperNode1 = Utils.ArgMax(segment.Side1Nodes, x => x.Rectangle.Z);
+                Node upperNode2 = Utils.ArgMax(segment.Side2Nodes, x => x.Rectangle.Z);
                 Assert.IsTrue(upperNode1.SegmentsDictionary()[Upper] == upperNode2.SegmentsDictionary()[Upper]);
 
-                Node lowerNode1 = Utils.ArgMin(segment.Side1Nodes, x => x.Rectangle.z);
-                Node lowerNode2 = Utils.ArgMin(segment.Side2Nodes, x => x.Rectangle.z);
+                Node lowerNode1 = Utils.ArgMin(segment.Side1Nodes, x => x.Rectangle.Z);
+                Node lowerNode2 = Utils.ArgMin(segment.Side2Nodes, x => x.Rectangle.Z);
                 Assert.IsTrue(lowerNode1.SegmentsDictionary()[Lower] == lowerNode2.SegmentsDictionary()[Lower]);
 
                 result.Add(new StretchMove(upperNode1, upperNode2));
@@ -49,12 +49,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 return result;
             }
 
-            Node rightNode1 = Utils.ArgMax(segment.Side1Nodes, x => x.Rectangle.x);
-            Node rightNode2 = Utils.ArgMax(segment.Side2Nodes, x => x.Rectangle.x);
+            Node rightNode1 = Utils.ArgMax(segment.Side1Nodes, x => x.Rectangle.X);
+            Node rightNode2 = Utils.ArgMax(segment.Side2Nodes, x => x.Rectangle.X);
             Assert.IsTrue(rightNode1.SegmentsDictionary()[Right] == rightNode2.SegmentsDictionary()[Right]);
 
-            Node leftNode1 = Utils.ArgMin(segment.Side1Nodes, x => x.Rectangle.x);
-            Node leftNode2 = Utils.ArgMin(segment.Side2Nodes, x => x.Rectangle.x);
+            Node leftNode1 = Utils.ArgMin(segment.Side1Nodes, x => x.Rectangle.X);
+            Node leftNode2 = Utils.ArgMin(segment.Side2Nodes, x => x.Rectangle.X);
             Assert.IsTrue(leftNode1.SegmentsDictionary()[Left] == leftNode2.SegmentsDictionary()[Left]);
 
             result.Add(new StretchMove(rightNode1, rightNode2));
@@ -73,23 +73,22 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             // node with rectangle with highest aspect ratio
             Node bestNode = Utils.ArgMax(nodes, x => x.Rectangle.AspectRatio());
 
-            newNode.Rectangle = new Rectangle(x: bestNode.Rectangle.x, z: bestNode.Rectangle.z,
-                width: bestNode.Rectangle.width, depth: bestNode.Rectangle.depth);
+            newNode.Rectangle = bestNode.Rectangle.Clone();
             IDictionary<Direction, Segment> segments = bestNode.SegmentsDictionary();
             foreach (Direction dir in Enum.GetValues(typeof(Direction)))
             {
                 newNode.RegisterSegment(segments[dir], dir);
             }
 
-            if (bestNode.Rectangle.width >= bestNode.Rectangle.depth)
+            if (bestNode.Rectangle.Width >= bestNode.Rectangle.Depth)
             {
                 // [bestNode]|[newNode]
                 Segment newSegment = new Segment(isConst: false, isVertical: true);
                 newNode.RegisterSegment(newSegment, Left);
                 bestNode.RegisterSegment(newSegment, Right);
-                bestNode.Rectangle.width *= 0.5f;
-                newNode.Rectangle.width *= 0.5f;
-                newNode.Rectangle.x = bestNode.Rectangle.x + bestNode.Rectangle.width;
+                bestNode.Rectangle.Width *= 0.5f;
+                newNode.Rectangle.Width *= 0.5f;
+                newNode.Rectangle.X = bestNode.Rectangle.X + bestNode.Rectangle.Width;
             }
             else
             {
@@ -99,9 +98,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 Segment newSegment = new Segment(isConst: false, isVertical: false);
                 newNode.RegisterSegment(newSegment, Lower);
                 bestNode.RegisterSegment(newSegment, Upper);
-                bestNode.Rectangle.depth *= 0.5f;
-                newNode.Rectangle.depth *= 0.5f;
-                newNode.Rectangle.z = bestNode.Rectangle.z + bestNode.Rectangle.depth;
+                bestNode.Rectangle.Depth *= 0.5f;
+                newNode.Rectangle.Depth *= 0.5f;
+                newNode.Rectangle.Z = bestNode.Rectangle.Z + bestNode.Rectangle.Depth;
             }
         }
 
@@ -121,7 +120,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 var expandingNodes = segments[Left].Side1Nodes.ToArray();
                 foreach (var node in expandingNodes)
                 {
-                    node.Rectangle.width += obsoleteNode.Rectangle.width;
+                    node.Rectangle.Width += obsoleteNode.Rectangle.Width;
                     node.RegisterSegment(segments[Right], Right);
                 }
             }
@@ -132,8 +131,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 var expandingNodes = segments[Right].Side2Nodes.ToArray();
                 foreach (var node in expandingNodes)
                 {
-                    node.Rectangle.x = obsoleteNode.Rectangle.x;
-                    node.Rectangle.width += obsoleteNode.Rectangle.width;
+                    node.Rectangle.X = obsoleteNode.Rectangle.X;
+                    node.Rectangle.Width += obsoleteNode.Rectangle.Width;
                     node.RegisterSegment(segments[Left], Left);
                 }
             }
@@ -145,7 +144,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 var expandingNodes = segments[Lower].Side1Nodes.ToArray();
                 foreach (var node in expandingNodes)
                 {
-                    node.Rectangle.depth += obsoleteNode.Rectangle.depth;
+                    node.Rectangle.Depth += obsoleteNode.Rectangle.Depth;
                     node.RegisterSegment(segments[Upper], Upper);
                 }
             }
@@ -157,8 +156,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 var expandingNodes = segments[Upper].Side2Nodes.ToArray();
                 foreach (var node in expandingNodes)
                 {
-                    node.Rectangle.z = obsoleteNode.Rectangle.z;
-                    node.Rectangle.depth += obsoleteNode.Rectangle.depth;
+                    node.Rectangle.Z = obsoleteNode.Rectangle.Z;
+                    node.Rectangle.Depth += obsoleteNode.Rectangle.Depth;
                     node.RegisterSegment(segments[Lower], Lower);
                 }
             }

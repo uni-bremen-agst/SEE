@@ -48,15 +48,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 
                 float ratio = nodes1.Sum(x => x.Size) / nodes.Sum(x => x.Size);
 
-                Rectangle rectangle1 = new Rectangle(x : rectangle.x, z : rectangle.z,
-                    width : rectangle.width, depth : rectangle.depth);
-                Rectangle rectangle2 = new Rectangle(x : rectangle.x, z : rectangle.z,
-                    width : rectangle.width, depth : rectangle.depth);
-                if(rectangle.width >= rectangle.depth)
+                Rectangle rectangle1 = rectangle.Clone();
+                Rectangle rectangle2 = rectangle.Clone();
+                if(rectangle.Width >= rectangle.Depth)
                 {
-                    rectangle1.width *= ratio;
-                    rectangle2.width *= (1 - ratio);
-                    rectangle2.x = rectangle1.x + rectangle1.width;
+                    rectangle1.Width *= ratio;
+                    rectangle2.Width *= (1 - ratio);
+                    rectangle2.X = rectangle1.X + rectangle1.Width;
                     Segment newSegment = new Segment(false,true);
 
                     Dissect.Apply(rectangle1, nodes1,
@@ -73,9 +71,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 }
                 else
                 {
-                    rectangle1.depth *= ratio;
-                    rectangle2.depth *= (1 - ratio);
-                    rectangle2.z = rectangle1.z + rectangle1.depth;
+                    rectangle1.Depth *= ratio;
+                    rectangle2.Depth *= (1 - ratio);
+                    rectangle2.Z = rectangle1.Z + rectangle1.Depth;
                     Segment newSegment = new Segment(false,false);
 
                     Dissect.Apply(rectangle1, nodes1,

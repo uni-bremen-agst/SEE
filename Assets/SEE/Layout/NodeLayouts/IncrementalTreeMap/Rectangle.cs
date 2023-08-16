@@ -1,31 +1,35 @@
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
-    public class Rectangle : System.ICloneable
+    /// <summary>
+    /// 
+    /// </summary>
+    public class Rectangle
     {
         public Rectangle(double x, double z, double width, double depth)
         {
-            this.x = x;
-            this.z = z;
-            this.width = width;
-            this.depth = depth;
+            X = x;
+            Z = z;
+            Width = width;
+            Depth = depth;
         }
-        public double x;      // x co-ordinate at corner
-        public double z;      // z co-ordinate at corner
-        public double width;  // width
-        public double depth;  // depth
+
+        public double X;      // x co-ordinate at corner 
+        public double Z;      // z co-ordinate at corner
+        public double Width;  // width
+        public double Depth;  // depth
 
         public double AspectRatio()
         {
-            return width >= depth ? width / depth : depth / width;
+            return Width >= Depth ? Width / Depth : Depth / Width;
         }
 
         public double Area()
         {
-            return width*depth;
+            return Width*Depth;
         }
-        public object Clone()
+        public Rectangle Clone()
         {
-            return new Rectangle(x:x,z:z,width:width,depth:depth);
+            return new Rectangle(x:X,z:Z,width:Width,depth:Depth);
         }
     }
 }

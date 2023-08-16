@@ -42,10 +42,10 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <returns>new parent rectangle</returns>
         public static Rectangle CreateParentRectangle(IList<Node> nodes)
         {
-            double x = nodes.Min(node => node.Rectangle.x);
-            double z = nodes.Min(node => node.Rectangle.z);
-            double width = nodes.Max(node => node.Rectangle.x + node.Rectangle.width) - x;
-            double depth = nodes.Max(node => node.Rectangle.z + node.Rectangle.depth) - z;
+            double x = nodes.Min(node => node.Rectangle.X);
+            double z = nodes.Min(node => node.Rectangle.Z);
+            double width = nodes.Max(node => node.Rectangle.X + node.Rectangle.Width) - x;
+            double depth = nodes.Max(node => node.Rectangle.Z + node.Rectangle.Depth) - z;
             return new Rectangle(x, z, width, depth);
         }
 
@@ -64,15 +64,15 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             // f  : [x1,x2] -> [y1,y2]
             // f  : x   maps to (x - x1) * ((y2-y1)/(x2-x1)) + y1
 
-            double scaleX = newRectangle.width / oldRectangle.width;
-            double scaleZ = newRectangle.depth / oldRectangle.depth;
+            double scaleX = newRectangle.Width / oldRectangle.Width;
+            double scaleZ = newRectangle.Depth / oldRectangle.Depth;
 
             foreach (var node in nodes)
             {
-                node.Rectangle.x = (node.Rectangle.x - oldRectangle.x) * scaleX + newRectangle.x;
-                node.Rectangle.z = (node.Rectangle.z - oldRectangle.z) * scaleZ + newRectangle.z;
-                node.Rectangle.width *= scaleX;
-                node.Rectangle.depth *= scaleZ;
+                node.Rectangle.X = (node.Rectangle.X - oldRectangle.X) * scaleX + newRectangle.X;
+                node.Rectangle.Z = (node.Rectangle.Z - oldRectangle.Z) * scaleZ + newRectangle.Z;
+                node.Rectangle.Width *= scaleX;
+                node.Rectangle.Depth *= scaleZ;
             }
         }
 
@@ -88,7 +88,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             IDictionary<string, Node> clonesMap = nodes.ToDictionary(node => node.ID,
                 node => new Node(node.ID)
                 {
-                    Rectangle = (Rectangle)node.Rectangle.Clone(), Size = node.Size
+                    Rectangle = node.Rectangle.Clone(), Size = node.Size
                 }
             );
             CloneSegments(nodes, clonesMap);
@@ -186,8 +186,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 Assert.IsTrue(segs[Lower].Side2Nodes.Contains(node));
                 Assert.IsTrue(segs[Upper].Side1Nodes.Contains(node));
 
-                Assert.IsTrue(node.Rectangle.width > 0);
-                Assert.IsTrue(node.Rectangle.depth > 0);
+                Assert.IsTrue(node.Rectangle.Width > 0);
+                Assert.IsTrue(node.Rectangle.Depth > 0);
             }
         }
 

@@ -72,22 +72,22 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             // [l][r]    [rrr]      [l][r]    [lll]
 
             // adjust rectangles
-            double width = leftNode.Rectangle.width + rightNode.Rectangle.width;
+            double width = leftNode.Rectangle.Width + rightNode.Rectangle.Width;
             double ratio = leftNode.Rectangle.Area() / (leftNode.Rectangle.Area() + rightNode.Rectangle.Area());
             
-            leftNode.Rectangle.width = width;
-            rightNode.Rectangle.width = width;
-            rightNode.Rectangle.x = leftNode.Rectangle.x;            
+            leftNode.Rectangle.Width = width;
+            rightNode.Rectangle.Width = width;
+            rightNode.Rectangle.X = leftNode.Rectangle.X;            
             
-            leftNode.Rectangle.depth *= ratio;
-            rightNode.Rectangle.depth *= (1-ratio);
+            leftNode.Rectangle.Depth *= ratio;
+            rightNode.Rectangle.Depth *= (1-ratio);
             if(clockwise)
             {
-                leftNode.Rectangle.z = rightNode.Rectangle.z + rightNode.Rectangle.depth;
+                leftNode.Rectangle.Z = rightNode.Rectangle.Z + rightNode.Rectangle.Depth;
             }
             else
             {
-                rightNode.Rectangle.z = leftNode.Rectangle.z + leftNode.Rectangle.depth;
+                rightNode.Rectangle.Z = leftNode.Rectangle.Z + leftNode.Rectangle.Depth;
             }
 
             // switch segments
@@ -118,22 +118,22 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             // [lll]      [l][u]        [lll]      [u][l]
 
             // adjust rectangles
-            double depth = lowerNode.Rectangle.depth + upperNode.Rectangle.depth;
+            double depth = lowerNode.Rectangle.Depth + upperNode.Rectangle.Depth;
             double ratio = lowerNode.Rectangle.Area() / (lowerNode.Rectangle.Area() + upperNode.Rectangle.Area());
             
-            lowerNode.Rectangle.depth = depth;
-            upperNode.Rectangle.depth = depth;
-            upperNode.Rectangle.z = lowerNode.Rectangle.z;         
+            lowerNode.Rectangle.Depth = depth;
+            upperNode.Rectangle.Depth = depth;
+            upperNode.Rectangle.Z = lowerNode.Rectangle.Z;         
             
-            lowerNode.Rectangle.width *= ratio;
-            upperNode.Rectangle.width *= (1-ratio);
+            lowerNode.Rectangle.Width *= ratio;
+            upperNode.Rectangle.Width *= (1-ratio);
             if(clockwise)
             {
-                upperNode.Rectangle.x = lowerNode.Rectangle.x  + lowerNode.Rectangle.width;
+                upperNode.Rectangle.X = lowerNode.Rectangle.X  + lowerNode.Rectangle.Width;
             }
             else
             {
-                lowerNode.Rectangle.x = upperNode.Rectangle.x + upperNode.Rectangle.width;
+                lowerNode.Rectangle.X = upperNode.Rectangle.X + upperNode.Rectangle.Width;
             }
 
             // switch segments
@@ -178,7 +178,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 || segmentsNode1[Direction.Left] == segmentsNode2[Direction.Right])
             {
                 var (leftNode, rightNode) = (segmentsNode1[Direction.Right] == segmentsNode2[Direction.Left]) ? (node1,node2) : (node2, node1);
-                if(leftNode.Rectangle.depth >= rightNode.Rectangle.depth)
+                if(leftNode.Rectangle.Depth >= rightNode.Rectangle.Depth)
                 {
                     apply_StretchRightOverVertical(leftNode: leftNode, rightNode: rightNode);
                 }
@@ -191,7 +191,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                      || segmentsNode1[Direction.Lower] == segmentsNode2[Direction.Upper])
             {
                 var (lowerNode, upperNode) = (segmentsNode1[Direction.Upper] == segmentsNode2[Direction.Lower]) ? (node1,node2) : (node2, node1);
-                if(lowerNode.Rectangle.width >= upperNode.Rectangle.width)
+                if(lowerNode.Rectangle.Width >= upperNode.Rectangle.Width)
                 {
                     apply_StretchUpperOverHorizontal(lowerNode: lowerNode, upperNode: upperNode);
                 }
@@ -221,11 +221,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             var segmentsRightNode = rightNode.SegmentsDictionary();
             bool alongLowerSegment = segmentsLeftNode[Direction.Lower] == segmentsRightNode[Direction.Lower];
             // adjust rectangles
-            leftNode.Rectangle.width += rightNode.Rectangle.width;
-            rightNode.Rectangle.depth -= leftNode.Rectangle.depth;
+            leftNode.Rectangle.Width += rightNode.Rectangle.Width;
+            rightNode.Rectangle.Depth -= leftNode.Rectangle.Depth;
             if(alongLowerSegment)
             {
-                rightNode.Rectangle.z = leftNode.Rectangle.z + leftNode.Rectangle.depth;
+                rightNode.Rectangle.Z = leftNode.Rectangle.Z + leftNode.Rectangle.Depth;
             }
             // switch segments
             leftNode.RegisterSegment(segmentsRightNode[Direction.Right], Direction.Right);
@@ -248,12 +248,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             var segmentsRightNode = rightNode.SegmentsDictionary();
             bool alongLowerSegment = segmentsLeftNode[Direction.Lower] == segmentsRightNode[Direction.Lower];
             // adjust rectangles
-            rightNode.Rectangle.width += leftNode.Rectangle.width;
-            rightNode.Rectangle.x = leftNode.Rectangle.x;
-            leftNode.Rectangle.depth -= rightNode.Rectangle.depth;
+            rightNode.Rectangle.Width += leftNode.Rectangle.Width;
+            rightNode.Rectangle.X = leftNode.Rectangle.X;
+            leftNode.Rectangle.Depth -= rightNode.Rectangle.Depth;
             if(alongLowerSegment)
             {
-                leftNode.Rectangle.z = rightNode.Rectangle.z + rightNode.Rectangle.depth;
+                leftNode.Rectangle.Z = rightNode.Rectangle.Z + rightNode.Rectangle.Depth;
             } 
             // switch segments
             rightNode.RegisterSegment(segmentsLeftNode[Direction.Left], Direction.Left);
@@ -276,11 +276,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             var segmentsUpperNode = upperNode.SegmentsDictionary();
             bool alongLeftSegment = segmentsLowerNode[Direction.Left] == segmentsUpperNode[Direction.Left];
             // adjust rectangles
-            lowerNode.Rectangle.depth += upperNode.Rectangle.depth;
-            upperNode.Rectangle.width -= lowerNode.Rectangle.width;
+            lowerNode.Rectangle.Depth += upperNode.Rectangle.Depth;
+            upperNode.Rectangle.Width -= lowerNode.Rectangle.Width;
             if(alongLeftSegment)
             {
-                upperNode.Rectangle.x = lowerNode.Rectangle.x + lowerNode.Rectangle.width;
+                upperNode.Rectangle.X = lowerNode.Rectangle.X + lowerNode.Rectangle.Width;
             }
             // switch segments
             lowerNode.RegisterSegment(segmentsUpperNode[Direction.Upper], Direction.Upper);
@@ -303,13 +303,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             var segmentsUpperNode = upperNode.SegmentsDictionary();
             bool alongLeftSegment = segmentsLowerNode[Direction.Left] == segmentsUpperNode[Direction.Left];
             // adjust rectangles
-            upperNode.Rectangle.depth += lowerNode.Rectangle.depth;
-            upperNode.Rectangle.z = lowerNode.Rectangle.z;
+            upperNode.Rectangle.Depth += lowerNode.Rectangle.Depth;
+            upperNode.Rectangle.Z = lowerNode.Rectangle.Z;
 
-            lowerNode.Rectangle.width -= upperNode.Rectangle.width;
+            lowerNode.Rectangle.Width -= upperNode.Rectangle.Width;
             if(alongLeftSegment)
             {
-                lowerNode.Rectangle.x = upperNode.Rectangle.x + upperNode.Rectangle.width;
+                lowerNode.Rectangle.X = upperNode.Rectangle.X + upperNode.Rectangle.Width;
             }
             // switch segments
             upperNode.RegisterSegment(segmentsLowerNode[Direction.Lower], Direction.Lower);
