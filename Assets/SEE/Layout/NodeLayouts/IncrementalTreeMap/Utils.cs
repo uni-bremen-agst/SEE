@@ -101,8 +101,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// The nodes of <paramref name="from"/> and <paramref name="to"/> needs to have the same IDs.
         /// </summary>
         /// <param name="from">nodes with segment structure, that should be copied</param>
-        /// <param name="to">dic: id -> node,
-        ///     with nodes that needs the same segment structure like <paramref name="from"/></param>
+        /// <param name="to">dic: id -> node, nodes should get the segment structure </param>
         public static void CloneSegments(IEnumerable<Node> from, IDictionary<string, Node> to)
         {
             var segments = from.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
@@ -124,7 +123,6 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         public static void CheckConsistent(IList<Node> nodes)
         {
-            return;
             foreach (var node in nodes)
             {
                 var segs = node.SegmentsDictionary();
