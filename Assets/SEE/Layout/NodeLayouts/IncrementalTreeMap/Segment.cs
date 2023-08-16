@@ -9,7 +9,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     /// Actually the specific position is not relevant but the relation to adjacent nodes.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class Segment
+    internal class Segment
     {
         /// <summary>
         /// Constructor

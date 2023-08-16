@@ -9,7 +9,11 @@ using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
-    static class CorrectAreas
+    /// <summary>
+    /// Provides an algorithm to recalibrate the layout, so that the areas of the <see cref="Rectangle"/>
+    /// of <see cref="Node"/> match the wanted <see cref="Node.Size"/> of the node.
+    /// </summary>
+    internal static class CorrectAreas
     {
         public static bool Correct(IList<Node> nodes, IncrementalTreeMapSetting settings)
         {

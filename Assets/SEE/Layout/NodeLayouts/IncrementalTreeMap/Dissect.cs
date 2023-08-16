@@ -8,7 +8,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     /// <summary>
     /// Provides an algorithm to create a new layout.
     /// </summary>
-    static class Dissect
+    internal static class Dissect
     {
         /// <summary>
         /// Calculates new Layout for <paramref name="nodes"/>

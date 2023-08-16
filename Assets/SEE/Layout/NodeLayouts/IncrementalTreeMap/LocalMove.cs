@@ -8,7 +8,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     /// A local moves a is small transformation of a layout that only affects two nodes.
     /// There are two types of local moves: <see cref="FlipMove"/> and <see cref="StretchMove"/>.
     /// </summary>
-    public abstract class LocalMove
+    internal abstract class LocalMove
     {
         /// <summary>
         /// one affected node 
@@ -39,7 +39,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     /// It rotates two nodes 90 degrees.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class FlipMove : LocalMove
+    internal class FlipMove : LocalMove
     {
         /// <summary>
         /// of the rotation is clockwise
@@ -212,7 +212,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     /// It expands a nodes over another.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class StretchMove : LocalMove
+    internal class StretchMove : LocalMove
     {
         /// <summary>
         /// Constructor

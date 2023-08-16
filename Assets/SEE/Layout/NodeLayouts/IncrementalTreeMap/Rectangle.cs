@@ -3,7 +3,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     /// <summary>
     /// A class that represents a rectangle as part of a layout
     /// </summary>
-    public class Rectangle
+    internal class Rectangle
     {
         /// <summary>
         /// Constructor

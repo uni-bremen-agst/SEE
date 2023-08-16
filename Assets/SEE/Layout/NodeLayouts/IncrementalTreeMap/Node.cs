@@ -10,7 +10,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     /// has a corresponding node.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class Node
+    internal class Node
     {
         /// <summary>
         /// Constructor

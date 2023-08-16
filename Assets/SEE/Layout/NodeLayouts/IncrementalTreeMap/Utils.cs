@@ -9,7 +9,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     /// <summary>
     /// Provides helper functions for incremental tree map layout.
     /// </summary>
-    public static class Utils
+    internal static class Utils
     {
         /// <summary>
         /// arg max function, returns a item of a collection, that maximizes a function.
