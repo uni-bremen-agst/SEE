@@ -35,7 +35,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     }
 
     /// <summary>
-    /// A flip move is a kind <see cref="LocalMove"/>.
+    /// A flip move is a kind of <see cref="LocalMove"/>.
     /// It rotates two nodes 90 degrees.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
@@ -208,7 +208,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     }
 
     /// <summary>
-    /// A flip move is a kind <see cref="LocalMove"/>.
+    /// A stretch move is a kind of <see cref="LocalMove"/>.
     /// It expands a nodes over another.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
