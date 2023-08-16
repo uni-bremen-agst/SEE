@@ -270,12 +270,8 @@ namespace SEE.Layout.NodeLayouts
                     // they are designed to be deleted but necessary to copy the layout of oldNodes 
                     newNode = new Node(oldNode.ID);
                     nodesToBeDeleted.Add(newNode);
-                    workWith.Add(newNode);
                 }
-                else
-                {
-                    workWith.Add(newNode);
-                }
+                workWith.Add(newNode);
                 newNode.Rectangle = oldNode.Rectangle.Clone();
             }
             IncrementalTreeMap.Utils.CloneSegments(
