@@ -43,7 +43,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         private ReflexionGraph graph;
 
-
         /// <summary>
         /// The information required to (re-)create the edge that solves the divergence.
         /// </summary>
@@ -106,11 +105,6 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The default type of an added edge.
-        /// </summary>
-        private const string DefaultEdgeType = "Source_Dependency";
-
-        /// <summary>
         /// See <see cref="ReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
@@ -149,7 +143,7 @@ namespace SEE.Controls.Actions
 
                         // we have both source and target of the edge and use a memento struct
                         // to remember which edge we have added
-                        memento = new Memento(source, target, "Source_Dependency");
+                        memento = new Memento(source, target, Edge.SourceDependency);
 
                         // create the edge
                         createdEdge = CreateEdge(memento);

@@ -121,7 +121,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The default type of an added edge.
         /// </summary>
-        private const string DefaultEdgeType = "Source_Dependency";
+        private const string DefaultEdgeType = Edge.SourceDependency;
 
         /// <summary>
         /// <see cref="ReversibleAction.Update"/>.
