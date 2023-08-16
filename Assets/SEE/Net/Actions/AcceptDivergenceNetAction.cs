@@ -70,17 +70,22 @@ namespace SEE.Net.Actions
         {
             if (!IsRequester())
             {
-                GameObject fromGO = GraphElementIDMap.Find(FromId);
-                if (fromGO && fromGO.TryGetNode(out Node fromNode))
+                GameObject fromGO = Find(FromId);
+                if (fromGO.TryGetNode(out Node fromNode))
                 {
-                    GameObject toGO = GraphElementIDMap.Find(ToId);
-                    if (toGO && toGO.TryGetNode(out Node toNode))
+                    GameObject toGO = Find(ToId);
+                    if (toGO.TryGetNode(out Node toNode))
                     {
-                        // create the edge beforehand (to change its ID)
-                        Edge edgeToPropagate = new Edge(fromNode, toNode, Type);
+                        // FIXME: This code is very similar to AcceptDivergenceAction.CreateEdge.
+                        // NetActions must be as dump as possible. All logic shared by these
+                        // and their corresponding Action must be extracted to a separate class.
 
-                        // change the edges ID before adding it to a graph
-                        edgeToPropagate.ID = EdgeId;
+                        // create the edge beforehand (to change its ID)
+                        Edge edgeToPropagate = new(fromNode, toNode, Type)
+                        {
+                            // change the edges ID before adding it to a graph
+                            ID = EdgeId
+                        };
 
                         // add the already created edge to the architecture graph
                         if (fromNode.ItsGraph is ReflexionGraph graph)
@@ -89,16 +94,16 @@ namespace SEE.Net.Actions
                         }
 
                         // (re)draw the new edge
-                        GameObject edgeGameObject = GameEdgeAdder.Draw(edgeToPropagate);
+                        GameEdgeAdder.Draw(edgeToPropagate);
                     }
                     else
                     {
-                        Debug.LogError($"There is no game node named {ToId} for the target.\n");
+                        Debug.LogError($"Game node {ToId} has not graph node attached.\n");
                     }
                 }
                 else
                 {
-                    Debug.LogError($"There is no game node named {FromId} for the source.\n");
+                    Debug.LogError($"Game node {FromId} has not graph node attached.\n");
                 }
             }
         }
