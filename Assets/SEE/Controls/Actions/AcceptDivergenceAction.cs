@@ -222,7 +222,7 @@ namespace SEE.Controls.Actions
         private Edge CreateEdge(Memento memento)
         {
             // create the edge beforehand
-            Edge newEdge = new Edge(memento.from, memento.to, memento.type);
+            Edge newEdge = new(memento.from, memento.to, memento.type);
 
             // add the already created edge to the architecture graph
             graph.AddToArchitecture(newEdge);
