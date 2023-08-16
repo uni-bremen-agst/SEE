@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine.Assertions;
+using static SEE.Layout.NodeLayouts.IncrementalTreeMap.Direction;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     /// <summary>
-    /// Provides helper functions for lay-outing nodes.
+    /// Provides helper functions for incremental tree map layout.
     /// </summary>
     public static class Utils
     {
@@ -77,7 +78,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         /// <summary>
         /// Clones a list of nodes and preserves the layout including segments.
-        /// Therefor the segments of the nodes are cloned to.
+        /// Therefor the <see cref="Segment"/>s and <see cref="Rectangle"/>s of the nodes are cloned to.
         /// </summary>
         /// <param name="nodes">siblings to be cloned</param>
         /// <returns>Dictionary that maps ID to new clone node</returns>
@@ -90,25 +91,35 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     Rectangle = (Rectangle)node.Rectangle.Clone(), Size = node.Size
                 }
             );
+            CloneSegments(nodes, clonesMap);
+            return clonesMap;
+        }
 
-            // segments are here cloned separately
-            var segments = nodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
-            Assert.IsTrue(segments.Count + 1 - 4 == nodes.Count);
+        /// <summary>
+        /// Clones all <see cref="Segment"/>s of <paramref name="from"/>
+        /// and register the segment clones to the nodes of <paramref name="to"/>.
+        /// The nodes of <paramref name="from"/> and <paramref name="to"/> needs to have the same IDs.
+        /// </summary>
+        /// <param name="from">nodes with segment structure, that should be copied</param>
+        /// <param name="to">dic: id -> node,
+        ///     with nodes that needs the same segment structure like <paramref name="from"/></param>
+        public static void CloneSegments(IEnumerable<Node> from, IDictionary<string, Node> to)
+        {
+            var segments = from.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
             foreach (var segment in segments)
             {
                 var segmentClone = new Segment(segment.IsConst, segment.IsVertical);
                 foreach (var node in segment.Side1Nodes)
                 {
-                    clonesMap[node.ID].RegisterSegment(segmentClone,
-                        segmentClone.IsVertical ? Direction.Right : Direction.Upper);
+                    to[node.ID].RegisterSegment(segmentClone,
+                        segmentClone.IsVertical ? Right : Upper);
                 }
                 foreach (var node in segment.Side2Nodes)
                 {
-                    clonesMap[node.ID].RegisterSegment(segmentClone,
-                        segmentClone.IsVertical ? Direction.Left : Direction.Lower);
+                    to[node.ID].RegisterSegment(segmentClone,
+                        segmentClone.IsVertical ? Left : Lower);
                 }
             }
-            return clonesMap;
         }
 
         public static void CheckConsistent(IList<Node> nodes)
@@ -130,7 +141,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                         Assert.IsTrue(seg.Side1Nodes.Count != 0 && seg.Side2Nodes.Count != 0);
                     }
 
-                    if (dir == Direction.Left || dir == Direction.Right)
+                    if (dir == Left || dir == Right)
                     {
                         Assert.IsTrue(seg.IsVertical);
                     }
@@ -139,43 +150,43 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                         Assert.IsTrue(!seg.IsVertical);
                     }
 
-                    if (dir == Direction.Left)
+                    if (dir == Left)
                     {
                         foreach (Node neighborNode in seg.Side1Nodes)
                         {
-                            Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Right] == seg);
+                            Assert.IsTrue(neighborNode.SegmentsDictionary()[Right] == seg);
                         }
                     }
 
-                    if (dir == Direction.Right)
+                    if (dir == Right)
                     {
                         foreach (Node neighborNode in seg.Side2Nodes)
                         {
-                            Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Left] == seg);
+                            Assert.IsTrue(neighborNode.SegmentsDictionary()[Left] == seg);
                         }
                     }
 
-                    if (dir == Direction.Lower)
+                    if (dir == Lower)
                     {
                         foreach (Node neighborNode in seg.Side1Nodes)
                         {
-                            Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Upper] == seg);
+                            Assert.IsTrue(neighborNode.SegmentsDictionary()[Upper] == seg);
                         }
                     }
 
-                    if (dir == Direction.Upper)
+                    if (dir == Upper)
                     {
                         foreach (Node neighborNode in seg.Side2Nodes)
                         {
-                            Assert.IsTrue(neighborNode.SegmentsDictionary()[Direction.Lower] == seg);
+                            Assert.IsTrue(neighborNode.SegmentsDictionary()[Lower] == seg);
                         }
                     }
                 }
 
-                Assert.IsTrue(segs[Direction.Left].Side2Nodes.Contains(node));
-                Assert.IsTrue(segs[Direction.Right].Side1Nodes.Contains(node));
-                Assert.IsTrue(segs[Direction.Lower].Side2Nodes.Contains(node));
-                Assert.IsTrue(segs[Direction.Upper].Side1Nodes.Contains(node));
+                Assert.IsTrue(segs[Left].Side2Nodes.Contains(node));
+                Assert.IsTrue(segs[Right].Side1Nodes.Contains(node));
+                Assert.IsTrue(segs[Lower].Side2Nodes.Contains(node));
+                Assert.IsTrue(segs[Upper].Side1Nodes.Contains(node));
 
                 Assert.IsTrue(node.Rectangle.width > 0);
                 Assert.IsTrue(node.Rectangle.depth > 0);
