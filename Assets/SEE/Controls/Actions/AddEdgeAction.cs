@@ -7,6 +7,7 @@ using SEE.Utils;
 using System;
 using UnityEngine;
 using SEE.Audio;
+using SEE.DataModel.DG;
 
 namespace SEE.Controls.Actions
 {
