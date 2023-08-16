@@ -112,7 +112,7 @@ namespace SEE.Controls.Actions
                   DrawAction.CreateReversibleAction);
 
             AcceptDivergence =
-              new("Accept Divergence", "Accept a diverging edge into the Architecture",
+              new("Accept Divergence", "Accept a diverging edge into the architecture",
                   Color.grey.Darker(), "Materials/ModernUIPack/Arrow Bold",
                   AcceptDivergenceAction.CreateReversibleAction);
 
