@@ -6,12 +6,6 @@ namespace SEE.Controls.Actions
 
     /// <summary>
     /// The type of a state-based action.
-    /// Implemented using the "Enumeration" (not enum) or "type safe enum" pattern.
-    /// The following two pages have been used for reference:
-    /// <ul>
-    /// <li>https://docs.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/enumeration-classes-over-enum-types#implement-an-enumeration-base-class</li>
-    /// <li>https://ardalis.com/enum-alternatives-in-c/</li>
-    /// </ul>
     /// </summary>
     public class ActionStateType : AbstractActionStateType
     {
