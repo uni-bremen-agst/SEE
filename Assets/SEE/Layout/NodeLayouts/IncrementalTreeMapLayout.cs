@@ -25,20 +25,17 @@ namespace SEE.Layout.NodeLayouts
         /// placed on this level</param>
         /// <param name="width">width of the rectangle in which to place all nodes in Unity units</param>
         /// <param name="depth">width of the rectangle in which to place all nodes in Unity units</param>
+        /// <param name="settings">the serializable settings for the layout</param>
         public IncrementalTreeMapLayout(float groundLevel,
             float width,
-            float depth)
+            float depth,
+            IncrementalTreeMapSetting settings)
             : base(groundLevel)
         {
             name = "IncrementalTreeMap";
-            this._width = width;
-            this._depth = depth;
-
-            // This is actually not a good solution to get the settings for the layout.
-            // Because it only works reliably when the SEECityEvolution is the only AbstractSEECity in the scene.
-            // However the architecture provides no good way to set the parameters of an layout. 
-            _settings = UnityEngine.Object.FindObjectOfType<AbstractSEECity>().NodeLayoutSettings
-                .incrementalTreeMapSetting;
+            _width = width;
+            _depth = depth;
+            _settings = settings;
         }
 
         /// <summary>

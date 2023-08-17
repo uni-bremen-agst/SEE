@@ -625,7 +625,11 @@ namespace SEE.Game
                 NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(GroundLevel),
                 NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(GroundLevel),
                 NodeLayoutKind.Treemap => new TreemapLayout(GroundLevel, parent.transform.lossyScale.x, parent.transform.lossyScale.z),
-                NodeLayoutKind.IncrementalTreeMap => new IncrementalTreeMapLayout(GroundLevel, parent.transform.lossyScale.x, parent.transform.lossyScale.z),
+                NodeLayoutKind.IncrementalTreeMap => new IncrementalTreeMapLayout(
+                    GroundLevel, 
+                    parent.transform.lossyScale.x, 
+                    parent.transform.lossyScale.z,
+                    Settings.NodeLayoutSettings.incrementalTreeMapSetting),
                 NodeLayoutKind.Balloon => new BalloonNodeLayout(GroundLevel),
                 NodeLayoutKind.CirclePacking => new CirclePackingNodeLayout(GroundLevel),
                 NodeLayoutKind.CompoundSpringEmbedder => new CoseLayout(GroundLevel, Settings),
