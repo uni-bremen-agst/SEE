@@ -122,6 +122,9 @@ namespace SEE.Game.Worlds
 #if !PLATFORM_LUMIN || UNITY_EDITOR
             if (networkManager.IsServer)
             {
+                // FIXME: The FaceCam prefab is instantiated only for the player on the server.
+                // That means the FaceCam will work only on the host, but not on any of the clients.
+                // This was noted in issue #633
                 // Add the FaceCam to the player.
                 GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam");
                 faceCam.GetComponent<NetworkObject>().Spawn();
