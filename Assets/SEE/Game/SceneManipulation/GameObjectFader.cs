@@ -5,7 +5,7 @@ using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.SceneManipulation
 {
     /// <summary>
     /// Provides fading in and out for game objects. There are static as well as instance methods

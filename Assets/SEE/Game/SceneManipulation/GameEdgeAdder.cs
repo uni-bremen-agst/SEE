@@ -4,10 +4,10 @@ using SEE.Game.City;
 using SEE.GO;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.SceneManipulation
 {
     /// <summary>
-    /// Creates new game objects representing graph edges or deleting these again,
+    /// Creates new game objects representing graph edges or deletes these again,
     /// respectively.
     /// </summary>
     public class GameEdgeAdder
@@ -52,6 +52,29 @@ namespace SEE.Game
                 throw new Exception($"Could not determine the code city for the new edge from {source.name} to {target.name}.\n");
             }
             return result;
+        }
+
+        /// <summary>
+        /// Simply (re)draws an edge.
+        /// </summary>
+        /// <param name="edge">the edge that should be (re)drawn</param>
+        /// <returns>the GameObject of the drawn edge</returns>
+        public static GameObject Draw(Edge edge)
+        {
+            GameObject source = GraphElementIDMap.Find(edge.Source.ID);
+            Transform cityObject = SceneQueries.GetCodeCity(source.transform);
+
+            if (!cityObject)
+            {
+                throw new Exception($"The code city for the new edge {edge.ToShortString()} cannot be determined.\n");
+            }
+
+            if (!cityObject.TryGetComponent(out AbstractSEECity city))
+            {
+                throw new Exception($"Could not determine the code city for the new edge {edge.ToShortString()}.\n");
+            }
+
+            return city.Renderer.DrawEdge(edge, source: source);
         }
 
         /// <summary>

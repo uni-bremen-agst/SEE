@@ -6,7 +6,7 @@ using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.SceneManipulation
 {
     /// <summary>
     /// Allows to delete nodes and edges.
@@ -106,7 +106,7 @@ namespace SEE.Game
             {
                 // The edge memento must be created before the edge is removed;
                 // otherwise ItsGraph would be null.
-                EdgeMemento edgeMemento = new EdgeMemento(edgeRef.Value);
+                EdgeMemento edgeMemento = new(edgeRef.Value);
                 edgeRef.Value.ItsGraph.RemoveEdge(edgeRef.Value);
                 GameObjectFader.FadingOut(gameEdge, SetInactive);
                 return (edgeMemento, new HashSet<GameObject>() { gameEdge });
