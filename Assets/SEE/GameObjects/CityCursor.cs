@@ -1,7 +1,7 @@
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.Game.UI3D;
+using SEE.UI3D;
 using SEE.Utils;
 using UnityEngine;
 

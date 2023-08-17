@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 ﻿using SEE.Game;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;

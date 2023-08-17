@@ -6,7 +6,7 @@ using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.Operator;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;

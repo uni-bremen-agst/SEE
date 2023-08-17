@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SEE.Game.UI.Window;
-using SEE.Game.UI.Menu;
-using SEE.Game.UI.StateIndicator;
+using SEE.UI.Window;
+using SEE.UI.Menu;
+using SEE.UI.StateIndicator;
 using SEE.GO;
 using UnityEngine;
 using UnityEngine.Events;

@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.TestTools;
 using UnityEngine.UI;
 
-namespace SEE.Game.UI.Menu
+namespace SEE.UI.Menu
 {
     /// <summary>
     /// Common abstract super class for menu tests.

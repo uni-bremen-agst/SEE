@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Cysharp.Threading.Tasks;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Utils;
 using UnityEngine;

@@ -4,6 +4,7 @@ using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.UI.PropertyDialog;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -22,7 +23,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The list of currently selected objects.
         /// </summary>
-        private readonly HashSet<GameObject> selectedObjects = new HashSet<GameObject>();
+        private readonly HashSet<GameObject> selectedObjects = new();
 
         /// <summary>
         /// The list of currently hidden objects.
@@ -89,17 +90,19 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void OpenDialog()
         {
-            Game.UI.PropertyDialog.HidePropertyDialog dialog = new Game.UI.PropertyDialog.HidePropertyDialog();
+            HidePropertyDialog dialog = new();
 
             dialog.OnConfirm.AddListener(OKButtonPressed);
             dialog.OnCancel.AddListener(Cancelled);
 
             dialog.Open();
+            return;
 
             void OKButtonPressed()
             {
                 mode = dialog.mode;
             }
+
             void Cancelled()
             {
                 Stop();
@@ -364,7 +367,8 @@ namespace SEE.Controls.Actions
                 if (childGameObject.CompareTag(Tags.Edge))
                 {
                     HideEdge(childGameObject);
-                } else if (childGameObject.CompareTag(Tags.Node))
+                }
+                else if (childGameObject.CompareTag(Tags.Node))
                 {
                     HideNodeIncludingConnectedEdges(childGameObject);
                 }
@@ -491,8 +495,8 @@ namespace SEE.Controls.Actions
         {
             if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
             {
-                HashSet<string> edgeIDs = new HashSet<string>();
-                HashSet<string> nodeIDs = new HashSet<string>();
+                HashSet<string> edgeIDs = new();
+                HashSet<string> nodeIDs = new();
 
                 foreach (Edge edge in nodeRef.Value.Outgoings)
                 {
@@ -510,7 +514,6 @@ namespace SEE.Controls.Actions
                 }
                 foreach (GameObject node in GameObject.FindGameObjectsWithTag(Tags.Node))
                 {
-
                     if (node.activeInHierarchy && nodeIDs.Contains(node.name))
                     {
                         HideNodeIncludingConnectedEdges(node);
@@ -529,8 +532,8 @@ namespace SEE.Controls.Actions
         {
             if (selectedObject != null && selectedObject.TryGetComponent(out NodeRef nodeRef))
             {
-                HashSet<string> edgeIDs = new HashSet<string>();
-                HashSet<string> nodeIDs = new HashSet<string>();
+                HashSet<string> edgeIDs = new();
+                HashSet<string> nodeIDs = new();
 
                 foreach (Edge edge in nodeRef.Value.Incomings)
                 {
@@ -753,7 +756,7 @@ namespace SEE.Controls.Actions
         /// <returns>IDs of all incoming and outgoing edges</returns>
         private static HashSet<string> GetEdgeIds(NodeRef nodeRef)
         {
-            HashSet<string> edgeIDs = new HashSet<string>();
+            HashSet<string> edgeIDs = new();
             foreach (Edge edge in nodeRef.Value.Outgoings)
             {
                 edgeIDs.Add(edge.ID);

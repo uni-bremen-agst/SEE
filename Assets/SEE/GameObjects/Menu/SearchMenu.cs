@@ -4,9 +4,9 @@ using FuzzySharp;
 using SEE.Controls;
 using SEE.Game;
 using SEE.Game.Operator;
-using SEE.Game.UI.Menu;
-using SEE.Game.UI.Notification;
-using SEE.Game.UI.PropertyDialog;
+using SEE.UI.Menu;
+using SEE.UI.Notification;
+using SEE.UI.PropertyDialog;
 using UnityEngine;
 
 namespace SEE.GO.Menu
