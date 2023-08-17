@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using SEE.Controls;
 using SEE.Controls.Actions;
-using SEE.Game.SceneManipulation;
 using SEE.GO;
 using UnityEngine;
 
@@ -41,7 +40,6 @@ namespace SEE.Game
             gameObject.AddComponentIfNecessary<ShowGrabbing>();
             if (gameObject.HasNodeRef())
             {
-                gameObject.AddComponentIfNecessary<GameNodeScaler>();
                 gameObject.AddComponentIfNecessary<ShowLabel>();
                 gameObject.AddComponentIfNecessary<ShowEdges>();
                 gameObject.AddComponentIfNecessary<HighlightErosion>();
