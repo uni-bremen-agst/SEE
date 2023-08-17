@@ -35,11 +35,6 @@ namespace SEE.Tools.FaceCam
         private readonly List<ulong> clientsIdsList = new();
 
         /// <summary>
-        /// All Network Ids, but not the owner (where the video is recorded) or the server.
-        /// </summary>
-        private ClientRpcParams clientsIdsRpcParams;
-
-        /// <summary>
         /// Id of this Client.
         /// </summary>
         private ulong ownClientId;
