@@ -226,7 +226,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         override
-            public void Apply()
+        public void Apply()
         {
             var segmentsNode1 = Node1.SegmentsDictionary();
             var segmentsNode2 = Node2.SegmentsDictionary();
@@ -267,7 +267,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         override
-            public LocalMove Clone(IDictionary<string, Node> cloneMap)
+        public LocalMove Clone(IDictionary<string, Node> cloneMap)
         {
             return new StretchMove(cloneMap[Node1.ID], cloneMap[Node2.ID]);
         }
@@ -418,6 +418,6 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Method for easy overview in debugger
         /// </summary>
-        private string DebuggerDisplay => "flip " + Node1.ID + " " + Node2.ID;
+        private string DebuggerDisplay => "stretch " + Node1.ID + " " + Node2.ID;
     }
 }
