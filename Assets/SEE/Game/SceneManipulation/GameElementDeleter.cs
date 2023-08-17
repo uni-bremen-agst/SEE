@@ -106,7 +106,7 @@ namespace SEE.Game.SceneManipulation
             {
                 // The edge memento must be created before the edge is removed;
                 // otherwise ItsGraph would be null.
-                EdgeMemento edgeMemento = new EdgeMemento(edgeRef.Value);
+                EdgeMemento edgeMemento = new(edgeRef.Value);
                 edgeRef.Value.ItsGraph.RemoveEdge(edgeRef.Value);
                 GameObjectFader.FadingOut(gameEdge, SetInactive);
                 return (edgeMemento, new HashSet<GameObject>() { gameEdge });
