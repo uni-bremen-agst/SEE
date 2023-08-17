@@ -31,8 +31,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 Split(nodes, slicingSegment,
                     out IList<Node> partition1,
                     out IList<Node> partition2);
-                Assert.AreEqual(partition1.Count + partition2.Count, nodes.Count);
-                AdjustSliced(partition1, partition2, slicingSegment);
+                
+                AdjustSliced(nodes,partition1, partition2, slicingSegment);
                 slicingSegment.IsConst = true;
                 bool works1 = Correct(partition1, settings);
                 bool works2 = Correct(partition2, settings);
@@ -147,33 +147,49 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Adjust the layout so that the size of <paramref name="partition1"/> and <paramref name="partition2"/> 
-        /// are consistent with the sizes of their nodes.
+        /// This method recalibrates a layout, that is sliced in 2 sub layouts.
+        /// So the sub layouts get the size they should have.
+        /// A sub layout can still have internal wrong node sizes.
         /// </summary>
-        /// <param name="partition1">the <see cref="Direction.Lower"/>/<see cref="Direction.Left"/> sub layout</param>
-        /// <param name="partition2">the <see cref="Direction.Upper"/>/<see cref="Direction.Right"/> sub layout</param>
-        /// <param name="slicingSegment"></param>
-        private static void AdjustSliced(IList<Node> partition1,
+        /// <param name="nodes">nodes of a slice able layout </param>
+        /// <param name="partition1">partition of <paramref name="nodes"/>,
+        /// the <see cref="Direction.Lower"/>/<see cref="Direction.Left"/> sub layout</param>
+        /// <param name="partition2">partition of <paramref name="nodes"/>,
+        /// the <see cref="Direction.Upper"/>/<see cref="Direction.Right"/> sub layout</param>
+        /// <param name="slicingSegment">the segment, that slices the layout</param>
+        private static void AdjustSliced(
+            IList<Node> nodes,
+            IList<Node> partition1,
             IList<Node> partition2,
             Segment slicingSegment)
         {
-            Rectangle rectangle1Old = Utils.CreateParentRectangle(partition1);
-            Rectangle rectangle2Old = Utils.CreateParentRectangle(partition2);
-            double size1 = partition1.Sum(n => n.Size);
-            double size2 = partition2.Sum(n => n.Size);
-            Rectangle rectangle1New = rectangle1Old.Clone();
-            Rectangle rectangle2New = rectangle2Old.Clone();
-
+            var rectangle1Old = Utils.CreateParentRectangle(nodes);
+            var rectangle2Old = rectangle1Old.Clone();
+            var rectangle1New = rectangle1Old.Clone();
+            var rectangle2New = rectangle1Old.Clone();
+            
             if (slicingSegment.IsVertical)
             {
-                rectangle1New.Width = size1 / rectangle1New.Depth;
-                rectangle2New.Width = size2 / rectangle2New.Depth;
+                var segmentXPosition = slicingSegment.Side2Nodes.First().Rectangle.X;
+                rectangle1Old.Width = segmentXPosition - rectangle1Old.X;
+                rectangle2Old.Width -= rectangle1Old.Width;
+                rectangle2Old.X = rectangle1Old.X + rectangle1Old.Width;
+
+                var ratio = partition1.Sum(n => n.Size) / nodes.Sum(n=>n.Size);
+                rectangle1New.Width *= ratio;
+                rectangle2New.Width *= (1 - ratio);
                 rectangle2New.X = rectangle1New.X + rectangle1New.Width;
             }
             else
             {
-                rectangle1New.Depth = size1 / rectangle1New.Width;
-                rectangle2New.Depth = size2 / rectangle2New.Width;
+                var segmentZPosition = slicingSegment.Side2Nodes.First().Rectangle.Z;
+                rectangle1Old.Depth = segmentZPosition - rectangle1Old.Z;
+                rectangle2Old.Depth -= rectangle1Old.Depth;
+                rectangle2Old.Z = rectangle1Old.Z + rectangle1Old.Depth;
+
+                var ratio = partition1.Sum(n => n.Size) / nodes.Sum(n=>n.Size);
+                rectangle1New.Depth *= ratio;
+                rectangle2New.Depth *= (1 - ratio);
                 rectangle2New.Z = rectangle1New.Z + rectangle1New.Depth;
             }
             Utils.TransformRectangles(partition1, newRectangle: rectangle1New, oldRectangle: rectangle1Old);
