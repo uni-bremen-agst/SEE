@@ -7,6 +7,28 @@ namespace SEE.DataModel.DG
     /// </summary>
     public sealed class Edge : GraphElement
     {
+        /// <summary>
+        /// The most general edge type for all dependencies extracted from the code.
+        /// This name must correspond to Axivion's nomenclatura.
+        /// </summary>
+        public const string SourceDependency = "Source_Dependency";
+
+        /// <summary>
+        /// Edge type for absences (reflexion analysis).
+        /// This name must correspond to Axivion's nomenclatura.
+        /// </summary>
+        public const string Absence = "Absence";
+        /// <summary>
+        /// Edge type for convergences (reflexion analysis).
+        /// This name must correspond to Axivion's nomenclatura.
+        /// </summary>
+        public const string Convergence = "Convergence";
+        /// <summary>
+        /// Edge type for divergences (reflexion analysis).
+        /// This name must correspond to Axivion's nomenclatura.
+        /// </summary>
+        public const string Divergence = "Divergence";
+
         // IMPORTANT NOTES:
         //
         // If you use Clone() to create a copy of an edge, be aware that the clone

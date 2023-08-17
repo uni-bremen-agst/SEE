@@ -4,6 +4,7 @@ using SEE.Audio;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Operator;
+using SEE.Game.SceneManipulation;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions;
