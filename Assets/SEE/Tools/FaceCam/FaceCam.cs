@@ -337,12 +337,12 @@ namespace SEE.Tools.FaceCam
         {
             if (texture != null)
             {
-                Destroy(texture);
+                Destroyer.Destroy(texture);
                 texture = null;
             }
             if (croppedTexture != null)
             {
-                Destroy(croppedTexture);
+                Destroyer.Destroy(croppedTexture);
                 croppedTexture = null;
             }
         }
