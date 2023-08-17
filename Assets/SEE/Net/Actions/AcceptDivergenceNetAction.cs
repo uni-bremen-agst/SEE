@@ -70,41 +70,7 @@ namespace SEE.Net.Actions
         {
             if (!IsRequester())
             {
-                GameObject fromGO = Find(FromId);
-                if (fromGO.TryGetNode(out Node fromNode))
-                {
-                    GameObject toGO = Find(ToId);
-                    if (toGO.TryGetNode(out Node toNode))
-                    {
-                        // FIXME: This code is very similar to AcceptDivergenceAction.CreateEdge.
-                        // NetActions must be as dump as possible. All logic shared by these
-                        // and their corresponding Action must be extracted to a separate class.
-
-                        // create the edge beforehand (to change its ID)
-                        Edge edgeToPropagate = new(fromNode, toNode, Type)
-                        {
-                            // change the edges ID before adding it to a graph
-                            ID = EdgeId
-                        };
-
-                        // add the already created edge to the architecture graph
-                        if (fromNode.ItsGraph is ReflexionGraph graph)
-                        {
-                            graph.AddToArchitecture(edgeToPropagate);
-                        }
-
-                        // (re)draw the new edge
-                        GameEdgeAdder.Draw(edgeToPropagate);
-                    }
-                    else
-                    {
-                        Debug.LogError($"Game node {ToId} has not graph node attached.\n");
-                    }
-                }
-                else
-                {
-                    Debug.LogError($"Game node {FromId} has not graph node attached.\n");
-                }
+                AcceptDivergence.Accept(Find(FromId), Find(ToId), Type, EdgeId);
             }
         }
     }

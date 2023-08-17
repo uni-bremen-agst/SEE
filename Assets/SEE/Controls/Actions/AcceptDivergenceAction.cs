@@ -222,14 +222,7 @@ namespace SEE.Controls.Actions
         /// <returns>the new edge's GameObject and a reference to itself, or both null</returns>
         private Edge CreateEdge(Memento memento)
         {
-            // create the edge beforehand
-            Edge newEdge = new(memento.from, memento.to, memento.type);
-
-            // add the already created edge to the architecture graph
-            graph.AddToArchitecture(newEdge);
-
-            // (re)draw the new edge
-            GameEdgeAdder.Draw(newEdge);
+            Edge newEdge = AcceptDivergence.Accept(memento.from, memento.to, memento.type);
 
             // propagate the edge (including matching ID) over network
             new AcceptDivergenceNetAction(memento.from.ID, memento.to.ID, newEdge.ID, newEdge.Type).Execute();
