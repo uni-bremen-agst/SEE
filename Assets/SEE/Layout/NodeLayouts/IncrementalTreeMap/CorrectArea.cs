@@ -1,9 +1,11 @@
 using System.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MathNet.Numerics.LinearAlgebra;
 using SEE.Game.City;
+using Sirenix.Utilities;
 using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
@@ -52,29 +54,28 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         private static bool IsSliceAble(IList<Node> nodes, out Segment slicingSegment)
         {
             slicingSegment = null;
-            var segments = nodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
+            var segments = nodes.SelectMany(n => n.SegmentsDictionary().Values).Distinct();
             foreach (var segment in segments)
             {
                 slicingSegment = segment;
-                if (segment.IsConst) return false;
+                if (segment.IsConst) continue;
                 if (segment.IsVertical)
                 {
                     var nodeLowerEnd = Utils.ArgMin(segment.Side1Nodes, node => node.Rectangle.Z);
-                    var nodeUpperEnd = Utils.ArgMax(segment.Side1Nodes,
-                        node => node.Rectangle.Z + node.Rectangle.Depth);
-                    return (nodeLowerEnd.SegmentsDictionary()[Direction.Lower].IsConst &&
-                            nodeUpperEnd.SegmentsDictionary()[Direction.Upper].IsConst);
+                    var nodeUpperEnd = Utils.ArgMax(segment.Side1Nodes, node => node.Rectangle.Z);
+                    if (nodeLowerEnd.SegmentsDictionary()[Direction.Lower].IsConst &&
+                        nodeUpperEnd.SegmentsDictionary()[Direction.Upper].IsConst) return true;
                 }
                 else
                 {
                     var nodeLeftEnd = Utils.ArgMin(segment.Side1Nodes, node => node.Rectangle.X);
-                    var nodeRightEnd = Utils.ArgMax(segment.Side1Nodes,
-                        node => node.Rectangle.X + node.Rectangle.Width);
-                    return (nodeLeftEnd.SegmentsDictionary()[Direction.Left].IsConst &&
-                            nodeRightEnd.SegmentsDictionary()[Direction.Right].IsConst);
+                    var nodeRightEnd = Utils.ArgMax(segment.Side1Nodes,node => node.Rectangle.X);
+                    if (nodeLeftEnd.SegmentsDictionary()[Direction.Left].IsConst &&
+                        nodeRightEnd.SegmentsDictionary()[Direction.Right].IsConst) return true;
                 }
             }
 
+            slicingSegment = null;
             return false;
         }
 
@@ -96,6 +97,17 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 double xPosSegment = slicingSegment.Side2Nodes.First().Rectangle.X;
                 foreach (var node in nodes)
                 {
+                    if (slicingSegment.Side1Nodes.Contains(node))
+                    {
+                        partition1.Add(node);
+                        continue;
+                    }
+                    if (slicingSegment.Side2Nodes.Contains(node))
+                    {
+                        partition2.Add(node);
+                        continue;
+                    }
+                    
                     if (node.Rectangle.X + .5 * node.Rectangle.Width < xPosSegment)
                     {
                         partition1.Add(node);
@@ -111,6 +123,17 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 double zPosSegment = slicingSegment.Side2Nodes.First().Rectangle.Z;
                 foreach (var node in nodes)
                 {
+                    if (slicingSegment.Side1Nodes.Contains(node))
+                    {
+                        partition1.Add(node);
+                        continue;
+                    }
+                    if (slicingSegment.Side2Nodes.Contains(node))
+                    {
+                        partition2.Add(node);
+                        continue;
+                    }
+                    
                     if (node.Rectangle.Z + .5 * node.Rectangle.Depth < zPosSegment)
                     {
                         partition1.Add(node);
@@ -153,7 +176,6 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 rectangle2New.Depth = size2 / rectangle2New.Width;
                 rectangle2New.Z = rectangle1New.Z + rectangle1New.Depth;
             }
-
             Utils.TransformRectangles(partition1, newRectangle: rectangle1New, oldRectangle: rectangle1Old);
             Utils.TransformRectangles(partition2, newRectangle: rectangle2New, oldRectangle: rectangle2Old);
         }
