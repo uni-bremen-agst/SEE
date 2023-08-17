@@ -36,6 +36,10 @@ namespace SEE.Tools.FaceCam
 
         /// <summary>
         /// All Network Ids, but not the owner (where the video is recorded) or the server.
+        /// This attribute is assigned in <see cref="CreateClientRpcParams()"/>, but never
+        /// read.
+        /// TODO: Is it really needed? Maybe the assigned value is kept in this field
+        /// such that it will not be cleaned up by the garbage collector.
         /// </summary>
         private ClientRpcParams clientsIdsRpcParams;
 
