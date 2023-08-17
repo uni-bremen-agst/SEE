@@ -8,6 +8,7 @@ using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
 using SEE.Utils.LiveDocumentation;
+using Sirenix.Utilities;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -31,7 +32,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Override of method from <see cref="AbstractPlayerAction"/>.
         ///
-        /// Always returns an empty list. 
+        /// Always returns an empty list.
         /// </summary>
         /// <returns>An empty list of strings</returns>
         public override HashSet<string> GetChangedObjects() => new();
@@ -56,14 +57,12 @@ namespace SEE.Controls.Actions
         public override void Awake()
         {
             // In case we do not have an ID yet, we request one.
-            if (ICRDT.GetLocalID() == 0) new NetCRDT().RequestID();
+            if (ICRDT.GetLocalID() == 0)
+            {
+                new NetCRDT().RequestID();
+            }
 
             spaceManager = WindowSpaceManager.ManagerInstance;
-        }
-
-        public override void Start()
-        {
-           // Do nothing because nothing has to be done here
         }
 
         /// <summary>
@@ -73,14 +72,15 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             // Only allow local player to open new code windows
-            if (Input.GetMouseButtonDown(0) &&
-                Raycasting.RaycastGraphElement(out var hit, out var g) == HitGraphElement.Node)
+            if (Input.GetMouseButtonDown(0)
+                &&  Raycasting.RaycastGraphElement(out var hit, out var g) == HitGraphElement.Node)
             {
                 var selectedNode = hit.collider.gameObject.GetComponent<NodeRef>();
 
                 // When the node the user has clicked on has no file attached.
                 // In this case an error is displayed.
-                if (selectedNode.Value.Path() == null || selectedNode.Value.Filename() == null)
+                if (string.IsNullOrWhiteSpace(selectedNode.Value.Path())
+                    || string.IsNullOrWhiteSpace(selectedNode.Value.Filename()))
                 {
                     ShowNotification.Error("Node has no File", "The selected node has no source code file attached");
                     return false;
@@ -92,19 +92,18 @@ namespace SEE.Controls.Actions
 
                 // When the node the user has clicked on wasn't a leaf node.
                 // In this case an error message is displayed and the LiveDocumentation windows is not going to open.
-                if (!selectedNode.Value.Type.Equals("Class"))
+                if (selectedNode.Value.Type != "Class")
                 {
                     ShowNotification.Error("Node not supported", "Only leaf nodes can be analysed");
                     return false;
                 }
-
 
                 if (!selectedNode.TryGetComponent(out LiveDocumentationWindow documentationWindow))
                 {
                     var fileName = selectedNode.Value.Filename();
 
                     // Copied from ShowCodeAction
-                    if (fileName == null)
+                    if (string.IsNullOrWhiteSpace(fileName))
                     {
                         ShowNotification.Warn("No file",
                             $"Selected node '{selectedNode.Value.SourceName}' has no filename.");
@@ -121,7 +120,6 @@ namespace SEE.Controls.Actions
 
                     var selectedFile = selectedNode.Value.Filename();
 
-
                     documentationWindow = selectedNode.gameObject.AddComponent<LiveDocumentationWindow>();
 
                     documentationWindow.Title = "Doc: " + selectedNode.Value.SourceName;
@@ -133,40 +131,40 @@ namespace SEE.Controls.Actions
                     documentationWindow.ClassName = documentationWindow.Title;
                     documentationWindow.NodeOfClass = selectedNode.Value;
 
-                    // Try initialise the FileParser 
+                    // Try initialise the FileParser
                     FileParser parser;
                     try
                     {
                         parser = new FileParser(selectedNode.Value.AbsolutePlatformPath());
                     }
-                    // If the source code file can't be found display an error and abort the action. 
-                    catch (FileNotFoundException e)
+                    // If the source code file can't be found display an error and abort the action.
+                    catch (FileNotFoundException)
                     {
                         ShowNotification.Error("File not found",
                             $"The file with the name {selectedNode.Value.AbsolutePlatformPath()}");
                         return false;
                     }
 
-
-                    var buffer = parser.ParseClassDoc(
-                        selectedNode.Value.SourceName);
-
+                    var buffer = parser.ParseClassDoc(selectedNode.Value.SourceName);
 
                     var classMembers = new List<LiveDocumentationBuffer>();
                     parser.ParseClassMethods(selectedNode.Value.SourceName)
                         .ForEach(x => classMembers.Add(x));
-                    if (buffer == null || classMembers == null) return false;
+                    if (buffer == null || classMembers == null)
+                    {
+                        return false;
+                    }
 
                     documentationWindow.DocumentationBuffer = buffer;
                     documentationWindow.ClassMembers = classMembers;
-
                     documentationWindow.ImportedNamespaces = parser.ParseNamespaceImports();
                 }
 
-
                 // Add code window to our space of code window, if it isn't in there yet
                 if (!spaceManager[WindowSpaceManager.LOCAL_PLAYER].Windows.Contains(documentationWindow))
+                {
                     spaceManager[WindowSpaceManager.LOCAL_PLAYER].AddWindow(documentationWindow);
+                }
 
                 spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = documentationWindow;
             }
