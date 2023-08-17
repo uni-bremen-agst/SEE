@@ -212,24 +212,18 @@ namespace SEE.Layout.NodeLayouts
             {
                 LocalMoves.DeleteNode(obsoleteNode);
                 workWith.Remove(obsoleteNode);
-                IncrementalTreeMap.Utils.CheckConsistent(workWith);
             }
 
             CorrectAreas.Correct(workWith, _settings);
-            IncrementalTreeMap.Utils.CheckConsistent(workWith);
             foreach (var nodeToBeAdded in nodesToBeAdded)
             {
                 LocalMoves.AddNode(workWith, nodeToBeAdded);
                 workWith.Add(nodeToBeAdded);
-                IncrementalTreeMap.Utils.CheckConsistent(workWith);
             }
-
-            IncrementalTreeMap.Utils.CheckEqualNodeSets(workWith, nodes);
 
             CorrectAreas.Correct(workWith, _settings);
 
             LocalMoves.LocalMovesSearch(workWith, _settings);
-            IncrementalTreeMap.Utils.CheckConsistent(workWith);
         }
 
         /// <summary>

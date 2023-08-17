@@ -1,12 +1,9 @@
 using System.Linq;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using MathNet.Numerics.LinearAlgebra;
 using SEE.Game.City;
-using Sirenix.Utilities;
-using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
@@ -34,10 +31,17 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 
                 AdjustSliced(nodes,partition1, partition2, slicingSegment);
                 slicingSegment.IsConst = true;
-                bool works1 = Correct(partition1, settings);
-                bool works2 = Correct(partition2, settings);
+                Correct(partition1, settings);
+                Correct(partition2, settings);
                 slicingSegment.IsConst = false;
-                return works1 && works2;
+                
+                Vector<double> nodesSizesWanted =
+                    Vector<double>.Build.DenseOfArray(nodes.Select(node => (double)node.Size).ToArray());
+                Vector<double> nodesSizesCurrent =
+                    Vector<double>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.Area()).ToArray());
+                var error = (nodesSizesWanted - nodesSizesCurrent).Norm(p: 1);
+
+                return error <= Math.Pow(10,settings.gradientDescentPrecisionExponent) && CheckNegativeLength(nodes);
             }
             else
             {
