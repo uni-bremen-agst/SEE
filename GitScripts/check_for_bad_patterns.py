@@ -132,6 +132,7 @@ We should just leave it as a backslash.""",
     BadPattern(
         re.compile(r"^\s*(\s|Object\.)Destroy\(.*$"),
         "Make sure to use `Destroyer.Destroy` (`Destroyer` class is in `SEE.Utils`) instead of `Object.Destroy`!",
+        filenames=[r".*(?<!/Destroyer)\.cs$"],
         level=Level.WARN,
     ),
     BadPattern(
