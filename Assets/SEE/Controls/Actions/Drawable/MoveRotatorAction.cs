@@ -15,15 +15,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
+using UnityEngine.UIElements;
+using MoveNetAction = Assets.SEE.Net.Actions.Drawable.MoveNetAction;
 
 namespace Assets.SEE.Controls.Actions.Drawable
 {
     public class MoveRotatorAction : AbstractPlayerAction
     {
         private Memento memento;
-        private bool isActive = false;
-        GameObject selectedLine;
-        GameObject oldLine;
+        private bool didSomething = false;
+        private bool isDone = false;
+        private GameObject selectedObject;
 
         /// <summary>
         /// 
@@ -32,143 +34,148 @@ namespace Assets.SEE.Controls.Actions.Drawable
         public override bool Update()
         {
             bool result = false;
-            selectedLine = GameMoveRotator.selectedLine;
+            selectedObject = GameMoveRotator.selectedObj;
+
             if (!Raycasting.IsMouseOverGUI())
             {
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && isActive == false &&
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !GameMoveRotator.isActive && !didSomething && !isDone &&
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                    raycastHit.collider.gameObject.CompareTag(Tags.Line))
+                    raycastHit.collider.gameObject.transform.parent.gameObject.CompareTag(Tags.Drawable))
                 {
-                    selectedLine = raycastHit.collider.gameObject;
-                    oldLine = GameMoveRotator.selectedLine;
-
-                    /*
-                    if (oldLine != null && !GameEditLine.oldValueHolder.CheckEquals(GameEditLine.newValueHolder))
-                    {
-                       memento = new Memento(oldLine, oldLine, GameEditLine.oldValueHolder, GameEditLine.newValueHolder,
-                                    oldLine.transform.parent.gameObject, oldLine.name);
-                       currentState = ReversibleAction.Progress.Completed;
-                    }
-                    *
-                    LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
-                    GameEditLine.oldValueHolder = new(renderer.material.color, renderer.sortingOrder, renderer.startWidth);
-                    GameEditLine.newValueHolder = new(renderer.material.color, renderer.sortingOrder, renderer.startWidth);
-                    */
-                    isActive = true;
-                    BlinkEffect effect = selectedLine.AddOrGetComponent<BlinkEffect>();
+                    selectedObject = raycastHit.collider.gameObject;
+                    GameMoveRotator.isActive = true;
+                    BlinkEffect effect = selectedObject.AddOrGetComponent<BlinkEffect>();
                     effect.SetAllowedActionStateType(GetActionStateType());
+                    effect.Activate(selectedObject);
+                    GameMoveRotator.SetSelectedLine(selectedObject);
+                    GameMoveRotator.firstPoint = raycastHit.point;
+                }
 
-                    if (oldLine != null)
+                if (selectedObject != null && selectedObject.GetComponent<BlinkEffect>() != null && selectedObject.GetComponent<BlinkEffect>().GetLoopStatus())
+                {   // MOVE
+                    if (Raycasting.RaycastAnything(out RaycastHit hit))
                     {
-                        if (selectedLine.name.Equals(oldLine.name))
+                        if (hit.collider.gameObject.CompareTag(Tags.Drawable))
                         {
-                            effect.LoopReverse();
-                            GameMoveRotator.selectedLine = null;
-                            /*
-                            if (!effect.GetLoopStatus())
+                            didSomething = true;
+                            Vector3 linePosition = GameMoveRotator.oldObjectPosition;
+                            GameMoveRotator.newObjectPosition = linePosition + new Vector3(hit.point.x - GameMoveRotator.firstPoint.x, hit.point.y - GameMoveRotator.firstPoint.y, 0);
+                            GameMoveRotator.MoveObject(selectedObject, GameMoveRotator.newObjectPosition);
+                            GameObject drawable = selectedObject.transform.parent.gameObject;
+                            GameObject drawableParent = drawable.transform.parent.gameObject;
+                            new MoveNetAction(drawable.name, drawableParent.name, selectedObject.name, GameMoveRotator.newObjectPosition).Execute();
+                        }
+                    }
+                    // Rotate ?
+                    /*
+                    LineRenderer renderer = selectedObject.GetComponent<LineRenderer>();
+                    Vector3[] positions = GameMoveRotator.oldLinePositions;
+                    if (Input.mouseScrollDelta.y > 0)
+                    {
+                        Debug.Log(DateTime.Now + " Mouse UP! " + Input.mouseScrollDelta.y);
+                        if (selectedObject.CompareTag(Tags.Line))
+                        {
+                            // Tricky shit
+                            Debug.Log("Positionsize: " + positions.Length + " - Render size: " + renderer.positionCount);
+                            for (int i = 0; i < renderer.positionCount; i++)
                             {
-                                Destroyer.Destroy(GameEditLine.editMenuInstance);
-                            }*/
+
+                                Vector3 position = positions[i];
+                                //float offsetX = hit.point.x - position.x;
+                                //float offsetY = hit.point.y - position.y;
+                                Vector3 moveOffset = position;
+                                Debug.Log("Step: " + GameMoveRotator.step);
+                                Debug.Log("First line: " + positions[0]);
+                                switch (GameMoveRotator.step)
+                                {
+                                    case 0:
+                                        moveOffset = new(0, position.y - GameMoveRotator.firstPoint.y, 0);
+                                        break;
+                                    case 1:
+                                        moveOffset = new(GameMoveRotator.firstPoint.x - position.x, 0, 0);
+                                        break;
+                                    case 2:
+                                        moveOffset = new(GameMoveRotator.firstPoint.x - position.x, GameMoveRotator.firstPoint.y - position.y, 0);
+                                        break;
+                                    case 3:
+                                        moveOffset = new(0, 0, 0);
+                                        break;
+                                    default:
+                                        GameMoveRotator.step = 0;
+                                        break;
+                                }
+
+                                positions[i] = position + moveOffset;
+                            }
+                            GameMoveRotator.step++;
+                            if (GameMoveRotator.step >= 4)
+                            {
+                                GameMoveRotator.step = 0;
+                            }
+                            renderer.SetPositions(positions);
+                            Mesh mesh = new();
+                            MeshCollider meshCollider = selectedObject.GetComponent<MeshCollider>();
+                            renderer.BakeMesh(mesh, false);
+                            meshCollider.sharedMesh = mesh;
+                        } else
+                        {
+                            // for image etc ?
+                        }
+                    }
+                    if (Input.mouseScrollDelta.y < 0)
+                    {
+                        Debug.Log(DateTime.Now + " Mouse Down! " + Input.mouseScrollDelta.y);
+                        if (selectedObject.CompareTag(Tags.Line))
+                        {
+                            // Tricky shit
                         }
                         else
                         {
-                            if (oldLine.GetComponent<BlinkEffect>() != null)
-                            {
-                                oldLine.GetComponent<BlinkEffect>().Deactivate();
-                                // Destroyer.Destroy(GameEditLine.editMenuInstance);
-                            }
+                            // for image etc ?
                         }
                     }
-                    if (oldLine == null || !selectedLine.name.Equals(oldLine.name))
-                    {
-                        effect.Activate(selectedLine);
-                        GameMoveRotator.selectedLine = selectedLine;
-                    }
-                }
+                    /*
+                             LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
+                             Vector3[] positions = GameMoveRotator.savedPositionsOfselectedLine;
 
-                if (selectedLine != null && selectedLine.GetComponent<BlinkEffect>() != null && selectedLine.GetComponent<BlinkEffect>().GetLoopStatus())
-                {
-                    if (Raycasting.RaycastAnything(out RaycastHit hit))
-                    {
-                        Debug.Log("Hit game object: " + hit.collider.gameObject);
-                        if (hit.collider.gameObject.CompareTag(Tags.Drawable))
-                        {
-                            Debug.Log(DateTime.Now + " - Hitposition: " + hit.point);
-                            LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
-                            Vector3[] positions = new Vector3[renderer.positionCount];
                             renderer.GetPositions(positions);
-                            if ((Input.GetMouseButton(0) || Input.GetMouseButtonDown(0)) && isActive == false)
-                            {
-                                isActive = true;
-                                Debug.Log("Positionsize: " + positions.Length + " - Render size: " + renderer.positionCount);
+                             Debug.Log("Positionsize: " + positions.Length + " - Render size: " + renderer.positionCount);
                                 for (int i = 0; i < renderer.positionCount; i++)
                                 {
                                     
                                     Vector3 position = positions[i];
-                                    float x = position.x;
-                                    float y = position.y;
+                                    float offsetX = hit.point.x - position.x;
+                                    float offsetY = hit.point.y - position.y;
 
-                                    float hitX = hit.point.x;
-                                    float hitY = hit.point.y;
+                                    Vector3 moveOffset = new(offsetX, offsetY, 0);
 
-                                    Vector3 moveOffset = new(hitX - x, hitY - y, 0);
-                                    
-                                    positions[i] = position + moveOffset;
+                                positions[i] = hit.point + moveOffset;
                                 }
                                 renderer.SetPositions(positions);
                                 Mesh mesh = new();
                                 MeshCollider meshCollider = selectedLine.GetComponent<MeshCollider>();
-                                Destroyer.Destroy(meshCollider);
-                                MeshCollider newMeshCollider = selectedLine.AddComponent<MeshCollider>(); 
+                                //Destroyer.Destroy(meshCollider);
+                               // MeshCollider newMeshCollider = selectedLine.AddComponent<MeshCollider>(); 
                                 renderer.BakeMesh(mesh, false);
-                                newMeshCollider.sharedMesh = mesh;
-                            }
-                        }
-                    }
-                            //Debug.Log("Rotate");
-                            //Vector3 newRotation = new Vector3(0, 0, 0);
-                            //selectedLine.transform.localEulerAngles = newRotation;
-
-                        /*
-                        GameEditLine.editMenuInstance = PrefabInstantiator.InstantiatePrefab(editPrefabPath,
-                            GameObject.Find("UI Canvas").transform, false);
-                        GameObject drawable = selectedLine.transform.parent.gameObject;
-                        GameObject drawableParent = drawable.transform.parent.gameObject;
-
-                        thicknessSlider = GameEditLine.editMenuInstance.GetComponentInChildren<ThicknessSliderController>();
-                        thicknessSlider.AssignValue(renderer.startWidth);
-                        thicknessSlider.onValueChanged.AddListener(thickness =>
-                        {
-                            GameEditLine.ChangeThickness(selectedLine, thickness);
-                            GameEditLine.newValueHolder.thickness = thickness;
-                            new EditLineThicknessNetAction(drawable.name, drawableParent.name, selectedLine.name, thickness).Execute();
-                        });
-
-                        layerSlider = GameEditLine.editMenuInstance.GetComponentInChildren<LayerSliderController>();
-                        layerSlider.AssignValue(renderer.sortingOrder);
-                        layerSlider.onValueChanged.AddListener(layerOrder =>
-                        {
-                            GameEditLine.ChangeLayer(selectedLine, layerOrder);
-                            GameEditLine.newValueHolder.layer = layerOrder;
-                            new EditLineLayerNetAction(drawable.name, drawableParent.name, selectedLine.name, layerOrder).Execute();
-                        });
-
-                        picker = GameEditLine.editMenuInstance.GetComponent<HSVPicker.ColorPicker>();
-                        picker.AssignColor(renderer.material.color);
-                        picker.onValueChanged.AddListener(color =>
-                        {
-                            GameEditLine.ChangeColor(selectedLine, color);
-                            GameEditLine.newValueHolder.color = color;
-                            new EditLineColorNetAction(drawable.name, drawableParent.name, selectedLine.name, color).Execute();
-                        });*/
-                    }
-
-
-                    result = true;
-                
-                if (Input.GetMouseButtonUp(0) && isActive)
+                                meshCollider.sharedMesh = mesh;
+                            */
+                    //Debug.Log("Rotate");
+                    //Vector3 newRotation = new Vector3(0, 0, 0);
+                    //selectedLine.transform.localEulerAngles = newRotation;
+                }
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && GameMoveRotator.selectedObj != null && didSomething && GameMoveRotator.isActive)
                 {
-                    isActive = false;
+                    memento = new Memento(selectedObject, selectedObject.transform.parent.gameObject, selectedObject.name,
+                        GameMoveRotator.oldObjectPosition, GameMoveRotator.newObjectPosition, GameMoveRotator.oldLinePositions, GameMoveRotator.newLinePositions);
+                    GameMoveRotator.isActive = false;
+                    isDone = true;
+                    didSomething = false;
+                    selectedObject.GetComponent<BlinkEffect>().Deactivate();
+                    selectedObject = null;
+                    GameMoveRotator.selectedObj = null;
+                    GameMoveRotator.oldObjectPosition = new Vector3();
+                    result = true;
+                    currentState = ReversibleAction.Progress.Completed;
                 }
                 return Input.GetMouseButtonUp(0);
             }
@@ -177,22 +184,24 @@ namespace Assets.SEE.Controls.Actions.Drawable
 
         private struct Memento
         {
-            public readonly GameObject oldLine;
-            public GameObject currentLine;
-            public readonly GameEditLine.ValueHolder oldValueHolder;
-            public readonly GameEditLine.ValueHolder newValueHolder;
+            public GameObject selectedLine;
             public readonly GameObject drawable;
             public readonly string currentLineName;
+            public readonly Vector3 oldObjectPosition;
+            public readonly Vector3 newObjectPosition;
+            public readonly Vector3[] oldLinePositions;
+            public readonly Vector3[] newLinePositions;
 
-            public Memento(GameObject oldLine, GameObject currentLine, GameEditLine.ValueHolder oldValueHolder,
-                GameEditLine.ValueHolder newValueHolder, GameObject drawable, string currentLineName)
+            public Memento(GameObject selectedLine, GameObject drawable, string currentLineName,
+                Vector3 oldObjectPosition, Vector3 newObjectPosition, Vector3[] oldLinePositions, Vector3[] newLinePositions)
             {
-                this.oldLine = oldLine;
-                this.currentLine = currentLine;
-                this.oldValueHolder = oldValueHolder;
-                this.newValueHolder = newValueHolder;
+                this.selectedLine = selectedLine;
                 this.drawable = drawable;
                 this.currentLineName = currentLineName;
+                this.oldObjectPosition = oldObjectPosition;
+                this.newObjectPosition = newObjectPosition;
+                this.oldLinePositions = oldLinePositions;
+                this.newLinePositions = newLinePositions;
             }
         }
 
@@ -203,35 +212,21 @@ namespace Assets.SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            if (memento.currentLine == null && memento.currentLineName != null)
+            if (memento.selectedLine == null && memento.currentLineName != null)
             {
-                memento.currentLine = GameDrawableIDFinder.FindChild(memento.drawable, memento.currentLineName);
+                memento.selectedLine = GameDrawableIDFinder.FindChild(memento.drawable, memento.currentLineName);
             }
-            if (memento.oldLine == null || (memento.oldLine != null && memento.oldLine.name.Equals(memento.currentLine.name)))
-            {
-                if (memento.currentLine != null)
-                {
-                    GameEditLine.ChangeThickness(memento.currentLine, memento.oldValueHolder.thickness);
-                    GameEditLine.ChangeLayer(memento.currentLine, memento.oldValueHolder.layer);
-                    GameEditLine.ChangeColor(memento.currentLine, memento.oldValueHolder.color);
 
-                    GameObject drawable = memento.currentLine.transform.parent.gameObject;
-                    GameObject drawableParent = drawable.transform.parent.gameObject;
-
-                    new EditLineThicknessNetAction(drawable.name, drawableParent.name, memento.currentLine.name, memento.oldValueHolder.thickness).Execute();
-                    new EditLineLayerNetAction(drawable.name, drawableParent.name, memento.currentLine.name, memento.oldValueHolder.layer).Execute();
-                    new EditLineColorNetAction(drawable.name, drawableParent.name, memento.currentLine.name, memento.oldValueHolder.color).Execute();
-                }
-            }
-            if (GameEditLine.editMenuInstance != null)
+            if (memento.selectedLine != null)
             {
-                Destroyer.Destroy(GameEditLine.editMenuInstance);
+                GameMoveRotator.MoveObject(memento.selectedLine, memento.oldObjectPosition);
+                GameMoveRotator.RotateLine(memento.selectedLine, memento.oldLinePositions);
+                GameObject drawable = memento.selectedLine.transform.parent.gameObject;
+                GameObject drawableParent = drawable.transform.parent.gameObject;
+                new MoveNetAction(drawable.name, drawableParent.name, memento.currentLineName, memento.oldObjectPosition).Execute();
+                new RotatorNetAction(drawable.name, drawableParent.name, memento.currentLineName, memento.oldLinePositions).Execute();
             }
-            if (memento.oldLine != null && memento.oldLine.TryGetComponent<BlinkEffect>(out BlinkEffect oldEffect))
-            {
-                oldEffect.Deactivate();
-            }
-            if (memento.currentLine != null && memento.currentLine.TryGetComponent<BlinkEffect>(out BlinkEffect currentEffect))
+            if (memento.selectedLine != null && memento.selectedLine.TryGetComponent<BlinkEffect>(out BlinkEffect currentEffect))
             {
                 currentEffect.Deactivate();
             }
@@ -245,35 +240,21 @@ namespace Assets.SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            if (memento.currentLine == null && memento.currentLineName != null)
+            if (memento.selectedLine == null && memento.currentLineName != null)
             {
-                memento.currentLine = GameDrawableIDFinder.FindChild(memento.drawable, memento.currentLineName);
+                memento.selectedLine = GameDrawableIDFinder.FindChild(memento.drawable, memento.currentLineName);
             }
-            if (memento.oldLine == null || (memento.oldLine != null && memento.oldLine.name.Equals(memento.currentLine.name)))
+            if (memento.selectedLine != null)
             {
-                if (memento.currentLine != null)
-                {
-                    GameEditLine.ChangeThickness(memento.currentLine, memento.newValueHolder.thickness);
-                    GameEditLine.ChangeLayer(memento.currentLine, memento.newValueHolder.layer);
-                    GameEditLine.ChangeColor(memento.currentLine, memento.newValueHolder.color);
+                GameMoveRotator.MoveObject(memento.selectedLine, memento.newObjectPosition);
+                GameMoveRotator.RotateLine(memento.selectedLine, memento.newLinePositions);
+                GameObject drawable = memento.selectedLine.transform.parent.gameObject;
+                GameObject drawableParent = drawable.transform.parent.gameObject;
+                new MoveNetAction(drawable.name, drawableParent.name, memento.currentLineName, memento.newObjectPosition).Execute();
+                new RotatorNetAction(drawable.name, drawableParent.name, memento.currentLineName, memento.newLinePositions).Execute();
+            }
 
-                    GameObject drawable = memento.currentLine.transform.parent.gameObject;
-                    GameObject drawableParent = drawable.transform.parent.gameObject;
-
-                    new EditLineThicknessNetAction(drawable.name, drawableParent.name, memento.currentLine.name, memento.newValueHolder.thickness).Execute();
-                    new EditLineLayerNetAction(drawable.name, drawableParent.name, memento.currentLine.name, memento.newValueHolder.layer).Execute();
-                    new EditLineColorNetAction(drawable.name, drawableParent.name, memento.currentLine.name, memento.newValueHolder.color).Execute();
-                }
-            }
-            if (GameEditLine.editMenuInstance != null)
-            {
-                Destroyer.Destroy(GameEditLine.editMenuInstance);
-            }
-            if (memento.oldLine != null && memento.oldLine.TryGetComponent<BlinkEffect>(out BlinkEffect oldEffect))
-            {
-                oldEffect.Deactivate();
-            }
-            if (memento.currentLine != null && memento.currentLine.TryGetComponent<BlinkEffect>(out BlinkEffect currentEffect))
+            if (memento.selectedLine != null && memento.selectedLine.TryGetComponent<BlinkEffect>(out BlinkEffect currentEffect))
             {
                 currentEffect.Deactivate();
             }
@@ -305,24 +286,15 @@ namespace Assets.SEE.Controls.Actions.Drawable
 
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento.oldLine == null && memento.currentLine == null)
+            if (memento.selectedLine == null)
             {
                 return new HashSet<string>();
             }
             else
-            if (memento.oldLine == null && memento.currentLine != null)
             {
                 return new HashSet<string>
                 {
-                    memento.currentLine.name
-                };
-            }
-            else
-            {
-                return new HashSet<string>
-                {
-                    memento.oldLine.name,
-                    memento.currentLine.name
+                    memento.selectedLine.name
                 };
             }
         }

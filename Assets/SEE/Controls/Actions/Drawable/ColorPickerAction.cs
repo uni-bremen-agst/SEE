@@ -11,6 +11,7 @@ using static RootMotion.FinalIK.HitReaction;
 using Assets.SEE.Net.Actions.Whiteboard;
 using SEE.Net.Actions;
 using Assets.SEE.Game.Drawable;
+using Assets.SEE.Game;
 
 namespace SEE.Controls.Actions
 {
@@ -21,11 +22,13 @@ namespace SEE.Controls.Actions
     /// </summary>
     class ColorPickerAction : AbstractPlayerAction
     {
-        private static Color choosenColor;
+        private Color oldChoosenColor;
 
-        private static Color pickedColor;
+        private Color pickedColor;
 
-        private static Material material;
+        private Material material;
+
+        private Memento memento;
 
         /// <summary>
         /// 
@@ -39,10 +42,17 @@ namespace SEE.Controls.Actions
             {
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && 
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) && raycastHit.collider.gameObject.transform.parent != null &&
-                    raycastHit.collider.gameObject.transform.parent.gameObject.CompareTag(Tags.Drawable))
+                    GameDrawableIDFinder.hasDrawableParent(raycastHit.collider.gameObject))
                 {
                     pickedColor = raycastHit.collider.gameObject.GetColor();
+                    HSVPicker.ColorPicker picker = DrawableConfigurator.drawableMenu.GetComponent<HSVPicker.ColorPicker>();
+                    picker.AssignColor(DrawableConfigurator.currentColor);
+                    picker.onValueChanged.AddListener(DrawableConfigurator.colorAction = color =>
+                    {
+                        DrawableConfigurator.currentColor = color;
+                    });
                     DrawableConfigurator.currentColor = pickedColor;
+                    memento = new(oldChoosenColor, pickedColor);
                     result = true;
                     currentState = ReversibleAction.Progress.Completed;
                 }/* Materials picker, nicht sinnvoll, da vieles keine Materials aufweisen
@@ -58,9 +68,31 @@ namespace SEE.Controls.Actions
             return result;
         }
 
-        static ColorPickerAction() 
+        public override void Awake()
         {
-            choosenColor = DrawableConfigurator.currentColor;
+            oldChoosenColor = DrawableConfigurator.currentColor;
+            DrawableConfigurator.enableDrawableMenu();
+            DrawableConfigurator.disableLayerFromDrawableMenu();
+            DrawableConfigurator.disableThicknessFromDrawableMenu();
+        }
+
+        public override void Stop()
+        {
+            DrawableConfigurator.enableLayerFromDrawableMenu();
+            DrawableConfigurator.enableThicknessFromDrawableMenu();
+            DrawableConfigurator.disableDrawableMenu();
+        }
+
+        struct Memento
+        {
+            public readonly Color oldChoosenColor;
+            public readonly Color pickedColor;
+
+            public Memento (Color oldChoosenColor, Color pickedColor)
+            {
+                this.oldChoosenColor = oldChoosenColor;
+                this.pickedColor = pickedColor;
+            }
         }
 
         /// <summary>
@@ -70,7 +102,7 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            DrawableConfigurator.currentColor = choosenColor;
+            DrawableConfigurator.currentColor = memento.oldChoosenColor;
         }
 
         /// <summary>
@@ -81,7 +113,7 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            DrawableConfigurator.currentColor = pickedColor;
+            DrawableConfigurator.currentColor = memento.pickedColor;
         }
 
         /// <summary>

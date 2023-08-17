@@ -9,10 +9,6 @@ namespace Assets.SEE.Game.Drawable
 
         public static GameObject oldLine;
 
-        public static GameObject editMenuInstance;
-
-        //public static Hashtable tableValueHolder = new();
-
         public static ValueHolder oldValueHolder;
 
         public static ValueHolder newValueHolder;

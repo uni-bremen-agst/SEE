@@ -1,6 +1,7 @@
 ﻿using Assets.SEE.Controls.Actions.Drawable;
 using SEE.Controls.Actions;
 using SEE.Utils;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -38,7 +39,7 @@ namespace Assets.SEE.Game.Drawable
         {
             if (GlobalActionHistory.Current() != ActionStateTypes.EditLine)
             {
-                Destroy(GameEditLine.editMenuInstance);
+                DrawableConfigurator.disableDrawableMenu();
             }
         }
 

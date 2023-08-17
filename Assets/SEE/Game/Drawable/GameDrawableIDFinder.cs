@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using SEE.Game;
+using System.Collections;
 using UnityEngine;
 
 namespace Assets.SEE.Game
@@ -28,6 +29,42 @@ namespace Assets.SEE.Game
         {
             return (drawable.transform.Find(lineName) != null) ? 
                 drawable.transform.Find(lineName).gameObject : null;
+        }
+
+        public static GameObject FindDrawableParent(GameObject child)
+        {
+            Transform transform = child.transform;
+            while(transform.parent != null)
+            {
+                if (transform.parent.gameObject.CompareTag(Tags.Drawable))
+                {
+                    return transform.parent.gameObject;
+                }
+                transform = transform.parent;
+            }
+            return null;
+        }
+
+        public static bool hasDrawableParent(GameObject child)
+        {
+            return FindDrawableParent(child) != null;
+        }
+
+        public static GameObject FindChildWithTag(GameObject parent, string tag)
+        {
+            foreach (Transform childTransform in parent.transform)
+            {
+                if (childTransform.gameObject.CompareTag(tag))
+                {
+                    return childTransform.gameObject;
+                }
+            }
+            return null;
+        }
+
+        public static bool hasChildWithTag(GameObject parent, string tag)
+        {
+            return FindChildWithTag(parent, tag) != null;
         }
     }
 }

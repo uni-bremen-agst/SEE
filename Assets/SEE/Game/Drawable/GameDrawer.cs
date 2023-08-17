@@ -30,17 +30,22 @@ namespace SEE.Game
 
         private static GameObject line;
 
+       // private static GameObject rendererLine;
+
         private static void Setup(GameObject drawable, String name, Vector3[] positions, Color color, float thickness)
         {
             line = new (name);
             line.tag = Tags.Line;
             line.transform.parent = drawable.transform;
-            //FIXME klappt nicht so
-            //line.transform.position = line.transform.position - DrawableConfigurator.distanceToDrawable;
+           // line.transform.position = drawable.transform.position;
+           // rendererLine = new(name + " Renderer");
+           // rendererLine.tag = Tags.Line;
+           // rendererLine.transform.SetParent(line.transform);
+           // renderer = rendererLine.AddComponent<LineRenderer>();
+           // meshCollider = rendererLine.AddComponent<MeshCollider>();
             renderer = line.AddComponent<LineRenderer>();
             meshCollider = line.AddComponent<MeshCollider>();
             renderer.sharedMaterial = GetMaterial(color);
-            //renderer.alignment = LineAlignment.TransformZ;
             renderer.startWidth = thickness;
             renderer.endWidth = renderer.startWidth;
             renderer.useWorldSpace = false;
@@ -51,6 +56,7 @@ namespace SEE.Game
         {
             Setup(drawable, "", positions, color, thickness);
             line.name = "line" + line.GetInstanceID();
+            //rendererLine.name = line.name + " Renderer";
             renderer.sortingOrder = DrawableConfigurator.orderInLayer;
             DrawableConfigurator.orderInLayer++;
             

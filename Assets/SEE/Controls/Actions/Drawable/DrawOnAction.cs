@@ -47,10 +47,8 @@ namespace SEE.Controls.Actions
 
         private Memento memento;
 
-        private const string drawableMenu = "Prefabs/UI/DrawableLineMenu";
         private HSVPicker.ColorPicker picker;
         private ThicknessSliderController thicknessSlider;
-        private GameObject menuInstance;
         private bool drawing = false;
 
         public override void Start()
@@ -60,29 +58,29 @@ namespace SEE.Controls.Actions
 
         public override void Awake()
         {
-            base.Awake();
-            Debug.Log("Awake von DrawOn wird aufgerufen");
-            menuInstance = PrefabInstantiator.InstantiatePrefab(drawableMenu,
-                            GameObject.Find("UI Canvas").transform, false);
+            DrawableConfigurator.enableDrawableMenu();
 
-            DrawableLineMenuDestroyer destroyer = menuInstance.AddOrGetComponent<DrawableLineMenuDestroyer>();
-            destroyer.SetAllowedState(GetActionStateType());
-
-            thicknessSlider = menuInstance.GetComponentInChildren<ThicknessSliderController>();
+            thicknessSlider = DrawableConfigurator.drawableMenu.GetComponentInChildren<ThicknessSliderController>();
             thicknessSlider.AssignValue(DrawableConfigurator.currentThickness);
             thicknessSlider.onValueChanged.AddListener(thickness =>
             {
                 DrawableConfigurator.currentThickness = thickness;
             });
 
-            menuInstance.transform.Find("Layer").gameObject.SetActive(false);
+            DrawableConfigurator.disableLayerFromDrawableMenu();
 
-            picker = menuInstance.GetComponent<HSVPicker.ColorPicker>();
+            picker = DrawableConfigurator.drawableMenu.GetComponent<HSVPicker.ColorPicker>();
             picker.AssignColor(DrawableConfigurator.currentColor);
-            picker.onValueChanged.AddListener(color =>
+            picker.onValueChanged.AddListener(DrawableConfigurator.colorAction = color =>
             {
                 DrawableConfigurator.currentColor = color;
             });
+        }
+
+        public override void Stop()
+        {
+            DrawableConfigurator.enableLayerFromDrawableMenu();
+            DrawableConfigurator.disableDrawableMenu();
         }
 
         /// <summary>
@@ -98,22 +96,17 @@ namespace SEE.Controls.Actions
 
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                    (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) || 
-                    (raycastHit.collider.gameObject.transform.parent != null && 
+                    (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
+                    (raycastHit.collider.gameObject.transform.parent != null &&
                         raycastHit.collider.gameObject.transform.parent.gameObject.CompareTag(Tags.Drawable))))
                 {
                     Debug.Log(DateTime.Now + " - Before Switch");
-                    GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ? 
+                    GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
                         raycastHit.collider.gameObject : raycastHit.collider.gameObject.transform.parent.gameObject;
                     drawing = true;
 
                     Ray ray = Raycasting.UserPointsTo();
-                    /*
-                     * Direction z fast 1 zu z sub
-                     * direction z fast -1 zu z add
-                     * direction x fast 1 zu x sub
-                     * direction x fast -1 zu x add
-                     **/
+
                     if (ray.direction.z < -0.80)
                     {
                         raycastHit.point = raycastHit.point + DrawableConfigurator.distanceZ;
@@ -130,8 +123,14 @@ namespace SEE.Controls.Actions
                     {
                         raycastHit.point = raycastHit.point - DrawableConfigurator.distanceX;
                     }
-                     
-                     
+                    if (ray.direction.y < -0.80)
+                    {
+                        raycastHit.point = raycastHit.point + DrawableConfigurator.distanceZ2;
+                    }
+                    if (ray.direction.y > 0.80)
+                    {
+                        raycastHit.point = raycastHit.point - DrawableConfigurator.distanceZ2;
+                    }
 
                     switch (progressState)
                     {
@@ -186,6 +185,7 @@ namespace SEE.Controls.Actions
                             result = true;
                             currentState = ReversibleAction.Progress.Completed;
                             progressState = ProgressState.StartDrawing;
+                            positions = new Vector3[1];
                         }
                         else
                         {
@@ -211,7 +211,7 @@ namespace SEE.Controls.Actions
             public readonly int orderInLayer;
 
             public string id;
-            
+
             public Memento(GameObject drawable, Vector3[] positions, Color color, float thickness, int orderInLayer)
             {
                 this.drawable = drawable;
@@ -247,12 +247,12 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            line = GameDrawer.ReDrawLine(memento.drawable, memento.id, memento.positions, memento.color, 
+            line = GameDrawer.ReDrawLine(memento.drawable, memento.id, memento.positions, memento.color,
                 memento.thickness, memento.orderInLayer);
             if (line != null)
             {
-                new DrawOnNetAction(memento.drawable.name, memento.drawable.transform.parent.name, 
-                    memento.id, memento.positions, memento.color, 
+                new DrawOnNetAction(memento.drawable.name, memento.drawable.transform.parent.name,
+                    memento.id, memento.positions, memento.color,
                     memento.thickness, memento.orderInLayer).Execute();
             }
         }
