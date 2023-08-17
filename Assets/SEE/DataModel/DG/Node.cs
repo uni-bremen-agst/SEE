@@ -316,6 +316,11 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// All edges connected to this node, i.e., the union of its incoming and outgoing edges.
+        /// </summary>
+        public ISet<Edge> Edges => Incomings.Union(Outgoings).ToHashSet();
+
+        /// <summary>
         /// Resets this node, i.e., removes all incoming and outgoing edges
         /// and children from this node. Resets its graph and parent to null.
         ///

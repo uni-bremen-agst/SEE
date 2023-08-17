@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -13,20 +14,15 @@ namespace SEE.Controls.Actions
     /// </summary>
     public class ShowEdges : InteractableObjectAction
     {
-        // TODO: Perhaps edges being hidden should be a city setting? The setting would simply need to set the
-        //       `Edge.IsHiddenToggle` on all edges the user wishes to hide. Such edges will then only be shown
-        //        when hovering or selecting connected nodes. This is currently the case for all reflexion edges
-        //        except absences and divergences.
-
         /// <summary>
         /// True if the object is currently being hovered over.
         /// </summary>
-        private bool isHovered = false;
+        private bool isHovered;
 
         /// <summary>
         /// True if the object is currently selected.
         /// </summary>
-        private bool isSelected = false;
+        private bool isSelected;
 
         /// <summary>
         /// The city object this edge is rendered in.
@@ -62,7 +58,7 @@ namespace SEE.Controls.Actions
                 Interactable.SelectOut -= SelectionOff;
                 Interactable.HoverIn -= HoverOn;
                 Interactable.HoverOut -= HoverOff;
-                codeCity = null;  // Reset codeCity
+                codeCity = null; // Reset codeCity
             }
             else
             {
@@ -184,8 +180,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Shows/hides all incoming/outgoing edges of the node this component is
-        /// attached to.
+        /// Shows/hides all incoming/outgoing edges of the node this component is attached to.
         /// </summary>
         /// <param name="show">if true, the edges are shown; otherwise hidden</param>
         private void OnOff(bool show)
@@ -194,10 +189,13 @@ namespace SEE.Controls.Actions
             {
                 codeCity ??= City();
 
+                IEnumerable<Edge> edges = codeCity.EdgeLayoutSettings.AnimateInnerEdges
+                    ? node.PostOrderDescendants().SelectMany(x => x.Edges)
+                    : node.Edges;
+
                 EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
 
-                // TODO: Perhaps the node along with its edges should be cached?
-                foreach (Edge edge in node.Incomings.Concat(node.Outgoings).Where(x => x.HasToggle(Edge.IsHiddenToggle)))
+                foreach (Edge edge in edges.Distinct().Where(x => x.HasToggle(Edge.IsHiddenToggle)))
                 {
                     edge.Operator().ShowOrHide(show, animationKind);
                 }

@@ -22,19 +22,22 @@ namespace SEE.Game.City
         /// <summary>
         /// The path to the GXL file containing the architecture graph data.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of GXL file for the architecture"), FoldoutGroup(DataFoldoutGroup)]
+        [SerializeField, ShowInInspector, Tooltip("Path of GXL file for the architecture"),
+         TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath GxlArchitecturePath = new();
 
         /// <summary>
         /// The path to the GXL file containing the mapping graph data.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of GXL file for the mapping from the implementation onto the architecture"), FoldoutGroup(DataFoldoutGroup)]
+        [SerializeField, ShowInInspector, Tooltip("Path of GXL file for the mapping from the implementation onto the architecture"),
+         TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath GxlMappingPath = new();
 
         /// <summary>
         /// The path to the CSV file containing the architecture metric data.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of CSV file for the metrics of the architecture"), FoldoutGroup(DataFoldoutGroup)]
+        [SerializeField, ShowInInspector, Tooltip("Path of CSV file for the metrics of the architecture"),
+         TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath CsvArchitecturePath = new();
 
         /// <summary>

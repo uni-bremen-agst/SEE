@@ -302,7 +302,7 @@
       }
     },
     "com.unity.xr.core-utils": {
-      "version": "2.2.1",
+      "version": "2.2.2",
       "depth": 1,
       "source": "registry",
       "dependencies": {

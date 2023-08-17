@@ -933,6 +933,16 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
+        /// Placeholder to satisfy the compiler. This method is not
+        /// called anywhere as of yet, but was required in <see
+        /// cref="EdgeRenderer"/>.
+        /// </summary>
+        public GameObject DrawEdge(Edge edge, GameObject source = null, GameObject target = null)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Returns an edge layout for the given <paramref name="gameEdges"/>.
         ///
         /// The result is a mapping of the names of the game objects in <paramref name="gameEdges"/>

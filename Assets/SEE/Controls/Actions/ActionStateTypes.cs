@@ -106,15 +106,20 @@ namespace SEE.Controls.Actions
                   Color.black, "Materials/ModernUIPack/Document",
                   ShowCodeAction.CreateReversibleAction);
 
+            AcceptDivergence =
+              new("Accept Divergence", "Accept a diverging edge into the architecture",
+                  Color.grey.Darker(), "Materials/ModernUIPack/Arrow Bold",
+                  AcceptDivergenceAction.CreateReversibleAction);
+
+            LiveDocumentation =
+                new("LiveDocumentation", "Displays the documentation of a node",
+                Color.magenta.Lighter(), "Materials/ModernUIPack/Document",
+                LiveDocumentationAction.CreateAction);
+
             Draw =
               new("Draw", "Draw a line",
                   Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
                   DrawAction.CreateReversibleAction);
-            
-            LiveDocumentation =
-                new("LiveDocumentation", "Displays the documentation of a node",
-                Color.magenta.Lighter(), "Materials/ModernUIPack/Document", 
-                LiveDocumentationAction.CreateAction);
 
             // Metric Board actions
             MetricBoard =
@@ -181,7 +186,7 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType ShowCode;
         public readonly static ActionStateType Draw;
         public readonly static ActionStateType LiveDocumentation;
-
+        public readonly static ActionStateType AcceptDivergence;
         public readonly static ActionStateTypeGroup MetricBoard;
         public readonly static ActionStateType AddBoard;
         public readonly static ActionStateType AddWidget;
@@ -191,7 +196,6 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType DeleteWidget;
         public readonly static ActionStateType LoadBoard;
         public readonly static ActionStateType SaveBoard;
-        
 
         #endregion
 
