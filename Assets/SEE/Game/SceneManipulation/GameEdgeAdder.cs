@@ -4,7 +4,7 @@ using SEE.Game.City;
 using SEE.GO;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.SceneManipulation
 {
     /// <summary>
     /// Creates new game objects representing graph edges or deletes these again,

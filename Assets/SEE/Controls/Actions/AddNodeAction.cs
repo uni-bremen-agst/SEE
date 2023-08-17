@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using SEE.Game;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Audio;
+using SEE.Game.SceneManipulation;
 
 namespace SEE.Controls.Actions
 {

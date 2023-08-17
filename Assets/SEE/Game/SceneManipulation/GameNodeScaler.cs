@@ -2,10 +2,10 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.SceneManipulation
 {
     /// <summary>
-    /// This GameNodeScaler allows us to scale a game node without modifying the 
+    /// This GameNodeScaler allows us to scale a game node without modifying the
     /// scale of its children.
     /// </summary>
     [ExecuteInEditMode]

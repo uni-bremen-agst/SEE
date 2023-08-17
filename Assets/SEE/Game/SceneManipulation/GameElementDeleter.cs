@@ -6,7 +6,7 @@ using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.SceneManipulation
 {
     /// <summary>
     /// Allows to delete nodes and edges.

@@ -1,8 +1,8 @@
 using SEE.DataModel.DG;
-using SEE.Game;
 using UnityEngine;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.Game.SceneManipulation;
 
 namespace SEE.Net.Actions
 {

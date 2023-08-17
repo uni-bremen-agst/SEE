@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using SEE.Controls;
 using SEE.Controls.Actions;
+using SEE.Game.SceneManipulation;
 using SEE.GO;
 using UnityEngine;
 

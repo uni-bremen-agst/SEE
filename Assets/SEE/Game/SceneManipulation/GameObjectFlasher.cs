@@ -2,7 +2,7 @@
 using DG.Tweening;
 using SEE.Utils;
 
-namespace SEE.Game
+namespace SEE.Game.SceneManipulation
 {
     /// <summary>
     /// Flashes a game object, that is, animates its color pulsating from its

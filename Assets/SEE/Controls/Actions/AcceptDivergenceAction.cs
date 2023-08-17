@@ -5,9 +5,10 @@ using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using System;
-using SEE.Game;
+using SEE.Game.SceneManipulation;
 using SEE.Net.Actions;
 using SEE.Audio;
+using SEE.Game;
 
 namespace SEE.Controls.Actions
 {
