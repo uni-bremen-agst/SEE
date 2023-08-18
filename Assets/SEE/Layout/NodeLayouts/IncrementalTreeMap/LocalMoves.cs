@@ -264,9 +264,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
 
             resultThisRecursion.Sort((x, y) => x.Item2.CompareTo(y.Item2));
-            resultThisRecursion =
-                (List<Tuple<List<Node>, double, IList<LocalMove>>>)resultThisRecursion.Take(settings
-                    .localMovesBranchingLimit);
+            resultThisRecursion = resultThisRecursion.Take(settings.localMovesBranchingLimit).ToList();
 
             var resultsNextRecursions = new List<Tuple<List<Node>, double, IList<LocalMove>>>();
             foreach (var result in resultThisRecursion)
