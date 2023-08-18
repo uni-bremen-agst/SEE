@@ -36,7 +36,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Calculates the layout by slices the <paramref name="rectangle"/> recursively.
+        /// Calculates the layout by slicing the <paramref name="rectangle"/> recursively.
         /// </summary>
         /// <param name="rectangle">the rectangle</param>
         /// <param name="nodes">nodes to be placed in rectangle</param>
@@ -113,7 +113,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         /// <summary>
         /// Calculates the index, that separates the <paramref name="nodes"/> array into two
-        /// partitions
+        /// partitions. The specific splitting should result in good visual quality.
         /// </summary>
         /// <param name="nodes"> sorted list</param>
         /// <returns>index</returns>

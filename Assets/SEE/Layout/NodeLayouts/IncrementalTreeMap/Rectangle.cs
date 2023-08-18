@@ -1,7 +1,7 @@
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     /// <summary>
-    /// A class that represents a rectangle as part of a layout
+    /// A class that represents a rectangle shape as part of a layout
     /// </summary>
     internal class Rectangle
     {
@@ -21,27 +21,27 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// The position of the left side
+        /// The position of the <see cref="Direction.Left"/> edge
         /// </summary>
         public double X;
 
         /// <summary>
-        /// the position of the lower side 
+        /// the position of the <see cref="Direction.Lower"/> edge 
         /// </summary>
         public double Z;
 
         /// <summary>
-        /// The lenght of x-axis
+        /// The lenght of x axis
         /// </summary>
         public double Width;
 
         /// <summary>
-        /// The lenght of z-axis
+        /// The lenght of z axis
         /// </summary>
-        public double Depth; // depth
+        public double Depth;
 
         /// <summary>
-        /// The ratio of the longer side to the smaller one.
+        /// The ratio of the longer edge to the smaller one.
         /// </summary>
         /// <returns>val >= 1</returns>
         public double AspectRatio()

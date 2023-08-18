@@ -4,22 +4,25 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     /// Direction in in the plane of x-axis and z-axis
     /// </summary>
     internal enum Direction
-    {   
+    {
         /// <summary>
         /// Left side means decreasing x coordinate
         /// </summary>
-        Left, 
+        Left,
+
         /// <summary>
         /// Right side means increasing x coordinate
         /// </summary>
-        Right, 
+        Right,
+
         /// <summary>
         /// Upper side means decreasing z coordinate
         /// </summary>
-        Upper, 
+        Upper,
+
         /// <summary>
         /// Lower side means increasing z coordinate
         /// </summary>
         Lower
-    } 
+    }
 }

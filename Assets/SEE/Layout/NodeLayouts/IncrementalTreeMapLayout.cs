@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SEE.Game.City;
 using UnityEngine;
+using UnityEngine.Assertions;
 using Node = SEE.Layout.NodeLayouts.IncrementalTreeMap.Node;
 
 namespace SEE.Layout.NodeLayouts
@@ -19,13 +20,12 @@ namespace SEE.Layout.NodeLayouts
     public class IncrementalTreeMapLayout : HierarchicalNodeLayout, IIncrementalNodeLayout
     {
         /// <summary>
-        /// Constructor. The width and depth are assumed to be in Unity units.
+        /// Constructor.
         /// </summary>
-        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
-        /// placed on this level</param>
+        /// <param name="groundLevel">the y co-ordinate setting the ground level</param>
         /// <param name="width">width of the rectangle in which to place all nodes in Unity units</param>
         /// <param name="depth">width of the rectangle in which to place all nodes in Unity units</param>
-        /// <param name="settings">the serializable settings for the layout</param>
+        /// <param name="settings">the settings for the layout</param>
         public IncrementalTreeMapLayout(float groundLevel,
             float width,
             float depth,
@@ -85,7 +85,7 @@ namespace SEE.Layout.NodeLayouts
                 {
                     this._oldLayout = null;
                     Debug.LogWarning("Incremental layout of last revision is not from same type " +
-                                     "then the layout for this revision");
+                                     "as the layout for this revision");
                 }
             }
         }
@@ -102,8 +102,8 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Creates and a <see cref="Node"/> for each <see cref="ILayoutNode"/> in the layout
-        /// and initiate it with the right <see cref="Node.Size"/>.
+        /// Creates and a <see cref="Node"/> for each <see cref="ILayoutNode"/>
+        /// and sets the wanted <see cref="Node.Size"/>.
         /// Fills the <see cref="_nodeMap"/> and the <see cref="_iLayoutNodeMap"/>.
         /// </summary>
         private void InitTNodes()
@@ -123,9 +123,9 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Initiate a <see cref="Node"/> for the given <see cref="ILayoutNode"/> <paramref name="node"/>
+        /// Creates a <see cref="Node"/> for the given <see cref="ILayoutNode"/> <paramref name="node"/>
         /// and continue recursively with the children of the ILayoutNode <paramref name="node"/>.
-        /// Extend both <see cref="_nodeMap"/> and <see cref="_iLayoutNodeMap"/>.
+        /// Extend both <see cref="_nodeMap"/> and <see cref="_iLayoutNodeMap"/> by the node.
         /// </summary>
         /// <param name="node">node of the layout</param>
         /// <returns>the absolute size of the node</returns>
@@ -203,7 +203,7 @@ namespace SEE.Layout.NodeLayouts
                 out var nodesToBeDeleted,
                 out var nodesToBeAdded);
 
-            Rectangle oldRectangle = _oldLayout.ParentRectangle(oldNodes.First());
+            Rectangle oldRectangle = IncrementalTreeMap.Utils.CreateParentRectangle(oldNodes);
             IncrementalTreeMap.Utils.TransformRectangles(workWith,
                 oldRectangle: oldRectangle,
                 newRectangle: rectangle);
@@ -262,13 +262,15 @@ namespace SEE.Layout.NodeLayouts
                     newNode = new Node(oldNode.ID);
                     nodesToBeDeleted.Add(newNode);
                 }
+
                 workWith.Add(newNode);
                 newNode.Rectangle = oldNode.Rectangle.Clone();
             }
+
             IncrementalTreeMap.Utils.CloneSegments(
                 from: oldNodes,
-                to : workWith.ToDictionary(n => n.ID, n=>n));
-            
+                to: workWith.ToDictionary(n => n.ID, n => n));
+
             var workWithAlias = workWith;
             nodesToBeAdded = nodes.Where(n => !workWithAlias.Contains(n)).ToList();
         }
@@ -282,6 +284,7 @@ namespace SEE.Layout.NodeLayouts
         /// <returns></returns>
         private ICollection<ILayoutNode> ParentsInOldGraph(IEnumerable<Node> nodes)
         {
+            Assert.IsNotNull(_oldLayout);
             HashSet<ILayoutNode> parents = new();
             foreach (var node in nodes)
             {
@@ -290,21 +293,24 @@ namespace SEE.Layout.NodeLayouts
                     parents.Add(oldNode.Parent);
                 }
             }
+
             return parents;
         }
 
         /// <summary>
-        /// The number of nodes, that are also in the last layout present.
+        /// The number of the nodes, that are also in the last layout present.
         /// </summary>
-        /// <param name="nodes"></param>
+        /// <param name="nodes">the nodes to look up</param>
         /// <returns></returns>
         private int NumberOfOccurrencesInOldGraph(IEnumerable<Node> nodes)
         {
+            Assert.IsNotNull(_oldLayout);
             return nodes.Sum(n => _oldLayout._iLayoutNodeMap.ContainsKey(n.ID) ? 1 : 0);
         }
 
         /// <summary>
         /// Adds the result of layout calculation to <see cref="_layoutResult"/>.
+        /// Applies padding to the result.
         /// </summary>
         /// <param name="nodes">nodes with calculated layout</param>
         private void AddToLayout(IEnumerable<Node> nodes)
@@ -332,27 +338,6 @@ namespace SEE.Layout.NodeLayouts
 
                 _layoutResult[layoutNode] = new NodeTransform(position, scale);
             }
-        }
-
-        /// <summary>
-        /// Returns a rectangle, in which the <paramref name="node"/> is placed.
-        /// </summary>
-        /// <param name="node">node with layouted parent or root</param>
-        /// <returns>a new rectangle - no reference</returns>
-        private Rectangle ParentRectangle(Node node)
-        {
-            var iLayoutNode = _iLayoutNodeMap[node.ID];
-            Rectangle result;
-            if (iLayoutNode.Parent == null)
-            {
-                result = new Rectangle(-.5f * _width, -.5f * _depth, _width, _depth);
-            }
-            else
-            {
-                var parentNode = _nodeMap[iLayoutNode.Parent.ID];
-                result = parentNode.Rectangle.Clone();
-            }
-            return result;
         }
 
         public override Dictionary<ILayoutNode, NodeTransform> Layout

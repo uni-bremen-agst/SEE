@@ -57,8 +57,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         private Segment _lowerBoundingSegment;
 
         /// <summary>
-        /// Register the node to a new segment, deregister from the old one on this side.
-        /// The node knows about new segment and the segment knows about new node.
+        /// Registers the node with a new segment,
+        /// so the node and the segment get the information about the new adjacent.
         /// </summary>
         /// <param name="segment">the new adjacent segment</param>
         /// <param name="dir">the side of the new adjacent segment</param>
@@ -116,7 +116,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Get all adjacent segments
         /// </summary>
-        /// <returns>dictionary direction -> segment in this direction</returns>
+        /// <returns>dictionary where the direction maps the segment in this direction</returns>
         public IDictionary<Direction, Segment> SegmentsDictionary()
         {
             return new Dictionary<Direction, Segment>
@@ -129,7 +129,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Method for easy overview in debugger
+        /// Method for better overview in debugger
         /// </summary>
         private string DebuggerDisplay =>
             string.Format(

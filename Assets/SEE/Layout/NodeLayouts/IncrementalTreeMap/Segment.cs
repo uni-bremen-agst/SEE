@@ -5,8 +5,9 @@ using System.Linq;
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     /// <summary>
-    /// A segment represent the line that separates the rectangles of <see cref="Node"/>s of a layout.
-    /// Actually the specific position is not relevant but the relation to adjacent nodes.
+    /// A segment is a core element in the layout,
+    /// it represent the line that separates the rectangles of <see cref="Node"/>s of a layout.
+    ///  The specific position is actually not relevant but the relation to adjacent nodes.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class Segment
@@ -30,9 +31,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// A layout has i.g. 4 const segments.
         /// </summary>
         public bool IsConst { get; set; }
-        
+
         /// <summary>
-        /// Is true if the segment is separates in <see cref="Direction.Left"/> and <see cref="Direction.Right"/>.
+        /// Is true if the segment separates the plane in <see cref="Direction.Left"/> and <see cref="Direction.Right"/>.
         /// </summary>
         public bool IsVertical { get; set; }
 
@@ -49,11 +50,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         public IList<Node> Side2Nodes { get; }
 
         /// <summary>
-        /// Method for easy overview in debugger
+        /// Method for better overview in debugger
         /// </summary>
         private string DebuggerDisplay
         {
-            get {
+            get
+            {
                 string s = Side1Nodes.Aggregate("[", (current, node) => current + (node.ID + ","));
                 s += "][";
                 s = Side2Nodes.Aggregate(s, (current, node) => current + (node.ID + ","));

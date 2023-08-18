@@ -17,20 +17,31 @@ namespace SEE.Game.City
         /// </summary>
         [SerializeField]
         [Range(0, 5)]
-        [Tooltip("The maximal depth for local moves algorithm")]
+        [Tooltip("The maximal depth for local moves algorithm. Increase for higher visual quality, " +
+                 "decrease for higher stability and to save runtime")]
         public int localMovesDepth = 3;
 
         /// <summary>
-        /// The maximal branching of the local moves search.
+        /// The maximal branching factor of the local moves search.
         /// </summary>
         [SerializeField]
         [Range(1, 10)]
-        [Tooltip("The maximal branching factor for local moves algorithm")]
+        [Tooltip("The maximal branching factor for local moves algorithm.  Increase for higher visual quality, " +
+                 "decrease for higher stability and to save runtime")]
         public int localMovesBranchingLimit = 4;
 
         /// <summary>
         /// Defines the specific p norm used in the local moves algorithm. See here:
         /// <see cref="Layout.NodeLayouts.IncrementalTreeMap.LocalMoves.AspectRatiosPNorm"/>.
+        ///
+        /// Notice:
+        /// The kind of p norm changes which layout is considered to have the greatest visual quality.
+        /// For example with p=1 (Manhattan Norm) the algorithm would
+        /// minimize the sum of aspect ratios, while with p=infinity (Chebyshev Norm)
+        /// the algorithm would minimize the maximal aspect ratio over the layout nodes.
+        /// The other p norms range between these extremes.
+        ///
+        /// that a higher p value means 
         /// Needs therefor a mapping from <see cref="PNormRange"/> to a double value p, which is realized with the
         /// property <see cref="PNorm"/>.
         /// </summary>
@@ -72,7 +83,7 @@ namespace SEE.Game.City
                     (PNormRange.P3) => 3d,
                     (PNormRange.P4) => 4d,
                     (PNormRange.PInfinityChebyshev) => double.PositiveInfinity,
-                    _ => 2
+                    _ => 2d
                 };
             }
         }
@@ -108,7 +119,7 @@ namespace SEE.Game.City
     }
 
     /// <summary>
-    /// Selection of possible PNorms. Used for better access in Unity Editor for the serialized field
+    /// Selection of possible PNorms. Used for better access in Unity Editor for the field
     /// <see cref="IncrementalTreeMapSetting.pNorm"/>.
     /// </summary>
     public enum PNormRange

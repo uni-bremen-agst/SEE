@@ -10,12 +10,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     /// <summary>
     /// Provides algorithms for adding and deleting nodes to a layout
-    /// and a algorithm to improve visual quality of a layout
+    /// and a algorithm to improve visual quality of a layout.
     /// </summary>
     internal static class LocalMoves
     {
         /// <summary>
-        /// Finds possible <see cref="LocalMove"/>s like flip the segment or stretch a node over the segment.
+        /// Finds possible <see cref="LocalMove"/>s for s specific segment.
+        /// Like flip the segment or stretch a node over the segment.
         /// </summary>
         /// <param name="segment">the segment</param>
         /// <returns>List of <see cref="LocalMove"/>s</returns>
@@ -63,7 +64,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Adds a node to the layout, by slicing the node with the worst aspect ratio.
+        /// Adds a node to the layout.
+        /// <paramref name="newNode"/> get rectangles and segments.
         /// Will NOT add <paramref name="newNode"/> to the list <paramref name="nodes"/>.
         /// </summary>
         /// <param name="nodes">nodes that represent a layout</param>
@@ -105,7 +107,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Deleting a node of the layout, by expanding neighbor nodes over it.
+        /// Deleting a node from the layout.
         /// </summary>
         /// <param name="obsoleteNode">node to be delete, part of a layout</param>
         public static void DeleteNode(Node obsoleteNode)
@@ -250,11 +252,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 var nodeClonesDictionary = Utils.CloneGraph(nodes);
                 var nodeClonesList = nodeClonesDictionary.Values.ToList();
                 var moveClone = move.Clone(nodeClonesDictionary);
-                
+
                 moveClone.Apply();
                 var works = CorrectAreas.Correct(nodeClonesList, settings);
                 if (!works) continue;
-                
+
                 var newMovesList = new List<LocalMove>(movesTillNow) { moveClone };
                 resultThisRecursion.Add(
                     new Tuple<List<Node>, double, IList<LocalMove>>
@@ -262,10 +264,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
 
             resultThisRecursion.Sort((x, y) => x.Item2.CompareTo(y.Item2));
-            while (resultThisRecursion.Count > settings.localMovesBranchingLimit)
-            {
-                resultThisRecursion.RemoveAt(settings.localMovesBranchingLimit);
-            }
+            resultThisRecursion =
+                (List<Tuple<List<Node>, double, IList<LocalMove>>>)resultThisRecursion.Take(settings
+                    .localMovesBranchingLimit);
 
             var resultsNextRecursions = new List<Tuple<List<Node>, double, IList<LocalMove>>>();
             foreach (var result in resultThisRecursion)
@@ -277,18 +278,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// A p norm is a class of vector norms, that is used in the local moves search algorithm
-        /// to assess the visual quality of a list of <paramref name="nodes"/>,
-        /// by considering the vector of aspect ratios of the <paramref name="nodes"/>.
-        /// The kind of p norm changes what layout would be considered the best.
-        /// For example with <paramref name="p"/>=1 (Manhattan Norm) the algorithm would
-        /// minimize the sum of aspect ratios, while with <paramref name="p"/>=infinity (Chebyshev Norm)
-        /// the algorithm would minimize the maximal aspect ratio over the <paramref name="nodes"/>.
-        /// The other p norms range between these extremes.
+        /// Measures the visual quality of a layout, based on the aspect ratio of <paramref name="nodes"/>.
         /// </summary>
         /// <param name="nodes">The nodes the should be assessed.</param>
         /// <param name="p">Determines the specific norm.</param>
-        /// <returns>A measure for the visual quality of the nodes.</returns>
+        /// <returns>A measure for the visual quality of the nodes.
+        /// Return value is greater than or equal to 1, while 1 means perfect visual quality</returns>
         private static double AspectRatiosPNorm(IList<Node> nodes, double p)
         {
             Vector<double> aspectRatios =

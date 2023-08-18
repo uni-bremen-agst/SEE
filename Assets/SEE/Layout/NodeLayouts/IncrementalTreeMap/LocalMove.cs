@@ -28,8 +28,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Creates a new local move, that can be applied on the layout of the node clones.
         /// </summary>
-        /// <param name="cloneMap">ID -> node, the nodes should be clones of the layout of <see cref="Node1"/></param>
-        /// and <see cref="Node2"/>.
+        /// <param name="cloneMap"> dictionary that maps id to node, assuming that the cloneMap represents a clone
+        /// of the node layout of of <see cref="Node1"/></param>/ <see cref="Node2"/>.
         /// <returns>a new local move</returns>
         public abstract LocalMove Clone(IDictionary<string, Node> cloneMap);
     }
@@ -42,7 +42,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     internal class FlipMove : LocalMove
     {
         /// <summary>
-        /// of the rotation is clockwise
+        /// if the rotation is clockwise
         /// </summary>
         private readonly bool _clockwise;
 
@@ -202,7 +202,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Method for easy overview in debugger
+        /// Method for better overview in debugger
         /// </summary>
         private string DebuggerDisplay => "flip " + Node1.ID + " " + Node2.ID + " {clockwise}";
     }
@@ -226,7 +226,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         override
-        public void Apply()
+            public void Apply()
         {
             var segmentsNode1 = Node1.SegmentsDictionary();
             var segmentsNode2 = Node2.SegmentsDictionary();
@@ -267,7 +267,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         override
-        public LocalMove Clone(IDictionary<string, Node> cloneMap)
+            public LocalMove Clone(IDictionary<string, Node> cloneMap)
         {
             return new StretchMove(cloneMap[Node1.ID], cloneMap[Node2.ID]);
         }
@@ -416,7 +416,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Method for easy overview in debugger
+        /// Method for better overview in debugger
         /// </summary>
         private string DebuggerDisplay => "stretch " + Node1.ID + " " + Node2.ID;
     }
