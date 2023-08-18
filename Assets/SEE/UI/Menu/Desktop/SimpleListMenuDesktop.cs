@@ -16,18 +16,20 @@ namespace SEE.UI.Menu
         /// Prefab for the list containing the menu entries.
         /// Can be <code>null</code> if a game object can be found at <see cref="EntryListPath"/>.
         /// </summary>
-        protected virtual string EntryListPrefab => UI_PREFAB_FOLDER + "MenuEntries";
+        protected virtual string EntryListPrefab => $"{UI_PREFAB_FOLDER}MenuEntries";
+
         /// <summary>
         /// Prefab for each menu entry.
         /// Required components: ButtonManagerBasicWithIcon, PointerHelper and Image.
         /// </summary>
-        protected virtual string EntryPrefab => UI_PREFAB_FOLDER + "Button";
+        protected virtual string EntryPrefab => $"{UI_PREFAB_FOLDER}Button";
 
         /// <summary>
         /// Path to the content game object.
         /// Contains the entry list.
         /// </summary>
         protected virtual string ContentPath => "Main Content/Content Mask/Content";
+
         /// <summary>
         /// Path to the entry list game object.
         /// Starts at the <see cref="Content"/> game object. (<seealso cref="ContentPath"/>)
@@ -38,6 +40,7 @@ namespace SEE.UI.Menu
         /// The content game object.
         /// </summary>
         protected GameObject Content { get; private set; }
+
         /// <summary>
         /// The entry list game object.
         /// </summary>
@@ -103,8 +106,7 @@ namespace SEE.UI.Menu
         /// <param name="entry">The added menu entry.</param>
         protected virtual void AddButton(T entry)
         {
-            GameObject button =
-                PrefabInstantiator.InstantiatePrefab(EntryPrefab, EntryList.transform, false);
+            GameObject button = PrefabInstantiator.InstantiatePrefab(EntryPrefab, EntryList.transform, false);
 
             // title and icon
             button.name = entry.Title;

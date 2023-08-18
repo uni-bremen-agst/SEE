@@ -107,7 +107,7 @@ namespace SEE.UI.Window.CodeWindow
         {
             TokenLanguage language = TokenLanguage.fromFileExtension(Path.GetExtension(filename)?.Substring(1));
             Lexer lexer = language.CreateLexer(File.ReadAllText(filename));
-            CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+            CommonTokenStream tokenStream = new(lexer);
             tokenStream.Fill();
             // Generate list of SEETokens using the token stream and its language
             return tokenStream.GetTokens().Select(x => fromAntlrToken(x, lexer, language)).ToList();
@@ -123,7 +123,7 @@ namespace SEE.UI.Window.CodeWindow
         public static IList<SEEToken> FromString(string text, TokenLanguage language)
         {
             Lexer lexer = language.CreateLexer(text);
-            CommonTokenStream tokenStream = new CommonTokenStream(lexer);
+            CommonTokenStream tokenStream = new(lexer);
             tokenStream.Fill();
             // Generate list of SEETokens using the token stream and its language
             return tokenStream.GetTokens().Select(x => fromAntlrToken(x, lexer, language)).ToList();
@@ -160,52 +160,52 @@ namespace SEE.UI.Window.CodeWindow
             /// <summary>
             /// Keyword tokens. This also includes boolean literals and null literals.
             /// </summary>
-            public static readonly Type Keyword = new Type("Keywords", "D988F2"); // purple
+            public static readonly Type Keyword = new("Keywords", "D988F2"); // purple
 
             /// <summary>
             /// Number literal tokens. This includes integer literals, floating point literals, etc.
             /// </summary>
-            public static readonly Type NumberLiteral = new Type("NumberLiterals", "D48F35"); // orange
+            public static readonly Type NumberLiteral = new("NumberLiterals", "D48F35"); // orange
 
             /// <summary>
             /// String literal tokens. This also includes character literals.
             /// </summary>
-            public static readonly Type StringLiteral = new Type("StringLiterals", "92F288"); // light green
+            public static readonly Type StringLiteral = new("StringLiterals", "92F288"); // light green
 
             /// <summary>
             /// Punctuation tokens, such as separators and operators.
             /// </summary>
-            public static readonly Type Punctuation = new Type("Punctuation", "96E5FF"); // light blue
+            public static readonly Type Punctuation = new("Punctuation", "96E5FF"); // light blue
 
             /// <summary>
             /// Identifier tokens, such as variable names.
             /// </summary>
-            public static readonly Type Identifier = new Type("Identifiers", "FFFFFF"); // white
+            public static readonly Type Identifier = new("Identifiers", "FFFFFF"); // white
 
             /// <summary>
             /// Comments of any kind.
             /// </summary>
-            public static readonly Type Comment = new Type("Comments", "6F708E"); // dark bluish gray
+            public static readonly Type Comment = new("Comments", "6F708E"); // dark bluish gray
 
             /// <summary>
             /// Whitespace tokens, excluding newlines.
             /// </summary>
-            public static readonly Type Whitespace = new Type("Whitespace", "000000"); // color doesn't matter
+            public static readonly Type Whitespace = new("Whitespace", "000000"); // color doesn't matter
 
             /// <summary>
             /// Newline tokens. Must contain exactly one newline.
             /// </summary>
-            public static readonly Type Newline = new Type("Newline", "000000"); // color doesn't matter
+            public static readonly Type Newline = new("Newline", "000000"); // color doesn't matter
 
             /// <summary>
             /// End-Of-File token.
             /// </summary>
-            public static readonly Type EOF = new Type("EOF", "000000"); // color doesn't matter
+            public static readonly Type EOF = new("EOF", "000000"); // color doesn't matter
 
             /// <summary>
             /// Unknown tokens, i.e. those not recognized by the lexer.
             /// </summary>
-            public static readonly Type Unknown = new Type("Unknown", "FFFFFF"); // white
+            public static readonly Type Unknown = new("Unknown", "FFFFFF"); // white
 
             #endregion
 

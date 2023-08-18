@@ -108,6 +108,7 @@ namespace SEE.UI.Tooltip
             {
                 textBeforeStart = text;
             }
+
             void SetLastSibling()
             {
                 if (TooltipManager != null && TooltipManager.gameObject != null)

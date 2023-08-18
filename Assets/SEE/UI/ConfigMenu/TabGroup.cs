@@ -37,14 +37,14 @@ namespace SEE.UI.ConfigMenu
         /// <summary>
         /// The list of all currently registered tab buttons.
         /// </summary>
-        public List<TabButton> TabButtons = new List<TabButton>();
+        public List<TabButton> TabButtons = new();
 
         /// <summary>
         /// The controller of all pages.
         /// </summary>
         public TabController TabController;
 
-        private readonly List<UpdateNotifier> updateSubscriber = new List<UpdateNotifier>();
+        private readonly List<UpdateNotifier> updateSubscriber = new();
         private TabButton activeButton;
         private void Start()
         {

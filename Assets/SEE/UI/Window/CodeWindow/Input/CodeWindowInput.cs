@@ -296,7 +296,7 @@ namespace SEE.UI.Window.CodeWindow
         /// <exception cref="ArgumentException">If <paramref name="text"/> is empty or <c>null</c></exception>
         public void EnterFromText(string[] text, bool asIs = false)
         {
-            if (text == null || text.Length <= 0)
+            if (text is not { Length: > 0 })
             {
                 throw new ArgumentException("Given text must not be empty or null.\n");
             }
@@ -492,7 +492,7 @@ namespace SEE.UI.Window.CodeWindow
         private async UniTask<string> AsyncGetCleanText()
         {
             await UniTask.SwitchToThreadPool();
-            string ret = TextMesh.textInfo.characterInfo.Aggregate("", (result, c) => result += c.character);
+            string ret = TextMesh.textInfo.characterInfo.Aggregate("", (result, c) => result + c.character);
             await UniTask.SwitchToMainThread();
             return ret;
         }

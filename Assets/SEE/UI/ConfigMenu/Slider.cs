@@ -60,7 +60,7 @@ namespace SEE.UI.ConfigMenu
         private SliderManager sliderManager;
         private TextMeshProUGUI label;
 
-        private readonly Queue<float> valueUpdates = new Queue<float>();
+        private readonly Queue<float> valueUpdates = new();
 
         /// <summary>
         /// Requests an external value update.

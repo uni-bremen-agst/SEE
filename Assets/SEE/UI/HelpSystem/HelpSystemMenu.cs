@@ -69,15 +69,15 @@ namespace SEE.UI.HelpSystem
             // FIXME: This should be loaded from a file and not be hard-coded here.
 
             // Initialisation of all Lists for the NestedMenuEntries or MenuEntries.
-            List<MenuEntry> mainMenuEntries = new List<MenuEntry>();
-            List<MenuEntry> architectureEntries = new List<MenuEntry>();
-            List<MenuEntry> playerMenuEntries = new List<MenuEntry>();
-            List<MenuEntry> evolutionEntries = new List<MenuEntry>();
-            List<MenuEntry> debuggingEntries = new List<MenuEntry>();
-            List<MenuEntry> qualityEntries = new List<MenuEntry>();
-            List<MenuEntry> navigationEntries = new List<MenuEntry>();
-            List<MenuEntry> playerNavigationEntries = new List<MenuEntry>();
-            List<MenuEntry> cityNavigationEntries = new List<MenuEntry>();
+            List<MenuEntry> mainMenuEntries = new();
+            List<MenuEntry> architectureEntries = new();
+            List<MenuEntry> playerMenuEntries = new();
+            List<MenuEntry> evolutionEntries = new();
+            List<MenuEntry> debuggingEntries = new();
+            List<MenuEntry> qualityEntries = new();
+            List<MenuEntry> navigationEntries = new();
+            List<MenuEntry> playerNavigationEntries = new();
+            List<MenuEntry> cityNavigationEntries = new();
 
             // Hint for LinkedLists:
             // These lists are important for the Voice-Output of SEE and the displayed notes.
@@ -85,14 +85,14 @@ namespace SEE.UI.HelpSystem
             // where the text should appear and said by SEE. The first start position has to be at point 0.
             // The linked list has to be inserted into a menu entry at the end of the function.
 
-            LinkedList<HelpEntry> addEdge = new LinkedList<HelpEntry>();
+            LinkedList<HelpEntry> addEdge = new();
             addEdge.AddLast(new HelpEntry(1, "Press Space for opening the player menu.", 0));
             addEdge.AddLast(new HelpEntry(2, "Left click on the entry new edge.", 6));
             addEdge.AddLast(new HelpEntry(3, "Left click on a node to select the start node.", 12));
             addEdge.AddLast(new HelpEntry(4, "Left click on a node to select the target node.", 18));
             addEdge.AddLast(new HelpEntry(5, "Press key F11 to reset the selected start node.", 27));
 
-            LinkedList<HelpEntry> editNode = new LinkedList<HelpEntry>();
+            LinkedList<HelpEntry> editNode = new();
             editNode.AddLast(new HelpEntry(1, "Press Space for opening the player menu.", 0));
             editNode.AddLast(new HelpEntry(2, "Left click on the entry edit node.", 8));
             editNode.AddLast(new HelpEntry(3, "Left click on the node you want to edit.", 14));
@@ -101,7 +101,7 @@ namespace SEE.UI.HelpSystem
             editNode.AddLast(new HelpEntry(6, "Finish the editing process by pushing the Okay button.", 30));
             editNode.AddLast(new HelpEntry(7, "Your newly inserted values are now visible.", 34));
 
-            LinkedList<HelpEntry> searchNode = new LinkedList<HelpEntry>();
+            LinkedList<HelpEntry> searchNode = new();
             searchNode.AddLast(new HelpEntry(1, "Press key F for opening the search menu.", 0));
             searchNode.AddLast(new HelpEntry(2, "Insert the name of the node or part of it into the input field.", 5));
             searchNode.AddLast(new HelpEntry(3, "Press the button Okay.", 13));
@@ -109,33 +109,33 @@ namespace SEE.UI.HelpSystem
             searchNode.AddLast(new HelpEntry(5, "If you left click on one node entry, the respective node will be highlighted.", 23));
             searchNode.AddLast(new HelpEntry(6, "The node is blinking and a light beam strikes for a few seconds.", 30));
 
-            LinkedList<HelpEntry> simpleNavigation = new LinkedList<HelpEntry>();
+            LinkedList<HelpEntry> simpleNavigation = new();
             simpleNavigation.AddLast(new HelpEntry(1, "To switch your point of view, hold the right mouse button and move the mouse.", 0));
             simpleNavigation.AddLast(new HelpEntry(2, "Press Key W or S to move forwards or backwards.", 10));
             simpleNavigation.AddLast(new HelpEntry(3, "If your view is unlocked, you can move to the right or left with Key A or D.", 20));
 
-            LinkedList<HelpEntry> switchTable = new LinkedList<HelpEntry>();
+            LinkedList<HelpEntry> switchTable = new();
             switchTable.AddLast(new HelpEntry(1, "By default, your focussed view may be locked on a code city.", 0));
             switchTable.AddLast(new HelpEntry(2, "Press key L for unlock your view to move free in space.", 10));
             switchTable.AddLast(new HelpEntry(3, "Now you can move free in space to other tables.", 20));
             switchTable.AddLast(new HelpEntry(4, "If you press key L again, your view is focussed on the architecture again.", 28));
 
-            LinkedList<HelpEntry> zoomIntoCity = new LinkedList<HelpEntry>();
+            LinkedList<HelpEntry> zoomIntoCity = new();
             zoomIntoCity.AddLast(new HelpEntry(1, "Hover with the mouse over the city you want to zoom into.", 0));
             zoomIntoCity.AddLast(new HelpEntry(2, "Now, you can scroll the mouse wheel up for zooming.", 6));
             zoomIntoCity.AddLast(new HelpEntry(3, "The zooming is focussed on the mouse pointer.", 10));
             zoomIntoCity.AddLast(new HelpEntry(4, "If you want to zoom out, scroll with the mouse wheel down.", 15));
             zoomIntoCity.AddLast(new HelpEntry(5, "If the city is not centered anymore, press key R to reset the layout to centered.", 26));
 
-            LinkedList<HelpEntry> hideNode = new LinkedList<HelpEntry>();
+            LinkedList<HelpEntry> hideNode = new();
             hideNode.AddLast(new HelpEntry(1, "For hiding one or more nodes press space to open the player menu and select hide node.", 0));
-            hideNode.AddLast(new HelpEntry(2, "Scroll down and select hide selected or hide unselected.",9 ));
+            hideNode.AddLast(new HelpEntry(2, "Scroll down and select hide selected or hide unselected.", 9));
             hideNode.AddLast(new HelpEntry(3, "Select the node to hide or stay by left clicking on it.", 22));
             hideNode.AddLast(new HelpEntry(4, "For the selection of multiple nodes, hold key Control while clicking.", 30));
             hideNode.AddLast(new HelpEntry(5, "If you are ready, confirm your selection with the button done.", 39));
             hideNode.AddLast(new HelpEntry(6, "Hint: If you hide a parent node, all connected edges and child nodes will be hidden too.", 50));
 
-            LinkedList<HelpEntry> playEvolution = new LinkedList<HelpEntry>();
+            LinkedList<HelpEntry> playEvolution = new();
             playEvolution.AddLast(new HelpEntry(1, "You can start the evolution with the play button at the navigation bar.", 0));
             playEvolution.AddLast(new HelpEntry(2, "You can see the current version of all versions on the lower right side.", 10));
             playEvolution.AddLast(new HelpEntry(3, "If you want to pause the evolution, press the pause button, which appears after pushing the play button.", 20));
@@ -152,46 +152,46 @@ namespace SEE.UI.HelpSystem
 
             playerMenuEntries = new List<MenuEntry>
             {
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "How to add a new edge", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4", addEdge, entry),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Edit Node", "How to edit an existing node", Color.magenta, "Assets/SEE/Videos/EditNode.mp4", editNode, entry),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Hide Node", "How to hide node(s)", Color.magenta, "Assets/SEE/Videos/hideNode.mp4", hideNode, entry),
+                HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "How to add a new edge", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4", addEdge, entry),
+                HelpSystemBuilder.CreateNewHelpSystemEntry("Edit Node", "How to edit an existing node", Color.magenta, "Assets/SEE/Videos/EditNode.mp4", editNode, entry),
+                HelpSystemBuilder.CreateNewHelpSystemEntry("Hide Node", "How to hide node(s)", Color.magenta, "Assets/SEE/Videos/hideNode.mp4", hideNode, entry),
             };
 
             architectureEntries = new List<MenuEntry>
             {
-            HelpSystemBuilder.CreateNewRefEntry(playerMenuEntries,"Player Menu", "Player Menu use cases", Color.magenta),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Search for a node", "How to search for a node by source-name", Color.magenta, "Assets/SEE/Videos/searchNode.mp4", searchNode, entry)
+                HelpSystemBuilder.CreateNewRefEntry(playerMenuEntries, "Player Menu", "Player Menu use cases", Color.magenta),
+                HelpSystemBuilder.CreateNewHelpSystemEntry("Search for a node", "How to search for a node by source-name", Color.magenta, "Assets/SEE/Videos/searchNode.mp4", searchNode, entry)
             };
 
             evolutionEntries = new List<MenuEntry>
             {
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Navigation bar", "How to navigate between versions of evolution", Color.red, "Assets/SEE/Videos/evolution.mp4", playEvolution, entry)
+                HelpSystemBuilder.CreateNewHelpSystemEntry("Navigation bar", "How to navigate between versions of evolution", Color.red, "Assets/SEE/Videos/evolution.mp4", playEvolution, entry)
             };
 
             playerNavigationEntries = new List<MenuEntry>
             {
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Switch table", "How to switch between tables", Color.green, "Assets/SEE/Videos/toggleFocus.mp4", switchTable, entry),
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Simple navigation", "How to edit an existing node", Color.green, "Assets/SEE/Videos/navigation.mp4", simpleNavigation, entry),
+                HelpSystemBuilder.CreateNewHelpSystemEntry("Switch table", "How to switch between tables", Color.green, "Assets/SEE/Videos/toggleFocus.mp4", switchTable, entry),
+                HelpSystemBuilder.CreateNewHelpSystemEntry("Simple navigation", "How to edit an existing node", Color.green, "Assets/SEE/Videos/navigation.mp4", simpleNavigation, entry),
             };
 
             cityNavigationEntries = new List<MenuEntry>
             {
-            HelpSystemBuilder.CreateNewHelpSystemEntry("Zoom into Code-Cities", "How to zoom into code-cities", Color.green, "Assets/SEE/Videos/zoomIntoCodeCity.mp4", zoomIntoCity, entry),
+                HelpSystemBuilder.CreateNewHelpSystemEntry("Zoom into Code-Cities", "How to zoom into code-cities", Color.green, "Assets/SEE/Videos/zoomIntoCodeCity.mp4", zoomIntoCity, entry),
             };
 
             navigationEntries = new List<MenuEntry>
             {
-            HelpSystemBuilder.CreateNewRefEntry(playerNavigationEntries,"Player navigation", "How to navigate in SEE", Color.green),
-            HelpSystemBuilder.CreateNewRefEntry(cityNavigationEntries, "City navigation", "How to navigate a code city", Color.green)
+                HelpSystemBuilder.CreateNewRefEntry(playerNavigationEntries, "Player navigation", "How to navigate in SEE", Color.green),
+                HelpSystemBuilder.CreateNewRefEntry(cityNavigationEntries, "City navigation", "How to navigate a code city", Color.green)
             };
 
             mainMenuEntries = new List<MenuEntry>
             {
-            HelpSystemBuilder.CreateNewRefEntry(architectureEntries, "Architecture", "Use cases related to the architecture", Color.magenta),
-            HelpSystemBuilder.CreateNewRefEntry(evolutionEntries, "Evolution", "Use cases related to software-evolution", Color.red),
-            HelpSystemBuilder.CreateNewRefEntry(debuggingEntries, "Debugging", "Use cases related to software-debugging ", Color.blue),
-            HelpSystemBuilder.CreateNewRefEntry(qualityEntries, "Quality", "Use cases related to the software-quality", Color.cyan),
-            HelpSystemBuilder.CreateNewRefEntry(navigationEntries, "Navigation", "Use cases related to the navigation in SEE", Color.green)
+                HelpSystemBuilder.CreateNewRefEntry(architectureEntries, "Architecture", "Use cases related to the architecture", Color.magenta),
+                HelpSystemBuilder.CreateNewRefEntry(evolutionEntries, "Evolution", "Use cases related to software-evolution", Color.red),
+                HelpSystemBuilder.CreateNewRefEntry(debuggingEntries, "Debugging", "Use cases related to software-debugging ", Color.blue),
+                HelpSystemBuilder.CreateNewRefEntry(qualityEntries, "Quality", "Use cases related to the software-quality", Color.cyan),
+                HelpSystemBuilder.CreateNewRefEntry(navigationEntries, "Navigation", "Use cases related to the navigation in SEE", Color.green)
             };
 
             return HelpSystemBuilder.CreateMainMenu("Help System", "Find your specific use case", "Materials/Notification/info", mainMenuEntries);

@@ -91,7 +91,7 @@ namespace SEE.UI.ConfigMenu
         /// The event handler that gets called when a user interaction changes the currently edited
         /// SEECity instance.
         /// </summary>
-        public UnityEvent<EditableInstance> OnInstanceChangeRequest = new UnityEvent<EditableInstance>();
+        public UnityEvent<EditableInstance> OnInstanceChangeRequest = new();
 
         /// <summary>
         /// The currently edited SEECity instance.

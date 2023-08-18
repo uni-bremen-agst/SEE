@@ -197,12 +197,12 @@ namespace SEE.UI.Notification
             /// The notification represented by this class.
             /// </summary>
             public readonly Notification Notification;
-            
+
             /// <summary>
             /// The height of this notification on the canvas.
             /// </summary>
             public readonly float Height;
-            
+
             /// <summary>
             /// The token with which the notification's timer can be cancelled.
             /// </summary>

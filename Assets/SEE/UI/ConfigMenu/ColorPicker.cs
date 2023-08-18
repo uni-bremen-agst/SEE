@@ -38,7 +38,7 @@ namespace SEE.UI.ConfigMenu
         private TextMeshProUGUI labelText;
         private ButtonManagerBasicWithIcon buttonManager;
 
-        private readonly Queue<Color> valueUpdates = new Queue<Color>();
+        private readonly Queue<Color> valueUpdates = new();
 
         /// <summary>
         /// The controller script of the singleton color picker.

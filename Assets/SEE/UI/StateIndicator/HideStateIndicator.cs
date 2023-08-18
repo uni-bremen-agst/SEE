@@ -34,7 +34,7 @@ namespace SEE.UI.StateIndicator
         /// <summary>
         /// Represents the button that cancels the selection in the UI.
         /// </summary>
-        private GameObject backbutton;
+        private GameObject backButton;
 
         /// <summary>
         /// Saves the name of <see cref="doneButton"/>
@@ -66,7 +66,7 @@ namespace SEE.UI.StateIndicator
         /// <summary>
         /// The tooltip containing the <see cref=description"/> of this <see cref="Property"/>, which will
         /// be displayed when hovering above it.
-        /// Used for <see cref="backbutton"/>.
+        /// Used for <see cref="backButton"/>.
         /// </summary>
         private Tooltip.Tooltip tooltipBack;
 
@@ -76,7 +76,7 @@ namespace SEE.UI.StateIndicator
         public string DescriptionDone;
 
         /// <summary>
-        /// Saves the description of <see cref="backbutton"/>
+        /// Saves the description of <see cref="backButton"/>
         /// </summary>
         public string DescriptionBack;
 
@@ -91,7 +91,7 @@ namespace SEE.UI.StateIndicator
         public HideModeSelector SelectionTypeDone;
 
         /// <summary>
-        /// Saves which property <see cref="backbutton"/> has.
+        /// Saves which property <see cref="backButton"/> has.
         /// </summary>
         public HideModeSelector SelectionTypeBack;
 
@@ -106,14 +106,14 @@ namespace SEE.UI.StateIndicator
         private Sprite iconSpriteDone;
 
         /// <summary>
-        /// Used to store the icon of <see cref="backbutton"/>
+        /// Used to store the icon of <see cref="backButton"/>
         /// </summary>
         private Sprite iconSpriteBack;
 
         /// <summary>
         /// Event triggered when the user presses the button.
         /// </summary>
-        public readonly UnityEvent OnSelected = new UnityEvent();
+        public readonly UnityEvent OnSelected = new();
 
         /// <summary>
         /// Sets all relevant values for the button
@@ -127,10 +127,10 @@ namespace SEE.UI.StateIndicator
 
             doneButton.name = ButtonNameDone;
             if (!doneButton.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) ||
-                    !doneButton.TryGetComponentOrLog(out Image buttonImage) ||
-                    !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
-                    !icon.TryGetComponentOrLog(out Image iconImage) ||
-                    !doneButton.TryGetComponentOrLog(out PointerHelper pointerHelper))
+                !doneButton.TryGetComponentOrLog(out Image buttonImage) ||
+                !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
+                !icon.TryGetComponentOrLog(out Image iconImage) ||
+                !doneButton.TryGetComponentOrLog(out PointerHelper pointerHelper))
             {
                 return;
             }
@@ -156,21 +156,21 @@ namespace SEE.UI.StateIndicator
         /// <param name="indicator">Parent GameObject via which the button is accessed</param>
         private void SetUpButtonBack(GameObject indicator)
         {
-            backbutton = indicator.transform.Find("Button_Back").gameObject;
-            GameObject text = backbutton.transform.Find("Text").gameObject;
-            GameObject icon = backbutton.transform.Find("Icon").gameObject;
+            backButton = indicator.transform.Find("Button_Back").gameObject;
+            GameObject text = backButton.transform.Find("Text").gameObject;
+            GameObject icon = backButton.transform.Find("Icon").gameObject;
 
-            backbutton.name = ButtonNameBack;
-            if (!backbutton.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) ||
-                    !backbutton.TryGetComponentOrLog(out Image buttonImage) ||
-                    !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
-                    !icon.TryGetComponentOrLog(out Image iconImage) ||
-                    !backbutton.TryGetComponentOrLog(out PointerHelper pointerHelper))
+            backButton.name = ButtonNameBack;
+            if (!backButton.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager) ||
+                !backButton.TryGetComponentOrLog(out Image buttonImage) ||
+                !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro) ||
+                !icon.TryGetComponentOrLog(out Image iconImage) ||
+                !backButton.TryGetComponentOrLog(out PointerHelper pointerHelper))
             {
                 return;
             }
 
-            if(iconSpriteBack != null)
+            if (iconSpriteBack != null)
             {
                 buttonManager.buttonIcon = iconSpriteBack;
             }
@@ -202,9 +202,9 @@ namespace SEE.UI.StateIndicator
         }
 
         /// <summary>
-        /// Sets up the tooltips for <see cref="backbutton"/>
+        /// Sets up the tooltips for <see cref="backButton"/>
         /// </summary>
-        /// <param name="indicator">The parent object of <see cref="backbutton"/> to which the tooltip is to be attached</param>
+        /// <param name="indicator">The parent object of <see cref="backButton"/> to which the tooltip is to be attached</param>
         private void SetupTooltipBack(GameObject indicator)
         {
             GameObject button = indicator.transform.Find("Button_Back").gameObject;

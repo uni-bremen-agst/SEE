@@ -143,20 +143,19 @@ namespace SEE.UI.HelpSystem
         /// <param name="entry">The HelpSystemEntry where these values should be inserted.</param>
         /// <returns>A new HelpSystemMenu-Entry.</returns>
         public static MenuEntry CreateNewHelpSystemEntry
-            (string title,
-            string description,
-            Color entryColor,
-            string videoPath,
-            LinkedList<HelpEntry> keywords,
-            HelpSystemEntry entry = null)
+        (string title,
+         string description,
+         Color entryColor,
+         string videoPath,
+         LinkedList<HelpEntry> keywords,
+         HelpSystemEntry entry = null)
         {
-            return new MenuEntry(
-                selectAction: () => { Execute(entry, title, keywords, videoPath); },
-                unselectAction: null,
-                title: title,
-                description: description,
-                entryColor: entryColor,
-                icon: Resources.Load<Sprite>(EntryIcon));
+            return new MenuEntry(selectAction: () => { Execute(entry, title, keywords, videoPath); },
+                                 unselectAction: null,
+                                 title: title,
+                                 description: description,
+                                 entryColor: entryColor,
+                                 icon: Resources.Load<Sprite>(EntryIcon));
         }
 
         /// <summary>
@@ -171,12 +170,11 @@ namespace SEE.UI.HelpSystem
         /// <returns>A new NestedMenuEntry.</returns>
         public static NestedMenuEntry<MenuEntry> CreateNewRefEntry(List<MenuEntry> innerEntries, string title, string description, Color entryColor)
         {
-            return new NestedMenuEntry<MenuEntry>(
-                innerEntries: innerEntries,
-                title: title,
-                description: description,
-                entryColor: entryColor,
-                icon: Resources.Load<Sprite>(RefIcon));
+            return new NestedMenuEntry<MenuEntry>(innerEntries: innerEntries,
+                                                  title: title,
+                                                  description: description,
+                                                  entryColor: entryColor,
+                                                  icon: Resources.Load<Sprite>(RefIcon));
         }
 
         /// <summary>
@@ -215,7 +213,7 @@ namespace SEE.UI.HelpSystem
             helpSystem.EntryShown = true;
             helpSystem.ShowEntry();
 
-            Headline.GetComponent<TextMeshProUGUI>().text = entryTitle != null ? entryTitle : "Placeholder";
+            Headline.GetComponent<TextMeshProUGUI>().text = entryTitle ?? "Placeholder";
 
             HelpSystemEntry entry = GetHelpMenuRootEntry();
             VideoPlayer videoPlayer = entry.GetVideoPlayer();

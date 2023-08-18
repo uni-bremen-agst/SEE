@@ -42,7 +42,7 @@ namespace SEE.UI.ConfigMenu
         private TextMeshProUGUI label;
         private SwitchManager switchManager;
 
-        private readonly Queue<bool> valueUpdates = new Queue<bool>();
+        private readonly Queue<bool> valueUpdates = new();
 
         /// <summary>
         /// Requests an external value update.

@@ -34,7 +34,7 @@ namespace SEE.UI.ConfigMenu
         /// <summary>
         /// A list of all page GameObject that can be accessed.
         /// </summary>
-        public List<GameObject> Pages = new List<GameObject>();
+        public List<GameObject> Pages = new();
 
         /// <summary>
         /// The index of the initially active page.

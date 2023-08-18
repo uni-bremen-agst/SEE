@@ -162,7 +162,7 @@ namespace SEE.UI.Window
         /// in them.</param>
         /// <returns>The newly re-created <see cref="WindowSpace"/>.</returns>
         public static WindowSpace FromValueObject(WindowSpaceValues valueObject, GameObject attachTo,
-                                                bool attachWindows = false)
+                                                  bool attachWindows = false)
         {
             if (attachTo == null)
             {

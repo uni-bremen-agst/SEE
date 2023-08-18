@@ -8,7 +8,7 @@ namespace SEE.UI.Menu
     /// <summary>
     /// A selection menu containing <see cref="MenuEntry"/> entries.
     /// </summary>
-    public class SelectionMenu : SelectionMenu<MenuEntry> {}
+    public class SelectionMenu : SelectionMenu<MenuEntry> { }
 
     /// <summary>
     /// A menu in which the user can choose one active selection out of a menu.
@@ -56,7 +56,13 @@ namespace SEE.UI.Menu
             OnEntrySelected += entry => ActiveEntry = entry;
             OnEntrySelected += ActivateButton;
             OnEntryUnselected += DeactivateButton;
-            OnEntryRemoved += entry => { if (entry == ActiveEntry) ActiveEntry = null; };
+            OnEntryRemoved += entry =>
+            {
+                if (entry == ActiveEntry)
+                {
+                    ActiveEntry = null;
+                }
+            };
         }
 
         /// <summary>

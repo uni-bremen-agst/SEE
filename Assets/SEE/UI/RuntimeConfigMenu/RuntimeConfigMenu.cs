@@ -18,6 +18,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// Contains the menus for each table/city.
         /// </summary>
         private static RuntimeTabMenu[] cityMenus;
+
         /// <summary>
         /// The index of the currently selected table.
         /// </summary>
@@ -76,9 +77,8 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <returns>table list</returns>
         public static AbstractSEECity[] GetCities()
         {
-            return GameObject.FindGameObjectsWithTag(Tags.CodeCity).
-                Select(go => go.GetComponent<AbstractSEECity>())
-                .OrderBy(go => go.name).ToArray();
+            return GameObject.FindGameObjectsWithTag(Tags.CodeCity).Select(go => go.GetComponent<AbstractSEECity>())
+                             .OrderBy(go => go.name).ToArray();
         }
 
         /// <summary>

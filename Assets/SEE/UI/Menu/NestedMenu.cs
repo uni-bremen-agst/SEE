@@ -113,7 +113,7 @@ namespace SEE.UI.Menu
                 RemoveEntry(Entries[0]); // Remove all entries
             }
             Title = nestedEntry.Title;
-            //TODO: Instead of abusing the description for this, use a proper individual text object
+            // TODO: Instead of abusing the description for this, use a proper individual text object
             // (Maybe displaying it above the title in a different color or something would work,
             // as the title is technically the last element in the breadcrumb)
             string breadcrumb = GetBreadcrumb();
@@ -200,7 +200,7 @@ namespace SEE.UI.Menu
                 MenuManager.onConfirm.AddListener(ResetToBase);
             }
 
-            // If the menu is enabled, keybord shortcuts must be disabled and vice versa.
+            // If the menu is enabled, keyboard shortcuts must be disabled and vice versa.
             OnShowMenuChanged += () => SEEInput.KeyboardShortcutsEnabled = !ShowMenu;
         }
 
@@ -256,15 +256,13 @@ namespace SEE.UI.Menu
             }
 
             AllEntries ??= GetAllEntries().ToDictionary(x => x.Title, x => x);
-            IEnumerable<T> results =
-                Process.ExtractTop(SearchMenu.FilterString(text), AllEntries.Keys, cutoff: 10)
-                       .OrderByDescending(x => x.Score)
-                       .Select(x => AllEntries[x.Value])
-                       .ToList();
+            IEnumerable<T> results = Process.ExtractTop(SearchMenu.FilterString(text), AllEntries.Keys, cutoff: 10)
+                                            .OrderByDescending(x => x.Score)
+                                            .Select(x => AllEntries[x.Value])
+                                            .ToList();
 
-            NestedMenuEntry<T> resultEntry
-                = new (results, "Results", $"Found {results.Count()} help pages.",
-                       default, default, Resources.Load<Sprite>("Materials/Notification/info"));
+            NestedMenuEntry<T> resultEntry = new(results, "Results", $"Found {results.Count()} help pages.",
+                                                 default, default, Resources.Load<Sprite>("Materials/Notification/info"));
             AscendLevel(resultEntry);
         }
 

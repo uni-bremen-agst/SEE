@@ -47,7 +47,7 @@ namespace SEE.UI.ConfigMenu
         /// <summary>
         /// The color when the button is inactive.
         /// </summary>
-        public Color InactiveColor = new Color(0.203f, 0.213f, 0.224f, 1f);
+        public Color InactiveColor = new(0.203f, 0.213f, 0.224f, 1f);
 
         /// <summary>
         /// The color when the button is active (selected).
@@ -57,7 +57,7 @@ namespace SEE.UI.ConfigMenu
         /// <summary>
         /// The color when the button gets hovered.
         /// </summary>
-        public Color HoverColor = new Color(0.45f, 0.55f, 0.72f, 1f);
+        public Color HoverColor = new(0.45f, 0.55f, 0.72f, 1f);
         private void Start()
         {
             group = GetComponentInParent<TabGroup>();

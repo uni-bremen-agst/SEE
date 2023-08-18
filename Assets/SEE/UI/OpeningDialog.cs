@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
-using SEE.UI.Menu;
-using SEE.Utils;
-using SEE.GO;
-using UnityEngine;
-using SEE.UI.PropertyDialog;
-using System;
-using SEE.UI.Notification;
+﻿using System;
+using System.Collections.Generic;
 using SEE.Controls;
+using SEE.GO;
+using SEE.UI.Menu;
+using SEE.UI.Notification;
+using SEE.UI.PropertyDialog;
+using SEE.Utils;
 using Sirenix.Utilities;
+using UnityEngine;
+using Network = SEE.Net.Network;
 
 namespace SEE.UI
 {
@@ -51,41 +52,41 @@ namespace SEE.UI
             Color color = Color.blue;
 
             return new List<MenuEntry>
-                    {
-                      new(selectAction: this.StartHost,
-                          unselectAction: null,
-                          title: "Host",
-                          description: "Starts a server and local client process.",
-                          entryColor: NextColor(),
-                          icon: Resources.Load<Sprite>("Icons/Host")),
-                      new(selectAction: this.StartClient,
-                          unselectAction: null,
-                          title: "Client",
-                          description: "Starts a local client connection to a server.",
-                          entryColor: NextColor(),
-                          icon: Resources.Load<Sprite>("Icons/Client")),
+            {
+                new(selectAction: StartHost,
+                    unselectAction: null,
+                    title: "Host",
+                    description: "Starts a server and local client process.",
+                    entryColor: NextColor(),
+                    icon: Resources.Load<Sprite>("Icons/Host")),
+                new(selectAction: StartClient,
+                    unselectAction: null,
+                    title: "Client",
+                    description: "Starts a local client connection to a server.",
+                    entryColor: NextColor(),
+                    icon: Resources.Load<Sprite>("Icons/Client")),
 #if ENABLE_VR
-                      new(selectAction: this.ToggleEnvironment,
-                          unselectAction: null,
-                          title: "Toggle Desktop/VR",
-                          description: "Toggles between desktop and VR hardware.",
-                          entryColor: NextColor(),
-                          icon: Resources.Load<Sprite>("Icons/Client")),
+                new(selectAction: ToggleEnvironment,
+                    unselectAction: null,
+                    title: "Toggle Desktop/VR",
+                    description: "Toggles between desktop and VR hardware.",
+                    entryColor: NextColor(),
+                    icon: Resources.Load<Sprite>("Icons/Client")),
 #endif
-                      // FIXME: Running only a server is currently not working.
-                      //new (               entryAction: StartServer,
-                      //                    exitAction: null,
-                      //                    title: "Server",
-                      //                    description: "Starts a dedicated server without local client.",
-                      //                    entryColor: NextColor(),
-                      //                    icon: Resources.Load<Sprite>("Icons/Server")),
-                      new(selectAction: this.Settings,
-                          unselectAction: null,
-                          title: "Settings",
-                          description: "Allows to set additional network settings.",
-                          entryColor: Color.gray,
-                          icon: Resources.Load<Sprite>("Icons/Settings")),
-                    };
+                // FIXME: Running only a server is currently not working.
+                //new (               entryAction: StartServer,
+                //                    exitAction: null,
+                //                    title: "Server",
+                //                    description: "Starts a dedicated server without local client.",
+                //                    entryColor: NextColor(),
+                //                    icon: Resources.Load<Sprite>("Icons/Server")),
+                new(selectAction: Settings,
+                    unselectAction: null,
+                    title: "Settings",
+                    description: "Allows to set additional network settings.",
+                    entryColor: Color.gray,
+                    icon: Resources.Load<Sprite>("Icons/Settings")),
+            };
 
             Color NextColor()
             {
@@ -98,7 +99,7 @@ namespace SEE.UI
         /// <summary>
         /// The <see cref="Net.Network"/> component configured by this dialog.
         /// </summary>
-        private Net.Network network;
+        private Network network;
 
         /// <summary>
         /// Starts a host (= server + local client) on this machine.
@@ -118,7 +119,8 @@ namespace SEE.UI
             catch (Exception exception)
             {
                 menu.ShowMenu = true;
-                ShowNotification.Error("Host cannot be started", exception.Message);
+                ShowNotification.Error("Host cannot be started", exception.Message, log: false);
+                throw;
             }
         }
 
@@ -140,7 +142,8 @@ namespace SEE.UI
             catch (Exception exception)
             {
                 menu.ShowMenu = true;
-                ShowNotification.Error("Server connection failed", exception.Message);
+                ShowNotification.Error("Server connection failed", exception.Message, log: false);
+                throw;
             }
         }
 

@@ -22,6 +22,7 @@ namespace SEE.UI.Menu
         /// Whether the menu can be closed by not making any selection.
         /// </summary>
         private bool allowNoSelection = true;
+
         /// <summary>
         /// Whether the menu can be closed by not making any selection.
         /// </summary>
@@ -39,6 +40,7 @@ namespace SEE.UI.Menu
         /// Whether to hide the menu after selection.
         /// </summary>
         private bool hideAfterSelection = true;
+
         /// <summary>
         /// Whether to hide the menu after selection.
         /// </summary>
@@ -56,6 +58,7 @@ namespace SEE.UI.Menu
         /// The menu entries.
         /// </summary>
         private readonly List<T> entries = new();
+
         /// <summary>
         /// A read-only wrapper around the menu entries.
         /// </summary>

@@ -16,6 +16,7 @@ namespace SEE.UI.Menu
         /// Requires a ModalWindowManager component.
         /// </summary>
         protected virtual string MenuPrefab => UI_PREFAB_FOLDER + "Menu";
+
         /// <summary>
         /// Sprite for the icon.
         /// </summary>
@@ -25,10 +26,12 @@ namespace SEE.UI.Menu
         /// The menu game object.
         /// </summary>
         protected GameObject Menu { get; private set; }
+
         /// <summary>
         /// The menu manager.
         /// </summary>
         protected ModalWindowManager MenuManager { get; private set; }
+
         /// <summary>
         /// The menu tooltip.
         /// </summary>

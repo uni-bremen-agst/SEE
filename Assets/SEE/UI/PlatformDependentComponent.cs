@@ -1,5 +1,4 @@
-﻿using Sirenix.Serialization.Utilities;
-using SEE.Controls;
+﻿using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -17,7 +16,7 @@ namespace SEE.UI
     /// This approach is especially well suited for UI components, as their presentation is almost always different
     /// based on the platform.
     /// </summary>
-    public abstract class PlatformDependentComponent: MonoBehaviour
+    public abstract class PlatformDependentComponent : MonoBehaviour
     {
         /// <summary>
         /// The folder where to find UI Prefabs.
@@ -70,16 +69,20 @@ namespace SEE.UI
             Platform = SceneSettings.InputType;
             switch (Platform)
             {
-                case PlayerInputType.DesktopPlayer: StartDesktop();
+                case PlayerInputType.DesktopPlayer:
+                    StartDesktop();
                     break;
-                case PlayerInputType.TouchGamepadPlayer: StartTouchGamepad();
+                case PlayerInputType.TouchGamepadPlayer:
+                    StartTouchGamepad();
                     break;
-                case PlayerInputType.VRPlayer: StartVR();
+                case PlayerInputType.VRPlayer:
+                    StartVR();
                     //TODO: Apply CurvedUI to canvas
                     break;
                 case PlayerInputType.None: // no UI has to be rendered
                     break;
-                default: PlatformUnsupported();
+                default:
+                    PlatformUnsupported();
                     break;
             }
 
@@ -96,15 +99,19 @@ namespace SEE.UI
         {
             switch (Platform)
             {
-                case PlayerInputType.DesktopPlayer: UpdateDesktop();
+                case PlayerInputType.DesktopPlayer:
+                    UpdateDesktop();
                     break;
-                case PlayerInputType.TouchGamepadPlayer: UpdateTouchGamepad();
+                case PlayerInputType.TouchGamepadPlayer:
+                    UpdateTouchGamepad();
                     break;
-                case PlayerInputType.VRPlayer: UpdateVR();
+                case PlayerInputType.VRPlayer:
+                    UpdateVR();
                     break;
                 case PlayerInputType.None: // no UI has to be rendered
                     break;
-                default: PlatformUnsupported();
+                default:
+                    PlatformUnsupported();
                     break;
             }
         }

@@ -66,7 +66,6 @@ namespace SEE.UI.StateIndicator
         /// <param name="color">The background color of the indicator</param>
         public void ChangeState(string text, Color color)
         {
-
             if (HasStarted)
             {
                 ModePanelImage.color = color.WithAlpha(0.5f);
@@ -78,7 +77,6 @@ namespace SEE.UI.StateIndicator
                 StartColor = color.WithAlpha(0.5f);
                 StartText = text;
             }
-
         }
 
         protected GameObject StartDesktopInit()

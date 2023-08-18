@@ -18,17 +18,17 @@ namespace SEE.UI.Notification
         /// <summary>
         /// Background color for error messages.
         /// </summary>
-        private static readonly Color ErrorColor = new Color(0x55/255f, 0x2D/255f, 0x2E/255f);
+        private static readonly Color ErrorColor = new(0x55 / 255f, 0x2D / 255f, 0x2E / 255f);
 
         /// <summary>
         /// Background color for warning messages.
         /// </summary>
-        private static readonly Color WarningColor = new Color(0x55/255f, 0x4E/255f, 0x2D/255f);
+        private static readonly Color WarningColor = new(0x55 / 255f, 0x4E / 255f, 0x2D / 255f);
 
         /// <summary>
         /// Background color for info messages.
         /// </summary>
-        private static readonly Color InfoColor = new Color(0x2D/255f, 0x40/255f, 0x55/255f);
+        private static readonly Color InfoColor = new(0x2D / 255f, 0x40 / 255f, 0x55 / 255f);
 
         /// <summary>
         /// Sprite for the error icon.
@@ -48,7 +48,7 @@ namespace SEE.UI.Notification
         /// <summary>
         /// Lazily initialized notification manager instance. Behaves like a singleton.
         /// </summary>
-        private static readonly Lazy<SEENotificationManager> Manager = new Lazy<SEENotificationManager>(CreateManager);
+        private static readonly Lazy<SEENotificationManager> Manager = new(CreateManager);
 
         /// <summary>
         /// Creates a new <see cref="SEENotificationManager"/> along with a corresponding new <see cref="GameObject"/>.
@@ -57,7 +57,7 @@ namespace SEE.UI.Notification
         private static SEENotificationManager CreateManager()
         {
             // All other notifications will be children to this manager object.
-            GameObject managerGameObject = new GameObject
+            GameObject managerGameObject = new()
             {
                 name = "Notifications"
             };
@@ -72,7 +72,7 @@ namespace SEE.UI.Notification
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
         /// <param name="log">Whether to log the given notification in Unity's log as well</param>
         /// <returns>The created notification. Will be <c>null</c> as soon it's done playing.</returns>
-        public static Notification Info(string title, string description, float duration = DEFAULT_DURATION, 
+        public static Notification Info(string title, string description, float duration = DEFAULT_DURATION,
                                         bool log = true)
         {
             if (log)
@@ -90,7 +90,7 @@ namespace SEE.UI.Notification
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
         /// <param name="log">Whether to log the given notification in Unity's log as well</param>
         /// <returns>The created notification. Will be <c>null</c> as soon it's done playing.</returns>
-        public static Notification Warn(string title, string description, float duration = DEFAULT_DURATION, 
+        public static Notification Warn(string title, string description, float duration = DEFAULT_DURATION,
                                         bool log = true)
         {
             if (log)
@@ -108,7 +108,7 @@ namespace SEE.UI.Notification
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
         /// <param name="log">Whether to log the given notification in Unity's log as well</param>
         /// <returns>The created notification. Will be <c>null</c> as soon it's done playing.</returns>
-        public static Notification Error(string title, string description, float duration = DEFAULT_DURATION, 
+        public static Notification Error(string title, string description, float duration = DEFAULT_DURATION,
                                          bool log = true)
         {
             if (log)
@@ -127,7 +127,7 @@ namespace SEE.UI.Notification
         /// <param name="color">The color of the notification.</param>
         /// <param name="duration">The duration of the notification.</param>
         /// <returns>The created notification. Will be <c>null</c> as soon it's done playing.</returns>
-        public static Notification Show(string title, string description, Sprite icon, Color color, 
+        public static Notification Show(string title, string description, Sprite icon, Color color,
                                         float duration = DEFAULT_DURATION)
         {
             return Manager.Value.Show(title, description, icon, color, duration);

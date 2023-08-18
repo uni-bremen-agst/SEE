@@ -18,6 +18,7 @@ namespace SEE.UI.Menu
         /// The title of this menu.
         /// </summary>
         private string title;
+
         /// <summary>
         /// The title of this menu.
         /// </summary>
@@ -35,6 +36,7 @@ namespace SEE.UI.Menu
         /// The description of this menu.
         /// </summary>
         private string description;
+
         /// <summary>
         /// The description of this menu.
         /// </summary>
@@ -52,6 +54,7 @@ namespace SEE.UI.Menu
         /// The icon of this menu.
         /// </summary>
         private Sprite icon;
+
         /// <summary>
         /// The icon of this menu.
         /// </summary>
@@ -74,6 +77,7 @@ namespace SEE.UI.Menu
         /// The keyword to close the menu.
         /// </summary>
         private string closeMenuKeyword = "close menu";
+
         /// <summary>
         /// The keyword to close the menu.
         /// </summary>
@@ -108,6 +112,7 @@ namespace SEE.UI.Menu
         /// Whether the menu is shown.
         /// </summary>
         private bool showMenu;
+
         /// <summary>
         /// Whether the menu is shown.
         /// </summary>
@@ -129,6 +134,7 @@ namespace SEE.UI.Menu
         /// Uses <see cref="Canvas"/> by default.
         /// </summary>
         private Transform parent;
+
         /// <summary>
         /// The parent of the menu.
         /// Uses <see cref="Canvas"/> by default.
@@ -167,7 +173,10 @@ namespace SEE.UI.Menu
                 KeywordListener.Dispose();
                 KeywordListener = null;
             }
-            if (!ShowMenu) return;
+            if (!ShowMenu)
+            {
+                return;
+            }
             // starts listening
             KeywordListener = new KeywordInput(GetKeywords().ToArray());
             KeywordListener.Register(HandleKeyword);

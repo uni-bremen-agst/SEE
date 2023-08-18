@@ -56,7 +56,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     smallEditor = PrefabInstantiator.InstantiatePrefab(SMALL_WINDOW_PREFAB, Canvas.transform, false);
                     smallEditor.transform.Find("CloseButton").GetComponent<Button>().onClick
-                        .AddListener(() => ShowMenu = false);
+                               .AddListener(() => ShowMenu = false);
                     CreateWidget(smallEditor.transform.Find("Content").gameObject);
                 }
                 else

@@ -42,7 +42,7 @@ namespace SEE.UI.ConfigMenu
         public delegate void OnDictationFinishedEventHandler(string recordedText);
         public event OnDictationFinishedEventHandler OnDictationFinished;
 
-        private static readonly Color RecordingColor = new Color(0.94f, 0.27f, 0.27f);
+        private static readonly Color RecordingColor = new(0.94f, 0.27f, 0.27f);
 
         /// <summary>
         /// A dictation input shared by all instances of this class.

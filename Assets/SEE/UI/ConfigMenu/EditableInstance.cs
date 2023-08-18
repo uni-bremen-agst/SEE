@@ -59,7 +59,7 @@ namespace SEE.UI.ConfigMenu
         /// <returns>all current instances of <see cref="SEECity"/> in the scene</returns>
         public static List<EditableInstance> AllEditableCodeCities()
         {
-            List<EditableInstance> result = new List<EditableInstance>();
+            List<EditableInstance> result = new();
 
             foreach (GameObject city in GameObject.FindGameObjectsWithTag(Tags.CodeCity))
             {

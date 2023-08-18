@@ -210,8 +210,9 @@ namespace SEE.UI.HelpSystem
         /// </summary>
         private void UpdateProgress()
         {
-            int currentProgress = currentHelpEntry.Index - 1 != 0 ? currentHelpEntry.Index - 1
-                                                                : HelpSystemBuilder.currentEntries.Count;
+            int currentProgress = currentHelpEntry.Index - 1 != 0
+                ? currentHelpEntry.Index - 1
+                : HelpSystemBuilder.currentEntries.Count;
             progress.text = currentProgress + "/" + HelpSystemBuilder.currentEntries.Count;
         }
 
@@ -271,11 +272,11 @@ namespace SEE.UI.HelpSystem
             pauseButton.clickEvent.AddListener(TogglePlaying);
 
             helpSystemEntry.transform.Find("Content/Lower Video/Buttons/Forward")
-                          .gameObject.TryGetComponentOrLog(out forwardButton);
+                           .gameObject.TryGetComponentOrLog(out forwardButton);
             forwardButton.clickEvent.AddListener(Forward);
 
             helpSystemEntry.transform.Find("Content/Lower Video/Buttons/Back")
-                        .gameObject.TryGetComponentOrLog(out backwardButton);
+                           .gameObject.TryGetComponentOrLog(out backwardButton);
             backwardButton.clickEvent.AddListener(Backward);
 
             helpSystemEntry.transform.Find("Content/Lower Video/Progress").gameObject.TryGetComponentOrLog(out progress);
@@ -388,7 +389,7 @@ namespace SEE.UI.HelpSystem
         public void TogglePlaying()
         {
             helpSystemEntry.transform.Find("Content/Lower Video/Buttons/Pause")
-                        .gameObject.TryGetComponentOrLog(out pauseButton);
+                           .gameObject.TryGetComponentOrLog(out pauseButton);
             if (!IsPlaying)
             {
                 // FIXME: Should this resource really be loaded each time playing is toggled?

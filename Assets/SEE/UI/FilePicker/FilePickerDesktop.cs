@@ -85,7 +85,10 @@ namespace SEE.UI.FilePicker
         /// </summary>
         private void OnDestroy()
         {
-            if (Menu != null) Destroyer.Destroy(Menu);
+            if (Menu != null)
+            {
+                Destroyer.Destroy(Menu);
+            }
         }
 
         /// <summary>
@@ -103,7 +106,7 @@ namespace SEE.UI.FilePicker
             PickerButton = Menu.transform.Find(PickerButtonPath).GetComponent<ButtonManagerBasic>();
 
             TMP_InputField inputField = Menu.transform.Find("DropdownCombo/SelectableInput/Input")
-                .GetComponent<TMP_InputField>();
+                                            .GetComponent<TMP_InputField>();
 
             LabelText.text = Label;
 
@@ -112,10 +115,12 @@ namespace SEE.UI.FilePicker
             Dropdown.listParent = Canvas.transform;
             Dropdown.dropdownItems.Clear();
             foreach (DataPath.RootKind kind in Enum.GetValues(typeof(DataPath.RootKind)))
+            {
                 Dropdown.CreateNewItemFast(kind.ToString(), null);
+            }
             Dropdown.dropdownEvent.AddListener(index =>
             {
-                var selectedItem = Dropdown.dropdownItems[index].itemName;
+                string selectedItem = Dropdown.dropdownItems[index].itemName;
                 Enum.TryParse(selectedItem, out DataPathInstance.Root);
                 UpdateInput();
                 OnChangedDropdown?.Invoke();
@@ -125,12 +130,11 @@ namespace SEE.UI.FilePicker
             PickerButton.clickEvent.AddListener(() =>
             {
                 FileBrowser.ShowLoadDialog(HandleFileBrowserSuccess,
-                    () => { },
-                    allowMultiSelection: false,
-                    pickMode: FileBrowser.PickMode.Files,
-                    title: "Pick a file/folder",
-                    initialPath: DataPathInstance.RootPath
-                );
+                                           () => { },
+                                           allowMultiSelection: false,
+                                           pickMode: FileBrowser.PickMode.Files,
+                                           title: "Pick a file/folder",
+                                           initialPath: DataPathInstance.RootPath);
 
                 // Find the newly opened file browser and optimize it for VR.
                 GameObject fileBrowser = GameObject.FindWithTag("FileBrowser");
@@ -150,14 +154,18 @@ namespace SEE.UI.FilePicker
                 }
             });
 
-            CustomInput.onSelect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = false);
-            CustomInput.onDeselect.AddListener(str => SEEInput.KeyboardShortcutsEnabled = true);
+            CustomInput.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
+            CustomInput.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
             inputField.onEndEdit.AddListener(path =>
             {
                 if (DataPathInstance.Root == DataPath.RootKind.Absolute)
+                {
                     DataPathInstance.AbsolutePath = path;
+                }
                 else
+                {
                     DataPathInstance.RelativePath = path;
+                }
                 UpdateInput();
                 OnChangedPath?.Invoke();
             });
@@ -208,8 +216,7 @@ namespace SEE.UI.FilePicker
         private void UpdateDropdown()
         {
             Dropdown.selectedItemIndex =
-                Dropdown.dropdownItems.FindIndex(
-                    item => item.itemName == DataPathInstance.Root.ToString());
+                Dropdown.dropdownItems.FindIndex(item => item.itemName == DataPathInstance.Root.ToString());
             Dropdown.SetupDropdown();
         }
 
@@ -226,15 +233,19 @@ namespace SEE.UI.FilePicker
         public void SyncPath(string newValue, bool isAbsolute)
         {
             if (isAbsolute)
+            {
                 DataPathInstance.AbsolutePath = newValue;
+            }
             else
+            {
                 DataPathInstance.RelativePath = newValue;
+            }
             UpdateInput();
         }
 
         public void SyncDropdown(int newValue)
         {
-            var selectedItem = Dropdown.dropdownItems[newValue].itemName;
+            string selectedItem = Dropdown.dropdownItems[newValue].itemName;
             Enum.TryParse(selectedItem, out DataPathInstance.Root);
             UpdateDropdown();
             UpdateInput();
@@ -242,8 +253,14 @@ namespace SEE.UI.FilePicker
 
         public void CloseDropdown()
         {
-            if (!HasStarted) return;
-            if (Dropdown.isOn) Dropdown.Animate();
+            if (!HasStarted)
+            {
+                return;
+            }
+            if (Dropdown.isOn)
+            {
+                Dropdown.Animate();
+            }
         }
 
         public Action OnChangedDropdown;

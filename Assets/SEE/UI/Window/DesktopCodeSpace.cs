@@ -43,7 +43,7 @@ namespace SEE.UI.Window
         /// of that list as well, this component will be destroyed and a <see cref="InvalidOperationException"/>
         /// may be thrown.
         /// </p>
-        /// 
+        ///
         /// <p>
         /// If any of the following are <c>null</c>, calling the method will have no effect:
         /// <ul>
@@ -73,9 +73,9 @@ namespace SEE.UI.Window
                         throw new InvalidOperationException();
                     }
                     ActiveWindow = currentActiveWindow;
-                    
-                    // Note: This is a tail-recursion, which would be great if C# had tail call optimization, 
-                    // but it doesn't. Your IDE may recommend to then use an iterative construct instead of the 
+
+                    // Note: This is a tail-recursion, which would be great if C# had tail call optimization,
+                    // but it doesn't. Your IDE may recommend to then use an iterative construct instead of the
                     // recursive one to be more efficient, but this will just "improve" an O(1) space complexity to
                     // O(1) space complexity, because the recursion will at most happen once per call.
                     // Additionally, the readability of the iterative version is (in my opinion) much worse, this is
@@ -84,7 +84,7 @@ namespace SEE.UI.Window
                     UpdateActiveTab();
                     return;
                 }
-                Panel.ActiveTab = Panel.GetTabIndex((RectTransform) ActiveWindow.Window.transform);
+                Panel.ActiveTab = Panel.GetTabIndex((RectTransform)ActiveWindow.Window.transform);
             }
         }
 
@@ -94,17 +94,17 @@ namespace SEE.UI.Window
             {
                 // We need to destroy the panel now
                 Destroyer.Destroy(Panel);
-            } 
+            }
             else if (!Panel && windows.Any(x => x.Window))
             {
                 InitializePanel();
-            } 
+            }
             else if (!Panel)
             {
                 // If no window is initialized yet, there's nothing we can do
                 return;
             }
-            
+
             if (currentActiveWindow != ActiveWindow)
             {
                 // Nominal active window has been changed, so we change the actual active window as well.
@@ -114,30 +114,30 @@ namespace SEE.UI.Window
                 // so currentActiveWindow is guaranteed to be part of windows.
                 currentActiveWindow = ActiveWindow;
             }
-            
+
             // Now we need to detect changes in the open windows.
             // Unfortunately this adds an O(m+n) call to each frame, but considering how small m and n are likely to be,
             // this shouldn't be a problem.
-            
+
             // First, close old windows that are not open anymore
             foreach (BaseWindow window in currentWindows.Except(windows).ToList())
             {
-                Panel.RemoveTab(Panel.GetTab((RectTransform) window.Window.transform));
+                Panel.RemoveTab(Panel.GetTab((RectTransform)window.Window.transform));
                 currentWindows.Remove(window);
                 Destroyer.Destroy(window);
             }
-            
-            // Then, add new tabs 
+
+            // Then, add new tabs
             // We need to skip windows which weren't initialized yet
             foreach (BaseWindow window in windows.Except(currentWindows).Where(x => x.Window != null).ToList())
             {
-                RectTransform rectTransform = (RectTransform) window.Window.transform;
+                RectTransform rectTransform = (RectTransform)window.Window.transform;
                 // Add the new window as a tab to our panel
                 PanelTab tab = Panel.AddTab(rectTransform);
                 tab.Label = window.Title;
                 tab.Icon = null;
                 currentWindows.Add(window);
-                
+
                 // Allow closing the tab
                 if (CanClose)
                 {
@@ -157,7 +157,7 @@ namespace SEE.UI.Window
                     CloseWindow(windows.First(x => x.Window.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID()));
                     if (panelTab.Panel.NumberOfTabs <= 1)
                     {
-                        // All tabs were closed, so we send out an event 
+                        // All tabs were closed, so we send out an event
                         // (The PanelNotificationCenter won't trigger in this case)
                         OnActiveWindowChanged.Invoke();
                     }
@@ -182,11 +182,11 @@ namespace SEE.UI.Window
                 windows.Clear();
                 return;
             }
-            Panel = PanelUtils.CreatePanelFor((RectTransform) windows[0].Window.transform, PanelsCanvas);
+            Panel = PanelUtils.CreatePanelFor((RectTransform)windows[0].Window.transform, PanelsCanvas);
             // When the active tab *on this panel* is changed, we invoke the corresponding event
             PanelNotificationCenter.OnActiveTabChanged += ChangeActiveTab;
             PanelNotificationCenter.OnPanelClosed += ClosePanel;
-            
+
             void ChangeActiveTab(PanelTab tab)
             {
                 if (Panel == tab.Panel)
@@ -203,7 +203,7 @@ namespace SEE.UI.Window
                     // Close each tab
                     foreach (BaseWindow window in windows)
                     {
-                        Panel.RemoveTab(Panel.GetTab((RectTransform) window.Window.transform));
+                        Panel.RemoveTab(Panel.GetTab((RectTransform)window.Window.transform));
                         Destroyer.Destroy(window);
                     }
 
@@ -212,7 +212,6 @@ namespace SEE.UI.Window
                     Destroyer.Destroy(Panel);
                 }
             }
-
         }
     }
 }

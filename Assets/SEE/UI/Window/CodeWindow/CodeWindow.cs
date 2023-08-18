@@ -227,8 +227,9 @@ namespace SEE.UI.Window.CodeWindow
         public override WindowValues ToValueObject()
         {
             string attachedTo = gameObject.name;
-            return FilePath == null ? new CodeWindowValues(Title, VisibleLine, attachedTo, Text)
-                                    : new CodeWindowValues(Title, VisibleLine, attachedTo, path: FilePath);
+            return FilePath == null
+                ? new CodeWindowValues(Title, VisibleLine, attachedTo, Text)
+                : new CodeWindowValues(Title, VisibleLine, attachedTo, path: FilePath);
         }
 
         /// <summary>
@@ -236,7 +237,7 @@ namespace SEE.UI.Window.CodeWindow
         /// Used for serialization when sending a <see cref="CodeWindow"/> over the network.
         /// </summary>
         [Serializable]
-        public class CodeWindowValues: WindowValues
+        public class CodeWindowValues : WindowValues
         {
             /// <summary>
             /// Text of the code window. May be <c>null</c>, in which case <see cref="Path"/> is not <c>null</c>.

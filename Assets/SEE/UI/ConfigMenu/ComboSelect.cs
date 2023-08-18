@@ -105,8 +105,8 @@ namespace SEE.UI.ConfigMenu
         /// </summary>
         private Dictaphone dictaphone;
 
-        private readonly Queue<List<string>> valuesUpdates = new Queue<List<string>>();
-        private readonly Queue<string> valueUpdates = new Queue<string>();
+        private readonly Queue<List<string>> valuesUpdates = new();
+        private readonly Queue<string> valueUpdates = new();
 
         /// <summary>
         /// The values (options) of this input.

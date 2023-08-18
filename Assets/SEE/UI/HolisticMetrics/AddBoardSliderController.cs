@@ -44,7 +44,6 @@ namespace SEE.UI.HolisticMetrics
         /// </summary>
         internal void Setup(Vector3 position)
         {
-
             windowDragger.dragArea = transform.parent.GetComponent<RectTransform>();
 
             slider.mainSlider.onValueChanged.AddListener(Rotate);

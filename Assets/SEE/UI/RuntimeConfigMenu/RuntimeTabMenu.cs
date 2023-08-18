@@ -218,21 +218,21 @@ namespace SEE.UI.RuntimeConfigMenu
         private void SetupMenu()
         {
             // creates the widgets for fields
-            IOrderedEnumerable<MemberInfo> members = city.GetType().GetMembers().
-                Where(IsCityAttribute).OrderBy(HasTabAttribute).ThenBy(GetTabName).ThenBy(SortIsNotNested);
+            IOrderedEnumerable<MemberInfo> members = city.GetType().GetMembers().Where(IsCityAttribute).OrderBy(HasTabAttribute).ThenBy(GetTabName).ThenBy(SortIsNotNested);
             members.ForEach(memberInfo => CreateSetting(memberInfo, null, city));
             SelectEntry(Entries.First());
 
             // creates the buttons for methods
             IOrderedEnumerable<MethodInfo> methods = city.GetType().GetMethods().Where(IsCityAttribute)
-                .OrderBy(GetButtonGroup).ThenBy(GetOrderOfMemberInfo).ThenBy(GetButtonName);
+                                                         .OrderBy(GetButtonGroup).ThenBy(GetOrderOfMemberInfo).ThenBy(GetButtonName);
             methods.ForEach(CreateButton);
+            return;
 
             // methods used for ordering the buttons and settings
             string GetButtonName(MemberInfo memberInfo) => memberInfo.Name;
 
             string GetTabName(MemberInfo memberInfo) =>
-                 memberInfo.GetCustomAttributes().OfType<RuntimeTabAttribute>().FirstOrDefault()?.Name;
+                memberInfo.GetCustomAttributes().OfType<RuntimeTabAttribute>().FirstOrDefault()?.Name;
 
             bool IsCityAttribute(MemberInfo memberInfo) =>
                 memberInfo.DeclaringType == typeof(AbstractSEECity) ||
@@ -243,7 +243,7 @@ namespace SEE.UI.RuntimeConfigMenu
 
             float GetOrderOfMemberInfo(MemberInfo memberInfo) =>
                 (memberInfo.GetCustomAttributes().OfType<PropertyOrderAttribute>()
-                    .FirstOrDefault() ?? new PropertyOrderAttribute()).Order;
+                           .FirstOrDefault() ?? new PropertyOrderAttribute()).Order;
 
             string GetButtonGroup(MemberInfo memberInfo) =>
                 (memberInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault()
@@ -452,7 +452,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="setter">setter of the setting value</param>
         /// <param name="attributes">attributes</param>
         private void CreateSetting(Func<object> getter, string settingName, GameObject parent,
-            UnityAction<object> setter = null, IEnumerable<Attribute> attributes = null)
+                                   UnityAction<object> setter = null, IEnumerable<Attribute> attributes = null)
         {
             // stores the attributes in an array so it can be accessed multiple times
             Attribute[] attributeArray = attributes as Attribute[] ?? attributes?.ToArray() ?? Array.Empty<Attribute>();
@@ -478,95 +478,77 @@ namespace SEE.UI.RuntimeConfigMenu
             switch (value)
             {
                 case bool:
-                    CreateSwitch(
-                        settingName,
-                        changedValue => setter!(changedValue),
-                        () => (bool)getter(),
-                        parent
-                    );
+                    CreateSwitch(settingName,
+                                 changedValue => setter!(changedValue),
+                                 () => (bool)getter(),
+                                 parent);
                     break;
                 case int:
-                    CreateSlider(
-                        settingName,
-                        attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
-                        changedValue => setter!((int)changedValue),
-                        () => (int)getter(),
-                        true,
-                        parent
-                    );
+                    CreateSlider(settingName,
+                                 attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
+                                 changedValue => setter!((int)changedValue),
+                                 () => (int)getter(),
+                                 true,
+                                 parent);
                     break;
                 case uint:
-                    CreateSlider(
-                        settingName,
-                        attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
-                        changedValue => setter!((uint)changedValue),
-                        () => (uint)getter(),
-                        true,
-                        parent
-                    );
+                    CreateSlider(settingName,
+                                 attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
+                                 changedValue => setter!((uint)changedValue),
+                                 () => (uint)getter(),
+                                 true,
+                                 parent);
                     break;
                 case float:
-                    CreateSlider(
-                        settingName,
-                        attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
-                        changedValue => setter!(changedValue),
-                        () => (float)getter(),
-                        false,
-                        parent
-                    );
+                    CreateSlider(settingName,
+                                 attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
+                                 changedValue => setter!(changedValue),
+                                 () => (float)getter(),
+                                 false,
+                                 parent);
                     break;
                 case string:
-                    CreateStringField(
-                        settingName,
-                        changedValue => setter!(changedValue),
-                        () => (string)getter(),
-                        parent
-                    );
+                    CreateStringField(settingName,
+                                      changedValue => setter!(changedValue),
+                                      () => (string)getter(),
+                                      parent);
                     break;
                 case Color:
                     parent = CreateNestedSetting(settingName, parent);
-                    CreateColorPicker(
-                        settingName,
-                        parent,
-                        changedValue => setter!(changedValue),
-                        () => (Color)getter()
-                    );
+                    CreateColorPicker(settingName,
+                                      parent,
+                                      changedValue => setter!(changedValue),
+                                      () => (Color)getter());
                     break;
                 case DataPath dataPath:
                     parent = CreateNestedSetting(settingName, parent);
                     CreateFilePicker(settingName, dataPath, parent);
                     break;
                 case Enum:
-                    CreateDropDown(
-                        settingName,
-                        changedValue => setter!(Enum.ToObject(value.GetType(), changedValue)),
-                        value.GetType().GetEnumNames(),
-                        () => getter().ToString(),
-                        parent
-                    );
+                    CreateDropDown(settingName,
+                                   changedValue => setter!(Enum.ToObject(value.GetType(), changedValue)),
+                                   value.GetType().GetEnumNames(),
+                                   () => getter().ToString(),
+                                   parent);
                     break;
                 // from here on come nested settings
                 case NodeTypeVisualsMap:
                 case ColorMap:
                     FieldInfo mapInfo =
                         value.GetType().GetField("map", BindingFlags.Instance | BindingFlags.NonPublic)!;
-                    CreateSetting(
-                        () => mapInfo.GetValue(value),
-                        settingName,
-                        parent,
-                        null,
-                        attributeArray
-                    );
+                    CreateSetting(() => mapInfo.GetValue(value),
+                                  settingName,
+                                  parent,
+                                  null,
+                                  attributeArray);
                     break;
                 case AntennaAttributes:
                     FieldInfo antennaInfo = value.GetType().GetField("AntennaSections")!;
-                    CreateSetting(
-                        () => antennaInfo.GetValue(value),
-                        settingName,
-                        parent,
-                        null,
-                        attributeArray
-                    );
+                    CreateSetting(() => antennaInfo.GetValue(value),
+                                  settingName,
+                                  parent,
+                                  null,
+                                  attributeArray);
                     break;
 
                 // types that shouldn't be in the configuration menu
@@ -652,8 +634,8 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
         private void CreateSlider(string settingName, RangeAttribute range, UnityAction<float> setter,
-            Func<float> getter, bool useRoundValue, GameObject parent,
-            bool recursive = false, Func<string> getWidgetName = null)
+                                  Func<float> getter, bool useRoundValue, GameObject parent,
+                                  bool recursive = false, Func<string> getWidgetName = null)
         {
             // use range 0-2 if non provided
             range ??= new RangeAttribute(0, 2);
@@ -745,7 +727,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
         private void CreateSwitch(string settingName, UnityAction<bool> setter, Func<bool> getter, GameObject parent,
-            bool recursive = false, Func<string> getWidgetName = null)
+                                  bool recursive = false, Func<string> getWidgetName = null)
         {
             // init the widget
             GameObject switchGameObject =
@@ -843,7 +825,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
         private void CreateStringField(string settingName, UnityAction<string> setter, Func<string> getter,
-            GameObject parent, bool recursive = false, Func<string> getWidgetName = null)
+                                       GameObject parent, bool recursive = false, Func<string> getWidgetName = null)
         {
             // init the widget
             GameObject stringGameObject =
@@ -925,7 +907,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
         private void CreateDropDown(string settingName, UnityAction<int> setter, IEnumerable<string> values,
-            Func<string> getter, GameObject parent, bool recursive = false, Func<string> getWidgetName = null)
+                                    Func<string> getter, GameObject parent, bool recursive = false, Func<string> getWidgetName = null)
         {
             // convert the value names to an array
             string[] valueArray = values as string[] ?? values.ToArray();
@@ -1011,7 +993,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
         private void CreateColorPicker(string settingName, GameObject parent, UnityAction<Color> setter,
-            Func<Color> getter, bool recursive = false, Func<string> getWidgetName = null)
+                                       Func<Color> getter, bool recursive = false, Func<string> getWidgetName = null)
         {
             // init the widget
             GameObject colorPickerGameObject =
@@ -1032,7 +1014,7 @@ namespace SEE.UI.RuntimeConfigMenu
             if (!recursive)
             {
                 colorPickerGameObject.transform.parent.parent.GetComponent<RuntimeConfigMenuCollapse>()
-                    .OnClickCollapse();
+                                     .OnClickCollapse();
             }
 
             // getter of widget name (if not provided)
@@ -1145,12 +1127,12 @@ namespace SEE.UI.RuntimeConfigMenu
             string GetWidgetName() => filePicker.gameObject.FullName() + "/" + settingName;
 
             // add listeners
-            OnShowMenuChanged += () => {
+            OnShowMenuChanged += () =>
+            {
                 if (!ShowMenu)
                 {
                     filePicker.CloseDropdown();
                 }
-
             };
             filePicker.OnMenuInitialized +=
                 () => AddLayoutElement(parent.transform.Find(settingName).gameObject);
@@ -1315,7 +1297,6 @@ namespace SEE.UI.RuntimeConfigMenu
                     );
                 }
             }
-
         }
 
         /// <summary>
