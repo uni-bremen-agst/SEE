@@ -13,6 +13,9 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
+    /// <summary>
+    /// An action for displaying the source code documentation of a node with clickable links.
+    /// </summary>
     public class LiveDocumentationAction : AbstractPlayerAction
     {
         /// <summary>
