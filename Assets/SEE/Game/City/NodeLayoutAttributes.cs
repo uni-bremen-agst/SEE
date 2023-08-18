@@ -55,7 +55,6 @@ namespace SEE.Game.City
         }
 
         private const string IncrementalTreeMapLabel = "IncrementalTreeMap";
-        
         private const string NodeLayoutLabel = "NodeLayout";
     }
 }

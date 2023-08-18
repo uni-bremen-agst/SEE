@@ -26,7 +26,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         public double X;
 
         /// <summary>
-        /// the position of the <see cref="Direction.Lower"/> edge 
+        /// the position of the <see cref="Direction.Lower"/> edge
         /// </summary>
         public double Z;
 
@@ -50,7 +50,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// the area of the rectangle 
+        /// the area of the rectangle
         /// </summary>
         /// <returns><see cref="Width"/>*<see cref="Depth"/></returns>
         public double Area()

@@ -39,7 +39,7 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// The adjustable parameters for the layout. 
+        /// The adjustable parameters for the layout.
         /// </summary>
         private readonly IncrementalTreeMapSetting _settings;
 
@@ -159,7 +159,7 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="rectangle">area to place siblings</param>
         private void CalculateLayout(ICollection<ILayoutNode> siblings, Rectangle rectangle)
         {
-            // the nodes of the 
+            // the nodes of the
             var nodes = siblings.Select(n => _nodeMap[n.ID]).ToList();
             // check if the old layout can be used for to lay out siblings.
             if (_oldLayout == null
@@ -185,7 +185,7 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Calculates a stable layout for <paramref name="nodes"/>. 
+        /// Calculates a stable layout for <paramref name="nodes"/>.
         /// </summary>
         /// <param name="nodes">nodes to be laid out</param>
         /// <param name="rectangle">rectangle in that the nodes should be laid out</param>
@@ -243,7 +243,7 @@ namespace SEE.Layout.NodeLayouts
             out List<Node> nodesToBeAdded)
         {
             //  [         oldNodes            ]--------------   <- nodes of OLD layout
-            //  --------------[              nodes          ]   <- nodes of new layout 
+            //  --------------[              nodes          ]   <- nodes of new layout
             //  [ toBeDeleted ]---------------[  toBeAdded  ]   <- nodes of new layout
             //  [         workWith            ]--------------   <- nodes of new layout
             //                                                     designed to be changed over time to nodes
@@ -258,7 +258,7 @@ namespace SEE.Layout.NodeLayouts
                 if (newNode == null)
                 {
                     // create a artificial node, that has no corresponding ILayoutNode in this layout
-                    // they are designed to be deleted but necessary to copy the layout of oldNodes 
+                    // they are designed to be deleted but necessary to copy the layout of oldNodes
                     newNode = new Node(oldNode.ID);
                     nodesToBeDeleted.Add(newNode);
                 }

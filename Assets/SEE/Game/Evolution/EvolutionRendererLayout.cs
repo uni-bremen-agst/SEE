@@ -112,7 +112,7 @@ namespace SEE.Game.Evolution
 
             // Since incremental layouts must know the layout of the last revision
             // but are also bound to the function calls of NodeLayout
-            // we must hand over this argument here separately 
+            // we must hand over this argument here separately
             if( nodeLayout is IIncrementalNodeLayout && oldLayout is IIncrementalNodeLayout)
             {
                 ((IIncrementalNodeLayout) nodeLayout).OldLayout = (IIncrementalNodeLayout) oldLayout;

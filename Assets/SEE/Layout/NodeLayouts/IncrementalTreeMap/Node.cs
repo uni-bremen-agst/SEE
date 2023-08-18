@@ -27,7 +27,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         public Rectangle Rectangle { get; set; }
 
         /// <summary>
-        /// The size that the node SHOULD occupy, may differ from the actual size/area of its rectangle. 
+        /// The size that the node SHOULD occupy, may differ from the actual size/area of its rectangle.
         /// </summary>
         public float Size { get; set; }
 

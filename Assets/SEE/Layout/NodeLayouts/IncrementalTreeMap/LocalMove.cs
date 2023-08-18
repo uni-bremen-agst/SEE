@@ -11,7 +11,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     internal abstract class LocalMove
     {
         /// <summary>
-        /// one affected node 
+        /// one affected node
         /// </summary>
         public Node Node1;
 
@@ -281,7 +281,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <param name="rightNode">node one the <see cref="Direction.Right"/> side</param>
         private void apply_StretchLeftOverVertical(Node leftNode, Node rightNode)
         {
-            // along lower           along upper   
+            // along lower           along upper
             //    [r]         [r]    [l][r]  ->  [llll]
             // [l][r]  ->  [llll]       [r]         [r]
             var segmentsLeftNode = leftNode.SegmentsDictionary();
@@ -316,7 +316,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <param name="rightNode">node one the <see cref="Direction.Right"/> side</param>
         private void apply_StretchRightOverVertical(Node leftNode, Node rightNode)
         {
-            // along lower           along upper   
+            // along lower           along upper
             // [l]         [l]       [l][r]  ->  [r][r]
             // [l][r]  ->  [r][r]    [l]         [l]
             var segmentsLeftNode = leftNode.SegmentsDictionary();
@@ -352,7 +352,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <param name="upperNode">node one the <see cref="Direction.Upper"/> side</param>
         private void apply_StretchLowerOverHorizontal(Node lowerNode, Node upperNode)
         {
-            // along left           along right   
+            // along left           along right
             // [uuuu] ->  [l][u]    [uuuu]  ->  [u][l]
             // [l]        [l]          [l]         [l]
             var segmentsLowerNode = lowerNode.SegmentsDictionary();

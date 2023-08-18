@@ -41,7 +41,7 @@ namespace SEE.Game.City
         /// the algorithm would minimize the maximal aspect ratio over the layout nodes.
         /// The other p norms range between these extremes.
         ///
-        /// that a higher p value means 
+        /// that a higher p value means
         /// Needs therefor a mapping from <see cref="PNormRange"/> to a double value p, which is realized with the
         /// property <see cref="PNorm"/>.
         /// </summary>
@@ -51,7 +51,7 @@ namespace SEE.Game.City
         private PNormRange pNorm = PNormRange.P2Euclidean;
 
         /// <summary>
-        /// The absolute padding between neighboring nodes so that they can be distinguished (in millimeter).  
+        /// The absolute padding between neighboring nodes so that they can be distinguished (in millimeter).
         /// </summary>
         [SerializeField]
         [Range(0.1f, 100f)]

@@ -84,7 +84,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         /// <summary>
         /// Splits the layout of <paramref name="nodes"/> into two disjoint layouts <paramref name="partition1"/>
-        /// and <paramref name="partition2"/>. 
+        /// and <paramref name="partition2"/>.
         /// </summary>
         /// <param name="nodes">nodes with layout</param>
         /// <param name="slicingSegment"> the segment that divides both layouts</param>
@@ -309,7 +309,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// A checker that verifies that the result has no rectangles with negative width or depth 
+        /// A checker that verifies that the result has no rectangles with negative width or depth
         /// </summary>
         /// <param name="nodes">nodes of the layout</param>
         /// <returns>true if all rectangles are fine, else false</returns>

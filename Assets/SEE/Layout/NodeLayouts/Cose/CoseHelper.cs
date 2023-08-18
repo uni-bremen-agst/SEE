@@ -124,9 +124,9 @@ namespace SEE.Layout.NodeLayouts.Cose
                     return new TreemapLayout(groundLevel, 1000.0f, 1000.0f);
                 case NodeLayoutKind.IncrementalTreeMap:
                     return new IncrementalTreeMapLayout(
-                        groundLevel, 
-                        1000.0f, 
-                        1000.0f, 
+                        groundLevel,
+                        1000.0f,
+                        1000.0f,
                         settings.NodeLayoutSettings.incrementalTreeMapSetting);
                 case NodeLayoutKind.Balloon:
                     return new BalloonNodeLayout(groundLevel);

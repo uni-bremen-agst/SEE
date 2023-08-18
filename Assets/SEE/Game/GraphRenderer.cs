@@ -626,8 +626,8 @@ namespace SEE.Game
                 NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(GroundLevel),
                 NodeLayoutKind.Treemap => new TreemapLayout(GroundLevel, parent.transform.lossyScale.x, parent.transform.lossyScale.z),
                 NodeLayoutKind.IncrementalTreeMap => new IncrementalTreeMapLayout(
-                    GroundLevel, 
-                    parent.transform.lossyScale.x, 
+                    GroundLevel,
+                    parent.transform.lossyScale.x,
                     parent.transform.lossyScale.z,
                     Settings.NodeLayoutSettings.incrementalTreeMapSetting),
                 NodeLayoutKind.Balloon => new BalloonNodeLayout(GroundLevel),
