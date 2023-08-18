@@ -1,7 +1,6 @@
 using System.Linq;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using MathNet.Numerics.LinearAlgebra;
 using SEE.Game.City;
 
@@ -221,19 +220,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 distance = CalculateOneStep(nodes, mapSegmentIndex);
                 if (distance <= maximalError) break;
             }
-
-            if (distance > maximalError)
-            {
-                Debug.LogWarning($" layout correction > {maximalError}");
-            }
-
-            bool cons = CheckNegativeLength(nodes);
-            if (!cons)
-            {
-                Debug.LogWarning("layout correction failed negative rec");
-            }
-
-            return (cons && distance < maximalError);
+            
+            return (CheckNegativeLength(nodes) && distance < maximalError);
         }
 
         /// <summary>

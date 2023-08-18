@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.Assertions;
 using static SEE.Layout.NodeLayouts.IncrementalTreeMap.Direction;
 
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
