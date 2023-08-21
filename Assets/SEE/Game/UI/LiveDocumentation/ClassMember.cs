@@ -64,14 +64,16 @@ namespace SEE.Game.UI.LiveDocumentation
         /// </summary>
         public void Start()
         {
-            var classMember =
+            GameObject classMember =
                 PrefabInstantiator.InstantiatePrefab(PREFAB_NAME, transform, false);
 
             Mesh = classMember.transform.Find(CLASS_MEMBER_OBJECT_PATH).gameObject
                 .GetComponent<TextMeshProUGUI>();
             Mesh.text = MethodsBuffer.PrintBuffer();
             if (MethodsBuffer is LiveDocumentationClassMemberBuffer classMemberBuffer)
+            {
                 Mesh.text = Mesh.text + "\n" + classMemberBuffer.Documentation.PrintBuffer();
+            }
 
             TextRectTransform = classMember.transform.Find(ScrollViewPath).gameObject
                 .GetComponent<RectTransform>();
@@ -87,12 +89,17 @@ namespace SEE.Game.UI.LiveDocumentation
             // When the user has clicked on the class member list item
             if (Input.GetMouseButtonDown(0))
             {
-                var linkId = TMP_TextUtilities.FindIntersectingLink(Mesh, Input.mousePosition, null);
+                int linkId = TMP_TextUtilities.FindIntersectingLink(Mesh, Input.mousePosition, null);
                 // When a link was found at the current position
-                if (linkId != -1) OnLinkClicked.Invoke(Mesh.textInfo.linkInfo[linkId].GetLinkID());
+                if (linkId != -1)
+                {
+                    OnLinkClicked.Invoke(Mesh.textInfo.linkInfo[linkId].GetLinkID());
+                }
 
                 if (TMP_TextUtilities.IsIntersectingRectTransform(TextRectTransform, Input.mousePosition, null))
+                {
                     OnClicked.Invoke(this);
+                }
             }
         }
 

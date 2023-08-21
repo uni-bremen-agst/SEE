@@ -28,8 +28,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <returns>The new created instance</returns>
         public static ReversibleAction CreateAction()
-        {
-            return new LiveDocumentationAction();
+        { return new LiveDocumentationAction();
         }
 
         /// <summary>
@@ -76,9 +75,9 @@ namespace SEE.Controls.Actions
         {
             // Only allow local player to open new code windows
             if (Input.GetMouseButtonDown(0)
-                &&  Raycasting.RaycastGraphElement(out var hit, out var g) == HitGraphElement.Node)
+                && Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef g) == HitGraphElement.Node)
             {
-                var selectedNode = hit.collider.gameObject.GetComponent<NodeRef>();
+                NodeRef selectedNode = hit.collider.gameObject.GetComponent<NodeRef>();
 
                 // When the node the user has clicked on has no file attached.
                 // In this case an error is displayed.
@@ -90,20 +89,20 @@ namespace SEE.Controls.Actions
                 }
 
                 // Concat the path and the file name to get the relative path of the file in the project
-                var path = selectedNode.Value.Path() + selectedNode.elem.Filename();
+                string path = selectedNode.Value.Path() + selectedNode.elem.Filename();
 
 
                 // When the node the user has clicked on wasn't a leaf node.
                 // In this case an error message is displayed and the LiveDocumentation windows is not going to open.
                 if (selectedNode.Value.Type != "Class")
                 {
-                    ShowNotification.Error("Node not supported", "Only leaf nodes can be analysed");
+                    ShowNotification.Error("Node not supported", "Only class nodes can be analysed");
                     return false;
                 }
 
                 if (!selectedNode.TryGetComponent(out LiveDocumentationWindow documentationWindow))
                 {
-                    var fileName = selectedNode.Value.Filename();
+                    string fileName = selectedNode.Value.Filename();
 
                     // Copied from ShowCodeAction
                     if (string.IsNullOrWhiteSpace(fileName))
@@ -113,7 +112,7 @@ namespace SEE.Controls.Actions
                         return false;
                     }
 
-                    var absolutePlatformPath = selectedNode.Value.AbsolutePlatformPath();
+                    string absolutePlatformPath = selectedNode.Value.AbsolutePlatformPath();
                     if (!File.Exists(absolutePlatformPath))
                     {
                         ShowNotification.Warn("File does not exist",
@@ -121,7 +120,7 @@ namespace SEE.Controls.Actions
                         return false;
                     }
 
-                    var selectedFile = selectedNode.Value.Filename();
+                    string selectedFile = selectedNode.Value.Filename();
 
                     documentationWindow = selectedNode.gameObject.AddComponent<LiveDocumentationWindow>();
 
@@ -129,7 +128,9 @@ namespace SEE.Controls.Actions
 
                     if (!documentationWindow.Title.Replace(".", "").Equals(selectedFile.Split('.').Reverse().Skip(1)
                             .Aggregate("", (acc, s) => s + acc)))
+                    {
                         documentationWindow.Title += $" ({selectedFile})";
+                    }
 
                     documentationWindow.ClassName = documentationWindow.Title;
                     documentationWindow.NodeOfClass = selectedNode.Value;
@@ -148,9 +149,9 @@ namespace SEE.Controls.Actions
                         return false;
                     }
 
-                    var buffer = parser.ParseClassDoc(selectedNode.Value.SourceName);
+                    LiveDocumentationBuffer buffer = parser.ParseClassDoc(selectedNode.Value.SourceName);
 
-                    var classMembers = new List<LiveDocumentationBuffer>();
+                    List<LiveDocumentationBuffer> classMembers = new List<LiveDocumentationBuffer>();
                     parser.ParseClassMethods(selectedNode.Value.SourceName)
                         .ForEach(x => classMembers.Add(x));
                     if (buffer == null || classMembers == null)

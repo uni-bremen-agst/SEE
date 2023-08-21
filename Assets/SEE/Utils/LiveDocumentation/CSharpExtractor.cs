@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Antlr4.Runtime;
+using Antlr4.Runtime.Tree;
 using JetBrains.Annotations;
+using SEE.DataModel.DG;
 using SEE.Game.UI.LiveDocumentation.Buffer;
 
 namespace SEE.Utils.LiveDocumentation
@@ -25,15 +27,18 @@ namespace SEE.Utils.LiveDocumentation
         public CSharpExtractor(string fileName)
         {
             _filePath = fileName;
-            if (!File.Exists(fileName)) throw new FileNotFoundException($"The file {fileName} doesn't exist");
+            if (!File.Exists(fileName))
+            {
+                throw new FileNotFoundException($"The file {fileName} doesn't exist");
+            }
 
-            var input = File.ReadAllText(fileName);
-            var lexer = new CSharpFullLexer(new AntlrInputStream(input));
+            string input = File.ReadAllText(fileName);
+            CSharpFullLexer lexer = new CSharpFullLexer(new AntlrInputStream(input));
             _tokens = new CommonTokenStream(lexer);
             _tokens.Fill();
             _parser = new CSharpParser(_tokens);
 
-            var lexer1 = new CSharpFullLexer(new AntlrInputStream(input));
+            CSharpFullLexer lexer1 = new CSharpFullLexer(new AntlrInputStream(input));
 
 
             _commentTokens = new CommonTokenStream(lexer1, 2);
@@ -53,24 +58,24 @@ namespace SEE.Utils.LiveDocumentation
             LiveDocumentationBuffer buffer = new();
 
 
-            var (classContext, upperLineBound) = GetClassByName(className);
+            (CSharpParser.Type_declarationContext classContext, int upperLineBound) = GetClassByName(className);
 
             if (classContext != null)
             {
                 // Combining the Type 2 Tokens (C# Class Documentation) between the start of the class and the
                 // start of the namespace, if the class is the first in the file, or between the start of the class and the
                 // end of the last type declaration
-                var commentTokens = string.Join(Environment.NewLine, _commentTokens.GetTokens()
+                string commentTokens = string.Join(Environment.NewLine, _commentTokens.GetTokens()
                     .Where(x => x.Type == 2 && x.Line < classContext.Start.Line && x.Line > upperLineBound)
                     .Select(x => x.Text).ToList());
 
                 // Parsing of the class documentation
-                var lexer = new CSharpCommentsGrammarLexer(new AntlrInputStream(commentTokens));
-                var tokens = new CommonTokenStream(lexer);
+                CSharpCommentsGrammarLexer lexer = new CSharpCommentsGrammarLexer(new AntlrInputStream(commentTokens));
+                CommonTokenStream tokens = new CommonTokenStream(lexer);
                 tokens.Fill();
                 if (tokens.GetTokens().Count > 1)
                 {
-                    var parser = new CSharpCommentsGrammarParser(tokens);
+                    CSharpCommentsGrammarParser parser = new CSharpCommentsGrammarParser(tokens);
                     // var t = parser.start().children;
                     ProcessSummary(buffer, parser.docs().summary());
                     // Parse C# Doc line by line and write it in the Buffer
@@ -92,34 +97,32 @@ namespace SEE.Utils.LiveDocumentation
             List<LiveDocumentationClassMemberBuffer> buffers = new();
             _parser.Reset();
 
-            var (classContext, upperLineBound) = GetClassByName(className);
+            (CSharpParser.Type_declarationContext classContext, int upperLineBound) = GetClassByName(className);
             // Parse all namespaces and iterate over them
 
-            var methodUpperLineBound = upperLineBound;
+            int methodUpperLineBound = upperLineBound;
 
-            foreach (var i in classContext.class_definition().class_body().class_member_declarations()
+            foreach (CSharpParser.Class_member_declarationContext i in classContext.class_definition().class_body().class_member_declarations()
                          .class_member_declaration())
             {
                 i.GetText();
-                var methodBuffer = new LiveDocumentationClassMemberBuffer();
+                LiveDocumentationClassMemberBuffer methodBuffer = new LiveDocumentationClassMemberBuffer();
                 methodBuffer.Documentation = new LiveDocumentationBuffer();
                 methodBuffer.LineNumber = i.common_member_declaration().Start.Line;
                 // Concatenate the Method signature together.
                 // Starting by the modifiers of the method
-                var signature = i.all_member_modifiers().all_member_modifier()
+                string signature = i.all_member_modifiers().all_member_modifier()
                     .Aggregate("", (test, modi) => test + modi.GetText() + " ");
                 // If the current class member is a method
 
                 // If the class member is a method
                 if (i.common_member_declaration().method_declaration() is { } methodDeclarationContext)
                 {
-                    var (parser, tokens) = CreateParserForMethod(methodUpperLineBound, i.Start.Line);
-                    var methodDoc = new LiveDocumentationBuffer();
+                    (CSharpCommentsGrammarParser parser, CommonTokenStream tokens) = CreateParserForMethod(methodUpperLineBound, i.Start.Line);
+                    LiveDocumentationBuffer methodDoc = new LiveDocumentationBuffer();
                     if (tokens.GetTokens().Count > 1)
                     {
                         ProcessSummary(methodDoc, parser.docs().summary());
-                        parser.Reset();
-                        ProcessReturnTag(methodBuffer, parser.docs().@return());
                         parser.Reset();
                     }
 
@@ -141,8 +144,8 @@ namespace SEE.Utils.LiveDocumentation
                 else if (i.common_member_declaration().constructor_declaration() is
                          { } constructorDeclarationContext)
                 {
-                    var (parser, tokens) = CreateParserForMethod(methodUpperLineBound, i.Start.Line);
-                    var methodDoc = new LiveDocumentationBuffer();
+                    (CSharpCommentsGrammarParser parser, CommonTokenStream tokens) = CreateParserForMethod(methodUpperLineBound, i.Start.Line);
+                    LiveDocumentationBuffer methodDoc = new LiveDocumentationBuffer();
                     if (tokens.GetTokens().Count > 1)
                     {
                         ProcessSummary(methodDoc, parser.docs().summary());
@@ -172,8 +175,8 @@ namespace SEE.Utils.LiveDocumentation
                         continue;
                     }
 
-                    var (parser, tokens) = CreateParserForMethod(methodUpperLineBound, i.Start.Line);
-                    var methodDoc = new LiveDocumentationBuffer();
+                    (CSharpCommentsGrammarParser parser, CommonTokenStream tokens) = CreateParserForMethod(methodUpperLineBound, i.Start.Line);
+                    LiveDocumentationBuffer methodDoc = new LiveDocumentationBuffer();
                     if (tokens.GetTokens().Count > 1)
                     {
                         ProcessSummary(methodDoc, parser.docs().summary());
@@ -186,7 +189,7 @@ namespace SEE.Utils.LiveDocumentation
                     methodBuffer.Parameters =
                         ProcessParametersDocumentation(
                             typedMemberDeclaration.method_declaration().formal_parameter_list(), parser);
-                    var methodType = typedMemberDeclaration.type_().GetText();
+                    string methodType = typedMemberDeclaration.type_().GetText();
                     methodBuffer.Add(new LiveDocumentationBufferText(signature));
                     methodBuffer.Add(new LiveDocumentationLink(methodType, methodType));
                     methodBuffer.Add(new LiveDocumentationBufferText(" "));
@@ -226,9 +229,15 @@ namespace SEE.Utils.LiveDocumentation
             _parser.Reset();
             // If the file doesn't have any using directives an empty list is returned.
             if (_parser.compilation_unit().using_directives() is { } usingDirectivesContext)
-                foreach (var usingDirective in usingDirectivesContext.using_directive())
+            {
+                foreach (CSharpParser.Using_directiveContext usingDirective in usingDirectivesContext.using_directive())
+                {
                     if (usingDirective is CSharpParser.UsingNamespaceDirectiveContext namespaceDirectiveContext)
+                    {
                         ret.Add(namespaceDirectiveContext.namespace_or_type_name().GetText());
+                    }
+                }
+            }
 
             return ret;
         }
@@ -252,33 +261,38 @@ namespace SEE.Utils.LiveDocumentation
             //  var enumerable = classNamePath.Take(classNamePath.Length - 1).ToList();
             // var strings = classNamePath[..^1];
             _parser.Reset();
-            var namespaces = _parser
+            CSharpParser.Namespace_member_declarationContext[] namespaces = _parser
                 .compilation_unit()
                 .namespace_member_declarations()
                 .namespace_member_declaration();
-            foreach (var namspace in namespaces)
+            foreach (CSharpParser.Namespace_member_declarationContext namspace in namespaces)
             {
-                var namespaceDefLine = namspace.namespace_declaration().Start.Line;
-                var types = namspace
+                int namespaceDefLine = namspace.namespace_declaration().Start.Line;
+                List<CSharpParser.Namespace_member_declarationContext> types = namspace
                     .namespace_declaration()
                     .namespace_body()
                     .namespace_member_declarations()
                     .namespace_member_declaration()
                     .ToList();
-                foreach (var type in types)
+                foreach (CSharpParser.Namespace_member_declarationContext type in types)
                     // Extract the name of the class or struct and compare it with the passed className
+                {
                     if ((type.type_declaration().class_definition() is { } c &&
                          c.identifier().GetText().Equals(className)) ||
                         (type.type_declaration().struct_definition() is { } s &&
                          s.identifier().GetText().Equals(className)))
                     {
-                        var classIndex = types.IndexOf(type);
-                        var classDocMinStartLine = namespaceDefLine;
+                        int classIndex = types.IndexOf(type);
+                        int classDocMinStartLine = namespaceDefLine;
                         // Get The end line of the last class
-                        if (classIndex > 0) classDocMinStartLine = types[classIndex - 1].Stop.Line;
+                        if (classIndex > 0)
+                        {
+                            classDocMinStartLine = types[classIndex - 1].Stop.Line;
+                        }
 
                         return (type.type_declaration(), classDocMinStartLine);
                     }
+                }
             }
 
             return (null, -1);
@@ -298,18 +312,21 @@ namespace SEE.Utils.LiveDocumentation
             buff.Add(new LiveDocumentationBufferText("("));
             if (parameterList != null)
             {
-                var parameters = parameterList
+                CSharpParser.Fixed_parameterContext[] parameters = parameterList
                     .fixed_parameters()
                     .fixed_parameter();
-                foreach (var parameter in parameters)
+                foreach (CSharpParser.Fixed_parameterContext parameter in parameters)
                 {
-                    var pType = parameter.arg_declaration().type_().GetText() + " ";
+                    string pType = parameter.arg_declaration().type_().GetText() + " ";
                     buff.Add(new LiveDocumentationLink(pType, pType));
                     buff.Add(
                         new LiveDocumentationBufferText(parameter.arg_declaration().identifier()
                             .GetText()));
                     // If this wasn't the last parameter append a comma
-                    if (!parameter.Equals(parameters.Last())) buff.Add(new LiveDocumentationBufferText(", "));
+                    if (!parameter.Equals(parameters.Last()))
+                    {
+                        buff.Add(new LiveDocumentationBufferText(", "));
+                    }
                 }
             }
 
@@ -325,12 +342,14 @@ namespace SEE.Utils.LiveDocumentation
             [CanBeNull] CSharpCommentsGrammarParser.SummaryContext summaryContext)
         {
             if (summaryContext != null)
-                foreach (var commentLine in summaryContext.comments())
+            {
+                foreach (CSharpCommentsGrammarParser.CommentsContext commentLine in summaryContext.comments())
                 {
                     ProcessComment(buffer, commentLine);
 
                     buffer.Add(new LiveDocumentationBufferText("\n"));
                 }
+            }
         }
 
         /// <summary>
@@ -341,13 +360,19 @@ namespace SEE.Utils.LiveDocumentation
         private void ProcessComment(LiveDocumentationBuffer buffer,
             CSharpCommentsGrammarParser.CommentsContext commentsContext)
         {
-            foreach (var i in commentsContext.children)
+            foreach (IParseTree i in commentsContext.children)
+            {
                 if (i is CSharpCommentsGrammarParser.SomeTextContext someTextContext)
+                {
                     buffer.Add(new LiveDocumentationBufferText(someTextContext.TEXT()
                         .Aggregate("", (text, word) => text += word.GetText() + " ").TrimEnd()));
+                }
                 else if (i is CSharpCommentsGrammarParser.ClassLinkContext classLinkContext)
+                {
                     buffer.Add(new LiveDocumentationLink(classLinkContext.linkID.Text,
                         classLinkContext.linkID.Text));
+                }
+            }
         }
 
         /// <summary>
@@ -358,12 +383,18 @@ namespace SEE.Utils.LiveDocumentation
         private void ProcessTagContent(LiveDocumentationBuffer buffer,
             CSharpCommentsGrammarParser.TagContentContext tagContentContext)
         {
-            foreach (var i in tagContentContext.children)
+            foreach (IParseTree i in tagContentContext.children)
+            {
                 if (i is CSharpCommentsGrammarParser.SomeTextContext someTextContext)
+                {
                     buffer.Add(new LiveDocumentationBufferText(someTextContext.TEXT()
                         .Aggregate("", (text, word) => text += word.GetText() + " ").TrimEnd()));
+                }
                 else if (i is CSharpCommentsGrammarParser.CommentsContext commentsContext)
+                {
                     ProcessComment(buffer, commentsContext);
+                }
+            }
         }
 
         /// <summary>
@@ -376,24 +407,30 @@ namespace SEE.Utils.LiveDocumentation
             [CanBeNull] CSharpParser.Formal_parameter_listContext parameterListContext,
             CSharpCommentsGrammarParser parser)
         {
-            var bufferList = new List<LiveDocumentationBuffer>();
+            List<LiveDocumentationBuffer> bufferList = new List<LiveDocumentationBuffer>();
 
             if (parameterListContext != null)
-                foreach (var parameter in parameterListContext.fixed_parameters().fixed_parameter())
+            {
+                foreach (CSharpParser.Fixed_parameterContext parameter in parameterListContext.fixed_parameters().fixed_parameter())
                 {
                     parser.Reset();
-                    var buffer = new LiveDocumentationBuffer();
-                    var parameterName = parameter.arg_declaration().identifier().GetText();
-                    var parameterType = parameter.arg_declaration().type_().GetText();
+                    LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
+                    string parameterName = parameter.arg_declaration().identifier().GetText();
+                    string parameterType = parameter.arg_declaration().type_().GetText();
                     buffer.Add(new LiveDocumentationLink(parameterType, parameterType));
                     buffer.Add(new LiveDocumentationBufferText(" " + parameterName));
                     buffer.Add(new LiveDocumentationBufferText(" "));
 
-                    var matchingParamDoc = parser.docs().parameters()?.parameter()
+                    CSharpCommentsGrammarParser.ParameterContext matchingParamDoc = parser.docs().parameters()?.parameter()
                         .FirstOrDefault(x => x.paramName.Text == parameterName);
-                    if (matchingParamDoc != null) ProcessTagContent(buffer, matchingParamDoc.parameterDescription);
+                    if (matchingParamDoc != null)
+                    {
+                        ProcessTagContent(buffer, matchingParamDoc.parameterDescription);
+                    }
+
                     bufferList.Add(buffer);
                 }
+            }
 
             return bufferList;
         }
@@ -410,12 +447,12 @@ namespace SEE.Utils.LiveDocumentation
         private (CSharpCommentsGrammarParser, CommonTokenStream) CreateParserForMethod(int methodUpperLineBound,
             int methodLowerLineBound)
         {
-            var commentTokens = string.Join(Environment.NewLine, _commentTokens.GetTokens()
+            string commentTokens = string.Join(Environment.NewLine, _commentTokens.GetTokens()
                 .Where(x => x.Type == 2 && x.Line < methodLowerLineBound && x.Line > methodUpperLineBound)
                 .Select(x => x.Text).ToList());
 
-            var lexer = new CSharpCommentsGrammarLexer(new AntlrInputStream(commentTokens));
-            var tokens = new CommonTokenStream(lexer);
+            CSharpCommentsGrammarLexer lexer = new CSharpCommentsGrammarLexer(new AntlrInputStream(commentTokens));
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
             tokens.Fill();
             return (new CSharpCommentsGrammarParser(tokens), tokens);
         }
