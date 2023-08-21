@@ -2,7 +2,7 @@
   "dependencies": {
     "com.cakeslice.outline-effect": "https://github.com/cakeslice/Outline-Effect.git",
     "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask#2.2.5",
-    "com.openai.unity": "5.0.3",
+    "com.openai.unity": "5.0.7",
     "com.unity.2d.sprite": "1.0.0",
     "com.unity.2d.tilemap": "1.0.0",
     "com.unity.ai.navigation": "1.1.4",
