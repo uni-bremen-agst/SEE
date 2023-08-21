@@ -159,7 +159,6 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="rectangle">area to place siblings</param>
         private void CalculateLayout(ICollection<ILayoutNode> siblings, Rectangle rectangle)
         {
-            // the nodes of the
             var nodes = siblings.Select(n => _nodeMap[n.ID]).ToList();
             // check if the old layout can be used for to lay out siblings.
             if (_oldLayout == null
