@@ -30,7 +30,15 @@ namespace profiling2gxl
         /// </summary>
         private readonly Regex _heapAllocEntryRegex = new(@"^\s*(?<rank>[0-9]+)\s+(?<self>[0-9]+\.[0-9]+)%\s+(?<accum>[0-9]+\.[0-9]+)%\s+(?<live_bytes>[0-9]+)\s+(?<live_objs>[0-9]+)\s+(?<alloc_bytes>[0-9]+)\s+(?<alloc_objs>[0-9]+)\s+(?<trace>[0-9]+)\s+(?<name>.*)$", RegexOptions.Compiled);
 
-        public HprofParser(StreamReader Sr) : base(Sr) { }
+        /// <summary>
+        /// HPROF refers to functions using traceid. This dictionary is used to store each found function.
+        /// </summary>
+        private Dictionary<int, Function> traceidFunctions;
+
+        public HprofParser(StreamReader Sr) : base(Sr) { 
+            traceidFunctions = new ();
+        }
+
 
         /// <summary>
         /// Reads a line of characters from the stream reader, removes trailing \r and \n and returns the data as a string.
@@ -49,7 +57,7 @@ namespace profiling2gxl
 
         private void ParseCg(List<Match> mos, string traceId)
         {
-            Callee? callee = null;
+            string? callee = null;
             for (int i = 0; i < mos.Count; i++)
             {
                 var mo = mos[i];
@@ -76,35 +84,34 @@ namespace profiling2gxl
 
                     if (i == 0)
                     {
-                        func.TraceIds.Add(int.Parse(traceId));
+                        traceidFunctions.Add(int.Parse(traceId), func);
                     }
 
-                    if (callee != null && func.Id != callee.Id && func.Children.Find(child => child.Id == callee.Id) == null)
+                    if (callee != null && func.Id != callee && func.Children.Find(childId => childId == callee) == null)
                     {
                         func.Children.Add(callee);
-                        var calleeFunc = Functions.Find(f => f.Id == callee.Id);
+                        var calleeFunc = Functions.Find(f => f.Id == callee);
                         calleeFunc?.Parents.Add(func);
                     }
 
-                    callee = new(func.Id);
+                    callee = func.Id;
                 }
             }
         }
 
         private Function getFunctionFromTraceId(string traceId, string name)
         {
-            var func = Functions.Find(f => f.TraceIds.Contains(int.Parse(traceId)));
-
-            if (func == null)
+            if (traceidFunctions.TryGetValue(int.Parse(traceId), out var func))
             {
-                func = new()
-                {
-                    Id = $"UnknownClass:{name}",
-                    Name = name,
-                    Module = "UnknownClass",
-                };
-                Functions.Add(func);
+                return func;
             }
+            func = new()
+            {
+                Id = $"UnknownClass:{name}",
+                Name = name,
+                Module = "UnknownClass",
+            };
+            Functions.Add(func);
 
             return func;
         }

@@ -13,16 +13,17 @@ namespace profiling2gxl
         private readonly static Dictionary<string, Func<StreamReader, Parser>> formats = new Dictionary<string, Func<StreamReader, Parser>> {
             {"gprof", content => new GprofParser(content) },
             {"perf", content => new PerfParser(content) },
-            {"hprof", content => new HprofParser(content) }
+            {"hprof", content => new HprofParser(content) },
+            {"jprofile", content => new JProfilerParser(content) }
         };
 
         static void Main(string[] args)
         {
 
-            var builder = new ConfigurationBuilder()
+            IConfigurationBuilder builder = new ConfigurationBuilder()
             .AddCommandLine(args);
 
-            var config = builder.Build();
+            IConfigurationRoot? config = builder.Build();
 
             string? file = config["file"];
             string? format = config["format"];
@@ -47,9 +48,9 @@ namespace profiling2gxl
                     try
                     {
                         using StreamReader sr = new(file);
-                        var parser = formats[format](sr);
-                        var functions = parser.parse();
-                        var gxlFilename = file + ".gxl";
+                        Parser parser = formats[format](sr);
+                        List<Function> functions = parser.parse();
+                        string gxlFilename = file + ".gxl";
                         if (!string.IsNullOrEmpty(gxlOutput))
                         {
                             gxlFilename = gxlOutput.EndsWith(".gxl") ? gxlOutput : gxlOutput + ".gxl";
@@ -58,7 +59,7 @@ namespace profiling2gxl
 
                         if (!string.IsNullOrEmpty(jlgOutput))
                         {
-                            var jlgFilename = jlgOutput.EndsWith(".jlg") ? jlgOutput : jlgOutput + ".jlg";
+                            string jlgFilename = jlgOutput.EndsWith(".jlg") ? jlgOutput : jlgOutput + ".jlg";
                             JLGWriter.Save(jlgFilename, functions);
                         }
                     }

@@ -113,7 +113,7 @@ namespace profiling2gxl
 
         private void ParseCg(List<Match> mos)
         {
-            Callee? callee = null;
+            string? callee = null;
             foreach (var mo in mos)
             {
                 if (mo.Groups.TryGetValue("name", out var name_group) && mo.Groups.TryGetValue("module", out var module_group))
@@ -157,14 +157,14 @@ namespace profiling2gxl
                         Functions.Add(func);
                     }
 
-                    if (callee != null && func.Id != callee.Id)
-                    {
+                    if (callee != null && func.Id != callee)
+                        {
                         func.Children.Add(callee);
-                        var calleeFunc = Functions.Find(f => f.Id == callee.Id);
+                        var calleeFunc = Functions.Find(f => f.Id == callee);
                         calleeFunc?.Parents.Add(func);
                     }
 
-                    callee = new(func.Id);
+                    callee = func.Id;
                 }
             }
         }
@@ -186,7 +186,7 @@ namespace profiling2gxl
                 if (func.Parents.Count == 0)
                 {
                     func.Parents.Add(unknownFunction);
-                    unknownFunction.Children.Add(new($"{func.Module}:{func.Name}"));
+                    unknownFunction.Children.Add($"{func.Module}:{func.Name}");
                 }
             }
         }

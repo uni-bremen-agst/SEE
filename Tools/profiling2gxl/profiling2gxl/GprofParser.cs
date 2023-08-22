@@ -110,7 +110,7 @@ namespace profiling2gxl
         private void ParseFunctionEntry(List<string> lines)
         {
             List<Function> parents = new();
-            List<Callee> children = new();
+            List<string> children = new();
             string line;
             while (true)
             {
@@ -142,7 +142,6 @@ namespace profiling2gxl
                         else
                         {
                             Function parent = Translate(mo);
-                            parent.Called = parent.CalledTotal;
                             parents.Add(parent);
                             if (!Functions.Contains(parent))
                             {
@@ -221,7 +220,7 @@ namespace profiling2gxl
                             child = Translate(mo);
                         }
                         
-                        children.Add(new($"{child.Module}:{child.Name}"));
+                        children.Add($"{child.Module}:{child.Name}");
                         if (!Functions.Contains(child))
                         {
                             Functions.Add(child);
@@ -240,7 +239,7 @@ namespace profiling2gxl
 
             parents.ForEach(parent =>
             {
-                if (parent.Children.Find(f => f.Id == $"{function.Module}:{function.Name}") == null)
+                if (parent.Children.Find(id => id == $"{function.Module}:{function.Name}") == null)
                 {
                     parent.Children.Add(new($"{function.Module}:{function.Name}"));
                 }

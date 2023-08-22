@@ -40,7 +40,7 @@ namespace profiling2gxl
             foreach (var kv in classNodeIDs_To_GXLids)
             {
                 var classNode = new Function() { Id = kv.Key };
-                functions.Where(f => f.Module == classNode.Id).ToList().ForEach(f => classNode.Children.Add(new(f.Id)));
+                functions.Where(f => f.Module == classNode.Id).ToList().ForEach(f => classNode.Children.Add(f.Id));
                 AppendChildren(doc, graphNode, classNode, nodeIDs_To_GXLids, "Belongs_To", ref hierarchicalEdgeCount);
             }
             try
@@ -191,9 +191,9 @@ namespace profiling2gxl
             ref int edgeCount)
         {
             string source = graphNodeIDsToGXLNodeIDs[parent.Id];
-            foreach (var child in parent.Children)
+            foreach (var childId in parent.Children)
             {
-                string target = graphNodeIDsToGXLNodeIDs[child.Id];
+                string target = graphNodeIDsToGXLNodeIDs[childId];
                 if (hierarchicalEdgeType == "Belongs_To")
                 {
                     XmlElement xmlNode = AppendEdge(doc, parentXMLNode, "E" + edgeCount.ToString(), hierarchicalEdgeType, target, source);

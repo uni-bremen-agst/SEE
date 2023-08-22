@@ -78,9 +78,9 @@ namespace profiling2gxl
                 calledFunctions.Add(func.Id);
                 if (func.Children.Count > 0)
                 {
-                    foreach(var child in func.Children)
+                    foreach(var childId in func.Children)
                     {
-                        var childFunc = functions.Find(f =>  f.Id == child.Id);
+                        var childFunc = functions.Find(f =>  f.Id == childId);
                         if (childFunc != null)
                         {
                             calledFunctions = ToOrderedFunctionCalls(childFunc, calledFunctions, functions);
