@@ -132,6 +132,7 @@ We should just leave it as a backslash.""",
     BadPattern(
         re.compile(r"^\s*(\s|Object\.)Destroy\(.*$"),
         "Make sure to use `Destroyer.Destroy` (`Destroyer` class is in `SEE.Utils`) instead of `Object.Destroy`!",
+        filenames=[r".*(?<!/Destroyer)\.cs$"],
         level=Level.WARN,
     ),
     BadPattern(
@@ -250,7 +251,7 @@ def main():
                 # We can't report this immediately, as this string may occur twice.
                 # Instead, we will report this once the next file / hunk starts.
                 missing_newline_at_eof = True
-            elif line != "" and line[0] not in ("-", "d", "i", "n", "o", "r", "B"):
+            elif line != "" and line[0] not in ("-", "d", "i", "n", "o", "r", "B", "s"):
                 # We ignore empty lines, removed lines, and diff metadata lines (starting with "diff" or "index" etc).
                 warn(
                     f'Unrecognized unified diff line indicator for line "{line}", skipping.'

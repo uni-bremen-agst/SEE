@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using SEE.Utils;
 
 namespace SEE.Game.Worlds
 {
@@ -45,6 +46,11 @@ namespace SEE.Game.Worlds
         {
             StartCoroutine(SpawnPlayerCoroutine());
         }
+
+        /// <summary>
+        /// The NetworkManager, used to spawn the FaceCam.
+        /// </summary>
+        private readonly NetworkManager networkManager = NetworkManager.Singleton;
 
         /// <summary>
         /// This co-routine sets <see cref="dissonanceComms"/>, registers <see cref="Spawn(ulong)"/>
@@ -113,6 +119,18 @@ namespace SEE.Game.Worlds
             {
                 Debug.LogError($"Spawned player {player.name} does not have a {typeof(NetworkObject)} component.\n");
             }
+#if !PLATFORM_LUMIN || UNITY_EDITOR
+            if (networkManager.IsServer)
+            {
+                // FIXME: The FaceCam prefab is instantiated only for the player on the server.
+                // That means the FaceCam will work only on the host, but not on any of the clients.
+                // This was noted in issue #633
+                // Add the FaceCam to the player.
+                GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam");
+                faceCam.GetComponent<NetworkObject>().Spawn();
+                faceCam.transform.parent = player.transform;
+            }
+#endif
         }
 
         /// <summary>
