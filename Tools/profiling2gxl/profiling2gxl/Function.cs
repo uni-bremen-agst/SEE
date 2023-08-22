@@ -3,7 +3,9 @@
     public class Function
     {
         /// <summary>
-        /// A Unique ID - will be used for Linkage.Name
+        /// A Unique ID. Will be used for Linkage.Name in GXL and LookupTable in JLG format.
+        /// <br/>
+        /// Recommended: <code>$"{function.Module}:{function.Name}"</code>
         /// </summary>
         public string Id { get; set; }
         /// <summary>
