@@ -1,7 +1,7 @@
-﻿namespace mini2
+﻿namespace mini
 {
     /// <summary>
-    /// Class C2 <see cref="mini"/>
+    /// Class C2.
     /// </summary>
     class C2
     {

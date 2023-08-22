@@ -1,9 +1,7 @@
-﻿using mini2;
-
-namespace mini
+﻿namespace mini
 {
 	/// <summary>
-	/// Class C1. <see cref="mini2"/>>
+	/// Class C1.
 	/// </summary>
 	public class C1
 	{
