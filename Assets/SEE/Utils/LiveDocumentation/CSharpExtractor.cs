@@ -5,7 +5,6 @@ using System.Linq;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using JetBrains.Annotations;
-using SEE.DataModel.DG;
 using SEE.Game.UI.LiveDocumentation.Buffer;
 
 namespace SEE.Utils.LiveDocumentation
@@ -13,20 +12,31 @@ namespace SEE.Utils.LiveDocumentation
     /// <summary>
     ///     Extractor class for CSharp source code
     /// </summary>
-    public class CSharpExtractor : Extractor
+    public class CSharpExtractor : IExtractor
     {
-        private readonly CommonTokenStream _commentTokens;
-        private readonly string _filePath;
-        private readonly CSharpParser _parser;
-        private readonly CommonTokenStream _tokens;
+        /// <summary>
+        /// The path of the file which should be parsed
+        /// </summary>
+        private readonly string filePath;
 
         /// <summary>
+        /// The extracted tokens from the CSharp file
         /// </summary>
-        /// <param name="fileName"></param>
+        private readonly CommonTokenStream commentTokens;
+
+        /// <summary>
+        /// The parser which is used to extract informations from the file
+        /// </summary>
+        private readonly CSharpParser parser;
+
+        /// <summary>
+        /// Constructs a new instance of a <see cref="CSharpExtractor"/>
+        /// </summary>
+        /// <param name="fileName">The name of the file which should be extracted</param>
         /// <exception cref="FileNotFoundException">When the source code file doesn't exist.</exception>
         public CSharpExtractor(string fileName)
         {
-            _filePath = fileName;
+            filePath = fileName;
             if (!File.Exists(fileName))
             {
                 throw new FileNotFoundException($"The file {fileName} doesn't exist");
@@ -34,15 +44,15 @@ namespace SEE.Utils.LiveDocumentation
 
             string input = File.ReadAllText(fileName);
             CSharpFullLexer lexer = new CSharpFullLexer(new AntlrInputStream(input));
-            _tokens = new CommonTokenStream(lexer);
-            _tokens.Fill();
-            _parser = new CSharpParser(_tokens);
+            CommonTokenStream tokens = new CommonTokenStream(lexer);
+            tokens.Fill();
+            parser = new CSharpParser(tokens);
 
             CSharpFullLexer lexer1 = new CSharpFullLexer(new AntlrInputStream(input));
 
 
-            _commentTokens = new CommonTokenStream(lexer1, 2);
-            _commentTokens.Fill();
+            commentTokens = new CommonTokenStream(lexer1, 2);
+            commentTokens.Fill();
         }
 
 
@@ -54,7 +64,7 @@ namespace SEE.Utils.LiveDocumentation
         /// <returns>The documentation of the class</returns>
         public LiveDocumentationBuffer ExtractClassComments(string className)
         {
-            _parser.Reset();
+            parser.Reset();
             LiveDocumentationBuffer buffer = new();
 
 
@@ -65,7 +75,7 @@ namespace SEE.Utils.LiveDocumentation
                 // Combining the Type 2 Tokens (C# Class Documentation) between the start of the class and the
                 // start of the namespace, if the class is the first in the file, or between the start of the class and the
                 // end of the last type declaration
-                string commentTokens = string.Join(Environment.NewLine, _commentTokens.GetTokens()
+                string commentTokens = string.Join(Environment.NewLine, this.commentTokens.GetTokens()
                     .Where(x => x.Type == 2 && x.Line < classContext.Start.Line && x.Line > upperLineBound)
                     .Select(x => x.Text).ToList());
 
@@ -75,8 +85,7 @@ namespace SEE.Utils.LiveDocumentation
                 tokens.Fill();
                 if (tokens.GetTokens().Count > 1)
                 {
-                    CSharpCommentsGrammarParser parser = new CSharpCommentsGrammarParser(tokens);
-                    // var t = parser.start().children;
+                    CSharpCommentsGrammarParser parser = new CSharpCommentsGrammarParser(tokens); ;
                     ProcessSummary(buffer, parser.docs().summary());
                     // Parse C# Doc line by line and write it in the Buffer
                 }
@@ -84,7 +93,7 @@ namespace SEE.Utils.LiveDocumentation
                 return buffer;
             }
 
-            throw new ClassNotFoundException(className, _filePath);
+            throw new ClassNotFoundException(className, filePath);
         }
 
         /// <summary>
@@ -95,7 +104,7 @@ namespace SEE.Utils.LiveDocumentation
         public List<LiveDocumentationClassMemberBuffer> ExtractMethods(string className)
         {
             List<LiveDocumentationClassMemberBuffer> buffers = new();
-            _parser.Reset();
+            parser.Reset();
 
             (CSharpParser.Type_declarationContext classContext, int upperLineBound) = GetClassByName(className);
             // Parse all namespaces and iterate over them
@@ -226,9 +235,9 @@ namespace SEE.Utils.LiveDocumentation
         public List<string> ExtractImportedNamespaces()
         {
             List<string> ret = new();
-            _parser.Reset();
+            parser.Reset();
             // If the file doesn't have any using directives an empty list is returned.
-            if (_parser.compilation_unit().using_directives() is { } usingDirectivesContext)
+            if (parser.compilation_unit().using_directives() is { } usingDirectivesContext)
             {
                 foreach (CSharpParser.Using_directiveContext usingDirective in usingDirectivesContext.using_directive())
                 {
@@ -253,15 +262,10 @@ namespace SEE.Utils.LiveDocumentation
         ///     name null is returned.
         ///     (Context, LineNumberBound)
         /// </returns>
-        [CanBeNull]
         private (CSharpParser.Type_declarationContext, int) GetClassByName(string className)
         {
-            //   var classNamePath = className.Split(".");
-            //   var classNameWithoutNS = classNamePath.LastOrDefault();
-            //  var enumerable = classNamePath.Take(classNamePath.Length - 1).ToList();
-            // var strings = classNamePath[..^1];
-            _parser.Reset();
-            CSharpParser.Namespace_member_declarationContext[] namespaces = _parser
+            parser.Reset();
+            CSharpParser.Namespace_member_declarationContext[] namespaces = parser
                 .compilation_unit()
                 .namespace_member_declarations()
                 .namespace_member_declaration();
@@ -447,7 +451,7 @@ namespace SEE.Utils.LiveDocumentation
         private (CSharpCommentsGrammarParser, CommonTokenStream) CreateParserForMethod(int methodUpperLineBound,
             int methodLowerLineBound)
         {
-            string commentTokens = string.Join(Environment.NewLine, _commentTokens.GetTokens()
+            string commentTokens = string.Join(Environment.NewLine, this.commentTokens.GetTokens()
                 .Where(x => x.Type == 2 && x.Line < methodLowerLineBound && x.Line > methodUpperLineBound)
                 .Select(x => x.Text).ToList());
 

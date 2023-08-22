@@ -10,7 +10,7 @@ namespace SEE.Utils.LiveDocumentation
     ///
     /// This interface is used to create new documentation parser for different languages.
     /// </summary>
-    public interface Extractor
+    public interface IExtractor
     {
         /// <summary>
         /// This method should extract the comments of an specific class in a specific source code file.
@@ -27,7 +27,7 @@ namespace SEE.Utils.LiveDocumentation
         /// <param name="fileName"></param>
         /// <param name="className"></param>
         /// <exception cref="ClassNotFoundException">Is thrown, when the class cant be found in the file</exception>
-        /// <returns></returns>
+        /// <returns>A list of <see cref="LiveDocumentationClassMemberBuffer"/> for each of the class members/methods</returns>
         [NotNull]
         public List<LiveDocumentationClassMemberBuffer> ExtractMethods(string className);
 
@@ -36,7 +36,7 @@ namespace SEE.Utils.LiveDocumentation
         /// This method should extract all import statements of the source code file.
         /// </summary>
         /// <param name="fileName"></param>
-        /// <returns></returns>
+        /// <returns>A <see cref="List{T}"/> of the names of all imported namespaces</returns>
         [NotNull]
         public List<string> ExtractImportedNamespaces();
     }
