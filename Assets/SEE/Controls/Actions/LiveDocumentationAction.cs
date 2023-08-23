@@ -27,8 +27,9 @@ namespace SEE.Controls.Actions
         /// Creates a new instance of <see cref="LiveDocumentationAction"/>
         /// </summary>
         /// <returns>The new created instance</returns>
-        public static ReversibleAction CreateAction()
-        { return new LiveDocumentationAction();
+        public static ReversibleAction CreateReversibleAction()
+        {
+            return new LiveDocumentationAction();
         }
 
         /// <summary>
@@ -49,7 +50,7 @@ namespace SEE.Controls.Actions
         /// Creates a new instance of the action
         /// </summary>
         /// <returns>The new instance</returns>
-        public override ReversibleAction NewInstance() => CreateAction();
+        public override ReversibleAction NewInstance() => CreateReversibleAction();
 
         /// <summary>
         /// Awake method

@@ -111,11 +111,6 @@ namespace SEE.Controls.Actions
                   Color.grey.Darker(), "Materials/ModernUIPack/Arrow Bold",
                   AcceptDivergenceAction.CreateReversibleAction);
 
-            LiveDocumentation =
-                new("LiveDocumentation", "Displays the documentation of a node",
-                Color.magenta.Lighter(), "Materials/ModernUIPack/Document",
-                LiveDocumentationAction.CreateAction);
-
             Draw =
               new("Draw", "Draw a line",
                   Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
@@ -173,6 +168,11 @@ namespace SEE.Controls.Actions
                   Color.blue.Darker(), "Materials/ModernUIPack/Document",
                   SaveBoardAction.CreateReversibleAction,
                   parent: MetricBoard);
+
+            LiveDocumentation =
+                new("LiveDocumentation", "Displays the documentation of a node",
+                    Color.magenta.Lighter(), "Materials/ModernUIPack/Document",
+                    LiveDocumentationAction.CreateReversibleAction);
         }
 
         public readonly static ActionStateType Move;
@@ -185,7 +185,6 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType Delete;
         public readonly static ActionStateType ShowCode;
         public readonly static ActionStateType Draw;
-        public readonly static ActionStateType LiveDocumentation;
         public readonly static ActionStateType AcceptDivergence;
         public readonly static ActionStateTypeGroup MetricBoard;
         public readonly static ActionStateType AddBoard;
@@ -196,6 +195,7 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType DeleteWidget;
         public readonly static ActionStateType LoadBoard;
         public readonly static ActionStateType SaveBoard;
+        public readonly static ActionStateType LiveDocumentation;
 
         #endregion
 
