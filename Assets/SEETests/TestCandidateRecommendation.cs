@@ -39,7 +39,7 @@ namespace SEE.Tools.Architecture
         /// <summary>
         /// 
         /// </summary>
-        CandidateRecommendations candidateRecommendation;
+        CandidateRecommendation candidateRecommendation;
 
         private readonly string[] alphabet = new string[]
         {
@@ -69,7 +69,7 @@ namespace SEE.Tools.Architecture
 
         private void SetupCandidateRecommendation()
         {
-            candidateRecommendation = new CandidateRecommendations();
+            candidateRecommendation = new CandidateRecommendation();
             candidateRecommendation.TargetType = "Class";
             candidateRecommendation.ReflexionGraph = graph;
             graph.Subscribe(candidateRecommendation);
@@ -303,9 +303,6 @@ namespace SEE.Tools.Architecture
                     HashSet<Node> recommendationsForCluster;
                     if (!recommendations.TryGetValue(cluster, out recommendationsForCluster)) return false;
 
-                    //// No required nodes for key
-                    //if (!mustBeRecommended.TryGetValue(cluster, _)) continue;
-
                     if (recommendationsForCluster == null && mustBeRecommended[cluster] == null) continue;
                     if (recommendationsForCluster == null || mustBeRecommended == null) return false;
                     if (!mustBeRecommended[cluster].IsSubsetOf(recommendationsForCluster)) return false;
@@ -326,7 +323,5 @@ namespace SEE.Tools.Architecture
 
             return true;
         }
-
-
     }
 }
