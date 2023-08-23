@@ -41,8 +41,8 @@ namespace SEE.Controls.Actions
             if (!Raycasting.IsMouseOverGUI())
             {
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && 
-                    Raycasting.RaycastAnything(out RaycastHit raycastHit) && raycastHit.collider.gameObject.transform.parent != null &&
-                    GameDrawableIDFinder.hasDrawableParent(raycastHit.collider.gameObject))
+                    Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
+                    GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject))
                 {
                     pickedColor = raycastHit.collider.gameObject.GetColor();
                     HSVPicker.ColorPicker picker = DrawableConfigurator.drawableMenu.GetComponent<HSVPicker.ColorPicker>();

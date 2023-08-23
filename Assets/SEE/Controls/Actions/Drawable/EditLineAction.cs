@@ -20,12 +20,36 @@ namespace Assets.SEE.Controls.Actions.Drawable
 {
     public class EditLineAction : AbstractPlayerAction
     {
-        private const string editPrefabPath = "Prefabs/UI/DrawableLineMenu";
         private HSVPicker.ColorPicker picker;
         private LayerSliderController layerSlider;
         private ThicknessSliderController thicknessSlider;
         private Memento memento;
         private bool isActive = false;
+
+        private static GameObject selectedLine;
+
+        private static ValueHolder oldValueHolder;
+
+        private static ValueHolder newValueHolder;
+
+        public class ValueHolder
+        {
+            public Color color;
+            public int layer;
+            public float thickness;
+
+            public ValueHolder(Color color, int layer, float thickness)
+            {
+                this.color = color;
+                this.layer = layer;
+                this.thickness = thickness;
+            }
+
+            public bool CheckEquals(ValueHolder holder)
+            {
+                return color.Equals(holder.color) && layer.Equals(holder.layer) && thickness.Equals(holder.thickness);
+            }
+        }
 
         /// <summary>
         /// 
@@ -40,30 +64,30 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     raycastHit.collider.gameObject.CompareTag(Tags.Line))
                 {
-                    GameObject selectedLine = raycastHit.collider.gameObject;
-                    GameObject oldLine = GameEditLine.selectedLine;
+                    GameObject currentSelectedLine = raycastHit.collider.gameObject;
+                    GameObject oldLine = selectedLine;
 
-                    if (oldLine != null && !GameEditLine.oldValueHolder.CheckEquals(GameEditLine.newValueHolder))
+                    if (oldLine != null && !oldValueHolder.CheckEquals(newValueHolder))
                     {
-                        memento = new Memento(oldLine, oldLine, GameEditLine.oldValueHolder, GameEditLine.newValueHolder,
-                                     oldLine.transform.parent.gameObject, oldLine.name);
+                        memento = new Memento(oldLine, oldLine, oldValueHolder, newValueHolder,
+                                     GameDrawableFinder.FindDrawableParent(oldLine), oldLine.name);
                         currentState = ReversibleAction.Progress.Completed;
                     }
 
-                    LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
-                    GameEditLine.oldValueHolder = new(renderer.material.color, renderer.sortingOrder, renderer.startWidth);
-                    GameEditLine.newValueHolder = new(renderer.material.color, renderer.sortingOrder, renderer.startWidth);
+                    LineRenderer renderer = currentSelectedLine.GetComponent<LineRenderer>();
+                    oldValueHolder = new(renderer.material.color, renderer.sortingOrder, renderer.startWidth);
+                    newValueHolder = new(renderer.material.color, renderer.sortingOrder, renderer.startWidth);
 
                     isActive = true;
-                    BlinkEffect effect = selectedLine.AddOrGetComponent<BlinkEffect>();
+                    BlinkEffect effect = currentSelectedLine.AddOrGetComponent<BlinkEffect>();
                     effect.SetAllowedActionStateType(GetActionStateType());
 
                     if (oldLine != null)
                     {
-                        if (selectedLine.name.Equals(oldLine.name))
+                        if (currentSelectedLine.name.Equals(oldLine.name))
                         {
                             effect.LoopReverse();
-                            GameEditLine.selectedLine = null;
+                            selectedLine = null;
                             if (!effect.GetLoopStatus())
                             {
                                 DrawableConfigurator.disableDrawableMenu();
@@ -78,18 +102,18 @@ namespace Assets.SEE.Controls.Actions.Drawable
                             }
                         }
                     }
-                    if (oldLine == null || !selectedLine.name.Equals(oldLine.name))
+                    if (oldLine == null || !currentSelectedLine.name.Equals(oldLine.name))
                     {
-                        effect.Activate(selectedLine);
-                        GameEditLine.selectedLine = selectedLine;
+                        effect.Activate(currentSelectedLine);
+                        selectedLine = currentSelectedLine;
                     }
 
-                    if (selectedLine.GetComponent<BlinkEffect>() != null && selectedLine.GetComponent<BlinkEffect>().GetLoopStatus())
+                    if (currentSelectedLine.GetComponent<BlinkEffect>() != null && currentSelectedLine.GetComponent<BlinkEffect>().GetLoopStatus())
                     {
                         DrawableConfigurator.enableDrawableMenu();
 
-                        GameObject drawable = selectedLine.transform.parent.gameObject;
-                        GameObject drawableParent = drawable.transform.parent.gameObject;
+                        GameObject drawable = GameDrawableFinder.FindDrawableParent(currentSelectedLine);
+                        string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
 
                         thicknessSlider = DrawableConfigurator.drawableMenu.GetComponentInChildren<ThicknessSliderController>();
                         thicknessSlider.AssignValue(renderer.startWidth);
@@ -97,9 +121,9 @@ namespace Assets.SEE.Controls.Actions.Drawable
                         {
                             if (thickness > 0.0f)
                             {
-                                GameEditLine.ChangeThickness(selectedLine, thickness);
-                                GameEditLine.newValueHolder.thickness = thickness;
-                                new EditLineThicknessNetAction(drawable.name, drawableParent.name, selectedLine.name, thickness).Execute();
+                                GameEditLine.ChangeThickness(currentSelectedLine, thickness);
+                                newValueHolder.thickness = thickness;
+                                new EditLineThicknessNetAction(drawable.name, drawableParentName, currentSelectedLine.name, thickness).Execute();
                             }
                         });
 
@@ -107,18 +131,18 @@ namespace Assets.SEE.Controls.Actions.Drawable
                         layerSlider.AssignValue(renderer.sortingOrder);
                         layerSlider.onValueChanged.AddListener(layerOrder =>
                         {
-                            GameEditLine.ChangeLayer(selectedLine, layerOrder);
-                            GameEditLine.newValueHolder.layer = layerOrder;
-                            new EditLineLayerNetAction(drawable.name, drawableParent.name, selectedLine.name, layerOrder).Execute();
+                            GameEditLine.ChangeLayer(currentSelectedLine, layerOrder);
+                            newValueHolder.layer = layerOrder;
+                            new EditLineLayerNetAction(drawable.name, drawableParentName, currentSelectedLine.name, layerOrder).Execute();
                         });
 
                         picker = DrawableConfigurator.drawableMenu.GetComponent<HSVPicker.ColorPicker>();
                         picker.AssignColor(renderer.material.color);
                         picker.onValueChanged.AddListener(DrawableConfigurator.colorAction = color =>
                         {
-                            GameEditLine.ChangeColor(selectedLine, color);
-                            GameEditLine.newValueHolder.color = color;
-                            new EditLineColorNetAction(drawable.name, drawableParent.name, selectedLine.name, color).Execute();
+                            GameEditLine.ChangeColor(currentSelectedLine, color);
+                            newValueHolder.color = color;
+                            new EditLineColorNetAction(drawable.name, drawableParentName, currentSelectedLine.name, color).Execute();
                         });
                     }
                     result = true;
@@ -136,13 +160,13 @@ namespace Assets.SEE.Controls.Actions.Drawable
         {
             public readonly GameObject oldLine;
             public GameObject currentLine;
-            public readonly GameEditLine.ValueHolder oldValueHolder;
-            public readonly GameEditLine.ValueHolder newValueHolder;
+            public readonly ValueHolder oldValueHolder;
+            public readonly ValueHolder newValueHolder;
             public readonly GameObject drawable;
             public readonly string currentLineName;
 
-            public Memento(GameObject oldLine, GameObject currentLine, GameEditLine.ValueHolder oldValueHolder,
-                GameEditLine.ValueHolder newValueHolder, GameObject drawable, string currentLineName)
+            public Memento(GameObject oldLine, GameObject currentLine, ValueHolder oldValueHolder,
+                ValueHolder newValueHolder, GameObject drawable, string currentLineName)
             {
                 this.oldLine = oldLine;
                 this.currentLine = currentLine;
@@ -162,7 +186,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             if (memento.currentLine == null && memento.currentLineName != null)
             {
-                memento.currentLine = GameDrawableIDFinder.FindChild(memento.drawable, memento.currentLineName);
+                memento.currentLine = GameDrawableFinder.FindChild(memento.drawable, memento.currentLineName);
             }
             if (memento.oldLine == null || (memento.oldLine != null && memento.oldLine.name.Equals(memento.currentLine.name)))
             {
@@ -172,12 +196,12 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     GameEditLine.ChangeLayer(memento.currentLine, memento.oldValueHolder.layer);
                     GameEditLine.ChangeColor(memento.currentLine, memento.oldValueHolder.color);
 
-                    GameObject drawable = memento.currentLine.transform.parent.gameObject;
-                    GameObject drawableParent = drawable.transform.parent.gameObject;
+                    GameObject drawable = GameDrawableFinder.FindDrawableParent(memento.currentLine);
+                    string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
 
-                    new EditLineThicknessNetAction(drawable.name, drawableParent.name, memento.currentLine.name, memento.oldValueHolder.thickness).Execute();
-                    new EditLineLayerNetAction(drawable.name, drawableParent.name, memento.currentLine.name, memento.oldValueHolder.layer).Execute();
-                    new EditLineColorNetAction(drawable.name, drawableParent.name, memento.currentLine.name, memento.oldValueHolder.color).Execute();
+                    new EditLineThicknessNetAction(drawable.name, drawableParent, memento.currentLine.name, memento.oldValueHolder.thickness).Execute();
+                    new EditLineLayerNetAction(drawable.name, drawableParent, memento.currentLine.name, memento.oldValueHolder.layer).Execute();
+                    new EditLineColorNetAction(drawable.name, drawableParent, memento.currentLine.name, memento.oldValueHolder.color).Execute();
                 }
             }
             DrawableConfigurator.disableDrawableMenu();
@@ -201,7 +225,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             if (memento.currentLine == null && memento.currentLineName != null)
             {
-                memento.currentLine = GameDrawableIDFinder.FindChild(memento.drawable, memento.currentLineName);
+                memento.currentLine = GameDrawableFinder.FindChild(memento.drawable, memento.currentLineName);
             }
             if (memento.oldLine == null || (memento.oldLine != null && memento.oldLine.name.Equals(memento.currentLine.name)))
             {
@@ -211,12 +235,12 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     GameEditLine.ChangeLayer(memento.currentLine, memento.newValueHolder.layer);
                     GameEditLine.ChangeColor(memento.currentLine, memento.newValueHolder.color);
 
-                    GameObject drawable = memento.currentLine.transform.parent.gameObject;
-                    GameObject drawableParent = drawable.transform.parent.gameObject;
+                    GameObject drawable = GameDrawableFinder.FindDrawableParent(memento.currentLine);
+                    string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
 
-                    new EditLineThicknessNetAction(drawable.name, drawableParent.name, memento.currentLine.name, memento.newValueHolder.thickness).Execute();
-                    new EditLineLayerNetAction(drawable.name, drawableParent.name, memento.currentLine.name, memento.newValueHolder.layer).Execute();
-                    new EditLineColorNetAction(drawable.name, drawableParent.name, memento.currentLine.name, memento.newValueHolder.color).Execute();
+                    new EditLineThicknessNetAction(drawable.name, drawableParent, memento.currentLine.name, memento.newValueHolder.thickness).Execute();
+                    new EditLineLayerNetAction(drawable.name, drawableParent, memento.currentLine.name, memento.newValueHolder.layer).Execute();
+                    new EditLineColorNetAction(drawable.name, drawableParent, memento.currentLine.name, memento.newValueHolder.color).Execute();
                 }
             }
             DrawableConfigurator.disableDrawableMenu();

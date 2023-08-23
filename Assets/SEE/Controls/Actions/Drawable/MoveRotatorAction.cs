@@ -14,6 +14,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 using MoveNetAction = Assets.SEE.Net.Actions.Drawable.MoveNetAction;
@@ -25,7 +26,35 @@ namespace Assets.SEE.Controls.Actions.Drawable
         private Memento memento;
         private bool didSomething = false;
         private bool isDone = false;
-        private GameObject selectedObject;
+
+        private enum ClickState
+        {
+            None,
+            Left,
+            Right
+        }
+
+        private static GameObject selectedObject;
+        private static bool isActive = false;
+        private static ClickState clickState = ClickState.None;
+        private static Vector3 firstPoint;
+        private static Vector3 oldObjectPosition;
+        private static Quaternion oldObjectRotation;
+        private static Vector3 direction = Vector3.zero;
+        private static float degree = 0;
+        private const string rotationMenuPrefab = "Prefabs/UI/DrawableRotate";
+        private static GameObject rotationMenu;
+
+        private Vector3 newObjectPosition;
+
+        
+
+        public void SetSelectedObject(GameObject obj)
+        {
+            selectedObject = obj;
+            oldObjectPosition = obj.transform.position;
+            oldObjectRotation = obj.transform.rotation;
+        }
 
         /// <summary>
         /// 
@@ -34,146 +63,128 @@ namespace Assets.SEE.Controls.Actions.Drawable
         public override bool Update()
         {
             bool result = false;
-            selectedObject = GameMoveRotator.selectedObj;
 
             if (!Raycasting.IsMouseOverGUI())
             {
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !GameMoveRotator.isActive && !didSomething && !isDone &&
-                    Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                    raycastHit.collider.gameObject.transform.parent.gameObject.CompareTag(Tags.Drawable))
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButton(1)) 
+                    && !isActive && !didSomething && !isDone && Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
+                    GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject) && clickState == ClickState.None)
                 {
                     selectedObject = raycastHit.collider.gameObject;
-                    GameMoveRotator.isActive = true;
+                    isActive = true;
+                    if (Input.GetMouseButtonDown(0)||Input.GetMouseButton(0))
+                    {
+                        clickState = ClickState.Left;
+                    } else if (Input.GetMouseButtonDown(1) || Input.GetMouseButton(1))
+                    {
+                        clickState = ClickState.Right;
+                    }
                     BlinkEffect effect = selectedObject.AddOrGetComponent<BlinkEffect>();
                     effect.SetAllowedActionStateType(GetActionStateType());
                     effect.Activate(selectedObject);
-                    GameMoveRotator.SetSelectedLine(selectedObject);
-                    GameMoveRotator.firstPoint = raycastHit.point;
+                    SetSelectedObject(selectedObject);
+                    firstPoint = raycastHit.point;
                 }
-
-                if (selectedObject != null && selectedObject.GetComponent<BlinkEffect>() != null && selectedObject.GetComponent<BlinkEffect>().GetLoopStatus())
-                {   // MOVE
+                // MOVE
+                if (selectedObject != null && selectedObject.GetComponent<BlinkEffect>() != null && selectedObject.GetComponent<BlinkEffect>().GetLoopStatus() && clickState == ClickState.Left)
+                {   
+                    GameObject drawable = GameDrawableFinder.FindDrawableParent(selectedObject);
+                    string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
+                    
                     if (Raycasting.RaycastAnything(out RaycastHit hit))
                     {
                         if (hit.collider.gameObject.CompareTag(Tags.Drawable))
                         {
                             didSomething = true;
-                            Vector3 linePosition = GameMoveRotator.oldObjectPosition;
-                            GameMoveRotator.newObjectPosition = linePosition + new Vector3(hit.point.x - GameMoveRotator.firstPoint.x, hit.point.y - GameMoveRotator.firstPoint.y, 0);
-                            GameMoveRotator.MoveObject(selectedObject, GameMoveRotator.newObjectPosition);
-                            GameObject drawable = selectedObject.transform.parent.gameObject;
-                            GameObject drawableParent = drawable.transform.parent.gameObject;
-                            new MoveNetAction(drawable.name, drawableParent.name, selectedObject.name, GameMoveRotator.newObjectPosition).Execute();
+                            Vector3 objectPosition = oldObjectPosition;
+                            newObjectPosition = objectPosition + new Vector3(hit.point.x - firstPoint.x, hit.point.y - firstPoint.y, 0);
+                            GameMoveRotator.MoveObject(selectedObject, newObjectPosition);
+                            new MoveNetAction(drawable.name, drawableParentName, selectedObject.name, newObjectPosition).Execute();
                         }
                     }
-                    // Rotate ?
-                    /*
-                    LineRenderer renderer = selectedObject.GetComponent<LineRenderer>();
-                    Vector3[] positions = GameMoveRotator.oldLinePositions;
-                    if (Input.mouseScrollDelta.y > 0)
+                }
+                // Rotate
+                if (selectedObject != null && selectedObject.GetComponent<BlinkEffect>() != null && selectedObject.GetComponent<BlinkEffect>().GetLoopStatus() && clickState == ClickState.Right)
+                {
+                    GameObject drawable = GameDrawableFinder.FindDrawableParent(selectedObject);
+                    string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
+                    bool rotate = false;
+                    if (rotationMenu == null)
                     {
-                        Debug.Log(DateTime.Now + " Mouse UP! " + Input.mouseScrollDelta.y);
-                        if (selectedObject.CompareTag(Tags.Line))
+                        rotationMenu = PrefabInstantiator.InstantiatePrefab(rotationMenuPrefab,
+                                GameObject.Find("UI Canvas").transform, false);
+                    }
+                    RotationSliderController slider = rotationMenu.GetComponentInChildren<RotationSliderController>();
+                    slider.AssignValue(selectedObject.transform.eulerAngles.z);
+                    slider.onValueChanged.AddListener(degree =>
+                    {
+                        float degreeToMove;
+                        Vector3 currentDirection;
+                        if (selectedObject.transform.eulerAngles.z > degree)
                         {
-                            // Tricky shit
-                            Debug.Log("Positionsize: " + positions.Length + " - Render size: " + renderer.positionCount);
-                            for (int i = 0; i < renderer.positionCount; i++)
-                            {
-
-                                Vector3 position = positions[i];
-                                //float offsetX = hit.point.x - position.x;
-                                //float offsetY = hit.point.y - position.y;
-                                Vector3 moveOffset = position;
-                                Debug.Log("Step: " + GameMoveRotator.step);
-                                Debug.Log("First line: " + positions[0]);
-                                switch (GameMoveRotator.step)
-                                {
-                                    case 0:
-                                        moveOffset = new(0, position.y - GameMoveRotator.firstPoint.y, 0);
-                                        break;
-                                    case 1:
-                                        moveOffset = new(GameMoveRotator.firstPoint.x - position.x, 0, 0);
-                                        break;
-                                    case 2:
-                                        moveOffset = new(GameMoveRotator.firstPoint.x - position.x, GameMoveRotator.firstPoint.y - position.y, 0);
-                                        break;
-                                    case 3:
-                                        moveOffset = new(0, 0, 0);
-                                        break;
-                                    default:
-                                        GameMoveRotator.step = 0;
-                                        break;
-                                }
-
-                                positions[i] = position + moveOffset;
-                            }
-                            GameMoveRotator.step++;
-                            if (GameMoveRotator.step >= 4)
-                            {
-                                GameMoveRotator.step = 0;
-                            }
-                            renderer.SetPositions(positions);
-                            Mesh mesh = new();
-                            MeshCollider meshCollider = selectedObject.GetComponent<MeshCollider>();
-                            renderer.BakeMesh(mesh, false);
-                            meshCollider.sharedMesh = mesh;
+                            degreeToMove = selectedObject.transform.eulerAngles.z - degree;
+                            currentDirection = Vector3.back;
                         } else
                         {
-                            // for image etc ?
+                            degreeToMove = degree - selectedObject.transform.eulerAngles.z;
+                            currentDirection = Vector3.forward;
                         }
-                    }
-                    if (Input.mouseScrollDelta.y < 0)
+                        GameMoveRotator.RotateObject(selectedObject, firstPoint, currentDirection, degreeToMove);
+                        new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, firstPoint, currentDirection, degreeToMove).Execute();
+                        didSomething = true;
+                    });
+                    //Transform transform = selectedObject.transform;
+                    if (Input.mouseScrollDelta.y > 0 && !Input.GetKey(KeyCode.LeftControl))
                     {
-                        Debug.Log(DateTime.Now + " Mouse Down! " + Input.mouseScrollDelta.y);
-                        if (selectedObject.CompareTag(Tags.Line))
-                        {
-                            // Tricky shit
-                        }
-                        else
-                        {
-                            // for image etc ?
-                        }
+                        //transform.RotateAround(firstPoint, Vector3.forward, 1);
+                        direction = Vector3.forward;
+                        degree = 1;
+                        rotate = true;
                     }
-                    /*
-                             LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
-                             Vector3[] positions = GameMoveRotator.savedPositionsOfselectedLine;
+                    if (Input.mouseScrollDelta.y > 0 && Input.GetKey(KeyCode.LeftControl))
+                    {
+                        // transform.RotateAround(firstPoint, Vector3.forward, 10);
+                        direction = Vector3.forward;
+                        degree = 10;
+                        rotate = true;
+                    }
 
-                            renderer.GetPositions(positions);
-                             Debug.Log("Positionsize: " + positions.Length + " - Render size: " + renderer.positionCount);
-                                for (int i = 0; i < renderer.positionCount; i++)
-                                {
-                                    
-                                    Vector3 position = positions[i];
-                                    float offsetX = hit.point.x - position.x;
-                                    float offsetY = hit.point.y - position.y;
+                    if (Input.mouseScrollDelta.y < 0 && !Input.GetKey(KeyCode.LeftControl))
+                    {
+                        //transform.RotateAround(firstPoint, Vector3.back, 1);
+                        direction = Vector3.back;
+                        degree = 1;
+                        rotate = true;
 
-                                    Vector3 moveOffset = new(offsetX, offsetY, 0);
+                    }
+                    if (Input.mouseScrollDelta.y < 0 && Input.GetKey(KeyCode.LeftControl))
+                    {
+                        // transform.RotateAround(firstPoint, Vector3.back, 10);
+                        direction = Vector3.back;
+                        degree = 10;
+                        rotate = true;
+                    }
 
-                                positions[i] = hit.point + moveOffset;
-                                }
-                                renderer.SetPositions(positions);
-                                Mesh mesh = new();
-                                MeshCollider meshCollider = selectedLine.GetComponent<MeshCollider>();
-                                //Destroyer.Destroy(meshCollider);
-                               // MeshCollider newMeshCollider = selectedLine.AddComponent<MeshCollider>(); 
-                                renderer.BakeMesh(mesh, false);
-                                meshCollider.sharedMesh = mesh;
-                            */
-                    //Debug.Log("Rotate");
-                    //Vector3 newRotation = new Vector3(0, 0, 0);
-                    //selectedLine.transform.localEulerAngles = newRotation;
+                    if (rotate)
+                    {
+                        GameMoveRotator.RotateObject(selectedObject, firstPoint, direction, degree);
+                        new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, firstPoint, direction, degree).Execute();
+                        didSomething = true;
+                    }
                 }
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && GameMoveRotator.selectedObj != null && didSomething && GameMoveRotator.isActive)
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObject != null && didSomething && isActive)
                 {
-                    memento = new Memento(selectedObject, selectedObject.transform.parent.gameObject, selectedObject.name,
-                        GameMoveRotator.oldObjectPosition, GameMoveRotator.newObjectPosition, GameMoveRotator.oldLinePositions, GameMoveRotator.newLinePositions);
-                    GameMoveRotator.isActive = false;
+                    memento = new Memento(selectedObject, GameDrawableFinder.FindDrawableParent(selectedObject), selectedObject.name,
+                        oldObjectPosition, newObjectPosition, oldObjectRotation, firstPoint, direction, selectedObject.transform.eulerAngles.z - oldObjectRotation.eulerAngles.z, clickState);
+                    clickState = ClickState.None;   
+                    isActive = false;
                     isDone = true;
                     didSomething = false;
                     selectedObject.GetComponent<BlinkEffect>().Deactivate();
                     selectedObject = null;
-                    GameMoveRotator.selectedObj = null;
-                    GameMoveRotator.oldObjectPosition = new Vector3();
+                    oldObjectPosition = new Vector3();
+                    oldObjectRotation = new Quaternion();
+                    Destroyer.Destroy(rotationMenu);
                     result = true;
                     currentState = ReversibleAction.Progress.Completed;
                 }
@@ -184,24 +195,30 @@ namespace Assets.SEE.Controls.Actions.Drawable
 
         private struct Memento
         {
-            public GameObject selectedLine;
+            public GameObject selectedObject;
             public readonly GameObject drawable;
-            public readonly string currentLineName;
+            public readonly string currentObjectName;
             public readonly Vector3 oldObjectPosition;
             public readonly Vector3 newObjectPosition;
-            public readonly Vector3[] oldLinePositions;
-            public readonly Vector3[] newLinePositions;
+            public readonly Quaternion oldObjectRotation;
+            public readonly Vector3 firstPoint;
+            public readonly Vector3 direction;
+            public readonly float degree;
+            public readonly ClickState clickState;
 
-            public Memento(GameObject selectedLine, GameObject drawable, string currentLineName,
-                Vector3 oldObjectPosition, Vector3 newObjectPosition, Vector3[] oldLinePositions, Vector3[] newLinePositions)
+            public Memento(GameObject selectedObject, GameObject drawable, string currentLineName,
+                Vector3 oldObjectPosition, Vector3 newObjectPosition, Quaternion oldObjectRotation, Vector3 firstPoint, Vector3 direction, float degree, ClickState clickState)
             {
-                this.selectedLine = selectedLine;
+                this.selectedObject = selectedObject;
                 this.drawable = drawable;
-                this.currentLineName = currentLineName;
+                this.currentObjectName = currentLineName;
                 this.oldObjectPosition = oldObjectPosition;
                 this.newObjectPosition = newObjectPosition;
-                this.oldLinePositions = oldLinePositions;
-                this.newLinePositions = newLinePositions;
+                this.oldObjectRotation = oldObjectRotation;
+                this.firstPoint = firstPoint;
+                this.direction = direction;
+                this.degree = degree;
+                this.clickState = clickState;
             }
         }
 
@@ -212,21 +229,28 @@ namespace Assets.SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            if (memento.selectedLine == null && memento.currentLineName != null)
+            if (memento.selectedObject == null && memento.currentObjectName != null)
             {
-                memento.selectedLine = GameDrawableIDFinder.FindChild(memento.drawable, memento.currentLineName);
+                memento.selectedObject = GameDrawableFinder.FindChild(memento.drawable, memento.currentObjectName);
             }
 
-            if (memento.selectedLine != null)
+            if (memento.selectedObject != null)
             {
-                GameMoveRotator.MoveObject(memento.selectedLine, memento.oldObjectPosition);
-                GameMoveRotator.RotateLine(memento.selectedLine, memento.oldLinePositions);
-                GameObject drawable = memento.selectedLine.transform.parent.gameObject;
-                GameObject drawableParent = drawable.transform.parent.gameObject;
-                new MoveNetAction(drawable.name, drawableParent.name, memento.currentLineName, memento.oldObjectPosition).Execute();
-                new RotatorNetAction(drawable.name, drawableParent.name, memento.currentLineName, memento.oldLinePositions).Execute();
+                GameObject drawable = GameDrawableFinder.FindDrawableParent(memento.selectedObject);
+                string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
+                if (memento.clickState == ClickState.Left)
+                {
+                    GameMoveRotator.MoveObject(memento.selectedObject, memento.oldObjectPosition);
+                    new MoveNetAction(drawable.name, drawableParent, memento.currentObjectName, memento.oldObjectPosition).Execute();
+                }
+                else if (memento.clickState == ClickState.Right)
+                {
+                    Vector3 newDirection = memento.direction == Vector3.forward ? Vector3.back : Vector3.forward;
+                    GameMoveRotator.RotateObject(memento.selectedObject, memento.firstPoint, newDirection, memento.degree);
+                    new RotatorNetAction(drawable.name, drawableParent, memento.currentObjectName, memento.firstPoint, newDirection, memento.degree).Execute();
+                }  
             }
-            if (memento.selectedLine != null && memento.selectedLine.TryGetComponent<BlinkEffect>(out BlinkEffect currentEffect))
+            if (memento.selectedObject != null && memento.selectedObject.TryGetComponent<BlinkEffect>(out BlinkEffect currentEffect))
             {
                 currentEffect.Deactivate();
             }
@@ -240,21 +264,27 @@ namespace Assets.SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            if (memento.selectedLine == null && memento.currentLineName != null)
+            if (memento.selectedObject == null && memento.currentObjectName != null)
             {
-                memento.selectedLine = GameDrawableIDFinder.FindChild(memento.drawable, memento.currentLineName);
+                memento.selectedObject = GameDrawableFinder.FindChild(memento.drawable, memento.currentObjectName);
             }
-            if (memento.selectedLine != null)
+            if (memento.selectedObject != null)
             {
-                GameMoveRotator.MoveObject(memento.selectedLine, memento.newObjectPosition);
-                GameMoveRotator.RotateLine(memento.selectedLine, memento.newLinePositions);
-                GameObject drawable = memento.selectedLine.transform.parent.gameObject;
-                GameObject drawableParent = drawable.transform.parent.gameObject;
-                new MoveNetAction(drawable.name, drawableParent.name, memento.currentLineName, memento.newObjectPosition).Execute();
-                new RotatorNetAction(drawable.name, drawableParent.name, memento.currentLineName, memento.newLinePositions).Execute();
+                GameObject drawable = GameDrawableFinder.FindDrawableParent(memento.selectedObject);
+                string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
+                if (memento.clickState == ClickState.Left)
+                {
+                    GameMoveRotator.MoveObject(memento.selectedObject, memento.newObjectPosition);
+                    new MoveNetAction(drawable.name, drawableParent, memento.currentObjectName, memento.newObjectPosition).Execute();
+                } 
+                else if (memento.clickState == ClickState.Right)
+                {
+                    GameMoveRotator.RotateObject(memento.selectedObject, memento.firstPoint, memento.direction, memento.degree);
+                    new RotatorNetAction(drawable.name, drawableParent, memento.currentObjectName, memento.firstPoint, memento.direction, memento.degree).Execute();
+                }
             }
 
-            if (memento.selectedLine != null && memento.selectedLine.TryGetComponent<BlinkEffect>(out BlinkEffect currentEffect))
+            if (memento.selectedObject != null && memento.selectedObject.TryGetComponent<BlinkEffect>(out BlinkEffect currentEffect))
             {
                 currentEffect.Deactivate();
             }
@@ -286,7 +316,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
 
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento.selectedLine == null)
+            if (memento.selectedObject == null)
             {
                 return new HashSet<string>();
             }
@@ -294,7 +324,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
             {
                 return new HashSet<string>
                 {
-                    memento.selectedLine.name
+                    memento.selectedObject.name
                 };
             }
         }

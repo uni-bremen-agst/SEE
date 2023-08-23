@@ -9,15 +9,15 @@ using UnityEngine.EventSystems;
 namespace Assets.SEE.Game.UI.Drawable
 {
     [RequireComponent(typeof(TMP_InputField))]
-    public class HexInputFieldEventTriggerController : MonoBehaviour
+    public class InputFieldEventTriggerController : MonoBehaviour
     {
-        private TMP_InputField hexInputField;
+        private TMP_InputField inputField;
 
         private void Awake()
         {
-            hexInputField = GetComponent<TMP_InputField>();
-            hexInputField.onEndEdit.AddListener(ActivateInput);
-            hexInputField.onSelect.AddListener(DeactivateInput);
+            inputField = GetComponent<TMP_InputField>();
+            inputField.onSubmit.AddListener(ActivateInput);
+            inputField.onSelect.AddListener(DeactivateInput);
         }
         private void DeactivateInput(string hex)
         {

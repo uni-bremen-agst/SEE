@@ -10,21 +10,35 @@ namespace Assets.SEE.Net.Actions.Drawable
     {
         public string DrawableID;
         public string ParentDrawableID;
-        public string LineName;
-        public Vector3[] positions;
+        public string ObjectName;
+        //public Quaternion OldRotation;
+        public Vector3 FirstPoint;
+        public Vector3 Direction;
+        public float Degree;
 
         /// <summary>
         /// Creates a new FastEraseNetAction.
         /// </summary>
         /// <param name="gameObjectID">the unique name of the gameObject of a line
         /// that has to be deleted</param>
-        public RotatorNetAction(string drawableID, string parentDrawableID, string lineName, Vector3[] positions) : base()
+        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, Vector3 firstPoint, Vector3 direction, float degree) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
-            LineName = lineName;
-            this.positions = positions;
+            ObjectName = objectName;
+            FirstPoint = firstPoint;
+            Direction = direction;
+            Degree = degree;
         }
+        /*
+        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, Quaternion rotation) : base()
+        {
+            DrawableID = drawableID;
+            ParentDrawableID = parentDrawableID;
+            ObjectName = objectName;
+            OldRotation = rotation;
+            Degree = -1;
+        }*/
         protected override void ExecuteOnServer()
         {
 
@@ -36,14 +50,20 @@ namespace Assets.SEE.Net.Actions.Drawable
             {
                 if (!IsRequester())
                 {
-                    GameObject drawable = GameDrawableIDFinder.Find(DrawableID, ParentDrawableID);
-                    if (drawable != null && GameDrawableIDFinder.FindChild(drawable, LineName) != null)
+                    GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
+                    if (drawable != null && GameDrawableFinder.FindChild(drawable, ObjectName) != null)
                     {
-                        GameMoveRotator.RotateLine(GameDrawableIDFinder.FindChild(drawable, LineName), positions);
+                      //  if (Degree > -1)
+                     //   {
+                            GameMoveRotator.RotateObject(GameDrawableFinder.FindChild(drawable, ObjectName), FirstPoint, Direction, Degree);
+                     //   } else
+                    //    {
+                    //        GameMoveRotator.RotateObject(GameDrawableFinder.FindChild(drawable, ObjectName), OldRotation);
+                    //    }
                     }
                     else
                     {
-                        throw new System.Exception($"There is no drawable with the ID {DrawableID} or line with the ID {LineName}.");
+                        throw new System.Exception($"There is no drawable with the ID {DrawableID} or line with the ID {ObjectName}.");
                     }
                 }
             }

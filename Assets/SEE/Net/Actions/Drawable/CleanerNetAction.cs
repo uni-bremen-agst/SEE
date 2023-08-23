@@ -45,12 +45,12 @@ namespace SEE.Net.Actions
             if (!IsRequester())
             {
                 // TODO implement other things than lines
-                GameObject drawable = GameDrawableIDFinder.Find(DrawableID, ParentDrawableID);
+                GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
                 if (drawable != null)
                 {
-                    if (Type == DrawableTypes.Line && GameDrawableIDFinder.FindChild(drawable, Name) != null)
+                    if (Type == DrawableTypes.Line && GameDrawableFinder.FindChild(drawable, Name) != null)
                     {
-                        Destroyer.Destroy(GameDrawableIDFinder.FindChild(drawable, Name));
+                        Destroyer.Destroy(GameDrawableFinder.FindChild(drawable, Name));
                     }
                 }
                 else

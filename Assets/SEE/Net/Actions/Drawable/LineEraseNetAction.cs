@@ -42,10 +42,10 @@ namespace SEE.Net.Actions
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameDrawableIDFinder.Find(DrawableID,ParentDrawableID);
-                if (drawable != null && GameDrawableIDFinder.FindChild(drawable, LineName) != null)
+                GameObject drawable = GameDrawableFinder.Find(DrawableID,ParentDrawableID);
+                if (drawable != null && GameDrawableFinder.FindChild(drawable, LineName) != null)
                 {
-                    Destroyer.Destroy(GameDrawableIDFinder.FindChild(drawable, LineName));
+                    Destroyer.Destroy(GameDrawableFinder.FindChild(drawable, LineName));
                 }
                 else
                 {

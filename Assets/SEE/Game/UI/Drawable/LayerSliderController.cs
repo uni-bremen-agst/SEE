@@ -28,7 +28,11 @@ public class LayerSliderController : MonoBehaviour
         tmpText = GetComponentsInChildren<TMP_Text>()[1];
         slider.onValueChanged.AddListener(SliderChanged);
         slider.minValue = 0;
-        slider.maxValue = DrawableConfigurator.orderInLayer + 1;
+    }
+
+    private void Start()
+    {
+        slider.maxValue = DrawableConfigurator.orderInLayer;
     }
 
     private void OnDestroy()

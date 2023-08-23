@@ -50,8 +50,8 @@ namespace SEE.Net.Actions
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameDrawableIDFinder.Find(DrawableID,ParentDrawableID);
-                GameObject obj = GameDrawableIDFinder.FindChild(drawable, ObjectName);
+                GameObject drawable = GameDrawableFinder.Find(DrawableID,ParentDrawableID);
+                GameObject obj = GameDrawableFinder.FindChild(drawable, ObjectName);
                 if (drawable == null)
                 {
                     throw new System.Exception($"There is no drawable with the ID {DrawableID}.");

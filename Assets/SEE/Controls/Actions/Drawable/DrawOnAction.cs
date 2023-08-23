@@ -97,12 +97,10 @@ namespace SEE.Controls.Actions
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                    (raycastHit.collider.gameObject.transform.parent != null &&
-                        raycastHit.collider.gameObject.transform.parent.gameObject.CompareTag(Tags.Drawable))))
+                    GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject)))
                 {
-                    Debug.Log(DateTime.Now + " - Before Switch");
                     GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                        raycastHit.collider.gameObject : raycastHit.collider.gameObject.transform.parent.gameObject;
+                        raycastHit.collider.gameObject : GameDrawableFinder.FindDrawableParent(raycastHit.collider.gameObject);
                     drawing = true;
 
                     Ray ray = Raycasting.UserPointsTo();
@@ -135,14 +133,12 @@ namespace SEE.Controls.Actions
                     switch (progressState)
                     {
                         case ProgressState.StartDrawing:
-                            Debug.Log(DateTime.Now + " - Start Drawing");
                             progressState = ProgressState.Drawing;
                             positions[0] = raycastHit.point;
                             line = GameDrawer.StartDrawing(drawable, positions, DrawableConfigurator.currentColor, DrawableConfigurator.currentThickness);
                             break;
 
                         case ProgressState.Drawing:
-                            Debug.Log(DateTime.Now + " - Drawing");
                             // The position at which to continue the line.
                             Vector3 newPosition = raycastHit.point;
 
@@ -158,7 +154,7 @@ namespace SEE.Controls.Actions
                                 memento = new Memento(drawable, positions, DrawableConfigurator.currentColor,
                                     DrawableConfigurator.currentThickness, line.GetComponent<LineRenderer>().sortingOrder);
                                 memento.id = line.name;
-                                new DrawOnNetAction(memento.drawable.name, memento.drawable.transform.parent.name,
+                                new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable),
                                     memento.id, memento.positions, memento.color, memento.thickness).Execute();
                                 currentState = ReversibleAction.Progress.InProgress;
                             }
@@ -169,18 +165,16 @@ namespace SEE.Controls.Actions
                 bool isMouseButtonUp = Input.GetMouseButtonUp(0);
                 if (isMouseButtonUp || (!Input.GetMouseButton(0) && drawing))
                 {
-                    Debug.Log(DateTime.Now + " - Set Finish Drawing");
                     progressState = ProgressState.FinishDrawing;
                     drawing = false;
 
                     if (progressState == ProgressState.FinishDrawing)
                     {
-                        Debug.Log(DateTime.Now + " - Finish Drawing");
                         if (GameDrawer.DifferentPositionCounter(positions) > 3)
                         {
                             memento.positions = positions;
                             GameDrawer.FinishDrawing();
-                            new DrawOnNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.id,
+                            new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id,
                                 memento.positions, memento.color, memento.thickness).Execute();
                             result = true;
                             currentState = ReversibleAction.Progress.Completed;
@@ -232,10 +226,10 @@ namespace SEE.Controls.Actions
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             if (line == null)
             {
-                line = GameDrawableIDFinder.FindChild(memento.drawable, memento.id);
+                line = GameDrawableFinder.FindChild(memento.drawable, memento.id);
             }
-            new LineEraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.id).Execute();
-            Destroyer.Destroy(line);
+            new LineEraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id).Execute();
+            Destroyer.Destroy(line.transform.parent.gameObject);
             line = null;
         }
 
@@ -251,7 +245,7 @@ namespace SEE.Controls.Actions
                 memento.thickness, memento.orderInLayer);
             if (line != null)
             {
-                new DrawOnNetAction(memento.drawable.name, memento.drawable.transform.parent.name,
+                new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable),
                     memento.id, memento.positions, memento.color,
                     memento.thickness, memento.orderInLayer).Execute();
             }

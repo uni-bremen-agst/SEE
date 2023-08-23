@@ -11,6 +11,7 @@ using static RootMotion.FinalIK.HitReaction;
 using Assets.SEE.Net.Actions.Whiteboard;
 using SEE.Net.Actions;
 using Assets.SEE.Game.Drawable;
+using Assets.SEE.Game;
 
 namespace SEE.Controls.Actions
 {
@@ -34,12 +35,11 @@ namespace SEE.Controls.Actions
             if (!Raycasting.IsMouseOverGUI())
             {
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && isInAction == false &&
-                    Raycasting.RaycastAnything(out RaycastHit raycastHit) && raycastHit.collider.gameObject.transform.parent != null &&
-                    raycastHit.collider.gameObject.transform.parent.gameObject.CompareTag(Tags.Drawable))
+                    Raycasting.RaycastAnything(out RaycastHit raycastHit) && GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject))
                 {
                     isInAction = true;
                     GameObject hittedObject = raycastHit.collider.gameObject;
-                    GameObject drawable = raycastHit.collider.gameObject.transform.parent.gameObject;
+                    GameObject drawable = GameDrawableFinder.FindDrawableParent(hittedObject);
 
                     switch (hittedObject.tag) { 
                         case Tags.Line:
@@ -49,8 +49,8 @@ namespace SEE.Controls.Actions
                             if (result)
                             {
                                 memento = new Memento(drawable, GameLayerChanger.LayerChangerStates.Increase, DrawableTypes.Line,
-                                    hittedObject, oldOrder, newOrder);
-                                new LayerChangerNetAction(memento.drawable.name, memento.drawable.transform.parent.name,
+                                    hittedObject, hittedObject.name, oldOrder, newOrder);
+                                new LayerChangerNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable),
                                     memento.obj.name, memento.state, memento.type, memento.newOrder).Execute();
                                 currentState = ReversibleAction.Progress.InProgress;
                             }
@@ -59,12 +59,11 @@ namespace SEE.Controls.Actions
                     }
                 }
                 if ((Input.GetMouseButtonDown(1) || Input.GetMouseButton(1)) && isInAction == false &&
-                    Raycasting.RaycastAnything(out RaycastHit raycastHit2) && raycastHit2.collider.gameObject.transform.parent != null &&
-                    raycastHit2.collider.gameObject.transform.parent.gameObject.CompareTag(Tags.Drawable))
+                    Raycasting.RaycastAnything(out RaycastHit raycastHit2) && GameDrawableFinder.hasDrawableParent(raycastHit2.collider.gameObject))
                 {
                     isInAction = true;
                     GameObject hittedObject = raycastHit2.collider.gameObject;
-                    GameObject drawable = raycastHit2.collider.gameObject.transform.parent.gameObject;
+                    GameObject drawable = GameDrawableFinder.FindDrawableParent(hittedObject);
 
                     switch (hittedObject.tag)
                     {
@@ -76,8 +75,8 @@ namespace SEE.Controls.Actions
                             if (result)
                             {
                                 memento = new Memento(drawable, GameLayerChanger.LayerChangerStates.Decrease, DrawableTypes.Line,
-                                hittedObject, oldOrder, newOrder);
-                                new LayerChangerNetAction(memento.drawable.name, memento.drawable.transform.parent.name,
+                                hittedObject, hittedObject.name, oldOrder, newOrder);
+                                new LayerChangerNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable),
                                     memento.obj.name, memento.state, memento.type, memento.newOrder).Execute();
                                 currentState = ReversibleAction.Progress.InProgress;
                             }
@@ -101,16 +100,18 @@ namespace SEE.Controls.Actions
             public readonly GameObject drawable;
             public readonly GameLayerChanger.LayerChangerStates state;
             public readonly DrawableTypes type;
-            public readonly GameObject obj;
+            public GameObject obj;
+            public readonly string objName;
             public readonly int oldOrder;
             public readonly int newOrder;
 
-            public Memento(GameObject drawable, GameLayerChanger.LayerChangerStates state, DrawableTypes type, GameObject obj, int oldOrder, int newOrder)
+            public Memento(GameObject drawable, GameLayerChanger.LayerChangerStates state, DrawableTypes type, GameObject obj, string objName, int oldOrder, int newOrder)
             {
                 this.drawable = drawable;
                 this.state = state;
                 this.type = type;
                 this.obj = obj;
+                this.objName = objName;
                 this.oldOrder = oldOrder;
                 this.newOrder = newOrder;
             }
@@ -123,7 +124,11 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            switch(memento.state)
+            if (memento.obj == null && memento.objName != null)
+            {
+                memento.obj = GameDrawableFinder.FindChild(memento.drawable, memento.objName);
+            }
+            switch (memento.state)
             {
                 case GameLayerChanger.LayerChangerStates.Increase:
                     GameLayerChanger.Decrease(memento.type, memento.obj, memento.oldOrder);
@@ -132,7 +137,7 @@ namespace SEE.Controls.Actions
                     GameLayerChanger.Increase(memento.type, memento.obj, memento.oldOrder);
                     break;
             }
-            new LayerChangerNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.obj.name, memento.state, memento.type, memento.oldOrder).Execute();
+            new LayerChangerNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.obj.name, memento.state, memento.type, memento.oldOrder).Execute();
         }
 
         /// <summary>
@@ -143,6 +148,10 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
+            if (memento.obj == null && memento.objName != null)
+            {
+                memento.obj = GameDrawableFinder.FindChild(memento.drawable, memento.objName);
+            }
             switch (memento.state)
             {
                 case GameLayerChanger.LayerChangerStates.Increase:
@@ -152,7 +161,7 @@ namespace SEE.Controls.Actions
                     GameLayerChanger.Decrease(memento.type, memento.obj, memento.newOrder);
                     break;
             }
-            new LayerChangerNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.obj.name, memento.state, memento.type, memento.newOrder).Execute();
+            new LayerChangerNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.obj.name, memento.state, memento.type, memento.newOrder).Execute();
         }
 
         /// <summary>

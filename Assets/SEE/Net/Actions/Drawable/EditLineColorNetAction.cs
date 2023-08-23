@@ -36,10 +36,11 @@ namespace Assets.SEE.Net.Actions.Drawable
             {
                 if (!IsRequester())
                 {
-                    GameObject drawable = GameDrawableIDFinder.Find(DrawableID, ParentDrawableID);
-                    if (drawable != null && GameDrawableIDFinder.FindChild(drawable, LineName) != null)
+                    GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
+                    if (drawable != null && GameDrawableFinder.FindChild(drawable, LineName) != null)
                     {
-                        GameEditLine.ChangeColor(GameDrawableIDFinder.FindChild(drawable, LineName), color);
+                        Debug.Log("Drawable: " + drawable + ", Child: " + GameDrawableFinder.FindChild(drawable, LineName));
+                        GameEditLine.ChangeColor(GameDrawableFinder.FindChild(drawable, LineName), color);
                     }
                     else
                     {

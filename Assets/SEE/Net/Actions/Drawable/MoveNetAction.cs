@@ -36,10 +36,10 @@ namespace Assets.SEE.Net.Actions.Drawable
             {
                 if (!IsRequester())
                 {
-                    GameObject drawable = GameDrawableIDFinder.Find(DrawableID, ParentDrawableID);
-                    if (drawable != null && GameDrawableIDFinder.FindChild(drawable, ObjectName) != null)
+                    GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
+                    if (drawable != null && GameDrawableFinder.FindChild(drawable, ObjectName) != null)
                     {
-                        GameMoveRotator.MoveObject(GameDrawableIDFinder.FindChild(drawable, ObjectName), position);
+                        GameMoveRotator.MoveObject(GameDrawableFinder.FindChild(drawable, ObjectName), position);
                     }
                     else
                     {

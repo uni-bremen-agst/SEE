@@ -30,19 +30,23 @@ namespace SEE.Game
 
         private static GameObject line;
 
-       // private static GameObject rendererLine;
+        private static GameObject lineHolder;
 
         private static void Setup(GameObject drawable, String name, Vector3[] positions, Color color, float thickness)
         {
+            if (name.Length > 4)
+            {
+                lineHolder = new("LineHolder" + name.Substring(4));
+            } else
+            {
+                lineHolder = new("");
+            }
+            lineHolder.transform.parent = drawable.transform;
+            lineHolder.transform.position = drawable.transform.position;
+
             line = new (name);
             line.tag = Tags.Line;
-            line.transform.parent = drawable.transform;
-           // line.transform.position = drawable.transform.position;
-           // rendererLine = new(name + " Renderer");
-           // rendererLine.tag = Tags.Line;
-           // rendererLine.transform.SetParent(line.transform);
-           // renderer = rendererLine.AddComponent<LineRenderer>();
-           // meshCollider = rendererLine.AddComponent<MeshCollider>();
+            line.transform.SetParent(lineHolder.transform);
             renderer = line.AddComponent<LineRenderer>();
             meshCollider = line.AddComponent<MeshCollider>();
             renderer.sharedMaterial = GetMaterial(color);
@@ -56,7 +60,7 @@ namespace SEE.Game
         {
             Setup(drawable, "", positions, color, thickness);
             line.name = "line" + line.GetInstanceID();
-            //rendererLine.name = line.name + " Renderer";
+            lineHolder.name = "LineHolder" + line.GetInstanceID();
             renderer.sortingOrder = DrawableConfigurator.orderInLayer;
             DrawableConfigurator.orderInLayer++;
             
@@ -81,9 +85,9 @@ namespace SEE.Game
 
         public static GameObject DrawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness)
         {
-            if (drawable.transform.Find(name) != null)
+            if (GameDrawableFinder.FindChild(drawable,name) != null)
             {
-                line = GameDrawableIDFinder.FindChild(drawable, name);
+                line = GameDrawableFinder.FindChild(drawable, name);
                 renderer = line.GetComponent<LineRenderer>();
                 meshCollider = line.GetComponent<MeshCollider>();
                 Drawing(positions);
@@ -103,6 +107,18 @@ namespace SEE.Game
         public static GameObject ReDrawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness, int orderInLayer)
         {
             Setup(drawable, name, positions, color, thickness);
+            renderer.SetPositions(positions);
+            renderer.sortingOrder = orderInLayer;
+            FinishDrawing();
+
+            return line;
+        }
+
+        public static GameObject ReDrawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness, int orderInLayer, Vector3 position, Vector3 eulerAngles)
+        {
+            Setup(drawable, name, positions, color, thickness);
+            line.transform.position = position;
+            line.transform.transform.eulerAngles = eulerAngles;
             renderer.SetPositions(positions);
             renderer.sortingOrder = orderInLayer;
             FinishDrawing();

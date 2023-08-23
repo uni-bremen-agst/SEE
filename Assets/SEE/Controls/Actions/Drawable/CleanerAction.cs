@@ -1,4 +1,5 @@
-﻿using Assets.SEE.Net.Actions.Whiteboard;
+﻿using Assets.SEE.Game;
+using Assets.SEE.Net.Actions.Whiteboard;
 using SEE.Controls.Actions;
 using SEE.Game;
 using SEE.Net.Actions;
@@ -24,9 +25,9 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
                     if (hittedObject.CompareTag(Tags.Drawable))
                     {
                         DeleteDrawableChilds(hittedObject);
-                    } else if (hittedObject.transform.parent != null && hittedObject.transform.parent.gameObject.CompareTag(Tags.Drawable))
+                    } else if (GameDrawableFinder.hasDrawableParent(hittedObject))
                     {
-                        DeleteDrawableChilds(hittedObject.transform.parent.gameObject);
+                        DeleteDrawableChilds(GameDrawableFinder.FindDrawableParent(hittedObject));
                     }
                 }
                 // The action is considered complete if the mouse button is no longer pressed.
@@ -37,7 +38,8 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
 
         private void DeleteDrawableChilds(GameObject drawable)
         {
-            foreach (Transform childsTransform in drawable.transform)
+            Transform[] allChildren = drawable.GetComponentsInChildren<Transform>();
+            foreach (Transform childsTransform in allChildren)
             {
                 GameObject child = childsTransform.gameObject;
                 // TODO implement the other types
@@ -47,14 +49,14 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
                     Vector3[] positions = new Vector3[lineRenderer.positionCount];
                     lineRenderer.GetPositions(positions);
 
-                    memento = new Memento(child, drawable, positions, child.name, DrawableTypes.Line);
+                    memento = new Memento(child, drawable, child.name, positions, child.name, DrawableTypes.Line, child.transform.position, child.transform.eulerAngles);
                     memento.color = lineRenderer.material.color;
                     memento.thickness = lineRenderer.startWidth;
                     memento.orderInLayer = lineRenderer.sortingOrder;
                     mementoList.Add(memento);
 
-                    new CleanerNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.id, DrawableTypes.Line).Execute();
-                    Destroyer.Destroy(child);
+                    new CleanerNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id, DrawableTypes.Line).Execute();
+                    Destroyer.Destroy(child.transform.parent.gameObject);
                     
                 }
             }
@@ -67,6 +69,7 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
         {
             public GameObject gameObject;
             public readonly GameObject drawable;
+            public readonly string gameObjectName;
 
             public Vector3[] positions;
 
@@ -80,13 +83,20 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
 
             public int orderInLayer;
 
-            public Memento(GameObject gameObject, GameObject drawable, Vector3[] positions, string id, DrawableTypes type)
+            public Vector3 position;
+
+            public Vector3 eulerAngles;
+
+            public Memento(GameObject gameObject, GameObject drawable, string gameObjectName, Vector3[] positions, string id, DrawableTypes type, Vector3 position, Vector3 eulerAngles)
             {
                 this.gameObject = gameObject;
                 this.drawable = drawable;
+                this.gameObjectName = gameObjectName;
                 this.positions = positions;
                 this.id = id;
                 this.type = type;
+                this.position = position;
+                this.eulerAngles = eulerAngles;
             }
         }
 
@@ -98,13 +108,14 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             foreach (Memento mem in mementoList)
-            {   
+            {
                 // TODO implement the other types
                 switch (mem.type)
                 {
                     case DrawableTypes.Line:
-                        mem.gameObject = GameDrawer.ReDrawLine(mem.drawable, mem.id, mem.positions, mem.color, mem.thickness, mem.orderInLayer);
-                        new DrawOnNetAction(mem.drawable.name, mem.drawable.transform.parent.name, mem.id, mem.positions, mem.color, mem.thickness, mem.orderInLayer).Execute();
+                        mem.gameObject = GameDrawer.ReDrawLine(mem.drawable, mem.id, mem.positions, mem.color, mem.thickness, mem.orderInLayer, mem.position, mem.eulerAngles);
+                        new DrawOnNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.id, mem.positions, 
+                            mem.color, mem.thickness, mem.orderInLayer, mem.position, mem.eulerAngles).Execute();
                         break;
                     default: break;
                 }
@@ -121,8 +132,19 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             foreach (Memento mem in mementoList)
             {
-                new CleanerNetAction(mem.drawable.name, mem.drawable.transform.parent.name, mem.id, mem.type).Execute();
-                Destroyer.Destroy(mem.gameObject);
+                if (mem.gameObject == null && mem.gameObjectName != null)
+                {
+                    mem.gameObject = GameDrawableFinder.FindChild(mem.drawable, mem.gameObjectName);
+                }
+                new CleanerNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.id, mem.type).Execute();
+                if (mem.gameObject.CompareTag(Tags.Line))
+                {
+                    Destroyer.Destroy(mem.gameObject.transform.parent.gameObject);
+                }
+                else
+                {
+                    Destroyer.Destroy(mem.gameObject);
+                }
             }
         }
 

@@ -1,47 +1,27 @@
-﻿using System.Collections;
+﻿using SEE.Game;
+using System;
+using System.Collections;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Assets.SEE.Game.Drawable
 {
     public static class GameMoveRotator
     {
-        public static GameObject selectedObj;
-
-        public static bool isActive = false;
-
-        public static int step = 0;
-
-        public static Vector3 oldObjectPosition;
-
-        public static Vector3[] oldLinePositions;
-
-        public static Vector3 newObjectPosition;
-
-        public static Vector3[] newLinePositions;
-
-        public static Vector3 firstPoint;
-
-        public static void SetSelectedLine(GameObject obj)
+        public static void MoveObject(GameObject obj, Vector3 position)
         {
-            selectedObj = obj;
-            oldObjectPosition = obj.transform.position;
-            LineRenderer selectedRenderer = selectedObj.GetComponent<LineRenderer>();
-            oldLinePositions = new Vector3[selectedRenderer.positionCount];
-            selectedRenderer.GetPositions(oldLinePositions);
-
-            //FIXME löschen
-            newLinePositions = oldLinePositions;
+            obj.transform.position = position;
         }
 
-        public static void MoveObject(GameObject line, Vector3 position)
+        public static void RotateObject(GameObject obj, Vector3 firstPoint, Vector3 direction, float degree)
         {
-            line.transform.position = position;
+            Debug.Log("Rotate: " + obj + firstPoint + direction + degree);
+            obj.transform.RotateAround(firstPoint, direction, degree);
         }
-
-        public static void RotateLine(GameObject line, Vector3[] linePositions)
+        /*
+        public static void RotateObject(GameObject obj, Quaternion oldRotation)
         {
-            LineRenderer render = line.GetComponent<LineRenderer>();
-            render.SetPositions(linePositions);
-        }
+            obj.transform.rotation = oldRotation;
+        }*/
     }
 }

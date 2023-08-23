@@ -4,31 +4,47 @@ using UnityEngine;
 
 namespace Assets.SEE.Game
 {
-    public static class GameDrawableIDFinder
+    public static class GameDrawableFinder
     {
         public static GameObject Find(string drawableID, string parentDrawableID)
         {
             GameObject drawable = null;
-            GameObject[] paintingReceivers = GameObject.FindGameObjectsWithTag("Drawable");
+            GameObject[] paintingReceivers = GameObject.FindGameObjectsWithTag(Tags.Drawable);
             ArrayList paintingReceiversList = new ArrayList(paintingReceivers);
 
             foreach (GameObject paintingReceiver in paintingReceiversList)
             {
-                string parentName = paintingReceiver.transform.parent.gameObject.name;
-                if (string.Equals(parentDrawableID, parentName) &&
-                      string.Equals(drawableID, paintingReceiver.name))
+                if (parentDrawableID != null && !parentDrawableID.Equals(""))
                 {
-                    drawable = paintingReceiver;
+                    string parentName = paintingReceiver.transform.parent.gameObject.name;
+                    if (string.Equals(parentDrawableID, parentName) &&
+                          string.Equals(drawableID, paintingReceiver.name))
+                    {
+                        drawable = paintingReceiver;
+                    }
+                } else
+                {
+                    if (string.Equals(drawableID, paintingReceiver.name))
+                    {
+                        drawable = paintingReceiver;
+                    }
                 }
             }
 
             return drawable;
         }
 
-        public static GameObject FindChild(GameObject drawable, string lineName)
+        public static GameObject FindChild(GameObject drawable, string childName)
         {
-            return (drawable.transform.Find(lineName) != null) ? 
-                drawable.transform.Find(lineName).gameObject : null;
+            Transform[] allChildren = drawable.GetComponentsInChildren<Transform>();
+            foreach (Transform child in allChildren)
+            {
+                if (child.gameObject.name.Equals(childName))
+                {
+                    return child.gameObject;
+                }
+            }
+            return null;
         }
 
         public static GameObject FindDrawableParent(GameObject child)
@@ -65,6 +81,16 @@ namespace Assets.SEE.Game
         public static bool hasChildWithTag(GameObject parent, string tag)
         {
             return FindChildWithTag(parent, tag) != null;
+        }
+
+        public static bool hasAParent(GameObject drawable)
+        {
+            return drawable.transform.parent != null;
+        }
+
+        public static string GetDrawableParentName(GameObject drawable)
+        {
+            return hasAParent(drawable) ? drawable.transform.parent.name : "";
         }
     }
 }
