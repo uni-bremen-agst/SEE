@@ -6,7 +6,6 @@ using System.Collections.Generic;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
-
     [Serializable]
     public abstract class AttractFunction
     {
@@ -46,7 +45,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             Node cluster = edgeEvent.Edge.Target;
             Node entity = edgeEvent.Edge.Source;
 
-            // Get targeted childs
+            // Get targeted childs of currently mapped node
             List<Node> mappedEntities = new List<Node>();
             GetTargetedChilds(entity, mappedEntities, targetType, ReflexionSubgraph.Implementation);
 
@@ -72,7 +71,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             switch(attractFunctionType)
             {
                 case AttractFunctionType.CountAttract: return new CountAttract(reflexionGraph, targetType);
-                case AttractFunctionType.NBAttract: return new NBAttract(reflexionGraph, targetType);
+                case AttractFunctionType.NBAttract: return new NBAttract(reflexionGraph, targetType, false, true);
             }
             throw new ArgumentException("Given attractFunctionType is currently not implemented");
         }

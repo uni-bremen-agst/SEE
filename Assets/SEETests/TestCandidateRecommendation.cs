@@ -1,0 +1,332 @@
+using System;
+using NUnit.Framework;
+using SEE.DataModel.DG;
+using System.Collections.Generic;
+using System.Linq;
+using Assets.SEE.Tools.ReflexionAnalysis;
+using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
+
+namespace SEE.Tools.Architecture
+{
+    /// <summary>
+    /// Tests for the candidate recommendation within a reflexion graph.
+    ///
+    ///
+    ///
+    /// </summary>
+    internal class TestCandidateRecommendation : TestReflexionAnalysis
+    {
+        /// <summary>
+        ///
+        /// </summary>
+        private Dictionary<int, Node> i;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private Dictionary<(int, int), Edge> ie;
+
+        /// <summary>
+        ///
+        /// </summary>
+        private Dictionary<int, Node> a;
+
+        /// <summary>
+        ///
+        /// </summary>
+        private Dictionary<(int, int), Edge> ae;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        CandidateRecommendations candidateRecommendation;
+
+        private readonly string[] alphabet = new string[]
+        {
+            "A", "B", "C", "D", "E", "F", "G", "H"
+        };
+
+        /// <summary>
+        /// Sets up all three graphs (implementation, architecture,
+        /// mapping) and registers itself at the reflexion analysis
+        /// to obtain the results via the callback Update(ChangeEvent).
+        /// Does not really run the analysis, however.
+        /// </summary>
+        [SetUp]
+        protected override void Setup()
+        {
+            base.Setup();
+            SetupReflexion();
+            SetupCandidateRecommendation();
+        }
+
+        private void SetupReflexion()
+        {
+            graph.Subscribe(this);
+            // An initial run is necessary to set up the necessary data structures.
+            graph.RunAnalysis();
+        }
+
+        private void SetupCandidateRecommendation()
+        {
+            candidateRecommendation = new CandidateRecommendations();
+            candidateRecommendation.TargetType = "Class";
+            candidateRecommendation.ReflexionGraph = graph;
+            graph.Subscribe(candidateRecommendation);
+        }
+
+        [TearDown]
+        protected override void Teardown()
+        {
+            base.Teardown();
+            i = null;
+            a = null;
+            candidateRecommendation = null;
+        }
+
+        /// <summary>
+        /// 
+        /// Creates implementation nodes for CountAttract Test1.
+        /// 
+        /// The dependencies are created as follows:
+        /// 
+        /// Dependency Edges:
+        /// i4(D) => i1(A)
+        /// i4(D) => i2(B)
+        /// i4(D) => i2(C)
+        /// i5(E) => i4(D)
+        /// i6(F) => i5(D)
+        /// i6(F) => i3(C)
+        /// i7(G) => i6(F)
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        public void AddImplementationCountAttract(string type = "Class")
+        {
+            i = new Dictionary<int, Node>();
+
+            i[0] = NewNode(false, "implementation", "Package");
+
+            for (int j = 1; j < 8; j++)
+            {
+                string character = alphabet[j - 1];
+                i[j] = NewNode(false, character, type);
+                i[0].AddChild(i[j]);
+            }
+
+            (int, int)[] edgesFromTo =
+            {
+                (4, 1), (4, 2), (4, 3), (5, 4), (6, 5), (6, 3), (7, 6)
+            };
+
+            ie = CreateEdgesDictionary(edgesFromTo, i);
+        }
+
+        /// <summary>
+        /// Creates an architecture as follows:
+        ///
+        /// a1
+        /// a2
+        /// 
+        /// a1 calls a2
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        private void AddArchitectureCountAttract()
+        {
+            a = new Dictionary<int, Node>();
+
+            a[0] = NewNode(true, "architecture", "Architecture_Layer");
+
+            for (int j = 1; j <= 3; j++)
+            {
+                a[j] = NewNode(true, "a" + j, "Cluster");
+                a[0].AddChild(a[j]);
+            }
+
+            (int, int)[] edgesFromTo =
+{
+                (1, 2)
+            };
+
+            ae = CreateEdgesDictionary(edgesFromTo, a);
+        }
+
+        [Test]
+        public void TestCountAttract()
+        {
+            this.AddArchitectureCountAttract();
+            this.AddImplementationCountAttract();
+
+            // Initial Mapping
+            // maps i1(A) to a1(H1)
+            graph.AddToMapping(i[1], a[1]);
+
+            // maps i2(B) to a2(H2)
+            graph.AddToMapping(i[2], a[2]);
+
+            // check if i4(D) is in the Recommendations for both cluster
+            Assert.That(DIsRecommendedForH1AndH2());
+
+            // maps i3(C) to a1(H1)
+            graph.AddToMapping(i[3], a[1]);
+
+            // check if i4(D) is in the Recommendations for a1(H1) but not a2(H2)
+            Assert.That(DIsRecommendedForH1ButNotH2());
+
+            // remove i3(C) from mapping a1(H1)
+            graph.RemoveFromMapping(i[3]);
+
+            // check of i4(D) is in the Recommendations for both
+            Assert.That(DIsRecommendedForH1AndH2());
+
+            // maps i3(C) to a2(H2)
+            graph.AddToMapping(i[3], a[2]);
+
+            // check if i4(D) is in the Recommendations for a2(H2) but not a1(H1)
+            Assert.That(DIsRecommendedForH2ButNotH1());
+
+            /**
+             * A mapsto H1
+             * B mapsto H2
+             * C mapsto H2
+             * 
+             * Overall(D) = 3 
+             * toOthers(D, H1) = 2 * Phi
+             * toOthers(D, H2) = 1
+             *
+             * CountAttract(D,H1) = 3 - 2 * phi
+             * CountAttract(D,H2) = 3 - 1
+             *
+             * phi <  0.5 => CountAttract(D,{H1,H2}) = {H1} 
+             * phi == 0.5 => CountAttract(D,{H1,H2}) = {H1,H2}
+             * phi >  0.5 => CountAttract(D,{H1,H2}) = {H2}
+            */
+
+            // update phi value
+            ((CountAttract)candidateRecommendation.AttractFunction).Phi = 0.4f;
+
+            // remaps i3(C) to a2(H2)
+            graph.RemoveFromMapping(i[3]);
+            graph.AddToMapping(i[3], a[2]);
+
+            // check if i4(D) is in the Recommendations for a1(H1) but not a2(H2)
+            Assert.That(DIsRecommendedForH1ButNotH2());
+
+            ((CountAttract)candidateRecommendation.AttractFunction).Phi = 0.5f;
+
+            // remaps i3(C) to a2(H2)
+            graph.RemoveFromMapping(i[3]);
+            graph.AddToMapping(i[3], a[2]);
+
+            Assert.That(DIsRecommendedForH1AndH2());
+
+            ((CountAttract)candidateRecommendation.AttractFunction).Phi = 0.6f;
+
+            // remaps i3(C) to a2(H2)
+            graph.RemoveFromMapping(i[3]);
+            graph.AddToMapping(i[3], a[2]);
+
+            Assert.That(DIsRecommendedForH2ButNotH1());
+
+            //// remove all mappings // TODO: Why does this provoke an Exception?
+            //for (int j = 1; j <= i.Count; ++j)
+            //{
+            //    graph.RemoveFromMapping(i[j], ignoreUnmapped: true);
+            //}
+
+            // Remove A, B and C from Mapping 
+            graph.RemoveFromMapping(i[1]);
+            graph.RemoveFromMapping(i[2]);
+            graph.RemoveFromMapping(i[3]);
+
+            Assert.That(candidateRecommendation.Recommendations.Keys.Count == 0 &&
+                        candidateRecommendation.Recommendations.Values.Count == 0);
+
+            #region local functions
+            bool DIsRecommendedForH1AndH2()
+            {
+                return CheckRecommendations(candidateRecommendation.Recommendations,
+                                    new Dictionary<Node, HashSet<Node>>()
+                                    {
+                                        {a[1], new HashSet<Node>() { i[4] } },
+                                        {a[2], new HashSet<Node>() { i[4] } }
+                                    },
+                                    null);
+            }
+
+            bool DIsRecommendedForH1ButNotH2()
+            {
+                return CheckRecommendations(candidateRecommendation.Recommendations,
+                                    new Dictionary<Node, HashSet<Node>>()
+                                    {
+                                        {a[1], new HashSet<Node>() { i[4] } },
+                                    },
+                                    new Dictionary<Node, HashSet<Node>>()
+                                    {
+                                        {a[2], new HashSet<Node>() { i[4] } },
+                                    });
+            }
+
+            bool DIsRecommendedForH2ButNotH1()
+            {
+                return CheckRecommendations(candidateRecommendation.Recommendations,
+                    new Dictionary<Node, HashSet<Node>>()
+                    {
+                                        {a[2], new HashSet<Node>() { i[4] } },
+                    },
+                    new Dictionary<Node, HashSet<Node>>()
+                    {
+                                        {a[1], new HashSet<Node>() { i[4] } },
+                    });
+            } 
+            #endregion
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="recommendations">Actual recommendations which are compared to the expected recommendations.</param>
+        /// <param name="mustBeRecommended">Required recommendations. If null this parameter is ignored.</param>
+        /// <param name="mustNotBeRecommended">Forbidden recommendation. If null this parameter is ignored.
+        /// If this parameter is not null it must not contain null values.</param>
+        /// <returns></returns>
+        public bool CheckRecommendations(Dictionary<Node, HashSet<Node>> recommendations, 
+                                         Dictionary<Node, HashSet<Node>> mustBeRecommended,
+                                         Dictionary<Node, HashSet<Node>> mustNotBeRecommended)
+        {
+            // Check mustRecommended
+            if (mustBeRecommended != null)
+            {
+                foreach (Node cluster in mustBeRecommended.Keys)
+                {
+                    HashSet<Node> recommendationsForCluster;
+                    if (!recommendations.TryGetValue(cluster, out recommendationsForCluster)) return false;
+
+                    //// No required nodes for key
+                    //if (!mustBeRecommended.TryGetValue(cluster, _)) continue;
+
+                    if (recommendationsForCluster == null && mustBeRecommended[cluster] == null) continue;
+                    if (recommendationsForCluster == null || mustBeRecommended == null) return false;
+                    if (!mustBeRecommended[cluster].IsSubsetOf(recommendationsForCluster)) return false;
+                } 
+            }
+
+            // Check mustNotRecommended 
+            if (mustNotBeRecommended != null)
+            {
+                foreach (Node cluster in mustNotBeRecommended.Keys)
+                {
+                    HashSet<Node> recommendationsForCluster;
+                    if (!recommendations.TryGetValue(cluster, out recommendationsForCluster)) continue;
+                    if (mustNotBeRecommended[cluster] == null) throw new Exception("Error in while comparing Recommendations. Forbidden recommendations cannot be null.");
+                    if(recommendationsForCluster.Intersect(mustNotBeRecommended[cluster]).Count() > 0) return false;
+                }
+            }
+
+            return true;
+        }
+
+
+    }
+}

@@ -138,12 +138,12 @@ namespace SEE.Game.City
                 Visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
                 
                 // TODO: right place to register?
-                CandidateRecommendation candidateRecommendation = gameObject.AddOrGetComponent<CandidateRecommendation>();
-                if (candidateRecommendation != null)
+                CandidateRecommendationVisualization candidateRecommendationViz = gameObject.AddOrGetComponent<CandidateRecommendationVisualization>();
+                if (candidateRecommendationViz != null)
                 {
-                    LoadedGraph.Subscribe(candidateRecommendation);
+                    candidateRecommendationViz.ReflexionGraph = reflexionGraph;
+                    LoadedGraph.Subscribe(candidateRecommendationViz);
                     Debug.Log("Registered CandidateRecommendation.");
-                    candidateRecommendation.ReflexionGraph = reflexionGraph;
                 }
 
                 Visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);

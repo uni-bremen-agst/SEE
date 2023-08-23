@@ -1,64 +1,71 @@
 ﻿using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
 using SEE.DataModel;
-using SEE.DataModel.DG;
-using SEE.Game.Operator;
-using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
-using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using System.Linq;
 using static Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions.AttractFunction;
 using Debug = UnityEngine.Debug;
 using Node = SEE.DataModel.DG.Node;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis
 {
-    public class CandidateRecommendation : MonoBehaviour, IObserver<ChangeEvent>
+    public class CandidateRecommendation : IObserver<ChangeEvent>
     {
-        private ReflexionGraph reflexionGraph; 
+        private ReflexionGraph reflexionGraph;
+
+        // Dictionary representing the the mapping of nodes and their clusters regarding the highest 
+        // attraction value
+        private Dictionary<Node, HashSet<Node>> recommendations;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Dictionary<Node, HashSet<Node>> Recommendations { get => recommendations; set => recommendations = value; }
+
+        public string TargetType
+        {
+            get;
+            set;
+        }
 
         /// <summary>
         /// Object representing the attractFunction
         /// </summary>
-        public AttractFunction attractFunction;
+        private AttractFunction attractFunction;
 
-        [SerializeField]
+        public AttractFunction AttractFunction { get => attractFunction; }
+
+        public bool UseCDA
+        {
+            get;
+            set;
+        }
+
         private AttractFunctionType attractFunctionType;
-
-        private static float BLINK_EFFECT_DELAY = 0.1f;
 
         public AttractFunctionType AttractFunctionType
         {
             get
             {
                 return attractFunctionType;
-            } 
+            }
             set
             {
                 attractFunctionType = value;
-                if(reflexionGraph != null)
+                if (reflexionGraph != null)
                 {
-                    // TODO: How to update the attracfuction. How to compensate the missing onNext callbacks if attractFunction changes.
-                    attractFunction = AttractFunction.Create(attractFunctionType, reflexionGraph, targetType);
+                    Debug.Log("created attract function");
+                    // TODO: How to update the attractfuction. How to compensate the missing onNext callbacks if attractFunction changes.
+                    attractFunction = AttractFunction.Create(attractFunctionType, reflexionGraph, TargetType);
                 }
             }
         }
 
-        public string targetType;
-
         public CandidateRecommendation()
         {
-            targetType = "Class";
+            recommendations = new Dictionary<Node, HashSet<Node>>();
         }
-
-        /// <summary>
-        /// 
-        /// /summary>
-        public bool useCDA;
-        
-        private Coroutine blinkEffectCoroutine;
 
         public ReflexionGraph ReflexionGraph
         {
@@ -66,8 +73,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             set
             {
                 reflexionGraph = value;
+
                 // TODO: Can a ReflexionGraph change after loading? How to update the attractfuction.           
-                attractFunction = AttractFunction.Create(attractFunctionType, value, targetType);
+                attractFunction = AttractFunction.Create(attractFunctionType, value, TargetType);
             }
         }
 
@@ -82,79 +90,106 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         }
 
         public void OnNext(ChangeEvent value)
-        {   
-            Debug.Log($"OnNext() from recommendation. edgeEvent.Affected={value.Affected} value.GetType()={value.GetType()}");
+        {
             if (value is EdgeEvent edgeEvent && edgeEvent.Affected == ReflexionSubgraph.Mapping)
             {
                 Debug.Log(edgeEvent.ToString());
-                attractFunction.MappingChanged(edgeEvent);
-           
-                // TODO: Subgraph clones, use a technique which avoids cloning
-                Graph targetedNodes = reflexionGraph.SubgraphByNodeType(new string[] { targetType });
-                Graph clusters = reflexionGraph.SubgraphByNodeType(new string[] { "Cluster" });
-
-                double maxAttractionValue = double.MinValue;
-
-                // Dictionary representing the the mapping of nodes and their clusters regarding the highest 
-                // attraction value
-                Dictionary<Node,HashSet<Node>> mostAttractedNodes = new Dictionary<Node,HashSet<Node>>();    
-
-                double delta = 0.01;
-
-                foreach (Node cluster in clusters.Nodes())
-                {
-                    foreach (Node node in targetedNodes.Nodes())
-                    {
-                        if (reflexionGraph.MapsTo(node) != null) continue;
-                        double attractionValue = attractFunction.GetAttractionValue(node, cluster);
-                        if (attractionValue > maxAttractionValue)
-                        {
-                            mostAttractedNodes.Clear();
-                            mostAttractedNodes.Add(cluster, new HashSet<Node>() { node });
-                            maxAttractionValue = attractionValue;
-                        }
-                        else if (Math.Abs(maxAttractionValue - attractionValue) < delta)
-                        {
-                            HashSet<Node> nodes;
-                            if (mostAttractedNodes.TryGetValue(cluster, out nodes))
-                            {
-                                nodes.Add(node);
-                            }
-                            else
-                            {
-                                mostAttractedNodes.Add(cluster, new HashSet<Node>() { node });
-                            }
-                        }
-                    } 
-                }
-
-                List<NodeOperator> nodeOperators = new List<NodeOperator>();
-                foreach (Node cluster in mostAttractedNodes.Keys)
-                {
-                    NodeOperator nodeOperator;
-
-                    nodeOperator = cluster.GameObject().AddOrGetComponent<NodeOperator>();
-                    nodeOperators.Add(nodeOperator);
-
-                    foreach (Node entity in mostAttractedNodes[cluster])
-                    {
-                        nodeOperators.Add(entity.GameObject().AddOrGetComponent<NodeOperator>());
-                    }
-
-                }
-                if(blinkEffectCoroutine != null) StopCoroutine(blinkEffectCoroutine);
-                // TODO: Distinction between different hypothesized entities is required
-                blinkEffectCoroutine = StartCoroutine(StartBlinkEffect(nodeOperators));
+                Debug.Log("Handle Change in Mapping...");
+                AttractFunction.MappingChanged(edgeEvent);
+                UpdateRecommendations();
             }
         }
 
-        private IEnumerator StartBlinkEffect(List<NodeOperator> nodeOperators)
+        private void UpdateRecommendations()
         {
-            // Wait for the delay duration
-            yield return new WaitForSeconds(BLINK_EFFECT_DELAY);
+            List<Node> targetedNodes = reflexionGraph.Nodes().Where(n => n.Type.Equals(TargetType) && n.IsInImplementation()).ToList();
+            List<Node> clusters = reflexionGraph.Nodes().Where(n => n.Type.Equals("Cluster") && n.IsInArchitecture()).ToList();
 
-            // Start blink effect
-            nodeOperators.ForEach((n) => n.Blink(10, 2));
+            double maxAttractionValue = double.MinValue;
+
+            recommendations.Clear();
+
+            double delta = 0.01;
+
+            Debug.Log("Calculate attraction values...");
+
+            foreach (Node cluster in clusters)
+            {
+                foreach (Node node in targetedNodes)
+                {
+                    // Skip already mapped nodes
+                    if (reflexionGraph.MapsTo(node) != null) continue;
+
+                    // Calculate the attraction value for current node and current cluster
+                    double attractionValue = AttractFunction.GetAttractionValue(node, cluster);
+
+                    // Only do a recommendation if attraction is above 0
+                    if (attractionValue <= 0) continue;
+
+                    if (maxAttractionValue < attractionValue)
+                    {
+                        recommendations.Clear();
+                        recommendations.Add(cluster, new HashSet<Node>() { node });
+                        maxAttractionValue = attractionValue;
+                    }
+                    else if (Math.Abs(maxAttractionValue - attractionValue) < delta)
+                    {
+                        HashSet<Node> nodes;
+                        if (recommendations.TryGetValue(cluster, out nodes))
+                        {
+                            nodes.Add(node);
+                        }
+                        else
+                        {
+                            recommendations.Add(cluster, new HashSet<Node>() { node });
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<Node, HashSet<Node>> CloneRecommendations()
+        {
+            Dictionary<Node, HashSet<Node>> clone  = new Dictionary<Node, HashSet<Node>>();
+            foreach (Node cluster in Recommendations.Keys)
+            {
+                clone[cluster] = Recommendations[cluster];
+            }
+            return clone;
+        }
+
+        // Currently not used.
+        public class Recommendation : IComparable<Recommendation>
+        {
+            private HashSet<Node> cluster;
+
+            private Dictionary<Node, Node> recommendations;
+
+            double attractionValue;
+
+            public HashSet<Node> Node { get { return cluster; } }
+            public double AttractionValue { get { return attractionValue; } }
+
+            private Recommendation(Node node, double attractionValue)
+            {
+                this.cluster = new HashSet<Node>() { node };
+                this.attractionValue = attractionValue;
+            }
+
+            private void Add(Node node)
+            {
+
+            }
+
+            public int CompareTo(Recommendation other)
+            {
+                if (this == other) return 0;
+                return this.AttractionValue.CompareTo(other.AttractionValue);
+            }
         }
     }
 }

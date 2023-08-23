@@ -82,11 +82,6 @@ namespace SEE.Tools.Architecture
             Save(implementation, architecture, mapping);
         }
 
-        private Edge AddToGraph(string edgeType, Node from, Node to)
-        {
-            return NewEdge(from, to, edgeType);
-        }
-
         /// <summary>
         /// Creates an architecture as follows:
         ///
@@ -125,16 +120,6 @@ namespace SEE.Tools.Architecture
                 (3, 7), (1, 3), (8, 8), (2, 4)
             };
             ae = CreateEdgesDictionary(edgesFromTo, a);
-        }
-
-        /// <summary>
-        /// Returns a new dictionary mapping from (source id, target id) to a newly created edge which maps from
-        /// <paramref name="nodes"/>[source id] to <paramref name="nodes"/>[target id].
-        /// </summary>
-        private Dictionary<(int, int), Edge> CreateEdgesDictionary(IEnumerable<(int, int)> edges,
-                                                                   IDictionary<int, Node> nodes)
-        {
-            return edges.ToDictionary(x => x, x => AddToGraph(call, nodes[x.Item1], nodes[x.Item2]));
         }
 
         /// <summary>

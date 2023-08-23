@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Accord.MachineLearning.Text.Stemmers;
 using System.Text;
 using SEE.Game.UI.Window.CodeWindow;
+using UnityEngine;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
@@ -14,34 +15,129 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
     {
         NaiveBayes naiveBayes;
 
-        public NBAttract(ReflexionGraph reflexionGraph, string targetType) : base(reflexionGraph, targetType)
+        bool useCda;
+
+        bool useStandardTerms;
+
+        public NBAttract(ReflexionGraph reflexionGraph, 
+                        string targetType,
+                        bool useStandardTerms,
+                        bool useCda) : base(reflexionGraph, targetType)
         {
-            naiveBayes = new NaiveBayes();   
+            this.naiveBayes = new NaiveBayes();   
+            this.useCda = useCda;
+            this.useStandardTerms = useStandardTerms;
         }
 
-        public override double GetAttractionValue(Node node, Node cluster)
+        public override double GetAttractionValue(Node candidate, Node cluster)
         {
-            Document doc = CreateDocument(node);
-            return naiveBayes.ProbabilityForClass(cluster.ID, doc);
+            Document docStandardTerms = new Document();
+
+            if (this.useStandardTerms)
+            {
+                this.AddStandardTerms(candidate, docStandardTerms);
+            }
+
+            Dictionary<string, Document> docCdaTerms = new Dictionary<string, Document>();
+
+            if (this.useCda)
+            {
+                this.reflexionGraph.AddToMappingSilent(cluster, candidate);
+                this.CreateCdaTerms(cluster, candidate, docCdaTerms);    
+                this.reflexionGraph.RemoveFromMappingSilent(cluster, candidate);
+            }
+
+            // TODO : check and formulate cda problems
+            // add cda terms to naiveBayes classifier
+            //foreach (string clusterID in docCdaTerms.Keys)
+            //{
+
+            //}
+
+            Document document = new Document(docStandardTerms);
+            document.AddWords(docCdaTerms[cluster.ID]);
+            double attraction = naiveBayes.ProbabilityForClass(cluster.ID, docStandardTerms);
+
+            // remove cda terms from naiveBayes classifier
+            //foreach (string clusterID in docCdaTerms.Keys)
+            //{
+
+            //}
+
+            return attraction;
         }
 
         public override void HandleMappedEntities(Node cluster, List<Node> mappedEntities, ChangeType changeType)
         {
             foreach(Node mappedEntity in mappedEntities)
             {
-                Document doc = this.CreateDocument(mappedEntity);
+                if (!mappedEntity.Type.Equals(targetType)) continue;
+
+                Document docStandardTerms = new Document();
+                if(useStandardTerms) this.AddStandardTerms(mappedEntity, docStandardTerms);
+
+                Dictionary<string, Document> docCdaTerms = new Dictionary<string, Document>();
+                if (useCda) this.CreateCdaTerms(cluster, mappedEntity, docCdaTerms);
+
                 if(changeType == ChangeType.Addition)
                 {
-                    naiveBayes.AddDocument(cluster.ID, doc);
-                } 
+                    naiveBayes.AddDocument(cluster.ID, docStandardTerms);
+
+                    foreach (string clusterID in docCdaTerms.Keys)
+                    {
+                        naiveBayes.AddDocument(clusterID, docCdaTerms[clusterID]);
+                    }
+                }
                 else if(changeType == ChangeType.Removal) 
                 {
-                    naiveBayes.DeleteDocument(cluster.ID, doc); 
+                    naiveBayes.DeleteDocument(cluster.ID, docStandardTerms);
+
+                    foreach (string clusterID in docCdaTerms.Keys)
+                    {
+                        naiveBayes.DeleteDocument(clusterID, docCdaTerms[clusterID]);
+                    }
                 }
             }
         }
 
-        private Document CreateDocument(Node node)
+        private void CreateCdaTerms(Node cluster, Node mappedEntity, Dictionary<string, Document> documents)
+        {
+            Debug.Log($"Try to create CDA Terms for {mappedEntity.ID} and cluster {cluster.ID}...");
+
+            List<Edge> edges = mappedEntity.GetImplementationEdges();
+
+            documents.Add(cluster.ID, new Document());
+
+            foreach (Edge edge in edges)
+            {
+                bool mappedEntityIsSource = edge.Source == mappedEntity;
+
+                Node neighbor = mappedEntityIsSource ? edge.Target : edge.Source;
+
+                Node neighborCluster = this.reflexionGraph.MapsTo(neighbor);
+
+                if (neighborCluster == null) continue;
+
+                if (neighborCluster != null)
+                {
+                    // create cda term
+                    string term = mappedEntityIsSource ? $"{cluster.ID} -{edge.Type}- {neighborCluster.ID}"
+                                                       : $"{neighborCluster.ID} -{edge.Type}- {cluster.ID}";
+
+                    // add for current changed cluster
+                    documents[cluster.ID].AddWord(term);
+
+                    if(!documents.TryGetValue(neighborCluster.ID, out Document neighborDocument)) 
+                    {
+                        neighborDocument = new Document();
+                        documents[neighborCluster.ID] = neighborDocument;
+                    } 
+                    neighborDocument.AddWord(term);                 
+                }
+            }
+        }
+
+        private Document AddStandardTerms(Node node, Document document)
         {
             string sourceCodeRegion = NodeRegionReader.ReadRegion(node);
             UnityEngine.Debug.Log("source code region: " + sourceCodeRegion);
@@ -80,7 +176,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             UnityEngine.Debug.Log($"stemmed words: {string.Join(',', words)}");
 
-            Document document = new Document(words);
+            document.AddWords(words);
             UnityEngine.Debug.Log(document.ToString());
             return document;
         }

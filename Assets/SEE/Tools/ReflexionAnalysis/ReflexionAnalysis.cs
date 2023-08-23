@@ -159,6 +159,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="newState">the state to be set</param>
         private static void SetState(Edge edge, State newState)
         {
+            // Debug.Log($"{edge.ID} Set Reflexion.State = {newState}");
             edge.SetInt(StateAttribute, (int)newState);
         }
 
@@ -168,7 +169,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Note that, if <paramref name="edge"/> is a propagated edge, <see cref="Transition"/> will be recursively
         /// called on each originating edge, and no notification will be sent for the propagated edge.
         /// </summary>
-        /// <param name="edge">edge being changed</param>
+        /// <param name="edge">edge being changed</param> 
         /// <param name="newState">the new state of the edge after the change</param>
         private void Transition(Edge edge, State newState)
         {
@@ -754,7 +755,7 @@ namespace SEE.Tools.ReflexionAnalysis
                     AddSubtreeToImplicitMap(child, target);
                 }
             }
-
+            UnityEngine.Debug.Log($"implicitMapsToTable[{root.ID}] = {target};");
             implicitMapsToTable[root.ID] = target;
         }
 

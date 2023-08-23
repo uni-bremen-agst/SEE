@@ -345,6 +345,21 @@ namespace SEE.Tools.Architecture
         }
 
         /// <summary>
+        /// Returns a new dictionary mapping from (source id, target id) to a newly created edge which maps from
+        /// <paramref name="nodes"/>[source id] to <paramref name="nodes"/>[target id].
+        /// </summary>
+        protected Dictionary<(int, int), Edge> CreateEdgesDictionary(IEnumerable<(int, int)> edges,
+                                                                   IDictionary<int, Node> nodes)
+        {
+            return edges.ToDictionary(x => x, x => AddToGraph(call, nodes[x.Item1], nodes[x.Item2]));
+        }
+
+        protected Edge AddToGraph(string edgeType, Node from, Node to)
+        {
+            return NewEdge(from, to, edgeType);
+        }
+
+        /// <summary>
         /// Callback of reflexion analysis. Will be called by reflexion analysis on every
         /// state change. Collects the events in the change-event list.
         /// </summary>

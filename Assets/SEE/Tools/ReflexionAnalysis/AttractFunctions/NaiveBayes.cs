@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ClusteringMethods
 {
@@ -41,12 +37,6 @@ namespace ClusteringMethods
         public void AddDocument(string clazz, Document document) 
         {
             this.EnsureClass(clazz);
-
-            //// TODO: Really necessary?
-            //foreach(ClassInformation classInfo in trainingData.Values)
-            //{
-            //    //classInfo.AddWords(document);
-            //}
 
             trainingData[clazz].Add(document);
             documentCountGlobal++;
