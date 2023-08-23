@@ -14,7 +14,7 @@ namespace SEE.Game.UI.LiveDocumentation
     ///     Is used to display documentation of a method (when <see cref="LiveDocumentationWindow.DocumentationWindowType" />
     ///     is set to <see cref="LiveDocumentationWindowType.CLASS" />
     ///     or to display the documentation of a methods parameter when set to
-    ///     <see cref="LiveDocumentationWindowType.METHOD" /> .
+    ///     <see cref="LiveDocumentationWindowType.METHOD" />.
     /// </summary>
     public class ClassMember : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     {

@@ -40,7 +40,7 @@ namespace SEE.Game.UI.LiveDocumentation
         ///     Text mesh for the (shortened) class name
         /// </summary>
         private TextMeshProUGUI ClassNameField;
-        
+
         /// <summary>
         ///     The node of the CodeCity where the class or method belongs to.
         /// </summary>
@@ -139,7 +139,7 @@ namespace SEE.Game.UI.LiveDocumentation
             // Setting the correct anchor point (upper left corner) for the new game object
             classMem.transform.parent = ClassMembersList.transform;
             rt.localScale = new Vector3(1, 1, 1);
-            // This will set the 
+            // This will set the
             rt.anchorMin = new Vector2(0, 1);
             rt.anchorMax = new Vector2(0, 1);
             rt.sizeDelta = new Vector2(0, 200);
@@ -181,7 +181,7 @@ namespace SEE.Game.UI.LiveDocumentation
                     newWin.ImportedNamespaces = ImportedNamespaces;
                     newWin.DocumentationBuffer = classMemberBuffer.Documentation;
                     newWin.ClassMembers = classMemberBuffer.Parameters;
-                    
+
                     // Add code window to our space of code window.
                     spaceManager[WindowSpaceManager.LOCAL_PLAYER].AddWindow(newWin);
                     spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = newWin;
@@ -209,14 +209,14 @@ namespace SEE.Game.UI.LiveDocumentation
             Window.transform.Find("Dragger/Title").gameObject.GetComponent<TextMeshProUGUI>().text =
                 "LiveDocumentation";
 
-            // Initializing Unity Components 
+            // Initializing Unity Components
             ClassNameField = livedoc.transform.Find("ClassName/Viewport/Content/ClassName").gameObject
                 .GetComponent<TextMeshProUGUI>();
             ClassDocumentation =
                 livedoc.transform.Find(ClassDocumentationPath).gameObject.GetComponent<TextMeshProUGUI>();
             ClassMembersList = livedoc.transform.Find(ClassMemberListPath).gameObject;
 
-            // Set the right title 
+            // Set the right title
             GameObject membersListTitle = ClassMembersList.gameObject.transform.Find("Title").gameObject;
             TextMeshProUGUI textField = membersListTitle.GetComponent<TextMeshProUGUI>();
             switch (DocumentationWindowType)
@@ -234,7 +234,7 @@ namespace SEE.Game.UI.LiveDocumentation
             ClassNameField.text = ClassName;
 
             // Try setting the actual documentation
-            // If the class has no documentation 
+            // If the class has no documentation
             ClassDocumentation.text = DocumentationBuffer?.PrintBuffer() ?? "NO DOCS AVAILABLE";
             if (ClassDocumentation.text == "")
             {
