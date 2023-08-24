@@ -69,9 +69,9 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Update method
+        /// Update method - see <see cref="ReversibleAction.Update"/> for more info
         /// </summary>
-        /// <returns></returns>
+        /// <returns>returns always false</returns>
         public override bool Update()
         {
             // Only allow local player to open new code windows
@@ -93,8 +93,8 @@ namespace SEE.Controls.Actions
                 string path = selectedNode.Value.Path() + selectedNode.elem.Filename();
 
 
-                // When the node the user has clicked on wasn't a leaf node.
-                // In this case an error message is displayed and the LiveDocumentation windows is not going to open.
+                // When the node the user has clicked on wasn't a class
+                // In this case an error message is displayed and the LiveDocumentation windows is not going to open, since only classes can be opened.
                 if (selectedNode.Value.Type != "Class")
                 {
                     ShowNotification.Error("Node not supported", "Only class nodes can be analysed");
@@ -146,7 +146,7 @@ namespace SEE.Controls.Actions
                     catch (FileNotFoundException)
                     {
                         ShowNotification.Error("File not found",
-                            $"The file with the name {selectedNode.Value.AbsolutePlatformPath()}");
+                            $"The file with the name {selectedNode.Value.AbsolutePlatformPath()} can't be found");
                         return false;
                     }
 
