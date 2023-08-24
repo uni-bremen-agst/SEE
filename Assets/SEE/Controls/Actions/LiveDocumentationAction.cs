@@ -133,7 +133,7 @@ namespace SEE.Controls.Actions
                         documentationWindow.Title += $" ({selectedFile})";
                     }
 
-                    documentationWindow.ClassName = documentationWindow.Title;
+                    documentationWindow.SourceName = documentationWindow.Title;
                     documentationWindow.NodeOfClass = selectedNode.Value;
 
                     // Try initialise the FileParser

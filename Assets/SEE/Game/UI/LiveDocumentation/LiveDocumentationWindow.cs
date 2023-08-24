@@ -57,9 +57,9 @@ namespace SEE.Game.UI.LiveDocumentation
         private LiveDocumentationWindowType DocumentationWindowType { get; set; }
 
         /// <summary>
-        ///     The name of the class
+        ///     The name of the node which should be analysed
         /// </summary>
-        public string ClassName { get; set; }
+        public string SourceName { get; set; }
 
         /// <summary>
         ///     A list of all imported namespaces/packages
@@ -108,7 +108,7 @@ namespace SEE.Game.UI.LiveDocumentation
         /// <returns>Returns true when all fields are set. Otherwise false</returns>
         private bool CheckNecessaryFields()
         {
-            return ClassName != null && NodeOfClass != null;
+            return SourceName != null && NodeOfClass != null;
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace SEE.Game.UI.LiveDocumentation
                         newWin.Title += $" ({selectedFile})";
                     }
 
-                    newWin.ClassName = newWin.Title;
+                    newWin.SourceName = newWin.Title;
                     newWin.NodeOfClass = method;
                     newWin.DocumentationWindowType = LiveDocumentationWindowType.METHOD;
                     newWin.ImportedNamespaces = ImportedNamespaces;
@@ -231,7 +231,7 @@ namespace SEE.Game.UI.LiveDocumentation
 
 
             // Setting the classname.
-            ClassNameField.text = ClassName;
+            ClassNameField.text = SourceName;
 
             // Try setting the actual documentation
             // If the class has no documentation
@@ -387,7 +387,7 @@ namespace SEE.Game.UI.LiveDocumentation
                     newWin.Title += $" ({selectedFile})";
                 }
 
-                newWin.ClassName = newWin.Title;
+                newWin.SourceName = newWin.Title;
                 newWin.NodeOfClass = nodeOfLink;
                 LiveDocumentationBuffer buffer = new LiveDocumentationBuffer();
                 FileParser parser = new FileParser(nodeOfLink.AbsolutePlatformPath());
