@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using SEE.Game.UI.LiveDocumentation;
 using SEE.Game.UI.LiveDocumentation.Buffer;
 
 namespace SEE.Utils.LiveDocumentation
