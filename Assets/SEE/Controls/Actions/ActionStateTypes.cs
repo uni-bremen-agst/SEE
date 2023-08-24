@@ -106,15 +106,20 @@ namespace SEE.Controls.Actions
                   Color.black, "Materials/ModernUIPack/Document",
                   ShowCodeAction.CreateReversibleAction);
 
+            Draw =
+              new("Draw", "Draw a line",
+                  Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                  DrawAction.CreateReversibleAction);
+
             AcceptDivergence =
               new("Accept Divergence", "Accept a diverging edge into the architecture",
                   Color.grey.Darker(), "Materials/ModernUIPack/Arrow Bold",
                   AcceptDivergenceAction.CreateReversibleAction);
 
-            Draw =
-              new("Draw", "Draw a line",
-                  Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
-                  DrawAction.CreateReversibleAction);
+            LiveDocumentation =
+                new("LiveDocumentation", "displays the documentation of a node",
+                    Color.magenta.Lighter(), "Materials/ModernUIPack/Document",
+                    LiveDocumentationAction.CreateReversibleAction);
 
             // Metric Board actions
             MetricBoard =
@@ -168,12 +173,8 @@ namespace SEE.Controls.Actions
                   Color.blue.Darker(), "Materials/ModernUIPack/Document",
                   SaveBoardAction.CreateReversibleAction,
                   parent: MetricBoard);
-
-            LiveDocumentation =
-                new("LiveDocumentation", "Displays the documentation of a node",
-                    Color.magenta.Lighter(), "Materials/ModernUIPack/Document",
-                    LiveDocumentationAction.CreateReversibleAction);
         }
+
 
         public readonly static ActionStateType Move;
         public readonly static ActionStateType Rotate;
@@ -186,6 +187,8 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType ShowCode;
         public readonly static ActionStateType Draw;
         public readonly static ActionStateType AcceptDivergence;
+        public readonly static ActionStateType LiveDocumentation;
+
         public readonly static ActionStateTypeGroup MetricBoard;
         public readonly static ActionStateType AddBoard;
         public readonly static ActionStateType AddWidget;
@@ -195,7 +198,6 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType DeleteWidget;
         public readonly static ActionStateType LoadBoard;
         public readonly static ActionStateType SaveBoard;
-        public readonly static ActionStateType LiveDocumentation;
 
         #endregion
 
