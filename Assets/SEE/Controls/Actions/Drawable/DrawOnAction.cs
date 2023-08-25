@@ -41,7 +41,7 @@ namespace SEE.Controls.Actions
         private GameObject line;
 
         /// <summary>
-        /// The positions of the line in world space.
+        /// The positions of the line in local space.
         /// </summary>
         private Vector3[] positions = new Vector3[1];
 
@@ -101,6 +101,7 @@ namespace SEE.Controls.Actions
                     GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
                         raycastHit.collider.gameObject : GameDrawableFinder.FindDrawableParent(raycastHit.collider.gameObject);
                     drawing = true;
+                    
                     switch (DrawableHelper.checkDirection(GameDrawableFinder.GetHighestParent(drawable)))
                     {
                         case DrawableHelper.Direction.Front:
@@ -124,6 +125,10 @@ namespace SEE.Controls.Actions
                         default: 
                             break;
                     }
+                    // TEST LOCAL DRAWING - malt nicht an den punkten wo es sein sollte
+                   // Debug.Log(DateTime.Now + " - Rayhitcast:" + drawable.transform.InverseTransformPoint(raycastHit.point));
+                   // raycastHit.point -= DrawableHelper.distanceZ;
+                   // raycastHit.point = GameDrawableFinder.GetHighestParent(drawable).transform.InverseTransformPoint(raycastHit.point);
                     
                     switch (progressState)
                     {
@@ -131,11 +136,12 @@ namespace SEE.Controls.Actions
                             progressState = ProgressState.Drawing;
                             positions[0] = raycastHit.point;
                             line = GameDrawer.StartDrawing(drawable, positions, DrawableHelper.currentColor, DrawableHelper.currentThickness);
+                           // positions[0] = line.transform.InverseTransformPoint(positions[0]); // local drawing
                             break;
 
                         case ProgressState.Drawing:
                             // The position at which to continue the line.
-                            Vector3 newPosition = raycastHit.point;
+                            Vector3 newPosition = raycastHit.point; //line.transform.InverseTransformPoint(raycastHit.point);
 
                             // Add newPosition to the line renderer.
                             Vector3[] newPositions = new Vector3[positions.Length + 1];

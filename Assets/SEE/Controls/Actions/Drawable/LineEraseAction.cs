@@ -35,6 +35,7 @@ namespace SEE.Controls.Actions
                     Raycasting.RaycastAnything(out RaycastHit raycastHit))
                 {
                     GameObject hittedObject = raycastHit.collider.gameObject;
+                    Debug.Log("Hitted: " + hittedObject);
                     if (hittedObject.CompareTag(Tags.Line)) {
                         LineRenderer lineRenderer = hittedObject.GetComponent<LineRenderer>();
                         Vector3[] positions = new Vector3[lineRenderer.positionCount];

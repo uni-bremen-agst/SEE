@@ -68,6 +68,13 @@ namespace SEE.Game
             renderer.endWidth = renderer.startWidth;
             renderer.useWorldSpace = false;
             renderer.positionCount = positions.Length;
+
+            //TEST local drawing
+            /*
+            lineHolder.transform.rotation = drawable.transform.rotation;
+            line.transform.position = lineHolder.transform.position;
+            line.transform.rotation = lineHolder.transform.rotation;
+            */
         }
 
         public static GameObject StartDrawing(GameObject drawable, Vector3[] positions, Color color, float thickness)
