@@ -37,12 +37,15 @@ namespace Assets.SEE.Game.Drawable
             {
                 if (obj.CompareTag(Tags.Line))
                 {
+                    Debug.Log(DateTime.Now + " - " + obj.name);
                     if (obj.name.Contains("Holder"))
                     {
+                        Debug.Log(DateTime.Now + " - enthält holder: " + obj.name);
                         obj.transform.Rotate(moveDirection, degree);
                     }
                     else
                     {
+                        Debug.Log(DateTime.Now + " - muss kind sein: " + obj.name);
                         Transform parentTransform = obj.transform.parent;
                         parentTransform.Rotate(moveDirection, degree);
                     }

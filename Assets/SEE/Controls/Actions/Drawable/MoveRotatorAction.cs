@@ -141,7 +141,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                         if (DrawableHelper.checkDirection(GameDrawableFinder.GetHighestParent(drawable)) == DrawableHelper.Direction.Below ||
                             DrawableHelper.checkDirection(GameDrawableFinder.GetHighestParent(drawable)) == DrawableHelper.Direction.Above)
                         {
-                          //  SliderListener(slider, selectedObject.transform.parent.gameObject, drawable, drawableParentName);
+                           // SliderListener(slider, selectedObject.transform.parent.gameObject, drawable, drawableParentName);
                         }
                         else
                         {
