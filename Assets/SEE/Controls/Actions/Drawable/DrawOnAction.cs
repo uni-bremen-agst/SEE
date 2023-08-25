@@ -58,29 +58,29 @@ namespace SEE.Controls.Actions
 
         public override void Awake()
         {
-            DrawableConfigurator.enableDrawableMenu();
+            DrawableHelper.enableDrawableMenu();
 
-            thicknessSlider = DrawableConfigurator.drawableMenu.GetComponentInChildren<ThicknessSliderController>();
-            thicknessSlider.AssignValue(DrawableConfigurator.currentThickness);
+            thicknessSlider = DrawableHelper.drawableMenu.GetComponentInChildren<ThicknessSliderController>();
+            thicknessSlider.AssignValue(DrawableHelper.currentThickness);
             thicknessSlider.onValueChanged.AddListener(thickness =>
             {
-                DrawableConfigurator.currentThickness = thickness;
+                DrawableHelper.currentThickness = thickness;
             });
 
-            DrawableConfigurator.disableLayerFromDrawableMenu();
+            DrawableHelper.disableLayerFromDrawableMenu();
 
-            picker = DrawableConfigurator.drawableMenu.GetComponent<HSVPicker.ColorPicker>();
-            picker.AssignColor(DrawableConfigurator.currentColor);
-            picker.onValueChanged.AddListener(DrawableConfigurator.colorAction = color =>
+            picker = DrawableHelper.drawableMenu.GetComponent<HSVPicker.ColorPicker>();
+            picker.AssignColor(DrawableHelper.currentColor);
+            picker.onValueChanged.AddListener(DrawableHelper.colorAction = color =>
             {
-                DrawableConfigurator.currentColor = color;
+                DrawableHelper.currentColor = color;
             });
         }
 
         public override void Stop()
         {
-            DrawableConfigurator.enableLayerFromDrawableMenu();
-            DrawableConfigurator.disableDrawableMenu();
+            DrawableHelper.enableLayerFromDrawableMenu();
+            DrawableHelper.disableDrawableMenu();
         }
 
         /// <summary>
@@ -93,7 +93,6 @@ namespace SEE.Controls.Actions
 
             if (!Raycasting.IsMouseOverGUI())
             {
-
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
@@ -102,40 +101,36 @@ namespace SEE.Controls.Actions
                     GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
                         raycastHit.collider.gameObject : GameDrawableFinder.FindDrawableParent(raycastHit.collider.gameObject);
                     drawing = true;
-
-                    Ray ray = Raycasting.UserPointsTo();
-
-                    if (ray.direction.z < -0.80)
+                    switch (DrawableHelper.checkDirection(GameDrawableFinder.GetHighestParent(drawable)))
                     {
-                        raycastHit.point = raycastHit.point + DrawableConfigurator.distanceZ;
+                        case DrawableHelper.Direction.Front:
+                            raycastHit.point -= DrawableHelper.distanceZ;
+                            break;
+                        case DrawableHelper.Direction.Back:
+                            raycastHit.point += DrawableHelper.distanceZ;
+                            break;
+                        case DrawableHelper.Direction.Left:
+                            raycastHit.point += DrawableHelper.distanceX;
+                            break;
+                        case DrawableHelper.Direction.Right:
+                            raycastHit.point -= DrawableHelper.distanceX;
+                            break;
+                        case DrawableHelper.Direction.Below:
+                            raycastHit.point += DrawableHelper.distanceY;
+                            break;
+                        case DrawableHelper.Direction.Above:
+                            raycastHit.point -= DrawableHelper.distanceY;
+                            break;
+                        default: 
+                            break;
                     }
-                    if (ray.direction.z > 0.80)
-                    {
-                        raycastHit.point = raycastHit.point - DrawableConfigurator.distanceZ;
-                    }
-                    if (ray.direction.x < -0.80)
-                    {
-                        raycastHit.point = raycastHit.point + DrawableConfigurator.distanceX;
-                    }
-                    if (ray.direction.x > 0.80)
-                    {
-                        raycastHit.point = raycastHit.point - DrawableConfigurator.distanceX;
-                    }
-                    if (ray.direction.y < -0.80)
-                    {
-                        raycastHit.point = raycastHit.point + DrawableConfigurator.distanceZ2;
-                    }
-                    if (ray.direction.y > 0.80)
-                    {
-                        raycastHit.point = raycastHit.point - DrawableConfigurator.distanceZ2;
-                    }
-
+                    
                     switch (progressState)
                     {
                         case ProgressState.StartDrawing:
                             progressState = ProgressState.Drawing;
                             positions[0] = raycastHit.point;
-                            line = GameDrawer.StartDrawing(drawable, positions, DrawableConfigurator.currentColor, DrawableConfigurator.currentThickness);
+                            line = GameDrawer.StartDrawing(drawable, positions, DrawableHelper.currentColor, DrawableHelper.currentThickness);
                             break;
 
                         case ProgressState.Drawing:
@@ -151,8 +146,8 @@ namespace SEE.Controls.Actions
                             if (GameDrawer.DifferentPositionCounter(positions) > 3)
                             {
                                 GameDrawer.Drawing(positions);
-                                memento = new Memento(drawable, positions, DrawableConfigurator.currentColor,
-                                    DrawableConfigurator.currentThickness, line.GetComponent<LineRenderer>().sortingOrder);
+                                memento = new Memento(drawable, positions, DrawableHelper.currentColor,
+                                    DrawableHelper.currentThickness, line.GetComponent<LineRenderer>().sortingOrder);
                                 memento.id = line.name;
                                 new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable),
                                     memento.id, memento.positions, memento.color, memento.thickness).Execute();

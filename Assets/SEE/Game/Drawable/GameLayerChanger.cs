@@ -20,7 +20,7 @@ namespace Assets.SEE.Game.Drawable
             {
                 case DrawableTypes.Line:
                     LineRenderer lineRenderer = obj.GetComponent<LineRenderer>();
-                    if (lineRenderer.sortingOrder >= DrawableConfigurator.orderInLayer)
+                    if (lineRenderer.sortingOrder >= DrawableHelper.orderInLayer)
                     {
                         ShowNotification.Warn("Maximum layer order", obj.name + " has reached the maximum layer order: " + lineRenderer.sortingOrder);
                     }

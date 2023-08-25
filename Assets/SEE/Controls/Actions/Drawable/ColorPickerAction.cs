@@ -45,13 +45,13 @@ namespace SEE.Controls.Actions
                     GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject))
                 {
                     pickedColor = raycastHit.collider.gameObject.GetColor();
-                    HSVPicker.ColorPicker picker = DrawableConfigurator.drawableMenu.GetComponent<HSVPicker.ColorPicker>();
-                    picker.AssignColor(DrawableConfigurator.currentColor);
-                    picker.onValueChanged.AddListener(DrawableConfigurator.colorAction = color =>
+                    HSVPicker.ColorPicker picker = DrawableHelper.drawableMenu.GetComponent<HSVPicker.ColorPicker>();
+                    picker.AssignColor(DrawableHelper.currentColor);
+                    picker.onValueChanged.AddListener(DrawableHelper.colorAction = color =>
                     {
-                        DrawableConfigurator.currentColor = color;
+                        DrawableHelper.currentColor = color;
                     });
-                    DrawableConfigurator.currentColor = pickedColor;
+                    DrawableHelper.currentColor = pickedColor;
                     memento = new(oldChoosenColor, pickedColor);
                     result = true;
                     currentState = ReversibleAction.Progress.Completed;
@@ -70,17 +70,17 @@ namespace SEE.Controls.Actions
 
         public override void Awake()
         {
-            oldChoosenColor = DrawableConfigurator.currentColor;
-            DrawableConfigurator.enableDrawableMenu();
-            DrawableConfigurator.disableLayerFromDrawableMenu();
-            DrawableConfigurator.disableThicknessFromDrawableMenu();
+            oldChoosenColor = DrawableHelper.currentColor;
+            DrawableHelper.enableDrawableMenu();
+            DrawableHelper.disableLayerFromDrawableMenu();
+            DrawableHelper.disableThicknessFromDrawableMenu();
         }
 
         public override void Stop()
         {
-            DrawableConfigurator.enableLayerFromDrawableMenu();
-            DrawableConfigurator.enableThicknessFromDrawableMenu();
-            DrawableConfigurator.disableDrawableMenu();
+            DrawableHelper.enableLayerFromDrawableMenu();
+            DrawableHelper.enableThicknessFromDrawableMenu();
+            DrawableHelper.disableDrawableMenu();
         }
 
         struct Memento
@@ -102,7 +102,7 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            DrawableConfigurator.currentColor = memento.oldChoosenColor;
+            DrawableHelper.currentColor = memento.oldChoosenColor;
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            DrawableConfigurator.currentColor = memento.pickedColor;
+            DrawableHelper.currentColor = memento.pickedColor;
         }
 
         /// <summary>

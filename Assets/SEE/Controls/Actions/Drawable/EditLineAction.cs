@@ -90,7 +90,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                             selectedLine = null;
                             if (!effect.GetLoopStatus())
                             {
-                                DrawableConfigurator.disableDrawableMenu();
+                                DrawableHelper.disableDrawableMenu();
                             }
                         }
                         else
@@ -98,7 +98,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                             if (oldLine.GetComponent<BlinkEffect>() != null)
                             {
                                 oldLine.GetComponent<BlinkEffect>().Deactivate();
-                                DrawableConfigurator.disableDrawableMenu();
+                                DrawableHelper.disableDrawableMenu();
                             }
                         }
                     }
@@ -110,12 +110,12 @@ namespace Assets.SEE.Controls.Actions.Drawable
 
                     if (currentSelectedLine.GetComponent<BlinkEffect>() != null && currentSelectedLine.GetComponent<BlinkEffect>().GetLoopStatus())
                     {
-                        DrawableConfigurator.enableDrawableMenu();
+                        DrawableHelper.enableDrawableMenu();
 
                         GameObject drawable = GameDrawableFinder.FindDrawableParent(currentSelectedLine);
                         string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
 
-                        thicknessSlider = DrawableConfigurator.drawableMenu.GetComponentInChildren<ThicknessSliderController>();
+                        thicknessSlider = DrawableHelper.drawableMenu.GetComponentInChildren<ThicknessSliderController>();
                         thicknessSlider.AssignValue(renderer.startWidth);
                         thicknessSlider.onValueChanged.AddListener(thickness =>
                         {
@@ -127,7 +127,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                             }
                         });
 
-                        layerSlider = DrawableConfigurator.drawableMenu.GetComponentInChildren<LayerSliderController>();
+                        layerSlider = DrawableHelper.drawableMenu.GetComponentInChildren<LayerSliderController>();
                         layerSlider.AssignValue(renderer.sortingOrder);
                         layerSlider.onValueChanged.AddListener(layerOrder =>
                         {
@@ -136,9 +136,9 @@ namespace Assets.SEE.Controls.Actions.Drawable
                             new EditLineLayerNetAction(drawable.name, drawableParentName, currentSelectedLine.name, layerOrder).Execute();
                         });
 
-                        picker = DrawableConfigurator.drawableMenu.GetComponent<HSVPicker.ColorPicker>();
+                        picker = DrawableHelper.drawableMenu.GetComponent<HSVPicker.ColorPicker>();
                         picker.AssignColor(renderer.material.color);
-                        picker.onValueChanged.AddListener(DrawableConfigurator.colorAction = color =>
+                        picker.onValueChanged.AddListener(DrawableHelper.colorAction = color =>
                         {
                             GameEditLine.ChangeColor(currentSelectedLine, color);
                             newValueHolder.color = color;
@@ -204,7 +204,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     new EditLineColorNetAction(drawable.name, drawableParent, memento.currentLine.name, memento.oldValueHolder.color).Execute();
                 }
             }
-            DrawableConfigurator.disableDrawableMenu();
+            DrawableHelper.disableDrawableMenu();
             if (memento.oldLine != null && memento.oldLine.TryGetComponent<BlinkEffect>(out BlinkEffect oldEffect))
             {
                 oldEffect.Deactivate();
@@ -243,7 +243,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     new EditLineColorNetAction(drawable.name, drawableParent, memento.currentLine.name, memento.newValueHolder.color).Execute();
                 }
             }
-            DrawableConfigurator.disableDrawableMenu();
+            DrawableHelper.disableDrawableMenu();
             if (memento.oldLine != null && memento.oldLine.TryGetComponent<BlinkEffect>(out BlinkEffect oldEffect))
             {
                 oldEffect.Deactivate();

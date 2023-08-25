@@ -39,7 +39,7 @@ namespace Assets.SEE.Game.Drawable
         {
             if (GlobalActionHistory.Current() != ActionStateTypes.EditLine)
             {
-                DrawableConfigurator.disableDrawableMenu();
+                DrawableHelper.disableDrawableMenu();
             }
         }
 

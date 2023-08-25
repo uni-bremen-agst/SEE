@@ -7,7 +7,7 @@ using UnityEngine.Events;
 
 namespace Assets.SEE.Game.Drawable
 {
-    public static class DrawableConfigurator
+    public static class DrawableHelper
     {
         /// <summary>
         /// The current choosen color for drawing.
@@ -25,13 +25,13 @@ namespace Assets.SEE.Game.Drawable
 
         public readonly static Vector3 distanceX = new(0.002f, 0, 0);
 
-        public readonly static Vector3 distanceZ2 = new(0, 0, 0.004f);
+        public readonly static Vector3 distanceY = new(0, 0.002f, 0);
 
         private const string drawableMenuPrefab = "Prefabs/UI/DrawableLineMenu";
         public static GameObject drawableMenu;
         public static UnityAction<Color> colorAction;
 
-        static DrawableConfigurator() {
+        static DrawableHelper() {
             currentColor = UnityEngine.Random.ColorHSV();
             currentThickness = 0.01f;
             orderInLayer = 0;
@@ -40,7 +40,7 @@ namespace Assets.SEE.Game.Drawable
                             GameObject.Find("UI Canvas").transform, false);
             drawableMenu.SetActive(false);
         }
-
+        #region DrawableMenu
         public static void disableDrawableMenu()
         {
             drawableMenu.SetActive(false);
@@ -76,5 +76,51 @@ namespace Assets.SEE.Game.Drawable
         {
             drawableMenu.transform.Find("Thickness").gameObject.SetActive(true);
         }
+        #endregion
+
+        #region Direction
+        public enum Direction
+        {
+            Front,
+            Back,
+            Left,
+            Right,
+            Below,
+            Above,
+            None
+        }
+
+        public static Direction checkDirection(GameObject parent)
+        {
+            Direction direction = Direction.None;
+            float x = Mathf.Round(parent.transform.rotation.eulerAngles.x);
+            float y = Mathf.Round(parent.transform.rotation.eulerAngles.y);
+            if (x == 0 && y == 180)
+            {
+                direction = Direction.Back;
+            }
+            if (x == 0 && y == 0)
+            {
+                direction = Direction.Front;
+            }
+            if (x == 0 && y == 270)
+            {
+                direction = Direction.Left;
+            }
+            if (x == 0 && y == 90)
+            {
+                direction = Direction.Right;
+            }
+            if (x == 90)
+            {
+                direction = Direction.Below;
+            }
+            if (x == 270)
+            {
+                direction = Direction.Above;
+            }
+            return direction;
+        }
+        #endregion
     }
 }

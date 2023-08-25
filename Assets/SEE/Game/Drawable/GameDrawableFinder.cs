@@ -92,5 +92,20 @@ namespace Assets.SEE.Game
         {
             return hasAParent(drawable) ? drawable.transform.parent.name : "";
         }
+
+        public static GameObject GetHighestParent(GameObject drawable)
+        {
+            if (drawable.CompareTag(Tags.Drawable))
+            {
+                if (drawable.transform.parent != null)
+                {
+                    return drawable.transform.parent.gameObject;
+                }
+            } else
+            {
+                drawable = GetHighestParent(FindDrawableParent(drawable));
+            }
+            return drawable;
+        }
     }
 }

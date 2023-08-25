@@ -43,7 +43,21 @@ namespace SEE.Game
             }
             lineHolder.transform.parent = drawable.transform;
             lineHolder.transform.position = drawable.transform.position;
-
+            
+            DrawableHelper.Direction direction = DrawableHelper.checkDirection(GameDrawableFinder.GetHighestParent(drawable));
+            if (direction == DrawableHelper.Direction.Below)
+            {
+                Quaternion quaternion = new Quaternion();
+                quaternion.eulerAngles = new Vector3(lineHolder.transform.rotation.eulerAngles.x, 90, -90);
+                lineHolder.transform.rotation = quaternion;
+            }
+            if (direction == DrawableHelper.Direction.Above)
+            {
+                Quaternion quaternion = new Quaternion();
+                quaternion.eulerAngles = new Vector3(lineHolder.transform.rotation.eulerAngles.x, -90, 90);
+                lineHolder.transform.rotation = quaternion;
+            }
+            
             line = new (name);
             line.tag = Tags.Line;
             line.transform.SetParent(lineHolder.transform);
@@ -61,8 +75,8 @@ namespace SEE.Game
             Setup(drawable, "", positions, color, thickness);
             line.name = "line" + line.GetInstanceID();
             lineHolder.name = "LineHolder" + line.GetInstanceID();
-            renderer.sortingOrder = DrawableConfigurator.orderInLayer;
-            DrawableConfigurator.orderInLayer++;
+            renderer.sortingOrder = DrawableHelper.orderInLayer;
+            DrawableHelper.orderInLayer++;
             
             return line;
         }
@@ -97,8 +111,8 @@ namespace SEE.Game
             {
                 Setup(drawable, name, positions, color, thickness);
                 renderer.SetPositions(positions);
-                renderer.sortingOrder = DrawableConfigurator.orderInLayer;
-                DrawableConfigurator.orderInLayer++;
+                renderer.sortingOrder = DrawableHelper.orderInLayer;
+                DrawableHelper.orderInLayer++;
                 FinishDrawing();
             }
             return line;
