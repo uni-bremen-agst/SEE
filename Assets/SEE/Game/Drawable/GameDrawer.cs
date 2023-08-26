@@ -28,6 +28,8 @@ namespace SEE.Game
         /// </summary>
         private static MeshCollider meshCollider;
 
+        private static EdgeCollider2D edgeCollider;
+
         private static GameObject line;
 
         private static GameObject lineHolder;
@@ -63,6 +65,7 @@ namespace SEE.Game
             line.transform.SetParent(lineHolder.transform);
             renderer = line.AddComponent<LineRenderer>();
             meshCollider = line.AddComponent<MeshCollider>();
+            //edgeCollider = line.AddComponent<EdgeCollider2D>();
             renderer.sharedMaterial = GetMaterial(color);
             renderer.startWidth = thickness;
             renderer.endWidth = renderer.startWidth;
@@ -99,9 +102,20 @@ namespace SEE.Game
 
         public static void FinishDrawing()
         {
+            
             Mesh mesh = new();
             renderer.BakeMesh(mesh, true);
             meshCollider.sharedMesh = mesh;
+            /*
+            Vector3[] positions = new Vector3[renderer.positionCount];
+            renderer.GetPositions(positions);
+            List<Vector2> positions2D = new();
+            for(int i = 0; i < renderer.positionCount; i++)
+            {
+                positions2D.Add(new Vector2(positions[i].x, positions[i].y));
+            }
+            edgeCollider.SetPoints(positions2D);
+            */
         }
 
         public static GameObject DrawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness)
