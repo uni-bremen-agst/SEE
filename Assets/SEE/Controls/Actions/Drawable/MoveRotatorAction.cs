@@ -93,6 +93,9 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     {
                         if (hit.collider.gameObject.CompareTag(Tags.Drawable))
                         {
+                            //Vector3 offset = selectedObject.transform.InverseTransformPoint(new Vector3(hit.point.x - firstPoint.x, hit.point.y - firstPoint.y, 0));
+                            //Vector3 offset = new Vector3(hit.point.x - firstPoint.x, hit.point.y - firstPoint.y, 0);
+                            
                             Vector3 offset = Vector3.zero;
                             switch (DrawableHelper.checkDirection(drawable))
                             {
@@ -120,7 +123,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                             didSomething = true;
                             Vector3 objectPosition = oldObjectPosition;
                             newObjectPosition = objectPosition + offset;
-                            GameMoveRotator.MoveObject(selectedObject, newObjectPosition);
+                            GameMoveRotator.MoveObject(selectedObject, newObjectPosition);//, oldObjectPosition);
                             new MoveNetAction(drawable.name, drawableParentName, selectedObject.name, newObjectPosition).Execute();
                         }
                     }

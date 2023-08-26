@@ -101,7 +101,7 @@ namespace SEE.Controls.Actions
                     GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
                         raycastHit.collider.gameObject : GameDrawableFinder.FindDrawableParent(raycastHit.collider.gameObject);
                     drawing = true;
-                    
+                    /* world drawing
                     switch (DrawableHelper.checkDirection(GameDrawableFinder.GetHighestParent(drawable)))
                     {
                         case DrawableHelper.Direction.Front:
@@ -124,10 +124,10 @@ namespace SEE.Controls.Actions
                             break;
                         default: 
                             break;
-                    }
+                    }*/
                     // TEST LOCAL DRAWING
                    // Debug.Log(DateTime.Now + " - Rayhitcast:" + drawable.transform.InverseTransformPoint(raycastHit.point));
-                   // raycastHit.point -= DrawableHelper.distanceZ;
+                    //raycastHit.point -= DrawableHelper.distanceZ;
                    // raycastHit.point = GameDrawableFinder.GetHighestParent(drawable).transform.InverseTransformPoint(raycastHit.point);
                     
                     switch (progressState)
@@ -136,12 +136,12 @@ namespace SEE.Controls.Actions
                             progressState = ProgressState.Drawing;
                             positions[0] = raycastHit.point;
                             line = GameDrawer.StartDrawing(drawable, positions, DrawableHelper.currentColor, DrawableHelper.currentThickness);
-                            //positions[0] = line.transform.InverseTransformPoint(positions[0]); // local drawing
+                            positions[0] = line.transform.InverseTransformPoint(positions[0]) - DrawableHelper.distanceToBoard; // local drawing
                             break;
-
+                             
                         case ProgressState.Drawing:
                             // The position at which to continue the line.
-                            Vector3 newPosition = raycastHit.point;// line.transform.InverseTransformPoint(raycastHit.point); //raycastHit.point;
+                            Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - DrawableHelper.distanceToBoard; //raycastHit.point;
 
                             // Add newPosition to the line renderer.
                             Vector3[] newPositions = new Vector3[positions.Length + 1];

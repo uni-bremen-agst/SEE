@@ -33,7 +33,6 @@ namespace SEE.Controls.Actions
             {
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
                     Raycasting.RaycastAnything(out RaycastHit raycastHit))
-                   // Raycasting.RaycastAnything2D(out RaycastHit2D raycastHit))
                 {
                     GameObject hittedObject = raycastHit.collider.gameObject;
                     Debug.Log("Hitted: " + hittedObject);

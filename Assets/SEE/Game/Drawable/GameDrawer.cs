@@ -73,11 +73,12 @@ namespace SEE.Game
             renderer.positionCount = positions.Length;
 
             //TEST local drawing
-            /*
+            
             lineHolder.transform.rotation = drawable.transform.rotation;
             line.transform.position = lineHolder.transform.position;
+            line.transform.position = new Vector3(line.transform.position.x, line.transform.position.y, DrawableHelper.distanceToBoard.z);
             line.transform.rotation = lineHolder.transform.rotation;
-            */
+            
         }
 
         public static GameObject StartDrawing(GameObject drawable, Vector3[] positions, Color color, float thickness)
@@ -102,10 +103,10 @@ namespace SEE.Game
 
         public static void FinishDrawing()
         {
-            
             Mesh mesh = new();
-            renderer.BakeMesh(mesh, true);
+            renderer.BakeMesh(mesh); //renderer.BakeMesh(mesh,true);
             meshCollider.sharedMesh = mesh;
+            
             /*
             Vector3[] positions = new Vector3[renderer.positionCount];
             renderer.GetPositions(positions);

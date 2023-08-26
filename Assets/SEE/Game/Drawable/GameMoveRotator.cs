@@ -9,8 +9,11 @@ namespace Assets.SEE.Game.Drawable
 {
     public static class GameMoveRotator
     {
-        public static void MoveObject(GameObject obj, Vector3 position)
+        public static void MoveObject(GameObject obj, Vector3 position)//, Vector3 oldPosition)
         {
+            //Debug.Log(DateTime.Now +  " - Old local Position: "+ obj.transform.localPosition +"New local Position: " + position + ", Position: " + obj.transform.position);
+            //position = new Vector3(position.x, position.y, obj.transform.localPosition.z);
+            //obj.transform.localPosition = position;//new Vector3(position.x, position.y, oldPosition.z);
             obj.transform.position = position;
         }
 

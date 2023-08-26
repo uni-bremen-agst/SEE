@@ -11,7 +11,7 @@ namespace Assets.SEE.Net.Actions.Drawable
         public string DrawableID;
         public string ParentDrawableID;
         public string ObjectName;
-        public Vector3 position;
+        public Vector3 Position;
 
         /// <summary>
         /// Creates a new FastEraseNetAction.
@@ -23,7 +23,7 @@ namespace Assets.SEE.Net.Actions.Drawable
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
             ObjectName = objectName;
-            this.position = position;
+            this.Position = position;
         }
         protected override void ExecuteOnServer()
         {
@@ -39,7 +39,7 @@ namespace Assets.SEE.Net.Actions.Drawable
                     GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
                     if (drawable != null && GameDrawableFinder.FindChild(drawable, ObjectName) != null)
                     {
-                        GameMoveRotator.MoveObject(GameDrawableFinder.FindChild(drawable, ObjectName), position);
+                        GameMoveRotator.MoveObject(GameDrawableFinder.FindChild(drawable, ObjectName), Position);
                     }
                     else
                     {
