@@ -130,7 +130,7 @@ namespace SEE.Controls
         {
             if (FindObjectsOfType<WindowSpaceManager>().Length > 1)
             {
-                Debug.LogError($"Warning: More than one  {nameof(WindowSpaceManager)} is present in the scene! "
+                Debug.LogError($"More than one {nameof(WindowSpaceManager)} is present in the scene! "
                                + "This will lead to undefined behaviour when synchronizing "
                                + "windows across the network! No new indicator will be created.\n");
                 foreach (WindowSpaceManager manager in FindObjectsOfType<WindowSpaceManager>())
