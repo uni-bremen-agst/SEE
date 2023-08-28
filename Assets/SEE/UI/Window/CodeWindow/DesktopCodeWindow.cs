@@ -101,8 +101,7 @@ namespace SEE.UI.Window.CodeWindow
             GameObject scrollable = PrefabInstantiator.InstantiatePrefab(CODE_WINDOW_PREFAB, Window.transform.Find("Content"), false);
             scrollable.name = "Scrollable";
 
-            // Set title, text and preferred font size
-            Window.transform.Find("Dragger/Title").gameObject.GetComponent<TextMeshProUGUI>().text = Title;
+            // Set text and preferred font size
             GameObject code = scrollable.transform.Find("Code").gameObject;
             if (code.TryGetComponentOrLog(out TextMesh) && code.TryGetComponentOrLog(out TextMeshInputField))
             {

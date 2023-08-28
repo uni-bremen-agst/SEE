@@ -2,6 +2,7 @@ using System;
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
+using TMPro;
 using UnityEngine;
 
 namespace SEE.UI.Window
@@ -40,6 +41,7 @@ namespace SEE.UI.Window
             }
 
             Window = PrefabInstantiator.InstantiatePrefab(WINDOW_PREFAB, Canvas.transform, false);
+            Window.name = Title;
 
             // Position code window in center of screen
             Window.transform.localPosition = Vector3.zero;
@@ -49,6 +51,11 @@ namespace SEE.UI.Window
             {
                 rect.sizeDelta = Resolution;
             }
+
+            // Set title
+            Window.transform.Find("Dragger/Title").gameObject.GetComponent<TextMeshProUGUI>().text = Title;
+
+            // TODO: Disable IDE Button if unused
         }
 
         /// <summary>
@@ -121,10 +128,10 @@ namespace SEE.UI.Window
 
         /// <summary>
         /// Sets up this newly created window from the values given in the <paramref name="valueObject"/>.
-        /// 
+        ///
         /// Note that the <see cref="Title"/> and <c>AttachedTo</c> attributes needn't be handled, only newly added
         /// fields compared to <see cref="WindowValues"/> are relevant here.
-        /// 
+        ///
         /// </summary>
         /// <param name="valueObject">The window value object whose values shall be used.</param>
         /// <remarks>
@@ -138,7 +145,7 @@ namespace SEE.UI.Window
         ///
         /// Note that this method will be called often, hence, do not simply use every new value if that negatively
         /// impedes performance! See below for an example.
-        /// 
+        ///
         /// </summary>
         /// <param name="valueObject">The window value object whose updated values shall be used.</param>
         /// <example>

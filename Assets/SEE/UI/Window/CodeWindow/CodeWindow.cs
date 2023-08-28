@@ -215,7 +215,7 @@ namespace SEE.UI.Window.CodeWindow
                 throw new UnsupportedTypeException(typeof(CodeWindowValues), valueObject.GetType());
             }
             VisibleLine = codeValues.VisibleLine;
-            //TODO: Text merge between windowValue.Text and window.Text
+            // TODO: Text merge between windowValue.Text and window.Text
         }
 
         /// <summary>
