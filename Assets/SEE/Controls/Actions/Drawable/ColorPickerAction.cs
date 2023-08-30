@@ -40,8 +40,8 @@ namespace SEE.Controls.Actions
 
             if (!Raycasting.IsMouseOverGUI())
             {
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && 
-                    Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
+                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) && // Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject))
                 {
                     pickedColor = raycastHit.collider.gameObject.GetColor();

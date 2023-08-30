@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Linq;
 using UnityEngine;
 
 namespace Assets.SEE.Game.Drawable
@@ -12,7 +13,7 @@ namespace Assets.SEE.Game.Drawable
             renderer.endWidth = thickness;
             MeshCollider meshCollider = line.GetComponent<MeshCollider>();
             Mesh mesh = new();
-            renderer.BakeMesh(mesh, true);
+            renderer.BakeMesh(mesh);
             meshCollider.sharedMesh = mesh;
         }
         public static void ChangeLayer(GameObject line, int layer)

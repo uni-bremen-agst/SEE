@@ -61,7 +61,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
             if (!Raycasting.IsMouseOverGUI())
             {
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && isActive == false &&
-                    Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
+                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) && // Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     raycastHit.collider.gameObject.CompareTag(Tags.Line))
                 {
                     GameObject currentSelectedLine = raycastHit.collider.gameObject;

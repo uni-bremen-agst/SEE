@@ -108,6 +108,22 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// Raycasts the scene from the camera in the direction the mouse is pointing.
+        /// Returns true if the mouse is not over any GUI element and if anything was hit.
+        /// <paramref name="raycastHit"/> will be set, if true is returned.
+        /// </summary>
+        /// <param name="raycastHit">hit object if true is returned, undefined otherwise</param>
+        /// <param name="maxDistance">how far the ray cast may reach; anything farther away
+        /// cannot be hit</param>
+        /// <returns>true if the mouse is not over any GUI element and if anything was hit</returns>
+        public static bool RaycastAnythingBackface(out RaycastHit raycastHit, float maxDistance = float.PositiveInfinity)
+        {
+            raycastHit = new RaycastHit();
+            Physics.queriesHitBackfaces = true;
+            return !IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out raycastHit, maxDistance);
+        }
+
+        /// <summary>
         /// Raycasts the scene from the camera in the direction the mouse is pointing and chooses the
         /// node that is the lowest one in the node hierarchy (more precisely, the one with the
         /// greatest value of the node attribute Level; where Level counting starts at the root

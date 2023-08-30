@@ -11,36 +11,31 @@ namespace Assets.SEE.Net.Actions.Drawable
         public string DrawableID;
         public string ParentDrawableID;
         public string ObjectName;
-        //public Quaternion OldRotation;
-        public Vector3 FirstPoint;
         public Vector3 Direction;
         public float Degree;
-        public Vector3 OldPosition;
 
         /// <summary>
         /// Creates a new FastEraseNetAction.
         /// </summary>
         /// <param name="gameObjectID">the unique name of the gameObject of a line
         /// that has to be deleted</param>
-        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, Vector3 firstPoint, Vector3 direction, float degree, Vector3 oldPosition) : base()
+        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, Vector3 direction, float degree) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
             ObjectName = objectName;
-            FirstPoint = firstPoint;
             Direction = direction;
             Degree = degree;
-            OldPosition = oldPosition;
         }
-        /*
-        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, Quaternion rotation) : base()
+        
+        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, float localEulerAnlgeZ) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
             ObjectName = objectName;
-            OldRotation = rotation;
-            Degree = -1;
-        }*/
+            Degree = localEulerAnlgeZ;
+            Direction = Vector3.zero;
+        }
         protected override void ExecuteOnServer()
         {
 
@@ -55,7 +50,14 @@ namespace Assets.SEE.Net.Actions.Drawable
                     GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
                     if (drawable != null && GameDrawableFinder.FindChild(drawable, ObjectName) != null)
                     {
-                            GameMoveRotator.RotateObject(GameDrawableFinder.FindChild(drawable, ObjectName), FirstPoint, Direction, Degree, OldPosition);
+                        GameObject child = GameDrawableFinder.FindChild(drawable, ObjectName);
+                        if (Direction != Vector3.zero)
+                        {
+                            GameMoveRotator.RotateObject(child, Direction, Degree);
+                        } else
+                        {
+                            GameMoveRotator.SetRotate(child, Degree);
+                        }
                     }
                     else
                     {

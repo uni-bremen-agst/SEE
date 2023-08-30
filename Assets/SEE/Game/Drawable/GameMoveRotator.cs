@@ -9,65 +9,30 @@ namespace Assets.SEE.Game.Drawable
 {
     public static class GameMoveRotator
     {
-        public static void MoveObject(GameObject obj, Vector3 position)//, Vector3 oldPosition)
+        public static void MoveObject(GameObject obj, Vector3 position)
         {
-            //Debug.Log(DateTime.Now +  " - Old local Position: "+ obj.transform.localPosition +"New local Position: " + position + ", Position: " + obj.transform.position);
-            //position = new Vector3(position.x, position.y, obj.transform.localPosition.z);
-            //obj.transform.localPosition = position;//new Vector3(position.x, position.y, oldPosition.z);
             obj.transform.position = position;
         }
 
-        public static void RotateObject(GameObject obj, Vector3 firstPoint, Vector3 moveDirection, float degree, Vector3 oldPosition)
+        public static void RotateObject(GameObject obj, Vector3 moveDirection, float degree)
         {
-            DrawableHelper.Direction drawableDirection = DrawableHelper.checkDirection(GameDrawableFinder.GetHighestParent(obj));
-
-            if ((drawableDirection == DrawableHelper.Direction.Front || drawableDirection == DrawableHelper.Direction.Back) &&
-                (moveDirection == Vector3.forward || moveDirection == Vector3.back))
+            Transform transform;
+            if (obj.CompareTag(Tags.Line))
             {
-                obj.transform.RotateAround(firstPoint, moveDirection, degree);
-                obj.transform.position = new Vector3(obj.transform.position.x, obj.transform.position.y, oldPosition.z);
-            }
-
-            if ((drawableDirection == DrawableHelper.Direction.Left || drawableDirection == DrawableHelper.Direction.Right) &&
-                (moveDirection == Vector3.right || moveDirection == Vector3.left))
+                transform = obj.transform.parent;
+            } else
             {
-                obj.transform.RotateAround(firstPoint, moveDirection, degree);
-                obj.transform.position = new Vector3(oldPosition.x, obj.transform.position.y, obj.transform.position.z);
+                transform = obj.transform;
             }
-
-            if ((drawableDirection == DrawableHelper.Direction.Below || drawableDirection == DrawableHelper.Direction.Above) &&
-                (moveDirection == Vector3.right || moveDirection == Vector3.left))
-            {
-                if (obj.CompareTag(Tags.Line))
-                {
-                    Debug.Log(DateTime.Now + " - " + obj.name);
-                    if (obj.name.Contains("Holder"))
-                    {
-                        Debug.Log(DateTime.Now + " - enthält holder: " + obj.name);
-                        obj.transform.Rotate(moveDirection, degree);
-                    }
-                    else
-                    {
-                        Debug.Log(DateTime.Now + " - muss kind sein: " + obj.name);
-                        Transform parentTransform = obj.transform.parent;
-                        parentTransform.Rotate(moveDirection, degree);
-                    }
-                    // To refresh the line mesh collider
-                    obj.GetComponent<MeshCollider>().enabled = false;
-                    obj.GetComponent<MeshCollider>().enabled = true;
-                }
-                else
-                {
-                    //FIXME: TESTEN OB DAS MIT ANDEREN OBJEKTEN WIRKLICH KLAPPT!
-                    obj.transform.RotateAround(firstPoint, moveDirection, degree);
-                }
-            }
+            transform.Rotate(moveDirection, degree, Space.Self);
+            obj.GetComponent<MeshCollider>().enabled = false;
+            obj.GetComponent<MeshCollider>().enabled = true;
         }
-        /*
-        public static void RotateObject(GameObject obj, Quaternion oldRotation, Vector3 oldPosition)
+
+        public static void SetRotate(GameObject obj, float localEulerAngleZ)
         {
-            obj.transform.rotation = oldRotation;
-            obj.transform.position = oldPosition;
-        }*/
+            Transform transform = obj.CompareTag(Tags.Line) ? obj.transform.parent : obj.transform;
+            transform.localEulerAngles = new Vector3(0, 0, localEulerAngleZ);
+        }
     }
 }

@@ -21,11 +21,11 @@ namespace Assets.SEE.Game.Drawable
 
         public static int orderInLayer { get; set; }
 
-        public readonly static Vector3 distanceToBoard = new(0, 0, 0.04f);
+        public readonly static Vector3 distanceToBoard = new(0, 0, 0.02f);
+
+
         public readonly static Vector3 distanceZ = new(0, 0, 0.002f);
-
         public readonly static Vector3 distanceX = new(0.002f, 0, 0);
-
         public readonly static Vector3 distanceY = new(0, 0.002f, 0);
 
         private const string drawableMenuPrefab = "Prefabs/UI/DrawableLineMenu";
@@ -35,7 +35,7 @@ namespace Assets.SEE.Game.Drawable
         static DrawableHelper() {
             currentColor = UnityEngine.Random.ColorHSV();
             currentThickness = 0.01f;
-            orderInLayer = 0;
+            orderInLayer = 1;
 
             drawableMenu = PrefabInstantiator.InstantiatePrefab(drawableMenuPrefab,
                             GameObject.Find("UI Canvas").transform, false);

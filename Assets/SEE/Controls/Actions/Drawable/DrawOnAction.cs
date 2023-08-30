@@ -101,47 +101,19 @@ namespace SEE.Controls.Actions
                     GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
                         raycastHit.collider.gameObject : GameDrawableFinder.FindDrawableParent(raycastHit.collider.gameObject);
                     drawing = true;
-                    /* world drawing
-                    switch (DrawableHelper.checkDirection(GameDrawableFinder.GetHighestParent(drawable)))
-                    {
-                        case DrawableHelper.Direction.Front:
-                            raycastHit.point -= DrawableHelper.distanceZ;
-                            break;
-                        case DrawableHelper.Direction.Back:
-                            raycastHit.point += DrawableHelper.distanceZ;
-                            break;
-                        case DrawableHelper.Direction.Left:
-                            raycastHit.point += DrawableHelper.distanceX;
-                            break;
-                        case DrawableHelper.Direction.Right:
-                            raycastHit.point -= DrawableHelper.distanceX;
-                            break;
-                        case DrawableHelper.Direction.Below:
-                            raycastHit.point += DrawableHelper.distanceY;
-                            break;
-                        case DrawableHelper.Direction.Above:
-                            raycastHit.point -= DrawableHelper.distanceY;
-                            break;
-                        default: 
-                            break;
-                    }*/
-                    // TEST LOCAL DRAWING
-                   // Debug.Log(DateTime.Now + " - Rayhitcast:" + drawable.transform.InverseTransformPoint(raycastHit.point));
-                    //raycastHit.point -= DrawableHelper.distanceZ;
-                   // raycastHit.point = GameDrawableFinder.GetHighestParent(drawable).transform.InverseTransformPoint(raycastHit.point);
-                    
+
                     switch (progressState)
                     {
                         case ProgressState.StartDrawing:
                             progressState = ProgressState.Drawing;
                             positions[0] = raycastHit.point;
                             line = GameDrawer.StartDrawing(drawable, positions, DrawableHelper.currentColor, DrawableHelper.currentThickness);
-                            positions[0] = line.transform.InverseTransformPoint(positions[0]) - DrawableHelper.distanceToBoard; // local drawing
+                            positions[0] = line.transform.InverseTransformPoint(positions[0]) - DrawableHelper.distanceToBoard;
                             break;
                              
                         case ProgressState.Drawing:
                             // The position at which to continue the line.
-                            Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - DrawableHelper.distanceToBoard; //raycastHit.point;
+                            Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - DrawableHelper.distanceToBoard;
 
                             // Add newPosition to the line renderer.
                             Vector3[] newPositions = new Vector3[positions.Length + 1];
@@ -184,7 +156,7 @@ namespace SEE.Controls.Actions
                         }
                         else
                         {
-                            Destroyer.Destroy(line);
+                            Destroyer.Destroy(line.transform.parent.gameObject);
                         }
                     }
                     return isMouseButtonUp;

@@ -39,7 +39,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
         private static ClickState clickState = ClickState.None;
         private static Vector3 firstPoint;
         private static Vector3 oldObjectPosition;
-        private static Quaternion oldObjectRotation;
+        private static Vector3 oldObjectLocalEulerAngles;
         private static Vector3 direction = Vector3.zero;
         private static float degree = 0;
         private const string rotationMenuPrefab = "Prefabs/UI/DrawableRotate";
@@ -51,7 +51,13 @@ namespace Assets.SEE.Controls.Actions.Drawable
         {
             selectedObject = obj;
             oldObjectPosition = obj.transform.position;
-            oldObjectRotation = obj.transform.rotation;
+            if (selectedObject.CompareTag(Tags.Line))
+            {
+                oldObjectLocalEulerAngles = selectedObject.transform.parent.localEulerAngles;
+            } else
+            {
+                oldObjectLocalEulerAngles = selectedObject.transform.localEulerAngles;
+            }
         }
 
         /// <summary>
@@ -65,7 +71,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
             if (!Raycasting.IsMouseOverGUI())
             {
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButton(1)) 
-                    && !isActive && !didSomething && !isDone && Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
+                    && !isActive && !didSomething && !isDone && Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) && // Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject) && clickState == ClickState.None)
                 {
                     selectedObject = raycastHit.collider.gameObject;
@@ -93,37 +99,21 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     {
                         if (hit.collider.gameObject.CompareTag(Tags.Drawable))
                         {
-                            //Vector3 offset = selectedObject.transform.InverseTransformPoint(new Vector3(hit.point.x - firstPoint.x, hit.point.y - firstPoint.y, 0));
-                            //Vector3 offset = new Vector3(hit.point.x - firstPoint.x, hit.point.y - firstPoint.y, 0);
-                            
-                            Vector3 offset = Vector3.zero;
-                            switch (DrawableHelper.checkDirection(drawable))
-                            {
-                                case DrawableHelper.Direction.Front:
-                                    offset = new Vector3(hit.point.x - firstPoint.x, hit.point.y - firstPoint.y, 0);
-                                    break;
-                                case DrawableHelper.Direction.Back:
-                                    offset = new Vector3(hit.point.x - firstPoint.x, hit.point.y - firstPoint.y, 0);
-                                    break;
-                                case DrawableHelper.Direction.Left:
-                                    offset = new Vector3(0, hit.point.y - firstPoint.y, hit.point.z - firstPoint.z);
-                                    break;
-                                case DrawableHelper.Direction.Right:
-                                    offset = new Vector3(0, hit.point.y - firstPoint.y, hit.point.z - firstPoint.z);
-                                    break;
-                                case DrawableHelper.Direction.Below:
-                                    offset = new Vector3(hit.point.x - firstPoint.x, 0, hit.point.z - firstPoint.z);
-                                    break;
-                                case DrawableHelper.Direction.Above:
-                                    offset = new Vector3(hit.point.x - firstPoint.x, 0, hit.point.z - firstPoint.z);
-                                    break;
-                                default:
-                                    break;
-                            }
+                            Vector3 offset = new Vector3(hit.point.x - firstPoint.x, hit.point.y - firstPoint.y, hit.point.z - firstPoint.z);
                             didSomething = true;
                             Vector3 objectPosition = oldObjectPosition;
-                            newObjectPosition = objectPosition + offset;
-                            GameMoveRotator.MoveObject(selectedObject, newObjectPosition);//, oldObjectPosition);
+                            if (selectedObject.CompareTag(Tags.Line))
+                            {
+                                Vector3 eulerAngles = selectedObject.transform.parent.localEulerAngles;
+                                selectedObject.transform.parent.localEulerAngles = Vector3.zero;
+                                newObjectPosition = objectPosition + multiply(selectedObject.transform.right, offset) + multiply(selectedObject.transform.up, offset);
+                                selectedObject.transform.parent.localEulerAngles = eulerAngles;
+                            }
+                            else
+                            {
+                                newObjectPosition = objectPosition + multiply(selectedObject.transform.right, offset) + multiply(selectedObject.transform.up, offset);
+                            }
+                            GameMoveRotator.MoveObject(selectedObject, newObjectPosition);
                             new MoveNetAction(drawable.name, drawableParentName, selectedObject.name, newObjectPosition).Execute();
                         }
                     }
@@ -141,58 +131,58 @@ namespace Assets.SEE.Controls.Actions.Drawable
                         RotationSliderController slider = rotationMenu.GetComponentInChildren<RotationSliderController>();
                         MenuDestroyer destroyer = rotationMenu.AddOrGetComponent<MenuDestroyer>();
                         destroyer.SetAllowedState(GetActionStateType());
-                        if (DrawableHelper.checkDirection(GameDrawableFinder.GetHighestParent(drawable)) == DrawableHelper.Direction.Below ||
-                            DrawableHelper.checkDirection(GameDrawableFinder.GetHighestParent(drawable)) == DrawableHelper.Direction.Above)
-                        {
-                           // SliderListener(slider, selectedObject.transform.parent.gameObject, drawable, drawableParentName);
-                        }
-                        else
-                        {
-                            SliderListener(slider, selectedObject, drawable, drawableParentName);
-                        }
+                        SliderListener(slider, selectedObject, drawable, drawableParentName);
                     } else
                     {
                         RotationSliderController slider = rotationMenu.GetComponentInChildren<RotationSliderController>();
-                        slider.AssignValue(GetRotatedAxis(selectedObject));
+                        float assignValue = selectedObject.CompareTag(Tags.Line) ? 
+                            selectedObject.transform.parent.localEulerAngles.z : selectedObject.transform.localEulerAngles.z;
+                        slider.AssignValue(assignValue);
+
                     }
                     if (Input.mouseScrollDelta.y > 0 && !Input.GetKey(KeyCode.LeftControl))
                     {
-                        direction = GetForwardVector(drawable);
+                        direction = Vector3.forward;
                         degree = 1;
                         rotate = true;
                     }
                     if (Input.mouseScrollDelta.y > 0 && Input.GetKey(KeyCode.LeftControl))
                     {
-                        direction = GetForwardVector(drawable);
+                        direction = Vector3.forward;
                         degree = 10;
                         rotate = true;
                     }
 
                     if (Input.mouseScrollDelta.y < 0 && !Input.GetKey(KeyCode.LeftControl))
                     {
-                        direction = GetBackVector(drawable);
+                        direction = Vector3.back;
                         degree = 1;
                         rotate = true;
 
                     }
                     if (Input.mouseScrollDelta.y < 0 && Input.GetKey(KeyCode.LeftControl))
                     {
-                        direction = GetBackVector(drawable);
+                        direction = Vector3.back;
                         degree = 10;
                         rotate = true;
                     }
 
                     if (rotate)
                     {
-                        GameMoveRotator.RotateObject(selectedObject, firstPoint, direction, degree, oldObjectPosition);
-                        new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, firstPoint, direction, degree, oldObjectPosition).Execute();
+                        GameMoveRotator.RotateObject(selectedObject, direction, degree);
+                        new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, direction, degree).Execute();
                         didSomething = true;
                     }
                 }
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObject != null && didSomething && isActive)
                 {
+                    float degree = selectedObject.CompareTag(Tags.Line) ? 
+                        selectedObject.transform.parent.localEulerAngles.z: 
+                        selectedObject.transform.localEulerAngles.z;
+
                     memento = new Memento(selectedObject, GameDrawableFinder.FindDrawableParent(selectedObject), selectedObject.name,
-                        oldObjectPosition, newObjectPosition, oldObjectRotation, firstPoint, direction, GetRotatedAxis(selectedObject) - GetRotatedAxis(selectedObject, oldObjectRotation), clickState);
+                        oldObjectPosition, newObjectPosition, oldObjectLocalEulerAngles, firstPoint, direction, 
+                        degree, clickState);
                     clickState = ClickState.None;   
                     isActive = false;
                     isDone = true;
@@ -200,7 +190,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     selectedObject.GetComponent<BlinkEffect>().Deactivate();
                     selectedObject = null;
                     oldObjectPosition = new Vector3();
-                    oldObjectRotation = new Quaternion();
+                    oldObjectLocalEulerAngles = new Vector3();
                     Destroyer.Destroy(rotationMenu);
                     result = true;
                     currentState = ReversibleAction.Progress.Completed;
@@ -210,122 +200,44 @@ namespace Assets.SEE.Controls.Actions.Drawable
             return result;
         }
 
+        private Vector3 multiply(Vector3 a, Vector3 b)
+        {
+            if (a.x <= -0.7f || a.y <= -0.7f || a.z <= -0.7f)
+            {
+                a = -a;
+            }
+            return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
+        }
+
         private void SliderListener(RotationSliderController slider, GameObject selectedObject, GameObject drawable, string drawableParentName)
         {
-            Debug.Log(DateTime.Now + " - selectedObject: " + selectedObject.name + " assign with value: " + GetRotatedAxis(selectedObject));
-            slider.AssignValue(GetRotatedAxis(selectedObject));
+            Transform transform = selectedObject.CompareTag(Tags.Line)? selectedObject.transform.parent : selectedObject.transform;
+
+            slider.AssignValue(transform.localEulerAngles.z);
             slider.onValueChanged.AddListener(degree =>
             {
                 float degreeToMove = 0;
-                Vector3 currentDirection = GetForwardVector(drawable);
+                Vector3 currentDirection = Vector3.forward;
                 bool unequal = false;
-                if (GetRotatedAxis(selectedObject) > degree)
+                if (transform.localEulerAngles.z > degree)
                 {
-                    degreeToMove = GetRotatedAxis(selectedObject) - degree;
-                    currentDirection = GetBackVector(drawable);
+                    degreeToMove = transform.localEulerAngles.z - degree;
+                    currentDirection = Vector3.back;
                     unequal = true;
                 }
-                else if (GetRotatedAxis(selectedObject) < degree)
+                else if (transform.localEulerAngles.z < degree)
                 {
-                    degreeToMove = degree - GetRotatedAxis(selectedObject);
-                    currentDirection = GetForwardVector(drawable);
+                    degreeToMove = degree - transform.localEulerAngles.z;
+                    currentDirection = Vector3.forward;
                     unequal = true;
                 }
                 if (unequal)
                 {
-                    Debug.Log(DateTime.Now + " - axis: " + GetRotatedAxis(selectedObject) + ", direction: " + currentDirection);
-                    GameMoveRotator.RotateObject(selectedObject, firstPoint, currentDirection, degreeToMove, oldObjectPosition);
-                    new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, firstPoint, currentDirection, degreeToMove, oldObjectPosition).Execute();
+                    GameMoveRotator.RotateObject(selectedObject, currentDirection, degreeToMove);
+                    new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, currentDirection, degreeToMove).Execute();
                     didSomething = true;
                 }
             });
-        }
-
-        private float GetRotatedAxis(GameObject obj)
-        {
-            float axis = 0;
-            switch (DrawableHelper.checkDirection(GameDrawableFinder.GetHighestParent(obj)))
-            {
-                case DrawableHelper.Direction.Front:
-
-                case DrawableHelper.Direction.Back:
-                    axis = obj.transform.rotation.eulerAngles.z;
-                    break;
-                case DrawableHelper.Direction.Left:
-                case DrawableHelper.Direction.Right:
-                case DrawableHelper.Direction.Below:
-                case DrawableHelper.Direction.Above:
-                    axis = obj.transform.rotation.eulerAngles.x;
-                    break;
-                default:
-                    break;
-            }
-            Debug.Log(DateTime.Now + " - GetRotatedAxis: " + DrawableHelper.checkDirection(GameDrawableFinder.GetHighestParent(obj)) + ", eulerAngles: " + obj.transform.rotation.eulerAngles + ", selected: " + axis);
-            return axis;
-        }
-
-        private float GetRotatedAxis(GameObject obj, Quaternion rotation)
-        {
-            float axis = 0;
-            switch (DrawableHelper.checkDirection(GameDrawableFinder.GetHighestParent(obj)))
-            {
-                case DrawableHelper.Direction.Front:
-
-                case DrawableHelper.Direction.Back:
-                    axis = rotation.eulerAngles.z;
-                    break;
-                case DrawableHelper.Direction.Left:
-                case DrawableHelper.Direction.Right:
-                case DrawableHelper.Direction.Below:
-                case DrawableHelper.Direction.Above:
-                    axis = rotation.eulerAngles.x;
-                    break;
-                default:
-                    break;
-            }
-            return axis;
-        }
-
-        private Vector3 GetForwardVector(GameObject obj)
-        {
-            Vector3 forward = Vector3.zero;
-            switch (DrawableHelper.checkDirection(GameDrawableFinder.GetHighestParent(obj)))
-            {
-                case DrawableHelper.Direction.Front:
-                case DrawableHelper.Direction.Back:
-                    forward = Vector3.forward;
-                    break;
-                case DrawableHelper.Direction.Left:
-                case DrawableHelper.Direction.Right:
-                case DrawableHelper.Direction.Below:
-                case DrawableHelper.Direction.Above:
-                    forward = Vector3.right;
-                    break;
-                default:
-                    break;
-            }
-            return forward;
-        }
-
-        private Vector3 GetBackVector(GameObject obj)
-        {
-            Vector3 back = Vector3.zero;
-            switch (DrawableHelper.checkDirection(GameDrawableFinder.GetHighestParent(obj)))
-            {
-                case DrawableHelper.Direction.Front:
-                case DrawableHelper.Direction.Back:
-                    back = Vector3.back;
-                    break;
-                case DrawableHelper.Direction.Left:
-                case DrawableHelper.Direction.Right:
-                case DrawableHelper.Direction.Below:
-                case DrawableHelper.Direction.Above:
-                    back = Vector3.left;
-                    break;
-                default:
-                    break;
-            }
-            return back;
         }
 
         public static void Reset()
@@ -335,7 +247,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
             selectedObject = null;
             firstPoint = Vector3.zero;
             oldObjectPosition = Vector3.zero;
-            oldObjectRotation = new Quaternion();
+            oldObjectLocalEulerAngles = Vector3.zero;
             rotationMenu = null;
             clickState = ClickState.None;
         }
@@ -347,21 +259,21 @@ namespace Assets.SEE.Controls.Actions.Drawable
             public readonly string currentObjectName;
             public readonly Vector3 oldObjectPosition;
             public readonly Vector3 newObjectPosition;
-            public readonly Quaternion oldObjectRotation;
+            public readonly Vector3 oldObjectLocalEulerAngles;
             public readonly Vector3 firstPoint;
             public readonly Vector3 direction;
             public readonly float degree;
             public readonly ClickState clickState;
 
             public Memento(GameObject selectedObject, GameObject drawable, string currentLineName,
-                Vector3 oldObjectPosition, Vector3 newObjectPosition, Quaternion oldObjectRotation, Vector3 firstPoint, Vector3 direction, float degree, ClickState clickState)
+                Vector3 oldObjectPosition, Vector3 newObjectPosition, Vector3 oldObjectLocalEulerAngles, Vector3 firstPoint, Vector3 direction, float degree, ClickState clickState)
             {
                 this.selectedObject = selectedObject;
                 this.drawable = drawable;
                 this.currentObjectName = currentLineName;
                 this.oldObjectPosition = oldObjectPosition;
                 this.newObjectPosition = newObjectPosition;
-                this.oldObjectRotation = oldObjectRotation;
+                this.oldObjectLocalEulerAngles = oldObjectLocalEulerAngles;
                 this.firstPoint = firstPoint;
                 this.direction = direction;
                 this.degree = degree;
@@ -392,9 +304,8 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 }
                 else if (memento.clickState == ClickState.Right)
                 {
-                    Vector3 newDirection = memento.direction == Vector3.forward ? Vector3.back : Vector3.forward;
-                    GameMoveRotator.RotateObject(memento.selectedObject, memento.firstPoint, newDirection, memento.degree, memento.oldObjectPosition);
-                    new RotatorNetAction(drawable.name, drawableParent, memento.currentObjectName, memento.firstPoint, newDirection, memento.degree, memento.oldObjectPosition).Execute();
+                    GameMoveRotator.SetRotate(memento.selectedObject, memento.oldObjectLocalEulerAngles.z);
+                    new RotatorNetAction(drawable.name, drawableParent, memento.currentObjectName, memento.oldObjectLocalEulerAngles.z).Execute();
                 }  
             }
             if (memento.selectedObject != null && memento.selectedObject.TryGetComponent<BlinkEffect>(out BlinkEffect currentEffect))
@@ -426,8 +337,8 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 } 
                 else if (memento.clickState == ClickState.Right)
                 {
-                    GameMoveRotator.RotateObject(memento.selectedObject, memento.firstPoint, memento.direction, memento.degree, memento.oldObjectPosition);
-                    new RotatorNetAction(drawable.name, drawableParent, memento.currentObjectName, memento.firstPoint, memento.direction, memento.degree, memento.oldObjectPosition).Execute();
+                    GameMoveRotator.SetRotate(memento.selectedObject, memento.degree);
+                    new RotatorNetAction(drawable.name, drawableParent, memento.currentObjectName, memento.degree).Execute();
                 }
             }
 

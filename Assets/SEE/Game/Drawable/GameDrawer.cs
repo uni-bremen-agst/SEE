@@ -28,8 +28,6 @@ namespace SEE.Game
         /// </summary>
         private static MeshCollider meshCollider;
 
-        private static EdgeCollider2D edgeCollider;
-
         private static GameObject line;
 
         private static GameObject lineHolder;
@@ -46,39 +44,21 @@ namespace SEE.Game
             lineHolder.transform.parent = drawable.transform;
             lineHolder.transform.position = drawable.transform.position;
             
-            DrawableHelper.Direction direction = DrawableHelper.checkDirection(GameDrawableFinder.GetHighestParent(drawable));
-            if (direction == DrawableHelper.Direction.Below)
-            {
-                Quaternion quaternion = new Quaternion();
-                quaternion.eulerAngles = new Vector3(lineHolder.transform.rotation.eulerAngles.x, 90, -90);
-                lineHolder.transform.rotation = quaternion;
-            }
-            if (direction == DrawableHelper.Direction.Above)
-            {
-                Quaternion quaternion = new Quaternion();
-                quaternion.eulerAngles = new Vector3(lineHolder.transform.rotation.eulerAngles.x, -90, 90);
-                lineHolder.transform.rotation = quaternion;
-            }
-            
             line = new (name);
             line.tag = Tags.Line;
             line.transform.SetParent(lineHolder.transform);
             renderer = line.AddComponent<LineRenderer>();
             meshCollider = line.AddComponent<MeshCollider>();
-            //edgeCollider = line.AddComponent<EdgeCollider2D>();
             renderer.sharedMaterial = GetMaterial(color);
             renderer.startWidth = thickness;
             renderer.endWidth = renderer.startWidth;
             renderer.useWorldSpace = false;
             renderer.positionCount = positions.Length;
 
-            //TEST local drawing
-            
             lineHolder.transform.rotation = drawable.transform.rotation;
             line.transform.position = lineHolder.transform.position;
-            line.transform.position = new Vector3(line.transform.position.x, line.transform.position.y, DrawableHelper.distanceToBoard.z);
+            line.transform.position -= line.transform.forward * DrawableHelper.distanceToBoard.z;
             line.transform.rotation = lineHolder.transform.rotation;
-            
         }
 
         public static GameObject StartDrawing(GameObject drawable, Vector3[] positions, Color color, float thickness)
@@ -104,19 +84,8 @@ namespace SEE.Game
         public static void FinishDrawing()
         {
             Mesh mesh = new();
-            renderer.BakeMesh(mesh); //renderer.BakeMesh(mesh,true);
+            renderer.BakeMesh(mesh);
             meshCollider.sharedMesh = mesh;
-            
-            /*
-            Vector3[] positions = new Vector3[renderer.positionCount];
-            renderer.GetPositions(positions);
-            List<Vector2> positions2D = new();
-            for(int i = 0; i < renderer.positionCount; i++)
-            {
-                positions2D.Add(new Vector2(positions[i].x, positions[i].y));
-            }
-            edgeCollider.SetPoints(positions2D);
-            */
         }
 
         public static GameObject DrawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness)
