@@ -32,7 +32,8 @@ namespace SEE.Controls.Actions
             if (!Raycasting.IsMouseOverGUI())
             {
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
-                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit)) // Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
+                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) && // Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
+                    GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject))
                 {
                     GameObject hittedObject = raycastHit.collider.gameObject;
                     Debug.Log("Hitted: " + hittedObject);

@@ -123,7 +123,7 @@ namespace SEE.Game
         {
             Setup(drawable, name, positions, color, thickness);
             line.transform.position = position;
-            line.transform.transform.eulerAngles = eulerAngles;
+            line.transform.parent.localEulerAngles = eulerAngles;
             renderer.SetPositions(positions);
             renderer.sortingOrder = orderInLayer;
             FinishDrawing();
