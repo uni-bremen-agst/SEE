@@ -30,6 +30,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
         private enum ClickState
         {
             None,
+            Selected,
             Left,
             Right
         }
@@ -76,18 +77,24 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 {
                     selectedObject = raycastHit.collider.gameObject;
                     isActive = true;
-                    if (Input.GetMouseButtonDown(0)||Input.GetMouseButton(0))
-                    {
-                        clickState = ClickState.Left;
-                    } else if (Input.GetMouseButtonDown(1) || Input.GetMouseButton(1))
-                    {
-                        clickState = ClickState.Right;
-                    }
+                    clickState = ClickState.Selected;
+
                     BlinkEffect effect = selectedObject.AddOrGetComponent<BlinkEffect>();
                     effect.SetAllowedActionStateType(GetActionStateType());
                     effect.Activate(selectedObject);
                     SetSelectedObject(selectedObject);
                     firstPoint = raycastHit.point;
+                }
+                if ((Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1)) && clickState == ClickState.Selected)
+                {
+                    if (Input.GetMouseButtonUp(0) || Input.GetMouseButton(0))
+                    {
+                        clickState = ClickState.Left;
+                    }
+                    else if (Input.GetMouseButtonUp(1) || Input.GetMouseButton(1))
+                    {
+                        clickState = ClickState.Right;
+                    }
                 }
                 // MOVE
                 if (selectedObject != null && selectedObject.GetComponent<BlinkEffect>() != null && selectedObject.GetComponent<BlinkEffect>().GetLoopStatus() && clickState == ClickState.Left)
