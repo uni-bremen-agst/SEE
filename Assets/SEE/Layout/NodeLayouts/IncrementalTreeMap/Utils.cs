@@ -82,7 +82,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             IDictionary<string, Node> clonesMap = nodes.ToDictionary(node => node.ID,
                 node => new Node(node.ID)
                 {
-                    Rectangle = node.Rectangle.Clone(), Size = node.Size
+                    Rectangle = node.Rectangle.Clone(), DesiredSize = node.DesiredSize
                 }
             );
             CloneSegments(nodes, clonesMap);

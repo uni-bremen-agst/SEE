@@ -19,9 +19,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         public static void Apply(IEnumerable<Node> nodes, Rectangle rectangle)
         {
             Node[] nodesArray = nodes.ToArray();
-            Array.Sort(nodesArray, (x, y) => (x.Size.CompareTo(y.Size)));
+            Array.Sort(nodesArray, (x, y) => (x.DesiredSize.CompareTo(y.DesiredSize)));
 
-            if (Math.Abs(nodesArray.Sum(x => x.Size) - rectangle.Area()) >= rectangle.Area() * Math.Pow(10, -3)
+            if (Math.Abs(nodesArray.Sum(x => x.DesiredSize) - rectangle.Area()) >= rectangle.Area() * Math.Pow(10, -3)
                 && nodesArray.Length > 1)
             {
                 Debug.LogWarning("Dissect: nodes don't fit in rectangle");
@@ -66,7 +66,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 Node[] nodes1 = nodes[..splitIndex];
                 Node[] nodes2 = nodes[splitIndex..];
 
-                float ratio = nodes1.Sum(x => x.Size) / nodes.Sum(x => x.Size);
+                float ratio = nodes1.Sum(x => x.DesiredSize) / nodes.Sum(x => x.DesiredSize);
 
                 Rectangle rectangle1 = rectangle.Clone();
                 Rectangle rectangle2 = rectangle.Clone();
@@ -119,8 +119,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <returns>index</returns>
         private static int GetSplitIndex(Node[] nodes)
         {
-            float totalSize = nodes.Sum(node => node.Size);
-            if (totalSize <= nodes.Last().Size * 3)
+            float totalSize = nodes.Sum(node => node.DesiredSize);
+            if (totalSize <= nodes.Last().DesiredSize * 3)
             {
                 return nodes.Length - 1;
             }
@@ -128,7 +128,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             {
                 for (int i = 1; i <= nodes.Length + 1; i++)
                 {
-                    if (nodes[..i].Sum(x => x.Size) * 3 >= totalSize)
+                    if (nodes[..i].Sum(x => x.DesiredSize) * 3 >= totalSize)
                     {
                         return i;
                     }

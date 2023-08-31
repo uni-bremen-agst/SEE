@@ -103,7 +103,7 @@ namespace SEE.Layout.NodeLayouts
 
         /// <summary>
         /// Creates and a <see cref="Node"/> for each <see cref="ILayoutNode"/>
-        /// and sets the wanted <see cref="Node.Size"/>.
+        /// and sets the <see cref="Node.DesiredSize"/>.
         /// Fills the <see cref="_nodeMap"/> and the <see cref="_iLayoutNodeMap"/>.
         /// </summary>
         private void InitTNodes()
@@ -118,7 +118,7 @@ namespace SEE.Layout.NodeLayouts
             float adjustFactor = (_width * _depth) / totalSize;
             foreach (var node in _nodeMap.Values)
             {
-                node.Size *= adjustFactor;
+                node.DesiredSize *= adjustFactor;
             }
         }
 
@@ -139,13 +139,13 @@ namespace SEE.Layout.NodeLayouts
             {
                 // x and z lengths may differ; we need to consider the larger value
                 float size = Mathf.Max(node.LocalScale.x, node.LocalScale.z);
-                newNode.Size = size;
+                newNode.DesiredSize = size;
                 return size;
             }
             else
             {
                 var totalSize = node.Children().Sum(InitTNode);
-                newNode.Size = totalSize;
+                newNode.DesiredSize = totalSize;
                 return totalSize;
             }
         }

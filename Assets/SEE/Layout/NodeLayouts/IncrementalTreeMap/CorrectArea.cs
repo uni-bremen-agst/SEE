@@ -9,13 +9,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     /// <summary>
     /// Provides an algorithm to recalibrate the layout, so that the areas of the <see cref="Rectangle"/>
-    /// of <see cref="Node"/> match the wanted <see cref="Node.Size"/> of the node.
+    /// of <see cref="Node"/> match the <see cref="Node.DesiredSize"/> of the node.
     /// </summary>
     internal static class CorrectAreas
     {
         /// <summary>
         /// Recalibrate the layout, so that the areas of the <see cref="Rectangle"/>
-        /// of <see cref="Node"/> match the wanted <see cref="Node.Size"/> of the node.
+        /// of <see cref="Node"/> match the <see cref="Node.DesiredSize"/> of the node.
         /// </summary>
         /// <param name="nodes">nodes with layout</param>
         /// <param name="settings">the settings of the incremental tree map layout</param>
@@ -44,7 +44,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 slicingSegment.IsConst = false;
 
                 Vector<double> nodesSizesWanted =
-                    Vector<double>.Build.DenseOfArray(nodes.Select(node => (double)node.Size).ToArray());
+                    Vector<double>.Build.DenseOfArray(nodes.Select(node => (double)node.DesiredSize).ToArray());
                 Vector<double> nodesSizesCurrent =
                     Vector<double>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.Area()).ToArray());
                 double error = (nodesSizesWanted - nodesSizesCurrent).Norm(p: 1);
@@ -179,7 +179,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 rectangle2Old.Width -= rectangle1Old.Width;
                 rectangle2Old.X = rectangle1Old.X + rectangle1Old.Width;
 
-                float ratio = partition1.Sum(n => n.Size) / nodes.Sum(n => n.Size);
+                float ratio = partition1.Sum(n => n.DesiredSize) / nodes.Sum(n => n.DesiredSize);
                 rectangle1New.Width *= ratio;
                 rectangle2New.Width *= (1 - ratio);
                 rectangle2New.X = rectangle1New.X + rectangle1New.Width;
@@ -191,7 +191,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 rectangle2Old.Depth -= rectangle1Old.Depth;
                 rectangle2Old.Z = rectangle1Old.Z + rectangle1Old.Depth;
 
-                float ratio = partition1.Sum(n => n.Size) / nodes.Sum(n => n.Size);
+                float ratio = partition1.Sum(n => n.DesiredSize) / nodes.Sum(n => n.DesiredSize);
                 rectangle1New.Depth *= ratio;
                 rectangle2New.Depth *= (1 - ratio);
                 rectangle2New.Z = rectangle1New.Z + rectangle1New.Depth;
@@ -286,18 +286,18 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         {
             Matrix<double> matrix = JacobianMatrix(nodes, mapSegmentIndex);
 
-            Vector<double> nodesSizesWanted =
-                Vector<double>.Build.DenseOfArray(nodes.Select(node => (double)node.Size).ToArray());
-            Vector<double> nodesSizesCurrent =
+            Vector<double> desiredNodeSizes =
+                Vector<double>.Build.DenseOfArray(nodes.Select(node => (double)node.DesiredSize).ToArray());
+            Vector<double> currentNodeSizes =
                 Vector<double>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.Area()).ToArray());
-            Vector<double> diff = nodesSizesWanted - nodesSizesCurrent;
+            Vector<double> diff = desiredNodeSizes - currentNodeSizes;
             Matrix<double> pseudoInverse = matrix.PseudoInverse();
             Vector<double> segmentShift = pseudoInverse * diff;
             ApplyShift(segmentShift, nodes, mapSegmentIndex);
 
             Vector<double> nodesSizesAfterStep =
                 Vector<double>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.Area()).ToArray());
-            return (nodesSizesAfterStep - nodesSizesWanted).Norm(1);
+            return (nodesSizesAfterStep - desiredNodeSizes).Norm(1);
         }
 
         /// <summary>

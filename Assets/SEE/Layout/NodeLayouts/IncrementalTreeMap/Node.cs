@@ -15,7 +15,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Constructor
         /// </summary>
-        /// <param name="id">the id</param>
+        /// <param name="id">the ID of the new node</param>
         public Node(string id)
         {
             ID = id;
@@ -29,7 +29,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// The size that the node SHOULD occupy, may differ from the actual size/area of its rectangle.
         /// </summary>
-        public float Size { get; set; }
+        public float DesiredSize { get; set; }
 
         /// <summary>
         /// the ID
@@ -37,24 +37,24 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         public string ID { get; }
 
         /// <summary>
-        /// the adjacent segment on the <see cref="Direction.Left"/> side of the node
+        /// The adjacent segment on the <see cref="Direction.Left"/> side of the node.
         /// </summary>
-        private Segment _leftBoundingSegment;
+        private Segment leftBoundingSegment;
 
         /// <summary>
-        ///the adjacent segment on the <see cref="Direction.Right"/> side of the node
+        /// The adjacent segment on the <see cref="Direction.Right"/> side of the node.
         /// </summary>
-        private Segment _rightBoundingSegment;
+        private Segment rightBoundingSegment;
 
         /// <summary>
-        ///the adjacent segment on the <see cref="Direction.Upper"/> side of the node
+        /// The adjacent segment on the <see cref="Direction.Upper"/> side of the node.
         /// </summary>
-        private Segment _upperBoundingSegment;
+        private Segment upperBoundingSegment;
 
         /// <summary>
-        /// the adjacent segment on the <see cref="Direction.Lower"/> side of the node
+        /// The adjacent segment on the <see cref="Direction.Lower"/> side of the node.
         /// </summary>
-        private Segment _lowerBoundingSegment;
+        private Segment lowerBoundingSegment;
 
         /// <summary>
         /// Registers the node with a new segment,
@@ -68,19 +68,19 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             switch (dir)
             {
                 case Left:
-                    _leftBoundingSegment = segment;
+                    leftBoundingSegment = segment;
                     segment.Side2Nodes.Add(this);
                     break;
                 case Right:
-                    _rightBoundingSegment = segment;
+                    rightBoundingSegment = segment;
                     segment.Side1Nodes.Add(this);
                     break;
                 case Lower:
-                    _lowerBoundingSegment = segment;
+                    lowerBoundingSegment = segment;
                     segment.Side2Nodes.Add(this);
                     break;
                 case Upper:
-                    _upperBoundingSegment = segment;
+                    upperBoundingSegment = segment;
                     segment.Side1Nodes.Add(this);
                     break;
                 default:
@@ -97,16 +97,16 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             switch (dir)
             {
                 case Left:
-                    _leftBoundingSegment?.Side2Nodes.Remove(this);
+                    leftBoundingSegment?.Side2Nodes.Remove(this);
                     break;
                 case Right:
-                    _rightBoundingSegment?.Side1Nodes.Remove(this);
+                    rightBoundingSegment?.Side1Nodes.Remove(this);
                     break;
                 case Lower:
-                    _lowerBoundingSegment?.Side2Nodes.Remove(this);
+                    lowerBoundingSegment?.Side2Nodes.Remove(this);
                     break;
                 case Upper:
-                    _upperBoundingSegment?.Side1Nodes.Remove(this);
+                    upperBoundingSegment?.Side1Nodes.Remove(this);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(dir), dir, "We should never arrive here");
@@ -121,10 +121,10 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         {
             return new Dictionary<Direction, Segment>
             {
-                { Left, _leftBoundingSegment },
-                { Right, _rightBoundingSegment },
-                { Lower, _lowerBoundingSegment },
-                { Upper, _upperBoundingSegment }
+                { Left, leftBoundingSegment },
+                { Right, rightBoundingSegment },
+                { Lower, lowerBoundingSegment },
+                { Upper, upperBoundingSegment }
             };
         }
 
