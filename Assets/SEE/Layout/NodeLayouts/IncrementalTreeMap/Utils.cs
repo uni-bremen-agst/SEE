@@ -6,7 +6,7 @@ using static SEE.Layout.NodeLayouts.IncrementalTreeMap.Direction;
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     /// <summary>
-    /// Provides helper functions for incremental tree map layout.
+    /// Provides helper functions for the incremental tree map layout.
     /// </summary>
     internal static class Utils
     {
@@ -50,7 +50,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         /// <summary>
         /// A list of <paramref name="nodes"/> with rectangles that are laid out
-        /// in a <paramref name="oldRectangle"/> will be transformed (linear), so that they fit
+        /// in an <paramref name="oldRectangle"/> will be transformed (linearly), so that they fit
         /// in <paramref name="newRectangle"/>
         /// </summary>
         /// <param name="nodes">nodes with rectangles that should be transformed</param>
@@ -72,13 +72,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         /// <summary>
         /// Clones a list of nodes and preserves the layout including segments and rectangles.
-        /// Therefor the <see cref="Segment"/>s and <see cref="Rectangle"/>s of the nodes are cloned to.
+        /// Therefore the <see cref="Segment"/>s and <see cref="Rectangle"/>s of the nodes are cloned to.
         /// </summary>
         /// <param name="nodes">siblings to be cloned</param>
         /// <returns>dictionary that maps ID to new clone node</returns>
         public static IDictionary<string, Node> CloneGraph(IList<Node> nodes)
         {
-            // clones the nodes only partially: does NOT clone the segment
             IDictionary<string, Node> clonesMap = nodes.ToDictionary(node => node.ID,
                 node => new Node(node.ID)
                 {
@@ -91,11 +90,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         /// <summary>
         /// Clones all <see cref="Segment"/>s of <paramref name="from"/>
-        /// and register the segment clones to the nodes of <paramref name="to"/>.
-        /// The nodes of <paramref name="from"/> and <paramref name="to"/> needs to have the same IDs.
+        /// and registers the segment clones to the nodes of <paramref name="to"/>.
+        /// The nodes of <paramref name="from"/> and <paramref name="to"/> need to have the same IDs.
         /// </summary>
-        /// <param name="from">nodes with segment structure, that should be copied</param>
-        /// <param name="to">dictionary that maps ID to nodes, that should get the segment structure </param>
+        /// <param name="from">nodes with segment structure that should be copied</param>
+        /// <param name="to">dictionary that maps ID to nodes that should get the segment structure</param>
         public static void CloneSegments(IEnumerable<Node> from, IDictionary<string, Node> to)
         {
             var segments = from.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
