@@ -11,7 +11,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     internal static class Dissect
     {
         /// <summary>
-        /// Calculates new Layout for <paramref name="nodes"/>
+        /// Calculates new Layout for <paramref name="nodes"/>.
         /// Assigns rectangles and segments to each node in <paramref name="nodes"/>.
         /// </summary>
         /// <param name="nodes">nodes to be laid out</param>
@@ -24,7 +24,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             if (Math.Abs(nodesArray.Sum(x => x.Size) - rectangle.Area()) >= rectangle.Area() * Math.Pow(10, -3)
                 && nodesArray.Length > 1)
             {
-                Debug.LogWarning("Dissect: nodes doesnt fit in rectangle");
+                Debug.LogWarning("Dissect: nodes don't fit in rectangle");
             }
 
             Apply(rectangle,
@@ -38,7 +38,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Calculates the layout by slicing the <paramref name="rectangle"/> recursively.
         /// </summary>
-        /// <param name="rectangle">the rectangle</param>
+        /// <param name="rectangle">the rectangle to be sliced</param>
         /// <param name="nodes">nodes to be placed in rectangle</param>
         /// <param name="leftBound">the <see cref="Direction.Left"/> segment of the rectangle</param>
         /// <param name="rightBound">the <see cref="Direction.Right"/> segment of the rectangle</param>
@@ -112,8 +112,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Calculates the index, that separates the <paramref name="nodes"/> array into two
-        /// partitions. The specific splitting should result in good visual quality.
+        /// Calculates the index that separates the <paramref name="nodes"/> array into two
+        /// partitions. The specific split should result in good visual quality.
         /// </summary>
         /// <param name="nodes"> sorted list</param>
         /// <returns>index</returns>
