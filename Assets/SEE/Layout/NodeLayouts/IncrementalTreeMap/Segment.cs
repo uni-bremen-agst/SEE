@@ -5,9 +5,10 @@ using System.Linq;
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     /// <summary>
-    /// A segment is a core element in the layout,
-    /// it represent the line that separates the rectangles of <see cref="Node"/>s of a layout.
-    ///  The specific position is actually not relevant but the relation to adjacent nodes.
+    /// A segment is a core element in the layout algorithm,
+    /// Segments representing lines separating/slicing the layout in rectangles.
+    /// The specific position of a segment in the layout is actually not relevant,
+    /// but the relation to adjacent nodes is relevant.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class Segment
@@ -21,14 +22,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         {
             this.IsConst = isConst;
             this.IsVertical = isVertical;
-            this.Side1Nodes = new List<Node>();
-            this.Side2Nodes = new List<Node>();
         }
 
         /// <summary>
         /// Is true if the segment is a border of the layout.
-        /// Means that <see cref="Side1Nodes"/> or <see cref="Side2Nodes"/> are empty.
-        /// A layout has i.g. 4 const segments.
+        /// In most cases that means that <see cref="Side1Nodes"/> or <see cref="Side2Nodes"/> are empty
+        /// and layout has i.g. 4 const segments.
         /// </summary>
         public bool IsConst { get; set; }
 
@@ -41,13 +40,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// The adjacent nodes on the <see cref="Direction.Lower"/> or <see cref="Direction.Left"/>
         /// depending on <see cref="IsVertical"/>
         /// </summary>
-        public IList<Node> Side1Nodes { get; }
+        public IList<Node> Side1Nodes { get; } = new List<Node>();
 
         /// <summary>
         /// The adjacent nodes on the <see cref="Direction.Upper"/> or <see cref="Direction.Right"/>
         /// depending on <see cref="IsVertical"/>
         /// </summary>
-        public IList<Node> Side2Nodes { get; }
+        public IList<Node> Side2Nodes { get; } = new List<Node>();
 
         /// <summary>
         /// Method for better overview in debugger
