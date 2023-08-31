@@ -97,7 +97,7 @@ namespace SEE.Game.City
         {
             if (!attributes.TryGetValue(label, out object dictionary)) return false;
             Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-            var result = ConfigIO.Restore(values, LocalMovesDepthLabel, ref localMovesDepth);
+            bool result = ConfigIO.Restore(values, LocalMovesDepthLabel, ref localMovesDepth);
             result |= ConfigIO.Restore(values, LocalMovesBranchingLimitLabel, ref localMovesBranchingLimit);
             result |= ConfigIO.RestoreEnum(values, PNormLabel, ref pNorm);
             result |= ConfigIO.Restore(values, GradientDescentPrecisionLabel, ref gradientDescentPrecisionExponent);
