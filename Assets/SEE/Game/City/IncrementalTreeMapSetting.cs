@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -71,21 +72,15 @@ namespace SEE.Game.City
         /// <summary>
         /// Maps <see cref="pNorm"/> to a double.
         /// </summary>
-        public double PNorm
-        {
-            get
-            {
-                return pNorm switch
+        public double PNorm => pNorm switch
                 {
                     (PNormRange.P1Manhattan) => 1d,
                     (PNormRange.P2Euclidean) => 2d,
                     (PNormRange.P3) => 3d,
                     (PNormRange.P4) => 4d,
                     (PNormRange.PInfinityChebyshev) => double.PositiveInfinity,
-                    _ => 2d
+                    _ => throw new InvalidEnumArgumentException("Unrecognized PNormRange value.")
                 };
-            }
-        }
 
         public void Save(ConfigWriter writer, string label)
         {
