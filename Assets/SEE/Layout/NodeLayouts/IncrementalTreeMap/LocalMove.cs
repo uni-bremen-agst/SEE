@@ -5,7 +5,7 @@ using System;
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     /// <summary>
-    /// A local moves a is small transformation of a layout that only affects two nodes.
+    /// A local move a is small transformation of a layout that only affects two nodes.
     /// There are two types of local moves: <see cref="FlipMove"/> and <see cref="StretchMove"/>.
     /// </summary>
     internal abstract class LocalMove
@@ -29,7 +29,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// Creates a new local move, that can be applied on the layout of the node clones.
         /// </summary>
         /// <param name="cloneMap"> dictionary that maps id to node, assuming that the cloneMap represents a clone
-        /// of the node layout of of <see cref="Node1"/></param>/ <see cref="Node2"/>.
+        /// of the node layout of of <see cref="Node1"/> and <see cref="Node2"/>.</param>
         /// <returns>a new local move</returns>
         public abstract LocalMove Clone(IDictionary<string, Node> cloneMap);
     }
@@ -59,8 +59,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             this._clockwise = clockwise;
         }
 
-        override
-            public void Apply()
+        override public void Apply()
         {
             var segmentsNode1 = Node1.SegmentsDictionary();
             var segmentsNode2 = Node2.SegmentsDictionary();
@@ -89,18 +88,17 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
             else
             {
-                throw new ArgumentException("Cant apply flip move");
+                throw new ArgumentException("Can't apply flip move");
             }
         }
 
-        override
-            public LocalMove Clone(IDictionary<string, Node> cloneMap)
+        override public LocalMove Clone(IDictionary<string, Node> cloneMap)
         {
             return new FlipMove(cloneMap[Node1.ID], cloneMap[Node2.ID], _clockwise);
         }
 
         /// <summary>
-        /// applies the local move for the case that the nodes are separated vertical
+        /// Applies the local move for the case that the nodes are separated vertically
         /// </summary>
         /// <param name="leftNode">the node on the <see cref="Direction.Left"/> side</param>
         /// <param name="rightNode">the node on the <see cref="Direction.Right"/> side</param>
@@ -151,7 +149,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// applies the local move for the case that the nodes are separated horizontal
+        /// Applies the local move for the case that the nodes are separated horizontally.
         /// </summary>
         /// <param name="lowerNode">the node on the <see cref="Direction.Lower"/> side</param>
         /// <param name="upperNode">the node on the <see cref="Direction.Upper"/> side</param>
@@ -209,7 +207,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
     /// <summary>
     /// A stretch move is a kind of <see cref="LocalMove"/>.
-    /// It expands a nodes over another.
+    /// It expands a node over another.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class StretchMove : LocalMove
@@ -225,8 +223,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             Node2 = node2;
         }
 
-        override
-            public void Apply()
+        override public void Apply()
         {
             var segmentsNode1 = Node1.SegmentsDictionary();
             var segmentsNode2 = Node2.SegmentsDictionary();
@@ -262,23 +259,22 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
             else
             {
-                throw new ArgumentException("Cant apply stretch move");
+                throw new ArgumentException("Can't apply stretch move");
             }
         }
 
-        override
-            public LocalMove Clone(IDictionary<string, Node> cloneMap)
+        override public LocalMove Clone(IDictionary<string, Node> cloneMap)
         {
             return new StretchMove(cloneMap[Node1.ID], cloneMap[Node2.ID]);
         }
 
         /// <summary>
         /// Apply for the case that:
-        /// - the nodes are seperated vertical
+        /// - the nodes are seperated vertically
         /// - the left node is the expanding node
         /// </summary>
-        /// <param name="leftNode">node one the <see cref="Direction.Left"/> side</param>
-        /// <param name="rightNode">node one the <see cref="Direction.Right"/> side</param>
+        /// <param name="leftNode">node on the <see cref="Direction.Left"/> side</param>
+        /// <param name="rightNode">node on the <see cref="Direction.Right"/> side</param>
         private void apply_StretchLeftOverVertical(Node leftNode, Node rightNode)
         {
             // along lower           along upper
@@ -309,11 +305,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         /// <summary>
         /// Apply for the case that:
-        /// - the nodes are seperated vertical
+        /// - the nodes are seperated vertically
         /// - the right node is the expanding node
         /// </summary>
-        /// <param name="leftNode">node one the <see cref="Direction.Left"/> side</param>
-        /// <param name="rightNode">node one the <see cref="Direction.Right"/> side</param>
+        /// <param name="leftNode">node on the <see cref="Direction.Left"/> side</param>
+        /// <param name="rightNode">node on the <see cref="Direction.Right"/> side</param>
         private void apply_StretchRightOverVertical(Node leftNode, Node rightNode)
         {
             // along lower           along upper
@@ -345,11 +341,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         /// <summary>
         /// Apply for the case that:
-        /// - the nodes are seperated horizontal
+        /// - the nodes are seperated horizontally
         /// - the lower node is the expanding node
         /// </summary>
-        /// <param name="lowerNode">node one the <see cref="Direction.Lower"/> side</param>
-        /// <param name="upperNode">node one the <see cref="Direction.Upper"/> side</param>
+        /// <param name="lowerNode">node on the <see cref="Direction.Lower"/> side</param>
+        /// <param name="upperNode">node on the <see cref="Direction.Upper"/> side</param>
         private void apply_StretchLowerOverHorizontal(Node lowerNode, Node upperNode)
         {
             // along left           along right
@@ -380,11 +376,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         /// <summary>
         /// Apply for the case that:
-        /// - the nodes are seperated horizontal
+        /// - the nodes are seperated horizontally
         /// - the upper node is the expanding node
         /// </summary>
-        /// <param name="lowerNode">node one the <see cref="Direction.Lower"/> side</param>
-        /// <param name="upperNode">node one the <see cref="Direction.Upper"/> side</param>
+        /// <param name="lowerNode">node on the <see cref="Direction.Lower"/> side</param>
+        /// <param name="upperNode">node on the <see cref="Direction.Upper"/> side</param>
         private void apply_StretchUpperOverHorizontal(Node lowerNode, Node upperNode)
         {
             // along left           along right
