@@ -49,7 +49,7 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
                     Vector3[] positions = new Vector3[lineRenderer.positionCount];
                     lineRenderer.GetPositions(positions);
 
-                    memento = new Memento(child, drawable, child.name, positions, child.name, DrawableTypes.Line, child.transform.position, child.transform.eulerAngles);
+                    memento = new Memento(child, drawable, positions, child.name, DrawableTypes.Line, child.transform.position, child.transform.parent.localEulerAngles);
                     memento.color = lineRenderer.material.color;
                     memento.thickness = lineRenderer.startWidth;
                     memento.orderInLayer = lineRenderer.sortingOrder;
@@ -69,7 +69,6 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
         {
             public GameObject gameObject;
             public readonly GameObject drawable;
-            public readonly string gameObjectName;
 
             public Vector3[] positions;
 
@@ -87,11 +86,10 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
 
             public Vector3 eulerAngles;
 
-            public Memento(GameObject gameObject, GameObject drawable, string gameObjectName, Vector3[] positions, string id, DrawableTypes type, Vector3 position, Vector3 eulerAngles)
+            public Memento(GameObject gameObject, GameObject drawable, Vector3[] positions, string id, DrawableTypes type, Vector3 position, Vector3 eulerAngles)
             {
                 this.gameObject = gameObject;
                 this.drawable = drawable;
-                this.gameObjectName = gameObjectName;
                 this.positions = positions;
                 this.id = id;
                 this.type = type;
@@ -132,9 +130,9 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             foreach (Memento mem in mementoList)
             {
-                if (mem.gameObject == null && mem.gameObjectName != null)
+                if (mem.gameObject == null && mem.id != null)
                 {
-                    mem.gameObject = GameDrawableFinder.FindChild(mem.drawable, mem.gameObjectName);
+                    mem.gameObject = GameDrawableFinder.FindChild(mem.drawable, mem.id);
                 }
                 new CleanerNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.id, mem.type).Execute();
                 if (mem.gameObject.CompareTag(Tags.Line))
@@ -149,10 +147,10 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
         }
 
         /// <summary>
-        /// A new instance of <see cref="LineEraseAction"/>.
+        /// A new instance of <see cref="FastEraseAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LineEraseAction"/></returns>
+        /// <returns>new instance of <see cref="FastEraseAction"/></returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new CleanerAction();

@@ -19,7 +19,7 @@ namespace SEE.Controls.Actions
     /// It serves as an example for a continuous action that modifies the
     /// scene while active.
     /// </summary>
-    class LineEraseAction : AbstractPlayerAction
+    class FastEraseAction : AbstractPlayerAction
     {
 
 
@@ -42,11 +42,11 @@ namespace SEE.Controls.Actions
                         Vector3[] positions = new Vector3[lineRenderer.positionCount];
                         lineRenderer.GetPositions(positions);
 
-                        memento = new Memento(hittedObject, GameDrawableFinder.FindDrawableParent(hittedObject), hittedObject.name, positions, lineRenderer.material.color, hittedObject.name, 
-                            lineRenderer.startWidth, lineRenderer.sortingOrder, hittedObject.transform.position, hittedObject.transform.eulerAngles);
+                        memento = new Memento(hittedObject, GameDrawableFinder.FindDrawableParent(hittedObject), positions, lineRenderer.material.color, hittedObject.name, 
+                            lineRenderer.startWidth, lineRenderer.sortingOrder, hittedObject.transform.position, hittedObject.transform.parent.localEulerAngles);
                         mementoList.Add(memento);
 
-                        new LineEraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.id).Execute();
+                        new FastEraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.id).Execute();
                         Destroyer.Destroy(hittedObject.transform.parent.gameObject);
                     }
                 }
@@ -69,13 +69,12 @@ namespace SEE.Controls.Actions
         {
             public GameObject line;
             public readonly GameObject drawable;
-            public readonly string lineName;
 
             public Vector3[] positions;
 
             public readonly Color color;
 
-            public readonly string id;
+            public string id;
 
             public readonly float thickness;
 
@@ -84,11 +83,10 @@ namespace SEE.Controls.Actions
             public readonly Vector3 position;
             public readonly Vector3 eulerAngles;
 
-            public Memento(GameObject line, GameObject drawable, string lineName, Vector3[] positions, Color color, String id, float thickness, int orderInLayer, Vector3 position, Vector3 eulerAngles)
+            public Memento(GameObject line, GameObject drawable, Vector3[] positions, Color color, String id, float thickness, int orderInLayer, Vector3 position, Vector3 eulerAngles)
             {
                 this.line = line;
                 this.drawable = drawable;
-                this.lineName = lineName;
                 this.positions = positions;
                 this.color = color;
                 this.id = id;
@@ -125,30 +123,30 @@ namespace SEE.Controls.Actions
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             foreach (Memento mem in mementoList)
             {
-                if (mem.line == null && mem.lineName != null)
+                if (mem.line == null && mem.id != null)
                 {
-                    mem.line = GameDrawableFinder.FindChild(mem.drawable, mem.lineName);
+                    mem.line = GameDrawableFinder.FindChild(mem.drawable, mem.id);
                 }
-                new LineEraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.id).Execute();
+                new FastEraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.id).Execute();
                 Destroyer.Destroy(mem.line.transform.parent.gameObject);
             }
         }
 
         /// <summary>
-        /// A new instance of <see cref="LineEraseAction"/>.
+        /// A new instance of <see cref="FastEraseAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LineEraseAction"/></returns>
+        /// <returns>new instance of <see cref="FastEraseAction"/></returns>
         public static ReversibleAction CreateReversibleAction()
         {
-            return new LineEraseAction();
+            return new FastEraseAction();
         }
 
         /// <summary>
-        /// A new instance of <see cref="LineEraseAction"/>.
+        /// A new instance of <see cref="FastEraseAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LineEraseAction"/></returns>
+        /// <returns>new instance of <see cref="FastEraseAction"/></returns>
         public override ReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -160,7 +158,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.DrawOnWhiteboard"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateTypes.LineErase;
+            return ActionStateTypes.FastErase;
         }
 
         /// <summary>

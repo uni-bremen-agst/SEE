@@ -8,7 +8,7 @@ namespace SEE.Net.Actions
     /// <summary>
     /// This class propagates a <see cref="DeleteAction"/> to all clients in the network.
     /// </summary>
-    public class LineEraseNetAction : AbstractNetAction
+    public class FastEraseNetAction : AbstractNetAction
     {
         public string DrawableID;
         public string ParentDrawableID;
@@ -19,7 +19,7 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="gameObjectID">the unique name of the gameObject of a line
         /// that has to be deleted</param>
-        public LineEraseNetAction(string drawableID, string parentDrawableID, string lineName) : base()
+        public FastEraseNetAction(string drawableID, string parentDrawableID, string lineName) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
@@ -45,7 +45,7 @@ namespace SEE.Net.Actions
                 GameObject drawable = GameDrawableFinder.Find(DrawableID,ParentDrawableID);
                 if (drawable != null && GameDrawableFinder.FindChild(drawable, LineName) != null)
                 {
-                    Destroyer.Destroy(GameDrawableFinder.FindChild(drawable, LineName));
+                    Destroyer.Destroy(GameDrawableFinder.FindChild(drawable, LineName).transform.parent.gameObject);
                 }
                 else
                 {

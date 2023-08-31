@@ -263,7 +263,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
         {
             public GameObject selectedObject;
             public readonly GameObject drawable;
-            public readonly string currentObjectName;
+            public readonly string id;
             public readonly Vector3 oldObjectPosition;
             public readonly Vector3 newObjectPosition;
             public readonly Vector3 oldObjectLocalEulerAngles;
@@ -272,12 +272,12 @@ namespace Assets.SEE.Controls.Actions.Drawable
             public readonly float degree;
             public readonly ClickState clickState;
 
-            public Memento(GameObject selectedObject, GameObject drawable, string currentLineName,
+            public Memento(GameObject selectedObject, GameObject drawable, string id,
                 Vector3 oldObjectPosition, Vector3 newObjectPosition, Vector3 oldObjectLocalEulerAngles, Vector3 firstPoint, Vector3 direction, float degree, ClickState clickState)
             {
                 this.selectedObject = selectedObject;
                 this.drawable = drawable;
-                this.currentObjectName = currentLineName;
+                this.id = id;
                 this.oldObjectPosition = oldObjectPosition;
                 this.newObjectPosition = newObjectPosition;
                 this.oldObjectLocalEulerAngles = oldObjectLocalEulerAngles;
@@ -295,9 +295,9 @@ namespace Assets.SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            if (memento.selectedObject == null && memento.currentObjectName != null)
+            if (memento.selectedObject == null && memento.id != null)
             {
-                memento.selectedObject = GameDrawableFinder.FindChild(memento.drawable, memento.currentObjectName);
+                memento.selectedObject = GameDrawableFinder.FindChild(memento.drawable, memento.id);
             }
 
             if (memento.selectedObject != null)
@@ -307,12 +307,12 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 if (memento.clickState == ClickState.Left)
                 {
                     GameMoveRotator.MoveObject(memento.selectedObject, memento.oldObjectPosition);
-                    new MoveNetAction(drawable.name, drawableParent, memento.currentObjectName, memento.oldObjectPosition).Execute();
+                    new MoveNetAction(drawable.name, drawableParent, memento.id, memento.oldObjectPosition).Execute();
                 }
                 else if (memento.clickState == ClickState.Right)
                 {
                     GameMoveRotator.SetRotate(memento.selectedObject, memento.oldObjectLocalEulerAngles.z);
-                    new RotatorNetAction(drawable.name, drawableParent, memento.currentObjectName, memento.oldObjectLocalEulerAngles.z).Execute();
+                    new RotatorNetAction(drawable.name, drawableParent, memento.id, memento.oldObjectLocalEulerAngles.z).Execute();
                 }  
             }
             if (memento.selectedObject != null && memento.selectedObject.TryGetComponent<BlinkEffect>(out BlinkEffect currentEffect))
@@ -329,9 +329,9 @@ namespace Assets.SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            if (memento.selectedObject == null && memento.currentObjectName != null)
+            if (memento.selectedObject == null && memento.id != null)
             {
-                memento.selectedObject = GameDrawableFinder.FindChild(memento.drawable, memento.currentObjectName);
+                memento.selectedObject = GameDrawableFinder.FindChild(memento.drawable, memento.id);
             }
             if (memento.selectedObject != null)
             {
@@ -340,12 +340,12 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 if (memento.clickState == ClickState.Left)
                 {
                     GameMoveRotator.MoveObject(memento.selectedObject, memento.newObjectPosition);
-                    new MoveNetAction(drawable.name, drawableParent, memento.currentObjectName, memento.newObjectPosition).Execute();
+                    new MoveNetAction(drawable.name, drawableParent, memento.id, memento.newObjectPosition).Execute();
                 } 
                 else if (memento.clickState == ClickState.Right)
                 {
                     GameMoveRotator.SetRotate(memento.selectedObject, memento.degree);
-                    new RotatorNetAction(drawable.name, drawableParent, memento.currentObjectName, memento.degree).Execute();
+                    new RotatorNetAction(drawable.name, drawableParent, memento.id, memento.degree).Execute();
                 }
             }
 

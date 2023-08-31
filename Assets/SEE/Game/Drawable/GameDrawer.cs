@@ -64,8 +64,8 @@ namespace SEE.Game
         public static GameObject StartDrawing(GameObject drawable, Vector3[] positions, Color color, float thickness)
         {
             Setup(drawable, "", positions, color, thickness);
-            line.name = "line" + line.GetInstanceID();
-            lineHolder.name = "LineHolder" + line.GetInstanceID();
+            line.name = DrawableHelper.LinePrefix + line.GetInstanceID();
+            lineHolder.name = DrawableHelper.LineHolderPrefix + line.GetInstanceID();
             renderer.sortingOrder = DrawableHelper.orderInLayer;
             DrawableHelper.orderInLayer++;
             

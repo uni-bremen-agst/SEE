@@ -163,17 +163,17 @@ namespace Assets.SEE.Controls.Actions.Drawable
             public readonly ValueHolder oldValueHolder;
             public readonly ValueHolder newValueHolder;
             public readonly GameObject drawable;
-            public readonly string currentLineName;
+            public readonly string id;
 
             public Memento(GameObject oldLine, GameObject currentLine, ValueHolder oldValueHolder,
-                ValueHolder newValueHolder, GameObject drawable, string currentLineName)
+                ValueHolder newValueHolder, GameObject drawable, string id)
             {
                 this.oldLine = oldLine;
                 this.currentLine = currentLine;
                 this.oldValueHolder = oldValueHolder;
                 this.newValueHolder = newValueHolder;
                 this.drawable = drawable;
-                this.currentLineName = currentLineName;
+                this.id = id;
             }
         }
 
@@ -184,9 +184,9 @@ namespace Assets.SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            if (memento.currentLine == null && memento.currentLineName != null)
+            if (memento.currentLine == null && memento.id != null)
             {
-                memento.currentLine = GameDrawableFinder.FindChild(memento.drawable, memento.currentLineName);
+                memento.currentLine = GameDrawableFinder.FindChild(memento.drawable, memento.id);
             }
             if (memento.oldLine == null || (memento.oldLine != null && memento.oldLine.name.Equals(memento.currentLine.name)))
             {
@@ -223,9 +223,9 @@ namespace Assets.SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            if (memento.currentLine == null && memento.currentLineName != null)
+            if (memento.currentLine == null && memento.id != null)
             {
-                memento.currentLine = GameDrawableFinder.FindChild(memento.drawable, memento.currentLineName);
+                memento.currentLine = GameDrawableFinder.FindChild(memento.drawable, memento.id);
             }
             if (memento.oldLine == null || (memento.oldLine != null && memento.oldLine.name.Equals(memento.currentLine.name)))
             {

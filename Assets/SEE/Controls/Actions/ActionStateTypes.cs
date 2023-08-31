@@ -201,10 +201,16 @@ namespace SEE.Controls.Actions
                         LayerChangerAction.CreateReversibleAction,
                         parent: Whiteboard);
 
-            LineErase =
-                new("Line erase", "Erase a complete line on a drawable",
+            FastErase =
+                new("Fast erase", "Erase a complete object on a drawable",
                 Color.red, "Materials/ModernUIPack/Pencil",
-                LineEraseAction.CreateReversibleAction,
+                FastEraseAction.CreateReversibleAction,
+                parent: Whiteboard);
+
+            PointLineErase =
+                new("Point line erase", "Erase a point from a line on a drawable",
+                Color.red, "Materials/ModernUIPack/Pencil",
+                PointEraseAction.CreateReversibleAction,
                 parent: Whiteboard);
 
             Cleaner =
@@ -241,7 +247,8 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType EditLine;
         public readonly static ActionStateType MoveRotator;
         public readonly static ActionStateType LayerChanger;
-        public readonly static ActionStateType LineErase;
+        public readonly static ActionStateType FastErase;
+        public readonly static ActionStateType PointLineErase;
         public readonly static ActionStateType Cleaner;
 
         #endregion

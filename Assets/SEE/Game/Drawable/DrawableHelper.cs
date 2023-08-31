@@ -2,6 +2,7 @@
 using SEE.GO;
 using SEE.Utils;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -20,6 +21,9 @@ namespace Assets.SEE.Game.Drawable
         public static float currentThickness { get; set; }
 
         public static int orderInLayer { get; set; }
+
+        public static readonly string LinePrefix = "Line";
+        public static readonly string LineHolderPrefix = "LineHolder";
 
         public readonly static Vector3 distanceToBoard = new(0, 0, 0.02f);
 
@@ -80,47 +84,53 @@ namespace Assets.SEE.Game.Drawable
         #endregion
 
         #region Direction
-        public enum Direction
+        public static Vector2[] castToVector2Array(Vector3[] vector3)
         {
-            Front,
-            Back,
-            Left,
-            Right,
-            Below,
-            Above,
-            None
+            Vector2[] vector2 = new Vector2[vector3.Length];
+            for (int i = 0; i < vector3.Length; i++)
+            {
+                vector2[i] = new Vector2(vector3[i].x, vector3[i].y);
+            }
+            return vector2;
         }
 
-        public static Direction checkDirection(GameObject parent)
+        public static List<int> GetNearestIndexes(Vector3[] positions, Vector3 hitPoint)
         {
-            Direction direction = Direction.None;
-            float x = Mathf.Round(parent.transform.rotation.eulerAngles.x);
-            float y = Mathf.Round(parent.transform.rotation.eulerAngles.y);
-            if (x == 0 && y == 180)
+            List<int> matchedIndexes = new();
+            Vector2[] vector2 = castToVector2Array(positions);
+            Vector2 hitPoint2D = new Vector2(hitPoint.x, hitPoint.y);
+            float nearestDistance = float.MaxValue;
+            for (int i = 0; i < vector2.Length; i++)
             {
-                direction = Direction.Back;
+                if (Vector2.Distance(vector2[i], hitPoint2D) < nearestDistance)
+                {
+                    nearestDistance = Vector2.Distance(vector2[i], hitPoint2D);
+                    matchedIndexes = new List<int>();
+                    matchedIndexes.Add(i);
+                }
+                else if (Vector2.Distance(vector2[i], hitPoint2D) == nearestDistance)
+                {
+                    matchedIndexes.Add(i);
+                }
             }
-            if (x == 0 && y == 0)
+            return matchedIndexes;
+        }
+
+        public static int GetNearestIndex(Vector3[] positions, Vector3 hitPoint)
+        {
+            int index = -1;
+            Vector2[] vector2 = castToVector2Array(positions);
+            Vector2 hitPoint2D = new Vector2(hitPoint.x, hitPoint.y);
+            float nearestDistance = float.MaxValue;
+            for (int i = 0; i < vector2.Length; i++)
             {
-                direction = Direction.Front;
+                if (Vector2.Distance(vector2[i], hitPoint2D) < nearestDistance)
+                {
+                    nearestDistance = Vector2.Distance(vector2[i], hitPoint2D);
+                    index = i;
+                }
             }
-            if (x == 0 && y == 270)
-            {
-                direction = Direction.Left;
-            }
-            if (x == 0 && y == 90)
-            {
-                direction = Direction.Right;
-            }
-            if (x == 90)
-            {
-                direction = Direction.Below;
-            }
-            if (x == 270)
-            {
-                direction = Direction.Above;
-            }
-            return direction;
+            return index;
         }
         #endregion
     }

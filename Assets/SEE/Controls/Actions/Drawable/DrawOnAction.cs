@@ -16,6 +16,7 @@ using Assets.SEE.Net.Actions.Drawable;
 using RTG;
 using Assets.SEE.Game.UI.Drawable;
 using DynamicPanels;
+using System.Linq;
 
 namespace SEE.Controls.Actions
 {
@@ -114,22 +115,24 @@ namespace SEE.Controls.Actions
                         case ProgressState.Drawing:
                             // The position at which to continue the line.
                             Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - DrawableHelper.distanceToBoard;
-
-                            // Add newPosition to the line renderer.
-                            Vector3[] newPositions = new Vector3[positions.Length + 1];
-                            Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
-                            newPositions[newPositions.Length - 1] = newPosition;
-                            positions = newPositions;
-
-                            if (GameDrawer.DifferentPositionCounter(positions) > 3)
+                            if (newPosition != positions.Last())
                             {
-                                GameDrawer.Drawing(positions);
-                                memento = new Memento(drawable, positions, DrawableHelper.currentColor,
-                                    DrawableHelper.currentThickness, line.GetComponent<LineRenderer>().sortingOrder);
-                                memento.id = line.name;
-                                new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable),
-                                    memento.id, memento.positions, memento.color, memento.thickness).Execute();
-                                currentState = ReversibleAction.Progress.InProgress;
+                                // Add newPosition to the line renderer.
+                                Vector3[] newPositions = new Vector3[positions.Length + 1];
+                                Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
+                                newPositions[newPositions.Length - 1] = newPosition;
+                                positions = newPositions;
+
+                                if (GameDrawer.DifferentPositionCounter(positions) > 3)
+                                {
+                                    GameDrawer.Drawing(positions);
+                                    memento = new Memento(drawable, positions, DrawableHelper.currentColor,
+                                        DrawableHelper.currentThickness, line.GetComponent<LineRenderer>().sortingOrder);
+                                    memento.id = line.name;
+                                    new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable),
+                                        memento.id, memento.positions, memento.color, memento.thickness).Execute();
+                                    currentState = ReversibleAction.Progress.InProgress;
+                                }
                             }
                             break;
                     }
@@ -201,9 +204,12 @@ namespace SEE.Controls.Actions
             {
                 line = GameDrawableFinder.FindChild(memento.drawable, memento.id);
             }
-            new LineEraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id).Execute();
-            Destroyer.Destroy(line.transform.parent.gameObject);
-            line = null;
+            if (line != null)
+            {
+                new FastEraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id).Execute();
+                Destroyer.Destroy(line.transform.parent.gameObject);
+                line = null;
+            }
         }
 
         /// <summary>

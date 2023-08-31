@@ -102,17 +102,17 @@ namespace SEE.Controls.Actions
             public readonly GameLayerChanger.LayerChangerStates state;
             public readonly DrawableTypes type;
             public GameObject obj;
-            public readonly string objName;
+            public readonly string id;
             public readonly int oldOrder;
             public readonly int newOrder;
 
-            public Memento(GameObject drawable, GameLayerChanger.LayerChangerStates state, DrawableTypes type, GameObject obj, string objName, int oldOrder, int newOrder)
+            public Memento(GameObject drawable, GameLayerChanger.LayerChangerStates state, DrawableTypes type, GameObject obj, string id, int oldOrder, int newOrder)
             {
                 this.drawable = drawable;
                 this.state = state;
                 this.type = type;
                 this.obj = obj;
-                this.objName = objName;
+                this.id = id;
                 this.oldOrder = oldOrder;
                 this.newOrder = newOrder;
             }
@@ -125,9 +125,9 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            if (memento.obj == null && memento.objName != null)
+            if (memento.obj == null && memento.id != null)
             {
-                memento.obj = GameDrawableFinder.FindChild(memento.drawable, memento.objName);
+                memento.obj = GameDrawableFinder.FindChild(memento.drawable, memento.id);
             }
             switch (memento.state)
             {
@@ -149,9 +149,9 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            if (memento.obj == null && memento.objName != null)
+            if (memento.obj == null && memento.id != null)
             {
-                memento.obj = GameDrawableFinder.FindChild(memento.drawable, memento.objName);
+                memento.obj = GameDrawableFinder.FindChild(memento.drawable, memento.id);
             }
             switch (memento.state)
             {
