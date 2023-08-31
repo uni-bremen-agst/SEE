@@ -1,6 +1,7 @@
 using System.Linq;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using MathNet.Numerics.LinearAlgebra;
 using SEE.Game.City;
 
@@ -17,18 +18,26 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// of <see cref="Node"/> match the wanted <see cref="Node.Size"/> of the node.
         /// </summary>
         /// <param name="nodes">nodes with layout</param>
-        /// <param name="settings">the settings</param>
-        /// <returns></returns>
+        /// <param name="settings">the settings of the incremental tree map layout</param>
+        /// <returns>true if correction was successful, else false</returns>
         public static bool Correct(IList<Node> nodes, IncrementalTreeMapSetting settings)
         {
-            if (nodes.Count == 1) return true;
+            if (nodes.Count == 1)
+            {
+                return true;
+            }
+
             if (IsSliceAble(nodes, out Segment slicingSegment))
             {
                 Split(nodes, slicingSegment,
                     out IList<Node> partition1,
                     out IList<Node> partition2);
 
+                // adjust the position of slicingSegments
                 AdjustSliced(nodes, partition1, partition2, slicingSegment);
+                // recursive adjust the two sub layouts
+                // since both sublayouts are temporally independent from each other
+                // the segment that separates these must be considered as border (IsConst = true)
                 slicingSegment.IsConst = true;
                 Correct(partition1, settings);
                 Correct(partition2, settings);
@@ -38,9 +47,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     Vector<double>.Build.DenseOfArray(nodes.Select(node => (double)node.Size).ToArray());
                 Vector<double> nodesSizesCurrent =
                     Vector<double>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.Area()).ToArray());
-                var error = (nodesSizesWanted - nodesSizesCurrent).Norm(p: 1);
+                double error = (nodesSizesWanted - nodesSizesCurrent).Norm(p: 1);
 
-                return error <= Math.Pow(10, settings.gradientDescentPrecisionExponent) && CheckNegativeLength(nodes);
+                return error <= Math.Pow(10, settings.gradientDescentPrecisionExponent) && CheckPositiveLength(nodes);
             }
             else
             {
@@ -53,28 +62,37 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// </summary>
         /// <param name="nodes">nodes with layout</param>
         /// <param name="slicingSegment">a segment that would separate the sub layouts</param>
-        /// <returns>true if nodes are slice able else false</returns>
+        /// <returns>true if nodes are sliceable else false</returns>
         private static bool IsSliceAble(IList<Node> nodes, out Segment slicingSegment)
         {
             slicingSegment = null;
-            var segments = nodes.SelectMany(n => n.SegmentsDictionary().Values).Distinct();
-            foreach (var segment in segments)
+            IEnumerable<Segment> segments = nodes.SelectMany(n => n.SegmentsDictionary().Values).Distinct();
+            foreach (Segment segment in segments)
             {
                 slicingSegment = segment;
-                if (segment.IsConst) continue;
+                if (segment.IsConst)
+                {
+                    continue;
+                }
                 if (segment.IsVertical)
                 {
-                    var nodeLowerEnd = Utils.ArgMin(segment.Side1Nodes, node => node.Rectangle.Z);
-                    var nodeUpperEnd = Utils.ArgMax(segment.Side1Nodes, node => node.Rectangle.Z);
+                    Node nodeLowerEnd = Utils.ArgMin(segment.Side1Nodes, node => node.Rectangle.Z);
+                    Node nodeUpperEnd = Utils.ArgMax(segment.Side1Nodes, node => node.Rectangle.Z);
                     if (nodeLowerEnd.SegmentsDictionary()[Direction.Lower].IsConst &&
-                        nodeUpperEnd.SegmentsDictionary()[Direction.Upper].IsConst) return true;
+                        nodeUpperEnd.SegmentsDictionary()[Direction.Upper].IsConst)
+                    {
+                        return true;
+                    }
                 }
                 else
                 {
-                    var nodeLeftEnd = Utils.ArgMin(segment.Side1Nodes, node => node.Rectangle.X);
-                    var nodeRightEnd = Utils.ArgMax(segment.Side1Nodes, node => node.Rectangle.X);
+                    Node nodeLeftEnd = Utils.ArgMin(segment.Side1Nodes, node => node.Rectangle.X);
+                    Node nodeRightEnd = Utils.ArgMax(segment.Side1Nodes, node => node.Rectangle.X);
                     if (nodeLeftEnd.SegmentsDictionary()[Direction.Left].IsConst &&
-                        nodeRightEnd.SegmentsDictionary()[Direction.Right].IsConst) return true;
+                        nodeRightEnd.SegmentsDictionary()[Direction.Right].IsConst)
+                    {
+                        return true;
+                    }
                 }
             }
 
@@ -98,7 +116,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             if (slicingSegment.IsVertical)
             {
                 double xPosSegment = slicingSegment.Side2Nodes.First().Rectangle.X;
-                foreach (var node in nodes)
+                foreach (Node node in nodes)
                 {
                     if (node.Rectangle.X + .5 * node.Rectangle.Width < xPosSegment)
                     {
@@ -113,7 +131,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             else
             {
                 double zPosSegment = slicingSegment.Side2Nodes.First().Rectangle.Z;
-                foreach (var node in nodes)
+                foreach (Node node in nodes)
                 {
                     if (node.Rectangle.Z + .5 * node.Rectangle.Depth < zPosSegment)
                     {
@@ -128,8 +146,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// This method recalibrates a layout, that is sliced in 2 sub layouts.
-        /// So the sub layouts get the size they should have.
+        /// This method recalibrates a layout that is sliced in 2 sublayouts,
+        /// so the sublayouts get the size they should have.
         /// A sub layout can still have internal wrong node sizes.
         /// </summary>
         /// <param name="nodes">nodes of a slice able layout </param>
@@ -137,38 +155,43 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// the <see cref="Direction.Lower"/>/<see cref="Direction.Left"/> sub layout</param>
         /// <param name="partition2">partition of <paramref name="nodes"/>,
         /// the <see cref="Direction.Upper"/>/<see cref="Direction.Right"/> sub layout</param>
-        /// <param name="slicingSegment">the segment, that slices the layout</param>
+        /// <param name="slicingSegment">the segment that slices the layout</param>
         private static void AdjustSliced(
             IList<Node> nodes,
             IList<Node> partition1,
             IList<Node> partition2,
             Segment slicingSegment)
         {
-            var rectangle1Old = Utils.CreateParentRectangle(nodes);
-            var rectangle2Old = rectangle1Old.Clone();
-            var rectangle1New = rectangle1Old.Clone();
-            var rectangle2New = rectangle1Old.Clone();
 
+            // creating four rectangles - two for each sublayout
+            // old rectangle -> current parent rectangle
+            // new rectangle -> parent rectangle how it should be after adjustment
+            Rectangle rectangle1Old = Utils.CreateParentRectangle(nodes);
+            Rectangle rectangle2Old = rectangle1Old.Clone();
+            Rectangle rectangle1New = rectangle1Old.Clone();
+            Rectangle rectangle2New = rectangle1Old.Clone();
+
+            // set the correct sizes for the four rectangles
             if (slicingSegment.IsVertical)
             {
-                var segmentXPosition = slicingSegment.Side2Nodes.First().Rectangle.X;
+                double segmentXPosition = slicingSegment.Side2Nodes.First().Rectangle.X;
                 rectangle1Old.Width = segmentXPosition - rectangle1Old.X;
                 rectangle2Old.Width -= rectangle1Old.Width;
                 rectangle2Old.X = rectangle1Old.X + rectangle1Old.Width;
 
-                var ratio = partition1.Sum(n => n.Size) / nodes.Sum(n => n.Size);
+                float ratio = partition1.Sum(n => n.Size) / nodes.Sum(n => n.Size);
                 rectangle1New.Width *= ratio;
                 rectangle2New.Width *= (1 - ratio);
                 rectangle2New.X = rectangle1New.X + rectangle1New.Width;
             }
             else
             {
-                var segmentZPosition = slicingSegment.Side2Nodes.First().Rectangle.Z;
+                double segmentZPosition = slicingSegment.Side2Nodes.First().Rectangle.Z;
                 rectangle1Old.Depth = segmentZPosition - rectangle1Old.Z;
                 rectangle2Old.Depth -= rectangle1Old.Depth;
                 rectangle2Old.Z = rectangle1Old.Z + rectangle1Old.Depth;
 
-                var ratio = partition1.Sum(n => n.Size) / nodes.Sum(n => n.Size);
+                float ratio = partition1.Sum(n => n.Size) / nodes.Sum(n => n.Size);
                 rectangle1New.Depth *= ratio;
                 rectangle2New.Depth *= (1 - ratio);
                 rectangle2New.Z = rectangle1New.Z + rectangle1New.Depth;
@@ -180,13 +203,19 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         /// <summary>
         /// A gradient decent approach to recalibrate the layout.
+        /// This approach 'moves' the segment in several steps, until the desired sizes are realized.
+        /// In one step it calculates a shift for all segments at once
+        /// by set up a function that maps the position of the segments to the area of each node,
+        /// get the derivative of this function
+        /// and calculate a shift for the segment vector in the direction of the desired size vector.
         /// </summary>
         /// <param name="nodes">nodes with layout</param>
-        /// <param name="settings">the setting</param>
-        /// <returns></returns>
+        /// <param name="settings">the settings of the incremental tree map layout,
+        /// especially including the maximal error between the desired layout and the result</param>
+        /// <returns>true if correction was successful, else false</returns>
         private static bool GradientDecent(IList<Node> nodes, IncrementalTreeMapSetting settings)
         {
-            var segments = nodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
+            HashSet<Segment> segments = nodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
             segments.RemoveWhere(s => s.IsConst);
             int i = 0;
             Dictionary<Segment, int> mapSegmentIndex
@@ -197,32 +226,35 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             for (int j = 0; j < 50; j++)
             {
                 distance = CalculateOneStep(nodes, mapSegmentIndex);
-                if (distance <= maximalError) break;
+                if (distance <= maximalError)
+                {
+                    break;
+                }
             }
 
-            return (CheckNegativeLength(nodes) && distance < maximalError);
+            return (CheckPositiveLength(nodes) && distance < maximalError);
         }
 
         /// <summary>
-        /// Calculates the jacobian matrix. A derivative for the function that maps
+        /// Calculates the jacobian matrix, a derivative for the function that maps
         /// the position of the segments to the area of each node (its rectangle).
         /// </summary>
         /// <param name="nodes">the nodes of the layout</param>
-        /// <param name="mapSegmentIndex">the segments as dictionary with their index in the function</param>
-        /// <returns></returns>
+        /// <param name="mapSegmentIndex">the segments as a dictionary with their index in the function</param>
+        /// <returns>the matrix</returns>
         private static Matrix<double> JacobianMatrix(
             IList<Node> nodes,
             Dictionary<Segment, int> mapSegmentIndex)
         {
             int n = nodes.Count;
-            var matrix = Matrix<double>.Build.Sparse(n, n - 1);
-            foreach (var node in nodes)
+            Matrix<double> matrix = Matrix<double>.Build.Sparse(n, n - 1);
+            for(int indexNode = 0; indexNode < nodes.Count; indexNode++)
             {
-                var segments = node.SegmentsDictionary();
-                int indexNode = nodes.IndexOf(node);
+                Node node = nodes[indexNode];
+                IDictionary<Direction, Segment> segments = node.SegmentsDictionary();
                 foreach (Direction dir in Enum.GetValues(typeof(Direction)))
                 {
-                    var segment = segments[dir];
+                    Segment segment = segments[dir];
                     if (!segment.IsConst)
                     {
                         double value = dir switch
@@ -231,7 +263,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                             Direction.Right => node.Rectangle.Depth,
                             Direction.Lower => -node.Rectangle.Width,
                             Direction.Upper => node.Rectangle.Width,
-                            _ => 0
+                            _ => throw new InvalidEnumArgumentException("Unrecognized Direction value.")
                         };
 
                         matrix[indexNode, mapSegmentIndex[segment]] = value;
@@ -258,7 +290,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 Vector<double>.Build.DenseOfArray(nodes.Select(node => (double)node.Size).ToArray());
             Vector<double> nodesSizesCurrent =
                 Vector<double>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.Area()).ToArray());
-            var diff = nodesSizesWanted - nodesSizesCurrent;
+            Vector<double> diff = nodesSizesWanted - nodesSizesCurrent;
             Matrix<double> pseudoInverse = matrix.PseudoInverse();
             Vector<double> segmentShift = pseudoInverse * diff;
             ApplyShift(segmentShift, nodes, mapSegmentIndex);
@@ -279,14 +311,17 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             IList<Node> nodes,
             Dictionary<Segment, int> mapSegmentIndex)
         {
-            foreach (var node in nodes)
+            foreach (Node node in nodes)
             {
-                var segments = node.SegmentsDictionary();
+                IDictionary<Direction, Segment> segments = node.SegmentsDictionary();
                 foreach (Direction dir in Enum.GetValues(typeof(Direction)))
                 {
-                    var segment = segments[dir];
-                    if (segment.IsConst) continue;
-                    var value = shift[mapSegmentIndex[segment]];
+                    Segment segment = segments[dir];
+                    if (segment.IsConst)
+                    {
+                        continue;
+                    }
+                    double value = shift[mapSegmentIndex[segment]];
                     switch (dir)
                     {
                         case Direction.Left:
@@ -309,18 +344,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// A checker that verifies that the result has no rectangles with negative width or depth
+        /// Checks that the result has no rectangles with non-positive width or depth
         /// </summary>
         /// <param name="nodes">nodes of the layout</param>
-        /// <returns>true if all rectangles are fine, else false</returns>
-        private static bool CheckNegativeLength(IList<Node> nodes)
+        /// <returns>true if all rectangles have positive lengths, else false</returns>
+        private static bool CheckPositiveLength(IList<Node> nodes)
         {
-            foreach (var node in nodes)
-            {
-                if (node.Rectangle.Width <= 0 || node.Rectangle.Depth <= 0) return false;
-            }
-
-            return true;
+            return nodes.All(node => node.Rectangle.Width > 0 || node.Rectangle.Depth > 0);
         }
     }
 }
