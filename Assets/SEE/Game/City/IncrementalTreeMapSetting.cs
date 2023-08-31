@@ -95,7 +95,10 @@ namespace SEE.Game.City
 
         public bool Restore(Dictionary<string, object> attributes, string label)
         {
-            if (!attributes.TryGetValue(label, out object dictionary)) return false;
+            if (!attributes.TryGetValue(label, out object dictionary))
+            {
+                return false;
+            }
             Dictionary<string, object> values = dictionary as Dictionary<string, object>;
             bool result = ConfigIO.Restore(values, LocalMovesDepthLabel, ref localMovesDepth);
             result |= ConfigIO.Restore(values, LocalMovesBranchingLimitLabel, ref localMovesBranchingLimit);
