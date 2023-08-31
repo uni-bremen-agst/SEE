@@ -112,14 +112,14 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         public static void DeleteNode(Node obsoleteNode)
         {
             // check whether node is grounded
-            var segments = obsoleteNode.SegmentsDictionary();
+            IDictionary<Direction, Segment> segments = obsoleteNode.SegmentsDictionary();
             bool isGrounded = false;
             if (segments[Left].Side2Nodes.Count == 1 && !segments[Left].IsConst)
             {
                 isGrounded = true;
                 //[E][O]
-                var expandingNodes = segments[Left].Side1Nodes.ToArray();
-                foreach (var node in expandingNodes)
+                Node[] expandingNodes = segments[Left].Side1Nodes.ToArray();
+                foreach (Node node in expandingNodes)
                 {
                     node.Rectangle.Width += obsoleteNode.Rectangle.Width;
                     node.RegisterSegment(segments[Right], Right);
@@ -129,8 +129,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             {
                 isGrounded = true;
                 //[O][E]
-                var expandingNodes = segments[Right].Side2Nodes.ToArray();
-                foreach (var node in expandingNodes)
+                Node[] expandingNodes = segments[Right].Side2Nodes.ToArray();
+                foreach (Node node in expandingNodes)
                 {
                     node.Rectangle.X = obsoleteNode.Rectangle.X;
                     node.Rectangle.Width += obsoleteNode.Rectangle.Width;
@@ -142,8 +142,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 isGrounded = true;
                 //[O]
                 //[E]
-                var expandingNodes = segments[Lower].Side1Nodes.ToArray();
-                foreach (var node in expandingNodes)
+                Node[] expandingNodes = segments[Lower].Side1Nodes.ToArray();
+                foreach (Node node in expandingNodes)
                 {
                     node.Rectangle.Depth += obsoleteNode.Rectangle.Depth;
                     node.RegisterSegment(segments[Upper], Upper);
@@ -154,8 +154,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 isGrounded = true;
                 //[E]
                 //[O]
-                var expandingNodes = segments[Upper].Side2Nodes.ToArray();
-                foreach (var node in expandingNodes)
+                Node[] expandingNodes = segments[Upper].Side2Nodes.ToArray();
+                foreach (Node node in expandingNodes)
                 {
                     node.Rectangle.Z = obsoleteNode.Rectangle.Z;
                     node.Rectangle.Depth += obsoleteNode.Rectangle.Depth;
@@ -174,9 +174,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             {
                 Segment bestSegment = Utils.ArgMin(segments.Values, x => x.Side1Nodes.Count + x.Side2Nodes.Count);
 
-                var moves = FindLocalMoves(bestSegment);
+                IList<LocalMove> moves = FindLocalMoves(bestSegment);
                 Assert.IsTrue(moves.All(x => x is (StretchMove)));
-                foreach (var move in moves)
+                foreach (LocalMove move in moves)
                 {
                     if (move.Node1 != obsoleteNode && move.Node2 != obsoleteNode)
                     {
@@ -200,17 +200,17 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <param name="settings">settings for search</param>
         public static void LocalMovesSearch(List<Node> nodes, IncrementalTreeMapSetting settings)
         {
-            var allResults = RecursiveMakeMoves(
+            List<Tuple<List<Node>, double, IList<LocalMove>>> allResults = RecursiveMakeMoves(
                 nodes,
                 new List<LocalMove>(),
                 settings);
             allResults.Add(new Tuple<List<Node>, double, IList<LocalMove>>
                 (nodes, AspectRatiosPNorm(nodes, settings.PNorm), new List<LocalMove>()));
-            var bestResult = Utils.ArgMin(allResults,
+            List<Node> bestResult = Utils.ArgMin(allResults,
                 x => x.Item2 * 10 + x.Item3.Count).Item1;
 
-            var nodesDictionary = nodes.ToDictionary(n => n.ID, n => n);
-            foreach (var resultNode in bestResult)
+            IDictionary<string, Node> nodesDictionary = nodes.ToDictionary(n => n.ID, n => n);
+            foreach (Node resultNode in bestResult)
             {
                 nodesDictionary[resultNode.ID].Rectangle = resultNode.Rectangle;
             }
@@ -231,8 +231,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             IList<LocalMove> movesUntilNow,
             IncrementalTreeMapSetting settings)
         {
-            var resultThisRecursion = new List<Tuple<List<Node>, double, IList<LocalMove>>>();
-            if (movesUntilNow.Count >= settings.localMovesDepth) return resultThisRecursion;
+            List<Tuple<List<Node>, double, IList<LocalMove>>> resultThisRecursion
+                = new List<Tuple<List<Node>, double, IList<LocalMove>>>();
+            if (movesUntilNow.Count >= settings.localMovesDepth)
+            {
+                return resultThisRecursion;
+            }
             ICollection<Segment> relevantSegments;
             if (movesUntilNow.Count == 0)
             {
@@ -240,23 +244,27 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
             else
             {
-                var relevantNodes = movesUntilNow.SelectMany(m => new[] { m.Node1.ID, m.Node2.ID }).ToHashSet()
+                IEnumerable<Node> relevantNodes = movesUntilNow.SelectMany(m => new[] { m.Node1.ID, m.Node2.ID })
+                    .ToHashSet()
                     .Select(id => nodes.First(n => n.ID == id));
                 relevantSegments = relevantNodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
             }
 
-            var possibleMoves = relevantSegments.SelectMany(FindLocalMoves);
-            foreach (var move in possibleMoves)
+            IEnumerable<LocalMove> possibleMoves = relevantSegments.SelectMany(FindLocalMoves);
+            foreach (LocalMove move in possibleMoves)
             {
-                var nodeClonesDictionary = Utils.CloneGraph(nodes);
-                var nodeClonesList = nodeClonesDictionary.Values.ToList();
-                var moveClone = move.Clone(nodeClonesDictionary);
+                IDictionary<string, Node> nodeClonesDictionary = Utils.CloneGraph(nodes);
+                List<Node> nodeClonesList = nodeClonesDictionary.Values.ToList();
+                LocalMove moveClone = move.Clone(nodeClonesDictionary);
 
                 moveClone.Apply();
-                var works = CorrectAreas.Correct(nodeClonesList, settings);
-                if (!works) continue;
+                bool works = CorrectAreas.Correct(nodeClonesList, settings);
+                if (!works)
+                {
+                    continue;
+                }
 
-                var newMovesList = new List<LocalMove>(movesUntilNow) { moveClone };
+                List<LocalMove> newMovesList = new List<LocalMove>(movesUntilNow) { moveClone };
                 resultThisRecursion.Add(
                     new Tuple<List<Node>, double, IList<LocalMove>>
                         (nodeClonesList, AspectRatiosPNorm(nodeClonesList, settings.PNorm), newMovesList));
@@ -265,8 +273,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             resultThisRecursion.Sort((x, y) => x.Item2.CompareTo(y.Item2));
             resultThisRecursion = resultThisRecursion.Take(settings.localMovesBranchingLimit).ToList();
 
-            var resultsNextRecursions = new List<Tuple<List<Node>, double, IList<LocalMove>>>();
-            foreach (var result in resultThisRecursion)
+            List<Tuple<List<Node>, double, IList<LocalMove>>> resultsNextRecursions =
+                new List<Tuple<List<Node>, double, IList<LocalMove>>>();
+            foreach (Tuple<List<Node>, double, IList<LocalMove>> result in resultThisRecursion)
             {
                 resultsNextRecursions.AddRange(RecursiveMakeMoves(result.Item1, result.Item3, settings));
             }
