@@ -42,8 +42,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         /// <summary>
         /// The ratio of the longer edge to the smaller one.
+        /// Notice that the aspect ratio is greater than or equal to 1 by definition.
         /// </summary>
-        /// <returns>val >= 1</returns>
+        /// <returns>The aspect ratio</returns>
         public double AspectRatio()
         {
             return Width >= Depth ? Width / Depth : Depth / Width;
