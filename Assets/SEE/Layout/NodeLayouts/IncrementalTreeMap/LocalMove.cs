@@ -44,7 +44,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// if the rotation is clockwise
         /// </summary>
-        private readonly bool _clockwise;
+        private readonly bool clockwise;
 
         /// <summary>
         /// Constructor
@@ -56,7 +56,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         {
             this.Node1 = node1;
             this.Node2 = node2;
-            this._clockwise = clockwise;
+            this.clockwise = clockwise;
         }
 
         override public void Apply()
@@ -67,24 +67,24 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             if (segmentsNode1[Direction.Right] == segmentsNode2[Direction.Left])
             {
                 // [Node1][Node2]
-                apply_flipOnVerticalSegment(leftNode: Node1, rightNode: Node2);
+                FlipOnVerticalSegment(leftNode: Node1, rightNode: Node2);
             }
             else if (segmentsNode1[Direction.Left] == segmentsNode2[Direction.Right])
             {
                 // [Node2][Node1]
-                apply_flipOnVerticalSegment(leftNode: Node2, rightNode: Node1);
+                FlipOnVerticalSegment(leftNode: Node2, rightNode: Node1);
             }
             else if (segmentsNode1[Direction.Upper] == segmentsNode2[Direction.Lower])
             {
                 // [Node2]
                 // [Node1]
-                apply_flipOnHorizontalSegment(lowerNode: Node1, upperNode: Node2);
+                FlipOnHorizontalSegment(lowerNode: Node1, upperNode: Node2);
             }
             else if (segmentsNode1[Direction.Lower] == segmentsNode2[Direction.Upper])
             {
                 // [Node1]
                 // [Node2]
-                apply_flipOnHorizontalSegment(lowerNode: Node2, upperNode: Node1);
+                FlipOnHorizontalSegment(lowerNode: Node2, upperNode: Node1);
             }
             else
             {
@@ -94,7 +94,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         override public LocalMove Clone(IDictionary<string, Node> cloneMap)
         {
-            return new FlipMove(cloneMap[Node1.ID], cloneMap[Node2.ID], _clockwise);
+            return new FlipMove(cloneMap[Node1.ID], cloneMap[Node2.ID], clockwise);
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// </summary>
         /// <param name="leftNode">the node on the <see cref="Direction.Left"/> side</param>
         /// <param name="rightNode">the node on the <see cref="Direction.Right"/> side</param>
-        private void apply_flipOnVerticalSegment(Node leftNode, Node rightNode)
+        private void FlipOnVerticalSegment(Node leftNode, Node rightNode)
         {
             // clockwise            anticlockwise
             // [l][r] -> [lll]      [l][r] -> [rrr]
@@ -118,7 +118,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
             leftNode.Rectangle.Depth *= ratio;
             rightNode.Rectangle.Depth *= (1 - ratio);
-            if (_clockwise)
+            if (clockwise)
             {
                 leftNode.Rectangle.Z = rightNode.Rectangle.Z + rightNode.Rectangle.Depth;
             }
@@ -136,7 +136,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             leftNode.RegisterSegment(newRightSegmentForLeftNode, Direction.Right);
             rightNode.RegisterSegment(newLeftSegmentForRightNode, Direction.Left);
 
-            if (_clockwise)
+            if (clockwise)
             {
                 leftNode.RegisterSegment(middle, Direction.Lower);
                 rightNode.RegisterSegment(middle, Direction.Upper);
@@ -153,7 +153,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// </summary>
         /// <param name="lowerNode">the node on the <see cref="Direction.Lower"/> side</param>
         /// <param name="upperNode">the node on the <see cref="Direction.Upper"/> side</param>
-        private void apply_flipOnHorizontalSegment(Node lowerNode, Node upperNode)
+        private void FlipOnHorizontalSegment(Node lowerNode, Node upperNode)
         {
             // clockwise                anticlockwise
             // [uuu]  ->  [l][u]        [uuu]  ->  [u][l]
@@ -169,7 +169,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
             lowerNode.Rectangle.Width *= ratio;
             upperNode.Rectangle.Width *= (1 - ratio);
-            if (_clockwise)
+            if (clockwise)
             {
                 upperNode.Rectangle.X = lowerNode.Rectangle.X + lowerNode.Rectangle.Width;
             }
@@ -187,7 +187,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             lowerNode.RegisterSegment(newUpperSegmentForLowerNode, Direction.Upper);
             upperNode.RegisterSegment(newLowerSegmentForUpperNode, Direction.Lower);
 
-            if (_clockwise)
+            if (clockwise)
             {
                 lowerNode.RegisterSegment(middle, Direction.Right);
                 upperNode.RegisterSegment(middle, Direction.Left);
@@ -235,11 +235,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     : (Node2, Node1);
                 if (leftNode.Rectangle.Depth >= rightNode.Rectangle.Depth)
                 {
-                    apply_StretchRightOverVertical(leftNode: leftNode, rightNode: rightNode);
+                    StretchRightOverVertical(leftNode: leftNode, rightNode: rightNode);
                 }
                 else
                 {
-                    apply_StretchLeftOverVertical(leftNode: leftNode, rightNode: rightNode);
+                    StretchLeftOverVertical(leftNode: leftNode, rightNode: rightNode);
                 }
             }
             else if (segmentsNode1[Direction.Upper] == segmentsNode2[Direction.Lower]
@@ -250,11 +250,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     : (Node2, Node1);
                 if (lowerNode.Rectangle.Width >= upperNode.Rectangle.Width)
                 {
-                    apply_StretchUpperOverHorizontal(lowerNode: lowerNode, upperNode: upperNode);
+                    StretchUpperOverHorizontal(lowerNode: lowerNode, upperNode: upperNode);
                 }
                 else
                 {
-                    apply_StretchLowerOverHorizontal(lowerNode: lowerNode, upperNode: upperNode);
+                    StretchLowerOverHorizontal(lowerNode: lowerNode, upperNode: upperNode);
                 }
             }
             else
@@ -275,7 +275,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// </summary>
         /// <param name="leftNode">node on the <see cref="Direction.Left"/> side</param>
         /// <param name="rightNode">node on the <see cref="Direction.Right"/> side</param>
-        private void apply_StretchLeftOverVertical(Node leftNode, Node rightNode)
+        private void StretchLeftOverVertical(Node leftNode, Node rightNode)
         {
             // along lower           along upper
             //    [r]         [r]    [l][r]  ->  [llll]
@@ -310,7 +310,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// </summary>
         /// <param name="leftNode">node on the <see cref="Direction.Left"/> side</param>
         /// <param name="rightNode">node on the <see cref="Direction.Right"/> side</param>
-        private void apply_StretchRightOverVertical(Node leftNode, Node rightNode)
+        private void StretchRightOverVertical(Node leftNode, Node rightNode)
         {
             // along lower           along upper
             // [l]         [l]       [l][r]  ->  [r][r]
@@ -346,7 +346,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// </summary>
         /// <param name="lowerNode">node on the <see cref="Direction.Lower"/> side</param>
         /// <param name="upperNode">node on the <see cref="Direction.Upper"/> side</param>
-        private void apply_StretchLowerOverHorizontal(Node lowerNode, Node upperNode)
+        private void StretchLowerOverHorizontal(Node lowerNode, Node upperNode)
         {
             // along left           along right
             // [uuuu] ->  [l][u]    [uuuu]  ->  [u][l]
@@ -381,7 +381,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// </summary>
         /// <param name="lowerNode">node on the <see cref="Direction.Lower"/> side</param>
         /// <param name="upperNode">node on the <see cref="Direction.Upper"/> side</param>
-        private void apply_StretchUpperOverHorizontal(Node lowerNode, Node upperNode)
+        private void StretchUpperOverHorizontal(Node lowerNode, Node upperNode)
         {
             // along left           along right
             // [u]    ->  [u]          [u]  ->      [u]
