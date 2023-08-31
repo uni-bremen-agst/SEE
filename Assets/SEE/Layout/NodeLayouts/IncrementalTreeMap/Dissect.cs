@@ -119,7 +119,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <returns>index</returns>
         private static int GetSplitIndex(Node[] nodes)
         {
-            if (nodes.Sum(x => x.Size) <= nodes.Last().Size * 3)
+            float totalSize = nodes.Sum(node => node.Size);
+            if (totalSize <= nodes.Last().Size * 3)
             {
                 return nodes.Length - 1;
             }
@@ -127,7 +128,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             {
                 for (int i = 1; i <= nodes.Length + 1; i++)
                 {
-                    if (nodes[..i].Sum(x => x.Size) * 3 >= nodes.Sum(x => x.Size))
+                    if (nodes[..i].Sum(x => x.Size) * 3 >= totalSize)
                     {
                         return i;
                     }
