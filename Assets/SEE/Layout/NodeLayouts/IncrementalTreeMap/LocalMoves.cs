@@ -10,13 +10,13 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     /// <summary>
     /// Provides algorithms for adding and deleting nodes to a layout
-    /// and a algorithm to improve visual quality of a layout.
+    /// and an algorithm to improve visual quality of a layout.
     /// </summary>
     internal static class LocalMoves
     {
         /// <summary>
-        /// Finds possible <see cref="LocalMove"/>s for s specific segment.
-        /// Like flip the segment or stretch a node over the segment.
+        /// Finds possible <see cref="LocalMove"/>s for a specific segment.
+        /// Examples are flipping the segment or stretching a node over the segment.
         /// </summary>
         /// <param name="segment">the segment</param>
         /// <returns>List of <see cref="LocalMove"/>s</returns>
@@ -65,11 +65,10 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         /// <summary>
         /// Adds a node to the layout.
-        /// <paramref name="newNode"/> get rectangles and segments.
-        /// Will NOT add <paramref name="newNode"/> to the list <paramref name="nodes"/>.
+        /// Will NOT add <paramref name="newNode"/> to the list of <paramref name="nodes"/>.
         /// </summary>
         /// <param name="nodes">nodes that represent a layout</param>
-        /// <param name="newNode">the that should be added</param>
+        /// <param name="newNode">the node that should be added</param>
         public static void AddNode(IList<Node> nodes, Node newNode)
         {
             // node with rectangle with highest aspect ratio
@@ -107,9 +106,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Deleting a node from the layout.
+        /// Deletes a node from the layout.
         /// </summary>
-        /// <param name="obsoleteNode">node to be delete, part of a layout</param>
+        /// <param name="obsoleteNode">node to be deleted, part of a layout</param>
         public static void DeleteNode(Node obsoleteNode)
         {
             // check whether node is grounded
@@ -193,7 +192,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Searches the space of layouts, that are similar to the layout of <paramref name="nodes"/>
+        /// Searches the space of layouts that are similar to the layout of <paramref name="nodes"/>
         /// (in terms of distance in local moves).
         /// Apply the layout with the best visual quality to <paramref name="nodes"/>
         /// </summary>
@@ -220,28 +219,28 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Makes recursively local moves on clones of the layout to find similar layout with good visual quality.
+        /// Makes recursively local moves on clones of the layout to find similar layouts with good visual quality.
         /// </summary>
         /// <param name="nodes">nodes that represent a layout</param>
-        /// <param name="movesTillNow">moves that are done before in recursion</param>
+        /// <param name="movesUntilNow">moves that are done before in recursion</param>
         /// <param name="settings">the settings</param>
         /// <returns>selection of reached layouts, as tuples of nodes, visual quality measure of the layout and
         /// the local moves that are applied to get this layout.</returns>
         private static List<Tuple<List<Node>, double, IList<LocalMove>>> RecursiveMakeMoves(
             IList<Node> nodes,
-            IList<LocalMove> movesTillNow,
+            IList<LocalMove> movesUntilNow,
             IncrementalTreeMapSetting settings)
         {
             var resultThisRecursion = new List<Tuple<List<Node>, double, IList<LocalMove>>>();
-            if (movesTillNow.Count >= settings.localMovesDepth) return resultThisRecursion;
+            if (movesUntilNow.Count >= settings.localMovesDepth) return resultThisRecursion;
             ICollection<Segment> relevantSegments;
-            if (movesTillNow.Count == 0)
+            if (movesUntilNow.Count == 0)
             {
                 relevantSegments = nodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
             }
             else
             {
-                var relevantNodes = movesTillNow.SelectMany(m => new[] { m.Node1.ID, m.Node2.ID }).ToHashSet()
+                var relevantNodes = movesUntilNow.SelectMany(m => new[] { m.Node1.ID, m.Node2.ID }).ToHashSet()
                     .Select(id => nodes.First(n => n.ID == id));
                 relevantSegments = relevantNodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
             }
@@ -257,7 +256,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 var works = CorrectAreas.Correct(nodeClonesList, settings);
                 if (!works) continue;
 
-                var newMovesList = new List<LocalMove>(movesTillNow) { moveClone };
+                var newMovesList = new List<LocalMove>(movesUntilNow) { moveClone };
                 resultThisRecursion.Add(
                     new Tuple<List<Node>, double, IList<LocalMove>>
                         (nodeClonesList, AspectRatiosPNorm(nodeClonesList, settings.PNorm), newMovesList));
