@@ -18,7 +18,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <returns></returns>
         public static T ArgMax<T>(ICollection<T> collection, Func<T, IComparable> eval)
         {
-            var bestVal = collection.Max(eval);
+            IComparable bestVal = collection.Max(eval);
             return collection.First(x => eval(x).CompareTo(bestVal) == 0);
         }
 
@@ -30,7 +30,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <returns></returns>
         public static T ArgMin<T>(ICollection<T> collection, Func<T, IComparable> eval)
         {
-            var bestVal = collection.Min(eval);
+            IComparable bestVal = collection.Min(eval);
             return collection.First(x => eval(x).CompareTo(bestVal) == 0);
         }
 
@@ -61,7 +61,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             double scaleX = newRectangle.Width / oldRectangle.Width;
             double scaleZ = newRectangle.Depth / oldRectangle.Depth;
 
-            foreach (var node in nodes)
+            foreach (Node node in nodes)
             {
                 node.Rectangle.X = (node.Rectangle.X - oldRectangle.X) * scaleX + newRectangle.X;
                 node.Rectangle.Z = (node.Rectangle.Z - oldRectangle.Z) * scaleZ + newRectangle.Z;
@@ -97,17 +97,17 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <param name="to">dictionary that maps ID to nodes that should get the segment structure</param>
         public static void CloneSegments(IEnumerable<Node> from, IDictionary<string, Node> to)
         {
-            var segments = from.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
-            foreach (var segment in segments)
+            HashSet<Segment> segments = from.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
+            foreach (Segment segment in segments)
             {
-                var segmentClone = new Segment(segment.IsConst, segment.IsVertical);
-                foreach (var node in segment.Side1Nodes.ToList())
+                Segment segmentClone = new Segment(segment.IsConst, segment.IsVertical);
+                foreach (Node node in segment.Side1Nodes.ToList())
                 {
                     to[node.ID].RegisterSegment(segmentClone,
                         segmentClone.IsVertical ? Right : Upper);
                 }
 
-                foreach (var node in segment.Side2Nodes.ToList())
+                foreach (Node node in segment.Side2Nodes.ToList())
                 {
                     to[node.ID].RegisterSegment(segmentClone,
                         segmentClone.IsVertical ? Left : Lower);
