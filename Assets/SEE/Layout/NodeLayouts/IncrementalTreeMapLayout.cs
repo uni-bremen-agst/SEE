@@ -76,6 +76,8 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Property for <see cref="oldLayout"/>
         /// </summary>
+        /// <exception cref="ArgumentException">throws exception if the set <see cref="IIncrementalNodeLayout"/>
+        /// is not a <see cref="IncrementalTreeMapLayout"/>.</exception>
         public IIncrementalNodeLayout OldLayout
         {
             set
@@ -86,9 +88,8 @@ namespace SEE.Layout.NodeLayouts
                 }
                 else
                 {
-                    this.oldLayout = null;
-                    Debug.LogWarning("Incremental layout of last revision is not from same type " +
-                                     "as the layout for this revision");
+                    throw new ArgumentException(
+                        "Predecessor of IncrementalTreeMapLayout was not a IncrementalTreeMapLayout");
                 }
             }
         }
@@ -100,6 +101,7 @@ namespace SEE.Layout.NodeLayouts
             {
                 throw new ArgumentException("No nodes to be laid out.");
             }
+
             this.roots = LayoutNodes.GetRoots(layoutNodesList);
             InitNodes();
             Rectangle rectangle = new Rectangle(x: -width / 2.0f, z: -depth / 2.0f, width, depth);
@@ -183,6 +185,7 @@ namespace SEE.Layout.NodeLayouts
                 {
                     continue;
                 }
+
                 Rectangle childRectangle = nodeMap[node.ID].Rectangle;
                 CalculateLayout(children, childRectangle);
             }
