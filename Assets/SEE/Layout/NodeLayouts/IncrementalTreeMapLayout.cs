@@ -95,8 +95,11 @@ namespace SEE.Layout.NodeLayouts
 
         public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
         {
-            var layoutNodesList = layoutNodes.ToList();
-            if (!layoutNodesList.Any()) throw new ArgumentException("No nodes to be laid out.");
+            List<ILayoutNode> layoutNodesList = layoutNodes.ToList();
+            if (!layoutNodesList.Any())
+            {
+                throw new ArgumentException("No nodes to be laid out.");
+            }
             this.roots = LayoutNodes.GetRoots(layoutNodesList);
             InitNodes();
             Rectangle rectangle = new Rectangle(x: -width / 2.0f, z: -depth / 2.0f, width, depth);
@@ -115,7 +118,7 @@ namespace SEE.Layout.NodeLayouts
 
             // adjust the absolute size to the rectangle of the layout
             float adjustFactor = (width * depth) / totalSize;
-            foreach (var node in nodeMap.Values)
+            foreach (Node node in nodeMap.Values)
             {
                 node.DesiredSize *= adjustFactor;
             }
@@ -143,7 +146,7 @@ namespace SEE.Layout.NodeLayouts
             }
             else
             {
-                var totalSize = node.Children().Sum(InitNode);
+                float totalSize = node.Children().Sum(InitNode);
                 newNode.DesiredSize = totalSize;
                 return totalSize;
             }
@@ -158,7 +161,7 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="rectangle">area to place siblings</param>
         private void CalculateLayout(ICollection<ILayoutNode> siblings, Rectangle rectangle)
         {
-            var nodes = siblings.Select(n => nodeMap[n.ID]).ToList();
+            List<Node> nodes = siblings.Select(n => nodeMap[n.ID]).ToList();
             // check if the old layout can be used to lay out siblings.
             if (oldLayout == null
                 || NumberOfOccurrencesInOldGraph(nodes) <= 4
@@ -176,7 +179,10 @@ namespace SEE.Layout.NodeLayouts
             foreach (ILayoutNode node in siblings)
             {
                 ICollection<ILayoutNode> children = node.Children();
-                if (children.Count <= 0) continue;
+                if (children.Count <= 0)
+                {
+                    continue;
+                }
                 Rectangle childRectangle = nodeMap[node.ID].Rectangle;
                 CalculateLayout(children, childRectangle);
             }
@@ -192,28 +198,29 @@ namespace SEE.Layout.NodeLayouts
             // oldNodes are not only the siblings that are in the old graph and in the new one,
             // but all siblings in old graph. Note that there is exactly one single parent (because of the if-clause),
             // but this parent can be null if children == roots
-            var oldILayoutParent = ParentsInOldGraph(nodes).First();
-            var oldILayoutSiblings = oldILayoutParent == null ? oldLayout.roots : oldILayoutParent.Children();
-            var oldNodes = oldILayoutSiblings.Select(n => oldLayout.nodeMap[n.ID]).ToList();
+            ILayoutNode oldILayoutParent = ParentsInOldGraph(nodes).First();
+            ICollection<ILayoutNode> oldILayoutSiblings =
+                oldILayoutParent == null ? oldLayout.roots : oldILayoutParent.Children();
+            List<Node> oldNodes = oldILayoutSiblings.Select(n => oldLayout.nodeMap[n.ID]).ToList();
 
             SetupNodeLists(nodes, oldNodes,
-                out var workWith,
-                out var nodesToBeDeleted,
-                out var nodesToBeAdded);
+                out List<Node> workWith,
+                out List<Node> nodesToBeDeleted,
+                out List<Node> nodesToBeAdded);
 
             Rectangle oldRectangle = IncrementalTreeMap.Utils.CreateParentRectangle(oldNodes);
             IncrementalTreeMap.Utils.TransformRectangles(workWith,
                 oldRectangle: oldRectangle,
                 newRectangle: rectangle);
 
-            foreach (var obsoleteNode in nodesToBeDeleted)
+            foreach (Node obsoleteNode in nodesToBeDeleted)
             {
                 LocalMoves.DeleteNode(obsoleteNode);
                 workWith.Remove(obsoleteNode);
             }
 
             CorrectAreas.Correct(workWith, settings);
-            foreach (var nodeToBeAdded in nodesToBeAdded)
+            foreach (Node nodeToBeAdded in nodesToBeAdded)
             {
                 LocalMoves.AddNode(workWith, nodeToBeAdded);
                 workWith.Add(nodeToBeAdded);
@@ -250,7 +257,7 @@ namespace SEE.Layout.NodeLayouts
             // setup workWith and nodesToBeDeleted
             workWith = new List<Node>();
             nodesToBeDeleted = new List<Node>();
-            foreach (var oldNode in oldNodes)
+            foreach (Node oldNode in oldNodes)
             {
                 Node newNode = nodes.Find(x => x.ID.Equals(oldNode.ID));
                 if (newNode == null)
@@ -269,7 +276,7 @@ namespace SEE.Layout.NodeLayouts
                 from: oldNodes,
                 to: workWith.ToDictionary(n => n.ID, n => n));
 
-            var workWithAlias = workWith;
+            List<Node> workWithAlias = workWith;
             nodesToBeAdded = nodes.Where(n => !workWithAlias.Contains(n)).ToList();
         }
 
@@ -284,9 +291,9 @@ namespace SEE.Layout.NodeLayouts
         {
             Assert.IsNotNull(oldLayout);
             HashSet<ILayoutNode> parents = new();
-            foreach (var node in nodes)
+            foreach (Node node in nodes)
             {
-                if (oldLayout.iLayoutNodeMap.TryGetValue(node.ID, out var oldNode))
+                if (oldLayout.iLayoutNodeMap.TryGetValue(node.ID, out ILayoutNode oldNode))
                 {
                     parents.Add(oldNode.Parent);
                 }
@@ -316,8 +323,8 @@ namespace SEE.Layout.NodeLayouts
             foreach (Node node in nodes)
             {
                 float absolutePadding = settings.paddingMm / 1000;
-                var rectangle = node.Rectangle;
-                var layoutNode = iLayoutNodeMap[node.ID];
+                Rectangle rectangle = node.Rectangle;
+                ILayoutNode layoutNode = iLayoutNodeMap[node.ID];
 
                 if (rectangle.Width - absolutePadding <= 0 ||
                     rectangle.Depth - absolutePadding <= 0)
@@ -325,11 +332,11 @@ namespace SEE.Layout.NodeLayouts
                     absolutePadding = 0;
                 }
 
-                var position = new Vector3(
+                Vector3 position = new Vector3(
                     (float)(rectangle.X + rectangle.Width / 2.0d),
                     groundLevel,
                     (float)(rectangle.Z + rectangle.Depth / 2.0d));
-                var scale = new Vector3(
+                Vector3 scale = new Vector3(
                     (float)(rectangle.Width - absolutePadding),
                     layoutNode.LocalScale.y,
                     (float)(rectangle.Depth - absolutePadding));
