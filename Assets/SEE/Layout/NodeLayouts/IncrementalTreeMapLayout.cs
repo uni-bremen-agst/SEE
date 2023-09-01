@@ -13,7 +13,7 @@ namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// A node layout designed for the evolution setting.
-    /// Incremental Tree Map Layout is a Tree Map Layout,
+    /// Incremental Tree Map Layout is a Tree Map Layout
     /// that can guarantee stability in the layouts over the series of graphs in the evolution
     /// while not neglecting the aspect of visual quality either.
     /// </summary>
@@ -33,57 +33,60 @@ namespace SEE.Layout.NodeLayouts
             : base(groundLevel)
         {
             name = "IncrementalTreeMap";
-            _width = width;
-            _depth = depth;
-            _settings = settings;
+            this.width = width;
+            this.depth = depth;
+            this.settings = settings;
         }
 
         /// <summary>
         /// The adjustable parameters for the layout.
         /// </summary>
-        private readonly IncrementalTreeMapSetting _settings;
+        private readonly IncrementalTreeMapSetting settings;
 
         /// <summary>
         /// The width of the rectangle in which to place all nodes in Unity units.
         /// </summary>
-        private readonly float _width;
+        private readonly float width;
 
         /// <summary>
         /// The depth of the rectangle in which to place all nodes in Unity units.
         /// </summary>
-        private readonly float _depth;
+        private readonly float depth;
 
         /// <summary>
         /// The node layout we compute as a result.
         /// </summary>
-        private readonly Dictionary<ILayoutNode, NodeTransform> _layoutResult = new();
+        private readonly Dictionary<ILayoutNode, NodeTransform> layoutResult = new();
 
         /// <summary>
         /// A map to find a node (fast) by its ID
         /// </summary>
-        private readonly Dictionary<string, Node> _nodeMap = new();
+        private readonly Dictionary<string, Node> nodeMap = new();
 
         /// <summary>
         /// A map to find a ILayoutNode (fast) by its ID
         /// </summary>
-        private readonly Dictionary<string, ILayoutNode> _iLayoutNodeMap = new();
+        private readonly Dictionary<string, ILayoutNode> iLayoutNodeMap = new();
 
         /// <summary>
         /// The layout of the last revision in the evolution. Can be null.
         /// </summary>
-        private IncrementalTreeMapLayout _oldLayout;
+        private IncrementalTreeMapLayout oldLayout;
 
+        /// <summary>
+        /// Property for <see cref="oldLayout"/>
+        /// </summary>
         public IIncrementalNodeLayout OldLayout
         {
             set
             {
                 if (value is IncrementalTreeMapLayout layout)
                 {
-                    this._oldLayout = layout;
+                    this.oldLayout = layout;
                 }
                 else
                 {
-                    this._oldLayout = null;
+                    this.oldLayout = null;
                     Debug.LogWarning("Incremental layout of last revision is not from same type " +
                                      "as the layout for this revision");
                 }
@@ -95,28 +98,24 @@ namespace SEE.Layout.NodeLayouts
             var layoutNodesList = layoutNodes.ToList();
             if (!layoutNodesList.Any()) throw new ArgumentException("No nodes to be laid out.");
             this.roots = LayoutNodes.GetRoots(layoutNodesList);
-            InitTNodes();
-            Rectangle rectangle = new Rectangle(x: -_width / 2.0f, z: -_depth / 2.0f, _width, _depth);
+            InitNodes();
+            Rectangle rectangle = new Rectangle(x: -width / 2.0f, z: -depth / 2.0f, width, depth);
             CalculateLayout(roots, rectangle);
-            return _layoutResult;
+            return layoutResult;
         }
 
         /// <summary>
-        /// Creates and a <see cref="Node"/> for each <see cref="ILayoutNode"/>
+        /// Creates a <see cref="Node"/> for each <see cref="ILayoutNode"/>
         /// and sets the <see cref="Node.DesiredSize"/>.
-        /// Fills the <see cref="_nodeMap"/> and the <see cref="_iLayoutNodeMap"/>.
+        /// Fills the <see cref="nodeMap"/> and the <see cref="iLayoutNodeMap"/>.
         /// </summary>
-        private void InitTNodes()
+        private void InitNodes()
         {
-            float totalSize = 0;
-            foreach (ILayoutNode node in roots)
-            {
-                totalSize += InitTNode(node);
-            }
+            float totalSize = roots.Sum(InitNode);
 
             // adjust the absolute size to the rectangle of the layout
-            float adjustFactor = (_width * _depth) / totalSize;
-            foreach (var node in _nodeMap.Values)
+            float adjustFactor = (width * depth) / totalSize;
+            foreach (var node in nodeMap.Values)
             {
                 node.DesiredSize *= adjustFactor;
             }
@@ -125,15 +124,15 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Creates a <see cref="Node"/> for the given <see cref="ILayoutNode"/> <paramref name="node"/>
         /// and continue recursively with the children of the ILayoutNode <paramref name="node"/>.
-        /// Extend both <see cref="_nodeMap"/> and <see cref="_iLayoutNodeMap"/> by the node.
+        /// Extend both <see cref="nodeMap"/> and <see cref="iLayoutNodeMap"/> by the node.
         /// </summary>
         /// <param name="node">node of the layout</param>
         /// <returns>the absolute size of the node</returns>
-        private float InitTNode(ILayoutNode node)
+        private float InitNode(ILayoutNode node)
         {
             Node newNode = new Node(node.ID);
-            _nodeMap.Add(node.ID, newNode);
-            _iLayoutNodeMap.Add(node.ID, node);
+            nodeMap.Add(node.ID, newNode);
+            iLayoutNodeMap.Add(node.ID, node);
 
             if (node.IsLeaf)
             {
@@ -144,7 +143,7 @@ namespace SEE.Layout.NodeLayouts
             }
             else
             {
-                var totalSize = node.Children().Sum(InitTNode);
+                var totalSize = node.Children().Sum(InitNode);
                 newNode.DesiredSize = totalSize;
                 return totalSize;
             }
@@ -153,15 +152,15 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Calculates the layout for <paramref name="siblings"/> so that they fit in <paramref name="rectangle"/>.
         /// Works recursively on the children of each sibling.
-        /// Adds the actual layout to <see cref="_layoutResult"/>
+        /// Adds the actual layout to <see cref="layoutResult"/>
         /// </summary>
         /// <param name="siblings">nodes with same parent (or roots)</param>
         /// <param name="rectangle">area to place siblings</param>
         private void CalculateLayout(ICollection<ILayoutNode> siblings, Rectangle rectangle)
         {
-            var nodes = siblings.Select(n => _nodeMap[n.ID]).ToList();
-            // check if the old layout can be used for to lay out siblings.
-            if (_oldLayout == null
+            var nodes = siblings.Select(n => nodeMap[n.ID]).ToList();
+            // check if the old layout can be used to lay out siblings.
+            if (oldLayout == null
                 || NumberOfOccurrencesInOldGraph(nodes) <= 4
                 || ParentsInOldGraph(nodes).Count != 1)
             {
@@ -178,7 +177,7 @@ namespace SEE.Layout.NodeLayouts
             {
                 ICollection<ILayoutNode> children = node.Children();
                 if (children.Count <= 0) continue;
-                Rectangle childRectangle = _nodeMap[node.ID].Rectangle;
+                Rectangle childRectangle = nodeMap[node.ID].Rectangle;
                 CalculateLayout(children, childRectangle);
             }
         }
@@ -191,11 +190,11 @@ namespace SEE.Layout.NodeLayouts
         private void ApplyIncrementalLayout(List<Node> nodes, Rectangle rectangle)
         {
             // oldNodes are not only the siblings that are in the old graph and in the new one,
-            // but all siblings in old graph. Note that there is exact one single parent (because of if-clause),
+            // but all siblings in old graph. Note that there is exactly one single parent (because of the if-clause),
             // but this parent can be null if children == roots
             var oldILayoutParent = ParentsInOldGraph(nodes).First();
-            var oldILayoutSiblings = oldILayoutParent == null ? _oldLayout.roots : oldILayoutParent.Children();
-            var oldNodes = oldILayoutSiblings.Select(n => _oldLayout._nodeMap[n.ID]).ToList();
+            var oldILayoutSiblings = oldILayoutParent == null ? oldLayout.roots : oldILayoutParent.Children();
+            var oldNodes = oldILayoutSiblings.Select(n => oldLayout.nodeMap[n.ID]).ToList();
 
             SetupNodeLists(nodes, oldNodes,
                 out var workWith,
@@ -213,16 +212,16 @@ namespace SEE.Layout.NodeLayouts
                 workWith.Remove(obsoleteNode);
             }
 
-            CorrectAreas.Correct(workWith, _settings);
+            CorrectAreas.Correct(workWith, settings);
             foreach (var nodeToBeAdded in nodesToBeAdded)
             {
                 LocalMoves.AddNode(workWith, nodeToBeAdded);
                 workWith.Add(nodeToBeAdded);
             }
 
-            CorrectAreas.Correct(workWith, _settings);
+            CorrectAreas.Correct(workWith, settings);
 
-            LocalMoves.LocalMovesSearch(workWith, _settings);
+            LocalMoves.LocalMovesSearch(workWith, settings);
         }
 
         /// <summary>
@@ -247,7 +246,7 @@ namespace SEE.Layout.NodeLayouts
             //  [         workWith            ]--------------   <- nodes of new layout
             //                                                     designed to be changed over time to nodes
 
-            // get nodes form old layout .. copy their rectangles
+            // get nodes from old layout and copy their rectangles
             // setup workWith and nodesToBeDeleted
             workWith = new List<Node>();
             nodesToBeDeleted = new List<Node>();
@@ -256,8 +255,8 @@ namespace SEE.Layout.NodeLayouts
                 Node newNode = nodes.Find(x => x.ID.Equals(oldNode.ID));
                 if (newNode == null)
                 {
-                    // create a artificial node, that has no corresponding ILayoutNode in this layout
-                    // they are designed to be deleted but necessary to copy the layout of oldNodes
+                    // create an artificial node that has no corresponding ILayoutNode in this layout.
+                    // they are designed to be deleted but it's necessary to copy the layout of oldNodes.
                     newNode = new Node(oldNode.ID);
                     nodesToBeDeleted.Add(newNode);
                 }
@@ -275,19 +274,19 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Collection all nodes of <see cref="_oldLayout"/> that are parent to a node,
-        /// with same id as a node in <paramref name="nodes"/>. The result will contain null
-        /// if there is a root in the old layout with a equivalent node in <paramref name="nodes"/>
+        /// Returns a collection of all nodes of <see cref="oldLayout"/> that are parent to a node
+        /// with the same id as a node in <paramref name="nodes"/>. The result will contain null
+        /// if there is a root in the old layout with an equivalent node in <paramref name="nodes"/>
         /// </summary>
         /// <param name="nodes"></param>
-        /// <returns></returns>
+        /// <returns>Collection of parent nodes from <see cref="oldLayout"/>.</returns>
         private ICollection<ILayoutNode> ParentsInOldGraph(IEnumerable<Node> nodes)
         {
-            Assert.IsNotNull(_oldLayout);
+            Assert.IsNotNull(oldLayout);
             HashSet<ILayoutNode> parents = new();
             foreach (var node in nodes)
             {
-                if (_oldLayout._iLayoutNodeMap.TryGetValue(node.ID, out var oldNode))
+                if (oldLayout.iLayoutNodeMap.TryGetValue(node.ID, out var oldNode))
                 {
                     parents.Add(oldNode.Parent);
                 }
@@ -297,18 +296,18 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// The number of the nodes, that are also in the last layout present.
+        /// The number of nodes that are also present in <see cref="oldLayout"/>.
         /// </summary>
         /// <param name="nodes">the nodes to look up</param>
-        /// <returns></returns>
+        /// <returns>The number of occurrences in the last graph.</returns>
         private int NumberOfOccurrencesInOldGraph(IEnumerable<Node> nodes)
         {
-            Assert.IsNotNull(_oldLayout);
-            return nodes.Sum(n => _oldLayout._iLayoutNodeMap.ContainsKey(n.ID) ? 1 : 0);
+            Assert.IsNotNull(oldLayout);
+            return nodes.Count(n => oldLayout.iLayoutNodeMap.ContainsKey(n.ID));
         }
 
         /// <summary>
-        /// Adds the result of layout calculation to <see cref="_layoutResult"/>.
+        /// Adds the result of the layout calculation to <see cref="layoutResult"/>.
         /// Applies padding to the result.
         /// </summary>
         /// <param name="nodes">nodes with calculated layout</param>
@@ -316,9 +315,9 @@ namespace SEE.Layout.NodeLayouts
         {
             foreach (Node node in nodes)
             {
-                float absolutePadding = _settings.paddingMm / 1000;
+                float absolutePadding = settings.paddingMm / 1000;
                 var rectangle = node.Rectangle;
-                var layoutNode = _iLayoutNodeMap[node.ID];
+                var layoutNode = iLayoutNodeMap[node.ID];
 
                 if (rectangle.Width - absolutePadding <= 0 ||
                     rectangle.Depth - absolutePadding <= 0)
@@ -335,7 +334,7 @@ namespace SEE.Layout.NodeLayouts
                     layoutNode.LocalScale.y,
                     (float)(rectangle.Depth - absolutePadding));
 
-                _layoutResult[layoutNode] = new NodeTransform(position, scale);
+                layoutResult[layoutNode] = new NodeTransform(position, scale);
             }
         }
 
@@ -343,6 +342,8 @@ namespace SEE.Layout.NodeLayouts
         (ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges,
             ICollection<SublayoutLayoutNode> sublayouts)
         {
+            // Must not be implemented because UsesEdgesAndSublayoutNodes() returns false
+            // and this method should never be called.
             throw new NotImplementedException();
         }
 
