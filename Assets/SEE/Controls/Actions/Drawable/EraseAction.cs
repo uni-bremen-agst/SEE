@@ -19,7 +19,7 @@ namespace SEE.Controls.Actions
     /// It serves as an example for a continuous action that modifies the
     /// scene while active.
     /// </summary>
-    class FastEraseAction : AbstractPlayerAction
+    class EraseAction : AbstractPlayerAction
     {
 
 
@@ -36,7 +36,6 @@ namespace SEE.Controls.Actions
                     GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject))
                 {
                     GameObject hittedObject = raycastHit.collider.gameObject;
-                    Debug.Log("Hitted: " + hittedObject);
                     if (hittedObject.CompareTag(Tags.Line)) {
                         LineRenderer lineRenderer = hittedObject.GetComponent<LineRenderer>();
                         Vector3[] positions = new Vector3[lineRenderer.positionCount];
@@ -133,20 +132,20 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// A new instance of <see cref="FastEraseAction"/>.
+        /// A new instance of <see cref="EraseAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="FastEraseAction"/></returns>
+        /// <returns>new instance of <see cref="EraseAction"/></returns>
         public static ReversibleAction CreateReversibleAction()
         {
-            return new FastEraseAction();
+            return new EraseAction();
         }
 
         /// <summary>
-        /// A new instance of <see cref="FastEraseAction"/>.
+        /// A new instance of <see cref="EraseAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="FastEraseAction"/></returns>
+        /// <returns>new instance of <see cref="EraseAction"/></returns>
         public override ReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -158,7 +157,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.DrawOnWhiteboard"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateTypes.FastErase;
+            return ActionStateTypes.Erase;
         }
 
         /// <summary>

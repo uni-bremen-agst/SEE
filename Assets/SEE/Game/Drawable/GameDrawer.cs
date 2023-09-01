@@ -36,15 +36,17 @@ namespace SEE.Game
         {
             if (name.Length > 4)
             {
-                lineHolder = new("LineHolder" + name.Substring(4));
+                lineHolder = new(DrawableHelper.LineHolderPrefix + name.Substring(4));
+                line = new(name);
             } else
             {
-                lineHolder = new("");
+                line = new("");
+                line.name = DrawableHelper.LinePrefix + line.GetInstanceID();
+                lineHolder = new(DrawableHelper.LineHolderPrefix + line.GetInstanceID());
             }
             lineHolder.transform.parent = drawable.transform;
             lineHolder.transform.position = drawable.transform.position;
             
-            line = new (name);
             line.tag = Tags.Line;
             line.transform.SetParent(lineHolder.transform);
             renderer = line.AddComponent<LineRenderer>();
@@ -64,8 +66,8 @@ namespace SEE.Game
         public static GameObject StartDrawing(GameObject drawable, Vector3[] positions, Color color, float thickness)
         {
             Setup(drawable, "", positions, color, thickness);
-            line.name = DrawableHelper.LinePrefix + line.GetInstanceID();
-            lineHolder.name = DrawableHelper.LineHolderPrefix + line.GetInstanceID();
+           // line.name = DrawableHelper.LinePrefix + line.GetInstanceID();
+           // lineHolder.name = DrawableHelper.LineHolderPrefix + line.GetInstanceID();
             renderer.sortingOrder = DrawableHelper.orderInLayer;
             DrawableHelper.orderInLayer++;
             

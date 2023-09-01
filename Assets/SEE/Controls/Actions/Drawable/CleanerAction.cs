@@ -147,10 +147,10 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
         }
 
         /// <summary>
-        /// A new instance of <see cref="FastEraseAction"/>.
+        /// A new instance of <see cref="EraseAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="FastEraseAction"/></returns>
+        /// <returns>new instance of <see cref="EraseAction"/></returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new CleanerAction();

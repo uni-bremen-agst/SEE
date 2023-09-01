@@ -20,7 +20,7 @@ namespace SEE.Controls.Actions
     /// It serves as an example for a continuous action that modifies the
     /// scene while active.
     /// </summary>
-    class PointEraseAction : AbstractPlayerAction
+    class LinePointEraseAction : AbstractPlayerAction
     {
 
         private static bool isActive = false;
@@ -34,7 +34,7 @@ namespace SEE.Controls.Actions
             if (!Raycasting.IsMouseOverGUI())
             { 
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
-                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) && // Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
+                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
                     GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject))
                 {
                     GameObject hittedObject = raycastHit.collider.gameObject;
@@ -50,52 +50,8 @@ namespace SEE.Controls.Actions
                         hittedObject.transform.TransformPoints(transformedPositions);
                         List<Line> lines = new();
                         List<int> matchedIndexes = DrawableHelper.GetNearestIndexes(transformedPositions, raycastHit.point);
-                        if (matchedIndexes.Count > 1 && !isActive)
-                        {
-                            isActive = true;
-                            Vector3[] firstPart = positionsList.GetRange(0, matchedIndexes[0] - 1).ToArray();
-                            int lastArrayIndex = matchedIndexes[matchedIndexes.Count - 1];
-                            int lastListIndex = positionsList.Count - 1 - lastArrayIndex;
-                            Vector3[] lastPart = positionsList.GetRange(lastArrayIndex + 1, lastListIndex).ToArray();
-                            TryReDraw(originLine, firstPart, lines);
-                            TryReDraw(originLine, lastPart, lines);
-                            positionsList.RemoveRange(0, matchedIndexes[0]);
-                            int removedCount = matchedIndexes[0];
-                            bool firstRun = true;
+                        isActive = GameLineSplit.GetSplittedPositions(isActive, originLine, matchedIndexes, positionsList, lines, true);
 
-                            for (int i = 0; i < matchedIndexes.Count; i++)
-                            {
-                                matchedIndexes[i] -= removedCount;
-                            }
-                            for (int i = 1; i < matchedIndexes.Count - 1; i++)
-                            {
-                                int j = i + 1;
-                                if (matchedIndexes[i] + 1 != matchedIndexes[j] || firstRun)
-                                {
-                                    firstRun = false;
-                                    Vector3[] middlePart = positionsList.GetRange(0, matchedIndexes[i]).ToArray();
-                                    positionsList.RemoveRange(0, matchedIndexes[i]);
-                                    removedCount = matchedIndexes[i];
-                                    for (int k = i; k < matchedIndexes.Count; k++)
-                                    {
-                                        matchedIndexes[k] -= removedCount;
-                                    }
-                                    TryReDraw(originLine, middlePart, lines);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (matchedIndexes.Count == 1 && matchedIndexes[0] > 0)
-                            {
-                                Vector3[] begin = positionsList.GetRange(0, matchedIndexes[0] - 1).ToArray();
-                                int lastIndex = positionsList.Count - 1 - matchedIndexes[0];
-                                Vector3[] end = positionsList.GetRange(matchedIndexes[0] + 1, lastIndex).ToArray();
-
-                                TryReDraw(originLine, begin, lines);
-                                TryReDraw(originLine, end, lines);
-                            }
-                        }
                         memento = new Memento(hittedObject, GameDrawableFinder.FindDrawableParent(hittedObject), lines);
                         mementoList.Add(memento);
                         new FastEraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.originalLine.id).Execute();
@@ -114,26 +70,6 @@ namespace SEE.Controls.Actions
                 return isMouseButtonUp;
             }
             return false;
-        }
-        private void TryReDraw(Line originLine, Vector3[] positions, List<Line> lines)
-        {
-            if (positions.Length > 1)
-            {
-                lines.Add(ReDraw(originLine, positions));
-            }
-        }
-        private Line ReDraw(Line originLine, Vector3[] positions)
-        {
-            GameObject newLine = new();
-            GameObject drawable = GameDrawableFinder.FindDrawableParent(originLine.gameObject);
-            newLine.name = DrawableHelper.LinePrefix + newLine.GetInstanceID();
-            newLine = GameDrawer.ReDrawLine(drawable, newLine.name, positions, originLine.color, originLine.thickness,
-                                        originLine.orderInLayer, originLine.position, originLine.parentEulerAngles);
-            new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), originLine.id,
-                positions, originLine.color, originLine.thickness,
-               originLine.orderInLayer, originLine.position, originLine.parentEulerAngles).Execute();
-
-            return Line.GetLine(newLine);
         }
 
         private List<Memento> mementoList = new List<Memento>();
@@ -164,6 +100,7 @@ namespace SEE.Controls.Actions
             reverseList.Reverse();
             foreach (Memento mem in reverseList)
             {
+
                 mem.originalLine.gameObject = GameDrawer.ReDrawLine(mem.drawable, mem.originalLine.id, mem.originalLine.rendererPositions,
                     mem.originalLine.color, mem.originalLine.thickness, mem.originalLine.orderInLayer,
                     mem.originalLine.position, mem.originalLine.parentEulerAngles);
@@ -221,20 +158,20 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// A new instance of <see cref="FastEraseAction"/>.
+        /// A new instance of <see cref="EraseAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="FastEraseAction"/></returns>
+        /// <returns>new instance of <see cref="EraseAction"/></returns>
         public static ReversibleAction CreateReversibleAction()
         {
-            return new PointEraseAction();
+            return new LinePointEraseAction();
         }
 
         /// <summary>
-        /// A new instance of <see cref="FastEraseAction"/>.
+        /// A new instance of <see cref="EraseAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="FastEraseAction"/></returns>
+        /// <returns>new instance of <see cref="EraseAction"/></returns>
         public override ReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -246,7 +183,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.DrawOnWhiteboard"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateTypes.PointLineErase;
+            return ActionStateTypes.LinePointErase;
         }
 
         /// <summary>

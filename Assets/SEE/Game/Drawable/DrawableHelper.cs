@@ -83,7 +83,7 @@ namespace Assets.SEE.Game.Drawable
         }
         #endregion
 
-        #region Direction
+        #region Nearest Point
         public static Vector2[] castToVector2Array(Vector3[] vector3)
         {
             Vector2[] vector2 = new Vector2[vector3.Length];
