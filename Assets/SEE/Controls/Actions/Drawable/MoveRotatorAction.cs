@@ -47,7 +47,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
         private static GameObject rotationMenu;
 
         private Vector3 newObjectPosition;
-        
+
         public void SetSelectedObject(GameObject obj)
         {
             selectedObject = obj;
@@ -55,7 +55,8 @@ namespace Assets.SEE.Controls.Actions.Drawable
             if (selectedObject.CompareTag(Tags.Line))
             {
                 oldObjectLocalEulerAngles = selectedObject.transform.parent.localEulerAngles;
-            } else
+            }
+            else
             {
                 oldObjectLocalEulerAngles = selectedObject.transform.localEulerAngles;
             }
@@ -71,7 +72,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
 
             if (!Raycasting.IsMouseOverGUI())
             {
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButton(1)) 
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButton(1))
                     && !isActive && !didSomething && !isDone && Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) && // Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject) && clickState == ClickState.None)
                 {
@@ -84,6 +85,14 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     effect.Activate(selectedObject);
                     SetSelectedObject(selectedObject);
                     firstPoint = raycastHit.point;
+
+                    if (selectedObject.CompareTag(Tags.Line))
+                    {
+                        MeshCollider collider = selectedObject.GetComponent<MeshCollider>();
+                        collider.convex = true;
+                        collider.isTrigger = true;
+
+                    }
                 }
                 if ((Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1)) && clickState == ClickState.Selected)
                 {
@@ -98,30 +107,40 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 }
                 // MOVE
                 if (selectedObject != null && selectedObject.GetComponent<BlinkEffect>() != null && selectedObject.GetComponent<BlinkEffect>().GetLoopStatus() && clickState == ClickState.Left)
-                {   
+                {
                     GameObject drawable = GameDrawableFinder.FindDrawableParent(selectedObject);
                     string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
-                    
+                    bool isTriggered = false;
+
+                    if (drawableParentName != "")
+                    {
+                        BorderTriggerController[] controllers = drawable.transform.parent.GetComponentsInChildren<BorderTriggerController>();
+                        if (controllers.Length > 1)
+                        {
+                            for (int i = 0; i < controllers.Length; i++)
+                            {
+                                if (i == 0)
+                                {
+                                    isTriggered = controllers[0].Trigger();
+                                }
+                                isTriggered = isTriggered && controllers[i].Trigger();
+                            }
+                        } else if (controllers.Length == 1)
+                        {
+                            isTriggered = controllers[0].Trigger();
+                        }
+                    }
+
                     if (Raycasting.RaycastAnything(out RaycastHit hit))
                     {
-                        if (hit.collider.gameObject.CompareTag(Tags.Drawable))
+                        if (!isTriggered)
                         {
-                            Vector3 offset = new Vector3(hit.point.x - firstPoint.x, hit.point.y - firstPoint.y, hit.point.z - firstPoint.z);
-                            didSomething = true;
-                            Vector3 objectPosition = oldObjectPosition;
-                            if (selectedObject.CompareTag(Tags.Line))
+                            if (hit.collider.gameObject.CompareTag(Tags.Drawable))
                             {
-                                Vector3 eulerAngles = selectedObject.transform.parent.localEulerAngles;
-                                selectedObject.transform.parent.localEulerAngles = Vector3.zero;
-                                newObjectPosition = objectPosition + multiply(selectedObject.transform.right, offset) + multiply(selectedObject.transform.up, offset);
-                                selectedObject.transform.parent.localEulerAngles = eulerAngles;
+                                didSomething = true;
+                                newObjectPosition = GameMoveRotator.MoveObject(selectedObject, hit.point, firstPoint, oldObjectPosition);
+                                new MoveNetAction(drawable.name, drawableParentName, selectedObject.name, newObjectPosition).Execute();
                             }
-                            else
-                            {
-                                newObjectPosition = objectPosition + multiply(selectedObject.transform.right, offset) + multiply(selectedObject.transform.up, offset);
-                            }
-                            GameMoveRotator.MoveObject(selectedObject, newObjectPosition);
-                            new MoveNetAction(drawable.name, drawableParentName, selectedObject.name, newObjectPosition).Execute();
                         }
                     }
                 }
@@ -139,10 +158,11 @@ namespace Assets.SEE.Controls.Actions.Drawable
                         MenuDestroyer destroyer = rotationMenu.AddOrGetComponent<MenuDestroyer>();
                         destroyer.SetAllowedState(GetActionStateType());
                         SliderListener(slider, selectedObject, drawable, drawableParentName);
-                    } else
+                    }
+                    else
                     {
                         RotationSliderController slider = rotationMenu.GetComponentInChildren<RotationSliderController>();
-                        float assignValue = selectedObject.CompareTag(Tags.Line) ? 
+                        float assignValue = selectedObject.CompareTag(Tags.Line) ?
                             selectedObject.transform.parent.localEulerAngles.z : selectedObject.transform.localEulerAngles.z;
                         slider.AssignValue(assignValue);
 
@@ -183,18 +203,23 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 }
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObject != null && didSomething && isActive)
                 {
-                    float degree = selectedObject.CompareTag(Tags.Line) ? 
-                        selectedObject.transform.parent.localEulerAngles.z: 
+                    float degree = selectedObject.CompareTag(Tags.Line) ?
+                        selectedObject.transform.parent.localEulerAngles.z :
                         selectedObject.transform.localEulerAngles.z;
 
                     memento = new Memento(selectedObject, GameDrawableFinder.FindDrawableParent(selectedObject), selectedObject.name,
-                        oldObjectPosition, newObjectPosition, oldObjectLocalEulerAngles, firstPoint, direction, 
-                        degree, clickState);
-                    clickState = ClickState.None;   
+                        oldObjectPosition, newObjectPosition, oldObjectLocalEulerAngles, degree, clickState);
+                    clickState = ClickState.None;
                     isActive = false;
                     isDone = true;
                     didSomething = false;
                     selectedObject.GetComponent<BlinkEffect>().Deactivate();
+                    if (selectedObject.CompareTag(Tags.Line))
+                    {
+                        MeshCollider collider = selectedObject.GetComponent<MeshCollider>();
+                        collider.isTrigger = false;
+                        collider.convex = false;
+                    }
                     selectedObject = null;
                     oldObjectPosition = new Vector3();
                     oldObjectLocalEulerAngles = new Vector3();
@@ -207,18 +232,9 @@ namespace Assets.SEE.Controls.Actions.Drawable
             return result;
         }
 
-        private Vector3 multiply(Vector3 a, Vector3 b)
-        {
-            if (a.x <= -0.7f || a.y <= -0.7f || a.z <= -0.7f)
-            {
-                a = -a;
-            }
-            return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
-        }
-
         private void SliderListener(RotationSliderController slider, GameObject selectedObject, GameObject drawable, string drawableParentName)
         {
-            Transform transform = selectedObject.CompareTag(Tags.Line)? selectedObject.transform.parent : selectedObject.transform;
+            Transform transform = selectedObject.CompareTag(Tags.Line) ? selectedObject.transform.parent : selectedObject.transform;
 
             slider.AssignValue(transform.localEulerAngles.z);
             slider.onValueChanged.AddListener(degree =>
@@ -267,13 +283,11 @@ namespace Assets.SEE.Controls.Actions.Drawable
             public readonly Vector3 oldObjectPosition;
             public readonly Vector3 newObjectPosition;
             public readonly Vector3 oldObjectLocalEulerAngles;
-            public readonly Vector3 firstPoint;
-            public readonly Vector3 direction;
             public readonly float degree;
             public readonly ClickState clickState;
 
             public Memento(GameObject selectedObject, GameObject drawable, string id,
-                Vector3 oldObjectPosition, Vector3 newObjectPosition, Vector3 oldObjectLocalEulerAngles, Vector3 firstPoint, Vector3 direction, float degree, ClickState clickState)
+                Vector3 oldObjectPosition, Vector3 newObjectPosition, Vector3 oldObjectLocalEulerAngles, float degree, ClickState clickState)
             {
                 this.selectedObject = selectedObject;
                 this.drawable = drawable;
@@ -281,8 +295,6 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 this.oldObjectPosition = oldObjectPosition;
                 this.newObjectPosition = newObjectPosition;
                 this.oldObjectLocalEulerAngles = oldObjectLocalEulerAngles;
-                this.firstPoint = firstPoint;
-                this.direction = direction;
                 this.degree = degree;
                 this.clickState = clickState;
             }
@@ -313,7 +325,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 {
                     GameMoveRotator.SetRotate(memento.selectedObject, memento.oldObjectLocalEulerAngles.z);
                     new RotatorNetAction(drawable.name, drawableParent, memento.id, memento.oldObjectLocalEulerAngles.z).Execute();
-                }  
+                }
             }
             if (memento.selectedObject != null && memento.selectedObject.TryGetComponent<BlinkEffect>(out BlinkEffect currentEffect))
             {
@@ -341,7 +353,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 {
                     GameMoveRotator.MoveObject(memento.selectedObject, memento.newObjectPosition);
                     new MoveNetAction(drawable.name, drawableParent, memento.id, memento.newObjectPosition).Execute();
-                } 
+                }
                 else if (memento.clickState == ClickState.Right)
                 {
                     GameMoveRotator.SetRotate(memento.selectedObject, memento.degree);
