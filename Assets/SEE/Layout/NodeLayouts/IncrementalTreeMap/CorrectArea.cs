@@ -35,9 +35,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
                 // adjust the position of slicingSegments
                 AdjustSliced(nodes, partition1, partition2, slicingSegment);
-                // recursive adjust the two sub layouts
+                // recursively adjust the two sub layouts
                 // since both sublayouts are temporally independent from each other
-                // the segment that separates these must be considered as border (IsConst = true)
+                // the segment that separates these must be considered as a border (IsConst = true)
                 slicingSegment.IsConst = true;
                 Correct(partition1, settings);
                 Correct(partition2, settings);
@@ -205,9 +205,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// A gradient decent approach to recalibrate the layout.
         /// This approach 'moves' the segment in several steps, until the desired sizes are realized.
         /// In one step it calculates a shift for all segments at once
-        /// by set up a function that maps the position of the segments to the area of each node,
-        /// get the derivative of this function
-        /// and calculate a shift for the segment vector in the direction of the desired size vector.
+        /// by setting up a function that maps the position of the segments to the area of each node,
+        /// getting the derivative of this function
+        /// and calculating a shift for the segment vector in the direction of the desired size vector.
         /// </summary>
         /// <param name="nodes">nodes with layout</param>
         /// <param name="settings">the settings of the incremental tree map layout,
@@ -248,7 +248,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         {
             int n = nodes.Count;
             Matrix<double> matrix = Matrix<double>.Build.Sparse(n, n - 1);
-            for(int indexNode = 0; indexNode < nodes.Count; indexNode++)
+            for (int indexNode = 0; indexNode < nodes.Count; indexNode++)
             {
                 Node node = nodes[indexNode];
                 IDictionary<Direction, Segment> segments = node.SegmentsDictionary();

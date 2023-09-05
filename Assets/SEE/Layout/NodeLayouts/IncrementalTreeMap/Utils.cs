@@ -11,23 +11,24 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     internal static class Utils
     {
         /// <summary>
-        /// arg max function, returns a item of a collection, that maximizes a function.
+        /// Returns the item of the given collection that maximizes the given function.
         /// </summary>
-        /// <param name="collection"></param>
-        /// <param name="eval">function to be maximized</param>
-        /// <returns></returns>
+        /// <param name="collection">The collection whose maximum with respect to 
+        /// <paramref name="eval"/> shall be returned</param>
+        /// <param name="eval">The function to be maximized</param>
+        /// <returns>Item of <paramref name="collection"/> that maximizes <paramref name="eval"/></returns>
         public static T ArgMax<T>(ICollection<T> collection, Func<T, IComparable> eval)
         {
             IComparable bestVal = collection.Max(eval);
             return collection.First(x => eval(x).CompareTo(bestVal) == 0);
         }
 
-        /// <summary>
-        /// arg min function, returns a item of a collection, that minimizes a function.
+        /// Returns the item of the given collection that minimizes the given function.
         /// </summary>
-        /// <param name="collection"></param>
-        /// <param name="eval">function to be minimized</param>
-        /// <returns></returns>
+        /// <param name="collection">The collection whose minimum with respect to 
+        /// <paramref name="eval"/> shall be returned</param>
+        /// <param name="eval">The function to be minimized</param>
+        /// <returns>Item of <paramref name="collection"/> that minimizes <paramref name="eval"/></returns>
         public static T ArgMin<T>(ICollection<T> collection, Func<T, IComparable> eval)
         {
             IComparable bestVal = collection.Min(eval);
@@ -84,7 +85,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     Rectangle = node.Rectangle.Clone(), DesiredSize = node.DesiredSize
                 }
             );
-            CloneSegments(nodes, clonesMap);
+            CloneSegments(from : nodes,to : clonesMap);
             return clonesMap;
         }
 
@@ -97,10 +98,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <param name="to">dictionary that maps ID to nodes that should get the segment structure</param>
         public static void CloneSegments(IEnumerable<Node> from, IDictionary<string, Node> to)
         {
-            HashSet<Segment> segments = from.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
+            IEnumerable<Segment> segments = from.SelectMany(n => n.SegmentsDictionary().Values).Distinct();
             foreach (Segment segment in segments)
             {
                 Segment segmentClone = new Segment(segment.IsConst, segment.IsVertical);
+                // Segment.SidesXNodes must be copied (.ToList()) because else in the case 'from == to'
+                // it would change the list while iterating over it.
                 foreach (Node node in segment.Side1Nodes.ToList())
                 {
                     to[node.ID].RegisterSegment(segmentClone,

@@ -27,7 +27,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Is true if the segment is a border of the layout.
         /// In most cases that means that <see cref="Side1Nodes"/> or <see cref="Side2Nodes"/> are empty
-        /// and layout has i.g. 4 const segments.
+        /// and layout has e.g. 4 const segments.
         /// </summary>
         public bool IsConst { get; set; }
 

@@ -288,7 +288,7 @@ namespace SEE.Layout.NodeLayouts
         /// with the same id as a node in <paramref name="nodes"/>. The result will contain null
         /// if there is a root in the old layout with an equivalent node in <paramref name="nodes"/>
         /// </summary>
-        /// <param name="nodes"></param>
+        /// <param name="nodes">nodes in this graph</param>
         /// <returns>Collection of parent nodes from <see cref="oldLayout"/>.</returns>
         private ICollection<ILayoutNode> ParentsInOldGraph(IEnumerable<Node> nodes)
         {
