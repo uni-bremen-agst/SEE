@@ -496,6 +496,7 @@ GameObject:
   - component: {fileID: 11443566}
   - component: {fileID: 11469678}
   - component: {fileID: 11453686}
+  - component: {fileID: 2371156636691029485}
   m_Layer: 5
   m_Name: Preset (8)
   m_TagString: Untagged
@@ -604,19 +605,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 11443566}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 11437434}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: PresetSelect
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11443566}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &11453686
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -637,6 +626,51 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &2371156636691029485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 110962}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onLeft:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: PresetSelect
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11443566}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onRight:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: RemoveColor
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11443566}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onMiddle:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &113042
 GameObject:
   m_ObjectHideFlags: 0
@@ -1181,6 +1215,7 @@ GameObject:
   - component: {fileID: 11417700}
   - component: {fileID: 11496660}
   - component: {fileID: 11491764}
+  - component: {fileID: 5492125574481067579}
   m_Layer: 5
   m_Name: Preset (2)
   m_TagString: Untagged
@@ -1289,19 +1324,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 11417700}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 11437434}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: PresetSelect
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11417700}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &11491764
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1322,6 +1345,51 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &5492125574481067579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 124486}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onLeft:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: PresetSelect
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11417700}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onRight:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: RemoveColor
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11417700}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onMiddle:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &127516
 GameObject:
   m_ObjectHideFlags: 0
@@ -1637,6 +1705,7 @@ GameObject:
   - component: {fileID: 11487346}
   - component: {fileID: 11468552}
   - component: {fileID: 11477610}
+  - component: {fileID: 2526102803106740588}
   m_Layer: 5
   m_Name: Preset (6)
   m_TagString: Untagged
@@ -1745,19 +1814,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 11487346}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 11437434}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: PresetSelect
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11487346}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &11477610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1778,6 +1835,51 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &2526102803106740588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 142866}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onLeft:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: PresetSelect
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11487346}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onRight:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: RemoveColor
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11487346}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onMiddle:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &144296
 GameObject:
   m_ObjectHideFlags: 0
@@ -2247,11 +2349,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 22485188}
-  - component: {fileID: 11437434}
   - component: {fileID: 11400472}
   - component: {fileID: 22284168}
   - component: {fileID: 11401494}
   - component: {fileID: 114096567426319414}
+  - component: {fileID: 8975606874673628997}
   m_Layer: 5
   m_Name: Presets
   m_TagString: Untagged
@@ -2291,32 +2393,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &11437434
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 155710}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0923373e76e77402c9c53a2f1250ad3e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  picker: {fileID: 11423364}
-  presets:
-  - {fileID: 157484}
-  - {fileID: 187878}
-  - {fileID: 124486}
-  - {fileID: 174742}
-  - {fileID: 194704}
-  - {fileID: 173810}
-  - {fileID: 142866}
-  - {fileID: 184328}
-  - {fileID: 110962}
-  - {fileID: 1674746125674564}
-  - {fileID: 167636}
-  createPresetImage: {fileID: 11489756}
 --- !u!114 &11400472
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2401,6 +2477,32 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &8975606874673628997
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 155710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55380a2c17ece834c96a5c7bfa74d470, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  picker: {fileID: 11423364}
+  presets:
+  - {fileID: 157484}
+  - {fileID: 187878}
+  - {fileID: 124486}
+  - {fileID: 174742}
+  - {fileID: 194704}
+  - {fileID: 173810}
+  - {fileID: 142866}
+  - {fileID: 184328}
+  - {fileID: 110962}
+  - {fileID: 1674746125674564}
+  - {fileID: 167636}
+  createPresetImage: {fileID: 11489756}
 --- !u!1 &157080
 GameObject:
   m_ObjectHideFlags: 0
@@ -2626,10 +2728,9 @@ MonoBehaviour:
     SliderToggleButtonText: {fileID: 7008529064164788781}
     PresetColorsId: default
     DefaultPresetColors:
+    - {r: 0, g: 0, b: 0, a: 1}
     - {r: 0.76470596, g: 0.18823531, b: 0.18823531, a: 1}
-    - {r: 0.21176472, g: 0.76470596, b: 0.30588236, a: 1}
-    - {r: 0.7176471, g: 0.5686275, b: 0.17254902, a: 1}
-    - {r: 0, g: 0.7868185, b: 1, a: 1}
+    - {r: 0.7924528, g: 0.61566496, b: 0.14578143, a: 1}
   onValueChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -2686,6 +2787,7 @@ GameObject:
   - component: {fileID: 11437926}
   - component: {fileID: 11482438}
   - component: {fileID: 11443026}
+  - component: {fileID: 6001882839544640560}
   m_Layer: 5
   m_Name: Preset (0)
   m_TagString: Untagged
@@ -2794,19 +2896,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 11437926}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 11437434}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: PresetSelect
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11437926}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &11443026
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2827,6 +2917,51 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &6001882839544640560
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 157484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onLeft:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: PresetSelect
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11437926}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onRight:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: RemoveColor
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11437926}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onMiddle:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &158070
 GameObject:
   m_ObjectHideFlags: 0
@@ -3541,6 +3676,7 @@ GameObject:
   - component: {fileID: 11425880}
   - component: {fileID: 11455240}
   - component: {fileID: 11495652}
+  - component: {fileID: 7983982643296422265}
   m_Layer: 5
   m_Name: Preset (10)
   m_TagString: Untagged
@@ -3649,19 +3785,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 11425880}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 11437434}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: PresetSelect
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11425880}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &11495652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3682,6 +3806,51 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &7983982643296422265
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 167636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onLeft:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: PresetSelect
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11425880}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onRight:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: RemoveColor
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11425880}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onMiddle:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &167830
 GameObject:
   m_ObjectHideFlags: 0
@@ -3805,8 +3974,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 11437434}
-        m_TargetAssemblyTypeName: 
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
         m_MethodName: CreatePresetButton
         m_Mode: 1
         m_Arguments:
@@ -4136,6 +4305,7 @@ GameObject:
   - component: {fileID: 11426590}
   - component: {fileID: 11487238}
   - component: {fileID: 11408032}
+  - component: {fileID: 3020598020407829430}
   m_Layer: 5
   m_Name: Preset (5)
   m_TagString: Untagged
@@ -4244,19 +4414,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 11426590}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 11437434}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: PresetSelect
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11426590}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &11408032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4277,6 +4435,51 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &3020598020407829430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 173810}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onLeft:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: PresetSelect
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11426590}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onRight:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: RemoveColor
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11426590}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onMiddle:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &174742
 GameObject:
   m_ObjectHideFlags: 0
@@ -4290,6 +4493,7 @@ GameObject:
   - component: {fileID: 11494638}
   - component: {fileID: 11485084}
   - component: {fileID: 11469158}
+  - component: {fileID: 6505687939254355146}
   m_Layer: 5
   m_Name: Preset (3)
   m_TagString: Untagged
@@ -4398,19 +4602,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 11494638}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 11437434}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: PresetSelect
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11494638}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &11469158
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4431,6 +4623,51 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &6505687939254355146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 174742}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onLeft:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: PresetSelect
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11494638}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onRight:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: RemoveColor
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11494638}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onMiddle:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &176944
 GameObject:
   m_ObjectHideFlags: 0
@@ -4534,6 +4771,7 @@ GameObject:
   - component: {fileID: 11425336}
   - component: {fileID: 11485672}
   - component: {fileID: 11482218}
+  - component: {fileID: 7429116029216952508}
   m_Layer: 5
   m_Name: Preset (7)
   m_TagString: Untagged
@@ -4642,19 +4880,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 11425336}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 11437434}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: PresetSelect
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11425336}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &11482218
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4675,6 +4901,51 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &7429116029216952508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 184328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onLeft:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: PresetSelect
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11425336}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onRight:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: RemoveColor
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11425336}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onMiddle:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &185536
 GameObject:
   m_ObjectHideFlags: 0
@@ -4903,6 +5174,7 @@ GameObject:
   - component: {fileID: 11441004}
   - component: {fileID: 11452934}
   - component: {fileID: 11439404}
+  - component: {fileID: 2096344566554854570}
   m_Layer: 5
   m_Name: Preset (1)
   m_TagString: Untagged
@@ -5011,19 +5283,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 11441004}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 11437434}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: PresetSelect
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11441004}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &11439404
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5044,6 +5304,51 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &2096344566554854570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 187878}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onLeft:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: PresetSelect
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11441004}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onRight:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: RemoveColor
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11441004}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onMiddle:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &188290
 GameObject:
   m_ObjectHideFlags: 0
@@ -5605,6 +5910,7 @@ GameObject:
   - component: {fileID: 11418286}
   - component: {fileID: 11470716}
   - component: {fileID: 11415596}
+  - component: {fileID: 4805615848801373512}
   m_Layer: 5
   m_Name: Preset (4)
   m_TagString: Untagged
@@ -5656,7 +5962,7 @@ MonoBehaviour:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
+  m_Maskable: 0
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -5713,19 +6019,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 11418286}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 11437434}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: PresetSelect
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 11418286}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &11415596
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5746,6 +6040,51 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &4805615848801373512
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 194704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onLeft:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: PresetSelect
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11418286}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onRight:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: RemoveColor
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 11418286}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onMiddle:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &196384
 GameObject:
   m_ObjectHideFlags: 0
@@ -6077,6 +6416,7 @@ GameObject:
   - component: {fileID: 114046120469557300}
   - component: {fileID: 114331424677014616}
   - component: {fileID: 114488889255215758}
+  - component: {fileID: 5452166232209144893}
   m_Layer: 5
   m_Name: Preset (9)
   m_TagString: Untagged
@@ -6185,19 +6525,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 114046120469557300}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 11437434}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: PresetSelect
-        m_Mode: 2
-        m_Arguments:
-          m_ObjectArgument: {fileID: 114046120469557300}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &114488889255215758
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6218,6 +6546,51 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
+--- !u!114 &5452166232209144893
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1674746125674564}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4882e00b93564544db6c1eab368566c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  onLeft:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: PresetSelect
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 114046120469557300}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onRight:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8975606874673628997}
+        m_TargetAssemblyTypeName: Assets.SEE.Game.UI.Drawable.ColorPresets, SEE
+        m_MethodName: RemoveColor
+        m_Mode: 2
+        m_Arguments:
+          m_ObjectArgument: {fileID: 114046120469557300}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.UI.Image, UnityEngine.UI
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onMiddle:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1746647264447762
 GameObject:
   m_ObjectHideFlags: 0
