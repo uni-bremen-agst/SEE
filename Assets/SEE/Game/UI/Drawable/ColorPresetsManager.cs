@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// File from the hsvpicker package, add remove color
+/// File from the hsvpicker package, add remove color and change color
 /// </summary>
 public static class ColorPresetManager
 {
@@ -55,6 +55,15 @@ public class ColorPresetList
     public void RemoveColor(Color color)
     {
         Colors.Remove(color);
+        if (OnColorsUpdated != null)
+        {
+            OnColorsUpdated.Invoke(Colors);
+        }
+    }
+
+    public void ChangeColor(int index, Color newColor)
+    {
+        Colors[index] = newColor;
         if (OnColorsUpdated != null)
         {
             OnColorsUpdated.Invoke(Colors);

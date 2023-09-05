@@ -8,7 +8,7 @@ using UnityEngine.UI;
 namespace Assets.SEE.Game.UI.Drawable
 {
     /// <summary>
-    /// File from the hsvpicker packages, add remove color
+    /// File from the hsvpicker packages, add remove color and change color
     /// </summary>
     public class ColorPresets : MonoBehaviour
     {
@@ -74,6 +74,11 @@ namespace Assets.SEE.Game.UI.Drawable
         public void RemoveColor(Image sender)
         {
             _colors.RemoveColor(sender.color);
+        }
+
+        public void ChangeColor(int index)
+        {
+            _colors.ChangeColor(index, picker.CurrentColor);
         }
     }
 }
