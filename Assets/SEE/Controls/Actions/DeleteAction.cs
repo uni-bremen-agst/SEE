@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SEE.Game;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.Audio;
+using SEE.Game.SceneManipulation;
 
 namespace SEE.Controls.Actions
 {
@@ -40,7 +40,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.Delete"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.Delete;
+            return ActionStateTypes.Delete;
         }
 
         /// <summary>

@@ -143,7 +143,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// If this is false, incremental events like <see cref="AddNode"/> will only modify the graph
         /// and not run the reflexion analysis.
         /// </summary>
-        public bool AnalysisInitialized = false;
+        public bool AnalysisInitialized { get; private set; }
 
         #region State Edge Attribute
 
@@ -208,6 +208,19 @@ namespace SEE.Tools.ReflexionAnalysis
             return state == State.Specified || state == State.Convergent || state == State.Absent || state == State.AllowedAbsent;
         }
 
+        /// <summary>
+        /// Returns true if <paramref name="edge"/> is a divergent
+        /// edge (present in the implementation graph, but missing in
+        /// the architecture graph).
+        /// Precondition: <paramref name="edge"/> must be in the implementation graph.
+        /// </summary>
+        /// <param name="edge">architecture dependency</param>
+        /// <returns>true if edge is a divergent architecture dependency</returns>
+        public static bool IsDivergent(Edge edge)
+        {
+            AssertOrThrow(edge.IsInReflexion(), () => new NotInSubgraphException(Implementation, edge));
+            return edge.State() == State.Divergent;
+        }
         #endregion
 
         #region Edge counter attribute

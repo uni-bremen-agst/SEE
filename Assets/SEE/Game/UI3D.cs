@@ -25,17 +25,17 @@ namespace SEE.Game.UI3D
         /// <summary>
         /// The default color of every 3d ui-element.
         /// </summary>
-        internal static readonly Color DefaultColor = new Color(1.0f, 0.25f, 0.0f, DefaultAlpha);
+        internal static readonly Color DefaultColor = new(1.0f, 0.25f, 0.0f, DefaultAlpha);
 
         /// <summary>
         /// The secondary default color of every 3d ui-element.
         /// </summary>
-        internal static readonly Color DefaultColorSecondary = new Color(1.0f, 0.75f, 0.0f, DefaultAlpha);
+        internal static readonly Color DefaultColorSecondary = new(1.0f, 0.75f, 0.0f, DefaultAlpha);
 
         /// <summary>
         /// The tertiary color of every 3d ui-element.
         /// </summary>
-        internal static readonly Color DefaultColorTertiary = new Color(1.0f, 0.0f, 0.5f, DefaultAlpha);
+        internal static readonly Color DefaultColorTertiary = new(1.0f, 0.0f, 0.5f, DefaultAlpha);
     }
 
     /// <summary>
@@ -64,6 +64,9 @@ namespace SEE.Game.UI3D
         /// </summary>
         private Material axisMaterial;
 
+        private static readonly int MainTexProperty = Shader.PropertyToID("_MainTex");
+        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
+
         /// <summary>
         /// Removes every <see cref="Transform"/> <c>t</c> from <see cref="focusses"/> that
         /// has been destroyed, i.e., for which <c>t == null</c> holds (Unity has redefined
@@ -75,7 +78,7 @@ namespace SEE.Game.UI3D
             {
                 if (focusses[i] == null)
                 {
-                    focusses[i] = focusses[focusses.Count - 1];
+                    focusses[i] = focusses[^1];
                     focusses.RemoveAt(focusses.Count - 1);
                 }
             }
@@ -89,7 +92,7 @@ namespace SEE.Game.UI3D
 #if UNITY_EDITOR
         internal static Cursor3D Create(string cityName)
         {
-            GameObject go = new GameObject("Cursor: " + cityName);
+            GameObject go = new("Cursor: " + cityName);
 #else
         internal static Cursor3D Create()
         {
@@ -105,12 +108,12 @@ namespace SEE.Game.UI3D
             outlineGameObject.transform.localPosition = Vector3.zero;
             outlineGameObject.transform.localScale = Vector3.one;
             Material outlineMaterial = new(Shader.Find(OutlineShaderName));
-            outlineMaterial.SetTexture("_MainTex", TextureGenerator.CreateCircleOutlineTextureR8(32, 31, 1.0f, 0.0f));
-            outlineMaterial.SetColor("_Color", UI3DProperties.DefaultColor);
+            outlineMaterial.SetTexture(MainTexProperty, TextureGenerator.CreateCircleOutlineTextureR8(32, 31, 1.0f, 0.0f));
+            outlineMaterial.SetColor(ColorProperty, UI3DProperties.DefaultColor);
             outlineGameObject.GetComponent<MeshRenderer>().sharedMaterial = outlineMaterial;
 
             c.axisMaterial = new Material(Shader.Find(UI3DProperties.PlainColorShaderName));
-            c.axisMaterial.SetColor("_Color", Color.black);
+            c.axisMaterial.SetColor(ColorProperty, Color.black);
 
             c.gameObject.SetActive(false);
 
@@ -383,11 +386,13 @@ namespace SEE.Game.UI3D
         /// The material for the outlined rectangle.
         /// </summary>
         private Material outlineRectangleMaterial;
-        
+
         /// <summary>
         /// The material of the line between the start- and end-position.
         /// </summary>
         private Material directLineMaterial;
+
+        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
 
         /// <summary>
         /// Creates a new move-gizmo.
@@ -395,7 +400,7 @@ namespace SEE.Game.UI3D
         /// <returns>The gizmo.</returns>
         internal static MoveGizmo Create()
         {
-            GameObject go = new GameObject("MovePivot");
+            GameObject go = new("MovePivot");
             MoveGizmo p = go.AddComponent<MoveGizmo>();
 
             p.start = Vector3.zero;
@@ -405,9 +410,9 @@ namespace SEE.Game.UI3D
             p.fillRectangleMaterial = new Material(shader);
             p.outlineRectangleMaterial = new Material(shader);
             p.directLineMaterial = new Material(shader);
-            p.fillRectangleMaterial.SetColor("_Color", new Color(0.5f, 0.5f, 0.5f, 0.2f * UI3DProperties.DefaultAlpha));
-            p.outlineRectangleMaterial.SetColor("_Color", new Color(0.0f, 0.0f, 0.0f, 0.5f * UI3DProperties.DefaultAlpha));
-            p.directLineMaterial.SetColor("_Color", UI3DProperties.DefaultColor);
+            p.fillRectangleMaterial.SetColor(ColorProperty, new Color(0.5f, 0.5f, 0.5f, 0.2f * UI3DProperties.DefaultAlpha));
+            p.outlineRectangleMaterial.SetColor(ColorProperty, new Color(0.0f, 0.0f, 0.0f, 0.5f * UI3DProperties.DefaultAlpha));
+            p.directLineMaterial.SetColor(ColorProperty, UI3DProperties.DefaultColor);
 
             go.SetActive(false);
 
@@ -501,7 +506,7 @@ namespace SEE.Game.UI3D
             set
             {
                 startAngle = value;
-                material.SetFloat("_MinAngle", value);
+                material.SetFloat(MinAngleProperty, value);
             }
         }
 
@@ -509,6 +514,12 @@ namespace SEE.Game.UI3D
         /// <see cref="TargetAngle"/>
         /// </summary>
         private float targetAngle;
+
+        private static readonly int MinAngleProperty = Shader.PropertyToID("_MinAngle");
+        private static readonly int MaxAngleProperty = Shader.PropertyToID("_MaxAngle");
+        private static readonly int MainTexProperty = Shader.PropertyToID("_MainTex");
+        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
+        private static readonly int AlphaProperty = Shader.PropertyToID("_Alpha");
 
         /// <summary>
         /// The target angle of the rotation.
@@ -519,7 +530,7 @@ namespace SEE.Game.UI3D
             set
             {
                 targetAngle = value;
-                material.SetFloat("_MaxAngle", value);
+                material.SetFloat(MaxAngleProperty, value);
             }
         }
 
@@ -542,9 +553,9 @@ namespace SEE.Game.UI3D
             int inner = Mathf.RoundToInt(outer * 0.98f);
 
             p.material = new Material(Shader.Find(RotateGizmoShaderName));
-            p.material.SetTexture("_MainTex", TextureGenerator.CreateCircleOutlineTextureR8(outer, inner, UI3DProperties.DefaultAlpha, 0.0f));
-            p.material.SetColor("_Color", UI3DProperties.DefaultColor);
-            p.material.SetFloat("_Alpha", UI3DProperties.DefaultAlpha);
+            p.material.SetTexture(MainTexProperty, TextureGenerator.CreateCircleOutlineTextureR8(outer, inner, UI3DProperties.DefaultAlpha, 0.0f));
+            p.material.SetColor(ColorProperty, UI3DProperties.DefaultColor);
+            p.material.SetFloat(AlphaProperty, UI3DProperties.DefaultAlpha);
 
             go.GetComponent<MeshRenderer>().sharedMaterial = p.material;
             go.SetActive(false);

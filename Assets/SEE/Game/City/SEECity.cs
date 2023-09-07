@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using InControl;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
+using SEE.Game.UI.RuntimeConfigMenu;
 using SEE.GO;
-using SEE.Layout;
-using SEE.Layout.NodeLayouts;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -29,13 +29,13 @@ namespace SEE.Game.City
         /// The path to the GXL file containing the graph data.
         /// Note that any deriving class may use multiple GXL paths from which the single city is constructed.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of GXL file"), FoldoutGroup(DataFoldoutGroup)]
+        [SerializeField, ShowInInspector, Tooltip("Path of GXL file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath GXLPath = new();
 
         /// <summary>
         /// The path to the CSV file containing the additional metric values.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Path of metric CSV file"), FoldoutGroup(DataFoldoutGroup)]
+        [SerializeField, ShowInInspector, Tooltip("Path of metric CSV file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
         public FilePath CSVPath = new();
 
         /// <summary>
@@ -127,8 +127,10 @@ namespace SEE.Game.City
         /// <summary>
         /// Sets up drawn city (if it has been drawn yet) and loads the metric board.
         /// </summary>
-        protected void Start()
+        protected override void Start()
         {
+            base.Start();
+
             if (!gameObject.IsCodeCityDrawn())
             {
                 Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
@@ -226,7 +228,7 @@ namespace SEE.Game.City
                     }
                 }
 #if UNITY_EDITOR
-                else if (child.CompareTag(DataModel.Tags.Node) || child.CompareTag(DataModel.Tags.Edge))
+                else if (child.CompareTag(Tags.Node) || child.CompareTag(Tags.Edge))
                 {
                     Debug.LogWarning($"Game object {child.name} has neither node nor edge reference.\n");
                 }
@@ -305,7 +307,7 @@ namespace SEE.Game.City
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public virtual void LoadData()
         {
@@ -329,7 +331,7 @@ namespace SEE.Game.City
         /// Saves the graph data to the GXL file with GXLPath().
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
         [PropertyOrder(DataButtonsGroupOrderSave)]
         public virtual void SaveData()
         {
@@ -366,7 +368,7 @@ namespace SEE.Game.City
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
-        [ButtonGroup(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
         public virtual void DrawGraph()
         {
@@ -418,7 +420,7 @@ namespace SEE.Game.City
         /// the file is saved in the SLD format.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Layout")]
         [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
         public void SaveLayout()
         {
@@ -441,7 +443,7 @@ namespace SEE.Game.City
         /// the file is assumed to be in the SLD format.
         /// </summary>
         [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Layout")]
         [PropertyOrder(DataButtonsGroupOrderLoadLayout)]
         public void LoadLayout()
         {
@@ -454,7 +456,7 @@ namespace SEE.Game.City
         /// the underlying graph, and all game objects visualizing information about it.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
-        [ButtonGroup(ResetButtonsGroup)]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
         [PropertyOrder(ResetButtonsGroupOrderReset)]
         public override void Reset()
         {

@@ -25,7 +25,9 @@ using SEE.GO;
 using SEE.Utils;
 using System;
 using UnityEngine;
-//using Valve.VR;
+#if INCLUDE_STEAM_VR
+using Valve.VR;
+#endif
 
 namespace SEE.Game.UI.ConfigMenu
 {
@@ -39,8 +41,7 @@ namespace SEE.Game.UI.ConfigMenu
     public class ConfigMenuFactory : DynamicUIBehaviour
     {
         private const string ConfigMenuPrefabPath = "Prefabs/UI/ConfigMenu";
-
-#if false // FIXME
+#if INCLUDE_STEAM_VR
         private SteamVR_Action_Boolean openAction;
         private readonly SteamVR_Input_Sources inputSource = SteamVR_Input_Sources.Any;
 #endif
@@ -59,7 +60,7 @@ namespace SEE.Game.UI.ConfigMenu
             {
                 try
                 {
-#if false // FIXME
+#if INCLUDE_STEAM_VR
                     openAction = SteamVR_Actions._default?.OpenSettingsMenu;
 #endif
                 }
@@ -121,7 +122,8 @@ namespace SEE.Game.UI.ConfigMenu
 
         private void HandleVRUpdate()
         {
-#if false // FIXME
+#if INCLUDE_STEAM_VR
+
             if (openAction != null && openAction.GetStateDown(inputSource))
             {
                 configMenu.Toggle();

@@ -3,6 +3,7 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SEE.Game
 {
@@ -32,10 +33,11 @@ namespace SEE.Game
         public float FontSize = 0.4f;
 
         /// <summary>
-        /// How many seconds the label should take to (dis)appear.
+        /// How fast the label should (dis)appear.
         /// </summary>
-        [Tooltip("How many seconds the label should take to (dis)appear.")]
-        public float AnimationDuration = 0.5f;
+        [FormerlySerializedAs("AnimationDuration")]
+        [Tooltip("How fast the label should (dis)appear, expressed as a factor multiplied to the base duration.")]
+        public float AnimationFactor = 0.5f;
 
         /// <summary>
         /// The alpha value of the label.
@@ -47,7 +49,7 @@ namespace SEE.Game
         private const string ShowLabel = "Show";
         private const string DistanceLabel = "Distance";
         private const string FontSizeLabel = "FontSize";
-        private const string AnimationDurationLabel = "AnimationDuration";
+        private const string AnimationFactorLabel = "AnimationDuration";
         private const string LabelAlphaLabel = "LabelAlpha";
 
         /// <summary>
@@ -61,7 +63,7 @@ namespace SEE.Game
             writer.Save(Show, ShowLabel);
             writer.Save(Distance, DistanceLabel);
             writer.Save(FontSize, FontSizeLabel);
-            writer.Save(AnimationDuration, AnimationDurationLabel);
+            writer.Save(AnimationFactor, AnimationFactorLabel);
             writer.Save(LabelAlpha, LabelAlphaLabel);
             writer.EndGroup();
         }
@@ -82,7 +84,7 @@ namespace SEE.Game
                     ConfigIO.Restore(values, ShowLabel, ref Show);
                     ConfigIO.Restore(values, DistanceLabel, ref Distance);
                     ConfigIO.Restore(values, FontSizeLabel, ref FontSize);
-                    ConfigIO.Restore(values, AnimationDurationLabel, ref AnimationDuration);
+                    ConfigIO.Restore(values, AnimationFactorLabel, ref AnimationFactor);
                     ConfigIO.Restore(values, LabelAlphaLabel, ref LabelAlpha);
                 }
             }

@@ -1,5 +1,4 @@
-﻿using SEE.DataModel;
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.GO.NodeFactories;

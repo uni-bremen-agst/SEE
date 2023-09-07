@@ -82,7 +82,7 @@ namespace SEE.Controls
             if (!WindowSpaces.ContainsKey(playerName))
             {
                 WindowSpaces[playerName] = WindowSpace.FromValueObject(valueObject, gameObject);
-                WindowMenu.AddEntry(new ToggleMenuEntry(false, () => ActivateSpace(playerName),
+                WindowMenu.AddEntry(new MenuEntry(() => ActivateSpace(playerName),
                                                   DeactivateCurrentSpace, playerName,
                                                   $"Code window from player with IP address '{playerName}'.", Color.white));
                 WindowSpaces[playerName].WindowSpaceName += $" ({playerName})";
@@ -173,16 +173,19 @@ namespace SEE.Controls
         {
             //TODO: Icons
             WindowMenu = gameObject.AddComponent<SelectionMenu>();
-            ToggleMenuEntry localEntry = new(true, () => ActivateSpace(LOCAL_PLAYER),
-                                             DeactivateCurrentSpace, LOCAL_PLAYER,
-                                             "Windows for the local player (you).", Color.black);
-            ToggleMenuEntry noneEntry = new(false, () => CurrentPlayer = NO_PLAYER, () => { }, NO_PLAYER,
-                                            "This option hides all windows.", Color.grey);
+            MenuEntry localEntry = new(selectAction: () => ActivateSpace(LOCAL_PLAYER),
+                                       unselectAction: DeactivateCurrentSpace,
+                                       title: LOCAL_PLAYER,
+                                       description: "Windows for the local player (you).",
+                                       entryColor: Color.black);
+            MenuEntry noneEntry = new(() => CurrentPlayer = NO_PLAYER, () => { }, NO_PLAYER,
+                                      "This option hides all windows.", Color.grey);
             WindowMenu.AddEntry(noneEntry);
             WindowMenu.AddEntry(localEntry);
+            WindowMenu.SelectEntry(localEntry);
             foreach (KeyValuePair<string, WindowSpace> space in WindowSpaces.Where(space => space.Key != LOCAL_PLAYER))
             {
-                WindowMenu.AddEntry(new ToggleMenuEntry(false, () => ActivateSpace(space.Key),
+                WindowMenu.AddEntry(new MenuEntry(() => ActivateSpace(space.Key),
                                                   DeactivateCurrentSpace, space.Key,
                                                   $"Window from player with IP address '{space.Key}'.", Color.white));
             }

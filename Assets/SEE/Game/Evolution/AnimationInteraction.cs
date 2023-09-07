@@ -23,6 +23,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SEE.Controls;
+using SEE.Game.City;
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
@@ -63,9 +65,14 @@ namespace SEE.Game.Evolution
         private GameObject RevisionSelectionCanvas; // serialized by Unity
 
         /// <summary>
-        /// The time in between two revisions in auto-play mode.
+        /// The factor applied to the animation speed when fast-forwarding, or the divisor when slowing down.
         /// </summary>
-        private float animationTimeValue = 2;
+        private float additionalAnimationFactor = 2;
+
+        /// <summary>
+        /// The original animation factor, used to reset the animation factor after fast-forwarding or slowing down.
+        /// </summary>
+        private  float originalAnimationFactor = 1;
 
         /// <summary>
         /// The user-data model for RevisionSelectionCanvas.
@@ -90,7 +97,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// A dictionary linking markers and comments, needed for saving the comments on application quit and deleting the comments
         /// </summary>
-        private readonly Dictionary<Button, InputField> markerDictionary = new Dictionary<Button, InputField>();
+        private readonly Dictionary<Button, InputField> markerDictionary = new();
 
         /// <summary>
         /// Specifies whether the animation is currently being fast-forwarded
@@ -179,13 +186,9 @@ namespace SEE.Game.Evolution
             animationDataModel.ReverseButton.onClick.AddListener(TaskOnClickReverseButton);
             animationDataModel.FastBackwardButton.onClick.AddListener(TaskOnClickFastBackwardButton);
 
-            if (animationDataModel.Slider.TryGetComponent(out SliderDrag sliderDrag))
+            if (animationDataModel.Slider.gameObject.TryGetComponentOrLog(out SliderDrag sliderDrag))
             {
                 sliderDrag.EvolutionRenderer = evolutionRenderer;
-            }
-            else
-            {
-                Debug.LogError("SliderDrag script could not be loaded.\n");
             }
 
             try
@@ -206,7 +209,8 @@ namespace SEE.Game.Evolution
 
             SetMode(false);
             OnShownGraphHasChanged();
-            evolutionRenderer.Register(OnShownGraphHasChanged);
+            evolutionRenderer.RegisterOnNewGraph(OnShownGraphHasChanged);
+            originalAnimationFactor = evolutionRenderer.AnimationLagFactor;
         }
 
         /// <summary>
@@ -220,14 +224,13 @@ namespace SEE.Game.Evolution
         private IEnumerator SetAnimationCanvasCamera()
         {
             Canvas canvas = AnimationCanvas.GetComponent<Canvas>();
-            Camera camera = Camera.main;
+            Camera camera = MainCamera.Camera;
 
             while (camera == null)
             {
                 yield return new WaitForSeconds(0.5f);
-                camera = Camera.main;
+                camera = MainCamera.Camera;
             }
-
             canvas.worldCamera = camera;
         }
 
@@ -290,8 +293,8 @@ namespace SEE.Game.Evolution
             {
                 if (isFastBackward)
                 {
-                    animationTimeValue = 2;
-                    evolutionRenderer.AnimationLag = animationTimeValue;
+                    additionalAnimationFactor = 2;
+                    evolutionRenderer.AnimationLagFactor = originalAnimationFactor*additionalAnimationFactor;
                     isFastBackward = false;
                     animationDataModel.FastBackwardButtonText.text = "◄◄";
                 }
@@ -318,10 +321,10 @@ namespace SEE.Game.Evolution
             {
                 if (isFastForward)
                 {
-                    animationTimeValue = 2;
-                    evolutionRenderer.AnimationLag = animationTimeValue;
+                    additionalAnimationFactor = 2;
+                    evolutionRenderer.AnimationLagFactor = originalAnimationFactor*additionalAnimationFactor;
                     isFastForward = false;
-                    animationDataModel.FastFowardButtonText.text = "►►";
+                    animationDataModel.FastForwardButtonText.text = "►►";
                 }
                 if (!evolutionRenderer.IsAutoPlayReverse)
                 {
@@ -350,32 +353,29 @@ namespace SEE.Game.Evolution
             }
             if (isFastBackward)
             {
-                animationTimeValue = 2;
-                evolutionRenderer.AnimationLag = animationTimeValue;
+                additionalAnimationFactor = 2;
                 isFastBackward = false;
                 animationDataModel.FastBackwardButtonText.text = "◄◄";
             }
-            switch (animationTimeValue)
+            switch (additionalAnimationFactor)
             {
                 case 2:
                     isFastForward = true;
-                    animationTimeValue = 1;
-                    evolutionRenderer.AnimationLag = animationTimeValue;
-                    animationDataModel.FastFowardButtonText.text = "►►2x";
+                    additionalAnimationFactor = 1;
+                    animationDataModel.FastForwardButtonText.text = "►►2x";
                     break;
                 case 1:
                     isFastForward = true;
-                    animationTimeValue = 0.5f;
-                    evolutionRenderer.AnimationLag = animationTimeValue;
-                    animationDataModel.FastFowardButtonText.text = "►►4x";
+                    additionalAnimationFactor = 0.5f;
+                    animationDataModel.FastForwardButtonText.text = "►►4x";
                     break;
                 case 0.5f:
                     isFastForward = false;
-                    animationTimeValue = 2;
-                    evolutionRenderer.AnimationLag = animationTimeValue;
-                    animationDataModel.FastFowardButtonText.text = "►►";
+                    additionalAnimationFactor = 2;
+                    animationDataModel.FastForwardButtonText.text = "►►";
                     break;
             }
+            evolutionRenderer.AnimationLagFactor = originalAnimationFactor*additionalAnimationFactor;
         }
 
         /// <summary>
@@ -384,38 +384,39 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void TaskOnClickFastBackwardButton()
         {
+            // TODO: There is a lot of opportunity for refactoring here, e.g., when comparing this method
+            //       with TaskOnClickFastForwardButton(). It also seems weird that the additionalAnimationFactor
+            //       is set to 2 by default, with the 2x option setting it to 1, rather than it starting at 1
+            //       and then being set to 0.5 by the 2x option.
             if (evolutionRenderer.IsAutoPlay)
             {
                 return;
             }
             if (isFastForward)
             {
-                animationTimeValue = 2;
-                evolutionRenderer.AnimationLag = animationTimeValue;
+                additionalAnimationFactor = 2;
                 isFastForward = false;
-                animationDataModel.FastFowardButtonText.text = "►►";
+                animationDataModel.FastForwardButtonText.text = "►►";
             }
-            switch (animationTimeValue)
+            switch (additionalAnimationFactor)
             {
                 case 2:
                     isFastBackward = true;
-                    animationTimeValue = 1;
-                    evolutionRenderer.AnimationLag = animationTimeValue;
+                    additionalAnimationFactor = 1;
                     animationDataModel.FastBackwardButtonText.text = "◄◄2x";
                     break;
                 case 1:
                     isFastBackward = true;
-                    animationTimeValue = 0.5f;
-                    evolutionRenderer.AnimationLag = animationTimeValue;
+                    additionalAnimationFactor = 0.5f;
                     animationDataModel.FastBackwardButtonText.text = "◄◄4x";
                     break;
                 case 0.5f:
                     isFastBackward = false;
-                    animationTimeValue = 2;
-                    evolutionRenderer.AnimationLag = animationTimeValue;
+                    additionalAnimationFactor = 2;
                     animationDataModel.FastBackwardButtonText.text = "◄◄";
                     break;
             }
+            evolutionRenderer.AnimationLagFactor = originalAnimationFactor*additionalAnimationFactor;
         }
 
         /// <summary>
@@ -443,7 +444,7 @@ namespace SEE.Game.Evolution
         {
             string commentName = marker.GetHashCode() + "-comment";
             InputField commentField = Instantiate(animationDataModel.CommentPrefab, marker.transform, false);
-            Vector3 commentPos = new Vector3(1500f, 0, 0);
+            Vector3 commentPos = new(1500f, 0, 0);
             commentField.transform.localScale = new Vector3(16f, 1f, 1f);
             commentField.transform.localPosition = commentPos;
             commentField.name = commentName;
@@ -468,10 +469,12 @@ namespace SEE.Game.Evolution
             newMarker.onClick.AddListener(() => TaskOnClickMarker(newMarker));
             if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) == null)
             {
-                SliderMarker newSliderMarker = new SliderMarker();
-                newSliderMarker.MarkerX = markerPos.x;
-                newSliderMarker.MarkerY = markerPos.y;
-                newSliderMarker.MarkerZ = markerPos.z;
+                SliderMarker newSliderMarker = new()
+                {
+                    MarkerX = markerPos.x,
+                    MarkerY = markerPos.y,
+                    MarkerZ = markerPos.z
+                };
                 sliderMarkerContainer.SliderMarkers.Add(newSliderMarker);
             }
             InputField commentField = AddCommentToMarker(newMarker, comment);
@@ -494,10 +497,10 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Handles the user input as follows:
-        ///   KeyBindings.PreviousRevision => previous graph revision is shown
-        ///   KeyBindings.NextRevision     => next graph revision is shown
-        ///   KeyBindings.SetMarker        => create new marker
+        ///   KeyBindings.Previous         => previous graph revision is shown
+        ///   KeyBindings.Next             => next graph revision is shown
         ///   KeyBindings.ToggleAutoPlay   => auto-play mode is toggled
+        ///   KeyBindings.SetMarker        => create new marker
         ///   KeyBindings.DeleteMarker     => delete selected marker
         ///   KeyBindings.IncreaseAnimationSpeed => double animation speed
         ///   KeyBindings.DecreaseAnimationSpeed => halve animation speed
@@ -505,45 +508,45 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void Update()
         {
+            bool userIsHoveringCity = AbstractSEECity.UserIsHoveringCity(evolutionRenderer.gameObject);
+
             if (!IsRevisionSelectionOpen)
             {
-                if (SEEInput.PreviousRevision())
+                if (userIsHoveringCity && SEEInput.Previous())
                 {
                     evolutionRenderer.ShowPreviousGraph();
                 }
-                else if (SEEInput.NextRevision())
+                else if (userIsHoveringCity && SEEInput.Next())
                 {
                     evolutionRenderer.ShowNextGraph();
                 }
-                else if (SEEInput.ToggleAutoPlay())
+                else if (userIsHoveringCity && SEEInput.ToggleAutoPlay())
                 {
                     evolutionRenderer.ToggleAutoPlay();
                 }
-                else if (SEEInput.SetMarker())
+                else if (userIsHoveringCity && SEEInput.SetMarker())
                 {
                     Vector3 handlePos = animationDataModel.Slider.handleRect.transform.position;
-                    Vector3 markerPos = new Vector3(handlePos.x, handlePos.y + .08f, handlePos.z);
+                    Vector3 markerPos = new(handlePos.x, handlePos.y + .08f, handlePos.z);
                     if (sliderMarkerContainer.getSliderMarkerForLocation(markerPos) == null)
                     {
-                        AddMarker(markerPos, null);
+                        AddMarker(markerPos);
                     }
                 }
-                else if (SEEInput.DeleteMarker())
+                else if (userIsHoveringCity && SEEInput.DeleteMarker())
                 {
                     RemoveMarker(selectedMarker);
                 }
-                else if (SEEInput.IncreaseAnimationSpeed())
+                else if (userIsHoveringCity && SEEInput.IncreaseAnimationSpeed())
                 {
-                    evolutionRenderer.AnimationLag = Mathf.Max(0.25f, evolutionRenderer.AnimationLag / 2);
-                    Debug.Log($"new animation lag is {evolutionRenderer.AnimationLag}\n");
+                    evolutionRenderer.AnimationLagFactor = Mathf.Max(0.25f, evolutionRenderer.AnimationLagFactor / 2);
                 }
-                else if (SEEInput.DecreaseAnimationSpeed())
+                else if (userIsHoveringCity && SEEInput.DecreaseAnimationSpeed())
                 {
-                    evolutionRenderer.AnimationLag = Mathf.Min(16.0f, evolutionRenderer.AnimationLag * 2);
-                    Debug.Log($"new animation lag is {evolutionRenderer.AnimationLag}\n");
+                    evolutionRenderer.AnimationLagFactor = Mathf.Min(16.0f, evolutionRenderer.AnimationLagFactor * 2);
                 }
             }
-            if (SEEInput.ToggleEvolutionCanvases())
+            if (userIsHoveringCity && SEEInput.ToggleEvolutionCanvases())
             {
                 ToggleMode();
             }

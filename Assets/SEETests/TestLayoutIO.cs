@@ -1,8 +1,7 @@
 ﻿using NUnit.Framework;
-using SEE.DataModel;
+using SEE.Game;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;

@@ -79,13 +79,6 @@ namespace SEE.Controls.Actions
             }
         }
 
-        /// <summary>
-        /// The time for the animation of the <see cref="cityRootNode"/> to return
-        /// to its original position if the user cancels or resets its shuffling
-        /// in seconds.
-        /// </summary>
-        private const float ResetAnimationDuration = 1.0f;
-
         private void Update()
         {
             bool synchronize = false;
@@ -95,7 +88,7 @@ namespace SEE.Controls.Actions
                 if (shuffling)
                 {
                     // Reset to initial state.
-                    nodeOperator.MoveTo(originalPosition, ResetAnimationDuration);
+                    nodeOperator.MoveTo(originalPosition);
                     gizmo.gameObject.SetActive(false);
                     cityRootNode = null;
                     shuffling = false;
@@ -165,7 +158,7 @@ namespace SEE.Controls.Actions
                 if (cityRootNode && !shuffling)
                 {
                     GO.Plane plane = cityRootNode.GetComponentInParent<GO.Plane>();
-                    nodeOperator.MoveTo(plane.CenterTop, ResetAnimationDuration);
+                    nodeOperator.MoveTo(plane.CenterTop);
                     new ShuffleNetAction(cityRootNode.name, plane.CenterTop).Execute();
                     gizmo.gameObject.SetActive(false);
 

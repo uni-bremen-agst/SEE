@@ -17,7 +17,7 @@ if [ -z "$CI" ]; then
     GIT_FSCK="$GIT_FSCK --pointers"
 fi
 
-output=$($GIT_FSCK)
+output=$($GIT_FSCK || true)
 if [ "$output" != 'Git LFS fsck OK' ]; then
     if [ -n "$CI" ]; then
         echo ""

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
@@ -156,7 +155,7 @@ namespace SEE.Game
             Assert.IsNotNull(toLayoutNode, $"Target node {edge.Target.ID} does not have a layout node.\n");
             // The single layout edge between source and target. We want the layout only for this edge.
             ICollection<LayoutGraphEdge<LayoutGameNode>> layoutEdges = new List<LayoutGraphEdge<LayoutGameNode>>
-                { new LayoutGraphEdge<LayoutGameNode>(fromLayoutNode, toLayoutNode, edge) };
+                { new(fromLayoutNode, toLayoutNode, edge) };
 
 
             // Calculate the edge layout (for the single edge only).
@@ -166,7 +165,7 @@ namespace SEE.Game
             InteractionDecorator.PrepareForInteraction(resultingEdge);
             // The edge becomes a child of the root node of the game-node hierarchy
             GameObject codeCity = SceneQueries.GetCodeCity(from.transform).gameObject;
-            GameObject rootNode = SceneQueries.GetCityRootNode(codeCity).gameObject;
+            GameObject rootNode = SceneQueries.GetCityRootNode(codeCity);
             resultingEdge.transform.SetParent(rootNode.transform);
             // The portal of the new edge is inherited from the codeCity.
             Portal.SetPortal(root: codeCity, gameObject: resultingEdge);
@@ -218,8 +217,37 @@ namespace SEE.Game
         }
 
         /// <summary>
+        /// Draws and returns a new game edge <paramref name="edge"/>
+        /// based on the current settings.
+        ///
+        /// Note: The default edge layout <see cref="IGraphRenderer.EdgeLayoutDefault"/> will be used if no edge layout,
+        /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
+        ///
+        /// Precondition: <paramref name="source"/> and <paramref name="target"/> must have a valid
+        /// node reference. The corresponding graph nodes must be in the same graph.
+        /// </summary>
+        /// <param name="edge">the edge to be drawn</param>
+        /// <param name="sourceNode">GameObject of source of the new edge</param>
+        /// <param name="targetNode">GameObject of target of the new edge</param>
+        /// <returns>The new game object representing the given edge.</returns>
+        public GameObject DrawEdge(Edge edge, GameObject sourceNode = null, GameObject targetNode = null)
+        {
+            if (sourceNode == null)
+            {
+                sourceNode = GraphElementIDMap.Find(edge.Source.ID);
+            }
+
+            if (targetNode == null)
+            {
+                targetNode = GraphElementIDMap.Find(edge.Target.ID);
+            }
+
+            return DrawEdge(edge, sourceNode, targetNode, true);
+        }
+
+        /// <summary>
         /// Adds <paramref name="node"/> and all its transitive parent game objects tagged by
-        /// Tags.Node to <paramref name="gameNodes"/>.
+        /// <see cref="Tags.Node"/> to <paramref name="gameNodes"/>.
         /// </summary>
         /// <param name="node">the game objects whose ascendant game nodes are to be added to <paramref name="gameNodes"/></param>
         /// <param name="gameNodes">where to add the ascendants</param>
@@ -229,7 +257,8 @@ namespace SEE.Game
             while (cursor != null && cursor.CompareTag(Tags.Node))
             {
                 gameNodes.Add(cursor);
-                cursor = cursor.transform.parent.gameObject;
+                cursor = cursor.transform.parent != null ?
+                    cursor.transform.parent.gameObject : null;
             }
         }
 

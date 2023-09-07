@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SEE.Utils;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -22,9 +23,28 @@ namespace SEE.Game.City
         public EdgeAnimationKind AnimationKind = EdgeAnimationKind.None;
 
         /// <summary>
+        /// Whether to animate edges of inner nodes as well when hovering over nodes.
+        /// </summary>
+        [Tooltip("When hovering over nodes, animate edges of inner nodes too.")]
+        [InfoBox("Be aware that animating inner edges may cause heavy performance issues when "
+                 + "combined with the 'Buildup' animation.", InfoMessageType.Warning,
+                 nameof(WarnAboutInnerEdgeAnimation))]
+        public bool AnimateInnerEdges = true;
+
+        /// <summary>
+        /// True if the user should be warned about animating inner edges due to performance issues.
+        /// </summary>
+        private bool WarnAboutInnerEdgeAnimation => AnimateInnerEdges && AnimationKind == EdgeAnimationKind.Buildup;
+
+        /// <summary>
+        /// The maximal width of an edge.
+        /// </summary>
+        public const float MaxEdgeWidth = 0.1f;
+
+        /// <summary>
         /// The width of an edge (drawn as line).
         /// </summary>
-        [Range(0.0f, float.MaxValue)]
+        [Range(0.0f, MaxEdgeWidth)]
         public float EdgeWidth = 0.01f;
 
         /// <summary>
@@ -47,6 +67,7 @@ namespace SEE.Game.City
             writer.BeginGroup(label);
             writer.Save(Kind.ToString(), EdgeLayoutLabel);
             writer.Save(AnimationKind.ToString(), AnimationKindLabel);
+            writer.Save(AnimateInnerEdges, AnimateInnerEdgesLabel);
             writer.Save(EdgeWidth, EdgeWidthLabel);
             writer.Save(EdgesAboveBlocks, EdgesAboveBlocksLabel);
             writer.Save(Tension, TensionLabel);
@@ -61,6 +82,7 @@ namespace SEE.Game.City
 
                 ConfigIO.RestoreEnum(values, EdgeLayoutLabel, ref Kind);
                 ConfigIO.RestoreEnum(values, AnimationKindLabel, ref AnimationKind);
+                ConfigIO.Restore(values, AnimateInnerEdgesLabel, ref AnimateInnerEdges);
                 ConfigIO.Restore(values, EdgeWidthLabel, ref EdgeWidth);
                 ConfigIO.Restore(values, EdgesAboveBlocksLabel, ref EdgesAboveBlocks);
                 ConfigIO.Restore(values, TensionLabel, ref Tension);
@@ -72,5 +94,6 @@ namespace SEE.Game.City
         private const string EdgesAboveBlocksLabel = "EdgesAboveBlocks";
         private const string TensionLabel = "Tension";
         private const string AnimationKindLabel = "AnimationKind";
+        private const string AnimateInnerEdgesLabel = "AnimateInnerEdges";
     }
 }

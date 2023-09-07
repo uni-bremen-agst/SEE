@@ -6,8 +6,10 @@ using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
-//using Valve.VR.InteractionSystem;
-using SEE.Game;
+#if INCLUDE_STEAM_VR
+using Valve.VR.InteractionSystem;
+#endif
+using SEE.Game.SceneManipulation;
 using SEE.Net.Actions;
 using SEE.Audio;
 using UnityEngine.UI;
@@ -22,11 +24,11 @@ namespace SEE.Controls
     /// </summary>
     public enum HoverFlag
     {
-        None                     = 0x0, // nothing is being hovered over
-        World                    = 0x1, // an object in the city world is being hovered over (game nodes or edges and the like)
-        ChartMarker              = 0x2, // a marker in a chart is being hovered over
-        ChartMultiSelect         = 0x4, // multiple markers in a chart are being hovered over (within a rectangular bound)
-        ChartScrollViewToggle    = 0x8  // the scroll view of a metric chart is being hovered over
+        None = 0x0, // nothing is being hovered over
+        World = 0x1, // an object in the city world is being hovered over (game nodes or edges and the like)
+        ChartMarker = 0x2, // a marker in a chart is being hovered over
+        ChartMultiSelect = 0x4, // multiple markers in a chart are being hovered over (within a rectangular bound)
+        ChartScrollViewToggle = 0x8 // the scroll view of a metric chart is being hovered over
     }
 
     /// <summary>
@@ -53,7 +55,8 @@ namespace SEE.Controls
         /// <summary>
         /// The interactable objects.
         /// </summary>
-        private static readonly Dictionary<string, InteractableObject> idToInteractableObjectDict = new Dictionary<string, InteractableObject>();
+        private static readonly Dictionary<string, InteractableObject> idToInteractableObjectDict =
+            new Dictionary<string, InteractableObject>();
 
         /// <summary>
         /// The hovered objects.
@@ -80,7 +83,8 @@ namespace SEE.Controls
         /// <summary>
         /// The selected objects per graph.
         /// </summary>
-        private static readonly Dictionary<Graph, HashSet<InteractableObject>> graphToSelectedIOs = new Dictionary<Graph, HashSet<InteractableObject>>();
+        private static readonly Dictionary<Graph, HashSet<InteractableObject>> graphToSelectedIOs =
+            new Dictionary<Graph, HashSet<InteractableObject>>();
 
         /// <summary>
         /// The graph element, this interactable object is attached to.
@@ -96,6 +100,7 @@ namespace SEE.Controls
                 result = true;
                 nodeRef = @ref;
             }
+
             return result;
         }
 
@@ -108,6 +113,7 @@ namespace SEE.Controls
                 result = true;
                 edgeRef = @ref;
             }
+
             return result;
         }
 
@@ -120,6 +126,7 @@ namespace SEE.Controls
                 node = nodeRef.Value;
                 result = node != null;
             }
+
             return result;
         }
 
@@ -132,6 +139,7 @@ namespace SEE.Controls
                 edge = edgeRef.Value;
                 result = edge != null;
             }
+
             return result;
         }
 
@@ -204,6 +212,7 @@ namespace SEE.Controls
         /// </summary>
         public bool IsGrabbed { get; private set; }
 
+#if INCLUDE_STEAM_VR
         /// <summary>
         /// The interactable component, that is used by SteamVR. The interactable
         /// component is attached to <code>this.gameObject</code>.
@@ -211,6 +220,7 @@ namespace SEE.Controls
 #if false // FIXME
         private Interactable interactable;
 #endif
+
         /// <summary>
         /// The synchronizer is attached to <code>this.gameObject</code>, iff it is
         /// grabbed.
@@ -224,7 +234,7 @@ namespace SEE.Controls
 
         private void Awake()
         {
-#if false // FIXME
+#if INCLUDE_STEAM_VR
             gameObject.TryGetComponentOrLog(out interactable);
 #endif
             GraphElemRef = GetComponent<GraphElementRef>();
@@ -237,16 +247,19 @@ namespace SEE.Controls
             {
                 SetHoverFlags(0, true);
             }
+
             if (IsSelected)
             {
                 SetSelect(false, true);
             }
+
             if (IsGrabbed)
             {
                 SetGrab(false, true);
             }
+
             GraphElemRef = null;
-#if false // FIXME STEAMVR
+#if INCLUDE_STEAM_VR
             interactable = null;
 #endif
         }
@@ -275,6 +288,7 @@ namespace SEE.Controls
             {
                 graphToSelectedIOs[graph] = new HashSet<InteractableObject>();
             }
+
             return graphToSelectedIOs[graph];
         }
 
@@ -311,6 +325,7 @@ namespace SEE.Controls
                 {
                     message += $"\n\t{flag}: {(IsHoverFlagSet(flag) ? "Yes" : "No")}";
                 }
+
                 Debug.LogWarning(message);
                 return;
             }
@@ -330,6 +345,7 @@ namespace SEE.Controls
                     LocalAnyHoverIn?.Invoke(this);
                     AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.HOVER_SOUND, this.gameObject);
                 }
+
                 HoveredObjects.Add(this);
                 if (IsHoverFlagSet(HoverFlag.World))
                 {
@@ -353,6 +369,7 @@ namespace SEE.Controls
                     LocalHoverOut?.Invoke(this);
                     LocalAnyHoverOut?.Invoke(this);
                 }
+
                 HoveredObjects.Remove(this);
                 if ((prevHoverFlags & (uint)HoverFlag.World) != 0)
                 {
@@ -400,6 +417,7 @@ namespace SEE.Controls
                 // hoverFlag will be "turned off" in HoverFlags
                 hoverFlags = HoverFlags & ~(uint)hoverFlag;
             }
+
             SetHoverFlags(hoverFlags, isInitiator);
         }
 
@@ -441,6 +459,7 @@ namespace SEE.Controls
                 {
                     graphToSelectedIOs[graph] = new HashSet<InteractableObject>();
                 }
+
                 graphToSelectedIOs[graph].Add(this);
 
                 flasher.StartFlashing();
@@ -509,6 +528,7 @@ namespace SEE.Controls
                 {
                     SelectedObjects.ElementAt(SelectedObjects.Count - 1).SetSelect(false, isInitiator);
                 }
+
                 if (invokeReplaceEvent)
                 {
                     ReplaceSelect?.Invoke(replaced, by, isInitiator);
@@ -530,6 +550,7 @@ namespace SEE.Controls
             {
                 by.Add(interactableObject);
             }
+
             if (replaced.Count > 0 || by.Count > 0)
             {
                 UnselectAllInternal(isInitiator, false);
@@ -537,6 +558,7 @@ namespace SEE.Controls
                 {
                     interactableObject.SetSelect(true, isInitiator);
                 }
+
                 ReplaceSelect?.Invoke(replaced, by, isInitiator);
             }
         }
@@ -568,7 +590,7 @@ namespace SEE.Controls
         /// <param name="isInitiator">Whether this client is initiating the grabbing action.</param>
         public void SetGrab(bool grab, bool isInitiator)
         {
-            Assert.IsTrue(IsGrabbed != grab);
+            //Assert.IsTrue(IsGrabbed != grab);
 
             IsGrabbed = grab;
 
@@ -610,7 +632,7 @@ namespace SEE.Controls
                 new SetGrabNetAction(this, grab).Execute();
                 if (grab)
                 {
-#if false // FIXME STEAMVR
+#if INCLUDE_STEAM_VR
                     InteractableSynchronizer = interactable.gameObject.AddComponent<Synchronizer>();
 #endif
                 }
@@ -646,7 +668,6 @@ namespace SEE.Controls
         /// ----------------------------
         /// Hovering event system
         /// ----------------------------
-
         /// <summary>
         /// A delegate to be called when a hovering event has happened (hover over
         /// or hover off the game object) in circumstances where a distinction between
@@ -670,6 +691,7 @@ namespace SEE.Controls
         /// being hovered over. Intended for multiplayer actions.
         /// </summary>
         public event MultiPlayerHoverAction HoverIn;
+
         /// <summary>
         /// Event to be triggered when this particular <see cref="InteractableObject"/> is
         /// no longer hovered over. Intended for multiplayer actions.
@@ -689,6 +711,7 @@ namespace SEE.Controls
         /// <see cref="InteractableObject"/.
         /// </summary>
         public static event MultiPlayerHoverAction AnyHoverIn;
+
         /// <summary>
         /// Event to be triggered when any <see cref="InteractableObject"/> is no longer being hovered over.
         /// It can be used for actions of a player. Rather than requiring a player to register
@@ -708,6 +731,7 @@ namespace SEE.Controls
         /// being hovered over. Intended for actions to be executed only locally.
         /// </summary>
         public event LocalPlayerHoverAction LocalHoverIn;
+
         /// <summary>
         /// Event to be triggered when this particular <see cref="InteractableObject"/> is
         /// no longer hovered over. Intended for actions to be executed only locally.
@@ -727,6 +751,7 @@ namespace SEE.Controls
         /// <see cref="InteractableObject"/.
         /// </summary>
         public static event LocalPlayerHoverAction LocalAnyHoverIn;
+
         /// <summary>
         /// Event to be triggered when any <see cref="InteractableObject"/> is no longer being hovered over.
         /// It can be used for actions of a player. Rather than requiring a player to register
@@ -744,7 +769,6 @@ namespace SEE.Controls
         /// ----------------------------
         /// Selection event system
         /// ----------------------------
-
         /// <summary>
         /// A delegate to be called when a selection event has happened (selecting
         /// or deselecting the game object). Intended for multiplayer actions.
@@ -753,7 +777,8 @@ namespace SEE.Controls
         /// <param name="isInitiator">true if a local user initiated this call</param>
         public delegate void MultiPlayerSelectAction(InteractableObject interactableObject, bool isInitiator);
 
-        public delegate void MulitPlayerReplaceSelectAction(List<InteractableObject> replaced, List<InteractableObject> by, bool isInitiator);
+        public delegate void MulitPlayerReplaceSelectAction(List<InteractableObject> replaced,
+            List<InteractableObject> by, bool isInitiator);
 
         /// <summary>
         /// A delegate to be called when a selection event has happened (selecting
@@ -767,6 +792,7 @@ namespace SEE.Controls
         /// Intended for multiplayer actions.
         /// </summary>
         public event MultiPlayerSelectAction SelectIn;
+
         /// <summary>
         /// Event to be triggered when this particular <see cref="InteractableObject"/> is no longer selected.
         /// Intended for multiplayer actions.
@@ -778,6 +804,7 @@ namespace SEE.Controls
         /// Intended for multiplayer actions.
         /// </summary>
         public static event MultiPlayerSelectAction AnySelectIn;
+
         /// <summary>
         /// Event to be triggered when any instance of <see cref="InteractableObject"/> is no longer selected.
         /// Intended for multiplayer actions.
@@ -791,6 +818,7 @@ namespace SEE.Controls
         /// Intended for actions of only the local player.
         /// </summary>
         public event LocalPlayerSelectAction LocalSelectIn;
+
         /// <summary>
         /// Event to be triggered when this particular <see cref="InteractableObject"/> is not longer selected.
         /// Intended for actions of only the local player.
@@ -802,6 +830,7 @@ namespace SEE.Controls
         /// Intended for actions of only the local player.
         /// </summary>
         public static event LocalPlayerSelectAction LocalAnySelectIn;
+
         /// <summary>
         /// Event to be triggered when any instance of <see cref="InteractableObject"/> is no longer selected.
         /// Intended for actions of only the local player.
@@ -811,7 +840,6 @@ namespace SEE.Controls
         /// ----------------------------
         /// Grabbing event system
         /// ----------------------------
-
         /// <summary>
         /// A delegate to be called when a grab event has happened (grabbing
         /// or releasing the game object). Intended for multiplayer actions.
@@ -819,6 +847,7 @@ namespace SEE.Controls
         /// <param name="interactableObject">the object being grabbed (or no longer grabbed)</param>
         /// <param name="isInitiator">true if a local user initiated this call</param>
         public delegate void MultiPlayerGrabAction(InteractableObject interactableObject, bool isInitiator);
+
         /// <summary>
         /// A delegate to be called when a grab event has happened (grabbing
         /// or releasing the game object). Intended for actions of the local player only.
@@ -831,6 +860,7 @@ namespace SEE.Controls
         /// Intended for multiplayer actions.
         /// </summary>
         public event MultiPlayerGrabAction GrabIn;
+
         /// <summary>
         /// Event to be triggered when this particular <see cref="InteractableObject"/> is no longer grabbed.
         /// Intended for multiplayer actions.
@@ -842,6 +872,7 @@ namespace SEE.Controls
         /// Intended for multiplayer actions.
         /// </summary>
         public static event MultiPlayerGrabAction AnyGrabIn;
+
         /// <summary>
         /// Event to be triggered when any instance of <see cref="InteractableObject"/> is no longer grabbed.
         /// Intended for multiplayer actions.
@@ -853,6 +884,7 @@ namespace SEE.Controls
         /// Intended for actions of the local player only.
         /// </summary>
         public event LocalPlayerGrabAction LocalGrabIn;
+
         /// <summary>
         /// Event to be triggered when this particular <see cref="InteractableObject"/> is being grabbed.
         /// Intended for actions of the local player only.
@@ -864,6 +896,7 @@ namespace SEE.Controls
         /// Intended for actions of the local player only.
         /// </summary>
         public static event LocalPlayerGrabAction LocalAnyGrabIn;
+
         /// <summary>
         /// Event to be triggered when any instance of <see cref="InteractableObject"/> is no longer grabbed.
         /// Intended for actions of the local player only.
@@ -930,7 +963,7 @@ namespace SEE.Controls
         // These methods are called by SteamVR by way of the interactable.
         // <see cref="Hand.Update"/>
         //----------------------------------------------------------------
-#if false // FIXME STEAMVR
+#if INCLUDE_STEAM_VR
         private const Hand.AttachmentFlags AttachmentFlags
             = Hand.defaultAttachmentFlags
             & ~Hand.AttachmentFlags.SnapOnAttach
@@ -940,6 +973,7 @@ namespace SEE.Controls
         private void OnHandHoverBegin(Hand hand) => SetHoverFlag(HoverFlag.World, true, true);
         private void OnHandHoverEnd(Hand hand) => SetHoverFlag(HoverFlag.World, false, true);
 #endif
-#endregion
+
+        #endregion
     }
 }

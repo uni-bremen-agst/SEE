@@ -1,4 +1,5 @@
-﻿using SEE.Game;
+﻿using SEE.Game.Operator;
+using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -9,25 +10,26 @@ namespace SEE.Net.Actions
     internal class RotateNodeNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The unique name of the gameObject of a node that needs to be rotated.
+        /// The unique name of the game object that needs to be rotated.
         /// </summary>
         public string GameObjectID;
 
         /// <summary>
-        /// Where the game object should be placed in world space.
+        /// The rotation of the game object.
         /// </summary>
-        public Vector3 Position;
+        public Quaternion Rotation;
 
         /// <summary>
-        /// The rotation of the game object around the y axis in degrees.
+        /// Constructor.
+        /// Assumption: The <paramref name="nodes"/> have their final rotation.
+        /// These rotations will be broadcasted.
         /// </summary>
-        public float YAngle;
-
-        public RotateNodeNetAction(string nodeID, Vector3 position, float yAngle) : base()
+        /// <param name="ID">the unique ID of the game object to be rotated</param>
+        /// <param name="rotation">the rotation by which to rotate the game object</param>
+        public RotateNodeNetAction(string ID, Quaternion rotation)
         {
-            GameObjectID = nodeID;
-            Position = position;
-            YAngle = yAngle;
+            GameObjectID = ID;
+            Rotation = rotation;
         }
 
         /// <summary>
@@ -37,15 +39,9 @@ namespace SEE.Net.Actions
         {
             if (!IsRequester())
             {
-                GameObject gameObject = GraphElementIDMap.Find(GameObjectID);
-                if (gameObject != null)
-                {
-                    Positioner.Set(gameObject.transform, position: Position, yAngle: YAngle);
-                }
-                else
-                {
-                    throw new System.Exception($"There is no game object with the ID {GameObjectID}.");
-                }
+                GameObject gameObject = Find(GameObjectID);
+                NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+                nodeOperator.RotateTo(Rotation, 0);
             }
         }
 

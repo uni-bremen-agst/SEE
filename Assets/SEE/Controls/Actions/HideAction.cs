@@ -1,5 +1,4 @@
-﻿using SEE.DataModel;
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
@@ -786,7 +785,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.Hide"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.Hide;
+            return ActionStateTypes.Hide;
         }
 
         /// <summary>

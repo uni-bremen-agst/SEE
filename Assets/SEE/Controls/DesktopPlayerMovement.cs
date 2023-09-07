@@ -3,7 +3,7 @@
 namespace SEE.Controls
 {
     /// <summary>
-    /// Moves a player in a desktop environment (keyboard and mouse input).
+    /// Moves a player in a desktop environment (based on keyboard and mouse input).
     /// </summary>
     public class DesktopPlayerMovement : PlayerMovement
     {

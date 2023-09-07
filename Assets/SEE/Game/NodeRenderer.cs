@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls.Interactables;
-using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.Operator;
@@ -14,7 +13,7 @@ using SEE.Layout.NodeLayouts;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Object = UnityEngine.Object;
+using InvalidOperationException = System.InvalidOperationException;
 
 namespace SEE.Game
 {
@@ -23,11 +22,6 @@ namespace SEE.Game
     /// </summary>
     public partial class GraphRenderer
     {
-        /// <summary>
-        /// The duration of an animation in seconds.
-        /// </summary>
-        const float animationDuration = 1.0f;
-
         /// <summary>
         /// Sets the name (<see cref="Node.ID"/>) and tag (<see cref="Tags.Node"/>)
         /// of given <paramref name="gameNode"/> and lets the node reference
@@ -59,7 +53,7 @@ namespace SEE.Game
         {
             if (!nodeTypeToFactory.TryGetValue(node.Type, out NodeFactory nodeFactory))
             {
-                Debug.LogError($"No node type factory for node type {node.Type}.\n");
+                throw new InvalidOperationException($"No node type factory for node type {node.Type}.\n");
             }
             GameObject result = nodeFactory.NewBlock(SelectStyle(node), SelectMetrics(node));
             SetGeneralNodeAttributes(node, result);
@@ -92,7 +86,7 @@ namespace SEE.Game
         /// <summary>
         /// Creates and returns a new game object for representing the given <paramref name="node"/>.
         /// The <paramref name="node"/> is attached to that new game object via a NodeRef component.
-        /// LOD is added and the resulting node is prepared for interaction.
+        /// LOD is added, its portal is set, and the resulting game node is prepared for interaction.
         /// </summary>
         /// <param name="node">graph node to be represented</param>
         /// <param name="city">the game object representing the city in which to draw this node;
@@ -116,7 +110,7 @@ namespace SEE.Game
         private void AddLOD(GameObject gameObject)
         {
             LODGroup lodGroup = gameObject.AddComponent<LODGroup>();
-            // Only a single LOD: we either or cull.
+            // Only a single LOD: we either render or cull.
             LOD[] lods = new LOD[1];
             Renderer[] renderers = new Renderer[1];
             renderers[0] = gameObject.GetComponent<Renderer>();
@@ -129,7 +123,7 @@ namespace SEE.Game
         /// Applies AddLOD to every game object in <paramref name="gameObjects"/>.
         /// </summary>
         /// <param name="gameObjects">the list of game objects where AddLOD is to be applied</param>
-        private void AddLOD(ICollection<GameObject> gameObjects)
+        private void AddLOD(IEnumerable<GameObject> gameObjects)
         {
             foreach (GameObject go in gameObjects)
             {
@@ -157,15 +151,12 @@ namespace SEE.Game
         {
             if (Settings.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes value))
             {
-                switch (value.ColorProperty.Property)
+                return value.ColorProperty.Property switch
                 {
-                    case PropertyKind.Metric:
-                        return NodeMetricToColor(node, value.ColorProperty.ColorMetric);
-                    case PropertyKind.Type:
-                        return NodeTypeToColor(node, value.ColorProperty.ByLevel);
-                    default:
-                        throw new NotImplementedException($"Unhandled {typeof(PropertyKind)} {value.ColorProperty.Property}");
-                }
+                    PropertyKind.Metric => NodeMetricToColor(node, value.ColorProperty.ColorMetric),
+                    PropertyKind.Type => NodeTypeToColor(node, value.ColorProperty.ByLevel),
+                    _ => throw new NotImplementedException($"Unhandled {typeof(PropertyKind)} {value.ColorProperty.Property}")
+                };
             }
             else
             {
@@ -193,7 +184,7 @@ namespace SEE.Game
                 uint numberOfStyles = nodeFactory.NumberOfStyles();
 
                 float metricMaximum;
-                if (Utils.FloatUtils.TryGetFloat(colorMetric, out float metricValue))
+                if (FloatUtils.TryGetFloat(colorMetric, out float metricValue))
                 {
                     // The colorMetric name is actually a constant number.
                     metricMaximum = numberOfStyles;
@@ -227,7 +218,7 @@ namespace SEE.Game
         /// <param name="gameNode">a game node representing a leaf or inner graph node</param>
         public void AdjustStyle(GameObject gameNode)
         {
-            if (gameNode.TryGetComponent<NodeRef>(out NodeRef nodeRef))
+            if (gameNode.TryGetComponent(out NodeRef nodeRef))
             {
                 Node node = nodeRef.Value;
                 nodeTypeToFactory[node.Type].SetStyle(gameNode, SelectStyle(node));
@@ -268,9 +259,7 @@ namespace SEE.Game
         private float[] SelectMetrics(Node node)
         {
             if (Settings.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes attributes)
-                && (attributes.Shape == NodeShapes.Spiders
-                    || attributes.Shape == NodeShapes.Polygons
-                    || attributes.Shape == NodeShapes.Bars))
+                && attributes.Shape is NodeShapes.Spiders or NodeShapes.Polygons or NodeShapes.Bars)
             {
                 // FIXME: Not all nodes have necessarily the same set of metrics.
                 // If one does not have a particular numeric attributes, but others
@@ -321,14 +310,14 @@ namespace SEE.Game
                     float widthOfSquare = Mathf.Sqrt(scale.x);
                     scale = new Vector3(widthOfSquare, scale.y, widthOfSquare);
                 }
-                return new float[] { scale.x, scale.y, scale.z };
+                return new[] { scale.x, scale.y, scale.z };
             }
 
             // Adds the values of the metrics of node listed in metricNames (excluding the
             // metric chosen to determine the color) to metrics.
-            void AddMetrics(Node node, IList<float> metrics, ICollection<string> metricNames)
+            void AddMetrics(Node node, ICollection<float> metrics, IEnumerable<string> metricNames)
             {
-                HashSet<string> relevantMetrics = new HashSet<string>(metricNames);
+                HashSet<string> relevantMetrics = new(metricNames);
                 string colorMetric = Settings.NodeTypes[node.Type].ColorProperty.ColorMetric;
                 relevantMetrics.Remove(colorMetric);
                 foreach (string metricName in relevantMetrics)
@@ -384,7 +373,7 @@ namespace SEE.Game
                         // blocks. The height of the blocks remains the original value of the metric
                         // chosen to determine the height, without any kind of transformation.
                         float widthOfSquare = Mathf.Sqrt(scale.x);
-                        Vector3 targetScale = new Vector3(widthOfSquare, scale.y, widthOfSquare);
+                        Vector3 targetScale = new(widthOfSquare, scale.y, widthOfSquare);
                         nodeTypeToFactory[node.Type].SetSize(gameNode, targetScale);
                     }
                     else
@@ -427,7 +416,7 @@ namespace SEE.Game
                         // the node operator's y co-ordinate is meant to be the center
                         nodeTransform.position.y += nodeTransform.scale.y / 2;
                         //Debug.Log($"{node.name} [{node.transform.position}, {node.transform.lossyScale}] => [{nodeTransform.position}), ({nodeTransform.scale}]\n");
-                        nodeOperator.MoveTo(nodeTransform.position, animationDuration);
+                        nodeOperator.MoveTo(nodeTransform.position);
                         // FIXME: Scaling doesn't work yet; likely because nodeTransform.scale is world space
                         // but the node operator expects local scale.
                         //nodeOperator.ScaleTo(nodeTransform.scale, animationDuration);
@@ -546,14 +535,14 @@ namespace SEE.Game
             {
                 //FIXME: This should instead check whether each node has non-aggregated metrics available,
                 // and use those instead of the aggregated ones, because they are usually more accurate (see MetricImporter).
-                ErosionIssues issueDecorator = new ErosionIssues(Settings.InnerIssueMap(),
-                                                                 scaler, Settings.ErosionSettings.ErosionScalingFactor);
+                ErosionIssues issueDecorator = new(Settings.InnerIssueMap(),
+                                                   scaler, Settings.ErosionSettings.ErosionScalingFactor);
                 issueDecorator.Add(innerNodes);
             }
             if (Settings.ErosionSettings.ShowLeafErosions)
             {
-                ErosionIssues issueDecorator = new ErosionIssues(Settings.LeafIssueMap(),
-                                                                 scaler, Settings.ErosionSettings.ErosionScalingFactor * 5);
+                ErosionIssues issueDecorator = new(Settings.LeafIssueMap(),
+                                                   scaler, Settings.ErosionSettings.ErosionScalingFactor * 5);
                 issueDecorator.Add(leafNodes);
             }
         }

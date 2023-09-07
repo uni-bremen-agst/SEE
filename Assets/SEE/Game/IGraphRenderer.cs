@@ -35,6 +35,22 @@ namespace SEE.Game
         GameObject DrawEdge(GameObject source, GameObject target, string edgeType);
 
         /// <summary>
+        /// Draws and returns a new game edge <paramref name="edge"/>
+        /// based on the current settings.
+        ///
+        /// Note: The default edge layout <see cref="IGraphRenderer.EdgeLayoutDefault"/> will be used if no edge layout,
+        /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
+        ///
+        /// Precondition: <paramref name="source"/> and <paramref name="target"/> must either have a valid
+        /// node reference or be <c>null</c>. The corresponding graph nodes must be in the same graph.
+        /// </summary>
+        /// <param name="edge">the edge to be drawn</param>
+        /// <param name="sourceNode">GameObject of source of the new edge</param>
+        /// <param name="targetNode">GameObject of target of the new edge</param>
+        /// <returns>The new game object representing the given edge.</returns>
+        GameObject DrawEdge(Edge edge, GameObject source = null, GameObject target = null);
+
+        /// <summary>
         /// Returns an edge layout for the given <paramref name="gameEdges"/>.
         ///
         /// The result is a mapping of the names of the game objects in <paramref name="gameEdges"/>

@@ -2,7 +2,12 @@
 using SEE.GO;
 using SEE.Utils;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using Cysharp.Threading.Tasks;
+using OpenAI;
+using OpenAI.Chat;
+using SEE.Game.UI.Notification;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
 
@@ -15,6 +20,18 @@ namespace SEE.Game.Avatars
     public class PersonalAssistantSpeechInput : MonoBehaviour
     {
         /// <summary>
+        /// Whether to use ChatGPT to answer all queries.
+        /// If this is set to true, the grammar file is ignored, and we will listen to all input.
+        /// </summary>
+        [Tooltip("Whether to use ChatGPT to answer all queries.")]
+        public bool UseChatGPT = true;
+
+        /// <summary>
+        /// The OpenAI API key to use for ChatGPT.
+        /// </summary>
+        public string OpenAiApiKey = "";
+
+        /// <summary>
         /// Path to the SRGS grammar file. The grammar is expected to define the
         /// following semantics: help, time, about.
         /// </summary>
@@ -24,7 +41,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// The grammar recognizer used to interpret the speech input.
         /// </summary>
-        private GrammarInput input;
+        private SpeechInput input;
 
         /// <summary>
         /// The brain of the personal assistant.
@@ -32,40 +49,121 @@ namespace SEE.Game.Avatars
         private PersonalAssistantBrain brain;
 
         /// <summary>
+        /// The OpenAI client to use for ChatGPT.
+        /// </summary>
+        private OpenAIClient openAiClient;
+
+        /// <summary>
+        /// Whether the personal assistant is currently listening for speech input.
+        /// </summary>
+        private bool currentlyListening = true;
+
+        /// <summary>
+        /// The history of the ChatGPT conversation.
+        /// At the start, this only consists of the prompt.
+        /// </summary>
+        private readonly IList<Message> chatGptHistory = new List<Message>
+        {
+            new(Role.System, string.Format(PROMPT, DateTime.Now.Year))
+        };
+
+        /// <summary>
+        /// The prompt to use for ChatGPT.
+        /// Note that the string should be formatted with the current year.
+        /// </summary>
+        private const string PROMPT = "You are the digital assistant for SEE, which stands for "
+            + "Software Engineering Experience. You are also named SEE yourself. "
+            + "You are helpful, concise and friendly. You will not hallucinate features that don't exist.\n"
+            + "SEE let's you visualize your software as code cities in 3D, using the Unity game engine. "
+            + "SEE is developed by the AG Softwaretechnik at the University of Bremen, led by Rainer Koschke.\n\n"
+            + "The hierarchical decomposition of a program forms a tree. "
+            + "The leaves of this tree are visualized as blocks where "
+            + "different metrics can be used to determine the width, height, "
+            + "depth, and color of the blocks. "
+            + "Inner nodes of this tree can be visualized as nested circles or rectangles "
+            + "depending on the layout you choose. "
+            + "Dependencies can be depicted by connecting edges between blocks. \n\n"
+            + "Knowledge Cutoff: 2021. Current year: {0}\n";
+
+        /// <summary>
         /// Sets up the grammar <see cref="input"/> and registers the callback
         /// <see cref="OnPhraseRecognized(PhraseRecognizedEventArgs)"/>.
         /// </summary>
         private void Start()
         {
+            // TODO: Rather than this boolean, SEE should react to the "Ok, SEE" keyword and then listen for
+            //       ChatGPT input next.
+            if (!UseChatGPT)
+            {
+                if (!InitializeGrammarInput())
+                {
+                    enabled = false;
+                    return;
+                }
+            }
+            else
+            {
+                if (!InitializeDictationInput())
+                {
+                    enabled = false;
+                    return;
+                }
+            }
+
+            input.Start();
+            if (!gameObject.TryGetComponentOrLog(out brain))
+            {
+                enabled = false;
+            }
+        }
+
+        /// <summary>
+        /// Initializes <see cref="input"/> with the grammar file specified in <see cref="GrammarFilePath"/>.
+        /// We will only react to certain keyword phrases.
+        /// </summary>
+        /// <returns>Whether the initialization was successful.</returns>
+        private bool InitializeGrammarInput()
+        {
             if (string.IsNullOrEmpty(GrammarFilePath.Path))
             {
                 Debug.LogError("Grammar file for speech recognition is not defined.\n");
-                enabled = false;
-                return;
+                return false;
             }
 
             if (!File.Exists(GrammarFilePath.Path))
             {
                 Debug.LogError($"Grammar file {GrammarFilePath} for speech recognition does not exist.\n");
-                enabled = false;
-                return;
+                return false;
             }
 
-            try
+            GrammarInput grammarInput;
+            input = grammarInput = new GrammarInput(GrammarFilePath.Path);
+            grammarInput.Register(OnPhraseRecognized);
+            return true;
+        }
+
+        /// <summary>
+        /// Initializes <see cref="input"/> with the ChatGPT API.
+        /// </summary>
+        /// <returns>Whether the initialization was successful.</returns>
+        private bool InitializeDictationInput()
+        {
+            if (string.IsNullOrEmpty(OpenAiApiKey))
             {
-                input = new GrammarInput(GrammarFilePath.Path);
-                input.Register(OnPhraseRecognized);
-                input.Start();
-                if (!gameObject.TryGetComponentOrLog(out brain))
-                {
-                    enabled = false;
-                }
+                Debug.LogWarning("OpenAI API key is not defined.\n");
+                return false;
             }
-            catch (Exception e)
+
+            openAiClient = new OpenAIClient(OpenAiApiKey);
+            if (PhraseRecognitionSystem.Status == SpeechSystemStatus.Running)
             {
-                Debug.LogError($"Failure in starting speech recognition with grammar file {GrammarFilePath}: {e.Message}\n");
-                enabled = false;
+                // Disable phrase recognition system first if it is running.
+                PhraseRecognitionSystem.Shutdown();
             }
+            DictationInput dictationInput;
+            input = dictationInput = new DictationInput();
+            dictationInput.Register(OnDictationResult);
+            return true;
         }
 
         /// <summary>
@@ -84,26 +182,24 @@ namespace SEE.Game.Avatars
                     // Debug.Log($"Meaning: {meaning.key} => {ToString(meaning.values)}\n");
                     foreach (string value in meaning.values)
                     {
-                        // data, help, time, about, goodBye
-                        if (value == "data")
+                        switch (value)
                         {
-                            brain.Overview();
-                        }
-                        else if (value == "interact")
-                        {
-                            brain.Interaction();
-                        }
-                        else if (value == "time")
-                        {
-                            brain.CurrentTime();
-                        }
-                        else if (value == "about")
-                        {
-                            brain.About();
-                        }
-                        else if (value == "goodBye")
-                        {
-                            brain.GoodBye();
+                            // data, interact, time, about, goodBye
+                            case "data":
+                                brain.Overview();
+                                break;
+                            case "interact":
+                                brain.Interaction();
+                                break;
+                            case "time":
+                                brain.CurrentTime();
+                                break;
+                            case "about":
+                                brain.About();
+                                break;
+                            case "goodBye":
+                                brain.GoodBye();
+                                break;
                         }
                     }
                 }
@@ -111,14 +207,33 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Returns the concatenation of all <paramref name="values"/> (separated by
-        /// a blank). Can be used for debugging.
+        /// Callback that is called by the <see cref="input"/> recognizer when a
+        /// free-form sentence was recognized.
+        /// This will make an API request to the ChatGPT API.
         /// </summary>
-        /// <param name="values">values to be concatenated</param>
-        /// <returns>concatenation of all <paramref name="values"/></returns>
-        private string ToString(string[] values)
+        /// <param name="text">The recognized text.</param>
+        /// <param name="confidence">The confidence level of the recognition.</param>
+        private void OnDictationResult(string text, ConfidenceLevel confidence)
         {
-            return string.Join(", ", values);
+            Debug.Log($"Detected phrase '{text}' with confidence {confidence}\n");
+            if (confidence != ConfidenceLevel.Rejected)
+            {
+                chatGptHistory.Add(new Message(Role.User, text));
+                Notification notification = ShowNotification.Info("Thinking...",
+                                                                  "Please wait while I think about what you said...");
+                SendChatMessage(new ChatRequest(chatGptHistory, "gpt-3.5-turbo"), notification).Forget();
+            }
+
+            async UniTaskVoid SendChatMessage(ChatRequest request, Notification notification)
+            {
+                ChatResponse result = await openAiClient.ChatEndpoint.GetCompletionAsync(request);
+                notification.Close();
+                string message = result.FirstChoice.Message.Content;
+                chatGptHistory.Add(new Message(Role.Assistant, message));
+                // We need to stop listening before we start speaking, else we will hear our own voice.
+                StopListening();
+                brain.Say(message, StartListening);
+            }
         }
 
         /// <summary>
@@ -132,12 +247,51 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
+        /// Stops listening to the user.
+        /// </summary>
+        private void StopListening()
+        {
+            if (input != null)
+            {
+                input.Stop();
+                if (UseChatGPT && input is DictationInput dictationInput)
+                {
+                    dictationInput.Unregister(OnDictationResult);
+                }
+                else if (input is GrammarInput grammarInput)
+                {
+                    grammarInput.Unregister(OnPhraseRecognized);
+                }
+                currentlyListening = false;
+            }
+        }
+
+        /// <summary>
+        /// Starts listening to the user.
+        /// </summary>
+        private void StartListening()
+        {
+            if (input != null)
+            {
+                input.Start();
+                if (UseChatGPT && input is DictationInput dictationInput)
+                {
+                    dictationInput.Register(OnDictationResult);
+                }
+                else if (input is GrammarInput grammarInput)
+                {
+                    grammarInput.Register(OnPhraseRecognized);
+                }
+                currentlyListening = true;
+            }
+        }
+
+        /// <summary>
         /// Re-starts <see cref="input"/>.
         /// </summary>
         private void OnEnable()
         {
-            input?.Start();
-            input?.Register(OnPhraseRecognized);
+            StartListening();
         }
 
         /// <summary>
@@ -145,8 +299,24 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void OnDisable()
         {
-            input?.Stop();
-            input?.Unregister(OnPhraseRecognized);
+            StopListening();
+        }
+
+        private void Update()
+        {
+            if (SEEInput.ToggleVoiceInput() && input != null)
+            {
+                if (currentlyListening)
+                {
+                    ShowNotification.Info("Stopped listening", "Disabled voice input.", 5f);
+                    StopListening();
+                }
+                else
+                {
+                    ShowNotification.Info("Started listening", "Enabled voice input.", 5f);
+                    StartListening();
+                }
+            }
         }
     }
 }

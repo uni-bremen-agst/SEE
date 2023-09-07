@@ -12,17 +12,6 @@ namespace SEE.Controls
 {
     public class SceneSettings : MonoBehaviour
     {
-        //----------------------------------------------------------------------------------
-        // Names of game objects present in the scene (possibly depending on the environment
-        // we are running in).
-        //----------------------------------------------------------------------------------
-
-        /// <summary>
-        /// The name of the game object where the ChartManager component and his friends are
-        /// attached to. It is used for handling the metric charts.
-        /// </summary>
-        private const string ChartManagerName = "ChartManager";
-
         //-----------------------------------------------
         // Attributes that can be configured by the user.
         //-----------------------------------------------
@@ -74,9 +63,6 @@ namespace SEE.Controls
                 InputType = PlayerInputType.DesktopPlayer;
             }
         }
-
-        [Tooltip("The factor by which code cities should be scaled on startup."), OdinSerialize, Min(0.01f)]
-        public float CityScalingFactor = 1f;
 
         /// <summary>
         /// The name of the game object holding the unique <see cref="SceneSettings"/>

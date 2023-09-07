@@ -1,4 +1,4 @@
-﻿using SEE.DataModel;
+﻿using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
@@ -15,10 +15,10 @@ namespace SEE.Layout.IO
     {
         /// <summary>
         /// Writes the layout information of all <paramref name="graphName"/> and their descendants tagged
-        /// by Tags.Node to a new file named <paramref name="filename"/> in GVL format, where 
-        /// <paramref name="graphName"/> is used as the value for attribute V of the layout (the 
+        /// by Tags.Node to a new file named <paramref name="filename"/> in GVL format, where
+        /// <paramref name="graphName"/> is used as the value for attribute V of the layout (the
         /// graph view).
-        /// 
+        ///
         /// Note: This method is equivalent to Save(string, string, ICollection<GameObject>)
         /// but intended for ILayoutNodes rather than GameObjects.
         /// </summary>
@@ -37,10 +37,10 @@ namespace SEE.Layout.IO
 
         /// <summary>
         /// Writes the layout information of all <paramref name="graphName"/> and their descendants tagged
-        /// by Tags.Node to a new file named <paramref name="filename"/> in GVL format, where 
-        /// <paramref name="graphName"/> is used as the value for attribute V of the layout (the 
+        /// by Tags.Node to a new file named <paramref name="filename"/> in GVL format, where
+        /// <paramref name="graphName"/> is used as the value for attribute V of the layout (the
         /// graph view).
-        /// 
+        ///
         /// Note: This method is equivalent to Save(string, string, ICollection<ILayoutNode>)
         /// but intended for GameObjects rather than ILayoutNodes.
         /// </summary>
@@ -163,7 +163,7 @@ namespace SEE.Layout.IO
         }
 
         /// <summary>
-        /// Appends 
+        /// Appends
         ///    <element />
         /// </summary>
         /// <param name="doc">the XML document in which to create the XML node</param>
@@ -178,16 +178,16 @@ namespace SEE.Layout.IO
         /// <summary>
         /// Appends
         ///   <Node Id="L*NAME*" X="*X*" Y="*Y*" W="*W* H="*H*" CS="14.14" Exp="True">
-        ///     .... 
+        ///     ....
         ///   </Node>
-        ///   where 
+        ///   where
         ///     ... contains all descendants of <paramref name="node"/> tagged by Tag.Node
         ///     *NAME* is node.ID
         ///     *X* is the x co-ordinate of the left upper corner of the rectangle containing node
         ///     *Y* is the z co-ordinate of the left upper corner of the rectangle containing node
         ///     *W* is the width (x axis) of the rectangle containing node
         ///     *H* is the depth (z axis) of the rectangle containing node
-        ///     and all emitted measures are in world space. If <paramref name="parent"/> = null, 
+        ///     and all emitted measures are in world space. If <paramref name="parent"/> = null,
         ///     *X* and *Y* are the original values of <paramref name="node"/>; otherwise those values
         ///     are relative offsets to the left upper corner of <paramref name="parent"/>.
         /// </summary>
@@ -214,16 +214,16 @@ namespace SEE.Layout.IO
         /// <summary>
         /// Appends
         ///   <Node Id="L*NAME*" X="*X*" Y="*Y*" W="*W* H="*H*" CS="14.14" Exp="True">
-        ///     .... 
+        ///     ....
         ///   </Node>
-        ///   where 
+        ///   where
         ///     ... contains all descendants of <paramref name="node"/> tagged by Tag.Node
         ///     *NAME* is node.ID
         ///     *X* is the x co-ordinate of the left upper corner of the rectangle containing node
         ///     *Y* is the z co-ordinate of the left upper corner of the rectangle containing node
         ///     *W* is the width (x axis) of the rectangle containing node
         ///     *H* is the depth (z axis) of the rectangle containing node
-        ///     and all emitted measures are in world space. If <paramref name="parent"/> = null, 
+        ///     and all emitted measures are in world space. If <paramref name="parent"/> = null,
         ///     *X* and *Y* are the original values of <paramref name="node"/>; otherwise those values
         ///     are relative offsets to the left upper corner of <paramref name="parent"/>.
         /// </summary>
@@ -250,17 +250,17 @@ namespace SEE.Layout.IO
         /// <summary>
         /// Appends
         ///   <Node Id="L*NAME*" X="*X*" Y="*Y*" W="*W* H="*H*" CS="14.14" Exp="True" />
-        ///   where 
+        ///   where
         ///     *NAME* is <paramref name="ID"/>
         ///     *X* is the x co-ordinate of the left upper corner of the rectangle containing node
         ///     *Y* is the z co-ordinate of the left upper corner of the rectangle containing node
         ///     *W* is the width (x axis) of the rectangle containing node
         ///     *H* is the depth (z axis) of the rectangle containing node
-        ///     and all emitted measures are in world space. If not <paramref name="isRoot"/>, 
-        ///     *X* and *Y* are absolute values for the rectangle defined by 
-        ///     <paramref name="nodeCenterPosition"/> and <paramref name="nodeAbsoluteScale"/>. 
-        ///     Otherwise those values are relative offsets to the left upper corner of the 
-        ///     rectangle defined by <paramref name="parentCenterPosition"/> and 
+        ///     and all emitted measures are in world space. If not <paramref name="isRoot"/>,
+        ///     *X* and *Y* are absolute values for the rectangle defined by
+        ///     <paramref name="nodeCenterPosition"/> and <paramref name="nodeAbsoluteScale"/>.
+        ///     Otherwise those values are relative offsets to the left upper corner of the
+        ///     rectangle defined by <paramref name="parentCenterPosition"/> and
         ///     <paramref name="parentAbsoluteScale"/>.
         /// </summary>
         /// <param name="doc">the XML document in which to create the XML node</param>

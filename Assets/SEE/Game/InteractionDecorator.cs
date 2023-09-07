@@ -9,8 +9,6 @@ using UnityEngine.EventSystems;
 using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit;
 
-//using Valve.VR.InteractionSystem;
-
 namespace SEE.Game
 {
     /// <summary>
@@ -33,8 +31,8 @@ namespace SEE.Game
         public static void PrepareForInteraction(GameObject gameObject)
         {
             gameObject.isStatic = false; // we want to move the object during the game
+#if INCLUDE_STEAM_VR
 
-#if false // FIXME STEAMVR
             Interactable interactable = gameObject.AddComponentIfNecessary<Interactable>();
             interactable.highlightOnHover = false;
 #endif
@@ -46,7 +44,6 @@ namespace SEE.Game
             gameObject.AddComponentIfNecessary<ShowGrabbing>();
             if (gameObject.HasNodeRef())
             {
-                gameObject.AddComponentIfNecessary<GameNodeScaler>();
                 gameObject.AddComponentIfNecessary<ShowLabel>();
                 gameObject.AddComponentIfNecessary<ShowEdges>();
                 gameObject.AddComponentIfNecessary<HighlightErosion>();

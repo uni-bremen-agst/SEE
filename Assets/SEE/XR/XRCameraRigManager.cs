@@ -4,6 +4,7 @@ using UnityEngine;
 
 namespace SEE.XR
 {
+#if ENABLE_VR
     /// <summary>
     /// Enables the two controllers of an XR camera rig when XR is enabled.
     ///
@@ -66,4 +67,5 @@ namespace SEE.XR
             }
         }
     }
+#endif
 }

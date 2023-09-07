@@ -66,6 +66,7 @@ namespace SEE.Game.UI.StateIndicator
         /// <param name="color">The background color of the indicator</param>
         public void ChangeState(string text, Color color)
         {
+
             if (HasStarted)
             {
                 ModePanelImage.color = color.WithAlpha(0.5f);
@@ -77,6 +78,7 @@ namespace SEE.Game.UI.StateIndicator
                 StartColor = color.WithAlpha(0.5f);
                 StartText = text;
             }
+
         }
 
         protected GameObject StartDesktopInit()
@@ -103,6 +105,7 @@ namespace SEE.Game.UI.StateIndicator
             {
                 Debug.LogError("Couldn't find ModeText game object in ModePanel\n");
             }
+
             return indicator;
         }
 

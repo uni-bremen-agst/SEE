@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using SEE.Game;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Audio;
+using SEE.Game.SceneManipulation;
 
 namespace SEE.Controls.Actions
 {
@@ -145,7 +145,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.NewNode"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.NewNode;
+            return ActionStateTypes.NewNode;
         }
 
         /// <summary>

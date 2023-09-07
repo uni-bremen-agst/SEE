@@ -7,6 +7,8 @@ using SEE.Utils;
 using System;
 using UnityEngine;
 using SEE.Audio;
+using SEE.DataModel.DG;
+using SEE.Game.SceneManipulation;
 
 namespace SEE.Controls.Actions
 {
@@ -121,7 +123,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The default type of an added edge.
         /// </summary>
-        private const string DefaultEdgeType = "Source_Dependency";
+        private const string DefaultEdgeType = Edge.SourceDependency;
 
         /// <summary>
         /// <see cref="ReversibleAction.Update"/>.
@@ -244,7 +246,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.NewEdge"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.NewEdge;
+            return ActionStateTypes.NewEdge;
         }
 
         /// <summary>

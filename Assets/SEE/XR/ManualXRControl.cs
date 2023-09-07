@@ -12,6 +12,7 @@ namespace SEE.XR
     /// this instance of the game on the computer running the VR),
     /// for instance, a SteamVR camera rig.
     /// </summary>
+#if ENABLE_VR
     internal class ManualXRControl : MonoBehaviour
     {
         /// <summary>
@@ -69,6 +70,8 @@ namespace SEE.XR
             if (XRGeneralSettings.Instance.Manager.activeLoader == null)
             {
                 Debug.LogError("[XR] Initializing XR Failed. Check Editor or Player log for details.\n");
+                Debug.LogError("[XR] Please check in \"Project Settings/XR Plug-in Management\" whether "
+                    + "a Plug-in Provider (OpenXR) has been turned on.\n");
             }
             else
             {
@@ -110,4 +113,5 @@ namespace SEE.XR
             return XRGeneralSettings.Instance.Manager.isInitializationComplete;
         }
     }
+#endif
 }

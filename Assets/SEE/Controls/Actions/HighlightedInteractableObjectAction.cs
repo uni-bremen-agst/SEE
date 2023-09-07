@@ -77,7 +77,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected void ResetOutlineColor()
         {
-            outline.OutlineColor = initialOutlineColor;
+            if (outline)
+            {
+                outline.OutlineColor = initialOutlineColor;
+            }
         }
 
         /// <summary>

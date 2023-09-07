@@ -1,71 +1,76 @@
-using System.Collections.Generic;
-using SEE.Game;
-using SEE.Game.UI3D;
-using SEE.GO;
+using RTG;
 using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
-using SEE.Audio;
 
 namespace SEE.Controls.Actions
 {
     /// <summary>
     /// An action to rotate nodes.
     /// </summary>
-    internal class RotateAction : AbstractPlayerAction
+    internal class RotateAction : NodeManipulationAction<Quaternion>
     {
-        /// <summary>
-        /// The number of degrees in a full circle.
-        /// </summary>
-        private const float FullCircleDegree = 360.0f;
+        #region Constructors
 
-        private struct Hit
+        /// <summary>
+        /// This constructor will be used when this kind of action is to be
+        /// continued with a new instance where <paramref name="gameNodeToBeContinuedWith"/>
+        /// was selected already.
+        /// </summary>
+        /// <param name="gameNodeToBeContinuedWith">the game node selected already</param>
+        private RotateAction(GameObject gameNodeToBeContinuedWith) : base()
         {
-            /// <summary>
-            /// The root of the code city. This is the top-most game object representing a node,
-            /// i.e., is tagged by <see cref="Tags.Node"/>.
-            /// </summary>
-            internal Transform CityRootNode;
-            internal CityCursor Cursor;
-            internal UnityEngine.Plane Plane;
+            Initialize();
+            StartAction(gameNodeToBeContinuedWith);
         }
 
-        private const float SnapStepCount = 8;
-        private const float SnapStepAngle = FullCircleDegree / SnapStepCount;
-        private const int TextureResolution = 1024;
-        private static readonly RotateGizmo gizmo = RotateGizmo.Create(TextureResolution);
-
-        private bool rotating;
-        private Hit hit;
-        private float originalEulerAngleY;
-        private Vector3 originalPosition;
-        private float startAngle;
+        /// <summary>
+        /// This constructor will be used if no game node was selected in a previous
+        /// instance of this type of action.
+        /// </summary>
+        private RotateAction() : base()
+        {
+            Initialize();
+        }
 
         /// <summary>
-        /// Returns a new instance of <see cref="RotateAction"/>.
+        /// Initializes the newly created instance by setting <see cref="currentState"/>
+        /// and <see cref="gizmo"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="RotateAction"/></returns>
-        internal static ReversibleAction CreateReversibleAction() => new RotateAction
+        private void Initialize()
         {
-            rotating = false,
-            hit = new Hit(),
-            originalEulerAngleY = 0.0f,
-            originalPosition = Vector3.zero,
-            startAngle = 0.0f
-        };
+            currentState = ReversibleAction.Progress.NoEffect;
+            gizmo = new RotateGizmo();
+        }
+
+        #endregion Constructors
+
+        #region ReversibleAction Overrides
 
         /// <summary>
         /// Returns a new instance of <see cref="RotateAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance() => new RotateAction
+        public static ReversibleAction CreateReversibleAction()
         {
-            rotating = rotating,
-            hit = hit,
-            originalEulerAngleY = originalEulerAngleY,
-            originalPosition = originalPosition,
-            startAngle = startAngle
-        };
+            return new RotateAction();
+        }
+
+        /// <summary>
+        /// Returns a new instance of <see cref="RotateAction"/>.
+        /// </summary>
+        /// <returns>new instance</returns>
+        public override ReversibleAction NewInstance()
+        {
+            if (gameNodeToBeContinuedInNextAction)
+            {
+                return new RotateAction(gameNodeToBeContinuedInNextAction);
+            }
+            else
+            {
+                return CreateReversibleAction();
+            }
+        }
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
@@ -73,178 +78,98 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.Rotate"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateType.Rotate;
+            return ActionStateTypes.Rotate;
+        }
+
+        #endregion ReversibleAction Overrides
+
+        #region Memento
+
+        /// <summary>
+        /// A memento of the rotation of <see cref="gameNodeSelected"/> before or after,
+        /// respectively, it was rotated.
+        /// </summary>
+        private class RotateMemento : Memento<Quaternion>
+        {
+            /// <summary>
+            /// Constructor taking a snapshot of the world-space rotation of <paramref name="gameObject"/>.
+            /// </summary>
+            /// <param name="gameObject">object whose rotation is to be captured</param>
+            public RotateMemento(GameObject gameObject) : base(gameObject)
+            {
+                InitialState = gameObject.transform.rotation;
+            }
+
+            /// <summary>
+            /// Should never be used.
+            /// </summary>
+            private RotateMemento() : base(null)
+            {
+                throw new System.NotImplementedException();
+            }
+
+            /// <summary>
+            /// Rotates the game object by the given world-space <paramref name="rotation"/>.
+            /// </summary>
+            /// <param name="rotation">world-space rotation</param>
+            protected override void Transform(Quaternion rotation)
+            {
+                base.Transform(rotation);
+                nodeOperator.RotateTo(rotation);
+            }
+
+            /// <summary>
+            /// Broadcasts the <paramref name="rotation"/> to all clients.
+            /// </summary>
+            /// <param name="rotation">rotation to be broadcast</param>
+            protected override void BroadcastState(Quaternion rotation)
+            {
+                new RotateNodeNetAction(nodeOperator.name, rotation).Execute();
+            }
+        }
+
+        #endregion Memento
+
+        #region NodeManipulationAction Overrides
+
+        protected override void FinalizeAction()
+        {
+            base.FinalizeAction();
+            memento.Finalize(gameNodeSelected.transform.rotation);
         }
 
         /// <summary>
-        /// Returns the set of IDs of all game objects changed by this action.
-        /// <see cref="ReversibleAction.GetChangedObjects"/>
+        /// Yields true if the object to be manipulated has had a change.
+        /// Precondition: the object to be manipulated is not null.
         /// </summary>
-        /// <returns>empty set because this action does not change anything</returns>
-        public override HashSet<string> GetChangedObjects()
+        /// <returns>true if the object to be manipulated has had a change</returns>
+        protected override bool HasChanges()
         {
-            return new HashSet<string>();
+            return gameNodeSelected.transform.rotation != memento.InitialState;
         }
+
+        protected override Memento<Quaternion> CreateMemento(GameObject gameNode)
+        {
+            return new RotateMemento(gameNode);
+        }
+
+        #endregion NodeManipulationAction Overrides
+
+        #region Gizmo
 
         /// <summary>
-        /// Returns a new instance of <see cref="RotateAction"/>.
-        /// <see cref="ReversibleAction.Update"/>.
+        /// Manages the gizmo to rotate the selected game node.
         /// </summary>
-        /// <returns>always false</returns>
-        public override bool Update()
+        private class RotateGizmo : Gizmo
         {
-            InteractableObject obj = InteractableObject.HoveredObjectWithWorldFlag;
-            Transform cityRootNode = null;
-            CityCursor cityCursor = null;
-
-            if (obj)
+            /// <summary>
+            /// Constructor setting up <see cref="objectTransformGizmo"/>.
+            /// </summary>
+            public RotateGizmo()
             {
-                cityRootNode = SceneQueries.GetCityRootTransformUpwards(obj.transform);
-                cityCursor = cityRootNode.GetComponentInParent<CityCursor>();
+                objectTransformationGizmo = RTGizmosEngine.Get.CreateObjectRotationGizmo();
             }
-
-            bool synchronize = false;
-
-            if (SEEInput.Cancel()) // cancel rotation
-            {
-                if (rotating)
-                {
-                    Positioner.Set(hit.CityRootNode, position: originalPosition, yAngle: originalEulerAngleY);
-                    foreach (InteractableObject interactable in hit.Cursor.E.GetFocusses())
-                    {
-                        if (interactable.IsGrabbed)
-                        {
-                            interactable.SetGrab(false, true);
-                        }
-                    }
-                    gizmo.gameObject.SetActive(false);
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
-                    rotating = false;
-                    synchronize = true;
-                }
-                else if (obj)
-                {
-                    // TODO(torben): Explanation in MoveAction.cs: @UnselectInWrongPlace
-                    InteractableObject.UnselectAllInGraph(obj.ItsGraph, true);
-                }
-            }
-            else if (SEEInput.Drag()) // start or continue rotation
-            {
-                Vector3 planeHitPoint;
-                if (cityRootNode)
-                {
-                    UnityEngine.Plane plane = new UnityEngine.Plane(Vector3.up, cityRootNode.position);
-                    if (!rotating && Raycasting.RaycastPlane(plane, out planeHitPoint)) // start rotation
-                    {
-                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND);
-                        rotating = true;
-                        hit.CityRootNode = cityRootNode;
-                        hit.Cursor = cityCursor;
-                        hit.Plane = plane;
-
-                        foreach (InteractableObject interactable in hit.Cursor.E.GetFocusses())
-                        {
-                            interactable.SetGrab(true, true);
-                        }
-                        gizmo.gameObject.SetActive(true);
-                        gizmo.Center = cityCursor.E.HasFocus() ? hit.Cursor.E.ComputeCenter() : hit.CityRootNode.position;
-
-                        Vector2 toHit = planeHitPoint.XZ() - gizmo.Center.XZ();
-                        float toHitAngle = toHit.Angle360();
-
-                        originalEulerAngleY = cityRootNode.rotation.eulerAngles.y;
-                        originalPosition = cityRootNode.position;
-                        startAngle = AngleMod(cityRootNode.rotation.eulerAngles.y - toHitAngle);
-                        gizmo.StartAngle = Mathf.Deg2Rad * toHitAngle;
-                        gizmo.TargetAngle = Mathf.Deg2Rad * toHitAngle;
-                    }
-                }
-
-                if (rotating && Raycasting.RaycastPlane(hit.Plane, out planeHitPoint)) // continue rotation
-                {
-                    Vector2 toHit = planeHitPoint.XZ() - gizmo.Center.XZ();
-                    float toHitAngle = toHit.Angle360();
-                    float angle = AngleMod(startAngle + toHitAngle);
-                    if (SEEInput.Snap())
-                    {
-                        angle = AngleMod(Mathf.Round(angle / SnapStepAngle) * SnapStepAngle);
-                    }
-
-                    hit.CityRootNode.RotateAround(gizmo.Center, Vector3.up, angle - hit.CityRootNode.rotation.eulerAngles.y);
-
-                    float prevAngle = Mathf.Rad2Deg * gizmo.TargetAngle;
-                    float currAngle = toHitAngle;
-
-                    while (Mathf.Abs(currAngle + FullCircleDegree - prevAngle) < Mathf.Abs(currAngle - prevAngle))
-                    {
-                        currAngle += FullCircleDegree;
-                    }
-                    while (Mathf.Abs(currAngle - FullCircleDegree - prevAngle) < Mathf.Abs(currAngle - prevAngle))
-                    {
-                        currAngle -= FullCircleDegree;
-                    }
-                    if (SEEInput.Snap())
-                    {
-                        currAngle = Mathf.Round((currAngle + startAngle) / (SnapStepAngle)) * (SnapStepAngle) - startAngle;
-                    }
-                    gizmo.TargetAngle = Mathf.Deg2Rad * currAngle;
-
-                    synchronize = true;
-                }
-            }
-            else if (SEEInput.Reset()) // reset rotation to identity();
-            {
-                if (obj && !rotating)
-                {
-                    foreach (InteractableObject interactable in cityCursor.E.GetFocusses())
-                    {
-                        if (interactable.IsGrabbed)
-                        {
-                            interactable.SetGrab(false, true);
-                        }
-                    }
-                    gizmo.gameObject.SetActive(false);
-
-                    cityRootNode.RotateAround(cityCursor.E.HasFocus() ?
-                          cityCursor.E.ComputeCenter()
-                        : cityRootNode.position, Vector3.up, -cityRootNode.rotation.eulerAngles.y);
-                    synchronize = true;
-                }
-            }
-            else if (rotating) // finalize rotation
-            {
-                rotating = false;
-
-                foreach (InteractableObject interactable in hit.Cursor.E.GetFocusses())
-                {
-                    interactable.SetGrab(false, true);
-                }
-                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND);
-                gizmo.gameObject.SetActive(false);
-                currentState = ReversibleAction.Progress.Completed;
-            }
-
-            if (synchronize)
-            {
-                new RotateNodeNetAction(hit.CityRootNode.name, hit.CityRootNode.position, hit.CityRootNode.eulerAngles.y).Execute();
-            }
-
-            if (currentState != ReversibleAction.Progress.Completed)
-            {
-                currentState = rotating ? ReversibleAction.Progress.InProgress : ReversibleAction.Progress.NoEffect;
-            }
-
-            return true;
         }
-
-        /// <summary>
-        /// Converts the given angle in degrees into the range [0, 360) degrees and returns the result.
-        /// </summary>
-        /// <param name="degrees">The angle in degrees.</param>
-        /// <returns>The angle in the range [0, 360) degrees.</returns>
-        private static float AngleMod(float degrees)
-        {
-            return ((degrees % FullCircleDegree) + FullCircleDegree) % FullCircleDegree;
-        }
+        #endregion
     }
 }

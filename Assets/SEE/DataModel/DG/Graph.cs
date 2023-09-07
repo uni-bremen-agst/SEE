@@ -11,13 +11,13 @@ namespace SEE.DataModel.DG
     /// A graph with nodes and edges representing the data to be visualized
     /// by way of blocks and connections.
     /// </summary>
-    public class Graph : Attributable
+    public partial class Graph : Attributable
     {
         // The list of graph nodes indexed by their unique IDs
-        private Dictionary<string, Node> nodes = new Dictionary<string, Node>();
+        private Dictionary<string, Node> nodes = new();
 
         // The list of graph edges indexed by their unique IDs.
-        private Dictionary<string, Edge> edges = new Dictionary<string, Edge>();
+        private Dictionary<string, Edge> edges = new();
 
         /// <summary>
         /// Name of the artificial node type used for artificial root nodes added
@@ -218,7 +218,7 @@ namespace SEE.DataModel.DG
             /// </summary>
             /// <param name="children">children to be re-parented</param>
             /// <param name="parent">new parent of <see cref="children"/></param>
-            void Reparent(IEnumerable<Node> children, Node parent)
+            static void Reparent(IEnumerable<Node> children, Node parent)
             {
                 foreach (Node child in children)
                 {
@@ -342,7 +342,7 @@ namespace SEE.DataModel.DG
         /// </summary>
         public virtual Edge AddEdge(Node from, Node to, string type)
         {
-            Edge edge = new Edge(from, to, type);
+            Edge edge = new(from, to, type);
             AddEdge(edge);
             return edge;
         }
@@ -761,6 +761,7 @@ namespace SEE.DataModel.DG
             string result = "{\n";
             result += " \"kind\": graph,\n";
             result += $" \"name\": \"{Name}\",\n";
+            result += $" \"path\": \"{Path}\",\n";
             // its own attributes
             result += base.ToString();
             // its nodes
@@ -1351,73 +1352,15 @@ namespace SEE.DataModel.DG
         /// Returns true if <paramref name="other"/> meets all of the following
         /// conditions:
         ///  (1) is not null
-        ///  (2) has exactly the same C# type
-        ///  (3) has exactly the same attributes with exactly the same values
-        ///  (4) has the same path
-        ///  (5) has the same graph name
-        ///  (6) has the same number of nodes and the sets of nodes are equal
-        ///  (7) has the same number of edges and the sets of edges are equal
-        ///  (8) has the same node hierarchy
-        ///
-        /// Note: This node and the other node may or may not be in the same graph.
+        ///  (2) has exactly the same C# type as this graph
+        ///  (3) has exactly the same Name and Path as this graph
         /// </summary>
         /// <param name="other">to be compared to</param>
         /// <returns>true if equal</returns>
         public override bool Equals(object other)
         {
-            if (!base.Equals(other))
-            {
-                Graph otherNode = other as Graph;
-                if (other != null)
-                {
-                    Report($"Graphs {Name} {otherNode?.Name} have differences");
-                }
-
-                return false;
-            }
-
-            Graph otherGraph = other as Graph;
-            Assert.IsNotNull(otherGraph);
-            if (Path != otherGraph.Path)
-            {
-                Report("Graph paths are different");
-                return false;
-            }
-
-            if (Name != otherGraph.Name)
-            {
-                Report("Graph names are different");
-                return false;
-            }
-
-            if (NodeCount != otherGraph.NodeCount)
-            {
-                Report("Number of nodes are different");
-                return false;
-            }
-
-            if (!AreEqual(nodes, otherGraph.nodes))
-            {
-                // Note: because the Equals operation for nodes checks also the ID
-                // of the node's parents and children, we will also implicitly check the
-                // node hierarchy.
-                Report("Graph nodes are different");
-                return false;
-            }
-
-            if (edges.Count != otherGraph.edges.Count)
-            {
-                Report("Number of edges are different");
-                return false;
-            }
-
-            bool equal = AreEqual(edges, otherGraph.edges);
-            if (!equal)
-            {
-                Report("Graph edges are different");
-            }
-
-            return true;
+            return (other is Graph otherGraph) && (GetType() == otherGraph.GetType())
+                && (Name == otherGraph.Name) && (Path == otherGraph.Path);
         }
 
         /// <summary>
@@ -1426,137 +1369,7 @@ namespace SEE.DataModel.DG
         /// <returns>hash code</returns>
         public override int GetHashCode()
         {
-            // we are using the viewName which is intended to be unique
-            return Name.GetHashCode();
-        }
-
-        /// <summary>
-        /// All names of integer attributes of all nodes in the graph.
-        /// </summary>
-        /// <returns>names of integer node attributes</returns>
-        public ISet<string> AllIntNodeAttributes()
-        {
-            return AllNodeAttributes(AllIntAttributeNames);
-        }
-
-        /// <summary>
-        /// All names of float attributes of all nodes in the graph.
-        /// </summary>
-        /// <returns>names of float node attributes</returns>
-        public ISet<string> AllFloatNodeAttributes()
-        {
-            return AllNodeAttributes(AllFloatAttributeNames);
-        }
-
-        /// <summary>
-        /// Returns the concatenation of <see cref="AllFloatNodeAttributes()"/>
-        /// and <see cref="AllIntNodeAttributes()"/>.
-        /// </summary>
-        /// <returns>names of all numeric (int or float) node attributes</returns>
-        public ISet<string> AllNumericNodeAttributes()
-        {
-            ISet<string> result = AllIntNodeAttributes();
-            result.UnionWith(AllFloatNodeAttributes());
-            return result;
-        }
-
-        /// <summary>
-        /// All names of toggle attributes of all nodes in the graph.
-        /// </summary>
-        /// <returns>names of toggle node attributes</returns>
-        public ISet<string> AllToggleNodeAttributes()
-        {
-            return AllNodeAttributes(AllToggleAttributeNames);
-        }
-
-        /// <summary>
-        /// All names of string attributes of all nodes in the graph.
-        /// </summary>
-        /// <returns>names of string node attributes</returns>
-        public ISet<string> AllStringNodeAttributes()
-        {
-            return AllNodeAttributes(AllStringAttributeNames);
-        }
-
-        /// <summary>
-        /// Returns the attribute names of given <paramref name="node"/>.
-        /// </summary>
-        /// <param name="node">the node whose attribute names are to be retrieved</param>
-        /// <returns>attribute names of a particular type</returns>
-        private delegate ICollection<string> AllAttributeNames(Node node);
-
-        /// <summary>
-        /// Yields all string attribute names of given <paramref name="node"/>.
-        /// </summary>
-        /// <param name="node">node whose string attributes are to be retrieved</param>
-        /// <returns>all string attribute names</returns>
-        private static ICollection<string> AllStringAttributeNames(Node node)
-        {
-            return node.StringAttributes.Keys;
-        }
-
-        /// <summary>
-        /// Yields all toggle attribute names of given <paramref name="node"/>.
-        /// </summary>
-        /// <param name="node">node whose toggle attributes are to be retrieved</param>
-        /// <returns>all toggle attribute names</returns>
-        private static ICollection<string> AllToggleAttributeNames(Node node)
-        {
-            return node.ToggleAttributes;
-        }
-
-        /// <summary>
-        /// Yields all float attribute names of given <paramref name="node"/>.
-        /// </summary>
-        /// <param name="node">node whose float attributes are to be retrieved</param>
-        /// <returns>all float attribute names</returns>
-        private static ICollection<string> AllFloatAttributeNames(Node node)
-        {
-            return node.FloatAttributes.Keys;
-        }
-
-        /// <summary>
-        /// Yields all integer attribute names of given <paramref name="node"/>.
-        /// </summary>
-        /// <param name="node">node whose integer attributes are to be retrieved</param>
-        /// <returns>all integer attribute names</returns>
-        private static ICollection<string> AllIntAttributeNames(Node node)
-        {
-            return node.IntAttributes.Keys;
-        }
-
-        /// <summary>
-        /// Returns all node attribute names collected via given <paramref name="attributeNames"/>
-        /// over all nodes in the graph.
-        /// </summary>
-        /// <param name="attributeNames">yields the node attribute names to collect</param>
-        /// <returns>all node attribute names collected via <paramref name="attributeNames"/></returns>
-        private ISet<string> AllNodeAttributes(AllAttributeNames attributeNames)
-        {
-            HashSet<string> result = new HashSet<string>();
-            foreach (Node node in Nodes())
-            {
-                foreach (string name in attributeNames(node))
-                {
-                    result.Add(name);
-                }
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Returns the union of the names of all numeric node attributes of the given <paramref name="graphs"/>.
-        /// </summary>
-        /// <param name="graphs">graphs for which to yield the metric names</param>
-        /// <returns>union of the names of all numeric node attributes</returns>
-        internal static HashSet<string> AllMetrics(ICollection<Graph> graphs)
-        {
-            HashSet<string> result = new HashSet<string>();
-            foreach (Graph graph in graphs)
-            {
-                result.UnionWith(graph.AllNumericNodeAttributes());
-            }
-            return result;
+            return HashCode.Combine(Name, Path);
         }
 
         /// <summary>
@@ -1597,7 +1410,10 @@ namespace SEE.DataModel.DG
             return null;
         }
 
-
+        /// <summary>
+        /// Returns true if <paramref name="graph"/> is not <c>null</c>.
+        /// </summary>
+        /// <param name="graph">graph to be checked</param>
         public static implicit operator bool(Graph graph)
         {
             return graph != null;

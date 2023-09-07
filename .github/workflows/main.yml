@@ -1,24 +1,32 @@
-name: Tests
+name: Test and build SEE
 
 on:
-  push:
-    branches: master
   pull_request:
-    types: [opened, reopened, synchronize, ready_for_review]
-    branches: master
+    types: [opened, reopened, synchronize, ready_for_review, closed]
+    branches: [master]
+  workflow_dispatch:
+    inputs:
+      windows:
+        description: 'Create Windows build?'
+        default: true
+        type: boolean
+      linux:
+        description: 'Create Linux build?'
+        default: true
+        type: boolean
 
 concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true
 
+permissions: read-all
+
 jobs:
   setup:
     name: Setup Repository
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [self-hosted]
+    # The following condition filters out pull requests that are closed, but not merged.
+    if: ${{ github.event_name != 'pull_request' || github.event.pull_request.state != 'closed' || github.event.pull_request.merged }}
+    runs-on: self-hosted
     outputs:
       runner: ${{ steps.remember.outputs.runner }}
     steps:
@@ -47,26 +55,23 @@ jobs:
   gitscripts:
     name: Run GitScript checks
     runs-on: ${{ needs.setup.outputs.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [self-hosted]
     needs: [setup]
+    if: ${{ github.event_name != 'workflow_dispatch' }}
     steps:
       - name: Run GitScripts checks
         run: ./GitScripts/run_all
   static:
     name: Run static checks
-    runs-on: ${{ matrix.os }}
-    if: '! github.event.pull_request.draft'
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [self-hosted]
+    runs-on: self-hosted
+    if: ${{ !github.event.pull_request.draft && github.event_name != 'workflow_dispatch' && !github.event.pull_request.merged }}
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: write
     steps:
       - name: Collect bad patterns
         run: |
-          if [ -n $GITHUB_BASE_REF ] && ! PATTERNS=$(curl -H 'Accept: application/vnd.github.v3.diff' -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -f 'https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}' | grep '^[+@]' | ./GitScripts/check_for_bad_patterns.py); then
+          if [ -n $GITHUB_BASE_REF ] && ! PATTERNS=$(curl -H 'Accept: application/vnd.github.v3.diff' -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -f 'https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}' | ./GitScripts/check_for_bad_patterns.py); then
             DELIMITER=7MApgggGyx6C0
             echo "PATTERNS<<$DELIMITER" >> $GITHUB_ENV
             echo "$PATTERNS" >> $GITHUB_ENV
@@ -83,31 +88,39 @@ jobs:
             const helper = require('./GitScripts/review_helper.js');
             if (PATTERNS === "none") {
               console.log("Found no bad patterns in changed files.");
-              if (context.ref !== 'refs/heads/master') {
-                // Not on master, but on PR: approve if necessary
-                await helper.approve(github, context, false);
-              }
             } else {
-              let bad_patterns = PATTERNS.split('\n');
-              console.log("::warning::Found " + Math.floor(bad_patterns.length/6) + " bad patterns!");
+              let comments = JSON.parse(PATTERNS);
+              console.log("::warning::Found " + comments.length + " bad patterns!");
               if (context.ref === 'refs/heads/master') {
                 console.log("However, we are on master, so we ignore them.");
               } else {
-                let comments = helper.to_comments(bad_patterns);
                 await helper.filter_out_existing_comments(github, context, comments);
                 if (comments.length > 0) {
                   console.log("Submitting PR review...");
-                  github.rest.pulls.createReview({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    pull_number: context.issue.number,
-                    event: 'REQUEST_CHANGES',
-                    body: 'There are a few bad patterns I found which you should check.',
-                    comments: comments
-                  });
+                  let limitMessage = '';
+                  if (comments.length > 50) {
+                    limitMessage = `\n\n**NOTE: Only the first 50 (out of ${comments.length}) review comments are included.** `;
+                    limitMessage += 'Remaining comments will appear when the CI is triggered next.';
+                    comments.splice(50);
+                  }
+                  try {
+                    github.rest.pulls.createReview({
+                      owner: context.repo.owner,
+                      repo: context.repo.repo,
+                      pull_number: context.issue.number,
+                      event: 'COMMENT',
+                      body: 'There are a few bad patterns I found which you should check.' + limitMessage,
+                      comments: comments
+                    });
+                  } catch (error) {
+                    console.error("Could not submit review for pull request. Please check the error message and, below it, the comments for this PR.\n" + error);
+                    console.log("Original comments:");
+                    for (let comment of comments) {
+                      console.warn(`${comment['path']}, line ${comment['line']}: ${comment['body']}`);
+                    }
+                  }
                 } else {
                   console.log("After filtering, no new comments are left. Not submitting a review.");
-                  await helper.approve(github, context, true);
                 }
               }
             }
@@ -115,11 +128,9 @@ jobs:
   test:
     name: Run editmode tests
     runs-on: ${{ needs.setup.outputs.runner }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [self-hosted]
-    needs: [setup, gitscripts, static]
+    needs: [setup, gitscripts]
+    if: ${{ ! github.event.pull_request.draft && github.event_name != 'workflow_dispatch' }}
+    permissions: write-all
     steps:
       - uses: actions/cache@v3
         name: Cache Library
@@ -139,32 +150,135 @@ jobs:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          checkName: ${{ matrix.os }} Test Results
+          checkName: Test Results
           testMode: EditMode  # PlayMode tests get stuck in batchmode
           customParameters: -testCategory "!NonDeterministic"
           coverageOptions: 'generateAdditionalMetrics;generateHtmlReport;assemblyFilters:+SEE'
       - uses: actions/upload-artifact@v3
+        continue-on-error: true
         name: Upload test results
         if: ${{ !cancelled() }}
         with:
-          name: Test results for ${{ matrix.os }}
+          name: Test results
           path: ${{ steps.tests.outputs.artifactsPath }}
       - uses: actions/upload-artifact@v3
+        continue-on-error: true
         name: Upload coverage results
-        if: github.ref == 'refs/heads/master'
+        # Coverage results can get quite large, so only upload on merge into master.
+        if: ${{ github.event.pull_request.merged }}
         with:
           name: Coverage results
           path: ${{ steps.tests.outputs.coveragePath }}
+
+  setup_build_targets:
+    name: Setup build targets
+    if: ${{ ! github.event.pull_request.draft }}
+    runs-on: self-hosted
+    outputs:
+      targetPlatforms: ${{ steps.rememberPlatforms.outputs.targetPlatforms }}
+    steps:
+      - id: rememberPlatforms
+        name: Choose platforms for which to create builds
+        run: |
+          if ${{ github.event_name != 'workflow_dispatch' }}; then
+            # Include all target platforms.
+            echo 'targetPlatforms=["StandaloneWindows64", "StandaloneLinux64"]' >> $GITHUB_OUTPUT
+          else
+            # Set targetPlatform based on inputs.
+            targetPlatforms=()
+            if ${{ github.event.inputs.windows == true }}; then
+                targetPlatforms+=("StandaloneWindows64")
+            fi
+            if ${{ github.event.inputs.linux == true }}; then
+                targetPlatforms+=("StandaloneLinux64")
+            fi
+            echo "targetPlatforms=$(jq --compact-output --null-input '$ARGS.positional' --args -- ${targetPlatforms[@]})" >> $GITHUB_OUTPUT
+          fi
+
+
+  build:
+    name: Create build
+    runs-on: ${{ needs.setup.outputs.runner }}
+    needs: [setup, setup_build_targets, test, gitscripts]
+    strategy:
+      matrix:
+        targetPlatform: ${{ fromJson(needs.setup_build_targets.outputs.targetPlatforms) }}
+    if: ${{ ! github.event.pull_request.draft }}
+    steps:
+      - name: Cleanup any modifications
+        run: |
+          sudo /mnt/scripts/set-work-permissions.sh  # Permissions may be messed up here
+          git reset --hard ${{ github.sha }}  # Test or previous build may have changed files
+          # Try deleting any previous build, but not other zip files that we may need later.
+          git clean -fd -e 'build-*.zip'
+          rm -rf build "build-${{ matrix.targetPlatform }}.zip" || true
+      - uses: game-ci/unity-builder@v2
+        timeout-minutes: 45
+        name: Build project
+        id: build
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          targetPlatform: ${{ matrix.targetPlatform }}
+          buildName: ${{ matrix.targetPlatform }}
+          allowDirtyBuild: true
+      - name: Compress build
+        # Compress only if manually triggered or merged into master, otherwise we won't upload.
+        if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.merged }}
+        run: zip -r build-${{ matrix.targetPlatform }}.zip build/${{ matrix.targetPlatform }}
+      - uses: actions/upload-artifact@v3
+        continue-on-error: true
+        name: Upload build
+        # Upload only if manually triggered, because for master merges we create a release below anyway.
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        with:
+          name: SEE-${{ matrix.targetPlatform }}-${{ github.sha }}.zip
+          path: build-${{ matrix.targetPlatform }}.zip
+          retention-days: 7  # Due to high space usage.
+
+  release:
+    name: Release
+    runs-on: ${{ needs.setup.outputs.runner }}
+    permissions: write-all
+    needs: [setup, build]
+    # We only want to create a release after merging a PR into master.
+    # Note that we will not create a release if the PR is labelled 'no release'.
+    # This label should be set when a PR does not lead to a noticeable change in the build.
+    if: ${{ github.event.pull_request.merged && !contains(github.event.pull_request.labels.*.name, 'no release') }}
+    steps:
+      - name: Create release tag
+        uses: rickstaa/action-create-tag@v1
+        with:
+          tag: pr-${{ github.event.pull_request.number }}
+          message: ${{ github.event.pull_request.title }}
+      - name: Publish release
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          name: ${{ github.event.pull_request.title }}
+          tag_name: pr-${{ github.event.pull_request.number }}
+          fail_on_unmatched_files: true
+          files: |
+            build-*.zip
+          body: |
+            This release incorporates the changes by @${{ github.event.pull_request.user.login }} from pull request #${{ github.event.pull_request.number }}.
+            Builds for Windows and Linux are available below.
+            
+            ## Details
+            ${{ github.event.pull_request.body }}
+            
+            ---
+            
+            > [See original pull request for details.](${{ github.event.pull_request.html_url }})
+
 
   cleanup:
     name: Cleanup
     runs-on: ${{ needs.setup.outputs.runner }}
     if: ${{ always() }}
-    needs: [setup, static, gitscripts, test]
+    needs: [setup, test, build, release]   # "test", "build" and "release" use docker and sometimes mess up permissions.
     strategy:
       fail-fast: false
-      matrix:
-        os: [self-hosted]
     steps:
       - name: Kill Unity
         if: always()
@@ -175,29 +289,3 @@ jobs:
         shell: bash
         run: sudo /mnt/scripts/set-work-permissions.sh
 
-# TODO: Implement build generation and style checking.
-# 
-#  build:
-#    needs: test
-#    runs-on: self-hosted
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        targetPlatform:
-#          #- StandaloneLinux64
-#          #- StandaloneOSX
-#          - StandaloneWindows64
-#    steps:
-#      - uses: actions/checkout@v2
-#        with:
-#          lfs: true
-#      - uses: game-ci/unity-builder@v2
-#        env:
-#          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-#        with:
-#          chownFilesTo: ubuntu:ubuntu
-#          targetPlatform: ${{ matrix.targetPlatform }}
-#      - name: Clean Up
-#        if: always()
-#        shell: bash
-#        run: sudo /mnt/scripts/set-work-permissions.sh

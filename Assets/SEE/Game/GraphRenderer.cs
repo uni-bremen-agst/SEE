@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.HolisticMetrics;
@@ -224,7 +223,7 @@ namespace SEE.Game
         /// <param name="graphs">set of graphs whose node metrics are to be scaled</param>
         public void SetScaler(ICollection<Graph> graphs)
         {
-            HashSet<string> nodeMetrics = Graph.AllMetrics(graphs);
+            ISet<string> nodeMetrics = Graph.AllNodeMetrics(graphs);
 
             if (Settings.ZScoreScale)
             {

@@ -7,6 +7,28 @@ namespace SEE.DataModel.DG
     /// </summary>
     public sealed class Edge : GraphElement
     {
+        /// <summary>
+        /// The most general edge type for all dependencies extracted from the code.
+        /// This name must correspond to Axivion's nomenclatura.
+        /// </summary>
+        public const string SourceDependency = "Source_Dependency";
+
+        /// <summary>
+        /// Edge type for absences (reflexion analysis).
+        /// This name must correspond to Axivion's nomenclatura.
+        /// </summary>
+        public const string Absence = "Absence";
+        /// <summary>
+        /// Edge type for convergences (reflexion analysis).
+        /// This name must correspond to Axivion's nomenclatura.
+        /// </summary>
+        public const string Convergence = "Convergence";
+        /// <summary>
+        /// Edge type for divergences (reflexion analysis).
+        /// This name must correspond to Axivion's nomenclatura.
+        /// </summary>
+        public const string Divergence = "Divergence";
+
         // IMPORTANT NOTES:
         //
         // If you use Clone() to create a copy of an edge, be aware that the clone
@@ -62,48 +84,6 @@ namespace SEE.DataModel.DG
         /// The target of the edge.
         /// </summary>
         public Node Target { get; set; }
-
-        /// <summary>
-        /// Returns true if <paramref name="other"/> meets all of the following conditions:
-        /// (1) is not null
-        /// (2) has exactly the same C# type
-        /// (3) has exactly the same attributes with exactly the same values as this edge
-        /// (4) has the same type name
-        /// (5) the ID of its source is the same as the ID of the source of this edge
-        /// (6) the ID of its target is the same as the ID of the target of this edge
-        ///
-        /// Note: This edge and the other edge may or may not be in the same graph.
-        /// </summary>
-        /// <param name="other">to be compared to</param>
-        /// <returns>true if equal</returns>
-        public override bool Equals(object other)
-        {
-            if (!base.Equals(other))
-            {
-                return false;
-            }
-            else
-            {
-                Edge otherEdge = other as Edge;
-                bool equal = Target.ID == otherEdge.Target.ID
-                    && Source.ID == otherEdge.Source.ID;
-                if (!equal)
-                {
-                    Report(ID + ": Source or target are different.");
-                }
-                return equal;
-            }
-        }
-
-        /// <summary>
-        /// Returns a hash code.
-        /// </summary>
-        /// <returns>hash code</returns>
-        public override int GetHashCode()
-        {
-            // we are using the ID which is intended to be unique
-            return ID.GetHashCode();
-        }
 
         /// <summary>
         /// Creates deep copies of attributes where necessary. Is called by

@@ -52,42 +52,35 @@ namespace SEE.Utils
                     // Now we can destroy the children.
                     foreach (GameObject child in allChildren)
                     {
-                        Destroy(child.gameObject);
+                        Destroy(child, recurseIntoChildren);
                     }
                 }
-                // We must use DestroyImmediate when we are in the editor mode.
-                if (Application.isPlaying)
-                {
-                    // playing either in a built player or in the player of the editor
-                    Object.Destroy(gameObject);
-                }
-                else
-                {
-                    // game is not played; we are in the editor mode
-                    Object.DestroyImmediate(gameObject);
-                }
+                /// Make sure that we do not run into an endless recursion. We really
+                /// want to call <see cref="Destroy(Object)"></see> and not
+                /// <see cref="Destroy(GameObject, bool)"/>.
+                Destroy(gameObject as Object);
             }
         }
 
         /// <summary>
-        /// Destroys given <paramref name="component"/> using <see cref="UnityEngine.Object.Destroy(Object)"/>
+        /// Destroys given <paramref name="object"/> using <see cref="UnityEngine.Object.Destroy(Object)"/>
         /// when in play mode or <see cref="UnityEngine.Object.DestroyImmediate(Object)"/> when in editor mode.
         /// </summary>
-        /// <param name="component">component to be destroyed</param>
-        public static void Destroy(Component component)
+        /// <param name="object">object to be destroyed</param>
+        public static void Destroy(Object @object)
         {
-            if (component != null)
+            if (@object != null)
             {
                 // We must use DestroyImmediate when we are in the editor mode.
                 if (Application.isPlaying)
                 {
                     // playing either in a built player or in the player of the editor
-                    Object.Destroy(component);
+                    Object.Destroy(@object);
                 }
                 else
                 {
                     // game is not played; we are in the editor mode
-                    Object.DestroyImmediate(component);
+                    Object.DestroyImmediate(@object);
                 }
             }
         }

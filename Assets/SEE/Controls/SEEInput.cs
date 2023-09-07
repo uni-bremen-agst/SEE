@@ -1,5 +1,4 @@
 ﻿using SEE.Utils;
-using System;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -31,6 +30,15 @@ namespace SEE.Controls
         public static bool Help()
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Help);
+        }
+
+        /// <summary>
+        /// Toggles voice input (i.e., for voice commands) on/off.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleVoiceInput()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleVoiceInput);
         }
 
         /// <summary>
@@ -190,26 +198,13 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Whether the left or right shift key was pressed down (and not again released).
-        /// </summary>
-        private static bool isModPressed = false;
-
-        /// <summary>
         /// Returns true if the user wants to toggle the run-time configuration
         /// menu allowing him/her to define the settings for code cities.
         /// </summary>
         /// <returns>true if the user wants to toggle the run-time configuration menu</returns>
         internal static bool ToggleConfigMenu()
         {
-            if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.RightShift))
-            {
-                isModPressed = true;
-            }
-            if (Input.GetKeyUp(KeyCode.LeftShift) || Input.GetKeyUp(KeyCode.RightShift))
-            {
-                isModPressed = false;
-            }
-            return isModPressed && Input.GetKeyUp(KeyCode.Escape);
+            return KeyboardShortcutsEnabled & Input.GetKeyDown(KeyBindings.ConfigMenu);
         }
 
         /// <summary>
@@ -467,30 +462,6 @@ namespace SEE.Controls
         //--------------------------
 
         /// <summary>
-        /// The previous revision is to be shown.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool PreviousRevision()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.PreviousRevision);
-        }
-        /// <summary>
-        /// The next revision is to be shown.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool NextRevision()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.NextRevision);
-        }
-        /// <summary>
-        /// Toggles auto play of the animation.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ToggleAutoPlay()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleAutoPlay);
-        }
-        /// <summary>
         /// Sets a new marker.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
@@ -518,8 +489,51 @@ namespace SEE.Controls
         #endregion
 
         //----------------------------------------------------
-        #region Animation speed (shared by Debugging and Evolution)
+        #region Animation (shared by Debugging and Evolution)
         //----------------------------------------------------
+
+        /// <summary>
+        /// The previous revision is to be shown.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool Previous()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Previous);
+        }
+        /// <summary>
+        /// The next revision is to be shown.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool Next()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.Next);
+        }
+        /// <summary>
+        /// Toggles auto play of the animation.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleAutoPlay()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleAutoPlay);
+        }
+
+        /// <summary>
+        /// Toggles execution order (forward/backward).
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleExecutionOrder()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleExecutionOrder);
+        }
+
+        /// <summary>
+        /// Execution is back to very first statement.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool FirstStatement()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.FirstStatement);
+        }
 
         /// <summary>
         /// Double animation speed.
@@ -529,6 +543,7 @@ namespace SEE.Controls
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.IncreaseAnimationSpeed);
         }
+
         /// <summary>
         /// Halve animation speed.
         /// </summary>
@@ -545,52 +560,12 @@ namespace SEE.Controls
         //--------------------------
 
         /// <summary>
-        /// Toggles automatic/manual execution mode.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ToggleAutomaticManualMode()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleAutomaticManualMode);
-        }
-        /// <summary>
-        /// Toggles execution order (forward/backward).
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ToggleExecutionOrder()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleExecutionOrder);
-        }
-        /// <summary>
         /// Continues execution until next breakpoint is reached.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ExecuteToBreakpoint()
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ExecuteToBreakpoint);
-        }
-        /// <summary>
-        /// Executes previous statement.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool PreviousStatement()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.PreviousStatement);
-        }
-        /// <summary>
-        /// Executes next statement.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool NextStatement()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.NextStatement);
-        }
-        /// <summary>
-        /// Execution is back to very first statement.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool FirstStatement()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.FirstStatement);
         }
 
         #endregion
@@ -640,30 +615,12 @@ namespace SEE.Controls
         //----------------------------------------------------
 
         /// <summary>
-        /// True if the user wants to toggle the global text chat.
+        /// Opens the text chat.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ToggleGlobalChat()
+        public static bool OpenTextChat()
         {
-            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleGlobalChat);
-        }
-
-        /// <summary>
-        /// True if the user wants to toggle the text chat for team 1.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ToggleTeam1Channel()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleTeam1Channel);
-        }
-
-        /// <summary>
-        /// True if the user wants to toggle the text chat for team 2.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ToggleTeam2Channel()
-        {
-            return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.ToggleTeam2Channel);
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.OpenTextChat);
         }
 
         #endregion
@@ -675,6 +632,7 @@ namespace SEE.Controls
         /// <summary>
         /// True if the user wants to close all notifications.
         /// </summary>
+        /// <returns>True if the user wants to close all notifications.</returns>
         public static bool CloseAllNotifications()
         {
             return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.CloseNotifications);
@@ -682,13 +640,25 @@ namespace SEE.Controls
 
         #endregion
 
+        #region FaceCam
         /// <summary>
-        /// Whether the user wants to toggle the menu for the metric boards.
+        /// True if the user wants to turn the FaceCam on or off (toggling).
         /// </summary>
-        /// <returns>true if the user wants to toggle the menu for the metric boards</returns>
-        public static bool ToggleHolisticMetricsMenu()
+        /// <returns>True if the user wants to turn the FaceCam on or off.</returns>
+        internal static bool ToggleFaceCam()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleHolisticMetricsMenu);
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleFaceCam);
         }
+
+        /// <summary>
+        /// True if the user wants to switch the position of the FaceCam on the player's face (toggling).
+        /// </summary>
+        /// <returns>True if the user wants to switch the position of the FaceCam.</returns>
+        internal static bool ToggleFaceCamPosition()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleFaceCamPosition);
+        }
+
+        #endregion
     }
 }
