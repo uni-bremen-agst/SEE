@@ -13,7 +13,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Returns the item of the given collection that maximizes the given function.
         /// </summary>
-        /// <param name="collection">The collection whose maximum with respect to 
+        /// <param name="collection">The collection whose maximum with respect to
         /// <paramref name="eval"/> shall be returned</param>
         /// <param name="eval">The function to be maximized</param>
         /// <returns>Item of <paramref name="collection"/> that maximizes <paramref name="eval"/></returns>
@@ -25,7 +25,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
         /// Returns the item of the given collection that minimizes the given function.
         /// </summary>
-        /// <param name="collection">The collection whose minimum with respect to 
+        /// <param name="collection">The collection whose minimum with respect to
         /// <paramref name="eval"/> shall be returned</param>
         /// <param name="eval">The function to be minimized</param>
         /// <returns>Item of <paramref name="collection"/> that minimizes <paramref name="eval"/></returns>
