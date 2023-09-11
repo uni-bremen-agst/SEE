@@ -342,7 +342,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.openxr": {
-      "version": "1.8.2",
+      "version": "1.8.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
