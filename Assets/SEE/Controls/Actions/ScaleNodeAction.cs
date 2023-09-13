@@ -122,7 +122,7 @@ namespace SEE.Controls.Actions
             /// <param name="localScale">local scale to be broadcast</param>
             protected override void BroadcastState(Vector3 localScale)
             {
-                new ScaleNodeNetAction(nodeOperator.name, localScale, AbstractOperator.DefaultAnimationDuration).Execute();
+                new ScaleNodeNetAction(nodeOperator.name, localScale).Execute();
             }
         }
 

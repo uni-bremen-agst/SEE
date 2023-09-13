@@ -72,7 +72,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <remarks>
         /// This does not really run the reflexion analysis. Use <see cref="RunAnalysis"/> to start the analysis.
         /// </remarks>
-        public ReflexionGraph(Graph fullGraph, bool allowDependenciesToParents = true): base(fullGraph)
+        public ReflexionGraph(Graph fullGraph, bool allowDependenciesToParents = true) : base(fullGraph)
         {
             AllowDependenciesToParents = allowDependenciesToParents;
             (Graph implementation, Graph architecture, _) = Disassemble();

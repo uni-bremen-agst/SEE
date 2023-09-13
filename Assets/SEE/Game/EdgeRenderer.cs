@@ -155,7 +155,7 @@ namespace SEE.Game
             Assert.IsNotNull(toLayoutNode, $"Target node {edge.Target.ID} does not have a layout node.\n");
             // The single layout edge between source and target. We want the layout only for this edge.
             ICollection<LayoutGraphEdge<LayoutGameNode>> layoutEdges = new List<LayoutGraphEdge<LayoutGameNode>>
-                { new LayoutGraphEdge<LayoutGameNode>(fromLayoutNode, toLayoutNode, edge) };
+                { new(fromLayoutNode, toLayoutNode, edge) };
 
 
             // Calculate the edge layout (for the single edge only).
@@ -214,6 +214,35 @@ namespace SEE.Game
             fromNode.ItsGraph.AddEdge(edge);
 
             return DrawEdge(edge, source, target, true);
+        }
+
+        /// <summary>
+        /// Draws and returns a new game edge <paramref name="edge"/>
+        /// based on the current settings.
+        ///
+        /// Note: The default edge layout <see cref="IGraphRenderer.EdgeLayoutDefault"/> will be used if no edge layout,
+        /// i.e., <see cref="EdgeLayoutKind.None>"/>, was chosen in the settings.
+        ///
+        /// Precondition: <paramref name="source"/> and <paramref name="target"/> must have a valid
+        /// node reference. The corresponding graph nodes must be in the same graph.
+        /// </summary>
+        /// <param name="edge">the edge to be drawn</param>
+        /// <param name="sourceNode">GameObject of source of the new edge</param>
+        /// <param name="targetNode">GameObject of target of the new edge</param>
+        /// <returns>The new game object representing the given edge.</returns>
+        public GameObject DrawEdge(Edge edge, GameObject sourceNode = null, GameObject targetNode = null)
+        {
+            if (sourceNode == null)
+            {
+                sourceNode = GraphElementIDMap.Find(edge.Source.ID);
+            }
+
+            if (targetNode == null)
+            {
+                targetNode = GraphElementIDMap.Find(edge.Target.ID);
+            }
+
+            return DrawEdge(edge, sourceNode, targetNode, true);
         }
 
         /// <summary>
