@@ -625,6 +625,10 @@
         }
     },
     "Project": {
+        "AxivionC#Analysis": {
+            "_copy_from": "AxivionC#Frontend",
+            "solution": "SEE.sln"
+        },
         "BuildSystemIntegration": {
             "child_order": [
                 "AxivionCompiler",
@@ -632,7 +636,8 @@
                 "Command",
                 "MakeIntegration",
                 "MSBuildIntegration",
-                "PrintAMessage"
+                "PrintAMessage",
+                "AxivionC#Analysis"
             ]
         },
         "Git": {
@@ -645,7 +650,7 @@
         },
         "MSBuildIntegration": {
             "_active": true,
-            "binary": "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "binary": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
             "project": "SEE.csproj"
         },
         "PrintAMessage": {
@@ -662,7 +667,7 @@
         }
     },
     "Results": {
-        "Database": {
+        "Dashboard": {
             "ci_mode": {
                 "filename": "SEE.db",
                 "provide_ir": {
@@ -679,11 +684,11 @@
         }
     },
     "_Format": "1.0",
-    "_Version": "7.1.4",
+    "_Version": "7.6.3",
     "_VersionNum": [
         7,
-        1,
-        4,
-        6285
+        6,
+        3,
+        12797
     ]
 }
