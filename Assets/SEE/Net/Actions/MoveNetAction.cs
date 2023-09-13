@@ -1,4 +1,5 @@
 ﻿using SEE.Game;
+using SEE.Game.SceneManipulation;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -20,9 +21,9 @@ namespace SEE.Net.Actions
         public Vector3 TargetPosition;
 
         /// <summary>
-        /// The duration of the movement animation in seconds.
+        /// The factor by which the movement animation duration is multiplied.
         /// </summary>
-        public float Duration;
+        public float AnimationFactor;
 
         /// <summary>
         /// Constructor.
@@ -30,12 +31,12 @@ namespace SEE.Net.Actions
         /// <param name="gameObjectID">the unique game-object name of the game object to be moved;
         /// must be known to <see cref="GraphElementIDMap"/></param>
         /// <param name="targetPosition">the new position of the game object in world space</param>
-        /// <param name="animationDuration">the duration of the movement animation in seconds</param>
-        public MoveNetAction(string gameObjectID, Vector3 targetPosition, float animationDuration)
+        /// <param name="animationFactor">the factor by which the animation duration is multiplied</param>
+        public MoveNetAction(string gameObjectID, Vector3 targetPosition, float animationFactor)
         {
             GameObjectID = gameObjectID;
             TargetPosition = targetPosition;
-            Duration = animationDuration;
+            AnimationFactor = animationFactor;
         }
 
         /// <summary>
@@ -45,7 +46,7 @@ namespace SEE.Net.Actions
         {
             if (!IsRequester())
             {
-                GameNodeMover.MoveTo(Find(GameObjectID), TargetPosition, Duration);
+                GameNodeMover.MoveTo(Find(GameObjectID), TargetPosition, AnimationFactor);
             }
         }
 

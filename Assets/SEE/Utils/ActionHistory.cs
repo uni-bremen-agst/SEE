@@ -68,7 +68,7 @@ namespace SEE.Utils
         /// <summary>
         /// An entry describing an executed action in the global action history.
         /// </summary>
-        public struct GlobalHistoryEntry
+        public readonly struct GlobalHistoryEntry
         {
             /// <summary>
             /// Represents an entry in the globalHistory.

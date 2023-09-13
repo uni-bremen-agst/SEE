@@ -34,7 +34,7 @@ set "REQUESTS_CA_BUNDLE=%AXIVION_DASHBOARD_CONFIG%\cert\auto.crt"
 REM URL of the dashserver
 REM set "AXIVION_DASHBOARD_URL=https://localhost:9443/axivion/"
 REM set "AXIVION_DASHBOARD_URL=https://swt-jenkins.informatik.uni-bremen.de:9443/axivion/"
-set "AXIVION_DASHBOARD_URL=https://stvive.informatik.uni-bremen.de:9443/axivion/"
+set "AXIVION_DASHBOARD_URL=https://stvr2.informatik.uni-bremen.de:9443/axivion/"
 
 REM If the dashserver is installed as a Windows service, you can
 REM start and stop it as follows:

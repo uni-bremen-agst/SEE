@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SEE.Game;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.Audio;
+using SEE.Game.SceneManipulation;
 
 namespace SEE.Controls.Actions
 {

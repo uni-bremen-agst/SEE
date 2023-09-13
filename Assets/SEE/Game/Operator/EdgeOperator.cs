@@ -39,73 +39,84 @@ namespace SEE.Game.Operator
         /// This will also disable the <paramref name="target"/>'s game object immediately so it's invisible.
         /// </summary>
         /// <param name="target">The spline this edge should animate towards</param>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<TweenCallback> MorphTo(SEESpline target, float duration)
+        public IOperationCallback<TweenCallback> MorphTo(SEESpline target, float factor = 1)
         {
             // We deactivate the target edge first so it's not visible.
             target.gameObject.SetActive(false);
             // We now use the MorphismOperation to actually move the edge.
-            return morphism.AnimateTo((target.Spline, target.gameObject), duration);
+            return morphism.AnimateTo((target.Spline, target.gameObject), ToDuration(factor));
         }
 
         /// <summary>
         /// Morph the spline represented by this edge to the given <paramref name="target"/> spline.
         /// </summary>
         /// <param name="target">The spline this edge should animate towards</param>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<TweenCallback> MorphTo(BSpline target, float duration)
+        public IOperationCallback<TweenCallback> MorphTo(BSpline target, float factor = 1)
         {
-            return morphism.AnimateTo((target, null), duration);
+            return morphism.AnimateTo((target, null), ToDuration(factor));
         }
 
         /// <summary>
         /// Construct the edge from subsplines.
         /// </summary>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> Construct(float duration)
+        public IOperationCallback<Action> Construct(float factor = 1)
         {
-            return construction.AnimateTo(true, duration);
+            return construction.AnimateTo(true, ToDuration(factor));
         }
 
         /// <summary>
         /// Destruct the edge from subsplines.
         /// </summary>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> Destruct(float duration)
+        public IOperationCallback<Action> Destruct(float factor = 1)
         {
-            return construction.AnimateTo(false, duration);
+            return construction.AnimateTo(false, ToDuration(factor));
         }
 
         /// <summary>
         /// Show the edge, revealing it as specified in the <see cref="animationKind"/>.
         /// </summary>
         /// <param name="animationKind">In which way to reveal the edge.</param>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> Show(EdgeAnimationKind animationKind, float duration)
+        public IOperationCallback<Action> Show(EdgeAnimationKind animationKind, float factor = 1)
         {
-            return ShowOrHide(true, animationKind, duration);
+            return ShowOrHide(true, animationKind, factor);
         }
 
         /// <summary>
         /// Hide the edge, animating it as specified in the <see cref="animationKind"/>.
         /// </summary>
         /// <param name="animationKind">In which way to hide the edge.</param>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
-        /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> Hide(EdgeAnimationKind animationKind, float duration)
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
+        public IOperationCallback<Action> Hide(EdgeAnimationKind animationKind, float factor = 1)
         {
-            return ShowOrHide(false, animationKind, duration);
+            return ShowOrHide(false, animationKind, factor);
         }
 
         /// <summary>
@@ -113,18 +124,20 @@ namespace SEE.Game.Operator
         /// </summary>
         /// <param name="show">Whether to show or hide the edge.</param>
         /// <param name="animationKind">In which way to animate the edge.</param>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <returns>An operation callback for the requested animation</returns>
         /// <exception cref="ArgumentOutOfRangeException">If the given <paramref name="animationKind"/>
         /// is unknown.</exception>
-        public IOperationCallback<Action> ShowOrHide(bool show, EdgeAnimationKind animationKind, float duration)
+        public IOperationCallback<Action> ShowOrHide(bool show, EdgeAnimationKind animationKind, float factor = 1)
         {
             return animationKind switch
             {
                 EdgeAnimationKind.None => new DummyOperationCallback<Action>(),
-                EdgeAnimationKind.Fading => FadeTo(show ? 1.0f : 0.0f, duration),
-                EdgeAnimationKind.Buildup => show ? Construct(duration) : Destruct(duration),
+                EdgeAnimationKind.Fading => FadeTo(show ? 1.0f : 0.0f, factor),
+                EdgeAnimationKind.Buildup => show ? Construct(factor) : Destruct(factor),
                 _ => throw new ArgumentOutOfRangeException(nameof(animationKind), "Unknown edge animation kind supplied.")
             };
         }
@@ -141,6 +154,8 @@ namespace SEE.Game.Operator
         {
             // Assigned so that the expensive getter isn't called everytime.
             GameObject go = gameObject;
+            go.MustGetComponent(out spline);
+            base.OnEnable();
 
             SplineMorphism AnimateToMorphismAction((BSpline targetSpline, GameObject temporaryGameObject) s, float d)
             {
@@ -167,7 +182,6 @@ namespace SEE.Game.Operator
                 return Animator;
             }
 
-            go.MustGetComponent(out spline);
             morphism = new MorphismOperation(AnimateToMorphismAction, spline.Spline, null);
 
             Tween[] ConstructAction(bool extending, float duration)
@@ -182,7 +196,6 @@ namespace SEE.Game.Operator
             }
 
             construction = new TweenOperation<bool>(ConstructAction, spline.SubsplineEndT >= 1);
-            base.OnEnable();
         }
 
         protected override TweenOperation<(Color start, Color end)> InitializeColorOperation()
@@ -212,6 +225,8 @@ namespace SEE.Game.Operator
             base.OnDisable();
             morphism.KillAnimator();
             morphism = null;
+            construction.KillAnimator();
+            construction = null;
         }
     }
 }

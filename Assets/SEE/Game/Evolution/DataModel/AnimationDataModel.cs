@@ -19,6 +19,7 @@
 
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace SEE.Game.Evolution
@@ -89,7 +90,8 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// Text of the fast-forward button.
         /// </summary>
-        public Text FastFowardButtonText; // serialized by Unity
+        [FormerlySerializedAs("FastFowardButtonText")]
+        public Text FastForwardButtonText; // serialized by Unity
 
         /// <summary>
         /// Text of the fast-backward button.
@@ -112,7 +114,7 @@ namespace SEE.Game.Evolution
             CommentPrefab.AssertNotNull("Comment");
             PlayButtonText.AssertNotNull("Text");
             ReverseButtonText.AssertNotNull("Text");
-            FastFowardButtonText.AssertNotNull("Text");
+            FastForwardButtonText.AssertNotNull("Text");
             FastBackwardButtonText.AssertNotNull("Text");
         }
     }

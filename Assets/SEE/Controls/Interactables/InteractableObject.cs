@@ -9,7 +9,7 @@ using UnityEngine.Assertions;
 #if INCLUDE_STEAM_VR
 using Valve.VR.InteractionSystem;
 #endif
-using SEE.Game;
+using SEE.Game.SceneManipulation;
 using SEE.Net.Actions;
 using SEE.Audio;
 

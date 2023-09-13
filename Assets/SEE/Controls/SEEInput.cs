@@ -632,9 +632,31 @@ namespace SEE.Controls
         /// <summary>
         /// True if the user wants to close all notifications.
         /// </summary>
+        /// <returns>True if the user wants to close all notifications.</returns>
         public static bool CloseAllNotifications()
         {
             return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.CloseNotifications);
+        }
+
+        #endregion
+
+        #region FaceCam
+        /// <summary>
+        /// True if the user wants to turn the FaceCam on or off (toggling).
+        /// </summary>
+        /// <returns>True if the user wants to turn the FaceCam on or off.</returns>
+        internal static bool ToggleFaceCam()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleFaceCam);
+        }
+
+        /// <summary>
+        /// True if the user wants to switch the position of the FaceCam on the player's face (toggling).
+        /// </summary>
+        /// <returns>True if the user wants to switch the position of the FaceCam.</returns>
+        internal static bool ToggleFaceCamPosition()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleFaceCamPosition);
         }
 
         #endregion

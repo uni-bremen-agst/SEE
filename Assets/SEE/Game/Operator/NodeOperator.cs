@@ -86,15 +86,6 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
-        /// The node to which the <see cref="Node"/> belongs.
-        /// </summary>
-        public AbstractSEECity City
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
         /// If this isn't null, represents the duration in seconds the layout update should take,
         /// and if this is null, the layout shall not be updated.
         /// Note that the layout includes the edge layout and the positioning of the node label, if it exists.
@@ -121,60 +112,72 @@ namespace SEE.Game.Operator
         #region Public API
 
         /// <summary>
-        /// Moves the node to the <paramref name="newXPosition"/> in world space, taking <paramref name="duration"/> seconds.
+        /// Moves the node to the <paramref name="newXPosition"/> in world space.
         /// </summary>
         /// <param name="newXPosition">the desired new target X coordinate in world space</param>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveXTo(float newXPosition, float duration = DefaultAnimationDuration, bool updateEdges = true)
+        public IOperationCallback<Action> MoveXTo(float newXPosition, float factor = 1, bool updateEdges = true)
         {
+            float duration = ToDuration(factor);
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
             return PositionX.AnimateTo(newXPosition, duration);
         }
 
         /// <summary>
-        /// Moves the node to the <paramref name="newYPosition"/> in world space, taking <paramref name="duration"/> seconds.
+        /// Moves the node to the <paramref name="newYPosition"/> in world space.
         /// </summary>
         /// <param name="newYPosition">the desired new target Y coordinate in world space</param>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveYTo(float newYPosition, float duration = DefaultAnimationDuration, bool updateEdges = true)
+        public IOperationCallback<Action> MoveYTo(float newYPosition, float factor = 1, bool updateEdges = true)
         {
+            float duration = ToDuration(factor);
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
             return PositionY.AnimateTo(newYPosition, duration);
         }
 
         /// <summary>
-        /// Moves the node to the <paramref name="newZPosition"/> in world space, taking <paramref name="duration"/> seconds.
+        /// Moves the node to the <paramref name="newZPosition"/> in world space.
         /// </summary>
         /// <param name="newZPosition">the desired new target Z coordinate in world space</param>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveZTo(float newZPosition, float duration = DefaultAnimationDuration, bool updateEdges = true)
+        public IOperationCallback<Action> MoveZTo(float newZPosition, float factor =1, bool updateEdges = true)
         {
+            float duration = ToDuration(factor);
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
             return PositionZ.AnimateTo(newZPosition, duration);
         }
 
         /// <summary>
-        /// Moves the node to the <paramref name="newPosition"/> in world space, taking <paramref name="duration"/> seconds.
+        /// Moves the node to the <paramref name="newPosition"/> in world space.
         /// </summary>
         /// <param name="newPosition">the desired new target position in world space</param>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveTo(Vector3 newPosition, float duration = DefaultAnimationDuration, bool updateEdges = true)
+        public IOperationCallback<Action> MoveTo(Vector3 newPosition, float factor = 1, bool updateEdges = true)
         {
+            float duration = ToDuration(factor);
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
             return new AndCombinedOperationCallback<Action>(new[]
@@ -186,59 +189,67 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
-        /// Rotates the node to the given quaternion <paramref name="newRotation"/>,
-        /// taking <paramref name="duration"/> seconds.
+        /// Rotates the node to the given quaternion <paramref name="newRotation"/>.
         /// </summary>
         /// <param name="newRotation">the desired new target rotation in world space</param>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> RotateTo(Quaternion newRotation, float duration = DefaultAnimationDuration)
+        public IOperationCallback<Action> RotateTo(Quaternion newRotation, float factor = 1)
         {
-            return Rotation.AnimateTo(newRotation, duration);
+            return Rotation.AnimateTo(newRotation, ToDuration(factor));
         }
 
         /// <summary>
-        /// Rotates the node around the given <paramref name="axis"/> by the given <paramref name="angle"/>, taking
-        /// <paramref name="duration"/> seconds.
+        /// Rotates the node around the given <paramref name="axis"/> by the given <paramref name="angle"/>.
         /// </summary>
         /// <param name="axis">the axis to rotate around</param>
         /// <param name="angle">the angle to rotate by</param>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> RotateTo(Vector3 axis, float angle, float duration = DefaultAnimationDuration)
+        public IOperationCallback<Action> RotateTo(Vector3 axis, float angle, float factor = 1)
         {
             Quaternion rotation = Quaternion.AngleAxis(angle, axis);
-            return RotateTo(rotation, duration);
+            return RotateTo(rotation, factor);
         }
 
         /// <summary>
-        /// Scales the node to the given <paramref name="newLocalScale"/>, taking <paramref name="duration"/> seconds.
+        /// Scales the node to the given <paramref name="newLocalScale"/>.
         /// </summary>
         /// <param name="newLocalScale">the desired new target scale, more precisely, factor by which the game object
         /// should be scaled relative to its parent (i.e., local scale)</param>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> ScaleTo(Vector3 newLocalScale, float duration = DefaultAnimationDuration, bool updateEdges = true)
+        public IOperationCallback<Action> ScaleTo(Vector3 newLocalScale, float factor = 1, bool updateEdges = true)
         {
+            float duration = ToDuration(factor);
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
             return Scale.AnimateTo(newLocalScale, duration);
         }
 
         /// <summary>
-        /// Makes the node blink <paramref name="blinkCount"/> times, taking <paramref name="duration"/> seconds.
+        /// Makes the node blink <paramref name="blinkCount"/> times.
         /// </summary>
         /// <param name="blinkCount">The number of times the node should blink.</param>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the blinking is stopped before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the blinking duration.
+        /// If set to 0, will execute directly, that is, the blinking is stopped
+        /// before control is returned to the caller.
+        /// </param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> Blink(int blinkCount, float duration = DefaultAnimationDuration)
+        public IOperationCallback<Action> Blink(int blinkCount, float factor = 1)
         {
-            return Blinking.AnimateTo(blinkCount, duration);
+            return Blinking.AnimateTo(blinkCount, ToDuration(factor));
         }
 
         /// <summary>
@@ -246,11 +257,15 @@ namespace SEE.Game.Operator
         /// Otherwise, hides the label.
         /// </summary>
         /// <param name="alpha">the desired target alpha value for the label.</param>
-        /// <param name="duration">Time in seconds the animation should take. If set to 0, will execute directly,
-        /// that is, the value is set before control is returned to the caller.</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> FadeLabel(float alpha, float duration = DefaultAnimationDuration) =>
-            new AndCombinedOperationCallback<Action>(new[]
+        public IOperationCallback<Action> FadeLabel(float alpha, float factor = 1)
+        {
+            float duration = ToDuration(factor);
+            return new AndCombinedOperationCallback<Action>(new[]
             {
                 // NOTE: Order is important, because the line's end position target depends on the text position target,
                 //       and the text position target depends on the alpha value's target!
@@ -259,6 +274,7 @@ namespace SEE.Game.Operator
                 LabelStartLinePosition.AnimateTo(DesiredLabelStartLinePosition, duration),
                 LabelEndLinePosition.AnimateTo(DesiredLabelEndLinePosition, duration)
             });
+        }
 
         #endregion
 
@@ -368,7 +384,7 @@ namespace SEE.Game.Operator
             foreach (GameObject gameEdge in gameEdges)
             {
                 EdgeOperator edgeOperator = gameEdge.AddOrGetComponent<EdgeOperator>();
-                edgeOperator.MorphTo(layoutEdges[gameEdge.name].Spline, duration);
+                edgeOperator.MorphTo(layoutEdges[gameEdge.name].Spline, ToFactor(duration));
             }
         }
 
@@ -399,8 +415,8 @@ namespace SEE.Game.Operator
 
         protected void OnEnable()
         {
+            base.OnEnable();
             Node = GetNode(gameObject);
-            City = GetCity(gameObject);
             Material material = GetRenderer(gameObject).material;
             Vector3 currentPosition = transform.position;
             Vector3 currentScale = transform.localScale;
@@ -441,8 +457,6 @@ namespace SEE.Game.Operator
 
             Blinking = new TweenOperation<int>(BlinkAction, 0, equalityComparer: new AlwaysFalseEqualityComparer<int>());
 
-            base.OnEnable();
-
             #region Local Methods
 
             static Node GetNode(GameObject gameObject)
@@ -453,24 +467,6 @@ namespace SEE.Game.Operator
                 }
 
                 return nodeRef.Value;
-            }
-
-            static AbstractSEECity GetCity(GameObject gameObject)
-            {
-                GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
-                if (codeCityObject == null || !codeCityObject.TryGetComponent(out AbstractSEECity city))
-                {
-                    throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()}"
-                                                        + $" in code city {CodeCityName(codeCityObject)}"
-                                                        + $" must have an {nameof(AbstractSEECity)} component!");
-                }
-
-                return city;
-
-                static string CodeCityName(GameObject codeCityObject)
-                {
-                    return codeCityObject ? codeCityObject.FullName() : "<null>";
-                }
             }
 
             #endregion

@@ -355,6 +355,22 @@ namespace SEE.Controls
 
         #endregion
 
+        #region FaceCam
+
+        /// <summary>
+        /// Toggles the face camera.
+        /// </summary>
+        internal static readonly KeyCode ToggleFaceCam
+            = Register(KeyCode.I, Scope.Always, "Toggles the face camera on or off.");
+
+        /// <summary>
+        /// Toggles the position of the FaceCam on the player's face.
+        /// </summary>
+        internal static readonly KeyCode ToggleFaceCamPosition
+            = Register(KeyCode.F3, Scope.Always, "Toggles the position of the FaceCam on the player's face.");
+
+        #endregion
+
         #region Holistic Metric Menu
 
         //-----------------------------------------------------

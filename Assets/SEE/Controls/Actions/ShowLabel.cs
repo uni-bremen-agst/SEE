@@ -169,7 +169,7 @@ namespace SEE.Controls.Actions
                 if (settings.Show)
                 {
                     DisplayedLabelOperators.Add(Operator);
-                    Operator.FadeLabel(settings.LabelAlpha, settings.AnimationDuration);
+                    Operator.FadeLabel(settings.LabelAlpha, settings.AnimationFactor);
                 }
             }
         }
@@ -182,7 +182,7 @@ namespace SEE.Controls.Actions
         private void Off()
         {
             LabelAttributes settings = GetLabelSettings(Operator.Node, Operator.City);
-            Operator.FadeLabel(0f, settings.AnimationDuration);
+            Operator.FadeLabel(0f, settings.AnimationFactor);
             DisplayedLabelOperators.Remove(Operator);
         }
 
