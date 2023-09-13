@@ -272,25 +272,52 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// If the graph has only a single root, nothing happens. Otherwise
-        /// all current roots become an immediate child of a newly added
-        /// root node with given <paramref name="name"/> and <paramref name="type"/>.
+        /// If the graph has no root, false is returned and <paramref name="root"/>
+        /// will be null.
+        /// 
+        /// If the graph has exactly one root, nothing happens and false is returned.
+        /// In this case, <paramref name="root"/> refers to the single root.
+        /// 
+        /// Otherwise all current roots become an immediate child of a newly added
+        /// root node with given <paramref name="name"/> and <paramref name="type"/>
+        /// and true is returned. The new root will have toggle attribute 
+        /// <see cref="RootToggle"/>. The given <paramref name="name"/> will be used for
+        /// the source name and ID of the new root node.
+        /// 
+        /// If <paramref name="name"/> is null or empty, a unique ID will be used.
+        /// If <paramref name="type"/> is null or empty, <see cref="Graph.UnknownType"/> will be used.
         /// </summary>
+        /// <param name="root">the resulting (new or existing) root or null if there is no root</param>
         /// <param name="name">ID of new root node</param>
         /// <param name="type">type of new root node</param>
-        public virtual void AddSingleRoot(string name, string type)
+        /// <returns>true if a new root node was created</returns>
+        public virtual bool AddSingleRoot(out Node root, string name = null, string type = null)
         {
             List<Node> roots = GetRoots();
-            if (roots.Count > 0)
+            if (roots.Count > 1)
             {
-                Node newRoot = new Node { SourceName = name, ID = name, Type = type };
-                AddNode(newRoot);
+                if (string.IsNullOrWhiteSpace(name)) 
+                {
+                    name = Guid.NewGuid().ToString();
+                }
+                if (string.IsNullOrWhiteSpace(type))
+                {
+                    type = Graph.UnknownType;
+                }
+                root = new() { SourceName = name, ID = name, Type = type, ToggleAttributes = { RootToggle } };
+                AddNode(root);
                 foreach (Node oldRoot in roots)
                 {
-                    newRoot.AddChild(oldRoot);
+                    root.AddChild(oldRoot);
                 }
 
                 NodeHierarchyHasChanged = true;
+                return true;
+            }
+            else
+            {
+                root = roots.FirstOrDefault();
+                return false;
             }
         }
 
@@ -1370,44 +1397,6 @@ namespace SEE.DataModel.DG
         public override int GetHashCode()
         {
             return HashCode.Combine(Name, Path);
-        }
-
-        /// <summary>
-        /// If <paramref name="graph"/> has a single root, nothing is done. Otherwise
-        /// an artificial root is created and added to the <paramref name="graph"/>
-        /// All true roots of <paramref name="graph"/> will
-        /// become children of this artificial root.
-        /// </summary>
-        /// <param name="graph">graph where a unique root node should be added</param>
-        /// <returns>the new artificial root or null if <paramref name="graph"/> has
-        /// already a single root</returns>
-        public Node AddRootNodeIfNecessary()
-        {
-            // Note: Because this method is called only when a hierarchical layout is to
-            // be applied (and then both leaves and inner nodes were added to nodeMap), we
-            // could traverse through graph.GetRoots() or nodeMaps.Keys. It would not make
-            // a difference. If -- for any reason --, we decide not to create a game object
-            // for some inner nodes, we should rather iterate on nodeMaps.Keys.
-            ICollection<Node> graphRoots = GetRoots();
-
-            if (graphRoots.Count > 1)
-            {
-                Node artificialRoot = new Node
-                {
-                    ID = $"{Name}#ROOT",
-                    SourceName = $"{Name} (Root)",
-                    Type = graphRoots.First().Type,
-                    ToggleAttributes = { RootToggle }
-                };
-                AddNode(artificialRoot);
-                foreach (Node root in graphRoots)
-                {
-                    artificialRoot.AddChild(root);
-                }
-                return artificialRoot;
-            }
-
-            return null;
         }
 
         /// <summary>

@@ -98,8 +98,8 @@ namespace SEE.Tools.ReflexionAnalysis
             }
 
             // Add artificial roots if graph has more than one root node, to physically differentiate the two.
-            ArchitectureRoot = ArchitectureGraph.AddRootNodeIfNecessary() ?? ArchitectureGraph.GetRoots().FirstOrDefault();
-            ImplementationRoot = ImplementationGraph.AddRootNodeIfNecessary() ?? ImplementationGraph.GetRoots().FirstOrDefault();
+            ArchitectureGraph.AddSingleRoot(out ArchitectureRoot);
+            ImplementationGraph.AddSingleRoot(out ImplementationRoot);
 
             // MappingGraph needn't be labeled, as any remaining/new edge (which must be Maps_To)
             // automatically belongs to it
@@ -153,7 +153,7 @@ namespace SEE.Tools.ReflexionAnalysis
             }
 
             mergedGraph = mergedGraph.MergeWith<ReflexionGraph>(MappingGraph, suffix);
-            mergedGraph.AddRootNodeIfNecessary();
+            mergedGraph.AddSingleRoot(out Node _);
             return mergedGraph;
 
             #region Local Functions
@@ -248,7 +248,11 @@ namespace SEE.Tools.ReflexionAnalysis
                     AddToImplementation(node);
                     break;
                 default:
-                    throw new NotSupportedException($"Given node {node.ID} must be in architecture or implementation graph!");
+                    if (!node.HasToggle(RootToggle))
+                    {
+                        throw new NotSupportedException($"Given node {node.ID} must be in architecture or implementation graph!");
+                    }
+                    break;
             }
         }
 
@@ -391,13 +395,18 @@ namespace SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
-        /// Unsupported method. Do not call this on <see cref="ReflexionGraph"/>.
+        /// Unsupported method. Do not call this on <see cref="ReflexionGraph"/> once it was
+        /// initialized, i.e., when <see cref="AnalysisInitialized"/> is true. 
+        /// 
+        /// If <see cref="AnalysisInitialized"/> is false, this method is equivalent to 
+        /// <see cref="Graph.AddSingleRoot(out Node, string, string)"/>.
         /// </summary>
-        public override void AddSingleRoot(string name, string type)
+        /// <exception cref="NotSupportedException">thrown in case the </exception>
+        public override bool AddSingleRoot(out Node root, string name = null, string type = null)
         {
             if (!AnalysisInitialized)
             {
-                base.AddSingleRoot(name, type);
+                return base.AddSingleRoot(out root, name, type);
             }
             else
             {

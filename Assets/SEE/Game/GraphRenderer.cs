@@ -331,11 +331,10 @@ namespace SEE.Game
 
             GameObject AddGameRootNodeIfNecessary(Graph graph, Dictionary<Node, GameObject> nodeMap)
             {
-                Node artificialRoot = graph.AddRootNodeIfNecessary();
-                if (artificialRoot != null)
+                if (graph.GetRoots().Count > 1 && graph.AddSingleRoot(out Node artificialRoot))
                 {
                     nodeMap[artificialRoot] = DrawNode(artificialRoot);
-                    Debug.Log("Artificial unique root was added.\n");
+                    Debug.Log($"Artificial unique root {artificialRoot.ID} was added.\n");
                     return nodeMap[artificialRoot];
                 }
                 else
