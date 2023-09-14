@@ -62,7 +62,7 @@
             "base_view_name": "Code Facts"
         },
         "Architecture-GXLExport": {
-            "_active": true,
+            "_active": false,
             "gxl_file": "SEE.gxl",
             "view_name": "Code Facts"
         },
@@ -80,19 +80,19 @@
             "hierarchy_view_name": "Code Facts"
         },
         "C#-BitfieldHasNoPluralS": {
-            "_active": true
+            "_active": false
         },
         "C#-BracesForSingleStatementBodies": {
-            "_active": true
+            "_active": false
         },
         "C#-CSharpCommentsConvention": {
-            "_active": true
+            "_active": false
         },
         "C#-CSharpNamingConvention": {
-            "_active": true
+            "_active": false
         },
         "C#-CSharpNoBackwardGotoJumps": {
-            "_active": true
+            "_active": false
         },
         "C#-CSharpNoCatchAllExceptionsClause": {
             "_active": false
@@ -101,7 +101,7 @@
             "_active": false
         },
         "C#-CSharpReferencedLabelInSameBlockAsGoto": {
-            "_active": true
+            "_active": false
         },
         "C#-EnumeratorRequiresInitialization": {
             "_active": false
@@ -110,97 +110,97 @@
             "_active": false
         },
         "C#-InvalidDependencyPropertyDeclaration": {
-            "_active": true
+            "_active": false
         },
         "C#-MethodShouldBeDeclaredStatic": {
-            "_active": true
+            "_active": false
         },
         "C#-NoHidingOfBaseClassMethods": {
-            "_active": true
+            "_active": false
         },
         "C#-VirtualCallInConstructor": {
-            "_active": true
+            "_active": false
         },
         "CloneDetection": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-AllmanBraces": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-CapitalizeFunctions": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-LineBreaks": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-LinesOfCodeInFile": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-MaxOneStmtPerLine": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-MaximumLineLength": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-NoBlankLinesAtBraces": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-NoSingleCharIdentifier": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-NoTabs": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-NoTrailingWhitespace": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-NoWhitespaceMemberSelection": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-NoWhitespacePointerReference": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-NoWhitespacePointerReferenceInverse": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-NoWhitespaceUnaryOperator": {
-            "_active": true
+            "_active": false
         },
         "CodingStyle-WhitespaceNextToOperator": {
-            "_active": true
+            "_active": false
         },
         "CycleDetection-CallgraphCycles": {
-            "_active": true
+            "_active": false
         },
         "CycleDetection-IncludeCycles": {
-            "_active": true
+            "_active": false
         },
         "Generic-MarkupComments": {
-            "_active": true
+            "_active": false
         },
         "Generic-MaxComplexity": {
-            "_active": true
+            "_active": false
         },
         "Generic-MaxConditions": {
-            "_active": true
+            "_active": false
         },
         "Generic-MaxNesting": {
-            "_active": true
+            "_active": false
         },
         "Generic-MaxOneStmtPerLine": {
-            "_active": true
+            "_active": false
         },
         "Generic-MaxParams": {
-            "_active": true
+            "_active": false
         },
         "Generic-NoDiscardedReturnCode": {
-            "_active": true
+            "_active": false
         },
         "Generic-NoEmptyLoops": {
-            "_active": true
+            "_active": false
         },
         "Generic-NoMagicNumbers": {
-            "_active": true
+            "_active": false
         },
         "Metric-Calling.CPP": {
             "_active": true,
@@ -629,7 +629,7 @@
             "_active": true,
             "_copy_from": "AxivionC#Frontend",
             "create_multiple_edges": false,
-            "framework_path": "C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App\\6.0.22",
+            "framework_path": null,
             "msbuild_path": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
             "project_is_library": true,
             "rfg": "SEE.rfg",
@@ -667,9 +667,9 @@
                 "update_workspace": true
             },
             "directory": "$(SEEDIRECTORY)",
-            "ir": "Temp\\bin\\Debug\\SEE.dll.ir",
+            "ir": null,
             "name": "SEE",
-            "rfg": null
+            "rfg": "SEE.rfg"
         }
     },
     "Results": {
@@ -677,7 +677,8 @@
             "ci_mode": {
                 "filename": "SEE.db",
                 "provide_ir": {
-                    "backup_existing": true
+                    "backup_existing": false,
+                    "provide_in_dashboard": false
                 },
                 "provide_rfg": {
                     "backup_existing": true,
