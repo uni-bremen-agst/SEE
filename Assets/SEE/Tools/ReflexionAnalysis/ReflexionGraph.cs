@@ -214,11 +214,14 @@ namespace SEE.Tools.ReflexionAnalysis
             }
             switch (edge.GetSubgraph())
             {
-                case Architecture: RemoveFromArchitecture(edge);
+                case Architecture:
+                    RemoveFromArchitecture(edge);
                     break;
-                case Implementation: RemoveFromImplementation(edge);
+                case Implementation:
+                    RemoveFromImplementation(edge);
                     break;
-                case Mapping: RemoveFromMapping(edge);
+                case Mapping:
+                    RemoveFromMapping(edge);
                     break;
                 default: throw new NotSupportedException("Given edge must be in reflexion graph!");
             }
@@ -317,9 +320,11 @@ namespace SEE.Tools.ReflexionAnalysis
             }
             switch (DetermineSubgraph(edge))
             {
-                case Architecture: AddToArchitecture(edge);
+                case Architecture:
+                    AddToArchitecture(edge);
                     break;
-                case Implementation: AddToImplementation(edge);
+                case Implementation:
+                    AddToImplementation(edge);
                     break;
                 case Mapping: throw new NotSupportedException("Call `AddToMapping` if you wish to create a MapsTo edge.");
                 default: throw new NotSupportedException("Given edge must either be in architecture or implementation graph!");
@@ -433,33 +438,32 @@ namespace SEE.Tools.ReflexionAnalysis
                 switch (element)
                 {
                     // Node with a parent:
-                    case Node { Parent: {} } node:
+                    case Node { Parent: { } } node:
                         subgraph = DetermineSubgraph(node.Parent);
                         break;
                     case Edge edge:
-                    {
-                        subgraph = DetermineSubgraph(edge.Source);
-                        ReflexionSubgraph target = DetermineSubgraph(edge.Target);
-                        if (subgraph == Implementation && target == Architecture)
                         {
-                            // If edge had the MapsTo type, its subgraph would already reflect that.
-                            throw new NotSupportedException("Mapping edge must have type MapsTo!\n"
-                                                            + $"(Offending edge: {edge.ToShortString()})");
+                            subgraph = DetermineSubgraph(edge.Source);
+                            ReflexionSubgraph target = DetermineSubgraph(edge.Target);
+                            if (subgraph == Implementation && target == Architecture)
+                            {
+                                // If edge had the MapsTo type, its subgraph would already reflect that.
+                                throw new NotSupportedException("Mapping edge must have type MapsTo!\n"
+                                                                + $"(Offending edge: {edge.ToShortString()})");
+                            }
+                            if (subgraph != target)
+                            {
+                                throw new NotSupportedException("Edge must be connected to nodes within the same graph!\n"
+                                                                + $"(Offending edge: {edge.ToShortString()})");
+                            }
+                            break;
                         }
-                        if (subgraph != target)
-                        {
-                            throw new NotSupportedException("Edge must be connected to nodes within the same graph!\n"
-                                                            + $"(Offending edge: {edge.ToShortString()})");
-                        }
-
-                        break;
-                    }
-                    default: subgraph = None;
+                    default:
+                        subgraph = None;
                         break;
                 }
             }
             return subgraph;
         }
-
     }
 }
