@@ -283,7 +283,7 @@ namespace SEE.DataModel.DG
         /// and true is returned. The new root will have toggle attribute
         /// <see cref="RootToggle"/>. The given <paramref name="name"/> will be used for
         /// the source name and ID of the new root node.
-        /// 
+        ///
         /// If <paramref name="name"/> is null or empty, a unique ID will be used.
         /// If <paramref name="type"/> is null or empty, <see cref="Graph.UnknownType"/> will be used.
         /// </summary>
