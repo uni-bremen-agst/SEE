@@ -296,7 +296,7 @@ namespace SEE.DataModel.DG
             List<Node> roots = GetRoots();
             if (roots.Count > 1)
             {
-                if (string.IsNullOrWhiteSpace(name)) 
+                if (string.IsNullOrWhiteSpace(name))
                 {
                     name = Guid.NewGuid().ToString();
                 }
