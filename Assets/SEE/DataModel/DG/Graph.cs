@@ -274,7 +274,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// If the graph has no root, false is returned and <paramref name="root"/>
         /// will be null.
-        /// 
+        ///
         /// If the graph has exactly one root, nothing happens and false is returned.
         /// In this case, <paramref name="root"/> refers to the single root.
         /// 
