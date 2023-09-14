@@ -27,7 +27,6 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         public Graph graph;
 
-        // TODO: Implement methods
         public override void RebuildLayout()
         {
             // Nothing needs to be done.
@@ -35,6 +34,7 @@ namespace SEE.UI.Window.TreeWindow
 
         protected override void InitializeFromValueObject(WindowValues valueObject)
         {
+            // TODO: Should tree windows be sent over the network?
             throw new System.NotImplementedException();
         }
 
