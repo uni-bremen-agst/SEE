@@ -392,7 +392,7 @@ namespace SEE.Tools.ReflexionAnalysis
 
         /// <summary>
         /// Unsupported method. Do not call this on <see cref="ReflexionGraph"/> once it was
-        /// initialized, i.e., when <see cref="AnalysisInitialized"/> is true. 
+        /// initialized, i.e., when <see cref="AnalysisInitialized"/> is true.
         /// 
         /// If <see cref="AnalysisInitialized"/> is false, this method is equivalent to 
         /// <see cref="Graph.AddSingleRoot(out Node, string, string)"/>.
