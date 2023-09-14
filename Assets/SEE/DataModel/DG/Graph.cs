@@ -280,7 +280,7 @@ namespace SEE.DataModel.DG
         ///
         /// Otherwise all current roots become an immediate child of a newly added
         /// root node with given <paramref name="name"/> and <paramref name="type"/>
-        /// and true is returned. The new root will have toggle attribute 
+        /// and true is returned. The new root will have toggle attribute
         /// <see cref="RootToggle"/>. The given <paramref name="name"/> will be used for
         /// the source name and ID of the new root node.
         /// 
