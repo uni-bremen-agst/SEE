@@ -626,8 +626,13 @@
     },
     "Project": {
         "AxivionC#Analysis": {
+            "_active": false,
             "_copy_from": "AxivionC#Frontend",
-            "solution": "SEE.sln"
+            "create_multiple_edges": false,
+            "msbuild_path": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "project_is_library": true,
+            "rfg": "SEE.rfg",
+            "solution": "SEE.csproj"
         },
         "BuildSystemIntegration": {
             "child_order": [
