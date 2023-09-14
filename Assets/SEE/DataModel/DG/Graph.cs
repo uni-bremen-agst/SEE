@@ -277,7 +277,7 @@ namespace SEE.DataModel.DG
         ///
         /// If the graph has exactly one root, nothing happens and false is returned.
         /// In this case, <paramref name="root"/> refers to the single root.
-        /// 
+        ///
         /// Otherwise all current roots become an immediate child of a newly added
         /// root node with given <paramref name="name"/> and <paramref name="type"/>
         /// and true is returned. The new root will have toggle attribute 
