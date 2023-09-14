@@ -248,11 +248,7 @@ namespace SEE.Tools.ReflexionAnalysis
                     AddToImplementation(node);
                     break;
                 default:
-                    if (!node.HasToggle(RootToggle))
-                    {
-                        throw new NotSupportedException($"Given node {node.ID} must be in architecture or implementation graph!");
-                    }
-                    break;
+                    throw new NotSupportedException($"Given node {node.ID} must be in architecture or implementation graph!");
             }
         }
 
