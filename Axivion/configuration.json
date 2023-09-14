@@ -626,9 +626,10 @@
     },
     "Project": {
         "AxivionC#Analysis": {
-            "_active": false,
+            "_active": true,
             "_copy_from": "AxivionC#Frontend",
             "create_multiple_edges": false,
+            "framework_path": "C:\\Program Files\\dotnet\\shared\\Microsoft.AspNetCore.App\\6.0.22",
             "msbuild_path": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
             "project_is_library": true,
             "rfg": "SEE.rfg",
@@ -654,7 +655,7 @@
             "sourceserver_remote_url": "https://github.com/uni-bremen-agst/SEE.git"
         },
         "MSBuildIntegration": {
-            "_active": true,
+            "_active": false,
             "binary": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
             "project": "SEE.csproj"
         },
