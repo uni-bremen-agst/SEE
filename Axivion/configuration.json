@@ -638,8 +638,14 @@
     },
     "Project": {
         "AxivionC#Analysis": {
+            "_active": true,
             "_copy_from": "AxivionC#Frontend",
-            "solution": "SEE.sln"
+            "create_multiple_edges": false,
+            "framework_path": null,
+            "msbuild_path": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
+            "project_is_library": true,
+            "rfg": "SEE.rfg",
+            "solution": "SEE.csproj"
         },
         "BuildSystemIntegration": {
             "child_order": [
@@ -661,7 +667,7 @@
             "sourceserver_remote_url": "https://github.com/uni-bremen-agst/SEE.git"
         },
         "MSBuildIntegration": {
-            "_active": true,
+            "_active": false,
             "binary": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\MSBuild\\Current\\Bin\\MSBuild.exe",
             "project": "SEE.csproj"
         },
@@ -673,9 +679,9 @@
                 "update_workspace": true
             },
             "directory": "$(SEEDIRECTORY)",
-            "ir": "Temp\\bin\\Debug\\SEE.dll.ir",
+            "ir": null,
             "name": "SEE",
-            "rfg": null
+            "rfg": "SEE.rfg"
         }
     },
     "Results": {
@@ -683,7 +689,8 @@
             "ci_mode": {
                 "filename": "SEE.db",
                 "provide_ir": {
-                    "backup_existing": true
+                    "backup_existing": false,
+                    "provide_in_dashboard": false
                 },
                 "provide_rfg": {
                     "backup_existing": true,
