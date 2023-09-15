@@ -62,7 +62,7 @@
             "base_view_name": "Code Facts"
         },
         "Architecture-GXLExport": {
-            "_active": false,
+            "_active": true,
             "gxl_file": "SEE.gxl",
             "view_name": "Code Facts"
         },
@@ -80,19 +80,19 @@
             "hierarchy_view_name": "Code Facts"
         },
         "C#-BitfieldHasNoPluralS": {
-            "_active": false
+            "_active": true
         },
         "C#-BracesForSingleStatementBodies": {
-            "_active": false
+            "_active": true
         },
         "C#-CSharpCommentsConvention": {
-            "_active": false
+            "_active": true
         },
         "C#-CSharpNamingConvention": {
-            "_active": false
+            "_active": true
         },
         "C#-CSharpNoBackwardGotoJumps": {
-            "_active": false
+            "_active": true
         },
         "C#-CSharpNoCatchAllExceptionsClause": {
             "_active": false
@@ -101,7 +101,7 @@
             "_active": false
         },
         "C#-CSharpReferencedLabelInSameBlockAsGoto": {
-            "_active": false
+            "_active": true
         },
         "C#-EnumeratorRequiresInitialization": {
             "_active": false
@@ -109,17 +109,20 @@
         "C#-FieldNotPrivateNorProtected": {
             "_active": false
         },
+        "C#-ImportCompilerAndAnalyzerDiagnostics": {
+            "_active": true
+        },
         "C#-InvalidDependencyPropertyDeclaration": {
-            "_active": false
+            "_active": true
         },
         "C#-MethodShouldBeDeclaredStatic": {
-            "_active": false
+            "_active": true
         },
         "C#-NoHidingOfBaseClassMethods": {
-            "_active": false
+            "_active": true
         },
         "C#-VirtualCallInConstructor": {
-            "_active": false
+            "_active": true
         },
         "CloneDetection": {
             "_active": false
@@ -149,10 +152,10 @@
             "_active": false
         },
         "CodingStyle-NoTabs": {
-            "_active": false
+            "_active": true
         },
         "CodingStyle-NoTrailingWhitespace": {
-            "_active": false
+            "_active": true
         },
         "CodingStyle-NoWhitespaceMemberSelection": {
             "_active": false
@@ -170,10 +173,10 @@
             "_active": false
         },
         "CycleDetection-CallgraphCycles": {
-            "_active": false
+            "_active": true
         },
         "CycleDetection-IncludeCycles": {
-            "_active": false
+            "_active": true
         },
         "Generic-MarkupComments": {
             "_active": false
@@ -203,7 +206,7 @@
             "_active": false
         },
         "Metric-Calling.CPP": {
-            "_active": true,
+            "_active": false,
             "max_value": null
         },
         "Metric-CloneRatio": {
@@ -214,7 +217,7 @@
         },
         "Metric-Comment.Density": {
             "_active": true,
-            "min_value": 0.1
+            "min_value": null
         },
         "Metric-Comment.Internal": {
             "_active": true
@@ -243,19 +246,19 @@
             "max_value": 20
         },
         "Metric-HIS.APCGCYCLE": {
-            "_active": true
+            "_active": false
         },
         "Metric-HIS.CALLING": {
-            "_active": true,
+            "_active": false,
             "max_value": 100
         },
         "Metric-HIS.CALLS": {
-            "_active": true,
+            "_active": false,
             "max_value": 20
         },
         "Metric-HIS.COMF": {
             "_active": true,
-            "min_value": 0.1
+            "min_value": null
         },
         "Metric-HIS.GOTO": {
             "_active": true
@@ -264,10 +267,10 @@
             "_active": true
         },
         "Metric-HIS.NOMV": {
-            "_active": true
+            "_active": false
         },
         "Metric-HIS.NOMVPR": {
-            "_active": true
+            "_active": false
         },
         "Metric-HIS.PARAM": {
             "_active": true,
@@ -329,25 +332,25 @@
             "_active": false
         },
         "Metric-Includes.DirectIncluders": {
-            "_active": true
+            "_active": false
         },
         "Metric-Includes.DirectIncludes": {
-            "_active": true
+            "_active": false
         },
         "Metric-Includes.IncludeBurden": {
-            "_active": true
+            "_active": false
         },
         "Metric-Includes.MaximumIncludeDepth": {
-            "_active": true
+            "_active": false
         },
         "Metric-Includes.MaximumIncluderDepth": {
-            "_active": true
+            "_active": false
         },
         "Metric-Includes.TransitiveIncluders": {
-            "_active": true
+            "_active": false
         },
         "Metric-Includes.TransitiveIncludes": {
-            "_active": true
+            "_active": false
         },
         "Metric-InverseCoupling": {
             "_active": true
@@ -385,6 +388,9 @@
         "Metric-Lines.Class.LOC": {
             "_active": true
         },
+        "Metric-Lines.Class.OnlyComment": {
+            "_active": true
+        },
         "Metric-Lines.Code": {
             "_active": true
         },
@@ -404,6 +410,9 @@
             "_active": true
         },
         "Metric-Lines.File.LOC": {
+            "_active": true
+        },
+        "Metric-Lines.File.OnlyComment": {
             "_active": true
         },
         "Metric-Lines.LOC": {
@@ -478,6 +487,9 @@
         "Metric-Lines.Routine.LOC": {
             "_active": true
         },
+        "Metric-Lines.Routine.OnlyComment": {
+            "_active": true
+        },
         "Metric-LogNPathCeiling": {
             "_active": true
         },
@@ -501,30 +513,30 @@
             "_active": true
         },
         "Metric-NumberOfCalledRoutines": {
-            "_active": true,
+            "_active": false,
             "max_value": 20
         },
         "Metric-NumberOfCallingRoutines": {
-            "_active": true,
+            "_active": false,
             "max_value": null
         },
         "Metric-NumberOfGotos": {
-            "_active": false
+            "_active": true
         },
         "Metric-NumberOfInvocations": {
             "_active": true
         },
         "Metric-NumberOfParameters": {
-            "_active": false
-        },
-        "Metric-NumberOfReturns": {
-            "_active": false
-        },
-        "Metric-NumberOfSCCs": {
             "_active": true
         },
-        "Metric-NumberOfStatements": {
+        "Metric-NumberOfReturns": {
+            "_active": true
+        },
+        "Metric-NumberOfSCCs": {
             "_active": false
+        },
+        "Metric-NumberOfStatements": {
+            "_active": true
         },
         "Metric-OO.CBO": {
             "_active": true
