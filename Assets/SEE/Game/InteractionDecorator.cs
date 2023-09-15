@@ -4,10 +4,6 @@ using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.GO;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.EventSystems;
-using UnityEngine.XR;
-using UnityEngine.XR.Interaction.Toolkit;
 
 namespace SEE.Game
 {

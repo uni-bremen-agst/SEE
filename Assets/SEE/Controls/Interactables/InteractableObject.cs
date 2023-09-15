@@ -12,7 +12,6 @@ using Valve.VR.InteractionSystem;
 using SEE.Game.SceneManipulation;
 using SEE.Net.Actions;
 using SEE.Audio;
-using UnityEngine.UI;
 
 namespace SEE.Controls
 {
@@ -217,7 +216,6 @@ namespace SEE.Controls
         /// The interactable component, that is used by SteamVR. The interactable
         /// component is attached to <code>this.gameObject</code>.
         /// </summary>
-#if false // FIXME
         private Interactable interactable;
 #endif
 
