@@ -25,7 +25,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         private readonly IDictionary<string, TreeWindow> treeWindows = new Dictionary<string, TreeWindow>();
 
-        private void Start()
+        /// <summary>
+        /// Displays the tree view window for each code city.
+        /// </summary>
+        private void ShowCodeView()
         {
             GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
             if (cities.Length == 0)
@@ -61,6 +64,33 @@ namespace SEE.Controls.Actions
                 {
                     space.AddWindow(treeWindows[city]);
                     space.ActiveWindow = treeWindows[city];
+                }
+            }
+        }
+
+        /// <summary>
+        /// Close all tree view windows.
+        /// </summary>
+        private void HideCodeView()
+        {
+            foreach (string city in treeWindows.Keys)
+            {
+                space.CloseWindow(treeWindows[city]);
+            }
+            treeWindows.Clear();
+        }
+
+        private void Update()
+        {
+            if (SEEInput.ToggleTreeView())
+            {
+                if (treeWindows.Count == 0)
+                {
+                    ShowCodeView();
+                }
+                else
+                {
+                    HideCodeView();
                 }
             }
         }
