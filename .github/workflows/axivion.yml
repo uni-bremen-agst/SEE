@@ -15,6 +15,14 @@ jobs:
     name: Run Axivion CI
     runs-on: [self-hosted, axivion]
     steps:
+      - name: Setup GitLab LFS
+        run: |
+          echo "$CREDENTIALS" > ~/.git-credentials
+          git config --global credential.helper store
+          git config --global lfs.url ${CREDENTIALS}project-see/see-lfs.git/info/lfs
+        env:
+          # NOTE: must be of the form https://koschke:token-here@gitlab.informatik.uni-bremen.de/
+          CREDENTIALS: ${{secrets.GITLAB_LFS_TOKEN}}
       - name: Run Axivion CI
         shell: cmd
         run: | 
