@@ -1,0 +1,22 @@
+name: Axivion Suite
+
+on:
+  push:
+    branches: [master]
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+permissions: read-all
+
+jobs:
+  run:
+    name: Run Axivion CI
+    runs-on: [self-hosted, axivion]
+    steps:
+      - name: Run Axivion CI
+        shell: cmd
+        run: | 
+            cd e:\koschke\SEE
+            Axivion\axivion-jenkins.bat axivion_ci
