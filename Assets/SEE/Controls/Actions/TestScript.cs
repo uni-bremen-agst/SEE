@@ -12,7 +12,7 @@ namespace SEE.Controls.Actions
     {
         public void Start()
         {
-            GlobalActionHistory.Execute(ActionStateType.Move);
+            GlobalActionHistory.Execute(ActionStateTypes.Move);
         }
 
         public void Update()
