@@ -46,7 +46,7 @@ namespace SEE.UI.Window.TreeWindow
             int children = node.NumberOfChildren() + Mathf.Min(node.Outgoings.Count, 1) + Mathf.Min(node.Incomings.Count, 1);
             AddItem(CleanupID(node.ID), CleanupID(node.Parent?.ID),
                     children, node.ToShortString(), node.Level,
-                    i => CollapseNode(node, i), i => ExpandNode(node, i));
+                    NODE_TYPE_UNICODE, i => CollapseNode(node, i), i => ExpandNode(node, i));
         }
 
         /// <summary>
@@ -57,17 +57,17 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="children">The number of children of the item to be added.</param>
         /// <param name="text">The text of the item to be added.</param>
         /// <param name="level">The level of the item to be added.</param>
+        /// <param name="icon">The icon of the item to be added, given as a unicode character.</param>
         /// <param name="collapseItem">A function that collapses the item.</param>
         /// <param name="expandItem">A function that expands the item.</param>
         private void AddItem(string id, string parentId, int children, string text, int level,
-                             Action<GameObject> collapseItem, Action<GameObject> expandItem)
+                             char icon, Action<GameObject> collapseItem, Action<GameObject> expandItem)
         {
             GameObject item = PrefabInstantiator.InstantiatePrefab(TREE_ITEM_PREFAB, content, false);
             if (parentId != null)
             {
                 // Position the item below its parent.
                 // TODO: Use colors from the city (e.g., depending on node type).
-                // TODO: Display icon based on type (either node type if standardized or inner/leaf/edge in/edge out).
                 // TODO: Include number badge in title.
                 item.transform.SetSiblingIndex(content.Find(parentId).GetSiblingIndex() + 1);
                 item.transform.Find("Foreground").localPosition += new Vector3(IndentShift * level, 0, 0);
@@ -78,6 +78,7 @@ namespace SEE.UI.Window.TreeWindow
             //       I hope this is unlikely enough to not be a problem for now.
             item.name = CleanupID(id);
             item.transform.Find("Foreground/Text").gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = text;
+            item.transform.Find("Foreground/Type Icon").gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = icon.ToString();
             if (children <= 0)
             {
                 item.transform.Find("Foreground/Expand Icon").gameObject.SetActive(false);
@@ -220,22 +221,22 @@ namespace SEE.UI.Window.TreeWindow
 
             if (node.Outgoings.Count > 0)
             {
-                AddEdgeButton("Outgoing", node.Outgoings);
+                AddEdgeButton("Outgoing", OUTGOING_EDGE_UNICODE, node.Outgoings);
             }
             if (node.Incomings.Count > 0)
             {
-                AddEdgeButton("Incoming", node.Incomings);
+                AddEdgeButton("Incoming", INCOMING_EDGE_UNICODE, node.Incomings);
             }
             return;
 
-            void AddEdgeButton(string edgesType, ICollection<Edge> edges)
+            void AddEdgeButton(string edgesType, char icon, ICollection<Edge> edges)
             {
                 string cleanedId = CleanupID(node.ID);
                 string id = $"{cleanedId}#{edgesType}";
                 // Note that an edge may appear multiple times in the tree view,
                 // hence we make its ID dependent on the node it is connected to,
                 // and whether it is an incoming or outgoing edge (to cover self-loops).
-                AddItem(id, cleanedId, edges.Count, $"{edgesType} Edges", node.Level + 1,
+                AddItem(id, cleanedId, edges.Count, $"{edgesType} Edges", node.Level + 1, icon,
                         i =>
                         {
                             CollapseItem(i);
@@ -248,7 +249,7 @@ namespace SEE.UI.Window.TreeWindow
                             ExpandItem(i);
                             foreach (Edge edge in edges)
                             {
-                                AddItem($"{id}#{CleanupID(edge.ID)}", id, 0, edge.ToShortString(), node.Level + 2, null, null);
+                                AddItem($"{id}#{CleanupID(edge.ID)}", id, 0, edge.ToShortString(), node.Level + 2, EDGE_TYPE_UNICODE, null, null);
                             }
                         });
             }

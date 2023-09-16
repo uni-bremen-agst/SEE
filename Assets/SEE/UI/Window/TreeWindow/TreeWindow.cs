@@ -21,6 +21,27 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         private const string TREE_ITEM_PREFAB = "Prefabs/UI/TreeViewItem";
 
+        // TODO: In the future, distinguish by node/edge type as well for the icons.
+        /// <summary>
+        /// The unicode character for a node.
+        /// </summary>
+        private const char NODE_TYPE_UNICODE = '\uf1b2';
+
+        /// <summary>
+        /// The unicode character for an edge.
+        /// </summary>
+        private const char EDGE_TYPE_UNICODE = '\uf542';
+
+        /// <summary>
+        /// The unicode character for outgoing edges.
+        /// </summary>
+        private const char OUTGOING_EDGE_UNICODE = '\uf2f5';
+
+        /// <summary>
+        /// The unicode character for incoming edges.
+        /// </summary>
+        private const char INCOMING_EDGE_UNICODE = '\uf2f6';
+
         /// <summary>
         /// The graph to be displayed.
         /// Must be set before starting the window.
