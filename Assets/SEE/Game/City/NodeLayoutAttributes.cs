@@ -30,7 +30,6 @@ namespace SEE.Game.City
         /// </summary>
         [OdinSerialize]
         public FilePath LayoutPath = new();
-       
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
