@@ -117,14 +117,14 @@ namespace SEE.Controls
         internal static readonly KeyCode Redo = Register(KeyCode.Y, Scope.Always, "Re-does the last action.");
 
         /// <summary>
-        /// Opens/Closes the configuration menu.
+        /// Opens/closes the configuration menu.
         /// </summary>
-        internal static readonly KeyCode ConfigMenu = Register(KeyCode.K, Scope.Always, "Opens/Closes the configuration menu.");
+        internal static readonly KeyCode ConfigMenu = Register(KeyCode.K, Scope.Always, "Opens/closes the configuration menu.");
 
         /// <summary>
-        /// Opens/Closes the tree view window.
+        /// Opens/closes the tree view window.
         /// </summary>
-        internal static readonly KeyCode TreeView = Register(KeyCode.Tab, Scope.Always, "Opens/Closes the tree view window.");
+        internal static readonly KeyCode TreeView = Register(KeyCode.Tab, Scope.Always, "Opens/closes the tree view window.");
 
         #endregion
 
