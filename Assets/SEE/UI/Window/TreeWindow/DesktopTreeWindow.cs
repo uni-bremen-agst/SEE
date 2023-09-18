@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
@@ -10,7 +9,9 @@ using UnityEngine.UI;
 
 namespace SEE.UI.Window.TreeWindow
 {
-    // Parts of the tree window that are specific to the desktop UI.
+    /// <summary>
+    /// Parts of the tree window that are specific to the desktop UI.
+    /// </summary>
     public partial class TreeWindow
     {
         /// <summary>
