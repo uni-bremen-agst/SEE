@@ -1,4 +1,4 @@
-using SEE.Game.UI.PropertyDialog.HolisticMetrics;
+using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 

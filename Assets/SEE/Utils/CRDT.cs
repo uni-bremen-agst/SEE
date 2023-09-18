@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using SEE.Game.UI.Window.CodeWindow;
+using SEE.UI.Window.CodeWindow;
 using UnityEngine;
 using UnityEngine.Events;
 

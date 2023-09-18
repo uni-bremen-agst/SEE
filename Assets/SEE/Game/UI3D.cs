@@ -5,7 +5,7 @@ using SEE.GO;
 using SEE.Utils;
 using SEE.Controls;
 
-namespace SEE.Game.UI3D
+namespace SEE.UI3D
 {
     /// <summary>
     /// Properties of 3d ui-elements.

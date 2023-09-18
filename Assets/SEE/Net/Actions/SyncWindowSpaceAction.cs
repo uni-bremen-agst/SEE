@@ -1,6 +1,6 @@
 ﻿using System;
 using SEE.Controls;
-using SEE.Game.UI.Window;
+using SEE.UI.Window;
 using UnityEngine;
 
 namespace SEE.Net.Actions

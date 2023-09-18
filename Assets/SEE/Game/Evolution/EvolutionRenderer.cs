@@ -20,7 +20,7 @@
 using SEE.DataModel.DG;
 using SEE.Game.Charts;
 using SEE.Game.City;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Utils;

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
-using SEE.Game.UI.Menu;
+using SEE.UI.Menu;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;

@@ -1,4 +1,4 @@
-using SEE.Game.UI.RuntimeConfigMenu;
+using SEE.UI.RuntimeConfigMenu;
 
 namespace SEE.Net.Actions.RuntimeConfig
 {

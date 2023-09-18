@@ -8,7 +8,7 @@ using SEE.Game.City;
 using SEE.Game.HolisticMetrics.ActionHelpers;
 using SEE.Game.HolisticMetrics.Metrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;

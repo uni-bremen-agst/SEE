@@ -7,7 +7,7 @@ using System.IO;
 using Cysharp.Threading.Tasks;
 using OpenAI;
 using OpenAI.Chat;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
 

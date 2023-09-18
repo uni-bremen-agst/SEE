@@ -33,7 +33,7 @@ using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.GO;
 using SEE.Utils;
 using SEE.Utils.RPC;

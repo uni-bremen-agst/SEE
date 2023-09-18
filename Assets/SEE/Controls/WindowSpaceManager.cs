@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SEE.Game.UI.Window;
-using SEE.Game.UI.Menu;
-using SEE.Game.UI.StateIndicator;
+using SEE.UI.Window;
+using SEE.UI.Menu;
+using SEE.UI.StateIndicator;
 using SEE.GO;
 using UnityEngine;
 using UnityEngine.Events;
@@ -130,7 +130,7 @@ namespace SEE.Controls
         {
             if (FindObjectsOfType<WindowSpaceManager>().Length > 1)
             {
-                Debug.LogError($"Warning: More than one  {nameof(WindowSpaceManager)} is present in the scene! "
+                Debug.LogError($"More than one {nameof(WindowSpaceManager)} is present in the scene! "
                                + "This will lead to undefined behaviour when synchronizing "
                                + "windows across the network! No new indicator will be created.\n");
                 foreach (WindowSpaceManager manager in FindObjectsOfType<WindowSpaceManager>())

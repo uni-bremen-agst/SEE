@@ -216,6 +216,15 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleEdges);
         }
 
+        /// <summary>
+        /// The user wants to toggle the visibility of the tree view window.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        internal static bool ToggleTreeView()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.TreeView);
+        }
+
         #endregion
 
         //-----------------------------------------------------

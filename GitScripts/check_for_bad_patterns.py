@@ -91,8 +91,7 @@ class BadPattern:
         if suggestion is not None:
             body_text += f"\n\n```suggestion\n{suggestion}\n```"
         if self.regex is not None:
-            body_text += "\n> This bad pattern was detected by the following regular expression:\n"
-            " > ```regex\n> {self.regex.pattern}\n> ```"
+            body_text += f"\n> This bad pattern was detected by the following regular expression:\n > ```regex\n> {self.regex.pattern}\n> ```"
         return {
             "path": filename,
             "line": line_number,

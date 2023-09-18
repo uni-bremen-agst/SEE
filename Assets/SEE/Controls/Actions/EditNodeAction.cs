@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SEE.DataModel.DG;
-using SEE.Game.UI.PropertyDialog;
+using SEE.UI.PropertyDialog;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;

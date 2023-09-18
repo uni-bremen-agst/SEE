@@ -2,8 +2,8 @@
 using System.Linq;
 using SEE.Controls;
 using SEE.Controls.Actions;
-using SEE.Game.UI.Menu;
-using SEE.Game.UI.StateIndicator;
+using SEE.UI.Menu;
+using SEE.UI.StateIndicator;
 using SEE.Utils;
 using UnityEngine;
 

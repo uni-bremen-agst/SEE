@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using SEE.Game.HolisticMetrics;
-using SEE.Game.UI.HolisticMetrics;
-using SEE.Game.UI.Notification;
-using SEE.Game.UI.PropertyDialog.HolisticMetrics;
+using SEE.UI.HolisticMetrics;
+using SEE.UI.Notification;
+using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;

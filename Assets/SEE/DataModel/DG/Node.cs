@@ -178,7 +178,7 @@ namespace SEE.DataModel.DG
         /// <returns>ascendants of this node in the hierarchy including the node itself</returns>
         public IList<Node> Ascendants()
         {
-            List<Node> result = new List<Node>();
+            List<Node> result = new();
             Node cursor = this;
             while (cursor != null)
             {
@@ -422,7 +422,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The list of immediate children of this node in the hierarchy.
         /// </summary>
-        private List<Node> children = new List<Node>();
+        private List<Node> children = new();
 
         /// <summary>
         /// The number of immediate children of this node in the hierarchy.
@@ -667,7 +667,7 @@ namespace SEE.DataModel.DG
         /// <returns>all deleted nodes and edges including this node</returns>
         public SubgraphMemento DeleteTree()
         {
-            SubgraphMemento result = new SubgraphMemento(ItsGraph);
+            SubgraphMemento result = new(ItsGraph);
             foreach (Node node in PostOrderDescendants())
             {
                 result.Parents[node] = node.Parent;
