@@ -19,7 +19,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Settings for the <see cref="SEE.Layout.NodeLayouts.IncrementalTreeMapLayout"/>.
         /// </summary>
-        public IncrementalTreeMapSetting incrementalTreeMapSetting = new();
+        public IncrementalTreeMapSetting IncrementalTreeMapSetting = new();
 
         /// <summary>
         /// The path for the layout file containing the node layout information.
@@ -29,16 +29,14 @@ namespace SEE.Game.City
         /// data of a game object.
         /// </summary>
         [OdinSerialize]
-        public FilePath LayoutPath = new FilePath();
-
-        private const string LayoutPathLabel = "LayoutPath";
-
+        public FilePath LayoutPath = new();
+       
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
             writer.Save(Kind.ToString(), NodeLayoutLabel);
             LayoutPath.Save(writer, LayoutPathLabel);
-            incrementalTreeMapSetting.Save(writer,IncrementalTreeMapLabel);
+            IncrementalTreeMapSetting.Save(writer, IncrementalTreeMapLabel);
             writer.EndGroup();
         }
 
@@ -50,11 +48,21 @@ namespace SEE.Game.City
 
                 ConfigIO.RestoreEnum(values, NodeLayoutLabel, ref Kind);
                 LayoutPath.Restore(values, LayoutPathLabel);
-                incrementalTreeMapSetting.Restore(values, IncrementalTreeMapLabel);
+                IncrementalTreeMapSetting.Restore(values, IncrementalTreeMapLabel);
             }
         }
 
+        /// <summary>
+        /// Configuration label for <see cref="LayoutPath"/>.
+        /// </summary>
+        private const string LayoutPathLabel = "LayoutPath";
+        /// <summary>
+        /// Configuration label for <see cref="IncrementalTreeMapSetting"/>.
+        /// </summary>
         private const string IncrementalTreeMapLabel = "IncrementalTreeMap";
+        /// <summary>
+        /// Configuration label for <see cref="Kind"/>.
+        /// </summary>
         private const string NodeLayoutLabel = "NodeLayout";
     }
 }

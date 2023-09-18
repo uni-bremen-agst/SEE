@@ -22,7 +22,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <returns>List of <see cref="LocalMove"/>s</returns>
         private static IList<LocalMove> FindLocalMoves(Segment segment)
         {
-            List<LocalMove> result = new List<LocalMove>();
+            List<LocalMove> result = new();
             if (segment.IsConst)
             {
                 return result;
@@ -194,7 +194,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Searches the space of layouts that are similar to the layout of <paramref name="nodes"/>
         /// (in terms of distance in local moves).
-        /// Apply the layout with the best visual quality to <paramref name="nodes"/>
+        /// Applies the layout with the best visual quality to <paramref name="nodes"/>
         /// </summary>
         /// <param name="nodes">nodes that represent a layout</param>
         /// <param name="settings">settings for search</param>
@@ -206,7 +206,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 settings);
             allResults.Add((nodes, AspectRatiosPNorm(nodes, settings.PNorm), new List<LocalMove>()));
             List<Node> bestResult = Utils.ArgMin(allResults,
-                x => x.Item2 * 10 + x.Item3.Count).Item1;
+                x => x.visualQuality * 10 + x.movesList.Count).nodes;
 
             IDictionary<string, Node> nodesDictionary = nodes.ToDictionary(n => n.ID, n => n);
             foreach (Node resultNode in bestResult)
@@ -218,7 +218,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Makes recursively local moves on clones of the layout to find similar layouts with good visual quality.
+        /// Recursively makes local moves on clones of the layout to find similar layouts with good visual quality.
         /// </summary>
         /// <param name="nodes">nodes that represent a layout</param>
         /// <param name="movesUntilNow">moves that are done before in recursion</param>
@@ -231,7 +231,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             IncrementalTreeMapSetting settings)
         {
             List<(List<Node> nodes, double visualQuality, List<LocalMove> movesList)> resultThisRecursion = new();
-            if (movesUntilNow.Count >= settings.localMovesDepth)
+            if (movesUntilNow.Count >= settings.LocalMovesDepth)
             {
                 return resultThisRecursion;
             }
@@ -269,7 +269,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
 
             resultThisRecursion.Sort((x, y) => x.Item2.CompareTo(y.Item2));
-            resultThisRecursion = resultThisRecursion.Take(settings.localMovesBranchingLimit).ToList();
+            resultThisRecursion = resultThisRecursion.Take(settings.LocalMovesBranchingLimit).ToList();
 
             List<(List<Node> nodes, double visualQuality, List<LocalMove> movesList)> resultsNextRecursions = new();
             foreach ((List<Node> resultNodes, double _, List<LocalMove> resultMoves) in resultThisRecursion)

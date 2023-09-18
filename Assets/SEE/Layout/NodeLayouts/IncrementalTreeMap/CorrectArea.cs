@@ -35,7 +35,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
                 // adjust the position of slicingSegments
                 AdjustSliced(nodes, partition1, partition2, slicingSegment);
-                // recursively adjust the two sub layouts
+                // recursively adjust the two sublayouts
                 // since both sublayouts are temporally independent from each other
                 // the segment that separates these must be considered as a border (IsConst = true)
                 slicingSegment.IsConst = true;
@@ -49,7 +49,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     Vector<double>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.Area()).ToArray());
                 double error = (nodesSizesWanted - nodesSizesCurrent).Norm(p: 1);
 
-                return error <= Math.Pow(10, settings.gradientDescentPrecisionExponent) && CheckPositiveLength(nodes);
+                return error <= Math.Pow(10, settings.GradientDescentPrecisionExponent) && CheckPositiveLength(nodes);
             }
             else
             {
@@ -58,11 +58,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Checks if the layout of <paramref name="nodes"/> can be divided into two disjoint sub layouts.
+        /// Checks if the layout of <paramref name="nodes"/> can be divided into two disjoint sublayouts.
         /// </summary>
         /// <param name="nodes">nodes with layout</param>
-        /// <param name="slicingSegment">a segment that would separate the sub layouts</param>
-        /// <returns>true if nodes are sliceable else false</returns>
+        /// <param name="slicingSegment">a segment that would separate the sublayouts</param>
+        /// <returns>true if nodes are sliceable, else false</returns>
         private static bool IsSliceAble(IList<Node> nodes, out Segment slicingSegment)
         {
             slicingSegment = null;
@@ -106,8 +106,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// </summary>
         /// <param name="nodes">nodes with layout</param>
         /// <param name="slicingSegment"> the segment that divides both layouts</param>
-        /// <param name="partition1">the <see cref="Direction.Lower"/>/<see cref="Direction.Left"/> sub layout</param>
-        /// <param name="partition2">the <see cref="Direction.Upper"/>/<see cref="Direction.Right"/> sub layout</param>
+        /// <param name="partition1">the <see cref="Direction.Lower"/>/<see cref="Direction.Left"/> sublayout</param>
+        /// <param name="partition2">the <see cref="Direction.Upper"/>/<see cref="Direction.Right"/> sublayout</param>
         private static void Split(IList<Node> nodes, Segment slicingSegment,
             out IList<Node> partition1, out IList<Node> partition2)
         {
@@ -146,15 +146,15 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// This method recalibrates a layout that is sliced in 2 sublayouts,
+        /// This method recalibrates a layout that is sliced in two sublayouts,
         /// so the sublayouts get the size they should have.
-        /// A sub layout can still have internal wrong node sizes.
+        /// A sublayout can still have internal wrong node sizes.
         /// </summary>
-        /// <param name="nodes">nodes of a slice able layout </param>
+        /// <param name="nodes">nodes of a sliceable layout </param>
         /// <param name="partition1">partition of <paramref name="nodes"/>,
-        /// the <see cref="Direction.Lower"/>/<see cref="Direction.Left"/> sub layout</param>
+        /// the <see cref="Direction.Lower"/>/<see cref="Direction.Left"/> sublayout</param>
         /// <param name="partition2">partition of <paramref name="nodes"/>,
-        /// the <see cref="Direction.Upper"/>/<see cref="Direction.Right"/> sub layout</param>
+        /// the <see cref="Direction.Upper"/>/<see cref="Direction.Right"/> sublayout</param>
         /// <param name="slicingSegment">the segment that slices the layout</param>
         private static void AdjustSliced(
             IList<Node> nodes,
@@ -222,8 +222,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 = segments.ToDictionary(s => s, _ => i++);
 
             double distance = 0;
-            double maximalError = Math.Pow(10, settings.gradientDescentPrecisionExponent);
-            for (int j = 0; j < 50; j++)
+            double maximalError = Math.Pow(10, settings.GradientDescentPrecisionExponent);
+            const int NumberOfIterations = 50;
+            for (int j = 0; j < NumberOfIterations; j++)
             {
                 distance = CalculateOneStep(nodes, mapSegmentIndex);
                 if (distance <= maximalError)
@@ -232,11 +233,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 }
             }
 
-            return (CheckPositiveLength(nodes) && distance < maximalError);
+            return CheckPositiveLength(nodes) && distance < maximalError;
         }
 
         /// <summary>
-        /// Calculates the jacobian matrix, a derivative for the function that maps
+        /// Calculates the Jacobian matrix, a derivative for the function that maps
         /// the position of the segments to the area of each node (its rectangle).
         /// </summary>
         /// <param name="nodes">the nodes of the layout</param>
@@ -344,7 +345,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Checks that the result has no rectangles with non-positive width or depth
+        /// Verifies that the result has no rectangles with non-positive width or depth.
         /// </summary>
         /// <param name="nodes">nodes of the layout</param>
         /// <returns>true if all rectangles have positive lengths, else false</returns>

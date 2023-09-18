@@ -1,7 +1,7 @@
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     /// <summary>
-    /// Direction in in the plane containing the x-axis and z-axis
+    /// Direction in the plane containing the x-axis and z-axis
     /// </summary>
     internal enum Direction
     {

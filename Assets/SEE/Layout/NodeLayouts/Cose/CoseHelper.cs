@@ -127,7 +127,7 @@ namespace SEE.Layout.NodeLayouts.Cose
                         groundLevel,
                         1000.0f,
                         1000.0f,
-                        settings.NodeLayoutSettings.incrementalTreeMapSetting);
+                        settings.NodeLayoutSettings.IncrementalTreeMapSetting);
                 case NodeLayoutKind.Balloon:
                     return new BalloonNodeLayout(groundLevel);
                 case NodeLayoutKind.CirclePacking:

@@ -6,22 +6,22 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     /// <summary>
     /// A flip move is a kind of <see cref="LocalMove"/>.
-    /// It rotates two nodes 90 degrees.
+    /// It rotates two nodes by 90 degrees.
     /// </summary>
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
     internal class FlipMove : LocalMove
     {
         /// <summary>
-        /// if the rotation is clockwise
+        /// Whether the rotation is clockwise.
         /// </summary>
         private readonly bool clockwise;
 
         /// <summary>
-        /// Constructor
+        /// Constructor.
         /// </summary>
         /// <param name="node1">one affected node</param>
         /// <param name="node2">other affected node</param>
-        /// <param name="clockwise">if the rotation is clockwise </param>
+        /// <param name="clockwise">whether the rotation is clockwise</param>
         public FlipMove(Node node1, Node node2, bool clockwise)
         {
             this.Node1 = node1;
@@ -58,7 +58,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             }
             else
             {
-                throw new ArgumentException("Can't apply flip move");
+                throw new ArgumentException("Can't apply flip move.");
             }
         }
 
@@ -68,7 +68,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Applies the local move for the case that the nodes are separated vertically
+        /// Applies the local move for the case that the nodes are separated vertically.
         /// </summary>
         /// <param name="leftNode">the node on the <see cref="Direction.Left"/> side</param>
         /// <param name="rightNode">the node on the <see cref="Direction.Right"/> side</param>
@@ -170,7 +170,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Method for better overview in debugger
+        /// Method for better overview in debugger.
         /// </summary>
         private string DebuggerDisplay => "flip " + Node1.ID + " " + Node2.ID + " {clockwise}";
     }

@@ -629,7 +629,7 @@ namespace SEE.Game
                     GroundLevel,
                     parent.transform.lossyScale.x,
                     parent.transform.lossyScale.z,
-                    Settings.NodeLayoutSettings.incrementalTreeMapSetting),
+                    Settings.NodeLayoutSettings.IncrementalTreeMapSetting),
                 NodeLayoutKind.Balloon => new BalloonNodeLayout(GroundLevel),
                 NodeLayoutKind.CirclePacking => new CirclePackingNodeLayout(GroundLevel),
                 NodeLayoutKind.CompoundSpringEmbedder => new CoseLayout(GroundLevel, Settings),

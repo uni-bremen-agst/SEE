@@ -13,7 +13,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     internal class Node
     {
         /// <summary>
-        /// Constructor
+        /// Constructor.
         /// </summary>
         /// <param name="id">the ID of the new node</param>
         public Node(string id)
@@ -32,7 +32,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         public float DesiredSize { get; set; }
 
         /// <summary>
-        /// the ID
+        /// The ID.
         /// </summary>
         public string ID { get; }
 
@@ -84,12 +84,12 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     segment.Side1Nodes.Add(this);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(dir), dir, "We should never arrive here");
+                    throw new ArgumentOutOfRangeException(nameof(dir), dir, "We should never arrive here.");
             }
         }
 
         /// <summary>
-        /// Remove node from a current adjacent segment
+        /// Removes the node from a current adjacent segment.
         /// </summary>
         /// <param name="dir">The side of the adjacent segment</param>
         public void DeregisterSegment(Direction dir)
@@ -114,7 +114,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Get all adjacent segments
+        /// Returns all adjacent segments.
         /// </summary>
         /// <returns>dictionary where the direction maps the segment in this direction</returns>
         public IDictionary<Direction, Segment> SegmentsDictionary()
@@ -129,7 +129,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Method for better overview in debugger
+        /// Method for better overview in debugger.
         /// </summary>
         private string DebuggerDisplay =>
             string.Format(

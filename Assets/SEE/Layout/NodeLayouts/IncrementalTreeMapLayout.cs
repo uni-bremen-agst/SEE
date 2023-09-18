@@ -89,7 +89,7 @@ namespace SEE.Layout.NodeLayouts
                 else
                 {
                     throw new ArgumentException(
-                        "Predecessor of IncrementalTreeMapLayout was not a IncrementalTreeMapLayout");
+                        "Predecessor of IncrementalTreeMapLayout was not a IncrementalTreeMapLayout.");
                 }
             }
         }
@@ -128,14 +128,14 @@ namespace SEE.Layout.NodeLayouts
 
         /// <summary>
         /// Creates a <see cref="Node"/> for the given <see cref="ILayoutNode"/> <paramref name="node"/>
-        /// and continue recursively with the children of the ILayoutNode <paramref name="node"/>.
-        /// Extend both <see cref="nodeMap"/> and <see cref="iLayoutNodeMap"/> by the node.
+        /// and continues recursively with the children of the ILayoutNode <paramref name="node"/>.
+        /// Extends both <see cref="nodeMap"/> and <see cref="iLayoutNodeMap"/> by the node.
         /// </summary>
         /// <param name="node">node of the layout</param>
         /// <returns>the absolute size of the node</returns>
         private float InitNode(ILayoutNode node)
         {
-            Node newNode = new Node(node.ID);
+            Node newNode = new(node.ID);
             nodeMap.Add(node.ID, newNode);
             iLayoutNodeMap.Add(node.ID, node);
 
@@ -195,7 +195,7 @@ namespace SEE.Layout.NodeLayouts
         /// Calculates a stable layout for <paramref name="nodes"/>.
         /// </summary>
         /// <param name="nodes">nodes to be laid out</param>
-        /// <param name="rectangle">rectangle in that the nodes should be laid out</param>
+        /// <param name="rectangle">rectangle in which the nodes should be laid out</param>
         private void ApplyIncrementalLayout(List<Node> nodes, Rectangle rectangle)
         {
             // oldNodes are not only the siblings that are in the old graph and in the new one,
@@ -325,7 +325,7 @@ namespace SEE.Layout.NodeLayouts
         {
             foreach (Node node in nodes)
             {
-                float absolutePadding = settings.paddingMm / 1000;
+                float absolutePadding = settings.PaddingMm / 1000;
                 Rectangle rectangle = node.Rectangle;
                 ILayoutNode layoutNode = iLayoutNodeMap[node.ID];
 

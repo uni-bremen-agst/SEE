@@ -11,11 +11,11 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     internal static class Dissect
     {
         /// <summary>
-        /// Calculates new Layout for <paramref name="nodes"/>.
+        /// Calculates new layout for <paramref name="nodes"/>.
         /// Assigns rectangles and segments to each node in <paramref name="nodes"/>.
         /// </summary>
         /// <param name="nodes">nodes to be laid out</param>
-        /// <param name="rectangle">rectangle in that the nodes should be placed</param>
+        /// <param name="rectangle">rectangle in which the nodes should be placed</param>
         public static void Apply(IEnumerable<Node> nodes, Rectangle rectangle)
         {
             Node[] nodesArray = nodes.ToArray();
@@ -115,7 +115,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// Calculates the index that separates the <paramref name="nodes"/> array into two
         /// partitions. The specific split should result in good visual quality.
         /// </summary>
-        /// <param name="nodes"> sorted list</param>
+        /// <param name="nodes">sorted list</param>
         /// <returns>index</returns>
         private static int GetSplitIndex(Node[] nodes)
         {

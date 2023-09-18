@@ -1,7 +1,7 @@
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     /// <summary>
-    /// A class that represents a rectangle shape as part of a layout
+    /// A class that represents a rectangle shape as part of an incremental tree-map layout.
     /// </summary>
     internal class Rectangle
     {
@@ -21,22 +21,22 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// The position of the <see cref="Direction.Left"/> edge
+        /// The position of the <see cref="Direction.Left"/> edge.
         /// </summary>
         public double X;
 
         /// <summary>
-        /// the position of the <see cref="Direction.Lower"/> edge
+        /// The position of the <see cref="Direction.Lower"/> edge.
         /// </summary>
         public double Z;
 
         /// <summary>
-        /// The lenght of x axis
+        /// The length of x axis.
         /// </summary>
         public double Width;
 
         /// <summary>
-        /// The lenght of z axis
+        /// The length of z axis.
         /// </summary>
         public double Depth;
 
@@ -51,7 +51,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// the area of the rectangle
+        /// The area of the rectangle.
         /// </summary>
         /// <returns><see cref="Width"/>*<see cref="Depth"/></returns>
         public double Area()
@@ -60,7 +60,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Creates a new identical Rectangle
+        /// Returns a new identical Rectangle.
         /// </summary>
         /// <returns>the clone</returns>
         public Rectangle Clone()

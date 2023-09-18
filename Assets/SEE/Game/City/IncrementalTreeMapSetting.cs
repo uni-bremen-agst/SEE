@@ -20,7 +20,7 @@ namespace SEE.Game.City
         [Range(0, 5)]
         [Tooltip("The maximal depth for local moves algorithm. Increase for higher visual quality, " +
                  "decrease for higher stability and to save runtime")]
-        public int localMovesDepth = 3;
+        public int LocalMovesDepth = 3;
 
         /// <summary>
         /// The maximal branching factor of the local moves search.
@@ -29,7 +29,7 @@ namespace SEE.Game.City
         [Range(1, 10)]
         [Tooltip("The maximal branching factor for local moves algorithm.  Increase for higher visual quality, " +
                  "decrease for higher stability and to save runtime")]
-        public int localMovesBranchingLimit = 4;
+        public int LocalMovesBranchingLimit = 4;
 
         /// <summary>
         /// Defines the specific p norm used in the local moves algorithm. See here:
@@ -57,7 +57,7 @@ namespace SEE.Game.City
         [Range(0.1f, 100f)]
         [LabelText("Padding (mm)")]
         [Tooltip("The distance between two neighbour nodes in mm")]
-        public float paddingMm = 5f;
+        public float PaddingMm = 5f;
 
         /// <summary>
         /// The maximal error for the method
@@ -67,7 +67,7 @@ namespace SEE.Game.City
         [Range(-7, -2)]
         [LabelText("Gradient Descent Precision (10^n)")]
         [Tooltip("The maximal error for the gradient descent method as power of 10")]
-        public int gradientDescentPrecisionExponent = -4;
+        public int GradientDescentPrecisionExponent = -4;
 
         /// <summary>
         /// Maps <see cref="pNorm"/> to a double.
@@ -85,11 +85,11 @@ namespace SEE.Game.City
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(localMovesDepth, LocalMovesDepthLabel);
-            writer.Save(localMovesBranchingLimit, LocalMovesBranchingLimitLabel);
+            writer.Save(LocalMovesDepth, LocalMovesDepthLabel);
+            writer.Save(LocalMovesBranchingLimit, LocalMovesBranchingLimitLabel);
             writer.Save(pNorm.ToString(), PNormLabel);
-            writer.Save(gradientDescentPrecisionExponent, GradientDescentPrecisionLabel);
-            writer.Save(paddingMm, PaddingLabel);
+            writer.Save(GradientDescentPrecisionExponent, GradientDescentPrecisionLabel);
+            writer.Save(PaddingMm, PaddingLabel);
             writer.EndGroup();
         }
 
@@ -100,18 +100,33 @@ namespace SEE.Game.City
                 return false;
             }
             Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-            bool result = ConfigIO.Restore(values, LocalMovesDepthLabel, ref localMovesDepth);
-            result |= ConfigIO.Restore(values, LocalMovesBranchingLimitLabel, ref localMovesBranchingLimit);
+            bool result = ConfigIO.Restore(values, LocalMovesDepthLabel, ref LocalMovesDepth);
+            result |= ConfigIO.Restore(values, LocalMovesBranchingLimitLabel, ref LocalMovesBranchingLimit);
             result |= ConfigIO.RestoreEnum(values, PNormLabel, ref pNorm);
-            result |= ConfigIO.Restore(values, GradientDescentPrecisionLabel, ref gradientDescentPrecisionExponent);
-            result |= ConfigIO.Restore(values, PaddingLabel, ref paddingMm);
+            result |= ConfigIO.Restore(values, GradientDescentPrecisionLabel, ref GradientDescentPrecisionExponent);
+            result |= ConfigIO.Restore(values, PaddingLabel, ref PaddingMm);
             return result;
         }
 
+        /// <summary>
+        /// Configuration label for <see cref="LocalMovesDepth"/>.
+        /// </summary>
         private const string LocalMovesDepthLabel = "LocalMovesDepth";
+        /// <summary>
+        /// Configuration label for <see cref="LocalMovesBranchingLimit"/>.
+        /// </summary>
         private const string LocalMovesBranchingLimitLabel = "LocalMovesBranchingLimit";
+        /// <summary>
+        /// Configuration label for <see cref="PNorm"/>.
+        /// </summary>
         private const string PNormLabel = "PNorm";
+        /// <summary>
+        /// Configuration label for <see cref="GradientDescentPrecisionExponent"/>.
+        /// </summary>
         private const string GradientDescentPrecisionLabel = "GradientDescentPrecision";
+        /// <summary>
+        /// Configuration label for <see cref="PaddingMm"/>.
+        /// </summary>
         private const string PaddingLabel = "Padding";
     }
 

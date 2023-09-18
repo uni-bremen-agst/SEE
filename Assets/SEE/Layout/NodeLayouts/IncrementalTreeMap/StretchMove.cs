@@ -211,7 +211,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Method for better overview in debugger
+        /// Method for better overview in debugger.
         /// </summary>
         private string DebuggerDisplay => "stretch " + Node1.ID + " " + Node2.ID;
     }

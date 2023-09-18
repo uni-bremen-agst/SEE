@@ -23,6 +23,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
             return collection.First(x => eval(x).CompareTo(bestVal) == 0);
         }
 
+        /// <summary>
         /// Returns the item of the given collection that minimizes the given function.
         /// </summary>
         /// <param name="collection">The collection whose minimum with respect to
@@ -36,7 +37,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         }
 
         /// <summary>
-        /// Creates a new rectangle that includes all rectangles of <paramref name="nodes"/>.
+        /// Returns a new rectangle that includes all rectangles of <paramref name="nodes"/>.
         /// </summary>
         /// <param name="nodes">nodes with set rectangles</param>
         /// <returns>new parent rectangle</returns>
@@ -52,7 +53,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// A list of <paramref name="nodes"/> with rectangles that are laid out
         /// in an <paramref name="oldRectangle"/> will be transformed (linearly), so that they fit
-        /// in <paramref name="newRectangle"/>
+        /// in <paramref name="newRectangle"/>.
         /// </summary>
         /// <param name="nodes">nodes with rectangles that should be transformed</param>
         /// <param name="newRectangle">new parent rectangle</param>

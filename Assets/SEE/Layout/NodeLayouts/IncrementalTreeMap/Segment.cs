@@ -5,8 +5,8 @@ using System.Linq;
 namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 {
     /// <summary>
-    /// A segment is a core element in the layout algorithm,
-    /// Segments representing lines separating/slicing the layout in rectangles.
+    /// A segment is a core element in the layout algorithm.
+    /// Segments are representing lines separating/slicing the layout in rectangles.
     /// The specific position of a segment in the layout is actually not relevant,
     /// but the relation to adjacent nodes is relevant.
     /// </summary>
@@ -14,7 +14,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
     internal class Segment
     {
         /// <summary>
-        /// Constructor
+        /// Constructor.
         /// </summary>
         /// <param name="isConst"><see cref="IsConst"/></param>
         /// <param name="isVertical"><see cref="IsVertical"/></param>
@@ -27,7 +27,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Is true if the segment is a border of the layout.
         /// In most cases that means that <see cref="Side1Nodes"/> or <see cref="Side2Nodes"/> are empty
-        /// and layout has e.g. 4 const segments.
+        /// and layout has e.g. four const segments.
         /// </summary>
         public bool IsConst { get; set; }
 
@@ -49,7 +49,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         public IList<Node> Side2Nodes { get; } = new List<Node>();
 
         /// <summary>
-        /// Method for better overview in debugger
+        /// Method for better overview in debugger.
         /// </summary>
         private string DebuggerDisplay
         {
