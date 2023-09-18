@@ -8,7 +8,9 @@ using UnityEngine.UI;
 namespace Assets.SEE.Game.UI.Drawable
 {
     /// <summary>
-    /// File from the hsvpicker packages, add remove color and change color
+    /// File from the hsvpicker packages
+    /// https://github.com/judah4/HSV-Color-Picker-Unity/blob/master/Packages/com.judahperez.hsvcolorpicker/UI/ColorPresets.cs
+    /// added remove color and change color
     /// </summary>
     public class ColorPresets : MonoBehaviour
     {

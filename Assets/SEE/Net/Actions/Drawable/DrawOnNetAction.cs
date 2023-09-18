@@ -17,9 +17,10 @@ namespace Assets.SEE.Net.Actions.Whiteboard
         public int OrderInLayer = -1;
         public Vector3 Position;
         public Vector3 EulerAngles;
+        public bool Loop;
 
         public DrawOnNetAction(
-            string drawableID, string parentDrawableID, string name, Vector3[] positions, Color color, float thickness, int orderInLayer)
+            string drawableID, string parentDrawableID, string name, Vector3[] positions, Color color, float thickness, int orderInLayer, bool loop)
         {
             this.DrawableID = drawableID;
             this.ParentDrawableID = parentDrawableID;
@@ -30,10 +31,11 @@ namespace Assets.SEE.Net.Actions.Whiteboard
             this.OrderInLayer = orderInLayer;
             Position = Vector3.zero;
             EulerAngles = Vector3.zero;
+            Loop = loop;
         }
 
         public DrawOnNetAction(
-            string drawableID, string parentDrawableID, string name, Vector3[] positions, Color color, float thickness)
+            string drawableID, string parentDrawableID, string name, Vector3[] positions, Color color, float thickness, bool loop)
         {
             this.DrawableID = drawableID;
             this.ParentDrawableID = parentDrawableID;
@@ -41,10 +43,11 @@ namespace Assets.SEE.Net.Actions.Whiteboard
             this.Positions = positions;
             this.Color = color;
             this.Thickness = thickness;
+            this.Loop = loop;
         }
 
         public DrawOnNetAction(
-            string drawableID, string parentDrawableID, string name, Vector3[] positions, Color color, float thickness, int orderInLayer, Vector3 position, Vector3 eulerAngles)
+            string drawableID, string parentDrawableID, string name, Vector3[] positions, Color color, float thickness, int orderInLayer, Vector3 position, Vector3 eulerAngles, bool loop)
         {
             this.DrawableID = drawableID;
             this.ParentDrawableID = parentDrawableID;
@@ -55,6 +58,7 @@ namespace Assets.SEE.Net.Actions.Whiteboard
             this.OrderInLayer = orderInLayer;
             this.Position = position;
             this.EulerAngles = eulerAngles;
+            this.Loop = loop;
         }
 
         protected override void ExecuteOnClient()
@@ -69,15 +73,15 @@ namespace Assets.SEE.Net.Actions.Whiteboard
                 }
                 if (OrderInLayer == -1)
                 {
-                    GameDrawer.DrawLine(drawable, Name, Positions, Color, Thickness);
+                    GameDrawer.DrawLine(drawable, Name, Positions, Color, Thickness, Loop);
                 } else
                 {
                     if (Position == Vector3.zero && EulerAngles == Vector3.zero)
                     {
-                        GameDrawer.ReDrawLine(drawable, Name, Positions, Color, Thickness, OrderInLayer);
+                        GameDrawer.ReDrawLine(drawable, Name, Positions, Color, Thickness, OrderInLayer, Loop);
                     } else
                     {
-                        GameDrawer.ReDrawLine(drawable, Name, Positions, Color, Thickness, OrderInLayer, Position, EulerAngles);
+                        GameDrawer.ReDrawLine(drawable, Name, Positions, Color, Thickness, OrderInLayer, Position, EulerAngles, Loop);
                     }
                 }
             }

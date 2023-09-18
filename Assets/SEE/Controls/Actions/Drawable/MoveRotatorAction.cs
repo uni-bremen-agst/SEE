@@ -43,7 +43,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
         private static Vector3 oldObjectLocalEulerAngles;
         private static Vector3 direction = Vector3.zero;
         private static float degree = 0;
-        private const string rotationMenuPrefab = "Prefabs/UI/DrawableRotate";
+        private const string rotationMenuPrefab = "Prefabs/UI/Drawable/DrawableRotate";
         private static GameObject rotationMenu;
 
         private Vector3 newObjectPosition;
@@ -108,6 +108,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 // MOVE
                 if (selectedObject != null && selectedObject.GetComponent<BlinkEffect>() != null && selectedObject.GetComponent<BlinkEffect>().GetLoopStatus() && clickState == ClickState.Left)
                 {
+                    
                     GameObject drawable = GameDrawableFinder.FindDrawableParent(selectedObject);
                     string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
                     bool isTriggered = false;

@@ -26,5 +26,11 @@ namespace Assets.SEE.Game.Drawable
             LineRenderer renderer = line.GetComponent<LineRenderer>();
             renderer.material.color = color;
         }
+
+        public static void ChangeLoop(GameObject line, bool loop)
+        {
+            LineRenderer renderer = line.GetComponent<LineRenderer>();
+            renderer.loop = loop;
+        }
     }
 }

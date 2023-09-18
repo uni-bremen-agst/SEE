@@ -72,12 +72,13 @@ namespace Assets.SEE.Game.Drawable
         }
         private static Line ReDraw(Line originLine, Vector3[] positions)
         {
+            LineRenderer renderer = originLine.gameObject.GetComponent<LineRenderer>();
             GameObject drawable = GameDrawableFinder.FindDrawableParent(originLine.gameObject);
             GameObject newLine = GameDrawer.ReDrawLine(drawable, "", positions, originLine.color, originLine.thickness,
-                                        originLine.orderInLayer, originLine.position, originLine.parentEulerAngles);
-            new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), originLine.id,
+                                        originLine.orderInLayer, originLine.position, originLine.parentEulerAngles, renderer.loop);
+            new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), newLine.name,
                 positions, originLine.color, originLine.thickness,
-               originLine.orderInLayer, originLine.position, originLine.parentEulerAngles).Execute();
+               originLine.orderInLayer, originLine.position, originLine.parentEulerAngles, renderer.loop).Execute();
 
             return Line.GetLine(newLine);
         }

@@ -173,57 +173,63 @@ namespace SEE.Controls.Actions
 
             DrawOn =
                 new("Draw on", "Draw a line on a drawable",
-                        Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
-                        DrawOnAction.CreateReversibleAction,
-                        parent: Whiteboard);
+                    Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                    DrawOnAction.CreateReversibleAction,
+                    parent: Whiteboard);
+
+            DrawShapes =
+                new("Draw Shape", "Draw different shapes on a drawable",
+                    Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                    DrawShapesAction.CreateReversibleAction,
+                    parent: Whiteboard);
 
             ColorPicker =
                 new("Color picker", "Picks a color",
-                        Color.yellow.Darker(), "Materials/ModernUIPack/Pencil",
-                        ColorPickerAction.CreateReversibleAction,
-                        parent: Whiteboard);
+                    Color.yellow.Darker(), "Materials/ModernUIPack/Pencil",
+                    ColorPickerAction.CreateReversibleAction,
+                    parent: Whiteboard);
 
             EditLine =
                 new("Edit line", "Edit the selected line.",
-                        Color.green.Darker(), "Materials/ModernUIPack/Pencil",
-                        EditLineAction.CreateReversibleAction,
-                        parent: Whiteboard);
+                    Color.green.Darker(), "Materials/ModernUIPack/Pencil",
+                    EditLineAction.CreateReversibleAction,
+                    parent: Whiteboard);
 
             MoveRotator =
                 new("Move or Rotate", "Move or rotates a Object on the Drawable.",
-                        Color.green.Darker(), "Materials/ModernUIPack/Pencil",
-                        MoveRotatorAction.CreateReversibleAction,
-                        parent: Whiteboard);
+                    Color.green.Darker(), "Materials/ModernUIPack/Pencil",
+                    MoveRotatorAction.CreateReversibleAction,
+                    parent: Whiteboard);
 
             LayerChanger =
                 new("Change the sorting layer", "Left mouse click to increase, right mouse click to decrease",
-                        Color.green.Darker(), "Materials/ModernUIPack/Pencil",
-                        LayerChangerAction.CreateReversibleAction,
-                        parent: Whiteboard);
+                    Color.green.Darker(), "Materials/ModernUIPack/Pencil",
+                    LayerChangerAction.CreateReversibleAction,
+                    parent: Whiteboard);
 
             LineSplit =
                 new("Line split", "Splittes a line on a given point.",
-                        Color.green.Darker(), "Materials/ModernUIPack/Pencil",
-                        LineSplitAction.CreateReversibleAction,
-                        parent: Whiteboard);
+                    Color.green.Darker(), "Materials/ModernUIPack/Pencil",
+                    LineSplitAction.CreateReversibleAction,
+                    parent: Whiteboard);
 
             Erase =
                 new("Erase", "Erase a complete object on a drawable",
-                Color.red, "Materials/ModernUIPack/Pencil",
-                EraseAction.CreateReversibleAction,
-                parent: Whiteboard);
+                    Color.red, "Materials/ModernUIPack/Pencil",
+                    EraseAction.CreateReversibleAction,
+                    parent: Whiteboard);
 
             LinePointErase =
                 new("Line point erase", "Erase a point from a line on a drawable",
-                Color.red, "Materials/ModernUIPack/Pencil",
-                LinePointEraseAction.CreateReversibleAction,
-                parent: Whiteboard);
+                    Color.red, "Materials/ModernUIPack/Pencil",
+                    LinePointEraseAction.CreateReversibleAction,
+                    parent: Whiteboard);
 
             Cleaner =
                 new("Cleaner", "Cleans a complete drawable",
-                Color.red.Darker(), "Materials/ModernUIPack/Pencil",
-                CleanerAction.CreateReversibleAction,
-                parent: Whiteboard);
+                    Color.red.Darker(), "Materials/ModernUIPack/Pencil",
+                    CleanerAction.CreateReversibleAction,
+                    parent: Whiteboard);
         }
 
         public readonly static ActionStateType Move;
@@ -249,6 +255,7 @@ namespace SEE.Controls.Actions
 
         public readonly static ActionStateTypeGroup Whiteboard;
         public readonly static ActionStateType DrawOn;
+        public readonly static ActionStateType DrawShapes;
         public readonly static ActionStateType ColorPicker;
         public readonly static ActionStateType EditLine;
         public readonly static ActionStateType MoveRotator;

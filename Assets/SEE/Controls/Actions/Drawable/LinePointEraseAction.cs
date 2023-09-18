@@ -52,7 +52,7 @@ namespace SEE.Controls.Actions
                         List<int> matchedIndexes = DrawableHelper.GetNearestIndexes(transformedPositions, raycastHit.point);
                         isActive = GameLineSplit.GetSplittedPositions(isActive, originLine, matchedIndexes, positionsList, lines, true);
 
-                        memento = new Memento(hittedObject, GameDrawableFinder.FindDrawableParent(hittedObject), lines);
+                        memento = new Memento(hittedObject, GameDrawableFinder.FindDrawableParent(hittedObject), lines, lineRenderer.loop);
                         mementoList.Add(memento);
                         new FastEraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.originalLine.id).Execute();
                         Destroyer.Destroy(hittedObject.transform.parent.gameObject);
@@ -78,14 +78,16 @@ namespace SEE.Controls.Actions
         private class Memento
         {
             public Line originalLine;
+            public bool loop;
             public readonly GameObject drawable;
             public List<Line> lines;
 
-            public Memento(GameObject originalLine, GameObject drawable, List<Line> lines)
+            public Memento(GameObject originalLine, GameObject drawable, List<Line> lines, bool loop)
             {
                 this.originalLine = Line.GetLine(originalLine);
                 this.drawable = drawable;
                 this.lines = lines;
+                this.loop = loop;
             }
         }
 
@@ -103,10 +105,10 @@ namespace SEE.Controls.Actions
 
                 mem.originalLine.gameObject = GameDrawer.ReDrawLine(mem.drawable, mem.originalLine.id, mem.originalLine.rendererPositions,
                     mem.originalLine.color, mem.originalLine.thickness, mem.originalLine.orderInLayer,
-                    mem.originalLine.position, mem.originalLine.parentEulerAngles);
+                    mem.originalLine.position, mem.originalLine.parentEulerAngles, mem.loop);
                 new DrawOnNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.originalLine.id,
                     mem.originalLine.rendererPositions, mem.originalLine.color, mem.originalLine.thickness,
-                    mem.originalLine.orderInLayer, mem.originalLine.position, mem.originalLine.parentEulerAngles).Execute();
+                    mem.originalLine.orderInLayer, mem.originalLine.position, mem.originalLine.parentEulerAngles, mem.loop).Execute();
 
                 foreach (Line line in mem.lines)
                 {
@@ -150,9 +152,9 @@ namespace SEE.Controls.Actions
                 foreach (Line line in mem.lines)
                 {
                     line.gameObject = GameDrawer.ReDrawLine(mem.drawable, line.id, line.rendererPositions, line.color, line.thickness,
-                    line.orderInLayer, line.position, line.parentEulerAngles);
+                    line.orderInLayer, line.position, line.parentEulerAngles, mem.loop);
                     new DrawOnNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), line.id, line.rendererPositions, line.color, line.thickness,
-                        line.orderInLayer, line.position, line.parentEulerAngles).Execute();
+                        line.orderInLayer, line.position, line.parentEulerAngles, mem.loop).Execute();
                 }
             }
         }

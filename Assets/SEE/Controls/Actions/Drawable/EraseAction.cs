@@ -42,7 +42,7 @@ namespace SEE.Controls.Actions
                         lineRenderer.GetPositions(positions);
 
                         memento = new Memento(hittedObject, GameDrawableFinder.FindDrawableParent(hittedObject), positions, lineRenderer.material.color, hittedObject.name, 
-                            lineRenderer.startWidth, lineRenderer.sortingOrder, hittedObject.transform.position, hittedObject.transform.parent.localEulerAngles);
+                            lineRenderer.startWidth, lineRenderer.sortingOrder, hittedObject.transform.position, hittedObject.transform.parent.localEulerAngles, lineRenderer.loop);
                         mementoList.Add(memento);
 
                         new FastEraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.id).Execute();
@@ -81,8 +81,9 @@ namespace SEE.Controls.Actions
 
             public readonly Vector3 position;
             public readonly Vector3 eulerAngles;
+            public readonly bool loop;
 
-            public Memento(GameObject line, GameObject drawable, Vector3[] positions, Color color, String id, float thickness, int orderInLayer, Vector3 position, Vector3 eulerAngles)
+            public Memento(GameObject line, GameObject drawable, Vector3[] positions, Color color, String id, float thickness, int orderInLayer, Vector3 position, Vector3 eulerAngles, bool loop)
             {
                 this.line = line;
                 this.drawable = drawable;
@@ -93,6 +94,7 @@ namespace SEE.Controls.Actions
                 this.orderInLayer = orderInLayer;
                 this.position = position;
                 this.eulerAngles = eulerAngles;
+                this.loop = loop;
             }
         }
 
@@ -105,10 +107,10 @@ namespace SEE.Controls.Actions
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             foreach (Memento mem in mementoList)
             {
-                mem.line = GameDrawer.ReDrawLine(mem.drawable, mem.id, mem.positions, mem.color, mem.thickness, mem.orderInLayer, mem.position, mem.eulerAngles);
+                mem.line = GameDrawer.ReDrawLine(mem.drawable, mem.id, mem.positions, mem.color, mem.thickness, mem.orderInLayer, mem.position, mem.eulerAngles, mem.loop);
 
                 new DrawOnNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.id, mem.positions, mem.color, mem.thickness, 
-                    mem.orderInLayer, mem.position, mem.eulerAngles).Execute();
+                    mem.orderInLayer, mem.position, mem.eulerAngles, mem.loop).Execute();
             }
         }
 

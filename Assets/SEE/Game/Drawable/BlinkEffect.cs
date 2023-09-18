@@ -1,5 +1,6 @@
 ﻿using Assets.SEE.Controls.Actions.Drawable;
 using SEE.Controls.Actions;
+using SEE.Game;
 using SEE.Utils;
 using System;
 using System.Collections;
@@ -12,6 +13,7 @@ namespace Assets.SEE.Game.Drawable
         private bool loopOn;
         private ActionStateType allowedState;
         new Renderer renderer;
+        private MeshCollider collider;
 
 
         public void SetAllowedActionStateType(ActionStateType allowedState)
@@ -47,6 +49,11 @@ namespace Assets.SEE.Game.Drawable
         {
             loopOn = false;
             renderer.enabled = true;
+            if (collider != null && collider.convex)
+            {
+                collider.isTrigger = false;
+                collider.convex = false;
+            } 
             Destroy(this);
         }
 
@@ -69,9 +76,10 @@ namespace Assets.SEE.Game.Drawable
 
         public void Activate(GameObject line)
         {
-            if (renderer == null)
+            if (renderer == null && line.CompareTag(Tags.Line))
             {
                 renderer = line.GetComponent<LineRenderer>();
+                collider = line.GetComponent<MeshCollider>();
             }
             loopOn = true;
             StartCoroutine(Blink());

@@ -38,7 +38,7 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
 
         private void DeleteDrawableChilds(GameObject drawable)
         {
-            Transform[] allChildren = drawable.GetComponentsInChildren<Transform>();
+            Transform[] allChildren = GameDrawableFinder.GetAttachedObjectsObject(drawable).GetComponentsInChildren<Transform>();
             foreach (Transform childsTransform in allChildren)
             {
                 GameObject child = childsTransform.gameObject;
@@ -49,7 +49,7 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
                     Vector3[] positions = new Vector3[lineRenderer.positionCount];
                     lineRenderer.GetPositions(positions);
 
-                    memento = new Memento(child, drawable, positions, child.name, DrawableTypes.Line, child.transform.position, child.transform.parent.localEulerAngles);
+                    memento = new Memento(child, drawable, positions, child.name, DrawableTypes.Line, child.transform.position, child.transform.parent.localEulerAngles, lineRenderer.loop);
                     memento.color = lineRenderer.material.color;
                     memento.thickness = lineRenderer.startWidth;
                     memento.orderInLayer = lineRenderer.sortingOrder;
@@ -86,7 +86,9 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
 
             public Vector3 eulerAngles;
 
-            public Memento(GameObject gameObject, GameObject drawable, Vector3[] positions, string id, DrawableTypes type, Vector3 position, Vector3 eulerAngles)
+            public bool loop;
+
+            public Memento(GameObject gameObject, GameObject drawable, Vector3[] positions, string id, DrawableTypes type, Vector3 position, Vector3 eulerAngles, bool loop)
             {
                 this.gameObject = gameObject;
                 this.drawable = drawable;
@@ -95,6 +97,7 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
                 this.type = type;
                 this.position = position;
                 this.eulerAngles = eulerAngles;
+                this.loop = loop;
             }
         }
 
@@ -111,9 +114,9 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
                 switch (mem.type)
                 {
                     case DrawableTypes.Line:
-                        mem.gameObject = GameDrawer.ReDrawLine(mem.drawable, mem.id, mem.positions, mem.color, mem.thickness, mem.orderInLayer, mem.position, mem.eulerAngles);
+                        mem.gameObject = GameDrawer.ReDrawLine(mem.drawable, mem.id, mem.positions, mem.color, mem.thickness, mem.orderInLayer, mem.position, mem.eulerAngles, mem.loop);
                         new DrawOnNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.id, mem.positions, 
-                            mem.color, mem.thickness, mem.orderInLayer, mem.position, mem.eulerAngles).Execute();
+                            mem.color, mem.thickness, mem.orderInLayer, mem.position, mem.eulerAngles, mem.loop).Execute();
                         break;
                     default: break;
                 }

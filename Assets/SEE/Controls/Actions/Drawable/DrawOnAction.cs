@@ -1,21 +1,12 @@
-using SEE.DataModel;
-using SEE.DataModel.DG;
 using SEE.Game;
-using SEE.GO;
 using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static RootMotion.FinalIK.HitReaction;
 using Assets.SEE.Net.Actions.Whiteboard;
 using SEE.Net.Actions;
 using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game;
-using Assets.SEE.Net.Actions.Drawable;
-using RTG;
-using Assets.SEE.Game.UI.Drawable;
-using DynamicPanels;
 using System.Linq;
 
 namespace SEE.Controls.Actions
@@ -59,7 +50,7 @@ namespace SEE.Controls.Actions
 
         public override void Awake()
         {
-            DrawableHelper.enableDrawableMenu();
+            DrawableHelper.enableDrawableMenu(withoutMenuPoints: new DrawableHelper.MenuPoint[] {DrawableHelper.MenuPoint.Layer, DrawableHelper.MenuPoint.Loop});
 
             thicknessSlider = DrawableHelper.drawableMenu.GetComponentInChildren<ThicknessSliderController>();
             thicknessSlider.AssignValue(DrawableHelper.currentThickness);
@@ -67,8 +58,6 @@ namespace SEE.Controls.Actions
             {
                 DrawableHelper.currentThickness = thickness;
             });
-
-            DrawableHelper.disableLayerFromDrawableMenu();
 
             picker = DrawableHelper.drawableMenu.GetComponent<HSVPicker.ColorPicker>();
             picker.AssignColor(DrawableHelper.currentColor);
@@ -80,7 +69,6 @@ namespace SEE.Controls.Actions
 
         public override void Stop()
         {
-            DrawableHelper.enableLayerFromDrawableMenu();
             DrawableHelper.disableDrawableMenu();
         }
 
@@ -111,7 +99,7 @@ namespace SEE.Controls.Actions
                             line = GameDrawer.StartDrawing(drawable, positions, DrawableHelper.currentColor, DrawableHelper.currentThickness);
                             positions[0] = line.transform.InverseTransformPoint(positions[0]) - DrawableHelper.distanceToBoard;
                             break;
-                             
+
                         case ProgressState.Drawing:
                             // The position at which to continue the line.
                             Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - DrawableHelper.distanceToBoard;
@@ -123,16 +111,15 @@ namespace SEE.Controls.Actions
                                 newPositions[newPositions.Length - 1] = newPosition;
                                 positions = newPositions;
 
-                                if (GameDrawer.DifferentPositionCounter(positions) > 3)
-                                {
-                                    GameDrawer.Drawing(positions);
-                                    memento = new Memento(drawable, positions, DrawableHelper.currentColor,
-                                        DrawableHelper.currentThickness, line.GetComponent<LineRenderer>().sortingOrder);
-                                    memento.id = line.name;
-                                    new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable),
-                                        memento.id, memento.positions, memento.color, memento.thickness).Execute();
-                                    currentState = ReversibleAction.Progress.InProgress;
-                                }
+                                // if (GameDrawer.DifferentMeshVerticesCounter() > 3)
+                                // {
+                                GameDrawer.Drawing(positions);
+                                memento = new Memento(drawable, line.name, positions, DrawableHelper.currentColor,
+                                    DrawableHelper.currentThickness, line.GetComponent<LineRenderer>().sortingOrder);
+                                new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable),
+                                    memento.id, memento.positions, memento.color, memento.thickness, false).Execute();
+                                currentState = ReversibleAction.Progress.InProgress;
+                                // }
                             }
                             break;
                     }
@@ -146,12 +133,12 @@ namespace SEE.Controls.Actions
 
                     if (progressState == ProgressState.FinishDrawing)
                     {
-                        if (GameDrawer.DifferentPositionCounter(positions) > 3)
+                        if (GameDrawer.DifferentMeshVerticesCounter() > 3)
                         {
                             memento.positions = positions;
-                            GameDrawer.FinishDrawing();
+                            GameDrawer.FinishDrawing(false);
                             new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id,
-                                memento.positions, memento.color, memento.thickness).Execute();
+                                memento.positions, memento.color, memento.thickness, false).Execute();
                             result = true;
                             currentState = ReversibleAction.Progress.Completed;
                             progressState = ProgressState.StartDrawing;
@@ -180,16 +167,16 @@ namespace SEE.Controls.Actions
 
             public readonly int orderInLayer;
 
-            public string id;
+            public readonly string id;
 
-            public Memento(GameObject drawable, Vector3[] positions, Color color, float thickness, int orderInLayer)
+            public Memento(GameObject drawable, string id, Vector3[] positions, Color color, float thickness, int orderInLayer)
             {
                 this.drawable = drawable;
                 this.positions = positions;
                 this.color = color;
                 this.thickness = thickness;
                 this.orderInLayer = orderInLayer;
-                this.id = null;
+                this.id = id;
             }
         }
 
@@ -221,12 +208,12 @@ namespace SEE.Controls.Actions
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             line = GameDrawer.ReDrawLine(memento.drawable, memento.id, memento.positions, memento.color,
-                memento.thickness, memento.orderInLayer);
+                memento.thickness, memento.orderInLayer, false);
             if (line != null)
             {
                 new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable),
                     memento.id, memento.positions, memento.color,
-                    memento.thickness, memento.orderInLayer).Execute();
+                    memento.thickness, memento.orderInLayer, false).Execute();
             }
         }
 

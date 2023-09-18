@@ -1,4 +1,5 @@
 ﻿using SEE.Game;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -9,8 +10,7 @@ namespace Assets.SEE.Game
         public static GameObject Find(string drawableID, string parentDrawableID)
         {
             GameObject drawable = null;
-            GameObject[] paintingReceivers = GameObject.FindGameObjectsWithTag(Tags.Drawable);
-            ArrayList paintingReceiversList = new ArrayList(paintingReceivers);
+            ArrayList paintingReceiversList = new ArrayList(GameObject.FindGameObjectsWithTag(Tags.Drawable));
 
             foreach (GameObject paintingReceiver in paintingReceiversList)
             {
@@ -34,9 +34,23 @@ namespace Assets.SEE.Game
             return drawable;
         }
 
-        public static GameObject FindChild(GameObject drawable, string childName)
+        public static GameObject FindChild(GameObject parent, string childName)
         {
-            Transform[] allChildren = drawable.GetComponentsInChildren<Transform>();
+            Transform[] allChildren;
+            if (parent.CompareTag(Tags.Drawable))
+            {
+                GameObject attachedObjects = FindChildWithTag(GetHighestParent(parent), Tags.AttachedObjects); //neu
+                if (attachedObjects != null)
+                {
+                    allChildren = attachedObjects.GetComponentsInChildren<Transform>();//parent.GetComponentsInChildren<Transform>();
+                } else
+                {
+                    allChildren = parent.GetComponentsInChildren<Transform>();
+                }
+            } else
+            {
+                allChildren = parent.GetComponentsInChildren<Transform>();
+            }
             foreach (Transform child in allChildren)
             {
                 if (child.gameObject.name.Equals(childName))
@@ -49,6 +63,7 @@ namespace Assets.SEE.Game
 
         public static GameObject FindDrawableParent(GameObject child)
         {
+            /*
             Transform transform = child.transform;
             while(transform.parent != null)
             {
@@ -59,16 +74,25 @@ namespace Assets.SEE.Game
                 transform = transform.parent;
             }
             return null;
+            */
+            return FindChildWithTag(GetHighestParent(child), Tags.Drawable);
         }
 
         public static bool hasDrawableParent(GameObject child)
         {
-            return FindDrawableParent(child) != null;
+            if (hasParentWithTag(child, Tags.AttachedObjects)) {
+                return FindDrawableParent(child) != null;
+            } else
+            {
+                return false;
+            }
+            
         }
 
         public static GameObject FindChildWithTag(GameObject parent, string tag)
         {
-            foreach (Transform childTransform in parent.transform)
+            Transform[] allChildren = parent.GetComponentsInChildren<Transform>();
+            foreach (Transform childTransform in allChildren)
             {
                 if (childTransform.gameObject.CompareTag(tag))
                 {
@@ -83,18 +107,32 @@ namespace Assets.SEE.Game
             return FindChildWithTag(parent, tag) != null;
         }
 
-        public static bool hasAParent(GameObject drawable)
+        public static bool hasAParent(GameObject child)
         {
-            return drawable.transform.parent != null;
+            return child.transform.parent != null;
         }
 
-        public static string GetDrawableParentName(GameObject drawable)
+        public static bool hasParentWithTag(GameObject child, String tag)
+        {
+            Transform transform = child.transform;
+            while (transform.parent != null)
+            {
+                if (transform.parent.gameObject.CompareTag(tag))
+                {
+                    return true;
+                }
+                transform = transform.parent;
+            }
+            return false;
+        }
+
+        public static string GetDrawableParentName(GameObject drawable) // Ändern auf DrawableHolder?
         {
             return hasAParent(drawable) ? drawable.transform.parent.name : "";
         }
 
-        public static GameObject GetHighestParent(GameObject drawable)
-        {
+        public static GameObject GetHighestParent(GameObject child)
+        {/*
             if (drawable.CompareTag(Tags.Drawable))
             {
                 if (drawable.transform.parent != null)
@@ -106,6 +144,19 @@ namespace Assets.SEE.Game
                 drawable = GetHighestParent(FindDrawableParent(drawable));
             }
             return drawable;
+            */
+            if (child.transform.parent != null)
+            {
+                return GetHighestParent(child.transform.parent.gameObject);
+            } else
+            {
+                return child;
+            }
+        }
+
+        public static GameObject GetAttachedObjectsObject(GameObject drawable)
+        {
+            return FindChildWithTag(GetHighestParent(drawable), Tags.AttachedObjects);
         }
     }
 }

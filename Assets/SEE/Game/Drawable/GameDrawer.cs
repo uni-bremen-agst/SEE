@@ -38,15 +38,55 @@ namespace SEE.Game
             {
                 lineHolder = new(DrawableHelper.LineHolderPrefix + name.Substring(4));
                 line = new(name);
-            } else
+            }
+            else
             {
                 line = new("");
                 line.name = DrawableHelper.LinePrefix + line.GetInstanceID();
                 lineHolder = new(DrawableHelper.LineHolderPrefix + line.GetInstanceID());
             }
-            lineHolder.transform.parent = drawable.transform;
-            lineHolder.transform.position = drawable.transform.position;
+            // Test Area
+            GameObject highestParent;
+            GameObject attachedObjects;
+            if (GameDrawableFinder.hasAParent(drawable))
+            {
+                GameObject parent = GameDrawableFinder.GetHighestParent(drawable);
+                if (!parent.name.StartsWith(DrawableHelper.DrawableHolderPrefix))
+                {
+                    highestParent = new GameObject(DrawableHelper.DrawableHolderPrefix + drawable.GetInstanceID());
+                    highestParent.transform.position = parent.transform.position;
+                    highestParent.transform.rotation = parent.transform.rotation;
+
+                    attachedObjects = new GameObject(DrawableHelper.AttachedObject);
+                    attachedObjects.tag = Tags.AttachedObjects;
+                    attachedObjects.transform.position = highestParent.transform.position;
+                    attachedObjects.transform.rotation = highestParent.transform.rotation;
+                    attachedObjects.transform.SetParent(highestParent.transform);
+                    parent.transform.SetParent(highestParent.transform);
+                } else
+                {
+                    highestParent = parent;
+                    attachedObjects = GameDrawableFinder.FindChildWithTag(highestParent, Tags.AttachedObjects);
+                }
+            } else
+            {
+                highestParent = new GameObject(DrawableHelper.DrawableHolderPrefix + drawable.GetInstanceID());
+                highestParent.transform.position = drawable.transform.position;
+                highestParent.transform.rotation = drawable.transform.rotation;
+
+                attachedObjects = new GameObject(DrawableHelper.AttachedObject);
+                attachedObjects.tag = Tags.AttachedObjects;
+                attachedObjects.transform.position = highestParent.transform.position;
+                attachedObjects.transform.rotation = highestParent.transform.rotation;
+                attachedObjects.transform.SetParent(highestParent.transform);
+
+                drawable.transform.SetParent(highestParent.transform);
+            }
+           // end 
             
+            lineHolder.transform.parent = attachedObjects.transform; // war drawable
+            lineHolder.transform.position = attachedObjects.transform.position; // war drawable
+
             line.tag = Tags.Line;
             line.transform.SetParent(lineHolder.transform);
             renderer = line.AddComponent<LineRenderer>();
@@ -57,7 +97,7 @@ namespace SEE.Game
             renderer.useWorldSpace = false;
             renderer.positionCount = positions.Length;
 
-            lineHolder.transform.rotation = drawable.transform.rotation;
+            lineHolder.transform.rotation = highestParent.transform.rotation; // war drawable
             line.transform.position = lineHolder.transform.position;
             line.transform.position -= line.transform.forward * DrawableHelper.distanceToBoard.z;
             line.transform.rotation = lineHolder.transform.rotation;
@@ -66,11 +106,9 @@ namespace SEE.Game
         public static GameObject StartDrawing(GameObject drawable, Vector3[] positions, Color color, float thickness)
         {
             Setup(drawable, "", positions, color, thickness);
-           // line.name = DrawableHelper.LinePrefix + line.GetInstanceID();
-           // lineHolder.name = DrawableHelper.LineHolderPrefix + line.GetInstanceID();
             renderer.sortingOrder = DrawableHelper.orderInLayer;
             DrawableHelper.orderInLayer++;
-            
+
             return line;
         }
 
@@ -83,22 +121,26 @@ namespace SEE.Game
             renderer.SetPositions(positions);
         }
 
-        public static void FinishDrawing()
+        public static void FinishDrawing(bool loop)
         {
+            renderer.loop = loop;
             Mesh mesh = new();
             renderer.BakeMesh(mesh);
-            meshCollider.sharedMesh = mesh;
+            if (mesh.vertices.Distinct().Count() >= 3)
+            {
+                meshCollider.sharedMesh = mesh;
+            }
         }
 
-        public static GameObject DrawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness)
+        public static GameObject DrawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness, bool loop)
         {
-            if (GameDrawableFinder.FindChild(drawable,name) != null)
+            if (GameDrawableFinder.FindChild(drawable, name) != null)
             {
                 line = GameDrawableFinder.FindChild(drawable, name);
                 renderer = line.GetComponent<LineRenderer>();
                 meshCollider = line.GetComponent<MeshCollider>();
                 Drawing(positions);
-                FinishDrawing();
+                FinishDrawing(loop);
             }
             else
             {
@@ -106,29 +148,29 @@ namespace SEE.Game
                 renderer.SetPositions(positions);
                 renderer.sortingOrder = DrawableHelper.orderInLayer;
                 DrawableHelper.orderInLayer++;
-                FinishDrawing();
+                FinishDrawing(loop);
             }
             return line;
         }
 
-        public static GameObject ReDrawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness, int orderInLayer)
+        public static GameObject ReDrawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness, int orderInLayer, bool loop)
         {
             Setup(drawable, name, positions, color, thickness);
             renderer.SetPositions(positions);
             renderer.sortingOrder = orderInLayer;
-            FinishDrawing();
+            FinishDrawing(loop);
 
             return line;
         }
 
-        public static GameObject ReDrawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness, int orderInLayer, Vector3 position, Vector3 eulerAngles)
+        public static GameObject ReDrawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness, int orderInLayer, Vector3 position, Vector3 eulerAngles, bool loop)
         {
             Setup(drawable, name, positions, color, thickness);
             line.transform.position = position;
             line.transform.parent.localEulerAngles = eulerAngles;
             renderer.SetPositions(positions);
             renderer.sortingOrder = orderInLayer;
-            FinishDrawing();
+            FinishDrawing(loop);
 
             return line;
         }
@@ -139,12 +181,40 @@ namespace SEE.Game
             return positionsList.Distinct().ToList().Count;
         }
 
+        public static int DifferentMeshVerticesCounter()
+        {
+            Mesh mesh = new();
+            renderer.BakeMesh(mesh);
+            return mesh.vertices.Distinct().ToList().Count;
+        }
+
         private static Material GetMaterial(Color color)
         {
             ColorRange colorRange = new ColorRange(color, color, 1);
             Materials materials = new Materials(Materials.ShaderType.DrawableLine, colorRange);
             Material material = materials.Get(0, 0);
             return material;
+        }
+
+        public static Vector3 GetConvertedPosition(GameObject drawable, Vector3 position)
+        {
+            Vector3 convertedPosition;
+            Setup(drawable, "", new Vector3[] { position }, DrawableHelper.currentColor, DrawableHelper.currentThickness);
+            convertedPosition = line.transform.InverseTransformPoint(position) - DrawableHelper.distanceToBoard;
+            Destroyer.Destroy(lineHolder);
+            return convertedPosition;
+        }
+
+        public static Vector3[] GetConvertedPositions(GameObject drawable, Vector3[] positions)
+        {
+            Vector3[] convertedPosition = new Vector3[positions.Length];
+            Setup(drawable, "", positions, DrawableHelper.currentColor, DrawableHelper.currentThickness);
+            for (int i = 0; i < positions.Length; i++)
+            {
+                convertedPosition[i] = line.transform.InverseTransformPoint(positions[i]) - DrawableHelper.distanceToBoard;
+            }
+            Destroyer.Destroy(lineHolder);
+            return convertedPosition;
         }
     }
 }

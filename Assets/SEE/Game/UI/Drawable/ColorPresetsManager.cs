@@ -4,7 +4,9 @@ using UnityEngine;
 using UnityEngine.Events;
 
 /// <summary>
-/// File from the hsvpicker package, add remove color and change color
+/// File from the hsvpicker package 
+/// https://github.com/judah4/HSV-Color-Picker-Unity/blob/master/Packages/com.judahperez.hsvcolorpicker/UI/ColorPresetManager.cs
+/// added remove color and change color
 /// </summary>
 public static class ColorPresetManager
 {

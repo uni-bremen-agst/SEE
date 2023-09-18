@@ -1,10 +1,12 @@
 ﻿using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -24,19 +26,17 @@ namespace Assets.SEE.Game.Drawable
 
         public static readonly string LinePrefix = "Line";
         public static readonly string LineHolderPrefix = "LineHolder";
+        public static readonly string DrawableHolderPrefix = "DrawableHolder";
+        public static readonly string AttachedObject = "AttachedObjects";
 
         public readonly static Vector3 distanceToBoard = new(0, 0, 0.02f);
 
-
-        public readonly static Vector3 distanceZ = new(0, 0, 0.002f);
-        public readonly static Vector3 distanceX = new(0.002f, 0, 0);
-        public readonly static Vector3 distanceY = new(0, 0.002f, 0);
-
-        private const string drawableMenuPrefab = "Prefabs/UI/DrawableLineMenu";
+        private const string drawableMenuPrefab = "Prefabs/UI/Drawable/DrawableLineMenu";
         public static GameObject drawableMenu;
         public static UnityAction<Color> colorAction;
 
-        static DrawableHelper() {
+        static DrawableHelper()
+        {
             currentColor = UnityEngine.Random.ColorHSV();
             currentThickness = 0.01f;
             orderInLayer = 1;
@@ -45,41 +45,100 @@ namespace Assets.SEE.Game.Drawable
                             GameObject.Find("UI Canvas").transform, false);
             drawableMenu.SetActive(false);
         }
+
         #region DrawableMenu
+        public enum MenuPoint
+        {
+            Thickness,
+            Layer,
+            Loop,
+            All
+        }
         public static void disableDrawableMenu()
         {
+            enableDrawableMenuPoints();
             drawableMenu.SetActive(false);
         }
 
-        public static void enableDrawableMenu()
+        public static void enableDrawableMenu(bool removeListeners = true, MenuPoint[] withoutMenuPoints = null)
         {
-            drawableMenu.GetComponentInChildren<ThicknessSliderController>().onValueChanged.RemoveAllListeners();
-            drawableMenu.GetComponentInChildren<LayerSliderController>().onValueChanged.RemoveAllListeners();
-            if (colorAction != null)
+            if (removeListeners)
             {
-                drawableMenu.GetComponentInChildren<HSVPicker.ColorPicker>().onValueChanged.RemoveListener(colorAction);
+                RemoveListeners();
+            }
+            if (withoutMenuPoints != null)
+            {
+                foreach (MenuPoint menuPoint in withoutMenuPoints)
+                {
+                    switch(menuPoint)
+                    {
+                        case MenuPoint.Thickness:
+                            disableThicknessFromDrawableMenu();
+                            break;
+                        case MenuPoint.Layer:
+                            disableLayerFromDrawableMenu();
+                            break;
+                        case MenuPoint.Loop:
+                            disableLoopFromDrawableMenu();
+                            break;
+                        case MenuPoint.All:
+                            disableThicknessFromDrawableMenu();
+                            disableLayerFromDrawableMenu();
+                            disableLoopFromDrawableMenu();
+                            break;
+                    }
+                }
             }
             drawableMenu.SetActive(true);
         }
 
-        public static void disableLayerFromDrawableMenu()
+        private static void RemoveListeners()
+        {
+            enableDrawableMenuPoints();
+            drawableMenu.GetComponentInChildren<ThicknessSliderController>().onValueChanged.RemoveAllListeners();
+            drawableMenu.GetComponentInChildren<LayerSliderController>().onValueChanged.RemoveAllListeners();
+            drawableMenu.GetComponentInChildren<Toggle>().onValueChanged.RemoveAllListeners();
+            if (colorAction != null)
+            {
+                drawableMenu.GetComponentInChildren<HSVPicker.ColorPicker>().onValueChanged.RemoveListener(colorAction);
+            }
+        }
+
+        private static void enableDrawableMenuPoints()
+        {
+            enableLoopFromDrawableMenu();
+            enableLayerFromDrawableMenu();
+            enableThicknessFromDrawableMenu();
+        }
+
+        private static void disableLayerFromDrawableMenu()
         {
             drawableMenu.transform.Find("Layer").gameObject.SetActive(false);
         }
 
-        public static void enableLayerFromDrawableMenu()
+        private static void enableLayerFromDrawableMenu()
         {
             drawableMenu.transform.Find("Layer").gameObject.SetActive(true);
         }
 
-        public static void disableThicknessFromDrawableMenu()
+        private static void disableThicknessFromDrawableMenu()
         {
             drawableMenu.transform.Find("Thickness").gameObject.SetActive(false);
         }
 
-        public static void enableThicknessFromDrawableMenu()
+        private static void enableThicknessFromDrawableMenu()
         {
             drawableMenu.transform.Find("Thickness").gameObject.SetActive(true);
+        }
+
+        private static void disableLoopFromDrawableMenu()
+        {
+            drawableMenu.transform.Find("Loop").gameObject.SetActive(false);
+        }
+
+        private static void enableLoopFromDrawableMenu()
+        {
+            drawableMenu.transform.Find("Loop").gameObject.SetActive(true);
         }
         #endregion
 

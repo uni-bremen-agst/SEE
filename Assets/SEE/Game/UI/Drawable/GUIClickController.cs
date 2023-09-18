@@ -3,8 +3,8 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.Events;
 /// <summary>
+/// author: @braur
 /// found at: https://forum.unity.com/threads/can-the-ui-buttons-detect-a-right-mouse-click.279027/#post-3344931
-/// @braur
 /// </summary>
 public class GUIClickController : MonoBehaviour, IPointerClickHandler
 {

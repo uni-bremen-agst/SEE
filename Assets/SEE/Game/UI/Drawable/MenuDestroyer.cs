@@ -1,5 +1,7 @@
 ﻿using Assets.SEE.Controls.Actions.Drawable;
+using Assets.SEE.Game.Drawable;
 using SEE.Controls.Actions;
+using SEE.Game;
 using System.Collections;
 using UnityEngine;
 
@@ -19,7 +21,14 @@ namespace Assets.SEE.Game.UI.Drawable
         {
             if (GlobalActionHistory.Current() != allowedState)
             {
-                Destroy(this.gameObject);
+                if (this.gameObject.CompareTag(Tags.Line))
+                {
+                    Destroy(this.gameObject.transform.parent.gameObject);
+                }
+                else
+                {
+                    Destroy(this.gameObject);
+                }
             }
         }
 
@@ -28,6 +37,11 @@ namespace Assets.SEE.Game.UI.Drawable
             if (allowedState == ActionStateTypes.MoveRotator)
             {
                 MoveRotatorAction.Reset();
+            }
+            
+            if (allowedState == ActionStateTypes.DrawShapes && !this.gameObject.CompareTag(Tags.Line))
+            {
+                DrawShapesAction.Reset();
             }
         }
     }

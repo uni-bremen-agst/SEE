@@ -13,7 +13,11 @@ namespace Assets.SEE.Game.UI.Drawable
 
         private void OnTriggerEnter(Collider other)
         {
-            trigger = true;
+            //FIXEME ADD OTHER TAGS.
+            if (other.gameObject.CompareTag(Tags.Line))
+            {
+                trigger = true;
+            }
         }
 
         private void OnTriggerStay(Collider other)
@@ -48,7 +52,10 @@ namespace Assets.SEE.Game.UI.Drawable
 
         private void OnTriggerExit(Collider other)
         {
-            trigger = false;
+            if (other.gameObject.CompareTag(Tags.Line))
+            {
+                trigger = true;
+            }
         }
 
         public bool Trigger()

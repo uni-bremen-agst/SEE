@@ -50,7 +50,7 @@ namespace SEE.Net.Actions
                 {
                     if (Type == DrawableTypes.Line && GameDrawableFinder.FindChild(drawable, Name) != null)
                     {
-                        Destroyer.Destroy(GameDrawableFinder.FindChild(drawable, Name));
+                        Destroyer.Destroy(GameDrawableFinder.FindChild(drawable, Name).transform.parent.gameObject);
                     }
                 }
                 else

@@ -71,16 +71,13 @@ namespace SEE.Controls.Actions
         public override void Awake()
         {
             oldChoosenColor = DrawableHelper.currentColor;
-            DrawableHelper.enableDrawableMenu();
-            DrawableHelper.disableLayerFromDrawableMenu();
-            DrawableHelper.disableThicknessFromDrawableMenu();
+            DrawableHelper.enableDrawableMenu(withoutMenuPoints: new DrawableHelper.MenuPoint[] {DrawableHelper.MenuPoint.All});
         }
 
         public override void Stop()
         {
-            DrawableHelper.enableLayerFromDrawableMenu();
-            DrawableHelper.enableThicknessFromDrawableMenu();
             DrawableHelper.disableDrawableMenu();
+
         }
 
         struct Memento
