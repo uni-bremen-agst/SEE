@@ -111,10 +111,14 @@ namespace SEE.Utils
                 throw new MalformedStatement($"Malformed statement '{locationLookupTable[int.Parse(allStatements[stmtIndex].Location)]}' at statement index {stmtIndex}: '(' expected.");
             }
             location = location.Substring(0, l + 1);
-            l = location.LastIndexOf('.');
+            l = location.LastIndexOf(':');
             if (l < 0)
             {
-                throw new MalformedStatement($"Malformed statement '{locationLookupTable[int.Parse(allStatements[stmtIndex].Location)]}' at statement index {stmtIndex}: '.' expected.");
+                l = location.LastIndexOf('.');
+                if (l < 0)
+                {
+                    throw new MalformedStatement($"Malformed statement '{locationLookupTable[int.Parse(allStatements[stmtIndex].Location)]}' at statement index {stmtIndex}: '.' expected.");
+                }
             }
             location = location.Substring(0, l);
             return location;

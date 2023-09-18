@@ -140,7 +140,7 @@ namespace SEE.Utils
                 {
                     string table = line.Substring(1);
                     //Fill LocationLookupTable
-                    string locationLookupTableRegex = "-\\d+=([A-Za-z0-9.,\\s()<>\\[\\]]*)";
+                    string locationLookupTableRegex = "-\\d+=([A-Za-z0-9._:\\-,\\s()<>\\[\\]\\$]*);";
                     var regex1 = new Regex(locationLookupTableRegex);
                     foreach (Match m in regex1.Matches(table))
                     {
