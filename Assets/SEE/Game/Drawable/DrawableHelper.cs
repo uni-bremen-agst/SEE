@@ -49,8 +49,6 @@ namespace Assets.SEE.Game.Drawable
         #region DrawableHolder
         public static void SetupDrawableHolder(GameObject drawable, out GameObject highestParent, out GameObject attachedObjects)
         {
-          //  GameObject highestParent;
-          //  GameObject attachedObjects;
             if (GameDrawableFinder.hasAParent(drawable))
             {
                 GameObject parent = GameDrawableFinder.GetHighestParent(drawable);
@@ -87,7 +85,6 @@ namespace Assets.SEE.Game.Drawable
 
                 drawable.transform.SetParent(highestParent.transform);
             }
-           // return new GameObject[]{ highestParent, attachedObjects};
         }
         #endregion
 
