@@ -113,49 +113,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
 
                     if (currentSelectedLine.GetComponent<BlinkEffect>() != null && currentSelectedLine.GetComponent<BlinkEffect>().GetLoopStatus())
                     {
-                        DrawableHelper.enableDrawableMenu();
-
-                        GameObject drawable = GameDrawableFinder.FindDrawableParent(currentSelectedLine);
-                        string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
-
-                        thicknessSlider = DrawableHelper.drawableMenu.GetComponentInChildren<ThicknessSliderController>();
-                        thicknessSlider.AssignValue(renderer.startWidth);
-                        thicknessSlider.onValueChanged.AddListener(thickness =>
-                        {
-                            if (thickness > 0.0f)
-                            {
-                                GameEditLine.ChangeThickness(currentSelectedLine, thickness);
-                                newValueHolder.thickness = thickness;
-                                new EditLineThicknessNetAction(drawable.name, drawableParentName, currentSelectedLine.name, thickness).Execute();
-                            }
-                        });
-
-                        layerSlider = DrawableHelper.drawableMenu.GetComponentInChildren<LayerSliderController>();
-                        layerSlider.AssignValue(renderer.sortingOrder);
-                        layerSlider.onValueChanged.AddListener(layerOrder =>
-                        {
-                            GameEditLine.ChangeLayer(currentSelectedLine, layerOrder);
-                            newValueHolder.layer = layerOrder;
-                            new EditLineLayerNetAction(drawable.name, drawableParentName, currentSelectedLine.name, layerOrder).Execute();
-                        });
-
-                        Toggle toggle = DrawableHelper.drawableMenu.GetComponentInChildren<Toggle>();
-                        toggle.isOn = renderer.loop;
-                        toggle.onValueChanged.AddListener(loop =>
-                        {
-                            GameEditLine.ChangeLoop(currentSelectedLine, loop);
-                            newValueHolder.loop = loop;
-                            new EditLineLoopNetAction(drawable.name, drawableParentName, currentSelectedLine.name, loop).Execute();
-                        });
-
-                        picker = DrawableHelper.drawableMenu.GetComponent<HSVPicker.ColorPicker>();
-                        picker.AssignColor(renderer.material.color);
-                        picker.onValueChanged.AddListener(DrawableHelper.colorAction = color =>
-                        {
-                            GameEditLine.ChangeColor(currentSelectedLine, color);
-                            newValueHolder.color = color;
-                            new EditLineColorNetAction(drawable.name, drawableParentName, currentSelectedLine.name, color).Execute();
-                        });
+                        enableMenu(currentSelectedLine, renderer);
                     }
                     result = true;
                 }
@@ -166,6 +124,53 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 return Input.GetMouseButtonUp(0);
             }
             return result;
+        }
+
+        private void enableMenu(GameObject currentSelectedLine, LineRenderer renderer)
+        {
+            DrawableHelper.enableDrawableMenu();
+
+            GameObject drawable = GameDrawableFinder.FindDrawableParent(currentSelectedLine);
+            string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
+
+            thicknessSlider = DrawableHelper.drawableMenu.GetComponentInChildren<ThicknessSliderController>();
+            thicknessSlider.AssignValue(renderer.startWidth);
+            thicknessSlider.onValueChanged.AddListener(thickness =>
+            {
+                if (thickness > 0.0f)
+                {
+                    GameEditLine.ChangeThickness(currentSelectedLine, thickness);
+                    newValueHolder.thickness = thickness;
+                    new EditLineThicknessNetAction(drawable.name, drawableParentName, currentSelectedLine.name, thickness).Execute();
+                }
+            });
+
+            layerSlider = DrawableHelper.drawableMenu.GetComponentInChildren<LayerSliderController>();
+            layerSlider.AssignValue(renderer.sortingOrder);
+            layerSlider.onValueChanged.AddListener(layerOrder =>
+            {
+                GameEditLine.ChangeLayer(currentSelectedLine, layerOrder);
+                newValueHolder.layer = layerOrder;
+                new EditLineLayerNetAction(drawable.name, drawableParentName, currentSelectedLine.name, layerOrder).Execute();
+            });
+
+            Toggle toggle = DrawableHelper.drawableMenu.GetComponentInChildren<Toggle>();
+            toggle.isOn = renderer.loop;
+            toggle.onValueChanged.AddListener(loop =>
+            {
+                GameEditLine.ChangeLoop(currentSelectedLine, loop);
+                newValueHolder.loop = loop;
+                new EditLineLoopNetAction(drawable.name, drawableParentName, currentSelectedLine.name, loop).Execute();
+            });
+
+            picker = DrawableHelper.drawableMenu.GetComponent<HSVPicker.ColorPicker>();
+            picker.AssignColor(renderer.material.color);
+            picker.onValueChanged.AddListener(DrawableHelper.colorAction = color =>
+            {
+                GameEditLine.ChangeColor(currentSelectedLine, color);
+                newValueHolder.color = color;
+                new EditLineColorNetAction(drawable.name, drawableParentName, currentSelectedLine.name, color).Execute();
+            });
         }
 
         private struct Memento

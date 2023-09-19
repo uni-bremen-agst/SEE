@@ -389,17 +389,6 @@ namespace Assets.SEE.Controls.Actions.Drawable
                         if (GameDrawer.DifferentPositionCounter(positions) > 1)
                         {
                             shape = GameDrawer.ReDrawLine(drawable, "", positions, DrawableHelper.currentColor, DrawableHelper.currentThickness, DrawableHelper.orderInLayer, true);
-                            /*shape.transform.InverseTransformPoints(positions);
-                            
-                            GameDrawer.Drawing(positions);
-                            /*
-                            for (int i = 0; i < positions.Length; i++)
-                            {
-                                Debug.Log(DateTime.Now + " oldPosition: " + positions[i] + ", InversePoint: " + shape.transform.InverseTransformPoint(positions[i]) + ", newPos: " + (shape.transform.InverseTransformPoint(positions[i]) - DrawableHelper.distanceToBoard));
-                                positions[i] = shape.transform.InverseTransformPoint(positions[i]) - DrawableHelper.distanceToBoard;
-                            }
-                            GameDrawer.Drawing(positions);
-                            */
                             memento = new Memento(drawable, shape.name, positions, DrawableHelper.currentColor,
                                DrawableHelper.currentThickness, shape.GetComponent<LineRenderer>().sortingOrder);
                             memento.loop = true;

@@ -13,27 +13,33 @@ namespace Assets.SEE.Net.Actions.Drawable
         public string ObjectName;
         public Vector3 Direction;
         public float Degree;
+        public Vector3 FirstPoint;
+        public Vector3 HolderPosition;
+        public Vector3 ObjectPosition;
 
         /// <summary>
         /// Creates a new FastEraseNetAction.
         /// </summary>
         /// <param name="gameObjectID">the unique name of the gameObject of a line
         /// that has to be deleted</param>
-        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, Vector3 direction, float degree) : base()
+        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, Vector3 direction, float degree, Vector3 firstPoint) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
             ObjectName = objectName;
             Direction = direction;
             Degree = degree;
+            FirstPoint = firstPoint;
         }
         
-        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, float localEulerAnlgeZ) : base()
+        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, float localEulerAnlgeZ, Vector3 holderPosition, Vector3 objectPosition) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
             ObjectName = objectName;
             Degree = localEulerAnlgeZ;
+            HolderPosition = holderPosition;
+            ObjectPosition = objectPosition;
             Direction = Vector3.zero;
         }
         protected override void ExecuteOnServer()
@@ -53,10 +59,10 @@ namespace Assets.SEE.Net.Actions.Drawable
                         GameObject child = GameDrawableFinder.FindChild(drawable, ObjectName);
                         if (Direction != Vector3.zero)
                         {
-                            GameMoveRotator.RotateObject(child, Direction, Degree);
+                            GameMoveRotator.RotateObject(child, Direction, Degree, FirstPoint);
                         } else
                         {
-                            GameMoveRotator.SetRotate(child, Degree);
+                            GameMoveRotator.SetRotate(child, Degree, HolderPosition, ObjectPosition);
                         }
                     }
                     else

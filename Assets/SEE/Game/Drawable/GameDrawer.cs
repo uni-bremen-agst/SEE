@@ -45,7 +45,8 @@ namespace SEE.Game
                 line.name = DrawableHelper.LinePrefix + line.GetInstanceID();
                 lineHolder = new(DrawableHelper.LineHolderPrefix + line.GetInstanceID());
             }
-            // Test Area
+
+            //TODO out source this in SetupDrawable with out highestParent and out attachedObjects, needed for other drawabletypes like image etc
             GameObject highestParent;
             GameObject attachedObjects;
             if (GameDrawableFinder.hasAParent(drawable))
@@ -81,11 +82,10 @@ namespace SEE.Game
                 attachedObjects.transform.SetParent(highestParent.transform);
 
                 drawable.transform.SetParent(highestParent.transform);
-            }
-           // end 
+            } 
             
-            lineHolder.transform.parent = attachedObjects.transform; // war drawable
-            lineHolder.transform.position = attachedObjects.transform.position; // war drawable
+            lineHolder.transform.parent = attachedObjects.transform;
+            lineHolder.transform.position = attachedObjects.transform.position;
 
             line.tag = Tags.Line;
             line.transform.SetParent(lineHolder.transform);
@@ -97,7 +97,7 @@ namespace SEE.Game
             renderer.useWorldSpace = false;
             renderer.positionCount = positions.Length;
 
-            lineHolder.transform.rotation = highestParent.transform.rotation; // war drawable
+            lineHolder.transform.rotation = highestParent.transform.rotation;
             line.transform.position = lineHolder.transform.position;
             line.transform.position -= line.transform.forward * DrawableHelper.distanceToBoard.z;
             line.transform.rotation = lineHolder.transform.rotation;

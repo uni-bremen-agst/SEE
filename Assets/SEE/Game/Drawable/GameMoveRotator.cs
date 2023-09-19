@@ -2,6 +2,7 @@
 using SEE.Game;
 using System;
 using System.Collections;
+using Unity.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem.HID;
 using UnityEngine.UIElements;
@@ -50,6 +51,9 @@ namespace Assets.SEE.Game.Drawable
             if (obj.CompareTag(Tags.Line))
             {
                 transform = obj.transform.parent;
+                obj.transform.SetParent(null);
+                transform.position = obj.transform.position;
+                obj.transform.SetParent(transform);
             } else
             {
                 transform = obj.transform;
@@ -59,10 +63,34 @@ namespace Assets.SEE.Game.Drawable
             obj.GetComponent<MeshCollider>().enabled = true;
         }
 
-        public static void SetRotate(GameObject obj, float localEulerAngleZ)
+        public static void RotateObject(GameObject obj, Vector3 moveDirection, float degree, Vector3 point)
+        {
+            Transform transform;
+            if (obj.CompareTag(Tags.Line))
+            {
+                transform = obj.transform.parent;
+                obj.transform.SetParent(null);
+                transform.position = obj.transform.position;
+                obj.transform.SetParent(transform);
+            }
+            else
+            {
+                transform = obj.transform;
+            }
+            transform.RotateAround(point, moveDirection, degree);
+            obj.GetComponent<MeshCollider>().enabled = false;
+            obj.GetComponent<MeshCollider>().enabled = true;
+        }
+
+        public static void SetRotate(GameObject obj, float localEulerAngleZ, Vector3 holderPosition, Vector3 objPosition)
         {
             Transform transform = obj.CompareTag(Tags.Line) ? obj.transform.parent : obj.transform;
             transform.localEulerAngles = new Vector3(0, 0, localEulerAngleZ);
+            if (obj.CompareTag(Tags.Line))
+            {
+                transform.localPosition = holderPosition;
+                obj.transform.localPosition = objPosition;
+            }
         }
     }
 }
