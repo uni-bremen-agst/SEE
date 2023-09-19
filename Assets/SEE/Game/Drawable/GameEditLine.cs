@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using SEE.Game;
+using System.Collections;
 using System.Linq;
 using UnityEngine;
 
@@ -11,10 +12,7 @@ namespace Assets.SEE.Game.Drawable
             LineRenderer renderer = line.GetComponent<LineRenderer>();
             renderer.startWidth = thickness;
             renderer.endWidth = thickness;
-            MeshCollider meshCollider = line.GetComponent<MeshCollider>();
-            Mesh mesh = new();
-            renderer.BakeMesh(mesh);
-            meshCollider.sharedMesh = mesh;
+            GameDrawer.RefreshCollider(line);
         }
         public static void ChangeLayer(GameObject line, int layer)
         {

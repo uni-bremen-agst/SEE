@@ -2,6 +2,7 @@
 using SEE.Game;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem.HID;
@@ -45,6 +46,18 @@ namespace Assets.SEE.Game.Drawable
             obj.transform.position = position;
         }
 
+        public static void MovePoint(GameObject line, List<int> indexes, Vector3 point)
+        {
+            LineRenderer renderer = line.GetComponent<LineRenderer>();
+            foreach (int i in indexes)
+            {
+                float z = renderer.GetPosition(i).z;
+                Vector3 newPoint = new Vector3(point.x, point.y, z);
+                renderer.SetPosition(i, newPoint);
+            }
+            GameDrawer.RefreshCollider(line);
+        }
+
         public static void RotateObject(GameObject obj, Vector3 moveDirection, float degree)
         {
             Transform transform;
@@ -54,7 +67,8 @@ namespace Assets.SEE.Game.Drawable
                 obj.transform.SetParent(null);
                 transform.position = obj.transform.position;
                 obj.transform.SetParent(transform);
-            } else
+            }
+            else
             {
                 transform = obj.transform;
             }

@@ -76,17 +76,16 @@ namespace Assets.SEE.Controls.Actions.Drawable
             if (!Raycasting.IsMouseOverGUI())
             {
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButton(1))
-                    && !isActive && !didSomething && !isDone && Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) && // Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
+                    && !isActive && !didSomething && !isDone && Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
                     GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject) && clickState == ClickState.None)
                 {
-                    selectedObject = raycastHit.collider.gameObject;
+                    SetSelectedObject(raycastHit.collider.gameObject);
                     isActive = true;
                     clickState = ClickState.Selected;
 
                     BlinkEffect effect = selectedObject.AddOrGetComponent<BlinkEffect>();
                     effect.SetAllowedActionStateType(GetActionStateType());
                     effect.Activate(selectedObject);
-                    SetSelectedObject(selectedObject);
                     firstPoint = raycastHit.point;
 
                     if (selectedObject.CompareTag(Tags.Line))
@@ -112,35 +111,28 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 // MOVE
                 if (selectedObject != null && selectedObject.GetComponent<BlinkEffect>() != null && selectedObject.GetComponent<BlinkEffect>().GetLoopStatus() && clickState == ClickState.Left)
                 {
-                    
+
                     GameObject drawable = GameDrawableFinder.FindDrawableParent(selectedObject);
                     string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
                     bool isTriggered = false;
 
-                    if (drawableParentName != "")
+                    BorderTriggerController[] controllers = drawable.transform.parent.GetComponentsInChildren<BorderTriggerController>();
+                    if (controllers.Length > 0)
                     {
-                        BorderTriggerController[] controllers = drawable.transform.parent.GetComponentsInChildren<BorderTriggerController>();
-                        if (controllers.Length > 1)
+                        for (int i = 0; i < controllers.Length; i++)
                         {
-                            for (int i = 0; i < controllers.Length; i++)
+                            if (i == 0)
                             {
-                                if (i == 0)
-                                {
-                                    isTriggered = controllers[0].Trigger();
-                                }
-                                isTriggered = isTriggered && controllers[i].Trigger();
+                                isTriggered = controllers[0].Trigger();
                             }
-                        } else if (controllers.Length == 1)
-                        {
-                            isTriggered = controllers[0].Trigger();
+                            isTriggered = isTriggered && controllers[i].Trigger();
                         }
                     }
-
                     if (Raycasting.RaycastAnything(out RaycastHit hit))
                     {
                         if (!isTriggered)
                         {
-                            if (hit.collider.gameObject.CompareTag(Tags.Drawable))
+                            if (hit.collider.gameObject.CompareTag(Tags.Drawable) || GameDrawableFinder.hasDrawableParent(hit.collider.gameObject))
                             {
                                 didSomething = true;
                                 newObjectPosition = GameMoveRotator.MoveObject(selectedObject, hit.point, firstPoint, oldObjectPosition);
@@ -300,7 +292,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
             public readonly Vector3 newHandlerPosition;
 
             public Memento(GameObject selectedObject, GameObject drawable, string id,
-                Vector3 oldObjectPosition, Vector3 newObjectPosition, Vector3 oldObjectLocalEulerAngles, float degree, ClickState clickState, 
+                Vector3 oldObjectPosition, Vector3 newObjectPosition, Vector3 oldObjectLocalEulerAngles, float degree, ClickState clickState,
                 Vector3 firstPoint, Vector3 oldHandlerPosition, Vector3 newHandlerPosition)
             {
                 this.selectedObject = selectedObject;

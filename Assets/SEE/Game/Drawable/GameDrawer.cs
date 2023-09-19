@@ -132,6 +132,18 @@ namespace SEE.Game
             }
         }
 
+        public static void RefreshCollider(GameObject line)
+        {
+            LineRenderer lineRenderer = line.GetComponent<LineRenderer>();
+            MeshCollider collider = line.GetComponent<MeshCollider>();
+            Mesh mesh = new();
+            lineRenderer.BakeMesh(mesh);
+            if (mesh.vertices.Distinct().Count() >= 3)
+            {
+                collider.sharedMesh = mesh;
+            }
+        }
+
         public static GameObject DrawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness, bool loop)
         {
             if (GameDrawableFinder.FindChild(drawable, name) != null)

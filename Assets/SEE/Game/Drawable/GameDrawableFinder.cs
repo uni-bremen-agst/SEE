@@ -126,7 +126,7 @@ namespace Assets.SEE.Game
             return false;
         }
 
-        public static string GetDrawableParentName(GameObject drawable) // Ändern auf DrawableHolder?
+        public static string GetDrawableParentName(GameObject drawable)
         {
             return hasAParent(drawable) ? drawable.transform.parent.name : "";
         }

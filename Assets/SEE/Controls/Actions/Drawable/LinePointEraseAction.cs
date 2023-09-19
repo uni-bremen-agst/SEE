@@ -46,7 +46,8 @@ namespace SEE.Controls.Actions
                         List<Vector3> positionsList = positions.ToList();
                         Line originLine = Line.GetLine(hittedObject);
 
-                        Vector3[] transformedPositions = positions;
+                        Vector3[] transformedPositions = new Vector3[positions.Length];
+                        Array.Copy(sourceArray: positions, destinationArray: transformedPositions, length: positions.Length);
                         hittedObject.transform.TransformPoints(transformedPositions);
                         List<Line> lines = new();
                         List<int> matchedIndexes = DrawableHelper.GetNearestIndexes(transformedPositions, raycastHit.point);

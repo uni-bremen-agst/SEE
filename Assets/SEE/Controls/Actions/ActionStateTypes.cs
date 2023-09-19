@@ -201,6 +201,12 @@ namespace SEE.Controls.Actions
                     MoveRotatorAction.CreateReversibleAction,
                     parent: Whiteboard);
 
+            MovePoint =
+                new("Moves a point", "Moves a point of a line.",
+                    Color.green.Darker(), "Materials/ModernUIPack/Pencil",
+                    MovePointAction.CreateReversibleAction,
+                    parent: Whiteboard);
+
             LayerChanger =
                 new("Change the sorting layer", "Left mouse click to increase, right mouse click to decrease",
                     Color.green.Darker(), "Materials/ModernUIPack/Pencil",
@@ -259,6 +265,7 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType ColorPicker;
         public readonly static ActionStateType EditLine;
         public readonly static ActionStateType MoveRotator;
+        public readonly static ActionStateType MovePoint;
         public readonly static ActionStateType LayerChanger;
         public readonly static ActionStateType LineSplit;
         public readonly static ActionStateType Erase;
