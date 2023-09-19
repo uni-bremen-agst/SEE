@@ -46,44 +46,9 @@ namespace SEE.Game
                 lineHolder = new(DrawableHelper.LineHolderPrefix + line.GetInstanceID());
             }
 
-            //TODO out source this in SetupDrawable with out highestParent and out attachedObjects, needed for other drawabletypes like image etc
-            GameObject highestParent;
-            GameObject attachedObjects;
-            if (GameDrawableFinder.hasAParent(drawable))
-            {
-                GameObject parent = GameDrawableFinder.GetHighestParent(drawable);
-                if (!parent.name.StartsWith(DrawableHelper.DrawableHolderPrefix))
-                {
-                    highestParent = new GameObject(DrawableHelper.DrawableHolderPrefix + drawable.GetInstanceID());
-                    highestParent.transform.position = parent.transform.position;
-                    highestParent.transform.rotation = parent.transform.rotation;
+            GameObject highestParent, attachedObjects;
+            DrawableHelper.SetupDrawableHolder(drawable, out highestParent, out attachedObjects);
 
-                    attachedObjects = new GameObject(DrawableHelper.AttachedObject);
-                    attachedObjects.tag = Tags.AttachedObjects;
-                    attachedObjects.transform.position = highestParent.transform.position;
-                    attachedObjects.transform.rotation = highestParent.transform.rotation;
-                    attachedObjects.transform.SetParent(highestParent.transform);
-                    parent.transform.SetParent(highestParent.transform);
-                } else
-                {
-                    highestParent = parent;
-                    attachedObjects = GameDrawableFinder.FindChildWithTag(highestParent, Tags.AttachedObjects);
-                }
-            } else
-            {
-                highestParent = new GameObject(DrawableHelper.DrawableHolderPrefix + drawable.GetInstanceID());
-                highestParent.transform.position = drawable.transform.position;
-                highestParent.transform.rotation = drawable.transform.rotation;
-
-                attachedObjects = new GameObject(DrawableHelper.AttachedObject);
-                attachedObjects.tag = Tags.AttachedObjects;
-                attachedObjects.transform.position = highestParent.transform.position;
-                attachedObjects.transform.rotation = highestParent.transform.rotation;
-                attachedObjects.transform.SetParent(highestParent.transform);
-
-                drawable.transform.SetParent(highestParent.transform);
-            } 
-            
             lineHolder.transform.parent = attachedObjects.transform;
             lineHolder.transform.position = attachedObjects.transform.position;
 

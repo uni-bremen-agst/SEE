@@ -46,6 +46,51 @@ namespace Assets.SEE.Game.Drawable
             drawableMenu.SetActive(false);
         }
 
+        #region DrawableHolder
+        public static void SetupDrawableHolder(GameObject drawable, out GameObject highestParent, out GameObject attachedObjects)
+        {
+          //  GameObject highestParent;
+          //  GameObject attachedObjects;
+            if (GameDrawableFinder.hasAParent(drawable))
+            {
+                GameObject parent = GameDrawableFinder.GetHighestParent(drawable);
+                if (!parent.name.StartsWith(DrawableHelper.DrawableHolderPrefix))
+                {
+                    highestParent = new GameObject(DrawableHelper.DrawableHolderPrefix + drawable.GetInstanceID());
+                    highestParent.transform.position = parent.transform.position;
+                    highestParent.transform.rotation = parent.transform.rotation;
+
+                    attachedObjects = new GameObject(DrawableHelper.AttachedObject);
+                    attachedObjects.tag = Tags.AttachedObjects;
+                    attachedObjects.transform.position = highestParent.transform.position;
+                    attachedObjects.transform.rotation = highestParent.transform.rotation;
+                    attachedObjects.transform.SetParent(highestParent.transform);
+                    parent.transform.SetParent(highestParent.transform);
+                }
+                else
+                {
+                    highestParent = parent;
+                    attachedObjects = GameDrawableFinder.FindChildWithTag(highestParent, Tags.AttachedObjects);
+                }
+            }
+            else
+            {
+                highestParent = new GameObject(DrawableHelper.DrawableHolderPrefix + drawable.GetInstanceID());
+                highestParent.transform.position = drawable.transform.position;
+                highestParent.transform.rotation = drawable.transform.rotation;
+
+                attachedObjects = new GameObject(DrawableHelper.AttachedObject);
+                attachedObjects.tag = Tags.AttachedObjects;
+                attachedObjects.transform.position = highestParent.transform.position;
+                attachedObjects.transform.rotation = highestParent.transform.rotation;
+                attachedObjects.transform.SetParent(highestParent.transform);
+
+                drawable.transform.SetParent(highestParent.transform);
+            }
+           // return new GameObject[]{ highestParent, attachedObjects};
+        }
+        #endregion
+
         #region DrawableMenu
         public enum MenuPoint
         {
