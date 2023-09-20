@@ -205,6 +205,9 @@
         "Generic-NoMagicNumbers": {
             "_active": false
         },
+        "ImportExternalAnalysisOutput": {
+            "_active": true
+        },
         "Metric-Calling.CPP": {
             "_active": false,
             "max_value": null
