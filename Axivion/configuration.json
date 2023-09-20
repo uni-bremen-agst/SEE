@@ -206,7 +206,7 @@
             "_active": false
         },
         "ImportExternalAnalysisOutput": {
-            "_active": true
+            "_active": false
         },
         "Metric-Calling.CPP": {
             "_active": false,
