@@ -17,6 +17,11 @@ namespace SEE.Game.City
         public NodeLayoutKind Kind = NodeLayoutKind.Balloon;
 
         /// <summary>
+        /// Settings for the <see cref="SEE.Layout.NodeLayouts.IncrementalTreeMapLayout"/>.
+        /// </summary>
+        public IncrementalTreeMapSetting IncrementalTreeMapSetting = new();
+
+        /// <summary>
         /// The path for the layout file containing the node layout information.
         /// If the file extension is <see cref="Filenames.GVLExtension"/>, the layout is expected
         /// to be stored in Axivion's Gravis layout (GVL) with 2D co-ordinates.
@@ -24,15 +29,13 @@ namespace SEE.Game.City
         /// data of a game object.
         /// </summary>
         [OdinSerialize]
-        public FilePath LayoutPath = new FilePath();
-
-        private const string LayoutPathLabel = "LayoutPath";
-
+        public FilePath LayoutPath = new();
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
             writer.Save(Kind.ToString(), NodeLayoutLabel);
             LayoutPath.Save(writer, LayoutPathLabel);
+            IncrementalTreeMapSetting.Save(writer, IncrementalTreeMapLabel);
             writer.EndGroup();
         }
 
@@ -44,9 +47,21 @@ namespace SEE.Game.City
 
                 ConfigIO.RestoreEnum(values, NodeLayoutLabel, ref Kind);
                 LayoutPath.Restore(values, LayoutPathLabel);
+                IncrementalTreeMapSetting.Restore(values, IncrementalTreeMapLabel);
             }
         }
 
+        /// <summary>
+        /// Configuration label for <see cref="LayoutPath"/>.
+        /// </summary>
+        private const string LayoutPathLabel = "LayoutPath";
+        /// <summary>
+        /// Configuration label for <see cref="IncrementalTreeMapSetting"/>.
+        /// </summary>
+        private const string IncrementalTreeMapLabel = "IncrementalTreeMap";
+        /// <summary>
+        /// Configuration label for <see cref="Kind"/>.
+        /// </summary>
         private const string NodeLayoutLabel = "NodeLayout";
     }
 }

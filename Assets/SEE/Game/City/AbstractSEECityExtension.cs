@@ -120,6 +120,8 @@ namespace SEE.Game.City
                     return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
                 case NodeLayoutKind.Treemap:
                     return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
+                case NodeLayoutKind.IncrementalTreeMap:
+                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
                 case NodeLayoutKind.CirclePacking:
                     return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: true, isHierarchical: true);
                 case NodeLayoutKind.Manhattan:

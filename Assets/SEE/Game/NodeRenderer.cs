@@ -286,7 +286,8 @@ namespace SEE.Game
             else
             {
                 Vector3 scale = GetScale(node);
-                if (Settings.NodeLayoutSettings.Kind == NodeLayoutKind.Treemap)
+                if (Settings.NodeLayoutSettings.Kind == NodeLayoutKind.Treemap
+                    || Settings.NodeLayoutSettings.Kind == NodeLayoutKind.IncrementalTreeMap)
                 {
                     // FIXME: This is ugly. The graph renderer should not need to care what
                     // kind of layout was applied.
@@ -351,7 +352,8 @@ namespace SEE.Game
                     Vector3 scale = GetScale(node);
 
                     // Scale according to the metrics.
-                    if (Settings.NodeLayoutSettings.Kind == NodeLayoutKind.Treemap)
+                    if (Settings.NodeLayoutSettings.Kind == NodeLayoutKind.Treemap
+                        || Settings.NodeLayoutSettings.Kind == NodeLayoutKind.IncrementalTreeMap)
                     {
                         // FIXME: This is ugly. The graph renderer should not need to care what
                         // kind of layout was applied.
