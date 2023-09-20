@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
+using SEE.Game.CityRendering;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;

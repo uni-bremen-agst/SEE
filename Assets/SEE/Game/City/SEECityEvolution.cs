@@ -28,6 +28,7 @@ using SEE.GO;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using SEE.Game.CityRendering;
 
 namespace SEE.Game.City
 {

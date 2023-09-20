@@ -4,7 +4,7 @@ using SEE.GO;
 using SEE.Layout;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.CityRendering
 {
     /// <summary>
     /// Implementation of ILayoutNode. It is simply a wrapper to game objects

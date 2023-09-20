@@ -14,7 +14,7 @@ using SEE.Utils;
 using UnityEngine;
 using Plane = SEE.GO.Plane;
 
-namespace SEE.Game
+namespace SEE.Game.CityRendering
 {
     /// <summary>
     /// A renderer for graphs. Encapsulates handling of block types, node and edge layouts,

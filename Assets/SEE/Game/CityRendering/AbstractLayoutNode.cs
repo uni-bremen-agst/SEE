@@ -3,7 +3,7 @@ using SEE.DataModel.DG;
 using SEE.Layout;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.CityRendering
 {
     /// <summary>
     /// Abstract super class for layout nodes representing a graph node.

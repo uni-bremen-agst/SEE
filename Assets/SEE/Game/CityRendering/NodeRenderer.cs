@@ -15,7 +15,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using InvalidOperationException = System.InvalidOperationException;
 
-namespace SEE.Game
+namespace SEE.Game.CityRendering
 {
     /// <summary>
     /// Implements the functions of the <see cref="GraphRenderer"/> related to nodes.

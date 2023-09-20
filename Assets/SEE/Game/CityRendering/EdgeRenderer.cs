@@ -9,7 +9,7 @@ using SEE.Layout.EdgeLayouts;
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace SEE.Game
+namespace SEE.Game.CityRendering
 {
     /// <summary>
     /// Implements the functions of the <see cref="GraphRenderer"/> related to edges.

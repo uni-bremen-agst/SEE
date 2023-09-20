@@ -1,9 +1,8 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Layout;
 
-namespace SEE.Game
+namespace SEE.Game.CityRendering
 {
-
     /// <summary>
     /// Implementation of ILayoutEdge that also stores the underlying graph edge that is 
     /// visualized by this layout edge.

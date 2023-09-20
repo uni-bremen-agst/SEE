@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using SEE.Game;
+using SEE.Game.CityRendering;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
 using SEE.Utils;

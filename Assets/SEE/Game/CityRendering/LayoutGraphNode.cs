@@ -3,7 +3,7 @@ using SEE.Layout;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.CityRendering
 {
     /// <summary>
     /// Implementation of ILayoutNode wrapping a graph node and its layout

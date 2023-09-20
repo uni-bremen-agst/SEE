@@ -4,7 +4,7 @@ using SEE.Layout;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Game
+namespace SEE.Game.CityRendering
 {
     /// <summary>
     /// Interface of all graph renderers.
