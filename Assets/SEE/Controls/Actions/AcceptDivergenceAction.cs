@@ -52,15 +52,15 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The source of the edge.
             /// </summary>
-            public Node from;
+            public Node From;
             /// <summary>
             /// The target of the edge.
             /// </summary>
-            public Node to;
+            public Node To;
             /// <summary>
             /// The type of the edge.
             /// </summary>
-            public string type;
+            public string Type;
             /// <summary>
             /// Construct a new memento.
             /// </summary>
@@ -68,9 +68,9 @@ namespace SEE.Controls.Actions
             /// <param name="target">the target node of the edge in the architecture grpah</param>
             public Memento(Node source, Node target, string type)
             {
-                this.from = source;
-                this.to = target;
-                this.type = type;
+                this.From = source;
+                this.To = target;
+                this.Type = type;
             }
         }
 
@@ -220,12 +220,12 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="memento">information needed to create the edge</param>
         /// <returns>the new edge's GameObject and a reference to itself, or both null</returns>
-        private Edge CreateEdge(Memento memento)
+        private static Edge CreateEdge(Memento memento)
         {
-            Edge newEdge = AcceptDivergence.Accept(memento.from, memento.to, memento.type);
+            Edge newEdge = AcceptDivergence.Accept(memento.From, memento.To, memento.Type);
 
             // propagate the edge (including matching ID) over network
-            new AcceptDivergenceNetAction(memento.from.ID, memento.to.ID, newEdge.ID, newEdge.Type).Execute();
+            new AcceptDivergenceNetAction(memento.From.ID, memento.To.ID, newEdge.ID, newEdge.Type).Execute();
 
             return newEdge;
         }
@@ -253,8 +253,8 @@ namespace SEE.Controls.Actions
             {
                 return new HashSet<string>
                 {
-                    memento.from.ID,
-                    memento.to.ID,
+                    memento.From.ID,
+                    memento.To.ID,
                     createdEdge.ID
                 };
             }
