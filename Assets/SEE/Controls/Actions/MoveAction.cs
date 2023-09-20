@@ -568,9 +568,9 @@ namespace SEE.Controls.Actions
         private static bool UserIsGrabbing()
         {
             // Index of the left mouse button.
-            const int LeftMouseButton = 0;
+            const int leftMouseButton = 0;
             // FIXME: We need a VR interaction, too.
-            return Input.GetMouseButton(LeftMouseButton);
+            return Input.GetMouseButton(leftMouseButton);
         }
 
         /// <summary>

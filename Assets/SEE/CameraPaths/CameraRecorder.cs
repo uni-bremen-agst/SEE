@@ -93,7 +93,7 @@ namespace SEE.CameraPaths
         /// <param name="take">the number of the take</param>
         /// <param name="extension">file extension</param>
         /// <returns>filename for the recording as a concatenation of all given input parameters</returns>
-        private string NewName(string path, string basename, string objectName, int take, string extension)
+        private static string NewName(string path, string basename, string objectName, int take, string extension)
         {
             if (!path.EndsWith(Path.DirectorySeparatorChar.ToString()))
             {

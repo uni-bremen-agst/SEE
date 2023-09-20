@@ -167,7 +167,7 @@ namespace SEE.CameraPaths
         public static CameraPath ReadPath(string filename)
         {
             string[] data = System.IO.File.ReadAllLines(filename);
-            CameraPath result = new CameraPath(filename);
+            CameraPath result = new(filename);
 
             int i = 0;
             foreach (string line in data)
@@ -440,23 +440,28 @@ namespace SEE.CameraPaths
             line.SetPositions(positions);
         }
 
-        private string Dump(Vector3 v)
+        /// <summary>
+        /// Returns <paramref name="v"/> as a string for debugging.
+        /// </summary>
+        /// <param name="v">vector to be turned into a string</param>
+        /// <returns><paramref name="v"/> as a string</returns>
+        private static string Dump(Vector3 v)
         {
             return ("(" + v.x.ToString("0.00000")
                     + ", " + v.y.ToString("0.00000")
                     + ", " + v.z.ToString("0.00000") + ")");
         }
 
+        /// <summary>
+        /// Dumps all paths in <see cref="data"/>
+        /// </summary>
         public void Dump()
         {
             foreach (PathData d in data)
             {
-                Debug.LogFormat("position(x,y,z)={0} rotation={1}, rotation(x, y, z, w)= ({2}, {3}, {4}, {5}), rotation(Euler angles)={6}, time={7})\n",
-                                d.position,
-                                d.rotation,
-                                d.rotation.x.ToString("0.000"), d.rotation.y.ToString("0.000"), d.rotation.z.ToString("0.000"), d.rotation.w.ToString("0.000"),
-                                Dump(d.rotation.eulerAngles),
-                                d.time);
+                Debug.LogFormat($"position(x,y,z)={d.position} rotation={d.rotation}, "
+                    + $"rotation(x, y, z, w)= ({d.rotation.x:0.000}, {d.rotation.y:0.000}, {d.rotation.z:0.000}, {d.rotation.w:0.000}), "
+                    + $"rotation(Euler angles)={Dump(d.rotation.eulerAngles)}, time={d.time})\n");
             }
         }
     }
