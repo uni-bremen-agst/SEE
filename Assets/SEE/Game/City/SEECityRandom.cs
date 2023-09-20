@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
 using SEE.GO;
-using SEE.Tools;
+using SEE.Tools.RandomGraphs;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;

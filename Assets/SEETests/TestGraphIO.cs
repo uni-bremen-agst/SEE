@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using SEE.Tools;
+using SEE.Tools.RandomGraphs;
 using SEE.Utils;
 using UnityEngine;
 

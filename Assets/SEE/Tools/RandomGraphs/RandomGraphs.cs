@@ -4,7 +4,7 @@ using SEE.DataModel.DG;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.Tools
+namespace SEE.Tools.RandomGraphs
 {
     /// <summary>
     /// A descriptor defining the name of an attribute and the normal distribution

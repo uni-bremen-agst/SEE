@@ -3,7 +3,7 @@ using NUnit.Framework;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Layout.NodeLayouts.Cose;
-using SEE.Tools;
+using SEE.Tools.RandomGraphs;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -704,9 +704,9 @@ namespace SEE.Utils
         private void WipeOutSEERandomCityAttributes(SEECityRandom city)
         {
             WipeOutSEECityAttributes(city);
-            city.LeafConstraint = new Tools.Constraint(nodeType: "X", edgeType: "Y", nodeNumber: 5, edgeDensity: 0);
-            city.InnerNodeConstraint = new Tools.Constraint(nodeType: "N", edgeType: "T", nodeNumber: 1, edgeDensity: 1);
-            city.LeafAttributes = new List<Tools.RandomAttributeDescriptor>();
+            city.LeafConstraint = new Constraint(nodeType: "X", edgeType: "Y", nodeNumber: 5, edgeDensity: 0);
+            city.InnerNodeConstraint = new Constraint(nodeType: "N", edgeType: "T", nodeNumber: 1, edgeDensity: 1);
+            city.LeafAttributes = new List<RandomAttributeDescriptor>();
         }
 
         /// <summary>
