@@ -317,6 +317,42 @@
         <string>Game</string>
       </attr>
     </node>
+    <node id="N769769">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N SEE.Game.City</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>City</string>
+      </attr>
+    </node>
+    <node id="N769770">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N SEE.Game.HolisticMetrics</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>HolisticMetrics</string>
+      </attr>
+    </node>
+    <node id="N769774">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N SEE.Game.SceneManipulation</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>SceneManipulation</string>
+      </attr>
+    </node>
+    <node id="N769775">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N SEE.Game.Operator</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Operator</string>
+      </attr>
+    </node>
     <node id="N769785">
       <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
@@ -333,6 +369,24 @@
       </attr>
       <attr name="Source.Name">
         <string>Charts</string>
+      </attr>
+    </node>
+    <node id="N769796">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N SEE.Game.Worlds</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Worlds</string>
+      </attr>
+    </node>
+    <node id="N769802">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N SEE.Game.Avatars</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>Avatars</string>
       </attr>
     </node>
     <node id="N769803">
@@ -578,6 +632,15 @@
         <string>Dissonance</string>
       </attr>
     </node>
+    <node id="N769949">
+      <type xlink:href="Namespace"/>
+      <attr name="Linkage.Name">
+        <string>N SEE.UI3D</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>UI3D</string>
+      </attr>
+    </node>
     <node id="N769959">
       <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
@@ -686,6 +749,15 @@
         <string>HtmlAgilityPack</string>
       </attr>
     </node>
+    <node id="N770441">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>City</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>4ea4e80a-0796-47a5-a3bc-9fdd90fc2722</string>
+      </attr>
+    </node>
     <node id="N770452">
       <type xlink:href="Namespace"/>
       <attr name="Linkage.Name">
@@ -774,6 +846,15 @@
       </attr>
       <attr name="Source.Name">
         <string>Sirenix</string>
+      </attr>
+    </node>
+    <node id="N773824">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Avatars</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>b7291931-6e01-4004-b811-0afcc6532503</string>
       </attr>
     </node>
     <node id="N773825">
@@ -1514,6 +1595,42 @@
         <string>ea6219b5-018f-4b14-a87d-8c33571513b9</string>
       </attr>
     </node>
+    <node id="N784422">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>HolisticMetrics</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>baa225e6-86e2-416c-aacb-208c14d8e2b2</string>
+      </attr>
+    </node>
+    <node id="N784423">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>SceneManipulations</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>0496857b-aa12-4fa9-b607-75d97e366f21</string>
+      </attr>
+    </node>
+    <node id="N784424">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Worlds</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>02e3639b-c2f8-4025-a78a-026f2a081bf7</string>
+      </attr>
+    </node>
+    <node id="N784426">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Operator</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>82817bf2-fe22-4da6-b0c8-c09643c438e1</string>
+      </attr>
+    </node>
     <edge id="E2285447" from="N769884" to="N784354">
       <type xlink:href="Maps_To"/>
     </edge>
@@ -1800,6 +1917,27 @@
       <type xlink:href="Maps_To"/>
     </edge>
     <edge id="E2294473" from="N777882" to="N784420">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E2297088" from="N769775" to="N784426">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E2297091" from="N769796" to="N784424">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E2297093" from="N769770" to="N784422">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E2297094" from="N769774" to="N784423">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E2297097" from="N769949" to="N784369">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E2297098" from="N769769" to="N770441">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E2297101" from="N769802" to="N773824">
       <type xlink:href="Maps_To"/>
     </edge>
     <edge id="E2297107" from="N769935" to="N773825">

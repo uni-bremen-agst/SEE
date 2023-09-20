@@ -2,6 +2,24 @@
 <!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
 <gxl xmlns:xlink="http://www.w3.org/1999/xlink">
   <graph id="Architecture" edgeids="true">
+    <node id="N770441">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>City</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>4ea4e80a-0796-47a5-a3bc-9fdd90fc2722</string>
+      </attr>
+    </node>
+    <node id="N773824">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Avatars</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>b7291931-6e01-4004-b811-0afcc6532503</string>
+      </attr>
+    </node>
     <node id="N773825">
       <type xlink:href="Cluster"/>
       <attr name="Source.Name">
@@ -650,6 +668,51 @@
         <string>ea6219b5-018f-4b14-a87d-8c33571513b9</string>
       </attr>
     </node>
+    <node id="N784422">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>HolisticMetrics</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>baa225e6-86e2-416c-aacb-208c14d8e2b2</string>
+      </attr>
+    </node>
+    <node id="N784423">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>SceneManipulations</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>0496857b-aa12-4fa9-b607-75d97e366f21</string>
+      </attr>
+    </node>
+    <node id="N784424">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Worlds</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>02e3639b-c2f8-4025-a78a-026f2a081bf7</string>
+      </attr>
+    </node>
+    <node id="N784425">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>CityRendering</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>f85136c5-7a87-411c-aa9d-64d1f759f3e7</string>
+      </attr>
+    </node>
+    <node id="N784426">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>Operator</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>82817bf2-fe22-4da6-b0c8-c09643c438e1</string>
+      </attr>
+    </node>
     <edge id="E2285358" from="N784384" to="N784382">
       <type xlink:href="Belongs_To"/>
     </edge>
@@ -820,9 +883,6 @@
     </edge>
     <edge id="E2285414" from="N784355" to="N784358">
       <type xlink:href="Source_Dependency"/>
-    </edge>
-    <edge id="E2285415" from="N784369" to="N784356">
-      <type xlink:href="Belongs_To"/>
     </edge>
     <edge id="E2285416" from="N784377" to="N784357">
       <type xlink:href="Source_Dependency"/>
@@ -1008,6 +1068,42 @@
       <type xlink:href="Belongs_To"/>
     </edge>
     <edge id="E2296823" from="N784397" to="N784404">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E2297089" from="N784426" to="N784356">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E2297090" from="N784425" to="N784356">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E2297092" from="N784424" to="N784356">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E2297095" from="N784423" to="N784356">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E2297096" from="N784369" to="N784370">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E2297099" from="N784422" to="N784356">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E2297100" from="N770441" to="N784356">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E2297102" from="N773824" to="N784419">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E2297103" from="N773824" to="N784356">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E2297104" from="N784419" to="N784389">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E2297105" from="N784377" to="N784403">
+      <type xlink:href="Source_Dependency"/>
+    </edge>
+    <edge id="E2297106" from="N784387" to="N784397">
       <type xlink:href="Source_Dependency"/>
     </edge>
     <edge id="E2297108" from="N773825" to="N784359">
