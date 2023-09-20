@@ -14,15 +14,15 @@ namespace SEE.Audio
         const string StartScene = "SEEStart";
 
         /// <summary>
-        /// Returns <see cref="SceneType.LOBBY"/> if <paramref name="scene"/>
-        /// is the <see cref="StartScene"/> or otherwise <see cref="SceneType.IN_GAME"/>.
+        /// Returns <see cref="SceneType.Lobby"/> if <paramref name="scene"/>
+        /// is the <see cref="StartScene"/> or otherwise <see cref="SceneType.InGame"/>.
         /// </summary>
         /// <param name="scene">The currently loaded scene.</param>
         /// <returns>A game state enum for the given scene.</returns>
         public static SceneType GetSceneType(Scene scene) => scene.name switch
         {
-            StartScene => SceneType.LOBBY,
-            _          => SceneType.IN_GAME,
+            StartScene => SceneType.Lobby,
+            _          => SceneType.InGame,
         };
 
         /// <summary>
@@ -34,12 +34,12 @@ namespace SEE.Audio
             /// Whether a player is currently in the "lobby", i.e, the scene in
             /// which the user can select the network configuration.
             /// </summary>
-            LOBBY,
+            Lobby,
             /// <summary>
             /// Whether a player is in a scene in which he/she can interact
             /// with code cities and other players.
             /// </summary>
-            IN_GAME
+            InGame
         }
     }
 }

@@ -403,7 +403,7 @@ namespace SEE.Audio
         /// <param name="sceneType">The current type of scene.</param>
         public void QueueMusic(SceneType sceneType)
         {
-            musicQueue.Enqueue(GetAudioClipFromMusicName(sceneType == SceneType.LOBBY ? Music.LobbySound : Music.WorldSound));
+            musicQueue.Enqueue(GetAudioClipFromMusicName(sceneType == SceneType.Lobby ? Music.LobbySound : Music.WorldSound));
         }
 
         /// <summary>
@@ -503,7 +503,7 @@ namespace SEE.Audio
                 soundEffectGameObjects.Add(controlObject);
             }
             controlObject.EnqueueSoundEffect(GetAudioClipFromSoundEffectName(soundEffect));
-            if (!sendToClients && previousGameState != SceneType.LOBBY)
+            if (!sendToClients && previousGameState != SceneType.Lobby)
             {
                 new SoundEffectNetAction(soundEffect, sourceObject.name).Execute();
             }

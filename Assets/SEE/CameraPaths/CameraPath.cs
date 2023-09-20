@@ -227,7 +227,7 @@ namespace SEE.CameraPaths
         /// <returns>game object representing the path</returns>
         public GameObject Draw()
         {
-            GameObject result = new GameObject(string.IsNullOrEmpty(path) ? "anonymous path" : path)
+            GameObject result = new(string.IsNullOrEmpty(path) ? "anonymous path" : path)
             {
                 tag = Tags.Path,
                 isStatic = true
@@ -253,58 +253,38 @@ namespace SEE.CameraPaths
             int i = 0;
             foreach (PathData d in Aggregate(data))
             {
-                /*
-                {
-                    float sphereRadius = 0.5f;
-                    // draw a sphere whose size is proportional to the time the camera has
-                    // spent at this location
-                    GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    sphere.name = "location " + i.ToString();
-                    sphere.isStatic = true;
-                    Renderer renderer = sphere.GetComponent<Renderer>();
-
-                    // Object should not cast shadows: too expensive and may hide information.
-                    renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                    renderer.receiveShadows = false;
-                    renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
-
-                    sphere.transform.localScale = 2 * sphereRadius * Vector3.one;
-                    sphere.transform.parent = result.transform;
-                    sphere.transform.position = d.position;
-                }
-                */
                 // draw a line towards the look out whose length is proportional to the
                 // time the camera has looked into this direction
+                GameObject direction = new("direction " + i.ToString())
                 {
-                    GameObject direction = new GameObject("direction " + i.ToString());
-                    direction.isStatic = true;
-                    direction.transform.parent = pathGameObject.transform;
-                    direction.transform.position = d.position;
+                    isStatic = true
+                };
+                direction.transform.parent = pathGameObject.transform;
+                direction.transform.position = d.position;
 
-                    LineRenderer line = direction.AddComponent<LineRenderer>();
+                LineRenderer line = direction.AddComponent<LineRenderer>();
 
-                    LineFactory.SetDefaults(line);
-                    LineFactory.SetColor(line, Color.red);
-                    LineFactory.SetWidth(line, lineWidth);
+                LineFactory.SetDefaults(line);
+                LineFactory.SetColor(line, Color.red);
+                LineFactory.SetWidth(line, lineWidth);
 
-                    line.useWorldSpace = true;
+                line.useWorldSpace = true;
 
-                    // All path lines have the same material to reduce the number of drawing calls.
-                    if (lookoutMaterial == null)
-                    {
-                        lookoutMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
-                    }
-                    line.sharedMaterial = lookoutMaterial;
-
-                    // Line from the surface of the sphere along the direction of the lookout
-                    // proportional to the length of the lookout
-                    Vector3[] positions = new Vector3[2];
-                    positions[0] = d.position;
-                    positions[1] = positions[0] + d.rotation * Vector3.forward * d.time * timeFactor;
-
-                    line.positionCount = positions.Length;
-                    line.SetPositions(positions);
+                // All path lines have the same material to reduce the number of drawing calls.
+                if (lookoutMaterial == null)
+                {
+                    lookoutMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
                 }
+                line.sharedMaterial = lookoutMaterial;
+
+                // Line from the surface of the sphere along the direction of the lookout
+                // proportional to the length of the lookout
+                Vector3[] positions = new Vector3[2];
+                positions[0] = d.position;
+                positions[1] = positions[0] + d.rotation * Vector3.forward * d.time * timeFactor;
+
+                line.positionCount = positions.Length;
+                line.SetPositions(positions);
                 i++;
             }
         }
@@ -317,8 +297,8 @@ namespace SEE.CameraPaths
         /// <param name="me">one vector to be compared</param>
         /// <param name="other">other vector to be compared against the first one</param>
         /// <param name="allowedDifference">allowable difference between co-ordinates</param>
-        /// <returns></returns>
-        private int CompareTo(Vector3 me, Vector3 other, float allowedDifference)
+        /// <returns>0 if similar, -1 or 1 if dissimilar</returns>
+        private static int CompareTo(Vector3 me, Vector3 other, float allowedDifference)
         {
             {
                 float delta = me.x - other.x;
@@ -408,7 +388,7 @@ namespace SEE.CameraPaths
         /// <param name="y">second argument to be compared to the first argument</param>
         /// <returns>0 if x and y are similar, 1 if x is before y, otherwise -1 (the 'before'
         /// relation is arbitrary)</returns>
-        private int CompareTo(PathData x, PathData y)
+        private static int CompareTo(PathData x, PathData y)
         {
             // The following value defines the difference below we still consider two
             // corresponding co-ordinates similar enough.
