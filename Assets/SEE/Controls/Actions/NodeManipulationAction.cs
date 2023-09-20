@@ -195,7 +195,7 @@ namespace SEE.Controls.Actions
             gameNodeSelected = gameNode;
             memento = CreateMemento(gameNodeSelected);
             gizmo.Enable(gameNodeSelected);
-            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, gameNodeSelected);
+            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, gameNodeSelected);
         }
 
         /// <summary>
@@ -209,7 +209,7 @@ namespace SEE.Controls.Actions
             UnityEngine.Assertions.Assert.IsNotNull(gameNodeSelected);
             gizmo.Disable();
             currentState = ReversibleAction.Progress.Completed;
-            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, gameNodeSelected);
+            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, gameNodeSelected);
         }
 
         /// <summary>

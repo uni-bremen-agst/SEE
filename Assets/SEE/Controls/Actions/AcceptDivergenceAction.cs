@@ -153,7 +153,7 @@ namespace SEE.Controls.Actions
                         divergenceSolved = createdEdge != null;
 
                         // add audio cue to the appearance of the new architecture edge
-                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NEW_EDGE_SOUND);
+                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound);
 
                         // update the current state depending on whether the divergence has been solved
                         // (required in order to register as an undo-able action)

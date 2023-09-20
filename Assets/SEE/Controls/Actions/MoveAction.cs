@@ -526,7 +526,7 @@ namespace SEE.Controls.Actions
                     if (hoveredObject && hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot())
                     {
                         grabbedObject.Grab(hoveredObject.gameObject);
-                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PICKUP_SOUND, hoveredObject.gameObject);
+                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, hoveredObject.gameObject);
                         // Remember the current distance from the pointing device to the grabbed object.
                         distanceToUser = Vector3.Distance(Raycasting.UserPointsTo().origin, grabbedObject.Position);
                         currentState = ReversibleAction.Progress.InProgress;
@@ -551,7 +551,7 @@ namespace SEE.Controls.Actions
                 // Finalize the action with the grabbed object.
                 if (grabbedObject.GrabbedGameObject != null)
                 {
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DROP_SOUND, grabbedObject.GrabbedGameObject);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, grabbedObject.GrabbedGameObject);
                 }
                 grabbedObject.UnGrab();
                 // Action is finished.

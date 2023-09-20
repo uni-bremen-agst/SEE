@@ -40,7 +40,7 @@ namespace SEE.Controls.Actions
                 new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
                 result = true;
                 currentState = ReversibleAction.Progress.Completed;
-                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NEW_NODE_SOUND, parent);
+                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewNodeSound, parent);
             }
             return result;
         }

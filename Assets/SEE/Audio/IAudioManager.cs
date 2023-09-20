@@ -92,45 +92,45 @@ namespace SEE.Audio
         enum SoundEffect
         {
             /// <summary>
-            /// A simple click sound. 
+            /// A simple click sound.
             /// </summary>
-            CLICK_SOUND,
+            ClickSound,
             /// <summary>
             /// Sound for dropping objects.
             /// </summary>
-            DROP_SOUND,
+            DropSound,
             /// <summary>
             /// Confirmation click sound.
             /// </summary>
-            OKAY_SOUND,
+            OkaySound,
             /// <summary>
             /// Sound for picking up objects.
             /// </summary>
-            PICKUP_SOUND,
+            PickupSound,
             /// <summary>
             /// Sound for creating a new edge.
             /// </summary>
-            NEW_EDGE_SOUND,
+            NewEdgeSound,
             /// <summary>
             /// Sound for creating a new node.
             /// </summary>
-            NEW_NODE_SOUND,
+            NewNodeSound,
             /// <summary>
             /// Player walking sound.
             /// </summary>
-            WALKING_SOUND,
+            WalkingSound,
             /// <summary>
             /// Declined click sound.
             /// </summary>
-            CANCEL_SOUND,
+            CancelSound,
             /// <summary>
             /// Drawing sound.
             /// </summary>
-            SCRIBBLE,
+            ScribbleSound,
             /// <summary>
             /// Sound for hovering over objects.
             /// </summary>
-            HOVER_SOUND
+            HoverSound
         }
 
         /// <summary>
@@ -141,11 +141,11 @@ namespace SEE.Audio
             /// <summary>
             /// The lobby music.
             /// </summary>
-            LOBBY_MUSIC,
+            LobbySound,
             /// <summary>
             /// The music played during the actual game.
             /// </summary>
-            WORLD_MUSIC
+            WorldSound
         }
     }
 }

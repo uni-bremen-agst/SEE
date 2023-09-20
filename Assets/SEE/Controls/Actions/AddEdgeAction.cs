@@ -162,7 +162,7 @@ namespace SEE.Controls.Actions
                 from = null;
                 to = null;
                 result = createdEdge != null;
-                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NEW_EDGE_SOUND);
+                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound);
                 currentState = result ? ReversibleAction.Progress.Completed : ReversibleAction.Progress.NoEffect;
             }
             // Forget from and to upon user request.

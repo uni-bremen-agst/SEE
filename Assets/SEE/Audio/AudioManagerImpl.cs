@@ -19,7 +19,7 @@ namespace SEE.Audio
         /// <summary>
         /// The music played in all scenes other than the lobby scene.
         /// </summary>
-        public AudioClip GameMusic;        
+        public AudioClip GameMusic;
 
         /// <summary>
         /// The sound effect played when clicking objects.
@@ -254,7 +254,10 @@ namespace SEE.Audio
             {
                 if (musicPlayer.clip == null)
                 {
-                    if (musicQueue.Count == 0) QueueMusic();
+                    if (musicQueue.Count == 0)
+                    {
+                        QueueMusic();
+                    }
                     musicPlayer.clip = musicQueue.Dequeue();
                 }
                 musicPlayer.loop = true;
@@ -400,7 +403,7 @@ namespace SEE.Audio
         /// <param name="sceneType">The current type of scene.</param>
         public void QueueMusic(SceneType sceneType)
         {
-            musicQueue.Enqueue(GetAudioClipFromMusicName(sceneType == SceneType.LOBBY ? Music.LOBBY_MUSIC : Music.WORLD_MUSIC));
+            musicQueue.Enqueue(GetAudioClipFromMusicName(sceneType == SceneType.LOBBY ? Music.LobbySound : Music.WorldSound));
         }
 
         /// <summary>
@@ -546,8 +549,8 @@ namespace SEE.Audio
         /// <returns>An AudioSource matching the given enum music name.</returns>
         private AudioClip GetAudioClipFromMusicName(Music music) => music switch
         {
-            Music.LOBBY_MUSIC => LobbyMusic,
-            Music.WORLD_MUSIC => GameMusic,
+            Music.LobbySound => LobbyMusic,
+            Music.WorldSound => GameMusic,
             _ => throw new System.Exception($"Unhandled {music}."),
         };
 
@@ -558,16 +561,16 @@ namespace SEE.Audio
         /// <returns>An AudioSource matching the given enum sound effect name.</returns>
         private AudioClip GetAudioClipFromSoundEffectName(SoundEffect soundEffect) => soundEffect switch
         {
-            SoundEffect.CLICK_SOUND => ClickSoundEffect,
-            SoundEffect.DROP_SOUND => DropSoundEffect,
-            SoundEffect.OKAY_SOUND => OkayButtonSoundEffect,
-            SoundEffect.PICKUP_SOUND => PickSoundEffect,
-            SoundEffect.NEW_EDGE_SOUND => NewEdgeSoundEffect,
-            SoundEffect.NEW_NODE_SOUND => NewNodeSoundEffect,
-            SoundEffect.WALKING_SOUND => FootstepSoundEffect,
-            SoundEffect.CANCEL_SOUND => CancelButtonSoundEffect,
-            SoundEffect.SCRIBBLE => ScribbleSoundEffect,
-            SoundEffect.HOVER_SOUND => HoverSoundEffect,
+            SoundEffect.ClickSound => ClickSoundEffect,
+            SoundEffect.DropSound => DropSoundEffect,
+            SoundEffect.OkaySound => OkayButtonSoundEffect,
+            SoundEffect.PickupSound => PickSoundEffect,
+            SoundEffect.NewEdgeSound => NewEdgeSoundEffect,
+            SoundEffect.NewNodeSound => NewNodeSoundEffect,
+            SoundEffect.WalkingSound => FootstepSoundEffect,
+            SoundEffect.CancelSound => CancelButtonSoundEffect,
+            SoundEffect.ScribbleSound => ScribbleSoundEffect,
+            SoundEffect.HoverSound => HoverSoundEffect,
             _ => ClickSoundEffect,
         };
     }

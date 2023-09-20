@@ -341,7 +341,7 @@ namespace SEE.Controls
                     // Non-local player are not concerned here.
                     LocalHoverIn?.Invoke(this);
                     LocalAnyHoverIn?.Invoke(this);
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.HOVER_SOUND, this.gameObject);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.HoverSound, this.gameObject);
                 }
 
                 HoveredObjects.Add(this);
