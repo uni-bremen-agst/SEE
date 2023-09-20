@@ -2,7 +2,7 @@
 <!DOCTYPE Gravis2_Layout>
 <Gravis2_Layout W="Hierarchy" V="Architecture">
   <Visualization>
-    <Zoom Factor="0.888889" Center_X="-1645.87" Center_Y="199.687"/>
+    <Zoom Factor="0.888889" Center_X="-1451.25" Center_Y="164.25"/>
     <Option Name="Mute_Edges" Value="False"/>
     <Option Name="Semi_Transparent_Edges" Value="False"/>
     <Option Name="Edges_Behind_Nodes" Value="False"/>
@@ -15,29 +15,85 @@
     <Hidden_Edge_Types>
     </Hidden_Edge_Types>
   </Visualization>
-  <Node Id="LApp" X="-2207.35" Y="-117.658" W="1317.67" H="697.816" CS="14.14" Exp="True">
+  <Node Id="LApp" X="-2207.35" Y="-117.658" W="1324.94" H="782.533" CS="14.14" Exp="True">
+    <Node Id="L12da4f55-08b1-47eb-bc33-3d306e6858a2" X="1255.6" Y="232.408" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="L0f42f640-5c5e-444c-935e-f92be8f61b9c" X="1249.98" Y="731.908" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="L3f26315c-76d7-4a19-9c67-dd1ce575d349" X="1181.35" Y="738.658" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="L54272502-42ae-47c4-8dfe-7d649f1a057f" X="1257.85" Y="184.033" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="L71ede6f7-9d64-4e83-a738-576afe8bb313" X="1087.98" Y="731.908" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="Lfa35c692-d532-421c-bc0b-55516f03553e" X="1041.85" Y="735.283" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="L9f33125a-25ef-4c30-8ad2-ff09cc8d506f" X="981.1" Y="728.533" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="L169ece02-a987-447d-a16a-fe38d039b4cf" X="942.85" Y="726.283" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="L95b80453-77b7-4a2f-8b6f-0ed42e5795f6" X="888.85" Y="722.908" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="Le04bf341-24f0-4797-be60-258acea09df5" X="806.725" Y="729.658" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="Ld8ccf4aa-d05f-4305-bcbc-43f9d0510423" X="752.725" Y="724.033" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="L3fb81e07-c064-4848-8fd4-c19ef46fbfff" X="697.6" Y="725.158" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="L2655124f-ac5c-401f-a6ab-e277fa99ec9c" X="618.85" Y="724.033" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="Lc179a007-8f37-495f-9ccc-1ea302229cfa" X="536.725" Y="729.658" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="L408f7cbc-d3b1-42b3-a876-bad0abe31b1c" X="464.725" Y="727.408" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="L9c1cd334-17a9-4c4b-9d2c-bc1df4448bc5" X="412.975" Y="726.283" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="L789ac143-5a16-4c1c-987f-e113ef94fef2" X="38.3503" Y="550.783" W="28.28" H="28.28" CS="10" Exp="True">
+    </Node>
+    <Node Id="Le750c80e-0f0f-46da-ad76-209519dbde86" X="271.225" Y="733.033" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="L215e7414-c265-473b-b882-a65d1a67aad1" X="201.475" Y="728.533" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="L00fb0d8d-9195-46df-8ba5-8b116dcc871c" X="45.1003" Y="731.908" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="L5392dddd-0776-4932-9658-c4e08e03ec3d" X="148.6" Y="726.283" W="0" H="0" CS="10">
+    </Node>
+    <Node Id="Lee9e0ae0-4a4a-4721-bcf6-cb7fb1a464de" X="29.3503" Y="658.783" W="28.28" H="28.28" CS="10" Exp="True">
+    </Node>
+    <Node Id="L9c4f0c58-00fd-4b7e-a650-2b9e269db7e3" X="32.7253" Y="603.658" W="28.28" H="28.28" CS="10" Exp="True">
+    </Node>
+    <Node Id="L5ccf396f-db6b-4473-9d51-4e40781b8a6f" X="25.9753" Y="509.158" W="28.28" H="28.28" CS="10" Exp="True">
+    </Node>
+    <Node Id="Lcabe9e19-734b-4617-9277-29c95188758c" X="22.6003" Y="465.283" W="28.28" H="28.28" CS="10" Exp="True">
+    </Node>
+    <Node Id="Lc692fbbc-870a-40ca-86b3-b565ba1e12eb" X="25.9753" Y="404.533" W="28.28" H="28.28" CS="10" Exp="True">
+    </Node>
+    <Node Id="La6a1d417-26b9-4834-b6fa-5e4b5c70a988" X="27.1003" Y="346.033" W="28.28" H="28.28" CS="10" Exp="True">
+    </Node>
+    <Node Id="Lb07c40dc-024a-498d-a7cf-6df31f8aaa50" X="27.1003" Y="295.408" W="28.28" H="28.28" CS="10" Exp="True">
+    </Node>
+    <Node Id="L319b54c6-f350-4213-b834-0b09e1102a50" X="31.6003" Y="233.533" W="28.28" H="28.28" CS="10" Exp="True">
+    </Node>
+    <Node Id="Lf90f981c-9cda-4f23-aa1a-573d374ca2dc" X="23.7253" Y="179.533" W="28.28" H="28.28" CS="10" Exp="True">
+    </Node>
+    <Node Id="LOdinSerializer" X="15.1819" Y="34.14" W="115.6" H="50.177" CS="10" Exp="True">
+    </Node>
     <Node Id="Lb67fc9c5-cf8d-4fdf-867c-caad50108740" X="16.9753" Y="106.408" W="113.625" H="49.5" CS="10" Exp="True">
     </Node>
-    <Node Id="LInControl" X="1218.63" Y="292.909" W="84.0408" H="40" CS="10" Exp="True">
+    <Node Id="LTinySplines" X="139.452" Y="643.954" W="1061.82" H="40" CS="10" Exp="True">
     </Node>
-    <Node Id="LTinySplines" X="137.851" Y="636.559" W="1061.82" H="40" CS="10" Exp="True">
-    </Node>
-    <Node Id="LSEE" X="138.475" Y="37.2787" W="1066.83" H="590.799" CS="10" Exp="True">
-      <Node Id="LSEEEditor" X="15" Y="195.46" W="98.512" H="44.4678" CS="10" Exp="True">
+    <Node Id="LSEE" X="144.922" Y="39.0143" W="1066.83" H="590.799" CS="10" Exp="True">
+      <Node Id="L7cb9ca1d-e6e6-4ae6-abe6-0659dfa413ef" X="162" Y="168.129" W="0" H="0" CS="10">
       </Node>
       <Node Id="LSEE.GO" X="440.117" Y="194.795" W="401.383" H="143.209" CS="10" Exp="True">
       </Node>
-      <Node Id="L672fd772-74d5-467b-ac1c-b54be624f023" X="15" Y="303.129" W="66.0002" H="37.125" CS="10" Exp="True">
+      <Node Id="Lb4a60a45-705f-4b6d-b7fb-2face8fddfee" X="15" Y="74.7543" W="78.3752" H="48.375" CS="10" Exp="True">
+      </Node>
+      <Node Id="LSEE.CameraPaths" X="188.543" Y="37.282" W="109.76" H="28.28" CS="10" Exp="True">
       </Node>
       <Node Id="LSEE.Controls" X="875.233" Y="260.843" W="133.518" H="52.1275" CS="10" Exp="True">
       </Node>
-      <Node Id="LSEE.Net" X="875.398" Y="190.892" W="130.856" H="52.7822" CS="10" Exp="True">
-      </Node>
-      <Node Id="Lb4a60a45-705f-4b6d-b7fb-2face8fddfee" X="15" Y="74.7543" W="78.3752" H="48.375" CS="10" Exp="True">
-      </Node>
-      <Node Id="L9973cdd7-e80c-45af-a8db-7a3d12542448" X="202.5" Y="154.629" W="0" H="0" CS="10">
-      </Node>
-      <Node Id="LSEE.CameraPaths" X="188.543" Y="37.282" W="109.76" H="28.28" CS="10" Exp="True">
+      <Node Id="LSEE.Utils" X="100.565" Y="535.799" W="947.517" H="40.0003" CS="10" Exp="True">
       </Node>
       <Node Id="LSEE.DataModel" X="776.474" Y="356.515" W="200.776" H="170.864" CS="10" Exp="True">
         <Node Id="LSEE.DataModel.Runtime" X="106.608" Y="23.5007" W="79.1681" H="80.9886" CS="10" Exp="True">
@@ -52,45 +108,55 @@
         </Node>
       </Node>
       <Node Id="LSEE.Tools" X="983.878" Y="359.751" W="67.9554" H="167.853" CS="10" Exp="True">
+        <Node Id="Lac4a6673-cb0a-4629-817c-b386b65ba547" X="23.3003" Y="85.6427" W="0" H="0" CS="10">
+        </Node>
+        <Node Id="Lea6219b5-018f-4b14-a87d-8c33571513b9" X="21.0503" Y="40.6427" W="0" H="0" CS="10">
+        </Node>
       </Node>
-      <Node Id="LSEE.Utils" X="100.565" Y="535.799" W="947.517" H="40.0003" CS="10" Exp="True">
+      <Node Id="LSEE.Net" X="875.398" Y="190.892" W="130.856" H="52.7822" CS="10" Exp="True">
       </Node>
-      <Node Id="LSEE.Game" X="436.225" Y="21.4618" W="562.775" H="158.334" CS="10" Exp="True">
-        <Node Id="L7cb9ca1d-e6e6-4ae6-abe6-0659dfa413ef" X="68.9002" Y="102.792" W="0" H="0" CS="10">
-        </Node>
-        <Node Id="LSEE.Game.Evolution" X="239.305" Y="17.4972" W="144.203" H="60.7394" CS="10" Exp="True">
-        </Node>
-        <Node Id="LSEE.Game.Runtime" X="48.6833" Y="16.2486" W="164.392" H="60.9003" CS="10" Exp="True">
-        </Node>
-        <Node Id="LSEE.Game.Charts" X="395.775" Y="17.1115" W="152" H="65.2222" CS="10" Exp="True">
-          <Node Id="LSEE.Game.Charts.VR" X="31.1111" Y="30.2222" W="0" H="0" CS="10">
-          </Node>
-        </Node>
-        <Node Id="LSEE.Controls.UI3D" X="238.442" Y="94.4449" W="144.889" H="48.889" CS="10" Exp="True">
-        </Node>
+      <Node Id="LSEEEditor" X="15" Y="195.46" W="98.512" H="44.4678" CS="10" Exp="True">
       </Node>
       <Node Id="LSEE.Layout" X="103.063" Y="354.752" W="665.219" H="173.445" CS="10" Exp="True">
-        <Node Id="LSEE.Layouts.IO" X="504.33" Y="89.8891" W="139.556" H="27.5556" CS="10" Exp="True">
-        </Node>
         <Node Id="LSEE.Layouts.Utils" X="502.552" Y="126.334" W="141.333" H="27.5556" CS="10" Exp="True">
         </Node>
-        <Node Id="LSEE.Layouts.NodeLayouts" X="40.3299" Y="28.3333" W="431.889" H="127.222" CS="10" Exp="True">
+        <Node Id="LSEE.Layouts.IO" X="504.33" Y="89.8891" W="139.556" H="27.5556" CS="10" Exp="True">
+        </Node>
+        <Node Id="LSEE.Layouts.EdgeLayouts" X="505.219" Y="36.5558" W="139.556" H="38.2222" CS="10" Exp="True">
+        </Node>
+        <Node Id="LSEE.Layouts.NodeLayouts" X="40.3299" Y="28.3333" W="431.889" H="128.544" CS="10" Exp="True">
+          <Node Id="Ldc43d43e-03f8-4fda-8cd2-044f28ed38b9" X="307.732" Y="70.794" W="106.875" H="42.75" CS="10" Exp="True">
+          </Node>
           <Node Id="LSEE.Layouts.NodeLayouts.EvoStreets" X="20.7812" Y="17.1111" W="116.997" H="32.8891" CS="10" Exp="True">
           </Node>
-          <Node Id="LSEE.Layouts.NodeLayouts.RectanglePacking" X="149.003" Y="71.3333" W="147.885" H="39.1113" CS="10" Exp="True">
+          <Node Id="LSEE.Layouts.NodeLayouts.TreeMap" X="148.559" Y="18.7778" W="146.552" H="36.5558" CS="10" Exp="True">
           </Node>
           <Node Id="LSEE.Layouts.NodeLayouts.Cose" X="305.778" Y="16.7778" W="111.111" H="40.3336" CS="10" Exp="True">
           </Node>
-          <Node Id="LSEE.Layouts.NodeLayouts.TreeMap" X="148.559" Y="18.7778" W="146.552" H="36.5558" CS="10" Exp="True">
+          <Node Id="LSEE.Layouts.NodeLayouts.RectanglePacking" X="149.003" Y="71.3333" W="147.885" H="39.1113" CS="10" Exp="True">
           </Node>
           <Node Id="LSEE.Layouts.NodeLayouts.CirclePacking" X="17.6701" Y="74.1111" W="122.774" H="38.1113" CS="10" Exp="True">
           </Node>
         </Node>
-        <Node Id="LSEE.Layouts.EdgeLayouts" X="505.219" Y="36.5558" W="139.556" H="38.2222" CS="10" Exp="True">
+      </Node>
+      <Node Id="L672fd772-74d5-467b-ac1c-b54be624f023" X="15" Y="303.129" W="66.0002" H="37.125" CS="10" Exp="True">
+      </Node>
+      <Node Id="LSEE.Game" X="436.225" Y="21.4618" W="562.775" H="158.334" CS="10" Exp="True">
+        <Node Id="LSEE.Game.Charts" X="395.775" Y="17.1115" W="152" H="65.2222" CS="10" Exp="True">
+          <Node Id="LSEE.Game.Charts.VR" X="31.1111" Y="30.2222" W="0" H="0" CS="10">
+          </Node>
+        </Node>
+        <Node Id="LSEE.Game.Evolution" X="239.305" Y="17.4972" W="144.203" H="60.7394" CS="10" Exp="True">
+        </Node>
+        <Node Id="LSEE.Controls.UI3D" X="238.442" Y="94.4449" W="144.889" H="48.889" CS="10" Exp="True">
+        </Node>
+        <Node Id="LSEE.Game.Runtime" X="48.6833" Y="16.2486" W="164.392" H="60.9003" CS="10" Exp="True">
         </Node>
       </Node>
+      <Node Id="L9973cdd7-e80c-45af-a8db-7a3d12542448" X="202.5" Y="154.629" W="0" H="0" CS="10">
+      </Node>
     </Node>
-    <Node Id="LOdinSerializer" X="15" Y="33.731" W="115.6" H="50.177" CS="10" Exp="True">
+    <Node Id="LInControl" X="1225.9" Y="294.655" W="84.0408" H="40" CS="10" Exp="True">
     </Node>
   </Node>
 </Gravis2_Layout>
