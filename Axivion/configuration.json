@@ -226,7 +226,8 @@
             "_active": true
         },
         "Metric-Comment.Preceding": {
-            "_active": true
+            "_active": true,
+            "min_value": null
         },
         "Metric-Coupling": {
             "_active": true
@@ -288,7 +289,8 @@
         },
         "Metric-HIS.STMT": {
             "_active": true,
-            "max_value": 100
+            "max_value": 100,
+            "min_value": null
         },
         "Metric-HIS.VG": {
             "_active": true,
@@ -599,7 +601,7 @@
             "_active": false
         },
         "Metric-TokenFileMetric.Check": {
-            "_active": true
+            "_active": false
         },
         "Metric-TokenFileMetric.Debug": {
             "_active": true
@@ -617,7 +619,7 @@
             "_active": true
         },
         "Metric-TokenMetric.Check": {
-            "_active": true
+            "_active": false
         },
         "Metric-TokenMetric.Debug": {
             "_active": true
