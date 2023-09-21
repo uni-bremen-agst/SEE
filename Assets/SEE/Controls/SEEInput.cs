@@ -364,7 +364,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action</returns>
         internal static bool Drag()
         {
-            return Input.GetMouseButton(MiddleMouseButton);
+            return Input.GetMouseButton(middleMouseButton);
         }
 
         #endregion
@@ -433,17 +433,17 @@ namespace SEE.Controls
         /// <summary>
         /// Index of the left mouse button.
         /// </summary>
-        private const int LeftMouseButton = 0;
+        private const int leftMouseButton = 0;
 
         /// <summary>
         /// Index of the right mouse button.
         /// </summary>
-        private const int RightMouseButton = 1;
+        private const int rightMouseButton = 1;
 
         /// <summary>
         /// Index of the middle mouse button.
         /// </summary>
-        private const int MiddleMouseButton = 2;
+        private const int middleMouseButton = 2;
 
         /// <summary>
         /// Rotates the camera.
@@ -451,8 +451,8 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action</returns>
         public static bool RotateCamera()
         {
-            return Input.GetMouseButton(RightMouseButton)
-                || (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButton(LeftMouseButton));
+            return Input.GetMouseButton(rightMouseButton)
+                || (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButton(leftMouseButton));
         }
 
         /// <summary>

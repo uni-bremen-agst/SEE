@@ -132,16 +132,16 @@ namespace SEE.Game.Charts.VR
         /// </summary>
         private void ScrollInOut()
         {
-            if (!PointerDown || _chartAction.move.Equals(0))
+            if (!PointerDown || _chartAction.Move.Equals(0))
             {
                 return;
             }
 
             Vector3 direction = _pointerCamera.transform.position - _rectTransform.position;
-            float moveBy = _chartAction.move * _chartScrollSpeed * Time.deltaTime;
-            if (!(_chartAction.move < 0 &&
+            float moveBy = _chartAction.Move * _chartScrollSpeed * Time.deltaTime;
+            if (!(_chartAction.Move < 0 &&
                   direction.magnitude < _minimumDistance + moveBy ||
-                  _chartAction.move > 0 &&
+                  _chartAction.Move > 0 &&
                   direction.magnitude > _maximumDistance - moveBy))
             {
                 _parent.position -= direction * moveBy;

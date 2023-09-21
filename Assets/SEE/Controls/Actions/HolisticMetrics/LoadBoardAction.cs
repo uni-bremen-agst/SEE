@@ -65,7 +65,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <summary>
             /// The config of the board that has been loaded.
             /// </summary>
-            internal readonly BoardConfig config;
+            internal readonly BoardConfig Config;
 
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
@@ -73,7 +73,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <param name="config">The config to save in this Memento</param>
             internal Memento(BoardConfig config)
             {
-                this.config = config;
+                this.Config = config;
             }
         }
 
@@ -111,9 +111,9 @@ namespace SEE.Controls.Actions.HolisticMetrics
                         {
                             BoardConfig config = ConfigManager.LoadBoard(filename);
                             memento = new Memento(config);
-                            BoardsManager.Create(memento.config);
-                            new CreateBoardNetAction(memento.config).Execute();
-                            currentState = ReversibleAction.Progress.Completed;
+                            BoardsManager.Create(memento.Config);
+                            new CreateBoardNetAction(memento.Config).Execute();
+                            CurrentState = ReversibleAction.Progress.Completed;
                             return true;
                         }
                         catch (Exception exception)
@@ -149,8 +149,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Undo()
         {
             base.Undo();
-            BoardsManager.Delete(memento.config.Title);
-            new DeleteBoardNetAction(memento.config.Title).Execute();
+            BoardsManager.Delete(memento.Config.Title);
+            new DeleteBoardNetAction(memento.Config.Title).Execute();
         }
 
         /// <summary>
@@ -159,8 +159,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Redo()
         {
             base.Redo();
-            BoardsManager.Create(memento.config);
-            new CreateBoardNetAction(memento.config).Execute();
+            BoardsManager.Create(memento.Config);
+            new CreateBoardNetAction(memento.Config).Execute();
         }
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// strings</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string> { memento.config.Title };
+            return new HashSet<string> { memento.Config.Title };
         }
     }
 }

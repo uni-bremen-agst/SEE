@@ -56,7 +56,7 @@ namespace SEE.Controls
         public override void Stop()
         {
             if (recognizer != null)
-            {               
+            {
                 recognizer.DictationComplete -= OnDictationComplete;
                 recognizer.DictationError -= OnDictationError;
 
@@ -193,7 +193,7 @@ namespace SEE.Controls
         /// </summary>
         /// <param name="error">the error message</param>
         /// <param name="hresult">HRESULT code that corresponds to the error</param>
-        private void OnDictationError(string error, int hresult)
+        private static void OnDictationError(string error, int hresult)
         {
             Debug.Log($"Dictation error: {error} with hresult code: {hresult}.\n");
         }

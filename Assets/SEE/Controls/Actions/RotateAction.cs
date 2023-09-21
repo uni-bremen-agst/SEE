@@ -39,8 +39,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void Initialize()
         {
-            currentState = ReversibleAction.Progress.NoEffect;
-            gizmo = new RotateGizmo();
+            CurrentState = ReversibleAction.Progress.NoEffect;
+            usedGizmo = new RotateGizmo();
         }
 
         #endregion Constructors
@@ -62,9 +62,9 @@ namespace SEE.Controls.Actions
         /// <returns>new instance</returns>
         public override ReversibleAction NewInstance()
         {
-            if (gameNodeToBeContinuedInNextAction)
+            if (GameNodeToBeContinuedInNextAction)
             {
-                return new RotateAction(gameNodeToBeContinuedInNextAction);
+                return new RotateAction(GameNodeToBeContinuedInNextAction);
             }
             else
             {
@@ -115,7 +115,7 @@ namespace SEE.Controls.Actions
             protected override void Transform(Quaternion rotation)
             {
                 base.Transform(rotation);
-                nodeOperator.RotateTo(rotation);
+                NodeOperator.RotateTo(rotation);
             }
 
             /// <summary>
@@ -124,7 +124,7 @@ namespace SEE.Controls.Actions
             /// <param name="rotation">rotation to be broadcast</param>
             protected override void BroadcastState(Quaternion rotation)
             {
-                new RotateNodeNetAction(nodeOperator.name, rotation).Execute();
+                new RotateNodeNetAction(NodeOperator.name, rotation).Execute();
             }
         }
 
@@ -135,7 +135,7 @@ namespace SEE.Controls.Actions
         protected override void FinalizeAction()
         {
             base.FinalizeAction();
-            memento.Finalize(gameNodeSelected.transform.rotation);
+            gameNodeMemento.Finalize(GameNodeSelected.transform.rotation);
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace SEE.Controls.Actions
         /// <returns>true if the object to be manipulated has had a change</returns>
         protected override bool HasChanges()
         {
-            return gameNodeSelected.transform.rotation != memento.InitialState;
+            return GameNodeSelected.transform.rotation != gameNodeMemento.InitialState;
         }
 
         protected override Memento<Quaternion> CreateMemento(GameObject gameNode)

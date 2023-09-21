@@ -11,17 +11,17 @@ namespace SEE.Audio
         /// The name of the scene to start the game, i.e., the one in which the
         /// user can configure the network configuration and enter the game.
         /// </summary>
-        const string StartScene = "SEEStart";
+        private const string startScene = "SEEStart";
 
         /// <summary>
         /// Returns <see cref="SceneType.Lobby"/> if <paramref name="scene"/>
-        /// is the <see cref="StartScene"/> or otherwise <see cref="SceneType.InGame"/>.
+        /// is the <see cref="startScene"/> or otherwise <see cref="SceneType.InGame"/>.
         /// </summary>
         /// <param name="scene">The currently loaded scene.</param>
         /// <returns>A game state enum for the given scene.</returns>
         public static SceneType GetSceneType(Scene scene) => scene.name switch
         {
-            StartScene => SceneType.Lobby,
+            startScene => SceneType.Lobby,
             _          => SceneType.InGame,
         };
 

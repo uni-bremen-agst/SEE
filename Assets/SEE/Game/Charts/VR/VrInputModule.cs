@@ -102,12 +102,12 @@ namespace SEE.Game.Charts.VR
         {
             HandlePointerExitAndEnter(EventData, hitData.transform.gameObject);
             ExecuteEvents.Execute(EventData.pointerDrag, EventData, ExecuteEvents.dragHandler);
-            if (_chartAction.clickDown)
+            if (_chartAction.ClickDown)
             {
                 Press(hitData.transform.gameObject);
             }
 
-            if (_chartAction.clickUp)
+            if (_chartAction.ClickUp)
             {
                 Release(hitData.transform.gameObject);
             }
@@ -117,12 +117,12 @@ namespace SEE.Game.Charts.VR
         {
             HandlePointerExitAndEnter(EventData, EventData.pointerCurrentRaycast.gameObject);
             ExecuteEvents.Execute(EventData.pointerDrag, EventData, ExecuteEvents.dragHandler);
-            if (_chartAction.clickDown)
+            if (_chartAction.ClickDown)
             {
                 Press(EventData.pointerCurrentRaycast.gameObject);
             }
 
-            if (_chartAction.clickUp)
+            if (_chartAction.ClickUp)
             {
                 Release(EventData.pointerCurrentRaycast.gameObject);
             }

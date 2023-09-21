@@ -34,7 +34,7 @@ namespace SEE.DataModel.DG
         /// Observer for graph elements. This way, changes in each element (e.g., attribute changes) are also
         /// propagated through the graph's own observable implementation.
         /// </summary>
-        private readonly ProxyObserver ElementObserver;
+        private readonly ProxyObserver elementObserver;
 
         /// <summary>
         /// Indicates whether the node hierarchy has changed and, hence,
@@ -84,7 +84,7 @@ namespace SEE.DataModel.DG
         {
             Name = name;
             BasePath = basePath;
-            ElementObserver = new ProxyObserver(this, x => x.CopyWithGuid(version));
+            elementObserver = new ProxyObserver(this, x => x.CopyWithGuid(Version));
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace SEE.DataModel.DG
         /// <param name="graph">The graph to copy from. Note that this will be a deep copy.</param>
         public Graph(Graph copyFrom)
         {
-            ElementObserver = new ProxyObserver(this, x => x.CopyWithGuid(version));
+            elementObserver = new ProxyObserver(this, x => x.CopyWithGuid(Version));
             copyFrom.HandleCloned(this);
         }
 
@@ -138,8 +138,8 @@ namespace SEE.DataModel.DG
             nodes[node.ID] = node;
             node.ItsGraph = this;
             NodeHierarchyHasChanged = true;
-            Notify(new NodeEvent(version, node, ChangeType.Addition));
-            ElementObserver.AddDisposable(node.Subscribe(ElementObserver));
+            Notify(new NodeEvent(Version, node, ChangeType.Addition));
+            elementObserver.AddDisposable(node.Subscribe(elementObserver));
         }
 
         /// <summary>
@@ -176,13 +176,13 @@ namespace SEE.DataModel.DG
             {
 
                 // We need to send out this event here, before the node is modified but after it has been removed.
-                Notify(new NodeEvent(version, node, ChangeType.Removal));
+                Notify(new NodeEvent(Version, node, ChangeType.Removal));
 
                 // The edges of node are stored in the node's data structure as well as
                 // in the node's neighbor's data structure.
                 foreach (Edge outgoing in node.Outgoings)
                 {
-                    Notify(new EdgeEvent(version, outgoing, ChangeType.Removal));
+                    Notify(new EdgeEvent(Version, outgoing, ChangeType.Removal));
                     Node successor = outgoing.Target;
                     successor.RemoveIncoming(outgoing);
                     edges.Remove(outgoing.ID);
@@ -191,7 +191,7 @@ namespace SEE.DataModel.DG
 
                 foreach (Edge incoming in node.Incomings)
                 {
-                    Notify(new EdgeEvent(version, incoming, ChangeType.Removal));
+                    Notify(new EdgeEvent(Version, incoming, ChangeType.Removal));
                     Node predecessor = incoming.Source;
                     predecessor.RemoveOutgoing(incoming);
                     edges.Remove(incoming.ID);
@@ -414,8 +414,8 @@ namespace SEE.DataModel.DG
                 edges[edge.ID] = edge;
                 edge.Source.AddOutgoing(edge);
                 edge.Target.AddIncoming(edge);
-                Notify(new EdgeEvent(version, edge, ChangeType.Addition));
-                ElementObserver.AddDisposable(edge.Subscribe(ElementObserver));
+                Notify(new EdgeEvent(Version, edge, ChangeType.Addition));
+                elementObserver.AddDisposable(edge.Subscribe(elementObserver));
             }
             else
             {
@@ -449,7 +449,7 @@ namespace SEE.DataModel.DG
                 throw new InvalidOperationException($"Edge {edge} is not contained in graph {Name}.");
             }
 
-            Notify(new EdgeEvent(version, edge, ChangeType.Removal));
+            Notify(new EdgeEvent(Version, edge, ChangeType.Removal));
             edge.Source.RemoveOutgoing(edge);
             edge.Target.RemoveIncoming(edge);
             edges.Remove(edge.ID);
@@ -640,7 +640,7 @@ namespace SEE.DataModel.DG
             edges.Clear();
             nodes.Clear();
             NotifyComplete();
-            ElementObserver.Reset();
+            elementObserver.Reset();
         }
 
         /// <summary>

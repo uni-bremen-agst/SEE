@@ -81,7 +81,7 @@ namespace SEE.DataModel.DG
         /// <param name="attributeName">name of the toggle attribute</param>
         /// <param name="value">true if <paramref name="element"/> has the toggle attribute <paramref name="attributeName"/></param>
         /// <returns>true if <paramref name="element"/> has the toggle attribute <paramref name="attributeName"/></returns>
-        private bool TryGetToggle(GraphElement element, string attributeName, out bool value)
+        private static bool TryGetToggle(GraphElement element, string attributeName, out bool value)
         {
             value = element.HasToggle(attributeName);
             return value;

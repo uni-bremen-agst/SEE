@@ -57,13 +57,13 @@ namespace SEE.Controls.Actions
         public override void Start()
         {
             syncAction = new SyncWindowSpaceAction();
-            spaceManager.OnActiveWindowChanged.AddListener(() => syncAction.UpdateSpace(spaceManager[WindowSpaceManager.LOCAL_PLAYER]));
+            spaceManager.OnActiveWindowChanged.AddListener(() => syncAction.UpdateSpace(spaceManager[WindowSpaceManager.LocalPlayer]));
         }
 
         public override bool Update()
         {
             // Only allow local player to open new code windows
-            if (spaceManager.CurrentPlayer == WindowSpaceManager.LOCAL_PLAYER
+            if (spaceManager.CurrentPlayer == WindowSpaceManager.LocalPlayer
                 && SEEInput.Select()
                 && Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef graphElementRef) != HitGraphElement.None)
             {
@@ -105,12 +105,12 @@ namespace SEE.Controls.Actions
                 codeWindow.SolutionPath = city.SolutionPath.Path;
 
                 // Add code window to our space of code window, if it isn't in there yet
-                if (!spaceManager[WindowSpaceManager.LOCAL_PLAYER].Windows.Contains(codeWindow))
+                if (!spaceManager[WindowSpaceManager.LocalPlayer].Windows.Contains(codeWindow))
                 {
-                    spaceManager[WindowSpaceManager.LOCAL_PLAYER].AddWindow(codeWindow);
-                    codeWindow.ScrollEvent.AddListener(() => syncAction.UpdateSpace(spaceManager[WindowSpaceManager.LOCAL_PLAYER]));
+                    spaceManager[WindowSpaceManager.LocalPlayer].AddWindow(codeWindow);
+                    codeWindow.ScrollEvent.AddListener(() => syncAction.UpdateSpace(spaceManager[WindowSpaceManager.LocalPlayer]));
                 }
-                spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = codeWindow;
+                spaceManager[WindowSpaceManager.LocalPlayer].ActiveWindow = codeWindow;
                 // TODO: Set font size etc in settings (maybe, or maybe that's too much)
             }
 

@@ -153,10 +153,10 @@ namespace SEE.DataModel.DG
                     case null when oldParent == null: // Nothing to be done.
                         break;
                     case null: // value is null while parent is not, so the parent has been removed.
-                        Notify(new HierarchyEvent(version, oldParent, this, ChangeType.Removal));
+                        Notify(new HierarchyEvent(Version, oldParent, this, ChangeType.Removal));
                         break;
                     default: // value != null, so the parent has been added or changed
-                        Notify(new HierarchyEvent(version, value, this, ChangeType.Addition));
+                        Notify(new HierarchyEvent(Version, value, this, ChangeType.Addition));
                         break;
                 }
             }

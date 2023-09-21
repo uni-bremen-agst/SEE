@@ -69,7 +69,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         ~DeleteAction()
         {
-            if (deletedGameObjects != null && currentState == ReversibleAction.Progress.Completed)
+            if (deletedGameObjects != null && CurrentState == ReversibleAction.Progress.Completed)
             {
                 foreach (GameObject nodeOrEdge in deletedGameObjects)
                 {
@@ -124,7 +124,7 @@ namespace SEE.Controls.Actions
                 InteractableObject.UnselectAll(true);
                 (_, deletedGameObjects) = GameElementDeleter.Delete(hitGraphElement);
                 new DeleteNetAction(hitGraphElement.name).Execute();
-                currentState = ReversibleAction.Progress.Completed;
+                CurrentState = ReversibleAction.Progress.Completed;
                 AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
                 return true; // the selected objects are deleted and this action is done now
             }

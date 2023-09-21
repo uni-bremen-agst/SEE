@@ -20,32 +20,32 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// This struct can store all the information needed to revert or repeat a <see cref="MoveBoardAction"/>.
         /// </summary>
-        private struct Memento
+        private readonly struct Memento
         {
             /// <summary>
             /// The name of the board that will be moved.
             /// </summary>
-            internal readonly string boardName;
+            internal readonly string BoardName;
 
             /// <summary>
             /// The old position of the board so we can revert this action.
             /// </summary>
-            internal readonly Vector3 oldPosition;
+            internal readonly Vector3 OldPosition;
 
             /// <summary>
             /// The position to which the board is to be moved by this action.
             /// </summary>
-            internal readonly Vector3 newPosition;
+            internal readonly Vector3 NewPosition;
 
             /// <summary>
             /// The old rotation that the board had, so we can revert this action.
             /// </summary>
-            internal readonly Quaternion oldRotation;
+            internal readonly Quaternion OldRotation;
 
             /// <summary>
             /// The new rotation to which the board will be set.
             /// </summary>
-            internal readonly Quaternion newRotation;
+            internal readonly Quaternion NewRotation;
 
             /// <summary>
             /// Initializes the fields of this instance.
@@ -58,11 +58,11 @@ namespace SEE.Controls.Actions.HolisticMetrics
             internal Memento(string boardName, Vector3 oldPosition, Vector3 newPosition, Quaternion oldRotation,
                 Quaternion newRotation)
             {
-                this.boardName = boardName;
-                this.oldPosition = oldPosition;
-                this.newPosition = newPosition;
-                this.oldRotation = oldRotation;
-                this.newRotation = newRotation;
+                this.BoardName = boardName;
+                this.OldPosition = oldPosition;
+                this.NewPosition = newPosition;
+                this.OldRotation = oldRotation;
+                this.NewRotation = newRotation;
             }
         }
 
@@ -85,9 +85,9 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     out Quaternion oldRotation, out Quaternion newRotation))
             {
                 memento = new Memento(boardName, oldPosition, newPosition, oldRotation, newRotation);
-                BoardsManager.Move(memento.boardName, memento.newPosition, memento.newRotation);
-                new MoveBoardNetAction(memento.boardName, memento.newPosition, memento.newRotation).Execute();
-                currentState = ReversibleAction.Progress.Completed;
+                BoardsManager.Move(memento.BoardName, memento.NewPosition, memento.NewRotation);
+                new MoveBoardNetAction(memento.BoardName, memento.NewPosition, memento.NewRotation).Execute();
+                CurrentState = ReversibleAction.Progress.Completed;
                 return true;
             }
 
@@ -109,8 +109,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Undo()
         {
             base.Undo();
-            BoardsManager.Move(memento.boardName, memento.oldPosition, memento.oldRotation);
-            new MoveBoardNetAction(memento.boardName, memento.oldPosition, memento.oldRotation).Execute();
+            BoardsManager.Move(memento.BoardName, memento.OldPosition, memento.OldRotation);
+            new MoveBoardNetAction(memento.BoardName, memento.OldPosition, memento.OldRotation).Execute();
         }
 
         /// <summary>
@@ -121,8 +121,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Redo()
         {
             base.Redo();
-            BoardsManager.Move(memento.boardName, memento.newPosition, memento.newRotation);
-            new MoveBoardNetAction(memento.boardName, memento.newPosition, memento.newRotation).Execute();
+            BoardsManager.Move(memento.BoardName, memento.NewPosition, memento.NewRotation);
+            new MoveBoardNetAction(memento.BoardName, memento.NewPosition, memento.NewRotation).Execute();
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <returns>A HashSet with one item which is the name of the board that was moved in this action</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string> { memento.boardName };
+            return new HashSet<string> { memento.BoardName };
         }
 
         /// <summary>

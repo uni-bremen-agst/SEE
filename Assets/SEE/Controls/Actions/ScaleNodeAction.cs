@@ -41,8 +41,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void Initialize()
         {
-            currentState = ReversibleAction.Progress.NoEffect;
-            gizmo = new ScaleGizmo();
+            CurrentState = ReversibleAction.Progress.NoEffect;
+            usedGizmo = new ScaleGizmo();
         }
 
         #endregion Constructors
@@ -64,9 +64,9 @@ namespace SEE.Controls.Actions
         /// <returns>new instance</returns>
         public override ReversibleAction NewInstance()
         {
-            if (gameNodeToBeContinuedInNextAction)
+            if (GameNodeToBeContinuedInNextAction)
             {
-                return new ScaleNodeAction(gameNodeToBeContinuedInNextAction);
+                return new ScaleNodeAction(GameNodeToBeContinuedInNextAction);
             }
             else
             {
@@ -113,7 +113,7 @@ namespace SEE.Controls.Actions
             protected override void Transform(Vector3 localScale)
             {
                 base.Transform(localScale);
-                nodeOperator.ScaleTo(localScale);
+                NodeOperator.ScaleTo(localScale);
             }
 
             /// <summary>
@@ -122,7 +122,7 @@ namespace SEE.Controls.Actions
             /// <param name="localScale">local scale to be broadcast</param>
             protected override void BroadcastState(Vector3 localScale)
             {
-                new ScaleNodeNetAction(nodeOperator.name, localScale).Execute();
+                new ScaleNodeNetAction(NodeOperator.name, localScale).Execute();
             }
         }
 
@@ -133,7 +133,7 @@ namespace SEE.Controls.Actions
         protected override void FinalizeAction()
         {
             base.FinalizeAction();
-            memento.Finalize(gameNodeSelected.transform.localScale);
+            gameNodeMemento.Finalize(GameNodeSelected.transform.localScale);
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace SEE.Controls.Actions
         /// <returns>true if the object to be manipulated has had a change</returns>
         protected override bool HasChanges()
         {
-            return gameNodeSelected.transform.localScale != memento.InitialState;
+            return GameNodeSelected.transform.localScale != gameNodeMemento.InitialState;
         }
 
         protected override Memento<Vector3> CreateMemento(GameObject gameNode)

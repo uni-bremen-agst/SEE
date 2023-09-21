@@ -58,8 +58,8 @@ namespace SEE.Controls.Actions
             async UniTaskVoid SetupManager()
             {
                 // We need to wait until the WindowSpaceManager has been initialized.
-                await UniTask.WaitUntil(() => WindowSpaceManager.ManagerInstance[WindowSpaceManager.LOCAL_PLAYER] != null);
-                space = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LOCAL_PLAYER];
+                await UniTask.WaitUntil(() => WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer] != null);
+                space = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
                 foreach (string city in treeWindows.Keys)
                 {
                     space.AddWindow(treeWindows[city]);

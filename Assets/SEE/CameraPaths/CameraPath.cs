@@ -108,14 +108,14 @@ namespace SEE.CameraPaths
 
             foreach (PathData d in data)
             {
-                Vector3 rotation = d.rotation.eulerAngles;
-                string output = FloatToString(d.position.x)
-                              + delimiter + FloatToString(d.position.y)
-                              + delimiter + FloatToString(d.position.z)
+                Vector3 rotation = d.Rotation.eulerAngles;
+                string output = FloatToString(d.Position.x)
+                              + delimiter + FloatToString(d.Position.y)
+                              + delimiter + FloatToString(d.Position.z)
                               + delimiter + FloatToString(rotation.x)
                               + delimiter + FloatToString(rotation.y)
                               + delimiter + FloatToString(rotation.z)
-                              + delimiter + FloatToString(d.time);
+                              + delimiter + FloatToString(d.Time);
                 outputs.Add(output);
             }
 
@@ -260,7 +260,7 @@ namespace SEE.CameraPaths
                     isStatic = true
                 };
                 direction.transform.parent = pathGameObject.transform;
-                direction.transform.position = d.position;
+                direction.transform.position = d.Position;
 
                 LineRenderer line = direction.AddComponent<LineRenderer>();
 
@@ -280,8 +280,8 @@ namespace SEE.CameraPaths
                 // Line from the surface of the sphere along the direction of the lookout
                 // proportional to the length of the lookout
                 Vector3[] positions = new Vector3[2];
-                positions[0] = d.position;
-                positions[1] = positions[0] + d.rotation * Vector3.forward * d.time * timeFactor;
+                positions[0] = d.Position;
+                positions[1] = positions[0] + d.Rotation * Vector3.forward * d.Time * timeFactor;
 
                 line.positionCount = positions.Length;
                 line.SetPositions(positions);
@@ -367,7 +367,7 @@ namespace SEE.CameraPaths
                 else if (CompareTo(d, current) == 0)
                 {
                     // d and current are in the same group
-                    current.time += d.time;
+                    current.Time += d.Time;
                 }
                 else
                 {
@@ -396,12 +396,12 @@ namespace SEE.CameraPaths
             // We do not really care about the precise order as we use this order only
             // for the aggregation. The main concern is that all path entries with
             // similar position and rotation are neighbors in the resulting order.
-            int positionCompareTo = CompareTo(x.position, y.position, allowedDifference);
+            int positionCompareTo = CompareTo(x.Position, y.Position, allowedDifference);
             if (positionCompareTo != 0)
             {
                 return positionCompareTo;
             }
-            return CompareTo(x.rotation.eulerAngles, y.rotation.eulerAngles, allowedDifference);
+            return CompareTo(x.Rotation.eulerAngles, y.Rotation.eulerAngles, allowedDifference);
         }
 
         /// <summary>
@@ -432,7 +432,7 @@ namespace SEE.CameraPaths
             int i = 0;
             foreach (PathData d in data)
             {
-                positions[i] = d.position;
+                positions[i] = d.Position;
                 i++;
             }
 
@@ -459,9 +459,9 @@ namespace SEE.CameraPaths
         {
             foreach (PathData d in data)
             {
-                Debug.LogFormat($"position(x,y,z)={d.position} rotation={d.rotation}, "
-                    + $"rotation(x, y, z, w)= ({d.rotation.x:0.000}, {d.rotation.y:0.000}, {d.rotation.z:0.000}, {d.rotation.w:0.000}), "
-                    + $"rotation(Euler angles)={Dump(d.rotation.eulerAngles)}, time={d.time})\n");
+                Debug.LogFormat($"position(x,y,z)={d.Position} rotation={d.Rotation}, "
+                    + $"rotation(x, y, z, w)= ({d.Rotation.x:0.000}, {d.Rotation.y:0.000}, {d.Rotation.z:0.000}, {d.Rotation.w:0.000}), "
+                    + $"rotation(Euler angles)={Dump(d.Rotation.eulerAngles)}, time={d.Time})\n");
             }
         }
     }

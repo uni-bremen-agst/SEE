@@ -24,12 +24,12 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <summary>
             /// The name of the board from which to delete the widget.
             /// </summary>
-            internal readonly string boardName;
+            internal readonly string BoardName;
 
             /// <summary>
             /// The configuration of the widget, so it can be restored.
             /// </summary>
-            internal readonly WidgetConfig widgetConfig;
+            internal readonly WidgetConfig WidgetConfig;
 
             /// <summary>
             /// Writes the two parameter values into fields of the class.
@@ -38,8 +38,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <param name="widgetConfig">The configuration of the widget, so it can be restored</param>
             internal Memento(string boardName, WidgetConfig widgetConfig)
             {
-                this.boardName = boardName;
-                this.widgetConfig = widgetConfig;
+                this.BoardName = boardName;
+                this.WidgetConfig = widgetConfig;
             }
         }
 
@@ -60,20 +60,20 @@ namespace SEE.Controls.Actions.HolisticMetrics
             if (BoardsManager.TryGetWidgetDeletion(out string boardName, out WidgetConfig widgetConfig))
             {
                 memento = new Memento(boardName, widgetConfig);
-                WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
+                WidgetsManager widgetsManager = BoardsManager.Find(memento.BoardName);
 
                 if (widgetsManager != null)
                 {
-                    widgetsManager.Delete(memento.widgetConfig.ID);
-                    new DeleteWidgetNetAction(memento.boardName, memento.widgetConfig.ID).Execute();
+                    widgetsManager.Delete(memento.WidgetConfig.ID);
+                    new DeleteWidgetNetAction(memento.BoardName, memento.WidgetConfig.ID).Execute();
                 }
                 else
                 {
-                    Debug.LogError($"Tried to delete a widget from a board named {memento.boardName} that " +
+                    Debug.LogError($"Tried to delete a widget from a board named {memento.BoardName} that " +
                                    $"could not be found.\n");
                 }
 
-                currentState = ReversibleAction.Progress.Completed;
+                CurrentState = ReversibleAction.Progress.Completed;
                 return true;
             }
             return false;
@@ -93,16 +93,16 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Redo()
         {
             base.Redo();
-            WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
+            WidgetsManager widgetsManager = BoardsManager.Find(memento.BoardName);
 
             if (widgetsManager != null)
             {
-                widgetsManager.Delete(memento.widgetConfig.ID);
-                new DeleteWidgetNetAction(memento.boardName, memento.widgetConfig.ID).Execute();
+                widgetsManager.Delete(memento.WidgetConfig.ID);
+                new DeleteWidgetNetAction(memento.BoardName, memento.WidgetConfig.ID).Execute();
             }
             else
             {
-                Debug.LogError($"Tried to delete a widget from a board named {memento.boardName} that " +
+                Debug.LogError($"Tried to delete a widget from a board named {memento.BoardName} that " +
                                $"could not be found.\n");
             }
         }
@@ -113,16 +113,16 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Undo()
         {
             base.Undo();
-            WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
+            WidgetsManager widgetsManager = BoardsManager.Find(memento.BoardName);
 
             if (widgetsManager != null)
             {
-                widgetsManager.Create(memento.widgetConfig);
-                new CreateWidgetNetAction(memento.boardName, memento.widgetConfig).Execute();
+                widgetsManager.Create(memento.WidgetConfig);
+                new CreateWidgetNetAction(memento.BoardName, memento.WidgetConfig).Execute();
             }
             else
             {
-                Debug.LogError($"Tried to create a widget on a board named {memento.boardName} that " +
+                Debug.LogError($"Tried to create a widget on a board named {memento.BoardName} that " +
                                $"could not be found.\n");
             }
         }
@@ -151,7 +151,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <returns>A HashSet of strings containing one item which is the ID of the widget that was moved</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string> { memento.widgetConfig.ID.ToString() };
+            return new HashSet<string> { memento.WidgetConfig.ID.ToString() };
         }
 
         /// <summary>

@@ -26,22 +26,22 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <summary>
             /// The name of the board by which we identify the board on which the widget to be moved should be.
             /// </summary>
-            public readonly string boardName;
+            public readonly string BoardName;
 
             /// <summary>
             /// The ID of the widget to be moved, so we can identify it.
             /// </summary>
-            public readonly Guid widgetID;
+            public readonly Guid WidgetID;
 
             /// <summary>
             /// The old position of the widget, so we can reset it to that position if needed.
             /// </summary>
-            public readonly Vector3 oldPosition;
+            public readonly Vector3 OldPosition;
 
             /// <summary>
             /// The new position of the widget to which the widget will be moved.
             /// </summary>
-            public readonly Vector3 newPosition;
+            public readonly Vector3 NewPosition;
 
             /// <summary>
             /// The constructor of this struct; this just assigns its parameters to this classes' fields.
@@ -52,10 +52,10 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <param name="newPosition">The position to which the widget was moved in this action</param>
             public Memento(string boardName, Guid widgetID, Vector3 oldPosition, Vector3 newPosition)
             {
-                this.boardName = boardName;
-                this.widgetID = widgetID;
-                this.oldPosition = oldPosition;
-                this.newPosition = newPosition;
+                this.BoardName = boardName;
+                this.WidgetID = widgetID;
+                this.OldPosition = oldPosition;
+                this.NewPosition = newPosition;
             }
         }
 
@@ -80,18 +80,18 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     out Guid widgetID))
             {
                 memento = new Memento(boardName, widgetID, oldPosition, newPosition);
-                WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
+                WidgetsManager widgetsManager = BoardsManager.Find(memento.BoardName);
                 if (widgetsManager != null)
                 {
-                    widgetsManager.Move(memento.widgetID, memento.newPosition);
-                    new MoveWidgetNetAction(memento.boardName, memento.widgetID, memento.newPosition).Execute();
+                    widgetsManager.Move(memento.WidgetID, memento.NewPosition);
+                    new MoveWidgetNetAction(memento.BoardName, memento.WidgetID, memento.NewPosition).Execute();
                 }
                 else
                 {
-                    Debug.LogError($"Could not find the board {memento.boardName} for moving a widget on it.\n");
+                    Debug.LogError($"Could not find the board {memento.BoardName} for moving a widget on it.\n");
                 }
 
-                currentState = ReversibleAction.Progress.Completed;
+                CurrentState = ReversibleAction.Progress.Completed;
                 return true;
             }
 
@@ -112,15 +112,15 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Undo()
         {
             base.Undo();
-            WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
+            WidgetsManager widgetsManager = BoardsManager.Find(memento.BoardName);
             if (widgetsManager != null)
             {
-                widgetsManager.Move(memento.widgetID, memento.oldPosition);
-                new MoveWidgetNetAction(memento.boardName, memento.widgetID, memento.oldPosition).Execute();
+                widgetsManager.Move(memento.WidgetID, memento.OldPosition);
+                new MoveWidgetNetAction(memento.BoardName, memento.WidgetID, memento.OldPosition).Execute();
             }
             else
             {
-                Debug.LogError($"Could not find the board {memento.boardName} for moving a widget on it.\n");
+                Debug.LogError($"Could not find the board {memento.BoardName} for moving a widget on it.\n");
             }
         }
 
@@ -130,15 +130,15 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Redo()
         {
             base.Redo();
-            WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
+            WidgetsManager widgetsManager = BoardsManager.Find(memento.BoardName);
             if (widgetsManager != null)
             {
-                widgetsManager.Move(memento.widgetID, memento.newPosition);
-                new MoveWidgetNetAction(memento.boardName, memento.widgetID, memento.newPosition).Execute();
+                widgetsManager.Move(memento.WidgetID, memento.NewPosition);
+                new MoveWidgetNetAction(memento.BoardName, memento.WidgetID, memento.NewPosition).Execute();
             }
             else
             {
-                Debug.LogError($"Could not find the board {memento.boardName} for moving a widget on it.\n");
+                Debug.LogError($"Could not find the board {memento.BoardName} for moving a widget on it.\n");
             }
         }
 
@@ -166,7 +166,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <returns>A HashSet with one item which is the ID of the widget that was moved in this action</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string> { memento.widgetID.ToString() };
+            return new HashSet<string> { memento.WidgetID.ToString() };
         }
 
         /// <summary>

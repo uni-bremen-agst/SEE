@@ -127,7 +127,7 @@ namespace SEE.Controls.Actions
 
                     DrawLine();
                     // The line has been continued so this action has had a visible effect.
-                    currentState = ReversibleAction.Progress.Completed;
+                    CurrentState = ReversibleAction.Progress.Completed;
                 }
                 if (Input.GetMouseButtonDown(0))
                 {

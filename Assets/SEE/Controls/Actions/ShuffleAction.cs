@@ -41,17 +41,17 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The number of degrees in a full circle.
         /// </summary>
-        private const float FullCircleDegree = 360.0f;
+        private const float fullCircleDegree = 360.0f;
 
         /// <summary>
         /// The number of snap steps in the circle.
         /// </summary>
-        private const float SnapStepCount = 8;
+        private const float snapStepCount = 8;
 
         /// <summary>
         /// The angle of each snap step in the circle in degrees.
         /// </summary>
-        private const float SnapStepAngle = FullCircleDegree / SnapStepCount;
+        private const float snapStepAngle = fullCircleDegree / snapStepCount;
 
         /// <summary>
         /// The gizmo serving as a visual aid for the shuffling.
@@ -136,7 +136,7 @@ namespace SEE.Controls.Actions
                     {
                         Vector2 point2 = new(totalDragOffsetFromStart.x, totalDragOffsetFromStart.z);
                         float angleDeg = point2.Angle360();
-                        float snappedAngleDeg = Mathf.Round(angleDeg / SnapStepAngle) * SnapStepAngle;
+                        float snappedAngleDeg = Mathf.Round(angleDeg / snapStepAngle) * snapStepAngle;
                         float snappedAngleRad = Mathf.Deg2Rad * snappedAngleDeg;
                         Vector2 dir = new(Mathf.Cos(snappedAngleRad), Mathf.Sin(-snappedAngleRad));
                         Vector2 proj = dir * Vector2.Dot(point2, dir);

@@ -50,12 +50,12 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// This struct can store all the information needed to revert or repeat an <see cref="AddBoardAction"/>.
         /// </summary>
-        private struct Memento
+        private readonly struct Memento
         {
             /// <summary>
             /// The configuration of the board to create/that has been created.
             /// </summary>
-            internal readonly BoardConfig boardConfig;
+            internal readonly BoardConfig BoardConfig;
 
             /// <summary>
             /// Creates this action. That does not execute it, it only prepares it.
@@ -63,7 +63,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <param name="boardConfig">The configuration of the board to create.</param>
             internal Memento(BoardConfig boardConfig)
             {
-                this.boardConfig = boardConfig;
+                this.BoardConfig = boardConfig;
             }
         }
 
@@ -97,7 +97,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                 case ProgressState.GettingRotation:
                     if (AddBoardSliderController.TryGetRotation(out Quaternion rotation))
                     {
-                        memento.boardConfig.Rotation = rotation;
+                        memento.BoardConfig.Rotation = rotation;
                         BoardAdder.Stop();
                         progress = ProgressState.GettingName;
                         addBoardDialog = new AddBoardDialog();
@@ -108,10 +108,10 @@ namespace SEE.Controls.Actions.HolisticMetrics
                 case ProgressState.GettingName:
                     if (addBoardDialog.TryGetName(out string name))
                     {
-                        memento.boardConfig.Title = name;
-                        BoardsManager.Create(memento.boardConfig);
-                        new CreateBoardNetAction(memento.boardConfig).Execute();
-                        currentState = ReversibleAction.Progress.Completed;
+                        memento.BoardConfig.Title = name;
+                        BoardsManager.Create(memento.BoardConfig);
+                        new CreateBoardNetAction(memento.BoardConfig).Execute();
+                        CurrentState = ReversibleAction.Progress.Completed;
                         return true;
                     }
 
@@ -141,8 +141,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Undo()
         {
             base.Undo();
-            BoardsManager.Delete(memento.boardConfig.Title);
-            new DeleteBoardNetAction(memento.boardConfig.Title).Execute();
+            BoardsManager.Delete(memento.BoardConfig.Title);
+            new DeleteBoardNetAction(memento.BoardConfig.Title).Execute();
         }
 
         /// <summary>
@@ -151,8 +151,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Redo()
         {
             base.Redo();
-            BoardsManager.Create(memento.boardConfig);
-            new CreateBoardNetAction(memento.boardConfig).Execute();
+            BoardsManager.Create(memento.BoardConfig);
+            new CreateBoardNetAction(memento.BoardConfig).Execute();
         }
 
         /// <summary>
@@ -179,7 +179,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <returns>A HashSet with one string in it which is the name of the new board.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string> { memento.boardConfig.Title };
+            return new HashSet<string> { memento.BoardConfig.Title };
         }
 
         /// <summary>

@@ -39,7 +39,7 @@ namespace SEE.DataModel
         /// Note that this only counts towards direct changes—e.g., a <see cref="MapsToEdgeEvent"/> will have this
         /// attribute set to <see cref="ReflexionSubgraph.Mapping"/>, even though the architecture graph may be affected
         /// as well due to changes to its propagated edges.
-        /// 
+        ///
         /// If an event can't be clearly traced to a single subgraph, this attribute will be set to
         /// <see cref="ReflexionSubgraph.FullReflexion"/>.
         /// If an event did not occur in the context of the reflexion analysis, this attribute will be set to
@@ -62,7 +62,7 @@ namespace SEE.DataModel
         protected abstract string Description();
 
         public override string ToString() => $"{GetType().Name}: {Description()}";
-        
+
         protected ChangeEvent(Guid versionId, ReflexionSubgraph? affectedGraph = null, ChangeType? change = null)
         {
             VersionId = versionId;

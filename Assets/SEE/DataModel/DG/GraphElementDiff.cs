@@ -1,7 +1,7 @@
 ﻿namespace SEE.DataModel.DG
 {
     /// <summary>
-    /// Allows one to determine whether there is any difference between two 
+    /// Allows one to determine whether there is any difference between two
     /// graph elements.
     /// </summary>
     public interface GraphElementDiff

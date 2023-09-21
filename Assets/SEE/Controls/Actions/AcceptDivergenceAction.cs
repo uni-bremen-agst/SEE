@@ -157,7 +157,7 @@ namespace SEE.Controls.Actions
 
                         // update the current state depending on whether the divergence has been solved
                         // (required in order to register as an undo-able action)
-                        currentState = divergenceSolved ? ReversibleAction.Progress.Completed : ReversibleAction.Progress.NoEffect;
+                        CurrentState = divergenceSolved ? ReversibleAction.Progress.Completed : ReversibleAction.Progress.NoEffect;
 
                         // the selected object is synced and this action is done
                         return true;

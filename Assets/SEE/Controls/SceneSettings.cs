@@ -68,7 +68,7 @@ namespace SEE.Controls
         /// The name of the game object holding the unique <see cref="SceneSettings"/>
         /// component.
         /// </summary>
-        private const string NameOfSceneSettingsGameObject = "Scene Settings";
+        private const string nameOfSceneSettingsGameObject = "Scene Settings";
 
         /// <summary>
         /// The single instance of <see cref="SceneSettings"/> derived from the
@@ -99,10 +99,10 @@ namespace SEE.Controls
             // Note: instance = FindObjectOfType<SceneSettings>() would not work
             // because FindObjectOfType does not work when changing scenes.
 
-            GameObject seeSettings = GameObject.Find(NameOfSceneSettingsGameObject);
+            GameObject seeSettings = GameObject.Find(nameOfSceneSettingsGameObject);
             if (seeSettings == null)
             {
-                Debug.LogError($"There is no game object with name {NameOfSceneSettingsGameObject}. This is a fatal error.\n");
+                Debug.LogError($"There is no game object with name {nameOfSceneSettingsGameObject}. This is a fatal error.\n");
             }
             else if (!seeSettings.TryGetComponent(out instance))
             {
@@ -121,7 +121,7 @@ namespace SEE.Controls
             {
                 if (localPlayer == null)
                 {
-                    localPlayer = instance.CreatePlayer(InputType);
+                    localPlayer = CreatePlayer(InputType);
                 }
                 return localPlayer;
             }
@@ -175,7 +175,7 @@ namespace SEE.Controls
         /// <returns>new player for given <paramref name="inputType"/>, <c>null</c>
         /// if <paramref name="inputType"/> equals <see cref="PlayerInputType.DesktopPlayer"/></returns>
         [Obsolete("Do not use. This method will be superseded by SEE.Game.Avatars.AvatarAdapter.")]
-        private GameObject CreatePlayer(PlayerInputType inputType)
+        private static GameObject CreatePlayer(PlayerInputType inputType)
         {
             GameObject player;
 

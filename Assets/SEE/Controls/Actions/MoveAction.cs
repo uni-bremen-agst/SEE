@@ -529,7 +529,7 @@ namespace SEE.Controls.Actions
                         AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, hoveredObject.gameObject);
                         // Remember the current distance from the pointing device to the grabbed object.
                         distanceToUser = Vector3.Distance(Raycasting.UserPointsTo().origin, grabbedObject.Position);
-                        currentState = ReversibleAction.Progress.InProgress;
+                        CurrentState = ReversibleAction.Progress.InProgress;
                     }
                 }
                 else // continue moving the grabbed object
@@ -555,7 +555,7 @@ namespace SEE.Controls.Actions
                 }
                 grabbedObject.UnGrab();
                 // Action is finished.
-                currentState = ReversibleAction.Progress.Completed;
+                CurrentState = ReversibleAction.Progress.Completed;
                 return true;
             }
             return false;

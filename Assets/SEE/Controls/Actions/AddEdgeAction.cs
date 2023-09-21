@@ -137,17 +137,17 @@ namespace SEE.Controls.Actions
             // Checking whether the two game objects are not null and whether they are
             // actually nodes.
             // FIXME: We need an interaction for VR, too.
-            if (hoveredObject != null && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI() && hoveredObject.HasNodeRef())
+            if (HoveredObject != null && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI() && HoveredObject.HasNodeRef())
             {
                 if (from == null)
                 {
                     // No source selected yet; this interaction is meant to set the source.
-                    from = hoveredObject;
+                    from = HoveredObject;
                 }
                 else if (to == null)
                 {
                     // Source is already set; this interaction is meant to set the target.
-                    to = hoveredObject;
+                    to = HoveredObject;
                 }
             }
             // Note: from == to may be possible.
@@ -163,7 +163,7 @@ namespace SEE.Controls.Actions
                 to = null;
                 result = createdEdge != null;
                 AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound);
-                currentState = result ? ReversibleAction.Progress.Completed : ReversibleAction.Progress.NoEffect;
+                CurrentState = result ? ReversibleAction.Progress.Completed : ReversibleAction.Progress.NoEffect;
             }
             // Forget from and to upon user request.
             if (SEEInput.Unselect())
