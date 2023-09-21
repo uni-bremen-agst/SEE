@@ -176,7 +176,7 @@ namespace SEE.Net.Dashboard.Model.Issues
 
         public override string IssueKind => "AV";
 
-        public override NumericAttributeNames AttributeName => NumericAttributeNames.Architecture_Violations;
+        public override NumericAttributeNames AttributeName => NumericAttributeNames.ArchitectureViolations;
 
         public override IEnumerable<SourceCodeEntity> Entities =>
             // Return source or target only if their path is not null

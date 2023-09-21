@@ -47,7 +47,7 @@ namespace SEE.UI3D
         /// <summary>
         /// The name of the shader used for the circular outline of the cursor.
         /// </summary>
-        private const string OutlineShaderName = "Unlit/CursorOutlineShader";
+        private const string outlineShaderName = "Unlit/CursorOutlineShader";
 
         /// <summary>
         /// The focusses of the cursor.
@@ -64,8 +64,8 @@ namespace SEE.UI3D
         /// </summary>
         private Material axisMaterial;
 
-        private static readonly int MainTexProperty = Shader.PropertyToID("_MainTex");
-        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
+        private static readonly int mainTexProperty = Shader.PropertyToID("_MainTex");
+        private static readonly int colorProperty = Shader.PropertyToID("_Color");
 
         /// <summary>
         /// Removes every <see cref="Transform"/> <c>t</c> from <see cref="focusses"/> that
@@ -107,13 +107,13 @@ namespace SEE.UI3D
             outlineGameObject.transform.parent = go.transform;
             outlineGameObject.transform.localPosition = Vector3.zero;
             outlineGameObject.transform.localScale = Vector3.one;
-            Material outlineMaterial = new(Shader.Find(OutlineShaderName));
-            outlineMaterial.SetTexture(MainTexProperty, TextureGenerator.CreateCircleOutlineTextureR8(32, 31, 1.0f, 0.0f));
-            outlineMaterial.SetColor(ColorProperty, UI3DProperties.DefaultColor);
+            Material outlineMaterial = new(Shader.Find(outlineShaderName));
+            outlineMaterial.SetTexture(mainTexProperty, TextureGenerator.CreateCircleOutlineTextureR8(32, 31, 1.0f, 0.0f));
+            outlineMaterial.SetColor(colorProperty, UI3DProperties.DefaultColor);
             outlineGameObject.GetComponent<MeshRenderer>().sharedMaterial = outlineMaterial;
 
             c.axisMaterial = new Material(Shader.Find(UI3DProperties.PlainColorShaderName));
-            c.axisMaterial.SetColor(ColorProperty, Color.black);
+            c.axisMaterial.SetColor(colorProperty, Color.black);
 
             c.gameObject.SetActive(false);
 
@@ -392,7 +392,7 @@ namespace SEE.UI3D
         /// </summary>
         private Material directLineMaterial;
 
-        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
+        private static readonly int colorProperty = Shader.PropertyToID("_Color");
 
         /// <summary>
         /// Creates a new move-gizmo.
@@ -410,9 +410,9 @@ namespace SEE.UI3D
             p.fillRectangleMaterial = new Material(shader);
             p.outlineRectangleMaterial = new Material(shader);
             p.directLineMaterial = new Material(shader);
-            p.fillRectangleMaterial.SetColor(ColorProperty, new Color(0.5f, 0.5f, 0.5f, 0.2f * UI3DProperties.DefaultAlpha));
-            p.outlineRectangleMaterial.SetColor(ColorProperty, new Color(0.0f, 0.0f, 0.0f, 0.5f * UI3DProperties.DefaultAlpha));
-            p.directLineMaterial.SetColor(ColorProperty, UI3DProperties.DefaultColor);
+            p.fillRectangleMaterial.SetColor(colorProperty, new Color(0.5f, 0.5f, 0.5f, 0.2f * UI3DProperties.DefaultAlpha));
+            p.outlineRectangleMaterial.SetColor(colorProperty, new Color(0.0f, 0.0f, 0.0f, 0.5f * UI3DProperties.DefaultAlpha));
+            p.directLineMaterial.SetColor(colorProperty, UI3DProperties.DefaultColor);
 
             go.SetActive(false);
 
@@ -475,7 +475,7 @@ namespace SEE.UI3D
         /// <summary>
         /// The name of the material responsible for rendering the circular rotation visualization.
         /// </summary>
-        private const string RotateGizmoShaderName = "Unlit/RotateGizmoShader";
+        private const string rotateGizmoShaderName = "Unlit/RotateGizmoShader";
 
         /// <summary>
         /// The center of the rotation.
@@ -506,7 +506,7 @@ namespace SEE.UI3D
             set
             {
                 startAngle = value;
-                material.SetFloat(MinAngleProperty, value);
+                material.SetFloat(minAngleProperty, value);
             }
         }
 
@@ -515,11 +515,11 @@ namespace SEE.UI3D
         /// </summary>
         private float targetAngle;
 
-        private static readonly int MinAngleProperty = Shader.PropertyToID("_MinAngle");
-        private static readonly int MaxAngleProperty = Shader.PropertyToID("_MaxAngle");
-        private static readonly int MainTexProperty = Shader.PropertyToID("_MainTex");
-        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
-        private static readonly int AlphaProperty = Shader.PropertyToID("_Alpha");
+        private static readonly int minAngleProperty = Shader.PropertyToID("_MinAngle");
+        private static readonly int maxAngleProperty = Shader.PropertyToID("_MaxAngle");
+        private static readonly int mainTexProperty = Shader.PropertyToID("_MainTex");
+        private static readonly int colorProperty = Shader.PropertyToID("_Color");
+        private static readonly int alphaProperty = Shader.PropertyToID("_Alpha");
 
         /// <summary>
         /// The target angle of the rotation.
@@ -530,7 +530,7 @@ namespace SEE.UI3D
             set
             {
                 targetAngle = value;
-                material.SetFloat(MaxAngleProperty, value);
+                material.SetFloat(maxAngleProperty, value);
             }
         }
 
@@ -552,10 +552,10 @@ namespace SEE.UI3D
             int outer = textureResolution / 2;
             int inner = Mathf.RoundToInt(outer * 0.98f);
 
-            p.material = new Material(Shader.Find(RotateGizmoShaderName));
-            p.material.SetTexture(MainTexProperty, TextureGenerator.CreateCircleOutlineTextureR8(outer, inner, UI3DProperties.DefaultAlpha, 0.0f));
-            p.material.SetColor(ColorProperty, UI3DProperties.DefaultColor);
-            p.material.SetFloat(AlphaProperty, UI3DProperties.DefaultAlpha);
+            p.material = new Material(Shader.Find(rotateGizmoShaderName));
+            p.material.SetTexture(mainTexProperty, TextureGenerator.CreateCircleOutlineTextureR8(outer, inner, UI3DProperties.DefaultAlpha, 0.0f));
+            p.material.SetColor(colorProperty, UI3DProperties.DefaultColor);
+            p.material.SetFloat(alphaProperty, UI3DProperties.DefaultAlpha);
 
             go.GetComponent<MeshRenderer>().sharedMaterial = p.material;
             go.SetActive(false);

@@ -16,13 +16,13 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         {
             if (metricValue is MetricValueRange metricValueRange)
             {
-                valueText.text = MetricValueRangeToString(metricValueRange);
-                titleText.text = metricValueRange.Name;
+                ValueText.text = MetricValueRangeToString(metricValueRange);
+                TitleText.text = metricValueRange.Name;
             }
             else if (metricValue is MetricValueCollection metricValueCollection)
             {
-                titleText.text = metricValueCollection.Name;
-                valueText.text = string.Join(Environment.NewLine,
+                TitleText.text = metricValueCollection.Name;
+                ValueText.text = string.Join(Environment.NewLine,
                                              metricValueCollection.MetricValues.Select(x => $"{x.Name}: {MetricValueRangeToString(x)}"));
             }
             else

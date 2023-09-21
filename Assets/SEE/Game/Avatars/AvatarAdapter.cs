@@ -31,7 +31,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// The distance from the top of the player's height to his eyes.
         /// </summary>
-        private const float PlayerTopToEyeDistance = 0.14f;
+        private const float playerTopToEyeDistance = 0.14f;
 
         /// <summary>
         /// If this code is executed for the local player, the necessary player type
@@ -212,7 +212,7 @@ namespace SEE.Game.Avatars
             desktopPlayer.name = PlayerInputType.DesktopPlayer.ToString();
             desktopPlayer.transform.SetParent(gameObject.transform);
             desktopPlayer.transform.localPosition =
-                new Vector3(0, DesktopAvatarHeight() - PlayerTopToEyeDistance, 0.3f);
+                new Vector3(0, DesktopAvatarHeight() - playerTopToEyeDistance, 0.3f);
             desktopPlayer.transform.localRotation = Quaternion.Euler(30, 0, 0);
 
             if (gameObject.TryGetComponentOrLog(out AvatarAimingSystem aaSystem))
@@ -247,34 +247,33 @@ namespace SEE.Game.Avatars
         /// is set up for VR. This controller will be assigned to the UMA avatar
         /// as the default race animation controller.
         /// </summary>
-        private const string AnimatorForVRIK = "Prefabs/Players/VRIKAnimatedLocomotion";
+        private const string animatorForVRIK = "Prefabs/Players/VRIKAnimatedLocomotion";
 
         /// <summary>
         /// The path of the prefab for the VR camera rig.
         /// </summary>
-        private const string VRPlayerRigPrefab = "Prefabs/Players/XRRig";
+        private const string vrPlayerRigPrefab = "Prefabs/Players/XRRig";
 
         /// <summary>
-        /// The composite name of the child within <see cref="VRPlayerRigPrefab"/>
+        /// The composite name of the child within <see cref="vrPlayerRigPrefab"/>
         /// representing the head for VRIK.
         /// </summary>
-        private const string VRPlayerHeadForVRIK = "Camera Offset/Main Camera/Head";
+        private const string vrPlayerHeadForVRIK = "Camera Offset/Main Camera/Head";
 
         /// <summary>
-        /// The composite name of the child within <see cref="VRPlayerRigPrefab"/>
+        /// The composite name of the child within <see cref="vrPlayerRigPrefab"/>
         /// representing the left hand for VRIK.
         /// </summary>
-        private const string VRPLayerLeftHandForVRIK = XRCameraRigManager.LeftControllerName + "/LeftHand";
+        private const string vrPLayerLeftHandForVRIK = XRCameraRigManager.LeftControllerName + "/LeftHand";
 
         /// <summary>
-        /// The composite name of the child within <see cref="VRPlayerRigPrefab"/>
+        /// The composite name of the child within <see cref="vrPlayerRigPrefab"/>
         /// representing the right hand for VRIK.
         /// </summary>
-        private const string VRPlayerRightHandForVRIK = XRCameraRigManager.RightControllerName + "/RightHand";
+        private const string vrPlayerRightHandForVRIK = XRCameraRigManager.RightControllerName + "/RightHand";
 
         public IEnumerator StartXRCoroutine()
         {
-
             // Start XR manually.
             StartCoroutine(ManualXRControl.StartXRCoroutine());
 
@@ -289,7 +288,7 @@ namespace SEE.Game.Avatars
 
             // Now we can instantiate the prefabs for VR that requires that XR is up and running.
 
-            GameObject rig = PrefabInstantiator.InstantiatePrefab(VRPlayerRigPrefab);
+            GameObject rig = PrefabInstantiator.InstantiatePrefab(vrPlayerRigPrefab);
             rig.transform.position = gameObject.transform.position;
             // FIXME: Only the server is allowed to spawn objects.
             //rig.AddComponent<NetworkObject>().Spawn();
@@ -303,7 +302,7 @@ namespace SEE.Game.Avatars
             // will remove components, the former must query.
             VRIKActions.AddComponents(gameObject, IsLocalPlayer);
             VRIKActions.TurnOffAvatarAimingSystem(gameObject);
-            VRIKActions.ReplaceAnimator(gameObject, AnimatorForVRIK);
+            VRIKActions.ReplaceAnimator(gameObject, animatorForVRIK);
 
             SetupVRIK();
 
@@ -320,12 +319,12 @@ namespace SEE.Game.Avatars
             /// </summary>
             void PrepareScene()
             {
-                const string GroundName = "Ground";
+                const string groundName = "Ground";
 
-                GameObject ground = GameObject.Find(GroundName);
+                GameObject ground = GameObject.Find(groundName);
                 if (ground == null)
                 {
-                    Debug.LogError($"There is no ground object named {GroundName}. Teleporting cannot be set up.\n");
+                    Debug.LogError($"There is no ground object named {groundName}. Teleporting cannot be set up.\n");
                 }
                 else
                 {
@@ -367,11 +366,11 @@ namespace SEE.Game.Avatars
 
                 VRIK vrIK = gameObject.AddOrGetComponent<VRIK>();
 
-                vrIK.solver.spine.headTarget = rig.transform.Find(VRPlayerHeadForVRIK);
+                vrIK.solver.spine.headTarget = rig.transform.Find(vrPlayerHeadForVRIK);
                 Assert.IsNotNull(vrIK.solver.spine.headTarget);
-                vrIK.solver.leftArm.target = rig.transform.Find(VRPLayerLeftHandForVRIK);
+                vrIK.solver.leftArm.target = rig.transform.Find(vrPLayerLeftHandForVRIK);
                 Assert.IsNotNull(vrIK.solver.leftArm.target);
-                vrIK.solver.rightArm.target = rig.transform.Find(VRPlayerRightHandForVRIK);
+                vrIK.solver.rightArm.target = rig.transform.Find(vrPlayerRightHandForVRIK);
                 Assert.IsNotNull(vrIK.solver.rightArm.target);
             }
 

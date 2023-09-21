@@ -159,17 +159,17 @@ namespace SEE.Game.Operator
 
             SplineMorphism AnimateToMorphismAction((BSpline targetSpline, GameObject temporaryGameObject) s, float d)
             {
-                SplineMorphism Animator = go.AddOrGetComponent<SplineMorphism>();
+                SplineMorphism animator = go.AddOrGetComponent<SplineMorphism>();
 
-                if (Animator.IsActive())
+                if (animator.IsActive())
                 {
                     // A tween already exists, we simply need to change its target.
-                    Animator.ChangeTarget(s.targetSpline);
+                    animator.ChangeTarget(s.targetSpline);
                 }
                 else
                 {
                     go.MustGetComponent(out SEESpline sourceSpline);
-                    Animator.CreateTween(sourceSpline.Spline, s.targetSpline, d)
+                    animator.CreateTween(sourceSpline.Spline, s.targetSpline, d)
                             .OnComplete(() =>
                             {
                                 if (s.temporaryGameObject != null)
@@ -179,7 +179,7 @@ namespace SEE.Game.Operator
                             }).Play();
                 }
 
-                return Animator;
+                return animator;
             }
 
             morphism = new MorphismOperation(AnimateToMorphismAction, spline.Spline, null);

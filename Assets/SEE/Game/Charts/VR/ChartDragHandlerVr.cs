@@ -32,15 +32,15 @@ namespace SEE.Game.Charts.VR
         /// <summary>
         /// The transform of the object to drag.
         /// </summary>
-        private Transform _parent;
+        private Transform parent;
 
         /// <summary>
         /// The distance between the pointer and the middle of the chart.
         /// </summary>
-        private Vector3 _distance;
+        private Vector3 distance;
 
         /// <summary>
-        /// Finds the <see cref="_parent" />.
+        /// Finds the <see cref="parent" />.
         /// </summary>
         protected override void Awake()
         {
@@ -57,7 +57,7 @@ namespace SEE.Game.Charts.VR
         {
             if (eventData.pointerCurrentRaycast.worldPosition != Vector3.zero)
             {
-                _parent.position = eventData.pointerCurrentRaycast.worldPosition - _distance;
+                parent.position = eventData.pointerCurrentRaycast.worldPosition - distance;
             }
         }
 
@@ -67,7 +67,7 @@ namespace SEE.Game.Charts.VR
         /// <param name="eventData">Contains position data of the pointer.</param>
         public override void OnPointerDown(PointerEventData eventData)
         {
-            _distance = eventData.pointerCurrentRaycast.worldPosition - chart.position;
+            distance = eventData.pointerCurrentRaycast.worldPosition - Chart.position;
         }
     }
 }

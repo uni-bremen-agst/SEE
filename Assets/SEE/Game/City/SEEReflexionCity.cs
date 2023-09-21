@@ -65,7 +65,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The <see cref="ReflexionVisualization"/> responsible for handling reflexion analysis changes.
         /// </summary>
-        private ReflexionVisualization Visualization;
+        private ReflexionVisualization visualization;
 
         /// <summary>
         /// First, if a graph was already loaded, everything will be reset by calling <see cref="Reset"/>.
@@ -101,32 +101,32 @@ namespace SEE.Game.City
 
             async UniTaskVoid LoadAllGraphs()
             {
-                Graph ArchitectureGraph = LoadGraph(GxlArchitecturePath.Path, "");
-                Graph ImplementationGraph = LoadGraph(GXLPath.Path, "");
-                Graph MappingGraph;
+                Graph architectureGraph = LoadGraph(GxlArchitecturePath.Path, "");
+                Graph implementationGraph = LoadGraph(GXLPath.Path, "");
+                Graph mappingGraph;
                 if (string.IsNullOrEmpty(GxlMappingPath.Path))
                 {
                     Debug.LogWarning("Mapping graph path is empty. Will create new mapping from scratch.\n");
                     /// The mapping graph may contain nodes and edges from the implementation. Possibly, their
                     /// <see cref="GraphElement.AbsolutePlatformPath()"/> will be retrieved. That is why we
                     /// will set the base path to <see cref="ProjectPath.Path"/>.
-                    MappingGraph = new Graph(SourceCodeDirectory.Path);
+                    mappingGraph = new Graph(SourceCodeDirectory.Path);
                 }
                 else
                 {
-                    MappingGraph = LoadGraph(GxlMappingPath.Path, "");
+                    mappingGraph = LoadGraph(GxlMappingPath.Path, "");
                 }
 
                 // We collect the tasks here so we can wait on them both at the same time instead of sequentially
                 IList<UniTask> tasks = new List<UniTask>();
                 if (!string.IsNullOrEmpty(CsvArchitecturePath.Path))
                 {
-                    tasks.Add(LoadGraphMetrics(ArchitectureGraph, CsvArchitecturePath.Path, ErosionSettings));
+                    tasks.Add(LoadGraphMetrics(architectureGraph, CsvArchitecturePath.Path, ErosionSettings));
                 }
 
                 if (!string.IsNullOrEmpty(CsvArchitecturePath.Path))
                 {
-                    tasks.Add(LoadGraphMetrics(ArchitectureGraph, CsvArchitecturePath.Path, ErosionSettings));
+                    tasks.Add(LoadGraphMetrics(architectureGraph, CsvArchitecturePath.Path, ErosionSettings));
                 }
 
                 if (tasks.Count > 0)
@@ -134,11 +134,11 @@ namespace SEE.Game.City
                     await UniTask.WhenAll(tasks);
                 }
 
-                ReflexionGraph reflexionGraph = new(ImplementationGraph, ArchitectureGraph, MappingGraph, CityName);
+                ReflexionGraph reflexionGraph = new(implementationGraph, architectureGraph, mappingGraph, CityName);
                 LoadedGraph = reflexionGraph;
                 Debug.Log($"Loaded graph {LoadedGraph.Name}.\n");
-                Visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
-                Visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
+                visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
+                visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
                 Debug.Log("Initialized Reflexion Analysis.\n");
             }
 
@@ -165,14 +165,14 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderSave)]
         public override void SaveData()
         {
-            IList<string> NoPathGraphs = new[]
+            IList<string> noPathGraphs = new[]
             {
                 GxlArchitecturePath.Path, GXLPath.Path, GxlMappingPath.Path
             }.Where(string.IsNullOrEmpty).ToList();
-            if (NoPathGraphs.Count > 0)
+            if (noPathGraphs.Count > 0)
             {
-                Debug.LogError($"Couldn't find any graph at path{(NoPathGraphs.Count > 1 ? "s" : "")} " +
-                               string.Join(", ", NoPathGraphs) + ".\n");
+                Debug.LogError($"Couldn't find any graph at path{(noPathGraphs.Count > 1 ? "s" : "")} " +
+                               string.Join(", ", noPathGraphs) + ".\n");
             }
             else
             {
@@ -195,7 +195,7 @@ namespace SEE.Game.City
             // visualization, but we have to wait until all edges have become meshes.
             if (gameObject.TryGetComponentOrLog(out EdgeMeshScheduler scheduler))
             {
-                scheduler.OnInitialEdgesDone += Visualization.InitializeEdges;
+                scheduler.OnInitialEdgesDone += visualization.InitializeEdges;
             }
         }
 
@@ -204,39 +204,39 @@ namespace SEE.Game.City
         /// <summary>
         /// Label of attribute <see cref="GxlArchitecturePath"/> in the configuration file.
         /// </summary>
-        private const string GxlArchitectureLabel = "ArchitectureGXL";
+        private const string gxlArchitectureLabel = "ArchitectureGXL";
 
         /// <summary>
         /// Label of attribute <see cref="GxlMappingPath"/> in the configuration file.
         /// </summary>
-        private const string GxlMappingLabel = "MappingGXL";
+        private const string gxlMappingLabel = "MappingGXL";
 
         /// <summary>
         /// Label of attribute <see cref="CsvArchitecturePath"/> in the configuration file.
         /// </summary>
-        private const string CsvArchitectureLabel = "ArchitectureCSV";
+        private const string csvArchitectureLabel = "ArchitectureCSV";
 
         /// <summary>
         /// Label of attribute <see cref="CityName"/> in the configuration file.
         /// </summary>
-        private const string CityNameLabel = "CityName";
+        private const string cityNameLabel = "CityName";
 
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
-            GxlArchitecturePath.Save(writer, GxlArchitectureLabel);
-            GxlMappingPath.Save(writer, GxlMappingLabel);
-            CsvArchitecturePath.Save(writer, CsvArchitectureLabel);
-            writer.Save(CityName, CityNameLabel);
+            GxlArchitecturePath.Save(writer, gxlArchitectureLabel);
+            GxlMappingPath.Save(writer, gxlMappingLabel);
+            CsvArchitecturePath.Save(writer, csvArchitectureLabel);
+            writer.Save(CityName, cityNameLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            GxlArchitecturePath.Restore(attributes, GxlArchitectureLabel);
-            GxlMappingPath.Restore(attributes, GxlMappingLabel);
-            CsvArchitecturePath.Restore(attributes, CsvArchitectureLabel);
-            ConfigIO.Restore(attributes, CityNameLabel, ref CityName);
+            GxlArchitecturePath.Restore(attributes, gxlArchitectureLabel);
+            GxlMappingPath.Restore(attributes, gxlMappingLabel);
+            CsvArchitecturePath.Restore(attributes, csvArchitectureLabel);
+            ConfigIO.Restore(attributes, cityNameLabel, ref CityName);
         }
 
         #endregion

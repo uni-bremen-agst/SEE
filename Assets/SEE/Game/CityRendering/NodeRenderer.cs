@@ -79,7 +79,7 @@ namespace SEE.Game.CityRendering
             InteractionDecorator.PrepareForInteraction(gameNode);
             if (city != null)
             {
-                Portal.SetPortal(city, gameNode, Portal.IncludeDescendants.ALL_DESCENDANTS);
+                Portal.SetPortal(city, gameNode, Portal.IncludeDescendants.AllDescendants);
             }
         }
 

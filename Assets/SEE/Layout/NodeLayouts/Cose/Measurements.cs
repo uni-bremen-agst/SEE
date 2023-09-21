@@ -13,66 +13,65 @@ namespace SEE.Layout.NodeLayouts.Cose
     /// </summary>
     public class EdgesMeasurements
     {
-
         /// <summary>
         /// The maximum length of an edge
         /// </summary>
-        public readonly float lengthMax;
+        public readonly float LengthMax;
 
         /// <summary>
         /// The minimum length of an edge
         /// </summary>
-        public readonly float lengthMin;
+        public readonly float LengthMin;
 
         /// <summary>
         /// The total length of all edges
         /// </summary>
-        public readonly float lengthTotal;
+        public readonly float LengthTotal;
 
         /// <summary>
         /// The maximum length of an edge in relation to the area (height + width / 2)
         /// </summary>
-        public readonly float lengthMaxArea;
+        public readonly float LengthMaxArea;
 
         /// <summary>
         /// The minimum length of an edge in relation to the area (height + width / 2)
         /// </summary>
-        public readonly float lengthMinArea;
+        public readonly float LengthMinArea;
 
         /// <summary>
         /// The total length of all edges in relation to the area (height + width / 2)
         /// </summary>
-        public readonly float lengthTotalArea;
+        public readonly float LengthTotalArea;
 
         /// <summary>
         /// The average length of an edge
         /// </summary>
-        public readonly float lengthAverage;
+        public readonly float LengthAverage;
 
         /// <summary>
         /// The average length of an edge in relation to the area (height + width / 2)
         /// </summary>
-        public readonly float lengthAverageArea;
+        public readonly float LengthAverageArea;
 
         /// <summary>
         /// The variance length of any edge
         /// </summary>
-        public readonly float lengthVariance;
+        public readonly float LengthVariance;
 
         /// <summary>
         /// The standart deviation of any edge length
         /// </summary>
-        public readonly float lengthStandardDeviation;
+        public readonly float LengthStandardDeviation;
 
         /// <summary>
         /// The variance length of any edge in relation to the area (height + width / 2)
         /// </summary>
-        public readonly float lengthVarianceArea;
+        public readonly float LengthVarianceArea;
 
         /// <summary>
         /// The standart deviation of any edge length in relation to the area (height + width / 2)
         /// </summary>
-        public readonly float lengthStandardDeviationArea;
+        public readonly float LengthStandardDeviationArea;
 
         /// <summary>
         /// class holding all measurements value of the edges
@@ -91,18 +90,18 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <param name="lengthVarianceArea">The variance length of any edge in relation to the area (height + width / 2)</param>
         public EdgesMeasurements(float lengthMax, float lengthMin, float lengthTotal, float lengthMaxArea, float lengthMinArea, float lengthTotalArea, float lengthAverage, float lengthAverageArea, float lengthVariance, float lengthStandardDeviation, float lengthVarianceArea, float lengthStandardDeviationArea)
         {
-            this.lengthMax = lengthMax;
-            this.lengthMin = lengthMin;
-            this.lengthTotal = lengthTotal;
-            this.lengthMaxArea = lengthMaxArea;
-            this.lengthMinArea = lengthMinArea;
-            this.lengthTotalArea = lengthTotalArea;
-            this.lengthAverage = lengthAverage;
-            this.lengthAverageArea = lengthAverageArea;
-            this.lengthVariance = lengthVariance;
-            this.lengthStandardDeviation = lengthStandardDeviation;
-            this.lengthVarianceArea = lengthVarianceArea;
-            this.lengthStandardDeviationArea = lengthStandardDeviationArea;
+            this.LengthMax = lengthMax;
+            this.LengthMin = lengthMin;
+            this.LengthTotal = lengthTotal;
+            this.LengthMaxArea = lengthMaxArea;
+            this.LengthMinArea = lengthMinArea;
+            this.LengthTotalArea = lengthTotalArea;
+            this.LengthAverage = lengthAverage;
+            this.LengthAverageArea = lengthAverageArea;
+            this.LengthVariance = lengthVariance;
+            this.LengthStandardDeviation = lengthStandardDeviation;
+            this.LengthVarianceArea = lengthVarianceArea;
+            this.LengthStandardDeviationArea = lengthStandardDeviationArea;
         }
     }
 
@@ -126,12 +125,12 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <summary>
         /// Dictonary with nodes and corresonding gameobjects
         /// </summary>
-        protected ICollection<ILayoutNode> layoutNodes;
+        private ICollection<ILayoutNode> layoutNodes;
 
         /// <summary>
         /// a dictionary containing all measurements with the according values
         /// </summary>
-        public SortedDictionary<string, string> measurementsDict = new SortedDictionary<string, string>();
+        private SortedDictionary<string, string> MeasurementsDict = new();
 
         /// <summary>
         /// the performance of the layout of the nodes
@@ -230,7 +229,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Gets the time needed gfor the calculation of the node layout 
+        /// Gets the time needed gfor the calculation of the node layout
         /// </summary>
         /// <returns>time in milliseconds</returns>
         public double GetNodePerformanceInMilliseconds()
@@ -248,9 +247,9 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <returns>string dictinary with measurements</returns>
         public SortedDictionary<string, string> ToStringDictionary(bool calcualteNew = false)
         {
-            if (!calcualteNew && measurementsDict.Count > 0)
+            if (!calcualteNew && MeasurementsDict.Count > 0)
             {
-                return measurementsDict;
+                return MeasurementsDict;
             }
 
             EdgesMeasurements edgeMeasure = EdgesMeasurements;
@@ -259,18 +258,18 @@ namespace SEE.Layout.NodeLayouts.Cose
                 { "Area", Math.Round (Area, 2).ToString() },
                 { "Nodes overlapping", OverlappingGameNodes.ToString() },
                 { "Number of edge crossings", EdgeCrossings.ToString() },
-                { "Straight Edge length max", Math.Round(edgeMeasure.lengthMax, 2).ToString() },
-                { "Straight Edge length min", Math.Round(edgeMeasure.lengthMin, 2).ToString() },
-                { "Straight Edge length total", Math.Round(edgeMeasure.lengthTotal, 2).ToString() },
-                { "Straight Edge length max (area)", Math.Round(edgeMeasure.lengthMaxArea, 2).ToString() },
-                { "Straight Edge length min (area)", Math.Round(edgeMeasure.lengthMinArea, 2).ToString() },
-                { "Straight Edge length total (area)", Math.Round(edgeMeasure.lengthTotalArea, 2).ToString() },
-                { "Straight Edge length average", Math.Round(edgeMeasure.lengthAverage, 2).ToString() },
-                { "Straight Edge length average (area)", Math.Round(edgeMeasure.lengthAverageArea, 2).ToString() },
-                { "Straight Edge length variance", Math.Round(edgeMeasure.lengthVariance, 2).ToString() },
-                { "Straight Edge length standard deviation", Math.Round(edgeMeasure.lengthStandardDeviation, 2).ToString() },
-                { "Straight Edge length variance (area)", Math.Round(edgeMeasure.lengthVarianceArea, 2).ToString() },
-                { "Straight Edge length standard deviation (area)", Math.Round(edgeMeasure.lengthStandardDeviationArea, 2).ToString() },
+                { "Straight Edge length max", Math.Round(edgeMeasure.LengthMax, 2).ToString() },
+                { "Straight Edge length min", Math.Round(edgeMeasure.LengthMin, 2).ToString() },
+                { "Straight Edge length total", Math.Round(edgeMeasure.LengthTotal, 2).ToString() },
+                { "Straight Edge length max (area)", Math.Round(edgeMeasure.LengthMaxArea, 2).ToString() },
+                { "Straight Edge length min (area)", Math.Round(edgeMeasure.LengthMinArea, 2).ToString() },
+                { "Straight Edge length total (area)", Math.Round(edgeMeasure.LengthTotalArea, 2).ToString() },
+                { "Straight Edge length average", Math.Round(edgeMeasure.LengthAverage, 2).ToString() },
+                { "Straight Edge length average (area)", Math.Round(edgeMeasure.LengthAverageArea, 2).ToString() },
+                { "Straight Edge length variance", Math.Round(edgeMeasure.LengthVariance, 2).ToString() },
+                { "Straight Edge length standard deviation", Math.Round(edgeMeasure.LengthStandardDeviation, 2).ToString() },
+                { "Straight Edge length variance (area)", Math.Round(edgeMeasure.LengthVarianceArea, 2).ToString() },
+                { "Straight Edge length standard deviation (area)", Math.Round(edgeMeasure.LengthStandardDeviationArea, 2).ToString() },
             };
 
             string nodePerformance = NodesPerformance;
@@ -279,8 +278,8 @@ namespace SEE.Layout.NodeLayouts.Cose
                 measurements.Add("Time for node layout", nodePerformance);
             }
 
-            measurementsDict = measurements;
-            return measurementsDict;
+            MeasurementsDict = measurements;
+            return MeasurementsDict;
         }
 
         /// <summary>
@@ -341,14 +340,14 @@ namespace SEE.Layout.NodeLayouts.Cose
             //Make sure the denominator is > 0, if not the lines are parallel
             if (denominator != 0f)
             {
-                float u_a = ((l2_p2.x - l2_p1.x) * (l1_p1.y - l2_p1.y) - (l2_p2.y - l2_p1.y) * (l1_p1.x - l2_p1.x)) / denominator;
-                float u_b = ((l1_p2.x - l1_p1.x) * (l1_p1.y - l2_p1.y) - (l1_p2.y - l1_p1.y) * (l1_p1.x - l2_p1.x)) / denominator;
+                float uA = ((l2_p2.x - l2_p1.x) * (l1_p1.y - l2_p1.y) - (l2_p2.y - l2_p1.y) * (l1_p1.x - l2_p1.x)) / denominator;
+                float uB = ((l1_p2.x - l1_p1.x) * (l1_p1.y - l2_p1.y) - (l1_p2.y - l1_p1.y) * (l1_p1.x - l2_p1.x)) / denominator;
 
                 //Are the line segments intersecting if the end points are the same
                 if (shouldIncludeEndPoints)
                 {
                     //Is intersecting if u_a and u_b are between 0 and 1 or exactly 0 or 1
-                    if (u_a >= 0f + epsilon && u_a <= 1f - epsilon && u_b >= 0f + epsilon && u_b <= 1f - epsilon)
+                    if (uA >= 0f + epsilon && uA <= 1f - epsilon && uB >= 0f + epsilon && uB <= 1f - epsilon)
                     {
                         isIntersecting = true;
                     }
@@ -356,7 +355,7 @@ namespace SEE.Layout.NodeLayouts.Cose
                 else
                 {
                     //Is intersecting if u_a and u_b are between 0 and 1
-                    if (u_a > 0f + epsilon && u_a < 1f - epsilon && u_b > 0f + epsilon && u_b < 1f - epsilon)
+                    if (uA > 0f + epsilon && uA < 1f - epsilon && uB > 0f + epsilon && uB < 1f - epsilon)
                     {
                         isIntersecting = true;
                     }
@@ -481,7 +480,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <param name="v0">2d coordinate</param>
         /// <param name="v1">2d coordinate</param>
         /// <returns>the distance</returns>
-        private float Distance(float v0, float v1)
+        private static float Distance(float v0, float v1)
         {
             if (v1 <= v0)
             {
@@ -597,7 +596,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <param name="bounds1">the first bound</param>
         /// <param name="bounds2">the second bound</param>
         /// <returns></returns>
-        private bool IntersectBounds(Bounds bounds1, Bounds bounds2)
+        private static bool IntersectBounds(Bounds bounds1, Bounds bounds2)
         {
             return !(bounds2.min.x > bounds1.max.x ||
                           bounds2.max.x < bounds1.min.x ||

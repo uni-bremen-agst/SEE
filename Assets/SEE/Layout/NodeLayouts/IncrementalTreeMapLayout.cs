@@ -32,7 +32,7 @@ namespace SEE.Layout.NodeLayouts
             IncrementalTreeMapSetting settings)
             : base(groundLevel)
         {
-            name = "IncrementalTreeMap";
+            Name = "IncrementalTreeMap";
             this.width = width;
             this.depth = depth;
             this.settings = settings;
@@ -102,10 +102,10 @@ namespace SEE.Layout.NodeLayouts
                 throw new ArgumentException("No nodes to be laid out.");
             }
 
-            this.roots = LayoutNodes.GetRoots(layoutNodesList);
+            this.Roots = LayoutNodes.GetRoots(layoutNodesList);
             InitNodes();
             Rectangle rectangle = new Rectangle(x: -width / 2.0f, z: -depth / 2.0f, width, depth);
-            CalculateLayout(roots, rectangle);
+            CalculateLayout(Roots, rectangle);
             return layoutResult;
         }
 
@@ -116,7 +116,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private void InitNodes()
         {
-            float totalSize = roots.Sum(InitNode);
+            float totalSize = Roots.Sum(InitNode);
 
             // adjust the absolute size to the rectangle of the layout
             float adjustFactor = (width * depth) / totalSize;
@@ -203,7 +203,7 @@ namespace SEE.Layout.NodeLayouts
             // but this parent can be null if children == roots
             ILayoutNode oldILayoutParent = ParentsInOldGraph(nodes).First();
             ICollection<ILayoutNode> oldILayoutSiblings =
-                oldILayoutParent == null ? oldLayout.roots : oldILayoutParent.Children();
+                oldILayoutParent == null ? oldLayout.Roots : oldILayoutParent.Children();
             List<Node> oldNodes = oldILayoutSiblings.Select(n => oldLayout.nodeMap[n.ID]).ToList();
 
             SetupNodeLists(nodes, oldNodes,
@@ -337,7 +337,7 @@ namespace SEE.Layout.NodeLayouts
 
                 Vector3 position = new Vector3(
                     (float)(rectangle.X + rectangle.Width / 2.0d),
-                    groundLevel,
+                    GroundLevel,
                     (float)(rectangle.Z + rectangle.Depth / 2.0d));
                 Vector3 scale = new Vector3(
                     (float)(rectangle.Width - absolutePadding),

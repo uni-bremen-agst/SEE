@@ -509,25 +509,25 @@ namespace SEE.Game.City
         /// <summary>
         /// Label of attribute <see cref="GXLPath"/> in the configuration file.
         /// </summary>
-        private const string GXLPathLabel = "GXLPath";
+        private const string gxlPathLabel = "GXLPath";
 
         /// <summary>
         /// Label of attribute <see cref="CSVPath"/> in the configuration file.
         /// </summary>
-        private const string CSVPathLabel = "CSVPath";
+        private const string csvPathLabel = "CSVPath";
 
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
-            GXLPath.Save(writer, GXLPathLabel);
-            CSVPath.Save(writer, CSVPathLabel);
+            GXLPath.Save(writer, gxlPathLabel);
+            CSVPath.Save(writer, csvPathLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            GXLPath.Restore(attributes, GXLPathLabel);
-            CSVPath.Restore(attributes, CSVPathLabel);
+            GXLPath.Restore(attributes, gxlPathLabel);
+            CSVPath.Restore(attributes, csvPathLabel);
         }
     }
 }

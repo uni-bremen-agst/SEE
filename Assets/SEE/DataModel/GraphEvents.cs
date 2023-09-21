@@ -19,15 +19,15 @@ namespace SEE.DataModel
     /// <summary>
     /// An event representing a new version being introduced.
     /// Events following this one will have the new <see cref="VersionId"/>, while events before this
-    /// (up until the last <see cref="VersionChangeEvent"/>) will have <see cref="OldVersion"/>.
+    /// (up until the last <see cref="VersionChangeEvent"/>) will have <see cref="oldVersion"/>.
     /// </summary>
     public class VersionChangeEvent : GraphEvent
     {
         /// <summary>
         /// The version before this one.
         /// </summary>
-        private readonly Guid OldVersion;
-        
+        private readonly Guid oldVersion;
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -35,10 +35,10 @@ namespace SEE.DataModel
         /// <param name="oldVersion">old version ID</param>
         public VersionChangeEvent(Guid newVersion, Guid oldVersion) : base(newVersion)
         {
-            OldVersion = oldVersion;
+            this.oldVersion = oldVersion;
         }
 
-        protected override string Description() => $"Changed version from {OldVersion} to {VersionId}.";
+        protected override string Description() => $"Changed version from {oldVersion} to {VersionId}.";
     }
 
     /// <summary>
@@ -169,7 +169,7 @@ namespace SEE.DataModel
         {
             get;
         }
-        
+
         /// <summary>
         /// The value of the changed attribute.
         /// Will be <c>null</c> either if the attribute has been unset, or if it is a toggle attribute.
@@ -187,7 +187,7 @@ namespace SEE.DataModel
     }
 
     /// <summary>
-    /// An event fired when the <see cref="GraphElement.Type"/> of a graph element changes. 
+    /// An event fired when the <see cref="GraphElement.Type"/> of a graph element changes.
     /// </summary>
     public class GraphElementTypeEvent : GraphEvent
     {
@@ -195,12 +195,12 @@ namespace SEE.DataModel
         /// The previous type of the graph element.
         /// </summary>
         public readonly string OldType;
-        
+
         /// <summary>
         /// The new type of the graph element.
         /// </summary>
         public readonly string NewType;
-        
+
         /// <summary>
         /// The element whose type was changed.
         /// </summary>

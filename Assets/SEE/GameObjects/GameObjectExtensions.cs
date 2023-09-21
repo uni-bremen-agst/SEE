@@ -846,7 +846,7 @@ namespace SEE.GO
         /// Whether the portal of the descendants of this <paramref name="gameObject"/> shall be updated too
         /// </param>
         public static void UpdatePortal(this GameObject gameObject, bool warnOnFailure = false,
-                                        Portal.IncludeDescendants includeDescendants = ONLY_SELF)
+                                        Portal.IncludeDescendants includeDescendants = OnlySelf)
         {
             GameObject rootCity = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
             if (rootCity != null)

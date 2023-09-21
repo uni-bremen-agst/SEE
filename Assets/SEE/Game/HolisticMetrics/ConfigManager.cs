@@ -130,7 +130,7 @@ namespace SEE.Game.HolisticMetrics
                 Position = boardTransform.localPosition,
                 Rotation = boardTransform.rotation
             };
-            foreach ((WidgetController, Metric) tuple in widgetsManager.widgets)
+            foreach ((WidgetController, Metric) tuple in widgetsManager.Widgets)
             {
                 WidgetConfig widgetConfig = GetWidgetConfig(tuple.Item1, tuple.Item2);
                 config.WidgetConfigs.Add(widgetConfig);

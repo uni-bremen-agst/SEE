@@ -30,7 +30,7 @@ namespace SEE.Game.City
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(AntennaSections, AntennaSectionsLabel);
+            writer.Save(AntennaSections, antennaSectionsLabel);
             writer.EndGroup();
         }
 
@@ -50,7 +50,7 @@ namespace SEE.Game.City
             {
                 bool result = false;
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-                ConfigIO.RestoreStringList(values, AntennaSectionsLabel, ref AntennaSections);
+                ConfigIO.RestoreStringList(values, antennaSectionsLabel, ref AntennaSections);
                 return result;
             }
             else
@@ -62,6 +62,6 @@ namespace SEE.Game.City
         /// <summary>
         /// Label in the configuration file for the antenna sections.
         /// </summary>
-        private const string AntennaSectionsLabel = "AntennaSections";
+        private const string antennaSectionsLabel = "AntennaSections";
     }
 }

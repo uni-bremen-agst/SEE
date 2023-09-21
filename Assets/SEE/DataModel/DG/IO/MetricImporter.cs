@@ -107,7 +107,7 @@ namespace SEE.DataModel.DG.IO
             {
                 NumericAttributeNames.Clone, NumericAttributeNames.Complexity, NumericAttributeNames.Cycle,
                 NumericAttributeNames.Metric, NumericAttributeNames.Style,
-                NumericAttributeNames.Architecture_Violations, NumericAttributeNames.Dead_Code
+                NumericAttributeNames.ArchitectureViolations, NumericAttributeNames.DeadCode
             };
             //FIXME: Aggregation from lower levels to classes doesn't work due to issues spanning multiple lines
             // Maybe simply ignore aggregated value when a non-aggregated value is present (which it would be)

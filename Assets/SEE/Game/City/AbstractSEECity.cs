@@ -492,7 +492,7 @@ namespace SEE.Game.City
                 ErosionSettings.ArchitectureIssue,
                 ErosionSettings.CloneIssue,
                 ErosionSettings.CycleIssue,
-                ErosionSettings.Dead_CodeIssue,
+                ErosionSettings.DeadCodeIssue,
                 ErosionSettings.MetricIssue,
                 ErosionSettings.StyleIssue,
                 ErosionSettings.UniversalIssue
@@ -506,13 +506,13 @@ namespace SEE.Game.City
         public IList<string> AllInnerNodeIssues() =>
             new List<string>
             {
-                ErosionSettings.ArchitectureIssue_SUM,
-                ErosionSettings.CloneIssue_SUM,
-                ErosionSettings.CycleIssue_SUM,
-                ErosionSettings.Dead_CodeIssue_SUM,
-                ErosionSettings.MetricIssue_SUM,
-                ErosionSettings.StyleIssue_SUM,
-                ErosionSettings.UniversalIssue_SUM
+                ErosionSettings.ArchitectureIssueSum,
+                ErosionSettings.CloneIssueSum,
+                ErosionSettings.CycleIssueSum,
+                ErosionSettings.DeadCodeIssueSum,
+                ErosionSettings.MetricIssueSum,
+                ErosionSettings.StyleIssueSum,
+                ErosionSettings.UniversalIssueSum
             };
 
         /// <summary>
@@ -531,10 +531,10 @@ namespace SEE.Game.City
         public Dictionary<string, IconFactory.Erosion> LeafIssueMap() =>
             new()
             {
-                { ErosionSettings.ArchitectureIssue, IconFactory.Erosion.Architecture_Violation },
+                { ErosionSettings.ArchitectureIssue, IconFactory.Erosion.ArchitectureViolation },
                 { ErosionSettings.CloneIssue, IconFactory.Erosion.Clone },
                 { ErosionSettings.CycleIssue, IconFactory.Erosion.Cycle },
-                { ErosionSettings.Dead_CodeIssue, IconFactory.Erosion.Dead_Code },
+                { ErosionSettings.DeadCodeIssue, IconFactory.Erosion.DeadCode },
                 { ErosionSettings.MetricIssue, IconFactory.Erosion.Metric },
                 { ErosionSettings.StyleIssue, IconFactory.Erosion.Style },
                 { ErosionSettings.UniversalIssue, IconFactory.Erosion.Universal }

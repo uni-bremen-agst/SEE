@@ -4,7 +4,7 @@
     /// Allows one to determine whether there is any difference between two
     /// graph elements.
     /// </summary>
-    public interface GraphElementDiff
+    public interface IGraphElementDiff
     {
         /// <summary>
         /// True whether there is a difference between <paramref name="left"/> and

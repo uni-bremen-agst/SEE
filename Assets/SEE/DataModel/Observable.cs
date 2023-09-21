@@ -15,14 +15,14 @@ namespace SEE.DataModel
         /// <summary>
         /// The list of currently registered observers that need to be notified upon a change of the state.
         /// </summary>
-        private readonly IList<IObserver<T>> Observers = new List<IObserver<T>>();
-        
+        private readonly IList<IObserver<T>> observers = new List<IObserver<T>>();
+
         /// <summary>
         /// If set to true, no notifications will be sent to observers.
         /// Note that this only suppresses notifications themselves, not errors or completion.
         /// </summary>
         public bool SuppressNotifications { get; set; } = false;
-        
+
         /// <summary>
         /// Registers a new subscriber for this observable.
         /// </summary>
@@ -30,13 +30,13 @@ namespace SEE.DataModel
         /// <returns>A disposable which can be used to unsubscribe from this observable</returns>
         public IDisposable Subscribe(IObserver<T> observer)
         {
-            if (!Observers.Contains(observer))
+            if (!observers.Contains(observer))
             {
-                Observers.Add(observer);
+                observers.Add(observer);
             }
-            return new Unsubscriber<T>(Observers, observer);
+            return new Unsubscriber<T>(observers, observer);
         }
-        
+
         /// <summary>
         /// A disposable responsible for unsubscribing an observer from this observable.
         /// </summary>
@@ -47,7 +47,7 @@ namespace SEE.DataModel
             /// The list of currently registered observers.
             /// </summary>
             private readonly IList<IObserver<U>> Observers;
-            
+
             /// <summary>
             /// The observer which is disposable by this class.
             /// </summary>
@@ -83,8 +83,8 @@ namespace SEE.DataModel
             {
                 return;
             }
-            
-            foreach (IObserver<T> observer in Observers)
+
+            foreach (IObserver<T> observer in observers)
             {
                 observer.OnNext(change);
             }
@@ -96,7 +96,7 @@ namespace SEE.DataModel
         /// </summary>
         protected void NotifyComplete()
         {
-            foreach (IObserver<T> observer in Observers)
+            foreach (IObserver<T> observer in observers)
             {
                 observer.OnCompleted();
             }
@@ -108,7 +108,7 @@ namespace SEE.DataModel
         /// <param name="error">information about the error that occurred</param>
         protected void NotifyError(Exception error)
         {
-            foreach (IObserver<T> observer in Observers)
+            foreach (IObserver<T> observer in observers)
             {
                 observer.OnError(error);
             }

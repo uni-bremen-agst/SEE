@@ -44,10 +44,11 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
         /// When the GameObject registers a mouse click, we get the position of the hit, create a new BoardConfiguration
         /// with that position and show the player a dialog where he can finish the configuration.
         /// </summary>
+        /// <remarks>This is a Unity method.</remarks>
         private void OnMouseUp()
         {
-            if (MainCamera.Camera != null && !Raycasting.IsMouseOverGUI() &&
-                Raycasting.RaycastAnything(out RaycastHit hit))
+            if (MainCamera.Camera != null && !Raycasting.IsMouseOverGUI()
+                && Raycasting.RaycastAnything(out RaycastHit hit))
             {
                 position = hit.point;
                 position.y += boardPrefab.transform.position.y;

@@ -32,7 +32,7 @@ namespace SEE.Game.Worlds
         /// The information needed to spawn player avatars.
         /// </summary>
         [Tooltip("The information to be used to spawn players."), ShowInInspector, SerializeField]
-        private List<SpawnInfo> PlayerSpawns = new List<SpawnInfo>();
+        private List<SpawnInfo> playerSpawns = new();
 
         /// <summary>
         /// The dissonance communication. Its game object holds the remote players as its children.
@@ -99,15 +99,15 @@ namespace SEE.Game.Worlds
         private int numberOfSpawnedPlayers = 0;
 
         /// <summary>
-        /// Spawns a player using the <see cref="PlayerSpawns"/>.
+        /// Spawns a player using the <see cref="ppyerSpawns"/>.
         /// </summary>
         /// <param name="owner">the network ID of the owner</param>
         private void Spawn(ulong owner)
         {
-            int index = numberOfSpawnedPlayers % PlayerSpawns.Count;
-            GameObject player = Instantiate(PlayerSpawns[index].PlayerPrefab,
-                                            PlayerSpawns[index].Position,
-                                            Quaternion.Euler(new Vector3(0, PlayerSpawns[index].Rotation, 0)));
+            int index = numberOfSpawnedPlayers % playerSpawns.Count;
+            GameObject player = Instantiate(playerSpawns[index].PlayerPrefab,
+                                            playerSpawns[index].Position,
+                                            Quaternion.Euler(new Vector3(0, playerSpawns[index].Rotation, 0)));
             numberOfSpawnedPlayers++;
             player.name = "Player " + numberOfSpawnedPlayers;
             Debug.Log($"Spawned {player.name} (network id: {owner}, local: {IsLocal(owner)}) at position {player.transform.position}.\n");
@@ -148,7 +148,7 @@ namespace SEE.Game.Worlds
         /// <param name="owner">the network ID of the owner</param>
         /// <returns>true iff <paramref name="owner"/> identifies
         /// <see cref="NetworkManager.Singleton.LocalClientId"/></returns>
-        private bool IsLocal(ulong owner)
+        private static bool IsLocal(ulong owner)
         {
             return owner == NetworkManager.Singleton.LocalClientId;
         }

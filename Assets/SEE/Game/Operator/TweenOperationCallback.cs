@@ -12,7 +12,7 @@ namespace SEE.Game.Operator
         /// <summary>
         /// The callback this tween operates on.
         /// </summary>
-        private readonly Tween TargetTween;
+        private readonly Tween targetTween;
 
         /// <summary>
         /// Creates a new <see cref="TweenOperationCallback"/> operating on the given <paramref name="targetTween"/>.
@@ -21,37 +21,37 @@ namespace SEE.Game.Operator
         public TweenOperationCallback(Tween targetTween)
         {
             Assert.IsNotNull(targetTween);
-            TargetTween = targetTween;
+            this.targetTween = targetTween;
         }
 
         public void SetOnComplete(TweenCallback callback)
         {
-            TargetTween.OnComplete((TweenCallback)Delegate.Combine(TargetTween.onComplete, callback));
+            targetTween.OnComplete((TweenCallback)Delegate.Combine(targetTween.onComplete, callback));
         }
 
         public void SetOnKill(TweenCallback callback)
         {
-            TargetTween.OnKill((TweenCallback)Delegate.Combine(TargetTween.onKill, callback));
+            targetTween.OnKill((TweenCallback)Delegate.Combine(targetTween.onKill, callback));
         }
 
         public void SetOnPlay(TweenCallback callback)
         {
-            TargetTween.OnPlay((TweenCallback)Delegate.Combine(TargetTween.onPlay, callback));
+            targetTween.OnPlay((TweenCallback)Delegate.Combine(targetTween.onPlay, callback));
         }
 
         public void SetOnPause(TweenCallback callback)
         {
-            TargetTween.OnPause((TweenCallback)Delegate.Combine(TargetTween.onPause, callback));
+            targetTween.OnPause((TweenCallback)Delegate.Combine(targetTween.onPause, callback));
         }
 
         public void SetOnRewind(TweenCallback callback)
         {
-            TargetTween.OnRewind((TweenCallback)Delegate.Combine(TargetTween.onRewind, callback));
+            targetTween.OnRewind((TweenCallback)Delegate.Combine(targetTween.onRewind, callback));
         }
 
         public void SetOnUpdate(TweenCallback callback)
         {
-            TargetTween.OnUpdate((TweenCallback)Delegate.Combine(TargetTween.onUpdate, callback));
+            targetTween.OnUpdate((TweenCallback)Delegate.Combine(targetTween.onUpdate, callback));
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace SEE.Game.Operator
         public void SetOnStart(TweenCallback callback)
         {
             // We can't combine delegates here because `onStart` is an internal property in DOTween.
-            TargetTween.OnStart(callback);
+            targetTween.OnStart(callback);
         }
     }
 }

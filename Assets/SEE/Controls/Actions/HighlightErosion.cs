@@ -241,7 +241,7 @@ namespace SEE.Controls.Actions
 
             foreach (Transform childTransform in gameObject.transform)
             {
-                if (childTransform.name.StartsWith(ErosionIssues.EROSION_SPRITE_PREFIX))
+                if (childTransform.name.StartsWith(ErosionIssues.ErosionSpritePrefix))
                 {
                     HorizontalLayoutGroup layoutGroup = childTransform.GetComponent<HorizontalLayoutGroup>();
                     SpriteRenderer spriteRenderer = childTransform.GetComponentInChildren<SpriteRenderer>();

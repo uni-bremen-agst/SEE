@@ -43,7 +43,7 @@ namespace SEE.GO
 
         private void AnySelectIn(InteractableObject interactableObject, bool isInitiator)
         {
-            Graph selectedGraph = interactableObject.GraphElemRef.elem.ItsGraph;
+            Graph selectedGraph = interactableObject.GraphElemRef.Elem.ItsGraph;
             if (selectedGraph.Equals(city.LoadedGraph))
             {
                 E.AddFocus(interactableObject);
@@ -52,7 +52,7 @@ namespace SEE.GO
 
         private void AnySelectOut(InteractableObject interactableObject, bool isInitiator)
         {
-            Graph selectedGraph = interactableObject.GraphElemRef.elem.ItsGraph;
+            Graph selectedGraph = interactableObject.GraphElemRef.Elem.ItsGraph;
             if (selectedGraph.Equals(city.LoadedGraph))
             {
                 E.RemoveFocus(interactableObject);

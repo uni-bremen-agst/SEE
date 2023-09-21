@@ -55,7 +55,7 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Removes the given node. The removal is animated by raising the
-        /// node to <see cref="SkyLevel"/> (y dimension). The node is not
+        /// node to <see cref="skyLevel"/> (y dimension). The node is not
         /// destroyed when the animation has finished.
         /// </summary>
         /// <param name="node">leaf node to be removed</param>
@@ -77,16 +77,16 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Triggers an animation indicating that the given <paramref name="gameObject"/> was
-        /// deleted by moving it up to the sky. When it reaches the sky at <see cref="SkyLevel"/>,
+        /// deleted by moving it up to the sky. When it reaches the sky at <see cref="skyLevel"/>,
         /// it will disappear (via <see cref="OnRemoveFinishedAnimation"/>).
         /// </summary>
         /// <param name="gameObject">a game object representing either a node or edge</param>
         private void AnimateToDeath(GameObject gameObject)
         {
             gameObject.transform.SetParent(null);
-            /// Let it raise to <see cref="SkyLevel"/>.
+            /// Let it raise to <see cref="skyLevel"/>.
             Vector3 newPosition = gameObject.transform.position;
-            newPosition.y = SkyLevel;
+            newPosition.y = skyLevel;
 
             MoveTo(gameObject, newPosition);
 

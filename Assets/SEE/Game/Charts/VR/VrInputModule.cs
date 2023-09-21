@@ -33,12 +33,12 @@ namespace SEE.Game.Charts.VR
         /// <summary>
         /// Manages the VR pointer used to interact with canvases.
         /// </summary>
-        private VrPointer _pointer;
+        private VrPointer pointer;
 
         /// <summary>
         /// Contains the users clicking information.
         /// </summary>
-        private ChartAction _chartAction;
+        private ChartAction chartAction;
 
         public PointerEventData EventData { get; private set; }
 
@@ -49,7 +49,7 @@ namespace SEE.Game.Charts.VR
         {
             base.Awake();
             GetSettingData();
-            _pointer = GameObject.FindGameObjectWithTag("Pointer").GetComponent<VrPointer>();
+            pointer = GameObject.FindGameObjectWithTag("Pointer").GetComponent<VrPointer>();
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace SEE.Game.Charts.VR
         /// </summary>
         private void GetSettingData()
         {
-            _chartAction = GameObject.Find("VRPlayer").GetComponent<ChartAction>();
+            chartAction = GameObject.Find("VRPlayer").GetComponent<ChartAction>();
         }
 
         /// <summary>
@@ -67,8 +67,8 @@ namespace SEE.Game.Charts.VR
         {
             EventData = new PointerEventData(eventSystem)
             {
-                position = new Vector2(_pointer.Camera.pixelWidth / 2,
-                    _pointer.Camera.pixelHeight / 2)
+                position = new Vector2(pointer.Camera.pixelWidth / 2,
+                    pointer.Camera.pixelHeight / 2)
             };
         }
 
@@ -79,7 +79,7 @@ namespace SEE.Game.Charts.VR
         {
             eventSystem.RaycastAll(EventData, m_RaycastResultCache);
             EventData.pointerCurrentRaycast = FindFirstRaycast(m_RaycastResultCache);
-            Ray ray = new Ray(_pointer.transform.position, _pointer.transform.forward);
+            Ray ray = new Ray(pointer.transform.position, pointer.transform.forward);
             Physics.Raycast(ray, out RaycastHit hitData, ChartManager.Instance.PointerLength);
             float colliderDistance = hitData.distance.Equals(0f)
                 ? ChartManager.Instance.PointerLength
@@ -102,12 +102,12 @@ namespace SEE.Game.Charts.VR
         {
             HandlePointerExitAndEnter(EventData, hitData.transform.gameObject);
             ExecuteEvents.Execute(EventData.pointerDrag, EventData, ExecuteEvents.dragHandler);
-            if (_chartAction.ClickDown)
+            if (chartAction.ClickDown)
             {
                 Press(hitData.transform.gameObject);
             }
 
-            if (_chartAction.ClickUp)
+            if (chartAction.ClickUp)
             {
                 Release(hitData.transform.gameObject);
             }
@@ -117,12 +117,12 @@ namespace SEE.Game.Charts.VR
         {
             HandlePointerExitAndEnter(EventData, EventData.pointerCurrentRaycast.gameObject);
             ExecuteEvents.Execute(EventData.pointerDrag, EventData, ExecuteEvents.dragHandler);
-            if (_chartAction.ClickDown)
+            if (chartAction.ClickDown)
             {
                 Press(EventData.pointerCurrentRaycast.gameObject);
             }
 
-            if (_chartAction.ClickUp)
+            if (chartAction.ClickUp)
             {
                 Release(EventData.pointerCurrentRaycast.gameObject);
             }

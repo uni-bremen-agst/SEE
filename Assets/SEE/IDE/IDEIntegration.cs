@@ -528,7 +528,10 @@ namespace SEE.IDE
                     string project = await ideCalls.GetProjectPath(connection);
                     connection.AddTarget(new RemoteProcedureCalls(this, project));
 
-                    if (project == null) return;
+                    if (project == null)
+                    {
+                        return;
+                    }
 
                     if (!cachedConnections.ContainsKey(project))
                     {

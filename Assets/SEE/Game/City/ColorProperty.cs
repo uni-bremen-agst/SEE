@@ -54,10 +54,10 @@ namespace SEE.Game.City
             if (attributes.TryGetValue(label, out object dictionary))
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-                ConfigIO.RestoreEnum(values, PropertyLabel, ref Property);
-                ConfigIO.Restore(values, TypeColorLabel, ref TypeColor);
-                ConfigIO.Restore(values, ByLevelLabel, ref ByLevel);
-                ConfigIO.Restore(values, ColorMetricLabel, ref ColorMetric);
+                ConfigIO.RestoreEnum(values, propertyLabel, ref Property);
+                ConfigIO.Restore(values, typeColorLabel, ref TypeColor);
+                ConfigIO.Restore(values, byLevelLabel, ref ByLevel);
+                ConfigIO.Restore(values, colorMetricLabel, ref ColorMetric);
                 return true;
             }
             else
@@ -75,28 +75,28 @@ namespace SEE.Game.City
         public void Save(ConfigWriter writer, string label = "")
         {
             writer.BeginGroup(label);
-            writer.Save(Property.ToString(), PropertyLabel);
-            writer.Save(TypeColor, TypeColorLabel);
-            writer.Save(ByLevel, ByLevelLabel);
-            writer.Save(ColorMetric, ColorMetricLabel);
+            writer.Save(Property.ToString(), propertyLabel);
+            writer.Save(TypeColor, typeColorLabel);
+            writer.Save(ByLevel, byLevelLabel);
+            writer.Save(ColorMetric, colorMetricLabel);
             writer.EndGroup();
         }
 
         /// <summary>
         /// Label in the configuration file for a <see cref="Property"/>
         /// </summary>
-        private const string PropertyLabel = "Property";
+        private const string propertyLabel = "Property";
         /// <summary>
         /// Label in the configuration file for <see cref="TypeColor"/>.
         /// </summary>
-        private const string TypeColorLabel = "TypeColor";
+        private const string typeColorLabel = "TypeColor";
         /// <summary>
         /// Label in the configuration file for <see cref="TypeColor"/>.
         /// </summary>
-        private const string ByLevelLabel = "ByLevel";
+        private const string byLevelLabel = "ByLevel";
         /// <summary>
         /// Label in the configuration file for a <see cref="ColorMetric"/>
         /// </summary>
-        private const string ColorMetricLabel = "ColorMetric";
+        private const string colorMetricLabel = "ColorMetric";
     }
 }

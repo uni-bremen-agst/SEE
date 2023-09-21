@@ -33,9 +33,9 @@ namespace SEE.Game.City
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(Kind.ToString(), NodeLayoutLabel);
-            LayoutPath.Save(writer, LayoutPathLabel);
-            IncrementalTreeMapSetting.Save(writer, IncrementalTreeMapLabel);
+            writer.Save(Kind.ToString(), nodeLayoutLabel);
+            LayoutPath.Save(writer, layoutPathLabel);
+            IncrementalTreeMapSetting.Save(writer, incrementalTreeMapLabel);
             writer.EndGroup();
         }
 
@@ -45,23 +45,23 @@ namespace SEE.Game.City
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
-                ConfigIO.RestoreEnum(values, NodeLayoutLabel, ref Kind);
-                LayoutPath.Restore(values, LayoutPathLabel);
-                IncrementalTreeMapSetting.Restore(values, IncrementalTreeMapLabel);
+                ConfigIO.RestoreEnum(values, nodeLayoutLabel, ref Kind);
+                LayoutPath.Restore(values, layoutPathLabel);
+                IncrementalTreeMapSetting.Restore(values, incrementalTreeMapLabel);
             }
         }
 
         /// <summary>
         /// Configuration label for <see cref="LayoutPath"/>.
         /// </summary>
-        private const string LayoutPathLabel = "LayoutPath";
+        private const string layoutPathLabel = "LayoutPath";
         /// <summary>
         /// Configuration label for <see cref="IncrementalTreeMapSetting"/>.
         /// </summary>
-        private const string IncrementalTreeMapLabel = "IncrementalTreeMap";
+        private const string incrementalTreeMapLabel = "IncrementalTreeMap";
         /// <summary>
         /// Configuration label for <see cref="Kind"/>.
         /// </summary>
-        private const string NodeLayoutLabel = "NodeLayout";
+        private const string nodeLayoutLabel = "NodeLayout";
     }
 }

@@ -34,28 +34,28 @@ namespace SEE.Game.Charts.VR
         /// <summary>
         /// Contains settings used in this script.
         /// </summary>
-        private ChartContentVr _chartContent;
+        private ChartContentVr chartContent;
 
         /// <summary>
         /// The transform of the ChartCanvasVRContainer (Contains world space <see cref="Canvas" /> and 3D
         /// objects for the canvas to sit on).
         /// </summary>
-        private Transform _parent;
+        private Transform parent;
 
         /// <summary>
         /// Contains information about scrolling input.
         /// </summary>
-        private ChartAction _chartAction;
+        private ChartAction chartAction;
 
         /// <summary>
         /// The minimum distance from the controller to the chart.
         /// </summary>
-        private float _minimumDistance;
+        private float minimumDistance;
 
         /// <summary>
         /// The maximum distance from the controller to the chart.
         /// </summary>
-        private float _maximumDistance;
+        private float maximumDistance;
 
         /// <summary>
         /// The speed at which charts will be moved in or out when the player scrolls.
@@ -65,27 +65,27 @@ namespace SEE.Game.Charts.VR
         /// <summary>
         /// The <see cref="Camera" /> attached to the pointer.
         /// </summary>
-        private Camera _pointerCamera;
+        private Camera pointerCamera;
 
         /// <summary>
         /// 3D representation of the chart when not minimized.
         /// </summary>
-        private GameObject _physicalOpen;
+        private GameObject physicalOpen;
 
         /// <summary>
         /// 3D representation of the chart when minimized.
         /// </summary>
-        private GameObject _physicalClosed;
+        private GameObject physicalClosed;
 
         /// <summary>
         /// Contains position Data of the object this script is attached to
         /// </summary>
-        private RectTransform _rectTransform;
+        private RectTransform rectTransform;
 
         /// <summary>
-        /// The offset of the <see cref="Canvas" /> to <see cref="_physicalOpen" /> so the two don't clip.
+        /// The offset of the <see cref="Canvas" /> to <see cref="physicalOpen" /> so the two don't clip.
         /// </summary>
-        private readonly Vector3 _chartOffset = new Vector3(0, 0, -0.03f);
+        private readonly Vector3 chartOffset = new Vector3(0, 0, -0.03f);
 
         /// <summary>
         /// Initializes some attributes.
@@ -96,11 +96,11 @@ namespace SEE.Game.Charts.VR
             Transform parent = transform.parent;
             // FIXME the line below was here before refactoring charts and needs to be reintroduced for VR
             //_parent = parent.GetComponent<ChartContent>().parent.transform;
-            _pointerCamera = GameObject.FindGameObjectWithTag("Pointer").GetComponent<Camera>();
-            _chartContent = parent.GetComponent<ChartContentVr>();
-            _physicalOpen = _chartContent.physicalOpen;
-            _physicalClosed = _chartContent.physicalClosed;
-            _rectTransform = GetComponent<RectTransform>();
+            pointerCamera = GameObject.FindGameObjectWithTag("Pointer").GetComponent<Camera>();
+            chartContent = parent.GetComponent<ChartContentVr>();
+            physicalOpen = chartContent.PhysicalOpen;
+            physicalClosed = chartContent.PhysicalClosed;
+            rectTransform = GetComponent<RectTransform>();
         }
 
         /// <summary>
@@ -110,9 +110,9 @@ namespace SEE.Game.Charts.VR
         {
             base.GetSettingData();
             _chartScrollSpeed = ChartManager.Instance.ChartScrollSpeed;
-            _minimumDistance = ChartManager.Instance.DistanceThreshold;
-            _maximumDistance = ChartManager.Instance.PointerLength;
-            _chartAction = GameObject.Find("VRPlayer").GetComponent<ChartAction>();
+            minimumDistance = ChartManager.Instance.DistanceThreshold;
+            maximumDistance = ChartManager.Instance.PointerLength;
+            chartAction = GameObject.Find("VRPlayer").GetComponent<ChartAction>();
         }
 
         /// <summary>
@@ -121,8 +121,8 @@ namespace SEE.Game.Charts.VR
         protected override void Update()
         {
             base.Update();
-            Vector3 parentPosition = _parent.position;
-            _parent.LookAt(parentPosition - (MainCamera.Camera.transform.position - parentPosition));
+            Vector3 parentPosition = parent.position;
+            parent.LookAt(parentPosition - (MainCamera.Camera.transform.position - parentPosition));
             ScrollInOut();
         }
 
@@ -132,19 +132,19 @@ namespace SEE.Game.Charts.VR
         /// </summary>
         private void ScrollInOut()
         {
-            if (!PointerDown || _chartAction.Move.Equals(0))
+            if (!PointerDown || chartAction.Move.Equals(0))
             {
                 return;
             }
 
-            Vector3 direction = _pointerCamera.transform.position - _rectTransform.position;
-            float moveBy = _chartAction.Move * _chartScrollSpeed * Time.deltaTime;
-            if (!(_chartAction.Move < 0 &&
-                  direction.magnitude < _minimumDistance + moveBy ||
-                  _chartAction.Move > 0 &&
-                  direction.magnitude > _maximumDistance - moveBy))
+            Vector3 direction = pointerCamera.transform.position - rectTransform.position;
+            float moveBy = chartAction.Move * _chartScrollSpeed * Time.deltaTime;
+            if (!(chartAction.Move < 0 &&
+                  direction.magnitude < minimumDistance + moveBy ||
+                  chartAction.Move > 0 &&
+                  direction.magnitude > maximumDistance - moveBy))
             {
-                _parent.position -= direction * moveBy;
+                parent.position -= direction * moveBy;
             }
         }
 
@@ -156,9 +156,9 @@ namespace SEE.Game.Charts.VR
         {
             if (eventData.pointerCurrentRaycast.worldPosition != Vector3.zero)
             {
-                _parent.position = eventData.pointerCurrentRaycast.worldPosition -
-                                   (transform.position - (_parent.position + _chartOffset)) -
-                                   _chartOffset;
+                parent.position = eventData.pointerCurrentRaycast.worldPosition -
+                                   (transform.position - (parent.position + chartOffset)) -
+                                   chartOffset;
             }
         }
 
@@ -167,8 +167,8 @@ namespace SEE.Game.Charts.VR
         /// </summary>
         protected override void ToggleMinimize()
         {
-            _physicalOpen.SetActive(Minimized);
-            _physicalClosed.SetActive(!Minimized);
+            physicalOpen.SetActive(Minimized);
+            physicalClosed.SetActive(!Minimized);
             base.ToggleMinimize();
         }
     }

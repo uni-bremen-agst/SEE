@@ -35,47 +35,47 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Label in the configuration file for the title of a metrics board.
         /// </summary>
-        private const string BoardTitleLabel = "Title";
+        private const string boardTitleLabel = "Title";
 
         /// <summary>
         /// Label in the configuration file for the x coordinate of a metrics board.
         /// </summary>
-        private const string BoardPositionXLabel = "BoardPositionX";
+        private const string boardPositionXLabel = "BoardPositionX";
 
         /// <summary>
         /// Label in the configuration file for the y coordinate of a metrics board.
         /// </summary>
-        private const string BoardPositionYLabel = "BoardPositionY";
+        private const string boardPositionYLabel = "BoardPositionY";
 
         /// <summary>
         /// Label in the configuration file for the z coordinate of a metrics board.
         /// </summary>
-        private const string BoardPositionZLabel = "BoardPositionZ";
+        private const string boardPositionZLabel = "BoardPositionZ";
 
         /// <summary>
         /// Label in the configuration file for the rotation w component of a metrics board.
         /// </summary>
-        private const string BoardRotationWLabel = "BoardRotationW";
+        private const string boardRotationWLabel = "BoardRotationW";
 
         /// <summary>
         /// Label in the configuration file for the rotation x component of a metrics board.
         /// </summary>
-        private const string BoardRotationXLabel = "BoardRotationX";
+        private const string boardRotationXLabel = "BoardRotationX";
 
         /// <summary>
         /// Label in the configuration file for the rotation y component of a metrics board.
         /// </summary>
-        private const string BoardRotationYLabel = "BoardRotationY";
+        private const string bardRotationYLabel = "BoardRotationY";
 
         /// <summary>
         /// Label in the configuration file for the rotation z component of a metrics board.
         /// </summary>
-        private const string BoardRotationZLabel = "BoardRotationZ";
+        private const string boardRotationZLabel = "BoardRotationZ";
 
         /// <summary>
         /// The label for the group of widget configurations in the configuration file.
         /// </summary>
-        private const string WidgetConfigsLabel = "WidgetConfigs";
+        private const string widgetConfigsLabel = "WidgetConfigs";
 
         /// <summary>
         /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
@@ -83,15 +83,15 @@ namespace SEE.Game.HolisticMetrics
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
         internal void Save(ConfigWriter writer)
         {
-            writer.Save(Title, BoardTitleLabel);
-            writer.Save(Position.x, BoardPositionXLabel);
-            writer.Save(Position.y, BoardPositionYLabel);
-            writer.Save(Position.z, BoardPositionZLabel);
-            writer.Save(Rotation.w, BoardRotationWLabel);
-            writer.Save(Rotation.x, BoardRotationXLabel);
-            writer.Save(Rotation.y, BoardRotationYLabel);
-            writer.Save(Rotation.z, BoardRotationZLabel);
-            writer.BeginList(WidgetConfigsLabel);
+            writer.Save(Title, boardTitleLabel);
+            writer.Save(Position.x, boardPositionXLabel);
+            writer.Save(Position.y, boardPositionYLabel);
+            writer.Save(Position.z, boardPositionZLabel);
+            writer.Save(Rotation.w, boardRotationWLabel);
+            writer.Save(Rotation.x, boardRotationXLabel);
+            writer.Save(Rotation.y, bardRotationYLabel);
+            writer.Save(Rotation.z, boardRotationZLabel);
+            writer.BeginList(widgetConfigsLabel);
             foreach (WidgetConfig widgetConfig in WidgetConfigs)
             {
                 widgetConfig.Save(writer);
@@ -108,7 +108,7 @@ namespace SEE.Game.HolisticMetrics
         internal bool Restore(Dictionary<string, object> attributes)
         {
             bool errorFree = true;
-            if (attributes.TryGetValue(BoardTitleLabel, out object title))
+            if (attributes.TryGetValue(boardTitleLabel, out object title))
             {
                 Title = (string)title;
             }
@@ -118,9 +118,9 @@ namespace SEE.Game.HolisticMetrics
                 errorFree = false;
             }
 
-            if (attributes.TryGetValue(BoardPositionXLabel, out object boardPositionX) &&
-                attributes.TryGetValue(BoardPositionYLabel, out object boardPositionY) &&
-                attributes.TryGetValue(BoardPositionZLabel, out object boardPositionZ))
+            if (attributes.TryGetValue(boardPositionXLabel, out object boardPositionX) &&
+                attributes.TryGetValue(boardPositionYLabel, out object boardPositionY) &&
+                attributes.TryGetValue(boardPositionZLabel, out object boardPositionZ))
             {
                 Position = new Vector3((float)boardPositionX, (float)boardPositionY, (float)boardPositionZ);
             }
@@ -130,10 +130,10 @@ namespace SEE.Game.HolisticMetrics
                 errorFree = false;
             }
 
-            if (attributes.TryGetValue(BoardRotationWLabel, out object boardRotationW) &&
-                attributes.TryGetValue(BoardRotationXLabel, out object boardRotationX) &&
-                attributes.TryGetValue(BoardRotationYLabel, out object boardRotationY) &&
-                attributes.TryGetValue(BoardRotationZLabel, out object boardRotationZ))
+            if (attributes.TryGetValue(boardRotationWLabel, out object boardRotationW) &&
+                attributes.TryGetValue(boardRotationXLabel, out object boardRotationX) &&
+                attributes.TryGetValue(bardRotationYLabel, out object boardRotationY) &&
+                attributes.TryGetValue(boardRotationZLabel, out object boardRotationZ))
             {
                 Rotation = new Quaternion(
                     (float)boardRotationX,
@@ -147,7 +147,7 @@ namespace SEE.Game.HolisticMetrics
                 errorFree = false;
             }
 
-            if (attributes.TryGetValue(WidgetConfigsLabel, out object widgetList))
+            if (attributes.TryGetValue(widgetConfigsLabel, out object widgetList))
             {
                 foreach (object item in (List<object>)widgetList)
                 {

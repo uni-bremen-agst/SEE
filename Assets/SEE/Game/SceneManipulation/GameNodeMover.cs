@@ -13,7 +13,7 @@ namespace SEE.Game.SceneManipulation
         /// <summary>
         /// Factor by which nodes should be scaled relative to their parents in <see cref="PutOn"/>.
         /// </summary>
-        public const float SCALING_FACTOR = 0.2f;
+        public const float ScalingFactor = 0.2f;
 
         /// <summary>
         /// Sets the <paramref name="newParent"/> for <paramref name="child"/> both in the
@@ -127,7 +127,7 @@ namespace SEE.Game.SceneManipulation
                 // TODO: We need a strategy to scale down a node to the maximal size that is still
                 // fitting into the area where the nodes has been placed.
                 // We want to shrink only the ground area, but maintain the height.
-                return new Vector3(SCALING_FACTOR * parent.transform.lossyScale.x, child.lossyScale.y, SCALING_FACTOR * parent.transform.lossyScale.z);
+                return new Vector3(ScalingFactor * parent.transform.lossyScale.x, child.lossyScale.y, ScalingFactor * parent.transform.lossyScale.z);
             }
         }
 

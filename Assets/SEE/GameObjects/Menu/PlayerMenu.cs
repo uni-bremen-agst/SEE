@@ -220,7 +220,7 @@ namespace SEE.GO.Menu
         /// Sets the currently selected menu entry in PlayerMenu to the action with given <paramref name="actionName"/>.
         /// </summary>
         /// <param name="actionName">name of the menu entry to be </param>
-        private void SetPlayerMenu(string actionName)
+        private static void SetPlayerMenu(string actionName)
         {
             if (SceneSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu))
             {

@@ -24,7 +24,7 @@ namespace SEE.Layout.NodeLayouts
         public RectanglePackingNodeLayout(float groundLevel, float padding = 1.0f)
             : base(groundLevel)
         {
-            name = "Rectangle Packing";
+            Name = "Rectangle Packing";
             this.padding = padding;
         }
 
@@ -90,7 +90,7 @@ namespace SEE.Layout.NodeLayouts
             {
                 ILayoutNode root = roots.FirstOrDefault();
                 Vector2 area = PlaceNodes(layoutResult, root);
-                Vector3 position = new(0.0f, groundLevel, 0.0f);
+                Vector3 position = new(0.0f, GroundLevel, 0.0f);
                 // Maintain the original height of all inner nodes (and root is an inner node).
                 layoutResult[root] = new NodeTransform(position, new Vector3(area.x, root.LocalScale.y, area.y));
                 RemovePadding(layoutResult, padding);
@@ -198,7 +198,7 @@ namespace SEE.Layout.NodeLayouts
                         // inner node. Nevertheless, we do not add padding here, because padding is already
                         // included in the returned childArea.
                         layout[child] = new NodeTransform(Vector3.zero,
-                                                          new Vector3(childArea.x, groundLevel, childArea.y));
+                                                          new Vector3(childArea.x, GroundLevel, childArea.y));
                     }
                 }
                 // The scales of all children of the node have now been set. Now
@@ -327,7 +327,7 @@ namespace SEE.Layout.NodeLayouts
                 foreach (PNode pnode in tree.GetSufficientlyLargeLeaves(requiredSize))
                 {
                     // Right lower corner of new rectangle
-                    Vector2 corner = pnode.rectangle.position + requiredSize;
+                    Vector2 corner = pnode.Rectangle.position + requiredSize;
                     // Expanded covrec.
                     Vector2 expandedCoveRec = new Vector2(Mathf.Max(covrec.x, corner.x), Mathf.Max(covrec.y, corner.y));
 
@@ -335,7 +335,7 @@ namespace SEE.Layout.NodeLayouts
                     if (PTree.FitsInto(expandedCoveRec, covrec))
                     {
                         // The remaining area of pnode if el were placed into it.
-                        float waste = pnode.rectangle.size.x * pnode.rectangle.size.y - requiredSize.x * requiredSize.y;
+                        float waste = pnode.Rectangle.size.x * pnode.Rectangle.size.y - requiredSize.x * requiredSize.y;
                         preservers[pnode] = waste;
                     }
                     else
@@ -387,16 +387,16 @@ namespace SEE.Layout.NodeLayouts
                 // The x and y co-ordinates of the rectangle denote the left front corner. The layout
                 // position returned must be the center. The y co-ordinate is the ground level.
                 Vector3 scale = layout[el].scale;
-                layout[el] = new NodeTransform(new Vector3(fitNode.rectangle.position.x + scale.x / 2.0f,
-                                                           groundLevel,
-                                                           fitNode.rectangle.position.y + scale.z / 2.0f),
+                layout[el] = new NodeTransform(new Vector3(fitNode.Rectangle.position.x + scale.x / 2.0f,
+                                                           GroundLevel,
+                                                           fitNode.Rectangle.position.y + scale.z / 2.0f),
                                                scale);
 
                 // If fitNode is a boundary expander, then we need to expand coverc to the
                 // newly covered area.
                 {
                     // Right lower corner of fitNode
-                    Vector2 corner = fitNode.rectangle.position + requiredSize;
+                    Vector2 corner = fitNode.Rectangle.position + requiredSize;
                     // Expanded covrec.
                     Vector2 expandedCoveRec = new Vector2(Mathf.Max(covrec.x, corner.x), Mathf.Max(covrec.y, corner.y));
 

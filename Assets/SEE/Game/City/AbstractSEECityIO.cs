@@ -13,79 +13,79 @@ namespace SEE.Game.City
         /// <summary>
         /// Label in the configuration file for <see cref="HierarchicalEdges"/>.
         /// </summary>
-        private const string HierarchicalEdgesLabel = "HierarchicalEdges";
+        private const string hierarchicalEdgesLabel = "HierarchicalEdges";
         /// <summary>
         /// Label in the configuration file for <see cref="NodeTypes"/>.
         /// </summary>
-        private const string NodeTypesLabel = "NodeTypes";
+        private const string nodeTypesLabel = "NodeTypes";
         /// <summary>
         /// Label in the configuration file for <see cref="CoseGraphSettings"/>.
         /// </summary>
-        private const string CoseGraphSettingsLabel = "CoseGraph";
+        private const string coseGraphSettingsLabel = "CoseGraph";
         /// <summary>
         /// Label in the configuration file for <see cref="ErosionSettings"/>.
         /// </summary>
-        private const string ErosionSettingsLabel = "ErosionIssues";
+        private const string erosionSettingsLabel = "ErosionIssues";
         /// <summary>
         /// Label in the configuration file for <see cref="BoardSettings"/>.
         /// </summary>
-        private const string BoardSettingsLabel = "BoardSettings";
+        private const string boardSettingsLabel = "BoardSettings";
         /// <summary>
         /// Label in the configuration file for <see cref="NodeLayoutSettings"/>.
         /// </summary>
-        private const string NodeLayoutSettingsLabel = "NodeLayout";
+        private const string nodeLayoutSettingsLabel = "NodeLayout";
         /// <summary>
         /// Label in the configuration file for <see cref="EdgeLayoutSettings"/>.
         /// </summary>
-        private const string EdgeLayoutSettingsLabel = "EdgeLayout";
+        private const string edgeLayoutSettingsLabel = "EdgeLayout";
         /// <summary>
         /// Label in the configuration file for <see cref="ConfigurationPath"/>.
         /// </summary>
-        private const string ConfigurationPathLabel= "ConfigPath";
+        private const string configurationPathLabel= "ConfigPath";
         /// <summary>
         /// Label in the configuration file for <see cref="SourceCodeDirectory"/>.
         /// </summary>
-        private const string SourceCodeDirectoryLabel = "ProjectPath";
+        private const string sourceCodeDirectoryLabel = "ProjectPath";
         /// <summary>
         /// Label in the configuration file for <see cref="SolutionPath"/>.
         /// </summary>
-        private const string SolutionPathLabel = "SolutionPath";
+        private const string solutionPathLabel = "SolutionPath";
         /// <summary>
         /// Label in the configuration file for <see cref="LODCulling"/>.
         /// </summary>
-        private const string LODCullingLabel = "LODCulling";
+        private const string lodCullingLabel = "LODCulling";
         /// <summary>
         /// Label in the configuration file for <see cref="ZScoreScale"/>.
         /// </summary>
-        private const string ZScoreScaleLabel = "ZScoreScale";
+        private const string zScoreScaleLabel = "ZScoreScale";
         /// <summary>
         /// Label in the configuration file for <see cref="ScaleOnlyLeafMetrics"/>.
         /// </summary>
-        private const string ScaleOnlyLeafMetricsLabel = "ScaleOnlyLeafMetrics";
+        private const string scaleOnlyLeafMetricsLabel = "ScaleOnlyLeafMetrics";
         /// <summary>
         /// Label in the configuration file for <see cref="EdgeSelectionSettings"/>.
         /// </summary>
-        private const string EdgeSelectionSettingsLabel = "EdgeSelection";
+        private const string edgeSelectionSettingsLabel = "EdgeSelection";
         /// <summary>
         /// Label in the configuration file for <see cref="MetricToColor"/>.
         /// </summary>
-        private const string MetricToColorLabel = "MetricToColor";
+        private const string metricToColorLabel = "MetricToColor";
         /// <summary>
         /// Label in the configuration file for <see cref="IgnoreSelfLoopsInLifting"/>.
         /// </summary>
-        private const string IgnoreSelfLoopsInLiftingLabel = "IgnoreSelfLoopsInLifting";
+        private const string ignoreSelfLoopsInLiftingLabel = "IgnoreSelfLoopsInLifting";
         /// <summary>
         /// Label in the configuration file for <see cref="MaximalAntennaSegmentHeight"/>.
         /// </summary>
-        private const string MaximalAntennaSegmentHeightLabel = "MaximalAntennaSegmentHeight";
+        private const string maximalAntennaSegmentHeightLabel = "MaximalAntennaSegmentHeight";
         /// <summary>
         /// Label in the configuration file for <see cref="AntennaWidth"/>.
         /// </summary>
-        private const string AntennaWidthLabel = "AntennaWidth";
+        private const string antennaWidthLabel = "AntennaWidth";
         /// <summary>
         /// Label in the configuration file for <see cref="BaseAnimationDuration"/>.
         /// </summary>
-        private const string BaseAnimationDurationLabel = "BaseAnimationDuration";
+        private const string baseAnimationDurationLabel = "BaseAnimationDuration";
 
         #endregion
 
@@ -96,25 +96,25 @@ namespace SEE.Game.City
         /// <param name="writer">writer for the configuration file</param>
         protected virtual void Save(ConfigWriter writer)
         {
-            ConfigurationPath.Save(writer, ConfigurationPathLabel);
-            SourceCodeDirectory.Save(writer, SourceCodeDirectoryLabel);
-            SolutionPath.Save(writer, SolutionPathLabel);
-            writer.Save(LODCulling, LODCullingLabel);
-            writer.Save(HierarchicalEdges.ToList(), HierarchicalEdgesLabel);
-            NodeTypes.Save(writer, NodeTypesLabel);
-            writer.Save(IgnoreSelfLoopsInLifting, IgnoreSelfLoopsInLiftingLabel);
-            writer.Save(MaximalAntennaSegmentHeight, MaximalAntennaSegmentHeightLabel);
-            writer.Save(AntennaWidth, AntennaWidthLabel);
-            writer.Save(BaseAnimationDuration, BaseAnimationDurationLabel);
-            MetricToColor.Save(writer, MetricToColorLabel);
-            writer.Save(ZScoreScale, ZScoreScaleLabel);
-            writer.Save(ScaleOnlyLeafMetrics, ScaleOnlyLeafMetricsLabel);
-            ErosionSettings.Save(writer, ErosionSettingsLabel);
-            BoardSettings.Save(writer, BoardSettingsLabel);
-            NodeLayoutSettings.Save(writer, NodeLayoutSettingsLabel);
-            EdgeLayoutSettings.Save(writer, EdgeLayoutSettingsLabel);
-            EdgeSelectionSettings.Save(writer, EdgeSelectionSettingsLabel);
-            CoseGraphSettings.Save(writer, CoseGraphSettingsLabel);
+            ConfigurationPath.Save(writer, configurationPathLabel);
+            SourceCodeDirectory.Save(writer, sourceCodeDirectoryLabel);
+            SolutionPath.Save(writer, solutionPathLabel);
+            writer.Save(LODCulling, lodCullingLabel);
+            writer.Save(HierarchicalEdges.ToList(), hierarchicalEdgesLabel);
+            NodeTypes.Save(writer, nodeTypesLabel);
+            writer.Save(IgnoreSelfLoopsInLifting, ignoreSelfLoopsInLiftingLabel);
+            writer.Save(MaximalAntennaSegmentHeight, maximalAntennaSegmentHeightLabel);
+            writer.Save(AntennaWidth, antennaWidthLabel);
+            writer.Save(BaseAnimationDuration, baseAnimationDurationLabel);
+            MetricToColor.Save(writer, metricToColorLabel);
+            writer.Save(ZScoreScale, zScoreScaleLabel);
+            writer.Save(ScaleOnlyLeafMetrics, scaleOnlyLeafMetricsLabel);
+            ErosionSettings.Save(writer, erosionSettingsLabel);
+            BoardSettings.Save(writer, boardSettingsLabel);
+            NodeLayoutSettings.Save(writer, nodeLayoutSettingsLabel);
+            EdgeLayoutSettings.Save(writer, edgeLayoutSettingsLabel);
+            EdgeSelectionSettings.Save(writer, edgeSelectionSettingsLabel);
+            CoseGraphSettings.Save(writer, coseGraphSettingsLabel);
         }
 
         /// <summary>
@@ -123,25 +123,25 @@ namespace SEE.Game.City
         /// <param name="attributes">dictionary containing the attributes (key = attribute label, value = attribute value)</param>
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
-            ConfigurationPath.Restore(attributes, ConfigurationPathLabel);
-            SourceCodeDirectory.Restore(attributes, SourceCodeDirectoryLabel);
-            SolutionPath.Restore(attributes, SolutionPathLabel);
-            ConfigIO.Restore(attributes, LODCullingLabel, ref LODCulling);
-            ConfigIO.Restore(attributes, HierarchicalEdgesLabel, ref HierarchicalEdges);
-            NodeTypes.Restore(attributes, NodeTypesLabel);
-            ConfigIO.Restore(attributes, IgnoreSelfLoopsInLiftingLabel, ref IgnoreSelfLoopsInLifting);
-            ConfigIO.Restore(attributes, MaximalAntennaSegmentHeightLabel, ref MaximalAntennaSegmentHeight);
-            ConfigIO.Restore(attributes, AntennaWidthLabel, ref AntennaWidth);
-            ConfigIO.Restore(attributes, BaseAnimationDurationLabel, ref BaseAnimationDuration);
-            MetricToColor.Restore(attributes, MetricToColorLabel);
-            ConfigIO.Restore(attributes, ZScoreScaleLabel, ref ZScoreScale);
-            ConfigIO.Restore(attributes, ScaleOnlyLeafMetricsLabel, ref ScaleOnlyLeafMetrics);
-            ErosionSettings.Restore(attributes, ErosionSettingsLabel);
-            BoardSettings.Restore(attributes, BoardSettingsLabel);
-            NodeLayoutSettings.Restore(attributes, NodeLayoutSettingsLabel);
-            EdgeLayoutSettings.Restore(attributes, EdgeLayoutSettingsLabel);
-            EdgeSelectionSettings.Restore(attributes, EdgeSelectionSettingsLabel);
-            CoseGraphSettings.Restore(attributes, CoseGraphSettingsLabel);
+            ConfigurationPath.Restore(attributes, configurationPathLabel);
+            SourceCodeDirectory.Restore(attributes, sourceCodeDirectoryLabel);
+            SolutionPath.Restore(attributes, solutionPathLabel);
+            ConfigIO.Restore(attributes, lodCullingLabel, ref LODCulling);
+            ConfigIO.Restore(attributes, hierarchicalEdgesLabel, ref HierarchicalEdges);
+            NodeTypes.Restore(attributes, nodeTypesLabel);
+            ConfigIO.Restore(attributes, ignoreSelfLoopsInLiftingLabel, ref IgnoreSelfLoopsInLifting);
+            ConfigIO.Restore(attributes, maximalAntennaSegmentHeightLabel, ref MaximalAntennaSegmentHeight);
+            ConfigIO.Restore(attributes, antennaWidthLabel, ref AntennaWidth);
+            ConfigIO.Restore(attributes, baseAnimationDurationLabel, ref BaseAnimationDuration);
+            MetricToColor.Restore(attributes, metricToColorLabel);
+            ConfigIO.Restore(attributes, zScoreScaleLabel, ref ZScoreScale);
+            ConfigIO.Restore(attributes, scaleOnlyLeafMetricsLabel, ref ScaleOnlyLeafMetrics);
+            ErosionSettings.Restore(attributes, erosionSettingsLabel);
+            BoardSettings.Restore(attributes, boardSettingsLabel);
+            NodeLayoutSettings.Restore(attributes, nodeLayoutSettingsLabel);
+            EdgeLayoutSettings.Restore(attributes, edgeLayoutSettingsLabel);
+            EdgeSelectionSettings.Restore(attributes, edgeSelectionSettingsLabel);
+            CoseGraphSettings.Restore(attributes, coseGraphSettingsLabel);
         }
     }
 }

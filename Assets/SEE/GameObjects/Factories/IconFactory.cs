@@ -29,10 +29,10 @@ namespace SEE.GO
         /// </summary>
         public enum Erosion
         {
-            Architecture_Violation = 0,
+            ArchitectureViolation = 0,
             Clone = 1,
             Cycle = 2,
-            Dead_Code = 3,
+            DeadCode = 3,
             Metric = 4,
             Style = 5,
             Universal = 6
@@ -46,10 +46,10 @@ namespace SEE.GO
         public static string ToString(Erosion erosion) =>
             erosion switch
             {
-                Erosion.Architecture_Violation => "Architecture_Violation",
+                Erosion.ArchitectureViolation => "Architecture_Violation",
                 Erosion.Clone => "Clone",
                 Erosion.Cycle => "Cycle",
-                Erosion.Dead_Code => "Dead_Code",
+                Erosion.DeadCode => "Dead_Code",
                 Erosion.Metric => "Metric",
                 Erosion.Style => "Style",
                 Erosion.Universal => "Universal",
@@ -58,7 +58,7 @@ namespace SEE.GO
 
         // Relative screen space required so that a erosion sprite becomes visible.
         // If the size of the sprite is below this value, it will be culled.
-        private const float ScreenRelativeTransitionHeight = 0.02f;
+        private const float screenRelativeTransitionHeight = 0.02f;
 
         /// <summary>
         /// The paths to the sprite prefab files.
@@ -184,9 +184,9 @@ namespace SEE.GO
 
             // Add metric text label
             GameObject text = PrefabInstantiator.InstantiatePrefab("Prefabs/Metric Value Label", gameObject.transform);
-            TextMeshPro MetricMesh = text.GetComponent<TextMeshPro>();
-            MetricMesh.text = metricText;
-            MetricMesh.enableAutoSizing = true;
+            TextMeshPro metricMesh = text.GetComponent<TextMeshPro>();
+            metricMesh.text = metricText;
+            metricMesh.enableAutoSizing = true;
             text.SetActive(false);
 
             // Add the erosion sprite.
@@ -213,7 +213,7 @@ namespace SEE.GO
                 renderer.color = color;
             }
             Renderer[] renderers = { renderer };
-            lods[0] = new LOD(ScreenRelativeTransitionHeight, renderers);
+            lods[0] = new LOD(screenRelativeTransitionHeight, renderers);
 
             group.SetLODs(lods);
             group.RecalculateBounds();

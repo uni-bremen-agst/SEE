@@ -27,27 +27,27 @@ namespace SEE.Game.City
         /// List of <see cref="ChangeEvent"/>s received from the reflexion <see cref="Analysis"/>.
         /// Note that this list is constructed by using <see cref="ReflexionGraphTools.Incorporate"/>.
         /// </summary>
-        private IList<ChangeEvent> Events = new List<ChangeEvent>();
+        private IList<ChangeEvent> events = new List<ChangeEvent>();
 
         /// <summary>
         /// The graph used for the reflexion analysis.
         /// </summary>
-        private ReflexionGraph CityGraph;
+        private ReflexionGraph cityGraph;
 
         /// <summary>
         /// The city this component is attached to.
         /// </summary>
-        private SEEReflexionCity City;
+        private SEEReflexionCity city;
 
         /// <summary>
         /// Percentage by which the starting color of an edge differs to its end color.
         /// </summary>
-        private const float EDGE_GRADIENT_FACTOR = 0.8f;
+        private const float edgeGradientFactor = 0.8f;
 
         /// <summary>
         /// States in which an edge shall be hidden.
         /// </summary>
-        private static readonly ISet<State> HiddenEdgeStates = new HashSet<State>
+        private static readonly ISet<State> hiddenEdgeStates = new HashSet<State>
         {
             // TODO: Make this configurable in, e.g., the SEECity editor.
             // We hide all implementation edges except divergences by default.
@@ -58,19 +58,19 @@ namespace SEE.Game.City
         /// A queue of <see cref="ChangeEvent"/>s which were received from the analysis, but not yet handled.
         /// More specifically, these are intended to be handled after the city has been drawn.
         /// </summary>
-        private readonly Queue<ChangeEvent> UnhandledEvents = new();
+        private readonly Queue<ChangeEvent> unhandledEvents = new();
 
         /// <summary>
         /// A queue of <see cref="EdgeOperator"/>s associated with edges which are currently highlighted, that is,
         /// edges which have changed compared to the <see cref="PreviousVersion"/>.
         /// </summary>
-        private readonly Queue<EdgeOperator> HighlightedEdgeOperators = new();
+        private readonly Queue<EdgeOperator> highlightedEdgeOperators = new();
 
         /// <summary>
         /// Mapping from Edge IDs to the state they had in the previous version.
         /// This is used to check for changes from the previous to this version.
         /// </summary>
-        private IDictionary<string, State> PreviousEdgeStates = new Dictionary<string, State>();
+        private IDictionary<string, State> previousEdgeStates = new Dictionary<string, State>();
 
         /// <summary>
         /// Sets edges' gradient to correct colors depending on reflexion state and hides edges
@@ -86,9 +86,9 @@ namespace SEE.Game.City
                 return;
             }
 
-            EdgeAnimationKind animationKind = City.EdgeLayoutSettings.AnimationKind;
+            EdgeAnimationKind animationKind = city.EdgeLayoutSettings.AnimationKind;
             // We have to set an initial color for the edges, and we have to convert them to meshes.
-            foreach (Edge edge in CityGraph.Edges().Where(x => !x.HasToggle(GraphElement.IsVirtualToggle)))
+            foreach (Edge edge in cityGraph.Edges().Where(x => !x.HasToggle(GraphElement.IsVirtualToggle)))
             {
                 GameObject edgeObject = edge.GameObject();
                 if (edgeObject != null && edgeObject.TryGetComponent(out SEESpline spline))
@@ -111,9 +111,9 @@ namespace SEE.Game.City
         private void Update()
         {
             // Unhandled events should only be handled once the city is drawn.
-            while (UnhandledEvents.Count > 0 && gameObject.IsCodeCityDrawn())
+            while (unhandledEvents.Count > 0 && gameObject.IsCodeCityDrawn())
             {
-                OnNext(UnhandledEvents.Dequeue());
+                OnNext(unhandledEvents.Dequeue());
             }
             // TODO: Why is the below commented out? Do we still need it?
             //if (SEEInput.ShowAllDivergences())
@@ -143,7 +143,7 @@ namespace SEE.Game.City
             if (allDivergencesAreShown != show)
             {
                 allDivergencesAreShown = show;
-                foreach (Edge edge in CityGraph.Edges())
+                foreach (Edge edge in cityGraph.Edges())
                 {
                     if (!edge.HasToggle(GraphElement.IsVirtualToggle)
                         && edge.IsInImplementation()
@@ -153,7 +153,7 @@ namespace SEE.Game.City
                         if (gameEdge != null)
                         {
                             EdgeOperator edgeOperator = gameEdge.AddOrGetComponent<EdgeOperator>();
-                            edgeOperator.ShowOrHide(allDivergencesAreShown, City.EdgeLayoutSettings.AnimationKind);
+                            edgeOperator.ShowOrHide(allDivergencesAreShown, city.EdgeLayoutSettings.AnimationKind);
                         }
                     }
                 }
@@ -167,9 +167,9 @@ namespace SEE.Game.City
         /// <param name="graph">The graph on which the reflexion analysis shall run</param>
         public void StartFromScratch(ReflexionGraph graph, SEEReflexionCity city)
         {
-            City = city;
-            CityGraph = graph;
-            Events.Clear();
+            this.city = city;
+            cityGraph = graph;
+            events.Clear();
             graph.Subscribe(this);
             graph.RunAnalysis();
             graph.NewVersion(); // required because we don't want to highlight any initial changes
@@ -185,15 +185,15 @@ namespace SEE.Game.City
         {
             (Color, Color) gradient = edge.State() switch
             {
-                State.Undefined => (Color.black, Color.Lerp(Color.gray, Color.black, EDGE_GRADIENT_FACTOR)),
-                State.Specified => (Color.gray, Color.Lerp(Color.gray, Color.black, EDGE_GRADIENT_FACTOR)),
-                State.Unmapped => (Color.gray, Color.Lerp(Color.gray, Color.black, EDGE_GRADIENT_FACTOR)),
+                State.Undefined => (Color.black, Color.Lerp(Color.gray, Color.black, edgeGradientFactor)),
+                State.Specified => (Color.gray, Color.Lerp(Color.gray, Color.black, edgeGradientFactor)),
+                State.Unmapped => (Color.gray, Color.Lerp(Color.gray, Color.black, edgeGradientFactor)),
                 State.ImplicitlyAllowed => (Color.green, Color.white),
                 State.AllowedAbsent => (Color.green, Color.white),
                 State.Allowed => (Color.green, Color.white),
-                State.Divergent => (Color.red, Color.Lerp(Color.red, Color.black, EDGE_GRADIENT_FACTOR)),
-                State.Absent => (Color.yellow, Color.Lerp(Color.yellow, Color.black, EDGE_GRADIENT_FACTOR)),
-                State.Convergent => (Color.green, Color.Lerp(Color.green, Color.black, EDGE_GRADIENT_FACTOR)),
+                State.Divergent => (Color.red, Color.Lerp(Color.red, Color.black, edgeGradientFactor)),
+                State.Absent => (Color.yellow, Color.Lerp(Color.yellow, Color.black, edgeGradientFactor)),
+                State.Convergent => (Color.green, Color.Lerp(Color.green, Color.black, edgeGradientFactor)),
                 _ => throw new ArgumentOutOfRangeException(nameof(edge), edge.State(), "Unknown state of given edge!")
             };
 
@@ -202,7 +202,7 @@ namespace SEE.Game.City
 
         public void OnCompleted()
         {
-            Events.Clear();
+            events.Clear();
         }
 
         public void OnError(Exception error)
@@ -213,7 +213,7 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Incorporates the given <paramref name="changeEvent"/> into <see cref="Events"/>, logs it to the console,
+        /// Incorporates the given <paramref name="changeEvent"/> into <see cref="events"/>, logs it to the console,
         /// and handles the changes by modifying this city.
         /// </summary>
         /// <param name="changeEvent">The change event received from the reflexion analysis</param>
@@ -221,7 +221,7 @@ namespace SEE.Game.City
         {
             if (!gameObject.IsCodeCityDrawn())
             {
-                UnhandledEvents.Enqueue(changeEvent);
+                unhandledEvents.Enqueue(changeEvent);
                 return;
             }
 
@@ -238,7 +238,7 @@ namespace SEE.Game.City
                     break;
             }
 
-            Events = Events.Incorporate(changeEvent);
+            events = events.Incorporate(changeEvent);
         }
 
         /// <summary>
@@ -255,10 +255,10 @@ namespace SEE.Game.City
 
             void ResetEdgeHighlights()
             {
-                while (HighlightedEdgeOperators.Count > 0)
+                while (highlightedEdgeOperators.Count > 0)
                 {
                     // Fade out the highlights for each previously marked edge.
-                    EdgeOperator edgeOperator = HighlightedEdgeOperators.Dequeue();
+                    EdgeOperator edgeOperator = highlightedEdgeOperators.Dequeue();
                     if (edgeOperator != null)
                     {
                         edgeOperator.GlowOut();
@@ -269,7 +269,7 @@ namespace SEE.Game.City
             void SaveEdgeStates()
             {
                 // Due to us using `Incorporate`, only the most recent edge change will exist.
-                PreviousEdgeStates = Events.OfType<EdgeChange>().ToDictionary(x => x.Edge.ID, x => x.NewState);
+                previousEdgeStates = events.OfType<EdgeChange>().ToDictionary(x => x.Edge.ID, x => x.NewState);
             }
 
             #endregion
@@ -282,7 +282,7 @@ namespace SEE.Game.City
         private async UniTaskVoid HandleEdgeChange(EdgeChange edgeChange)
         {
             // We first check if the corresponding edge should be hidden.
-            if (HiddenEdgeStates.Contains(edgeChange.NewState))
+            if (hiddenEdgeStates.Contains(edgeChange.NewState))
             {
                 edgeChange.Edge.SetToggle(Edge.IsHiddenToggle);
             }
@@ -307,15 +307,15 @@ namespace SEE.Game.City
             {
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge);
                 EdgeOperator edgeOperator = edge.AddOrGetComponent<EdgeOperator>();
-                edgeOperator.ShowOrHide(!edgeChange.Edge.HasToggle(Edge.IsHiddenToggle), City.EdgeLayoutSettings.AnimationKind);
+                edgeOperator.ShowOrHide(!edgeChange.Edge.HasToggle(Edge.IsHiddenToggle), city.EdgeLayoutSettings.AnimationKind);
                 edgeOperator.ChangeColorsTo((newColors.start, newColors.end), useAlpha: false);
 
-                if (!PreviousEdgeStates.TryGetValue(edgeChange.Edge.ID, out State previous) || previous != edgeChange.NewState)
+                if (!previousEdgeStates.TryGetValue(edgeChange.Edge.ID, out State previous) || previous != edgeChange.NewState)
                 {
                     // Mark changed edges compared to previous version.
                     edgeOperator.GlowIn();
                     edgeOperator.HitEffect();
-                    HighlightedEdgeOperators.Enqueue(edgeOperator);
+                    highlightedEdgeOperators.Enqueue(edgeOperator);
                 }
             }
             else if (!edgeChange.Edge.HasToggle(GraphElement.IsVirtualToggle))

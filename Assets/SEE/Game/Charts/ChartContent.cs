@@ -41,18 +41,18 @@ namespace SEE.Game.Charts
         /// <summary>
         /// The offset The gap between entries in the <see cref="scrollContent" /> indicating a new hierarchy layer.
         /// </summary>
-        private const float ScrollViewEntryIndentation = 15;
+        private const float scrollViewEntryIndentation = 15;
 
         /// <summary>
         /// The height of an entry in the <see cref="scrollContent"/>.
         /// </summary>
-        private const float ScrollViewEntryHeight = 25;
+        private const float scrollViewEntryHeight = 25;
 
         // TODO(torben): this may need to be reintroduced
         /// <summary>
         /// The distance to another marker to recognize it as overlapping.
         /// </summary>
-        private const float MarkerOverlapDistance = 22;
+        private const float markerOverlapDistance = 22;
 
         /// <summary>
         /// This entry of the dropdown box represents not a metric but just the
@@ -60,7 +60,7 @@ namespace SEE.Game.Charts
         /// metric on one axis and then all nodes sorted by this metric on the other
         /// axis.
         /// </summary>
-        private const string NodeEnumeration = "NODES";
+        private const string nodeEnumeration = "NODES";
 
         /// <summary>
         /// Contains one <see cref="scrollEntryPrefab"/> for each <see cref="Node"/> in
@@ -87,12 +87,12 @@ namespace SEE.Game.Charts
         /// <summary>
         /// The <see cref="AxisContentDropdown" /> containing Values for the X-Axis.
         /// </summary>
-        public AxisContentDropdown axisDropdownX;
+        public AxisContentDropdown AxisDropdownX;
 
         /// <summary>
         /// The <see cref="AxisContentDropdown" /> containing Values for the Y-Axis.
         /// </summary>
-        public AxisContentDropdown axisDropdownY;
+        public AxisContentDropdown AxisDropdownY;
 
         /// <summary>
         /// The prefab used to display content in charts.
@@ -132,12 +132,12 @@ namespace SEE.Game.Charts
         /// <summary>
         /// The panel on which the <see cref="ChartMarker" />s are instantiated.
         /// </summary>
-        public RectTransform dataPanel;
+        public RectTransform DataPanel;
 
         /// <summary>
         /// The panel on which the buttons and scales of the chart are displayed.
         /// </summary>
-        public RectTransform labelsPanel;
+        public RectTransform LabelsPanel;
 
         /// <summary>
         /// The current data of the vertical scroll bar is used to determine the range of
@@ -215,12 +215,12 @@ namespace SEE.Game.Charts
         /// <summary>
         /// A list of all <see cref="ChartMarker"/>s currently displayed in the chart.
         /// </summary>
-        protected List<ChartMarker> activeMarkers = new List<ChartMarker>();
+        protected List<ChartMarker> ActiveMarkers = new();
 
         /// <summary>
         /// Contains all metric names contained in any <see cref="GameObject" /> of <see cref="listDataObjects" />.
         /// </summary>
-        public readonly SortedSet<string> allMetricNames = new SortedSet<string>();
+        public readonly SortedSet<string> AllMetricNames = new();
 
         // FIXME: all attributes need documentation no matter whether they are public or private.
 
@@ -243,7 +243,7 @@ namespace SEE.Game.Charts
         private int previousFirst = 0;
         private int previousOnePastLast = 0;
 
-        public static bool revisionChanged = false;
+        public static bool RevisionChanged = false;
 
         private int currentRevisionCountCache = 0;
 
@@ -262,9 +262,9 @@ namespace SEE.Game.Charts
 
         protected virtual void Start()
         {
-            axisDropdownX.Initialize();
-            axisDropdownY.Initialize();
-            axisDropdownX.AddNodeEnumerationEntry(NodeEnumeration);
+            AxisDropdownX.Initialize();
+            AxisDropdownY.Initialize();
+            AxisDropdownX.AddNodeEnumerationEntry(nodeEnumeration);
             DrawData();
         }
 
@@ -282,7 +282,7 @@ namespace SEE.Game.Charts
             // the data takes some time to update).
             if (!NodeChangesBuffer.Instance().RevisionChanged)
             {
-                float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / ScrollViewEntryHeight;
+                float panelEntryCount = totalHeight * (1.0f - verticalScrollBar.size) / scrollViewEntryHeight;
                 int totalEntryCount = scrollViewEntries.Length - (scrollViewIsTree ? 2 : 0);
                 int first = Mathf.Max(0, Mathf.FloorToInt((1.0f - verticalScrollBar.value) * panelEntryCount));
                 int onePastLast = Mathf.Min(totalEntryCount, first + maxPanelEntryCount);
@@ -451,8 +451,8 @@ namespace SEE.Game.Charts
             RetrieveScrollViewEntry(ref entry, ref go);
 
             go.name = "ScrollViewEntry: " + label;
-            float x = ScrollViewEntryIndentation * hierarchy;
-            float y = -ScrollViewEntryHeight * index;
+            float x = scrollViewEntryIndentation * hierarchy;
+            float y = -scrollViewEntryHeight * index;
             go.transform.localPosition = scrollEntryOffset + new Vector2(x, y);
 
             entry.Init(this, scrollViewEntryData[index], label);
@@ -477,7 +477,7 @@ namespace SEE.Game.Charts
 
             for (int i = 0; i < scrollViewEntryData.Length; i++)
             {
-                if (scrollViewEntryData[i].interactableObject)
+                if (scrollViewEntryData[i].InteractableObject)
                 {
                     // Note(torben): This only unsubscribes from events from the
                     // interactable object and thus can be inside of this if-statement
@@ -540,7 +540,7 @@ namespace SEE.Game.Charts
                         }
                         if (h == hierarchy + 1)
                         {
-                            scrollViewEntryData[i].childIndices[childCount] = j;
+                            scrollViewEntryData[i].ChildIndices[childCount] = j;
                             childCount++;
                         }
                     }
@@ -560,7 +560,7 @@ namespace SEE.Game.Charts
                 {
                     InteractableObject o = listDataObjects[dataObjectIdx++].GetComponent<InteractableObject>();
                     scrollViewEntryData[idx] = new ScrollViewEntryData(idx, this, o, 0, 0);
-                    scrollViewEntryData[0].childIndices[i] = idx;
+                    scrollViewEntryData[0].ChildIndices[i] = idx;
                     idx++;
                 }
 
@@ -573,7 +573,7 @@ namespace SEE.Game.Charts
                 {
                     InteractableObject o = listDataObjects[dataObjectIdx++].GetComponent<InteractableObject>();
                     scrollViewEntryData[idx] = new ScrollViewEntryData(idx, this, o, innerNodeIdx, 0);
-                    scrollViewEntryData[innerNodeIdx].childIndices[i] = idx;
+                    scrollViewEntryData[innerNodeIdx].ChildIndices[i] = idx;
                     idx++;
                 }
 
@@ -595,7 +595,7 @@ namespace SEE.Game.Charts
             // does have a height of zero... that's why i have to calculate the current
             // height of the scrollrect in Update() every frame
             float maxPanelHeight = scrollViewRectTransform.sizeDelta.y;
-            maxPanelEntryCount = Mathf.FloorToInt(maxPanelHeight / ScrollViewEntryHeight) + 1;
+            maxPanelEntryCount = Mathf.FloorToInt(maxPanelHeight / scrollViewEntryHeight) + 1;
         }
 
         /// <summary>
@@ -606,7 +606,7 @@ namespace SEE.Game.Charts
         /// ChartManager.MetricPrefix.</summary>
         private void GetAllNumericAttributes()
         {
-            allMetricNames.Clear();
+            AllMetricNames.Clear();
 #if UNITY_EDITOR
             if (listDataObjects.Count == 0)
             {
@@ -615,10 +615,10 @@ namespace SEE.Game.Charts
 #endif
             foreach (string cname in Attributable.NumericAttributeNames.Where(cname => cname.StartsWith(ChartManager.MetricPrefix)))
             {
-                allMetricNames.Add(cname);
+                AllMetricNames.Add(cname);
             }
 #if UNITY_EDITOR
-            if (allMetricNames.Count == 0)
+            if (AllMetricNames.Count == 0)
             {
                 Debug.LogWarning("No metrics available for charts.\n");
             }
@@ -635,7 +635,7 @@ namespace SEE.Game.Charts
         /// not mutually exclusive.
         /// </summary>
         /// <returns>the nodes to be shown in the chart</returns>
-        private List<NodeRef> RelevantNodes()
+        private static List<NodeRef> RelevantNodes()
         {
             if (ChartManager.Instance.CodeCity == null)
             {
@@ -644,7 +644,7 @@ namespace SEE.Game.Charts
             }
             else
             {
-                List<NodeRef> result = new List<NodeRef>();
+                List<NodeRef> result = new();
                 foreach (GameObject gameNode in ChartManager.Instance.CodeCity.AllDescendants(Tags.Node))
                 {
                     if (gameNode.TryGetComponent(out NodeRef nodeRef))
@@ -718,7 +718,7 @@ namespace SEE.Game.Charts
 
         /// <summary>
         /// Fills the chart with data depending on the values of
-        /// <see cref="axisDropdownX"/> and <see cref="axisDropdownY"/>.
+        /// <see cref="AxisDropdownX"/> and <see cref="AxisDropdownY"/>.
         /// </summary>
         public void DrawData()
         {
@@ -728,9 +728,9 @@ namespace SEE.Game.Charts
 
             // Whether the user selected "NODES" on the x axis. That means the x axis
             // is just a list of nodes, not a real metric.
-            bool xIsNodeEnum = axisDropdownX.CurrentlySelectedMetric == NodeEnumeration;
+            bool xIsNodeEnum = AxisDropdownX.CurrentlySelectedMetric == nodeEnumeration;
             // Whether the x and y axes represent the same metric.
-            bool xEqY = axisDropdownX.CurrentlySelectedMetric == axisDropdownY.CurrentlySelectedMetric;
+            bool xEqY = AxisDropdownX.CurrentlySelectedMetric == AxisDropdownY.CurrentlySelectedMetric;
 
             // Note that we determine the minimal and maximal metric values of the two
             // axes globally, that is, over all nodes in listDataObjects and not just those
@@ -745,7 +745,7 @@ namespace SEE.Game.Charts
             {
                 // x axis
                 bool inX = false;
-                if (nodeRef.Value.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out float valueX) || xIsNodeEnum)
+                if (nodeRef.Value.TryGetNumeric(AxisDropdownX.CurrentlySelectedMetric, out float valueX) || xIsNodeEnum)
                 {
                     // Note: if the node does not have the currently selected metric but the user selected
                     // NODES for the x axis, valueX will be 0 because that is the default for float.
@@ -757,7 +757,7 @@ namespace SEE.Game.Charts
                 }
                 // y axis
                 bool inY = false;
-                if (nodeRef.Value.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY))
+                if (nodeRef.Value.TryGetNumeric(AxisDropdownY.CurrentlySelectedMetric, out float valueY))
                 {
                     minY = Mathf.Min(minY, valueY);
                     maxY = Mathf.Max(maxY, valueY);
@@ -782,8 +782,8 @@ namespace SEE.Game.Charts
                     // If both axes show the same metric, we simply sort the values for this metric.
                     toDraw.Sort(delegate (NodeRef nodeRef0, NodeRef nodeRef1)
                     {
-                        nodeRef0.Value.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float value1);
-                        nodeRef1.Value.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float value2);
+                        nodeRef0.Value.TryGetNumeric(AxisDropdownY.CurrentlySelectedMetric, out float value1);
+                        nodeRef1.Value.TryGetNumeric(AxisDropdownY.CurrentlySelectedMetric, out float value2);
                         return value1.CompareTo(value2);
                     });
                 }
@@ -815,11 +815,11 @@ namespace SEE.Game.Charts
             {
                 noDataWarning.SetActive(true);
                 // Check for null avoids double destroy. Operator == is overloaded accordingly.
-                foreach (ChartMarker marker in activeMarkers.Where(marker => marker != null && marker.gameObject != null))
+                foreach (ChartMarker marker in ActiveMarkers.Where(marker => marker != null && marker.gameObject != null))
                 {
                     Destroyer.Destroy(marker.gameObject);
                 }
-                activeMarkers.Clear();
+                ActiveMarkers.Clear();
             }
         }
 
@@ -837,10 +837,10 @@ namespace SEE.Game.Charts
         {
             callbackFnDict.Clear();
 
-            List<ChartMarker> updatedMarkers = new List<ChartMarker>(activeMarkers.Count);
-            Dictionary<Vector2, ChartMarker> anchoredPositionToChartMarkerDict = new Dictionary<Vector2, ChartMarker>(activeMarkers.Count);
+            List<ChartMarker> updatedMarkers = new List<ChartMarker>(ActiveMarkers.Count);
+            Dictionary<Vector2, ChartMarker> anchoredPositionToChartMarkerDict = new Dictionary<Vector2, ChartMarker>(ActiveMarkers.Count);
 
-            Rect dataRect = dataPanel.rect;
+            Rect dataRect = DataPanel.rect;
             // If ignoreXAxis is true, we just enumerate all nodes in nodeRefsToDraw in their order
             // therein on the x axis. The metric selected for the x axis is NODES and, hence, will
             // not be considered. We achieve that by representing the x values as if they define
@@ -866,9 +866,9 @@ namespace SEE.Game.Charts
                 if (!ignoreXAxis)
                 {
                     // We retrieve the value of the metrics chosen for the x axis.
-                    if (!nodeRef.Value.TryGetNumeric(axisDropdownX.CurrentlySelectedMetric, out valueX))
+                    if (!nodeRef.Value.TryGetNumeric(AxisDropdownX.CurrentlySelectedMetric, out valueX))
                     {
-                        Debug.LogError($"Node {nodeRef.Value.ID} does not have metric {axisDropdownX.CurrentlySelectedMetric}.\n");
+                        Debug.LogError($"Node {nodeRef.Value.ID} does not have metric {AxisDropdownX.CurrentlySelectedMetric}.\n");
                     }
                 }
                 else
@@ -877,16 +877,16 @@ namespace SEE.Game.Charts
                     nodeIndex++;
                     valueX = nodeIndex;
                 }
-                nodeRef.Value.TryGetNumeric(axisDropdownY.CurrentlySelectedMetric, out float valueY);
+                nodeRef.Value.TryGetNumeric(AxisDropdownY.CurrentlySelectedMetric, out float valueY);
                 Vector2 anchoredPosition = new Vector2((valueX - minX) * widthFactor, (valueY - minY) * heightFactor);
 
                 if (!anchoredPositionToChartMarkerDict.TryGetValue(anchoredPosition, out ChartMarker chartMarker))
                 {
                     GameObject marker;
-                    if (currentReusedActiveMarkerIndex < activeMarkers.Count)
+                    if (currentReusedActiveMarkerIndex < ActiveMarkers.Count)
                     {
                         // Reuse previously used marker
-                        chartMarker = activeMarkers[currentReusedActiveMarkerIndex++];
+                        chartMarker = ActiveMarkers[currentReusedActiveMarkerIndex++];
                         chartMarker.OnDestroy();
                         marker = chartMarker.gameObject;
                     }
@@ -909,7 +909,7 @@ namespace SEE.Game.Charts
 #endif
                     marker.GetComponent<RectTransform>().anchoredPosition = anchoredPosition;
                     marker.GetComponent<SortingGroup>().sortingOrder = positionInLayer++;
-                    chartMarker.chartContent = this;
+                    chartMarker.ChartContent = this;
                     updatedMarkers.Add(chartMarker);
                     anchoredPositionToChartMarkerDict.Add(anchoredPosition, chartMarker);
                 }
@@ -925,26 +925,26 @@ namespace SEE.Game.Charts
             }
 
             // Increase capacity at once to reduce number of allocations to only one.
-            int markerPoolCount = chartMarkerPool.Count + activeMarkers.Count - currentReusedActiveMarkerIndex;
+            int markerPoolCount = chartMarkerPool.Count + ActiveMarkers.Count - currentReusedActiveMarkerIndex;
             if (markerPoolCount > chartMarkerPool.Capacity)
             {
                 chartMarkerPool.Capacity = markerPoolCount;
             }
 
-            for (int i = currentReusedActiveMarkerIndex; i < activeMarkers.Count; i++)
+            for (int i = currentReusedActiveMarkerIndex; i < ActiveMarkers.Count; i++)
             {
-                if (activeMarkers[i].gameObject != null)
+                if (ActiveMarkers[i].gameObject != null)
                 {
                     // Pool markers for future use
-                    activeMarkers[i].gameObject.SetActive(false);
-                    activeMarkers[i].OnDestroy();
+                    ActiveMarkers[i].gameObject.SetActive(false);
+                    ActiveMarkers[i].OnDestroy();
 #if UNITY_EDITOR
-                    activeMarkers[i].name = "Pooled ChartMarker";
+                    ActiveMarkers[i].name = "Pooled ChartMarker";
 #endif
-                    chartMarkerPool.Add(activeMarkers[i]);
+                    chartMarkerPool.Add(ActiveMarkers[i]);
                 }
             }
-            activeMarkers = updatedMarkers;
+            ActiveMarkers = updatedMarkers;
         }
 
         /// <summary>
@@ -955,12 +955,12 @@ namespace SEE.Game.Charts
         public virtual void AreaHover(Vector2 min, Vector2 max)
         {
             bool toggleHover = SEEInput.ToggleMetricHoveringSelection();
-            foreach (ChartMarker marker in activeMarkers)
+            foreach (ChartMarker marker in ActiveMarkers)
             {
                 Vector2 markerPos = marker.transform.position;
                 if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                 {
-                    List<string> ids = marker.ids;
+                    List<string> ids = marker.Ids;
                     foreach (InteractableObject o in ids.Select(InteractableObject.Get).Where(o => !o.IsHoverFlagSet(HoverFlag.ChartMultiSelect)))
                     {
                         o.SetHoverFlag(HoverFlag.ChartMultiSelect, true, true);
@@ -968,7 +968,7 @@ namespace SEE.Game.Charts
                 }
                 else if (!toggleHover)
                 {
-                    List<string> ids = marker.ids;
+                    List<string> ids = marker.Ids;
                     foreach (InteractableObject o in ids.Select(InteractableObject.Get).Where(o => o.IsHoverFlagSet(HoverFlag.ChartMultiSelect)))
                     {
                         o.SetHoverFlag(HoverFlag.ChartMultiSelect, false, true);
@@ -986,12 +986,12 @@ namespace SEE.Game.Charts
         public virtual void AreaSelection(Vector2 min, Vector2 max)
         {
             bool toggleSelect = SEEInput.ToggleMetricHoveringSelection();
-            foreach (ChartMarker marker in activeMarkers)
+            foreach (ChartMarker marker in ActiveMarkers)
             {
                 Vector2 markerPos = marker.transform.position;
                 if (markerPos.x > min.x && markerPos.x < max.x && markerPos.y > min.y && markerPos.y < max.y)
                 {
-                    List<string> ids = marker.ids;
+                    List<string> ids = marker.Ids;
                     foreach (InteractableObject o in ids.Select(InteractableObject.Get).Where(o => !o.IsSelected))
                     {
                         o.SetSelect(true, true);
@@ -999,7 +999,7 @@ namespace SEE.Game.Charts
                 }
                 else if (!toggleSelect)
                 {
-                    List<string> ids = marker.ids;
+                    List<string> ids = marker.Ids;
                     foreach (InteractableObject o in ids.Select(InteractableObject.Get).Where(o => o.IsSelected))
                     {
                         o.SetSelect(false, true);
@@ -1013,16 +1013,16 @@ namespace SEE.Game.Charts
         /// </summary>
         public void SetInfoText()
         {
-            string metricX = axisDropdownX.CurrentlySelectedMetric;
-            string metricY = axisDropdownY.CurrentlySelectedMetric;
+            string metricX = AxisDropdownX.CurrentlySelectedMetric;
+            string metricY = AxisDropdownY.CurrentlySelectedMetric;
             if (metricX.Equals(metricY))
             {
                 moveHandler.SetInfoText(metricX);
             }
             else
             {
-                moveHandler.SetInfoText("X-Axis: " + axisDropdownX.CurrentlySelectedMetric
-                                        + "\n" + "Y-Axis: " + axisDropdownY.CurrentlySelectedMetric
+                moveHandler.SetInfoText("X-Axis: " + AxisDropdownX.CurrentlySelectedMetric
+                                        + "\n" + "Y-Axis: " + AxisDropdownY.CurrentlySelectedMetric
                 );
             }
         }
@@ -1045,7 +1045,7 @@ namespace SEE.Game.Charts
             {
                 for (int i = 0; i < scrollViewEntryData.Length; i++)
                 {
-                    if (scrollViewEntryData[i].interactableObject)
+                    if (scrollViewEntryData[i].InteractableObject)
                     {
                         // Note(torben): This only unsubscribes from events from the
                         // interactable object and thus can be inside of this if-statement
@@ -1062,7 +1062,7 @@ namespace SEE.Game.Charts
             // nodes, so this here is the capacity.
             // Note(Leo): removedNodeIDs Count needs to be added, otherwise removed nodes won't show
             int totalEntryCount2 = 2 + listDataObjects.Count + removedNodeIDs.Count;
-            totalHeight = totalEntryCount2 * ScrollViewEntryHeight;
+            totalHeight = totalEntryCount2 * scrollViewEntryHeight;
 
             leafCount = listDataObjects.Count(nodeRef => nodeRef.Value.IsLeaf());
 

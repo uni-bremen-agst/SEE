@@ -24,7 +24,7 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Operation handling changes to the color of the element.
         /// </summary>
-        protected TweenOperation<C> color { get; private set; }
+        protected TweenOperation<C> Color { get; private set; }
 
         /// <summary>
         /// Operation handling the glow effect around the element.
@@ -111,7 +111,7 @@ namespace SEE.Game.Operator
                     return c.WithAlpha(alphas.Current);
                 });
             }
-            return color.AnimateTo(targetColor, ToDuration(factor));
+            return Color.AnimateTo(targetColor, ToDuration(factor));
         }
 
         /// <summary>
@@ -133,14 +133,14 @@ namespace SEE.Game.Operator
                 throw new ArgumentException("Given alpha value must be greater than zero and not more than one!");
             }
 
-            C targetColor = ModifyColor(color.TargetValue, c => c.WithAlpha(alpha));
+            C targetColor = ModifyColor(Color.TargetValue, c => c.WithAlpha(alpha));
             // Elements being faded should also lead to highlights being faded.
             float targetGlow = GetTargetGlow(glowEnabled ? fullGlow : 0, alpha);
 
             float duration = ToDuration(factor);
             return new AndCombinedOperationCallback<Action>(new[]
             {
-                color.AnimateTo(targetColor, duration),
+                Color.AnimateTo(targetColor, duration),
                 glow.AnimateTo(targetGlow, duration)
             });
         }
@@ -155,7 +155,7 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> GlowIn(float factor = 1)
         {
-            float targetGlow = GetTargetGlow(fullGlow, AsEnumerable(color.TargetValue).Max(x => x.a));
+            float targetGlow = GetTargetGlow(fullGlow, AsEnumerable(Color.TargetValue).Max(x => x.a));
             glowEnabled = true;
             return glow.AnimateTo(targetGlow, ToDuration(factor));
         }
@@ -188,7 +188,7 @@ namespace SEE.Game.Operator
             //       Should be alright because overlapping animations aren't a big problem here.
             highlightEffect.hitFxFadeOutDuration = ToDuration(factor);
 
-            Color targetColor = AsEnumerable(color.TargetValue).Aggregate((c1, c2) => Color.Lerp(c1, c2, 0.5f)).Invert();
+            Color targetColor = AsEnumerable(Color.TargetValue).Aggregate((c1, c2) => UnityEngine.Color.Lerp(c1, c2, 0.5f)).Invert();
             highlightEffect.hitFxColor = targetColor;
             highlightEffect.HitFX();
         }
@@ -291,7 +291,7 @@ namespace SEE.Game.Operator
         protected virtual void OnEnable()
         {
             City = GetCity(gameObject);
-            color = InitializeColorOperation();
+            Color = InitializeColorOperation();
 
             if (TryGetComponent(out highlightEffect))
             {
@@ -306,17 +306,17 @@ namespace SEE.Game.Operator
 
             SetupGlow();
 
-            if (gameObject.TryGetComponentOrLog(out GraphElementRef elementRef) && elementRef.elem != null)
+            if (gameObject.TryGetComponentOrLog(out GraphElementRef elementRef) && elementRef.Elem != null)
             {
                 // When the hierarchy changes, we need to refresh the glow effect properties.
-                elementRef.elem.Subscribe(this);
+                elementRef.Elem.Subscribe(this);
             }
         }
 
         protected virtual void OnDisable()
         {
-            color.KillAnimator();
-            color = null;
+            Color.KillAnimator();
+            Color = null;
             glow.KillAnimator();
             glow = null;
         }

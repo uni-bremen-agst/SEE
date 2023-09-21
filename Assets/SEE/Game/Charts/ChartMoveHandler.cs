@@ -35,23 +35,23 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Contains the position of the chart on the <see cref="Canvas" />.
         /// </summary>
-        private RectTransform _chart;
+        private RectTransform chart;
 
         /// <summary>
         /// The current size of the screen the charts can be displayed on.
         /// </summary>
-        private RectTransform _screenSize;
+        private RectTransform screenSize;
 
         /// <summary>
         /// The time between <see cref="OnPointerDown" /> and <see cref="OnPointerUp" /> to be recognized as
         /// click instead of a drag.
         /// </summary>
-        private float _dragDelay;
+        private float dragDelay;
 
         /// <summary>
         /// Tracks the time between <see cref="OnPointerDown" /> and <see cref="OnPointerUp" />.
         /// </summary>
-        private float _timer;
+        private float timer;
 
         /// <summary>
         /// If the pointer is currently down or not.
@@ -81,7 +81,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// The button to resize the chart with. Needs to be minimized too.
         /// </summary>
-        [SerializeField] protected GameObject sizeButton;
+        [SerializeField] protected GameObject SizeButton;
 
         /// <summary>
         /// The sidebar in which the user can select what nodes will be displayed in the chart.
@@ -96,8 +96,8 @@ namespace SEE.Game.Charts
         protected virtual void Awake()
         {
             GetSettingData();
-            _chart = transform.parent.GetComponent<RectTransform>();
-            _screenSize = _chart.transform.parent.parent.GetComponent<RectTransform>();
+            chart = transform.parent.GetComponent<RectTransform>();
+            screenSize = chart.transform.parent.parent.GetComponent<RectTransform>();
         }
 
         /// <summary>
@@ -105,19 +105,19 @@ namespace SEE.Game.Charts
         /// </summary>
         protected virtual void GetSettingData()
         {
-            _dragDelay = ChartManager.Instance.DragDelay;
+            dragDelay = ChartManager.Instance.DragDelay;
             _maximizedSprite = ChartManager.Instance.MaximizedSprite;
             _minimizedSprite = ChartManager.Instance.MinimizedSprite;
         }
 
         /// <summary>
-        /// Adds the time passed since the last frame to the <see cref="_timer" />
+        /// Adds the time passed since the last frame to the <see cref="timer" />
         /// </summary>
         protected virtual void Update()
         {
             if (PointerDown)
             {
-                _timer += Time.deltaTime;
+                timer += Time.deltaTime;
             }
         }
 
@@ -129,11 +129,11 @@ namespace SEE.Game.Charts
         {
             RectTransform pos = GetComponent<RectTransform>();
             if (eventData.position.x > 0 &&
-                eventData.position.x < _screenSize.sizeDelta.x * _screenSize.lossyScale.x &&
+                eventData.position.x < screenSize.sizeDelta.x * screenSize.lossyScale.x &&
                 eventData.position.y > 0 &&
-                eventData.position.y < _screenSize.sizeDelta.y * _screenSize.lossyScale.y)
+                eventData.position.y < screenSize.sizeDelta.y * screenSize.lossyScale.y)
             {
-                _chart.position =
+                chart.position =
                     new Vector2(eventData.position.x - pos.anchoredPosition.x * pos.lossyScale.x,
                         eventData.position.y - pos.anchoredPosition.y * pos.lossyScale.y);
             }
@@ -145,7 +145,7 @@ namespace SEE.Game.Charts
         /// <param name="eventData">Event payload associated with pointer (mouse / touch) events.</param>
         public void OnPointerDown(PointerEventData eventData)
         {
-            _timer = 0f;
+            timer = 0f;
             PointerDown = true;
             chartInfo.SetActive(false);
         }
@@ -157,7 +157,7 @@ namespace SEE.Game.Charts
         public void OnPointerUp(PointerEventData eventData)
         {
             PointerDown = false;
-            if (_timer < _dragDelay)
+            if (timer < dragDelay)
             {
                 ToggleMinimize();
             }
@@ -203,10 +203,10 @@ namespace SEE.Game.Charts
         /// </summary>
         protected virtual void ToggleMinimize()
         {
-            ChartContent chart = _chart.GetComponent<ChartContent>();
-            chart.labelsPanel.gameObject.SetActive(Minimized);
-            chart.dataPanel.gameObject.SetActive(Minimized);
-            sizeButton.SetActive(Minimized);
+            ChartContent chartContent = chart.GetComponent<ChartContent>();
+            chartContent.LabelsPanel.gameObject.SetActive(Minimized);
+            chartContent.DataPanel.gameObject.SetActive(Minimized);
+            SizeButton.SetActive(Minimized);
             contentSelection.SetActive(Minimized);
             GetComponent<Image>().sprite = Minimized ? _maximizedSprite : _minimizedSprite;
             Minimized = !Minimized;

@@ -19,27 +19,27 @@ namespace SEE.GO
         /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
         protected IScale(IEnumerable<Graph> graphs, ISet<string> metrics, bool leavesOnly)
         {
-            this.metrics = metrics;
+            this.Metrics = metrics;
             this.leavesOnly = leavesOnly;
-            metricMaxima = new Dictionary<string, float>();
-            metricLevelMaxima = new Dictionary<int, Dictionary<string, float>>();
+            MetricMaxima = new Dictionary<string, float>();
+            MetricLevelMaxima = new Dictionary<int, Dictionary<string, float>>();
             DetermineMetricMaxima(graphs);
         }
 
         /// <summary>
         /// The list of metrics to be scaled.
         /// </summary>
-        protected readonly ISet<string> metrics;
+        protected readonly ISet<string> Metrics;
 
         /// <summary>
         /// The maximal values of all metrics as a map metric-name -> maximal value.
         /// </summary>
-        protected readonly Dictionary<string, float> metricMaxima;
+        protected readonly Dictionary<string, float> MetricMaxima;
 
         /// <summary>
         /// The maximal values of all metrics on each given level, as a map from level -> metric-name -> maximal value.
         /// </summary>
-        protected readonly Dictionary<int, Dictionary<string, float>> metricLevelMaxima;
+        protected readonly Dictionary<int, Dictionary<string, float>> MetricLevelMaxima;
 
         /// <summary>
         /// If true, the normalization is done only for leaf nodes.
@@ -124,7 +124,7 @@ namespace SEE.GO
         /// <returns>maximum</returns>
         public float GetMaximum(string metric)
         {
-            if (metricMaxima.TryGetValue(metric, out float max))
+            if (MetricMaxima.TryGetValue(metric, out float max))
             {
                 return max;
             }
@@ -141,7 +141,7 @@ namespace SEE.GO
         /// <returns>normalized maximum</returns>
         public float GetNormalizedMaximum(string metric)
         {
-            if (metricMaxima.TryGetValue(metric, out float value))
+            if (MetricMaxima.TryGetValue(metric, out float value))
             {
                 return GetNormalizedValue(metric, value);
             }
@@ -149,7 +149,7 @@ namespace SEE.GO
             {
                 Debug.LogError($"Attempt to retrieve the normalized maximum of metric {metric} that is not known.\n");
                 Debug.Log("The available normalized metric maxima are as follows:\n");
-                DumpMetricMaxima(metricMaxima);
+                DumpMetricMaxima(MetricMaxima);
                 throw new Exception("A metric named " + metric + " does not exist.");
             }
         }
@@ -162,7 +162,7 @@ namespace SEE.GO
         /// <returns>normalized maximum</returns>
         public float GetNormalizedMaximumForLevel(string metric, int level)
         {
-            if (metricLevelMaxima.TryGetValue(level, out Dictionary<string, float> dictionary)
+            if (MetricLevelMaxima.TryGetValue(level, out Dictionary<string, float> dictionary)
                 && dictionary.TryGetValue(metric, out float value))
             {
                 return GetNormalizedValueForLevel(metric, value, level);
@@ -172,7 +172,7 @@ namespace SEE.GO
                 Debug.LogError($"Attempt to retrieve the normalized maximum of metric {metric} in level {level} "
                                + $"that is not known.\n");
                 Debug.Log("The available normalized metric maxima are as follows:\n");
-                DumpMetricMaxima(metricMaxima);
+                DumpMetricMaxima(MetricMaxima);
                 throw new Exception($"A metric named {metric} does not exist in level {level}.");
             }
         }
@@ -208,44 +208,44 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the maximal values of the node metrics in <see cref="metrics"/>.
+        /// Returns the maximal values of the node metrics in <see cref="Metrics"/>.
         /// </summary>
         /// <param name="graphs">the set of graphs for which to determine the node metric maxima</param>
         private void DetermineMetricMaxima(IEnumerable<Graph> graphs)
         {
-            metricMaxima.Clear();
-            metricLevelMaxima.Clear();
+            MetricMaxima.Clear();
+            MetricLevelMaxima.Clear();
 
             // Set default maxima for metricMaxima
-            foreach (string metric in metrics)
+            foreach (string metric in Metrics)
             {
-                metricMaxima[metric] = 0.0f;
+                MetricMaxima[metric] = 0.0f;
             }
 
             foreach (Graph graph in graphs)
             {
                 foreach (Node node in graph.Nodes())
                 {
-                    if (!metricLevelMaxima.ContainsKey(node.Level))
+                    if (!MetricLevelMaxima.ContainsKey(node.Level))
                     {
-                        metricLevelMaxima[node.Level] = new Dictionary<string, float>();
+                        MetricLevelMaxima[node.Level] = new Dictionary<string, float>();
                     }
 
                     if (!leavesOnly || node.IsLeaf())
                     {
-                        foreach (string metric in metrics)
+                        foreach (string metric in Metrics)
                         {
                             if (node.TryGetNumeric(metric, out float value))
                             {
-                                if (value > metricMaxima[metric])
+                                if (value > MetricMaxima[metric])
                                 {
-                                    metricMaxima[metric] = value;
+                                    MetricMaxima[metric] = value;
                                 }
 
-                                if (!metricLevelMaxima[node.Level].ContainsKey(metric) ||
-                                    value > metricLevelMaxima[node.Level][metric])
+                                if (!MetricLevelMaxima[node.Level].ContainsKey(metric) ||
+                                    value > MetricLevelMaxima[node.Level][metric])
                                 {
-                                    metricLevelMaxima[node.Level][metric] = value;
+                                    MetricLevelMaxima[node.Level][metric] = value;
                                 }
                             }
                         }
@@ -254,18 +254,18 @@ namespace SEE.GO
             }
 
             // Set default maxima for metricLevelMaxima (for each level and each metric where it no maximum has been set)
-            foreach (int level in Enumerable.Range(0, (metricLevelMaxima.Keys.Any() ? metricLevelMaxima.Keys.Max() : 0) + 1))
+            foreach (int level in Enumerable.Range(0, (MetricLevelMaxima.Keys.Any() ? MetricLevelMaxima.Keys.Max() : 0) + 1))
             {
-                if (!metricLevelMaxima.ContainsKey(level))
+                if (!MetricLevelMaxima.ContainsKey(level))
                 {
-                    metricLevelMaxima[level] = new Dictionary<string, float>();
+                    MetricLevelMaxima[level] = new Dictionary<string, float>();
                 }
 
-                foreach (string metric in metrics)
+                foreach (string metric in Metrics)
                 {
-                    if (!metricLevelMaxima[level].ContainsKey(metric))
+                    if (!MetricLevelMaxima[level].ContainsKey(metric))
                     {
-                        metricLevelMaxima[level][metric] = 0.0f;
+                        MetricLevelMaxima[level][metric] = 0.0f;
                     }
                 }
             }

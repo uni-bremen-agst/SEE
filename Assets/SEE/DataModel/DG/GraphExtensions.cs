@@ -30,7 +30,7 @@ namespace SEE.DataModel.DG
             Graph oldGraph,
             Func<Graph, IEnumerable<T>> GetElements,
             Func<Graph, string, T> GetElement,
-            GraphElementDiff diff,
+            IGraphElementDiff diff,
             GraphElementEqualityComparer<T> comparer,
             out ISet<T> added,
             out ISet<T> removed,
@@ -102,12 +102,12 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns a new <see cref="GraphElementDiff"/> that considers all
+        /// Returns a new <see cref="IGraphElementDiff"/> that considers all
         /// node and edge attributes contained in any of the given <paramref name="graphs"/>.
         /// </summary>
         /// <param name="graphs">list of graphs</param>
-        /// <returns>a <see cref="GraphElementDiff"/> for all types of node and edge attributes</returns>
-        public static GraphElementDiff AttributeDiff(params Graph[] graphs)
+        /// <returns>a <see cref="IGraphElementDiff"/> for all types of node and edge attributes</returns>
+        public static IGraphElementDiff AttributeDiff(params Graph[] graphs)
         {
             ISet<string> floatAttributes = new HashSet<string>();
             ISet<string> intAttributes = new HashSet<string>();

@@ -1,40 +1,53 @@
 ﻿namespace SEE.DataModel.DG
 {
+    /// <summary>
+    /// Names of node attributes provided by the Axivion Suite.
+    /// </summary>
     public enum NumericAttributeNames
     {
-        Number_Of_Tokens,
-        Clone_Rate,
+        NumberOfTokens,
+        CloneRate,
         LOC,
         Complexity,
-        Architecture_Violations,
+        ArchitectureViolations,
         Clone,
         Cycle,
-        Dead_Code,
+        DeadCode,
         Metric,
         Style,
         Universal,
         IssuesTotal
     }
 
+    /// <summary>
+    /// Provides an extension <see cref="Name(NumericAttributeNames)"/> for <see cref="NumericAttributeNames"/>.
+    /// </summary>
     public static class AttributeNamesExtensions
     {
-        public static string Name(this NumericAttributeNames me)
+        /// <summary>
+        /// Name of the given <paramref name="numericAttributeName"/>.
+        /// </summary>
+        /// <param name="numericAttributeName">numeric attribute name whose name is requested</param>
+        /// <returns>the name of <paramref name="numericAttributeName"/></returns>
+        /// <exception cref="System.Exception">thrown if <paramref name="numericAttributeName"/>
+        /// is not handled in this method</exception>
+        public static string Name(this NumericAttributeNames numericAttributeName)
         {
-            return me switch
+            return numericAttributeName switch
             {
-                NumericAttributeNames.Number_Of_Tokens => "Metric.Number_of_Tokens",
-                NumericAttributeNames.Clone_Rate => "Metric.Clone_Rate",
+                NumericAttributeNames.NumberOfTokens => "Metric.Number_of_Tokens",
+                NumericAttributeNames.CloneRate => "Metric.Clone_Rate",
                 NumericAttributeNames.LOC => "Metric.LOC",
                 NumericAttributeNames.Complexity => "Metric.Complexity",
-                NumericAttributeNames.Architecture_Violations => "Metric.Architecture_Violations",
+                NumericAttributeNames.ArchitectureViolations => "Metric.Architecture_Violations",
                 NumericAttributeNames.Clone => "Metric.Clone",
                 NumericAttributeNames.Cycle => "Metric.Cycle",
-                NumericAttributeNames.Dead_Code => "Metric.Dead_Code",
+                NumericAttributeNames.DeadCode => "Metric.Dead_Code",
                 NumericAttributeNames.Metric => "Metric.Metric",
                 NumericAttributeNames.Style => "Metric.Style",
                 NumericAttributeNames.Universal => "Metric.Universal",
                 NumericAttributeNames.IssuesTotal => "Metric.IssuesTotal",
-                _ => throw new System.Exception("Unknown attribute name " + me)
+                _ => throw new System.Exception("Unknown attribute name " + numericAttributeName)
             };
         }
     }

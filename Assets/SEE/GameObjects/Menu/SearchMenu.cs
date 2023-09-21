@@ -20,22 +20,22 @@ namespace SEE.GO.Menu
         /// <summary>
         /// The time (in seconds) the found node will blink.
         /// </summary>
-        private const float BLINK_SECONDS = 15;
+        private const float blinkSeconds = 15;
 
         /// <summary>
         /// The number of times the found node will blink.
         /// </summary>
-        private const int BLINK_COUNT = 20;
+        private const int blinkCount = 20;
 
         /// <summary>
         /// The height of the marker used to mark the found node.
         /// </summary>
-        private const float MARKER_HEIGHT = 1f;
+        private const float markerHeight = 1f;
 
         /// <summary>
         /// The width of the marker used to mark the found node.
         /// </summary>
-        private const float MARKER_WIDTH = 0.01f;
+        private const float markerWidth = 0.01f;
 
         /// <summary>
         /// The dialog in which the search query can be entered.
@@ -178,12 +178,12 @@ namespace SEE.GO.Menu
         {
             ShowNotification.Info($"Highlighting '{resultName}'",
                                   "The selected node will be blinking and marked by a spear "
-                                  + $"for {BLINK_SECONDS} seconds.");
+                                  + $"for {blinkSeconds} seconds.");
             NodeOperator nodeOperator = result.AddOrGetComponent<NodeOperator>();
             // Display marker above the node
-            MarkerFactory marker = new(MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR, default, default);
+            MarkerFactory marker = new(markerWidth, markerHeight, MARKER_COLOR, default, default);
             marker.MarkBorn(result);
-            nodeOperator.Blink(BLINK_COUNT, BLINK_SECONDS).SetOnComplete(RemoveMarker);
+            nodeOperator.Blink(blinkCount, blinkSeconds).SetOnComplete(RemoveMarker);
 
             void RemoveMarker() => marker.Clear();
         }

@@ -157,19 +157,19 @@ namespace SEE.Controls
         public Node GetNode()
         {
             Assert.IsTrue(GraphElemRef is NodeRef);
-            return (Node)GraphElemRef.elem;
+            return (Node)GraphElemRef.Elem;
         }
 
         public Edge GetEdge()
         {
             Assert.IsTrue(GraphElemRef is EdgeRef);
-            return (Edge)GraphElemRef.elem;
+            return (Edge)GraphElemRef.Elem;
         }
 
         /// <summary>
         /// <see cref="GraphElement.ItsGraph"/>
         /// </summary>
-        public Graph ItsGraph => GraphElemRef.elem.ItsGraph;
+        public Graph ItsGraph => GraphElemRef.Elem.ItsGraph;
 
         /// <summary>
         /// A bit vector for hovering flags. Each flag is a bit as defined in <see cref="HoverFlag"/>.
@@ -452,7 +452,7 @@ namespace SEE.Controls
                 SelectedObjects.Add(this);
 
                 // Update all selected object list per graph
-                Graph graph = GraphElemRef.elem.ItsGraph;
+                Graph graph = GraphElemRef.Elem.ItsGraph;
                 if (!graphToSelectedIOs.ContainsKey(graph))
                 {
                     graphToSelectedIOs[graph] = new HashSet<InteractableObject>();
@@ -479,7 +479,7 @@ namespace SEE.Controls
                 SelectedObjects.Remove(this);
 
                 // Update all selected object list per graph
-                graphToSelectedIOs[GraphElemRef.elem.ItsGraph].Remove(this);
+                graphToSelectedIOs[GraphElemRef.Elem.ItsGraph].Remove(this);
 
                 flasher.StopFlashing();
 

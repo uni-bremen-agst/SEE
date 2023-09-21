@@ -120,7 +120,7 @@ namespace SEE.Game.Avatars
             }
             Speaker.Instance.Speak(text, audioSource, voice: voice);
             Speaker.Instance.OnSpeakCompleted.AddListener(OnSpeakCompleted);
-            
+
             void OnSpeakCompleted(string _)
             {
                 onSpeakCompleted?.Invoke();
@@ -152,7 +152,7 @@ namespace SEE.Game.Avatars
         /// Dumps the available voices on the current platform to the debugging console.
         /// Can be used to retrieve the available voices on the current system.
         /// </summary>
-        private void DumpVoices()
+        private static void DumpVoices()
         {
             foreach (Voice voice in Speaker.Instance.Voices)
             {

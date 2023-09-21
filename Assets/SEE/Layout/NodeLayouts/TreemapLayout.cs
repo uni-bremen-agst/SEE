@@ -28,7 +28,7 @@ namespace SEE.Layout.NodeLayouts
                              float depth)
         : base(groundLevel)
         {
-            name = "Treemap";
+            Name = "Treemap";
             this.width = width;
             this.depth = depth;
         }
@@ -84,7 +84,7 @@ namespace SEE.Layout.NodeLayouts
                     break;
                 }
                 default:
-                    roots = LayoutNodes.GetRoots(layoutNodeList);
+                    Roots = LayoutNodes.GetRoots(layoutNodeList);
                     CalculateSize();
                     CalculateLayout();
                     break;
@@ -106,9 +106,9 @@ namespace SEE.Layout.NodeLayouts
             /// assumes the rectangle's location be specified by its left front corner.
             /// Hence, we need to transform the center of the "logical" rectangle to the left front
             /// corner of the rectangle by -width/2 and -depth/2, respectively.
-            if (roots.Count == 1)
+            if (Roots.Count == 1)
             {
-                ILayoutNode root = roots[0];
+                ILayoutNode root = Roots[0];
                 Assert.AreEqual(root.AbsoluteScale, root.LocalScale);
                 layout_result[root] = new NodeTransform(Vector3.zero,
                                                         new Vector3(width, root.LocalScale.y, depth));
@@ -116,7 +116,7 @@ namespace SEE.Layout.NodeLayouts
             }
             else
             {
-                CalculateLayout(roots, x: -width / 2.0f, z: -depth / 2.0f, width, depth);
+                CalculateLayout(Roots, x: -width / 2.0f, z: -depth / 2.0f, width, depth);
             }
         }
 
@@ -196,7 +196,7 @@ namespace SEE.Layout.NodeLayouts
         private float CalculateSize()
         {
             float total_size = 0.0f;
-            foreach (ILayoutNode root in roots)
+            foreach (ILayoutNode root in Roots)
             {
                 total_size += CalculateSize(root);
             }
@@ -278,7 +278,7 @@ namespace SEE.Layout.NodeLayouts
             foreach (RectangleTiling.Rectangle rect in rects)
             {
                 ILayoutNode o = nodes[i].gameNode;
-                Vector3 position = new Vector3(rect.x + rect.width / 2.0f, groundLevel, rect.z + rect.depth / 2.0f);
+                Vector3 position = new Vector3(rect.x + rect.width / 2.0f, GroundLevel, rect.z + rect.depth / 2.0f);
                 Vector3 scale = new Vector3(rect.width, o.LocalScale.y, rect.depth);
                 Assert.AreEqual(o.AbsoluteScale, o.LocalScale, $"{o.ID}: {o.AbsoluteScale} != {o.LocalScale}");
                 layout_result[o] = new NodeTransform(position, scale);

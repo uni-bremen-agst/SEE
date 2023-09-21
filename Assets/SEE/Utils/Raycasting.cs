@@ -183,13 +183,13 @@ namespace SEE.Utils
                 raycastHit = hit;
                 if (hit.transform.TryGetComponent(out InteractableObject io))
                 {
-                    if (io.GraphElemRef.elem is Node)
+                    if (io.GraphElemRef.Elem is Node)
                     {
                         result = HitGraphElement.Node;
                     }
                     else
                     {
-                        Assert.IsTrue(io.GraphElemRef.elem is Edge);
+                        Assert.IsTrue(io.GraphElemRef.Elem is Edge);
                         result = HitGraphElement.Edge;
                     }
                     obj = io;

@@ -50,17 +50,17 @@ namespace SEE.Game.Operator
         /// Mapping from each combined callback to a bitmask representing whether the respective method was called.
         /// Bitmask order: OnComplete, OnKill, OnPlay, OnPause, OnRewind, OnStart, OnUpdate
         /// </summary>
-        private readonly IDictionary<IOperationCallback<C>, int> CallbackCounter = new Dictionary<IOperationCallback<C>, int>();
+        private readonly IDictionary<IOperationCallback<C>, int> callbackCounter = new Dictionary<IOperationCallback<C>, int>();
 
         /// <summary>
         /// List of all callbacks combined by this class.
         /// </summary>
-        private readonly IList<IOperationCallback<C>> Callbacks = new List<IOperationCallback<C>>();
-        
+        private readonly IList<IOperationCallback<C>> callbacks = new List<IOperationCallback<C>>();
+
         /// <summary>
         /// Function which converts from an <see cref="Action"/> to a delegate of type <typeparamref name="C"/>.
         /// </summary>
-        private readonly Func<Action, C> CallbackConverter;
+        private readonly Func<Action, C> callbackConverter;
 
         /// <summary>
         /// Create a new <see cref="AndCombinedOperationCallback{C}"/> based on the given <paramref name="callbacks"/>.
@@ -73,21 +73,21 @@ namespace SEE.Game.Operator
         {
             if (typeof(C) == typeof(Action))
             {
-                CallbackConverter = a => a as C;
-            } 
+                this.callbackConverter = a => a as C;
+            }
             else if (callbackConverter == null)
             {
                 throw new ArgumentException("callbackConverter must not be null when generic parameter C != Action!");
             }
             else
             {
-                CallbackConverter = callbackConverter;
+                this.callbackConverter = callbackConverter;
             }
             foreach (IOperationCallback<C> operationCallback in callbacks)
             {
-                Callbacks.Add(operationCallback);
+                this.callbacks.Add(operationCallback);
                 // We initialize the dictionary with 0, indicating that no callback has been triggered.
-                CallbackCounter[operationCallback] = 0;
+                callbackCounter[operationCallback] = 0;
             }
 
             // We register ourselves as a listener on each callback method only once the callback is set.
@@ -99,17 +99,17 @@ namespace SEE.Game.Operator
         /// Handles a callback method triggered by one of the composited callbacks.
         /// </summary>
         /// <param name="callback">The callback which triggered the callback method</param>
-        /// <param name="index">Index of the callback method. See <see cref="CallbackCounter"/> for a reference.</param>
+        /// <param name="index">Index of the callback method. See <see cref="callbackCounter"/> for a reference.</param>
         /// <exception cref="IndexOutOfRangeException">When <paramref name="index"/> is not in [0;6]</exception>
         private void HandleSingleCallback(IOperationCallback<C> callback, int index)
         {
-            if ((CallbackCounter[callback] & (1 << index)) == 1)
+            if ((callbackCounter[callback] & (1 << index)) == 1)
             {
                 // Callback already triggered.
                 return;
             }
-            CallbackCounter[callback] |= 1 << index;
-            if (CallbackCounter.All(x => (x.Value & (1 << index)) == 1))
+            callbackCounter[callback] |= 1 << index;
+            if (callbackCounter.All(x => (x.Value & (1 << index)) == 1))
             {
                 // All callbacks have been triggered, so we trigger the actual user-defined callback.
                 switch (index)
@@ -136,63 +136,63 @@ namespace SEE.Game.Operator
         public void SetOnComplete(Action callback)
         {
             onComplete = callback;
-            foreach (IOperationCallback<C> operationCallback in Callbacks)
+            foreach (IOperationCallback<C> operationCallback in callbacks)
             {
-                operationCallback.SetOnComplete(CallbackConverter(() => HandleSingleCallback(operationCallback, 0)));
+                operationCallback.SetOnComplete(callbackConverter(() => HandleSingleCallback(operationCallback, 0)));
             }
         }
 
         public void SetOnKill(Action callback)
         {
             onKill = callback;
-            foreach (IOperationCallback<C> operationCallback in Callbacks)
+            foreach (IOperationCallback<C> operationCallback in callbacks)
             {
-                operationCallback.SetOnKill(CallbackConverter(() => HandleSingleCallback(operationCallback, 1)));
+                operationCallback.SetOnKill(callbackConverter(() => HandleSingleCallback(operationCallback, 1)));
             }
         }
 
         public void SetOnPlay(Action callback)
         {
             onPlay = callback;
-            foreach (IOperationCallback<C> operationCallback in Callbacks)
+            foreach (IOperationCallback<C> operationCallback in callbacks)
             {
-                operationCallback.SetOnPlay(CallbackConverter(() => HandleSingleCallback(operationCallback, 2)));
+                operationCallback.SetOnPlay(callbackConverter(() => HandleSingleCallback(operationCallback, 2)));
             }
         }
 
         public void SetOnPause(Action callback)
         {
             onPause = callback;
-            foreach (IOperationCallback<C> operationCallback in Callbacks)
+            foreach (IOperationCallback<C> operationCallback in callbacks)
             {
-                operationCallback.SetOnPause(CallbackConverter(() => HandleSingleCallback(operationCallback, 3)));
+                operationCallback.SetOnPause(callbackConverter(() => HandleSingleCallback(operationCallback, 3)));
             }
         }
 
         public void SetOnRewind(Action callback)
         {
             onRewind = callback;
-            foreach (IOperationCallback<C> operationCallback in Callbacks)
+            foreach (IOperationCallback<C> operationCallback in callbacks)
             {
-                operationCallback.SetOnRewind(CallbackConverter(() => HandleSingleCallback(operationCallback, 4)));
+                operationCallback.SetOnRewind(callbackConverter(() => HandleSingleCallback(operationCallback, 4)));
             }
         }
 
         public void SetOnStart(Action callback)
         {
             onStart = callback;
-            foreach (IOperationCallback<C> operationCallback in Callbacks)
+            foreach (IOperationCallback<C> operationCallback in callbacks)
             {
-                operationCallback.SetOnStart(CallbackConverter(() => HandleSingleCallback(operationCallback, 5)));
+                operationCallback.SetOnStart(callbackConverter(() => HandleSingleCallback(operationCallback, 5)));
             }
         }
 
         public void SetOnUpdate(Action callback)
         {
             onUpdate = callback;
-            foreach (IOperationCallback<C> operationCallback in Callbacks)
+            foreach (IOperationCallback<C> operationCallback in callbacks)
             {
-                operationCallback.SetOnUpdate(CallbackConverter(() => HandleSingleCallback(operationCallback, 6)));
+                operationCallback.SetOnUpdate(callbackConverter(() => HandleSingleCallback(operationCallback, 6)));
             }
         }
     }

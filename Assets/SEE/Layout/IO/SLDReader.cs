@@ -50,9 +50,9 @@ namespace SEE.Layout.IO
                 }
                 else
                 {
-                    string ID = columns[0];
+                    string id = columns[0];
 
-                    if (result.TryGetValue(ID, out IGameNode node))
+                    if (result.TryGetValue(id, out IGameNode node))
                     {
                         Vector3 position;
                         position.x = float.Parse(columns[1], CultureInfo.InvariantCulture);
@@ -77,7 +77,7 @@ namespace SEE.Layout.IO
                     }
                     else
                     {
-                        Debug.LogError($"{filename}:{lineNumber}: Unknown node ID {ID}.\n");
+                        Debug.LogError($"{filename}:{lineNumber}: Unknown node ID {id}.\n");
                     }
                 }
             }

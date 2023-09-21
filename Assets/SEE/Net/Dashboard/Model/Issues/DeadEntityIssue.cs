@@ -68,7 +68,7 @@ namespace SEE.Net.Dashboard.Model.Issues
 
         public override string IssueKind => "DE";
 
-        public override NumericAttributeNames AttributeName => NumericAttributeNames.Dead_Code;
+        public override NumericAttributeNames AttributeName => NumericAttributeNames.DeadCode;
 
         public override IEnumerable<SourceCodeEntity> Entities => new[]
         {

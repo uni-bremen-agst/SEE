@@ -88,37 +88,37 @@ namespace SEE.Game.City
         /// <summary>
         /// Label for attribute <see cref="JLGPath"/> in configuration file.
         /// </summary>
-        private const string JLGPathLabel = "JLGPath";
+        private const string jlgPathLabel = "JLGPath";
 
         /// <summary>
         /// Label for attribute <see cref="SEEJlgCity.BreakpointClass"/> in configuration file.
         /// </summary>
-        private const string BreakpointClassLabel = "BreakpointClass";
+        private const string breakpointClassLabel = "BreakpointClass";
 
         /// <summary>
         /// Label for attribute <see cref="SEEJlgCity.BreakpointLine"/> in configuration file.
         /// </summary>
-        private const string BreakpointLineLabel = "BreakpointLine";
+        private const string breakpointLineLabel = "BreakpointLine";
 
         /// <summary>
         /// Label for attribute <see cref="SEEJlgCity.DistanceAboveCity"/> in configuration file.
         /// </summary>
-        private const string DistanceAboveCityLabel = "DistanceAboveCity";
+        private const string distanceAboveCityLabel = "DistanceAboveCity";
 
         /// <summary>
         /// Label for attribute <see cref="SEEJlgCity.DistanceBehindCity"/> in configuration file.
         /// </summary>
-        private const string DistanceBehindCityLabel = "DistanceBehindCity";
+        private const string distanceBehindCityLabel = "DistanceBehindCity";
 
         /// <summary>
         /// Label for attribute <see cref="SEEJlgCity.LineWidth"/> in configuration file.
         /// </summary>
-        private const string LineWidthLabel = "LineWidth";
+        private const string lineWidthLabel = "LineWidth";
 
         /// <summary>
         /// Label for attribute <see cref="SEEJlgCity.ShowOnlyCalls"/> in configuration file.
         /// </summary>
-        private const string ShowOnlyCallsLabel = "ShowOnlyCalls";
+        private const string showOnlyCallsLabel = "ShowOnlyCalls";
 
         /// <summary>
         /// <see cref="City.AbstractSEECity.Save(ConfigWriter)"/>
@@ -126,14 +126,14 @@ namespace SEE.Game.City
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
-            JLGPath.Save(writer, JLGPathLabel);
+            JLGPath.Save(writer, jlgPathLabel);
             // Configuration attributes relating to the animation
-            writer.Save(BreakpointClass, BreakpointClassLabel);
-            writer.Save(BreakpointLine, BreakpointLineLabel);
-            writer.Save(DistanceAboveCity, DistanceAboveCityLabel);
-            writer.Save(DistanceBehindCity, DistanceBehindCityLabel);
-            writer.Save(LineWidth, LineWidthLabel);
-            writer.Save(ShowOnlyCalls, ShowOnlyCallsLabel);
+            writer.Save(BreakpointClass, breakpointClassLabel);
+            writer.Save(BreakpointLine, breakpointLineLabel);
+            writer.Save(DistanceAboveCity, distanceAboveCityLabel);
+            writer.Save(DistanceBehindCity, distanceBehindCityLabel);
+            writer.Save(LineWidth, lineWidthLabel);
+            writer.Save(ShowOnlyCalls, showOnlyCallsLabel);
         }
 
         /// <summary>
@@ -142,14 +142,14 @@ namespace SEE.Game.City
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            JLGPath.Restore(attributes, JLGPathLabel);
+            JLGPath.Restore(attributes, jlgPathLabel);
             // Configuration attributes relating to the animation
-            ConfigIO.Restore(attributes, BreakpointClassLabel, ref BreakpointClass);
-            ConfigIO.Restore(attributes, BreakpointLineLabel, ref BreakpointLine);
-            ConfigIO.Restore(attributes, DistanceAboveCityLabel, ref DistanceAboveCity);
-            ConfigIO.Restore(attributes, DistanceBehindCityLabel, ref DistanceBehindCity);
-            ConfigIO.Restore(attributes, LineWidthLabel, ref LineWidth);
-            ConfigIO.Restore(attributes, ShowOnlyCallsLabel, ref ShowOnlyCalls);
+            ConfigIO.Restore(attributes, breakpointClassLabel, ref BreakpointClass);
+            ConfigIO.Restore(attributes, breakpointLineLabel, ref BreakpointLine);
+            ConfigIO.Restore(attributes, distanceAboveCityLabel, ref DistanceAboveCity);
+            ConfigIO.Restore(attributes, distanceBehindCityLabel, ref DistanceBehindCity);
+            ConfigIO.Restore(attributes, lineWidthLabel, ref LineWidth);
+            ConfigIO.Restore(attributes, showOnlyCallsLabel, ref ShowOnlyCalls);
         }
     }
 }

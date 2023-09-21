@@ -29,7 +29,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         protected override void Synchronize()
         {
-            new VRIKNetAction(networkObject.NetworkObjectId, vrik).Execute();
+            new VRIKNetAction(NetworkObject.NetworkObjectId, vrik).Execute();
         }
     }
 }

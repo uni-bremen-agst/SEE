@@ -46,7 +46,7 @@ namespace SEE.Game.HolisticMetrics
         /// This contains references to all widgets on the board each represented by one WidgetController and one
         /// Metric. This list is needed so we can refresh the metrics.
         /// </summary>
-        internal readonly List<(WidgetController, Metric)> widgets = new();
+        internal readonly List<(WidgetController, Metric)> Widgets = new();
 
         /// <summary>
         /// The title of the board that this controller controls.
@@ -146,7 +146,7 @@ namespace SEE.Game.HolisticMetrics
                 WidgetController widgetController = widgetInstance.GetComponent<WidgetController>();
                 Metric metricInstance = (Metric)widgetInstance.AddComponent(metricType);
                 widgetController.ID = widgetConfiguration.ID;
-                widgets.Add((widgetController, metricInstance));
+                Widgets.Add((widgetController, metricInstance));
                 try
                 {
                     widgetController.Display(metricInstance.Refresh(GetSelectedCity()));
@@ -168,7 +168,7 @@ namespace SEE.Game.HolisticMetrics
         /// <param name="position">The position to which the widget should be moved</param>
         internal void Move(Guid widgetID, Vector3 position)
         {
-            WidgetController controller = widgets
+            WidgetController controller = Widgets
                 .Find(widget => widget.Item1.ID.Equals(widgetID)).Item1;
             controller.transform.position = position;
         }
@@ -181,14 +181,14 @@ namespace SEE.Game.HolisticMetrics
         {
             if (enable)
             {
-                foreach ((WidgetController controller, Metric) tuple in widgets)
+                foreach ((WidgetController controller, Metric) tuple in Widgets)
                 {
                     tuple.controller.gameObject.AddComponent<WidgetDeleter>();
                 }
             }
             else
             {
-                foreach ((WidgetController controller, Metric) tuple in widgets)
+                foreach ((WidgetController controller, Metric) tuple in Widgets)
                 {
                     Destroyer.Destroy(tuple.controller.gameObject.GetComponent<WidgetDeleter>());
                 }
@@ -203,7 +203,7 @@ namespace SEE.Game.HolisticMetrics
         /// <returns>Whether one of the widgets that this manager manages is marked as "to be deleted".</returns>
         internal bool GetWidgetDeletion(out WidgetConfig widgetConfig)
         {
-            foreach ((WidgetController controller, Metric) widget in widgets)
+            foreach ((WidgetController controller, Metric) widget in Widgets)
             {
                 if (widget.controller.GetComponent<WidgetDeleter>().GetDeletion(out widgetConfig))
                 {
@@ -222,9 +222,9 @@ namespace SEE.Game.HolisticMetrics
         internal void Delete(Guid widgetID)
         {
             (WidgetController, Metric) widget =
-                widgets.Find(widget => widget.Item1.ID.Equals(widgetID));
+                Widgets.Find(widget => widget.Item1.ID.Equals(widgetID));
             WidgetController widgetController = widget.Item1;
-            widgets.Remove(widget);
+            Widgets.Remove(widget);
             Destroyer.Destroy(widgetController.gameObject);
         }
 
@@ -295,7 +295,7 @@ namespace SEE.Game.HolisticMetrics
         /// <param name="enable">Whether or not the widgets should be move-able now</param>
         internal void ToggleWidgetsMoving(bool enable)
         {
-            foreach ((WidgetController, Metric) widget in widgets)
+            foreach ((WidgetController, Metric) widget in Widgets)
             {
                 widget.Item1.ToggleMoving(enable);
             }
@@ -310,7 +310,7 @@ namespace SEE.Game.HolisticMetrics
         /// <returns>Whether a widget movement was found</returns>
         internal bool TryGetWidgetMovement(out Vector3 originalPosition, out Vector3 newPosition, out Guid widgetID)
         {
-            foreach ((WidgetController, Metric) widget in widgets)
+            foreach ((WidgetController, Metric) widget in Widgets)
             {
                 if (widget.Item1.GetComponent<WidgetMover>().TryGetMovement(out originalPosition, out newPosition))
                 {
@@ -385,7 +385,7 @@ namespace SEE.Game.HolisticMetrics
         /// but it is not used and can be ignored when manually calling the method.</param>
         private void Redraw(int index = -1)
         {
-            foreach ((WidgetController, Metric) tuple in widgets)
+            foreach ((WidgetController, Metric) tuple in Widgets)
             {
                 MetricValue metricValue = tuple.Item2.Refresh(GetSelectedCity());
                 tuple.Item1.Display(metricValue);

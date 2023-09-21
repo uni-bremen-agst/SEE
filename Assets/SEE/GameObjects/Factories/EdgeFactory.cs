@@ -25,13 +25,13 @@ namespace SEE.GO
         {
             this.layout = layout;
             this.edgeWidth = edgeWidth;
-            defaultLineMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
+            DefaultLineMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
         }
 
         /// <summary>
         /// The material used for edges.
         /// </summary>
-        protected readonly Material defaultLineMaterial;
+        protected readonly Material DefaultLineMaterial;
 
         /// <summary>
         /// The width of the line for the created edges, given in the constructor.
@@ -112,7 +112,7 @@ namespace SEE.GO
             // renderer.material instead will create a copy of the
             // material and will not be affected by changes of the
             // original material.
-            line.sharedMaterial = defaultLineMaterial;
+            line.sharedMaterial = DefaultLineMaterial;
 
             LineFactory.SetDefaults(line);
             LineFactory.SetWidth(line, edgeWidth);

@@ -21,7 +21,7 @@ using SEE.Game.City;
 namespace SEE.Layout.NodeLayouts.Cose
 {
     /// <summary>
-    /// A class for holding properties for a sublayout 
+    /// A class for holding properties for a sublayout
     /// </summary>
     public class SublayoutNode : AbstractSublayoutNode<Node>
     {

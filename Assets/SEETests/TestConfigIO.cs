@@ -829,18 +829,18 @@ namespace SEE.Utils
             city.ErosionSettings.StyleIssue = "X";
             city.ErosionSettings.UniversalIssue = "X";
             city.ErosionSettings.MetricIssue = "X";
-            city.ErosionSettings.Dead_CodeIssue = "X";
+            city.ErosionSettings.DeadCodeIssue = "X";
             city.ErosionSettings.CycleIssue = "X";
             city.ErosionSettings.CloneIssue = "X";
             city.ErosionSettings.ArchitectureIssue = "X";
 
-            city.ErosionSettings.StyleIssue_SUM = "X";
-            city.ErosionSettings.UniversalIssue_SUM = "X";
-            city.ErosionSettings.MetricIssue_SUM = "X";
-            city.ErosionSettings.Dead_CodeIssue_SUM = "X";
-            city.ErosionSettings.CycleIssue_SUM = "X";
-            city.ErosionSettings.CloneIssue_SUM = "X";
-            city.ErosionSettings.ArchitectureIssue_SUM = "X";
+            city.ErosionSettings.StyleIssueSum = "X";
+            city.ErosionSettings.UniversalIssueSum = "X";
+            city.ErosionSettings.MetricIssueSum = "X";
+            city.ErosionSettings.DeadCodeIssueSum = "X";
+            city.ErosionSettings.CycleIssueSum = "X";
+            city.ErosionSettings.CloneIssueSum = "X";
+            city.ErosionSettings.ArchitectureIssueSum = "X";
         }
 
         private static void AreEqualErosionSettings(ErosionAttributes expected, ErosionAttributes actual)
@@ -856,18 +856,18 @@ namespace SEE.Utils
             Assert.AreEqual(expected.StyleIssue, actual.StyleIssue);
             Assert.AreEqual(expected.UniversalIssue, actual.UniversalIssue);
             Assert.AreEqual(expected.MetricIssue, actual.MetricIssue);
-            Assert.AreEqual(expected.Dead_CodeIssue, actual.Dead_CodeIssue);
+            Assert.AreEqual(expected.DeadCodeIssue, actual.DeadCodeIssue);
             Assert.AreEqual(expected.CycleIssue, actual.CycleIssue);
             Assert.AreEqual(expected.CloneIssue, actual.CloneIssue);
             Assert.AreEqual(expected.ArchitectureIssue, actual.ArchitectureIssue);
 
-            Assert.AreEqual(expected.StyleIssue_SUM, actual.StyleIssue_SUM);
-            Assert.AreEqual(expected.UniversalIssue_SUM, actual.UniversalIssue_SUM);
-            Assert.AreEqual(expected.MetricIssue_SUM, actual.MetricIssue_SUM);
-            Assert.AreEqual(expected.Dead_CodeIssue_SUM, actual.Dead_CodeIssue_SUM);
-            Assert.AreEqual(expected.CycleIssue_SUM, actual.CycleIssue_SUM);
-            Assert.AreEqual(expected.CloneIssue_SUM, actual.CloneIssue_SUM);
-            Assert.AreEqual(expected.ArchitectureIssue_SUM, actual.ArchitectureIssue_SUM);
+            Assert.AreEqual(expected.StyleIssueSum, actual.StyleIssueSum);
+            Assert.AreEqual(expected.UniversalIssueSum, actual.UniversalIssueSum);
+            Assert.AreEqual(expected.MetricIssueSum, actual.MetricIssueSum);
+            Assert.AreEqual(expected.DeadCodeIssueSum, actual.DeadCodeIssueSum);
+            Assert.AreEqual(expected.CycleIssueSum, actual.CycleIssueSum);
+            Assert.AreEqual(expected.CloneIssueSum, actual.CloneIssueSum);
+            Assert.AreEqual(expected.ArchitectureIssueSum, actual.ArchitectureIssueSum);
         }
 
         private static void WipeOutEdgeLayoutSettings(AbstractSEECity city)

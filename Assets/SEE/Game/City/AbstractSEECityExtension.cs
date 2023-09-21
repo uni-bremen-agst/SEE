@@ -54,17 +54,17 @@ namespace SEE.Game.City
         /// <summary>
         /// constructor
         /// </summary>
-        /// <param name="OnlyLeaves">true if the nodelayout only visualize leaf nodes</param>
-        /// <param name="CanApplySublayouts">true if the nodelayout can handle sublayouts</param>
-        /// <param name="InnerNodesEncloseLeafNodes">true if the inner nodes enclose the leaf nodes</param>
-        /// <param name="IsCircular"> true if the layout is a circular layout</param>
+        /// <param name="onlyLeaves">true if the nodelayout only visualize leaf nodes</param>
+        /// <param name="canApplySublayouts">true if the nodelayout can handle sublayouts</param>
+        /// <param name="innerNodesEncloseLeafNodes">true if the inner nodes enclose the leaf nodes</param>
+        /// <param name="isCircular"> true if the layout is a circular layout</param>
         /// <param name="isHierarchical">true if the layout displays the hierarchie of the graph</param>
-        public NodelayoutModel(bool OnlyLeaves, bool CanApplySublayouts, bool InnerNodesEncloseLeafNodes, bool IsCircular, bool isHierarchical)
+        public NodelayoutModel(bool onlyLeaves, bool canApplySublayouts, bool innerNodesEncloseLeafNodes, bool isCircular, bool isHierarchical)
         {
-            this.OnlyLeaves = OnlyLeaves;
-            this.CanApplySublayouts = CanApplySublayouts;
-            this.InnerNodesEncloseLeafNodes = InnerNodesEncloseLeafNodes;
-            this.IsCircular = IsCircular;
+            this.OnlyLeaves = onlyLeaves;
+            this.CanApplySublayouts = canApplySublayouts;
+            this.InnerNodesEncloseLeafNodes = innerNodesEncloseLeafNodes;
+            this.IsCircular = isCircular;
             IsHierarchical = isHierarchical;
         }
     }
@@ -87,12 +87,12 @@ namespace SEE.Game.City
         /// <summary>
         /// constructor
         /// </summary>
-        /// <param name="IsCircular">true if the inner node kind has a circluar shape</param>
-        /// <param name="IsRectangular"> true if the inner node kind has a rectangular shape</param>
-        public InnerNodeKindsModel(bool IsCircular, bool IsRectangular)
+        /// <param name="isCircular">true if the inner node kind has a circluar shape</param>
+        /// <param name="isRectangular"> true if the inner node kind has a rectangular shape</param>
+        public InnerNodeKindsModel(bool isCircular, bool isRectangular)
         {
-            this.IsCircular = IsCircular;
-            this.IsRectangular = IsRectangular;
+            this.IsCircular = isCircular;
+            this.IsRectangular = isRectangular;
         }
     }
 
@@ -111,23 +111,23 @@ namespace SEE.Game.City
             switch (nodeLayout)
             {
                 case NodeLayoutKind.CompoundSpringEmbedder:
-                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: true, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
+                    return new NodelayoutModel(onlyLeaves: false, canApplySublayouts: true, innerNodesEncloseLeafNodes: true, isCircular: false, isHierarchical: true);
                 case NodeLayoutKind.EvoStreets:
-                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: false, IsCircular: false, isHierarchical: true);
+                    return new NodelayoutModel(onlyLeaves: false, canApplySublayouts: false, innerNodesEncloseLeafNodes: false, isCircular: false, isHierarchical: true);
                 case NodeLayoutKind.Balloon:
-                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: true, isHierarchical: true);
+                    return new NodelayoutModel(onlyLeaves: false, canApplySublayouts: false, innerNodesEncloseLeafNodes: true, isCircular: true, isHierarchical: true);
                 case NodeLayoutKind.RectanglePacking:
-                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
+                    return new NodelayoutModel(onlyLeaves: false, canApplySublayouts: false, innerNodesEncloseLeafNodes: true, isCircular: false, isHierarchical: true);
                 case NodeLayoutKind.Treemap:
-                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
+                    return new NodelayoutModel(onlyLeaves: false, canApplySublayouts: false, innerNodesEncloseLeafNodes: true, isCircular: false, isHierarchical: true);
                 case NodeLayoutKind.IncrementalTreeMap:
-                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
+                    return new NodelayoutModel(onlyLeaves: false, canApplySublayouts: false, innerNodesEncloseLeafNodes: true, isCircular: false, isHierarchical: true);
                 case NodeLayoutKind.CirclePacking:
-                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: true, isHierarchical: true);
+                    return new NodelayoutModel(onlyLeaves: false, canApplySublayouts: false, innerNodesEncloseLeafNodes: true, isCircular: true, isHierarchical: true);
                 case NodeLayoutKind.Manhattan:
-                    return new NodelayoutModel(OnlyLeaves: true, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: false, IsCircular: false, isHierarchical: false);
+                    return new NodelayoutModel(onlyLeaves: true, canApplySublayouts: false, innerNodesEncloseLeafNodes: false, isCircular: false, isHierarchical: false);
                 default:
-                    return new NodelayoutModel(OnlyLeaves: false, CanApplySublayouts: false, InnerNodesEncloseLeafNodes: true, IsCircular: false, isHierarchical: true);
+                    return new NodelayoutModel(onlyLeaves: false, canApplySublayouts: false, innerNodesEncloseLeafNodes: true, isCircular: false, isHierarchical: true);
             }
         }
 
@@ -174,15 +174,15 @@ namespace SEE.Game.City
             switch (shape)
             {
                 case NodeShapes.Blocks:
-                    return new InnerNodeKindsModel(IsCircular: false, IsRectangular: true);
+                    return new InnerNodeKindsModel(isCircular: false, isRectangular: true);
                 case NodeShapes.Cylinders:
-                    return new InnerNodeKindsModel(IsCircular: true, IsRectangular: false);
+                    return new InnerNodeKindsModel(isCircular: true, isRectangular: false);
                 case NodeShapes.Spiders:
-                    return new InnerNodeKindsModel(IsCircular: true, IsRectangular: false);
+                    return new InnerNodeKindsModel(isCircular: true, isRectangular: false);
                 case NodeShapes.Polygons:
-                    return new InnerNodeKindsModel(IsCircular: true, IsRectangular: false);
+                    return new InnerNodeKindsModel(isCircular: true, isRectangular: false);
                 case NodeShapes.Bars:
-                    return new InnerNodeKindsModel(IsCircular: true, IsRectangular: false);
+                    return new InnerNodeKindsModel(isCircular: true, isRectangular: false);
                 default:
                     throw new NotImplementedException($"Unexpected case {shape}");
             }

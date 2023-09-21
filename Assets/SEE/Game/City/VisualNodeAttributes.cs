@@ -32,7 +32,7 @@ namespace SEE.Game.City
         /// width, depth, and height. <seealso cref="MetricToLength"/>
         /// Using this default value means that no metric name is used but a fixed value.
         /// </summary>
-        private const string DefaultLengthMetricValue = "0.001";
+        private const string defaultLengthMetricValue = "0.001";
 
         /// <summary>
         /// A mapping of node metric names onto lengths. The first three metrics
@@ -41,7 +41,7 @@ namespace SEE.Game.City
         /// </summary>
         [Tooltip("Maps metric names onto lengths of the shape."), HideReferenceObjectPicker]
         [OdinSerialize]
-        public IList<string> MetricToLength = new List<string>() { DefaultLengthMetricValue, DefaultLengthMetricValue, DefaultLengthMetricValue };
+        public IList<string> MetricToLength = new List<string>() { defaultLengthMetricValue, defaultLengthMetricValue, defaultLengthMetricValue };
 
         /// <summary>
         /// The index of the metric for the width within <see cref="MetricToLength"/>.
@@ -168,16 +168,16 @@ namespace SEE.Game.City
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(Shape.ToString(), NodeShapeLabel);
-            writer.Save(IsRelevant, IsRelevantLabel);
-            writer.Save(MetricToLength, MetricToLengthLabel);
-            ColorProperty.Save(writer, ColorPropertyLabel);
-            writer.Save(MinimalBlockLength, MinimalBlockLengthLabel);
-            writer.Save(MaximalBlockLength, MaximalBlockLengthLabel);
-            LabelSettings.Save(writer, LabelSettingsLabel);
-            AntennaSettings.Save(writer, AntennaSettingsLabel);
-            writer.Save(OutlineWidth, OutlineWidthLabel);
-            writer.Save(ShowNames, ShowNamesLabel);
+            writer.Save(Shape.ToString(), nodeShapeLabel);
+            writer.Save(IsRelevant, isRelevantLabel);
+            writer.Save(MetricToLength, metricToLengthLabel);
+            ColorProperty.Save(writer, colorPropertyLabel);
+            writer.Save(MinimalBlockLength, minimalBlockLengthLabel);
+            writer.Save(MaximalBlockLength, maximalBlockLengthLabel);
+            LabelSettings.Save(writer, labelSettingsLabel);
+            AntennaSettings.Save(writer, antennaSettingsLabel);
+            writer.Save(OutlineWidth, outlineWidthLabel);
+            writer.Save(ShowNames, showNamesLabel);
             writer.EndGroup();
         }
 
@@ -203,57 +203,57 @@ namespace SEE.Game.City
         /// <param name="values">dictionary of attributes from which to retrieve the settings</param>
         internal virtual void Restore(Dictionary<string, object> values)
         {
-            ConfigIO.RestoreEnum(values, NodeShapeLabel, ref Shape);
-            ConfigIO.Restore(values, IsRelevantLabel, ref IsRelevant);
-            ConfigIO.RestoreStringList(values, MetricToLengthLabel, ref MetricToLength);
-            ColorProperty.Restore(values, ColorPropertyLabel);
-            ConfigIO.Restore(values, MinimalBlockLengthLabel, ref MinimalBlockLength);
-            ConfigIO.Restore(values, MaximalBlockLengthLabel, ref MaximalBlockLength);
-            LabelSettings.Restore(values, LabelSettingsLabel);
-            AntennaSettings.Restore(values, AntennaSettingsLabel);
-            ConfigIO.Restore(values, OutlineWidthLabel, ref OutlineWidth);
-            ConfigIO.Restore(values, ShowNamesLabel, ref ShowNames);
+            ConfigIO.RestoreEnum(values, nodeShapeLabel, ref Shape);
+            ConfigIO.Restore(values, isRelevantLabel, ref IsRelevant);
+            ConfigIO.RestoreStringList(values, metricToLengthLabel, ref MetricToLength);
+            ColorProperty.Restore(values, colorPropertyLabel);
+            ConfigIO.Restore(values, minimalBlockLengthLabel, ref MinimalBlockLength);
+            ConfigIO.Restore(values, maximalBlockLengthLabel, ref MaximalBlockLength);
+            LabelSettings.Restore(values, labelSettingsLabel);
+            AntennaSettings.Restore(values, antennaSettingsLabel);
+            ConfigIO.Restore(values, outlineWidthLabel, ref OutlineWidth);
+            ConfigIO.Restore(values, showNamesLabel, ref ShowNames);
         }
 
         /// <summary>
         /// Label in the configuration file for <see cref="Shape"/>.
         /// </summary>
-        private const string NodeShapeLabel = "Shape";
+        private const string nodeShapeLabel = "Shape";
         /// <summary>
         /// Label in the configuration file for <see cref="IsRelevant"/>.
         /// </summary>
-        private const string IsRelevantLabel = "IsRelevant";
+        private const string isRelevantLabel = "IsRelevant";
         /// <summary>
         /// Label in the configuration file for <see cref="MetricToLength"/>.
         /// </summary>
-        private const string MetricToLengthLabel = "MetricToLength";
+        private const string metricToLengthLabel = "MetricToLength";
         /// <summary>
         /// Label in the configuration file for a <see cref="ColorProperty"/>.
         /// </summary>
-        private const string ColorPropertyLabel = "ColorProperty";
+        private const string colorPropertyLabel = "ColorProperty";
         /// <summary>
         /// Label in the configuration file for <see cref="MinimalBlockLength"/>.
         /// </summary>
-        private const string MinimalBlockLengthLabel = "MinimalBlockLength";
+        private const string minimalBlockLengthLabel = "MinimalBlockLength";
         /// <summary>
         /// Label in the configuration file for <see cref="MaximalBlockLength"/>.
         /// </summary>
-        private const string MaximalBlockLengthLabel = "MaximalBlockLength";
+        private const string maximalBlockLengthLabel = "MaximalBlockLength";
         /// <summary>
         /// Label in the configuration file for <see cref="LabelSettings"/>.
         /// </summary>
-        private const string LabelSettingsLabel = "LabelSettings";
+        private const string labelSettingsLabel = "LabelSettings";
         /// <summary>
         /// Label in the configuration file for <see cref="AntennaSettings"/>.
         /// </summary>
-        private const string AntennaSettingsLabel = "AntennnaSettings";
+        private const string antennaSettingsLabel = "AntennnaSettings";
         /// <summary>
         /// Label in the configuration file for <see cref="OutlineWidth"/>.
         /// </summary>
-        private const string OutlineWidthLabel = "OutlineWidth";
+        private const string outlineWidthLabel = "OutlineWidth";
         /// <summary>
         /// Label in the configuration file for <see cref="ShowNames"/>.
         /// </summary>
-        private const string ShowNamesLabel = "ShowNames";
+        private const string showNamesLabel = "ShowNames";
     }
 }

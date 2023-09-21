@@ -28,53 +28,53 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Operation handling X-axis movement in world space.
         /// </summary>
-        private TweenOperation<float> PositionX;
+        private TweenOperation<float> positionX;
 
         /// <summary>
         /// Operation handling Y-axis movement in world space.
         /// </summary>
-        private TweenOperation<float> PositionY;
+        private TweenOperation<float> positionY;
 
         /// <summary>
         /// Operation handling Z-axis movement in world space.
         /// </summary>
-        private TweenOperation<float> PositionZ;
+        private TweenOperation<float> positionZ;
 
         /// <summary>
         /// Operation handling node rotation.
         /// </summary>
-        private TweenOperation<Quaternion> Rotation;
+        private TweenOperation<Quaternion> rotation;
 
         /// <summary>
         /// Operation handling animated label display.
         /// </summary>
-        private TweenOperation<float> LabelAlpha;
+        private TweenOperation<float> labelAlpha;
 
         /// <summary>
         /// Operation handling the blinking of the node.
         /// The parameter specifies the number of blinks.
         /// </summary>
-        private TweenOperation<int> Blinking;
+        private TweenOperation<int> blinking;
 
         /// <summary>
         /// Operation handling the starting position of the label's line.
         /// </summary>
-        private TweenOperation<Vector3> LabelStartLinePosition;
+        private TweenOperation<Vector3> labelStartLinePosition;
 
         /// <summary>
         /// Operation handling the end position of the label's line.
         /// </summary>
-        private TweenOperation<Vector3> LabelEndLinePosition;
+        private TweenOperation<Vector3> labelEndLinePosition;
 
         /// <summary>
         /// Operation handling the position of the label's text.
         /// </summary>
-        private TweenOperation<Vector3> LabelTextPosition;
+        private TweenOperation<Vector3> labelTextPosition;
 
         /// <summary>
         /// Operation handling node scaling (specifically, localScale).
         /// </summary>
-        private TweenOperation<Vector3> Scale;
+        private TweenOperation<Vector3> scale;
 
         /// <summary>
         /// The node to which this node operator belongs.
@@ -101,13 +101,13 @@ namespace SEE.Game.Operator
         /// The position this node is supposed to be at.
         /// </summary>
         /// <seealso cref="AbstractOperator"/>
-        public Vector3 TargetPosition => new(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
+        public Vector3 TargetPosition => new(positionX.TargetValue, positionY.TargetValue, positionZ.TargetValue);
 
         /// <summary>
         /// The scale this node is supposed to be at.
         /// </summary>
         /// <seealso cref="AbstractOperator"/>
-        public Vector3 TargetScale => Scale.TargetValue;
+        public Vector3 TargetScale => scale.TargetValue;
 
         #region Public API
 
@@ -126,7 +126,7 @@ namespace SEE.Game.Operator
             float duration = ToDuration(factor);
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
-            return PositionX.AnimateTo(newXPosition, duration);
+            return positionX.AnimateTo(newXPosition, duration);
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace SEE.Game.Operator
             float duration = ToDuration(factor);
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
-            return PositionY.AnimateTo(newYPosition, duration);
+            return positionY.AnimateTo(newYPosition, duration);
         }
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace SEE.Game.Operator
             float duration = ToDuration(factor);
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
-            return PositionZ.AnimateTo(newZPosition, duration);
+            return positionZ.AnimateTo(newZPosition, duration);
         }
 
         /// <summary>
@@ -182,9 +182,9 @@ namespace SEE.Game.Operator
             this.updateEdges = updateEdges;
             return new AndCombinedOperationCallback<Action>(new[]
             {
-                PositionX.AnimateTo(newPosition.x, duration),
-                PositionY.AnimateTo(newPosition.y, duration),
-                PositionZ.AnimateTo(newPosition.z, duration)
+                positionX.AnimateTo(newPosition.x, duration),
+                positionY.AnimateTo(newPosition.y, duration),
+                positionZ.AnimateTo(newPosition.z, duration)
             }, a => a);
         }
 
@@ -199,7 +199,7 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> RotateTo(Quaternion newRotation, float factor = 1)
         {
-            return Rotation.AnimateTo(newRotation, ToDuration(factor));
+            return rotation.AnimateTo(newRotation, ToDuration(factor));
         }
 
         /// <summary>
@@ -234,7 +234,7 @@ namespace SEE.Game.Operator
             float duration = ToDuration(factor);
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
-            return Scale.AnimateTo(newLocalScale, duration);
+            return scale.AnimateTo(newLocalScale, duration);
         }
 
         /// <summary>
@@ -249,7 +249,7 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> Blink(int blinkCount, float factor = 1)
         {
-            return Blinking.AnimateTo(blinkCount, ToDuration(factor));
+            return blinking.AnimateTo(blinkCount, ToDuration(factor));
         }
 
         /// <summary>
@@ -269,10 +269,10 @@ namespace SEE.Game.Operator
             {
                 // NOTE: Order is important, because the line's end position target depends on the text position target,
                 //       and the text position target depends on the alpha value's target!
-                LabelAlpha.AnimateTo(alpha, duration),
-                LabelTextPosition.AnimateTo(DesiredLabelTextPosition, duration),
-                LabelStartLinePosition.AnimateTo(DesiredLabelStartLinePosition, duration),
-                LabelEndLinePosition.AnimateTo(DesiredLabelEndLinePosition, duration)
+                labelAlpha.AnimateTo(alpha, duration),
+                labelTextPosition.AnimateTo(DesiredLabelTextPosition, duration),
+                labelStartLinePosition.AnimateTo(DesiredLabelStartLinePosition, duration),
+                labelEndLinePosition.AnimateTo(DesiredLabelEndLinePosition, duration)
             });
         }
 
@@ -312,9 +312,9 @@ namespace SEE.Game.Operator
             // edge layouts (dependent on position and scale) can be correctly calculated.
             Transform ourTransform = transform; // cache transform for performance
             Vector3 oldPosition = ourTransform.position;
-            ourTransform.position = new Vector3(PositionX.TargetValue, PositionY.TargetValue, PositionZ.TargetValue);
+            ourTransform.position = new Vector3(positionX.TargetValue, positionY.TargetValue, positionZ.TargetValue);
             Vector3 oldScale = ourTransform.localScale;
-            ourTransform.localScale = Scale.TargetValue;
+            ourTransform.localScale = scale.TargetValue;
             Node node;
             try
             {
@@ -426,36 +426,36 @@ namespace SEE.Game.Operator
             Tween[] AnimateToYAction(float y, float d) => new Tween[] { transform.DOMoveY(y, d).Play() };
             Tween[] AnimateToZAction(float z, float d) => new Tween[] { transform.DOMoveZ(z, d).Play() };
             Tween[] AnimateToRotationAction(Quaternion r, float d) => new Tween[] { transform.DORotateQuaternion(r, d).Play() };
-            PositionX = new TweenOperation<float>(AnimateToXAction, currentPosition.x);
-            PositionY = new TweenOperation<float>(AnimateToYAction, currentPosition.y);
-            PositionZ = new TweenOperation<float>(AnimateToZAction, currentPosition.z);
-            Rotation = new TweenOperation<Quaternion>(AnimateToRotationAction, currentRotation);
+            positionX = new TweenOperation<float>(AnimateToXAction, currentPosition.x);
+            positionY = new TweenOperation<float>(AnimateToYAction, currentPosition.y);
+            positionZ = new TweenOperation<float>(AnimateToZAction, currentPosition.z);
+            rotation = new TweenOperation<Quaternion>(AnimateToRotationAction, currentRotation);
 
             Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] { transform.DOScale(s, d).Play() };
-            Scale = new TweenOperation<Vector3>(AnimateToScaleAction, currentScale);
+            scale = new TweenOperation<Vector3>(AnimateToScaleAction, currentScale);
 
             PrepareLabel();
-            LabelAlpha = new TweenOperation<float>(AnimateLabelAlphaAction, 0f);
-            LabelTextPosition = new TweenOperation<Vector3>(AnimateLabelTextPositionAction, DesiredLabelTextPosition);
-            LabelStartLinePosition = new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction, DesiredLabelStartLinePosition);
-            LabelEndLinePosition = new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction, DesiredLabelEndLinePosition);
+            labelAlpha = new TweenOperation<float>(AnimateLabelAlphaAction, 0f);
+            labelTextPosition = new TweenOperation<Vector3>(AnimateLabelTextPositionAction, DesiredLabelTextPosition);
+            labelStartLinePosition = new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction, DesiredLabelStartLinePosition);
+            labelEndLinePosition = new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction, DesiredLabelEndLinePosition);
 
             Tween[] BlinkAction(int count, float duration)
             {
-                if (color.IsRunning)
+                if (Color.IsRunning)
                 {
-                    color.KillAnimator(true);
+                    Color.KillAnimator(true);
                 }
                 // If we're interrupting another blinking, we need to make sure the color still has the correct value.
-                material.color = color.TargetValue;
+                material.color = Color.TargetValue;
 
                 return new Tween[]
                 {
-                    material.DOColor(color.TargetValue.Invert(), duration / (2 * count)).SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play()
+                    material.DOColor(Color.TargetValue.Invert(), duration / (2 * count)).SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play()
                 };
             }
 
-            Blinking = new TweenOperation<int>(BlinkAction, 0, equalityComparer: new AlwaysFalseEqualityComparer<int>());
+            blinking = new TweenOperation<int>(BlinkAction, 0, equalityComparer: new AlwaysFalseEqualityComparer<int>());
 
             #region Local Methods
 
@@ -493,24 +493,24 @@ namespace SEE.Game.Operator
         protected override void OnDisable()
         {
             base.OnDisable();
-            PositionX.KillAnimator();
-            PositionX = null;
-            PositionY.KillAnimator();
-            PositionY = null;
-            PositionZ.KillAnimator();
-            PositionZ = null;
-            Rotation.KillAnimator();
-            Rotation = null;
-            Scale.KillAnimator();
-            Scale = null;
-            LabelAlpha.KillAnimator();
-            LabelAlpha = null;
-            LabelTextPosition.KillAnimator();
-            LabelTextPosition = null;
-            LabelStartLinePosition.KillAnimator();
-            LabelStartLinePosition = null;
-            LabelEndLinePosition.KillAnimator();
-            LabelEndLinePosition = null;
+            positionX.KillAnimator();
+            positionX = null;
+            positionY.KillAnimator();
+            positionY = null;
+            positionZ.KillAnimator();
+            positionZ = null;
+            rotation.KillAnimator();
+            rotation = null;
+            scale.KillAnimator();
+            scale = null;
+            labelAlpha.KillAnimator();
+            labelAlpha = null;
+            labelTextPosition.KillAnimator();
+            labelTextPosition = null;
+            labelStartLinePosition.KillAnimator();
+            labelStartLinePosition = null;
+            labelEndLinePosition.KillAnimator();
+            labelEndLinePosition = null;
             Destroyer.Destroy(nodeLabel);
             nodeLabel = null;
         }
