@@ -50,7 +50,7 @@ namespace SEE.Controls.Actions
 
         public override void Awake()
         {
-            DrawableHelper.enableDrawableMenu(withoutMenuPoints: new DrawableHelper.MenuPoint[] {DrawableHelper.MenuPoint.Layer, DrawableHelper.MenuPoint.Loop});
+            DrawableHelper.enableDrawableMenu(withoutMenuPoints: new DrawableHelper.MenuPoint[] { DrawableHelper.MenuPoint.Layer, DrawableHelper.MenuPoint.Loop });
 
             thicknessSlider = DrawableHelper.drawableMenu.GetComponentInChildren<ThicknessSliderController>();
             thicknessSlider.AssignValue(DrawableHelper.currentThickness);
@@ -113,7 +113,7 @@ namespace SEE.Controls.Actions
 
                                 // if (GameDrawer.DifferentMeshVerticesCounter() > 3)
                                 // {
-                                GameDrawer.Drawing(positions);
+                                GameDrawer.Drawing(line, positions);
                                 memento = new Memento(drawable, line.name, positions, DrawableHelper.currentColor,
                                     DrawableHelper.currentThickness, line.GetComponent<LineRenderer>().sortingOrder);
                                 new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable),
@@ -133,12 +133,13 @@ namespace SEE.Controls.Actions
 
                     if (progressState == ProgressState.FinishDrawing)
                     {
-                        if (GameDrawer.DifferentMeshVerticesCounter() > 3)
+                        if (GameDrawer.DifferentMeshVerticesCounter(line) >= 3)
                         {
                             memento.positions = positions;
-                            GameDrawer.FinishDrawing(false);
+                            GameDrawer.FinishDrawing(line, false);
                             new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id,
                                 memento.positions, memento.color, memento.thickness, false).Execute();
+                            Debug.Log("Created: " + line);
                             result = true;
                             currentState = ReversibleAction.Progress.Completed;
                             progressState = ProgressState.StartDrawing;
@@ -187,13 +188,16 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
+            Debug.Log("Undo: " + line + ", id:" + memento.id);
             if (line == null)
             {
                 line = GameDrawableFinder.FindChild(memento.drawable, memento.id);
+                Debug.Log("Try to find: " + line);
             }
             if (line != null)
             {
-                new FastEraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id).Execute();
+                Debug.Log("Delete: " + line);
+                new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id).Execute();
                 Destroyer.Destroy(line.transform.parent.gameObject);
                 line = null;
             }
@@ -207,7 +211,7 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            line = GameDrawer.ReDrawLine(memento.drawable, memento.id, memento.positions, memento.color,
+            line = GameDrawer.ReDrawRawLine(memento.drawable, memento.id, memento.positions, memento.color,
                 memento.thickness, memento.orderInLayer, false);
             if (line != null)
             {

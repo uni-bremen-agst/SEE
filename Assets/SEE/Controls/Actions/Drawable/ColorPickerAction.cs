@@ -30,8 +30,10 @@ namespace SEE.Controls.Actions
 
         private Memento memento;
 
+        private HSVPicker.ColorPicker picker;
+
         /// <summary>
-        /// 
+        /// Undo and Redo only used when a object is clicked! Don't support the color picker. Because the color picker would make to many states.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
@@ -45,13 +47,9 @@ namespace SEE.Controls.Actions
                     GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject))
                 {
                     pickedColor = raycastHit.collider.gameObject.GetColor();
-                    HSVPicker.ColorPicker picker = DrawableHelper.drawableMenu.GetComponent<HSVPicker.ColorPicker>();
-                    picker.AssignColor(DrawableHelper.currentColor);
-                    picker.onValueChanged.AddListener(DrawableHelper.colorAction = color =>
-                    {
-                        DrawableHelper.currentColor = color;
-                    });
+                    picker.AssignColor(pickedColor);
                     DrawableHelper.currentColor = pickedColor;
+
                     memento = new(oldChoosenColor, pickedColor);
                     result = true;
                     currentState = ReversibleAction.Progress.Completed;
@@ -63,7 +61,8 @@ namespace SEE.Controls.Actions
                     Debug.Log("Choosen Material: " + material);
                     DrawableConfigurator.currentMaterial = material;
                 }*/
-                return Input.GetMouseButtonUp(0);
+                
+                //return Input.GetMouseButtonUp(0);
             }
             return result;
         }
@@ -72,12 +71,17 @@ namespace SEE.Controls.Actions
         {
             oldChoosenColor = DrawableHelper.currentColor;
             DrawableHelper.enableDrawableMenu(withoutMenuPoints: new DrawableHelper.MenuPoint[] {DrawableHelper.MenuPoint.All});
+            picker = DrawableHelper.drawableMenu.GetComponent<HSVPicker.ColorPicker>();
+            picker.AssignColor(DrawableHelper.currentColor);
+            picker.onValueChanged.AddListener(DrawableHelper.colorAction = color =>
+            {
+                DrawableHelper.currentColor = color;
+            });
         }
 
         public override void Stop()
         {
             DrawableHelper.disableDrawableMenu();
-
         }
 
         struct Memento
@@ -100,6 +104,7 @@ namespace SEE.Controls.Actions
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             DrawableHelper.currentColor = memento.oldChoosenColor;
+            picker.AssignColor (memento.oldChoosenColor);
         }
 
         /// <summary>

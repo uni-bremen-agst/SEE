@@ -125,14 +125,14 @@ namespace Assets.SEE.Controls.Actions.Drawable
                             {
                                 isTriggered = controllers[0].Trigger();
                             }
-                            isTriggered = isTriggered && controllers[i].Trigger();
+                            isTriggered = isTriggered || controllers[i].Trigger();
                         }
                     }
                     if (Raycasting.RaycastAnything(out RaycastHit hit))
                     {
                         if (!isTriggered)
                         {
-                            if (hit.collider.gameObject.CompareTag(Tags.Drawable) || GameDrawableFinder.hasDrawableParent(hit.collider.gameObject))
+                            if (hit.collider.gameObject.CompareTag(Tags.Drawable))//|| GameDrawableFinder.hasDrawableParent(hit.collider.gameObject))
                             {
                                 didSomething = true;
                                 newObjectPosition = GameMoveRotator.MoveObject(selectedObject, hit.point, firstPoint, oldObjectPosition);

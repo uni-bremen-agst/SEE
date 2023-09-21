@@ -1,5 +1,7 @@
 ﻿using Assets.SEE.Net.Actions.Whiteboard;
+using RTG;
 using SEE.Game;
+using SEE.Game.UI.Notification;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -49,9 +51,16 @@ namespace Assets.SEE.Game.Drawable
             }
             else
             {
-                if (matchedIndexes.Count == 1 && matchedIndexes[0] > 0)
+                if (matchedIndexes.Count == 1)
                 {
                     Vector3[] begin = positions.GetRange(0, matchedIndexes[0] + 1 - removeCounter).ToArray();
+                    if (begin.Length == 1)
+                    {
+                        ShowNotification.Warn("Line Split Problem: ", "You can't split the line on the start point.\nThe line was redrawn nonetheless.");
+                    } else if (begin.Length == positions.Count)
+                    {
+                        ShowNotification.Warn("Line Split Problem: ", "You can't split the line on the end point.\nThe line was redrawn nonetheless.");
+                    }
                     int lastIndex = positions.Count - removeCounter - matchedIndexes[0];
                     Vector3[] end = positions.GetRange(matchedIndexes[0] + removeCounter, lastIndex).ToArray();
 
@@ -74,12 +83,21 @@ namespace Assets.SEE.Game.Drawable
         {
             LineRenderer renderer = originLine.gameObject.GetComponent<LineRenderer>();
             GameObject drawable = GameDrawableFinder.FindDrawableParent(originLine.gameObject);
+            
+            Line lineToCreate = (Line)originLine.Clone();
+            lineToCreate.id = "";
+            lineToCreate.rendererPositions = positions;
+
+            GameObject newLine = GameDrawer.ReDrawLine(drawable, lineToCreate);
+            new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), Line.GetLine(newLine)).Execute();
+            
+            /*
             GameObject newLine = GameDrawer.ReDrawLine(drawable, "", positions, originLine.color, originLine.thickness,
-                                        originLine.orderInLayer, originLine.position, originLine.parentEulerAngles, renderer.loop);
+                                        originLine.orderInLayer, originLine.position, originLine.holderEulerAngles, originLine.holderPosition, originLine.holderScale, renderer.loop);
             new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), newLine.name,
                 positions, originLine.color, originLine.thickness,
-               originLine.orderInLayer, originLine.position, originLine.parentEulerAngles, renderer.loop).Execute();
-
+               originLine.orderInLayer, originLine.position, originLine.holderEulerAngles, originLine.holderPosition, originLine.holderScale, renderer.loop).Execute();
+            */
             return Line.GetLine(newLine);
         }
     }

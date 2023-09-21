@@ -91,7 +91,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     }
                 }
 
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedLine != null && isActive && didSomething && isActive)
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedLine != null && isActive && didSomething)
                 {
                     string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
                     GameMoveRotator.MovePoint(selectedLine, indexes, newPointPosition);
@@ -223,6 +223,13 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     memento.line.name
                 };
             }
+        }
+
+        internal static void Reset()
+        {
+            isActive = false;
+            selectedLine = null;
+            oldPointPosition = new Vector3();
         }
     }
 }

@@ -59,15 +59,17 @@ namespace Assets.SEE.Controls.Actions.Drawable
         private static FloatValueSliderController sliderValue4;
         private static GameObject objVertices;
         private static IntValueSliderController sliderVertices;
-        private static GameObject objAlpha;
-        private static FloatValueSliderController sliderAlpha;
+        private static GameObject objInfo;
+        private static Button infoBtn;
+        private static GameObject objImage;
+        private static Image infoImage;
 
         private static float value1;
         private static float value2;
         private static float value3;
         private static float value4;
         private static int vertices;
-        private static float alpha;
+        private static bool infoVisibility;
         
         private void InitSwitchMenu()
         {
@@ -115,12 +117,66 @@ namespace Assets.SEE.Controls.Actions.Drawable
             vertices = sliderVertices.GetValue();
             sliderVertices.onValueChanged.AddListener(value => { vertices = value; });
 
-            objAlpha = GameDrawableFinder.FindChild(shapeMenu, "Alpha");
-            sliderAlpha = objAlpha.GetComponent<FloatValueSliderController>();
-            alpha = sliderAlpha.GetValue();
-            sliderAlpha.onValueChanged.AddListener(value => { alpha = value; });
+            objInfo = GameDrawableFinder.FindChild(shapeMenu, "Info");
+            infoBtn = objInfo.GetComponentInChildren<Button>();
+            infoVisibility = false;
+            infoBtn.onClick.AddListener(ToggleInfo);
+
+            objImage = GameDrawableFinder.FindChild(shapeMenu, "Image");
+            infoImage = objImage.GetComponent<Image>();
+
 
             SetSelectedShape(GameShapesCalculator.GetShapes()[0]);
+        }
+
+        private void ToggleInfo()
+        {
+            infoVisibility = !infoVisibility;
+            objImage.SetActive(infoVisibility);
+            if (infoVisibility)
+            {
+                LoadImage();
+            }
+        }
+
+        private void LoadImage()
+        {
+            string path = "";
+            switch (selectedShape)
+            {
+                case GameShapesCalculator.Shapes.Square:
+                    path = "Textures/Drawable/Test";
+                    break;
+                case GameShapesCalculator.Shapes.Rectangle:
+                    path = "Textures/Drawable/Rectangle";
+                    break;
+                case GameShapesCalculator.Shapes.Rhombus:
+                    path = "Textures/Drawable/Rhombus";
+                    break;
+                case GameShapesCalculator.Shapes.Kite:
+                    path = "Textures/Drawable/Kite";
+                    break;
+                case GameShapesCalculator.Shapes.Triangle:
+                    path = "Textures/Drawable/Triangle";
+                    break;
+                case GameShapesCalculator.Shapes.Circle:
+                    path = "Textures/Drawable/Circle";
+                    break;
+                case GameShapesCalculator.Shapes.Ellipse:
+                    path = "Textures/Drawable/Ellipse";
+                    break;
+                case GameShapesCalculator.Shapes.Parallelogram:
+                    path = "Textures/Drawable/Parallelogram";
+                    break;
+                case GameShapesCalculator.Shapes.Trapezoid:
+                    path = "Textures/Drawable/Trapezoid";
+                    break;
+                case GameShapesCalculator.Shapes.Polygon:
+                    path = "Textures/Drawable/Polygon";
+                    break;
+            }
+            infoImage.sprite = Resources.Load<Sprite>(path); ;
+            Debug.Log(infoImage.sprite.name);
         }
 
         private void InitConfigMenu()
@@ -202,14 +258,13 @@ namespace Assets.SEE.Controls.Actions.Drawable
             objValue3.SetActive(true);
             objValue4.SetActive(true);
             objVertices.SetActive(true);
-            objAlpha.SetActive(true);
 
             sliderValue1.ResetToMin();
             sliderValue2.ResetToMin();
             sliderValue3.ResetToMin();
             sliderValue4.ResetToMin();
             sliderVertices.ResetToMin();
-            sliderAlpha.ResetToMin();
+            infoVisibility = false;
         }
         private void AllValuesDisable()
         {
@@ -218,7 +273,8 @@ namespace Assets.SEE.Controls.Actions.Drawable
             objValue3.SetActive(false);
             objValue4.SetActive(false);
             objVertices.SetActive(false);
-            objAlpha.SetActive(false);
+            objInfo.SetActive(false);
+            objImage.SetActive(false);
         }
         private void ChangeMenu()
         {
@@ -231,18 +287,21 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 case GameShapesCalculator.Shapes.Square:
                     objValue1.SetActive(true);
                     objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "a";
+                    objInfo.SetActive(true);
                     break;
                 case GameShapesCalculator.Shapes.Rectangle:
                     objValue1.SetActive(true);
                     objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "a";
                     objValue2.SetActive(true);
                     objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "b";
+                    objInfo.SetActive(true);
                     break;
                 case GameShapesCalculator.Shapes.Rhombus:
                     objValue1.SetActive(true);
                     objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "f";
                     objValue2.SetActive(true);
                     objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "e";
+                    objInfo.SetActive(true);
                     break;
                 case GameShapesCalculator.Shapes.Kite:
                     objValue1.SetActive(true);
@@ -251,22 +310,26 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "f2";
                     objValue3.SetActive(true);
                     objValue3.GetComponentsInChildren<TMP_Text>()[0].text = "e";
+                    objInfo.SetActive(true);
                     break;
                 case GameShapesCalculator.Shapes.Triangle:
                     objValue1.SetActive(true);
                     objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "c";
                     objValue2.SetActive(true);
                     objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "h";
+                    objInfo.SetActive(true);
                     break;
                 case GameShapesCalculator.Shapes.Circle:
                     objValue1.SetActive(true);
                     objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "Radius";
+                    objInfo.SetActive(true);
                     break;
                 case GameShapesCalculator.Shapes.Ellipse:
                     objValue1.SetActive(true);
                     objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "X-Scale";
                     objValue2.SetActive(true);
                     objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "Y-Scale";
+                    objInfo.SetActive(true);
                     break;
                 case GameShapesCalculator.Shapes.Parallelogram:
                     objValue1.SetActive(true);
@@ -275,7 +338,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "h";
                     objValue4.SetActive(true);
                     objValue4.GetComponentsInChildren<TMP_Text>()[0].text = "Shift";
-                    //objAlpha.SetActive(true);
+                    objInfo.SetActive(true);
                     break;
                 case GameShapesCalculator.Shapes.Trapezoid:
                     objValue1.SetActive(true);
@@ -284,12 +347,13 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "c";
                     objValue3.SetActive(true);
                     objValue3.GetComponentsInChildren<TMP_Text>()[0].text = "h";
-                    // objAlpha.SetActive(true);
+                    objInfo.SetActive(true);
                     break;
                 case GameShapesCalculator.Shapes.Polygon:
                     objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "a";
+                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "Length";
                     objVertices.SetActive(true);
+                    objInfo.SetActive(true);
                     break;
             }
         }
@@ -388,7 +452,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     {
                         if (GameDrawer.DifferentPositionCounter(positions) > 1)
                         {
-                            shape = GameDrawer.ReDrawLine(drawable, "", positions, DrawableHelper.currentColor, DrawableHelper.currentThickness, DrawableHelper.orderInLayer, true);
+                            shape = GameDrawer.ReDrawRawLine(drawable, "", positions, DrawableHelper.currentColor, DrawableHelper.currentThickness, DrawableHelper.orderInLayer, true);
                             memento = new Memento(drawable, shape.name, positions, DrawableHelper.currentColor,
                                DrawableHelper.currentThickness, shape.GetComponent<LineRenderer>().sortingOrder);
                             memento.loop = true;
@@ -418,7 +482,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     Vector3[] newPositions = new Vector3[positions.Length + 1];
                     Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
                     newPositions[newPositions.Length - 1] = newPosition;
-                    GameDrawer.Drawing(newPositions);
+                    GameDrawer.Drawing(shape ,newPositions);
                     new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable),
                             shape.name, newPositions, DrawableHelper.currentColor, DrawableHelper.currentThickness, false).Execute();
                 }
@@ -438,7 +502,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                         newPositions[newPositions.Length - 1] = newPosition;
                         positions = newPositions;
 
-                        GameDrawer.Drawing(positions);
+                        GameDrawer.Drawing(shape, positions);
                         memento = new Memento(drawable, shape.name, positions, DrawableHelper.currentColor,
                             DrawableHelper.currentThickness, shape.GetComponent<LineRenderer>().sortingOrder);
                         memento.loop = false;
@@ -454,10 +518,10 @@ namespace Assets.SEE.Controls.Actions.Drawable
 
                 if (Input.GetMouseButtonUp(1) && !Input.GetKey(KeyCode.LeftControl) && drawing && positions.Length > 1 && selectedShape == GameShapesCalculator.Shapes.Line)
                 {
-                    GameDrawer.Drawing(positions);
+                    GameDrawer.Drawing(shape, positions);
                     memento.positions = positions;
                     memento.loop = false;
-                    GameDrawer.FinishDrawing(memento.loop);
+                    GameDrawer.FinishDrawing(shape, memento.loop);
                     new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id,
                         memento.positions, memento.color, memento.thickness, memento.loop).Execute();
                     result = true;
@@ -471,10 +535,10 @@ namespace Assets.SEE.Controls.Actions.Drawable
 
                 if (Input.GetMouseButtonUp(1) && Input.GetKey(KeyCode.LeftControl) && drawing && positions.Length > 1 && selectedShape == GameShapesCalculator.Shapes.Line)
                 {
-                    GameDrawer.Drawing(positions);
+                    GameDrawer.Drawing(shape, positions);
                     memento.positions = positions;
                     memento.loop = true;
-                    GameDrawer.FinishDrawing(memento.loop);
+                    GameDrawer.FinishDrawing(shape, memento.loop);
                     new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id,
                         memento.positions, memento.color, memento.thickness, memento.loop).Execute();
                     result = true;
@@ -530,7 +594,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
             }
             if (shape != null)
             {
-                new FastEraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id).Execute();
+                new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id).Execute();
                 Destroyer.Destroy(shape.transform.parent.gameObject);
                 shape = null;
             }
@@ -544,7 +608,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            shape = GameDrawer.ReDrawLine(memento.drawable, memento.id, memento.positions, memento.color,
+            shape = GameDrawer.ReDrawRawLine(memento.drawable, memento.id, memento.positions, memento.color,
                 memento.thickness, memento.orderInLayer, memento.loop);
             if (shape != null)
             {

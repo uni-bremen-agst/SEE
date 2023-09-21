@@ -1,4 +1,5 @@
-﻿using SEE.Game;
+﻿using SEE.Controls.Actions;
+using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
 using System;
@@ -96,6 +97,8 @@ namespace Assets.SEE.Game.Drawable
             Loop,
             All
         }
+
+        public static List<ActionStateType> usedIn = new() {ActionStateTypes.DrawOn, ActionStateTypes.ColorPicker};
         public static void disableDrawableMenu()
         {
             enableDrawableMenuPoints();

@@ -54,7 +54,7 @@ namespace Assets.SEE.Game.UI.Drawable
         {
             if (other.gameObject.CompareTag(Tags.Line))
             {
-                trigger = true;
+                trigger = false;
             }
         }
 

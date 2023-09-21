@@ -213,6 +213,12 @@ namespace SEE.Controls.Actions
                     LayerChangerAction.CreateReversibleAction,
                     parent: Whiteboard);
 
+            Scale =
+                new("Scale", "Scales a drawable type. Mouse wheel up to scale up, mouse wheel down to scale down.",
+                    Color.green.Darker(), "Materials/ModernUIPack/Pencil",
+                    ScaleAction.CreateReversibleAction,
+                    parent: Whiteboard);
+
             LineSplit =
                 new("Line split", "Splittes a line on a given point.",
                     Color.green.Darker(), "Materials/ModernUIPack/Pencil",
@@ -267,6 +273,7 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType MoveRotator;
         public readonly static ActionStateType MovePoint;
         public readonly static ActionStateType LayerChanger;
+        public readonly static ActionStateType Scale;
         public readonly static ActionStateType LineSplit;
         public readonly static ActionStateType Erase;
         public readonly static ActionStateType LinePointErase;

@@ -1,6 +1,8 @@
 ﻿using Assets.SEE.Game;
+using Assets.SEE.Game.Drawable;
 using SEE.Game;
 using SEE.Net.Actions;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -17,7 +19,10 @@ namespace Assets.SEE.Net.Actions.Whiteboard
         public int OrderInLayer = -1;
         public Vector3 Position;
         public Vector3 EulerAngles;
+        public Vector3 HolderPosition;
+        public Vector3 HolderScale;
         public bool Loop;
+        public Line Line;
 
         public DrawOnNetAction(
             string drawableID, string parentDrawableID, string name, Vector3[] positions, Color color, float thickness, int orderInLayer, bool loop)
@@ -32,6 +37,7 @@ namespace Assets.SEE.Net.Actions.Whiteboard
             Position = Vector3.zero;
             EulerAngles = Vector3.zero;
             Loop = loop;
+            Line = null;
         }
 
         public DrawOnNetAction(
@@ -44,10 +50,12 @@ namespace Assets.SEE.Net.Actions.Whiteboard
             this.Color = color;
             this.Thickness = thickness;
             this.Loop = loop;
+            Line = null;
         }
-
+        
         public DrawOnNetAction(
-            string drawableID, string parentDrawableID, string name, Vector3[] positions, Color color, float thickness, int orderInLayer, Vector3 position, Vector3 eulerAngles, bool loop)
+            string drawableID, string parentDrawableID, string name, Vector3[] positions, Color color, float thickness, int orderInLayer, Vector3 position, 
+            Vector3 eulerAngles, Vector3 holderPosition, Vector3 holderScale, bool loop)
         {
             this.DrawableID = drawableID;
             this.ParentDrawableID = parentDrawableID;
@@ -58,7 +66,16 @@ namespace Assets.SEE.Net.Actions.Whiteboard
             this.OrderInLayer = orderInLayer;
             this.Position = position;
             this.EulerAngles = eulerAngles;
+            this.HolderPosition = holderPosition;
+            this.HolderScale = holderScale;
             this.Loop = loop;
+        }
+        
+        public DrawOnNetAction(string drawableID, string parentDrawableID, Line line)
+        {
+            this.DrawableID = drawableID;
+            this.ParentDrawableID = parentDrawableID;
+            this.Line = line;
         }
 
         protected override void ExecuteOnClient()
@@ -66,26 +83,32 @@ namespace Assets.SEE.Net.Actions.Whiteboard
             if (!IsRequester())
             {
                 GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
-
                 if (drawable == null)
                 {
                     throw new System.Exception($"There is no drawable with the ID {DrawableID}.");
                 }
-                if (OrderInLayer == -1)
+                if (Line != null && Line.id != "")
                 {
-                    GameDrawer.DrawLine(drawable, Name, Positions, Color, Thickness, Loop);
-                } else
+                    GameDrawer.ReDrawLine(drawable, Line);
+                }
+                else
                 {
-                    if (Position == Vector3.zero && EulerAngles == Vector3.zero)
+                    if (OrderInLayer == -1)
                     {
-                        GameDrawer.ReDrawLine(drawable, Name, Positions, Color, Thickness, OrderInLayer, Loop);
-                    } else
+                        GameDrawer.DrawLine(drawable, Name, Positions, Color, Thickness, Loop);
+                    }
+                    else
                     {
-                        GameDrawer.ReDrawLine(drawable, Name, Positions, Color, Thickness, OrderInLayer, Position, EulerAngles, Loop);
+                        if (Position == Vector3.zero && EulerAngles == Vector3.zero)
+                        {
+                            GameDrawer.ReDrawRawLine(drawable, Name, Positions, Color, Thickness, OrderInLayer, Loop);
+                        } else
+                        {
+                            GameDrawer.ReDrawLine(drawable, Name, Positions, Color, Thickness, OrderInLayer, Position, EulerAngles, HolderPosition, HolderScale, Loop);
+                        }
                     }
                 }
             }
-
         }
 
         protected override void ExecuteOnServer()

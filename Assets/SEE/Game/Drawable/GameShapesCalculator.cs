@@ -1,10 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using System;
 using System.Linq;
-using Cysharp.Threading.Tasks;
-using SEE.Game;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -22,10 +19,7 @@ namespace Assets.SEE.Game.Drawable
             Ellipse,
             Parallelogram,
             Trapezoid,
-            Polygon//,
-            //Pentagon
-            //Hexagon
-            //Octagon
+            Polygon
         }
 
         public static List<Shapes> GetShapes()
@@ -95,33 +89,8 @@ namespace Assets.SEE.Game.Drawable
         }
 
 
-        public static Vector3[] Parallelogram(Vector3 point, float a, float h, float offset)//float b, float alpha)
-        {/*
-            if (alpha == 90.0f)
-            {
-                Debug.Log(DateTime.Now + ", Call Rectangle");
-                return Rectanlge(point, a, b);
-            }
-
-            float alpha2 = alpha > 90 ? alpha - 90 : alpha;
-            float h = b * Mathf.Sin(alpha2);
-            h = h < 0 ? h * -1 : h;
-            float x = b * Mathf.Cos(alpha2);
-            x = x < 0 ? x * -1 : x;
-            Debug.Log(DateTime.Now + ", Alpha: "+ alpha + ", Alpha2: " + alpha2 + ", h: " + h + ", x: " + x);
-
-            Vector3 A = new Vector3(point.x - a / 2, point.y - h / 2, 0) - DrawableHelper.distanceToBoard;
-            Vector3 B = new Vector3(point.x + a / 2, point.y - h / 2, 0) - DrawableHelper.distanceToBoard;
-            Vector3 C = new Vector3(B.x + x, B.y + h, 0) - DrawableHelper.distanceToBoard;
-            Vector3 D = new Vector3(A.x + x, A.y + h, 0) - DrawableHelper.distanceToBoard;
-            if (alpha > 90)
-            {
-                C = new Vector3(B.x - x, B.y + h, 0) - DrawableHelper.distanceToBoard;
-                D = new Vector3(A.x - x, A.y + h, 0) - DrawableHelper.distanceToBoard;
-            }
-            // punkt D = new Vector3(a * sin(alpha), b * sin(alpha), 0)
-            return new Vector3[] { A, B, C, D };
-            */
+        public static Vector3[] Parallelogram(Vector3 point, float a, float h, float offset)
+        {
             Debug.Log(DateTime.Now + ", a: " + a + ", h: " + h + ", offset: " + offset);
             Vector3 A = new Vector3(point.x - a / 2, point.y - h / 2, 0) - DrawableHelper.distanceToBoard;
             Vector3 B = new Vector3(point.x + a / 2, point.y - h / 2, 0) - DrawableHelper.distanceToBoard;
@@ -141,28 +110,6 @@ namespace Assets.SEE.Game.Drawable
         /// <returns>the calculated points of the trapezoid.</returns>
         public static Vector3[] Trapezoid(Vector3 point, float a, float c, float h)//float alpha)
         {
-            /*
-            if (alpha == 90)
-            {
-                return Rectanlge(point, a, b);
-            }
-            float alpha2 = alpha > 90 ? alpha - 90 : alpha;
-            float h = b * Mathf.Sin(alpha2);
-            float x = b * Mathf.Cos(alpha2);
-
-            Vector3 A = new Vector3(point.x - a / 2, point.y - h / 2, 0) - DrawableHelper.distanceToBoard;
-            Vector3 B = new Vector3(point.x + a / 2, point.y - h / 2, 0) - DrawableHelper.distanceToBoard;
-            Vector3 C = new Vector3(B.x - x, B.y + h, 0) - DrawableHelper.distanceToBoard;
-            Vector3 D = new Vector3(A.x + x, A.y + h, 0) - DrawableHelper.distanceToBoard;
-
-            if (alpha > 90)
-            {
-                C = new Vector3(B.x + x, B.y + h, 0) - DrawableHelper.distanceToBoard;
-                D = new Vector3(A.x - x, A.y + h, 0) - DrawableHelper.distanceToBoard;
-            }
-
-            return new Vector3[] { A, B, C, D };
-            */
             Vector3 A = new Vector3(point.x - a / 2, point.y - h / 2, 0) - DrawableHelper.distanceToBoard;
             Vector3 B = new Vector3(point.x + a / 2, point.y - h / 2, 0) - DrawableHelper.distanceToBoard;
             Vector3 C = new Vector3(point.x + c / 2, point.y + h / 2, 0) - DrawableHelper.distanceToBoard;

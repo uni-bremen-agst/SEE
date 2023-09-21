@@ -55,7 +55,7 @@ namespace SEE.Controls.Actions
 
                         memento = new Memento(hittedObject, GameDrawableFinder.FindDrawableParent(hittedObject), lines, lineRenderer.loop);
                         mementoList.Add(memento);
-                        new FastEraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.originalLine.id).Execute();
+                        new EraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.originalLine.id).Execute();
                         Destroyer.Destroy(hittedObject.transform.parent.gameObject);
 
                     }
@@ -65,7 +65,10 @@ namespace SEE.Controls.Actions
                 if (isMouseButtonUp)
                 {
                     isActive = false;
-                    currentState = ReversibleAction.Progress.Completed;
+                    if (memento != null)
+                    {
+                        currentState = ReversibleAction.Progress.Completed;
+                    }
                 }
                 // The action is considered complete if the mouse button is no longer pressed.
                 return isMouseButtonUp;
@@ -103,13 +106,8 @@ namespace SEE.Controls.Actions
             reverseList.Reverse();
             foreach (Memento mem in reverseList)
             {
-
-                mem.originalLine.gameObject = GameDrawer.ReDrawLine(mem.drawable, mem.originalLine.id, mem.originalLine.rendererPositions,
-                    mem.originalLine.color, mem.originalLine.thickness, mem.originalLine.orderInLayer,
-                    mem.originalLine.position, mem.originalLine.parentEulerAngles, mem.loop);
-                new DrawOnNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.originalLine.id,
-                    mem.originalLine.rendererPositions, mem.originalLine.color, mem.originalLine.thickness,
-                    mem.originalLine.orderInLayer, mem.originalLine.position, mem.originalLine.parentEulerAngles, mem.loop).Execute();
+                mem.originalLine.gameObject = GameDrawer.ReDrawLine(mem.drawable, mem.originalLine);
+                new DrawOnNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.originalLine).Execute();
 
                 foreach (Line line in mem.lines)
                 {
@@ -122,7 +120,7 @@ namespace SEE.Controls.Actions
                     {
                         refreshed = Line.GetLine(line.gameObject);
                     }
-                    new FastEraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), refreshed.id).Execute();
+                    new EraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), refreshed.id).Execute();
                     Destroyer.Destroy(refreshed.gameObject.transform.parent.gameObject);
                 }
             }
@@ -147,15 +145,13 @@ namespace SEE.Controls.Actions
                 {
                     origin = Line.GetLine(mem.originalLine.gameObject);
                 }
-                new FastEraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), origin.id).Execute();
+                new EraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), origin.id).Execute();
                 Destroyer.Destroy(origin.gameObject.transform.parent.gameObject);
 
                 foreach (Line line in mem.lines)
                 {
-                    line.gameObject = GameDrawer.ReDrawLine(mem.drawable, line.id, line.rendererPositions, line.color, line.thickness,
-                    line.orderInLayer, line.position, line.parentEulerAngles, mem.loop);
-                    new DrawOnNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), line.id, line.rendererPositions, line.color, line.thickness,
-                        line.orderInLayer, line.position, line.parentEulerAngles, mem.loop).Execute();
+                    line.gameObject = GameDrawer.ReDrawLine(mem.drawable, line);
+                    new DrawOnNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), line).Execute();
                 }
             }
         }

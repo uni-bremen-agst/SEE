@@ -39,9 +39,22 @@ namespace Assets.SEE.Game.Drawable
 
         private void OnDestroy()
         {
-            if (GlobalActionHistory.Current() != ActionStateTypes.EditLine)
+            if (GlobalActionHistory.Current() != ActionStateTypes.EditLine && allowedState == ActionStateTypes.EditLine 
+                && !DrawableHelper.usedIn.Contains(GlobalActionHistory.Current()))
             {
                 DrawableHelper.disableDrawableMenu();
+            }
+            if (GlobalActionHistory.Current() != ActionStateTypes.MoveRotator && allowedState == ActionStateTypes.MoveRotator)
+            {
+                MoveRotatorAction.Reset();
+            }
+            if (GlobalActionHistory.Current() != ActionStateTypes.Scale && allowedState == ActionStateTypes.Scale)
+            {
+                ScaleAction.Reset();
+            }
+            if (GlobalActionHistory.Current() != ActionStateTypes.MovePoint && allowedState == ActionStateTypes.MovePoint)
+            {
+                MovePointAction.Reset();
             }
         }
 

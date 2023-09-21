@@ -1,4 +1,5 @@
 ﻿using Assets.SEE.Game;
+using Assets.SEE.Game.Drawable;
 using Assets.SEE.Net.Actions.Whiteboard;
 using SEE.Controls.Actions;
 using SEE.Game;
@@ -48,11 +49,8 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
                     LineRenderer lineRenderer = child.GetComponent<LineRenderer>();
                     Vector3[] positions = new Vector3[lineRenderer.positionCount];
                     lineRenderer.GetPositions(positions);
-
-                    memento = new Memento(child, drawable, positions, child.name, DrawableTypes.Line, child.transform.position, child.transform.parent.localEulerAngles, lineRenderer.loop);
-                    memento.color = lineRenderer.material.color;
-                    memento.thickness = lineRenderer.startWidth;
-                    memento.orderInLayer = lineRenderer.sortingOrder;
+                    memento = new Memento(child, drawable, DrawableTypes.Line, child.name);
+                    memento.line = Line.GetLine(child);
                     mementoList.Add(memento);
 
                     new CleanerNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id, DrawableTypes.Line).Execute();
@@ -65,39 +63,21 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
 
         private List<Memento> mementoList = new List<Memento>();
         private Memento memento;
+
         private class Memento
         {
             public GameObject gameObject;
             public readonly GameObject drawable;
-
-            public Vector3[] positions;
-
-            public readonly string id;
-
             public readonly DrawableTypes type;
+            public readonly string id;
+            public Line line;
 
-            public Color color;
-
-            public float thickness;
-
-            public int orderInLayer;
-
-            public Vector3 position;
-
-            public Vector3 eulerAngles;
-
-            public bool loop;
-
-            public Memento(GameObject gameObject, GameObject drawable, Vector3[] positions, string id, DrawableTypes type, Vector3 position, Vector3 eulerAngles, bool loop)
+            public Memento(GameObject gameObject, GameObject drawable, DrawableTypes type, string id)
             {
                 this.gameObject = gameObject;
                 this.drawable = drawable;
-                this.positions = positions;
-                this.id = id;
                 this.type = type;
-                this.position = position;
-                this.eulerAngles = eulerAngles;
-                this.loop = loop;
+                this.id = id;
             }
         }
 
@@ -114,9 +94,8 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
                 switch (mem.type)
                 {
                     case DrawableTypes.Line:
-                        mem.gameObject = GameDrawer.ReDrawLine(mem.drawable, mem.id, mem.positions, mem.color, mem.thickness, mem.orderInLayer, mem.position, mem.eulerAngles, mem.loop);
-                        new DrawOnNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.id, mem.positions, 
-                            mem.color, mem.thickness, mem.orderInLayer, mem.position, mem.eulerAngles, mem.loop).Execute();
+                        mem.gameObject = GameDrawer.ReDrawLine(mem.drawable, mem.line);
+                        new DrawOnNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.line).Execute();
                         break;
                     default: break;
                 }
