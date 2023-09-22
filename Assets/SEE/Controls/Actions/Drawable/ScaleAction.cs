@@ -60,8 +60,8 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     if (selectedObj.TryGetComponent<MeshCollider>(out MeshCollider meshCollider))
                     {
                         collider = meshCollider;
-                        collider.convex = true;
-                        collider.isTrigger = true;
+                      //  collider.convex = true; deactivated collisions detection with border
+                      //  collider.isTrigger = true;
                     }
                     else
                     {
@@ -70,7 +70,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     // TODO Schauen ob die anderen Types auch holder besitzen!
                     if (selectedObj.CompareTag(Tags.Line))
                     {
-                        oldScale = selectedObj.transform.parent.localScale;
+                        oldScale = selectedObj.transform.localScale;//parent.localScale;
                     } else
                     {
                         oldScale = selectedObj.transform.localScale;

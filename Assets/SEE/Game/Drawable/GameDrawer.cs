@@ -38,7 +38,6 @@ namespace SEE.Game
 
             lineHolder.transform.parent = attachedObjects.transform;
             lineHolder.transform.position = attachedObjects.transform.position;
-            lineHolder.transform.rotation = highestParent.transform.rotation;
 
             line.tag = Tags.Line;
             line.transform.SetParent(lineHolder.transform);
@@ -50,7 +49,7 @@ namespace SEE.Game
             renderer.useWorldSpace = false;
             renderer.positionCount = positions.Length;
 
-            
+            lineHolder.transform.rotation = highestParent.transform.rotation;
             line.transform.position = lineHolder.transform.position;
             line.transform.position -= line.transform.forward * DrawableHelper.distanceToBoard.z;
             line.transform.rotation = lineHolder.transform.rotation;
@@ -96,6 +95,34 @@ namespace SEE.Game
             {
                 meshCollider.sharedMesh = mesh;
             }
+            
+        }
+
+        public static GameObject SetPivot(GameObject line)
+        {
+            LineRenderer renderer = GetRenderer(line);
+            Vector3[] positions = new Vector3[renderer.positionCount];
+            renderer.GetPositions(positions);
+            Vector3 middlePos = Vector3.zero;
+            if (positions.Length % 2 == 1)
+            {
+                middlePos = positions[(int)Mathf.Round(positions.Length / 2)];
+            }
+            else
+            {
+                Vector3 left = positions[(positions.Length / 2) - 1];
+                Vector3 right = positions[positions.Length / 2];
+                middlePos = (left + right) / 2;
+            }
+            middlePos.z = -DrawableHelper.distanceToBoard.z;
+            Vector3[] convertedPositions = new Vector3[positions.Length];
+            Array.Copy(sourceArray: positions, destinationArray: convertedPositions, length: positions.Length);
+            line.transform.TransformPoints(convertedPositions);
+            line.transform.localPosition = middlePos;
+            line.transform.InverseTransformPoints(convertedPositions);
+            Drawing(line, convertedPositions);
+            FinishDrawing(line, renderer.loop);
+            return line;
         }
 
         public static void RefreshCollider(GameObject line)
@@ -144,17 +171,33 @@ namespace SEE.Game
         public static GameObject ReDrawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness, int orderInLayer, Vector3 position,
             Vector3 eulerAngles, Vector3 holderLocalPosition, Vector3 holderScale, bool loop)
         {
-            Setup(drawable, name, positions, color, thickness, out GameObject line, out GameObject lineHolder, out LineRenderer renderer, out MeshCollider meshCollider);
-            line.transform.parent.localScale = holderScale;
-            line.transform.parent.localEulerAngles = eulerAngles;
-            line.transform.parent.localPosition = holderLocalPosition;
-            line.transform.position = position;
+            if (GameDrawableFinder.FindChild(drawable, name) != null)
+            {
+                GameObject line = GameDrawableFinder.FindChild(drawable, name);
+                line.transform.localScale = holderScale;
+                line.transform.parent.localEulerAngles = eulerAngles;
+                line.transform.parent.localPosition = holderLocalPosition;
+                line.transform.position = position;
+                GetRenderer(line).sortingOrder = orderInLayer;
+                Drawing(line, positions);
+                FinishDrawing(line, loop);
 
-            renderer.SetPositions(positions);
-            renderer.sortingOrder = orderInLayer;
-            FinishDrawing(line, loop);
+                return line;
+            }
+            else
+            {
+                Setup(drawable, name, positions, color, thickness, out GameObject line, out GameObject lineHolder, out LineRenderer renderer, out MeshCollider meshCollider);
+                line.transform.localScale = holderScale;
+                line.transform.parent.localEulerAngles = eulerAngles;
+                line.transform.parent.localPosition = holderLocalPosition;
+                line.transform.position = position;
 
-            return line;
+                renderer.SetPositions(positions);
+                renderer.sortingOrder = orderInLayer;
+                FinishDrawing(line, loop);
+
+                return line;
+            }
         }
 
         public static GameObject ReDrawLine(GameObject drawable, Line lineToRedraw)

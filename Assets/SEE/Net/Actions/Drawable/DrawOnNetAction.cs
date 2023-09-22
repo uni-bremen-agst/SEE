@@ -53,24 +53,6 @@ namespace Assets.SEE.Net.Actions.Whiteboard
             Line = null;
         }
         
-        public DrawOnNetAction(
-            string drawableID, string parentDrawableID, string name, Vector3[] positions, Color color, float thickness, int orderInLayer, Vector3 position, 
-            Vector3 eulerAngles, Vector3 holderPosition, Vector3 holderScale, bool loop)
-        {
-            this.DrawableID = drawableID;
-            this.ParentDrawableID = parentDrawableID;
-            this.Name = name;
-            this.Positions = positions;
-            this.Color = color;
-            this.Thickness = thickness;
-            this.OrderInLayer = orderInLayer;
-            this.Position = position;
-            this.EulerAngles = eulerAngles;
-            this.HolderPosition = holderPosition;
-            this.HolderScale = holderScale;
-            this.Loop = loop;
-        }
-        
         public DrawOnNetAction(string drawableID, string parentDrawableID, Line line)
         {
             this.DrawableID = drawableID;
@@ -87,6 +69,7 @@ namespace Assets.SEE.Net.Actions.Whiteboard
                 {
                     throw new System.Exception($"There is no drawable with the ID {DrawableID}.");
                 }
+
                 if (Line != null && Line.id != "")
                 {
                     GameDrawer.ReDrawLine(drawable, Line);

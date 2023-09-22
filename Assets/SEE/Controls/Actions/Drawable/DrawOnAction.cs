@@ -32,6 +32,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         private GameObject line;
 
+        private GameObject drawable;
+
         /// <summary>
         /// The positions of the line in local space.
         /// </summary>
@@ -87,7 +89,7 @@ namespace SEE.Controls.Actions
                     (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
                     GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject)))
                 {
-                    GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
+                    drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
                         raycastHit.collider.gameObject : GameDrawableFinder.FindDrawableParent(raycastHit.collider.gameObject);
                     drawing = true;
 
@@ -111,15 +113,9 @@ namespace SEE.Controls.Actions
                                 newPositions[newPositions.Length - 1] = newPosition;
                                 positions = newPositions;
 
-                                // if (GameDrawer.DifferentMeshVerticesCounter() > 3)
-                                // {
                                 GameDrawer.Drawing(line, positions);
-                                memento = new Memento(drawable, line.name, positions, DrawableHelper.currentColor,
-                                    DrawableHelper.currentThickness, line.GetComponent<LineRenderer>().sortingOrder);
-                                new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable),
-                                    memento.id, memento.positions, memento.color, memento.thickness, false).Execute();
+                                new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), Line.GetLine(line)).Execute();
                                 currentState = ReversibleAction.Progress.InProgress;
-                                // }
                             }
                             break;
                     }
@@ -135,10 +131,10 @@ namespace SEE.Controls.Actions
                     {
                         if (GameDrawer.DifferentMeshVerticesCounter(line) >= 3)
                         {
-                            memento.positions = positions;
-                            GameDrawer.FinishDrawing(line, false);
-                            new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id,
-                                memento.positions, memento.color, memento.thickness, false).Execute();
+                            line = GameDrawer.SetPivot(line);
+                            Line currentLine = Line.GetLine(line);
+                            memento = new Memento(drawable, currentLine);
+                            new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), currentLine).Execute();
                             Debug.Log("Created: " + line);
                             result = true;
                             currentState = ReversibleAction.Progress.Completed;
@@ -159,25 +155,12 @@ namespace SEE.Controls.Actions
         private struct Memento
         {
             public readonly GameObject drawable;
+            public Line line;
 
-            public Vector3[] positions;
-
-            public readonly Color color;
-
-            public readonly float thickness;
-
-            public readonly int orderInLayer;
-
-            public readonly string id;
-
-            public Memento(GameObject drawable, string id, Vector3[] positions, Color color, float thickness, int orderInLayer)
+            public Memento(GameObject drawable, Line line)
             {
                 this.drawable = drawable;
-                this.positions = positions;
-                this.color = color;
-                this.thickness = thickness;
-                this.orderInLayer = orderInLayer;
-                this.id = id;
+                this.line = line;
             }
         }
 
@@ -188,16 +171,16 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            Debug.Log("Undo: " + line + ", id:" + memento.id);
+            Debug.Log("Undo: " + line + ", id:" + memento.line.id);
             if (line == null)
             {
-                line = GameDrawableFinder.FindChild(memento.drawable, memento.id);
+                line = GameDrawableFinder.FindChild(memento.drawable, memento.line.id);
                 Debug.Log("Try to find: " + line);
             }
             if (line != null)
             {
                 Debug.Log("Delete: " + line);
-                new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id).Execute();
+                new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.line.id).Execute();
                 Destroyer.Destroy(line.transform.parent.gameObject);
                 line = null;
             }
@@ -211,13 +194,10 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            line = GameDrawer.ReDrawRawLine(memento.drawable, memento.id, memento.positions, memento.color,
-                memento.thickness, memento.orderInLayer, false);
+            line = GameDrawer.ReDrawLine(memento.drawable, memento.line);
             if (line != null)
             {
-                new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable),
-                    memento.id, memento.positions, memento.color,
-                    memento.thickness, memento.orderInLayer, false).Execute();
+                new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), Line.GetLine(line)).Execute();
             }
         }
 
@@ -268,7 +248,7 @@ namespace SEE.Controls.Actions
                 return new HashSet<string>
                 {
                     memento.drawable.name,
-                    memento.id
+                    memento.line.id
                 };
             }
         }

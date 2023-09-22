@@ -453,11 +453,18 @@ namespace Assets.SEE.Controls.Actions.Drawable
                         if (GameDrawer.DifferentPositionCounter(positions) > 1)
                         {
                             shape = GameDrawer.ReDrawRawLine(drawable, "", positions, DrawableHelper.currentColor, DrawableHelper.currentThickness, DrawableHelper.orderInLayer, true);
+                            shape.GetComponent<LineRenderer>().loop = true;
+                            shape = GameDrawer.SetPivot(shape);
+                            Line currentShape = Line.GetLine(shape);
+                            memento = new Memento(drawable, currentShape);
+                            new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), currentShape).Execute();
+                            /*
                             memento = new Memento(drawable, shape.name, positions, DrawableHelper.currentColor,
                                DrawableHelper.currentThickness, shape.GetComponent<LineRenderer>().sortingOrder);
                             memento.loop = true;
                             new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id,
                             memento.positions, memento.color, memento.thickness, memento.loop).Execute();
+                            */
                             result = true;
                             currentState = ReversibleAction.Progress.Completed;
                             positions = new Vector3[1];
@@ -503,11 +510,15 @@ namespace Assets.SEE.Controls.Actions.Drawable
                         positions = newPositions;
 
                         GameDrawer.Drawing(shape, positions);
+                        new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), Line.GetLine(shape)).Execute();
+                        /*
                         memento = new Memento(drawable, shape.name, positions, DrawableHelper.currentColor,
                             DrawableHelper.currentThickness, shape.GetComponent<LineRenderer>().sortingOrder);
                         memento.loop = false;
+                        
                         new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable),
                             memento.id, memento.positions, memento.color, memento.thickness, memento.loop).Execute();
+                        */
                         currentState = ReversibleAction.Progress.InProgress;
                         if (shape.GetComponent<MenuDestroyer>() != null)
                         {
@@ -518,41 +529,56 @@ namespace Assets.SEE.Controls.Actions.Drawable
 
                 if (Input.GetMouseButtonUp(1) && !Input.GetKey(KeyCode.LeftControl) && drawing && positions.Length > 1 && selectedShape == GameShapesCalculator.Shapes.Line)
                 {
-                    GameDrawer.Drawing(shape, positions);
-                    memento.positions = positions;
-                    memento.loop = false;
-                    GameDrawer.FinishDrawing(shape, memento.loop);
-                    new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id,
-                        memento.positions, memento.color, memento.thickness, memento.loop).Execute();
                     result = true;
-                    currentState = ReversibleAction.Progress.Completed;
-                    positions = new Vector3[1];
-                    drawing = false;
-                    shape = null;
-
+                    EndLineShapeDrawing(false);
                     return Input.GetMouseButtonUp(1);
                 }
 
                 if (Input.GetMouseButtonUp(1) && Input.GetKey(KeyCode.LeftControl) && drawing && positions.Length > 1 && selectedShape == GameShapesCalculator.Shapes.Line)
-                {
-                    GameDrawer.Drawing(shape, positions);
-                    memento.positions = positions;
-                    memento.loop = true;
-                    GameDrawer.FinishDrawing(shape, memento.loop);
-                    new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id,
-                        memento.positions, memento.color, memento.thickness, memento.loop).Execute();
+                {   
                     result = true;
-                    currentState = ReversibleAction.Progress.Completed;
-                    positions = new Vector3[1];
-                    drawing = false;
-                    shape = null;
-
+                    EndLineShapeDrawing(true);
                     return Input.GetMouseButtonUp(1);
                 }
             }
             return result;
         }
 
+        private void EndLineShapeDrawing(bool loop)
+        {
+            GameDrawer.Drawing(shape, positions);
+            shape.GetComponent<LineRenderer>().loop = loop;
+            shape = GameDrawer.SetPivot(shape);
+            Line currentShape = Line.GetLine(shape);
+            memento = new Memento(drawable, currentShape);
+            new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), currentShape).Execute();
+            /*
+            GameDrawer.Drawing(shape, positions);
+            memento.positions = positions;
+            memento.loop = loop;
+            GameDrawer.FinishDrawing(shape, memento.loop);
+            
+            new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id,
+                memento.positions, memento.color, memento.thickness, memento.loop).Execute();
+            */
+            currentState = ReversibleAction.Progress.Completed;
+            positions = new Vector3[1];
+            drawing = false;
+            shape = null;
+        }
+
+        private struct Memento
+        {
+            public readonly GameObject drawable;
+            public readonly Line shape;
+
+            public Memento(GameObject drawable, Line shape)
+            {
+                this.drawable = drawable;
+                this.shape = shape;
+            }
+        }
+        /*
         private struct Memento
         {
             public readonly GameObject drawable;
@@ -580,7 +606,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 this.loop = false;
             }
         }
-
+        */
         /// <summary>
         /// Destroys the drawn line.
         /// See <see cref="ReversibleAction.Undo()"/>.
@@ -590,11 +616,11 @@ namespace Assets.SEE.Controls.Actions.Drawable
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             if (shape == null)
             {
-                shape = GameDrawableFinder.FindChild(memento.drawable, memento.id);
+                shape = GameDrawableFinder.FindChild(memento.drawable, memento.shape.id);
             }
             if (shape != null)
             {
-                new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id).Execute();
+                new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.shape.id).Execute();
                 Destroyer.Destroy(shape.transform.parent.gameObject);
                 shape = null;
             }
@@ -608,14 +634,19 @@ namespace Assets.SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            shape = GameDrawer.ReDrawRawLine(memento.drawable, memento.id, memento.positions, memento.color,
+            shape = GameDrawer.ReDrawLine(memento.drawable, memento.shape);
+            if (shape != null)
+            {
+                new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), Line.GetLine(shape)).Execute();
+            }
+            /*GameDrawer.ReDrawRawLine(memento.drawable, memento.id, memento.positions, memento.color,
                 memento.thickness, memento.orderInLayer, memento.loop);
             if (shape != null)
             {
                 new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable),
                     memento.id, memento.positions, memento.color,
                     memento.thickness, memento.orderInLayer, memento.loop).Execute();
-            }
+            }*/
         }
 
         /// <summary>
@@ -665,7 +696,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 return new HashSet<string>
                 {
                     memento.drawable.name,
-                    memento.id
+                    memento.shape.id
                 };
             }
         }

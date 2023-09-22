@@ -10,7 +10,7 @@ namespace Assets.SEE.Game.Drawable
         {
             Transform transform;
             if (objectToScale.CompareTag(Tags.Line)) {
-                transform = objectToScale.transform.parent.transform;
+                transform = objectToScale.transform;//.parent.transform;
             } else
             {
                 transform = objectToScale.transform;
@@ -30,7 +30,7 @@ namespace Assets.SEE.Game.Drawable
             Transform transform;
             if (objectToScale.CompareTag(Tags.Line))
             {
-                transform = objectToScale.transform.parent.transform;
+                transform = objectToScale.transform;//.parent.transform;
             }
             else
             {

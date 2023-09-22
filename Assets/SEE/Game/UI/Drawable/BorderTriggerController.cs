@@ -9,6 +9,7 @@ namespace Assets.SEE.Game.UI.Drawable
 {
     public class BorderTriggerController : MonoBehaviour
     {
+        [SerializeField]
         private bool trigger = false;
 
         private void OnTriggerEnter(Collider other)
