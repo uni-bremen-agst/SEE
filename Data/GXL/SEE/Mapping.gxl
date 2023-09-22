@@ -2,6 +2,24 @@
 <!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
 <gxl xmlns:xlink="http://www.w3.org/1999/xlink">
   <graph id="Mapping" edgeids="true">
+    <node id="N4090">
+      <type xlink:href="Interface"/>
+      <attr name="Linkage.Name">
+        <string>T:SEE.Utils.ReversibleAction@Temp/Bin/Debug/SEE.dll</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>ReversibleAction</string>
+      </attr>
+    </node>
+    <node id="N4437">
+      <type xlink:href="Class"/>
+      <attr name="Linkage.Name">
+        <string>T:SEE.Utils.ActionHistory@Temp/Bin/Debug/SEE.dll</string>
+      </attr>
+      <attr name="Source.Name">
+        <string>ActionHistory</string>
+      </attr>
+    </node>
     <node id="N5497">
       <type xlink:href="Class"/>
       <attr name="Linkage.Name">
@@ -1541,6 +1559,15 @@
         <string>82817bf2-fe22-4da6-b0c8-c09643c438e1</string>
       </attr>
     </node>
+    <node id="N784637">
+      <type xlink:href="Cluster"/>
+      <attr name="Source.Name">
+        <string>History</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>4622a420-7aa7-4f89-976c-73f056e84c10</string>
+      </attr>
+    </node>
     <edge id="E2298745" from="N769880" to="N784564">
       <type xlink:href="Maps_To"/>
     </edge>
@@ -1824,6 +1851,12 @@
       <type xlink:href="Maps_To"/>
     </edge>
     <edge id="E2298849" from="N769930" to="N784631">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E2299245" from="N4437" to="N784637">
+      <type xlink:href="Maps_To"/>
+    </edge>
+    <edge id="E2299246" from="N4090" to="N784637">
       <type xlink:href="Maps_To"/>
     </edge>
   </graph>
