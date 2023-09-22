@@ -26,8 +26,11 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace SEE.Utils
+namespace SEE.Runtime.JLG
 {
+    /// <summary>
+    /// A parser for runtime data in JLG format.
+    /// </summary>
     public class JLGParser
     {
         /// <summary>

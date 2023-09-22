@@ -6,6 +6,7 @@ using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game.Runtime;
 using SEE.GO;
+using SEE.Runtime.JLG;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using TMPro;

@@ -24,7 +24,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Utils
+namespace SEE.Runtime.JLG
 {
     /// <summary>
     /// Thrown if the input contains a malformed statement.
@@ -46,14 +46,14 @@ namespace SEE.Utils
         private IList<string> filesOfProject;
 
         /// <summary>
-        /// Look-up table for the location of a JavaStatement. The number saved in the location of a 
+        /// Look-up table for the location of a JavaStatement. The number saved in the location of a
         /// JavaStatement equals the index in this table of its location.
-        /// </summary>   
+        /// </summary>
         [SerializeField]
         private IList<string> locationLookupTable;
 
         /// <summary>
-        /// Look-up table for the names of all fields in the parsed javalog. The number used to identify 
+        /// Look-up table for the names of all fields in the parsed javalog. The number used to identify
         /// a field is the index of its name in the lookuptable.
         /// </summary>
         [SerializeField]
@@ -66,11 +66,11 @@ namespace SEE.Utils
         private List<JavaStatement> allStatements;
 
         /// <summary>
-        /// This Stack contains all return Values, until the current Point in the Visualization. It is 
+        /// This Stack contains all return Values, until the current Point in the Visualization. It is
         /// filled and used, when a ParsedJLG object is being visualized by a JLGVisualizer script.
         /// </summary>
         [SerializeField]
-        private Stack<String> returnValues = new Stack<string>();
+        private Stack<String> returnValues = new();
 
         /// <summary>
         /// Constructs a new ParsedJLG.
