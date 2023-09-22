@@ -4,8 +4,8 @@ using SEE.Game.HolisticMetrics;
 using SEE.Game.HolisticMetrics.ActionHelpers;
 using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
-using SEE.Utils;
 using UnityEngine;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions.HolisticMetrics
 {
@@ -120,7 +120,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                         }
 
                         progress = ProgressState.Finished;
-                        CurrentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
 
@@ -180,7 +180,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Returns a new instance of <see cref="AddWidgetAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new AddWidgetAction();
         }
@@ -189,7 +189,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Returns a new instance of <see cref="AddWidgetAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

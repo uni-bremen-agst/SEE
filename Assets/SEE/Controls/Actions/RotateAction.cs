@@ -1,6 +1,6 @@
 using RTG;
 using SEE.Net.Actions;
-using SEE.Utils;
+using SEE.Utils.History;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -39,7 +39,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void Initialize()
         {
-            CurrentState = ReversibleAction.Progress.NoEffect;
+            CurrentState = IReversibleAction.Progress.NoEffect;
             UsedGizmo = new RotateGizmo();
         }
 
@@ -51,7 +51,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="RotateAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new RotateAction();
         }
@@ -60,7 +60,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="RotateAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             if (GameNodeToBeContinuedInNextAction)
             {

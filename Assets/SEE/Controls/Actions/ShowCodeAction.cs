@@ -11,6 +11,7 @@ using SEE.Utils;
 using UnityEngine;
 using SEE.DataModel.DG;
 using System;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions
 {
@@ -41,9 +42,9 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="ShowCodeAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction() => new ShowCodeAction();
+        public static IReversibleAction CreateReversibleAction() => new ShowCodeAction();
 
-        public override ReversibleAction NewInstance() => CreateReversibleAction();
+        public override IReversibleAction NewInstance() => CreateReversibleAction();
 
         public override void Awake()
         {

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using SEE.Game.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
+using SEE.Utils.History;
 using UnityEngine;
 
 namespace SEE.Controls.Actions.HolisticMetrics
@@ -53,7 +54,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     memento = new Memento(ConfigManager.GetBoardConfig(widgetsManager));
                     BoardsManager.Delete(memento.BoardConfig.Title);
                     new DeleteBoardNetAction(memento.BoardConfig.Title).Execute();
-                    CurrentState = ReversibleAction.Progress.Completed;
+                    CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 }
             }
@@ -85,7 +86,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Returns a new instance of <see cref="DeleteBoardAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new DeleteBoardAction();
         }
@@ -94,7 +95,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Returns a new instance of <see cref="DeleteBoardAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

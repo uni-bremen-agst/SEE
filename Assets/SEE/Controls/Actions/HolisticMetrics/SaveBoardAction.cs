@@ -4,6 +4,7 @@ using SEE.UI.HolisticMetrics;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
+using SEE.Utils.History;
 using UnityEngine;
 
 namespace SEE.Controls.Actions.HolisticMetrics
@@ -122,7 +123,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     {
                         memento = new Memento(filename, widgetsManager);
                         ConfigManager.SaveBoard(memento.WidgetsManager, memento.Filename);
-                        CurrentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         progress = ProgressState.Finished;
                         return true;
                     }
@@ -171,7 +172,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Returns a new instance of <see cref="SaveBoardAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new SaveBoardAction();
         }
@@ -180,7 +181,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Returns a new instance of <see cref="SaveBoardAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

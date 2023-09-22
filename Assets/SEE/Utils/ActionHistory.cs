@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SEE.Utils
+namespace SEE.Utils.History
 {
     /// <summary>
     /// Thrown in case an Undo is called although there is no action
@@ -136,12 +136,12 @@ namespace SEE.Utils
         /// <summary>
         /// Contains all actions executed by the player.
         /// </summary>
-        private Stack<ReversibleAction> UndoHistory { get; } = new Stack<ReversibleAction>();
+        private Stack<IReversibleAction> UndoHistory { get; } = new Stack<IReversibleAction>();
 
         /// <summary>
         /// Contains all undone actions executed by the player.
         /// </summary>
-        private Stack<ReversibleAction> RedoHistory { get; } = new Stack<ReversibleAction>();
+        private Stack<IReversibleAction> RedoHistory { get; } = new Stack<IReversibleAction>();
 
         /// <summary>
         /// Whether to synchronize the action history over the network.
@@ -159,27 +159,27 @@ namespace SEE.Utils
 
         /// <summary>
         /// Checks the invariant that the <see cref="UndoHistory"/> has at most
-        /// one action with progress state <see cref="ReversibleAction.Progress.NoEffect"/>
+        /// one action with progress state <see cref="IReversibleAction.Progress.NoEffect"/>
         /// and this action is at the top of <see cref="UndoHistory"/>.
         /// </summary>
         private void AssertAtMostOneActionWithNoEffect()
         {
             UnityEngine.Assertions.Assert.IsTrue
-               (UndoHistory.Skip(1).All(action => action.CurrentProgress() != ReversibleAction.Progress.NoEffect));
+               (UndoHistory.Skip(1).All(action => action.CurrentProgress() != IReversibleAction.Progress.NoEffect));
         }
 
         /// <summary>
         /// The currently executing action in the undo history.
         /// </summary>
-        public ReversibleAction CurrentAction => UndoHistory.Count > 0 ? UndoHistory.Peek() : null;
+        public IReversibleAction CurrentAction => UndoHistory.Count > 0 ? UndoHistory.Peek() : null;
 
         /// <summary>
         /// Let C be the currently executed action (if there is any) in this action history.
-        /// Then <see cref="ReversibleAction.Stop"/> will be called for C. After that
-        /// <see cref="ReversibleAction.Awake()"/> and then <see cref="ReversibleAction.Start"/>
+        /// Then <see cref="IReversibleAction.Stop"/> will be called for C. After that
+        /// <see cref="IReversibleAction.Awake()"/> and then <see cref="IReversibleAction.Start"/>
         /// will be called for <paramref name="action"/> and <paramref name="action"/> is added to
         /// the action history and becomes the currently executed action for which
-        /// <see cref="ReversibleAction.Update"/> will be called whenever a client
+        /// <see cref="IReversibleAction.Update"/> will be called whenever a client
         /// of this action history calls the action history's <see cref="Update"/> method.
         ///
         /// No action previously undone can be redone anymore.
@@ -187,7 +187,7 @@ namespace SEE.Utils
         /// Precondition: <paramref name="action"/> is not already present in the action history.
         /// </summary>
         /// <param name="action">the action to be executed</param>
-        public void Execute(ReversibleAction action)
+        public void Execute(IReversibleAction action)
         {
             AssertAtMostOneActionWithNoEffect();
             CurrentAction?.Stop();
@@ -199,9 +199,9 @@ namespace SEE.Utils
             DeleteAllRedos();
         }
 
-        /// Calls <see cref="ReversibleAction.Update"/> for the currently executed action of this
+        /// Calls <see cref="IReversibleAction.Update"/> for the currently executed action of this
         /// action history if there is any. If that action signals that it is complete (via
-        /// <see cref="ReversibleAction.Update"/>), a new instance of the same kind as this
+        /// <see cref="IReversibleAction.Update"/>), a new instance of the same kind as this
         /// action will be created, added to the action history and become the new currently
         /// executed action. The Update is propagated to all clients in the network.
         ///
@@ -209,7 +209,7 @@ namespace SEE.Utils
         /// </summary>
         public void Update()
         {
-            ReversibleAction lastAction = CurrentAction;
+            IReversibleAction lastAction = CurrentAction;
             if (lastAction != null && lastAction.Update())
             {
                 // Note: An action is put to the global history only when
@@ -227,7 +227,7 @@ namespace SEE.Utils
         /// This is the counterpart of <see cref="RemoveFromGlobalHistory(GlobalHistoryEntry)"/>.
         /// </summary>
         /// <param name="action">action to be added</param>
-        private void AddToGlobalHistory(ReversibleAction action)
+        private void AddToGlobalHistory(IReversibleAction action)
         {
             string actionID = action.GetId();
             HashSet<string> changedObjects = action.GetChangedObjects();
@@ -242,7 +242,7 @@ namespace SEE.Utils
         /// Removes <paramref name="action"/> from the global history, that is,
         /// from <see cref="globalHistory"/> and also via the network on all clients.
         ///
-        /// This is the counterpart of <see cref="AddToGlobalHistory(ReversibleAction)"/>.
+        /// This is the counterpart of <see cref="AddToGlobalHistory(IReversibleAction)"/>.
         /// </summary>
         /// <param name="action">action to be added</param>
         private void RemoveFromGlobalHistory(GlobalHistoryEntry action)
@@ -392,7 +392,7 @@ namespace SEE.Utils
             // feedback of her/his Undo decision because that kind of action has
             // not had any effect yet.
             CurrentAction.Stop();
-            ReversibleAction current = LastActionWithEffect();
+            IReversibleAction current = LastActionWithEffect();
 
             if (current == null)
             {
@@ -420,10 +420,10 @@ namespace SEE.Utils
                 /// The global action history contains only those actions whose
                 /// execution is completed. The current action could still
                 /// be running (we know that it has already had an effect,
-                /// that is, its current progress cannot be <see cref="ReversibleAction.Progress.NoEffect"/>,
+                /// that is, its current progress cannot be <see cref="IReversibleAction.Progress.NoEffect"/>,
                 /// otherwise we would not have arrived here). If it is still
                 /// running, it cannot be found in the global history.
-                if (current.CurrentProgress() == ReversibleAction.Progress.Completed)
+                if (current.CurrentProgress() == IReversibleAction.Progress.Completed)
                 {
                     /// current is a fully executed action contained in <see cref="globalHistory"/>
                     GlobalHistoryEntry lastAction = globalHistory[GetIndexOfAction(current.GetId())];
@@ -472,14 +472,14 @@ namespace SEE.Utils
                     throw new RedoImpossible("Redo not possible. Someone else has made a change on the same object.");
                 }
 
-                ReversibleAction redoAction = RedoHistory.Pop();
+                IReversibleAction redoAction = RedoHistory.Pop();
                 LastActionWithEffect();
                 UndoHistory.Push(redoAction);
                 redoAction.Redo();
                 Resume(redoAction);
 
                 UnityEngine.Assertions.Assert.IsTrue(RedoHistory.Count == 0
-                                 || RedoHistory.Peek().CurrentProgress() != ReversibleAction.Progress.NoEffect);
+                                 || RedoHistory.Peek().CurrentProgress() != IReversibleAction.Progress.NoEffect);
 
                 // Only if the action to be redone has been executed completely
                 // and is, thus, contained in the global history, we need to update
@@ -503,18 +503,18 @@ namespace SEE.Utils
 
         /// <summary>
         /// Resumes the execution with a fresh instance of the given <paramref name="action"/>
-        /// if its current progress is <see cref="ReversibleAction.Progress.Completed"/>
+        /// if its current progress is <see cref="IReversibleAction.Progress.Completed"/>
         /// or otherwise with <paramref name="action"/> if the current progress
-        /// is <see cref="ReversibleAction.Progress.InProgress"/>.
+        /// is <see cref="IReversibleAction.Progress.InProgress"/>.
         ///
         /// Precondition: the current progress of <paramref name="action"/>
-        /// is different from <see cref="ReversibleAction.Progress.NoEffect"/>.
+        /// is different from <see cref="IReversibleAction.Progress.NoEffect"/>.
         /// </summary>
         /// <param name="action">action to be resumed</param>
-        private void Resume(ReversibleAction action)
+        private void Resume(IReversibleAction action)
         {
-            UnityEngine.Assertions.Assert.IsTrue(action.CurrentProgress() != ReversibleAction.Progress.NoEffect);
-            if (action.CurrentProgress() == ReversibleAction.Progress.Completed)
+            UnityEngine.Assertions.Assert.IsTrue(action.CurrentProgress() != IReversibleAction.Progress.NoEffect);
+            if (action.CurrentProgress() == IReversibleAction.Progress.Completed)
             {
                 // We will resume with a fresh instance of the current action as
                 // the (now) current has already been completed.
@@ -535,12 +535,12 @@ namespace SEE.Utils
         /// </summary>
         /// <returns>the last action on the <see cref="UndoHistory"/> that
         /// has had any effect (preliminary or complete) or null<</returns>
-        private ReversibleAction LastActionWithEffect()
+        private IReversibleAction LastActionWithEffect()
         {
             while (UndoHistory.Count > 0)
             {
-                ReversibleAction action = UndoHistory.Peek();
-                if (action.CurrentProgress() != ReversibleAction.Progress.NoEffect)
+                IReversibleAction action = UndoHistory.Peek();
+                if (action.CurrentProgress() != IReversibleAction.Progress.NoEffect)
                 {
                     return action;
                 }

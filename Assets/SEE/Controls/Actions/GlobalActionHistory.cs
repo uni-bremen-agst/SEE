@@ -1,5 +1,6 @@
 ﻿using SEE.Utils;
-using static SEE.Utils.ActionHistory;
+using SEE.Utils.History;
+using static SEE.Utils.History.ActionHistory;
 
 namespace SEE.Controls.Actions
 {
@@ -51,7 +52,7 @@ namespace SEE.Controls.Actions
         /// <param name="actionType">kind of action to be executed</param>
         public static void Execute(ActionStateType actionType)
         {
-            ReversibleAction action = actionType.CreateReversible();
+            IReversibleAction action = actionType.CreateReversible();
             history.Execute(action);
         }
 

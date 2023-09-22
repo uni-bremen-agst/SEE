@@ -6,6 +6,7 @@ using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions
 {
@@ -81,7 +82,7 @@ namespace SEE.Controls.Actions
         /// NodeSelected: Instantiates the canvasObject if a gameNode is selected.
         /// ValuesAreGiven: Saves the new values of the node in a memento and updates the specific node.
         /// EditIsCanceled: Removes the canvas and resets all values if the process is canceled.
-        /// See <see cref="ReversibleAction.Update"/>.
+        /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
@@ -116,7 +117,7 @@ namespace SEE.Controls.Actions
                 case ProgressState.ValuesAreGiven:
                     progress = ProgressState.NoNodeSelected;
                     result = true;
-                    CurrentState = ReversibleAction.Progress.Completed;
+                    CurrentState = IReversibleAction.Progress.Completed;
                     NotifyClients(memento.Node);
                     break;
 
@@ -166,13 +167,13 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="EditNodeAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction() => new EditNodeAction();
+        public static IReversibleAction CreateReversibleAction() => new EditNodeAction();
 
         /// <summary>
         /// Returns a new instance of <see cref="EditNodeAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance() => CreateReversibleAction();
+        public override IReversibleAction NewInstance() => CreateReversibleAction();
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.

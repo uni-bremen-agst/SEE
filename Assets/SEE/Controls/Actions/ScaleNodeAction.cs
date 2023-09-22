@@ -1,9 +1,8 @@
-﻿
-using SEE.Net.Actions;
+﻿using SEE.Net.Actions;
 using SEE.Game.Operator;
 using RTG;
 using UnityEngine;
-using SEE.Utils;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions
 {
@@ -41,7 +40,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void Initialize()
         {
-            CurrentState = ReversibleAction.Progress.NoEffect;
+            CurrentState = IReversibleAction.Progress.NoEffect;
             UsedGizmo = new ScaleGizmo();
         }
 
@@ -53,7 +52,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="ScaleNodeAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new ScaleNodeAction();
         }
@@ -62,7 +61,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="ScaleNodeAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             if (GameNodeToBeContinuedInNextAction)
             {

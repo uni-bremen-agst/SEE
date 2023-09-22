@@ -1,13 +1,13 @@
 ﻿using SEE.Controls.Actions;
 using System.Collections.Generic;
 
-namespace SEE.Utils
+namespace SEE.Utils.History
 {
     /// <summary>
-    /// Creates a new instance of <see cref="ReversibleAction"/>.
+    /// Creates a new instance of <see cref="IReversibleAction"/>.
     /// </summary>
-    /// <returns>new instance of <see cref="ReversibleAction"/>/returns>
-    public delegate ReversibleAction CreateReversibleAction();
+    /// <returns>new instance of <see cref="IReversibleAction"/>/returns>
+    public delegate IReversibleAction CreateReversibleAction();
 
     /// <summary>
     /// Defines the expected operations and their protocol for actions that
@@ -18,7 +18,7 @@ namespace SEE.Utils
     /// See also the test cases in <seealso cref="SEETests.TestActionHistory"/> for
     /// additional information.
     /// </summary>
-    public interface ReversibleAction
+    public interface IReversibleAction
     {
         // The protocol of the following operations over the lifecycle of a
         // reversible object is as follows (where "X . Y" means X is called
@@ -152,6 +152,6 @@ namespace SEE.Utils
         /// Returns a new instance of the same type as this particular type of ReversibleAction.
         /// </summary>
         /// <returns>new instance</returns>
-        ReversibleAction NewInstance();
+        IReversibleAction NewInstance();
     }
 }

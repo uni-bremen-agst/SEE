@@ -4,6 +4,7 @@ using SEE.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
+using SEE.Utils.History;
 using System;
 using UnityEngine;
 using SEE.Audio;
@@ -21,7 +22,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="AddEdgeAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="AddEdgeAction"/></returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new AddEdgeAction();
         }
@@ -30,7 +31,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="AddEdgeAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="AddEdgeAction"/></returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }
@@ -126,7 +127,7 @@ namespace SEE.Controls.Actions
         private const string defaultEdgeType = Edge.SourceDependency;
 
         /// <summary>
-        /// <see cref="ReversibleAction.Update"/>.
+        /// <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
@@ -163,7 +164,7 @@ namespace SEE.Controls.Actions
                 to = null;
                 result = createdEdge != null;
                 AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound);
-                CurrentState = result ? ReversibleAction.Progress.Completed : ReversibleAction.Progress.NoEffect;
+                CurrentState = result ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
             }
             // Forget from and to upon user request.
             if (SEEInput.Unselect())

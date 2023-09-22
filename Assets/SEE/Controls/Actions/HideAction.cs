@@ -1,12 +1,12 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
-using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.UI.PropertyDialog;
 using UnityEngine;
 using UnityEngine.Assertions;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions
 {
@@ -59,7 +59,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="HideAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new HideAction();
         }
@@ -68,7 +68,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="HideAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }
@@ -122,7 +122,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// See <see cref="ReversibleAction.Update"/>.
+        /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
@@ -133,69 +133,69 @@ namespace SEE.Controls.Actions
                 case HideModeSelector.HideAll:
                     if (HideAllEdges())
                     {
-                        CurrentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideSelected:
                     if (HideSelected())
                     {
-                        CurrentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideUnselected:
                     if (HideUnselected())
                     {
-                        CurrentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideOutgoing:
                     if (HideOutgoingEdges())
                     {
-                        CurrentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideIncoming:
                     if (HideIncomingEdges())
                     {
-                        CurrentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideAllEdgesOfSelected:
                     if (HideAllConnectedEdges())
                     {
-                        CurrentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideForwardTransitiveClosure:
                     if (HideForwardTransitive())
                     {
-                        CurrentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideBackwardTransitiveClosure:
                     if (HideBackwardTransitive())
                     {
-                        CurrentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HideAllTransitiveClosure:
                     if (HideAllTransitive())
                     {
-                        CurrentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                     break;
                 case HideModeSelector.HighlightEdges:
                     HighlightEdges();
-                    CurrentState = ReversibleAction.Progress.Completed;
+                    CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 default: return false;
             }
@@ -793,7 +793,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Returns the set of IDs of all game objects hidden by this action.
-        /// <see cref="ReversibleAction.GetChangedObjects"/>.
+        /// <see cref="IReversibleAction.GetChangedObjects"/>.
         /// </summary>
         /// <returns>The set of the IDs of all game objects hidden by this action</returns>
         public override HashSet<string> GetChangedObjects()

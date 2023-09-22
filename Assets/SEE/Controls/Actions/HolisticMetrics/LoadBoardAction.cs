@@ -7,6 +7,7 @@ using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions.HolisticMetrics
 {
@@ -113,7 +114,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                             memento = new Memento(config);
                             BoardsManager.Create(memento.Config);
                             new CreateBoardNetAction(memento.Config).Execute();
-                            CurrentState = ReversibleAction.Progress.Completed;
+                            CurrentState = IReversibleAction.Progress.Completed;
                             return true;
                         }
                         catch (Exception exception)
@@ -167,7 +168,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Returns a new instance of <see cref="LoadBoardAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new LoadBoardAction();
         }
@@ -176,7 +177,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Returns a new instance of <see cref="LoadBoardAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

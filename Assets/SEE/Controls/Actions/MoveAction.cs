@@ -12,6 +12,7 @@ using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
 using UnityEngine;
 using Node = SEE.DataModel.DG.Node;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions
 {
@@ -24,17 +25,17 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="MoveAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="MoveAction"/></returns>
-        internal static ReversibleAction CreateReversibleAction() => new MoveAction();
+        internal static IReversibleAction CreateReversibleAction() => new MoveAction();
 
         /// <summary>
         /// Returns a new instance of <see cref="MoveAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance() => new MoveAction();
+        public override IReversibleAction NewInstance() => new MoveAction();
 
         /// <summary>
         /// Returns the set of IDs of all game objects changed by this action.
-        /// <see cref="ReversibleAction.GetChangedObjects"/>
+        /// <see cref="IReversibleAction.GetChangedObjects"/>
         /// </summary>
         /// <returns>returns the ID of the currently grabbed object if any; otherwise
         /// the empty set</returns>
@@ -511,7 +512,7 @@ namespace SEE.Controls.Actions
         /// of city, re-parenting is always hierarchically interpreted. A hierarchical
         /// re-parenting means that the moved node becomes a child of the target node
         /// both in the game-node hierarchy as well as in the underlying graph.
-        /// <seealso cref="ReversibleAction.Update"/>.
+        /// <seealso cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
@@ -529,7 +530,7 @@ namespace SEE.Controls.Actions
                         AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, hoveredObject.gameObject);
                         // Remember the current distance from the pointing device to the grabbed object.
                         distanceToUser = Vector3.Distance(Raycasting.UserPointsTo().origin, grabbedObject.Position);
-                        CurrentState = ReversibleAction.Progress.InProgress;
+                        CurrentState = IReversibleAction.Progress.InProgress;
                     }
                 }
                 else // continue moving the grabbed object
@@ -555,7 +556,7 @@ namespace SEE.Controls.Actions
                 }
                 grabbedObject.UnGrab();
                 // Action is finished.
-                CurrentState = ReversibleAction.Progress.Completed;
+                CurrentState = IReversibleAction.Progress.Completed;
                 return true;
             }
             return false;
@@ -604,7 +605,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// <see cref="ReversibleAction.Undo"/>.
+        /// <see cref="IReversibleAction.Undo"/>.
         /// </summary>
         public override void Undo()
         {
@@ -613,7 +614,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// <see cref="ReversibleAction.Redo"/>.
+        /// <see cref="IReversibleAction.Redo"/>.
         /// </summary>
         public override void Redo()
         {

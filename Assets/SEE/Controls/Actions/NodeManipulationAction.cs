@@ -4,6 +4,7 @@ using SEE.Game;
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Utils;
+using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -100,7 +101,7 @@ namespace SEE.Controls.Actions
         protected GameObject GameNodeToBeContinuedInNextAction;
 
         /// <summary
-        /// See <see cref="ReversibleAction.Update"/>.
+        /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
@@ -110,7 +111,7 @@ namespace SEE.Controls.Actions
                 // Transformation via the gizmo is in progress.
                 if (GameNodeSelected && HasChanges())
                 {
-                    CurrentState = ReversibleAction.Progress.InProgress;
+                    CurrentState = IReversibleAction.Progress.InProgress;
                 }
                 return false;
             }
@@ -200,7 +201,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Finalizes the action: set the final state of the memento,
-        /// disables <see cref="UsedGizmo"/>, marks the action as <see cref="ReversibleAction.Progress.Completed"/>,
+        /// disables <see cref="UsedGizmo"/>, marks the action as <see cref="IReversibleAction.Progress.Completed"/>,
         /// and plays a final sound.
         /// This method should be called when the action is completed.
         /// </summary>
@@ -208,7 +209,7 @@ namespace SEE.Controls.Actions
         {
             UnityEngine.Assertions.Assert.IsNotNull(GameNodeSelected);
             UsedGizmo.Disable();
-            CurrentState = ReversibleAction.Progress.Completed;
+            CurrentState = IReversibleAction.Progress.Completed;
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, GameNodeSelected);
         }
 

@@ -2,13 +2,14 @@ using System.Collections.Generic;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.GO;
-using SEE.Utils;
+using SEE.Utils.History;
 using UnityEngine;
 using System;
 using SEE.Game.SceneManipulation;
 using SEE.Net.Actions;
 using SEE.Audio;
 using SEE.Game;
+using SEE.Utils;
 
 namespace SEE.Controls.Actions
 {
@@ -23,17 +24,17 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="AcceptDivergenceAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new AcceptDivergenceAction();
         }
 
         /// <summary>
         /// Returns a new instance of <see cref="AcceptDivergenceAction"/> as a <see
-        /// cref="ReversibleAction"/>.
+        /// cref="IReversibleAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }
@@ -106,7 +107,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// See <see cref="ReversibleAction.Update"/>.
+        /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
@@ -157,7 +158,7 @@ namespace SEE.Controls.Actions
 
                         // update the current state depending on whether the divergence has been solved
                         // (required in order to register as an undo-able action)
-                        CurrentState = divergenceSolved ? ReversibleAction.Progress.Completed : ReversibleAction.Progress.NoEffect;
+                        CurrentState = divergenceSolved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
 
                         // the selected object is synced and this action is done
                         return true;

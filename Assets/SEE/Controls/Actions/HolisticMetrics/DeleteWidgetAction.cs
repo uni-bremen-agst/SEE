@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using SEE.Game.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
-using SEE.Utils;
+using SEE.Utils.History;
 using UnityEngine;
 
 namespace SEE.Controls.Actions.HolisticMetrics
@@ -73,7 +73,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                                    $"could not be found.\n");
                 }
 
-                CurrentState = ReversibleAction.Progress.Completed;
+                CurrentState = IReversibleAction.Progress.Completed;
                 return true;
             }
             return false;
@@ -131,7 +131,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Returns a new instance of <see cref="DeleteWidgetAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new DeleteWidgetAction();
         }
@@ -140,7 +140,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Returns a new instance of <see cref="DeleteWidgetAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

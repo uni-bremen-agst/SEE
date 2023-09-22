@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using SEE.Game.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
-using SEE.Utils;
+using SEE.Utils.History;
 using UnityEngine;
 
 namespace SEE.Controls.Actions.HolisticMetrics
@@ -87,7 +87,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                 memento = new Memento(boardName, oldPosition, newPosition, oldRotation, newRotation);
                 BoardsManager.Move(memento.BoardName, memento.NewPosition, memento.NewRotation);
                 new MoveBoardNetAction(memento.BoardName, memento.NewPosition, memento.NewRotation).Execute();
-                CurrentState = ReversibleAction.Progress.Completed;
+                CurrentState = IReversibleAction.Progress.Completed;
                 return true;
             }
 
@@ -129,7 +129,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Returns a new instance of <see cref="MoveBoardAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new MoveBoardAction();
         }
@@ -138,7 +138,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Returns a new instance of <see cref="MoveBoardAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }

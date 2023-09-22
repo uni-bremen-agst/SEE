@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.Audio;
 using SEE.Game.SceneManipulation;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions
 {
@@ -20,7 +21,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="DeleteAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new DeleteAction();
         }
@@ -29,7 +30,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="DeleteAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }
@@ -69,7 +70,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         ~DeleteAction()
         {
-            if (deletedGameObjects != null && CurrentState == ReversibleAction.Progress.Completed)
+            if (deletedGameObjects != null && CurrentState == IReversibleAction.Progress.Completed)
             {
                 foreach (GameObject nodeOrEdge in deletedGameObjects)
                 {
@@ -109,7 +110,7 @@ namespace SEE.Controls.Actions
         private ISet<GameObject> deletedGameObjects;
 
         /// <summary>
-        /// See <see cref="ReversibleAction.Update"/>.
+        /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
@@ -124,7 +125,7 @@ namespace SEE.Controls.Actions
                 InteractableObject.UnselectAll(true);
                 (_, deletedGameObjects) = GameElementDeleter.Delete(hitGraphElement);
                 new DeleteNetAction(hitGraphElement.name).Execute();
-                CurrentState = ReversibleAction.Progress.Completed;
+                CurrentState = IReversibleAction.Progress.Completed;
                 AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
                 return true; // the selected objects are deleted and this action is done now
             }

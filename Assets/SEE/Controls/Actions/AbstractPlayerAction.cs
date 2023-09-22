@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.Utils;
+using SEE.Utils.History;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -10,7 +10,7 @@ namespace SEE.Controls.Actions
     /// An abstract superclass of all PlayerActions such as NewNodeAction, ScaleNodeAction, EditNodeAction and AddEdgeAction.
     /// The most important attribute for all of them is the hoveredObject, which will be instantiated and updated by LocalAnyHoverIn and LocalAnyHoverOut.
     /// </summary>
-    public abstract class AbstractPlayerAction : ReversibleAction
+    public abstract class AbstractPlayerAction : IReversibleAction
     {
         /// <summary>
         /// The unique ID of an action.
@@ -23,19 +23,19 @@ namespace SEE.Controls.Actions
         protected GameObject HoveredObject = null;
 
         /// <summary>
-        /// The current state of the action as specified by <see cref="ReversibleAction.Progress"/>.
+        /// The current state of the action as specified by <see cref="IReversibleAction.Progress"/>.
         /// </summary>
-        protected ReversibleAction.Progress CurrentState = ReversibleAction.Progress.NoEffect;
+        protected IReversibleAction.Progress CurrentState = IReversibleAction.Progress.NoEffect;
 
         /// <summary>
         /// The undo operation which has to be implemented specifically by subclasses
         /// to revert the effect of an executed action.
-        /// See <see cref="ReversibleAction.Undo"/>.
+        /// See <see cref="IReversibleAction.Undo"/>.
         /// </summary>
         public virtual void Undo()
         {
-            Assert.IsTrue(CurrentState == ReversibleAction.Progress.InProgress
-                || CurrentState == ReversibleAction.Progress.Completed);
+            Assert.IsTrue(CurrentState == IReversibleAction.Progress.InProgress
+                || CurrentState == IReversibleAction.Progress.Completed);
             // intentionally left blank; can be overridden by subclasses
         }
 
@@ -43,11 +43,11 @@ namespace SEE.Controls.Actions
         /// The redo operation which has to be implemented specifically by subclasses
         /// to revert the effect of an undone action, in other words, to return to
         /// the state at the point in time when <see cref="Undo"/> was called.
-        /// See <see cref="ReversibleAction.Redo"/>.
+        /// See <see cref="IReversibleAction.Redo"/>.
         /// </summary>
         public virtual void Redo()
         {
-            Assert.IsTrue(CurrentState == ReversibleAction.Progress.Completed);
+            Assert.IsTrue(CurrentState == IReversibleAction.Progress.Completed);
             // intentionally left blank; can be overridden by subclasses
         }
 
@@ -60,7 +60,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Will be called once when the action is started for the
         /// first time. Intended for initialization purposes.
-        /// See <see cref="ReversibleAction.Awake"/>.
+        /// See <see cref="IReversibleAction.Awake"/>.
         /// </summary>
         public virtual void Awake()
         {
@@ -70,7 +70,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Will be called after <see cref="Awake"/> and then again whenever the
         /// action is re-enabled (<see cref="Stop"/> was called before then).
-        /// See <see cref="ReversibleAction.Start"/>.
+        /// See <see cref="IReversibleAction.Start"/>.
         /// </summary>
         public virtual void Start()
         {
@@ -79,7 +79,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Will be called upon every frame when this action is being executed.
-        /// See <see cref="ReversibleAction.Update"/>.
+        /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if action is completed</returns>
         public abstract bool Update();
@@ -88,7 +88,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of the same type as this particular type of ReversibleAction.
         /// </summary>
         /// <returns>new instance</returns>
-        public abstract ReversibleAction NewInstance();
+        public abstract IReversibleAction NewInstance();
 
         /// <summary>
         /// Will be called when another action is to be executed. This signals that
@@ -123,10 +123,10 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the current state of the action indicating whether it has had an effect
         /// that may need to be undone and whether it is still ongoing.
-        /// Implements <see cref="ReversibleAction.CurrentProgress"/>.
+        /// Implements <see cref="IReversibleAction.CurrentProgress"/>.
         /// </summary>
         /// <returns>the current state of the action</returns>
-        public ReversibleAction.Progress CurrentProgress() => CurrentState;
+        public IReversibleAction.Progress CurrentProgress() => CurrentState;
 
         /// <summary>
         /// Returns the IDs of all gameObjects manipulated by the specific action.
