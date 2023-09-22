@@ -4178,6 +4178,12 @@ MonoBehaviour:
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
     Kind: 4
+    IncrementalTreeMapSetting:
+      LocalMovesDepth: 3
+      LocalMovesBranchingLimit: 4
+      pNorm: 1
+      PaddingMm: 5
+      GradientDescentPrecisionExponent: -4
     LayoutPath:
       Root: 2
       relativePath: 
@@ -4205,17 +4211,17 @@ MonoBehaviour:
     ArchitectureIssue: Metric.Architecture_Violations
     CloneIssue: Metric.Clone
     CycleIssue: Metric.Cycle
-    Dead_CodeIssue: Metric.Dead_Code
+    DeadCodeIssue: Metric.Dead_Code
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
-    ArchitectureIssue_SUM: Metric.Architecture_Violations_SUM
-    CloneIssue_SUM: Metric.Clone_SUM
-    CycleIssue_SUM: Metric.Cycle_SUM
-    Dead_CodeIssue_SUM: Metric.Dead_Code_SUM
-    MetricIssue_SUM: Metric.Metric_SUM
-    StyleIssue_SUM: Metric.Style_SUM
-    UniversalIssue_SUM: Metric.Universal_SUM
+    ArchitectureIssueSum: Metric.Architecture_Violations_SUM
+    CloneIssueSum: Metric.Clone_SUM
+    CycleIssueSum: Metric.Cycle_SUM
+    DeadCodeIssueSum: Metric.Dead_Code_SUM
+    MetricIssueSum: Metric.Metric_SUM
+    StyleIssueSum: Metric.Style_SUM
+    UniversalIssueSum: Metric.Universal_SUM
   BoardSettings:
     LoadBoardOnStartup: 0
     BoardPath:
@@ -10453,6 +10459,12 @@ MonoBehaviour:
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
     Kind: 4
+    IncrementalTreeMapSetting:
+      LocalMovesDepth: 3
+      LocalMovesBranchingLimit: 4
+      pNorm: 1
+      PaddingMm: 5
+      GradientDescentPrecisionExponent: -4
     LayoutPath:
       Root: 2
       relativePath: 
@@ -10480,17 +10492,17 @@ MonoBehaviour:
     ArchitectureIssue: Metric.Architecture_Violations
     CloneIssue: Metric.Clone
     CycleIssue: Metric.Cycle
-    Dead_CodeIssue: Metric.Dead_Code
+    DeadCodeIssue: Metric.Dead_Code
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
-    ArchitectureIssue_SUM: Metric.Architecture_Violations_SUM
-    CloneIssue_SUM: Metric.Clone_SUM
-    CycleIssue_SUM: Metric.Cycle_SUM
-    Dead_CodeIssue_SUM: Metric.Dead_Code_SUM
-    MetricIssue_SUM: Metric.Metric_SUM
-    StyleIssue_SUM: Metric.Style_SUM
-    UniversalIssue_SUM: Metric.Universal_SUM
+    ArchitectureIssueSum: Metric.Architecture_Violations_SUM
+    CloneIssueSum: Metric.Clone_SUM
+    CycleIssueSum: Metric.Cycle_SUM
+    DeadCodeIssueSum: Metric.Dead_Code_SUM
+    MetricIssueSum: Metric.Metric_SUM
+    StyleIssueSum: Metric.Style_SUM
+    UniversalIssueSum: Metric.Universal_SUM
   BoardSettings:
     LoadBoardOnStartup: 0
     BoardPath:
@@ -12504,6 +12516,12 @@ MonoBehaviour:
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
     Kind: 4
+    IncrementalTreeMapSetting:
+      LocalMovesDepth: 3
+      LocalMovesBranchingLimit: 4
+      pNorm: 1
+      PaddingMm: 5
+      GradientDescentPrecisionExponent: -4
     LayoutPath:
       Root: 2
       relativePath: 
@@ -12531,17 +12549,17 @@ MonoBehaviour:
     ArchitectureIssue: Metric.Architecture_Violations
     CloneIssue: Metric.Clone
     CycleIssue: Metric.Cycle
-    Dead_CodeIssue: Metric.Dead_Code
+    DeadCodeIssue: Metric.Dead_Code
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
-    ArchitectureIssue_SUM: Metric.Architecture_Violations_SUM
-    CloneIssue_SUM: Metric.Clone_SUM
-    CycleIssue_SUM: Metric.Cycle_SUM
-    Dead_CodeIssue_SUM: Metric.Dead_Code_SUM
-    MetricIssue_SUM: Metric.Metric_SUM
-    StyleIssue_SUM: Metric.Style_SUM
-    UniversalIssue_SUM: Metric.Universal_SUM
+    ArchitectureIssueSum: Metric.Architecture_Violations_SUM
+    CloneIssueSum: Metric.Clone_SUM
+    CycleIssueSum: Metric.Cycle_SUM
+    DeadCodeIssueSum: Metric.Dead_Code_SUM
+    MetricIssueSum: Metric.Metric_SUM
+    StyleIssueSum: Metric.Style_SUM
+    UniversalIssueSum: Metric.Universal_SUM
   BoardSettings:
     LoadBoardOnStartup: 0
     BoardPath:
@@ -14578,6 +14596,12 @@ MonoBehaviour:
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
     Kind: 3
+    IncrementalTreeMapSetting:
+      LocalMovesDepth: 3
+      LocalMovesBranchingLimit: 4
+      pNorm: 1
+      PaddingMm: 5
+      GradientDescentPrecisionExponent: -4
     LayoutPath:
       Root: 2
       relativePath: 
@@ -14605,17 +14629,17 @@ MonoBehaviour:
     ArchitectureIssue: Metric.Architecture_Violations
     CloneIssue: Metric.Clone
     CycleIssue: Metric.Cycle
-    Dead_CodeIssue: Metric.Dead_Code
+    DeadCodeIssue: Metric.Dead_Code
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
-    ArchitectureIssue_SUM: Metric.Architecture_Violations_SUM
-    CloneIssue_SUM: Metric.Clone_SUM
-    CycleIssue_SUM: Metric.Cycle_SUM
-    Dead_CodeIssue_SUM: Metric.Dead_Code_SUM
-    MetricIssue_SUM: Metric.Metric_SUM
-    StyleIssue_SUM: Metric.Style_SUM
-    UniversalIssue_SUM: Metric.Universal_SUM
+    ArchitectureIssueSum: Metric.Architecture_Violations_SUM
+    CloneIssueSum: Metric.Clone_SUM
+    CycleIssueSum: Metric.Cycle_SUM
+    DeadCodeIssueSum: Metric.Dead_Code_SUM
+    MetricIssueSum: Metric.Metric_SUM
+    StyleIssueSum: Metric.Style_SUM
+    UniversalIssueSum: Metric.Universal_SUM
   BoardSettings:
     LoadBoardOnStartup: 1
     BoardPath:
@@ -21209,31 +21233,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d774210f68c92ba42a39ab95f8b89946, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerSpawns:
+  playerSpawns:
   - PlayerPrefab: {fileID: 1540848273603986277, guid: e24fb68f145dafb4b9fe506c2d7ae0a0,
       type: 3}
-    Position: {x: -28.9, y: 0.017, z: 9.4}
-    Rotation: 0
+    Position: {x: -28.5, y: 0, z: 10.8}
+    Rotation: 270
   - PlayerPrefab: {fileID: 5742082173775082023, guid: d3731029eb4ac1641a0db38185e57382,
       type: 3}
-    Position: {x: -31.3, y: 0.017, z: 9.19}
-    Rotation: 90
+    Position: {x: -28.5, y: 0, z: 11.8}
+    Rotation: 270
   - PlayerPrefab: {fileID: 1592577805375857840, guid: 60b12fcbdbb597e40a8d036aa796583c,
       type: 3}
-    Position: {x: -31.3, y: 0.017, z: 8.521}
-    Rotation: 90
+    Position: {x: -28.5, y: 0, z: 9.8}
+    Rotation: 270
   - PlayerPrefab: {fileID: 1056781579854251772, guid: 7e3c3a5fd5a77c6498e41bbe7ba387c4,
       type: 3}
-    Position: {x: -31.3, y: 0.017, z: 7.931}
-    Rotation: 90
+    Position: {x: -28.5, y: 0, z: 12.8}
+    Rotation: 270
   - PlayerPrefab: {fileID: 7839154548958412681, guid: aa2505da96d6e284a9ff9d911702535a,
       type: 3}
-    Position: {x: -31.3, y: 0.017, z: 7.931}
-    Rotation: 90
+    Position: {x: -28.5, y: 0, z: 7.8}
+    Rotation: 270
   - PlayerPrefab: {fileID: 4749666707957422873, guid: 1c018d74588b5b74eaaf639548ff76fa,
       type: 3}
-    Position: {x: -31.3, y: 0.017, z: 7.931}
-    Rotation: 90
+    Position: {x: -28.5, y: 0, z: 13.8}
+    Rotation: 270
 --- !u!4 &1706360000
 Transform:
   m_ObjectHideFlags: 0
@@ -22563,7 +22587,6 @@ MonoBehaviour:
   timingEndVariance: 0.97
   silenceSampleWeight: 0.95
   silenceHits: 0
-  salsaCanAnalyzeAudio: 1
 --- !u!114 &1800030780
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24245,7 +24268,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 1
   warnOnNullRefs: 1
-  inspSalsaLinked: 1
+  inspSalsaLinked: 0
   inspStateFoldoutProcessing: 0
   inspStateFoldoutSettings: 0
   inspStateFoldoutEmotes: 0
