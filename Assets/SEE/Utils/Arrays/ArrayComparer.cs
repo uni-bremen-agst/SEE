@@ -1,4 +1,4 @@
-﻿namespace SEE.Utils
+﻿namespace SEE.Utils.Arrays
 {
     /// <summary>
     /// Compares two arrays for equivalence.

@@ -1,8 +1,11 @@
 using System;
 using System.Linq;
 
-namespace SEE.Utils
+namespace SEE.Utils.Arrays
 {
+    /// <summary>
+    /// A creator for arrays.
+    /// </summary>
     public static class ArrayUtils
     {
         /// <summary>

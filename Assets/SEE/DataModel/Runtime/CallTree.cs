@@ -1,5 +1,5 @@
 ﻿using SEE.DataModel.DG;
-using SEE.Utils;
+using SEE.Utils.Arrays;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -762,11 +762,7 @@ namespace SEE.DataModel.Runtime
 
             public override int GetHashCode()
             {
-                int hashCode = -1534923972;
-                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(Name);
-                hashCode = hashCode * -1521134295 + EqualityComparer<string[]>.Default.GetHashCode(Parameters);
-                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ReturnValue);
-                return hashCode;
+                return HashCode.Combine(Name, Parameters, ReturnValue);
             }
         }
     }
