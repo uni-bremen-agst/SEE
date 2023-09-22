@@ -38,6 +38,7 @@ namespace SEE.Game
 
             lineHolder.transform.parent = attachedObjects.transform;
             lineHolder.transform.position = attachedObjects.transform.position;
+            lineHolder.transform.rotation = highestParent.transform.rotation;
 
             line.tag = Tags.Line;
             line.transform.SetParent(lineHolder.transform);
@@ -49,7 +50,7 @@ namespace SEE.Game
             renderer.useWorldSpace = false;
             renderer.positionCount = positions.Length;
 
-            lineHolder.transform.rotation = highestParent.transform.rotation;
+            
             line.transform.position = lineHolder.transform.position;
             line.transform.position -= line.transform.forward * DrawableHelper.distanceToBoard.z;
             line.transform.rotation = lineHolder.transform.rotation;
@@ -144,10 +145,10 @@ namespace SEE.Game
             Vector3 eulerAngles, Vector3 holderLocalPosition, Vector3 holderScale, bool loop)
         {
             Setup(drawable, name, positions, color, thickness, out GameObject line, out GameObject lineHolder, out LineRenderer renderer, out MeshCollider meshCollider);
-            line.transform.position = position;
             line.transform.parent.localScale = holderScale;
             line.transform.parent.localEulerAngles = eulerAngles;
             line.transform.parent.localPosition = holderLocalPosition;
+            line.transform.position = position;
 
             renderer.SetPositions(positions);
             renderer.sortingOrder = orderInLayer;
