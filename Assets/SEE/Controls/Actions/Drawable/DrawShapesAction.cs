@@ -452,7 +452,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     {
                         if (GameDrawer.DifferentPositionCounter(positions) > 1)
                         {
-                            shape = GameDrawer.ReDrawRawLine(drawable, "", positions, DrawableHelper.currentColor, DrawableHelper.currentThickness, DrawableHelper.orderInLayer, true);
+                            shape = GameDrawer.DrawLine(drawable, "", positions, DrawableHelper.currentColor, DrawableHelper.currentThickness, DrawableHelper.orderInLayer, true);
                             shape.GetComponent<LineRenderer>().loop = true;
                             shape = GameDrawer.SetPivot(shape);
                             Line currentShape = Line.GetLine(shape);

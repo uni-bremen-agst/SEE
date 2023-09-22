@@ -54,16 +54,6 @@ namespace SEE.Game
             line.transform.position -= line.transform.forward * DrawableHelper.distanceToBoard.z;
             line.transform.rotation = lineHolder.transform.rotation;
         }
-
-        public static GameObject StartDrawing(GameObject drawable, Vector3[] positions, Color color, float thickness)
-        {
-            Setup(drawable, "", positions, color, thickness, out GameObject line, out GameObject lineHolder, out LineRenderer renderer, out MeshCollider meshCollider);
-            renderer.sortingOrder = DrawableHelper.orderInLayer;
-            DrawableHelper.orderInLayer++;
-
-            return line;
-        }
-
         private static LineRenderer GetRenderer(GameObject line)
         {
             return line.GetComponent<LineRenderer>();
@@ -72,6 +62,14 @@ namespace SEE.Game
         private static MeshCollider GetMeshCollider(GameObject line)
         {
             return line.GetComponent<MeshCollider>();
+        }
+        public static GameObject StartDrawing(GameObject drawable, Vector3[] positions, Color color, float thickness)
+        {
+            Setup(drawable, "", positions, color, thickness, out GameObject line, out GameObject lineHolder, out LineRenderer renderer, out MeshCollider meshCollider);
+            renderer.sortingOrder = DrawableHelper.orderInLayer;
+            DrawableHelper.orderInLayer++;
+
+            return line;
         }
 
         /// <summary>
@@ -98,45 +96,6 @@ namespace SEE.Game
             
         }
 
-        public static GameObject SetPivot(GameObject line)
-        {
-            LineRenderer renderer = GetRenderer(line);
-            Vector3[] positions = new Vector3[renderer.positionCount];
-            renderer.GetPositions(positions);
-            Vector3 middlePos = Vector3.zero;
-            if (positions.Length % 2 == 1)
-            {
-                middlePos = positions[(int)Mathf.Round(positions.Length / 2)];
-            }
-            else
-            {
-                Vector3 left = positions[(positions.Length / 2) - 1];
-                Vector3 right = positions[positions.Length / 2];
-                middlePos = (left + right) / 2;
-            }
-            middlePos.z = -DrawableHelper.distanceToBoard.z;
-            Vector3[] convertedPositions = new Vector3[positions.Length];
-            Array.Copy(sourceArray: positions, destinationArray: convertedPositions, length: positions.Length);
-            line.transform.TransformPoints(convertedPositions);
-            line.transform.localPosition = middlePos;
-            line.transform.InverseTransformPoints(convertedPositions);
-            Drawing(line, convertedPositions);
-            FinishDrawing(line, renderer.loop);
-            return line;
-        }
-
-        public static void RefreshCollider(GameObject line)
-        {
-            LineRenderer lineRenderer = line.GetComponent<LineRenderer>();
-            MeshCollider collider = line.GetComponent<MeshCollider>();
-            Mesh mesh = new();
-            lineRenderer.BakeMesh(mesh);
-            if (mesh.vertices.Distinct().Count() >= 3)
-            {
-                collider.sharedMesh = mesh;
-            }
-        }
-
         public static GameObject DrawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness, bool loop)
         {
             GameObject l;
@@ -158,7 +117,7 @@ namespace SEE.Game
             return l;
         }
 
-        public static GameObject ReDrawRawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness, int orderInLayer, bool loop)
+        public static GameObject DrawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness, int orderInLayer, bool loop)
         {
             Setup(drawable, name, positions, color, thickness, out GameObject line, out GameObject lineHolder, out LineRenderer renderer, out MeshCollider meshCollider);
             renderer.SetPositions(positions);
@@ -215,7 +174,44 @@ namespace SEE.Game
                  lineToRedraw.loop);
             return line;
         }
+        public static GameObject SetPivot(GameObject line)
+        {
+            LineRenderer renderer = GetRenderer(line);
+            Vector3[] positions = new Vector3[renderer.positionCount];
+            renderer.GetPositions(positions);
+            Vector3 middlePos = Vector3.zero;
+            if (positions.Length % 2 == 1)
+            {
+                middlePos = positions[(int)Mathf.Round(positions.Length / 2)];
+            }
+            else
+            {
+                Vector3 left = positions[(positions.Length / 2) - 1];
+                Vector3 right = positions[positions.Length / 2];
+                middlePos = (left + right) / 2;
+            }
+            middlePos.z = -DrawableHelper.distanceToBoard.z;
+            Vector3[] convertedPositions = new Vector3[positions.Length];
+            Array.Copy(sourceArray: positions, destinationArray: convertedPositions, length: positions.Length);
+            line.transform.TransformPoints(convertedPositions);
+            line.transform.localPosition = middlePos;
+            line.transform.InverseTransformPoints(convertedPositions);
+            Drawing(line, convertedPositions);
+            FinishDrawing(line, renderer.loop);
+            return line;
+        }
 
+        public static void RefreshCollider(GameObject line)
+        {
+            LineRenderer lineRenderer = line.GetComponent<LineRenderer>();
+            MeshCollider collider = line.GetComponent<MeshCollider>();
+            Mesh mesh = new();
+            lineRenderer.BakeMesh(mesh);
+            if (mesh.vertices.Distinct().Count() >= 3)
+            {
+                collider.sharedMesh = mesh;
+            }
+        }
         public static int DifferentPositionCounter(Vector3[] positions)
         {
             List<Vector3> positionsList = new List<Vector3>(positions);
@@ -241,7 +237,8 @@ namespace SEE.Game
         public static Vector3 GetConvertedPosition(GameObject drawable, Vector3 position)
         {
             Vector3 convertedPosition;
-            Setup(drawable, "", new Vector3[] { position }, DrawableHelper.currentColor, DrawableHelper.currentThickness, out GameObject line, out GameObject lineHolder, out LineRenderer renderer, out MeshCollider meshCollider);
+            Setup(drawable, "", new Vector3[] { position }, DrawableHelper.currentColor, DrawableHelper.currentThickness, 
+                out GameObject line, out GameObject lineHolder, out LineRenderer renderer, out MeshCollider meshCollider);
             convertedPosition = line.transform.InverseTransformPoint(position) - DrawableHelper.distanceToBoard;
             Destroyer.Destroy(lineHolder);
             return convertedPosition;
@@ -250,7 +247,8 @@ namespace SEE.Game
         public static Vector3[] GetConvertedPositions(GameObject drawable, Vector3[] positions)
         {
             Vector3[] convertedPosition = new Vector3[positions.Length];
-            Setup(drawable, "", positions, DrawableHelper.currentColor, DrawableHelper.currentThickness, out GameObject line, out GameObject lineHolder, out LineRenderer renderer, out MeshCollider meshCollider);
+            Setup(drawable, "", positions, DrawableHelper.currentColor, DrawableHelper.currentThickness, out GameObject line, 
+                out GameObject lineHolder, out LineRenderer renderer, out MeshCollider meshCollider);
             for (int i = 0; i < positions.Length; i++)
             {
                 convertedPosition[i] = line.transform.InverseTransformPoint(positions[i]) - DrawableHelper.distanceToBoard;

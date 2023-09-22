@@ -17,10 +17,6 @@ namespace Assets.SEE.Net.Actions.Whiteboard
         public Color Color;
         public float Thickness;
         public int OrderInLayer = -1;
-        public Vector3 Position;
-        public Vector3 EulerAngles;
-        public Vector3 HolderPosition;
-        public Vector3 HolderScale;
         public bool Loop;
         public Line Line;
 
@@ -34,8 +30,6 @@ namespace Assets.SEE.Net.Actions.Whiteboard
             this.Color = color;
             this.Thickness = thickness;
             this.OrderInLayer = orderInLayer;
-            Position = Vector3.zero;
-            EulerAngles = Vector3.zero;
             Loop = loop;
             Line = null;
         }
@@ -52,7 +46,7 @@ namespace Assets.SEE.Net.Actions.Whiteboard
             this.Loop = loop;
             Line = null;
         }
-        
+
         public DrawOnNetAction(string drawableID, string parentDrawableID, Line line)
         {
             this.DrawableID = drawableID;
@@ -82,13 +76,7 @@ namespace Assets.SEE.Net.Actions.Whiteboard
                     }
                     else
                     {
-                        if (Position == Vector3.zero && EulerAngles == Vector3.zero)
-                        {
-                            GameDrawer.ReDrawRawLine(drawable, Name, Positions, Color, Thickness, OrderInLayer, Loop);
-                        } else
-                        {
-                            GameDrawer.ReDrawLine(drawable, Name, Positions, Color, Thickness, OrderInLayer, Position, EulerAngles, HolderPosition, HolderScale, Loop);
-                        }
+                        GameDrawer.DrawLine(drawable, Name, Positions, Color, Thickness, OrderInLayer, Loop);
                     }
                 }
             }
