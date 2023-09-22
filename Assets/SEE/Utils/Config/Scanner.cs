@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace SEE.Utils
+namespace SEE.Utils.Config
 {
     public partial class ConfigReader
     {

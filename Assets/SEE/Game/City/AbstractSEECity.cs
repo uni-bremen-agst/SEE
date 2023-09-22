@@ -14,6 +14,7 @@ using UnityEngine;
 using Debug = UnityEngine.Debug;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Game.CityRendering;
+using SEE.Utils.Config;
 
 namespace SEE.Game.City
 {
@@ -291,7 +292,7 @@ namespace SEE.Game.City
         /// <param name="filename">name of the file from which the settings are restored</param>
         public void Load(string filename)
         {
-            using ConfigReader stream = new(filename);
+            using Utils.Config.ConfigReader stream = new(filename);
             Restore(stream.Read());
         }
 

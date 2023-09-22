@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Sirenix.Serialization;
 using SEE.Utils;
+using SEE.Utils.Config;
 
 namespace SEE.Game.City
 {

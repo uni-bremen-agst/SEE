@@ -13,6 +13,7 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.Net.Util;
 using SEE.Utils;
+using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -31,7 +32,7 @@ namespace SEE.Net
         /// <summary>
         /// The default severity of the native logger of <see cref="NetworkCommsDotNet"/>.
         /// </summary>
-        private const NetworkCommsLogger.Severity DefaultSeverity = NetworkCommsLogger.Severity.High;
+        private const NetworkCommsLogger.Severity defaultSeverity = NetworkCommsLogger.Severity.High;
 
         /// <summary>
         /// The single unique instance of the network.
@@ -41,13 +42,13 @@ namespace SEE.Net
         /// <summary>
         /// The maximal port number.
         /// </summary>
-        private const int MaxServerPort = 65535;
+        private const int maxServerPort = 65535;
 
         /// <summary>
         /// The port of the server where the server listens to SEE action requests.
         /// Note: This field is accessed in NetworkEditor, hence, the name must not change.
         /// </summary>
-        [Range(0, MaxServerPort), Tooltip("The TCP port of the server where it listens to SEE actions.")]
+        [Range(0, maxServerPort), Tooltip("The TCP port of the server where it listens to SEE actions.")]
         public int ServerActionPort = 12345;
 
         /// <summary>
@@ -58,9 +59,9 @@ namespace SEE.Net
         {
             set
             {
-                if (value < 0 || value > MaxServerPort)
+                if (value < 0 || value > maxServerPort)
                 {
-                    throw new ArgumentOutOfRangeException($"A port must be in [0..{MaxServerPort}. Received: {value}.");
+                    throw new ArgumentOutOfRangeException($"A port must be in [0..{maxServerPort}. Received: {value}.");
                 }
                 UnityTransport netTransport = GetNetworkTransport();
                 netTransport.ConnectionData.Port = (ushort)value;
@@ -184,7 +185,7 @@ namespace SEE.Net
         /// </summary>
         [SerializeField, FoldoutGroup(LoggingFoldoutGroup)]
         [PropertyTooltip("The minimal logged severity.")]
-        private NetworkCommsLogger.Severity minimalSeverity = DefaultSeverity;
+        private NetworkCommsLogger.Severity minimalSeverity = defaultSeverity;
 
         /// <summary>
         /// Whether the logging of NetworkComms should be enabled.

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SEE.Game.HolisticMetrics.Metrics;
-using SEE.Utils;
+using SEE.Utils.Config;
 using UnityEngine;
 
 namespace SEE.Game.HolisticMetrics

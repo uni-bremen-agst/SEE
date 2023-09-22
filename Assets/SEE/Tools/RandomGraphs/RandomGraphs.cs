@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using SEE.DataModel.DG;
 using SEE.Utils;
+using SEE.Utils.Config;
 using UnityEngine;
 
 namespace SEE.Tools.RandomGraphs

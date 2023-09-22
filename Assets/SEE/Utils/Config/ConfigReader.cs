@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SEE.Utils
+namespace SEE.Utils.Config
 {
     /// <summary>
     /// Thrown in case of syntax errors.

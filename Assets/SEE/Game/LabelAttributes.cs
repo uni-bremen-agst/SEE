@@ -1,4 +1,4 @@
-﻿using SEE.Utils;
+﻿using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;

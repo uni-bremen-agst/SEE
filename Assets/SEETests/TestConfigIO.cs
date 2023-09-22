@@ -4,6 +4,7 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Tools.RandomGraphs;
+using SEE.Utils.Config;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -16,7 +17,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseInteger1()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", 0 }
             };
@@ -26,7 +27,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseInteger2()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "l", -1 }
             };
@@ -36,7 +37,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseInteger3()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", 123 }
             };
@@ -46,7 +47,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseFloat1()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", 123.0f }
             };
@@ -56,7 +57,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseFloat2()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", -1234.0f }
             };
@@ -66,7 +67,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseFloat3()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", 1.234567E-06f }
             };
@@ -76,7 +77,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseFloat4()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", -1.234567e-1f }
             };
@@ -87,7 +88,7 @@ namespace SEE.Utils
         public void TestConfigParseInfinity()
         {
             const float value = float.PositiveInfinity;
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", value }
             };
@@ -98,7 +99,7 @@ namespace SEE.Utils
         public void TestConfigParseNegativeInfinity()
         {
             const float value = float.NegativeInfinity;
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", value }
             };
@@ -108,7 +109,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseString1()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", "hello" }
             };
@@ -118,7 +119,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseString3()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", "" }
             };
@@ -128,7 +129,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseString4()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", "\"" }
             };
@@ -138,7 +139,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseString2()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", "\"hello, world\"" }
             };
@@ -148,7 +149,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseTrue()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", true }
             };
@@ -158,7 +159,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseFalse()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "label", false }
             };
@@ -168,7 +169,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseAttribute1()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "attr", new Dictionary<string, object>() { { "int", 1 } } }
             };
@@ -178,9 +179,9 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseAttribute2()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
-                { "attr", new Dictionary<string, object>() }
+                { "attr", new() }
             };
             CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("attr : { };"));
         }
@@ -188,7 +189,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseAttribute3()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "attr", new Dictionary<string, object>() { { "int", 1 }, { "x", "hello" } } }
             };
@@ -199,9 +200,9 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseAttribute4()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
-                { "attr", new Dictionary<string, object>() { { "x", new Dictionary<string, object>() } } }
+                { "attr", new Dictionary<string, object>() { { "x", new() } } }
             };
             CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("attr : { x: {}; };"));
         }
@@ -209,7 +210,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseAttribute5()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "attr", new Dictionary<string, object>() { { "a", 1 }, { "b", 2 }, { "x", new Dictionary<string, object>() { { "y", true }, { "z", false } } } } }
             };
@@ -219,7 +220,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseList1()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "list", new List<object>() { } }
             };
@@ -229,7 +230,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseList2()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "list", new List<object>() { 1, 2, 3 } }
             };
@@ -239,7 +240,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseList3()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "list", new List<object>() { true} }
             };
@@ -249,7 +250,7 @@ namespace SEE.Utils
         [Test]
         public void TestConfigParseList4()
         {
-            Dictionary<string, object> expected = new Dictionary<string, object>()
+            Dictionary<string, object> expected = new()
             {
                 { "list", new List<object>() { new List<object>(), new List<object>() { 1 }, new List<object>() { 1, 2 } } }
             };

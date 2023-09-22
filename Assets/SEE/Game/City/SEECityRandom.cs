@@ -4,7 +4,7 @@ using System.Linq;
 using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Tools.RandomGraphs;
-using SEE.Utils;
+using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using UnityEngine;
 

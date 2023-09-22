@@ -6,6 +6,7 @@ using SEE.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
 using System;
+using SEE.Utils.Config;
 
 namespace SEE.Game.HolisticMetrics
 {

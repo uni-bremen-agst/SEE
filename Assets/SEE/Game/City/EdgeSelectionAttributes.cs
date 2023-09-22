@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.Utils;
+using SEE.Utils.Config;
 
 namespace SEE.Game.City
 {

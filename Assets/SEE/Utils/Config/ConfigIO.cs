@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Utils
+namespace SEE.Utils.Config
 {
     /// <summary>
     /// Abstract super class of input/output of configuration attributes.

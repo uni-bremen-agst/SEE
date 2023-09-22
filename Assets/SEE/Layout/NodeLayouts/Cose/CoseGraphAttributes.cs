@@ -17,7 +17,7 @@
 
 using System.Collections.Generic;
 using SEE.Game.City;
-using SEE.Utils;
+using SEE.Utils.Config;
 
 namespace SEE.Layout.NodeLayouts.Cose
 {
