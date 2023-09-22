@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace SEE.Utils
+namespace SEE.Utils.Paths
 {
     /// <summary>
     /// A representation of paths for files and directories containing data

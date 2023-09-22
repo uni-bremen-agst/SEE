@@ -1,7 +1,7 @@
 ﻿using Sirenix.OdinInspector;
 using System;
 
-namespace SEE.Utils
+namespace SEE.Utils.Paths
 {
     /// <summary>
     /// A representation of paths for files containing data that can be set absolute

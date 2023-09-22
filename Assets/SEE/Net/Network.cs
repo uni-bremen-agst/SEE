@@ -14,6 +14,7 @@ using SEE.GO;
 using SEE.Net.Util;
 using SEE.Utils;
 using SEE.Utils.Config;
+using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -919,7 +920,7 @@ namespace SEE.Net
         [SerializeField]
         [PropertyTooltip("Path of the file containing the network configuration.")]
         [HideReferenceObjectPicker, FoldoutGroup(ConfigurationFoldoutGroup)]
-        public FilePath ConfigPath = new FilePath();
+        public FilePath ConfigPath = new();
 
         /// <summary>
         /// Saves the settings of this network configuration to <see cref="ConfigPath()"/>.

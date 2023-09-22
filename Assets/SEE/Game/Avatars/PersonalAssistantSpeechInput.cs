@@ -1,6 +1,6 @@
 ﻿using SEE.Controls;
 using SEE.GO;
-using SEE.Utils;
+using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
 using System.IO;

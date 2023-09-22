@@ -25,11 +25,11 @@ using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.GO;
-using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using SEE.Game.CityRendering;
 using SEE.Utils.Config;
+using SEE.Utils.Paths;
 
 namespace SEE.Game.City
 {

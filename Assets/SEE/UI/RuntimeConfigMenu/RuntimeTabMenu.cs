@@ -22,6 +22,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using SEE.Utils.Config;
+using SEE.Utils.Paths;
 
 namespace SEE.UI.RuntimeConfigMenu
 {

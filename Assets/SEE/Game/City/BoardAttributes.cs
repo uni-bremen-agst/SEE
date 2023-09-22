@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using SEE.Game.HolisticMetrics;
-using SEE.Utils;
+using SEE.Utils.Paths;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using UnityEngine;

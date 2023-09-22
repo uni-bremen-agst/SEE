@@ -12,6 +12,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.Game.CityRendering;
 using SEE.Utils.Config;
+using SEE.Utils.Paths;
 
 namespace SEE.Game.City
 {

@@ -5,7 +5,7 @@ using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.GO;
-using SEE.Utils;
+using SEE.Utils.Paths;
 using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
 using Sirenix.OdinInspector;

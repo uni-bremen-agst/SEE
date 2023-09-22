@@ -7,6 +7,7 @@ using SEE.Utils;
 using UnityEngine;
 using System;
 using SEE.Utils.Config;
+using SEE.Utils.Paths;
 
 namespace SEE.Game.HolisticMetrics
 {
