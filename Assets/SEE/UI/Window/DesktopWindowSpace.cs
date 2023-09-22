@@ -13,15 +13,15 @@ namespace SEE.UI.Window
     public partial class WindowSpace
     {
         /// <summary>
-        /// The <see cref="Panel"/> containing the windows.
+        /// The <see cref="panel"/> containing the windows.
         /// </summary>
-        private Panel Panel;
+        private Panel panel;
 
         /// <summary>
         /// The dynamic canvas of the panel.
         /// This canvas will implement tabs, moving, tiling, and resizing for us.
         /// </summary>
-        private DynamicPanelsCanvas PanelsCanvas;
+        private DynamicPanelsCanvas panelsCanvas;
 
         protected override void StartDesktop()
         {
@@ -29,7 +29,7 @@ namespace SEE.UI.Window
             space = Canvas.transform.Find(WindowSpaceName)?.gameObject;
             if (!space)
             {
-                space = PrefabInstantiator.InstantiatePrefab(WINDOW_SPACE_PREFAB, Canvas.transform, false);
+                space = PrefabInstantiator.InstantiatePrefab(windowSpacePrefab, Canvas.transform, false);
                 space.name = WindowSpaceName;
             }
             space.SetActive(true);
@@ -47,7 +47,7 @@ namespace SEE.UI.Window
         /// <p>
         /// If any of the following are <c>null</c>, calling the method will have no effect:
         /// <ul>
-        /// <li><see cref="Panel"/></li>
+        /// <li><see cref="panel"/></li>
         /// <li><see cref="ActiveWindow"/></li>
         /// <li><c>ActiveWindow.window</c></li>
         /// </ul>
@@ -60,7 +60,7 @@ namespace SEE.UI.Window
         /// </exception>
         private void UpdateActiveTab()
         {
-            if (Panel != null && ActiveWindow != null && ActiveWindow.Window != null)
+            if (panel != null && ActiveWindow != null && ActiveWindow.Window != null)
             {
                 if (!windows.Contains(ActiveWindow))
                 {
@@ -84,22 +84,22 @@ namespace SEE.UI.Window
                     UpdateActiveTab();
                     return;
                 }
-                Panel.ActiveTab = Panel.GetTabIndex((RectTransform)ActiveWindow.Window.transform);
+                panel.ActiveTab = panel.GetTabIndex((RectTransform)ActiveWindow.Window.transform);
             }
         }
 
         protected override void UpdateDesktop()
         {
-            if (Panel && !windows.Any())
+            if (panel && !windows.Any())
             {
                 // We need to destroy the panel now
-                Destroyer.Destroy(Panel);
+                Destroyer.Destroy(panel);
             }
-            else if (!Panel && windows.Any(x => x.Window))
+            else if (!panel && windows.Any(x => x.Window))
             {
                 InitializePanel();
             }
-            else if (!Panel)
+            else if (!panel)
             {
                 // If no window is initialized yet, there's nothing we can do
                 return;
@@ -122,7 +122,7 @@ namespace SEE.UI.Window
             // First, close old windows that are not open anymore
             foreach (BaseWindow window in currentWindows.Except(windows).ToList())
             {
-                Panel.RemoveTab(Panel.GetTab((RectTransform)window.Window.transform));
+                panel.RemoveTab(panel.GetTab((RectTransform)window.Window.transform));
                 currentWindows.Remove(window);
                 Destroyer.Destroy(window);
             }
@@ -133,7 +133,7 @@ namespace SEE.UI.Window
             {
                 RectTransform rectTransform = (RectTransform)window.Window.transform;
                 // Add the new window as a tab to our panel
-                PanelTab tab = Panel.AddTab(rectTransform);
+                PanelTab tab = panel.AddTab(rectTransform);
                 tab.Label = window.Title;
                 tab.Icon = null;
                 currentWindows.Add(window);
@@ -146,13 +146,13 @@ namespace SEE.UI.Window
                 }
 
                 // Rebuild layout
-                PanelsCanvas.ForceRebuildLayoutImmediate();
+                panelsCanvas.ForceRebuildLayoutImmediate();
                 window.RebuildLayout();
             }
 
             void CloseTab(PanelTab panelTab)
             {
-                if (panelTab.Panel == Panel)
+                if (panelTab.Panel == panel)
                 {
                     CloseWindow(windows.First(x => x.Window.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID()));
                     if (panelTab.Panel.NumberOfTabs <= 1)
@@ -170,7 +170,7 @@ namespace SEE.UI.Window
         /// </summary>
         private void InitializePanel()
         {
-            if (!space.TryGetComponentOrLog(out PanelsCanvas))
+            if (!space.TryGetComponentOrLog(out panelsCanvas))
             {
                 Destroyer.Destroy(this);
             }
@@ -182,14 +182,14 @@ namespace SEE.UI.Window
                 windows.Clear();
                 return;
             }
-            Panel = PanelUtils.CreatePanelFor((RectTransform)windows[0].Window.transform, PanelsCanvas);
+            panel = PanelUtils.CreatePanelFor((RectTransform)windows[0].Window.transform, panelsCanvas);
             // When the active tab *on this panel* is changed, we invoke the corresponding event
             PanelNotificationCenter.OnActiveTabChanged += ChangeActiveTab;
             PanelNotificationCenter.OnPanelClosed += ClosePanel;
 
             void ChangeActiveTab(PanelTab tab)
             {
-                if (Panel == tab.Panel)
+                if (panel == tab.Panel)
                 {
                     ActiveWindow = Windows.First(x => x.Window.GetInstanceID() == tab.Content.gameObject.GetInstanceID());
                     OnActiveWindowChanged.Invoke();
@@ -198,18 +198,18 @@ namespace SEE.UI.Window
 
             void ClosePanel(Panel panel)
             {
-                if (panel == Panel)
+                if (panel == this.panel)
                 {
                     // Close each tab
                     foreach (BaseWindow window in windows)
                     {
-                        Panel.RemoveTab(Panel.GetTab((RectTransform)window.Window.transform));
+                        this.panel.RemoveTab(this.panel.GetTab((RectTransform)window.Window.transform));
                         Destroyer.Destroy(window);
                     }
 
                     windows.Clear();
                     OnActiveWindowChanged.Invoke();
-                    Destroyer.Destroy(Panel);
+                    Destroyer.Destroy(this.panel);
                 }
             }
         }

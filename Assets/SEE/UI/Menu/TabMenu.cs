@@ -18,12 +18,12 @@ namespace SEE.UI.Menu
         /// <summary>
         /// Folder for tab menu prefabs.
         /// </summary>
-        protected const string TAB_PREFAB_FOLDER = UI_PREFAB_FOLDER + "TabMenu/";
+        protected const string tabPrefabFolder = UIPrefabFolder + "TabMenu/";
 
         /// <summary>
         /// The prefab for the tab menu.
         /// </summary>
-        protected override string MenuPrefab => TAB_PREFAB_FOLDER + "TabMenu";
+        protected override string MenuPrefab => tabPrefabFolder + "TabMenu";
 
         /// <summary>
         /// The button list is already part of the tab menu prefab.
@@ -33,7 +33,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// The button prefab for each entry.
         /// </summary>
-        protected override string EntryPrefab => TAB_PREFAB_FOLDER + "TabButton";
+        protected override string EntryPrefab => tabPrefabFolder + "TabButton";
 
         /// <summary>
         /// The path to the content game object.
@@ -61,7 +61,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// The view prefab for each entry.
         /// </summary>
-        protected virtual string ViewPrefab => TAB_PREFAB_FOLDER + "TabView";
+        protected virtual string ViewPrefab => tabPrefabFolder + "TabView";
 
         /// <summary>
         /// The game object containing the views.
@@ -106,7 +106,10 @@ namespace SEE.UI.Menu
         protected override void OnStartFinished()
         {
             base.OnStartFinished();
-            if (ActiveEntry != null) ActivateView(ActiveEntry);
+            if (ActiveEntry != null)
+            {
+                ActivateView(ActiveEntry);
+            }
             Entries.ForEach(AddView);
 
             OnEntryAdded += AddView;

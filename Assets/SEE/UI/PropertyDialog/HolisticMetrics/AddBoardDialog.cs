@@ -18,29 +18,29 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         internal void Open()
         {
-            gotInput = false;
+            GotInput = false;
 
-            dialog = new GameObject("Add board dialog");
-            PropertyGroup group = dialog.AddComponent<PropertyGroup>();
+            Dialog = new GameObject("Add board dialog");
+            PropertyGroup group = Dialog.AddComponent<PropertyGroup>();
             group.Name = "Add board dialog";
 
-            boardName = dialog.AddComponent<StringProperty>();
+            boardName = Dialog.AddComponent<StringProperty>();
             boardName.Name = "Enter name (unique)";
             boardName.Description = "Enter the title of the board. This has to be unique.";
             group.AddProperty(boardName);
             group.GetReady();
 
-            propertyDialog = dialog.AddComponent<PropertyDialog>();
-            propertyDialog.Title = "Add board";
-            propertyDialog.Description = "Configure the board; then hit OK button.";
-            propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Plus");
-            propertyDialog.AddGroup(group);
+            PropertyDialog = Dialog.AddComponent<PropertyDialog>();
+            PropertyDialog.Title = "Add board";
+            PropertyDialog.Description = "Configure the board; then hit OK button.";
+            PropertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Plus");
+            PropertyDialog.AddGroup(group);
 
-            propertyDialog.OnConfirm.AddListener(AddBoard);
-            propertyDialog.OnCancel.AddListener(Cancel);
+            PropertyDialog.OnConfirm.AddListener(AddBoard);
+            PropertyDialog.OnCancel.AddListener(Cancel);
 
             SEEInput.KeyboardShortcutsEnabled = false;
-            propertyDialog.DialogShouldBeShown = true;
+            PropertyDialog.DialogShouldBeShown = true;
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         private void AddBoard()
         {
-            gotInput = true;
+            GotInput = true;
             Close();
         }
 
@@ -60,10 +60,10 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         /// <param name="name">The name given by the player, if present and not yet fetched. Otherwise a dummy value.
         /// </param>
-        /// <returns>The value of <see cref="HolisticMetricsDialog.gotInput"/></returns>
+        /// <returns>The value of <see cref="HolisticMetricsDialog.GotInput"/></returns>
         internal bool TryGetName(out string name)
         {
-            if (gotInput)
+            if (GotInput)
             {
                 name = boardName.Value;
                 return true;

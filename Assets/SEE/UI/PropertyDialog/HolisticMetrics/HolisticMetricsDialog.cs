@@ -12,7 +12,7 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// <summary>
         /// Whether this dialog has some complete user input that hasn't yet been fetched.
         /// </summary>
-        protected bool gotInput;
+        protected bool GotInput;
 
         /// <summary>
         /// Whether this dialog was canceled.
@@ -22,19 +22,19 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// <summary>
         /// The property dialog.
         /// </summary>
-        protected PropertyDialog propertyDialog;
+        protected PropertyDialog PropertyDialog;
 
         /// <summary>
         /// The dialog GameObject.
         /// </summary>
-        internal GameObject dialog;
+        internal GameObject Dialog;
 
         /// <summary>
         /// Can be invoked to properly close the dialog.
         /// </summary>
         protected void Close()
         {
-            Destroyer.Destroy(dialog);
+            Destroyer.Destroy(Dialog);
             SEEInput.KeyboardShortcutsEnabled = true;
         }
 

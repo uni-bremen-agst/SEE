@@ -223,8 +223,8 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
 
             double distance = 0;
             double maximalError = Math.Pow(10, settings.GradientDescentPrecisionExponent);
-            const int NumberOfIterations = 50;
-            for (int j = 0; j < NumberOfIterations; j++)
+            const int numberOfIterations = 50;
+            for (int j = 0; j < numberOfIterations; j++)
             {
                 distance = CalculateOneStep(nodes, mapSegmentIndex);
                 if (distance <= maximalError)

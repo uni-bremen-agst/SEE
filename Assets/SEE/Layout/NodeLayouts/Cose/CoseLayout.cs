@@ -317,11 +317,11 @@ namespace SEE.Layout.NodeLayouts.Cose
             {
                 ILayoutNode node = entry.Key;
                 NodeTransform transform = entry.Value;
-                Vector3 position = transform.position;
-                position.y += transform.scale.y / 2.0f;
+                Vector3 position = transform.Position;
+                position.y += transform.Scale.y / 2.0f;
                 node.CenterPosition = position;
-                node.LocalScale = transform.scale;
-                node.Rotation = transform.rotation;
+                node.LocalScale = transform.Scale;
+                node.Rotation = transform.Rotation;
             }
         }
 

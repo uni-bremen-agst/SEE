@@ -40,54 +40,54 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// Represents the difference of another version in comparison to this one.
         /// This will always represent the <i>biggest</i> difference, e.g. for 7.1.5 and 7.0.2 it will
-        /// be <see cref="MINOR_OLDER"/> .
+        /// be <see cref="MinorOlder"/> .
         /// </summary>
         public enum Difference
         {
             /// <summary>
             /// When the major version of the other version is smaller than this one.
             /// </summary>
-            MAJOR_OLDER,
+            MajorOlder,
 
             /// <summary>
             /// When the minor version of the other version is smaller than this one.
             /// </summary>
-            MINOR_OLDER,
+            MinorOlder,
 
             /// <summary>
             /// When the patch version of the other version is smaller than this one.
             /// </summary>
-            PATCH_OLDER,
+            PathOlder,
 
             /// <summary>
             /// When the extra version of the other version is smaller than this one.
             /// </summary>
-            EXTRA_OLDER,
+            ExtraOlder,
 
             /// <summary>
             /// When the major version of the other version is bigger than this one.
             /// </summary>
-            MAJOR_NEWER,
+            MajorNewer,
 
             /// <summary>
             /// When the minor version of the other version is bigger than this one.
             /// </summary>
-            MINOR_NEWER,
+            MinorNewer,
 
             /// <summary>
             /// When the patch version of the other version is bigger than this one.
             /// </summary>
-            PATCH_NEWER,
+            PatchNewer,
 
             /// <summary>
             /// When the extra version of the other version is bigger than this one.
             /// </summary>
-            EXTRA_NEWER,
+            ExtraNewer,
 
             /// <summary>
             /// When both versions are equal.
             /// </summary>
-            EQUAL
+            Equal
         }
 
         /// <summary>
@@ -133,14 +133,14 @@ namespace SEE.Net.Dashboard
 
         /// <summary>
         /// Will return the difference from this version to the supported version.
-        /// For example, if the difference is <see cref="Difference.MAJOR_NEWER"/>, this means that the
+        /// For example, if the difference is <see cref="Difference.MajorNewer"/>, this means that the
         /// supported version has a newer major version.
         /// </summary>
         public Difference DifferenceToSupportedVersion => GetDifference(SupportedVersion);
 
         /// <summary>
         /// Returns the difference from this version to the given <paramref name="other"/> version.
-        /// For example, if the difference is <see cref="Difference.MAJOR_NEWER"/>, this means that the
+        /// For example, if the difference is <see cref="Difference.MajorNewer"/>, this means that the
         /// other version has a newer major version.
         /// </summary>
         /// <param name="other">The version with which this one shall be compared.</param>
@@ -149,15 +149,15 @@ namespace SEE.Net.Dashboard
             CompareTo(other) switch
             {
                 // All of these refer to the OTHER one, i.e., the OTHER is newer than this one
-                4 => Difference.MAJOR_NEWER,
-                3 => Difference.MINOR_NEWER,
-                2 => Difference.PATCH_NEWER,
-                1 => Difference.EXTRA_NEWER,
-                0 => Difference.EQUAL,
-                -1 => Difference.EXTRA_OLDER,
-                -2 => Difference.PATCH_OLDER,
-                -3 => Difference.MINOR_OLDER,
-                -4 => Difference.MAJOR_OLDER,
+                4 => Difference.MajorNewer,
+                3 => Difference.MinorNewer,
+                2 => Difference.PatchNewer,
+                1 => Difference.ExtraNewer,
+                0 => Difference.Equal,
+                -1 => Difference.ExtraOlder,
+                -2 => Difference.PathOlder,
+                -3 => Difference.MinorOlder,
+                -4 => Difference.MajorOlder,
                 _ => throw new InvalidOperationException("There appears to be an error in the CompareTo method of this class.")
             };
 

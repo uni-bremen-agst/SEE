@@ -40,7 +40,7 @@ namespace SEE.UI.ConfigMenu
     /// </summary>
     public class ConfigMenuFactory : DynamicUIBehaviour
     {
-        private const string ConfigMenuPrefabPath = "Prefabs/UI/ConfigMenu";
+        private const string configMenuPrefabPath = "Prefabs/UI/ConfigMenu";
 #if INCLUDE_STEAM_VR
         private SteamVR_Action_Boolean openAction;
         private readonly SteamVR_Input_Sources inputSource = SteamVR_Input_Sources.Any;
@@ -50,7 +50,7 @@ namespace SEE.UI.ConfigMenu
 
         private void Awake()
         {
-            configMenuPrefab = PrefabInstantiator.LoadPrefab(ConfigMenuPrefabPath);
+            configMenuPrefab = PrefabInstantiator.LoadPrefab(configMenuPrefabPath);
             BuildConfigMenu(ConfigMenu.DefaultEditableInstance(), false);
         }
 
@@ -120,7 +120,7 @@ namespace SEE.UI.ConfigMenu
             }
         }
 
-        private void HandleVRUpdate()
+        private static void HandleVRUpdate()
         {
 #if INCLUDE_STEAM_VR
 

@@ -10,21 +10,21 @@ namespace SEE.Controls
     /// set of keywords or a particular grammar. The recognization, however, may
     /// be less accurate. This speech recognition may be useful for free texts
     /// in the context of dictation.
-    /// 
+    ///
     /// As an example on how to use this class, take a look at the test class
     /// TestDictationInput.
-    /// 
+    ///
     /// IMPORTANT NOTE.
-    /// Dictation (DictationInput) and phrase recognition (KeywordInput or GrammarInput) cannot be 
-    /// handled at the same time. If a GrammarInput or KeywordInput is active, a DictationInput 
+    /// Dictation (DictationInput) and phrase recognition (KeywordInput or GrammarInput) cannot be
+    /// handled at the same time. If a GrammarInput or KeywordInput is active, a DictationInput
     /// cannot be active and vice versa.
     /// </summary>
     public class DictationInput : SpeechInput
     {
-        // Dictation recognizer is currently functional only on Windows 10, and requires that dictation 
-        // is permitted in the user's Speech privacy policy (Settings->Privacy->Speech, inking & typing). 
-        // If dictation is not enabled, DictationRecognizer will fail on Start. Developers can handle this 
-        // failure in an app-specific way by providing a DictationError delegate and testing for 
+        // Dictation recognizer is currently functional only on Windows 10, and requires that dictation
+        // is permitted in the user's Speech privacy policy (Settings->Privacy->Speech, inking & typing).
+        // If dictation is not enabled, DictationRecognizer will fail on Start. Developers can handle this
+        // failure in an app-specific way by providing a DictationError delegate and testing for
         // SPERR_SPEECH_PRIVACY_POLICY_NOT_ACCEPTED (0x80045509).
 
         /// <summary>
@@ -102,9 +102,9 @@ namespace SEE.Controls
 
         /// <summary>
         /// Registers <paramref name="dictationHypothesisDelegate"/> as a callback
-        /// to be called when there is a hypothesis on the phrase currently being 
+        /// to be called when there is a hypothesis on the phrase currently being
         /// recognized. The hypothesis is subject to change depending upon the
-        /// following input. The final result will be provided by a 
+        /// following input. The final result will be provided by a
         /// DictationResultDelegate later.
         /// </summary>
         /// <param name="dictationHypothesisDelegate">delegate to be registered</param>
@@ -115,7 +115,7 @@ namespace SEE.Controls
 
         /// <summary>
         /// Unregisters <paramref name="dictationHypothesisDelegate"/> as a callback
-        /// formerly to be called when there is a hypothesis on the phrase currently being 
+        /// formerly to be called when there is a hypothesis on the phrase currently being
         /// recognized.
         /// </summary>
         /// <param name="dictationHypothesisDelegate">delegate to be unregistered</param>

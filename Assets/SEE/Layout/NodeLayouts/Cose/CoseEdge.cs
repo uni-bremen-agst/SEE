@@ -132,7 +132,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Returns the other end node of the edge 
+        /// Returns the other end node of the edge
         /// </summary>
         /// <param name="node"></param>
         /// <returns>the other end node of this edge</returns>

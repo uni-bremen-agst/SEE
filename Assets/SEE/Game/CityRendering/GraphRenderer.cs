@@ -106,7 +106,7 @@ namespace SEE.Game.CityRendering
             // The default node factory that we use if the we cannot find a setting for a given node type.
             NodeFactory GetDefaultNodeFactory()
             {
-                return new CubeFactory(ShaderType, ColorRange.Default());
+                return new CubeFactory(shaderType, ColorRange.Default());
             }
 
             // The appropriate node factory for value.Shape.
@@ -116,11 +116,11 @@ namespace SEE.Game.CityRendering
 
                 return value.Shape switch
                 {
-                    NodeShapes.Blocks => new CubeFactory(ShaderType, colorRange),
-                    NodeShapes.Cylinders => new CylinderFactory(ShaderType, colorRange),
-                    NodeShapes.Spiders => new SpiderFactory(ShaderType, colorRange),
-                    NodeShapes.Polygons => new PolygonFactory(ShaderType, colorRange),
-                    NodeShapes.Bars => new BarsFactory(ShaderType, colorRange),
+                    NodeShapes.Blocks => new CubeFactory(shaderType, colorRange),
+                    NodeShapes.Cylinders => new CylinderFactory(shaderType, colorRange),
+                    NodeShapes.Spiders => new SpiderFactory(shaderType, colorRange),
+                    NodeShapes.Polygons => new PolygonFactory(shaderType, colorRange),
+                    NodeShapes.Bars => new BarsFactory(shaderType, colorRange),
                     _ => throw new NotImplementedException($"Missing handling of {value.Shape}.")
                 };
             }
@@ -162,17 +162,17 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// The shader to be used for drawing the nodes.
         /// </summary>
-        private const Materials.ShaderType ShaderType = Materials.ShaderType.OpaqueMetallic;
+        private const Materials.ShaderType shaderType = Materials.ShaderType.OpaqueMetallic;
 
         /// <summary>
         /// The distance between two stacked game objects (parent/child).
         /// </summary>
-        private const float LevelDistance = 0.001f;
+        private const float levelDistance = 0.001f;
 
         /// <summary>
         /// the ground level of the nodes
         /// </summary>
-        private const float GroundLevel = 0.0f;
+        private const float groundLevel = 0.0f;
 
         /// <summary>
         /// The graphs to be rendered.
@@ -252,13 +252,6 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// To turn on the extension hack for our VISSOFT paper. Will be
-        /// removed soon.
-        /// </summary>
-        [Obsolete]
-        private const bool VISSOFT = false;
-
-        /// <summary>
         /// Draws the nodes and edges of the graph and their decorations by applying the layouts according
         /// to the user's choice in the settings.
         /// </summary>
@@ -275,12 +268,6 @@ namespace SEE.Game.CityRendering
             }
             // FIXME: The two following calls DrawLeafNodes and DrawInnerNodes can be merged into one.
             Dictionary<Node, GameObject> nodeMap = DrawLeafNodes(nodes);
-
-            // FIXME-IWSC: Remove this call after the publication.
-            if (VISSOFT)
-            {
-                GenerateAndVisualizeCloneClasses(nodes, nodeMap);
-            }
 
             DrawInnerNodes(nodeMap, nodes);
 
@@ -342,73 +329,7 @@ namespace SEE.Game.CityRendering
                     return null;
                 }
             }
-
-            // FIXME-IWSC
-            // This method exists only to create the texture-based visualization of clones for the IWSC paper.
-            // It will be either become well integrated or removed later.
-            //[Obsolete]
-            void GenerateAndVisualizeCloneClasses(List<Node> nodes, Dictionary<Node, GameObject> nodeMap)
-            {
-                // Generate clone classes.
-                HashSet<HashSet<Node>> cloneClasses = new HashSet<HashSet<Node>>();
-                HashSet<Node> alreadyAssignedToCloneClass = new HashSet<Node>();
-                foreach (var item in nodeMap)
-                {
-                    // Skip node if it already assigned.
-                    if (alreadyAssignedToCloneClass.Contains(item.Key)) continue;
-
-                    // Find all nodes of the clone class of `item'.
-                    HashSet<Node> cloneClass = new HashSet<Node>();
-                    cloneClass.Add(item.Key);
-                    alreadyAssignedToCloneClass.Add(item.Key);
-                    CollectOutgoings(item.Key.Outgoings);
-                    CollectIncommings(item.Key.Incomings);
-                    cloneClasses.Add(cloneClass);
-
-                    void CollectOutgoings(ISet<Edge> outgoings)
-                    {
-                        foreach (var e in outgoings)
-                        {
-                            if (!cloneClass.Contains(e.Target))
-                            {
-                                cloneClass.Add(e.Target);
-                                alreadyAssignedToCloneClass.Add(e.Target);
-                                CollectOutgoings(e.Target.Outgoings);
-                                CollectIncommings(e.Target.Incomings);
-                            }
-                        }
-                    }
-                    void CollectIncommings(ISet<Edge> incommings)
-                    {
-                        foreach (var e in incommings)
-                        {
-                            if (!cloneClass.Contains(e.Source))
-                            {
-                                cloneClass.Add(e.Source);
-                                alreadyAssignedToCloneClass.Add(e.Source);
-                                CollectIncommings(e.Source.Incomings);
-                                CollectOutgoings(e.Source.Outgoings);
-                            }
-                        }
-                    }
-                }
-
-                // Set materials of clone classes.
-                // FIXME: This is a very dirty hack!!!
-                if (nodes.Count > 0 && nodeTypeToFactory[nodes.First().Type] is CubeFactory)
-                {
-                    int matIdx = 1;
-                    foreach (HashSet<Node> cc in cloneClasses)
-                    {
-                        Material material = Resources.Load("Materials/LSHMetal/" + matIdx++, typeof(Material)) as Material;
-                        foreach (Node node in cc)
-                        {
-                            nodeMap[node].GetComponent<Renderer>().material = material;
-                        }
-                    }
-                }
-            }
-
+           
             // This is necessary for the holistic metrics boards. They need to be informed when a code city is being
             // drawn because then there will be a new graph loaded. In that case, the metrics boards might
             // need to start listening for change events from that graph.
@@ -422,7 +343,7 @@ namespace SEE.Game.CityRendering
         /// <param name="layoutNodes">the layout nodes to be stacked</param>
         public static void Stack(GameObject plane, IEnumerable<ILayoutNode> layoutNodes)
         {
-            NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + LevelDistance);
+            NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + levelDistance);
         }
 
         /// <summary>
@@ -433,7 +354,7 @@ namespace SEE.Game.CityRendering
         /// <param name="parent">parent of the new light</param>
         private void AddLight(ICollection<GameObject> gameObjects, GameObject parent)
         {
-            GameObject lightGameObject = new GameObject("Light")
+            GameObject lightGameObject = new("Light")
             {
                 tag = Tags.Decoration
             };
@@ -621,19 +542,19 @@ namespace SEE.Game.CityRendering
         public NodeLayout GetLayout(GameObject parent) =>
             Settings.NodeLayoutSettings.Kind switch
             {
-                NodeLayoutKind.Manhattan => new ManhattanLayout(GroundLevel),
-                NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(GroundLevel),
-                NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(GroundLevel),
-                NodeLayoutKind.Treemap => new TreemapLayout(GroundLevel, parent.transform.lossyScale.x, parent.transform.lossyScale.z),
+                NodeLayoutKind.Manhattan => new ManhattanLayout(groundLevel),
+                NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(groundLevel),
+                NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(groundLevel),
+                NodeLayoutKind.Treemap => new TreemapLayout(groundLevel, parent.transform.lossyScale.x, parent.transform.lossyScale.z),
                 NodeLayoutKind.IncrementalTreeMap => new IncrementalTreeMapLayout(
-                    GroundLevel,
+                    groundLevel,
                     parent.transform.lossyScale.x,
                     parent.transform.lossyScale.z,
                     Settings.NodeLayoutSettings.IncrementalTreeMapSetting),
-                NodeLayoutKind.Balloon => new BalloonNodeLayout(GroundLevel),
-                NodeLayoutKind.CirclePacking => new CirclePackingNodeLayout(GroundLevel),
-                NodeLayoutKind.CompoundSpringEmbedder => new CoseLayout(GroundLevel, Settings),
-                NodeLayoutKind.FromFile => new LoadedNodeLayout(GroundLevel, Settings.NodeLayoutSettings.LayoutPath.Path),
+                NodeLayoutKind.Balloon => new BalloonNodeLayout(groundLevel),
+                NodeLayoutKind.CirclePacking => new CirclePackingNodeLayout(groundLevel),
+                NodeLayoutKind.CompoundSpringEmbedder => new CoseLayout(groundLevel, Settings),
+                NodeLayoutKind.FromFile => new LoadedNodeLayout(groundLevel, Settings.NodeLayoutSettings.LayoutPath.Path),
                 _ => throw new Exception("Unhandled node layout " + Settings.NodeLayoutSettings.Kind)
             };
 
@@ -654,9 +575,9 @@ namespace SEE.Game.CityRendering
         /// <param name="leftFrontCorner">the left front corner</param>
         /// <param name="rightBackCorner">the right back corner</param>
         /// <returns>a new plane</returns>
-        public GameObject DrawPlane(Vector2 leftFrontCorner, Vector2 rightBackCorner, float yLevel)
+        public static GameObject DrawPlane(Vector2 leftFrontCorner, Vector2 rightBackCorner, float yLevel)
         {
-            return PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, yLevel, LevelDistance);
+            return PlaneFactory.NewPlane(leftFrontCorner, rightBackCorner, yLevel, levelDistance);
         }
 
         /// <summary>
@@ -803,7 +724,7 @@ namespace SEE.Game.CityRendering
         /// <param name="gameNodes">the list of game nodes that are enclosed in the resulting bounding box</param>
         /// <param name="leftLowerCorner">the left lower front corner (x axis in 3D space) of the bounding box</param>
         /// <param name="rightUpperCorner">the right lower back corner (z axis in 3D space) of the bounding box</param>
-        private void ComputeBoundingBox(ICollection<GameObject> gameNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
+        private static void ComputeBoundingBox(ICollection<GameObject> gameNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
         {
             if (gameNodes.Count == 0)
             {

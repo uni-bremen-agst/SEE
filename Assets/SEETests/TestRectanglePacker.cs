@@ -58,8 +58,8 @@ namespace SEE.Layout.RectanglePacking
 
             PNode A = tree.Root;
             Assert.That(A.Occupied, Is.False);
-            Assert.That(A.Rectangle.position, Is.EqualTo(Vector2.zero));
-            Assert.That(A.Rectangle.size, Is.EqualTo(totalSize));
+            Assert.That(A.Rectangle.Position, Is.EqualTo(Vector2.zero));
+            Assert.That(A.Rectangle.Size, Is.EqualTo(totalSize));
 
             // First split
             Vector2 EL1size = new Vector2(8, 6);
@@ -73,24 +73,24 @@ namespace SEE.Layout.RectanglePacking
             Assert.AreSame(result, El1);
 
             Assert.That(A.Occupied, Is.False);
-            Assert.That(A.Rectangle.position, Is.EqualTo(Vector2.zero));
-            Assert.That(A.Rectangle.size, Is.EqualTo(totalSize));
+            Assert.That(A.Rectangle.Position, Is.EqualTo(Vector2.zero));
+            Assert.That(A.Rectangle.Size, Is.EqualTo(totalSize));
 
             Assert.That(B.Occupied, Is.False);
-            Assert.That(B.Rectangle.position, Is.EqualTo(Vector2.zero));
-            Assert.That(B.Rectangle.size, Is.EqualTo(new Vector2(14, 6)));
+            Assert.That(B.Rectangle.Position, Is.EqualTo(Vector2.zero));
+            Assert.That(B.Rectangle.Size, Is.EqualTo(new Vector2(14, 6)));
 
             Assert.That(El1.Occupied, Is.True);
-            Assert.That(El1.Rectangle.position, Is.EqualTo(Vector2.zero));
-            Assert.That(El1.Rectangle.size, Is.EqualTo(EL1size));
+            Assert.That(El1.Rectangle.Position, Is.EqualTo(Vector2.zero));
+            Assert.That(El1.Rectangle.Size, Is.EqualTo(EL1size));
 
             Assert.That(C.Occupied, Is.False);
-            Assert.That(C.Rectangle.position, Is.EqualTo(new Vector2(0, 6)));
-            Assert.That(C.Rectangle.size, Is.EqualTo(new Vector2(14, 6)));
+            Assert.That(C.Rectangle.Position, Is.EqualTo(new Vector2(0, 6)));
+            Assert.That(C.Rectangle.Size, Is.EqualTo(new Vector2(14, 6)));
 
             Assert.That(D.Occupied, Is.False);
-            Assert.That(D.Rectangle.position, Is.EqualTo(new Vector2(8, 0)));
-            Assert.That(D.Rectangle.size, Is.EqualTo(new Vector2(6, 6)));
+            Assert.That(D.Rectangle.Position, Is.EqualTo(new Vector2(8, 0)));
+            Assert.That(D.Rectangle.Size, Is.EqualTo(new Vector2(6, 6)));
 
             Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
 
@@ -104,38 +104,38 @@ namespace SEE.Layout.RectanglePacking
             Assert.AreSame(result, El2);
 
             Assert.That(El2.Occupied, Is.True);
-            Assert.That(El2.Rectangle.position, Is.EqualTo(new Vector2(0, 6)));
-            Assert.That(El2.Rectangle.size, Is.EqualTo(new Vector2(7, 3)));
+            Assert.That(El2.Rectangle.Position, Is.EqualTo(new Vector2(0, 6)));
+            Assert.That(El2.Rectangle.Size, Is.EqualTo(new Vector2(7, 3)));
 
             Assert.That(G.Occupied, Is.False);
-            Assert.That(G.Rectangle.position, Is.EqualTo(new Vector2(7, 6)));
-            Assert.That(G.Rectangle.size, Is.EqualTo(new Vector2(7, 3)));
+            Assert.That(G.Rectangle.Position, Is.EqualTo(new Vector2(7, 6)));
+            Assert.That(G.Rectangle.Size, Is.EqualTo(new Vector2(7, 3)));
 
             Assert.That(E.Occupied, Is.False);
-            Assert.That(E.Rectangle.position, Is.EqualTo(new Vector2(0, 6)));
-            Assert.That(E.Rectangle.size, Is.EqualTo(new Vector2(14, 3)));
+            Assert.That(E.Rectangle.Position, Is.EqualTo(new Vector2(0, 6)));
+            Assert.That(E.Rectangle.Size, Is.EqualTo(new Vector2(14, 3)));
 
             Assert.That(F.Occupied, Is.False);
-            Assert.That(F.Rectangle.position, Is.EqualTo(new Vector2(0, 9)));
-            Assert.That(F.Rectangle.size, Is.EqualTo(new Vector2(14, 3)));
+            Assert.That(F.Rectangle.Position, Is.EqualTo(new Vector2(0, 9)));
+            Assert.That(F.Rectangle.Size, Is.EqualTo(new Vector2(14, 3)));
 
             Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { D, G, F }), Is.True);
 
             // Third split
             // requested rectangle has same height as G
-            result = tree.Split(G, new Vector2(5, G.Rectangle.size.y));
+            result = tree.Split(G, new Vector2(5, G.Rectangle.Size.y));
             PNode El3 = G.Left;
             PNode H = G.Right;
 
             Assert.AreSame(result, El3);
 
             Assert.That(El3.Occupied, Is.True);
-            Assert.That(El3.Rectangle.position, Is.EqualTo(G.Rectangle.position));
-            Assert.That(El3.Rectangle.size, Is.EqualTo(new Vector2(5, 3)));
+            Assert.That(El3.Rectangle.Position, Is.EqualTo(G.Rectangle.Position));
+            Assert.That(El3.Rectangle.Size, Is.EqualTo(new Vector2(5, 3)));
 
             Assert.That(H.Occupied, Is.False);
-            Assert.That(H.Rectangle.position, Is.EqualTo(G.Rectangle.position + new Vector2(5, 0)));
-            Assert.That(H.Rectangle.size, Is.EqualTo(new Vector2(2, 3)));
+            Assert.That(H.Rectangle.Position, Is.EqualTo(G.Rectangle.Position + new Vector2(5, 0)));
+            Assert.That(H.Rectangle.Size, Is.EqualTo(new Vector2(2, 3)));
 
             Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { D, H, F }), Is.True);
 
@@ -149,26 +149,26 @@ namespace SEE.Layout.RectanglePacking
             Assert.AreSame(result, El4);
 
             Assert.That(El4.Occupied, Is.True);
-            Assert.That(El4.Rectangle.position, Is.EqualTo(D.Rectangle.position));
-            Assert.That(El4.Rectangle.size, Is.EqualTo(new Vector2(4, 4)));
+            Assert.That(El4.Rectangle.Position, Is.EqualTo(D.Rectangle.Position));
+            Assert.That(El4.Rectangle.Size, Is.EqualTo(new Vector2(4, 4)));
 
             Assert.That(I.Occupied, Is.False);
-            Assert.That(I.Rectangle.position, Is.EqualTo(D.Rectangle.position));
-            Assert.That(I.Rectangle.size, Is.EqualTo(new Vector2(D.Rectangle.size.x, El4.Rectangle.size.y)));
+            Assert.That(I.Rectangle.Position, Is.EqualTo(D.Rectangle.Position));
+            Assert.That(I.Rectangle.Size, Is.EqualTo(new Vector2(D.Rectangle.Size.x, El4.Rectangle.Size.y)));
 
             Assert.That(J.Occupied, Is.False);
-            Assert.That(J.Rectangle.position, Is.EqualTo(D.Rectangle.position + new Vector2(0, El4.Rectangle.size.y)));
-            Assert.That(J.Rectangle.size, Is.EqualTo(new Vector2(D.Rectangle.size.x, D.Rectangle.size.y - El4.Rectangle.size.y)));
+            Assert.That(J.Rectangle.Position, Is.EqualTo(D.Rectangle.Position + new Vector2(0, El4.Rectangle.Size.y)));
+            Assert.That(J.Rectangle.Size, Is.EqualTo(new Vector2(D.Rectangle.Size.x, D.Rectangle.Size.y - El4.Rectangle.Size.y)));
 
             Assert.That(K.Occupied, Is.False);
-            Assert.That(K.Rectangle.position, Is.EqualTo(D.Rectangle.position + new Vector2(El4.Rectangle.size.x, 0)));
-            Assert.That(K.Rectangle.size, Is.EqualTo(new Vector2(D.Rectangle.size.x - El4.Rectangle.size.x, El4.Rectangle.size.y)));
+            Assert.That(K.Rectangle.Position, Is.EqualTo(D.Rectangle.Position + new Vector2(El4.Rectangle.Size.x, 0)));
+            Assert.That(K.Rectangle.Size, Is.EqualTo(new Vector2(D.Rectangle.Size.x - El4.Rectangle.Size.x, El4.Rectangle.Size.y)));
 
             Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { J, K, H, F }), Is.True);
 
             // Fifth split
             // perfect match
-            result = tree.Split(J, J.Rectangle.size);
+            result = tree.Split(J, J.Rectangle.Size);
 
             Assert.AreSame(result, J);
 
@@ -180,19 +180,19 @@ namespace SEE.Layout.RectanglePacking
 
             // Sixth split
             // requested rectangle has same width as F
-            result = tree.Split(F, new Vector2(F.Rectangle.size.x, 1));
+            result = tree.Split(F, new Vector2(F.Rectangle.Size.x, 1));
             PNode Fleft = F.Left;
             PNode Fright = F.Right;
 
             Assert.AreSame(result, Fleft);
 
             Assert.That(Fleft.Occupied, Is.True);
-            Assert.That(Fleft.Rectangle.position, Is.EqualTo(F.Rectangle.position));
-            Assert.That(Fleft.Rectangle.size, Is.EqualTo(new Vector2(F.Rectangle.size.x, 1)));
+            Assert.That(Fleft.Rectangle.Position, Is.EqualTo(F.Rectangle.Position));
+            Assert.That(Fleft.Rectangle.Size, Is.EqualTo(new Vector2(F.Rectangle.Size.x, 1)));
 
             Assert.That(Fright.Occupied, Is.False);
-            Assert.That(Fright.Rectangle.position, Is.EqualTo(F.Rectangle.position + new Vector2(0, Fleft.Rectangle.size.y)));
-            Assert.That(Fright.Rectangle.size, Is.EqualTo(new Vector2(F.Rectangle.size.x, F.Rectangle.size.y - Fleft.Rectangle.size.y)));
+            Assert.That(Fright.Rectangle.Position, Is.EqualTo(F.Rectangle.Position + new Vector2(0, Fleft.Rectangle.Size.y)));
+            Assert.That(Fright.Rectangle.Size, Is.EqualTo(new Vector2(F.Rectangle.Size.x, F.Rectangle.Size.y - Fleft.Rectangle.Size.y)));
 
             Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { K, H, Fright }), Is.True);
 

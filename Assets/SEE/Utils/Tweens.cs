@@ -28,14 +28,14 @@ namespace SEE.Utils
         /// <param name="position">
         /// A <see cref="Vector3"/> for the destination Vector3.
         /// </param>
-        /// <param name="MaxAnimationTime">
+        /// <param name="maxAnimationTime">
         /// A <see cref="System.Single"/> for the time in seconds the animation will take to complete.
         /// </param>
         /// <param name="callback">
         /// A <see cref="Action"/> The invoked callback after the animation.
         /// </param>
         /// <remarks>For game objects representing graph nodes, use <see cref="NodeOperator.Move"/> instead.</remarks>
-        public static void Move(GameObject gameObject, Vector3 position, float MaxAnimationTime, Action<object> callback = null)
+        public static void Move(GameObject gameObject, Vector3 position, float maxAnimationTime, Action<object> callback = null)
         {
             if (gameObject.HasNodeRef())
             {
@@ -43,11 +43,11 @@ namespace SEE.Utils
             }
             if (callback != null)
             {
-                gameObject.transform.DOMove(position, MaxAnimationTime).OnComplete(()=>{callback?.Invoke(gameObject);});
+                gameObject.transform.DOMove(position, maxAnimationTime).OnComplete(()=>{callback?.Invoke(gameObject);});
             }
             else
             {
-                gameObject.transform.DOMove(position, MaxAnimationTime);
+                gameObject.transform.DOMove(position, maxAnimationTime);
             }
         }
 

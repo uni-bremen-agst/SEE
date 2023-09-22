@@ -61,13 +61,13 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         internal void Open()
         {
-            gotInput = false;
+            GotInput = false;
 
-            dialog = new GameObject("Add widget dialog");
-            PropertyGroup group = dialog.AddComponent<PropertyGroup>();
+            Dialog = new GameObject("Add widget dialog");
+            PropertyGroup group = Dialog.AddComponent<PropertyGroup>();
             group.Name = "Add widget dialog";
 
-            selectedMetric = dialog.AddComponent<SelectionProperty>();
+            selectedMetric = Dialog.AddComponent<SelectionProperty>();
             selectedMetric.Name = "Select metric";
             selectedMetric.Description = "Select the metric you want to display";
             string[] metricOptions = metricTypes.Select(type => type.Name).ToArray();
@@ -75,7 +75,7 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
             selectedMetric.Value = metricOptions[0];
             group.AddProperty(selectedMetric);
 
-            selectedWidget = dialog.AddComponent<SelectionProperty>();
+            selectedWidget = Dialog.AddComponent<SelectionProperty>();
             selectedWidget.Name = "Select widget";
             selectedWidget.Description = "Select the widget that is supposed to display the metric";
             string[] widgetOptions = widgetPrefabs.Select(prefab => prefab.name).ToArray();
@@ -83,18 +83,18 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
             selectedWidget.Value = widgetOptions[0];
             group.AddProperty(selectedWidget);
 
-            propertyDialog = dialog.AddComponent<PropertyDialog>();
-            propertyDialog.Title = "Add widget";
-            propertyDialog.Description = "Configure the widget; then hit OK button. Then click on any metrics board" +
+            PropertyDialog = Dialog.AddComponent<PropertyDialog>();
+            PropertyDialog.Title = "Add widget";
+            PropertyDialog.Description = "Configure the widget; then hit OK button. Then click on any metrics board" +
                                          "where you want to place the widget.";
-            propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Plus");
-            propertyDialog.AddGroup(group);
+            PropertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Plus");
+            PropertyDialog.AddGroup(group);
 
-            propertyDialog.OnConfirm.AddListener(AddWidget);
-            propertyDialog.OnCancel.AddListener(Cancel);
+            PropertyDialog.OnConfirm.AddListener(AddWidget);
+            PropertyDialog.OnCancel.AddListener(Cancel);
 
             SEEInput.KeyboardShortcutsEnabled = false;
-            propertyDialog.DialogShouldBeShown = true;
+            PropertyDialog.DialogShouldBeShown = true;
         }
 
         /// <summary>
@@ -104,7 +104,7 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         private void AddWidget()
         {
-            gotInput = true;
+            GotInput = true;
             metricType = selectedMetric.Value;
             widgetName = selectedWidget.Value;
             Close();
@@ -117,14 +117,14 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// </param>
         /// <param name="widget">If given and not yet fetched, this will be the widget type selected by the player.
         /// </param>
-        /// <returns>The value of <see cref="HolisticMetricsDialog.gotInput"/></returns>
+        /// <returns>The value of <see cref="HolisticMetricsDialog.GotInput"/></returns>
         internal bool TryGetConfig(out string metric, out string widget)
         {
-            if (gotInput)
+            if (GotInput)
             {
                 metric = metricType;
                 widget = widgetName;
-                gotInput = false;
+                GotInput = false;
                 return true;
             }
 

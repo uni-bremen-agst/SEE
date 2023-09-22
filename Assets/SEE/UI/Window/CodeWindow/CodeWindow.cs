@@ -16,12 +16,12 @@ namespace SEE.UI.Window.CodeWindow
         /// <summary>
         /// The text displayed in the code window.
         /// </summary>
-        private string Text;
+        private string text;
 
         /// <summary>
         /// TextMeshPro component containing the code.
         /// </summary>
-        private TextMeshProUGUI TextMesh;
+        private TextMeshProUGUI textMesh;
 
         /// <summary>
         /// Path to the file whose content is displayed in this code window.
@@ -64,7 +64,7 @@ namespace SEE.UI.Window.CodeWindow
         /// <summary>
         /// Path to the code window content prefab.
         /// </summary>
-        private const string CODE_WINDOW_PREFAB = "Prefabs/UI/CodeWindowContent";
+        private const string codeWindowPrefab = "Prefabs/UI/CodeWindowContent";
 
         /// <summary>
         /// Visually marks the line at the given <paramref name="lineNumber"/> and scrolls to it.
@@ -75,9 +75,9 @@ namespace SEE.UI.Window.CodeWindow
         private void MarkLine(int lineNumber)
         {
             markedLine = lineNumber;
-            string[] allLines = TextMesh.text.Split('\n').Select(x => x.EndsWith("</mark>") ? x.Substring(16, x.Length - 16 - 7) : x).ToArray();
+            string[] allLines = textMesh.text.Split('\n').Select(x => x.EndsWith("</mark>") ? x.Substring(16, x.Length - 16 - 7) : x).ToArray();
             string markLine = $"<mark=#ff000044>{allLines[lineNumber - 1]}</mark>\n";
-            TextMesh.text = string.Join("", allLines.Select(x => x + "\n").Take(lineNumber - 1).Append(markLine)
+            textMesh.text = string.Join("", allLines.Select(x => x + "\n").Take(lineNumber - 1).Append(markLine)
                                                     .Concat(allLines.Select(x => x + "\n").Skip(lineNumber).Take(lines - lineNumber - 2)));
         }
 
@@ -87,7 +87,7 @@ namespace SEE.UI.Window.CodeWindow
         /// The line we're scrolling towards at the moment.
         /// Will be 0 if we're not scrolling towards anything.
         /// </summary>
-        private int ScrollingTo;
+        private int scrollingTo;
 
         /// <summary>
         /// Number of "excess lines" within this code window.
@@ -102,7 +102,7 @@ namespace SEE.UI.Window.CodeWindow
         /// Holds the desired visible line before <see cref="Start"/> is called, because <see cref="scrollbar"/> will
         /// be undefined until then.
         /// </summary>
-        private float PreStartLine = 1;
+        private float preStartLine = 1;
 
         /// <summary>
         /// The line currently at the top of the window.
@@ -114,7 +114,7 @@ namespace SEE.UI.Window.CodeWindow
         /// will be returned.</remarks>
         public int VisibleLine
         {
-            get => ScrollingTo > 0 ? ScrollingTo : Mathf.CeilToInt(visibleLine) + 1;
+            get => scrollingTo > 0 ? scrollingTo : Mathf.CeilToInt(visibleLine) + 1;
             set
             {
                 if (value > lines || value < 1)
@@ -128,18 +128,18 @@ namespace SEE.UI.Window.CodeWindow
                 // the desired visible line.
                 if (!HasStarted)
                 {
-                    PreStartLine = value;
+                    preStartLine = value;
                 }
                 else
                 {
                     // Animate scroll
-                    ScrollingTo = value;
+                    scrollingTo = value;
                     DOTween.Sequence().Append(DOTween.To(() => visibleLine, f => visibleLine = f, value - 1, 1f))
-                           .AppendCallback(() => ScrollingTo = 0);
+                           .AppendCallback(() => scrollingTo = 0);
 
                     // FIXME: TMP bug: Large files cause issues with highlighting text. This is just a workaround.
                     // See https://github.com/uni-bremen-agst/SEE/issues/250#issuecomment-819653373
-                    if (Text.Length < 16382)
+                    if (text.Length < 16382)
                     {
                         MarkLine(value);
                     }
@@ -156,7 +156,7 @@ namespace SEE.UI.Window.CodeWindow
         /// </summary>
         private float visibleLine
         {
-            get => HasStarted ? (1 - scrollRect.verticalNormalizedPosition) * (lines - 1 - excessLines) : PreStartLine;
+            get => HasStarted ? (1 - scrollRect.verticalNormalizedPosition) * (lines - 1 - excessLines) : preStartLine;
             set
             {
                 if (value > lines - 1 || value < 0)
@@ -168,7 +168,7 @@ namespace SEE.UI.Window.CodeWindow
                 // the desired visible line.
                 if (!HasStarted)
                 {
-                    PreStartLine = value;
+                    preStartLine = value;
                 }
                 else
                 {
@@ -221,14 +221,14 @@ namespace SEE.UI.Window.CodeWindow
         /// <summary>
         /// Generates and returns a <see cref="CodeWindowValues"/> struct for this code window.
         /// If <see cref="FilePath"/> is <c>null</c>, the resulting <see cref="CodeWindowValues"/>
-        /// is created with <see cref="Text"/>; otherwise with <see cref="FilePath"/>.
+        /// is created with <see cref="text"/>; otherwise with <see cref="FilePath"/>.
         /// </summary>
         /// <returns>The newly created <see cref="CodeWindowValues"/>, matching this class</returns>
         public override WindowValues ToValueObject()
         {
             string attachedTo = gameObject.name;
             return FilePath == null
-                ? new CodeWindowValues(Title, VisibleLine, attachedTo, Text)
+                ? new CodeWindowValues(Title, VisibleLine, attachedTo, text)
                 : new CodeWindowValues(Title, VisibleLine, attachedTo, path: FilePath);
         }
 

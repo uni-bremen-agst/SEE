@@ -78,9 +78,9 @@ namespace SEE.Layout.NodeLayouts
                     // tree depth so that they can be stacked visually (level 0 is at the bottom).
                     position.y += LevelLift(child);
                 }
-                childTransform.position += position;
+                childTransform.Position += position;
                 layoutResult[child] = childTransform;
-                MakeGlobal(layoutResult, childTransform.position, child.Children());
+                MakeGlobal(layoutResult, childTransform.Position, child.Children());
             }
         }
 

@@ -74,7 +74,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// </summary>
         /// <param name="leftNode">node on the <see cref="Direction.Left"/> side</param>
         /// <param name="rightNode">node on the <see cref="Direction.Right"/> side</param>
-        private void StretchLeftOverVertical(Node leftNode, Node rightNode)
+        private static void StretchLeftOverVertical(Node leftNode, Node rightNode)
         {
             // along lower           along upper
             //    [r]         [r]    [l][r]  ->  [llll]
@@ -109,7 +109,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// </summary>
         /// <param name="leftNode">node on the <see cref="Direction.Left"/> side</param>
         /// <param name="rightNode">node on the <see cref="Direction.Right"/> side</param>
-        private void StretchRightOverVertical(Node leftNode, Node rightNode)
+        private static void StretchRightOverVertical(Node leftNode, Node rightNode)
         {
             // along lower           along upper
             // [l]         [l]       [l][r]  ->  [r][r]
@@ -145,7 +145,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// </summary>
         /// <param name="lowerNode">node on the <see cref="Direction.Lower"/> side</param>
         /// <param name="upperNode">node on the <see cref="Direction.Upper"/> side</param>
-        private void StretchLowerOverHorizontal(Node lowerNode, Node upperNode)
+        private static void StretchLowerOverHorizontal(Node lowerNode, Node upperNode)
         {
             // along left           along right
             // [uuuu] ->  [l][u]    [uuuu]  ->  [u][l]
@@ -180,7 +180,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// </summary>
         /// <param name="lowerNode">node on the <see cref="Direction.Lower"/> side</param>
         /// <param name="upperNode">node on the <see cref="Direction.Upper"/> side</param>
-        private void StretchUpperOverHorizontal(Node lowerNode, Node upperNode)
+        private static void StretchUpperOverHorizontal(Node lowerNode, Node upperNode)
         {
             // along left           along right
             // [u]    ->  [u]          [u]  ->      [u]

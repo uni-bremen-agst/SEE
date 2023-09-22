@@ -34,35 +34,35 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         internal void Open()
         {
-            dialog = new GameObject("Save board configuration dialog");
-            PropertyGroup group = dialog.AddComponent<PropertyGroup>();
+            Dialog = new GameObject("Save board configuration dialog");
+            PropertyGroup group = Dialog.AddComponent<PropertyGroup>();
             group.Name = "Save board configuration dialog";
 
-            selectedBoard = dialog.AddComponent<SelectionProperty>();
+            selectedBoard = Dialog.AddComponent<SelectionProperty>();
             selectedBoard.Name = "Select board";
             selectedBoard.Description = "Select the board of which to save the configuration";
             selectedBoard.AddOptions(BoardsManager.GetNames());
             selectedBoard.Value = BoardsManager.GetNames()[0];
             group.AddProperty(selectedBoard);
 
-            fileName = dialog.AddComponent<StringProperty>();
+            fileName = Dialog.AddComponent<StringProperty>();
             fileName.Name = "File name";
             fileName.Description =
                 "Enter a file name under which to save the configuration. If the file already exists," +
                 "it will be overwritten.";
             group.AddProperty(fileName);
 
-            propertyDialog = dialog.AddComponent<PropertyDialog>();
-            propertyDialog.Title = "Specify board configuration";
-            propertyDialog.Description = "Select the board to save and give the configuration file a name";
-            propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
-            propertyDialog.AddGroup(group);
+            PropertyDialog = Dialog.AddComponent<PropertyDialog>();
+            PropertyDialog.Title = "Specify board configuration";
+            PropertyDialog.Description = "Select the board to save and give the configuration file a name";
+            PropertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
+            PropertyDialog.AddGroup(group);
 
-            propertyDialog.OnConfirm.AddListener(SaveBoardConfiguration);
-            propertyDialog.OnCancel.AddListener(Cancel);
+            PropertyDialog.OnConfirm.AddListener(SaveBoardConfiguration);
+            PropertyDialog.OnCancel.AddListener(Cancel);
 
             SEEInput.KeyboardShortcutsEnabled = false;
-            propertyDialog.DialogShouldBeShown = true;
+            PropertyDialog.DialogShouldBeShown = true;
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         private void SaveBoardConfiguration()
         {
-            gotInput = true;
+            GotInput = true;
             filename = fileName.Value;
             widgetsManager = BoardsManager.Find(selectedBoard.Value);
             Close();
@@ -80,16 +80,16 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// <summary>
         /// Fetches the input the player gave us.
         /// </summary>
-        /// <param name="filenameOut">If <see cref="HolisticMetricsDialog.gotInput"/>, this will be the
+        /// <param name="filenameOut">If <see cref="HolisticMetricsDialog.GotInput"/>, this will be the
         /// <see cref="filename"/>. Otherwise null.</param>
-        /// <param name="widgetsManagerOut">If <see cref="HolisticMetricsDialog.gotInput"/>, this will be the
+        /// <param name="widgetsManagerOut">If <see cref="HolisticMetricsDialog.GotInput"/>, this will be the
         /// <see cref="widgetsManager"/>. Otherwise null.</param>
-        /// <returns><see cref="HolisticMetricsDialog.gotInput"/></returns>
+        /// <returns><see cref="HolisticMetricsDialog.GotInput"/></returns>
         internal bool GetUserInput(out string filenameOut, out WidgetsManager widgetsManagerOut)
         {
-            if (gotInput)
+            if (GotInput)
             {
-                gotInput = false;
+                GotInput = false;
                 filenameOut = filename;
                 widgetsManagerOut = widgetsManager;
                 return true;

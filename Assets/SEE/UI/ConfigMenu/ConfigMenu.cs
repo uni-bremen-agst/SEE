@@ -68,10 +68,9 @@ namespace SEE.UI.ConfigMenu
             }
         }
 
-        private const string PagePrefabPath = "Prefabs/UI/Page";
-        private const string TabButtonPrefabPath = "Prefabs/UI/TabButton";
-        private const string ActionButtonPrefabPath = "Prefabs/UI/ActionButton";
-        private const string PointerPrefabPath = "Prefabs/UI/Pointer";
+        private const string pagePrefabPath = "Prefabs/UI/Page";
+        private const string tabButtonPrefabPath = "Prefabs/UI/TabButton";
+        private const string actionButtonPrefabPath = "Prefabs/UI/ActionButton";
 
         private GameObject pagePrefab;
         private GameObject actionButtonPrefab;
@@ -194,9 +193,9 @@ namespace SEE.UI.ConfigMenu
 
         private void LoadPrefabs()
         {
-            tabButtonPrefab = PrefabInstantiator.LoadPrefab(TabButtonPrefabPath);
-            pagePrefab = PrefabInstantiator.LoadPrefab(PagePrefabPath);
-            actionButtonPrefab = PrefabInstantiator.LoadPrefab(ActionButtonPrefabPath);
+            tabButtonPrefab = PrefabInstantiator.LoadPrefab(tabButtonPrefabPath);
+            pagePrefab = PrefabInstantiator.LoadPrefab(pagePrefabPath);
+            actionButtonPrefab = PrefabInstantiator.LoadPrefab(actionButtonPrefabPath);
         }
         private void SetupActions()
         {

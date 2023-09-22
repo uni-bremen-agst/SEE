@@ -249,8 +249,8 @@ namespace SEE.Net.Dashboard
             DashboardVersion version = await GetDashboardVersion();
             switch (version.DifferenceToSupportedVersion)
             {
-                case DashboardVersion.Difference.MAJOR_OLDER:
-                case DashboardVersion.Difference.MINOR_OLDER:
+                case DashboardVersion.Difference.MajorOlder:
+                case DashboardVersion.Difference.MinorOlder:
                     // If major or minor version of the dashboard is older, we may use features that aren't existent
                     // in it yet, so we have to notify the user with a warning.
                     ShowNotification.Error("Dashboard Version too old",
@@ -258,35 +258,35 @@ namespace SEE.Net.Dashboard
                                            + $"has been written for version {DashboardVersion.SupportedVersion}."
                                            + $" Please update your dashboard.");
                     break;
-                case DashboardVersion.Difference.PATCH_OLDER:
+                case DashboardVersion.Difference.PathOlder:
                     // If patch version is older, there may be some bugfixes / security problems not accounted for.
                     ShowNotification.Warn("Dashboard Version outdated",
                                           $"Your dashboard has version {version} but this API supports "
                                           + $"{DashboardVersion.SupportedVersion}. The difference in versions is small,"
                                           + "so this shouldn't be too critical, but please update your dashboard to avoid any issues.");
                     break;
-                case DashboardVersion.Difference.MAJOR_NEWER:
+                case DashboardVersion.Difference.MajorNewer:
                     // Major new version can introduce breaking changes
                     ShowNotification.Error("Dashboard Version unsupported",
                                            $"Your dashboard has a major new version ({version}) compared to the supported version "
                                            + $"({DashboardVersion.SupportedVersion}), which may have introduced breaking changes. "
                                            + "Please update SEE's retrieval code accordingly.");
                     break;
-                case DashboardVersion.Difference.MINOR_NEWER:
-                case DashboardVersion.Difference.PATCH_NEWER:
+                case DashboardVersion.Difference.MinorNewer:
+                case DashboardVersion.Difference.PatchNewer:
                     // Minor and patch updates shouldn't impact existing functionality, but the retrieval code
                     // should still be updated by a developer.
                     Debug.LogWarning($"The dashboard uses version {version} while the retrieval code has been "
                                      + $"written for version {DashboardVersion.SupportedVersion}. Please update SEE's retrieval "
                                      + "code accordingly.");
                     break;
-                case DashboardVersion.Difference.EXTRA_OLDER:
-                case DashboardVersion.Difference.EXTRA_NEWER:
+                case DashboardVersion.Difference.ExtraOlder:
+                case DashboardVersion.Difference.ExtraNewer:
                     // Extra changes are assumed to be small enough to not even warrant a warning.
                     Debug.Log($"Dashboard version {version} differs slightly from supported version "
                               + $"{DashboardVersion.SupportedVersion}.");
                     break;
-                case DashboardVersion.Difference.EQUAL:
+                case DashboardVersion.Difference.Equal:
                     // No need to do anything
                     break;
                 default: throw new ArgumentOutOfRangeException();
@@ -350,7 +350,7 @@ namespace SEE.Net.Dashboard
             /// <summary>
             /// Public key of the accepted certificate.
             /// </summary>
-            private readonly string AcceptKey;
+            private readonly string acceptKey;
 
             /// <summary>
             /// Instantiates a new <see cref="AxivionCertificateHandler"/> with the given <paramref name="acceptKey"/>
@@ -359,11 +359,11 @@ namespace SEE.Net.Dashboard
             /// <param name="acceptKey">The public key of the accepted certificate.</param>
             public AxivionCertificateHandler(string acceptKey)
             {
-                AcceptKey = acceptKey;
+                this.acceptKey = acceptKey;
             }
 
             /// <summary>
-            /// Validates the given <paramref name="certificateData"/> by comparing it with <see cref="AcceptKey"/>.
+            /// Validates the given <paramref name="certificateData"/> by comparing it with <see cref="acceptKey"/>.
             /// </summary>
             /// <param name="certificateData">Certificate which shall be validated</param>
             /// <returns>True iff the certificate's validation was successful</returns>
@@ -373,7 +373,7 @@ namespace SEE.Net.Dashboard
                 // https://docs.unity3d.com/ScriptReference/Networking.CertificateHandler.ValidateCertificate.html
                 X509Certificate2 certificate = new X509Certificate2(certificateData);
                 string certPublicKey = certificate.GetPublicKeyString();
-                return certPublicKey?.Equals(AcceptKey) ?? false;
+                return certPublicKey?.Equals(acceptKey) ?? false;
             }
         }
     }

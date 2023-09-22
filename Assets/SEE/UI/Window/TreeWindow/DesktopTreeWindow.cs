@@ -29,7 +29,7 @@ namespace SEE.UI.Window.TreeWindow
         /// <summary>
         /// The amount by which the text of an item is indented per level.
         /// </summary>
-        private const int IndentShift = 22;
+        private const int indentShift = 22;
 
         /// <summary>
         /// Replace slashes with backslashes in the given <paramref name="id"/>.
@@ -47,7 +47,7 @@ namespace SEE.UI.Window.TreeWindow
             int children = node.NumberOfChildren() + Mathf.Min(node.Outgoings.Count, 1) + Mathf.Min(node.Incomings.Count, 1);
             AddItem(CleanupID(node.ID), CleanupID(node.Parent?.ID),
                     children, node.ToShortString(), node.Level,
-                    NODE_TYPE_UNICODE, i => CollapseNode(node, i), i => ExpandNode(node, i));
+                    nodeTypeUnicode, i => CollapseNode(node, i), i => ExpandNode(node, i));
         }
 
         /// <summary>
@@ -64,14 +64,14 @@ namespace SEE.UI.Window.TreeWindow
         private void AddItem(string id, string parentId, int children, string text, int level,
                              char icon, Action<GameObject> collapseItem, Action<GameObject> expandItem)
         {
-            GameObject item = PrefabInstantiator.InstantiatePrefab(TREE_ITEM_PREFAB, content, false);
+            GameObject item = PrefabInstantiator.InstantiatePrefab(treeItemPrefab, content, false);
             if (parentId != null)
             {
                 // Position the item below its parent.
                 // TODO: Use colors from the city (e.g., depending on node type).
                 // TODO: Include number badge in title.
                 item.transform.SetSiblingIndex(content.Find(parentId).GetSiblingIndex() + 1);
-                item.transform.Find("Foreground").localPosition += new Vector3(IndentShift * level, 0, 0);
+                item.transform.Find("Foreground").localPosition += new Vector3(indentShift * level, 0, 0);
             }
             // Slashes will cause problems later on, so we replace them with backslashes.
             // NOTE: This becomes a problem if two nodes A and B exist where node A's name contains slashes and node B
@@ -112,9 +112,9 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="node">The node to be removed.</param>
         private void RemoveNodeChildren(Node node)
         {
-            foreach ((string ID, Node child) in GetChildItems(node))
+            foreach ((string childID, Node child) in GetChildItems(node))
             {
-                RemoveItem(ID, child, GetChildItems);
+                RemoveItem(childID, child, GetChildItems);
             }
             return;
 
@@ -162,9 +162,9 @@ namespace SEE.UI.Window.TreeWindow
 
             if (expandedItems.Contains(id) && initial != null)
             {
-                foreach ((string ID, T child) in getChildItems(initial))
+                foreach ((string childID, T child) in getChildItems(initial))
                 {
-                    RemoveItem(ID, child, getChildItems);
+                    RemoveItem(childID, child, getChildItems);
                 }
             }
             Destroyer.Destroy(item);
@@ -222,11 +222,11 @@ namespace SEE.UI.Window.TreeWindow
 
             if (node.Outgoings.Count > 0)
             {
-                AddEdgeButton("Outgoing", OUTGOING_EDGE_UNICODE, node.Outgoings);
+                AddEdgeButton("Outgoing", outgoingEdgeUnicode, node.Outgoings);
             }
             if (node.Incomings.Count > 0)
             {
-                AddEdgeButton("Incoming", INCOMING_EDGE_UNICODE, node.Incomings);
+                AddEdgeButton("Incoming", incomingEdgeUnicode, node.Incomings);
             }
             return;
 
@@ -250,7 +250,7 @@ namespace SEE.UI.Window.TreeWindow
                             ExpandItem(i);
                             foreach (Edge edge in edges)
                             {
-                                AddItem($"{id}#{CleanupID(edge.ID)}", id, 0, edge.ToShortString(), node.Level + 2, EDGE_TYPE_UNICODE, null, null);
+                                AddItem($"{id}#{CleanupID(edge.ID)}", id, 0, edge.ToShortString(), node.Level + 2, edgeTypeUnicode, null, null);
                             }
                         });
             }
@@ -270,18 +270,18 @@ namespace SEE.UI.Window.TreeWindow
 
         protected override void StartDesktop()
         {
-            if (graph == null)
+            if (Graph == null)
             {
                 Debug.LogError("Graph must be set before starting the tree window.");
                 return;
             }
 
-            Title = $"{graph.Name} – Tree View";
+            Title = $"{Graph.Name} – Tree View";
             base.StartDesktop();
-            content = PrefabInstantiator.InstantiatePrefab(TREE_WINDOW_PREFAB, Window.transform.Find("Content"), false).transform.Find("Content");
+            content = PrefabInstantiator.InstantiatePrefab(treeWindowPrefab, Window.transform.Find("Content"), false).transform.Find("Content");
 
             // We will traverse the graph and add each node to the tree view.
-            IList<Node> roots = graph.GetRoots();
+            IList<Node> roots = Graph.GetRoots();
             foreach (Node root in roots)
             {
                 AddNode(root);

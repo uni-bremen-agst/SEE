@@ -88,7 +88,7 @@ namespace SEE.UI.Notification
         /// <summary>
         /// Path to the notification prefab.
         /// </summary>
-        private const string NOTIFICATION_PREFAB = "Prefabs/UI/Notification";
+        private const string notificationPrefab = "Prefabs/UI/Notification";
 
         /// <summary>
         /// The number of frames this notification has been active.
@@ -112,7 +112,7 @@ namespace SEE.UI.Notification
         /// <summary>
         /// The operator for the <see cref="ManagedNotification"/>.
         /// </summary>
-        private NotificationOperator Operator;
+        private NotificationOperator notificationOperator;
 
         /// <summary>
         /// Called when the notification is finished.
@@ -164,14 +164,14 @@ namespace SEE.UI.Notification
         /// <returns>a callback for the started animation, or null if no animation has been started</returns>
         public IOperationCallback<Action> MoveDown(float y)
         {
-            if (Operator == null)
+            if (notificationOperator == null)
             {
                 targetY = y;
                 return null;
             }
             else
             {
-                return Operator.MoveToY(Operator.TargetPositionY - y);
+                return notificationOperator.MoveToY(notificationOperator.TargetPositionY - y);
             }
         }
 
@@ -180,8 +180,8 @@ namespace SEE.UI.Notification
         /// </summary>
         protected override void StartDesktop()
         {
-            ManagedNotification = PrefabInstantiator.InstantiatePrefab(NOTIFICATION_PREFAB, Canvas.transform, false);
-            ManagedNotification.MustGetComponent(out Operator);
+            ManagedNotification = PrefabInstantiator.InstantiatePrefab(notificationPrefab, Canvas.transform, false);
+            ManagedNotification.MustGetComponent(out notificationOperator);
 
             // Setup anchoring
             RectTransform rectTransform = (RectTransform)ManagedNotification.transform;

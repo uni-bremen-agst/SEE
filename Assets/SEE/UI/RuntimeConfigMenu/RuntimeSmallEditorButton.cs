@@ -17,7 +17,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// The prefab for small editor window.
         /// </summary>
         private const string SMALL_WINDOW_PREFAB =
-            RuntimeTabMenu.RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfig_SmallConfigWindow";
+            RuntimeTabMenu.runtimeConfigPrefabFolder + "RuntimeConfig_SmallConfigWindow";
 
         /// <summary>
         /// The editor window.

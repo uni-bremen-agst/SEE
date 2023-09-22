@@ -42,7 +42,7 @@ namespace SEE.Controls.Actions
         private void Initialize()
         {
             CurrentState = ReversibleAction.Progress.NoEffect;
-            usedGizmo = new ScaleGizmo();
+            UsedGizmo = new ScaleGizmo();
         }
 
         #endregion Constructors
@@ -133,7 +133,7 @@ namespace SEE.Controls.Actions
         protected override void FinalizeAction()
         {
             base.FinalizeAction();
-            gameNodeMemento.Finalize(GameNodeSelected.transform.localScale);
+            GameNodeMemento.Finalize(GameNodeSelected.transform.localScale);
         }
 
         /// <summary>
@@ -143,7 +143,7 @@ namespace SEE.Controls.Actions
         /// <returns>true if the object to be manipulated has had a change</returns>
         protected override bool HasChanges()
         {
-            return GameNodeSelected.transform.localScale != gameNodeMemento.InitialState;
+            return GameNodeSelected.transform.localScale != GameNodeMemento.InitialState;
         }
 
         protected override Memento<Vector3> CreateMemento(GameObject gameNode)
@@ -165,7 +165,7 @@ namespace SEE.Controls.Actions
             /// </summary>
             public ScaleGizmo()
             {
-                objectTransformationGizmo = RTGizmosEngine.Get.CreateObjectScaleGizmo();
+                ObjectTransformationGizmo = RTGizmosEngine.Get.CreateObjectScaleGizmo();
             }
         }
         #endregion

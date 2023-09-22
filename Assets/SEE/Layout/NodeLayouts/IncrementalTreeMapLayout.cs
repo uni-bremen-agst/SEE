@@ -243,7 +243,7 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="workWith">a copy of the old layout with nodes from the new one</param>
         /// <param name="nodesToBeDeleted">artificial nodes with no equivalent ILayoutNode, part of workWith</param>
         /// <param name="nodesToBeAdded">nodes that are not in workWith, but in nodes</param>
-        private void SetupNodeLists(
+        private static void SetupNodeLists(
             List<Node> nodes,
             List<Node> oldNodes,
             out List<Node> workWith,

@@ -21,19 +21,19 @@ namespace SEE.UI
         /// <summary>
         /// The folder where to find UI Prefabs.
         /// </summary>
-        protected const string UI_PREFAB_FOLDER = "Prefabs/UI/";
+        protected const string UIPrefabFolder = "Prefabs/UI/";
 
         /// <summary>
         /// Name of the canvas on which UI elements are placed.
         /// </summary>
-        private const string UI_CANVAS_NAME = "UI Canvas";
+        private const string uiCanvasName = "UI Canvas";
 
         /// <summary>
         /// Path to where the UI Canvas prefab is stored.
         /// This prefab should contain all components necessary for the UI canvas, such as an event system,
         /// a graphic raycaster, etc.
         /// </summary>
-        private const string UI_CANVAS_PREFAB = UI_PREFAB_FOLDER + "UICanvas";
+        private const string uiCanvasPrefab = UIPrefabFolder + "UICanvas";
 
         /// <summary>
         /// The canvas on which UI elements are placed.
@@ -61,8 +61,8 @@ namespace SEE.UI
             {
                 // TODO: Is it needed to search for the UI canvas?
                 // The canvas is now static and nobody else should instantiate the canvas...
-                Canvas = GameObject.Find(UI_CANVAS_NAME) ?? PrefabInstantiator.InstantiatePrefab(UI_CANVAS_PREFAB);
-                Canvas.name = UI_CANVAS_NAME;
+                Canvas = GameObject.Find(uiCanvasName) ?? PrefabInstantiator.InstantiatePrefab(uiCanvasPrefab);
+                Canvas.name = uiCanvasName;
             }
 
             // calls the start method for the current platform

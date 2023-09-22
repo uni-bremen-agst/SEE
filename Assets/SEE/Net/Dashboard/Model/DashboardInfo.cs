@@ -15,31 +15,31 @@ namespace SEE.Net.Dashboard.Model
         /// Axivion Dashboard version serving this API.
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly string dashboardVersion;
+        public readonly string DashboardVersion;
 
         /// <summary>
         /// Parseable Axivion Dashboard Version.
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly string dashboardVersionNumber;
+        public readonly string DashboardVersionNumber;
 
         /// <summary>
         /// Dashboard Server Build date.
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly string dashboardBuildDate;
+        public readonly string DashboardBuildDate;
 
         /// <summary>
         /// Name of the successfully authenticated user if a dashboard-user is associated with the request.
         /// </summary>
         [JsonProperty(Required = Required.Default)]
-        public readonly string username;
+        public readonly string Username;
 
         /// <summary>
         /// The HTTP-Request Header expected present for all HTTP requests that are not GET, HEAD, OPTIONS or TRACE.
         /// </summary>
         [JsonProperty(Required = Required.Default)]
-        public readonly string csrfTokenHeader;
+        public readonly string CsrfTokenHeader;
 
         /// <summary>
         /// The value expected to be sent along the <c>csrfTokenHeader</c> for all HTTP requests that are not
@@ -53,39 +53,39 @@ namespace SEE.Net.Dashboard.Model
         /// this token from time to time.
         /// </remarks>
         [JsonProperty(Required = Required.Default)]
-        public readonly string csrfToken;
+        public readonly string CsrfToken;
 
         /// <summary>
         /// A URI that can be used to check credentials via GET. It returns "ok" in case of valid credentials.
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly string checkCredentialsUrl;
+        public readonly string CheckCredentialsUrl;
 
         /// <summary>
         /// List of references to the projects visible to the authenticated user.
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly IList<ProjectReference> projects;
+        public readonly IList<ProjectReference> Projects;
 
         /// <summary>
         /// Entry point for creating, listing, deleting api tokens of the authenticated user.
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly string userApiTokenUrl;
+        public readonly string UserApiTokenUrl;
 
         public DashboardInfo(string dashboardVersion, string dashboardVersionNumber, string dashboardBuildDate,
                              string username, string csrfTokenHeader, string csrfToken, string checkCredentialsUrl,
                              IList<ProjectReference> projects, string userApiTokenUrl)
         {
-            this.dashboardVersion = dashboardVersion;
-            this.dashboardVersionNumber = dashboardVersionNumber;
-            this.dashboardBuildDate = dashboardBuildDate;
-            this.username = username;
-            this.csrfTokenHeader = csrfTokenHeader;
-            this.csrfToken = csrfToken;
-            this.checkCredentialsUrl = checkCredentialsUrl;
-            this.projects = projects;
-            this.userApiTokenUrl = userApiTokenUrl;
+            this.DashboardVersion = dashboardVersion;
+            this.DashboardVersionNumber = dashboardVersionNumber;
+            this.DashboardBuildDate = dashboardBuildDate;
+            this.Username = username;
+            this.CsrfTokenHeader = csrfTokenHeader;
+            this.CsrfToken = csrfToken;
+            this.CheckCredentialsUrl = checkCredentialsUrl;
+            this.Projects = projects;
+            this.UserApiTokenUrl = userApiTokenUrl;
         }
 
         /// <summary>
@@ -98,34 +98,34 @@ namespace SEE.Net.Dashboard.Model
             /// The name of the project. Use this string to refer to the project.
             /// </summary>
             [JsonProperty(Required = Required.Always)]
-            public readonly string name;
+            public readonly string Name;
 
             /// <summary>
             /// URI to get further information about the project.
             /// </summary>
             [JsonProperty(Required = Required.Always)]
-            public readonly string url;
+            public readonly string URL;
 
             public ProjectReference(string name, string url)
             {
-                this.name = name;
-                this.url = url;
+                this.Name = name;
+                this.URL = url;
             }
 
             public override string ToString()
             {
-                return $"{nameof(name)}: {name}, {nameof(url)}: {url}";
+                return $"{nameof(Name)}: {Name}, {nameof(URL)}: {URL}";
             }
         }
 
         public override string ToString()
         {
-            return $"{nameof(dashboardVersion)}: {dashboardVersion}, "
-                   + $"{nameof(dashboardVersionNumber)}: {dashboardVersionNumber}, "
-                   + $"{nameof(dashboardBuildDate)}: {dashboardBuildDate}, {nameof(username)}: {username},"
-                   + $" {nameof(csrfTokenHeader)}: {csrfTokenHeader}, {nameof(csrfToken)}: {csrfToken},"
-                   + $" {nameof(checkCredentialsUrl)}: {checkCredentialsUrl}, {nameof(projects)}: {projects},"
-                   + $" {nameof(userApiTokenUrl)}: {userApiTokenUrl}";
+            return $"{nameof(DashboardVersion)}: {DashboardVersion}, "
+                   + $"{nameof(DashboardVersionNumber)}: {DashboardVersionNumber}, "
+                   + $"{nameof(DashboardBuildDate)}: {DashboardBuildDate}, {nameof(Username)}: {Username},"
+                   + $" {nameof(CsrfTokenHeader)}: {CsrfTokenHeader}, {nameof(CsrfToken)}: {CsrfToken},"
+                   + $" {nameof(CheckCredentialsUrl)}: {CheckCredentialsUrl}, {nameof(Projects)}: {Projects},"
+                   + $" {nameof(UserApiTokenUrl)}: {UserApiTokenUrl}";
         }
     }
 }

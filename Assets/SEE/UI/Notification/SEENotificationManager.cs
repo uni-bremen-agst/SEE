@@ -14,7 +14,7 @@ namespace SEE.UI.Notification
     /// It behaves as follows:
     /// <ul>
     /// <li>New notifications are displayed at the top right. Any existing notifications will be pushed down,
-    /// along with a configurable <see cref="MARGIN"/>.</li>
+    /// along with a configurable <see cref="margin"/>.</li>
     /// <li>Notifications can be closed by clicking on them,
     /// which will cause below notifications to "slide up" and fill the empty space.</li>
     /// <li>Movement in both directions is done via the <see cref="NotificationOperator"/>,
@@ -32,12 +32,12 @@ namespace SEE.UI.Notification
         /// <summary>
         /// Size of vertical margin between each notification.
         /// </summary>
-        private const float MARGIN = 10f;
+        private const float margin = 10f;
 
         /// <summary>
         /// Notifications managed by this component along with their respective height.
         /// </summary>
-        private readonly List<NotificationData> Notifications = new();
+        private readonly List<NotificationData> notifications = new();
 
         /// <summary>
         /// Creates and immediately displays a notification using the given parameters.
@@ -82,22 +82,22 @@ namespace SEE.UI.Notification
             });
 
             // We iterate through the list in reverse so we can remove elements without complications.
-            for (int i = Notifications.Count - 1; i >= 0; i--)
+            for (int i = notifications.Count - 1; i >= 0; i--)
             {
-                if (Notifications[i].Notification == null)
+                if (notifications[i].Notification == null)
                 {
-                    Notifications.RemoveAt(i);
+                    notifications.RemoveAt(i);
                     continue;
                 }
 
                 // New notification is at the top. We move all others down by the height of this one.
-                Notifications[i].Notification.MoveDown(finalHeight + MARGIN);
+                notifications[i].Notification.MoveDown(finalHeight + margin);
                 // This also cancels their timer. Only the notification at the very top will be timed.
-                Notifications[i].Token.Cancel();
+                notifications[i].Token.Cancel();
             }
 
             CancellationTokenSource token = new();
-            Notifications.Add(new NotificationData(notification, finalHeight + MARGIN, token));
+            notifications.Add(new NotificationData(notification, finalHeight + margin, token));
 
             StartTimer(notification, token.Token).Forget();
         }
@@ -120,7 +120,7 @@ namespace SEE.UI.Notification
 
             await UniTask.Delay(TimeSpan.FromSeconds(notification.Timer), cancellationToken: token);
             // If the notification is still active AND at the top of the list, we'll close it
-            if (Notifications.Count > 0 && Notifications.Last().Notification == notification)
+            if (notifications.Count > 0 && notifications.Last().Notification == notification)
             {
                 notification.Close();
             }
@@ -134,8 +134,8 @@ namespace SEE.UI.Notification
         {
             bool belowRemovedNotification = false;
             float height = 0;
-            int index = Notifications.Count - 1;
-            foreach (NotificationData entry in Notifications.AsQueryable().Reverse())
+            int index = notifications.Count - 1;
+            foreach (NotificationData entry in notifications.AsQueryable().Reverse())
             {
                 // All notifications below this one need to be moved up by the height of the closed notification.
                 // We do nothing until we find our notification, as the ones above do not need to be adjusted.
@@ -164,26 +164,26 @@ namespace SEE.UI.Notification
                 return;
             }
 
-            if (index == Notifications.Count - 1 && Notifications.Count > 1)
+            if (index == notifications.Count - 1 && notifications.Count > 1)
             {
                 // Top spot has changed. We start the timer for the new top notification.
-                CancellationTokenSource token = Notifications[index - 1].Token = new CancellationTokenSource();
-                StartTimer(Notifications[index - 1].Notification, token.Token).Forget();
+                CancellationTokenSource token = notifications[index - 1].Token = new CancellationTokenSource();
+                StartTimer(notifications[index - 1].Notification, token.Token).Forget();
             }
 
             // We also need to dispose the token.
-            Notifications[index].Token.Cancel();
-            Notifications[index].Token.Dispose();
-            Notifications.RemoveAt(index);
+            notifications[index].Token.Cancel();
+            notifications[index].Token.Dispose();
+            notifications.RemoveAt(index);
         }
 
         private void Update()
         {
             if (SEEInput.CloseAllNotifications())
             {
-                for (int i = Notifications.Count - 1; i >= 0; i--)
+                for (int i = notifications.Count - 1; i >= 0; i--)
                 {
-                    Notifications[i].Notification.Close();
+                    notifications[i].Notification.Close();
                 }
             }
         }

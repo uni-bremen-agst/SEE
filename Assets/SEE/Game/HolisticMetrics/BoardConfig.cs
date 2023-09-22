@@ -192,27 +192,27 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// The label in the configuration file for the x coordinate of a widget.
         /// </summary>
-        private const string WidgetPositionXLabel = "WidgetPositionX";
+        private const string widgetPositionXLabel = "WidgetPositionX";
 
         /// <summary>
         /// The label in the configuration file for the y coordinate of a widget.
         /// </summary>
-        private const string WidgetPositionYLabel = "WidgetPositionY";
+        private const string widgetPositionYLabel = "WidgetPositionY";
 
         /// <summary>
         /// The label in the configuration file for the z coordinate of a widget.
         /// </summary>
-        private const string WidgetPositionZLabel = "WidgetPositionZ";
+        private const string widgetPositionZLabel = "WidgetPositionZ";
 
         /// <summary>
         /// Label in the configuration file for the metric type of a widget.
         /// </summary>
-        private const string MetricTypeLabel = "MetricType";
+        private const string wetricTypeLabel = "MetricType";
 
         /// <summary>
         /// Label in the configuration file for the name (type) of a widget.
         /// </summary>
-        private const string WidgetNameLabel = "WidgetName";
+        private const string widgetNameLabel = "WidgetName";
 
         /// <summary>
         /// Writes this <see cref="BoardConfig"/>'s attributes into the given <see cref="ConfigWriter"/>.
@@ -223,11 +223,11 @@ namespace SEE.Game.HolisticMetrics
             writer.BeginGroup();
             // TODO: Could we add the ID as a string here and read from it later? Also when transferring widgets
             // to other players?
-            writer.Save(Position.x, WidgetPositionXLabel);
-            writer.Save(Position.y, WidgetPositionYLabel);
-            writer.Save(Position.z, WidgetPositionZLabel);
-            writer.Save(MetricType, MetricTypeLabel);
-            writer.Save(WidgetName, WidgetNameLabel);
+            writer.Save(Position.x, widgetPositionXLabel);
+            writer.Save(Position.y, widgetPositionYLabel);
+            writer.Save(Position.z, widgetPositionZLabel);
+            writer.Save(MetricType, wetricTypeLabel);
+            writer.Save(WidgetName, widgetNameLabel);
             writer.EndGroup();
         }
 
@@ -245,9 +245,9 @@ namespace SEE.Game.HolisticMetrics
             bool errors = false;
             ID = Guid.NewGuid();
 
-            if (attributes.TryGetValue(WidgetPositionXLabel, out object widgetPositionX) &&
-                attributes.TryGetValue(WidgetPositionYLabel, out object widgetPositionY) &&
-                attributes.TryGetValue(WidgetPositionZLabel, out object widgetPositionZ))
+            if (attributes.TryGetValue(widgetPositionXLabel, out object widgetPositionX) &&
+                attributes.TryGetValue(widgetPositionYLabel, out object widgetPositionY) &&
+                attributes.TryGetValue(widgetPositionZLabel, out object widgetPositionZ))
             {
                 Position = new Vector3((float)widgetPositionX, (float)widgetPositionY, (float)widgetPositionZ);
             }
@@ -257,7 +257,7 @@ namespace SEE.Game.HolisticMetrics
                 errors = true;
             }
 
-            if (attributes.TryGetValue(MetricTypeLabel, out object metricType))
+            if (attributes.TryGetValue(wetricTypeLabel, out object metricType))
             {
                 MetricType = (string)metricType;
             }
@@ -268,7 +268,7 @@ namespace SEE.Game.HolisticMetrics
                 errors = true;
             }
 
-            if (attributes.TryGetValue(WidgetNameLabel, out object widgetName))
+            if (attributes.TryGetValue(widgetNameLabel, out object widgetName))
             {
                 WidgetName = (string)widgetName;
             }

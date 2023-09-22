@@ -26,14 +26,14 @@ namespace SEE.UI.PropertyDialog
         /// The game object representing the group of properties. It is an instantiation
         /// of the prefab <see cref="configurationGroupPrefabPath"/>. It will be an
         /// ascendant of the UI canvas. Its children will be the input fields for the
-        /// <see cref="Properties"/>.
+        /// <see cref="properties"/>.
         /// </summary>
         public GameObject PropertyGroupUIObject;
 
         /// <summary>
         /// The input fields for the properties in this property group.
         /// </summary>
-        private readonly IList<Property> Properties = new List<Property>();
+        private readonly IList<Property> properties = new List<Property>();
 
         /// <summary>
         /// The path of the prefab for a PropertyGroup.
@@ -59,23 +59,23 @@ namespace SEE.UI.PropertyDialog
         }
 
         /// <summary>
-        /// Adds a <paramref name="property"/> to this group's <see cref="Properties"/>.
-        /// The names of the properties must be unique within the group's <see cref="Properties"/>.
+        /// Adds a <paramref name="property"/> to this group's <see cref="properties"/>.
+        /// The names of the properties must be unique within the group's <see cref="properties"/>.
         /// If a name exists already, an exception will be thrown.
         /// </summary>
         /// <param name="property">The property to add to this group.</param>
         public void AddProperty(Property property)
         {
-            if (Properties.Any(x => x.Name == property.Name))
+            if (properties.Any(x => x.Name == property.Name))
             {
                 throw new InvalidOperationException($"Property with the given name '{property.Name}' already exists!\n");
             }
-            Properties.Add(property);
+            properties.Add(property);
         }
 
         /// <summary>
         /// Creates <see cref="PropertyGroupUIObject"/> and makes all properties in
-        /// <see cref="Properties"/> its children.
+        /// <see cref="properties"/> its children.
         /// </summary>
         protected override void StartDesktop()
         {
@@ -83,7 +83,7 @@ namespace SEE.UI.PropertyDialog
             {
                 PropertyGroupUIObject = CreatePropertyUIObject(Name);
             }
-            foreach (Property property in Properties)
+            foreach (Property property in properties)
             {
                 property.SetParent(PropertyGroupUIObject);
             }
@@ -109,7 +109,7 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         internal void GetReady()
         {
-            foreach (Property property in Properties)
+            foreach (Property property in properties)
             {
                 property.GetReady();
             }

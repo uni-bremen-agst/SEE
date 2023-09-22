@@ -13,42 +13,42 @@ namespace SEE.UI.Notification
         /// <summary>
         /// Default amount of time a notification is shown (in seconds), if not specified any further.
         /// </summary>
-        private const float DEFAULT_DURATION = 10f;
+        private const float defaultDuration = 10f;
 
         /// <summary>
         /// Background color for error messages.
         /// </summary>
-        private static readonly Color ErrorColor = new(0x55 / 255f, 0x2D / 255f, 0x2E / 255f);
+        private static readonly Color errorColor = new(0x55 / 255f, 0x2D / 255f, 0x2E / 255f);
 
         /// <summary>
         /// Background color for warning messages.
         /// </summary>
-        private static readonly Color WarningColor = new(0x55 / 255f, 0x4E / 255f, 0x2D / 255f);
+        private static readonly Color warningColor = new(0x55 / 255f, 0x4E / 255f, 0x2D / 255f);
 
         /// <summary>
         /// Background color for info messages.
         /// </summary>
-        private static readonly Color InfoColor = new(0x2D / 255f, 0x40 / 255f, 0x55 / 255f);
+        private static readonly Color infoColor = new(0x2D / 255f, 0x40 / 255f, 0x55 / 255f);
 
         /// <summary>
         /// Sprite for the error icon.
         /// </summary>
-        private static readonly Sprite ErrorIcon = Resources.Load<Sprite>("Materials/Notification/Error");
+        private static readonly Sprite errorIcon = Resources.Load<Sprite>("Materials/Notification/Error");
 
         /// <summary>
         /// Sprite for the warning icon.
         /// </summary>
-        private static readonly Sprite WarningIcon = Resources.Load<Sprite>("Materials/Notification/Warning");
+        private static readonly Sprite warningIcon = Resources.Load<Sprite>("Materials/Notification/Warning");
 
         /// <summary>
         /// Sprite for the info icon.
         /// </summary>
-        private static readonly Sprite InfoIcon = Resources.Load<Sprite>("Materials/Notification/Info");
+        private static readonly Sprite infoIcon = Resources.Load<Sprite>("Materials/Notification/Info");
 
         /// <summary>
         /// Lazily initialized notification manager instance. Behaves like a singleton.
         /// </summary>
-        private static readonly Lazy<SEENotificationManager> Manager = new(CreateManager);
+        private static readonly Lazy<SEENotificationManager> manager = new(CreateManager);
 
         /// <summary>
         /// Creates a new <see cref="SEENotificationManager"/> along with a corresponding new <see cref="GameObject"/>.
@@ -72,14 +72,14 @@ namespace SEE.UI.Notification
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
         /// <param name="log">Whether to log the given notification in Unity's log as well</param>
         /// <returns>The created notification. Will be <c>null</c> as soon it's done playing.</returns>
-        public static Notification Info(string title, string description, float duration = DEFAULT_DURATION,
+        public static Notification Info(string title, string description, float duration = defaultDuration,
                                         bool log = true)
         {
             if (log)
             {
                 Debug.Log($"{title}: {description}\n");
             }
-            return Show(title, description, InfoIcon, InfoColor, duration);
+            return Show(title, description, infoIcon, infoColor, duration);
         }
 
         /// <summary>
@@ -90,14 +90,14 @@ namespace SEE.UI.Notification
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
         /// <param name="log">Whether to log the given notification in Unity's log as well</param>
         /// <returns>The created notification. Will be <c>null</c> as soon it's done playing.</returns>
-        public static Notification Warn(string title, string description, float duration = DEFAULT_DURATION,
+        public static Notification Warn(string title, string description, float duration = defaultDuration,
                                         bool log = true)
         {
             if (log)
             {
                 Debug.LogWarning($"{title}: {description}\n");
             }
-            return Show(title, description, WarningIcon, WarningColor, duration);
+            return Show(title, description, warningIcon, warningColor, duration);
         }
 
         /// <summary>
@@ -108,14 +108,14 @@ namespace SEE.UI.Notification
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
         /// <param name="log">Whether to log the given notification in Unity's log as well</param>
         /// <returns>The created notification. Will be <c>null</c> as soon it's done playing.</returns>
-        public static Notification Error(string title, string description, float duration = DEFAULT_DURATION,
+        public static Notification Error(string title, string description, float duration = defaultDuration,
                                          bool log = true)
         {
             if (log)
             {
                 Debug.LogError($"{title}: {description}\n");
             }
-            return Show(title, description, ErrorIcon, ErrorColor, duration);
+            return Show(title, description, errorIcon, errorColor, duration);
         }
 
         /// <summary>
@@ -128,9 +128,9 @@ namespace SEE.UI.Notification
         /// <param name="duration">The duration of the notification.</param>
         /// <returns>The created notification. Will be <c>null</c> as soon it's done playing.</returns>
         public static Notification Show(string title, string description, Sprite icon, Color color,
-                                        float duration = DEFAULT_DURATION)
+                                        float duration = defaultDuration)
         {
-            return Manager.Value.Show(title, description, icon, color, duration);
+            return manager.Value.Show(title, description, icon, color, duration);
         }
     }
 }

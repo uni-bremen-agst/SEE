@@ -99,7 +99,7 @@ namespace SEE.Layout.NodeLayouts
             foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
             {
                 NodeTransform transform = entry.Value;
-                transform.position += offset;
+                transform.Position += offset;
                 result[entry.Key] = transform;
             }
             return result;
@@ -330,11 +330,11 @@ namespace SEE.Layout.NodeLayouts
                 T node = entry.Key;
                 NodeTransform transform = entry.Value;
                 // y co-ordinate of transform.position refers to the ground
-                Vector3 position = transform.position;
-                position.y += transform.scale.y / 2.0f;
+                Vector3 position = transform.Position;
+                position.y += transform.Scale.y / 2.0f;
                 node.CenterPosition = position;
-                node.LocalScale = transform.scale;
-                node.Rotation = transform.rotation;
+                node.LocalScale = transform.Scale;
+                node.Rotation = transform.Rotation;
             }
         }
     }

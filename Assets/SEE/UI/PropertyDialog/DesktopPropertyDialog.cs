@@ -18,14 +18,14 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// The path of the prefab to instantiate the dialog.
         /// </summary>
-        private const string DialogPrefab = "Prefabs/UI/PropertyDialog";
+        private const string dialogPrefab = "Prefabs/UI/PropertyDialog";
         /// <summary>
         /// Name of the ascendant in the Modern UI Pack dialog relative to the instantiated <see cref="dialog"/>.
         /// </summary>
-        private const string ContentChildName = "Main Content/Content Mask/Content/InputFields/Scroll Area/List";
+        private const string contentChildName = "Main Content/Content Mask/Content/InputFields/Scroll Area/List";
 
         /// <summary>
-        /// The instantiation of <see cref="DialogPrefab"/>.
+        /// The instantiation of <see cref="dialogPrefab"/>.
         /// </summary>
         private GameObject dialog;
         /// <summary>
@@ -41,22 +41,22 @@ namespace SEE.UI.PropertyDialog
         private bool allowClosing = true;
 
         /// <summary>
-        /// Instantiates <see cref="dialog"/> from <see cref="DialogPrefab"/>,
+        /// Instantiates <see cref="dialog"/> from <see cref="dialogPrefab"/>,
         /// and makes it a child of the <see cref="Canvas"/>.
         /// In addition, a <see cref="ModalWindowManager"/> is attached to it (<see cref="modal"/>)
         /// with the attributes <see cref="Title"/> and <see cref="Description"/> and the <see cref="Icon"/>.
         /// Every <see cref="groups"/> element is created and added as child to the dialog's ascendant
-        /// named <see cref="ContentChildName"/>.
+        /// named <see cref="contentChildName"/>.
         /// </summary>
         protected override void StartDesktop()
         {
             try
             {
-                dialog = PrefabInstantiator.InstantiatePrefab(DialogPrefab, Canvas.transform, false);
+                dialog = PrefabInstantiator.InstantiatePrefab(dialogPrefab, Canvas.transform, false);
             }
             catch (Exception e)
             {
-                Debug.LogError($"The dialog {Title} could not be instantiated using the prefab {DialogPrefab}: {e.Message}.\n");
+                Debug.LogError($"The dialog {Title} could not be instantiated using the prefab {dialogPrefab}: {e.Message}.\n");
                 enabled = false;
                 return;
             }
@@ -70,7 +70,7 @@ namespace SEE.UI.PropertyDialog
                 }
                 modal.descriptionText = Description;
 
-                Transform contentChild = dialog.transform.Find(ContentChildName);
+                Transform contentChild = dialog.transform.Find(contentChildName);
                 foreach (PropertyGroup group in groups)
                 {
                     group.SetParent(contentChild.gameObject);

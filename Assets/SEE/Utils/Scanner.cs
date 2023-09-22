@@ -87,7 +87,7 @@ namespace SEE.Utils
             /// </summary>
             /// <param name="value">character to be checked</param>
             /// <returns>true if <paramref name="value"/> is whitespace</returns>
-            private bool IsWhiteSpace(char value)
+            private static bool IsWhiteSpace(char value)
             {
                 return value == ' '
                     || value == '\n'
@@ -263,7 +263,7 @@ namespace SEE.Utils
             /// </summary>
             /// <param name="c">character to be checked</param>
             /// <returns>true for letter, digit, and underscore</returns>
-            private bool IsLabelLetter(char c)
+            private static bool IsLabelLetter(char c)
             {
                 return Char.IsLetterOrDigit(c) || c == '_';
             }

@@ -416,9 +416,9 @@ namespace SEE.Game.CityRendering
                         NodeOperator nodeOperator = node.AddOrGetComponent<NodeOperator>();
                         // nodeTransform.position.y relates to the ground of the node;
                         // the node operator's y co-ordinate is meant to be the center
-                        nodeTransform.position.y += nodeTransform.scale.y / 2;
+                        nodeTransform.Position.y += nodeTransform.Scale.y / 2;
                         //Debug.Log($"{node.name} [{node.transform.position}, {node.transform.lossyScale}] => [{nodeTransform.position}), ({nodeTransform.scale}]\n");
-                        nodeOperator.MoveTo(nodeTransform.position);
+                        nodeOperator.MoveTo(nodeTransform.Position);
                         // FIXME: Scaling doesn't work yet; likely because nodeTransform.scale is world space
                         // but the node operator expects local scale.
                         //nodeOperator.ScaleTo(nodeTransform.scale, animationDuration);
@@ -575,7 +575,7 @@ namespace SEE.Game.CityRendering
         /// <param name="gameNodes">game nodes whose source name is to be added</param>
         private void AddLabels(IEnumerable<GameObject> gameNodes)
         {
-            const float RelativeLabelSize = 0.8f;
+            const float relativeLabelSize = 0.8f;
             GameObject codeCity = null;
             foreach (GameObject node in gameNodes)
             {
@@ -588,7 +588,7 @@ namespace SEE.Game.CityRendering
                     Vector3 position = node.GetRoofCenter();
                     GameObject text = TextFactory.GetTextWithWidth(text: theNode.SourceName,
                                                                    position: position,
-                                                                   width: length * RelativeLabelSize,
+                                                                   width: length * relativeLabelSize,
                                                                    lift: true,
                                                                    textColor: node.GetColor().Invert());
                     text.transform.SetParent(node.transform);

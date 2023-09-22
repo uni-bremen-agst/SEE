@@ -14,17 +14,17 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// The graph node to be laid out.
         /// </summary>
-        protected readonly Node node;
+        protected readonly Node Node;
 
         /// <summary>
         /// The game object this layout node encapsulates.
         /// </summary>
-        public GameObject gameObject { get; protected set; }
+        public GameObject GameObject { get; protected set; }
 
         /// <summary>
         /// The underlying graph node represented by this laid out node.
         /// </summary>
-        public Node ItsNode => node;
+        public Node ItsNode => Node;
 
         /// <summary>
         /// Constructor setting the graph <paramref name="node"/> corresponding to this layout node
@@ -36,9 +36,9 @@ namespace SEE.Game.CityRendering
         /// <param name="toLayoutNode">the mapping of graph nodes onto LayoutNodes this node should be added to</param>
         protected AbstractLayoutNode(Node node, IDictionary<Node, ILayoutNode> toLayoutNode)
         {
-            this.node = node;
-            this.toLayoutNode = toLayoutNode;
-            this.toLayoutNode[node] = this;
+            this.Node = node;
+            this.ToLayoutNode = toLayoutNode;
+            this.ToLayoutNode[node] = this;
         }
 
         /// <summary>
@@ -60,22 +60,22 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// The mapping from graph nodes onto layout nodes. Every layout node created by any of the
         /// constructors of this class or one of its subclasses will be added to it. All layout nodes
-        /// given to the layout will refer to the same mapping, i.e., <see cref="toLayoutNode"/> is the
+        /// given to the layout will refer to the same mapping, i.e., <see cref="ToLayoutNode"/> is the
         /// same for all. The mapping will be gathered by the constructor.
         /// </summary>
-        protected readonly IDictionary<Node, ILayoutNode> toLayoutNode;
+        protected readonly IDictionary<Node, ILayoutNode> ToLayoutNode;
 
         /// <summary>
         /// Whether this node represents a leaf.
         /// </summary>
         /// <returns>true if this node represents a leaf</returns>
-        public bool IsLeaf => node.IsLeaf();
+        public bool IsLeaf => Node.IsLeaf();
 
         /// <summary>
         /// A unique ID for a node: the ID of the graph node underlying this layout node.
         /// </summary>
         /// <returns>unique ID for this node</returns>
-        public string ID => node.ID;
+        public string ID => Node.ID;
 
         /// <summary>
         /// The parent of this node. May be null if it has none.
@@ -90,12 +90,12 @@ namespace SEE.Game.CityRendering
         {
             get
             {
-                if (node.Parent == null)
+                if (Node.Parent == null)
                 {
                     // The node does not have a parent in the original graph.
                     return null;
                 }
-                else if (toLayoutNode.TryGetValue(node.Parent, out ILayoutNode result))
+                else if (ToLayoutNode.TryGetValue(Node.Parent, out ILayoutNode result))
                 {
                     // The node has a parent in the original graph and that parent was passed to the layout.
                     return result;
@@ -113,7 +113,7 @@ namespace SEE.Game.CityRendering
         /// is true, the empty list will be returned.
         ///
         /// Note: If a child of the node in the underlying graph, has no
-        /// corresponding layout node (<see cref="toLayoutNode"/>), it will be ignored silently.
+        /// corresponding layout node (<see cref="ToLayoutNode"/>), it will be ignored silently.
         /// This is useful in situation where only a subset of nodes is to be considered for a layout.
         /// </summary>
         /// <returns>children of this node</returns>
@@ -122,11 +122,11 @@ namespace SEE.Game.CityRendering
             IList<ILayoutNode> result;
             if (!IsLeaf)
             {
-                IList<Node> children = node.Children();
+                IList<Node> children = Node.Children();
                 result = new List<ILayoutNode>(children.Count);
                 foreach (Node node in children)
                 {
-                    if (toLayoutNode.TryGetValue(node, out ILayoutNode layoutNode))
+                    if (ToLayoutNode.TryGetValue(node, out ILayoutNode layoutNode))
                     {
                         result.Add(layoutNode);
                     }
@@ -160,9 +160,9 @@ namespace SEE.Game.CityRendering
             get
             {
                 ICollection<ILayoutNode> successors = new List<ILayoutNode>();
-                foreach (Edge edge in node.Outgoings)
+                foreach (Edge edge in Node.Outgoings)
                 {
-                    successors.Add(toLayoutNode[edge.Target]);
+                    successors.Add(ToLayoutNode[edge.Target]);
                 }
                 return successors;
             }

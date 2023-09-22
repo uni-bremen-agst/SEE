@@ -14,7 +14,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// The prefab for a string input field.
         /// </summary>
-        private const string StringInputFieldPrefab = "Prefabs/UI/InputFields/StringInputField";
+        private const string stringInputFieldPrefab = "Prefabs/UI/InputFields/StringInputField";
 
         /// <summary>
         /// The text field in which the value will be entered by the user.
@@ -26,7 +26,7 @@ namespace SEE.UI.PropertyDialog
         private TMP_InputField textField;
 
         /// <summary>
-        /// Instantiation of the prefab <see cref="StringInputFieldPrefab"/>.
+        /// Instantiation of the prefab <see cref="stringInputFieldPrefab"/>.
         /// </summary>
         private GameObject inputField;
 
@@ -44,12 +44,12 @@ namespace SEE.UI.PropertyDialog
         private Tooltip.Tooltip tooltip;
 
         /// <summary>
-        /// Sets <see cref="inputField"/> as an instantiation of prefab <see cref="StringInputFieldPrefab"/>.
+        /// Sets <see cref="inputField"/> as an instantiation of prefab <see cref="stringInputFieldPrefab"/>.
         /// Sets the label and value of the field.
         /// </summary>
         protected override void StartDesktop()
         {
-            inputField = PrefabInstantiator.InstantiatePrefab(StringInputFieldPrefab, instantiateInWorldSpace: false);
+            inputField = PrefabInstantiator.InstantiatePrefab(stringInputFieldPrefab, instantiateInWorldSpace: false);
             if (parentOfInputField != null)
             {
                 SetParent(parentOfInputField);
@@ -107,7 +107,7 @@ namespace SEE.UI.PropertyDialog
                 }
                 else
                 {
-                    throw new Exception($"Prefab {StringInputFieldPrefab} does not have a {typeof(TMP_InputField)}");
+                    throw new Exception($"Prefab {stringInputFieldPrefab} does not have a {typeof(TMP_InputField)}");
                 }
             }
 

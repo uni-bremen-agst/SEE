@@ -40,7 +40,7 @@ namespace SEE.Controls.Actions
         private void Initialize()
         {
             CurrentState = ReversibleAction.Progress.NoEffect;
-            usedGizmo = new RotateGizmo();
+            UsedGizmo = new RotateGizmo();
         }
 
         #endregion Constructors
@@ -135,7 +135,7 @@ namespace SEE.Controls.Actions
         protected override void FinalizeAction()
         {
             base.FinalizeAction();
-            gameNodeMemento.Finalize(GameNodeSelected.transform.rotation);
+            GameNodeMemento.Finalize(GameNodeSelected.transform.rotation);
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace SEE.Controls.Actions
         /// <returns>true if the object to be manipulated has had a change</returns>
         protected override bool HasChanges()
         {
-            return GameNodeSelected.transform.rotation != gameNodeMemento.InitialState;
+            return GameNodeSelected.transform.rotation != GameNodeMemento.InitialState;
         }
 
         protected override Memento<Quaternion> CreateMemento(GameObject gameNode)
@@ -167,7 +167,7 @@ namespace SEE.Controls.Actions
             /// </summary>
             public RotateGizmo()
             {
-                objectTransformationGizmo = RTGizmosEngine.Get.CreateObjectRotationGizmo();
+                ObjectTransformationGizmo = RTGizmosEngine.Get.CreateObjectRotationGizmo();
             }
         }
         #endregion

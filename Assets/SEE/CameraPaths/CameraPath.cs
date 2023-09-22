@@ -335,7 +335,7 @@ namespace SEE.CameraPaths
         /// </summary>
         /// <param name="path"></param>
         /// <returns>path aggregation</returns>
-        private List<PathData> Aggregate(List<PathData> path)
+        private static List<PathData> Aggregate(List<PathData> path)
         {
             if (path.Count <= 1)
             {

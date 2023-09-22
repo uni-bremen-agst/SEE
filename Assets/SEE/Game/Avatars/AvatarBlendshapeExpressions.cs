@@ -31,7 +31,7 @@ namespace SEE.Game.Avatars
         /// UMA Renderer.
         /// </summary>
         private Transform umaRenderer;
-        
+
         /// <summary>
         /// Constant string literals for the fake Blendshapes.
         /// </summary>
@@ -61,7 +61,7 @@ namespace SEE.Game.Avatars
         private const string mouthUpperInside = "Mouth_Upper_Inside";
         private const string mouthLowerInside = "Mouth_Lower_Inside";
         private const string mouthLowerOverlay = "Mouth_Lower_Overlay";
-        
+
         // Tongue
         private const string tongueLongStep1 = "Tongue_LongStep1";
         private const string tongueLongStep2 = "Tongue_LongStep2";
@@ -74,12 +74,12 @@ namespace SEE.Game.Avatars
         private const string tongueUpRightMorph = "Tongue_UpRight_Morph";
         private const string tongueDownLeftMorph = "Tongue_DownLeft_Morph";
         private const string tongueDownRightMorph = "Tongue_DownRight_Morph";
-        
+
         // Cheeks
         private const string cheekPuffLeft = "Cheek_Puff_Left";
         private const string cheekPuffRight = "Cheek_Puff_Right";
         private const string cheekSuck = "Cheek_Suck";
-        
+
         /// <summary>
         /// Starts a coroutine that waits for components to be generated at runtime.
         /// </summary>

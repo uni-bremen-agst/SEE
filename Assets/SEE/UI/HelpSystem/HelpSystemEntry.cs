@@ -49,12 +49,12 @@ namespace SEE.UI.HelpSystem
         /// <summary>
         /// Path to the HelpSystemEntry prefab.
         /// </summary>
-        private const string HELP_SYSTEM_ENTRY_PREFAB = "Prefabs/UI/HelpSystemEntry";
+        private const string helpSystemEntryPrefab = "Prefabs/UI/HelpSystemEntry";
 
         /// <summary>
         /// Path to the HelpSystemEntrySpace prefab.
         /// </summary>
-        private const string HELP_SYSTEM_ENTRY_SPACE_PREFAB = "Prefabs/UI/HelpSystemEntrySpace";
+        private const string helpSystemEntrySpacePrefab = "Prefabs/UI/HelpSystemEntrySpace";
 
         /// <summary>
         /// The name of this help-system entry. Displayed to the user.
@@ -64,16 +64,16 @@ namespace SEE.UI.HelpSystem
         /// <summary>
         /// The path name of the game object holding the TextMeshPro component in which the
         /// instructions are printed textually. This game object is a descendant of the
-        /// prefab <see cref="HELP_SYSTEM_ENTRY_PREFAB"/>.
+        /// prefab <see cref="helpSystemEntryPrefab"/>.
         /// </summary>
-        private const string TextFieldPath = "Content/Lower Video/Scrollable/TextField";
+        private const string textFieldPath = "Content/Lower Video/Scrollable/TextField";
 
         /// <summary>
         /// The path name of the game object holding the <see cref="VideoPlayer"/> component that
         /// is used to play the help videos. This game object is a descendant of the
-        /// prefab <see cref="HELP_SYSTEM_ENTRY_PREFAB"/>.
+        /// prefab <see cref="helpSystemEntryPrefab"/>.
         /// </summary>
-        private const string VideoPlayerPath = "Video Player";
+        private const string videoPlayerPath = "Video Player";
 
         /// <summary>
         /// The video-player which is responsible for interaction with the video such as play, pause, skip, etc.
@@ -114,7 +114,7 @@ namespace SEE.UI.HelpSystem
         /// <summary>
         /// The game object holding a TextMeshPro component in which the instructions are printed.
         /// This game object is a descendant of <see cref="helpSystemEntry"/> with the named
-        /// path <see cref="TextFieldPath"/>.
+        /// path <see cref="textFieldPath"/>.
         /// </summary>
         private GameObject instructionsDisplay;
 
@@ -145,12 +145,12 @@ namespace SEE.UI.HelpSystem
         /// <summary>
         /// Returns the game object holding a TextMeshPro component in which the instructions
         /// are printed. It is the descendant of <see cref="helpSystemEntry"/> with the
-        /// object-name path <see cref="TextFieldPath"/>.
+        /// object-name path <see cref="textFieldPath"/>.
         /// </summary>
         /// <returns>the text field where the instructions are printed</returns>
         private GameObject GetTextField()
         {
-            return helpSystemEntry.transform.Find(TextFieldPath).gameObject;
+            return helpSystemEntry.transform.Find(textFieldPath).gameObject;
         }
 
         /// <summary>
@@ -172,9 +172,9 @@ namespace SEE.UI.HelpSystem
                     isAdded = false;
                     currentHelpEntry = null;
                 }
-                if (HelpSystemBuilder.currentEntries != null)
+                if (HelpSystemBuilder.CurrentEntries != null)
                 {
-                    LinkedList<HelpEntry> currentEntries = HelpSystemBuilder.currentEntries;
+                    LinkedList<HelpEntry> currentEntries = HelpSystemBuilder.CurrentEntries;
                     if (currentEntries.Count > 0)
                     {
                         currentHelpEntry ??= currentEntries.First();
@@ -185,7 +185,7 @@ namespace SEE.UI.HelpSystem
                     {
                         if (Mathf.Round((float)videoPlayer.time) == currentHelpEntry.CumulatedTime && !isAdded)
                         {
-                            if (currentHelpEntry?.Index - 1 == HelpSystemBuilder.currentEntries.Count)
+                            if (currentHelpEntry?.Index - 1 == HelpSystemBuilder.CurrentEntries.Count)
                             {
                                 instructionsDisplay.GetComponent<TextMeshProUGUI>().text = string.Empty;
                             }
@@ -212,8 +212,8 @@ namespace SEE.UI.HelpSystem
         {
             int currentProgress = currentHelpEntry.Index - 1 != 0
                 ? currentHelpEntry.Index - 1
-                : HelpSystemBuilder.currentEntries.Count;
-            progress.text = currentProgress + "/" + HelpSystemBuilder.currentEntries.Count;
+                : HelpSystemBuilder.CurrentEntries.Count;
+            progress.text = currentProgress + "/" + HelpSystemBuilder.CurrentEntries.Count;
         }
 
         /// <summary>
@@ -223,10 +223,10 @@ namespace SEE.UI.HelpSystem
         /// <exception cref="Exception">thrown if none can be found</exception>
         public VideoPlayer GetVideoPlayer()
         {
-            Transform videoPlayer = helpSystemEntry.transform.Find(VideoPlayerPath);
+            Transform videoPlayer = helpSystemEntry.transform.Find(videoPlayerPath);
             if (videoPlayer == null)
             {
-                throw new Exception($"Help-system entry {helpSystemEntry.FullName()} has no video player {VideoPlayerPath}.");
+                throw new Exception($"Help-system entry {helpSystemEntry.FullName()} has no video player {videoPlayerPath}.");
             }
             if (videoPlayer.gameObject.TryGetComponent(out VideoPlayer result))
             {
@@ -234,7 +234,7 @@ namespace SEE.UI.HelpSystem
             }
             else
             {
-                throw new Exception($"Help-system entry {helpSystemEntry.FullName()} has a video player {VideoPlayerPath} without {typeof(VideoPlayer)} component.");
+                throw new Exception($"Help-system entry {helpSystemEntry.FullName()} has a video player {videoPlayerPath} without {typeof(VideoPlayer)} component.");
             }
         }
 
@@ -243,13 +243,13 @@ namespace SEE.UI.HelpSystem
         /// </summary>
         public void ShowEntry()
         {
-            helpSystemSpace = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_SPACE_PREFAB, Canvas.transform, false);
-            helpSystemEntry = PrefabInstantiator.InstantiatePrefab(HELP_SYSTEM_ENTRY_PREFAB, helpSystemSpace.transform, false);
+            helpSystemSpace = PrefabInstantiator.InstantiatePrefab(helpSystemEntrySpacePrefab, Canvas.transform, false);
+            helpSystemEntry = PrefabInstantiator.InstantiatePrefab(helpSystemEntryPrefab, helpSystemSpace.transform, false);
             HelpSystemBuilder.EntrySpace = helpSystemSpace;
             helpSystemSpace.transform.localScale = new Vector3(1.7f, 1.7f);
             RectTransform dynamicPanel = helpSystemSpace.transform.GetChild(2).GetComponent<RectTransform>();
             dynamicPanel.sizeDelta = new Vector2(550, 425);
-            helpSystemEntry.transform.Find(TextFieldPath).gameObject.TryGetComponentOrLog(out text);
+            helpSystemEntry.transform.Find(textFieldPath).gameObject.TryGetComponentOrLog(out text);
             text.fontSize = 18;
 
             {
@@ -262,7 +262,7 @@ namespace SEE.UI.HelpSystem
             }
             videoPlayer = GetVideoPlayer();
 
-            if (!helpSystemSpace.TryGetComponentOrLog(out DynamicPanelsCanvas PanelsCanvas))
+            if (!helpSystemSpace.TryGetComponentOrLog(out DynamicPanelsCanvas panelsCanvas))
             {
                 Destroyer.Destroy(this);
             }
@@ -281,7 +281,7 @@ namespace SEE.UI.HelpSystem
 
             helpSystemEntry.transform.Find("Content/Lower Video/Progress").gameObject.TryGetComponentOrLog(out progress);
 
-            Panel panel = PanelUtils.CreatePanelFor((RectTransform)helpSystemEntry.transform, PanelsCanvas);
+            Panel panel = PanelUtils.CreatePanelFor((RectTransform)helpSystemEntry.transform, panelsCanvas);
             PanelTab tab = panel.GetTab((RectTransform)helpSystemEntry.transform);
             tab.Label = "";
             GameObject headline = (GameObject)Instantiate(Resources.Load("Prefabs/UI/HeadlineHelpSystem"),
@@ -333,8 +333,8 @@ namespace SEE.UI.HelpSystem
                 throw new Exception("No video player found");
             }
             // play the current keyword again
-            LinkedListNode<HelpEntry> previous = HelpSystemBuilder.currentEntries.Find(currentHelpEntry)?.Previous;
-            currentHelpEntry = previous == null ? HelpSystemBuilder.currentEntries.Last.Value : previous.Value;
+            LinkedListNode<HelpEntry> previous = HelpSystemBuilder.CurrentEntries.Find(currentHelpEntry)?.Previous;
+            currentHelpEntry = previous == null ? HelpSystemBuilder.CurrentEntries.Last.Value : previous.Value;
             TextMeshProUGUI tmp = instructionsDisplay.GetComponent<TextMeshProUGUI>();
             tmp.text = tmp.text[..^(currentHelpEntry.Text.Length + 1)];
             videoPlayer.time = currentHelpEntry.CumulatedTime;
@@ -345,7 +345,7 @@ namespace SEE.UI.HelpSystem
                 string textToBeRemoved;
                 if (previous == null)
                 {
-                    currentHelpEntry = HelpSystemBuilder.currentEntries.Last.Value;
+                    currentHelpEntry = HelpSystemBuilder.CurrentEntries.Last.Value;
                     textToBeRemoved = currentHelpEntry.Text;
                 }
                 else
@@ -361,11 +361,11 @@ namespace SEE.UI.HelpSystem
                 catch (ArgumentOutOfRangeException)
                 {
                     tmp.text = string.Empty;
-                    foreach (HelpEntry s in HelpSystemBuilder.currentEntries)
+                    foreach (HelpEntry s in HelpSystemBuilder.CurrentEntries)
                     {
                         tmp.text += s.Text + "\n";
                     }
-                    tmp.text = tmp.text[..^(HelpSystemBuilder.currentEntries.Last.Value.Text.Length + 1)];
+                    tmp.text = tmp.text[..^(HelpSystemBuilder.CurrentEntries.Last.Value.Text.Length + 1)];
                 }
             }
         }

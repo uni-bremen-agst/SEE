@@ -37,13 +37,13 @@ namespace SEE.UI.Window.CodeWindow
         /// <summary>
         /// List of tokens for this code window.
         /// </summary>
-        private List<SEEToken> TokenList;
+        private List<SEEToken> tokenList;
 
         /// <summary>
         /// Characters representing newlines.
         /// Note that newlines may also consist of aggregations of this set (e.g. "\r\n").
         /// </summary>
-        private static readonly char[] NewlineCharacters = {'\r', '\n'};
+        private static readonly char[] newlineCharacters = {'\r', '\n'};
 
         /// <summary>
         /// Populates the code window with the content of the given token stream.
@@ -63,29 +63,29 @@ namespace SEE.UI.Window.CodeWindow
             }
 
             // Avoid multiple enumeration in case iteration over the data source is expensive.
-            TokenList = tokens.ToList();
-            TokenLanguage language = TokenList.FirstOrDefault()?.Language;
+            tokenList = tokens.ToList();
+            TokenLanguage language = tokenList.FirstOrDefault()?.Language;
             if (language == null)
             {
-                Text = "<i>This file is empty.</i>";
+                text = "<i>This file is empty.</i>";
                 return;
             }
 
             // Unsurprisingly, each newline token corresponds to a new line.
             // However, we need to also add "hidden" newlines contained in other tokens, e.g. block comments.
-            int assumedLines = TokenList.Count(x => x.TokenType.Equals(SEEToken.Type.Newline))
-                               + TokenList.Where(x => !x.TokenType.Equals(SEEToken.Type.Newline))
+            int assumedLines = tokenList.Count(x => x.TokenType.Equals(SEEToken.Type.Newline))
+                               + tokenList.Where(x => !x.TokenType.Equals(SEEToken.Type.Newline))
                                           .Aggregate(0, (_, token) => token.Text.Count(x => x == '\n'));
             // Needed padding is the number of lines, because the line number will be at most this long.
              neededPadding = assumedLines.ToString().Length;
 
-            Text = $"<color=#CCCCCC>{string.Join("", Enumerable.Repeat(" ", neededPadding - 1))}1</color> ";
+            text = $"<color=#CCCCCC>{string.Join("", Enumerable.Repeat(" ", neededPadding - 1))}1</color> ";
             int lineNumber = 2; // Line number we'll write down next
             bool currentlyMarking = false;
             Dictionary<SEEToken, ISet<Issue>> issueTokens = new();
             //TODO: Handle these issues
 
-            foreach (SEEToken token in TokenList)
+            foreach (SEEToken token in tokenList)
             {
                 if (token.TokenType == SEEToken.Type.Unknown)
                 {
@@ -94,7 +94,7 @@ namespace SEE.UI.Window.CodeWindow
 
                 if (token.TokenType == SEEToken.Type.Newline)
                 {
-                    AppendNewline(ref lineNumber, ref Text, neededPadding, token);
+                    AppendNewline(ref lineNumber, ref text, neededPadding, token);
                 }
                 else if (token.TokenType != SEEToken.Type.EOF) // Skip EOF token completely.
                 {
@@ -103,8 +103,8 @@ namespace SEE.UI.Window.CodeWindow
             }
 
             // Lines are equal to number of newlines, including the initial newline.
-            lines = Text.Count(x => x.Equals('\n')); // No more weird CRLF shenanigans are present at this point.
-            Text = Text.TrimStart('\n'); // Remove leading newline.
+            lines = text.Count(x => x.Equals('\n')); // No more weird CRLF shenanigans are present at this point.
+            text = text.TrimStart('\n'); // Remove leading newline.
 
             # region Local Functions
 
@@ -145,11 +145,11 @@ namespace SEE.UI.Window.CodeWindow
             // Returns the new line number.
             int HandleToken(SEEToken token)
             {
-                string[] newlineStrings = NewlineCharacters.Select(x => x.ToString()).Concat(new[]
+                string[] newlineStrings = newlineCharacters.Select(x => x.ToString()).Concat(new[]
                 {
                     // Apart from the characters themselves, we also want to look for the concatenation of them
-                    NewlineCharacters.Aggregate("", (s, c) => s + c),
-                    NewlineCharacters.Aggregate("", (s, c) => c + s)
+                    newlineCharacters.Aggregate("", (s, c) => s + c),
+                    newlineCharacters.Aggregate("", (s, c) => c + s)
                 }).ToArray();
                 string[] tokenLines = token.Text.Split(newlineStrings, StringSplitOptions.None);
                 bool firstRun = true;
@@ -158,7 +158,7 @@ namespace SEE.UI.Window.CodeWindow
                     // Any entry after the first is on a separate line.
                     if (!firstRun)
                     {
-                        AppendNewline(ref lineNumber, ref Text, neededPadding, token);
+                        AppendNewline(ref lineNumber, ref text, neededPadding, token);
                     }
 
                     // Mark any potential issue
@@ -176,7 +176,7 @@ namespace SEE.UI.Window.CodeWindow
                             string issueColorString = ColorUtility.ToHtmlStringRGB(issueColor);
                             IncreaseLinkCounter();
                             issueDictionary[linkCounter] = issueTokens[token].ToList();
-                            Text += $"<link=\"{linkCounter.ToString()}\"><mark=#{issueColorString}33>";
+                            text += $"<link=\"{linkCounter.ToString()}\"><mark=#{issueColorString}33>";
                         }
                     }
 
@@ -184,17 +184,17 @@ namespace SEE.UI.Window.CodeWindow
                     {
                         // We just copy the whitespace verbatim, no need to even color it.
                         // Note: We have to assume that whitespace will not interfere with TMP's XML syntax.
-                        Text += line.Replace("\t", new string(' ', language.TabWidth));
+                        text += line.Replace("\t", new string(' ', language.TabWidth));
                     }
                     else
                     {
-                        Text += $"<color=#{token.TokenType.Color}><noparse>{line.Replace("/noparse", "")}</noparse></color>";
+                        text += $"<color=#{token.TokenType.Color}><noparse>{line.Replace("/noparse", "")}</noparse></color>";
                     }
 
                     // Close any potential issue marking
                     if (issueTokens.ContainsKey(token) && !currentlyMarking)
                     {
-                        Text += "</mark></link>";
+                        text += "</mark></link>";
                     }
 
                     firstRun = false;
@@ -216,9 +216,9 @@ namespace SEE.UI.Window.CodeWindow
                     // In order to do this, we look ahead in the token stream and construct the line we're on
                     // to determine whether the entity will arrive in this line or not.
                     IList<SEEToken> lineTokens =
-                        TokenList.SkipWhile(x => x != currentToken).Skip(1)
+                        tokenList.SkipWhile(x => x != currentToken).Skip(1)
                                  .TakeWhile(x => x.TokenType != SEEToken.Type.Newline
-                                                 && !x.Text.Intersect(NewlineCharacters).Any()).ToList();
+                                                 && !x.Text.Intersect(newlineCharacters).Any()).ToList();
                     string line = lineTokens.Aggregate("", (s, t) => s + t.Text);
                     MatchCollection matches = Regex.Matches(line, Regex.Escape(entityContent));
                     if (matches.Count != 1)
@@ -302,20 +302,20 @@ namespace SEE.UI.Window.CodeWindow
             }
 
             neededPadding = $"{text.Length}".Length;
-            Text = "";
+            this.text = "";
             for (int i = 0; i < text.Length; i++)
             {
                 // Add whitespace next to line number so it's consistent.
-                Text += string.Join("", Enumerable.Repeat(" ", neededPadding - $"{i + 1}".Length));
+                this.text += string.Join("", Enumerable.Repeat(" ", neededPadding - $"{i + 1}".Length));
                 // Line number will be typeset in yellow to distinguish it from the rest.
-                Text += $"<color=\"yellow\">{i + 1}</color> ";
+                this.text += $"<color=\"yellow\">{i + 1}</color> ";
                 if (asIs)
                 {
-                    Text += text[i] + "\n";
+                    this.text += text[i] + "\n";
                 }
                 else
                 {
-                    Text += $"<noparse>{text[i].Replace("noparse", "")}</noparse>\n";
+                    this.text += $"<noparse>{text[i].Replace("noparse", "")}</noparse>\n";
                 }
             }
 
@@ -349,7 +349,7 @@ namespace SEE.UI.Window.CodeWindow
                 {
                     try
                     {
-                        EnterFromTokens(SEEToken.fromFile(filename));
+                        EnterFromTokens(SEEToken.FromFile(filename));
                         if (ShowIssues)
                         {
                             MarkIssues(filename).Forget(); // initiate issue search
@@ -397,15 +397,15 @@ namespace SEE.UI.Window.CodeWindow
                 return;
             }
 
-            const char PATH_SEPARATOR = '/';
+            const char pathSeparator = '/';
             // When there are different paths in the issue table, this implies that there are some files
             // which aren't actually the one we're looking for (because we've only matched by filename so far).
             // In this case, we'll gradually refine our results until this isn't the case anymore.
-            for (int skippedParts = path.Count(x => x == PATH_SEPARATOR) - 2; !MatchingPaths(allIssues); skippedParts--)
+            for (int skippedParts = path.Count(x => x == pathSeparator) - 2; !MatchingPaths(allIssues); skippedParts--)
             {
-                Assert.IsTrue(path.Contains(PATH_SEPARATOR));
+                Assert.IsTrue(path.Contains(pathSeparator));
                 // Skip the first <c>skippedParts</c> parts, so that we query progressively larger parts.
-                queryPath = string.Join(PATH_SEPARATOR.ToString(), path.Split(PATH_SEPARATOR).Skip(skippedParts));
+                queryPath = string.Join(pathSeparator.ToString(), path.Split(pathSeparator).Skip(skippedParts));
                 allIssues.RemoveAll(x => !x.Entities.Select(e => e.path).Any(p => p.EndsWith(queryPath)));
             }
 
@@ -417,15 +417,15 @@ namespace SEE.UI.Window.CodeWindow
                          .OrderBy(x => x.entity.line).GroupBy(x => x.entity.line)
                          .ToDictionary(x => x.Key, x => x.ToList());
 
-            EnterFromTokens(TokenList, entities);
+            EnterFromTokens(tokenList, entities);
 
             await UniTask.SwitchToMainThread();
             firstNotification.Close();
             try
             {
-                TextMesh.text = Text;
-                TextMeshInputField.text = Text;
-                TextMesh.ForceMeshUpdate();
+                textMesh.text = text;
+                textMeshInputField.text = text;
+                textMesh.ForceMeshUpdate();
             }
             catch (IndexOutOfRangeException)
             {
@@ -471,7 +471,7 @@ namespace SEE.UI.Window.CodeWindow
         /// </example>
         private int GetRichIndex(int cleanIndex)
         {
-            return TextMesh.textInfo.characterInfo[cleanIndex].index;
+            return textMesh.textInfo.characterInfo[cleanIndex].index;
         }
 
         /// <summary>
@@ -482,7 +482,7 @@ namespace SEE.UI.Window.CodeWindow
         /// <returns>clean index</returns>
         private int GetCleanIndex(int richIndex)
         {
-            return TextMesh.textInfo.characterInfo.Select((x, idx) => (x, idx)).First( x => x.x.index >= richIndex).idx;
+            return textMesh.textInfo.characterInfo.Select((x, idx) => (x, idx)).First( x => x.x.index >= richIndex).idx;
         }
 
         /// <summary>
@@ -492,7 +492,7 @@ namespace SEE.UI.Window.CodeWindow
         private async UniTask<string> AsyncGetCleanText()
         {
             await UniTask.SwitchToThreadPool();
-            string ret = TextMesh.textInfo.characterInfo.Aggregate("", (result, c) => result + c.character);
+            string ret = textMesh.textInfo.characterInfo.Aggregate("", (result, c) => result + c.character);
             await UniTask.SwitchToMainThread();
             return ret;
         }

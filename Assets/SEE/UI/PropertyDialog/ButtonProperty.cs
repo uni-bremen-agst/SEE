@@ -17,7 +17,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// The prefab for a button.
         /// </summary>
-        private const string ButtonPrefab = "Prefabs/UI/Button";
+        private const string buttonPrefab = "Prefabs/UI/Button";
 
         /// <summary>
         /// EventFunction that is triggered when the button is pressed.
@@ -25,37 +25,37 @@ namespace SEE.UI.PropertyDialog
         public readonly UnityEvent OnSelected = new();
 
         /// <summary>
-        /// Instantiation of the prefab <see cref="ButtonPrefab"/>.
+        /// Instantiation of the prefab <see cref="buttonPrefab"/>.
         /// </summary>
         private GameObject button;
 
         /// <summary>
         /// Used to store the icon of the button.
         /// </summary>
-        public Sprite iconSprite;
+        public Sprite IconSprite;
 
         /// <summary>
         /// Saves which method of the hide action is to be executed.
         /// </summary>
-        public HideModeSelector hideMode;
+        public HideModeSelector HideMode;
 
         /// <summary>
         /// Saves whether the button represents a function of the Hide action that can select several or only one element.
         /// </summary>
-        public HideModeSelector selectionType;
+        public HideModeSelector SelectionType;
 
         /// <summary>
         /// Used to set the color of the button.
         /// </summary>
-        public Color buttonColor;
+        public Color ButtonColor;
 
         /// <summary>
         /// Value of the input field.
         /// </summary>
         public override HideModeSelector Value
         {
-            get => hideMode;
-            set => hideMode = value;
+            get => HideMode;
+            set => HideMode = value;
         }
 
         /// <summary>
@@ -72,12 +72,12 @@ namespace SEE.UI.PropertyDialog
         private Tooltip.Tooltip tooltip;
 
         /// <summary>
-        /// Sets <see cref="button"/> as an instantiation of prefab <see cref="ButtonPrefab"/>.
+        /// Sets <see cref="button"/> as an instantiation of prefab <see cref="buttonPrefab"/>.
         /// Sets the label and value of the field.
         /// </summary>
         protected override void StartDesktop()
         {
-            button = PrefabInstantiator.InstantiatePrefab(ButtonPrefab, instantiateInWorldSpace: false);
+            button = PrefabInstantiator.InstantiatePrefab(buttonPrefab, instantiateInWorldSpace: false);
 
             if (parent != null)
             {
@@ -103,10 +103,10 @@ namespace SEE.UI.PropertyDialog
                 }
 
                 textMeshPro.fontSize = 20;
-                buttonImage.color = buttonColor;
-                textMeshPro.color = buttonColor.IdealTextColor();
-                iconImage.color = buttonColor.IdealTextColor();
-                iconImage.sprite = iconSprite;
+                buttonImage.color = ButtonColor;
+                textMeshPro.color = ButtonColor.IdealTextColor();
+                iconImage.color = ButtonColor.IdealTextColor();
+                iconImage.sprite = IconSprite;
 
                 buttonManager.buttonText = Name;
                 buttonManager.clickEvent.AddListener(Clicked);

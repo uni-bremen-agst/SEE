@@ -68,23 +68,23 @@ namespace SEE.Tools.RandomGraphs
         /// <summary>
         /// Label of <see cref="Name"/> in the configuration file.
         /// </summary>
-        private const string NameLabel = "Name";
+        private const string nameLabel = "Name";
         /// <summary>
         /// Label of <see cref="Mean"/> in the configuration file.
         /// </summary>
-        private const string MeanLabel = "Mean";
+        private const string meanLabel = "Mean";
         /// <summary>
         /// Label of <see cref="StandardDeviation"/> in the configuration file.
         /// </summary>
-        private const string StandardDeviationLabel = "StandardDeviation";
+        private const string standardDeviationLabel = "StandardDeviation";
         /// <summary>
         /// Label of <see cref="Minimum"/> in the configuration file.
         /// </summary>
-        private const string MinimumLabel = "Minimum";
+        private const string minimumLabel = "Minimum";
         /// <summary>
         /// Label of <see cref="Maximum"/> in the configuration file.
         /// </summary>
-        private const string MaximumLabel = "Maximum";
+        private const string maximumLabel = "Maximum";
 
         /// <summary>
         /// <see cref="ConfigIO.PersistentConfigItem.Save()"/>
@@ -92,11 +92,11 @@ namespace SEE.Tools.RandomGraphs
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(Name, NameLabel);
-            writer.Save(Mean, MeanLabel);
-            writer.Save(StandardDeviation, StandardDeviationLabel);
-            writer.Save(Minimum, MinimumLabel);
-            writer.Save(Maximum, MaximumLabel);
+            writer.Save(Name, nameLabel);
+            writer.Save(Mean, meanLabel);
+            writer.Save(StandardDeviation, standardDeviationLabel);
+            writer.Save(Minimum, minimumLabel);
+            writer.Save(Maximum, maximumLabel);
             writer.EndGroup();
         }
 
@@ -124,11 +124,11 @@ namespace SEE.Tools.RandomGraphs
                 return false;
             }
 
-            bool result = ConfigIO.Restore(values, NameLabel, ref Name);
-            result = ConfigIO.Restore(values, MeanLabel, ref Mean) || result;
-            result = ConfigIO.Restore(values, StandardDeviationLabel, ref StandardDeviation) || result;
-            result = ConfigIO.Restore(values, MinimumLabel, ref Minimum) || result;
-            result = ConfigIO.Restore(values, MaximumLabel, ref Maximum) || result;
+            bool result = ConfigIO.Restore(values, nameLabel, ref Name);
+            result = ConfigIO.Restore(values, meanLabel, ref Mean) || result;
+            result = ConfigIO.Restore(values, standardDeviationLabel, ref StandardDeviation) || result;
+            result = ConfigIO.Restore(values, minimumLabel, ref Minimum) || result;
+            result = ConfigIO.Restore(values, maximumLabel, ref Maximum) || result;
             return result;
         }
     }
@@ -190,18 +190,18 @@ namespace SEE.Tools.RandomGraphs
             }
         }
 
-        private const string NodeTypeLabel = "NodeType";
-        private const string EdgeTypeLabel = "EdgeType";
-        private const string NodeNumberLabel = "NodeNumber";
-        private const string EdgeDensityLabel = "EdgeDensity";
+        private const string nodeTypeLabel = "NodeType";
+        private const string edgeTypeLabel = "EdgeType";
+        private const string nodeNumberLabel = "NodeNumber";
+        private const string edgeDensityLabel = "EdgeDensity";
 
         internal void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(NodeType, NodeTypeLabel);
-            writer.Save(EdgeType, EdgeTypeLabel);
-            writer.Save(NodeNumber, NodeNumberLabel);
-            writer.Save(EdgeDensity, EdgeDensityLabel);
+            writer.Save(NodeType, nodeTypeLabel);
+            writer.Save(EdgeType, edgeTypeLabel);
+            writer.Save(NodeNumber, nodeNumberLabel);
+            writer.Save(EdgeDensity, edgeDensityLabel);
             writer.EndGroup();
         }
 
@@ -211,10 +211,10 @@ namespace SEE.Tools.RandomGraphs
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
                 {
-                    ConfigIO.Restore(values, NodeTypeLabel, ref NodeType);
-                    ConfigIO.Restore(values, EdgeTypeLabel, ref EdgeType);
-                    ConfigIO.Restore(values, NodeNumberLabel, ref NodeNumber);
-                    ConfigIO.Restore(values, EdgeDensityLabel, ref EdgeDensity);
+                    ConfigIO.Restore(values, nodeTypeLabel, ref NodeType);
+                    ConfigIO.Restore(values, edgeTypeLabel, ref EdgeType);
+                    ConfigIO.Restore(values, nodeNumberLabel, ref NodeNumber);
+                    ConfigIO.Restore(values, edgeDensityLabel, ref EdgeDensity);
                 }
             }
         }
@@ -230,7 +230,7 @@ namespace SEE.Tools.RandomGraphs
         /// The seed for the random generators. A fixed value to make the random generation
         /// deterministic.
         /// </summary>
-        private const int Seed = 500;
+        private const int seed = 500;
 
         /// <summary>
         /// Creates and returns a randomly generated graph for the given constraints.
@@ -249,7 +249,7 @@ namespace SEE.Tools.RandomGraphs
             leafConstraint.Check();
             innerNodeConstraint.Check();
             // Randomly generated graph do not need to have a base path; that is why we use the empty string.
-            Graph graph = new Graph("");
+            Graph graph = new("");
             ICollection<Node> leaves = CreateLeaves(graph, leafConstraint, leafAttributes);
             ICollection<Edge> leafEdges = CreateEdges(graph, leaves, leafConstraint);
             IList<Node> innerNodes = CreateTree(graph, innerNodeConstraint);
@@ -279,7 +279,7 @@ namespace SEE.Tools.RandomGraphs
 
         private static void AssignLeaves(Graph graph, IEnumerable<Node> leaves, IList<Node> innerNodes)
         {
-            System.Random random = new System.Random(Seed);
+            System.Random random = new System.Random(seed);
             foreach (Node leaf in leaves)
             {
                 // Next(n) yields a non-negative number smaller than n.
@@ -289,7 +289,7 @@ namespace SEE.Tools.RandomGraphs
             }
         }
 
-        private IList<Node> CreateTree(Graph graph, Constraint innerNodeConstraint)
+        private static IList<Node> CreateTree(Graph graph, Constraint innerNodeConstraint)
         {
             // Create the inner nodes
             IList<Node> innerNodes = new List<Node>(innerNodeConstraint.NodeNumber);
@@ -312,7 +312,7 @@ namespace SEE.Tools.RandomGraphs
 
         private static ICollection<Edge> CreateEdges(Graph graph, ICollection<Node> nodes, Constraint constraint)
         {
-            System.Random random = new System.Random(Seed);
+            System.Random random = new System.Random(seed);
             ICollection<Edge> result = new List<Edge>();
             foreach (Node source in nodes)
             {
@@ -336,9 +336,9 @@ namespace SEE.Tools.RandomGraphs
             return leaves;
         }
 
-        private void CreateAttributes(IEnumerable<Node> nodes, ICollection<RandomAttributeDescriptor> attributes)
+        private static void CreateAttributes(IEnumerable<Node> nodes, ICollection<RandomAttributeDescriptor> attributes)
         {
-            System.Random random = new System.Random(Seed);
+            System.Random random = new System.Random(seed);
 
             foreach (Node node in nodes)
             {
@@ -351,7 +351,7 @@ namespace SEE.Tools.RandomGraphs
             }
         }
 
-        private ICollection<Node> CreateNodes(Graph graph, int numberOfNodes, string linkPrefix, string nodeType)
+        private static ICollection<Node> CreateNodes(Graph graph, int numberOfNodes, string linkPrefix, string nodeType)
         {
             ICollection<Node> nodes = new List<Node>();
             for (int i = 1; i <= numberOfNodes; i++)
@@ -363,7 +363,7 @@ namespace SEE.Tools.RandomGraphs
 
         private static Node CreateNode(Graph graph, string linkName, string type)
         {
-            Node result = new Node
+            Node result = new()
             {
                 ID = linkName,
                 SourceName = linkName,

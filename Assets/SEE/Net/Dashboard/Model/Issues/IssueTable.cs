@@ -15,13 +15,13 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// If the query was not an actual diff query this will be unset.
         /// </summary>
         [JsonProperty(Required = Required.Default)]
-        public readonly AnalysisVersion startVersion;
+        public readonly AnalysisVersion StartVersion;
 
         /// <summary>
         /// The version of the added issues for a diff query or simply the version of a normal issue list query (no startVersion)
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly AnalysisVersion endVersion;
+        public readonly AnalysisVersion EndVersion;
 
         /// <summary>
         /// The actual issue data objects.
@@ -64,8 +64,8 @@ namespace SEE.Net.Dashboard.Model.Issues
         public IssueTable(AnalysisVersion startVersion, AnalysisVersion endVersion, IList<T> rows,
                           uint totalRowCount, uint totalAddedCount, uint totalRemovedCount)
         {
-            this.startVersion = startVersion;
-            this.endVersion = endVersion;
+            this.StartVersion = startVersion;
+            this.EndVersion = endVersion;
             this.rows = rows;
             this.totalRowCount = totalRowCount;
             this.totalAddedCount = totalAddedCount;

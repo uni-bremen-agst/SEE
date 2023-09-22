@@ -169,7 +169,7 @@ namespace SEE.UI.ConfigMenu
             }
         }
 
-        private DataPath.RootKind ItemToRootKind(string item)
+        private static DataPath.RootKind ItemToRootKind(string item)
         {
             return Enum.TryParse(item, out DataPath.RootKind rootKind) ?
                      rootKind

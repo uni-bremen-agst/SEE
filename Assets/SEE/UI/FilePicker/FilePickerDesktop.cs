@@ -201,7 +201,10 @@ namespace SEE.UI.FilePicker
         /// <exception cref="Exception">Received no paths from file browser</exception>
         protected void HandleFileBrowserSuccess(string[] paths)
         {
-            if (paths.Length == 0) throw new Exception("Received no paths from file browser.");
+            if (paths.Length == 0)
+            {
+                throw new Exception("Received no paths from file browser.");
+            }
             // There should only be a single path since multiple selections are forbidden.
             DataPathInstance.Set(paths[0]);
             UpdateDropdown();

@@ -4,7 +4,7 @@ using SEE.Layout;
 namespace SEE.Game.CityRendering
 {
     /// <summary>
-    /// Implementation of ILayoutEdge that also stores the underlying graph edge that is 
+    /// Implementation of ILayoutEdge that also stores the underlying graph edge that is
     /// visualized by this layout edge.
     /// </summary>
     /// <typeparam name="T">Type of node this edge connects to.</typeparam>

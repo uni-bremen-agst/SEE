@@ -21,7 +21,7 @@ namespace SEE.Game.CityRendering
         public LayoutGameNode(IDictionary<Node, ILayoutNode> toLayoutNode, GameObject gameObject)
             : base(gameObject.GetComponent<NodeRef>().Value, toLayoutNode)
         {
-            this.gameObject = gameObject;
+            this.GameObject = gameObject;
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace SEE.Game.CityRendering
         /// <returns>game object corresponding to this layout node</returns>
         public GameObject GetGameObject()
         {
-            return gameObject;
+            return GameObject;
         }
 
         /// <summary>
@@ -40,11 +40,11 @@ namespace SEE.Game.CityRendering
         {
             get
             {
-                return gameObject.transform.localScale;
+                return GameObject.transform.localScale;
             }
             set
             {
-                gameObject.transform.localScale = value;
+                GameObject.transform.localScale = value;
             }
         }
 
@@ -55,7 +55,7 @@ namespace SEE.Game.CityRendering
         /// </summary>
         public override Vector3 AbsoluteScale
         {
-            get => gameObject.transform.lossyScale;
+            get => GameObject.transform.lossyScale;
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace SEE.Game.CityRendering
         /// <param name="factor">factor by which to mulitply the scale</param>
         public override void ScaleBy(float factor)
         {
-            LineRenderer renderer = gameObject.GetComponent<LineRenderer>();
+            LineRenderer renderer = GameObject.GetComponent<LineRenderer>();
             if (renderer != null)
             {
                 // This object is drawn by a line. The width of the line must
@@ -84,18 +84,18 @@ namespace SEE.Game.CityRendering
         {
             get
             {
-                return gameObject.transform.position;
+                return GameObject.transform.position;
             }
             set
             {
-                gameObject.transform.position = value;
+                GameObject.transform.position = value;
             }
         }
 
         public override float Rotation
         {
-            get => gameObject.transform.eulerAngles.y;
-            set => gameObject.transform.Rotate(new Vector3(0, value, 0));
+            get => GameObject.transform.eulerAngles.y;
+            set => GameObject.transform.Rotate(new Vector3(0, value, 0));
         }
 
 
@@ -106,7 +106,7 @@ namespace SEE.Game.CityRendering
         {
             get
             {
-                return gameObject.GetRoofCenter();
+                return GameObject.GetRoofCenter();
             }
         }
 
@@ -117,7 +117,7 @@ namespace SEE.Game.CityRendering
         {
             get
             {
-                return gameObject.GetGroundCenter();
+                return GameObject.GetGroundCenter();
             }
         }
 

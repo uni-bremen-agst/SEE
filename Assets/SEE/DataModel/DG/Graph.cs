@@ -324,16 +324,16 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns the node with the given unique ID if it exists; otherwise null.
         /// </summary>
-        /// <param name="ID">unique ID</param>
+        /// <param name="id">unique ID</param>
         /// <returns>node with the given unique ID if it exists; otherwise null</returns>
-        public Node GetNode(string ID)
+        public Node GetNode(string id)
         {
-            if (string.IsNullOrEmpty(ID))
+            if (string.IsNullOrEmpty(id))
             {
                 throw new ArgumentException("ID must neither be null nor empty");
             }
 
-            if (nodes.TryGetValue(ID, out Node node))
+            if (nodes.TryGetValue(id, out Node node))
             {
                 return node;
             }
@@ -344,16 +344,16 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns the edge with the given unique ID if it exists; otherwise null.
         /// </summary>
-        /// <param name="ID">unique ID</param>
+        /// <param name="id">unique ID</param>
         /// <returns>edge with the given unique ID if it exists; otherwise null</returns>
-        public Edge GetEdge(string ID)
+        public Edge GetEdge(string id)
         {
-            if (string.IsNullOrEmpty(ID))
+            if (string.IsNullOrEmpty(id))
             {
                 throw new ArgumentException("ID must neither be null nor empty");
             }
 
-            if (edges.TryGetValue(ID, out Edge edge))
+            if (edges.TryGetValue(id, out Edge edge))
             {
                 return edge;
             }
@@ -520,13 +520,13 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns true if a node with the given <paramref name="ID"/> is part of the graph.
+        /// Returns true if a node with the given <paramref name="id"/> is part of the graph.
         /// </summary>
-        /// <param name="ID">unique ID of the node searched</param>
-        /// <returns>true if a node with the given <paramref name="ID"/> is part of the graph</returns>
-        public bool ContainsNodeID(string ID)
+        /// <param name="id">unique ID of the node searched</param>
+        /// <returns>true if a node with the given <paramref name="id"/> is part of the graph</returns>
+        public bool ContainsNodeID(string id)
         {
-            return nodes.ContainsKey(ID);
+            return nodes.ContainsKey(id);
         }
 
         /// <summary>
@@ -534,12 +534,12 @@ namespace SEE.DataModel.DG
         /// such node, node will be null and false will be returned; otherwise
         /// true will be returned.
         /// </summary>
-        /// <param name="ID">unique ID of the searched node</param>
+        /// <param name="id">unique ID of the searched node</param>
         /// <param name="node">the found node, otherwise null</param>
         /// <returns>true if a node could be found</returns>
-        public bool TryGetNode(string ID, out Node node)
+        public bool TryGetNode(string id, out Node node)
         {
-            return nodes.TryGetValue(ID, out node);
+            return nodes.TryGetValue(id, out node);
         }
 
         /// <summary>

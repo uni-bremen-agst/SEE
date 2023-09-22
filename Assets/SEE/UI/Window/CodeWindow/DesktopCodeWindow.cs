@@ -37,12 +37,12 @@ namespace SEE.UI.Window.CodeWindow
         /// TODO: Let the user set this, e.g., within the code city menu.
         /// FIXME: My Unity editor crashes whenever I set this to true and open a code window.
         /// </summary>
-        private const bool INPUT_ENABLED = false;
+        private const bool inputEnabled = false;
 
         /// <summary>
         /// Represents the TextMeshInputField from the code window in which the user can edit text.
         /// </summary>
-        private TMP_InputField TextMeshInputField;
+        private TMP_InputField textMeshInputField;
 
         /// <summary>
         /// The old index of the caret inside the text. Used to calculate the real index if the caret
@@ -90,7 +90,7 @@ namespace SEE.UI.Window.CodeWindow
 
         protected override void StartDesktop()
         {
-            if (Text == null)
+            if (text == null)
             {
                 Debug.LogError("Text must be defined when setting up CodeWindow!\n");
                 return;
@@ -98,38 +98,38 @@ namespace SEE.UI.Window.CodeWindow
 
             base.StartDesktop();
 
-            GameObject scrollable = PrefabInstantiator.InstantiatePrefab(CODE_WINDOW_PREFAB, Window.transform.Find("Content"), false);
+            GameObject scrollable = PrefabInstantiator.InstantiatePrefab(codeWindowPrefab, Window.transform.Find("Content"), false);
             scrollable.name = "Scrollable";
 
             // Set text and preferred font size
             GameObject code = scrollable.transform.Find("Code").gameObject;
-            if (code.TryGetComponentOrLog(out TextMesh) && code.TryGetComponentOrLog(out TextMeshInputField))
+            if (code.TryGetComponentOrLog(out textMesh) && code.TryGetComponentOrLog(out textMeshInputField))
             {
-                TextMesh.fontSize = FontSize;
-                TextMeshInputField.interactable = INPUT_ENABLED;
-                TextMeshInputField.text = TextMesh.text = Text;
+                textMesh.fontSize = FontSize;
+                textMeshInputField.interactable = inputEnabled;
+                textMeshInputField.text = textMesh.text = text;
 
-                if (INPUT_ENABLED)
+                if (inputEnabled)
                 {
                     // Add the text of the code window to the crdt if the crdt is empty.
                     if (ICRDT.IsEmpty(Title))
                     {
-                        TextMeshInputField.enabled = false;
+                        textMeshInputField.enabled = false;
                         AddStringStart().Forget();
                     }
                     else
                     {
-                        EnterFromTokens(SEEToken.FromString(RemoveLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?[1..])));
-                        TextMeshInputField.text = TextMesh.text = Text;
+                        EnterFromTokens(SEEToken.FromString(RemoveLineNumbers(ICRDT.PrintString(Title)), TokenLanguage.FromFileExtension(Path.GetExtension(FilePath)?[1..])));
+                        textMeshInputField.text = textMesh.text = text;
                     }
 
                     // Change Listener that listens for remote changes in the crdt to add them to the code window
                     ICRDT.GetChangeEvent(Title).AddListener(UpdateCodeWindow);
-                    TextMeshInputField.onTextSelection.AddListener((_, start, end) =>
+                    textMeshInputField.onTextSelection.AddListener((_, start, end) =>
                     {
                         int clean = GetCleanIndex(end);
                         int richIdx = GetRichIndex(clean - 1);
-                        if (TextMeshInputField.text[richIdx].Equals('\n'))
+                        if (textMeshInputField.text[richIdx].Equals('\n'))
                         {
                             clean--;
                             fixSelection = true;
@@ -138,8 +138,8 @@ namespace SEE.UI.Window.CodeWindow
                         selectedText = new Tuple<int, int>(GetCleanIndex(start), clean);
                     });
 
-                    TextMeshInputField.onEndTextSelection.AddListener((_, _, _) => { selectedText = null; });
-                    TextMeshInputField.onValueChanged.AddListener(_ => { valueHasChanged = true; });
+                    textMeshInputField.onEndTextSelection.AddListener((_, _, _) => { selectedText = null; });
+                    textMeshInputField.onValueChanged.AddListener(_ => { valueHasChanged = true; });
 
                     // Updates the entries in the CodeWindow.
                     void UpdateCodeWindow(char c, int idx, OperationType type)
@@ -147,18 +147,18 @@ namespace SEE.UI.Window.CodeWindow
                         switch (type)
                         {
                             case OperationType.Add:
-                                TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), c.ToString());
-                                if (TextMeshInputField.caretPosition > idx)
+                                textMeshInputField.text = textMeshInputField.text.Insert(GetRichIndex(idx), c.ToString());
+                                if (textMeshInputField.caretPosition > idx)
                                 {
-                                    TextMeshInputField.caretPosition++;
+                                    textMeshInputField.caretPosition++;
                                 }
 
                                 break;
                             case OperationType.Delete:
-                                TextMeshInputField.text = TextMeshInputField.text.Remove(GetRichIndex(idx), 1);
-                                if (TextMeshInputField.caretPosition > idx)
+                                textMeshInputField.text = textMeshInputField.text.Remove(GetRichIndex(idx), 1);
+                                if (textMeshInputField.caretPosition > idx)
                                 {
-                                    TextMeshInputField.caretPosition--;
+                                    textMeshInputField.caretPosition--;
                                 }
 
                                 break;
@@ -204,7 +204,7 @@ namespace SEE.UI.Window.CodeWindow
             RecalculateExcessLines();
 
             // Animate scrollbar to scroll to desired line
-            VisibleLine = Mathf.Clamp(Mathf.FloorToInt(PreStartLine), 1, lines);
+            VisibleLine = Mathf.Clamp(Mathf.FloorToInt(preStartLine), 1, lines);
         }
 
         /// <summary>
@@ -215,7 +215,7 @@ namespace SEE.UI.Window.CodeWindow
         protected override void UpdateDesktop()
         {
             // Input handling of the code window.
-            if (INPUT_ENABLED && TextMeshInputField.isFocused)
+            if (inputEnabled && textMeshInputField.isFocused)
             {
                 // resets the old index after the cooldown expires.
                 if (Time.time > oldIDXCoolDown)
@@ -273,14 +273,14 @@ namespace SEE.UI.Window.CodeWindow
                 {
                     ShowNotification.Info("Reloading Code", "");
                     EnterFromTokens(SEEToken.FromString(RemoveLineNumbers(ICRDT.PrintString(Title)),
-                                                        TokenLanguage.fromFileExtension(Path.GetExtension(FilePath)?[1..])));
-                    TextMeshInputField.text = TextMesh.text = Text;
+                                                        TokenLanguage.FromFileExtension(Path.GetExtension(FilePath)?[1..])));
+                    textMeshInputField.text = textMesh.text = text;
                     ShowNotification.Info("Reloading Code Complete", "Recalculating syntax highlighting finished");
                 }
 
                 // https://stackoverflow.com/questions/56373604/receive-any-keyboard-input-and-use-with-switch-statement-on-unity/56373753
                 // Get the input.
-                int idx = TextMeshInputField.caretPosition;
+                int idx = textMeshInputField.caretPosition;
                 string input = Input.inputString;
 
                 // Remove special chars that should not be in the string.
@@ -360,7 +360,7 @@ namespace SEE.UI.Window.CodeWindow
                     }
                     else if (fixSelection)
                     {
-                        TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), "\n");
+                        textMeshInputField.text = textMeshInputField.text.Insert(GetRichIndex(idx), "\n");
                         fixSelection = false;
                         oldKeyCode = KeyCode.None;
                     }
@@ -422,10 +422,10 @@ namespace SEE.UI.Window.CodeWindow
             if (issueDictionary.Count != 0 && Input.GetMouseButtonDown(0))
             {
                 // Passing camera as null causes the screen space rather than world space camera to be used
-                int link = TMP_TextUtilities.FindIntersectingLink(TextMesh, Input.mousePosition, null);
+                int link = TMP_TextUtilities.FindIntersectingLink(textMesh, Input.mousePosition, null);
                 if (link != -1)
                 {
-                    char linkId = TextMesh.textInfo.linkInfo[link].GetLinkID()[0];
+                    char linkId = textMesh.textInfo.linkInfo[link].GetLinkID()[0];
                     issueTooltip ??= gameObject.AddComponent<Tooltip.Tooltip>();
                     // Display tooltip containing all issue descriptions
                     UniTask.WhenAll(issueDictionary[linkId].Select(x => x.ToDisplayString()))
@@ -454,7 +454,7 @@ namespace SEE.UI.Window.CodeWindow
         {
             try
             {
-                TextMesh.ForceMeshUpdate();
+                textMesh.ForceMeshUpdate();
             }
             catch (IndexOutOfRangeException)
             {
@@ -464,7 +464,7 @@ namespace SEE.UI.Window.CodeWindow
 
             if (lines > 0 && Window.transform.Find("Content/Scrollable").gameObject.TryGetComponentOrLog(out RectTransform rect))
             {
-                excessLines = Mathf.CeilToInt(rect.rect.height / TextMesh.textInfo.lineInfo[0].lineHeight) - 2;
+                excessLines = Mathf.CeilToInt(rect.rect.height / textMesh.textInfo.lineInfo[0].lineHeight) - 2;
             }
         }
 
@@ -477,7 +477,7 @@ namespace SEE.UI.Window.CodeWindow
             ShowNotification.Info("Loading editor", "The Editable file is loading, please wait");
             string cleanText = await AsyncGetCleanText();
             await ICRDT.AsyncAddString(cleanText, 0, Title, true);
-            TextMeshInputField.enabled = true;
+            textMeshInputField.enabled = true;
             ShowNotification.Info("Editor ready", "You now can use the editor");
         }
 
@@ -507,12 +507,12 @@ namespace SEE.UI.Window.CodeWindow
             oldIDXCoolDown = Time.time + 0.1f;
             if (DeleteSelectedText() && fixSelection)
             {
-                TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), "\n");
+                textMeshInputField.text = textMeshInputField.text.Insert(GetRichIndex(idx), "\n");
                 fixSelection = false;
             }
 
-            TextMeshInputField.text = TextMeshInputField.text.Insert(GetRichIndex(idx), new string(' ', neededPadding + 1));
-            TextMeshInputField.MoveToEndOfLine(false, false);
+            textMeshInputField.text = textMeshInputField.text.Insert(GetRichIndex(idx), new string(' ', neededPadding + 1));
+            textMeshInputField.MoveToEndOfLine(false, false);
             ICRDT.AddString("\n" + new string(' ', neededPadding + 1), idx - 1, Title);
         }
 

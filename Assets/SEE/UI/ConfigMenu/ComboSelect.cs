@@ -57,7 +57,7 @@ namespace SEE.UI.ConfigMenu
         /// <summary>
         /// The initial input of the combo selection if nothing has been selected yet.
         /// </summary>
-        private const string CustomInputText = "--Custom Input--";
+        private const string customInputText = "--Custom Input--";
 
         /// <summary>
         /// The label of the component.
@@ -156,7 +156,7 @@ namespace SEE.UI.ConfigMenu
                 dropdown.dropdownItems.Clear();
                 if (Mode == ComboSelectMode.Combo)
                 {
-                    dropdown.CreateNewItemFast(CustomInputText, null);
+                    dropdown.CreateNewItemFast(customInputText, null);
                 }
                 foreach (string s in newValues)
                 {
@@ -176,7 +176,7 @@ namespace SEE.UI.ConfigMenu
         private void SetToCustomMode(string customValue)
         {
             dropdown.selectedItemIndex =
-                dropdown.dropdownItems.FindIndex(item => item.itemName == CustomInputText);
+                dropdown.dropdownItems.FindIndex(item => item.itemName == customInputText);
             dropdown.SetupDropdown();
             customInput.gameObject.SetActive(true);
             dictaphone.gameObject.SetActive(true);
@@ -198,21 +198,21 @@ namespace SEE.UI.ConfigMenu
         {
             // If the new value is already part of the items in the list, we simply select its index.
             int index = dropdown.dropdownItems.FindIndex(item => item.itemName == value);
-            if (index >= 0 && value != CustomInputText)
+            if (index >= 0 && value != customInputText)
             {
                 SetToFixedMode(index);
             }
             // The item is new, so we set the input to custom mode.
             else
             {
-                SetToCustomMode(value == CustomInputText ? null : value);
+                SetToCustomMode(value == customInputText ? null : value);
             }
         }
 
         private string FigureOutValue()
         {
             string item = dropdown.dropdownItems[dropdown.selectedItemIndex].itemName;
-            if (item == CustomInputText)
+            if (item == customInputText)
             {
                 return customInput.text;
             }

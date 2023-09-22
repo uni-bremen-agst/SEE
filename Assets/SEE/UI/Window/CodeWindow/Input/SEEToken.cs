@@ -83,11 +83,11 @@ namespace SEE.UI.Window.CodeWindow
         /// <param name="language">The language of the <paramref name="token"/>.
         /// If this is not given, the language will be inferred from the given <paramref name="lexer"/>'s grammar.</param>
         /// <returns>The <see cref="SEEToken"/> corresponding to the given <see cref="token"/>.</returns>
-        public static SEEToken fromAntlrToken(IToken token, Lexer lexer, TokenLanguage language = null)
+        public static SEEToken FromAntlrToken(IToken token, Lexer lexer, TokenLanguage language = null)
         {
-            language ??= TokenLanguage.fromLexerFileName(lexer.GrammarFileName);
+            language ??= TokenLanguage.FromLexerFileName(lexer.GrammarFileName);
             return new SEEToken(token.Text,
-                                Type.fromAntlrType(language, lexer.Vocabulary.GetSymbolicName(token.Type)),
+                                Type.FromAntlrType(language, lexer.Vocabulary.GetSymbolicName(token.Type)),
                                 token.StartIndex, token.StopIndex + 1, language); // Antlr StopIndex is inclusive
         }
 
@@ -100,17 +100,17 @@ namespace SEE.UI.Window.CodeWindow
         /// <remarks>
         /// <ul>
         /// <li>The language of the file will be determined by checking its file extension.</li>
-        /// <li>Each token will be created by using <see cref="fromAntlrToken"/>.</li>
+        /// <li>Each token will be created by using <see cref="FromAntlrToken"/>.</li>
         /// </ul>
         /// </remarks>
-        public static IList<SEEToken> fromFile(string filename)
+        public static IList<SEEToken> FromFile(string filename)
         {
-            TokenLanguage language = TokenLanguage.fromFileExtension(Path.GetExtension(filename)?.Substring(1));
+            TokenLanguage language = TokenLanguage.FromFileExtension(Path.GetExtension(filename)?.Substring(1));
             Lexer lexer = language.CreateLexer(File.ReadAllText(filename));
             CommonTokenStream tokenStream = new(lexer);
             tokenStream.Fill();
             // Generate list of SEETokens using the token stream and its language
-            return tokenStream.GetTokens().Select(x => fromAntlrToken(x, lexer, language)).ToList();
+            return tokenStream.GetTokens().Select(x => FromAntlrToken(x, lexer, language)).ToList();
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace SEE.UI.Window.CodeWindow
             CommonTokenStream tokenStream = new(lexer);
             tokenStream.Fill();
             // Generate list of SEETokens using the token stream and its language
-            return tokenStream.GetTokens().Select(x => fromAntlrToken(x, lexer, language)).ToList();
+            return tokenStream.GetTokens().Select(x => FromAntlrToken(x, lexer, language)).ToList();
         }
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace SEE.UI.Window.CodeWindow
             /// </summary>
             public static IList<Type> AllTokens { get; } = new List<Type>();
 
-            /* IMPORTANT: The name has to match with the name of the collection in TokenLanguage! */
+            // IMPORTANT: The name has to match with the name of the collection in TokenLanguage!
 
             /// <summary>
             /// Keyword tokens. This also includes boolean literals and null literals.
@@ -229,7 +229,7 @@ namespace SEE.UI.Window.CodeWindow
             /// <param name="language">The language the <paramref name="symbolicName"/> is from</param>
             /// <param name="symbolicName">Symbolic name from an antlr lexer</param>
             /// <returns>The corresponding token for the given <paramref name="symbolicName"/>.</returns>
-            public static Type fromAntlrType(TokenLanguage language, string symbolicName)
+            public static Type FromAntlrType(TokenLanguage language, string symbolicName)
             {
                 if (language == null || symbolicName == null)
                 {

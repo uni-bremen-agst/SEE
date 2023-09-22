@@ -22,7 +22,7 @@ namespace SEE.UI.Window
         /// <summary>
         /// Path to the code space prefab, in which all windows will be contained.
         /// </summary>
-        private const string WINDOW_SPACE_PREFAB = "Prefabs/UI/WindowSpace";
+        private const string windowSpacePrefab = "Prefabs/UI/WindowSpace";
 
         /// <summary>
         /// Name of the game object containing the windows.

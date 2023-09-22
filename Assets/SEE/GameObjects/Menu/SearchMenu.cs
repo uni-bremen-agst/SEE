@@ -56,7 +56,7 @@ namespace SEE.GO.Menu
         /// <summary>
         /// The color of the marker pointing to the found node.
         /// </summary>
-        private static readonly Color MARKER_COLOR = Color.red;
+        private static readonly Color markerColor = Color.red;
 
         /// <summary>
         /// A mapping from names to a list of nodes with that name.
@@ -181,7 +181,7 @@ namespace SEE.GO.Menu
                                   + $"for {blinkSeconds} seconds.");
             NodeOperator nodeOperator = result.AddOrGetComponent<NodeOperator>();
             // Display marker above the node
-            MarkerFactory marker = new(markerWidth, markerHeight, MARKER_COLOR, default, default);
+            MarkerFactory marker = new(markerWidth, markerHeight, markerColor, default, default);
             marker.MarkBorn(result);
             nodeOperator.Blink(blinkCount, blinkSeconds).SetOnComplete(RemoveMarker);
 

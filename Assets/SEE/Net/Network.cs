@@ -436,7 +436,7 @@ namespace SEE.Net
                         }
                         else if (Client.Connection.Equals(connection))
                         {
-                            id = Client.outgoingPacketID++;
+                            id = Client.OutgoingPacketID++;
                         }
                         Assert.IsTrue(id != ulong.MaxValue);
 

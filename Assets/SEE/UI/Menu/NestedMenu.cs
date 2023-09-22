@@ -31,7 +31,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// The menu levels we have ascended through.
         /// </summary>
-        private readonly Stack<MenuLevel> Levels = new();
+        private readonly Stack<MenuLevel> levels = new();
 
         /// <summary>
         /// Path to the NestedMenu prefab.
@@ -41,7 +41,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// The keyword to be used to step back in the menu verbally.
         /// </summary>
-        private const string BackMenuCommand = "go back";
+        private const string backMenuCommand = "go back";
 
         /// <summary>
         /// The input-field for the fuzzy-search of the nestedMenu.
@@ -59,7 +59,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// All leaf-entries of the nestedMenu.
         /// </summary>
-        private IDictionary<string, T> AllEntries;
+        private IDictionary<string, T> allEntries;
 
         /// <summary>
         /// True, if the fuzzy-search is active, else false.
@@ -81,17 +81,17 @@ namespace SEE.UI.Menu
         }
 
         /// <summary>
-        /// Appends the <see cref="BackMenuCommand"/> to the keywords.
+        /// Appends the <see cref="backMenuCommand"/> to the keywords.
         /// </summary>
         /// <returns></returns>
         protected override IEnumerable<string> GetKeywords()
         {
-            return base.GetKeywords().Append(BackMenuCommand);
+            return base.GetKeywords().Append(backMenuCommand);
         }
 
         protected override void HandleKeyword(PhraseRecognizedEventArgs args)
         {
-            if (args.text == BackMenuCommand)
+            if (args.text == backMenuCommand)
             {
                 DescendLevel();
             }
@@ -107,7 +107,7 @@ namespace SEE.UI.Menu
         /// <param name="nestedEntry">The entry from which to construct the new level</param>
         private void AscendLevel(NestedMenuEntry<T> nestedEntry)
         {
-            Levels.Push(new MenuLevel(Title, Description, Icon, Entries));
+            levels.Push(new MenuLevel(Title, Description, Icon, Entries));
             while (Entries.Count != 0)
             {
                 RemoveEntry(Entries[0]); // Remove all entries
@@ -129,16 +129,16 @@ namespace SEE.UI.Menu
         /// Returns a "breadcrumb" for the current level, displaying our current position in the menu hierarchy.
         /// </summary>
         /// <returns>breadcrumb for the current level</returns>
-        private string GetBreadcrumb() => string.Join(" / ", Levels.Reverse().Select(x => x.Title));
+        private string GetBreadcrumb() => string.Join(" / ", levels.Reverse().Select(x => x.Title));
 
         /// <summary>
-        /// Descends down a level in the menu hierarchy and removes the entry from the <see cref="Levels"/>.
+        /// Descends down a level in the menu hierarchy and removes the entry from the <see cref="levels"/>.
         /// </summary>
         private void DescendLevel()
         {
-            if (Levels.Count != 0)
+            if (levels.Count != 0)
             {
-                MenuLevel level = Levels.Pop();
+                MenuLevel level = levels.Pop();
                 Title = level.Title;
                 Description = level.Description;
                 Icon = level.Icon;
@@ -165,7 +165,7 @@ namespace SEE.UI.Menu
             {
                 searchInput.text = string.Empty;
             }
-            while (Levels.Count > 0)
+            while (levels.Count > 0)
             {
                 DescendLevel();
             }
@@ -210,7 +210,7 @@ namespace SEE.UI.Menu
         /// <returns>All leaf-entries of the nestedMenu.</returns>
         private IEnumerable<T> GetAllEntries()
         {
-            IList<T> allEntries = Levels.LastOrDefault()?.Entries ?? Entries;
+            IList<T> allEntries = levels.LastOrDefault()?.Entries ?? Entries;
             return GetAllEntries(allEntries);
         }
 
@@ -255,10 +255,10 @@ namespace SEE.UI.Menu
                 return;
             }
 
-            AllEntries ??= GetAllEntries().ToDictionary(x => x.Title, x => x);
-            IEnumerable<T> results = Process.ExtractTop(SearchMenu.FilterString(text), AllEntries.Keys, cutoff: 10)
+            allEntries ??= GetAllEntries().ToDictionary(x => x.Title, x => x);
+            IEnumerable<T> results = Process.ExtractTop(SearchMenu.FilterString(text), allEntries.Keys, cutoff: 10)
                                             .OrderByDescending(x => x.Score)
-                                            .Select(x => AllEntries[x.Value])
+                                            .Select(x => allEntries[x.Value])
                                             .ToList();
 
             NestedMenuEntry<T> resultEntry = new(results, "Results", $"Found {results.Count()} help pages.",

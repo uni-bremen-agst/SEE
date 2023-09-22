@@ -85,11 +85,11 @@ namespace SEE.Game.City
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(LocalMovesDepth, LocalMovesDepthLabel);
-            writer.Save(LocalMovesBranchingLimit, LocalMovesBranchingLimitLabel);
-            writer.Save(pNorm.ToString(), PNormLabel);
-            writer.Save(GradientDescentPrecisionExponent, GradientDescentPrecisionLabel);
-            writer.Save(PaddingMm, PaddingLabel);
+            writer.Save(LocalMovesDepth, localMovesDepthLabel);
+            writer.Save(LocalMovesBranchingLimit, localMovesBranchingLimitLabel);
+            writer.Save(pNorm.ToString(), pNormLabel);
+            writer.Save(GradientDescentPrecisionExponent, gradientDescentPrecisionLabel);
+            writer.Save(PaddingMm, paddingLabel);
             writer.EndGroup();
         }
 
@@ -100,34 +100,34 @@ namespace SEE.Game.City
                 return false;
             }
             Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-            bool result = ConfigIO.Restore(values, LocalMovesDepthLabel, ref LocalMovesDepth);
-            result |= ConfigIO.Restore(values, LocalMovesBranchingLimitLabel, ref LocalMovesBranchingLimit);
-            result |= ConfigIO.RestoreEnum(values, PNormLabel, ref pNorm);
-            result |= ConfigIO.Restore(values, GradientDescentPrecisionLabel, ref GradientDescentPrecisionExponent);
-            result |= ConfigIO.Restore(values, PaddingLabel, ref PaddingMm);
+            bool result = ConfigIO.Restore(values, localMovesDepthLabel, ref LocalMovesDepth);
+            result |= ConfigIO.Restore(values, localMovesBranchingLimitLabel, ref LocalMovesBranchingLimit);
+            result |= ConfigIO.RestoreEnum(values, pNormLabel, ref pNorm);
+            result |= ConfigIO.Restore(values, gradientDescentPrecisionLabel, ref GradientDescentPrecisionExponent);
+            result |= ConfigIO.Restore(values, paddingLabel, ref PaddingMm);
             return result;
         }
 
         /// <summary>
         /// Configuration label for <see cref="LocalMovesDepth"/>.
         /// </summary>
-        private const string LocalMovesDepthLabel = "LocalMovesDepth";
+        private const string localMovesDepthLabel = "LocalMovesDepth";
         /// <summary>
         /// Configuration label for <see cref="LocalMovesBranchingLimit"/>.
         /// </summary>
-        private const string LocalMovesBranchingLimitLabel = "LocalMovesBranchingLimit";
+        private const string localMovesBranchingLimitLabel = "LocalMovesBranchingLimit";
         /// <summary>
         /// Configuration label for <see cref="PNorm"/>.
         /// </summary>
-        private const string PNormLabel = "PNorm";
+        private const string pNormLabel = "PNorm";
         /// <summary>
         /// Configuration label for <see cref="GradientDescentPrecisionExponent"/>.
         /// </summary>
-        private const string GradientDescentPrecisionLabel = "GradientDescentPrecision";
+        private const string gradientDescentPrecisionLabel = "GradientDescentPrecision";
         /// <summary>
         /// Configuration label for <see cref="PaddingMm"/>.
         /// </summary>
-        private const string PaddingLabel = "Padding";
+        private const string paddingLabel = "Padding";
     }
 
     /// <summary>

@@ -415,7 +415,7 @@ namespace SEE.Layout.IO
             // will be ignored
         }
 
-        private void StartHiddenNodeTypes()
+        private static void StartHiddenNodeTypes()
         {
             // will be ignored
         }
@@ -591,7 +591,7 @@ namespace SEE.Layout.IO
         /// <param name="reader">reader processing the XML data</param>
         /// <param name="attribute">name of the float attribute</param>
         /// <returns>float value of the given XML <paramref name="attribute"/></returns>
-        private float GetFloat(XmlTextReader reader, string attribute)
+        private static float GetFloat(XmlTextReader reader, string attribute)
         {
             string value = reader.GetAttribute(attribute);
             if (value.Length == 0)
@@ -608,7 +608,7 @@ namespace SEE.Layout.IO
         /// </summary>
         /// <param name="reader">reader processing the XML data</param>
         /// <returns>value of the Id attribute</returns>
-        private string GetID(XmlTextReader reader)
+        private static string GetID(XmlTextReader reader)
         {
             string id = reader.GetAttribute("Id");
             if (id.Length == 0)

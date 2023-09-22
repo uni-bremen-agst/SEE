@@ -25,40 +25,40 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         public void Open()
         {
-            dialog = new GameObject("Load board configuration dialog");
-            PropertyGroup group = dialog.AddComponent<PropertyGroup>();
+            Dialog = new GameObject("Load board configuration dialog");
+            PropertyGroup group = Dialog.AddComponent<PropertyGroup>();
             group.Name = "Load board configuration dialog";
 
-            selectedFile = dialog.AddComponent<SelectionProperty>();
+            selectedFile = Dialog.AddComponent<SelectionProperty>();
             selectedFile.Name = "Select file";
             selectedFile.Description = "Select the file to load the board configuration from";
             selectedFile.AddOptions(ConfigManager.GetSavedFileNames());
             selectedFile.Value = ConfigManager.GetSavedFileNames()[0];
             group.AddProperty(selectedFile);
 
-            propertyDialog = dialog.AddComponent<PropertyDialog>();
-            propertyDialog.Title = "Select file";
-            propertyDialog.Description = "Select file to load the board configuration from";
-            propertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
-            propertyDialog.AddGroup(group);
+            PropertyDialog = Dialog.AddComponent<PropertyDialog>();
+            PropertyDialog.Title = "Select file";
+            PropertyDialog.Description = "Select file to load the board configuration from";
+            PropertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
+            PropertyDialog.AddGroup(group);
 
-            propertyDialog.OnConfirm.AddListener(OnConfirm);
-            propertyDialog.OnCancel.AddListener(Cancel);
+            PropertyDialog.OnConfirm.AddListener(OnConfirm);
+            PropertyDialog.OnCancel.AddListener(Cancel);
 
             SEEInput.KeyboardShortcutsEnabled = false;
-            propertyDialog.DialogShouldBeShown = true;
+            PropertyDialog.DialogShouldBeShown = true;
         }
 
         /// <summary>
         /// This method gets called when the player confirms the dialog. It will save the selected filename in a
-        /// variable and set <see cref="HolisticMetricsDialog.gotInput"/> to true.
+        /// variable and set <see cref="HolisticMetricsDialog.GotInput"/> to true.
         /// </summary>
         private void OnConfirm()
         {
             SEEInput.KeyboardShortcutsEnabled = true;
             filename = selectedFile.Value;
-            gotInput = true;
-            Destroyer.Destroy(dialog);
+            GotInput = true;
+            Destroyer.Destroy(Dialog);
         }
 
         /// <summary>
@@ -66,13 +66,13 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         /// <param name="nameOfFile">If given and not yet fetched, this will be the filename the player selected.
         /// </param>
-        /// <returns>The value of <see cref="HolisticMetricsDialog.gotInput"/></returns>
+        /// <returns>The value of <see cref="HolisticMetricsDialog.GotInput"/></returns>
         internal bool TryGetFilename(out string nameOfFile)
         {
-            if (gotInput)
+            if (GotInput)
             {
                 nameOfFile = filename;
-                gotInput = false;
+                GotInput = false;
                 return true;
             }
 

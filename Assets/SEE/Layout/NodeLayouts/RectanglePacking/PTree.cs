@@ -16,8 +16,10 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         public PTree(Vector2 position, Vector2 size)
         {
             Root = new PNode(position, size);
-            FreeLeaves = new List<PNode>();
-            FreeLeaves.Add(Root);
+            FreeLeaves = new List<PNode>
+            {
+                Root
+            };
         }
 
         /// <summary>
@@ -84,13 +86,13 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             {
                 throw new System.Exception("Node to be split is not a free leaf.");
             }
-            else if (size.x > node.Rectangle.size.x || size.y > node.Rectangle.size.y)
+            else if (size.x > node.Rectangle.Size.x || size.y > node.Rectangle.Size.y)
             {
                 throw new System.Exception("Requested size does not fit into this rectangle.");
             }
-            else if (size.x == node.Rectangle.size.x)
+            else if (size.x == node.Rectangle.Size.x)
             {
-                if (size.y == node.Rectangle.size.y)
+                if (size.y == node.Rectangle.Size.y)
                 {
                     // size.x = rectangle.size.x && size.y = rectangle.size.y. Perfect match.
                     node.Occupied = true;
@@ -99,13 +101,13 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
                 else
                 {
                     // size.x = rectangle.size.x && size.y < rectangle.size.y
-                    node.Left = new PNode();
-                    node.Left.Rectangle = new PRectangle(node.Rectangle.position, size);
+                    node.Left = new();
+                    node.Left.Rectangle = new PRectangle(node.Rectangle.Position, size);
                     node.Left.Occupied = true;
 
-                    node.Right = new PNode();
-                    node.Right.Rectangle = new PRectangle(new Vector2(node.Rectangle.position.x, node.Rectangle.position.y + size.y),
-                                                          new Vector2(node.Rectangle.size.x, node.Rectangle.size.y - size.y));
+                    node.Right = new();
+                    node.Right.Rectangle = new PRectangle(new Vector2(node.Rectangle.Position.x, node.Rectangle.Position.y + size.y),
+                                                          new Vector2(node.Rectangle.Size.x, node.Rectangle.Size.y - size.y));
                     FreeLeaves.Add(node.Right);
                     result = node.Left;
                 }
@@ -113,16 +115,16 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             else
             {
                 // size.x < rectangle.size.x
-                if (size.y == node.Rectangle.size.y)
+                if (size.y == node.Rectangle.Size.y)
                 {
                     // size.x < rectangle.size.x && size.y = rectangle.size.y
-                    node.Left = new PNode();
-                    node.Left.Rectangle = new PRectangle(node.Rectangle.position, size);
+                    node.Left = new();
+                    node.Left.Rectangle = new PRectangle(node.Rectangle.Position, size);
                     node.Left.Occupied = true;
 
-                    node.Right = new PNode();
-                    node.Right.Rectangle = new PRectangle(new Vector2(node.Rectangle.position.x + size.x, node.Rectangle.position.y),
-                                                          new Vector2(node.Rectangle.size.x - size.x, size.y));
+                    node.Right = new();
+                    node.Right.Rectangle = new PRectangle(new Vector2(node.Rectangle.Position.x + size.x, node.Rectangle.Position.y),
+                                                          new Vector2(node.Rectangle.Size.x - size.x, size.y));
                     FreeLeaves.Add(node.Right);
                     result = node.Left;
                 }
@@ -134,27 +136,27 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
                     // The origin of left is the origin of the enclosing rectangle. Its width is the width
                     // of the enclosing rectangle. Its depth is the size of the requested rectangle.
 
-                    node.Left = new PNode();
-                    node.Left.Rectangle = new PRectangle(node.Rectangle.position, new Vector2(node.Rectangle.size.x, size.y));
+                    node.Left = new();
+                    node.Left.Rectangle = new PRectangle(node.Rectangle.Position, new Vector2(node.Rectangle.Size.x, size.y));
 
-                    node.Right = new PNode();
-                    node.Right.Rectangle = new PRectangle(new Vector2(node.Rectangle.position.x, node.Rectangle.position.y + size.y),
-                                                        new Vector2(node.Rectangle.size.x, node.Rectangle.size.y - size.y));
+                    node.Right = new();
+                    node.Right.Rectangle = new PRectangle(new Vector2(node.Rectangle.Position.x, node.Rectangle.Position.y + size.y),
+                                                        new Vector2(node.Rectangle.Size.x, node.Rectangle.Size.y - size.y));
                     FreeLeaves.Add(node.Right);
 
                     // The upper enclosed rectangle is split again. Its left rectangle will be the rectangle
                     // requested. Its right rectangle is available.
-                    node.Left.Left = new PNode();
+                    node.Left.Left = new();
                     // This space is not available anymore.
                     node.Left.Left.Occupied = true;
                     // The allocated rectangle is added at the left upper corner of left node.
-                    node.Left.Left.Rectangle = new PRectangle(node.Left.Rectangle.position, size);
+                    node.Left.Left.Rectangle = new PRectangle(node.Left.Rectangle.Position, size);
 
                     // The remaining rectangle sits right of the allocated one and occupies
                     // the remaining space of left.
-                    node.Left.Right = new PNode();
-                    node.Left.Right.Rectangle = new PRectangle(new Vector2(node.Left.Rectangle.position.x + size.x, node.Left.Rectangle.position.y),
-                                                              new Vector2(node.Left.Rectangle.size.x - size.x, node.Left.Rectangle.size.y));
+                    node.Left.Right = new();
+                    node.Left.Right.Rectangle = new PRectangle(new Vector2(node.Left.Rectangle.Position.x + size.x, node.Left.Rectangle.Position.y),
+                                                               new Vector2(node.Left.Rectangle.Size.x - size.x, node.Left.Rectangle.Size.y));
                     FreeLeaves.Add(node.Left.Right);
                     result = node.Left.Left;
                 }
@@ -180,10 +182,10 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <returns>all free leaves having at least the requested size</returns>
         public IList<PNode> GetSufficientlyLargeLeaves(Vector2 size)
         {
-            List<PNode> result = new List<PNode>();
+            List<PNode> result = new();
             foreach (PNode leaf in FreeLeaves)
             {
-                if (FitsInto(size, leaf.Rectangle.size))
+                if (FitsInto(size, leaf.Rectangle.Size))
                 {
                     result.Add(leaf);
                 }

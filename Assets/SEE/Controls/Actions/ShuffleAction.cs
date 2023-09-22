@@ -71,6 +71,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         private Vector3 dragStartOffset = Vector3.positiveInfinity;
 
+        /// <summary>
+        /// Assigns <see cref="gizmo"/> if not already assigned.
+        /// </summary>
         private void Awake()
         {
             if (gizmo == null)

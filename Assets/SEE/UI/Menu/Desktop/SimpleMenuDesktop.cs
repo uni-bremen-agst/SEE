@@ -15,7 +15,7 @@ namespace SEE.UI.Menu
         /// Prefab for the menu.
         /// Requires a ModalWindowManager component.
         /// </summary>
-        protected virtual string MenuPrefab => UI_PREFAB_FOLDER + "Menu";
+        protected virtual string MenuPrefab => UIPrefabFolder + "Menu";
 
         /// <summary>
         /// Sprite for the icon.

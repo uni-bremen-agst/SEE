@@ -46,7 +46,7 @@ namespace SEE.Controls.Actions
                         continue;
                     }
                     TreeWindow window = gameObject.AddComponent<TreeWindow>();
-                    window.graph = city.LoadedGraph;
+                    window.Graph = city.LoadedGraph;
                     treeWindows.Add(city.name, window);
                 }
             }

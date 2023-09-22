@@ -16,13 +16,13 @@ namespace SEE.UI.Menu
         /// Prefab for the list containing the menu entries.
         /// Can be <code>null</code> if a game object can be found at <see cref="EntryListPath"/>.
         /// </summary>
-        protected virtual string EntryListPrefab => $"{UI_PREFAB_FOLDER}MenuEntries";
+        protected virtual string EntryListPrefab => $"{UIPrefabFolder}MenuEntries";
 
         /// <summary>
         /// Prefab for each menu entry.
         /// Required components: ButtonManagerBasicWithIcon, PointerHelper and Image.
         /// </summary>
-        protected virtual string EntryPrefab => $"{UI_PREFAB_FOLDER}Button";
+        protected virtual string EntryPrefab => $"{UIPrefabFolder}Button";
 
         /// <summary>
         /// Path to the content game object.

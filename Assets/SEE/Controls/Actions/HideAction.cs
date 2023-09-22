@@ -100,7 +100,7 @@ namespace SEE.Controls.Actions
 
             void OKButtonPressed()
             {
-                mode = dialog.mode;
+                mode = dialog.Mode;
             }
 
             void Cancelled()

@@ -43,7 +43,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// The maximal valid network port number.
         /// </summary>
-        private const int MaximalPortNumber = 65535;
+        private const int maximalPortNumber = 65535;
 
         /// <summary>
         /// The network configuration to be manipulated by this dialog.
@@ -156,7 +156,7 @@ namespace SEE.UI.PropertyDialog
         /// Returns the enum values of <see cref="VoiceChatSystems"/> as a list of strings.
         /// </summary>
         /// <returns>enum values of <see cref="VoiceChatSystems"/> as a list of strings</returns>
-        private IList<string> VoiceChatSystemsToStrings()
+        private static IList<string> VoiceChatSystemsToStrings()
         {
             return Enum.GetNames(typeof(VoiceChatSystems)).ToList();
         }
@@ -165,7 +165,7 @@ namespace SEE.UI.PropertyDialog
         /// Returns the enum values of <see cref="PlayerInputType"/> as a list of strings.
         /// </summary>
         /// <returns>enum values of <see cref="PlayerInputType"/> as a list of strings</returns>
-        private IList<string> PlayerInputTypesToStrings()
+        private static IList<string> PlayerInputTypesToStrings()
         {
             return Enum.GetNames(typeof(PlayerInputType)).ToList();
         }
@@ -209,7 +209,7 @@ namespace SEE.UI.PropertyDialog
             {
                 // Server Port Number
                 if (Int32.TryParse(serverPort.Value.Trim(), out int serverPortNumber)
-                    && 0 <= serverPortNumber && serverPortNumber <= MaximalPortNumber)
+                    && 0 <= serverPortNumber && serverPortNumber <= maximalPortNumber)
                 {
                     networkConfig.ServerPort = serverPortNumber;
                 }
@@ -222,7 +222,7 @@ namespace SEE.UI.PropertyDialog
             {
                 // Server Action Port Number
                 if (Int32.TryParse(serverActionPort.Value.Trim(), out int serverActionPortNumber)
-                    && 0 <= serverActionPortNumber && serverActionPortNumber <= MaximalPortNumber)
+                    && 0 <= serverActionPortNumber && serverActionPortNumber <= maximalPortNumber)
                 {
                     networkConfig.ServerActionPort = serverActionPortNumber;
                 }
@@ -258,7 +258,7 @@ namespace SEE.UI.PropertyDialog
 
             static void ShowPortError(string portPrefix)
             {
-                ShowNotification.Error(portPrefix + " Port Error", $"A port must be an integer in the range of 0 to {MaximalPortNumber}.");
+                ShowNotification.Error(portPrefix + " Port Error", $"A port must be an integer in the range of 0 to {maximalPortNumber}.");
             }
         }
 
@@ -269,7 +269,7 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         /// <param name="ipAddress">the IP address to be validated syntactically</param>
         /// <returns>true if <paramref name="ipAddress"/> conforms to the syntax</returns>
-        private bool HasCorrectIPv4AddressSyntax(string ipAddress)
+        private static bool HasCorrectIPv4AddressSyntax(string ipAddress)
         {
             if (String.IsNullOrWhiteSpace(ipAddress))
             {

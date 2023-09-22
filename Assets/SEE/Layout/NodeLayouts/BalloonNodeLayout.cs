@@ -193,11 +193,11 @@ namespace SEE.Layout.NodeLayouts
                 {
 
                     // Find the radius rad_k and outer-radius out_rad_k for each child k of node i.
-                    CalculateRadius2D(child, out float child_out_rad);
-                    innerSum += child_out_rad;
-                    if (maxChildrenRad < child_out_rad)
+                    CalculateRadius2D(child, out float childOutRad);
+                    innerSum += childOutRad;
+                    if (maxChildrenRad < childOutRad)
                     {
-                        maxChildrenRad = child_out_rad;
+                        maxChildrenRad = childOutRad;
                     }
                 }
                 innerSum *= 2;

@@ -60,7 +60,7 @@ namespace SEE.Game.Charts.VR
         /// <summary>
         /// The speed at which charts will be moved in or out when the player scrolls.
         /// </summary>
-        private float _chartScrollSpeed;
+        private float chartScrollSpeed;
 
         /// <summary>
         /// The <see cref="Camera" /> attached to the pointer.
@@ -109,7 +109,7 @@ namespace SEE.Game.Charts.VR
         protected override void GetSettingData()
         {
             base.GetSettingData();
-            _chartScrollSpeed = ChartManager.Instance.ChartScrollSpeed;
+            chartScrollSpeed = ChartManager.Instance.ChartScrollSpeed;
             minimumDistance = ChartManager.Instance.DistanceThreshold;
             maximumDistance = ChartManager.Instance.PointerLength;
             chartAction = GameObject.Find("VRPlayer").GetComponent<ChartAction>();
@@ -138,7 +138,7 @@ namespace SEE.Game.Charts.VR
             }
 
             Vector3 direction = pointerCamera.transform.position - rectTransform.position;
-            float moveBy = chartAction.Move * _chartScrollSpeed * Time.deltaTime;
+            float moveBy = chartAction.Move * chartScrollSpeed * Time.deltaTime;
             if (!(chartAction.Move < 0 &&
                   direction.magnitude < minimumDistance + moveBy ||
                   chartAction.Move > 0 &&

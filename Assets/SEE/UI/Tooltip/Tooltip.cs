@@ -26,26 +26,26 @@ namespace SEE.UI.Tooltip
         /// The path to the prefab for the tooltip game object.
         /// Will be added as a child to the <see cref="Canvas"/>.
         /// </summary>
-        private const string TOOLTIP_PREFAB = "Prefabs/UI/Tooltip";
+        private const string tooltipPrefab = "Prefabs/UI/Tooltip";
 
         /// <summary>
         /// The time it shall take to fade in the tooltip.
-        /// Note that changing this value will affect the <see cref="FADE_OUT_DURATION"/>
+        /// Note that changing this value will affect the <see cref="fadeOutDuration"/>
         /// as well as the default delay of <see cref="Show"/>.
         /// </summary>
-        private const float FADE_IN_DURATION = 0.5f; // Note: This will affect fade out and delay
+        private const float fadeInDuration = 0.5f; // Note: This will affect fade out and delay
 
         /// <summary>
         /// The time it will take to fade out.
         /// </summary>
-        private const float FADE_OUT_DURATION = FADE_IN_DURATION / 2;
+        private const float fadeOutDuration = fadeInDuration / 2;
 
         /// <summary>
         /// The tooltip manager, which can (as its name implies) control tooltips.
         /// Note that this manager controls a single tooltip whose text can be changed. If multiple tooltips
         /// are needed, more GameObjects with TooltipManagers need to be created.
         /// </summary>
-        private TooltipManager TooltipManager;
+        private TooltipManager tooltipManager;
 
         /// <summary>
         /// The text mesh pro containing the actual tooltip text.
@@ -69,12 +69,12 @@ namespace SEE.UI.Tooltip
 
         /// <summary>
         /// Displays the tooltip with the given <paramref name="text"/> after the given <paramref name="delay"/>.
-        /// By default, the <paramref name="delay"/> will be set to twice the <see cref="FADE_IN_DURATION"/>.
+        /// By default, the <paramref name="delay"/> will be set to twice the <see cref="fadeInDuration"/>.
         /// </summary>
         /// <param name="text">The text which shall be displayed in the tooltip.</param>
         /// <param name="delay">The time after which the tooltip should start fading in.</param>
         /// <exception cref="ArgumentException">If <paramref name="delay"/> is negative.</exception>
-        public void Show(string text, float delay = FADE_IN_DURATION * 2)
+        public void Show(string text, float delay = fadeInDuration * 2)
         {
             if (delay < 0f)
             {
@@ -89,9 +89,9 @@ namespace SEE.UI.Tooltip
                 // To avoid this jarring visual, we wait until the fade out duration has passed
                 // and only then change the text, when it's no longer visible. After this, we wait for
                 // the rest of our delay. The Min and Max calls are here in case delay is less than FADE_OUT_DURATION.
-                fadeIn.AppendInterval(Mathf.Min(delay, FADE_OUT_DURATION));
+                fadeIn.AppendInterval(Mathf.Min(delay, fadeOutDuration));
                 fadeIn.AppendCallback(() => textComp.text = text);
-                fadeIn.AppendInterval(Mathf.Max(delay - FADE_OUT_DURATION, 0f));
+                fadeIn.AppendInterval(Mathf.Max(delay - fadeOutDuration, 0f));
                 // Move to top of layer hierarchy, which is at the bottom
 
                 fadeIn.AppendCallback(SetLastSibling);
@@ -101,7 +101,7 @@ namespace SEE.UI.Tooltip
                     {
                         canvasGroup.alpha = a;
                     }
-                }, 1f, FADE_IN_DURATION));
+                }, 1f, fadeInDuration));
                 fadeIn.Play();
             }
             else
@@ -111,9 +111,9 @@ namespace SEE.UI.Tooltip
 
             void SetLastSibling()
             {
-                if (TooltipManager != null && TooltipManager.gameObject != null)
+                if (tooltipManager != null && tooltipManager.gameObject != null)
                 {
-                    TooltipManager.gameObject.transform.SetAsLastSibling();
+                    tooltipManager.gameObject.transform.SetAsLastSibling();
                 }
             }
         }
@@ -134,7 +134,7 @@ namespace SEE.UI.Tooltip
                     {
                         canvasGroup.alpha = a;
                     }
-                }, 0f, FADE_OUT_DURATION).Play();
+                }, 0f, fadeOutDuration).Play();
             }
             else
             {
@@ -149,17 +149,17 @@ namespace SEE.UI.Tooltip
         protected override void StartDesktop()
         {
             // Create new tooltip GameObject
-            tooltipGameObject = PrefabInstantiator.InstantiatePrefab(TOOLTIP_PREFAB, Canvas.transform, false);
-            if (tooltipGameObject.TryGetComponentOrLog(out TooltipManager))
+            tooltipGameObject = PrefabInstantiator.InstantiatePrefab(tooltipPrefab, Canvas.transform, false);
+            if (tooltipGameObject.TryGetComponentOrLog(out tooltipManager))
             {
-                TooltipManager.allowUpdating = true;
+                tooltipManager.allowUpdating = true;
                 // Move tooltip to front of layer hierarchy
-                TooltipManager.gameObject.transform.SetAsLastSibling();
+                tooltipManager.gameObject.transform.SetAsLastSibling();
                 // tooltipObject only has 1 child, and will never have more than that
-                if (TooltipManager.tooltipObject.transform.GetChild(0).gameObject.TryGetComponentOrLog(out canvasGroup))
+                if (tooltipManager.tooltipObject.transform.GetChild(0).gameObject.TryGetComponentOrLog(out canvasGroup))
                 {
                     // Get the actual text object
-                    TextMeshProUGUI[] texts = TooltipManager.tooltipContent.GetComponentsInChildren<TextMeshProUGUI>();
+                    TextMeshProUGUI[] texts = tooltipManager.tooltipContent.GetComponentsInChildren<TextMeshProUGUI>();
                     textComp = texts.SingleOrDefault(x => x.name == "Description");
                     if (textComp == null)
                     {

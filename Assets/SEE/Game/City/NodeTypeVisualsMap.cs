@@ -95,8 +95,8 @@ namespace SEE.Game.City
             foreach (var item in map)
             {
                 writer.BeginGroup();
-                writer.Save(item.Key, NodeTypeLabel);
-                item.Value.Save(writer, VisualNodeAttributesLabel);
+                writer.Save(item.Key, nodeTypeLabel);
+                item.Value.Save(writer, visualNodeAttributesLabel);
                 writer.EndGroup();
             }
             writer.EndList();
@@ -119,14 +119,14 @@ namespace SEE.Game.City
                     Dictionary<string, object> dict = item as Dictionary<string, object>;
                     // node-type name
                     string name = null;
-                    if (!ConfigIO.Restore(dict, NodeTypeLabel, ref name))
+                    if (!ConfigIO.Restore(dict, nodeTypeLabel, ref name))
                     {
-                        Debug.LogError($"Entry of {typeof(NodeTypeVisualsMap)} has no value for {NodeTypeLabel}\n");
+                        Debug.LogError($"Entry of {typeof(NodeTypeVisualsMap)} has no value for {nodeTypeLabel}\n");
                         continue;
                     }
                     // VisualNodeAttributes
                     VisualNodeAttributes visualNodeAttributes = new VisualNodeAttributes();
-                    visualNodeAttributes.Restore(dict, VisualNodeAttributesLabel);
+                    visualNodeAttributes.Restore(dict, visualNodeAttributesLabel);
 
                     map[name] = visualNodeAttributes;
                     result = true;
@@ -142,11 +142,11 @@ namespace SEE.Game.City
         /// <summary>
         /// The label of the name of the node type in the configuration file.
         /// </summary>
-        private const string NodeTypeLabel = "nodeType";
+        private const string nodeTypeLabel = "nodeType";
 
         /// <summary>
         /// The label of the <see cref="VisualNodeAttributes"/> in the configuration file.
         /// </summary>
-        private const string VisualNodeAttributesLabel = "visualNodeAttributes";
+        private const string visualNodeAttributesLabel = "visualNodeAttributes";
     }
 }

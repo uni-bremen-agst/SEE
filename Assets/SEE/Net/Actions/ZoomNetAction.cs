@@ -49,9 +49,9 @@ namespace SEE.Net.Actions
                 GameObject gameObject = GraphElementIDMap.Find(GameObjectID);
                 if (gameObject != null)
                 {
-                    NodeOperator Operator = gameObject.AddOrGetComponent<NodeOperator>();
-                    Operator.MoveTo(Position, ZoomAction.AnimationFactor);
-                    Operator.ScaleTo(LocalScale, ZoomAction.AnimationFactor);
+                    NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+                    nodeOperator.MoveTo(Position, ZoomAction.AnimationFactor);
+                    nodeOperator.ScaleTo(LocalScale, ZoomAction.AnimationFactor);
                 }
                 else
                 {

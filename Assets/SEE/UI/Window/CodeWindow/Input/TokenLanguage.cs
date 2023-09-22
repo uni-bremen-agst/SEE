@@ -14,12 +14,12 @@ namespace SEE.UI.Window.CodeWindow
         /// <summary>
         /// Default number of spaces a tab is equivalent to.
         /// </summary>
-        private const int DEFAULT_TAB_WIDTH = 4;
+        private const int defaultTabWidth = 4;
 
         /// <summary>
         /// Language-independent symbolic name for the end of file token.
         /// </summary>
-        private const string EOF = "EOF";
+        private const string eof = "EOF";
 
         /// <summary>
         /// File extensions which apply for the given language.
@@ -34,7 +34,7 @@ namespace SEE.UI.Window.CodeWindow
 
         /// <summary>
         /// Number of spaces equivalent to a tab in this language.
-        /// If not specified, this will be <see cref="DEFAULT_TAB_WIDTH"/>.
+        /// If not specified, this will be <see cref="defaultTabWidth"/>.
         /// </summary>
         public int TabWidth { get; }
 
@@ -421,7 +421,7 @@ namespace SEE.UI.Window.CodeWindow
         private TokenLanguage(string lexerFileName, ISet<string> fileExtensions, ISet<string> keywords,
                               ISet<string> numberLiterals, ISet<string> stringLiterals, ISet<string> punctuation,
                               ISet<string> identifiers, ISet<string> whitespace, ISet<string> newline,
-                              ISet<string> comments, int tabWidth = DEFAULT_TAB_WIDTH)
+                              ISet<string> comments, int tabWidth = defaultTabWidth)
         {
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
             if (AllTokenLanguages.Any(x => x.LexerFileName.Equals(lexerFileName) || x.FileExtensions.Overlaps(fileExtensions)))
@@ -463,7 +463,7 @@ namespace SEE.UI.Window.CodeWindow
         /// <param name="lexerFileName">File name of the antlr lexer. Can be found in <c>lexer.GrammarFileName</c></param>
         /// <returns>The matching token language</returns>
         /// <exception cref="ArgumentException">If the given <paramref name="lexerFileName"/> is not supported.</exception>
-        public static TokenLanguage fromLexerFileName(string lexerFileName)
+        public static TokenLanguage FromLexerFileName(string lexerFileName)
         {
             return AllTokenLanguages.SingleOrDefault(x => x.LexerFileName.Equals(lexerFileName))
                    ?? throw new ArgumentException($"The given {nameof(lexerFileName)} is not of a supported grammar. Supported grammars are "
@@ -484,7 +484,7 @@ namespace SEE.UI.Window.CodeWindow
         /// <exception cref="ArgumentException">
         /// If the given <paramref name="extension"/> is not supported and <paramref name="throwOnUnknown"/> is true.
         /// </exception>
-        public static TokenLanguage fromFileExtension(string extension, bool throwOnUnknown = false)
+        public static TokenLanguage FromFileExtension(string extension, bool throwOnUnknown = false)
         {
             TokenLanguage target = AllTokenLanguages.SingleOrDefault(x => x.FileExtensions.Contains(extension));
             if (target == null)
@@ -564,7 +564,7 @@ namespace SEE.UI.Window.CodeWindow
             {
                 return nameof(Newline);
             }
-            return EOF.Equals(token) ? nameof(EOF) : null;
+            return eof.Equals(token) ? nameof(eof) : null;
         }
     }
 }

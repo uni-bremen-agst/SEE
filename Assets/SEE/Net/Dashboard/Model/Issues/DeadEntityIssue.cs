@@ -17,31 +17,31 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The dead entity
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly string entity;
+        public readonly string Entity;
 
         /// <summary>
         /// The type of the entity
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly string entityType;
+        public readonly string EntityType;
 
         /// <summary>
         /// The filename of the entity
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly string path;
+        public readonly string Path;
 
         /// <summary>
         /// The line number of the entity
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly int line;
+        public readonly int Line;
 
         /// <summary>
         /// The internal name of the corresponding entity
         /// </summary>
         [JsonProperty(Required = Required.Always)]
-        public readonly string linkName;
+        public readonly string LinkName;
 
         public DeadEntityIssue()
         {
@@ -51,19 +51,19 @@ namespace SEE.Net.Dashboard.Model.Issues
         [JsonConstructor]
         protected DeadEntityIssue(string entity, string entityType, string path, int line, string linkName)
         {
-            this.entity = entity;
-            this.entityType = entityType;
-            this.path = path;
-            this.line = line;
-            this.linkName = linkName;
+            this.Entity = entity;
+            this.EntityType = entityType;
+            this.Path = path;
+            this.Line = line;
+            this.LinkName = linkName;
         }
 
         public override async UniTask<string> ToDisplayString()
         {
-            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"DE{id}");
+            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"DE{ID}");
             return "<style=\"H2\">Dead Entity</style>"
-                   + $"\nThe entity '{entity.WrapLines(WRAP_AT)}' ({entityType.WrapLines(WRAP_AT)}) is dead."
-                   + $"\nMay it rest in peace.\n{explanation.WrapLines(WRAP_AT)}";
+                   + $"\nThe entity '{Entity.WrapLines(WrapAt)}' ({EntityType.WrapLines(WrapAt)}) is dead."
+                   + $"\nMay it rest in peace.\n{explanation.WrapLines(WrapAt)}";
         }
 
         public override string IssueKind => "DE";
@@ -72,7 +72,7 @@ namespace SEE.Net.Dashboard.Model.Issues
 
         public override IEnumerable<SourceCodeEntity> Entities => new[]
         {
-            new SourceCodeEntity(path, line, null, entity)
+            new SourceCodeEntity(Path, Line, null, Entity)
         };
     }
 }

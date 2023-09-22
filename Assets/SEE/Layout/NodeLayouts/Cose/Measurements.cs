@@ -125,12 +125,12 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <summary>
         /// Dictonary with nodes and corresonding gameobjects
         /// </summary>
-        private ICollection<ILayoutNode> layoutNodes;
+        private readonly ICollection<ILayoutNode> layoutNodes;
 
         /// <summary>
         /// a dictionary containing all measurements with the according values
         /// </summary>
-        private SortedDictionary<string, string> MeasurementsDict = new();
+        private SortedDictionary<string, string> measurementsDict = new();
 
         /// <summary>
         /// the performance of the layout of the nodes
@@ -247,9 +247,9 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <returns>string dictinary with measurements</returns>
         public SortedDictionary<string, string> ToStringDictionary(bool calcualteNew = false)
         {
-            if (!calcualteNew && MeasurementsDict.Count > 0)
+            if (!calcualteNew && measurementsDict.Count > 0)
             {
-                return MeasurementsDict;
+                return measurementsDict;
             }
 
             EdgesMeasurements edgeMeasure = EdgesMeasurements;
@@ -278,8 +278,8 @@ namespace SEE.Layout.NodeLayouts.Cose
                 measurements.Add("Time for node layout", nodePerformance);
             }
 
-            MeasurementsDict = measurements;
-            return MeasurementsDict;
+            measurementsDict = measurements;
+            return measurementsDict;
         }
 
         /// <summary>
@@ -316,18 +316,18 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// calculates whether two lines intersect
+        /// Calculates whether two lines intersect.
         /// Algorithm: https://www.habrador.com/tutorials/math/5-line-line-intersection/
         /// http://inis.jinr.ru/sl/vol1/CMC/Graphics_Gems_3,ed_D.Kirk.pdf
         /// https://forum.unity.com/threads/line-intersection.17384/
         /// </summary>
-        /// <param name="l1_p1">2D coordinate of start position of line 1</param>
-        /// <param name="l1_p2">2D coordinate of end position of line 1</param>
-        /// <param name="l2_p1">2D coordinate of start position of line 2</param>
-        /// <param name="l2_p2">2D coordinate of end position of line 2</param>
+        /// <param name="l1P1">2D coordinate of start position of line 1</param>
+        /// <param name="l1P2">2D coordinate of end position of line 1</param>
+        /// <param name="l2P1">2D coordinate of start position of line 2</param>
+        /// <param name="l2P2">2D coordinate of end position of line 2</param>
         /// <param name="shouldIncludeEndPoints"></param>
-        /// <returns></returns>
-        private static bool FasterLineSegmentIntersection(Vector2 l1_p1, Vector2 l1_p2, Vector2 l2_p1, Vector2 l2_p2, bool shouldIncludeEndPoints)
+        /// <returns>true if the lines intersect</returns>
+        private static bool FasterLineSegmentIntersection(Vector2 l1P1, Vector2 l1P2, Vector2 l2P1, Vector2 l2P2, bool shouldIncludeEndPoints)
         {
             //To avoid floating point precision issues we can add a small value
 
@@ -335,13 +335,13 @@ namespace SEE.Layout.NodeLayouts.Cose
 
             bool isIntersecting = false;
 
-            float denominator = (l2_p2.y - l2_p1.y) * (l1_p2.x - l1_p1.x) - (l2_p2.x - l2_p1.x) * (l1_p2.y - l1_p1.y);
+            float denominator = (l2P2.y - l2P1.y) * (l1P2.x - l1P1.x) - (l2P2.x - l2P1.x) * (l1P2.y - l1P1.y);
 
             //Make sure the denominator is > 0, if not the lines are parallel
             if (denominator != 0f)
             {
-                float uA = ((l2_p2.x - l2_p1.x) * (l1_p1.y - l2_p1.y) - (l2_p2.y - l2_p1.y) * (l1_p1.x - l2_p1.x)) / denominator;
-                float uB = ((l1_p2.x - l1_p1.x) * (l1_p1.y - l2_p1.y) - (l1_p2.y - l1_p1.y) * (l1_p1.x - l2_p1.x)) / denominator;
+                float uA = ((l2P2.x - l2P1.x) * (l1P1.y - l2P1.y) - (l2P2.y - l2P1.y) * (l1P1.x - l2P1.x)) / denominator;
+                float uB = ((l1P2.x - l1P1.x) * (l1P1.y - l2P1.y) - (l1P2.y - l1P1.y) * (l1P1.x - l2P1.x)) / denominator;
 
                 //Are the line segments intersecting if the end points are the same
                 if (shouldIncludeEndPoints)
@@ -580,7 +580,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <param name="node1">the first node</param>
         /// <param name="node2">the second node</param>
         /// <returns></returns>
-        private bool CheckOverlapping(ILayoutNode node1, ILayoutNode node2)
+        private static bool CheckOverlapping(ILayoutNode node1, ILayoutNode node2)
         {
             Bounds bounds1 = new Bounds(node1.CenterPosition, node1.LocalScale);
             Bounds bounds2 = new Bounds(node2.CenterPosition, node2.LocalScale);

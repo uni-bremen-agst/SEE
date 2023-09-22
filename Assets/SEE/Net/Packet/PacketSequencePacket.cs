@@ -97,9 +97,9 @@ namespace SEE.Net
         {
             Assert.IsNotNull(connection);
 
-            if (id == Client.incomingPacketID)
+            if (id == Client.IncomingPacketID)
             {
-                Client.incomingPacketID++;
+                Client.IncomingPacketID++;
                 foreach (string serializedPacket in serializedPackets)
                 {
                     AbstractPacket packet = PacketSerializer.Deserialize(serializedPacket);

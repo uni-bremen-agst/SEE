@@ -15,7 +15,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Stores which function from the <see cref="HideAction"/> is to be executed.
         /// </summary>
-        public HideModeSelector mode;
+        public HideModeSelector Mode;
 
         /// <summary>
         /// Event triggered when the user presses the OK button. Clients can
@@ -46,7 +46,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Represents the Selected HideMode
         /// </summary>
-        public HideInInspector selectedMode;
+        public HideInInspector SelectedMode;
 
         /// <summary>
         /// Button to hide all edges.
@@ -138,72 +138,72 @@ namespace SEE.UI.PropertyDialog
             bHideAllEdges = dialog.AddComponent<ButtonProperty>();
             bHideAllEdges.Name = "Hide all edges";
             bHideAllEdges.Description = "Hides all edges";
-            bHideAllEdges.buttonColor = Color.red.Darker();
+            bHideAllEdges.ButtonColor = Color.red.Darker();
             bHideAllEdges.Value = HideModeSelector.HideAll;
-            bHideAllEdges.selectionType = HideModeSelector.SelectSingle;
+            bHideAllEdges.SelectionType = HideModeSelector.SelectSingle;
 
             bHideIncoming = dialog.AddComponent<ButtonProperty>();
             bHideIncoming.Name = "Hide incomings";
             bHideIncoming.Description = "Hides only incoming edges";
-            bHideIncoming.buttonColor = Color.blue.Darker();
+            bHideIncoming.ButtonColor = Color.blue.Darker();
             bHideIncoming.Value = HideModeSelector.HideIncoming;
-            bHideIncoming.selectionType = HideModeSelector.SelectSingle;
+            bHideIncoming.SelectionType = HideModeSelector.SelectSingle;
 
             bHideOutgoing = dialog.AddComponent<ButtonProperty>();
             bHideOutgoing.Name = "Hide outgoings";
             bHideOutgoing.Description = "Hides only outgoing edges";
-            bHideOutgoing.buttonColor = Color.magenta.Darker();
+            bHideOutgoing.ButtonColor = Color.magenta.Darker();
             bHideOutgoing.Value = HideModeSelector.HideOutgoing;
-            bHideOutgoing.selectionType = HideModeSelector.SelectSingle;
+            bHideOutgoing.SelectionType = HideModeSelector.SelectSingle;
 
             bHideForwardTransitiveClosure = dialog.AddComponent<ButtonProperty>();
             bHideForwardTransitiveClosure.Name = "Hide forward transitive closure";
             bHideForwardTransitiveClosure.Description = "Hides nodes reachable transitively via outgoing edges of the selected node.";
-            bHideForwardTransitiveClosure.buttonColor = Color.cyan.Darker();
+            bHideForwardTransitiveClosure.ButtonColor = Color.cyan.Darker();
             bHideForwardTransitiveClosure.Value = HideModeSelector.HideForwardTransitiveClosure;
-            bHideForwardTransitiveClosure.selectionType = HideModeSelector.SelectSingle;
+            bHideForwardTransitiveClosure.SelectionType = HideModeSelector.SelectSingle;
 
             bHideBackwardTransitiveClosure = dialog.AddComponent<ButtonProperty>();
             bHideBackwardTransitiveClosure.Name = "Hide backward transitive closure";
             bHideBackwardTransitiveClosure.Description = "Hides nodes reachable transitively via incoming edges of the selected node.";
-            bHideBackwardTransitiveClosure.buttonColor = Color.red.Darker();
+            bHideBackwardTransitiveClosure.ButtonColor = Color.red.Darker();
             bHideBackwardTransitiveClosure.Value = HideModeSelector.HideBackwardTransitiveClosure;
-            bHideBackwardTransitiveClosure.selectionType = HideModeSelector.SelectSingle;
+            bHideBackwardTransitiveClosure.SelectionType = HideModeSelector.SelectSingle;
 
             bHideTransitiveClosure = dialog.AddComponent<ButtonProperty>();
             bHideTransitiveClosure.Name = "Hide transitive closure";
             bHideTransitiveClosure.Description = "Hides nodes reachable transitively via incoming and outgoing edges of the selected node.";
-            bHideTransitiveClosure.buttonColor = Color.yellow.Darker();
+            bHideTransitiveClosure.ButtonColor = Color.yellow.Darker();
             bHideTransitiveClosure.Value = HideModeSelector.HideAllTransitiveClosure;
-            bHideTransitiveClosure.selectionType = HideModeSelector.SelectSingle;
+            bHideTransitiveClosure.SelectionType = HideModeSelector.SelectSingle;
 
             bHideSelected = dialog.AddComponent<ButtonProperty>();
             bHideSelected.Name = "Hide selected";
             bHideSelected.Description = "Hides only the selected objects.";
-            bHideSelected.buttonColor = Color.green.Darker();
+            bHideSelected.ButtonColor = Color.green.Darker();
             bHideSelected.Value = HideModeSelector.HideSelected;
-            bHideSelected.selectionType = HideModeSelector.SelectMultiple;
+            bHideSelected.SelectionType = HideModeSelector.SelectMultiple;
 
             bHideUnselected = dialog.AddComponent<ButtonProperty>();
             bHideUnselected.Name = "Hide unselected";
             bHideUnselected.Description = "Hides only the unselected objects.";
-            bHideUnselected.buttonColor = Color.yellow.Darker();
+            bHideUnselected.ButtonColor = Color.yellow.Darker();
             bHideUnselected.Value = HideModeSelector.HideUnselected;
-            bHideUnselected.selectionType = HideModeSelector.SelectMultiple;
+            bHideUnselected.SelectionType = HideModeSelector.SelectMultiple;
 
             bHideAllEdgesOfSelected = dialog.AddComponent<ButtonProperty>();
             bHideAllEdgesOfSelected.Name = "Hide edges";
             bHideAllEdgesOfSelected.Description = "Hides the edges for all selected nodes.";
-            bHideAllEdgesOfSelected.buttonColor = Color.magenta.Darker();
+            bHideAllEdgesOfSelected.ButtonColor = Color.magenta.Darker();
             bHideAllEdgesOfSelected.Value = HideModeSelector.HideAllEdgesOfSelected;
-            bHideAllEdgesOfSelected.selectionType = HideModeSelector.SelectSingle;
+            bHideAllEdgesOfSelected.SelectionType = HideModeSelector.SelectSingle;
 
             bHighlightConnectingEdges = dialog.AddComponent<ButtonProperty>();
             bHighlightConnectingEdges.Name = "Highlight connecting edges";
             bHighlightConnectingEdges.Description = "Highlights edges connecting the selected nodes.";
-            bHighlightConnectingEdges.buttonColor = Color.yellow.Darker();
+            bHighlightConnectingEdges.ButtonColor = Color.yellow.Darker();
             bHighlightConnectingEdges.Value = HideModeSelector.HighlightEdges;
-            bHighlightConnectingEdges.selectionType = HideModeSelector.SelectMultiple;
+            bHighlightConnectingEdges.SelectionType = HideModeSelector.SelectMultiple;
 
             // Group for buttons
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
@@ -219,16 +219,16 @@ namespace SEE.UI.PropertyDialog
             group.AddProperty(bHighlightConnectingEdges);
 
             // Register listeners for buttons
-            bHideAllEdges.OnSelected.AddListener(() => SetMode(bHideAllEdges.hideMode, bHideAllEdges.selectionType));
-            bHideIncoming.OnSelected.AddListener(() => SetMode(bHideIncoming.hideMode, bHideIncoming.selectionType));
-            bHideOutgoing.OnSelected.AddListener(() => SetMode(bHideOutgoing.hideMode, bHideOutgoing.selectionType));
-            bHideForwardTransitiveClosure.OnSelected.AddListener(() => SetMode(bHideForwardTransitiveClosure.hideMode, bHideForwardTransitiveClosure.selectionType));
-            bHideBackwardTransitiveClosure.OnSelected.AddListener(() => SetMode(bHideBackwardTransitiveClosure.hideMode, bHideForwardTransitiveClosure.selectionType));
-            bHideTransitiveClosure.OnSelected.AddListener(() => SetMode(bHideTransitiveClosure.hideMode, bHideTransitiveClosure.selectionType));
-            bHideSelected.OnSelected.AddListener(() => SetMode(bHideSelected.hideMode, bHideSelected.selectionType));
-            bHideUnselected.OnSelected.AddListener(() => SetMode(bHideUnselected.hideMode, bHideUnselected.selectionType));
-            bHideAllEdgesOfSelected.OnSelected.AddListener(() => SetMode(bHideAllEdgesOfSelected.hideMode, bHideAllEdgesOfSelected.selectionType));
-            bHighlightConnectingEdges.OnSelected.AddListener(() => SetMode(bHighlightConnectingEdges.hideMode, bHighlightConnectingEdges.selectionType));
+            bHideAllEdges.OnSelected.AddListener(() => SetMode(bHideAllEdges.HideMode, bHideAllEdges.SelectionType));
+            bHideIncoming.OnSelected.AddListener(() => SetMode(bHideIncoming.HideMode, bHideIncoming.SelectionType));
+            bHideOutgoing.OnSelected.AddListener(() => SetMode(bHideOutgoing.HideMode, bHideOutgoing.SelectionType));
+            bHideForwardTransitiveClosure.OnSelected.AddListener(() => SetMode(bHideForwardTransitiveClosure.HideMode, bHideForwardTransitiveClosure.SelectionType));
+            bHideBackwardTransitiveClosure.OnSelected.AddListener(() => SetMode(bHideBackwardTransitiveClosure.HideMode, bHideForwardTransitiveClosure.SelectionType));
+            bHideTransitiveClosure.OnSelected.AddListener(() => SetMode(bHideTransitiveClosure.HideMode, bHideTransitiveClosure.SelectionType));
+            bHideSelected.OnSelected.AddListener(() => SetMode(bHideSelected.HideMode, bHideSelected.SelectionType));
+            bHideUnselected.OnSelected.AddListener(() => SetMode(bHideUnselected.HideMode, bHideUnselected.SelectionType));
+            bHideAllEdgesOfSelected.OnSelected.AddListener(() => SetMode(bHideAllEdgesOfSelected.HideMode, bHideAllEdgesOfSelected.SelectionType));
+            bHighlightConnectingEdges.OnSelected.AddListener(() => SetMode(bHighlightConnectingEdges.HideMode, bHighlightConnectingEdges.SelectionType));
 
             // Dialog
             PropertyDialog propertyDialog = dialog.AddComponent<PropertyDialog>();
@@ -254,7 +254,7 @@ namespace SEE.UI.PropertyDialog
             switch (selectionType)
             {
                 case HideModeSelector.SelectSingle:
-                    this.mode = mode;
+                    this.Mode = mode;
                     OKButtonPressed();
                     break;
                 case HideModeSelector.SelectMultiple:
@@ -262,7 +262,7 @@ namespace SEE.UI.PropertyDialog
                     OpenSelectionMenu(mode);
                     break;
                 case HideModeSelector.Confirmed:
-                    this.mode = mode;
+                    this.Mode = mode;
                     OKButtonPressed();
                     break;
                 case HideModeSelector.Back:

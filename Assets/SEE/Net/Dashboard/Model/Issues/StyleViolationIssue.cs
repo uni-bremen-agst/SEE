@@ -75,8 +75,8 @@ namespace SEE.Net.Dashboard.Model.Issues
 
         public override async UniTask<string> ToDisplayString()
         {
-            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"SV{id}");
-            return $"<style=\"H2\">{message.WrapLines(WRAP_AT / 2)}</style>\n{explanation.WrapLines(WRAP_AT)}";
+            string explanation = await DashboardRetriever.Instance.GetIssueDescription($"SV{ID}");
+            return $"<style=\"H2\">{message.WrapLines(WrapAt / 2)}</style>\n{explanation.WrapLines(WrapAt)}";
         }
 
         public override string IssueKind => "SV";

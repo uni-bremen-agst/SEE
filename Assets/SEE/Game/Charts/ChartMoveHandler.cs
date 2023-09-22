@@ -66,12 +66,12 @@ namespace SEE.Game.Charts
         /// <summary>
         /// The sprite for the drag button when the chart is maximized.
         /// </summary>
-        private Sprite _maximizedSprite;
+        private Sprite maximizedSprite;
 
         /// <summary>
         /// The sprite for the drag button when the chart is minimized.
         /// </summary>
-        private Sprite _minimizedSprite;
+        private Sprite minimizedSprite;
 
         /// <summary>
         /// Contains information about what is displayed on the chart.
@@ -106,8 +106,8 @@ namespace SEE.Game.Charts
         protected virtual void GetSettingData()
         {
             dragDelay = ChartManager.Instance.DragDelay;
-            _maximizedSprite = ChartManager.Instance.MaximizedSprite;
-            _minimizedSprite = ChartManager.Instance.MinimizedSprite;
+            maximizedSprite = ChartManager.Instance.MaximizedSprite;
+            minimizedSprite = ChartManager.Instance.MinimizedSprite;
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace SEE.Game.Charts
             chartContent.DataPanel.gameObject.SetActive(Minimized);
             SizeButton.SetActive(Minimized);
             contentSelection.SetActive(Minimized);
-            GetComponent<Image>().sprite = Minimized ? _maximizedSprite : _minimizedSprite;
+            GetComponent<Image>().sprite = Minimized ? maximizedSprite : minimizedSprite;
             Minimized = !Minimized;
         }
     }

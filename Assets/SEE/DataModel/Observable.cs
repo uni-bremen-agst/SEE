@@ -46,28 +46,28 @@ namespace SEE.DataModel
             /// <summary>
             /// The list of currently registered observers.
             /// </summary>
-            private readonly IList<IObserver<U>> Observers;
+            private readonly IList<IObserver<U>> observers;
 
             /// <summary>
             /// The observer which is disposable by this class.
             /// </summary>
-            private readonly IObserver<U> Observer;
+            private readonly IObserver<U> observer;
 
             public Unsubscriber(IList<IObserver<U>> observers, IObserver<U> observer)
             {
-                Observers = observers;
-                Observer = observer;
+                this.observers = observers;
+                this.observer = observer;
             }
 
             /// <summary>
-            /// Disposes the registered <see cref="Observer"/> by removing it
-            /// from the list of active <see cref="Observers"/>
+            /// Disposes the registered <see cref="observer"/> by removing it
+            /// from the list of active <see cref="observers"/>
             /// </summary>
             public void Dispose()
             {
-                if (Observers != null && Observers.Contains(Observer))
+                if (observers != null && observers.Contains(observer))
                 {
-                    Observers.Remove(Observer);
+                    observers.Remove(observer);
                 }
             }
         }

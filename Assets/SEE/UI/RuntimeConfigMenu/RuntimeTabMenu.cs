@@ -32,52 +32,52 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Path which contains the prefabs for the runtime config menu.
         /// </summary>
-        public const string RUNTIME_CONFIG_PREFAB_FOLDER = UI_PREFAB_FOLDER + "RuntimeConfigMenu/";
+        public const string runtimeConfigPrefabFolder = UIPrefabFolder + "RuntimeConfigMenu/";
 
         /// <summary>
         /// Prefab for a setting object.
         /// </summary>
-        private const string SETTINGS_OBJECT_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsObject";
+        private const string settingsObjectPrefab = runtimeConfigPrefabFolder + "RuntimeSettingsObject";
 
         /// <summary>
         /// Prefab for a switch.
         /// </summary>
-        private const string SWITCH_PREFAB = UI_PREFAB_FOLDER + "Input Group - Switch";
+        private const string switchPrefab = UIPrefabFolder + "Input Group - Switch";
 
         /// <summary>
         /// Prefab for a slider.
         /// </summary>
-        private const string SLIDER_PREFAB = UI_PREFAB_FOLDER + "Input Group - Slider";
+        private const string sliderPrefab = UIPrefabFolder + "Input Group - Slider";
 
         /// <summary>
         /// Prefab for a dropdown.
         /// </summary>
-        private const string DROPDOWN_PREFAB = UI_PREFAB_FOLDER + "Input Group - Dropdown 2";
+        private const string dropDownPrefab = UIPrefabFolder + "Input Group - Dropdown 2";
 
         /// <summary>
         /// Prefab for a color picker.
         /// </summary>
-        private const string COLOR_PICKER_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeColorPicker";
+        private const string colorPickerPrefab = runtimeConfigPrefabFolder + "RuntimeColorPicker";
 
         /// <summary>
         /// Prefab for a string field.
         /// </summary>
-        private const string STRING_FIELD_PREFAB = UI_PREFAB_FOLDER + "Input Group - String Input Field";
+        private const string stringFieldPrefab = UIPrefabFolder + "Input Group - String Input Field";
 
         /// <summary>
         /// Prefab for a button.
         /// </summary>
-        private const string BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigButton";
+        private const string buttonPrefab = runtimeConfigPrefabFolder + "RuntimeConfigButton";
 
         /// <summary>
         /// Prefab for a add button.
         /// </summary>
-        private const string ADD_ELEMENT_BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeAddButton";
+        private const string addElementButtonPrefab = runtimeConfigPrefabFolder + "RuntimeAddButton";
 
         /// <summary>
         /// Prefab for a remove button.
         /// </summary>
-        private const string REMOVE_ELEMENT_BUTTON_PREFAB = RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeRemoveButton";
+        private const string removeElementButtonPrefab = runtimeConfigPrefabFolder + "RuntimeRemoveButton";
 
         /// <summary>
         /// The city index
@@ -146,17 +146,17 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Prefab for the menu
         /// </summary>
-        protected override string MenuPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeConfigMenu";
+        protected override string MenuPrefab => runtimeConfigPrefabFolder + "RuntimeConfigMenu";
 
         /// <summary>
         /// Prefab for a view
         /// </summary>
-        protected override string ViewPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeSettingsView";
+        protected override string ViewPrefab => runtimeConfigPrefabFolder + "RuntimeSettingsView";
 
         /// <summary>
         /// Prefab for a tab button
         /// </summary>
-        protected override string EntryPrefab => RUNTIME_CONFIG_PREFAB_FOLDER + "RuntimeTabButton";
+        protected override string EntryPrefab => runtimeConfigPrefabFolder + "RuntimeTabButton";
 
         /// <summary>
         /// Path to the content game object
@@ -176,18 +176,18 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Path to game object containing the configuration buttons
         /// </summary>
-        private const string ConfigButtonListPath = "ConfigButtons/Content";
+        private const string configButtonListPath = "ConfigButtons/Content";
 
         /// <summary>
         /// Path to game object containing the <see cref="citySwitcher"/>.
         /// </summary>
-        private const string CitySwitcherPath = "City Switcher";
+        private const string citySwitcherPath = "City Switcher";
 
         protected override void StartDesktop()
         {
             base.StartDesktop();
-            configButtonList = Content.transform.Find(ConfigButtonListPath).gameObject;
-            citySwitcher = Content.transform.Find(CitySwitcherPath).GetComponent<HorizontalSelector>();
+            configButtonList = Content.transform.Find(configButtonListPath).gameObject;
+            citySwitcher = Content.transform.Find(citySwitcherPath).GetComponent<HorizontalSelector>();
 
             SetupCitySwitcher();
         }
@@ -323,7 +323,7 @@ namespace SEE.UI.RuntimeConfigMenu
             }
 
             // creates the button
-            GameObject button = PrefabInstantiator.InstantiatePrefab(BUTTON_PREFAB, configButtonList.transform, false);
+            GameObject button = PrefabInstantiator.InstantiatePrefab(buttonPrefab, configButtonList.transform, false);
             button.name = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
             ButtonManagerWithIcon buttonManager = button.GetComponent<ButtonManagerWithIcon>();
             buttonManager.buttonText = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
@@ -616,7 +616,7 @@ namespace SEE.UI.RuntimeConfigMenu
         private GameObject CreateNestedSetting(string settingName, GameObject parent)
         {
             GameObject container =
-                PrefabInstantiator.InstantiatePrefab(SETTINGS_OBJECT_PREFAB, parent.transform, false);
+                PrefabInstantiator.InstantiatePrefab(settingsObjectPrefab, parent.transform, false);
             container.name = settingName;
             container.GetComponentInChildren<TextMeshProUGUI>().text = settingName;
             return container.transform.Find("Content").gameObject;
@@ -642,7 +642,7 @@ namespace SEE.UI.RuntimeConfigMenu
 
             // init the widget
             GameObject sliderGameObject =
-                PrefabInstantiator.InstantiatePrefab(SLIDER_PREFAB, parent.transform, false);
+                PrefabInstantiator.InstantiatePrefab(sliderPrefab, parent.transform, false);
             sliderGameObject.name = settingName;
             AddLayoutElement(sliderGameObject);
             SliderManager sliderManager = sliderGameObject.GetComponentInChildren<SliderManager>();
@@ -731,7 +731,7 @@ namespace SEE.UI.RuntimeConfigMenu
         {
             // init the widget
             GameObject switchGameObject =
-                PrefabInstantiator.InstantiatePrefab(SWITCH_PREFAB, parent.transform, false);
+                PrefabInstantiator.InstantiatePrefab(switchPrefab, parent.transform, false);
             switchGameObject.name = settingName;
             AddLayoutElement(switchGameObject);
             SwitchManager switchManager = switchGameObject.GetComponentInChildren<SwitchManager>();
@@ -829,7 +829,7 @@ namespace SEE.UI.RuntimeConfigMenu
         {
             // init the widget
             GameObject stringGameObject =
-                PrefabInstantiator.InstantiatePrefab(STRING_FIELD_PREFAB, parent.transform, false);
+                PrefabInstantiator.InstantiatePrefab(stringFieldPrefab, parent.transform, false);
             stringGameObject.name = settingName;
             AddLayoutElement(stringGameObject);
             TextMeshProUGUI text = stringGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
@@ -914,7 +914,7 @@ namespace SEE.UI.RuntimeConfigMenu
 
             // init the widget
             GameObject dropDownGameObject =
-                PrefabInstantiator.InstantiatePrefab(DROPDOWN_PREFAB, parent.transform, false);
+                PrefabInstantiator.InstantiatePrefab(dropDownPrefab, parent.transform, false);
             dropDownGameObject.name = settingName;
             AddLayoutElement(dropDownGameObject);
             TextMeshProUGUI text = dropDownGameObject.transform.Find("Label").GetComponent<TextMeshProUGUI>();
@@ -997,7 +997,7 @@ namespace SEE.UI.RuntimeConfigMenu
         {
             // init the widget
             GameObject colorPickerGameObject =
-                PrefabInstantiator.InstantiatePrefab(COLOR_PICKER_PREFAB, parent.transform, false);
+                PrefabInstantiator.InstantiatePrefab(colorPickerPrefab, parent.transform, false);
             colorPickerGameObject.name = settingName;
             AddLayoutElement(colorPickerGameObject);
 
@@ -1192,9 +1192,9 @@ namespace SEE.UI.RuntimeConfigMenu
             buttonContainer.transform.SetParent(parent.transform);
 
             GameObject addButton =
-                PrefabInstantiator.InstantiatePrefab(ADD_ELEMENT_BUTTON_PREFAB, buttonContainer.transform);
+                PrefabInstantiator.InstantiatePrefab(addElementButtonPrefab, buttonContainer.transform);
             GameObject removeButton =
-                PrefabInstantiator.InstantiatePrefab(REMOVE_ELEMENT_BUTTON_PREFAB, buttonContainer.transform);
+                PrefabInstantiator.InstantiatePrefab(removeElementButtonPrefab, buttonContainer.transform);
             removeButton.name = "RemoveElementButton";
             ButtonManagerWithIcon removeButtonManager = removeButton.GetComponent<ButtonManagerWithIcon>();
             addButton.name = "AddElementButton";

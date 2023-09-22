@@ -40,7 +40,7 @@ namespace SEE.Net.Dashboard
             DashboardVersion version;
             try
             {
-                version = new DashboardVersion((await GetDashboardInfo()).dashboardVersionNumber);
+                version = new DashboardVersion((await GetDashboardInfo()).DashboardVersionNumber);
             }
             catch (DashboardException e)
             {
@@ -49,7 +49,7 @@ namespace SEE.Net.Dashboard
                     throw;
                 }
 
-                version = new DashboardVersion(e.Error.dashboardVersionNumber);
+                version = new DashboardVersion(e.Error.DashboardVersionNumber);
             }
 
             return version;
@@ -106,7 +106,7 @@ namespace SEE.Net.Dashboard
                                                          int offset = 0, bool computeTotalRowCount = false)
             where T : Issue, new()
         {
-            const string ANY_PATH = "filter_any path";
+            const string anyPath = "filter_any path";
             // add non-nullable parameters
             Dictionary<string, string> parameters = new Dictionary<string, string>
             {
@@ -128,7 +128,7 @@ namespace SEE.Net.Dashboard
                     throw new ArgumentNullException();
                 }
 
-                if (columnFilters.ContainsKey(ANY_PATH))
+                if (columnFilters.ContainsKey(anyPath))
                 {
                     throw new ArgumentException($"When filtering for file paths, use the {nameof(fileFilter)} parameter!");
                 }
@@ -146,7 +146,7 @@ namespace SEE.Net.Dashboard
 
             if (fileFilter != null)
             {
-                parameters[ANY_PATH] = fileFilter;
+                parameters[anyPath] = fileFilter;
             }
 
             return await QueryDashboard<IssueTable<T>>("/issues/", parameters, false);
@@ -229,7 +229,7 @@ namespace SEE.Net.Dashboard
         /// Retrieves the issue description for the given <paramref name="issueName"/>.
         /// This will return an empty string if the retrieved issue description contains HTML tags.
         /// Note that this implementation is very hacky and may easily break for more complex descriptions
-        /// or for older/more recent versions of the Axivion Dashboard. 
+        /// or for older/more recent versions of the Axivion Dashboard.
         /// </summary>
         /// <param name="issueName">The ID of the issue whose rule text shall be displayed</param>
         /// <param name="version">The optional analysis version of the issue.</param>

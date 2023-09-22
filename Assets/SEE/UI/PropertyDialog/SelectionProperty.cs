@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Michsky.UI.ModernUIPack;
-using SEE.GO;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
@@ -24,7 +23,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// The prefab for a string input field.
         /// </summary>
-        private const string InputFieldPrefab = "Prefabs/UI/InputFields/SelectionInputField";
+        private const string inputFieldPrefab = "Prefabs/UI/InputFields/SelectionInputField";
 
         /// <summary>
         /// The text field in which the value will be entered by the user.
@@ -36,7 +35,7 @@ namespace SEE.UI.PropertyDialog
         private TMP_InputField textField;
 
         /// <summary>
-        /// Instantiation of the prefab <see cref="InputFieldPrefab"/>.
+        /// Instantiation of the prefab <see cref="inputFieldPrefab"/>.
         /// </summary>
         private GameObject inputField;
 
@@ -56,12 +55,12 @@ namespace SEE.UI.PropertyDialog
         private HorizontalSelector horizontalSelector;
 
         /// <summary>
-        /// Sets <see cref="inputField"/> as an instantiation of prefab <see cref="InputFieldPrefab"/>.
+        /// Sets <see cref="inputField"/> as an instantiation of prefab <see cref="inputFieldPrefab"/>.
         /// Sets the label and value of the field.
         /// </summary>
         protected override void StartDesktop()
         {
-            inputField = PrefabInstantiator.InstantiatePrefab(InputFieldPrefab, instantiateInWorldSpace: false);
+            inputField = PrefabInstantiator.InstantiatePrefab(inputFieldPrefab, instantiateInWorldSpace: false);
             if (parentOfInputField != null)
             {
                 SetParent(parentOfInputField);
@@ -107,7 +106,7 @@ namespace SEE.UI.PropertyDialog
                 }
                 else
                 {
-                    throw new Exception($"Prefab {InputFieldPrefab} does not have a {typeof(HorizontalSelector)}");
+                    throw new Exception($"Prefab {inputFieldPrefab} does not have a {typeof(HorizontalSelector)}");
                 }
             }
 

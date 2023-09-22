@@ -33,22 +33,22 @@ namespace SEE.UI.HelpSystem
         /// <summary>
         /// The name of the HelpSystem GameObject. Must be present in the scene.
         /// </summary>
-        private const string HelpSystemName = "HelpSystem";
+        private const string helpSystemName = "HelpSystem";
 
         /// <summary>
         /// The root menu entry of the help system. It is assumed to be a component
-        /// attached to the game object named <see cref="HelpSystemName"/>.
+        /// attached to the game object named <see cref="helpSystemName"/>.
         /// </summary>
         private static HelpSystemEntry helpMenuRootEntry;
 
         /// <summary>
         /// Returns the root menu entry of the help system.
-        /// Precondition: There must be a game object in the scene named <see cref="HelpSystemName"/>
+        /// Precondition: There must be a game object in the scene named <see cref="helpSystemName"/>
         /// holding a <see cref="HelpSystemEntry"/> component.
         /// </summary>
         /// <returns>the root menu entry of the help system</returns>
         /// <exception cref="System.Exception">thrown if there is no game object in the scene
-        /// named <see cref="HelpSystemName"/> or - if one exists - that object is not
+        /// named <see cref="helpSystemName"/> or - if one exists - that object is not
         /// holding a <see cref="HelpSystemEntry"/> component</exception>
         public static HelpSystemEntry GetHelpMenuRootEntry()
         {
@@ -57,7 +57,7 @@ namespace SEE.UI.HelpSystem
                 GameObject helpSystem = HelpSystemObject();
                 if (!helpSystem.TryGetComponent(out helpMenuRootEntry))
                 {
-                    throw new System.Exception($"The help system named {HelpSystemName} does not have a {typeof(HelpSystemEntry)} component.");
+                    throw new System.Exception($"The help system named {helpSystemName} does not have a {typeof(HelpSystemEntry)} component.");
                 }
             }
             return helpMenuRootEntry;
@@ -65,18 +65,18 @@ namespace SEE.UI.HelpSystem
 
         /// <summary>
         /// The help-system menu. It is assumed to be a component
-        /// attached to the game object named <see cref="HelpSystemName"/>.
+        /// attached to the game object named <see cref="helpSystemName"/>.
         /// </summary>
         private static HelpSystemMenu helpSystemMenu;
 
         /// <summary>
         /// Returns the help-system menu.
-        /// Precondition: There must be a game object in the scene named <see cref="HelpSystemName"/>
+        /// Precondition: There must be a game object in the scene named <see cref="helpSystemName"/>
         /// holding a <see cref="HelpSystemMenu"/> component.
         /// </summary>
         /// <returns>the help-system menu</returns>
         /// <exception cref="System.Exception">thrown if there is no game object in the scene
-        /// named <see cref="HelpSystemName"/> or - if one exists - that object is not
+        /// named <see cref="helpSystemName"/> or - if one exists - that object is not
         /// holding a <see cref="HelpSystemMenu"/> component</exception>
         public static HelpSystemMenu GetHelpSystemMenu()
         {
@@ -85,23 +85,23 @@ namespace SEE.UI.HelpSystem
                 GameObject helpSystem = HelpSystemObject();
                 if (!helpSystem.TryGetComponent(out helpSystemMenu))
                 {
-                    throw new System.Exception($"The help system named {HelpSystemName} does not have a {typeof(HelpSystemMenu)} component.");
+                    throw new System.Exception($"The help system named {helpSystemName} does not have a {typeof(HelpSystemMenu)} component.");
                 }
             }
             return helpSystemMenu;
         }
 
         /// <summary>
-        /// Returns the game object named <see cref="HelpSystemName"/>.
+        /// Returns the game object named <see cref="helpSystemName"/>.
         /// </summary>
-        /// <returns>the game object named <see cref="HelpSystemName"/></returns>
+        /// <returns>the game object named <see cref="helpSystemName"/></returns>
         /// <exception cref="System.Exception">throw if there is no such object in the scene</exception>
         private static GameObject HelpSystemObject()
         {
-            GameObject helpSystem = GameObject.Find(HelpSystemName);
+            GameObject helpSystem = GameObject.Find(helpSystemName);
             if (helpSystem == null)
             {
-                throw new System.Exception($"There is no help system named {HelpSystemName} in the scene.");
+                throw new System.Exception($"There is no help system named {helpSystemName} in the scene.");
             }
             return helpSystem;
         }
@@ -109,17 +109,17 @@ namespace SEE.UI.HelpSystem
         /// <summary>
         /// The path to the default-icon for an HelpSystemEntry in the nested menu.
         /// </summary>
-        private const string EntryIcon = "Materials/ModernUIPack/Eye";
+        private const string entryIcon = "Materials/ModernUIPack/Eye";
 
         /// <summary>
         /// The path to the default-icon for an RefEntry in the nested menu.
         /// </summary>
-        private const string RefIcon = "Materials/ModernUIPack/Plus";
+        private const string refIcon = "Materials/ModernUIPack/Plus";
 
         /// <summary>
         /// The LinkedListEntries of the currently selected HelpSystemEntry.
         /// </summary>
-        public static LinkedList<HelpEntry> currentEntries;
+        public static LinkedList<HelpEntry> CurrentEntries;
 
         /// <summary>
         /// The space where the entry is inside.
@@ -155,7 +155,7 @@ namespace SEE.UI.HelpSystem
                                  title: title,
                                  description: description,
                                  entryColor: entryColor,
-                                 icon: Resources.Load<Sprite>(EntryIcon));
+                                 icon: Resources.Load<Sprite>(entryIcon));
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace SEE.UI.HelpSystem
                                                   title: title,
                                                   description: description,
                                                   entryColor: entryColor,
-                                                  icon: Resources.Load<Sprite>(RefIcon));
+                                                  icon: Resources.Load<Sprite>(refIcon));
         }
 
         /// <summary>
@@ -189,7 +189,7 @@ namespace SEE.UI.HelpSystem
         /// <returns>The Main-Menu as a NestedMenu.</returns>
         public static NestedListMenu CreateMainMenu(string title, string description, string icon, List<MenuEntry> mainMenuEntries)
         {
-            NestedListMenu mainMenu = GameObject.Find(HelpSystemName).AddComponent<NestedListMenu>();
+            NestedListMenu mainMenu = GameObject.Find(helpSystemName).AddComponent<NestedListMenu>();
             mainMenu.Title = title;
             mainMenu.Description = description;
             mainMenu.Icon = Resources.Load<Sprite>(icon);
@@ -223,7 +223,7 @@ namespace SEE.UI.HelpSystem
 
             entry.IsPlaying = true;
             GetHelpSystemMenu().ToggleMenu();
-            currentEntries = instructions;
+            CurrentEntries = instructions;
         }
     }
 }

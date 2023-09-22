@@ -53,7 +53,7 @@ namespace SEE.Controls.Actions
         {
             base.Stop();
             RTGInitializer.Disable();
-            usedGizmo.Disable();
+            UsedGizmo.Disable();
         }
 
         #endregion ReversibleAction Overrides
@@ -66,7 +66,7 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
-            gameNodeMemento.Undo();
+            GameNodeMemento.Undo();
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            gameNodeMemento.Redo();
+            GameNodeMemento.Redo();
         }
 
         #endregion Undo Redo
@@ -105,7 +105,7 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            if (usedGizmo.IsHovered())
+            if (UsedGizmo.IsHovered())
             {
                 // Transformation via the gizmo is in progress.
                 if (GameNodeSelected && HasChanges())
@@ -193,21 +193,21 @@ namespace SEE.Controls.Actions
         protected void StartAction(GameObject gameNode)
         {
             GameNodeSelected = gameNode;
-            gameNodeMemento = CreateMemento(GameNodeSelected);
-            usedGizmo.Enable(GameNodeSelected);
+            GameNodeMemento = CreateMemento(GameNodeSelected);
+            UsedGizmo.Enable(GameNodeSelected);
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, GameNodeSelected);
         }
 
         /// <summary>
         /// Finalizes the action: set the final state of the memento,
-        /// disables <see cref="usedGizmo"/>, marks the action as <see cref="ReversibleAction.Progress.Completed"/>,
+        /// disables <see cref="UsedGizmo"/>, marks the action as <see cref="ReversibleAction.Progress.Completed"/>,
         /// and plays a final sound.
         /// This method should be called when the action is completed.
         /// </summary>
         protected virtual void FinalizeAction()
         {
             UnityEngine.Assertions.Assert.IsNotNull(GameNodeSelected);
-            usedGizmo.Disable();
+            UsedGizmo.Disable();
             CurrentState = ReversibleAction.Progress.Completed;
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, GameNodeSelected);
         }
@@ -234,7 +234,7 @@ namespace SEE.Controls.Actions
         /// The memento for <see cref="GameNodeSelected"/>.
         /// This memento is needed for <see cref="Undo"/> and <see cref="Redo"/>.
         /// </summary>
-        protected Memento<T> gameNodeMemento;
+        protected Memento<T> GameNodeMemento;
 
         /// <summary>
         /// A memento of the intial and final state of the game object being transformed.
@@ -331,7 +331,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The gizmo used to manipulate <see cref="GameNodeSelected"/>.
         /// </summary>
-        protected Gizmo usedGizmo;
+        protected Gizmo UsedGizmo;
 
         /// <summary>
         /// Common superclass to manage the RTG gizmos for transforming the object.
@@ -341,14 +341,14 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Gizmo used for transforming the object.
             /// </summary>
-            protected ObjectTransformGizmo objectTransformationGizmo;
+            protected ObjectTransformGizmo ObjectTransformationGizmo;
 
             /// <summary>
             /// Disables the transformation gizmo.
             /// </summary>
             public void Disable()
             {
-                objectTransformationGizmo?.Gizmo.SetEnabled(false);
+                ObjectTransformationGizmo?.Gizmo.SetEnabled(false);
             }
 
             /// <summary>
@@ -356,8 +356,8 @@ namespace SEE.Controls.Actions
             /// </summary>
             public void Enable(GameObject gameNodeSelected)
             {
-                objectTransformationGizmo.SetTargetObject(gameNodeSelected);
-                objectTransformationGizmo.Gizmo.SetEnabled(true);
+                ObjectTransformationGizmo.SetTargetObject(gameNodeSelected);
+                ObjectTransformationGizmo.Gizmo.SetEnabled(true);
             }
 
             /// <summary>
@@ -366,7 +366,7 @@ namespace SEE.Controls.Actions
             /// <returns></returns>
             public bool IsHovered()
             {
-                return objectTransformationGizmo != null && objectTransformationGizmo.Gizmo.IsHovered;
+                return ObjectTransformationGizmo != null && ObjectTransformationGizmo.Gizmo.IsHovered;
             }
         }
 
