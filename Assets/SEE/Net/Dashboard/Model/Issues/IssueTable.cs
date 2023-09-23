@@ -14,13 +14,13 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// The version of the removed issues.
         /// If the query was not an actual diff query this will be unset.
         /// </summary>
-        [JsonProperty(Required = Required.Default)]
+        [JsonProperty(PropertyName = "startVersion", Required = Required.Default)]
         public readonly AnalysisVersion StartVersion;
 
         /// <summary>
         /// The version of the added issues for a diff query or simply the version of a normal issue list query (no startVersion)
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "endVersion", Required = Required.Always)]
         public readonly AnalysisVersion EndVersion;
 
         /// <summary>
@@ -30,8 +30,8 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// This only contains a subset of the complete data if paging is enabled via <c>offset</c> and <c>limit</c>.
         /// </summary>
         /// <typeparam name="T">Type of the issue. If this is unknown, simply use <see cref="Issue"/>.</typeparam>
-        [JsonProperty(Required = Required.Always)]
-        public readonly IList<T> rows;
+        [JsonProperty(PropertyName = "rows", Required = Required.Always)]
+        public readonly IList<T> Rows;
 
         /// <summary>
         /// The total number of issues.
@@ -40,8 +40,8 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// Only available when <c>computeTotalRowCount</c> was specified as <c>true</c>.
         /// Mostly useful when doing paged queries using the query parameters <c>limit</c> and <c>offset</c>.
         /// </remarks>
-        [JsonProperty(Required = Required.Default)]
-        public readonly uint totalRowCount;
+        [JsonProperty(PropertyName = "totalRowCount", Required = Required.Default)]
+        public readonly uint TotalRowCount;
 
         /// <summary>
         /// The total number of issues existing in the current version and not in the baseline version.
@@ -49,8 +49,8 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// <remarks>
         /// Only useful in diff queries and only calculated when <c>computeTotalRowCount</c> was specified as <c>true</c>.
         /// </remarks>
-        [JsonProperty(Required = Required.Default)]
-        public readonly uint totalAddedCount;
+        [JsonProperty(PropertyName = "totalAddedCount", Required = Required.Default)]
+        public readonly uint TotalAddedCount;
 
         /// <summary>
         /// The total number of issues existing in the baseline version and not in the current version.
@@ -58,18 +58,18 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// <remarks>
         /// Only useful in diff queries and only calculated when <c>computeTotalRowCount</c> was specified as <c>true</c>.
         /// </remarks>
-        [JsonProperty(Required = Required.Default)]
-        public readonly uint totalRemovedCount;
+        [JsonProperty(PropertyName = "totalRemovedCount", Required = Required.Default)]
+        public readonly uint TotalRemovedCount;
 
         public IssueTable(AnalysisVersion startVersion, AnalysisVersion endVersion, IList<T> rows,
                           uint totalRowCount, uint totalAddedCount, uint totalRemovedCount)
         {
             this.StartVersion = startVersion;
             this.EndVersion = endVersion;
-            this.rows = rows;
-            this.totalRowCount = totalRowCount;
-            this.totalAddedCount = totalAddedCount;
-            this.totalRemovedCount = totalRemovedCount;
+            this.Rows = rows;
+            this.TotalRowCount = totalRowCount;
+            this.TotalAddedCount = totalAddedCount;
+            this.TotalRemovedCount = totalRemovedCount;
         }
     }
 }

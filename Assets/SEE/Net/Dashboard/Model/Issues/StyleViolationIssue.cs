@@ -16,44 +16,44 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// <summary>
         /// The severity of the violation
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string severity;
+        [JsonProperty(PropertyName = "severity", Required = Required.Always)]
+        public readonly string Severity;
 
         /// <summary>
         /// The tool/manufacturer that reported this violation
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string provider;
+        [JsonProperty(PropertyName = "provider", Required = Required.Always)]
+        public readonly string Provider;
 
         /// <summary>
         /// The error number / error code / rule name
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string errorNumber;
+        [JsonProperty(PropertyName = "errorNumber", Required = Required.Always)]
+        public readonly string ErrorNumber;
 
         /// <summary>
         /// The message describing the violation
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string message;
+        [JsonProperty(PropertyName = "message", Required = Required.Always)]
+        public readonly string Message;
 
         /// <summary>
         /// The source code entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string entity;
+        [JsonProperty(PropertyName = "entity", Required = Required.Always)]
+        public readonly string Entity;
 
         /// <summary>
         /// The filename
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string path;
+        [JsonProperty(PropertyName = "path", Required = Required.Always)]
+        public readonly string Path;
 
         /// <summary>
         /// The line number
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly int line;
+        [JsonProperty(PropertyName = "line", Required = Required.Always)]
+        public readonly int Line;
 
         public StyleViolationIssue()
         {
@@ -64,19 +64,19 @@ namespace SEE.Net.Dashboard.Model.Issues
         public StyleViolationIssue(string severity, string provider, string errorNumber, string message, string entity,
                                    string path, int line)
         {
-            this.severity = severity;
-            this.provider = provider;
-            this.errorNumber = errorNumber;
-            this.message = message;
-            this.entity = entity;
-            this.path = path;
-            this.line = line;
+            this.Severity = severity;
+            this.Provider = provider;
+            this.ErrorNumber = errorNumber;
+            this.Message = message;
+            this.Entity = entity;
+            this.Path = path;
+            this.Line = line;
         }
 
         public override async UniTask<string> ToDisplayString()
         {
             string explanation = await DashboardRetriever.Instance.GetIssueDescription($"SV{ID}");
-            return $"<style=\"H2\">{message.WrapLines(WrapAt / 2)}</style>\n{explanation.WrapLines(WrapAt)}";
+            return $"<style=\"H2\">{Message.WrapLines(WrapAt / 2)}</style>\n{explanation.WrapLines(WrapAt)}";
         }
 
         public override string IssueKind => "SV";
@@ -85,7 +85,7 @@ namespace SEE.Net.Dashboard.Model.Issues
 
         public override IEnumerable<SourceCodeEntity> Entities => new[]
         {
-            new SourceCodeEntity(path, line, null, entity)
+            new SourceCodeEntity(Path, Line, null, Entity)
         };
     }
 }

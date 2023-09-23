@@ -16,67 +16,67 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// <summary>
         /// The type of the relation between source and target
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "dependencyType", Required = Required.Always)]
         public readonly string DependencyType;
 
         /// <summary>
         /// The source entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "sourceEntity", Required = Required.Always)]
         public readonly string SourceEntity;
 
         /// <summary>
         /// The source entity type
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "sourceEntityType", Required = Required.Always)]
         public readonly string SourceEntityType;
 
         /// <summary>
         /// The source filename
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "sourcePath", Required = Required.Always)]
         public readonly string SourcePath;
 
         /// <summary>
         /// The source line number
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "sourceLine", Required = Required.Always)]
         public readonly int SourceLine;
 
         /// <summary>
         /// The internal name of the corresponding entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "sourceLinkName", Required = Required.Always)]
         public readonly string SourceLinkName;
 
         /// <summary>
         /// The target entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "targetEntity", Required = Required.Always)]
         public readonly string TargetEntity;
 
         /// <summary>
         /// The target entity type
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "targetEntityType", Required = Required.Always)]
         public readonly string TargetEntityType;
 
         /// <summary>
         /// The target filename
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "targetPath", Required = Required.Always)]
         public readonly string TargetPath;
 
         /// <summary>
         /// The target line number
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "targetLine", Required = Required.Always)]
         public readonly int TargetLine;
 
         /// <summary>
         /// The internal name of the corresponding entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "targetLinkName", Required = Required.Always)]
         public readonly string TargetLinkName;
 
         public CycleIssue()

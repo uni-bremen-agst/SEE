@@ -16,31 +16,31 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// <summary>
         /// The dead entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "entity", Required = Required.Always)]
         public readonly string Entity;
 
         /// <summary>
         /// The type of the entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "entityType", Required = Required.Always)]
         public readonly string EntityType;
 
         /// <summary>
         /// The filename of the entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "path", Required = Required.Always)]
         public readonly string Path;
 
         /// <summary>
         /// The line number of the entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "line", Required = Required.Always)]
         public readonly int Line;
 
         /// <summary>
         /// The internal name of the corresponding entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "linkName", Required = Required.Always)]
         public readonly string LinkName;
 
         public DeadEntityIssue()

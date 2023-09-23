@@ -17,115 +17,115 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// <summary>
         /// The architecture source entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "architectureSource", Required = Required.Always)]
         public readonly string ArchitectureSource;
 
         /// <summary>
         /// The type of the architecture source entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "architectureSourceType", Required = Required.Always)]
         public readonly string ArchitectureSourceType;
 
         /// <summary>
         /// The internal name of the corresponding entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "architectureSourceLinkName", Required = Required.Always)]
         public readonly string ArchitectureSourceLinkName;
 
         /// <summary>
         /// The architecture target entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "architectureTarget", Required = Required.Always)]
         public readonly string ArchitectureTarget;
 
         /// <summary>
         /// The type of the architecture target entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "architectureTargetType", Required = Required.Always)]
         public readonly string ArchitectureTargetType;
 
         /// <summary>
         /// The internal name of the corresponding entity
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "architectureTargetLinkName", Required = Required.Always)]
         public readonly string ArchitectureTargetLinkName;
 
         /// <summary>
         /// The error number / error code / rule name
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "errorNumber", Required = Required.Always)]
         public readonly string ErrorNumber;
 
         /// <summary>
         /// The type of the architecture violation
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "violationType", Required = Required.Always)]
         public readonly string ViolationType;
 
         /// <summary>
         /// The type of the relation between source and target
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "dependencyType", Required = Required.Always)]
         public readonly string DependencyType;
 
         /// <summary>
         /// The source code source entity
         /// </summary>
-        [JsonProperty(Required = Required.AllowNull)]
+        [JsonProperty(PropertyName = "sourceEntity", Required = Required.AllowNull)]
         public readonly string SourceEntity;
 
         /// <summary>
         /// The type of the source code source entity
         /// </summary>
-        [JsonProperty(Required = Required.AllowNull)]
+        [JsonProperty(PropertyName = "sourceEntityType", Required = Required.AllowNull)]
         public readonly string SourceEntityType;
 
         /// <summary>
         /// The file of the source code target location
         /// </summary>
-        [JsonProperty(Required = Required.AllowNull)]
+        [JsonProperty(PropertyName = "sourcePath", Required = Required.AllowNull)]
         public readonly string SourcePath;
 
         /// <summary>
         /// The line of the source code target location
         /// </summary>
-        [JsonProperty(Required = Required.AllowNull)]
+        [JsonProperty(PropertyName = "sourceLine", Required = Required.AllowNull)]
         public readonly int SourceLine;
 
         /// <summary>
         /// The internal name of the corresponding entity
         /// </summary>
-        [JsonProperty(Required = Required.AllowNull)]
+        [JsonProperty(PropertyName = "sourceLinkName", Required = Required.AllowNull)]
         public readonly string SourceLinkName;
 
         /// <summary>
         /// The source code target entity
         /// </summary>
-        [JsonProperty(Required = Required.AllowNull)]
+        [JsonProperty(PropertyName = "targetEntity", Required = Required.AllowNull)]
         public readonly string TargetEntity;
 
         /// <summary>
         /// The source code target entity type
         /// </summary>
-        [JsonProperty(Required = Required.AllowNull)]
+        [JsonProperty(PropertyName = "targetEntityType", Required = Required.AllowNull)]
         public readonly string TargetEntityType;
 
         /// <summary>
         /// The file of the source code source location
         /// </summary>
-        [JsonProperty(Required = Required.AllowNull)]
+        [JsonProperty(PropertyName = "targetPath", Required = Required.AllowNull)]
         public readonly string TargetPath;
 
         /// <summary>
         /// The line of the source code source location
         /// </summary>
-        [JsonProperty(Required = Required.AllowNull)]
+        [JsonProperty(PropertyName = "targetLine", Required = Required.AllowNull)]
         public readonly int TargetLine;
 
         /// <summary>
         /// The internal name of the corresponding entity
         /// </summary>
-        [JsonProperty(Required = Required.AllowNull)]
+        [JsonProperty(PropertyName = "targetLinkName", Required = Required.AllowNull)]
         public readonly string TargetLinkName;
 
         public ArchitectureViolationIssue()

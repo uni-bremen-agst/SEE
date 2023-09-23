@@ -14,31 +14,31 @@ namespace SEE.Net.Dashboard.Model
         /// <summary>
         /// Axivion Dashboard version serving this API.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "dashboardVersion", Required = Required.Always)]
         public readonly string DashboardVersion;
 
         /// <summary>
         /// Parseable Axivion Dashboard Version.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "dashboardVersionNumber", Required = Required.Always)]
         public readonly string DashboardVersionNumber;
 
         /// <summary>
         /// Dashboard Server Build date.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "dashboardBuildDate", Required = Required.Always)]
         public readonly string DashboardBuildDate;
 
         /// <summary>
         /// Name of the successfully authenticated user if a dashboard-user is associated with the request.
         /// </summary>
-        [JsonProperty(Required = Required.Default)]
+        [JsonProperty(PropertyName = "username", Required = Required.Default)]
         public readonly string Username;
 
         /// <summary>
         /// The HTTP-Request Header expected present for all HTTP requests that are not GET, HEAD, OPTIONS or TRACE.
         /// </summary>
-        [JsonProperty(Required = Required.Default)]
+        [JsonProperty(PropertyName = "csrfTokenHeader", Required = Required.Default)]
         public readonly string CsrfTokenHeader;
 
         /// <summary>
@@ -52,25 +52,25 @@ namespace SEE.Net.Dashboard.Model
         /// Its lifetime is limited, so when creating a very long-running application you should consider refreshing
         /// this token from time to time.
         /// </remarks>
-        [JsonProperty(Required = Required.Default)]
+        [JsonProperty(PropertyName = "csrfToken", Required = Required.Default)]
         public readonly string CsrfToken;
 
         /// <summary>
         /// A URI that can be used to check credentials via GET. It returns "ok" in case of valid credentials.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "checkCredentialsUrl", Required = Required.Always)]
         public readonly string CheckCredentialsUrl;
 
         /// <summary>
         /// List of references to the projects visible to the authenticated user.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "projects", Required = Required.Always)]
         public readonly IList<ProjectReference> Projects;
 
         /// <summary>
         /// Entry point for creating, listing, deleting api tokens of the authenticated user.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "userApiTokenUrl", Required = Required.Always)]
         public readonly string UserApiTokenUrl;
 
         public DashboardInfo(string dashboardVersion, string dashboardVersionNumber, string dashboardBuildDate,
@@ -97,13 +97,13 @@ namespace SEE.Net.Dashboard.Model
             /// <summary>
             /// The name of the project. Use this string to refer to the project.
             /// </summary>
-            [JsonProperty(Required = Required.Always)]
+            [JsonProperty(PropertyName = "name", Required = Required.Always)]
             public readonly string Name;
 
             /// <summary>
             /// URI to get further information about the project.
             /// </summary>
-            [JsonProperty(Required = Required.Always)]
+            [JsonProperty(PropertyName = "url", Required = Required.Always)]
             public readonly string URL;
 
             public ProjectReference(string name, string url)

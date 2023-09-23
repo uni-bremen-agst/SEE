@@ -14,26 +14,26 @@ namespace SEE.Net.Dashboard.Model
         /// A parseable version number indicating the server version.
         /// </summary>
         /// <remarks>This can be parsed using <see cref="DashboardVersion"/>.</remarks>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "dashboardVersionNumber", Required = Required.Always)]
         public readonly string DashboardVersionNumber;
 
         /// <summary>
         /// The name of the error kind.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "type", Required = Required.Always)]
         public readonly string Type;
 
         /// <summary>
         /// A human readable english message describing the error.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "message", Required = Required.Always)]
         public readonly string Message;
 
         /// <summary>
         /// Use this instead of message in order to display a message translated according to your language preferences.
         /// Will contain exactly the same contents as message in case no translation is available.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
+        [JsonProperty(PropertyName = "localizedMessage", Required = Required.Always)]
         public readonly string LocalizedMessage;
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace SEE.Net.Dashboard.Model
         /// understand and communicate certain types of error to the user.
         /// Always inspect the type so you know what keys you can expect.
         /// </summary>
-        [JsonProperty(Required = Required.Default)]
+        [JsonProperty(PropertyName = "data", Required = Required.Default)]
         public readonly DashboardErrorData Data;
 
         public DashboardError(string dashboardVersionNumber, string type, string message, string localizedMessage, DashboardErrorData data)
@@ -64,21 +64,21 @@ namespace SEE.Net.Dashboard.Model
             /// References the column that has the invalid filter value.
             /// The file filter is referred to by the string "any path"
             /// </summary>
-            [JsonProperty(Required = Required.Default)]
+            [JsonProperty(PropertyName = "column", Required = Required.Default)]
             public readonly string Column;
 
             /// <summary>
             /// Provides an ASCII-encoded URL pointing to human-readable help that might help a user understand
             /// and resolve the error. If the URL is relative, then it is meant relative to the Dashboard the error originated from.
             /// </summary>
-            [JsonProperty(Required = Required.Default)]
+            [JsonProperty(PropertyName = "help", Required = Required.Default)]
             public readonly string Help;
 
             /// <summary>
             /// Indicates that the provided password may be used as API token with the respective API.
             /// E.g. use 'Authorization: AxToken …' header instead of HTTP basic auth.
             /// </summary>
-            [JsonProperty(Required = Required.Default)]
+            [JsonProperty(PropertyName = "passwordMayBeUsedAsApiToken", Required = Required.Default)]
             public readonly bool? PasswordMayBeUsedAsApiToken;
 
             public DashboardErrorData(string column, string help, bool? passwordMayBeUsedAsApiToken)

@@ -40,7 +40,7 @@ namespace SEETests
         {
             EntityList list = await DashboardRetriever.Instance.GetSystemEntity("latest");
             Assert.IsNotNull(list);
-            Assert.AreEqual(1, list.entities.Count);
+            Assert.AreEqual(1, list.Entities.Count);
         });
 
         [UnityTest]
@@ -48,7 +48,7 @@ namespace SEETests
         {
             EntityList list = await DashboardRetriever.Instance.GetEntities("latest");
             Assert.IsNotNull(list);
-            Assert.IsNotEmpty(list.entities);
+            Assert.IsNotEmpty(list.Entities);
         });
 
         [UnityTest]
@@ -56,7 +56,7 @@ namespace SEETests
         {
             MetricList list = await DashboardRetriever.Instance.GetMetrics("latest");
             Assert.IsNotNull(list);
-            Assert.IsNotEmpty(list.metrics);
+            Assert.IsNotEmpty(list.Metrics);
         });
 
         [UnityTest]
@@ -66,10 +66,10 @@ namespace SEETests
             const string metric = "Metric.LOC";
             MetricValueRange range = await DashboardRetriever.Instance.GetMetricValueRange(entity, metric);
             Assert.IsNotNull(range);
-            Assert.IsNotEmpty(range.values);
-            Assert.AreEqual(range.entity, entity);
-            Assert.AreEqual(range.metric, metric);
-            Assert.IsFalse(range.values.Contains(null));
+            Assert.IsNotEmpty(range.Values);
+            Assert.AreEqual(range.Entity, entity);
+            Assert.AreEqual(range.Metric, metric);
+            Assert.IsFalse(range.Values.Contains(null));
         });
 
         [UnityTest]
@@ -77,7 +77,7 @@ namespace SEETests
         {
             MetricValueTable table = await DashboardRetriever.Instance.GetMetricValueTable();
             Assert.IsNotNull(table);
-            Assert.IsNotEmpty(table.rows);
+            Assert.IsNotEmpty(table.Rows);
         });
 
         [UnityTest]

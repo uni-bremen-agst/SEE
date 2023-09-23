@@ -129,7 +129,7 @@ namespace SEE.UI.Window.CodeWindow
                 if (issues?.ContainsKey(theLineNumber) ?? false)
                 {
                     // If all issues in this line are content-based, we try to find the content within the line
-                    if (issues[theLineNumber].Exists(x => x.entity.content == null)
+                    if (issues[theLineNumber].Exists(x => x.entity.Content == null)
                         || !HandleContentBasedIssue(theLineNumber, token))
                     {
                         // Otherwise, start new issue marking here if an issue in the line is line-based (has no content)
@@ -211,7 +211,7 @@ namespace SEE.UI.Window.CodeWindow
                 // to simply not mark the issues by content, but instead only use line-based markings.
                 foreach ((SourceCodeEntity entity, Issue issue) in issues[theLineNumber])
                 {
-                    string entityContent = entity.content;
+                    string entityContent = entity.Content;
                     // We now have to determine whether this token is part of an issue entity.
                     // In order to do this, we look ahead in the token stream and construct the line we're on
                     // to determine whether the entity will arrive in this line or not.
@@ -406,15 +406,15 @@ namespace SEE.UI.Window.CodeWindow
                 Assert.IsTrue(path.Contains(pathSeparator));
                 // Skip the first <c>skippedParts</c> parts, so that we query progressively larger parts.
                 queryPath = string.Join(pathSeparator.ToString(), path.Split(pathSeparator).Skip(skippedParts));
-                allIssues.RemoveAll(x => !x.Entities.Select(e => e.path).Any(p => p.EndsWith(queryPath)));
+                allIssues.RemoveAll(x => !x.Entities.Select(e => e.Path).Any(p => p.EndsWith(queryPath)));
             }
 
             // Mapping from each line to the entities and issues contained therein.
             // Important: When an entity spans over multiple lines, it's split up into one entity per line.
             Dictionary<int, List<(SourceCodeEntity entity, Issue issue)>> entities =
                 allIssues.SelectMany(x => x.Entities.SelectMany(SplitUpIntoLines).Select(e => (entity: e, issue: x)))
-                         .Where(x => x.entity.path.EndsWith(queryPath))
-                         .OrderBy(x => x.entity.line).GroupBy(x => x.entity.line)
+                         .Where(x => x.entity.Path.EndsWith(queryPath))
+                         .OrderBy(x => x.entity.Line).GroupBy(x => x.entity.Line)
                          .ToDictionary(x => x.Key, x => x.ToList());
 
             EnterFromTokens(tokenList, entities);
@@ -442,16 +442,16 @@ namespace SEE.UI.Window.CodeWindow
             {
                 // Every path in the first issue could be the "right" path, so we try them all.
                 // If every issue has at least one path which matches that one, we can return true.
-                return issues.First().Entities.Select(e => e.path)
-                             .Any(path => issues.All(x => x.Entities.Any(e => e.path == path)));
+                return issues.First().Entities.Select(e => e.Path)
+                             .Any(path => issues.All(x => x.Entities.Any(e => e.Path == path)));
             }
 
             // Splits up a SourceCodeEntity into one entity per line it is set on (ranging from line to endLine).
             // Each new entity will have a line attribute of the line it is split on and an endLine of null.
             // If the input parameter has no endLine, an enumerable with this entity as its only value will be returned.
             static IEnumerable<SourceCodeEntity> SplitUpIntoLines(SourceCodeEntity entity)
-                => Enumerable.Range(entity.line, entity.endLine - entity.line + 1 ?? 1)
-                             .Select(l => new SourceCodeEntity(entity.path, l, null, entity.content));
+                => Enumerable.Range(entity.Line, entity.EndLine - entity.Line + 1 ?? 1)
+                             .Select(l => new SourceCodeEntity(entity.Path, l, null, entity.Content));
         }
 
         /// <summary>

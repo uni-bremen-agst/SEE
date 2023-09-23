@@ -288,7 +288,7 @@ namespace SEE.Net.Dashboard
         /// <returns>A list of <see cref="MetricValueTableRow"/>s which matches the given parameters.</returns>
         public async UniTask<List<MetricValueTableRow>> GetSpecificMetricRows(string path, string entityName)
         {
-            metrics ??= (await GetMetricValueTable()).rows.GroupBy(x => (x.path, x.entity))
+            metrics ??= (await GetMetricValueTable()).Rows.GroupBy(x => (x.Path, x.Entity))
                                                      .ToDictionary(x => x.Key, x => x.ToList());
 
             return metrics.ContainsKey((path, entityName)) ? metrics[(path, entityName)] : new List<MetricValueTableRow>();
@@ -300,7 +300,7 @@ namespace SEE.Net.Dashboard
         /// <returns></returns>
         public async UniTask<IDictionary<(string path, string entity), List<MetricValueTableRow>>> GetAllMetricRows()
         {
-            metrics ??= (await GetMetricValueTable()).rows.GroupBy(x => (x.path, x.entity))
+            metrics ??= (await GetMetricValueTable()).Rows.GroupBy(x => (x.Path, x.Entity))
                                                      .ToDictionary(x => x.Key, x => x.ToList());
             return metrics;
         }
@@ -323,37 +323,37 @@ namespace SEE.Net.Dashboard
             if (ArchitectureViolationIssues)
             {
                 issues.AddRange((await GetIssues<ArchitectureViolationIssue>(start, end, state, user, fileFilter,
-                                                                             columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                                             columnFilters, limit, offset, computeTotalRowCount)).Rows);
             }
 
             if (CloneIssues)
             {
                 issues.AddRange((await GetIssues<CloneIssue>(start, end, state, user, fileFilter,
-                                                             columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                             columnFilters, limit, offset, computeTotalRowCount)).Rows);
             }
 
             if (CycleIssues)
             {
                 issues.AddRange((await GetIssues<CycleIssue>(start, end, state, user, fileFilter,
-                                                             columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                             columnFilters, limit, offset, computeTotalRowCount)).Rows);
             }
 
             if (DeadEntityIssues)
             {
                 issues.AddRange((await GetIssues<DeadEntityIssue>(start, end, state, user, fileFilter,
-                                                                  columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                                  columnFilters, limit, offset, computeTotalRowCount)).Rows);
             }
 
             if (MetricViolationIssues)
             {
                 issues.AddRange((await GetIssues<MetricViolationIssue>(start, end, state, user, fileFilter,
-                                                                       columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                                       columnFilters, limit, offset, computeTotalRowCount)).Rows);
             }
 
             if (StyleViolationIssues)
             {
                 issues.AddRange((await GetIssues<StyleViolationIssue>(start, end, state, user, fileFilter,
-                                                                      columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                                      columnFilters, limit, offset, computeTotalRowCount)).Rows);
             }
 
             return issues;
