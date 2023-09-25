@@ -52,7 +52,7 @@ namespace SEE.Net.Dashboard.Model
         /// Version information of the Axivion Suite used to do this analysis run.
         /// Note that this field is only available when the analysis was done with at least version 6.5.0.
         /// </summary>
-        [JsonProperty(PropertyName = "axivionSuiteVersion", Required = Required.AllowNull)]
+        [JsonProperty(PropertyName = "toolsVersion", Required = Required.AllowNull)]
         public readonly ToolsVersion AxivionSuiteVersion;
 
         /// <summary>
