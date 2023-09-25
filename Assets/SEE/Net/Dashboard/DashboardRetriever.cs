@@ -36,32 +36,33 @@ namespace SEE.Net.Dashboard
         [EnvironmentVariable("DASHBOARD_PUBLIC_KEY")]
         [TextArea]
         [Tooltip("The public key for the X.509 certificate authority from the dashboard's certificate.")]
-        public string PublicKey = "308201A2300D06092A864886F70D01010105000382018F003082018A0282018100D5EB3F1B3AB"
-                                  + "0ABCE827FA70BA32FCF8C834B1206464B785B7AE13D962F19887D6733B0A555651F130BCDB0"
-                                  + "4D8BF6F199EF76DB7932C001B6916D0E3F0C84C9A7DDB7BC62C93590E49C5DD97109B01B2CF"
-                                  + "AFD183A45DD8E02F86EBAFB4C74DF24449D582DFC03D8E783DA035BB2985907EC00774D748A"
-                                  + "FC9A0195E05E2B992A7877F437DB6088E2490A53D83D8F729482A383142AE5FBAFA4F2C3112"
-                                  + "E5A5C16D520ADFCF5E0F0C9FF865126AFC8B97EAEFD77CE31A431F0E66C2200CDF70BC56B47"
-                                  + "8FB7B56858CE605E3313A876E4B719529DB929D9D7A966B16A9656FF639AE7382B6B7591E19"
-                                  + "D05A0B3546803007DCE8354FDFDFC0DAB4E5103C0ED67A6BFD42E810C78A649DD419A0E4C1B"
-                                  + "B15267A85DB4336D101F3799B71A654C5A8422875EE4ADCF7FD7D684D5B71AC4C0E392A533D"
-                                  + "E143AACC68CCDD77F3FB47AFCF59F058E3873FCF454CED0EF1B5DF8A18A14C4D56A4C81E6F3"
-                                  + "D3D8246BDF2E402C78AB50DCA8CC603E2681B9E28A032BFE156DDC04C266986E3110112A86C"
-                                  + "C01C5150203010001";
+        public string PublicKey = "3082018A0282018100D5EB3F1B3AB0ABCE827FA70BA32FCF8C834B1206464B785B7AE1"
+                                + "3D962F19887D6733B0A555651F130BCDB04D8BF6F199EF76DB7932C001B6916D0E3F0C"
+                                + "84C9A7DDB7BC62C93590E49C5DD97109B01B2CFAFD183A45DD8E02F86EBAFB4C74DF24"
+                                + "449D582DFC03D8E783DA035BB2985907EC00774D748AFC9A0195E05E2B992A7877F437"
+                                + "DB6088E2490A53D83D8F729482A383142AE5FBAFA4F2C3112E5A5C16D520ADFCF5E0F0"
+                                + "C9FF865126AFC8B97EAEFD77CE31A431F0E66C2200CDF70BC56B478FB7B56858CE605E"
+                                + "3313A876E4B719529DB929D9D7A966B16A9656FF639AE7382B6B7591E19D05A0B35468"
+                                + "03007DCE8354FDFDFC0DAB4E5103C0ED67A6BFD42E810C78A649DD419A0E4C1BB15267"
+                                + "A85DB4336D101F3799B71A654C5A8422875EE4ADCF7FD7D684D5B71AC4C0E392A533DE"
+                                + "143AACC68CCDD77F3FB47AFCF59F058E3873FCF454CED0EF1B5DF8A18A14C4D56A4C81"
+                                + "E6F3D3D8246BDF2E402C78AB50DCA8CC603E2681B9E28A032BFE156DDC04C266986E31"
+                                + "10112A86CC01C5150203010001";
 
         /// <summary>
         /// The URL to the Axivion Dashboard, up to the project name.
         /// </summary>
         [EnvironmentVariable("DASHBOARD_BASE_URL")]
         [Tooltip("The URL to the Axivion Dashboard, up to the project name.")]
-        public string BaseUrl = "https://stvive.informatik.uni-bremen.de:9443/axivion/projects/SEE/";
+        public string BaseUrl = "https://stvr2.informatik.uni-bremen.de:9443/axivion/projects/SEE/";
 
         /// <summary>
         /// The API token for the Axivion Dashboard.
         /// </summary>
+        /// <remarks>This must be a log-in token to have the necessary rights.</remarks>
         [EnvironmentVariable("DASHBOARD_TOKEN")]
         [Tooltip("The API token for the Axivion Dashboard.")]
-        public string Token = "0.0000000000016.9SGjXPqUhOKygmJuKLo63yNhyx6bx4RQbMD2h2BlIEU";
+        public string Token = "0.000000000000Q.2Jb6PIgB1pk4g8ss-DtnfdtDp0xlcugYQHFRcRvBRH4";
 
         /// <summary>
         /// When true, receiving Dashboard models which have more fields than the C# models will throw an error
@@ -128,7 +129,7 @@ namespace SEE.Net.Dashboard
         /// </summary>
         /// <seealso cref="Lazy{T}"/>
         private static readonly Lazy<DashboardRetriever> instance =
-            new Lazy<DashboardRetriever>(FindObjectOfType<DashboardRetriever>);
+            new(FindObjectOfType<DashboardRetriever>);
 
         /// <summary>
         /// Will automatically search for this component when it's accessed first, afterwards the single instance
@@ -163,7 +164,7 @@ namespace SEE.Net.Dashboard
             request.certificateHandler = new AxivionCertificateHandler(PublicKey);
             request.SetRequestHeader("Accept", accept);
             request.SetRequestHeader("Authorization", $"AxToken {Token}");
-            #pragma warning disable CS4014
+#pragma warning disable CS4014
             request.SendWebRequest(); // we don't need to await this, because of the next line
             #pragma warning restore CS4014
             await UniTask.WaitUntil(() => request.isDone);
@@ -233,7 +234,7 @@ namespace SEE.Net.Dashboard
         /// <returns>The queried object of type <typeparamref name="T"/>.</returns>
         private async UniTask<T> QueryDashboard<T>(string path, Dictionary<string, string> parameters = null,
                                                    bool apiPath = true)
-        {
+        {            
             DashboardResult result = await GetAtPath(path, parameters, apiPath);
             return result.RetrieveObject<T>(StrictMode);
         }
@@ -369,7 +370,7 @@ namespace SEE.Net.Dashboard
             {
                 // Code adapted from:
                 // https://docs.unity3d.com/ScriptReference/Networking.CertificateHandler.ValidateCertificate.html
-                X509Certificate2 certificate = new X509Certificate2(certificateData);
+                X509Certificate2 certificate = new(certificateData);
                 string certPublicKey = certificate.GetPublicKeyString();
                 return certPublicKey?.Equals(acceptKey) ?? false;
             }
