@@ -87,7 +87,7 @@ namespace SEE.Game.Evolution
         /// <summary>
         /// List of all created game nodes that are in use.
         /// </summary>
-        private IList<GameObject> gameNodes => nodes.Values.ToList();
+        private IList<GameObject> GameNodes => nodes.Values.ToList();
 
         /// <summary>
         /// Returns a saved plane or generates a new one if it does not already exist. The resulting
@@ -104,7 +104,7 @@ namespace SEE.Game.Evolution
             bool hasPlane = currentPlane != null;
             if (!hasPlane)
             {
-                currentPlane = graphRenderer.DrawPlane(gameNodes, city.transform.position.y);
+                currentPlane = graphRenderer.DrawPlane(GameNodes, city.transform.position.y);
                 currentPlane.transform.SetParent(city.transform);
             }
             plane = currentPlane;
@@ -112,18 +112,18 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Adjusts the current plane so that all current <see cref="gameNodes"/> managed here
+        /// Adjusts the current plane so that all current <see cref="GameNodes"/> managed here
         /// fit onto it. Height and y co-ordinate will be maintained. Only its
         /// x and z co-ordinates will be adjusted.
         /// </summary>
         public void AdjustPlane()
         {
-            graphRenderer.AdjustPlane(currentPlane, gameNodes);
+            graphRenderer.AdjustPlane(currentPlane, GameNodes);
         }
 
         /// <summary>
         /// Determines the new <paramref name="centerPosition"/> and <paramref name="scale"/> for the
-        /// <see cref="currentPlane"/> so that it would enclose all cached <see cref="gameNodes"/> of the city where
+        /// <see cref="currentPlane"/> so that it would enclose all cached <see cref="GameNodes"/> of the city where
         /// the y co-ordinate and the height of the plane would remain the same. The plane itself
         /// is not actually changed.
         /// </summary>
@@ -131,7 +131,7 @@ namespace SEE.Game.Evolution
         /// <param name="scale">the new scale of the plane</param>
         public void GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale)
         {
-            graphRenderer.GetPlaneTransform(currentPlane, gameNodes, out centerPosition, out scale);
+            graphRenderer.GetPlaneTransform(currentPlane, GameNodes, out centerPosition, out scale);
         }
 
         /// <summary>
