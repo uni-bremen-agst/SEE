@@ -34,12 +34,12 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Path which contains the prefabs for the runtime config menu.
         /// </summary>
-        public const string runtimeConfigPrefabFolder = UIPrefabFolder + "RuntimeConfigMenu/";
+        public const string RuntimeConfigPrefabFolder = UIPrefabFolder + "RuntimeConfigMenu/";
 
         /// <summary>
         /// Prefab for a setting object.
         /// </summary>
-        private const string settingsObjectPrefab = runtimeConfigPrefabFolder + "RuntimeSettingsObject";
+        private const string settingsObjectPrefab = RuntimeConfigPrefabFolder + "RuntimeSettingsObject";
 
         /// <summary>
         /// Prefab for a switch.
@@ -59,7 +59,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Prefab for a color picker.
         /// </summary>
-        private const string colorPickerPrefab = runtimeConfigPrefabFolder + "RuntimeColorPicker";
+        private const string colorPickerPrefab = RuntimeConfigPrefabFolder + "RuntimeColorPicker";
 
         /// <summary>
         /// Prefab for a string field.
@@ -69,17 +69,17 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Prefab for a button.
         /// </summary>
-        private const string buttonPrefab = runtimeConfigPrefabFolder + "RuntimeConfigButton";
+        private const string buttonPrefab = RuntimeConfigPrefabFolder + "RuntimeConfigButton";
 
         /// <summary>
         /// Prefab for a add button.
         /// </summary>
-        private const string addElementButtonPrefab = runtimeConfigPrefabFolder + "RuntimeAddButton";
+        private const string addElementButtonPrefab = RuntimeConfigPrefabFolder + "RuntimeAddButton";
 
         /// <summary>
         /// Prefab for a remove button.
         /// </summary>
-        private const string removeElementButtonPrefab = runtimeConfigPrefabFolder + "RuntimeRemoveButton";
+        private const string removeElementButtonPrefab = RuntimeConfigPrefabFolder + "RuntimeRemoveButton";
 
         /// <summary>
         /// The city index
@@ -148,17 +148,17 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Prefab for the menu
         /// </summary>
-        protected override string MenuPrefab => runtimeConfigPrefabFolder + "RuntimeConfigMenu";
+        protected override string MenuPrefab => RuntimeConfigPrefabFolder + "RuntimeConfigMenu";
 
         /// <summary>
         /// Prefab for a view
         /// </summary>
-        protected override string ViewPrefab => runtimeConfigPrefabFolder + "RuntimeSettingsView";
+        protected override string ViewPrefab => RuntimeConfigPrefabFolder + "RuntimeSettingsView";
 
         /// <summary>
         /// Prefab for a tab button
         /// </summary>
-        protected override string EntryPrefab => runtimeConfigPrefabFolder + "RuntimeTabButton";
+        protected override string EntryPrefab => RuntimeConfigPrefabFolder + "RuntimeTabButton";
 
         /// <summary>
         /// Path to the content game object
@@ -587,10 +587,10 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 // unconfirmed types where the nested fields should be edited
                 case VisualAttributes:
-                case ConfigIO.PersistentConfigItem:
+                case ConfigIO.IPersistentConfigItem:
                 case LabelAttributes:
                     if (value.GetType() != typeof(VisualAttributes)
-                        && value.GetType() != typeof(ConfigIO.PersistentConfigItem)
+                        && value.GetType() != typeof(ConfigIO.IPersistentConfigItem)
                         && value.GetType() != typeof(LabelAttributes)
                        )
                     {
@@ -610,12 +610,12 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Creates a container game object which contains multiple settings.
         ///
-        /// Uses the `SETTINGS_OBJECT_PREFAB` prefab.
+        /// Uses the <see cref="settingsObjectPrefab"/>.
         /// </summary>
         /// <param name="settingName">setting name</param>
         /// <param name="parent">container</param>
         /// <returns>container for child settings</returns>
-        private GameObject CreateNestedSetting(string settingName, GameObject parent)
+        private static GameObject CreateNestedSetting(string settingName, GameObject parent)
         {
             GameObject container =
                 PrefabInstantiator.InstantiatePrefab(settingsObjectPrefab, parent.transform, false);
@@ -1338,7 +1338,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// Uses the widget size as the minimum layout size.
         /// </summary>
         /// <param name="widget">widget where the layout element is added</param>
-        private void AddLayoutElement(GameObject widget)
+        private static void AddLayoutElement(GameObject widget)
         {
             LayoutElement layoutElement = widget.AddComponent<LayoutElement>();
             layoutElement.minWidth = ((RectTransform)widget.transform).rect.width;

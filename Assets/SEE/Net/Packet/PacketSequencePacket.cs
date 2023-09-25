@@ -13,12 +13,12 @@ namespace SEE.Net
         /// <summary>
         /// The ID of this packet sequence.
         /// </summary>
-        public ulong id;
+        public ulong ID;
 
         /// <summary>
         /// The serialized packets, this packet contains.
         /// </summary>
-        public string[] serializedPackets;
+        public string[] SerializedPackets;
 
         /// <summary>
         /// Empty constructor is necessary for JsonUtility-serialization.
@@ -37,8 +37,8 @@ namespace SEE.Net
         {
             Assert.IsNotNull(serializedPackets);
 
-            this.id = id;
-            this.serializedPackets = serializedPackets;
+            this.ID = id;
+            this.SerializedPackets = serializedPackets;
         }
 
         /// <summary>
@@ -58,8 +58,8 @@ namespace SEE.Net
         internal override void Deserialize(string serializedPacket)
         {
             PacketSequencePacket packet = JsonUtility.FromJson<PacketSequencePacket>(serializedPacket);
-            id = packet.id;
-            serializedPackets = packet.serializedPackets;
+            ID = packet.ID;
+            SerializedPackets = packet.SerializedPackets;
         }
 
         /// <summary>
@@ -72,11 +72,11 @@ namespace SEE.Net
         {
             Assert.IsNotNull(connection);
 
-            bool result = Server.incomingPacketSequenceIDs.TryGetValue(connection, out ulong nextID);
-            if (result && id == nextID)
+            bool result = Server.IncomingPacketSequenceIDs.TryGetValue(connection, out ulong nextID);
+            if (result && ID == nextID)
             {
-                Server.incomingPacketSequenceIDs[connection] = ++nextID;
-                foreach (string serializedPacket in serializedPackets)
+                Server.IncomingPacketSequenceIDs[connection] = ++nextID;
+                foreach (string serializedPacket in SerializedPackets)
                 {
                     AbstractPacket packet = PacketSerializer.Deserialize(serializedPacket);
                     packet.ExecuteOnServer(connection);
@@ -97,10 +97,10 @@ namespace SEE.Net
         {
             Assert.IsNotNull(connection);
 
-            if (id == Client.IncomingPacketID)
+            if (ID == Client.IncomingPacketID)
             {
                 Client.IncomingPacketID++;
-                foreach (string serializedPacket in serializedPackets)
+                foreach (string serializedPacket in SerializedPackets)
                 {
                     AbstractPacket packet = PacketSerializer.Deserialize(serializedPacket);
                     packet.ExecuteOnClient(connection);

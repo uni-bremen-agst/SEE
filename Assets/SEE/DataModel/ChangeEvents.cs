@@ -37,15 +37,15 @@ namespace SEE.DataModel
         /// Which graph was affected by this event.
         ///
         /// Note that this only counts towards direct changes—e.g., a <see cref="MapsToEdgeEvent"/> will have this
-        /// attribute set to <see cref="ReflexionSubgraph.Mapping"/>, even though the architecture graph may be affected
+        /// attribute set to <see cref="ReflexionSubgraphs.Mapping"/>, even though the architecture graph may be affected
         /// as well due to changes to its propagated edges.
         ///
         /// If an event can't be clearly traced to a single subgraph, this attribute will be set to
-        /// <see cref="ReflexionSubgraph.FullReflexion"/>.
+        /// <see cref="ReflexionSubgraphs.FullReflexion"/>.
         /// If an event did not occur in the context of the reflexion analysis, this attribute will be set to
-        /// <see cref="ReflexionSubgraph.None"/>.
+        /// <see cref="ReflexionSubgraphs.None"/>.
         /// </summary>
-        public readonly ReflexionSubgraph Affected;
+        public readonly ReflexionSubgraphs Affected;
 
         /// <summary>
         /// Unique ID of the graph version this event is associated to.
@@ -63,11 +63,11 @@ namespace SEE.DataModel
 
         public override string ToString() => $"{GetType().Name}: {Description()}";
 
-        protected ChangeEvent(Guid versionId, ReflexionSubgraph? affectedGraph = null, ChangeType? change = null)
+        protected ChangeEvent(Guid versionId, ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null)
         {
             VersionId = versionId;
             Change = change;
-            Affected = affectedGraph ?? ReflexionSubgraph.None;
+            Affected = affectedGraph ?? ReflexionSubgraphs.None;
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace SEE.DataModel
         /// <param name="oldState">the old state of the edge</param>
         /// <param name="newState">the new state of the edge after the change</param>
         /// <param name="subgraph">the subgraph the edge is contained in</param>
-        public EdgeChange(Guid version, Edge edge, State oldState, State newState, ReflexionSubgraph subgraph = ReflexionSubgraph.Architecture) : base(version, subgraph)
+        public EdgeChange(Guid version, Edge edge, State oldState, State newState, ReflexionSubgraphs subgraph = ReflexionSubgraphs.Architecture) : base(version, subgraph)
         {
             Edge = edge;
             OldState = oldState;

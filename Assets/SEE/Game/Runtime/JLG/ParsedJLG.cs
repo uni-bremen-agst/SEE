@@ -144,9 +144,9 @@ namespace SEE.Runtime.JLG
         /// This Methode creates the string, that visualizes the runtime data in the small text window.
         /// </summary>
         /// <param name="statementCounter"></param>
-        /// <param name="AddReturnValueToStack">This should be true when the Visualization is running forward. Only then the return value is put on the stack.</param>
+        /// <param name="addReturnValueToStack">This should be true when the Visualization is running forward. Only then the return value is put on the stack.</param>
         /// <returns></returns>
-        internal string CreateStatementInfoString(int statementCounter, Boolean AddReturnValueToStack)
+        internal string CreateStatementInfoString(int statementCounter, Boolean addReturnValueToStack)
         {
             JavaStatement js = allStatements[statementCounter];
             string info = "Line " + js.Line + Environment.NewLine;
@@ -181,7 +181,7 @@ namespace SEE.Runtime.JLG
             if (js.ReturnValue != null)
             {
                 info = info + Environment.NewLine + locationLookupTable[int.Parse(js.Location)] + " returns: " + js.ReturnValue;
-                if (AddReturnValueToStack)
+                if (addReturnValueToStack)
                 {
                     returnValues.Push(locationLookupTable[int.Parse(js.Location)] + " returned " + js.ReturnValue);
                 }

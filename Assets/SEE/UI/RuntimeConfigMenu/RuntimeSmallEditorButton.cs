@@ -16,8 +16,8 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// The prefab for small editor window.
         /// </summary>
-        private const string SMALL_WINDOW_PREFAB =
-            RuntimeTabMenu.runtimeConfigPrefabFolder + "RuntimeConfig_SmallConfigWindow";
+        private const string smallWindowPrefab =
+            RuntimeTabMenu.RuntimeConfigPrefabFolder + "RuntimeConfig_SmallConfigWindow";
 
         /// <summary>
         /// The editor window.
@@ -54,7 +54,7 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 if (value)
                 {
-                    smallEditor = PrefabInstantiator.InstantiatePrefab(SMALL_WINDOW_PREFAB, Canvas.transform, false);
+                    smallEditor = PrefabInstantiator.InstantiatePrefab(smallWindowPrefab, Canvas.transform, false);
                     smallEditor.transform.Find("CloseButton").GetComponent<Button>().onClick
                                .AddListener(() => ShowMenu = false);
                     CreateWidget(smallEditor.transform.Find("Content").gameObject);

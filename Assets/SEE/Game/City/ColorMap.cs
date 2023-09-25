@@ -11,7 +11,7 @@ namespace SEE.Game.City
     /// Specifies which color is used to render a named property.
     /// </summary>
     [Serializable]
-    public class ColorMap : ConfigIO.PersistentConfigItem, IEnumerable<KeyValuePair<string, ColorRange>>
+    public class ColorMap : ConfigIO.IPersistentConfigItem, IEnumerable<KeyValuePair<string, ColorRange>>
     {
         /// <summary>
         /// Mapping of property name onto color.

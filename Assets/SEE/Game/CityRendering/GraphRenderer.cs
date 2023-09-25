@@ -329,7 +329,7 @@ namespace SEE.Game.CityRendering
                     return null;
                 }
             }
-           
+
             // This is necessary for the holistic metrics boards. They need to be informed when a code city is being
             // drawn because then there will be a new graph loaded. In that case, the metrics boards might
             // need to start listening for change events from that graph.
@@ -563,7 +563,7 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="gameNodes">the game objects to be enclosed by the new plane</param>
         /// <returns>new plane enclosing all given <paramref name="gameNodes"/></returns>
-        public GameObject DrawPlane(ICollection<GameObject> gameNodes, float yLevel)
+        public static GameObject DrawPlane(ICollection<GameObject> gameNodes, float yLevel)
         {
             ComputeBoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             return DrawPlane(leftFrontCorner, rightBackCorner, yLevel);
@@ -586,7 +586,7 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="plane">the plane to be adjusted</param>
         /// <param name="gameNodes">the game nodes that should be fitted onto <paramref name="plane"/></param>
-        public void AdjustPlane(GameObject plane, ICollection<GameObject> gameNodes)
+        public static void AdjustPlane(GameObject plane, ICollection<GameObject> gameNodes)
         {
             ComputeBoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             PlaneFactory.AdjustXZ(plane, leftFrontCorner, rightBackCorner);
@@ -603,7 +603,7 @@ namespace SEE.Game.CityRendering
         /// <param name="gameNodes">the game nodes that should be fitted onto <paramref name="plane"/></param>
         /// <param name="centerPosition">the new center of the plane</param>
         /// <param name="scale">the new scale of the plane</param>
-        public void GetPlaneTransform(GameObject plane, ICollection<GameObject> gameNodes, out Vector3 centerPosition, out Vector3 scale)
+        public static void GetPlaneTransform(GameObject plane, ICollection<GameObject> gameNodes, out Vector3 centerPosition, out Vector3 scale)
         {
             ComputeBoundingBox(gameNodes, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
             PlaneFactory.GetTransform(plane, leftFrontCorner, rightBackCorner, out centerPosition, out scale);

@@ -11,12 +11,12 @@ namespace SEE.Utils
         /// <summary>
         /// Returns the text contained in the file with given <paramref name="fileName"/>
         /// in the range <paramref name="fromLine"/> to <paramref name="toLine"/>.
-        /// 
+        ///
         /// If the file has less lines than <paramref name="fromLine"/>, the empty
         /// string will be returned. If the file has less lines than  <paramref name="toLine"/>
         /// only the lines from <paramref name="fromLine"/> to the last line in the file
         /// will be returned.
-        /// 
+        ///
         /// Precondition: <paramref name="fromLine"/> must be greater than zero
         /// and must the less than or equal to <paramref name="toLine"/>.
         /// </summary>

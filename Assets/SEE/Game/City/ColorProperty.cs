@@ -11,7 +11,7 @@ namespace SEE.Game.City
     /// or a node metric.
     /// </summary>
     [Serializable]
-    public class ColorProperty : ConfigIO.PersistentConfigItem
+    public class ColorProperty : ConfigIO.IPersistentConfigItem
     {
         /// <summary>
         /// Whether color is used to represent the node type or a metric.

@@ -35,7 +35,7 @@ namespace SEE.UI.Window.CodeWindow
         public bool ShowIssues;
 
         /// <summary>
-        /// The line that was marked (1-indexed). Unlike <see cref="VisibleLine"/>,
+        /// The line that was marked (1-indexed). Unlike <see cref="ScrolledVisibleLine"/>,
         /// this line is independent of scrolling.
         /// </summary>
         private int markedLine = 1;
@@ -112,9 +112,9 @@ namespace SEE.UI.Window.CodeWindow
         /// </summary>
         /// <remarks>Only a fully visible line counts. If a line is partially obscured, the next line number
         /// will be returned.</remarks>
-        public int VisibleLine
+        public int ScrolledVisibleLine
         {
-            get => scrollingTo > 0 ? scrollingTo : Mathf.CeilToInt(visibleLine) + 1;
+            get => scrollingTo > 0 ? scrollingTo : Mathf.CeilToInt(ImmediateVisibleLine) + 1;
             set
             {
                 if (value > lines || value < 1)
@@ -134,7 +134,7 @@ namespace SEE.UI.Window.CodeWindow
                 {
                     // Animate scroll
                     scrollingTo = value;
-                    DOTween.Sequence().Append(DOTween.To(() => visibleLine, f => visibleLine = f, value - 1, 1f))
+                    DOTween.Sequence().Append(DOTween.To(() => ImmediateVisibleLine, f => ImmediateVisibleLine = f, value - 1, 1f))
                            .AppendCallback(() => scrollingTo = 0);
 
                     // FIXME: TMP bug: Large files cause issues with highlighting text. This is just a workaround.
@@ -152,9 +152,9 @@ namespace SEE.UI.Window.CodeWindow
         /// <summary>
         /// The line currently at the top of the window.
         /// Will immediately set the line.
-        /// Note that the line here is 0-indexed, as opposed to <see cref="VisibleLine"/>, which is 1-indexed.
+        /// Note that the line here is 0-indexed, as opposed to <see cref="ScrolledVisibleLine"/>, which is 1-indexed.
         /// </summary>
-        private float visibleLine
+        private float ImmediateVisibleLine
         {
             get => HasStarted ? (1 - scrollRect.verticalNormalizedPosition) * (lines - 1 - excessLines) : preStartLine;
             set
@@ -205,7 +205,7 @@ namespace SEE.UI.Window.CodeWindow
             {
                 throw new ArgumentException("Invalid value object. Either FilePath or Text must not be null.");
             }
-            VisibleLine = codeValues.VisibleLine;
+            ScrolledVisibleLine = codeValues.VisibleLine;
         }
 
         public override void UpdateFromNetworkValueObject(WindowValues valueObject)
@@ -214,7 +214,7 @@ namespace SEE.UI.Window.CodeWindow
             {
                 throw new UnsupportedTypeException(typeof(CodeWindowValues), valueObject.GetType());
             }
-            VisibleLine = codeValues.VisibleLine;
+            ScrolledVisibleLine = codeValues.VisibleLine;
             // TODO: Text merge between windowValue.Text and window.Text
         }
 
@@ -228,8 +228,8 @@ namespace SEE.UI.Window.CodeWindow
         {
             string attachedTo = gameObject.name;
             return FilePath == null
-                ? new CodeWindowValues(Title, VisibleLine, attachedTo, text)
-                : new CodeWindowValues(Title, VisibleLine, attachedTo, path: FilePath);
+                ? new CodeWindowValues(Title, ScrolledVisibleLine, attachedTo, text)
+                : new CodeWindowValues(Title, ScrolledVisibleLine, attachedTo, path: FilePath);
         }
 
         /// <summary>

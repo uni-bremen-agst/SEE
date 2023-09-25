@@ -87,7 +87,10 @@ namespace SEE.Utils.RPC
         /// </summary>
         public void Run()
         {
-            if (started) return;
+            if (started)
+            {
+                return;
+            }
             started = true;
             RunTask(tokenSource.Token).Forget();
         }

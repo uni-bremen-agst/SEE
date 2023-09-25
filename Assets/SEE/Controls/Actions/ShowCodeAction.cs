@@ -132,7 +132,7 @@ namespace SEE.Controls.Actions
                                                  targetAbsolutePlatformPath, targetStartLine, targetEndLine);
                 CodeWindow codeWindow = GetOrCreateCodeWindow(edge, graphElementRef, sourceFilename);
                 codeWindow.EnterFromText(diff, true);
-                codeWindow.VisibleLine = 1;
+                codeWindow.ScrolledVisibleLine = 1;
                 return codeWindow;
             }
 
@@ -216,7 +216,7 @@ namespace SEE.Controls.Actions
                 int? line = graphElement.SourceLine();
                 if (line.HasValue)
                 {
-                    codeWindow.VisibleLine = line.Value;
+                    codeWindow.ScrolledVisibleLine = line.Value;
                 }
                 else
                 {

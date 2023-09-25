@@ -171,7 +171,7 @@ namespace SEE.Utils.Config
         /// <typeparam name="V">type of the value of <paramref name="collection"/></typeparam>
         /// <param name="collection">the dictionary to be saved</param>
         /// <param name="label">the label to be added in front of the value</param>
-        internal void Save<T>(ICollection<T> collection, string label = "") where T : PersistentConfigItem
+        internal void Save<T>(ICollection<T> collection, string label = "") where T : IPersistentConfigItem
         {
             BeginList(label);
             foreach (var item in collection)

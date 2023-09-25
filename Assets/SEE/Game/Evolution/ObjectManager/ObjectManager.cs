@@ -104,7 +104,7 @@ namespace SEE.Game.Evolution
             bool hasPlane = currentPlane != null;
             if (!hasPlane)
             {
-                currentPlane = graphRenderer.DrawPlane(GameNodes, city.transform.position.y);
+                currentPlane = GraphRenderer.DrawPlane(GameNodes, city.transform.position.y);
                 currentPlane.transform.SetParent(city.transform);
             }
             plane = currentPlane;
@@ -118,7 +118,7 @@ namespace SEE.Game.Evolution
         /// </summary>
         public void AdjustPlane()
         {
-            graphRenderer.AdjustPlane(currentPlane, GameNodes);
+            GraphRenderer.AdjustPlane(currentPlane, GameNodes);
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace SEE.Game.Evolution
         /// <param name="scale">the new scale of the plane</param>
         public void GetPlaneTransform(out Vector3 centerPosition, out Vector3 scale)
         {
-            graphRenderer.GetPlaneTransform(currentPlane, GameNodes, out centerPosition, out scale);
+            GraphRenderer.GetPlaneTransform(currentPlane, GameNodes, out centerPosition, out scale);
         }
 
         /// <summary>

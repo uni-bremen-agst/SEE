@@ -5,7 +5,7 @@ namespace SEE.Net.Dashboard.Model.Issues
     /// <summary>
     /// An entity in the source code, consisting of a <see cref="Path"/>, a <see cref="Line"/>,
     /// an optional <see cref="EndLine"/> and an optional <see cref="Content"/>.
-    /// The <see cref="Content"/> will usually be the "entity" as described in the Axivion 
+    /// The <see cref="Content"/> will usually be the "entity" as described in the Axivion
     /// Dashboard documentation.
     /// </summary>
     public class SourceCodeEntity
@@ -17,7 +17,7 @@ namespace SEE.Net.Dashboard.Model.Issues
 
         /// <summary>
         /// The line number of the entity.
-        /// If <see cref="EndLine"/> is specified, this will be the beginning of the line 
+        /// If <see cref="EndLine"/> is specified, this will be the beginning of the line
         /// range of this entity.
         /// </summary>
         public readonly int Line;

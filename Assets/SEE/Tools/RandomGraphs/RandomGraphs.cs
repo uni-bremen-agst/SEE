@@ -16,7 +16,7 @@ namespace SEE.Tools.RandomGraphs
     /// SEECityRandomEditor.
     /// </summary>
     [Serializable]
-    public class RandomAttributeDescriptor : ConfigIO.PersistentConfigItem
+    public class RandomAttributeDescriptor : ConfigIO.IPersistentConfigItem
     {
         public RandomAttributeDescriptor()
         { }
@@ -88,7 +88,7 @@ namespace SEE.Tools.RandomGraphs
         private const string maximumLabel = "Maximum";
 
         /// <summary>
-        /// <see cref="ConfigIO.PersistentConfigItem.Save()"/>
+        /// <see cref="ConfigIO.IPersistentConfigItem.Save()"/>
         /// </summary>
         public void Save(ConfigWriter writer, string label)
         {
@@ -102,7 +102,7 @@ namespace SEE.Tools.RandomGraphs
         }
 
         /// <summary>
-        /// <see cref="ConfigIO.PersistentConfigItem.Restore()"/>
+        /// <see cref="ConfigIO.IPersistentConfigItem.Restore()"/>
         /// </summary>
         public bool Restore(Dictionary<string, object> attributes, string label = "")
         {
@@ -330,7 +330,7 @@ namespace SEE.Tools.RandomGraphs
             return result;
         }
 
-        private ICollection<Node> CreateLeaves(Graph graph, Constraint leafConstraint, ICollection<RandomAttributeDescriptor> leafAttributes)
+        private static ICollection<Node> CreateLeaves(Graph graph, Constraint leafConstraint, ICollection<RandomAttributeDescriptor> leafAttributes)
         {
             ICollection<Node> leaves = CreateNodes(graph, leafConstraint.NodeNumber, "Leaf~", leafConstraint.NodeType);
             CreateAttributes(leaves, leafAttributes);

@@ -11,7 +11,7 @@ namespace SEE.Game.City
     /// The settings for <see cref="Layout.NodeLayouts.IncrementalTreeMapLayout"/>.
     /// </summary>
     [Serializable]
-    public class IncrementalTreeMapSetting : ConfigIO.PersistentConfigItem
+    public class IncrementalTreeMapSetting : ConfigIO.IPersistentConfigItem
     {
         /// <summary>
         /// The depth of the local moves search.

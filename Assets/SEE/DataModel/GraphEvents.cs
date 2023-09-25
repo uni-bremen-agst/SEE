@@ -6,12 +6,12 @@ namespace SEE.DataModel
 {
     /// <summary>
     /// An event representing a change to a graph component.
-    /// May be used outside of reflexion analysis contexts, in which case the <see cref="ReflexionSubgraph"/> will be
+    /// May be used outside of reflexion analysis contexts, in which case the <see cref="ReflexionSubgraphs"/> will be
     /// <c>None</c>.
     /// </summary>
     public abstract class GraphEvent : ChangeEvent
     {
-        protected GraphEvent(Guid version, ReflexionSubgraph? affectedGraph = null, ChangeType? change = null) : base(version, affectedGraph, change)
+        protected GraphEvent(Guid version, ReflexionSubgraphs? affectedGraph = null, ChangeType? change = null) : base(version, affectedGraph, change)
         {
         }
     }
@@ -60,7 +60,7 @@ namespace SEE.DataModel
         /// <param name="edge">the edge being added or removed</param>
         /// <param name="change">the type of change to <paramref name="edge"/></param>
         /// <param name="affectedGraph">The graph the edge was added to or removed from</param>
-        public EdgeEvent(Guid version, Edge edge, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(version, affectedGraph ?? edge.GetSubgraph(), change)
+        public EdgeEvent(Guid version, Edge edge, ChangeType change, ReflexionSubgraphs? affectedGraph = null) : base(version, affectedGraph ?? edge.GetSubgraph(), change)
         {
             Edge = edge;
         }
@@ -86,9 +86,9 @@ namespace SEE.DataModel
         /// </summary>
         public readonly Node Child;
 
-        public HierarchyEvent(Guid version, Node parent, Node child, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(version, affectedGraph ?? child.GetSubgraph(), change)
+        public HierarchyEvent(Guid version, Node parent, Node child, ChangeType change, ReflexionSubgraphs? affectedGraph = null) : base(version, affectedGraph ?? child.GetSubgraph(), change)
         {
-            if (affectedGraph == ReflexionSubgraph.Mapping || affectedGraph == ReflexionSubgraph.FullReflexion)
+            if (affectedGraph == ReflexionSubgraphs.Mapping || affectedGraph == ReflexionSubgraphs.FullReflexion)
             {
                 throw new ArgumentException("Only architecture or implementation hierarchy can be changed!");
             }
@@ -113,9 +113,9 @@ namespace SEE.DataModel
         /// </summary>
         public readonly Node Node;
 
-        public NodeEvent(Guid version, Node node, ChangeType change, ReflexionSubgraph? affectedGraph = null) : base(version, affectedGraph ?? node.GetSubgraph(), change)
+        public NodeEvent(Guid version, Node node, ChangeType change, ReflexionSubgraphs? affectedGraph = null) : base(version, affectedGraph ?? node.GetSubgraph(), change)
         {
-            if (affectedGraph == ReflexionSubgraph.Mapping || affectedGraph == ReflexionSubgraph.FullReflexion)
+            if (affectedGraph == ReflexionSubgraphs.Mapping || affectedGraph == ReflexionSubgraphs.FullReflexion)
             {
                 throw new ArgumentException("Nodes can only be added to architecture or implementation!");
             }

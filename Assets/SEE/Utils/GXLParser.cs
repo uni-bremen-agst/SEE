@@ -19,8 +19,8 @@ namespace SEE.Utils
         /// <param name="logger">Logger to use for log messages</param>
         protected GXLParser(Stream gxl, string name = "[unknown]", ILogger logger = null)
         {
-            this.name = name;
-            this.logger = logger;
+            this.Name = name;
+            this.Logger = logger;
             XmlReaderSettings settings = new()
             {
                 CloseInput = true,
@@ -29,7 +29,7 @@ namespace SEE.Utils
                 // TODO: Apparently enabling the below has security implications due to the URL being resolved.
                 DtdProcessing = DtdProcessing.Parse
             };
-            reader = XmlReader.Create(gxl, settings);
+            Reader = XmlReader.Create(gxl, settings);
         }
 
         /// <summary>
@@ -37,17 +37,17 @@ namespace SEE.Utils
         /// </summary>
         protected enum State
         {
-            undefined = 0,
-            inGXL = 1,
-            inGraph = 2,
-            inNode = 3,
-            inEdge = 4,
-            inType = 5,
-            inAttr = 6,
-            inString = 7,
-            inFloat = 8,
-            inInt = 9,
-            inEnum = 10 // toggle attributes are represented as <enum/> and nothing else
+            Undefined = 0,
+            InGXL = 1,
+            InGraph = 2,
+            InNode = 3,
+            InEdge = 4,
+            InType = 5,
+            InAttr = 6,
+            InString = 7,
+            InFloat = 8,
+            InInt = 9,
+            InEnum = 10 // toggle attributes are represented as <enum/> and nothing else
         }
 
         /// <summary>
@@ -59,17 +59,17 @@ namespace SEE.Utils
         {
             return state switch
             {
-                State.undefined => "undefined",
-                State.inGXL => "gxl",
-                State.inGraph => "graph",
-                State.inNode => "node",
-                State.inEdge => "edge",
-                State.inType => "type",
-                State.inAttr => "attr",
-                State.inString => "string",
-                State.inFloat => "float",
-                State.inInt => "int",
-                State.inEnum => "enum",
+                State.Undefined => "undefined",
+                State.InGXL => "gxl",
+                State.InGraph => "graph",
+                State.InNode => "node",
+                State.InEdge => "edge",
+                State.InType => "type",
+                State.InAttr => "attr",
+                State.InString => "string",
+                State.InFloat => "float",
+                State.InInt => "int",
+                State.InEnum => "enum",
                 _ => throw new NotImplementedException()
             };
         }
@@ -83,39 +83,39 @@ namespace SEE.Utils
         {
             return name switch
             {
-                "gxl" => State.inGXL,
-                "graph" => State.inGraph,
-                "node" => State.inNode,
-                "edge" => State.inEdge,
-                "type" => State.inType,
-                "attr" => State.inAttr,
-                "string" => State.inString,
-                "int" => State.inInt,
-                "float" => State.inFloat,
-                "enum" => State.inEnum,
-                _ => State.undefined
+                "gxl" => State.InGXL,
+                "graph" => State.InGraph,
+                "node" => State.InNode,
+                "edge" => State.InEdge,
+                "type" => State.InType,
+                "attr" => State.InAttr,
+                "string" => State.InString,
+                "int" => State.InInt,
+                "float" => State.InFloat,
+                "enum" => State.InEnum,
+                _ => State.Undefined
             };
         }
 
         /// <summary>
         /// Stack storing the context of the parser.
         /// </summary>
-        protected Stack<State> context = new();
+        protected Stack<State> Context = new();
 
         /// <summary>
         /// Name of the GXL file.
         /// </summary>
-        protected string name;
+        protected string Name;
 
         /// <summary>
         /// Reader responsible for parsing XML.
         /// </summary>
-        protected XmlReader reader;
+        protected XmlReader Reader;
 
         /// <summary>
         /// Logger responsible for log messages.
         /// </summary>
-        protected ILogger logger;
+        protected ILogger Logger;
 
         /// <summary>
         /// Exception indicating that a syntax error within the GXL file has occurred.
@@ -139,25 +139,25 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Logs the given <paramref name="message"/> as a debug message using <see cref="logger"/>.
+        /// Logs the given <paramref name="message"/> as a debug message using <see cref="Logger"/>.
         /// </summary>
         /// <param name="message">The message to log</param>
         protected virtual void LogDebug(string message)
         {
-            logger?.LogDebug(message);
+            Logger?.LogDebug(message);
         }
 
         /// <summary>
-        /// Logs the given <paramref name="message"/> as an error message using <see cref="logger"/>.
+        /// Logs the given <paramref name="message"/> as an error message using <see cref="Logger"/>.
         /// </summary>
         /// <param name="message">The message to log</param>
         protected virtual void LogError(string message)
         {
-            if (logger != null)
+            if (Logger != null)
             {
-                IXmlLineInfo xmlInfo = (IXmlLineInfo)reader;
+                IXmlLineInfo xmlInfo = (IXmlLineInfo)Reader;
                 int lineNumber = xmlInfo.LineNumber - 1;
-                logger.LogError($"{name}:{lineNumber}: {message}\n");
+                Logger.LogError($"{Name}:{lineNumber}: {message}\n");
             }
         }
 
@@ -167,14 +167,14 @@ namespace SEE.Utils
         /// <exception cref="SyntaxError">If the opening and closing tags are mismatched</exception>
         private void EnsureExpectedEndTag()
         {
-            State actual = ToState(reader.Name);
-            State expected = context.Pop();
+            State actual = ToState(Reader.Name);
+            State expected = Context.Pop();
 
             if (actual != expected)
             {
                 // TODO: Is logging this really necessary, as we throw an exception already?
-                LogError($"syntax error: </{ToString(expected)}> expected. Actual: {reader.Name}");
-                throw new SyntaxError($"Mismatched Tags: </{ToString(expected)}> expected. Actual: {reader.Name}");
+                LogError($"syntax error: </{ToString(expected)}> expected. Actual: {Reader.Name}");
+                throw new SyntaxError($"Mismatched Tags: </{ToString(expected)}> expected. Actual: {Reader.Name}");
             }
         }
 
@@ -190,63 +190,63 @@ namespace SEE.Utils
 
             try
             {
-                while (reader.Read())
+                while (Reader.Read())
                 {
                     // LogDebug("XML processing: name=" + reader.Name + " nodetype=" + reader.NodeType + " value=" + reader.Value + "\n");
 
                     // See https://docs.microsoft.com/de-de/dotnet/api/system.xml.xmlnodetype?view=netframework-4.8
                     // for information on the XML reader.
-                    switch (reader.NodeType)
+                    switch (Reader.NodeType)
                     {
                         case XmlNodeType.Element:
                             // An element(for example, <item> ).
                         {
-                            State state = ToState(reader.Name);
-                            if (!reader.IsEmptyElement)
+                            State state = ToState(Reader.Name);
+                            if (!Reader.IsEmptyElement)
                             {
                                 // This is not a self-closing (empty) element, e.g., <item/>.
                                 // Note: A corresponding EndElement node is not generated for empty elements.
                                 // That is why we must push an expected EndElement onto the context stack
                                 // only if the element is not self-closing.
-                                context.Push(state);
+                                Context.Push(state);
                             }
 
                             switch (state)
                             {
-                                case State.undefined:
+                                case State.Undefined:
                                     StartUndefined();
                                     break;
-                                case State.inGXL:
+                                case State.InGXL:
                                     StartGXL();
                                     break;
-                                case State.inGraph:
+                                case State.InGraph:
                                     StartGraph();
                                     break;
-                                case State.inNode:
+                                case State.InNode:
                                     StartNode();
                                     break;
-                                case State.inEdge:
+                                case State.InEdge:
                                     StartEdge();
                                     break;
-                                case State.inType:
+                                case State.InType:
                                     StartType();
                                     break;
-                                case State.inAttr:
+                                case State.InAttr:
                                     StartAttr();
                                     break;
-                                case State.inString:
+                                case State.InString:
                                     lastText = string.Empty;
                                     StartString();
                                     break;
-                                case State.inFloat:
+                                case State.InFloat:
                                     lastText = string.Empty;
                                     StartFloat();
                                     break;
-                                case State.inInt:
+                                case State.InInt:
                                     lastText = string.Empty;
                                     StartInt();
                                     break;
-                                case State.inEnum:
+                                case State.InEnum:
                                     lastText = string.Empty;
                                     StartEnum();
                                     break;
@@ -257,38 +257,38 @@ namespace SEE.Utils
                             break;
                         case XmlNodeType.Text:
                             // The text content of a node. (e.g., "this text" in <item>this text</item>
-                            lastText = reader.Value;
+                            lastText = Reader.Value;
                             break;
                         case XmlNodeType.EndElement:
                             // An end element tag (for example, </item> ).
                             EnsureExpectedEndTag();
-                            switch (ToState(reader.Name))
+                            switch (ToState(Reader.Name))
                             {
-                                case State.undefined:
+                                case State.Undefined:
                                     EndUndefined();
                                     break;
-                                case State.inGXL:
+                                case State.InGXL:
                                     EndGXL();
                                     break;
-                                case State.inGraph:
+                                case State.InGraph:
                                     EndGraph();
                                     break;
-                                case State.inNode:
+                                case State.InNode:
                                     EndNode();
                                     break;
-                                case State.inEdge:
+                                case State.InEdge:
                                     EndEdge();
                                     break;
-                                case State.inType:
+                                case State.InType:
                                     EndType();
                                     break;
-                                case State.inAttr:
+                                case State.InAttr:
                                     EndAttr();
                                     break;
-                                case State.inString:
+                                case State.InString:
                                     EndString(lastText);
                                     break;
-                                case State.inFloat:
+                                case State.InFloat:
                                 {
                                     if (lastText == string.Empty)
                                     {
@@ -308,7 +308,7 @@ namespace SEE.Utils
                                     }
                                 }
                                     break;
-                                case State.inInt:
+                                case State.InInt:
                                 {
                                     if (lastText == string.Empty)
                                     {
@@ -328,7 +328,7 @@ namespace SEE.Utils
                                     }
                                 }
                                     break;
-                                case State.inEnum:
+                                case State.InEnum:
                                     EndEnum();
                                     break;
                                 default:
@@ -389,13 +389,13 @@ namespace SEE.Utils
             }
             finally
             {
-                reader.Close();
+                Reader.Close();
             }
 
-            if (context.Count > 0)
+            if (Context.Count > 0)
             {
-                LogError($"XML parser is still expecting input in state {context.Peek()}");
-                throw new SyntaxError($"missing closing {ToString(context.Peek())} tag");
+                LogError($"XML parser is still expecting input in state {Context.Peek()}");
+                throw new SyntaxError($"missing closing {ToString(Context.Peek())} tag");
             }
         }
 
@@ -498,10 +498,10 @@ namespace SEE.Utils
                 if (disposing)
                 {
                     // dispose managed resources
-                    if (reader != null)
+                    if (Reader != null)
                     {
-                        reader.Dispose();
-                        reader = null;
+                        Reader.Dispose();
+                        Reader = null;
                     }
                 }
 
@@ -509,9 +509,9 @@ namespace SEE.Utils
                 // there are none here
 
                 // set larger attributes to null
-                context = null;
-                logger = null;
-                name = null;
+                Context = null;
+                Logger = null;
+                Name = null;
 
                 // this object is now considered disposed
                 disposedValue = true;

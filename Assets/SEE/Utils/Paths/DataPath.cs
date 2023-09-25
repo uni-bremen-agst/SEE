@@ -267,15 +267,15 @@ namespace SEE.Utils.Paths
         /// <summary>
         /// The attribute label for the relative path of a DataPath in the stored configuration file.
         /// </summary>
-        private const string RelativePathLabel = "RelativePath";
+        private const string relativePathLabel = "RelativePath";
         /// <summary>
         /// The attribute label for the absolute path of a DataPath in the stored configuration file.
         /// </summary>
-        private const string AbsolutePathLabel = "AbsolutePath";
+        private const string absolutePathLabel = "AbsolutePath";
         /// <summary>
         /// The attribute label for the root kind of a DataPath in the stored configuration file.
         /// </summary>
-        private const string RootLabel = "Root";
+        private const string rootLabel = "Root";
 
         /// <summary>
         /// Saves the attributes of this <see cref="DataPath"/> using given <paramref name="writer"/>
@@ -286,9 +286,9 @@ namespace SEE.Utils.Paths
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(Root.ToString(), RootLabel);
-            writer.Save(RelativePath, RelativePathLabel);
-            writer.Save(AbsolutePath, AbsolutePathLabel);
+            writer.Save(Root.ToString(), rootLabel);
+            writer.Save(RelativePath, relativePathLabel);
+            writer.Save(AbsolutePath, absolutePathLabel);
             writer.EndGroup();
         }
 
@@ -308,19 +308,19 @@ namespace SEE.Utils.Paths
                 Dictionary<string, object> path = dictionary as Dictionary<string, object>;
                 {
                     string value = "";
-                    if (ConfigIO.Restore(path, RelativePathLabel, ref value))
+                    if (ConfigIO.Restore(path, relativePathLabel, ref value))
                     {
                         RelativePath = value;
                     }
                 }
                 {
                     string value = "";
-                    if (ConfigIO.Restore(path, AbsolutePathLabel, ref value))
+                    if (ConfigIO.Restore(path, absolutePathLabel, ref value))
                     {
                         AbsolutePath = value;
                     }
                 }
-                ConfigIO.RestoreEnum(path, RootLabel, ref Root);
+                ConfigIO.RestoreEnum(path, rootLabel, ref Root);
             }
         }
     }

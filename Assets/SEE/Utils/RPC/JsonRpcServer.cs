@@ -213,7 +213,10 @@ namespace SEE.Utils.RPC
             {
                 try
                 {
-                    if (connection.Rpc == null) return default;
+                    if (connection.Rpc == null)
+                    {
+                        return default;
+                    }
                     return await connection.Rpc.InvokeAsync<T>(targetName, arguments);
                 }
                 catch (Exception e)

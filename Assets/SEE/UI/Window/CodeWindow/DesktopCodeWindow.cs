@@ -204,7 +204,7 @@ namespace SEE.UI.Window.CodeWindow
             RecalculateExcessLines();
 
             // Animate scrollbar to scroll to desired line
-            VisibleLine = Mathf.Clamp(Mathf.FloorToInt(preStartLine), 1, lines);
+            ScrolledVisibleLine = Mathf.Clamp(Mathf.FloorToInt(preStartLine), 1, lines);
         }
 
         /// <summary>

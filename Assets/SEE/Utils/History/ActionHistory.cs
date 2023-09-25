@@ -146,7 +146,7 @@ namespace SEE.Utils.History
         /// <summary>
         /// Whether to synchronize the action history over the network.
         /// </summary>
-        private readonly bool SyncOverNetwork;
+        private readonly bool syncOverNetwork;
 
         /// <summary>
         /// Creates a new <see cref="ActionHistory"/> instance.
@@ -154,7 +154,7 @@ namespace SEE.Utils.History
         /// <param name="syncOverNetwork">whether to synchronize the action history over the network</param>
         public ActionHistory(bool syncOverNetwork = true)
         {
-            SyncOverNetwork = syncOverNetwork;
+            this.syncOverNetwork = syncOverNetwork;
         }
 
         /// <summary>
@@ -232,7 +232,7 @@ namespace SEE.Utils.History
             string actionID = action.GetId();
             HashSet<string> changedObjects = action.GetChangedObjects();
             Push(new GlobalHistoryEntry(true, HistoryType.Action, actionID, changedObjects));
-            if (SyncOverNetwork)
+            if (syncOverNetwork)
             {
                 new NetActionHistory().Push(HistoryType.Action, actionID, changedObjects);
             }
@@ -248,7 +248,7 @@ namespace SEE.Utils.History
         private void RemoveFromGlobalHistory(GlobalHistoryEntry action)
         {
             RemoveAction(action.ActionID);
-            if (SyncOverNetwork)
+            if (syncOverNetwork)
             {
                 new NetActionHistory().Delete(action.ActionID);
             }
@@ -265,7 +265,7 @@ namespace SEE.Utils.History
             {
                 if (globalHistory[i].IsOwner && globalHistory[i].ActionType == HistoryType.UndoneAction)
                 {
-                    if (SyncOverNetwork)
+                    if (syncOverNetwork)
                     {
                         new NetActionHistory().Delete(globalHistory[i].ActionID);
                     }
@@ -306,7 +306,7 @@ namespace SEE.Utils.History
         public void Replace(GlobalHistoryEntry oldItem, GlobalHistoryEntry newItem, bool isNetwork)
         {
             globalHistory[GetIndexOfAction(oldItem.ActionID)] = newItem;
-            if (!isNetwork && SyncOverNetwork)
+            if (!isNetwork && syncOverNetwork)
             {
                 new NetActionHistory().Replace(oldItem.ActionID, oldItem.ActionType, oldItem.ChangedObjects,
                                                newItem.ActionType, newItem.ChangedObjects);
@@ -431,7 +431,7 @@ namespace SEE.Utils.History
 
                     GlobalHistoryEntry undoneAction = new GlobalHistoryEntry(true, HistoryType.UndoneAction, lastAction.ActionID, lastAction.ChangedObjects);
                     Push(undoneAction);
-                    if (SyncOverNetwork)
+                    if (syncOverNetwork)
                     {
                         new NetActionHistory().Push(undoneAction.ActionType, undoneAction.ActionID, undoneAction.ChangedObjects);
                     }
@@ -488,12 +488,12 @@ namespace SEE.Utils.History
                 {
                     GlobalHistoryEntry redoneAction = new GlobalHistoryEntry(true, HistoryType.Action, lastUndoneAction.ActionID, lastUndoneAction.ChangedObjects);
                     RemoveAction(lastUndoneAction.ActionID);
-                    if (SyncOverNetwork)
+                    if (syncOverNetwork)
                     {
                         new NetActionHistory().Delete(lastUndoneAction.ActionID);
                     }
                     Push(redoneAction);
-                    if (SyncOverNetwork)
+                    if (syncOverNetwork)
                     {
                         new NetActionHistory().Push(redoneAction.ActionType, redoneAction.ActionID, redoneAction.ChangedObjects);
                     }

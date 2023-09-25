@@ -11,7 +11,7 @@ namespace SEE.Utils.Config
     /// </summary>
     public abstract class ConfigIO
     {
-        public interface PersistentConfigItem
+        public interface IPersistentConfigItem
         {
             /// <summary>
             /// Saves the configuration attributes by way of the given <paramref name="writer"/>
@@ -137,7 +137,7 @@ namespace SEE.Utils.Config
         /// <param name="value">the value of the looked up <paramref name="label"/> if the <paramref name="label"/>
         /// exists</param>
         /// <returns>true if the <paramref name="label"/> was found</returns>
-        public static bool RestoreList<T>(Dictionary<string, object> attributes, string label, ref IList<T> value) where T : PersistentConfigItem, new()
+        public static bool RestoreList<T>(Dictionary<string, object> attributes, string label, ref IList<T> value) where T : IPersistentConfigItem, new()
         {
             if (attributes.TryGetValue(label, out object v))
             {

@@ -28,15 +28,15 @@ namespace SEE.Utils
         /// <summary>
         /// Number of raycast hits we can store in the buffer for <see cref="RaycastLowestNode"/>.
         /// </summary>
-        private const uint RAYCAST_BUFFER_SIZE = 500;
+        private const uint raycastBufferSize = 500;
 
         /// <summary>
         /// Layer number for game objects representing UI components.
         /// </summary>
-        private const uint UI_LAYER = 5;
+        private const uint uiLayer = 5;
 
         /// <summary>
-        /// Names of game objects which are on the <see cref="UI_LAYER"/>,
+        /// Names of game objects which are on the <see cref="uiLayer"/>,
         /// but won't "count" as UI components, e.g., when checking whether
         /// the user is currently hovering over any UI components.
         /// </summary>
@@ -127,9 +127,9 @@ namespace SEE.Utils
         /// <paramref name="hitNode"/> and <paramref name="raycastHit"/> are defined</returns>
         public static bool RaycastLowestNode(out RaycastHit? raycastHit, out Node hitNode, NodeRef referenceNode = null)
         {
-            RaycastHit[] hits = new RaycastHit[RAYCAST_BUFFER_SIZE];
+            RaycastHit[] hits = new RaycastHit[raycastBufferSize];
             int numberOfHits = Physics.RaycastNonAlloc(UserPointsTo(), hits);
-            if (numberOfHits == RAYCAST_BUFFER_SIZE)
+            if (numberOfHits == raycastBufferSize)
             {
                 Debug.LogWarning("We possibly got more hits than buffer space is available.\n");
             }
@@ -217,7 +217,7 @@ namespace SEE.Utils
             {
                 Assert.IsNotNull(Mouse.current);
                 GameObject lastGameObject = inputModule.GetLastRaycastResult(Mouse.current.deviceId).gameObject;
-                return lastGameObject != null && lastGameObject.layer == UI_LAYER
+                return lastGameObject != null && lastGameObject.layer == uiLayer
                                               && !ignoredUINames.Contains(lastGameObject.name);
             }
         }

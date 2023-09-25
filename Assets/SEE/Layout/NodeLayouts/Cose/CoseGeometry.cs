@@ -390,7 +390,7 @@ namespace SEE.Layout.NodeLayouts.Cose
             //  |________|_______|______|
             //           |       |
             //           |       |
-            // rectA                
+            // rectA
             {
                 overlapAmount[0] += Mathf.Min((rectA.x - rectB.x),
                     (rectB.xMax - rectA.xMax));

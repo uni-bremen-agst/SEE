@@ -4,7 +4,7 @@ using System.Linq;
 using SEE.DataModel.DG;
 using UnityEngine;
 using UnityEngine.Assertions;
-using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
+using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraphs;
 
 namespace SEE.Tools.ReflexionAnalysis
 {
@@ -34,7 +34,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="allowDependenciesToParents">whether descendants may access their ancestors</param>
         public ReflexionGraph(string basePath, string name = "", bool allowDependenciesToParents = true) : base(basePath, name)
         {
-            AllowDependenciesToParents = allowDependenciesToParents;
+            this.allowDependenciesToParents = allowDependenciesToParents;
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace SEE.Tools.ReflexionAnalysis
             // FIXME: This constructor has really bad performance, due to all the copying around in Assemble().
             ArchitectureRoot = aRoot;
             ImplementationRoot = iRoot;
-            AllowDependenciesToParents = allowDependenciesToParents;
+            this.allowDependenciesToParents = allowDependenciesToParents;
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </remarks>
         public ReflexionGraph(Graph fullGraph, bool allowDependenciesToParents = true) : base(fullGraph)
         {
-            AllowDependenciesToParents = allowDependenciesToParents;
+            this.allowDependenciesToParents = allowDependenciesToParents;
             (Graph implementation, Graph architecture, _) = Disassemble();
             ArchitectureRoot = architecture.GetRoots().FirstOrDefault();
             ImplementationRoot = implementation.GetRoots().FirstOrDefault();
@@ -89,40 +89,41 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <see cref="MappingGraph"/> are not <c>null</c> (i.e. have been loaded).
         /// </summary>
         /// <returns>Full graph obtained by combining architecture, implementation and mapping</returns>
-        private static ReflexionGraph Assemble(Graph ArchitectureGraph, Graph ImplementationGraph, Graph MappingGraph, string Name, out Node ArchitectureRoot, out Node ImplementationRoot)
+        private static ReflexionGraph Assemble(Graph architectureGraph, Graph implementationGraph, Graph mappingGraph, 
+            string name, out Node architectureRoot, out Node implementationRoot)
         {
-            if (ImplementationGraph == null || ArchitectureGraph == null || MappingGraph == null)
+            if (implementationGraph == null || architectureGraph == null || mappingGraph == null)
             {
                 throw new ArgumentException("All three sub-graphs must be loaded before generating "
                                             + "the full graph.");
             }
 
             // Add artificial roots if graph has more than one root node, to physically differentiate the two.
-            ArchitectureGraph.AddSingleRoot(out ArchitectureRoot);
-            ImplementationGraph.AddSingleRoot(out ImplementationRoot);
+            architectureGraph.AddSingleRoot(out architectureRoot);
+            implementationGraph.AddSingleRoot(out implementationRoot);
 
             // MappingGraph needn't be labeled, as any remaining/new edge (which must be Maps_To)
             // automatically belongs to it
-            ArchitectureGraph.MarkGraphNodesIn(Architecture);
-            ImplementationGraph.MarkGraphNodesIn(Implementation);
+            architectureGraph.MarkGraphNodesIn(Architecture);
+            implementationGraph.MarkGraphNodesIn(Implementation);
 
             // We need to set all Maps_To edges as virtual so they don't get drawn.
             // (Mapping is indicated by moving the implementation node, not by a separate edge.)
-            foreach (Edge mapsTo in MappingGraph.Edges())
+            foreach (Edge mapsTo in mappingGraph.Edges())
             {
                 Assert.IsTrue(mapsTo.HasSupertypeOf(MapsToType));
                 mapsTo.SetToggle(GraphElement.IsVirtualToggle);
             }
 
             // We set the name for the implementation graph, because its name will be used for the merged graph.
-            ImplementationGraph.Name = Name;
+            implementationGraph.Name = name;
 
             // We merge architecture and implementation first.
             // Duplicate node IDs between architecture and implementation are not allowed.
             // Any duplicate nodes in the mapping graph are merged into the full graph.
             // If there are duplicate edge IDs, try to remedy this by appending a suffix to the edge ID.
-            List<string> nodesOverlap = NodeIntersection(ImplementationGraph, ArchitectureGraph).ToList();
-            List<string> edgesOverlap = EdgeIntersection(ImplementationGraph, ArchitectureGraph).ToList();
+            List<string> nodesOverlap = NodeIntersection(implementationGraph, architectureGraph).ToList();
+            List<string> edgesOverlap = EdgeIntersection(implementationGraph, architectureGraph).ToList();
             string suffix = null;
             if (nodesOverlap.Count > 0)
             {
@@ -136,14 +137,14 @@ namespace SEE.Tools.ReflexionAnalysis
                                  + $"Offending elements: {string.Join(", ", edgesOverlap)}");
             }
 
-            if (ImplementationGraph is not ReflexionGraph)
+            if (implementationGraph is not ReflexionGraph)
             {
-                ImplementationGraph = new ReflexionGraph(ImplementationGraph);
+                implementationGraph = new ReflexionGraph(implementationGraph);
             }
-            ReflexionGraph mergedGraph = ImplementationGraph.MergeWith<ReflexionGraph>(ArchitectureGraph, edgeIdSuffix: suffix);
+            ReflexionGraph mergedGraph = implementationGraph.MergeWith<ReflexionGraph>(architectureGraph, edgeIdSuffix: suffix);
 
             // Then we add the mappings, again checking if any IDs overlap, though node IDs overlapping is fine here.
-            edgesOverlap = EdgeIntersection(mergedGraph, MappingGraph).ToList();
+            edgesOverlap = EdgeIntersection(mergedGraph, mappingGraph).ToList();
             suffix = null;
             if (edgesOverlap.Count > 0)
             {
@@ -152,7 +153,7 @@ namespace SEE.Tools.ReflexionAnalysis
                                  + $"Offending elements: {string.Join(", ", edgesOverlap)}");
             }
 
-            mergedGraph = mergedGraph.MergeWith<ReflexionGraph>(MappingGraph, suffix);
+            mergedGraph = mergedGraph.MergeWith<ReflexionGraph>(mappingGraph, suffix);
             mergedGraph.AddSingleRoot(out Node _);
             return mergedGraph;
 
@@ -179,10 +180,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>3-tuple consisting of (implementation, architecture, mapping) graph</returns>
         public (Graph implementation, Graph architecture, Graph mapping) Disassemble()
         {
-            Graph ImplementationGraph = SubgraphBy(ReflexionGraphTools.IsInImplementation);
-            Graph ArchitectureGraph = SubgraphBy(ReflexionGraphTools.IsInArchitecture);
-            Graph MappingGraph = SubgraphBy(ReflexionGraphTools.IsInMapping);
-            return (ImplementationGraph, ArchitectureGraph, MappingGraph);
+            return (implementation: SubgraphBy(ReflexionGraphTools.IsInImplementation), 
+                    architecture: SubgraphBy(ReflexionGraphTools.IsInArchitecture), 
+                    mapping: SubgraphBy(ReflexionGraphTools.IsInMapping));
         }
 
         #region Overridden Methods
@@ -375,8 +375,8 @@ namespace SEE.Tools.ReflexionAnalysis
             {
                 return base.AddEdge(from, to, type);
             }
-            ReflexionSubgraph fromSub = DetermineSubgraph(from);
-            ReflexionSubgraph toSub = DetermineSubgraph(to);
+            ReflexionSubgraphs fromSub = DetermineSubgraph(from);
+            ReflexionSubgraphs toSub = DetermineSubgraph(to);
             switch (fromSub, toSub)
             {
                 case (Architecture, Architecture):
@@ -428,9 +428,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="element">Non-null node or edge whose subgraph shall be determined</param>
         /// <returns></returns>
-        private static ReflexionSubgraph DetermineSubgraph(GraphElement element)
+        private static ReflexionSubgraphs DetermineSubgraph(GraphElement element)
         {
-            ReflexionSubgraph subgraph = element.GetSubgraph();
+            ReflexionSubgraphs subgraph = element.GetSubgraph();
             if (subgraph != Architecture && subgraph != Implementation && (subgraph != Mapping || element is Node))
             {
                 // No subgraph has been explicitly assigned to this element.
@@ -444,7 +444,7 @@ namespace SEE.Tools.ReflexionAnalysis
                     case Edge edge:
                         {
                             subgraph = DetermineSubgraph(edge.Source);
-                            ReflexionSubgraph target = DetermineSubgraph(edge.Target);
+                            ReflexionSubgraphs target = DetermineSubgraph(edge.Target);
                             if (subgraph == Implementation && target == Architecture)
                             {
                                 // If edge had the MapsTo type, its subgraph would already reflect that.

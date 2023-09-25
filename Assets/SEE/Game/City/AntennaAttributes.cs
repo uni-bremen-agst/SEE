@@ -11,7 +11,7 @@ namespace SEE.Game.City
     /// </summary>
     [Serializable]
     [HideReferenceObjectPicker]
-    public sealed class AntennaAttributes : ConfigIO.PersistentConfigItem
+    public sealed class AntennaAttributes : ConfigIO.IPersistentConfigItem
     {
         /// <summary>
         /// This parameter determines the sections of the antenna.
@@ -23,7 +23,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Saves the settings in the configuration file.
         ///
-        /// Implements <see cref="ConfigIO.PersistentConfigItem.Save(ConfigWriter, string)"/>.
+        /// Implements <see cref="ConfigIO.IPersistentConfigItem.Save(ConfigWriter, string)"/>.
         /// </summary>
         /// <param name="writer">to be used for writing the settings</param>
         /// <param name="label">the outer label grouping the settings</param>
@@ -39,7 +39,7 @@ namespace SEE.Game.City
         /// The latter must be the label under which the settings were grouped, i.e., the same
         /// value originally passed in <see cref="Save(ConfigWriter, string)"/>.
         ///
-        /// Implements <see cref="ConfigIO.PersistentConfigItem.Save(ConfigWriter, string)"/>.
+        /// Implements <see cref="ConfigIO.IPersistentConfigItem.Save(ConfigWriter, string)"/>.
         /// </summary>
         /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
         /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>

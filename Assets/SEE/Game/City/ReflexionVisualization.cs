@@ -335,7 +335,7 @@ namespace SEE.Game.City
             // mapped. Other additions or removals are of no relevance here and are handled as usual.
             switch (edgeEvent.Change, edgeEvent.Affected)
             {
-                case (ChangeType.Addition, ReflexionSubgraph.Mapping):
+                case (ChangeType.Addition, ReflexionSubgraphs.Mapping):
                     HandleNewMapping(edgeEvent.Edge);
                     break;
             }

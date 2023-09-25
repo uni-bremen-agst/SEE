@@ -11,7 +11,7 @@ namespace SEE.Game.City
     /// A mapping of node types onto <see cref="VisualNodeAttributes"/>.
     /// </summary>
     [Serializable]
-    public class NodeTypeVisualsMap : ConfigIO.PersistentConfigItem, IEnumerable<KeyValuePair<string, VisualNodeAttributes>>
+    public class NodeTypeVisualsMap : ConfigIO.IPersistentConfigItem, IEnumerable<KeyValuePair<string, VisualNodeAttributes>>
     {
         /// <summary>
         /// Mapping of node type name onto <see cref="VisualNodeAttributes"/>.

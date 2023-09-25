@@ -30,7 +30,7 @@ namespace SEE.UI.Window
         /// <summary>
         /// Path to the window canvas prefab.
         /// </summary>
-        private const string WINDOW_PREFAB = "Prefabs/UI/BaseWindow";
+        private const string windowPrefab = "Prefabs/UI/BaseWindow";
 
         protected override void StartDesktop()
         {
@@ -40,7 +40,7 @@ namespace SEE.UI.Window
                 return;
             }
 
-            Window = PrefabInstantiator.InstantiatePrefab(WINDOW_PREFAB, Canvas.transform, false);
+            Window = PrefabInstantiator.InstantiatePrefab(windowPrefab, Canvas.transform, false);
             Window.name = Title;
 
             // Position code window in center of screen

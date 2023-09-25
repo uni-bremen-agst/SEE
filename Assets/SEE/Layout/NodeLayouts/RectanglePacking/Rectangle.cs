@@ -13,7 +13,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         public Vector2 Size;
 
         /// <summary>
-        /// Position of the rectangle relative to the origin, i.e., the left upper corner 
+        /// Position of the rectangle relative to the origin, i.e., the left upper corner
         /// of the original available space.
         /// </summary>
         public Vector2 Position;

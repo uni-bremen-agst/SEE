@@ -82,7 +82,7 @@ namespace SEE.Net
         /// available only during run-time.
         /// </summary>
         /// <returns>underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/></returns>
-        private UnityTransport GetNetworkTransport()
+        private static UnityTransport GetNetworkTransport()
         {
             NetworkManager networkManager = GetNetworkManager();
             NetworkConfig networkConfig = networkManager.NetworkConfig;
@@ -344,7 +344,7 @@ namespace SEE.Net
         /// Enables/disables Dissonance as the voice chat system.
         /// </summary>
         /// <param name="enable">whether to enable Dissonance</param>
-        private void EnableDissonance(bool enable)
+        private static void EnableDissonance(bool enable)
         {
             // The DissonanceComms is initially active and the local player is not muted and not deafened.
             DissonanceComms dissonanceComms = FindObjectOfType<DissonanceComms>(includeInactive: true);
@@ -434,7 +434,7 @@ namespace SEE.Net
                         ulong id = ulong.MaxValue;
                         if (HostServer && Server.Connections.Contains(connection))
                         {
-                            id = Server.outgoingPacketSequenceIDs[connection]++;
+                            id = Server.OutgoingPacketSequenceIDs[connection]++;
                         }
                         else if (Client.Connection.Equals(connection))
                         {
@@ -530,7 +530,7 @@ namespace SEE.Net
         /// </summary>
         /// <param name="connection">The connection.</param>
         /// <param name="serializedPacket">The serialized packet to be sent.</param>
-        private void Send(Connection connection, string serializedPacket)
+        private static void Send(Connection connection, string serializedPacket)
         {
             string packetType = Client.Connection.Equals(connection) ? Server.PacketType : Client.PacketType;
 
@@ -955,27 +955,27 @@ namespace SEE.Net
         /// <summary>
         /// Label of attribute <see cref="ServerActionPort"/> in the configuration file.
         /// </summary>
-        private const string ServerActionPortLabel = "serverActionPort";
+        private const string serverActionPortLabel = "serverActionPort";
         /// <summary>
         /// Label of attribute <see cref="loadCityOnStart"/> in the configuration file.
         /// </summary>
-        private const string LoadCityOnStartLabel = "loadCityOnStart";
+        private const string loadCityOnStartLabel = "loadCityOnStart";
         /// <summary>
         /// Label of attribute <see cref="GameScene"/> in the configuration file.
         /// </summary>
-        private const string GameSceneLabel = "gameScene";
+        private const string gameSceneLabel = "gameScene";
         /// <summary>
         /// Label of attribute <see cref="VoiceChat"/> in the configuration file.
         /// </summary>
-        private const string VoiceChatLabel = "voiceChat";
+        private const string voiceChatLabel = "voiceChat";
         /// <summary>
         /// Label of attribute <see cref="ServerPort"/> in the configuration file.
         /// </summary>
-        private const string ServerPortLabel = "serverPort";
+        private const string serverPortLabel = "serverPort";
         /// <summary>
         /// Label of attribute <see cref="ServerIP4Address"/> in the configuration file.
         /// </summary>
-        private const string ServerIP4AddressLabel = "serverIP4Address";
+        private const string serverIP4AddressLabel = "serverIP4Address";
 
         /// <summary>
         /// Saves the settings of this network configuration to <paramref name="filename"/>.
@@ -1010,12 +1010,12 @@ namespace SEE.Net
         /// <param name="writer">the writer to be used to save the settings</param>
         protected virtual void Save(ConfigWriter writer)
         {
-            writer.Save(ServerActionPort, ServerActionPortLabel);
-            writer.Save(loadCityOnStart, LoadCityOnStartLabel);
-            writer.Save(GameScene, GameSceneLabel);
-            writer.Save(VoiceChat.ToString(), VoiceChatLabel);
-            writer.Save(ServerPort, ServerPortLabel);
-            writer.Save(ServerIP4Address, ServerIP4AddressLabel);
+            writer.Save(ServerActionPort, serverActionPortLabel);
+            writer.Save(loadCityOnStart, loadCityOnStartLabel);
+            writer.Save(GameScene, gameSceneLabel);
+            writer.Save(VoiceChat.ToString(), voiceChatLabel);
+            writer.Save(ServerPort, serverPortLabel);
+            writer.Save(ServerIP4Address, serverIP4AddressLabel);
         }
 
         /// <summary>
@@ -1024,18 +1024,18 @@ namespace SEE.Net
         /// <param name="attributes">the attributes from which to restore the settings</param>
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
-            ConfigIO.Restore(attributes, ServerActionPortLabel, ref ServerActionPort);
-            ConfigIO.Restore(attributes, LoadCityOnStartLabel, ref loadCityOnStart);
-            ConfigIO.Restore(attributes, GameSceneLabel, ref GameScene);
-            ConfigIO.RestoreEnum(attributes, VoiceChatLabel, ref VoiceChat);
+            ConfigIO.Restore(attributes, serverActionPortLabel, ref ServerActionPort);
+            ConfigIO.Restore(attributes, loadCityOnStartLabel, ref loadCityOnStart);
+            ConfigIO.Restore(attributes, gameSceneLabel, ref GameScene);
+            ConfigIO.RestoreEnum(attributes, voiceChatLabel, ref VoiceChat);
             {
                 int value = ServerPort;
-                ConfigIO.Restore(attributes, ServerPortLabel, ref value);
+                ConfigIO.Restore(attributes, serverPortLabel, ref value);
                 ServerPort = value;
             }
             {
                 string value = ServerIP4Address;
-                ConfigIO.Restore(attributes, ServerIP4AddressLabel, ref value);
+                ConfigIO.Restore(attributes, serverIP4AddressLabel, ref value);
                 ServerIP4Address = value;
             }
         }

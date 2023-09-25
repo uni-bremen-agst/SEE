@@ -103,13 +103,13 @@ namespace SEE.Tools.FaceCam
         /// <summary>
         /// This is the final maximum height of the FaceCam.
         /// </summary>
-        private const float MaxHeight = 0.24f;
+        private const float maxHeight = 0.24f;
 
         /// <summary>
         /// This seems to be the maximum size for files in bytes to be sent over the network.
         /// (No documentation found regarding this limitation).
         /// </summary>
-        private const int MaximumNetworkByteSize = 32768;
+        private const int maximumNetworkByteSize = 32768;
 
         /// <summary>
         /// The webcam texture to mat helper from the WebCamTextureToMatHelperExample.
@@ -143,11 +143,11 @@ namespace SEE.Tools.FaceCam
         /// </summary>
         [SerializeField, FormerlySerializedAs("Face tracking speed"),
             Tooltip("Set the speed which the face tracking will use to follow the face if it detects one.")]
-        public float _MoveStartSpeed;
+        private float moveStartSpeed;
         public float MoveStartSpeed
         {
-            get => _MoveStartSpeed;
-            set => _MoveStartSpeed = Mathf.Abs(value);
+            get => moveStartSpeed;
+            set => moveStartSpeed = Mathf.Abs(value);
         }
 
         /// <summary>
@@ -155,11 +155,11 @@ namespace SEE.Tools.FaceCam
         /// </summary>
         [SerializeField, FormerlySerializedAs("Face tracking acceleration"),
             Tooltip("Set the acceleration which occurs after the face tracking found a face.")]
-        public float _MoveAcceleration;
+        private float moveAcceleration;
         public float MoveAcceleration
         {
-            get => _MoveAcceleration;
-            set => _MoveAcceleration = Mathf.Abs(value);
+            get => moveAcceleration;
+            set => moveAcceleration = Mathf.Abs(value);
         }
 
         /// <summary>
@@ -178,24 +178,24 @@ namespace SEE.Tools.FaceCam
         /// <summary>
         /// The on/off state of the FaceCam.
         /// </summary>
-        private bool FaceCamOn;
+        private bool faceCamOn;
 
         /// <summary>
         /// The state of the position of the FaceCam.
         /// Can be on front of the face or above the face, tilted to the observer.
         /// </summary>
-        private bool FaceCamOnFront = true;
+        private bool faceCamOnFront = true;
 
         /// <summary>
         /// The mesh renderer of the FaceCam, used to hide it.
         /// </summary>
-        public MeshRenderer MeshRenderer;
+        private MeshRenderer meshRenderer;
 
         /// <summary>
         /// The material of the FaceCam, its texture displaying a default picture, or
         /// the face of the user.
         /// </summary>
-        private Material MainMaterial;
+        private Material mainMaterial;
 
         /// <summary>
         /// A timer used to ensure the frame rate of the video transmitted over the network.
@@ -214,11 +214,11 @@ namespace SEE.Tools.FaceCam
         /// </summary>
         [SerializeField, FormerlySerializedAs("Network FPS"),
             Tooltip("Set the frame rate of the video which will be transmitted over the Network.")]
-        protected float _NetworkFPS;
-        public float networkFPS
+        private float networkFPS;
+        public float NetworkFPS
         {
-            get => _NetworkFPS;
-            set => _NetworkFPS = Mathf.Clamp(value, 1, float.MaxValue);
+            get => networkFPS;
+            set => networkFPS = Mathf.Clamp(value, 1, float.MaxValue);
         }
 
 
@@ -248,7 +248,7 @@ namespace SEE.Tools.FaceCam
         {
             // The network FPS is used to calculate everything needed to send the video
             // at the specified frame rate.
-            networkVideoDelay = 1f / networkFPS;
+            networkVideoDelay = 1f / NetworkFPS;
 
             // This is the size of the FaceCam at the start
             transform.localScale = new Vector3(0.2f, 0.2f, -1); // z = -1 to face away from the player.
@@ -273,7 +273,7 @@ namespace SEE.Tools.FaceCam
 
             // Cache the material of the FaceCam to change its texture later. (Display a default
             // picture or the face of the user).
-            MainMaterial = MeshRenderer.material;
+            mainMaterial = meshRenderer.material;
         }
 
         /// <summary>
@@ -352,7 +352,7 @@ namespace SEE.Tools.FaceCam
         /// Raises the web cam texture to mat helper error occurred event.
         /// </summary>
         /// <param name="errorCode">Error code.</param>
-        public void OnWebCamTextureToMatHelperErrorOccurred(WebCamTextureToMatHelper.ErrorCode errorCode)
+        public static void OnWebCamTextureToMatHelperErrorOccurred(WebCamTextureToMatHelper.ErrorCode errorCode)
         {
             Debug.LogError($"OnWebCamTextureToMatHelperErrorOccurred {errorCode}\n");
         }
@@ -379,10 +379,10 @@ namespace SEE.Tools.FaceCam
                 // Switch the FaceCam on or off.
                 if (SEEInput.ToggleFaceCam())
                 {
-                    FaceCamOnOffServerRpc(FaceCamOn);
+                    FaceCamOnOffServerRpc(faceCamOn);
                 }
 
-                if (FaceCamOn)
+                if (faceCamOn)
                 {
                     // The local video is displayed.
                     DisplayLocalVideo();
@@ -444,21 +444,21 @@ namespace SEE.Tools.FaceCam
                 if (rectFound)
                 {
                     // Dimensions of the new found face.
-                    int NextRectX = Mathf.RoundToInt(mainRect.x);
-                    int NextRectY = Mathf.RoundToInt(mainRect.y);
-                    int NextRectWidth = Mathf.RoundToInt(mainRect.width);
-                    int NextRectHeight = Mathf.RoundToInt(mainRect.height);
+                    int nextRectX = Mathf.RoundToInt(mainRect.x);
+                    int nextRectY = Mathf.RoundToInt(mainRect.y);
+                    int nextRectWidth = Mathf.RoundToInt(mainRect.width);
+                    int nextRectHeight = Mathf.RoundToInt(mainRect.height);
 
                     // calculate the space over and under the detected head to make it fully visible.
-                    int SpaceAbove = NextRectHeight / 2;
-                    int SpaceBelow = NextRectHeight / 6;
+                    int spaceAbove = nextRectHeight / 2;
+                    int spaceBelow = nextRectHeight / 6;
 
                     // Add the Space above and below to the dimension of the cropped texture.
-                    int nextCutoutTextureX = NextRectX;
+                    int nextCutoutTextureX = nextRectX;
                     // Because texture and rect do not both use y the same way, it needs to be converted.
-                    int nextCutoutTextureY = Math.Max(0, texture.height - NextRectY - NextRectHeight - SpaceBelow);
-                    int nextCutoutTextureWidth = NextRectWidth;
-                    int nextCutoutTextureHeight = NextRectHeight + SpaceAbove + SpaceBelow;
+                    int nextCutoutTextureY = Math.Max(0, texture.height - nextRectY - nextRectHeight - spaceBelow);
+                    int nextCutoutTextureWidth = nextRectWidth;
+                    int nextCutoutTextureHeight = nextRectHeight + spaceAbove + spaceBelow;
 
                     // If the new texture is outside of the original webcam texture, remove the extra space.
                     if (nextCutoutTextureY + nextCutoutTextureHeight > texture.height)
@@ -471,9 +471,9 @@ namespace SEE.Tools.FaceCam
                     }
 
                     // This is the distance which will be ignored, if a face moves.
-                    int rectMoveOffset = NextRectWidth / 11;
+                    int rectMoveOffset = nextRectWidth / 11;
                     // This is the distance which means the face is at a completely new position.
-                    int rectPositionOffset = NextRectWidth;
+                    int rectPositionOffset = nextRectWidth;
 
                     // Reset the interpolation factor if the cropped texture already is at the face,
                     // or otherwise if the face moves a significant amount.
@@ -511,7 +511,7 @@ namespace SEE.Tools.FaceCam
                     // Calculate the interpolation factor for the next frame.
                     // If the new rectangle is further away than the actual cropped texture plus half the size of the rectangle,
                     // move faster towards the rectangle.
-                    if (distancePosition >= NextRectWidth / 2.0 || distanceSize >= NextRectWidth / 2.0)
+                    if (distancePosition >= nextRectWidth / 2.0 || distanceSize >= nextRectWidth / 2.0)
                     {
                         faceTrackingSpeed += MoveAcceleration * Time.deltaTime;
                     }
@@ -527,7 +527,7 @@ namespace SEE.Tools.FaceCam
 
                     // Apply the cutout texture size to the FacCam prefab.
                     // The size is way to big, so it needs to be reduced. A maximum height is used.
-                    float divisor = croppedTextureHeight / MaxHeight;
+                    float divisor = croppedTextureHeight / maxHeight;
                     transform.localScale = new Vector3(croppedTextureWidth / divisor, croppedTextureHeight / divisor, -1);
                 }
 
@@ -538,7 +538,7 @@ namespace SEE.Tools.FaceCam
                 croppedTexture.Apply();
 
                 // Renders the cutout texture onto the FaceCam.
-                MainMaterial.mainTexture = croppedTexture;
+                mainMaterial.mainTexture = croppedTexture;
             }
         }
 
@@ -546,7 +546,7 @@ namespace SEE.Tools.FaceCam
         private void LateUpdate()
         {
             // Refresh the position of the FaceCam.
-            if (FaceCamOn)
+            if (faceCamOn)
             {
                 RefreshFaceCamPosition();
             }
@@ -562,7 +562,7 @@ namespace SEE.Tools.FaceCam
             // Switch the position of the FaceCam.
             if (SEEInput.ToggleFaceCamPosition())
             {
-                FaceCamOnFrontToggleServerRpc(FaceCamOnFront);
+                FaceCamOnFrontToggleServerRpc(faceCamOnFront);
             }
 
             // Calculate the position of the FaceCam
@@ -571,7 +571,7 @@ namespace SEE.Tools.FaceCam
             {
                 // Put it where the players face is.
                 transform.SetPositionAndRotation(playersFace.position, playersFace.rotation);
-                if (FaceCamOnFront)
+                if (faceCamOnFront)
                 {
                     // Rotate and move it a bit up and a bit forward.
                     transform.Rotate(0, -90, -90); // To face away from the avatars face.
@@ -601,9 +601,9 @@ namespace SEE.Tools.FaceCam
         /// Tell the server to toggle the FaceCam on off state of all clients.
         /// </summary>
         [ServerRpc(RequireOwnership = false)]
-        private void FaceCamOnOffServerRpc(bool NetworkFaceCamOn) {
+        private void FaceCamOnOffServerRpc(bool networkFaceCamOn) {
             // Toggle the FaceCam on off state of all clients.
-            FaceCamOnOffClientRpc(NetworkFaceCamOn);
+            FaceCamOnOffClientRpc(networkFaceCamOn);
         }
 
         /// <summary>
@@ -611,12 +611,12 @@ namespace SEE.Tools.FaceCam
         /// (Can only be used by the server).
         /// </summary>
         [ClientRpc]
-        private void FaceCamOnOffClientRpc(bool NetworkFaceCamOn)
+        private void FaceCamOnOffClientRpc(bool networkFaceCamOn)
         {
             // NetworkFaceCamOn, resp. FaceCamOn has the value which should be inverted.
-            if (FaceCamOn == NetworkFaceCamOn)
+            if (faceCamOn == networkFaceCamOn)
             {
-                FaceCamOn = !FaceCamOn;
+                faceCamOn = !faceCamOn;
                 FaceCamOnOffToggle();
             }
         }
@@ -625,7 +625,7 @@ namespace SEE.Tools.FaceCam
         /// Toggle the FaceCam on off state.
         /// </summary>
         private void FaceCamOnOffToggle() {
-            if (FaceCamOn)
+            if (faceCamOn)
             {
                 webCamTextureToMatHelper.Play();
             }
@@ -634,16 +634,16 @@ namespace SEE.Tools.FaceCam
                 webCamTextureToMatHelper.Stop();
             }
             // Hide the FaceCam if it's deactivated.
-            MeshRenderer.enabled = FaceCamOn;
+            meshRenderer.enabled = faceCamOn;
         }
 
         /// <summary>
         /// Tell the server to toggle the FaceCam position of all clients.
         /// </summary>
         [ServerRpc(RequireOwnership = false)]
-        private void FaceCamOnFrontToggleServerRpc(bool NetworkFaceCamOnFront)
+        private void FaceCamOnFrontToggleServerRpc(bool networkFaceCamOnFront)
         {
-            FaceCamOnFrontToggleClientRpc(NetworkFaceCamOnFront);
+            FaceCamOnFrontToggleClientRpc(networkFaceCamOnFront);
         }
 
         /// <summary>
@@ -651,11 +651,11 @@ namespace SEE.Tools.FaceCam
         /// (Can only be used by the server).
         /// </summary
         [ClientRpc]
-        private void FaceCamOnFrontToggleClientRpc(bool NetworkFaceCamOnFront)
+        private void FaceCamOnFrontToggleClientRpc(bool networkFaceCamOnFront)
         {
-            if (FaceCamOnFront == NetworkFaceCamOnFront)
+            if (faceCamOnFront == networkFaceCamOnFront)
             {
-                FaceCamOnFront = !FaceCamOnFront;
+                faceCamOnFront = !faceCamOnFront;
             }
         }
 
@@ -665,7 +665,7 @@ namespace SEE.Tools.FaceCam
         [ServerRpc(RequireOwnership = false)]
         private void GetFaceCamStatusServerRpc()
         {
-            SetFaceCamStatusClientRpc(FaceCamOn, FaceCamOnFront);
+            SetFaceCamStatusClientRpc(faceCamOn, faceCamOnFront);
         }
 
         /// <summary>
@@ -673,9 +673,9 @@ namespace SEE.Tools.FaceCam
         /// (Can only be used by the server).
         /// </summary
         [ClientRpc]
-        private void SetFaceCamStatusClientRpc(bool FaceCamOn, bool FaceCamOnFront) {
-            this.FaceCamOn = FaceCamOn;
-            this.FaceCamOnFront = FaceCamOnFront;
+        private void SetFaceCamStatusClientRpc(bool faceCamOn, bool faceCamOnFront) {
+            this.faceCamOn = faceCamOn;
+            this.faceCamOnFront = faceCamOnFront;
             // Make the FaceCam visible/invisible and/or start/stop it.
             FaceCamOnOffToggle();
         }
@@ -716,7 +716,7 @@ namespace SEE.Tools.FaceCam
             // Converts the texture to an byte array containing an JPG.
             byte[] networkTexture = croppedTexture.EncodeToJPG();
             // Only return the array if it's not too big.
-            if (networkTexture != null && networkTexture.Length <= MaximumNetworkByteSize)
+            if (networkTexture != null && networkTexture.Length <= maximumNetworkByteSize)
             {
                 return networkTexture;
             }
@@ -758,7 +758,7 @@ namespace SEE.Tools.FaceCam
         private void RenderNetworkFrameOnFaceCam(byte[] videoFrame)
         {
             croppedTexture.LoadImage(videoFrame);
-            MainMaterial.mainTexture = croppedTexture;
+            mainMaterial.mainTexture = croppedTexture;
         }
 
         /// <summary>

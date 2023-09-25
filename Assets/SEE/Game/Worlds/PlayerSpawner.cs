@@ -137,7 +137,7 @@ namespace SEE.Game.Worlds
         /// Emits that the client with given <paramref name="networkID"/> has disconnected.
         /// </summary>
         /// <param name="networkID">the network ID of the disconnecting client</param>
-        private void ClientDisconnects(ulong networkID)
+        private static void ClientDisconnects(ulong networkID)
         {
             Debug.Log($"Player with ID {networkID} (local: {IsLocal(networkID)}) disconnects.\n");
         }
