@@ -26,7 +26,7 @@ using Cysharp.Threading.Tasks;
 using StreamRpc;
 using UnityEngine;
 
-namespace SEE.Utils.RPC
+namespace SEE.Utils.IdeRPC
 {
     /// <summary>
     /// Represents a unique client connection. Contains the underlying <see cref="JsonRpc"/>

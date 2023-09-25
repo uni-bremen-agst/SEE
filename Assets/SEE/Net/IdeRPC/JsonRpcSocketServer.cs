@@ -29,7 +29,7 @@ using Cysharp.Threading.Tasks;
 using StreamRpc;
 using UnityEngine;
 
-namespace SEE.Utils.RPC
+namespace SEE.Utils.IdeRPC
 {
     /// <summary>
     /// The implementation of JsonRpcServer that will use <see cref="TcpListener"/>.

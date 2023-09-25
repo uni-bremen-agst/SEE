@@ -26,7 +26,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-namespace SEE.Utils.RPC
+namespace SEE.Utils.IdeRPC
 {
     /// <summary>
     /// The base class of the inter-process communication implementation for

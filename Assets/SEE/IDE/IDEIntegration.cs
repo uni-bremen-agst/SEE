@@ -36,9 +36,9 @@ using SEE.Game.City;
 using SEE.UI.Notification;
 using SEE.GO;
 using SEE.Utils;
-using SEE.Utils.RPC;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using SEE.Utils.IdeRPC;
 
 namespace SEE.IDE
 {
