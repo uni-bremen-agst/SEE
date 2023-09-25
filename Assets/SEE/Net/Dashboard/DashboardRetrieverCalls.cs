@@ -22,10 +22,10 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// Retrieves dashboard information from the dashboard configured for this <see cref="DashboardRetriever"/>.
         /// IMPORTANT NOTE: This will only work if your token has full permissions, i.e., when it's not just
-        /// an IDE token. If you simply want to retrieve the dashboard version, use
+        /// an IDE token. If you simply want to retrieve the dashboard version, use ... FIXME: how does this sentence continue?
         /// </summary>
         /// <returns>Dashboard information about the queried dashboard.</returns>
-        public async UniTask<DashboardInfo> GetDashboardInfo() => await QueryDashboard<DashboardInfo>("/../../", apiPath: false);
+        public async UniTask<DashboardInfo> GetDashboardInfo() => await QueryDashboard<DashboardInfo>("../../", apiPath: false);
 
         /// <summary>
         /// Returns the version number of the dashboard that's being queried.
@@ -201,12 +201,13 @@ namespace SEE.Net.Dashboard
 
         /// <summary>
         /// Queries a <paramref name="metric"/> for a particular <paramref name="entity"/>.
+        /// If the <paramref name="entity"/> does not exist, the metric values will be <c>null</c>.
         /// </summary>
         /// <param name="entity">The Entity ID to fetch the values for.</param>
         /// <param name="metric">The Metric ID to fetch the values for.</param>
         /// <param name="start">The result Version range start specifier.</param>
         /// <param name="end">The result Version range end (inclusive) specifier.</param>
-        /// <returns></returns>
+        /// <returns>the <paramref name="metric"/> value range for the <paramref name="entity"/></returns>
         public async UniTask<MetricValueRange> GetMetricValueRange(string entity, string metric, string start = null,
                                                                    string end = null) =>
             await QueryDashboard<MetricValueRange>("/queryMetricValueRange", new[] {entity, metric, start, end});
