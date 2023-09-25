@@ -12,6 +12,12 @@ namespace SEE.Net.Dashboard.Model
     public class DashboardInfo
     {
         /// <summary>
+        /// The complete dashboard base URL.
+        /// </summary>
+        [JsonProperty(PropertyName = "mainUrl", Required = Required.Always)]
+        public readonly string MainUrl;
+
+        /// <summary>
         /// Axivion Dashboard version serving this API.
         /// </summary>
         [JsonProperty(PropertyName = "dashboardVersion", Required = Required.Always)]
@@ -62,6 +68,12 @@ namespace SEE.Net.Dashboard.Model
         public readonly string CheckCredentialsUrl;
 
         /// <summary>
+        /// Endpoint for managing global named filters.
+        /// </summary>
+        [JsonProperty(PropertyName = "namedFiltersUrl", Required = Required.Always)]
+        public readonly string NamedFiltersUrl;
+
+        /// <summary>
         /// List of references to the projects visible to the authenticated user.
         /// </summary>
         [JsonProperty(PropertyName = "projects", Required = Required.Always)]
@@ -72,6 +84,24 @@ namespace SEE.Net.Dashboard.Model
         /// </summary>
         [JsonProperty(PropertyName = "userApiTokenUrl", Required = Required.Always)]
         public readonly string UserApiTokenUrl;
+
+        /// <summary>
+        /// Endpoint for managing custom named filters of the current user.
+        /// </summary>
+        [JsonProperty(PropertyName = "userNamedFiltersUrl", Required = Required.Always)]
+        public readonly string UserNamedFiltersUrl;
+
+        /// <summary>
+        /// E-mail address for support requests.
+        /// </summary>
+        [JsonProperty(PropertyName = "supportAddress", Required = Required.Always)]
+        public readonly string SupportAddress;
+
+        /// <summary>
+        /// A host-relative URL that can be used to display filter-help meant for humans.
+        /// </summary>
+        [JsonProperty(PropertyName = "issueFilterHelp", Required = Required.Always)]
+        public readonly string IssueFilterHelp;
 
         public DashboardInfo(string dashboardVersion, string dashboardVersionNumber, string dashboardBuildDate,
                              string username, string csrfTokenHeader, string csrfToken, string checkCredentialsUrl,

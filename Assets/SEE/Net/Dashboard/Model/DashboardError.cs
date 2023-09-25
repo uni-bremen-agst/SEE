@@ -37,6 +37,20 @@ namespace SEE.Net.Dashboard.Model
         public readonly string LocalizedMessage;
 
         /// <summary>
+        /// The email address for Axivion support.
+        /// </summary>
+        [JsonProperty(PropertyName = "supportAddress")]
+        public readonly string SupportAddress;
+
+        /// <summary>
+        /// If this is true, this is an indication by the server, that this error is probably a bug
+        /// on server-side and clients are encouraged to encourage users to escalate this problem,
+        /// e.g. using supportAddress.
+        /// </summary>
+        [JsonProperty(PropertyName = "displayServerBugHint")]
+        public readonly string DisplayServerBugHint;
+
+        /// <summary>
         /// Optional field containing additional error information meant for automatic processing.
         /// This data is meant for helping software that uses the API to better
         /// understand and communicate certain types of error to the user.
