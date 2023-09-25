@@ -104,11 +104,11 @@ namespace SEE.Net
         private static NetworkManager GetNetworkManager()
         {
 #if UNITY_EDITOR
-            const string NetworkManagerName = "NetworkManager";
-            GameObject networkManagerGO = GameObject.Find(NetworkManagerName);
+            const string metworkManagerName = "NetworkManager";
+            GameObject networkManagerGO = GameObject.Find(metworkManagerName);
             if (networkManagerGO == null)
             {
-                throw new Exception($"The scene currently opened in the editor does not have a game object {NetworkManagerName}.");
+                throw new Exception($"The scene currently opened in the editor does not have a game object {metworkManagerName}.");
             }
             if (networkManagerGO.TryGetComponentOrLog(out NetworkManager result))
             {
@@ -116,7 +116,7 @@ namespace SEE.Net
             }
             else
             {
-                throw new Exception($"The game object {NetworkManagerName} in the scene currently opened in the editor does not have a component {nameof(NetworkManager)}.");
+                throw new Exception($"The game object {metworkManagerName} in the scene currently opened in the editor does not have a component {nameof(NetworkManager)}.");
             }
 #else
             // NetworkManager.Singleton is available only during run-time.
@@ -172,26 +172,26 @@ namespace SEE.Net
         /// <summary>
         /// Name of the Inspector foldout group for the logging setttings.
         /// </summary>
-        private const string LoggingFoldoutGroup = "Logging";
+        private const string loggingFoldoutGroup = "Logging";
 
         /// <summary>
         /// Whether the internal logging should be enabled.
         /// </summary>
-        [SerializeField, FoldoutGroup(LoggingFoldoutGroup)]
+        [SerializeField, FoldoutGroup(loggingFoldoutGroup)]
         [PropertyTooltip("Whether the network logging should be enabled.")]
         private bool internalLoggingEnabled = true;
 
         /// <summary>
         /// The minimal logged severity.
         /// </summary>
-        [SerializeField, FoldoutGroup(LoggingFoldoutGroup)]
+        [SerializeField, FoldoutGroup(loggingFoldoutGroup)]
         [PropertyTooltip("The minimal logged severity.")]
         private NetworkCommsLogger.Severity minimalSeverity = defaultSeverity;
 
         /// <summary>
         /// Whether the logging of NetworkComms should be enabled.
         /// </summary>
-        [SerializeField, FoldoutGroup(LoggingFoldoutGroup), LabelText("NetworkComms Logging")]
+        [SerializeField, FoldoutGroup(loggingFoldoutGroup), LabelText("NetworkComms Logging")]
         [PropertyTooltip("Whether the NetworkComms logging should be enabled. NetworkComms is the third-party network component used by SEE.")]
         private bool networkCommsLoggingEnabled = false;
 
