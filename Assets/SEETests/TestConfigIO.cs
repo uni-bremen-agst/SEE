@@ -182,9 +182,10 @@ namespace SEE.Utils
         {
             Dictionary<string, object> expected = new()
             {
-                { "attr", new() }
+                { "attr", new Dictionary<string, object>() }
             };
-            CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("attr : { };"));
+            Dictionary<string, object> actual = ConfigReader.Parse("attr : { };");
+            CollectionAssert.AreEquivalent(expected, actual);
         }
 
         [Test]
@@ -203,7 +204,7 @@ namespace SEE.Utils
         {
             Dictionary<string, object> expected = new()
             {
-                { "attr", new Dictionary<string, object>() { { "x", new() } } }
+                { "attr", new Dictionary<string, object>() { { "x", new Dictionary<string, object>() } } }
             };
             CollectionAssert.AreEquivalent(expected, ConfigReader.Parse("attr : { x: {}; };"));
         }
