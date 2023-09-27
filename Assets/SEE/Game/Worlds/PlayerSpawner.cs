@@ -99,9 +99,10 @@ namespace SEE.Game.Worlds
         private int numberOfSpawnedPlayers = 0;
 
         /// <summary>
-        /// Spawns a player using the <see cref="ppyerSpawns"/>.
+        /// Spawns a player using the <see cref="playerSpawns"/>.
         /// </summary>
         /// <param name="owner">the network ID of the owner</param>
+        /// <remarks>This code can be executed only on the server.</remarks>
         private void Spawn(ulong owner)
         {
             int index = numberOfSpawnedPlayers % playerSpawns.Count;
@@ -113,24 +114,47 @@ namespace SEE.Game.Worlds
             Debug.Log($"Spawned {player.name} (network id: {owner}, local: {IsLocal(owner)}) at position {player.transform.position}.\n");
             if (player.TryGetComponent(out NetworkObject net))
             {
+                // By default a newly spawned network Prefab instance is owned by the server
+                // unless otherwise specified.
                 net.SpawnAsPlayerObject(owner, destroyWithScene: true);
+
+                // A network Prefab is any unity Prefab asset that has one NetworkObject
+                // component attached to a GameObject within the prefab. 
+                // player is a network Prefab, i.e., it has a NetworkObject attached to it.
+                // More commonly, the NetworkObject component is attached to the root GameObject
+                // of the Prefab asset because this allows any child GameObject to have
+                // NetworkBehaviour components automatically assigned to the NetworkObject.
+                // The reason for this is that a NetworkObject component attached to a
+                // GameObject will be assigned (associated with) any NetworkBehaviour components on:
+                //
+                // (1) the same GameObject that the NetworkObject component is attached to
+                // (2) any child or children of the GameObject that the NetworkObject is attached to.
+                //
+                // A caveat of the above two rules is when one of the children GameObjects also
+                // has a NetworkObject component assigned to it (a.k.a. "Nested NetworkObjects").
+                // Nested NetworkObject components aren't permited in network prefabs.
+
+                GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam");
+                faceCam.transform.parent = player.transform;
+#if false // FIXME
+
+#if !PLATFORM_LUMIN || UNITY_EDITOR
+                if (networkManager.IsServer)
+                {
+                    // Netcode uses a server authoritative networking model so spawning netcode objects
+                    // can only be done on a server or host. 
+                    // Add the FaceCam to the player.
+                    GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam");
+                    faceCam.GetComponent<NetworkObject>().Spawn();
+                    faceCam.transform.parent = player.transform;
+                }
+#endif
+#endif
             }
             else
             {
                 Debug.LogError($"Spawned player {player.name} does not have a {typeof(NetworkObject)} component.\n");
             }
-#if !PLATFORM_LUMIN || UNITY_EDITOR
-            if (networkManager.IsServer)
-            {
-                // FIXME: The FaceCam prefab is instantiated only for the player on the server.
-                // That means the FaceCam will work only on the host, but not on any of the clients.
-                // This was noted in issue #633
-                // Add the FaceCam to the player.
-                GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam");
-                faceCam.GetComponent<NetworkObject>().Spawn();
-                faceCam.transform.parent = player.transform;
-            }
-#endif
         }
 
         /// <summary>
