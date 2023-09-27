@@ -279,6 +279,12 @@ namespace SEE.Tools.FaceCam
                     enabled = false;
                 }
             }
+
+            if (!gameObject.TryGetComponentOrLog(out meshRenderer))
+            {
+                gameObject.SetActive(false);
+                return;
+            }
         }
 
         /// <summary>
@@ -298,7 +304,7 @@ namespace SEE.Tools.FaceCam
             // This is the size of the FaceCam at the start
             transform.localScale = new Vector3(0.2f, 0.2f, -1); // z = -1 to face away from the player.
 
-            // For the location of the face of the player we use his his nose. This makes
+            // For the location of the face of the player we use his nose. This makes
             // the FaceCam also aprox. centered to his face.
             playersFace = transform.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase");
 
@@ -319,11 +325,6 @@ namespace SEE.Tools.FaceCam
             // Set the speed of the face tracking.
             faceTrackingSpeed = MoveStartSpeed;
 
-            if (!gameObject.TryGetComponentOrLog(out meshRenderer))
-            {
-                gameObject.SetActive(false);
-                return;
-            }
             // Cache the material of the FaceCam to change its texture later. (Display a default
             // picture or the face of the user).
             mainMaterial = meshRenderer.material;
