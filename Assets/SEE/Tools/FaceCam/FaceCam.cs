@@ -19,7 +19,7 @@ namespace SEE.Tools.FaceCam
     /// an avatar (a local or remote player), which can display a
     /// WebCam image of the tracked face of the user over the network.
     /// It can be switched off, and it can toggle the position between being
-    /// above the player always facing the camera, and the front of the players face.
+    /// above the player always facing the camera, and the front of the player's face.
     /// </summary>
     [RequireComponent(typeof(WebCamTextureToMatHelper))]
     public class FaceCam : NetworkBehaviour
@@ -44,7 +44,11 @@ namespace SEE.Tools.FaceCam
         private ClientRpcParams clientsIdsRpcParams;
 
         /// <summary>
-        /// Id of this Client.
+        /// Network id of this client. After instantiated locally, each NetworkObject is assigned a
+        /// NetworkObjectId that's used to associate NetworkObjects across the network. For example,
+        /// one peer can say "Send this RPC to the object with the NetworkObjectId 103," and everyone
+        /// knows what object it's referring to. A NetworkObject is spawned on a client is when it's
+        /// instantiated and assigned a unique NetworkObjectId.
         /// </summary>
         private ulong ownClientId;
 
@@ -54,7 +58,7 @@ namespace SEE.Tools.FaceCam
         private Texture2D texture;
 
         /// <summary>
-        /// Texture2D of the cropped webcam frame, containing the Face.
+        /// Texture2D of the cropped webcam frame, containing the face.
         /// </summary>
         private Texture2D croppedTexture;
 
@@ -189,7 +193,7 @@ namespace SEE.Tools.FaceCam
         /// <summary>
         /// The mesh renderer of the FaceCam, used to hide it.
         /// </summary>
-        private MeshRenderer meshRenderer;
+        private readonly MeshRenderer meshRenderer;
 
         /// <summary>
         /// The material of the FaceCam, its texture displaying a default picture, or
@@ -221,10 +225,23 @@ namespace SEE.Tools.FaceCam
             set => networkFPS = Mathf.Clamp(value, 1, float.MaxValue);
         }
 
-
-        // Called on Network Spawn before Start.
+        /// <summary>
+        /// Adds the own client id to the server's list of clients to which the video should
+        /// be broadcasted if and only
+        ///
+        /// </summary>
+        /// <remarks>Called on network spawn before Start through NetCode.</remarks>
         public override void OnNetworkSpawn()
         {
+            // IsOwner is true if the local client is the owner of this NetworkObject.
+            // IsServer is true if this code runs on the server. Note: a host can be
+            // a server and a local client at the same time, in which case IsServer
+            // would also be true.
+            // The default NetworkObject.Spawn method assumes server-side ownership,
+            // but the ownership can be transferred to a client (and also returned to
+            // the server again). We do not do that. That is, our server always owns
+            // all network objects.
+
             // Add own ClientId to list of Clients, to which the video should be broadcasted.
             ownClientId = NetworkManager.Singleton.LocalClientId;
             if (!IsServer && !IsOwner)
@@ -232,7 +249,7 @@ namespace SEE.Tools.FaceCam
                 AddClientIdToListServerRPC(ownClientId);
             }
 
-            // Always invoked the base.
+            // Always invoke the base.
             base.OnNetworkSpawn();
         }
 
@@ -281,7 +298,6 @@ namespace SEE.Tools.FaceCam
         /// </summary>
         private void StartupCodeFromWebCamTextureToMatHelperExample()
         {
-
             webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper>();
 
             dlibShapePredictorFileName = DlibFaceLandmarkDetectorExample.DlibFaceLandmarkDetectorExample.dlibShapePredictorFileName;
@@ -601,7 +617,8 @@ namespace SEE.Tools.FaceCam
         /// Tell the server to toggle the FaceCam on off state of all clients.
         /// </summary>
         [ServerRpc(RequireOwnership = false)]
-        private void FaceCamOnOffServerRpc(bool networkFaceCamOn) {
+        private void FaceCamOnOffServerRpc(bool networkFaceCamOn)
+        {
             // Toggle the FaceCam on off state of all clients.
             FaceCamOnOffClientRpc(networkFaceCamOn);
         }
@@ -624,7 +641,8 @@ namespace SEE.Tools.FaceCam
         /// <summary>
         /// Toggle the FaceCam on off state.
         /// </summary>
-        private void FaceCamOnOffToggle() {
+        private void FaceCamOnOffToggle()
+        {
             if (faceCamOn)
             {
                 webCamTextureToMatHelper.Play();
@@ -673,7 +691,8 @@ namespace SEE.Tools.FaceCam
         /// (Can only be used by the server).
         /// </summary
         [ClientRpc]
-        private void SetFaceCamStatusClientRpc(bool faceCamOn, bool faceCamOnFront) {
+        private void SetFaceCamStatusClientRpc(bool faceCamOn, bool faceCamOnFront)
+        {
             this.faceCamOn = faceCamOn;
             this.faceCamOnFront = faceCamOnFront;
             // Make the FaceCam visible/invisible and/or start/stop it.
@@ -779,10 +798,7 @@ namespace SEE.Tools.FaceCam
             }
 
             // Code from the WebCamTextureToMatHelperExample.
-            if (faceLandmarkDetector != null)
-            {
-                faceLandmarkDetector.Dispose();
-            }
+            faceLandmarkDetector?.Dispose();
 
             // Code from the WebCamTextureToMatHelperExample.
 #if UNITY_WEBGL
