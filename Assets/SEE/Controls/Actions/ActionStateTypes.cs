@@ -225,6 +225,12 @@ namespace SEE.Controls.Actions
                     LineSplitAction.CreateReversibleAction,
                     parent: Whiteboard);
 
+            Load =
+                new("Load", "Load one or more drawables.",
+                    Color.yellow.Darker(), "Materials/ModernUIPack/Pencil",
+                    LoadAction.CreateReversibleAction,
+                    parent: Whiteboard);
+
             Erase =
                 new("Erase", "Erase a complete object on a drawable",
                     Color.red, "Materials/ModernUIPack/Pencil",
@@ -275,6 +281,8 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType LayerChanger;
         public readonly static ActionStateType Scale;
         public readonly static ActionStateType LineSplit;
+        public readonly static ActionStateType Load;
+        public readonly static ActionStateType Save;
         public readonly static ActionStateType Erase;
         public readonly static ActionStateType LinePointErase;
         public readonly static ActionStateType Cleaner;
