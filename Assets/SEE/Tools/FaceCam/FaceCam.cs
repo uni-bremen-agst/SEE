@@ -17,8 +17,8 @@ namespace SEE.Tools.FaceCam
 {
     /// <summary>
     /// This component is attached to a FaceCam.prefab, which will be instantiated
-    /// as an immediate child to a game object representing an avatar (a local or 
-    /// remote player). It can be used to display a WebCam image of the tracked 
+    /// as an immediate child to a game object representing an avatar (a local or
+    /// remote player). It can be used to display a WebCam image of the tracked
     /// face of the user over the network.
     /// It can be switched off, and it can toggle the position between being
     /// above the player always facing the camera, and the front of the player's face.
@@ -235,6 +235,8 @@ namespace SEE.Tools.FaceCam
         /// <remarks>Called on network spawn before Start through NetCode.</remarks>
         public override void OnNetworkSpawn()
         {
+            Initialize();
+
             // IsOwner is true if the local client is the owner of this NetworkObject.
             // IsServer is true if this code runs on the server. Note: a host can be
             // a server and a local client at the same time, in which case IsServer
@@ -253,6 +255,30 @@ namespace SEE.Tools.FaceCam
 
             // Always invoke the base.
             base.OnNetworkSpawn();
+        }
+
+        /// <summary>
+        /// Initializes <see cref="webCamTextureToMatHelper"/> if not already set.
+        /// </summary>
+        private void Initialize()
+        {
+            // For dynamically spawned NetworkObjects (instantiating a network Prefab
+            // during runtime) the OnNetworkSpawn method is invoked before the Start
+            // method is invoked. So, it's important to be aware of this because finding
+            // and assigning components to a local property within the Start method exclusively
+            // will result in that property not being set in a NetworkBehaviour component's
+            // OnNetworkSpawn method when the NetworkObject is dynamically spawned. To
+            // circumvent this issue, you can have a common method that initializes the
+            // components and is invoked both during the Start method and the
+            // OnNetworkSpawned method. That's the purpose of this method.
+
+            if (webCamTextureToMatHelper == null)
+            {
+                if (!gameObject.TryGetComponentOrLog(out webCamTextureToMatHelper))
+                {
+                    enabled = false;
+                }
+            }
         }
 
         /// <summary>
@@ -275,6 +301,8 @@ namespace SEE.Tools.FaceCam
             // For the location of the face of the player we use his his nose. This makes
             // the FaceCam also aprox. centered to his face.
             playersFace = transform.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase");
+
+            Initialize();
 
             // The startup code from the WebCamTextureToMatHelperExample.
             StartupCodeFromWebCamTextureToMatHelperExample();
@@ -306,8 +334,6 @@ namespace SEE.Tools.FaceCam
         /// </summary>
         private void StartupCodeFromWebCamTextureToMatHelperExample()
         {
-            webCamTextureToMatHelper = gameObject.GetComponent<WebCamTextureToMatHelper>();
-
             dlibShapePredictorFileName = DlibFaceLandmarkDetectorExample.DlibFaceLandmarkDetectorExample.dlibShapePredictorFileName;
 #if UNITY_WEBGL
             getFilePath_Coroutine = DlibFaceLandmarkDetector.UnityUtils.Utils.getFilePathAsync(dlibShapePredictorFileName, (result) =>
