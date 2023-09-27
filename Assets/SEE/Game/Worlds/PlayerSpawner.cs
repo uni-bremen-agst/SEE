@@ -119,7 +119,7 @@ namespace SEE.Game.Worlds
                 net.SpawnAsPlayerObject(owner, destroyWithScene: true);
 
                 // A network Prefab is any unity Prefab asset that has one NetworkObject
-                // component attached to a GameObject within the prefab. 
+                // component attached to a GameObject within the prefab.
                 // player is a network Prefab, i.e., it has a NetworkObject attached to it.
                 // More commonly, the NetworkObject component is attached to the root GameObject
                 // of the Prefab asset because this allows any child GameObject to have
@@ -134,15 +134,14 @@ namespace SEE.Game.Worlds
                 // has a NetworkObject component assigned to it (a.k.a. "Nested NetworkObjects").
                 // Nested NetworkObject components aren't permited in network prefabs.
 
-                GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam");
-                faceCam.transform.parent = player.transform;
+                GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam", parent: player.transform);
 #if false // FIXME
 
 #if !PLATFORM_LUMIN || UNITY_EDITOR
                 if (networkManager.IsServer)
                 {
                     // Netcode uses a server authoritative networking model so spawning netcode objects
-                    // can only be done on a server or host. 
+                    // can only be done on a server or host.
                     // Add the FaceCam to the player.
                     GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam");
                     faceCam.GetComponent<NetworkObject>().Spawn();
