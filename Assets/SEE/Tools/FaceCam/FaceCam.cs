@@ -349,22 +349,22 @@ namespace SEE.Tools.FaceCam
             dlibShapePredictorFilePath = DlibFaceLandmarkDetector.UnityUtils.Utils.getFilePath(dlibShapePredictorFileName);
             Run();
 #endif
-        }
 
-        /// <summary>
-        /// The 'run' code from the WebCamTextureToMatHelperExample.
-        /// </summary>
-        private void Run()
-        {
-            if (string.IsNullOrEmpty(dlibShapePredictorFilePath))
+            /// <summary>
+            /// The 'run' code from the WebCamTextureToMatHelperExample.
+            /// </summary>
+            void Run()
             {
-                throw new InvalidOperationException
-                    ("shape predictor file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/DlibFaceLandmarkDetector/” to “Assets/StreamingAssets/DlibFaceLandmarkDetector/” folder. ");
+                if (string.IsNullOrEmpty(dlibShapePredictorFilePath))
+                {
+                    throw new InvalidOperationException
+                        ("shape predictor file does not exist. Please copy from “DlibFaceLandmarkDetector/StreamingAssets/DlibFaceLandmarkDetector/” to “Assets/StreamingAssets/DlibFaceLandmarkDetector/” folder. ");
+                }
+
+                faceLandmarkDetector = new FaceLandmarkDetector(dlibShapePredictorFilePath);
+
+                webCamTextureToMatHelper.Initialize();
             }
-
-            faceLandmarkDetector = new FaceLandmarkDetector(dlibShapePredictorFilePath);
-
-            webCamTextureToMatHelper.Initialize();
         }
 
         /// <summary>
@@ -377,7 +377,6 @@ namespace SEE.Tools.FaceCam
 
             texture = new Texture2D(webCamTextureMat.cols(), webCamTextureMat.rows(), TextureFormat.RGBA32, false);
             OpenCVForUnity.UnityUtils.Utils.fastMatToTexture2D(webCamTextureMat, texture);
-
         }
 
         /// <summary>
@@ -411,8 +410,8 @@ namespace SEE.Tools.FaceCam
         /// <summary>
         /// Once per frame, the local video is displayed.
         /// Switches the FaceCam on and off, if the 'I' key is pressed.
-        /// It also checks whether the video should be sent to the clients in this frame based
-        /// on the specified network FPS, and transmit it.
+        /// It also checks whether the video should be sent to the clients in this frame - based
+        /// on the specified network FPS - and transmits it.
         /// </summary>
         private void Update()
         {
@@ -425,6 +424,7 @@ namespace SEE.Tools.FaceCam
 
             // Display/render the video from the Webcam if this is the owner. (For each player,
             // the player is the owner of the local FaceCam)
+            // NetworkBehaviour.IsOwner is true if the local client is the owner of this NetworkObject.
             if (IsOwner)
             {
                 // Switch the FaceCam on or off.
@@ -649,22 +649,44 @@ namespace SEE.Tools.FaceCam
         }
 
         /// <summary>
-        /// Tell the server to toggle the FaceCam on off state of all clients.
+        /// Tell the server to toggle the FaceCam on/off for all clients.
         /// </summary>
+        /// <remarks>
+        /// This call will be sent to the server. The default [ServerRpc] attribute
+        /// setting allows onlya client owner (client that owns the NetworkObject associated
+        /// with the NetworkBehaviour containing the ServerRpc method) invocation rights.
+        /// Any client that isn't the owner won't be allowed to invoke the ServerRpc.
+        /// By setting the ServerRpc attribute's RequireOwnership parameter to false,
+        /// any client has ServerRpc invocation rights.
+        /// </remarks>
         [ServerRpc(RequireOwnership = false)]
-        private void FaceCamOnOffServerRpc(bool networkFaceCamOn)
+        private void FaceCamOnOffServerRpc(bool networkFaceCamOn, ServerRpcParams serverRpcParams = default)
         {
-            // Toggle the FaceCam on off state of all clients.
+            // A ServerRpc is a remote procedure call (RPC) that can be only invoked
+            // by a client and will always be received and executed on the server/host.
+            Debug.Log($"Server received FaceCamOnOffServerRpc from {serverRpcParams.Receive.SenderClientId} with networkFaceCamOn={networkFaceCamOn}\n");
             FaceCamOnOffClientRpc(networkFaceCamOn);
         }
 
         /// <summary>
-        /// Toggle the FaceCam on off state of all clients.
+        /// Toggle the FaceCam on/off for all clients.
         /// (Can only be used by the server).
         /// </summary>
+        /// <remarks>This call is sent from the server to all its clients.</remarks>
         [ClientRpc]
         private void FaceCamOnOffClientRpc(bool networkFaceCamOn)
         {
+            Debug.Log($"Client {NetworkManager.Singleton.LocalClientId} received FaceCamOnOffClientRpc from server with networkFaceCamOn={networkFaceCamOn}\n");
+
+            // Note: The host is both a client and a server. If a host invokes a client RPC,
+            // it triggers the call on all clients, including the host.
+            //
+            // When running as a host, Netcode for GameObjects invokes RPCs immediately within the
+            // same stack as the method invoking the RPC. Since a host is both considered a server
+            // and a client, you should avoid design patterns where a ClientRpc invokes a ServerRpc
+            // that invokes the same ClientRpc as this can end up in a stack overflow (infinite
+            // recursion).
+
             // NetworkFaceCamOn, resp. FaceCamOn has the value which should be inverted.
             if (faceCamOn == networkFaceCamOn)
             {
@@ -694,8 +716,9 @@ namespace SEE.Tools.FaceCam
         /// Tell the server to toggle the FaceCam position of all clients.
         /// </summary>
         [ServerRpc(RequireOwnership = false)]
-        private void FaceCamOnFrontToggleServerRpc(bool networkFaceCamOnFront)
+        private void FaceCamOnFrontToggleServerRpc(bool networkFaceCamOnFront, ServerRpcParams serverRpcParams = default)
         {
+            Debug.Log($"Server received FaceCamOnFrontToggleServerRpc from {serverRpcParams.Receive.SenderClientId} with networkFaceCamOn={networkFaceCamOnFront}\n");
             FaceCamOnFrontToggleClientRpc(networkFaceCamOnFront);
         }
 
@@ -706,6 +729,8 @@ namespace SEE.Tools.FaceCam
         [ClientRpc]
         private void FaceCamOnFrontToggleClientRpc(bool networkFaceCamOnFront)
         {
+            Debug.Log($"Client {NetworkManager.Singleton.LocalClientId} received FaceCamOnFrontToggleClientRpc from server with networkFaceCamOnFront={networkFaceCamOnFront}\n");
+
             if (faceCamOnFront == networkFaceCamOnFront)
             {
                 faceCamOnFront = !faceCamOnFront;
@@ -716,8 +741,9 @@ namespace SEE.Tools.FaceCam
         /// Get the FaceCam status from the server to all clients.
         /// </summary
         [ServerRpc(RequireOwnership = false)]
-        private void GetFaceCamStatusServerRpc()
+        private void GetFaceCamStatusServerRpc(ServerRpcParams serverRpcParams = default)
         {
+            Debug.Log($"Server received GetFaceCamStatusServerRpc from {serverRpcParams.Receive.SenderClientId}\n");
             SetFaceCamStatusClientRpc(faceCamOn, faceCamOnFront);
         }
 
@@ -728,6 +754,7 @@ namespace SEE.Tools.FaceCam
         [ClientRpc]
         private void SetFaceCamStatusClientRpc(bool faceCamOn, bool faceCamOnFront)
         {
+            Debug.Log($"Client {NetworkManager.Singleton.LocalClientId} received SetFaceCamStatusClientRpc from server\n");
             this.faceCamOn = faceCamOn;
             this.faceCamOnFront = faceCamOnFront;
             // Make the FaceCam visible/invisible and/or start/stop it.
@@ -784,8 +811,10 @@ namespace SEE.Tools.FaceCam
         //[ServerRpc(Delivery = RpcDelivery.Unreliable)]
         // Large files not supported by unreliable Rpc. (No documentation found regarding this limitation).
         [ServerRpc]
-        private void GetVideoFromClientAndSendItToClientsToRenderItServerRPC(byte[] videoFrame)
+        private void GetVideoFromClientAndSendItToClientsToRenderItServerRPC(byte[] videoFrame, ServerRpcParams serverRpcParams = default)
         {
+            Debug.Log($"Server received GetVideoFromClientAndSendItToClientsToRenderItServerRPC from {serverRpcParams.Receive.SenderClientId}\n");
+
             // The server will render this video onto his instance of the FaceCam.
             RenderNetworkFrameOnFaceCam(videoFrame);
 
@@ -803,6 +832,7 @@ namespace SEE.Tools.FaceCam
         [ClientRpc]
         private void SendVideoToClientsToRenderItClientRPC(byte[] videoFrame)
         {
+            Debug.Log($"Client {NetworkManager.Singleton.LocalClientId} received SendVideoToClientsToRenderItClientRPC from server\n");
             RenderNetworkFrameOnFaceCam(videoFrame);
         }
 
@@ -853,8 +883,9 @@ namespace SEE.Tools.FaceCam
         /// The clients call this to add their ClientId to the list on the Server.
         /// </summary>
         [ServerRpc(RequireOwnership = false)]
-        private void AddClientIdToListServerRPC(ulong clientId)
+        private void AddClientIdToListServerRPC(ulong clientId, ServerRpcParams serverRpcParams = default)
         {
+            Debug.Log($"Server received AddClientIdToListServerRPC from {serverRpcParams.Receive.SenderClientId} with clientId={clientId}\n");
             clientsIdsList.Add(clientId);
             // Create the RpcParams from the list to make the list usable as RpcParams.
             CreateClientRpcParams();
@@ -864,8 +895,9 @@ namespace SEE.Tools.FaceCam
         /// The clients call this to remove their ClientId from the list on the Server.
         /// </summary>
         [ServerRpc(RequireOwnership = false)]
-        private void RemoveClientFromListServerRPC(ulong clientId)
+        private void RemoveClientFromListServerRPC(ulong clientId, ServerRpcParams serverRpcParams = default)
         {
+            Debug.Log($"Server received RemoveClientFromListServerRPC from {serverRpcParams.Receive.SenderClientId} with clientId={clientId}\n");
             clientsIdsList.Remove(clientId);
             // Create the RpcParams to make this list usable.
             CreateClientRpcParams();
