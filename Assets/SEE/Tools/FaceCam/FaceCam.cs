@@ -11,13 +11,15 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using Rect = UnityEngine.Rect;
 using SEE.Controls;
+using SEE.GO;
 
 namespace SEE.Tools.FaceCam
 {
     /// <summary>
-    /// This component is assumed to be attached to a game object representing
-    /// an avatar (a local or remote player), which can display a
-    /// WebCam image of the tracked face of the user over the network.
+    /// This component is attached to a FaceCam.prefab, which will be instantiated
+    /// as an immediate child to a game object representing an avatar (a local or 
+    /// remote player). It can be used to display a WebCam image of the tracked 
+    /// face of the user over the network.
     /// It can be switched off, and it can toggle the position between being
     /// above the player always facing the camera, and the front of the player's face.
     /// </summary>
@@ -193,7 +195,7 @@ namespace SEE.Tools.FaceCam
         /// <summary>
         /// The mesh renderer of the FaceCam, used to hide it.
         /// </summary>
-        private readonly MeshRenderer meshRenderer;
+        private MeshRenderer meshRenderer;
 
         /// <summary>
         /// The material of the FaceCam, its texture displaying a default picture, or
@@ -281,13 +283,19 @@ namespace SEE.Tools.FaceCam
             croppedTexture = new Texture2D(0, 0, TextureFormat.RGBA32, false);
 
             // Receive the status of the FaceCam if this is not the owner.
-            if (!IsOwner) {
+            if (!IsOwner)
+            {
                 GetFaceCamStatusServerRpc();
             }
 
             // Set the speed of the face tracking.
             faceTrackingSpeed = MoveStartSpeed;
 
+            if (!gameObject.TryGetComponentOrLog(out meshRenderer))
+            {
+                gameObject.SetActive(false);
+                return;
+            }
             // Cache the material of the FaceCam to change its texture later. (Display a default
             // picture or the face of the user).
             mainMaterial = meshRenderer.material;
