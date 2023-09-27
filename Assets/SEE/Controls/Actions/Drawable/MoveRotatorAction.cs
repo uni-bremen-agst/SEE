@@ -46,6 +46,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
         private static float degree = 0;
         private const string rotationMenuPrefab = "Prefabs/UI/Drawable/DrawableRotate";
         private static GameObject rotationMenu;
+        private static bool moveByMouse = true;
 
         private Vector3 newObjectPosition;
         private Vector3 newHandlerPosition = Vector3.zero;
@@ -128,7 +129,24 @@ namespace Assets.SEE.Controls.Actions.Drawable
                             isTriggered = isTriggered || controllers[i].Trigger();
                         }
                     }
-                    if (Raycasting.RaycastAnything(out RaycastHit hit))
+                    if (Input.GetKey(KeyCode.LeftArrow)|| Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow))
+                    {
+                        bool turbo = false;
+                        if (Input.GetKey(KeyCode.LeftControl))
+                        {
+                            turbo = true;
+                        }
+                        KeyCode key = GetArrowKey();
+                        moveByMouse = false;
+                        didSomething = true;
+                        newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, key, turbo);
+                        new MoveNetAction(drawable.name, drawableParentName, selectedObject.name, newObjectPosition).Execute();
+                    }
+                    if (Input.GetMouseButtonDown(1))
+                    {
+                        moveByMouse = true;
+                    }
+                    if (moveByMouse && Raycasting.RaycastAnything(out RaycastHit hit))
                     {
                         if (!isTriggered)
                         {
@@ -232,6 +250,23 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 return Input.GetMouseButtonUp(0);
             }
             return result;
+        }
+
+        private KeyCode GetArrowKey()
+        {
+            if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                return KeyCode.LeftArrow;
+            } else if (Input.GetKey(KeyCode.RightArrow))
+            {
+                return KeyCode.RightArrow;
+            } else if(Input.GetKey(KeyCode.UpArrow))
+            {
+                return KeyCode.UpArrow;
+            } else
+            {
+                return KeyCode.DownArrow;
+            }
         }
 
         private void SliderListener(RotationSliderController slider, GameObject selectedObject, GameObject drawable, string drawableParentName, Vector3 firstPoint)

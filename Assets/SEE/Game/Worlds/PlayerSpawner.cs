@@ -1,4 +1,5 @@
-﻿using Dissonance;
+﻿using Assets.SEE.Game.Drawable;
+using Dissonance;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
@@ -108,6 +109,8 @@ namespace SEE.Game.Worlds
             if (player.TryGetComponent(out NetworkObject net))
             {
                 net.SpawnAsPlayerObject(owner, destroyWithScene: true);
+                //TODO right position?
+                DrawableSynchronizer.Synchronize();
             }
             else
             {

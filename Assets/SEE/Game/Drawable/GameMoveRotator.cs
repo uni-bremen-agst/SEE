@@ -41,6 +41,33 @@ namespace Assets.SEE.Game.Drawable
             return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
         }
 
+        public static Vector3 MoveObjectByKeyboard(GameObject obj, KeyCode key, bool turbo)
+        {
+            Vector3 newPosition = obj.transform.position;
+            float multiplyValue = 0.001f;
+            if (turbo)
+            {
+                multiplyValue = 0.01f;
+            }
+            switch (key)
+            {
+                case KeyCode.LeftArrow:
+                    newPosition -= obj.transform.right * multiplyValue;
+                    break;
+                case KeyCode.RightArrow:
+                    newPosition += obj.transform.right * multiplyValue;
+                    break;
+                case KeyCode.UpArrow:
+                    newPosition += obj.transform.up * multiplyValue;
+                    break;
+                case KeyCode.DownArrow:
+                    newPosition -= obj.transform.up * multiplyValue;
+                    break;
+            }
+            obj.transform.position = newPosition;
+            return newPosition;
+        }
+
         public static void MoveObject(GameObject obj, Vector3 position)
         {
             obj.transform.position = position;
