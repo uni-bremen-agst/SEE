@@ -134,7 +134,7 @@ namespace SEE.Game.Worlds
                 // has a NetworkObject component assigned to it (a.k.a. "Nested NetworkObjects").
                 // Nested NetworkObject components aren't permited in network prefabs.
 
-                GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam", parent: player.transform);
+                //GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam", parent: player.transform);
 #if false // FIXME
 
 #if !PLATFORM_LUMIN || UNITY_EDITOR
