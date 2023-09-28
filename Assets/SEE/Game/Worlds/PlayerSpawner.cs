@@ -5,7 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using SEE.Utils;
 
 namespace SEE.Game.Worlds
 {
@@ -89,7 +88,7 @@ namespace SEE.Game.Worlds
             // to spawn a player whenever a client connects.
             networkManager.OnClientConnectedCallback += Spawn;
             networkManager.OnClientDisconnectCallback += ClientDisconnects;
-            // Spawn the local player.
+            // Spawn the local player. This code is executed by the server.
             Spawn(networkManager.LocalClientId);
         }
 
@@ -111,13 +110,14 @@ namespace SEE.Game.Worlds
                                             Quaternion.Euler(new Vector3(0, playerSpawns[index].Rotation, 0)));
             numberOfSpawnedPlayers++;
             player.name = "Player " + numberOfSpawnedPlayers;
-            Debug.Log($"Spawned {player.name} (network id: {owner}, local: {IsLocal(owner)}) at position {player.transform.position}.\n");
+            Debug.Log($"Spawned {player.name} (network id of owner: {owner}, local: {IsLocal(owner)}) at position {player.transform.position}.\n");
             if (player.TryGetComponent(out NetworkObject net))
             {
                 // By default a newly spawned network Prefab instance is owned by the server
                 // unless otherwise specified.
                 net.SpawnAsPlayerObject(owner, destroyWithScene: true);
 
+                Debug.Log($"Owner of player {player.name} is server: {net.IsOwner}\n");
                 // A network Prefab is any unity Prefab asset that has one NetworkObject
                 // component attached to a GameObject within the prefab.
                 // player is a network Prefab, i.e., it has a NetworkObject attached to it.
