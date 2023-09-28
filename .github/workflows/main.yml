@@ -186,10 +186,10 @@ jobs:
           else
             # Set targetPlatform based on inputs.
             targetPlatforms=()
-            if ${{ github.event.inputs.windows == true }}; then
+            if ${{ inputs.windows == true }}; then
                 targetPlatforms+=("StandaloneWindows64")
             fi
-            if ${{ github.event.inputs.linux == true }}; then
+            if ${{ inputs.linux == true }}; then
                 targetPlatforms+=("StandaloneLinux64")
             fi
             echo "targetPlatforms=$(jq --compact-output --null-input '$ARGS.positional' --args -- ${targetPlatforms[@]})" >> $GITHUB_OUTPUT
