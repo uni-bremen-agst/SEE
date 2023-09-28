@@ -329,7 +329,7 @@ namespace SEE.Tools.FaceCam
             // picture or the face of the user).
             mainMaterial = meshRenderer.material;
 
-            Debug.Log($"Owner of player {NetworkManager.LocalClient.PlayerObject.name} is server: {NetworkManager.LocalClient.PlayerObject.IsOwnedByServer} or is local client: {NetworkManager.LocalClient.PlayerObject.IsOwner}\n");
+            Debug.Log($"[FaceCam.Start] Owner of player {NetworkManager.LocalClient.PlayerObject.name} is server: {NetworkManager.LocalClient.PlayerObject.IsOwnedByServer} or is local client: {NetworkManager.LocalClient.PlayerObject.IsOwner}\n");
         }
 
         /// <summary>
@@ -424,8 +424,10 @@ namespace SEE.Tools.FaceCam
             }
             // Netcode specific logic executed when spawned.
 
-            // Display/render the video from the Webcam if this is the owner. (For each player,
-            // the player is the owner of the local FaceCam)
+            // Display/render the video from the Webcam if this is the owner.
+            // The local client owns the player object the NetworkObject is attached to.
+            // The FaceCam is attached to a child of the local player.
+            // Hence, the local player (client) is the owner of the local FaceCam.
             // NetworkBehaviour.IsOwner is true if the local client is the owner of this NetworkObject.
             if (IsOwner)
             {
