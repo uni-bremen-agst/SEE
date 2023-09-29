@@ -221,6 +221,7 @@ jobs:
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
           buildName: ${{ matrix.targetPlatform }}
+          buildMethod: CITools.BuildScript.Build
           allowDirtyBuild: true
       - name: Compress build
         # Compress only if manually triggered or merged into master, otherwise we won't upload.
