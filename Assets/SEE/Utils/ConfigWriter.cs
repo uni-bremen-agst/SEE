@@ -246,6 +246,21 @@ namespace SEE.Utils
         }
 
         /// <summary>
+        /// Writes <paramref name="label"/> and its <paramref name="value"/> to <see cref="stream"/>
+        /// as a composite value of its constituents (Red, Green, Blue, Alpha).
+        /// </summary>
+        /// <param name="label">label to be emitted</param>
+        /// <param name="value">value to be emitted</param>
+        internal void Save(Vector3 vector, string label = "")
+        {
+            BeginGroup(label);
+            Save(vector.x, XLabel);
+            Save(vector.y, YLabel);
+            Save(vector.z, ZLabel);
+            EndGroup();
+        }
+
+        /// <summary>
         /// Returns <paramref name="value"/> where every quote " has been replaced by a double quote "".
         /// </summary>
         /// <param name="value">the string where " is to be escaped</param>

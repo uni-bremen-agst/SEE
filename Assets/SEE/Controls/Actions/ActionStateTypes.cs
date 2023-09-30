@@ -225,6 +225,12 @@ namespace SEE.Controls.Actions
                     LineSplitAction.CreateReversibleAction,
                     parent: Whiteboard);
 
+            Save =
+                new("Save", "Save one or more drawables.",
+                    Color.yellow, "Materials/ModernUIPack/Pencil",
+                    SaveAction.CreateReversibleAction,
+                    parent: Whiteboard);
+
             Load =
                 new("Load", "Load one or more drawables.",
                     Color.yellow.Darker(), "Materials/ModernUIPack/Pencil",

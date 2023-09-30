@@ -1,6 +1,7 @@
 ﻿using SEE.Game;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.SEE.Game
@@ -9,29 +10,29 @@ namespace Assets.SEE.Game
     {
         public static GameObject Find(string drawableID, string parentDrawableID)
         {
-            GameObject drawable = null;
-            ArrayList paintingReceiversList = new ArrayList(GameObject.FindGameObjectsWithTag(Tags.Drawable));
+            GameObject searchedDrawable = null;
+            List<GameObject> drawables = new (GameObject.FindGameObjectsWithTag(Tags.Drawable));
 
-            foreach (GameObject paintingReceiver in paintingReceiversList)
+            foreach (GameObject drawable in drawables)
             {
                 if (parentDrawableID != null && !parentDrawableID.Equals(""))
                 {
-                    string parentName = paintingReceiver.transform.parent.gameObject.name;
+                    string parentName = drawable.transform.parent.gameObject.name;
                     if (string.Equals(parentDrawableID, parentName) &&
-                          string.Equals(drawableID, paintingReceiver.name))
+                          string.Equals(drawableID, drawable.name))
                     {
-                        drawable = paintingReceiver;
+                        searchedDrawable = drawable;
                     }
                 } else
                 {
-                    if (string.Equals(drawableID, paintingReceiver.name))
+                    if (string.Equals(drawableID, drawable.name))
                     {
-                        drawable = paintingReceiver;
+                        searchedDrawable = drawable;
                     }
                 }
             }
 
-            return drawable;
+            return searchedDrawable;
         }
 
         public static GameObject FindChild(GameObject parent, string childName)
@@ -100,6 +101,20 @@ namespace Assets.SEE.Game
                 }
             }
             return null;
+        }
+
+        public static List<GameObject> FindAllChildrenWithTag(GameObject parent, string tag)
+        {
+            List<GameObject> gameObjects = new();
+            Transform[] allChildren = parent.GetComponentsInChildren<Transform>();
+            foreach (Transform childTransform in allChildren)
+            {
+                if (childTransform.gameObject.CompareTag(tag))
+                {
+                    gameObjects.Add(childTransform.gameObject);
+                }
+            }
+            return gameObjects;
         }
 
         public static bool hasChildWithTag(GameObject parent, string tag)

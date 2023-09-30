@@ -24,10 +24,8 @@ namespace SEE.Controls.Actions
     /// It serves as an example for a continuous action that modifies the
     /// scene while active.
     /// </summary>
-    class LoadAction : AbstractPlayerAction
+    class SaveAction : AbstractPlayerAction
     {
-        
-
         /// <summary>
         /// Undo and Redo only used when a object is clicked! Don't support the color picker. Because the color picker would make to many states.
         /// </summary>
@@ -39,45 +37,30 @@ namespace SEE.Controls.Actions
             if (!Raycasting.IsMouseOverGUI())
             {
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
-                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit))// && // Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
+                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&// && // Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
+                    (GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject) || raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
                 {
-                    DrawableConfig config = DrawableConfigManager.LoadDrawable("Test");
-                    GameObject drawable = GameDrawableFinder.Find(config.DrawableName, config.DrawableParentName);
-                    RestoreLines(drawable, config.LineConfigs);
+                    GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
+                        raycastHit.collider.gameObject : GameDrawableFinder.FindDrawableParent(raycastHit.collider.gameObject);
+                    DrawableConfigManager.SaveDrawable(drawable, "Test");
                 }
                 if (Input.GetMouseButtonDown(1) || Input.GetMouseButton(1))
                 {
-                    DrawablesConfigs configs = DrawableConfigManager.LoadDrawables("Test1");
-                    foreach(DrawableConfig config  in configs.Drawables) 
-                    {
-                        GameObject drawable = GameDrawableFinder.Find(config.DrawableName, config.DrawableParentName);
-                        RestoreLines(drawable, config.LineConfigs);
-                    }
+                    List<GameObject> drawables = new (GameObject.FindGameObjectsWithTag(Tags.Drawable));
+                    DrawableConfigManager.SaveDrawables(drawables.ToArray(), "Test1");
                 }
-
             }
             return result;
         }
 
-        private void RestoreLines(GameObject drawable, List<Line> lines)
-        {
-            foreach (Line line in lines)
-            {
-                GameDrawer.ReDrawLine(drawable, line);
-                new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), line);
-            }
-        }
-
         public override void Awake()
         {
-            GameObject.Find("UI Canvas").AddComponent<Test>();
+         //   GameObject.Find("UI Canvas").AddComponent<Test>();
         }
-
-
 
         public override void Stop()
         {
-            Destroyer.Destroy(GameObject.Find("UI Canvas").GetComponent<Test>());
+         //   Destroyer.Destroy(GameObject.Find("UI Canvas").GetComponent<Test>());
         }
 
 
@@ -88,7 +71,7 @@ namespace SEE.Controls.Actions
         /// <returns>new instance of <see cref="DrawOnAction"/></returns>
         public static ReversibleAction CreateReversibleAction()
         {
-            return new LoadAction();
+            return new SaveAction();
         }
 
         /// <summary>
@@ -107,7 +90,7 @@ namespace SEE.Controls.Actions
         /// <returns><see cref="ActionStateType.DrawOnWhiteboard"/></returns>
         public override ActionStateType GetActionStateType()
         {
-            return ActionStateTypes.Load;
+            return ActionStateTypes.Save;
         }
 
         /// <summary>
