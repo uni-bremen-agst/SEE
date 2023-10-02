@@ -97,9 +97,7 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public override void LoadData()
         {
-            // generate graph randomly
-            RandomGraphs randomGraphs = new RandomGraphs();
-            LoadedGraph = randomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes, true);
+            LoadedGraph = RandomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes, true);
         }
 
         /// <summary>

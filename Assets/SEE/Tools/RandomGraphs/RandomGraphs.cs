@@ -241,7 +241,7 @@ namespace SEE.Tools.RandomGraphs
         /// <param name="leafAttributes">constraints for node attributes to be generated</param>
         /// <param name="printStatistics">if true statistics about the graph will be printed to the debugging console</param>
         /// <returns>a random graph fulfilling the given constraints</returns>
-        public Graph Create
+        public static Graph Create
             (Constraint leafConstraint,
              Constraint innerNodeConstraint,
              ICollection<RandomAttributeDescriptor> leafAttributes,

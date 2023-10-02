@@ -89,7 +89,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <see cref="MappingGraph"/> are not <c>null</c> (i.e. have been loaded).
         /// </summary>
         /// <returns>Full graph obtained by combining architecture, implementation and mapping</returns>
-        private static ReflexionGraph Assemble(Graph architectureGraph, Graph implementationGraph, Graph mappingGraph, 
+        private static ReflexionGraph Assemble(Graph architectureGraph, Graph implementationGraph, Graph mappingGraph,
             string name, out Node architectureRoot, out Node implementationRoot)
         {
             if (implementationGraph == null || architectureGraph == null || mappingGraph == null)
@@ -180,8 +180,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>3-tuple consisting of (implementation, architecture, mapping) graph</returns>
         public (Graph implementation, Graph architecture, Graph mapping) Disassemble()
         {
-            return (implementation: SubgraphBy(ReflexionGraphTools.IsInImplementation), 
-                    architecture: SubgraphBy(ReflexionGraphTools.IsInArchitecture), 
+            return (implementation: SubgraphBy(ReflexionGraphTools.IsInImplementation),
+                    architecture: SubgraphBy(ReflexionGraphTools.IsInArchitecture),
                     mapping: SubgraphBy(ReflexionGraphTools.IsInMapping));
         }
 
