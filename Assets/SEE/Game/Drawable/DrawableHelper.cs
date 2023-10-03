@@ -5,6 +5,7 @@ using SEE.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -23,6 +24,10 @@ namespace Assets.SEE.Game.Drawable
         /// </summary>
         public static float currentThickness { get; set; }
 
+        public static GameDrawer.LineKind currentLineKind { get; set; }
+
+        public static float currentTiling { get; set; }
+
         public static int orderInLayer { get; set; }
 
         public static readonly string LinePrefix = "Line";
@@ -30,24 +35,53 @@ namespace Assets.SEE.Game.Drawable
         public static readonly string DrawableHolderPrefix = "DrawableHolder";
         public static readonly string AttachedObject = "AttachedObjects";
 
-        public readonly static Vector3 distanceToBoard = new(0, 0, 0.02f);
+        public readonly static Vector3 distanceToBoard = new(0, 0, 0.0001f);
 
         private const string drawableMenuPrefab = "Prefabs/UI/Drawable/DrawableLineMenu";
         public static GameObject drawableMenu;
         public static UnityAction<Color> colorAction;
+        private static TMP_Text lineKindText;
+        private static GameDrawer.LineKind selectedKind;
+        private static FloatValueSliderController tilingSlider;
+        public static UnityAction<float> tilingAction;
+        private static Button nextBtn;
+        private static Button previousBtn;
 
         static DrawableHelper()
         {
             currentColor = UnityEngine.Random.ColorHSV();
             currentThickness = 0.01f;
+            currentLineKind = GameDrawer.LineKind.Solid;
+            currentTiling = 1f;
             orderInLayer = 1;
 
             drawableMenu = PrefabInstantiator.InstantiatePrefab(drawableMenuPrefab,
                             GameObject.Find("UI Canvas").transform, false);
+            lineKindText = drawableMenu.transform.Find("LineKindSelection").GetComponentsInChildren<TMP_Text>()[1];
+            AssignLineKind(currentLineKind);
+            previousBtn = drawableMenu.transform.Find("LineKindSelection").GetComponentsInChildren<Button>()[0];
+            //previousBtn.onClick.AddListener(PreviousLineKind);
+            nextBtn = drawableMenu.transform.Find("LineKindSelection").GetComponentsInChildren<Button>()[1];
+            //nextBtn.onClick.AddListener(NextLineKind);
+            tilingSlider = drawableMenu.transform.Find("Tiling").GetComponentInChildren<FloatValueSliderController>();
             drawableMenu.SetActive(false);
         }
 
         #region DrawableHolder
+        private const string letters = "abcdefghijklmnopqrstuvwxyz";
+        private const string numbers = "0123456789";
+        private const string specialCharacters = "!?§$%&.,_-#+*@";
+        private static readonly string characters = letters + letters.ToUpper() + numbers + specialCharacters;
+        public static string GetRandomString(int size)
+        {
+            string randomString = "";
+            for (int i = 0; i < size; i++)
+            {
+                randomString += characters[UnityEngine.Random.Range(0, characters.Length)];
+            }
+            return randomString;
+        }
+
         public static void SetupDrawableHolder(GameObject drawable, out GameObject highestParent, out GameObject attachedObjects)
         {
             if (GameDrawableFinder.hasAParent(drawable))
@@ -55,7 +89,7 @@ namespace Assets.SEE.Game.Drawable
                 GameObject parent = GameDrawableFinder.GetHighestParent(drawable);
                 if (!parent.name.StartsWith(DrawableHelper.DrawableHolderPrefix))
                 {
-                    highestParent = new GameObject(DrawableHelper.DrawableHolderPrefix + drawable.GetInstanceID());
+                    highestParent = new GameObject(DrawableHelper.DrawableHolderPrefix + "-" + parent.name);//drawable.GetInstanceID());
                     highestParent.transform.position = parent.transform.position;
                     highestParent.transform.rotation = parent.transform.rotation;
 
@@ -92,17 +126,33 @@ namespace Assets.SEE.Game.Drawable
         #region DrawableMenu
         public enum MenuPoint
         {
+            LineKind,
             Thickness,
             Layer,
             Loop,
             All
         }
 
-        public static List<ActionStateType> usedIn = new() {ActionStateTypes.DrawOn, ActionStateTypes.ColorPicker};
+        public static List<ActionStateType> usedIn = new() { ActionStateTypes.DrawOn, ActionStateTypes.ColorPicker };
         public static void disableDrawableMenu()
         {
             enableDrawableMenuPoints();
             drawableMenu.SetActive(false);
+        }
+
+        public static Button GetPreviousBtn()
+        {
+            return previousBtn;
+        }
+
+        public static Button GetNextBtn()
+        {
+            return nextBtn;
+        }
+
+        public static FloatValueSliderController GetTilingSlider()
+        {
+            return tilingSlider;
         }
 
         public static void enableDrawableMenu(bool removeListeners = true, MenuPoint[] withoutMenuPoints = null)
@@ -115,8 +165,11 @@ namespace Assets.SEE.Game.Drawable
             {
                 foreach (MenuPoint menuPoint in withoutMenuPoints)
                 {
-                    switch(menuPoint)
+                    switch (menuPoint)
                     {
+                        case MenuPoint.LineKind:
+                            disableLineKindFromDrawableMenu();
+                            break;
                         case MenuPoint.Thickness:
                             disableThicknessFromDrawableMenu();
                             break;
@@ -127,6 +180,7 @@ namespace Assets.SEE.Game.Drawable
                             disableLoopFromDrawableMenu();
                             break;
                         case MenuPoint.All:
+                            disableLineKindFromDrawableMenu();
                             disableThicknessFromDrawableMenu();
                             disableLayerFromDrawableMenu();
                             disableLoopFromDrawableMenu();
@@ -134,12 +188,26 @@ namespace Assets.SEE.Game.Drawable
                     }
                 }
             }
+            if (selectedKind != GameDrawer.LineKind.Dashed)
+            {
+                disableTilingFromDrawableMenu();
+            }
             drawableMenu.SetActive(true);
         }
 
         private static void RemoveListeners()
         {
             enableDrawableMenuPoints();
+            previousBtn.onClick.RemoveAllListeners();
+            previousBtn.onClick.RemoveAllListeners();
+            if (tilingAction != null)
+            {
+                if (selectedKind != GameDrawer.LineKind.Dashed)
+                {
+                    tilingSlider.ResetToMin();
+                }
+                drawableMenu.GetComponentInChildren<FloatValueSliderController>().onValueChanged.RemoveListener(tilingAction);
+            }
             drawableMenu.GetComponentInChildren<ThicknessSliderController>().onValueChanged.RemoveAllListeners();
             drawableMenu.GetComponentInChildren<LayerSliderController>().onValueChanged.RemoveAllListeners();
             drawableMenu.GetComponentInChildren<Toggle>().onValueChanged.RemoveAllListeners();
@@ -149,13 +217,123 @@ namespace Assets.SEE.Game.Drawable
             }
         }
 
+        public static int GetIndexOfSelectedLineKind()
+        {
+            return GameDrawer.GetLineKinds().IndexOf(selectedKind);
+        }
+
+        public static void AssignLineKind(GameDrawer.LineKind kind)
+        {
+            lineKindText.text = kind.ToString();
+            selectedKind = kind;
+        }
+        /*
+        public static void NextLineKind()
+        {
+            int index = GetIndexOfSelectedLineKind() + 1;
+            if (index >= GameDrawer.GetLineKinds().Count)
+            {
+                index = 0;
+            }
+            if (GameDrawer.GetLineKinds()[index] == GameDrawer.LineKind.Dashed)
+            {
+                enableTilingFromDrawableMenu();
+            } else
+            {
+                disableTilingFromDrawableMenu();
+            }
+            AssignLineKind(GameDrawer.GetLineKinds()[index]);
+        }
+        */
+        public static GameDrawer.LineKind NextLineKind()
+        {
+            int index = GetIndexOfSelectedLineKind() + 1;
+            if (index >= GameDrawer.GetLineKinds().Count)
+            {
+                index = 0;
+            }
+            if (GameDrawer.GetLineKinds()[index] == GameDrawer.LineKind.Dashed)
+            {
+                enableTilingFromDrawableMenu();
+            }
+            else
+            {
+                disableTilingFromDrawableMenu();
+            }
+            AssignLineKind(GameDrawer.GetLineKinds()[index]);
+            return GameDrawer.GetLineKinds()[index];
+        }
+        /*
+        public static void PreviousLineKind()
+        {
+            int index = GetIndexOfSelectedLineKind() - 1;
+            if (index < 0)
+            {
+                index = GameDrawer.GetLineKinds().Count - 1;
+            }
+            if (GameDrawer.GetLineKinds()[index] == GameDrawer.LineKind.Dashed)
+            {
+                enableTilingFromDrawableMenu();
+            }
+            else
+            {
+                disableTilingFromDrawableMenu();
+            }
+            AssignLineKind(GameDrawer.GetLineKinds()[index]);
+            previousAction.Invoke(GameDrawer.GetLineKinds()[index].ToString());
+        }
+        */
+        public static GameDrawer.LineKind PreviousLineKind()
+        {
+            int index = GetIndexOfSelectedLineKind() - 1;
+            if (index < 0)
+            {
+                index = GameDrawer.GetLineKinds().Count - 1;
+            }
+            if (GameDrawer.GetLineKinds()[index] == GameDrawer.LineKind.Dashed)
+            {
+                enableTilingFromDrawableMenu();
+            }
+            else
+            {
+                disableTilingFromDrawableMenu();
+            }
+            AssignLineKind(GameDrawer.GetLineKinds()[index]);
+            return GameDrawer.GetLineKinds()[index];
+        }
+
         private static void enableDrawableMenuPoints()
         {
+            enableLineKindFromDrawableMenu();
+            enableTilingFromDrawableMenu();
             enableLoopFromDrawableMenu();
             enableLayerFromDrawableMenu();
             enableThicknessFromDrawableMenu();
         }
 
+        private static void disableLineKindFromDrawableMenu()
+        {
+            drawableMenu.transform.Find("LineKindSelection").gameObject.SetActive(false);
+        }
+
+        private static void enableLineKindFromDrawableMenu()
+        {
+            if (selectedKind != GameDrawer.LineKind.Dashed)
+            {
+                tilingSlider.ResetToMin();
+            }
+            drawableMenu.transform.Find("LineKindSelection").gameObject.SetActive(true);
+        }
+        private static void disableTilingFromDrawableMenu()
+        {
+            tilingSlider.ResetToMin();
+            drawableMenu.transform.Find("Tiling").gameObject.SetActive(false);
+        }
+
+        private static void enableTilingFromDrawableMenu()
+        {
+            drawableMenu.transform.Find("Tiling").gameObject.SetActive(true);
+        }
         private static void disableLayerFromDrawableMenu()
         {
             drawableMenu.transform.Find("Layer").gameObject.SetActive(false);

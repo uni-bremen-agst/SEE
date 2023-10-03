@@ -34,42 +34,50 @@ namespace Assets.SEE.Game.Drawable
 
         public float thickness;
 
-        public Vector3 holderEulerAngles;
+        public Vector3 eulerAngles;
 
-        public Vector3 holderPosition;
+        public GameDrawer.LineKind lineKind;
+
+        public float tiling;
+
+       // public Vector3 holderPosition;
 
         private const string IdLabel = "IDLabel";
         private const string PositionLabel = "PositionLabel";
         private const string ScaleLabel = "ScaleLabel";
         private const string RendererPositionsLabel = "RendererPositions";
-        private const string RenderPosPrefix = "RenPos";
         private const string LoopLabel = "LoopLabel";
         private const string ColorLabel = "ColorLabel";
         private const string OrderInLayerLabel = "OrderInLayerLabel";
         private const string ThicknessLabel = "ThicknessLabel";
-        private const string HolderEulerAnglesLabel = "HolderEulerAnglesLabel";
+        private const string EulerAnglesLabel = "EulerAnglesLabel";
         private const string HolderPositionLabel = "HolderPositionLabel";
+        private const string LineKindLabel = "LineKindLabel";
+        private const string TilingLabel = "TilingLabel";
 
         public static Line GetLine(GameObject lineGameObject)
         {
             Line line = null;
             if (lineGameObject != null && lineGameObject.CompareTag(Tags.Line))
             {
-                Transform holderTransform = lineGameObject.transform.parent;
+               // Transform holderTransform = lineGameObject.transform.parent;
                 line = new();
                 line.gameObject = lineGameObject;
                 line.id = lineGameObject.name;
-                line.position = lineGameObject.transform.position;
+                line.position = lineGameObject.transform.localPosition;
                 line.scale = lineGameObject.transform.localScale;
                 LineRenderer renderer = lineGameObject.GetComponent<LineRenderer>();
                 line.rendererPositions = new Vector3[renderer.positionCount];
                 renderer.GetPositions(line.rendererPositions);
                 line.loop = renderer.loop;
-                line.holderEulerAngles = holderTransform.localEulerAngles;
-                line.holderPosition = holderTransform.localPosition;
+                line.eulerAngles = lineGameObject.transform.localEulerAngles;
+               // line.holderEulerAngles = holderTransform.localEulerAngles;
+                //line.holderPosition = holderTransform.localPosition;
                 line.color = renderer.material.color;
                 line.orderInLayer = renderer.sortingOrder;
                 line.thickness = renderer.startWidth;
+                line.tiling = renderer.textureScale.x;
+                line.lineKind = lineGameObject.GetComponent<LineKindHolder>().GetLineKind();
             }
             return line;
         }
@@ -86,9 +94,12 @@ namespace Assets.SEE.Game.Drawable
                 color = this.color,
                 orderInLayer = this.orderInLayer,
                 thickness = this.thickness,
-                holderEulerAngles = this.holderEulerAngles,
-                holderPosition = this.holderPosition,
+                eulerAngles = this.eulerAngles,
+               // holderEulerAngles = this.holderEulerAngles,
+               // holderPosition = this.holderPosition,
                 scale = this.scale,
+                lineKind = this.lineKind,
+                tiling = this.tiling,
             };
         }
 
@@ -106,14 +117,16 @@ namespace Assets.SEE.Game.Drawable
             writer.Save(orderInLayer, OrderInLayerLabel);
             writer.Save(thickness, ThicknessLabel);
             writer.Save(loop, LoopLabel);
-            
+            writer.Save(lineKind.ToString(), LineKindLabel);
+            writer.Save(tiling, TilingLabel);
             foreach(Vector3 pos in rendererPositions)
             {
                 rendererPositionConfigs.Add(new Vector3Config() { vector = pos });
             }
             writer.Save(rendererPositionConfigs, RendererPositionsLabel);
-            writer.Save(holderEulerAngles, HolderEulerAnglesLabel);
-            writer.Save(holderPosition, HolderPositionLabel);
+            writer.Save(eulerAngles, EulerAnglesLabel);
+           // writer.Save(holderEulerAngles, HolderEulerAnglesLabel);
+            //writer.Save(holderPosition, HolderPositionLabel);
             writer.EndGroup();
         }
 
@@ -209,7 +222,7 @@ namespace Assets.SEE.Game.Drawable
                 }
                 rendererPositions = listRendererPositions.ToArray();
             }
-            
+            /*
             Vector3 loadedHolderPosition = Vector3.zero;
             if (ConfigIO.Restore(attributes, HolderPositionLabel, ref loadedHolderPosition))
             {
@@ -219,15 +232,35 @@ namespace Assets.SEE.Game.Drawable
             {
                 holderPosition = Vector3.zero;
                 errors = true;
-            }
+            }*/
             Vector3 loadedEulerAngles = Vector3.zero;
-            if (ConfigIO.Restore(attributes, ScaleLabel, ref loadedEulerAngles))
+            if (ConfigIO.Restore(attributes, EulerAnglesLabel, ref loadedEulerAngles))
             {
-                holderEulerAngles = loadedEulerAngles;
+                eulerAngles = loadedEulerAngles;
             }
             else
             {
-                holderEulerAngles = Vector3.zero;
+                eulerAngles = Vector3.zero;
+                errors = true;
+            }
+
+            if (attributes.TryGetValue(TilingLabel, out object til))
+            {
+                tiling = (float)til;
+            }
+            else
+            {
+                tiling = 1;
+                errors = true;
+            }
+
+            if (attributes.TryGetValue(LineKindLabel, out object kind) && Enum.TryParse<GameDrawer.LineKind>((string)kind, out GameDrawer.LineKind result))
+            {
+                lineKind = result;
+            }
+            else
+            {
+                lineKind = GameDrawer.LineKind.Solid;
                 errors = true;
             }
 

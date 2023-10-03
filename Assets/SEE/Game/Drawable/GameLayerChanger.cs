@@ -27,6 +27,7 @@ namespace Assets.SEE.Game.Drawable
                     else
                     {
                         lineRenderer.sortingOrder = order;
+                        SetOrder(obj, order);
                         result = true;
                     }
                     break;
@@ -51,6 +52,7 @@ namespace Assets.SEE.Game.Drawable
                     else
                     {
                         lineRenderer.sortingOrder = order;
+                        SetOrder(obj, order);
                         result = true;
                     }
                     break;
@@ -59,6 +61,17 @@ namespace Assets.SEE.Game.Drawable
                     break;
             }
             return result;
+        }
+
+        public static void SetOrder(GameObject obj, int order)
+        {
+            Vector3 oldPos = obj.transform.localPosition;
+            float multiplyValue = order;
+            if (order == 0)
+            {
+                multiplyValue = 0.5f;
+            }
+            obj.transform.localPosition = new Vector3(oldPos.x, oldPos.y, multiplyValue * -DrawableHelper.distanceToBoard.z);;
         }
     }
 }

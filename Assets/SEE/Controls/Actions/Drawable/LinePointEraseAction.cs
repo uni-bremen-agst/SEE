@@ -56,7 +56,8 @@ namespace SEE.Controls.Actions
                         memento = new Memento(hittedObject, GameDrawableFinder.FindDrawableParent(hittedObject), lines, lineRenderer.loop);
                         mementoList.Add(memento);
                         new EraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.originalLine.id).Execute();
-                        Destroyer.Destroy(hittedObject.transform.parent.gameObject);
+                        Destroyer.Destroy(hittedObject);
+                        //Destroyer.Destroy(hittedObject.transform.parent.gameObject);
 
                     }
                 }
@@ -121,7 +122,7 @@ namespace SEE.Controls.Actions
                         refreshed = Line.GetLine(line.gameObject);
                     }
                     new EraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), refreshed.id).Execute();
-                    Destroyer.Destroy(refreshed.gameObject.transform.parent.gameObject);
+                    Destroyer.Destroy(refreshed.gameObject);//.transform.parent.gameObject);
                 }
             }
         }
@@ -146,7 +147,7 @@ namespace SEE.Controls.Actions
                     origin = Line.GetLine(mem.originalLine.gameObject);
                 }
                 new EraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), origin.id).Execute();
-                Destroyer.Destroy(origin.gameObject.transform.parent.gameObject);
+                Destroyer.Destroy(origin.gameObject);//.transform.parent.gameObject);
 
                 foreach (Line line in mem.lines)
                 {

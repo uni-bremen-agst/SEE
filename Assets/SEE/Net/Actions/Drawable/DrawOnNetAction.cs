@@ -5,6 +5,7 @@ using SEE.Net.Actions;
 using System;
 using System.Collections;
 using UnityEngine;
+using static SEE.Game.GameDrawer;
 
 namespace Assets.SEE.Net.Actions.Whiteboard
 {
@@ -18,10 +19,13 @@ namespace Assets.SEE.Net.Actions.Whiteboard
         public float Thickness;
         public int OrderInLayer = -1;
         public bool Loop;
+        public GameDrawer.LineKind LineKind;
+        public float Tiling;
         public Line Line;
 
         public DrawOnNetAction(
-            string drawableID, string parentDrawableID, string name, Vector3[] positions, Color color, float thickness, int orderInLayer, bool loop)
+            string drawableID, string parentDrawableID, string name, Vector3[] positions, Color color, 
+            float thickness, int orderInLayer, bool loop, LineKind lineKind, float tiling)
         {
             this.DrawableID = drawableID;
             this.ParentDrawableID = parentDrawableID;
@@ -30,12 +34,14 @@ namespace Assets.SEE.Net.Actions.Whiteboard
             this.Color = color;
             this.Thickness = thickness;
             this.OrderInLayer = orderInLayer;
-            Loop = loop;
+            this.Loop = loop;
+            this.LineKind = lineKind;
+            this.Tiling = tiling;
             Line = null;
         }
 
         public DrawOnNetAction(
-            string drawableID, string parentDrawableID, string name, Vector3[] positions, Color color, float thickness, bool loop)
+            string drawableID, string parentDrawableID, string name, Vector3[] positions, Color color, float thickness, bool loop, LineKind lineKind, float tiling)
         {
             this.DrawableID = drawableID;
             this.ParentDrawableID = parentDrawableID;
@@ -44,6 +50,8 @@ namespace Assets.SEE.Net.Actions.Whiteboard
             this.Color = color;
             this.Thickness = thickness;
             this.Loop = loop;
+            this.LineKind = lineKind;
+            this.Tiling = tiling;
             Line = null;
         }
 
@@ -72,11 +80,11 @@ namespace Assets.SEE.Net.Actions.Whiteboard
                 {
                     if (OrderInLayer == -1)
                     {
-                        GameDrawer.DrawLine(drawable, Name, Positions, Color, Thickness, Loop);
+                        GameDrawer.DrawLine(drawable, Name, Positions, Color, Thickness, Loop, LineKind, Tiling);
                     }
                     else
                     {
-                        GameDrawer.DrawLine(drawable, Name, Positions, Color, Thickness, OrderInLayer, Loop);
+                        GameDrawer.DrawLine(drawable, Name, Positions, Color, Thickness, OrderInLayer, Loop, LineKind, Tiling);
                     }
                 }
             }

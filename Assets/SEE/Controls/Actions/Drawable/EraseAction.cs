@@ -46,7 +46,8 @@ namespace SEE.Controls.Actions
                         mementoList.Add(memento);
 
                         new EraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.line.id).Execute();
-                        Destroyer.Destroy(hittedObject.transform.parent.gameObject);
+                        Destroyer.Destroy(hittedObject);
+                       // Destroyer.Destroy(hittedObject.transform.parent.gameObject);
                     }
                 }
                 bool isMouseButtonUp = Input.GetMouseButtonUp(0);
@@ -105,7 +106,8 @@ namespace SEE.Controls.Actions
                     mem.line.gameObject = GameDrawableFinder.FindChild(mem.drawable, mem.line.id);
                 }
                 new EraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.line.id).Execute();
-                Destroyer.Destroy(mem.line.gameObject.transform.parent.gameObject);
+                Destroyer.Destroy(mem.line.gameObject);
+              //  Destroyer.Destroy(mem.line.gameObject.transform.parent.gameObject);
             }
         }
 

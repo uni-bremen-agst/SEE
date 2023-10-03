@@ -16,9 +16,15 @@ namespace Assets.SEE.Game.Drawable
         {
             Vector3 offset = new Vector3(hitPoint.x - firstPoint.x, hitPoint.y - firstPoint.y, hitPoint.z - firstPoint.z);
             Vector3 position;
+            ///This is needed to ensure that the correct axes are being moved. A rotation changes the axis position.
+            Vector3 eulerAngles = obj.transform.localEulerAngles;
+            obj.transform.localEulerAngles = Vector3.zero;
+
+            position = oldPosition + multiply(obj.transform.right, offset) + multiply(obj.transform.up, offset);
+            /*
             if (obj.CompareTag(Tags.Line))
             {
-                ///This is needed to ensure that the correct axes are being moved. A rotation changes the axis position.
+                
                 Vector3 eulerAngles = obj.transform.parent.localEulerAngles;
                 obj.transform.parent.localEulerAngles = Vector3.zero;
                 position = oldPosition + multiply(obj.transform.right, offset) + multiply(obj.transform.up, offset);
@@ -27,8 +33,9 @@ namespace Assets.SEE.Game.Drawable
             else
             {
                 position = oldPosition + multiply(obj.transform.right, offset) + multiply(obj.transform.up, offset);
-            }
+            }*/
             obj.transform.position = position;
+            obj.transform.localEulerAngles = eulerAngles;
             return position;
         }
 
@@ -44,6 +51,8 @@ namespace Assets.SEE.Game.Drawable
         public static Vector3 MoveObjectByKeyboard(GameObject obj, KeyCode key, bool turbo)
         {
             Vector3 newPosition = obj.transform.position;
+            Vector3 eulerAngles = obj.transform.localEulerAngles;
+            obj.transform.localEulerAngles = Vector3.zero;
             float multiplyValue = 0.001f;
             if (turbo)
             {
@@ -65,6 +74,7 @@ namespace Assets.SEE.Game.Drawable
                     break;
             }
             obj.transform.position = newPosition;
+            obj.transform.localEulerAngles = eulerAngles;
             return newPosition;
         }
 
@@ -87,7 +97,8 @@ namespace Assets.SEE.Game.Drawable
 
         public static void RotateObject(GameObject obj, Vector3 moveDirection, float degree)
         {
-            Transform transform;
+            Transform transform = obj.transform;//Transform transform;
+            /*
             if (obj.CompareTag(Tags.Line))
             {
                 transform = obj.transform.parent;
@@ -98,7 +109,7 @@ namespace Assets.SEE.Game.Drawable
             else
             {
                 transform = obj.transform;
-            }
+            }*/
             transform.Rotate(moveDirection, degree, Space.Self);
             obj.GetComponent<MeshCollider>().enabled = false;
             obj.GetComponent<MeshCollider>().enabled = true;
@@ -122,7 +133,7 @@ namespace Assets.SEE.Game.Drawable
             obj.GetComponent<MeshCollider>().enabled = false;
             obj.GetComponent<MeshCollider>().enabled = true;
         }
-
+        /*
         public static void SetRotate(GameObject obj, float localEulerAngleZ, Vector3 holderPosition, Vector3 objPosition)
         {
             Transform transform = obj.CompareTag(Tags.Line) ? obj.transform.parent : obj.transform;
@@ -132,6 +143,16 @@ namespace Assets.SEE.Game.Drawable
                 transform.localPosition = holderPosition;
                 obj.transform.localPosition = objPosition;
             }
+        }*/
+        public static void SetRotate(GameObject obj, float localEulerAngleZ)
+        {
+            Transform transform = obj.transform;
+            transform.localEulerAngles = new Vector3(0, 0, localEulerAngleZ);
+            /*if (obj.CompareTag(Tags.Line))
+            {
+                transform.localPosition = holderPosition;
+                obj.transform.localPosition = objPosition;
+            }*/
         }
     }
 }

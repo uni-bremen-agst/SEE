@@ -54,7 +54,8 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
                     mementoList.Add(memento);
 
                     new CleanerNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id, DrawableTypes.Line).Execute();
-                    Destroyer.Destroy(child.transform.parent.gameObject);
+                    Destroyer.Destroy(child);
+                    //Destroyer.Destroy(child.transform.parent.gameObject);
                     
                 }
             }
@@ -117,6 +118,8 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
                     mem.gameObject = GameDrawableFinder.FindChild(mem.drawable, mem.id);
                 }
                 new CleanerNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.id, mem.type).Execute();
+                Destroyer.Destroy(mem.gameObject);
+                /*
                 if (mem.gameObject.CompareTag(Tags.Line))
                 {
                     Destroyer.Destroy(mem.gameObject.transform.parent.gameObject);
@@ -124,7 +127,7 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
                 else
                 {
                     Destroyer.Destroy(mem.gameObject);
-                }
+                }*/
             }
         }
 

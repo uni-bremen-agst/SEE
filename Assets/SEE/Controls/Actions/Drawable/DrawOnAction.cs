@@ -43,7 +43,7 @@ namespace SEE.Controls.Actions
 
         private HSVPicker.ColorPicker picker;
         private ThicknessSliderController thicknessSlider;
-        private bool drawing = false;
+       private bool drawing = false;
 
         public override void Start()
         {
@@ -53,6 +53,15 @@ namespace SEE.Controls.Actions
         public override void Awake()
         {
             DrawableHelper.enableDrawableMenu(withoutMenuPoints: new DrawableHelper.MenuPoint[] { DrawableHelper.MenuPoint.Layer, DrawableHelper.MenuPoint.Loop });
+
+            DrawableHelper.GetTilingSlider().onValueChanged.AddListener(DrawableHelper.tilingAction = tiling =>
+            {
+                DrawableHelper.currentTiling = tiling;
+            });
+            DrawableHelper.GetNextBtn().onClick.RemoveAllListeners();
+            DrawableHelper.GetNextBtn().onClick.AddListener(() => DrawableHelper.currentLineKind = DrawableHelper.NextLineKind());
+            DrawableHelper.GetPreviousBtn().onClick.RemoveAllListeners();
+            DrawableHelper.GetPreviousBtn().onClick.AddListener(() => DrawableHelper.currentLineKind = DrawableHelper.PreviousLineKind());
 
             thicknessSlider = DrawableHelper.drawableMenu.GetComponentInChildren<ThicknessSliderController>();
             thicknessSlider.AssignValue(DrawableHelper.currentThickness);
@@ -98,7 +107,8 @@ namespace SEE.Controls.Actions
                         case ProgressState.StartDrawing:
                             progressState = ProgressState.Drawing;
                             positions[0] = raycastHit.point;
-                            line = GameDrawer.StartDrawing(drawable, positions, DrawableHelper.currentColor, DrawableHelper.currentThickness);
+                            line = GameDrawer.StartDrawing(drawable, positions, DrawableHelper.currentColor, DrawableHelper.currentThickness, 
+                                DrawableHelper.currentLineKind, DrawableHelper.currentTiling);
                             positions[0] = line.transform.InverseTransformPoint(positions[0]) - DrawableHelper.distanceToBoard;
                             break;
 
@@ -143,7 +153,7 @@ namespace SEE.Controls.Actions
                         }
                         else
                         {
-                            Destroyer.Destroy(line.transform.parent.gameObject);
+                            Destroyer.Destroy(line);//.transform.parent.gameObject);
                         }
                     }
                     return isMouseButtonUp;
@@ -181,7 +191,7 @@ namespace SEE.Controls.Actions
             {
                 Debug.Log("Delete: " + line);
                 new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.line.id).Execute();
-                Destroyer.Destroy(line.transform.parent.gameObject);
+                Destroyer.Destroy(line);//.transform.parent.gameObject);
                 line = null;
             }
         }
