@@ -74,7 +74,7 @@ namespace Assets.SEE.Game.Drawable
                // line.holderEulerAngles = holderTransform.localEulerAngles;
                 //line.holderPosition = holderTransform.localPosition;
                 line.color = renderer.material.color;
-                line.orderInLayer = renderer.sortingOrder;
+                line.orderInLayer = lineGameObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();//renderer.sortingOrder;
                 line.thickness = renderer.startWidth;
                 line.tiling = renderer.textureScale.x;
                 line.lineKind = lineGameObject.GetComponent<LineKindHolder>().GetLineKind();

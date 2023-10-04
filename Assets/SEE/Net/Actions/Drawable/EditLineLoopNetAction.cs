@@ -1,24 +1,40 @@
 ﻿using Assets.SEE.Game;
 using Assets.SEE.Game.Drawable;
 using SEE.Net.Actions;
-using SEE.Utils;
-using System.Collections;
+using SEE.Controls.Actions.Drawable;
 using UnityEngine;
 
-namespace Assets.SEE.Net.Actions.Drawable
+namespace SEE.Net.Actions.Drawable
 {
+    /// <summary>
+    /// This class is responsible for changing the loop (<see cref="EditLineAction"/>) of a line on all clients.
+    /// </summary>
     public class EditLineLoopNetAction : AbstractNetAction
     {
+        /// <summary>
+        /// The id of the drawable on which the object is located
+        /// </summary>
         public string DrawableID;
+        /// <summary>
+        /// The id of the drawable parent
+        /// </summary>
         public string ParentDrawableID;
+        /// <summary>
+        /// The id of the line that should be changed
+        /// </summary>
         public string LineName;
+        /// <summary>
+        /// The new loop value for the line.
+        /// </summary>
         public bool Loop;
 
         /// <summary>
-        /// Creates a new FastEraseNetAction.
+        /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="gameObjectID">the unique name of the gameObject of a line
-        /// that has to be deleted</param>
+        /// <param name="drawableID">The id of the drawable on which the object is located.</param>
+        /// <param name="parentDrawableID">The id of the drawable parent.</param>
+        /// <param name="lineName">The id of the line that should be changed.</param>
+        /// <param name="loop">The new loop value for the line.</param>
         public EditLineLoopNetAction(string drawableID, string parentDrawableID, string lineName, bool loop) : base()
         {
             DrawableID = drawableID;
@@ -26,11 +42,20 @@ namespace Assets.SEE.Net.Actions.Drawable
             LineName = lineName;
             Loop = loop;
         }
+
+        /// <summary>
+        /// Things to execute on the server (none for this class). Necessary because it is abstract
+        /// in the superclass.
+        /// </summary>
         protected override void ExecuteOnServer()
         {
 
         }
 
+        /// <summary>
+        /// Changes the loop of the given line on each client.
+        /// </summary>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="LineName"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())

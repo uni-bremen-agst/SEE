@@ -1,24 +1,15 @@
 ﻿using Assets.SEE.Game;
 using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game.UI.Drawable;
-using Assets.SEE.Net.Actions.Drawable;
-using Assets.SEE.Net.Actions.Whiteboard;
-using RTG;
-using SEE.Controls.Actions;
+using SEE.Net.Actions.Drawable;
 using SEE.Game;
-using SEE.Game.UI.ConfigMenu;
 using SEE.GO;
-using SEE.Net.Actions;
 using SEE.Utils;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using UnityEngine;
 using UnityEngine.UI;
 using static SEE.Game.GameDrawer;
 
-namespace Assets.SEE.Controls.Actions.Drawable
+namespace SEE.Controls.Actions.Drawable
 {
     public class EditLineAction : AbstractPlayerAction
     {

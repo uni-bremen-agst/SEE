@@ -1,19 +1,14 @@
 using Assets.SEE.Game;
 using Assets.SEE.Game.Drawable;
-using Assets.SEE.Net.Actions.Whiteboard;
-using RTG;
-using SEE.DataModel;
+using SEE.Net.Actions.Drawable;
 using SEE.Game;
-using SEE.GO;
-using SEE.Net.Actions;
 using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
     /// Allows to create drawings by the mouse cursor.
@@ -35,7 +30,7 @@ namespace SEE.Controls.Actions
             { 
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
                     Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
-                    GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject))
+                    GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject))
                 {
                     GameObject hittedObject = raycastHit.collider.gameObject;
                     if (hittedObject.CompareTag(Tags.Line))

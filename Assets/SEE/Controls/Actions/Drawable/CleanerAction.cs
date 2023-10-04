@@ -1,16 +1,12 @@
 ﻿using Assets.SEE.Game;
 using Assets.SEE.Game.Drawable;
-using Assets.SEE.Net.Actions.Whiteboard;
-using SEE.Controls.Actions;
 using SEE.Game;
-using SEE.Net.Actions;
+using SEE.Net.Actions.Drawable;
 using SEE.Utils;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.SEE.Controls.Actions.Whiteboard
+namespace SEE.Controls.Actions.Drawable
 {
     public class CleanerAction : AbstractPlayerAction
     {       
@@ -26,7 +22,7 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
                     if (hittedObject.CompareTag(Tags.Drawable))
                     {
                         DeleteDrawableChilds(hittedObject);
-                    } else if (GameDrawableFinder.hasDrawableParent(hittedObject))
+                    } else if (GameDrawableFinder.hasDrawable(hittedObject))
                     {
                         DeleteDrawableChilds(GameDrawableFinder.FindDrawable(hittedObject));
                     }
@@ -53,7 +49,7 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
                     memento.line = Line.GetLine(child);
                     mementoList.Add(memento);
 
-                    new CleanerNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id, DrawableTypes.Line).Execute();
+                    new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id).Execute();
                     Destroyer.Destroy(child);
                     //Destroyer.Destroy(child.transform.parent.gameObject);
                     
@@ -117,7 +113,7 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
                 {
                     mem.gameObject = GameDrawableFinder.FindChild(mem.drawable, mem.id);
                 }
-                new CleanerNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.id, mem.type).Execute();
+                new EraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.id).Execute();
                 Destroyer.Destroy(mem.gameObject);
                 /*
                 if (mem.gameObject.CompareTag(Tags.Line))

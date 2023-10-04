@@ -24,20 +24,48 @@ namespace Assets.SEE.Game.Drawable
         /// </summary>
         public static float currentThickness { get; set; }
 
+        /// <summary>
+        /// The current choosen line kind for drawing.
+        /// </summary>
         public static GameDrawer.LineKind currentLineKind { get; set; }
 
+        /// <summary>
+        /// The current choosen tiling for drawing a dashed line kind.
+        /// </summary>
         public static float currentTiling { get; set; }
 
+        /// <summary>
+        /// The current order in layer value.
+        /// </summary>
         public static int orderInLayer { get; set; }
 
+        /// <summary>
+        /// The prefix of a line object name.
+        /// </summary>
         public static readonly string LinePrefix = "Line";
-        public static readonly string LineHolderPrefix = "LineHolder";
+
+        /// <summary>
+        /// The prefix of a drawable holder object.
+        /// </summary>
         public static readonly string DrawableHolderPrefix = "DrawableHolder";
+
+        /// <summary>
+        /// The name of the attached objects object.
+        /// </summary>
         public static readonly string AttachedObject = "AttachedObjects";
 
-        public readonly static Vector3 distanceToBoard = new(0, 0, 0.0001f);
+        /// <summary>
+        /// The distance to a drawable that is used by default to place objects.
+        /// </summary>
+        public readonly static Vector3 distanceToDrawable = new(0, 0, 0.0001f);
 
+        /// <summary>
+        /// The location where the drawable menu prefeb is placed.
+        /// </summary>
         private const string drawableMenuPrefab = "Prefabs/UI/Drawable/DrawableLineMenu";
+        /// <summary>
+        /// The instance of the drawable menu.
+        /// </summary>
         public static GameObject drawableMenu;
         public static UnityAction<Color> colorAction;
         private static TMP_Text lineKindText;
@@ -241,24 +269,7 @@ namespace Assets.SEE.Game.Drawable
                 disableTilingFromDrawableMenu();
             }
         }
-        /*
-        public static void NextLineKind()
-        {
-            int index = GetIndexOfSelectedLineKind() + 1;
-            if (index >= GameDrawer.GetLineKinds().Count)
-            {
-                index = 0;
-            }
-            if (GameDrawer.GetLineKinds()[index] == GameDrawer.LineKind.Dashed)
-            {
-                enableTilingFromDrawableMenu();
-            } else
-            {
-                disableTilingFromDrawableMenu();
-            }
-            AssignLineKind(GameDrawer.GetLineKinds()[index]);
-        }
-        */
+
         public static GameDrawer.LineKind NextLineKind()
         {
             int index = GetIndexOfSelectedLineKind() + 1;
@@ -277,26 +288,7 @@ namespace Assets.SEE.Game.Drawable
             AssignLineKind(GameDrawer.GetLineKinds()[index]);
             return GameDrawer.GetLineKinds()[index];
         }
-        /*
-        public static void PreviousLineKind()
-        {
-            int index = GetIndexOfSelectedLineKind() - 1;
-            if (index < 0)
-            {
-                index = GameDrawer.GetLineKinds().Count - 1;
-            }
-            if (GameDrawer.GetLineKinds()[index] == GameDrawer.LineKind.Dashed)
-            {
-                enableTilingFromDrawableMenu();
-            }
-            else
-            {
-                disableTilingFromDrawableMenu();
-            }
-            AssignLineKind(GameDrawer.GetLineKinds()[index]);
-            previousAction.Invoke(GameDrawer.GetLineKinds()[index].ToString());
-        }
-        */
+
         public static GameDrawer.LineKind PreviousLineKind()
         {
             int index = GetIndexOfSelectedLineKind() - 1;

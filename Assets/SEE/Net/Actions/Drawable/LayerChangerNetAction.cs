@@ -1,36 +1,51 @@
 ﻿using Assets.SEE.Game;
 using Assets.SEE.Game.Drawable;
-using SEE.Game;
-using SEE.Utils;
+using SEE.Controls;
 using UnityEngine;
+using SEE.Controls.Actions.Drawable;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class propagates a <see cref="DeleteAction"/> to all clients in the network.
+    /// This class is responsible for changing the order in layer (<see cref="LayerChangerAction"/>) of an object on all clients.
     /// </summary>
     public class LayerChangerNetAction : AbstractNetAction
     {
+        /// <summary>
+        /// The id of the drawable on which the object is located
+        /// </summary>
         public string DrawableID;
+        /// <summary>
+        /// The id of the drawable parent
+        /// </summary>
         public string ParentDrawableID;
+        /// <summary>
+        /// The id of the object that should be changed
+        /// </summary>
         public string ObjectName;
+        /// <summary>
+        /// The state of layer change
+        /// </summary>
         public GameLayerChanger.LayerChangerStates State;
-        public DrawableTypes Type;
+        /// <summary>
+        /// The order in layer that should be set
+        /// </summary>
         public int Order;
 
-
         /// <summary>
-        /// Creates a new FastEraseNetAction.
+        /// Creates a new <see cref="LayerChangerNetAction"/>
         /// </summary>
-        /// <param name="gameObjectID">the unique name of the gameObject of a line
-        /// that has to be deleted</param>
-        public LayerChangerNetAction(string drawableID, string parentDrawableID, string objectName, GameLayerChanger.LayerChangerStates state, DrawableTypes type, int order) : base()
+        /// <param name="drawableID">The id of the drawable on which the object is located.</param>
+        /// <param name="parentDrawableID">The id of the drawable parent.</param>
+        /// <param name="objectName">The id of the object that should be changed.</param>
+        /// <param name="state">The state of layer change</param>
+        /// <param name="order">The order in layer that should be set.</param>
+        public LayerChangerNetAction(string drawableID, string parentDrawableID, string objectName, GameLayerChanger.LayerChangerStates state, int order) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
             ObjectName = objectName;
             State = state;
-            Type = type;
             Order = order;
         }
 
@@ -44,8 +59,9 @@ namespace SEE.Net.Actions
         }
 
         /// <summary>
-        /// Deletes the game object identified by <see cref="GameObjectID"/> on each client.
+        /// Changes the order in layer of the given object on each client.
         /// </summary>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="ObjectName"/> don't exists.</exception>
         protected override void ExecuteOnClient()
         {
             if (!IsRequester())
@@ -60,14 +76,13 @@ namespace SEE.Net.Actions
                 {
                     throw new System.Exception($"There is no object with the name {ObjectName}.");
                 }
-
                 switch (State) {
                     case GameLayerChanger.LayerChangerStates.Increase:
-                        GameLayerChanger.Increase(Type, obj, Order);
+                        GameLayerChanger.Increase(obj, Order);
                         break;
 
                     case GameLayerChanger.LayerChangerStates.Decrease:
-                        GameLayerChanger.Decrease(Type, obj, Order);
+                        GameLayerChanger.Decrease(obj, Order);
                         break;
                 }
             }

@@ -64,16 +64,16 @@ namespace SEE.Game
             line.tag = Tags.Line;
             line.transform.SetParent(attachedObjects.transform);
             //   line.transform.SetParent(lineHolder.transform);
+            
             renderer = line.AddComponent<LineRenderer>();
             meshCollider = line.AddComponent<MeshCollider>();
-            line.AddComponent<LineKindHolder>().SetLineKind(lineKind);
             renderer.alignment = LineAlignment.TransformZ;
             //renderer.textureMode = LineTextureMode.Tile;
             renderer.sharedMaterial = GetMaterial(color, lineKind);
             SetRendererTextrueScale(renderer, lineKind, tiling);
             renderer.startWidth = thickness;
             renderer.endWidth = renderer.startWidth;
-            renderer.sortingOrder = order;
+           // renderer.sortingOrder = order;
             renderer.useWorldSpace = false;
             renderer.positionCount = positions.Length;
 
@@ -81,8 +81,10 @@ namespace SEE.Game
             // line.transform.position = lineHolder.transform.position;
             line.transform.position = attachedObjects.transform.position;
             line.transform.rotation = attachedObjects.transform.rotation;//lineHolder.transform.rotation;
-            line.transform.position -= line.transform.forward * DrawableHelper.distanceToBoard.z * order;
+            line.transform.position -= line.transform.forward * DrawableHelper.distanceToDrawable.z * order;
             //GameLayerChanger.SetOrder(line, renderer.sortingOrder);
+            line.AddComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
+            line.AddComponent<LineKindHolder>().SetLineKind(lineKind);
         }
 
         private static LineRenderer GetRenderer(GameObject line)
@@ -185,8 +187,9 @@ namespace SEE.Game
                 //line.transform.parent.localEulerAngles = eulerAngles;
                 //line.transform.parent.localPosition = holderLocalPosition;
                 line.transform.localPosition = position;
-                LineRenderer renderer = GetRenderer(line);
-                renderer.sortingOrder = orderInLayer;
+                line.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(orderInLayer);
+                //LineRenderer renderer = GetRenderer(line);
+                //renderer.sortingOrder = orderInLayer;
                 //GameLayerChanger.SetOrder(line, renderer.sortingOrder);
                 Drawing(line, positions);
                 FinishDrawing(line, loop);
@@ -349,7 +352,7 @@ namespace SEE.Game
                 out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
             //  Setup(drawable, "", new Vector3[] { position }, DrawableHelper.currentColor, DrawableHelper.currentThickness, 
             //      out GameObject line, out GameObject lineHolder, out LineRenderer renderer, out MeshCollider meshCollider);
-            convertedPosition = line.transform.InverseTransformPoint(position) - DrawableHelper.distanceToBoard;
+            convertedPosition = line.transform.InverseTransformPoint(position) - DrawableHelper.distanceToDrawable;
             Destroyer.Destroy(line);
             //Destroyer.Destroy(lineHolder);
             return convertedPosition;
@@ -364,7 +367,7 @@ namespace SEE.Game
             //       out GameObject lineHolder, out LineRenderer renderer, out MeshCollider meshCollider);
             for (int i = 0; i < positions.Length; i++)
             {
-                convertedPosition[i] = line.transform.InverseTransformPoint(positions[i]) - DrawableHelper.distanceToBoard;
+                convertedPosition[i] = line.transform.InverseTransformPoint(positions[i]) - DrawableHelper.distanceToDrawable;
             }
             Destroyer.Destroy(line);
             //Destroyer.Destroy(lineHolder);

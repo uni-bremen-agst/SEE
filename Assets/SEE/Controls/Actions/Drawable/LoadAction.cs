@@ -8,7 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static RootMotion.FinalIK.HitReaction;
-using Assets.SEE.Net.Actions.Whiteboard;
+using SEE.Net.Actions.Drawable;
 using SEE.Net.Actions;
 using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game;
@@ -17,12 +17,10 @@ using SimpleFileBrowser;
 using Assets.SEE.Game.UI.Drawable;
 using UnityEngine.UI;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
-    /// Allows to create drawings by the mouse cursor.
-    /// It serves as an example for a continuous action that modifies the
-    /// scene while active.
+    /// Adds the <see cref="DrawableTypes"/> to the scene from one or more drawable configs saved in a file on the disk.
     /// </summary>
     class LoadAction : AbstractPlayerAction
     {
@@ -92,7 +90,7 @@ namespace SEE.Controls.Actions
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && Input.GetKey(KeyCode.LeftControl) && !clicked &&
                     Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
                     (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                    GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject)))
+                    GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject)))
                 {
                     clicked = true;
                     DrawableConfig config = DrawableConfigManager.LoadDrawable("Test");
@@ -126,6 +124,10 @@ namespace SEE.Controls.Actions
                     clicked = false;
                 }
 
+                if(Input.GetMouseButtonDown(2))
+                {
+                    GameObject.Find("UI Canvas").AddComponent<Test>();
+                }
             }
             return result;
         }
@@ -228,16 +230,9 @@ namespace SEE.Controls.Actions
             }
         }
 
-        public override void Awake()
-        {
-           // GameObject.Find("UI Canvas").AddComponent<Test>();
-        }
-
-
-
         public override void Stop()
         {
-          //  Destroyer.Destroy(GameObject.Find("UI Canvas").GetComponent<Test>());
+            Destroyer.Destroy(GameObject.Find("UI Canvas").GetComponent<Test>());
         }
 
 

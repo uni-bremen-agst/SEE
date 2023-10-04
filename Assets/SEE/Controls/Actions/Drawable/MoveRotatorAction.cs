@@ -1,25 +1,15 @@
 ﻿using Assets.SEE.Game;
 using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game.UI.Drawable;
-using Assets.SEE.Net.Actions.Drawable;
-using Assets.SEE.Net.Actions.Whiteboard;
-using RTG;
-using SEE.Controls.Actions;
+using SEE.Net.Actions.Drawable;
 using SEE.Game;
-using SEE.Game.UI.ConfigMenu;
 using SEE.GO;
-using SEE.Net.Actions;
 using SEE.Utils;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using UnityEditor;
 using UnityEngine;
-using UnityEngine.UIElements;
-using MoveNetAction = Assets.SEE.Net.Actions.Drawable.MoveNetAction;
+using MoveNetAction = SEE.Net.Actions.Drawable.MoveNetAction;
 
-namespace Assets.SEE.Controls.Actions.Drawable
+namespace SEE.Controls.Actions.Drawable
 {
     public class MoveRotatorAction : AbstractPlayerAction
     {
@@ -80,7 +70,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
             {
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButton(1))
                     && !isActive && !didSomething && !isDone && Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
-                    GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject) && clickState == ClickState.None)
+                    GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject) && clickState == ClickState.None)
                 {
                     SetSelectedObject(raycastHit.collider.gameObject);
                     isActive = true;

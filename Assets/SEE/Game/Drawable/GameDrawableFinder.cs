@@ -79,7 +79,7 @@ namespace Assets.SEE.Game
             return FindChildWithTag(GetHighestParent(child), Tags.Drawable);
         }
 
-        public static bool hasDrawableParent(GameObject child)
+        public static bool hasDrawable(GameObject child)
         {
             if (hasParentWithTag(child, Tags.AttachedObjects)) {
                 return FindDrawable(child) != null;

@@ -1,5 +1,5 @@
 ﻿using Assets.SEE.Game.Drawable;
-using Assets.SEE.Net.Actions.Drawable;
+using SEE.Net.Actions.Drawable;
 using SEE.Game;
 using System;
 using System.Collections;

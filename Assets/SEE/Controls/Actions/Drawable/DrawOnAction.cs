@@ -3,13 +3,13 @@ using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Assets.SEE.Net.Actions.Whiteboard;
-using SEE.Net.Actions;
+using SEE.Net.Actions.Drawable;
 using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game;
 using System.Linq;
+using SEE.Controls.Actions;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
     /// Allows to create drawings by the mouse cursor.
@@ -96,7 +96,7 @@ namespace SEE.Controls.Actions
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                    GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject)))
+                    GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject)))
                 {
                     drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
                         raycastHit.collider.gameObject : GameDrawableFinder.FindDrawable(raycastHit.collider.gameObject);
@@ -109,12 +109,12 @@ namespace SEE.Controls.Actions
                             positions[0] = raycastHit.point;
                             line = GameDrawer.StartDrawing(drawable, positions, DrawableHelper.currentColor, DrawableHelper.currentThickness, 
                                 DrawableHelper.currentLineKind, DrawableHelper.currentTiling);
-                            positions[0] = line.transform.InverseTransformPoint(positions[0]) - DrawableHelper.distanceToBoard;
+                            positions[0] = line.transform.InverseTransformPoint(positions[0]) - DrawableHelper.distanceToDrawable;
                             break;
 
                         case ProgressState.Drawing:
                             // The position at which to continue the line.
-                            Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - DrawableHelper.distanceToBoard;
+                            Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - DrawableHelper.distanceToDrawable;
                             if (newPosition != positions.Last())
                             {
                                 // Add newPosition to the line renderer.

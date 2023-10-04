@@ -1,28 +1,14 @@
-﻿using SEE.DataModel;
-using SEE.DataModel.DG;
-using SEE.Game;
-using SEE.GO;
+﻿using SEE.Game;
 using SEE.Utils;
-using System.IO;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static RootMotion.FinalIK.HitReaction;
-using Assets.SEE.Net.Actions.Whiteboard;
-using SEE.Net.Actions;
 using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game;
-using static SimpleFileBrowser.FileBrowser;
-using SimpleFileBrowser;
-using Assets.SEE.Game.UI.Drawable;
-using UnityEngine.UI;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
-    /// Allows to create drawings by the mouse cursor.
-    /// It serves as an example for a continuous action that modifies the
-    /// scene while active.
+    /// Saves one or more drawable configuration's to a file.
     /// </summary>
     class SaveAction : AbstractPlayerAction
     {
@@ -90,7 +76,7 @@ namespace SEE.Controls.Actions
             {
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !clicked &&
                     Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&// && // Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                    (GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject) || raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
+                    (GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject) || raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
                 {
                     clicked = true;
                     GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?

@@ -1,8 +1,12 @@
-﻿namespace SEE.Game
+﻿using System;
+
+namespace Assets.SEE.Game.Drawable
 {
     /// <summary>
-    /// The drawable types. It used to identify the kind of game object on drawables.
+    /// This enum represents the kind of gameObjects on a drawable.
+    /// It will be used to identify the kind of game object.
     /// </summary>
+    [Serializable]
     public enum DrawableTypes
     {
         Line

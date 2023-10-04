@@ -1,4 +1,4 @@
-﻿using Assets.SEE.Controls.Actions.Drawable;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Controls.Actions;
 using SEE.Game;
 using SEE.Utils;

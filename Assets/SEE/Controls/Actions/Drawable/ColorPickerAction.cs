@@ -1,19 +1,11 @@
-using SEE.DataModel;
-using SEE.DataModel.DG;
-using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static RootMotion.FinalIK.HitReaction;
-using Assets.SEE.Net.Actions.Whiteboard;
-using SEE.Net.Actions;
 using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game;
 
-namespace SEE.Controls.Actions
+namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
     /// Allows to create drawings by the mouse cursor.
@@ -44,7 +36,7 @@ namespace SEE.Controls.Actions
             {
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
                     Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) && // Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                    GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject))
+                    GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject))
                 {
                     pickedColor = raycastHit.collider.gameObject.GetColor();
                     picker.AssignColor(pickedColor);

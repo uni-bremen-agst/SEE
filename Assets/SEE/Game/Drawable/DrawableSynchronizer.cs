@@ -1,4 +1,4 @@
-﻿using Assets.SEE.Net.Actions.Whiteboard;
+﻿using SEE.Net.Actions.Drawable;
 using SEE.Game;
 using System.Collections;
 using UnityEngine;

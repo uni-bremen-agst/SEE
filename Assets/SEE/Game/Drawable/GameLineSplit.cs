@@ -1,4 +1,4 @@
-﻿using Assets.SEE.Net.Actions.Whiteboard;
+﻿using SEE.Net.Actions.Drawable;
 using RTG;
 using SEE.Game;
 using SEE.Game.UI.Notification;

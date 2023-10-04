@@ -1,9 +1,7 @@
-﻿using SEE.Controls.Actions;
-using SEE.Utils;
-using System.Collections;
+﻿using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using Assets.SEE.Net.Actions.Whiteboard;
+using SEE.Net.Actions.Drawable;
 using SEE.Net.Actions;
 using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game;
@@ -13,10 +11,9 @@ using System;
 using UnityEngine.UI;
 using Assets.SEE.Game.UI.Drawable;
 using TMPro;
-using RTG;
-using static RootMotion.FinalIK.HitReactionVRIK;
 
-namespace Assets.SEE.Controls.Actions.Drawable
+
+namespace SEE.Controls.Actions.Drawable
 {
     public class DrawShapesAction : AbstractPlayerAction
     {
@@ -409,7 +406,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 if (Input.GetMouseButtonDown(0) &&
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                    GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject))
+                    GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject))
                     && !drawing)
                 {
                     drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
@@ -424,7 +421,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                             positions[0] = raycastHit.point;
                             shape = GameDrawer.StartDrawing(drawable, positions, DrawableHelper.currentColor, DrawableHelper.currentThickness,
                                 DrawableHelper.currentLineKind, DrawableHelper.currentTiling);
-                            positions[0] = shape.transform.InverseTransformPoint(positions[0]) - DrawableHelper.distanceToBoard;
+                            positions[0] = shape.transform.InverseTransformPoint(positions[0]) - DrawableHelper.distanceToDrawable;
                             shape.AddComponent<MenuDestroyer>().SetAllowedState(GetActionStateType());
                             break;
                         case GameShapesCalculator.Shapes.Square:
@@ -493,10 +490,10 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 if (drawing && !Input.GetMouseButton(0) && !Input.GetMouseButtonDown(0) &&
                     Raycasting.RaycastAnything(out RaycastHit rh) &&
                     (rh.collider.gameObject.CompareTag(Tags.Drawable) ||
-                    GameDrawableFinder.hasDrawableParent(rh.collider.gameObject)) &&
+                    GameDrawableFinder.hasDrawable(rh.collider.gameObject)) &&
                     selectedShape == GameShapesCalculator.Shapes.Line)
                 {
-                    Vector3 newPosition = shape.transform.InverseTransformPoint(rh.point) - DrawableHelper.distanceToBoard;
+                    Vector3 newPosition = shape.transform.InverseTransformPoint(rh.point) - DrawableHelper.distanceToDrawable;
                     // Add newPosition to the line renderer.
                     Vector3[] newPositions = new Vector3[positions.Length + 1];
                     Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
@@ -510,10 +507,10 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 if (Input.GetMouseButtonDown(0) &&
                     Raycasting.RaycastAnything(out RaycastHit hit) &&
                     (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                    GameDrawableFinder.hasDrawableParent(hit.collider.gameObject))
+                    GameDrawableFinder.hasDrawable(hit.collider.gameObject))
                     && drawing && selectedShape == GameShapesCalculator.Shapes.Line)
                 {
-                    Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - DrawableHelper.distanceToBoard;
+                    Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - DrawableHelper.distanceToDrawable;
                     if (newPosition != positions.Last())
                     {
                         // Add newPosition to the line renderer.

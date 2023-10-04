@@ -1,69 +1,80 @@
 ﻿using SEE.Controls.Actions;
 using SEE.Game;
 using SEE.Game.UI.Notification;
+using System;
 using System.Collections;
 using UnityEngine;
 
 namespace Assets.SEE.Game.Drawable
 {
+    /// <summary>
+    /// This GameLayerChanger allows to change the order in layer of a <see cref="DrawableTypes"/>
+    /// The <see cref="DrawableTypes"/> needs a <see cref="OrderInLayerValueHolder"/> component.
+    /// </summary>
     public static class GameLayerChanger
     {
+        /// <summary>
+        /// The state of the layer changer.
+        /// Increase when the order in layer was increased.
+        /// Decrease when the order in layer was decreased.
+        /// </summary>
+        [Serializable]
         public enum LayerChangerStates
         {
             Increase,
             Decrease
         }
-        public static bool Increase(DrawableTypes type, GameObject obj, int order)
-        {
-            bool result = false;
-            switch (type)
-            {
-                case DrawableTypes.Line:
-                    LineRenderer lineRenderer = obj.GetComponent<LineRenderer>();
-                    if (lineRenderer.sortingOrder >= DrawableHelper.orderInLayer)
-                    {
-                        ShowNotification.Warn("Maximum layer order", obj.name + " has reached the maximum layer order: " + lineRenderer.sortingOrder);
-                    }
-                    else
-                    {
-                        lineRenderer.sortingOrder = order;
-                        SetOrder(obj, order);
-                        result = true;
-                    }
-                    break;
 
-                default:
-                    break;
+        /// <summary>
+        /// Increase the order in layer of an object with a <see cref="OrderInLayerValueHolder"/> component.
+        /// </summary>
+        /// <param name="obj">The object whose order in layer is to be changed</param>
+        /// <param name="order">The new order of the object.</param>
+        public static void Increase(GameObject obj, int order)
+        {
+            if (obj.GetComponent<OrderInLayerValueHolder>() != null)
+            {
+                OrderInLayerValueHolder holder = obj.GetComponent<OrderInLayerValueHolder>();
+                if (holder.GetOrderInLayer() >= DrawableHelper.orderInLayer)
+                {
+                    ShowNotification.Warn("Maximum layer order", obj.name + " has reached the maximum layer order: " + holder.GetOrderInLayer());
+                }
+                else
+                {
+                    holder.SetOrderInLayer(order);
+                    MoveObjectZ(obj, order);
+                }
             }
-            return result;
         }
 
-        public static bool Decrease(DrawableTypes type, GameObject obj, int order)
+        /// <summary>
+        /// Decrease the order in layer of an object with a <see cref="OrderInLayerValueHolder"/> component.
+        /// </summary>
+        /// <param name="obj">The object whose order in layer is to be changed</param>
+        /// <param name="order">The new order of the object.</param>
+        public static void Decrease(GameObject obj, int order)
         {
-            bool result = false;
-            switch (type)
+            if (obj.GetComponent<OrderInLayerValueHolder>() != null)
             {
-                case DrawableTypes.Line:
-                    LineRenderer lineRenderer = obj.GetComponent<LineRenderer>();
-                    if (lineRenderer.sortingOrder == 0)
-                    {
-                        ShowNotification.Warn("Minimum layer order", obj.name + " has reached the minimum layer order: " + lineRenderer.sortingOrder);
-                    }
-                    else
-                    {
-                        lineRenderer.sortingOrder = order;
-                        SetOrder(obj, order);
-                        result = true;
-                    }
-                    break;
-
-                default:
-                    break;
+                OrderInLayerValueHolder holder = obj.GetComponent<OrderInLayerValueHolder>();
+                if (holder.GetOrderInLayer() == 0)
+                {
+                    ShowNotification.Warn("Minimum layer order", obj.name + " has reached the minimum layer order: " + holder.GetOrderInLayer());
+                }
+                else
+                {
+                    holder.SetOrderInLayer(order);
+                    MoveObjectZ(obj, order);
+                }
             }
-            return result;
         }
 
-        public static void SetOrder(GameObject obj, int order)
+        /// <summary>
+        /// This method implements the order in layers by moving the object on the z axis.
+        /// </summary>
+        /// <param name="obj">The object that is to be moved</param>
+        /// <param name="order">The order to calculate the new z position of the object</param>
+        private static void MoveObjectZ(GameObject obj, int order)
         {
             Vector3 oldPos = obj.transform.localPosition;
             float multiplyValue = order;
@@ -71,7 +82,7 @@ namespace Assets.SEE.Game.Drawable
             {
                 multiplyValue = 0.5f;
             }
-            obj.transform.localPosition = new Vector3(oldPos.x, oldPos.y, multiplyValue * -DrawableHelper.distanceToBoard.z);;
+            obj.transform.localPosition = new Vector3(oldPos.x, oldPos.y, multiplyValue * -DrawableHelper.distanceToDrawable.z);;
         }
     }
 }
