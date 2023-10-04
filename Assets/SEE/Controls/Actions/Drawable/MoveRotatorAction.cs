@@ -115,7 +115,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 if (selectedObject != null && selectedObject.GetComponent<BlinkEffect>() != null && selectedObject.GetComponent<BlinkEffect>().GetLoopStatus() && clickState == ClickState.Left)
                 {
 
-                    GameObject drawable = GameDrawableFinder.FindDrawableParent(selectedObject);
+                    GameObject drawable = GameDrawableFinder.FindDrawable(selectedObject);
                     string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
                     /*
                     bool isTriggered = false;
@@ -165,7 +165,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 // Rotate
                 if (selectedObject != null && selectedObject.GetComponent<BlinkEffect>() != null && selectedObject.GetComponent<BlinkEffect>().GetLoopStatus() && clickState == ClickState.Right)
                 {
-                    GameObject drawable = GameDrawableFinder.FindDrawableParent(selectedObject);
+                    GameObject drawable = GameDrawableFinder.FindDrawable(selectedObject);
                     string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
                     bool rotate = false;
                     if (rotationMenu == null)
@@ -235,7 +235,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                         selectedObject.transform.parent.localEulerAngles.z :
                         selectedObject.transform.localEulerAngles.z;*/
 
-                    memento = new Memento(selectedObject, GameDrawableFinder.FindDrawableParent(selectedObject), selectedObject.name,
+                    memento = new Memento(selectedObject, GameDrawableFinder.FindDrawable(selectedObject), selectedObject.name,
                         oldObjectPosition, newObjectPosition, oldObjectLocalEulerAngles, degree, clickState, firstPoint);//, oldHandlerPosition, newHandlerPosition);
                     clickState = ClickState.None;
                     isActive = false;
@@ -369,7 +369,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
 
             if (memento.selectedObject != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawableParent(memento.selectedObject);
+                GameObject drawable = GameDrawableFinder.FindDrawable(memento.selectedObject);
                 string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
                 if (memento.clickState == ClickState.Left)
                 {
@@ -402,7 +402,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
             }
             if (memento.selectedObject != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawableParent(memento.selectedObject);
+                GameObject drawable = GameDrawableFinder.FindDrawable(memento.selectedObject);
                 string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
                 if (memento.clickState == ClickState.Left)
                 {

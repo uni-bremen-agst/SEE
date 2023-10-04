@@ -51,7 +51,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject))
                 {
                     selectedObj = raycastHit.collider.gameObject;
-                    drawable = GameDrawableFinder.FindDrawableParent(selectedObj);
+                    drawable = GameDrawableFinder.FindDrawable(selectedObj);
                     start = true;
 
                     BlinkEffect effect = selectedObj.AddOrGetComponent<BlinkEffect>();
@@ -119,7 +119,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
 
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj != null && isActive)
                 {
-                    memento = new Memento(selectedObj, GameDrawableFinder.FindDrawableParent(selectedObj), selectedObj.name, oldScale, newScale);
+                    memento = new Memento(selectedObj, GameDrawableFinder.FindDrawable(selectedObj), selectedObj.name, oldScale, newScale);
                     isActive = false;
                     isDone = true;
                     didSomething = false;
@@ -175,7 +175,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
 
             if (memento.selectedObject != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawableParent(memento.selectedObject);
+                GameObject drawable = GameDrawableFinder.FindDrawable(memento.selectedObject);
                 string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
                 GameScaler.SetScale(memento.selectedObject, memento.oldScale);
                 new ScaleNetAction(drawable.name, drawableParent, memento.selectedObject.name, memento.oldScale).Execute();
@@ -200,7 +200,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
             }
             if (memento.selectedObject != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawableParent(memento.selectedObject);
+                GameObject drawable = GameDrawableFinder.FindDrawable(memento.selectedObject);
                 string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
                 GameScaler.SetScale(memento.selectedObject, memento.newScale);
                 new ScaleNetAction(drawable.name, drawableParent, memento.selectedObject.name, memento.newScale).Execute();

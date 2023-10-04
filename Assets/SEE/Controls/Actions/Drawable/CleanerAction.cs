@@ -28,7 +28,7 @@ namespace Assets.SEE.Controls.Actions.Whiteboard
                         DeleteDrawableChilds(hittedObject);
                     } else if (GameDrawableFinder.hasDrawableParent(hittedObject))
                     {
-                        DeleteDrawableChilds(GameDrawableFinder.FindDrawableParent(hittedObject));
+                        DeleteDrawableChilds(GameDrawableFinder.FindDrawable(hittedObject));
                     }
                 }
                 // The action is considered complete if the mouse button is no longer pressed.

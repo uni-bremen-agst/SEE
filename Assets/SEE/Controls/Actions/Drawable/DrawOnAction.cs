@@ -99,7 +99,7 @@ namespace SEE.Controls.Actions
                     GameDrawableFinder.hasDrawableParent(raycastHit.collider.gameObject)))
                 {
                     drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                        raycastHit.collider.gameObject : GameDrawableFinder.FindDrawableParent(raycastHit.collider.gameObject);
+                        raycastHit.collider.gameObject : GameDrawableFinder.FindDrawable(raycastHit.collider.gameObject);
                     drawing = true;
 
                     switch (progressState)

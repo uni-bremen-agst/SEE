@@ -42,7 +42,7 @@ namespace SEE.Controls.Actions
                         LineRenderer lineRenderer = hittedObject.GetComponent<LineRenderer>();
                         Vector3[] positions = new Vector3[lineRenderer.positionCount];
                         lineRenderer.GetPositions(positions);
-                        memento = new Memento(GameDrawableFinder.FindDrawableParent(hittedObject), Line.GetLine(hittedObject));
+                        memento = new Memento(GameDrawableFinder.FindDrawable(hittedObject), Line.GetLine(hittedObject));
                         mementoList.Add(memento);
 
                         new EraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.line.id).Execute();

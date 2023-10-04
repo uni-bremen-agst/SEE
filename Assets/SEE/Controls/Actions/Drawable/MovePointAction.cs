@@ -52,7 +52,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     raycastHit.collider.gameObject.CompareTag(Tags.Line))
                 {
                     selectedLine = raycastHit.collider.gameObject;
-                    drawable = GameDrawableFinder.FindDrawableParent(selectedLine);
+                    drawable = GameDrawableFinder.FindDrawable(selectedLine);
                     start = true;
 
                     BlinkEffect effect = selectedLine.AddOrGetComponent<BlinkEffect>();
@@ -96,7 +96,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
                     GameMoveRotator.MovePoint(selectedLine, indexes, newPointPosition);
                     new MovePointNetAction(drawable.name, drawableParentName, selectedLine.name, indexes, newPointPosition).Execute();
-                    memento = new Memento(selectedLine, GameDrawableFinder.FindDrawableParent(selectedLine), selectedLine.name,
+                    memento = new Memento(selectedLine, GameDrawableFinder.FindDrawable(selectedLine), selectedLine.name,
                         indexes, oldPointPosition, newPointPosition);
                     isActive = false;
                     isDone = true;
@@ -149,7 +149,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
 
             if (memento.line != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawableParent(memento.line);
+                GameObject drawable = GameDrawableFinder.FindDrawable(memento.line);
                 string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
                 GameMoveRotator.MovePoint(memento.line, memento.indexes, memento.oldPointPosition);
                 new MovePointNetAction(drawable.name, drawableParent, memento.line.name, memento.indexes, memento.oldPointPosition).Execute();
@@ -174,7 +174,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
             }
             if (memento.line != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawableParent(memento.line);
+                GameObject drawable = GameDrawableFinder.FindDrawable(memento.line);
                 string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
                 GameMoveRotator.MovePoint(memento.line, memento.indexes, memento.newPointPosition);
                 new MovePointNetAction(drawable.name, drawableParent, memento.line.name, memento.indexes, memento.newPointPosition).Execute();

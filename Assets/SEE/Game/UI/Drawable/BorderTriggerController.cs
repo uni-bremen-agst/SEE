@@ -27,7 +27,7 @@ namespace Assets.SEE.Game.UI.Drawable
             //FIXEME ADD OTHER TAGS.
             if (other.gameObject.CompareTag(Tags.Line))
             {
-                GameObject drawable = GameDrawableFinder.FindDrawableParent(other.gameObject);
+                GameObject drawable = GameDrawableFinder.FindDrawable(other.gameObject);
                 string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
                 Transform transform = other.gameObject.transform;
                 Vector3 eulerAngles = transform.localEulerAngles;

@@ -227,6 +227,20 @@ namespace Assets.SEE.Game.Drawable
             lineKindText.text = kind.ToString();
             selectedKind = kind;
         }
+
+        public static void AssignLineKind(GameDrawer.LineKind kind, float tiling)
+        {
+            lineKindText.text = kind.ToString();
+            selectedKind = kind;
+            if (kind == GameDrawer.LineKind.Dashed)
+            {
+                enableTilingFromDrawableMenu();
+                tilingSlider.AssignValue(tiling);
+            } else
+            {
+                disableTilingFromDrawableMenu();
+            }
+        }
         /*
         public static void NextLineKind()
         {

@@ -62,7 +62,7 @@ namespace Assets.SEE.Game
             return null;
         }
 
-        public static GameObject FindDrawableParent(GameObject child)
+        public static GameObject FindDrawable(GameObject child)
         {
             /*
             Transform transform = child.transform;
@@ -82,7 +82,7 @@ namespace Assets.SEE.Game
         public static bool hasDrawableParent(GameObject child)
         {
             if (hasParentWithTag(child, Tags.AttachedObjects)) {
-                return FindDrawableParent(child) != null;
+                return FindDrawable(child) != null;
             } else
             {
                 return false;
@@ -117,6 +117,21 @@ namespace Assets.SEE.Game
             return gameObjects;
         }
 
+        // NEEDED FOR MINDMAP NODE
+        public static List<GameObject> FindAllChildrenWithTagExceptParentHasTag(GameObject parent, string childTag, string parentTag)
+        {
+            List<GameObject> gameObjects = new();
+            Transform[] allChildren = parent.GetComponentsInChildren<Transform>();
+            foreach (Transform childTransform in allChildren)
+            {
+                if (childTransform.gameObject.CompareTag(childTag) && !childTransform.parent.gameObject.CompareTag(parentTag))
+                {
+                    gameObjects.Add(childTransform.gameObject);
+                }
+            }
+            return gameObjects;
+        }
+
         public static bool hasChildWithTag(GameObject parent, string tag)
         {
             return FindChildWithTag(parent, tag) != null;
@@ -143,7 +158,13 @@ namespace Assets.SEE.Game
 
         public static string GetDrawableParentName(GameObject drawable)
         {
-            return hasAParent(drawable) ? drawable.transform.parent.name : "";
+            if (drawable.CompareTag(Tags.Drawable))
+            {
+                return hasAParent(drawable) ? drawable.transform.parent.name : "";
+            } else
+            {
+                return "";
+            }
         }
 
         public static GameObject GetHighestParent(GameObject child)

@@ -12,18 +12,18 @@ namespace SEE.Net.Actions
     {
         public string DrawableID;
         public string ParentDrawableID;
-        public string LineName;
+        public string ObjectName;
 
         /// <summary>
         /// Creates a new FastEraseNetAction.
         /// </summary>
         /// <param name="gameObjectID">the unique name of the gameObject of a line
         /// that has to be deleted</param>
-        public EraseNetAction(string drawableID, string parentDrawableID, string lineName) : base()
+        public EraseNetAction(string drawableID, string parentDrawableID, string objectName) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
-            LineName = lineName;
+            ObjectName = objectName;
         }
 
         /// <summary>
@@ -43,13 +43,13 @@ namespace SEE.Net.Actions
             if (!IsRequester())
             {
                 GameObject drawable = GameDrawableFinder.Find(DrawableID,ParentDrawableID);
-                if (drawable != null && GameDrawableFinder.FindChild(drawable, LineName) != null)
+                if (drawable != null && GameDrawableFinder.FindChild(drawable, ObjectName) != null)
                 {
-                    Destroyer.Destroy(GameDrawableFinder.FindChild(drawable, LineName).transform.parent.gameObject);
+                    Destroyer.Destroy(GameDrawableFinder.FindChild(drawable, ObjectName));
                 }
                 else
                 {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or line with the ID {LineName}.");
+                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or line with the ID {ObjectName}.");
                 }
             }
         }

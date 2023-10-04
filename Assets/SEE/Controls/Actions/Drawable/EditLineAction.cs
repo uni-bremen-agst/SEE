@@ -79,7 +79,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     if (oldLine != null && !oldValueHolder.CheckEquals(newValueHolder))
                     {
                         memento = new Memento(oldLine, oldLine, oldValueHolder, newValueHolder,
-                                     GameDrawableFinder.FindDrawableParent(oldLine), oldLine.name);
+                                     GameDrawableFinder.FindDrawable(oldLine), oldLine.name);
                         currentState = ReversibleAction.Progress.Completed;
                     }
 
@@ -139,8 +139,10 @@ namespace Assets.SEE.Controls.Actions.Drawable
         {
             DrawableHelper.enableDrawableMenu();
 
-            GameObject drawable = GameDrawableFinder.FindDrawableParent(currentSelectedLine);
+            GameObject drawable = GameDrawableFinder.FindDrawable(currentSelectedLine);
             string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
+
+            DrawableHelper.AssignLineKind(currentSelectedLine.GetComponent<LineKindHolder>().GetLineKind(), renderer.textureScale.x);
 
             DrawableHelper.GetTilingSlider().onValueChanged.AddListener(DrawableHelper.tilingAction = tiling =>
             {
@@ -258,7 +260,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     GameEditLine.ChangeColor(memento.currentLine, memento.oldValueHolder.color);
                     GameDrawer.ChangeLineKind(memento.currentLine, memento.oldValueHolder.lineKind, memento.oldValueHolder.tiling);
 
-                    GameObject drawable = GameDrawableFinder.FindDrawableParent(memento.currentLine);
+                    GameObject drawable = GameDrawableFinder.FindDrawable(memento.currentLine);
                     string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
 
                     new EditLineThicknessNetAction(drawable.name, drawableParent, memento.currentLine.name, memento.oldValueHolder.thickness).Execute();
@@ -302,7 +304,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     GameEditLine.ChangeColor(memento.currentLine, memento.newValueHolder.color);
                     GameDrawer.ChangeLineKind(memento.currentLine, memento.newValueHolder.lineKind, memento.newValueHolder.tiling);
 
-                    GameObject drawable = GameDrawableFinder.FindDrawableParent(memento.currentLine);
+                    GameObject drawable = GameDrawableFinder.FindDrawable(memento.currentLine);
                     string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
 
                     new EditLineThicknessNetAction(drawable.name, drawableParent, memento.currentLine.name, memento.newValueHolder.thickness).Execute();

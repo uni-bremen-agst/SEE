@@ -94,7 +94,7 @@ namespace SEE.Controls.Actions
                 {
                     clicked = true;
                     GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                        raycastHit.collider.gameObject : GameDrawableFinder.FindDrawableParent(raycastHit.collider.gameObject);
+                        raycastHit.collider.gameObject : GameDrawableFinder.FindDrawable(raycastHit.collider.gameObject);
                     DrawableConfigManager.SaveDrawable(drawable, "Test");
                     memento = new Memento("Test", new GameObject[] { drawable }, SavedCounter.One);
                     currentState = ReversibleAction.Progress.Completed;

@@ -82,7 +82,7 @@ namespace Assets.SEE.Game.Drawable
         private static Line ReDraw(Line originLine, Vector3[] positions)
         {
             LineRenderer renderer = originLine.gameObject.GetComponent<LineRenderer>();
-            GameObject drawable = GameDrawableFinder.FindDrawableParent(originLine.gameObject);
+            GameObject drawable = GameDrawableFinder.FindDrawable(originLine.gameObject);
             
             Line lineToCreate = (Line)originLine.Clone();
             lineToCreate.id = "";

@@ -48,9 +48,9 @@ namespace SEE.Net.Actions
                 GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
                 if (drawable != null)
                 {
-                    if (Type == DrawableTypes.Line && GameDrawableFinder.FindChild(drawable, Name) != null)
+                    if (GameDrawableFinder.FindChild(drawable, Name) != null)
                     {
-                        Destroyer.Destroy(GameDrawableFinder.FindChild(drawable, Name).transform.parent.gameObject);
+                        Destroyer.Destroy(GameDrawableFinder.FindChild(drawable, Name));
                     }
                 }
                 else

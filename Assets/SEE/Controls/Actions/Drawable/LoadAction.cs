@@ -97,7 +97,7 @@ namespace SEE.Controls.Actions
                     clicked = true;
                     DrawableConfig config = DrawableConfigManager.LoadDrawable("Test");
                     GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                        raycastHit.collider.gameObject : GameDrawableFinder.FindDrawableParent(raycastHit.collider.gameObject);
+                        raycastHit.collider.gameObject : GameDrawableFinder.FindDrawable(raycastHit.collider.gameObject);
                     Restore(drawable, config);
                     memento = new Memento(LoadState.OneSpecific);
                     memento.config = config;
@@ -150,7 +150,7 @@ namespace SEE.Controls.Actions
             foreach (Line line in lines)
             {
                 GameDrawer.ReDrawLine(drawable, line);
-                new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), line);
+                new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), line).Execute();
             }
         }
 
@@ -162,9 +162,16 @@ namespace SEE.Controls.Actions
         /// <param name="config"></param>
         private void DestroyLoadedObjects(GameObject attachedObjects, DrawableConfig config)
         {
-            foreach (Line line in config.LineConfigs)
+            if (attachedObjects != null)
             {
-                Destroyer.Destroy(GameDrawableFinder.FindChild(attachedObjects, line.id));
+                GameObject drawable = GameDrawableFinder.FindDrawable(attachedObjects);
+                string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
+                foreach (Line line in config.LineConfigs)
+                {
+                    GameObject lineObj = GameDrawableFinder.FindChild(attachedObjects, line.id);
+                    new EraseNetAction(drawable.name, drawableParentName, lineObj.name).Execute();
+                    Destroyer.Destroy(lineObj);
+                }
             }
         }
 

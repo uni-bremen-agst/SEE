@@ -40,7 +40,7 @@ namespace SEE.Controls.Actions
                 {
                     isInAction = true;
                     GameObject hittedObject = raycastHit.collider.gameObject;
-                    GameObject drawable = GameDrawableFinder.FindDrawableParent(hittedObject);
+                    GameObject drawable = GameDrawableFinder.FindDrawable(hittedObject);
 
                     switch (hittedObject.tag) { 
                         case Tags.Line:
@@ -64,7 +64,7 @@ namespace SEE.Controls.Actions
                 {
                     isInAction = true;
                     GameObject hittedObject = raycastHit2.collider.gameObject;
-                    GameObject drawable = GameDrawableFinder.FindDrawableParent(hittedObject);
+                    GameObject drawable = GameDrawableFinder.FindDrawable(hittedObject);
 
                     switch (hittedObject.tag)
                     {

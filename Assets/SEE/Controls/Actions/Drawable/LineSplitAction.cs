@@ -57,7 +57,7 @@ namespace SEE.Controls.Actions
                         List<int> matchedIndexes = DrawableHelper.GetNearestIndexes(transformedPositions, raycastHit.point);
                         isActive = GameLineSplit.GetSplittedPositions(isActive, originLine, matchedIndexes, positionsList, lines, false);
 
-                        memento = new Memento(hittedObject, GameDrawableFinder.FindDrawableParent(hittedObject), lines, lineRenderer.loop);
+                        memento = new Memento(hittedObject, GameDrawableFinder.FindDrawable(hittedObject), lines, lineRenderer.loop);
                         new EraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.originalLine.id).Execute();
                         Destroyer.Destroy(hittedObject);
                         //Destroyer.Destroy(hittedObject.transform.parent.gameObject);
