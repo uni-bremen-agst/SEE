@@ -234,7 +234,7 @@ namespace SEE.Net.Dashboard
         /// <returns>The queried object of type <typeparamref name="T"/>.</returns>
         private async UniTask<T> QueryDashboard<T>(string path, Dictionary<string, string> parameters = null,
                                                    bool apiPath = true)
-        {            
+        {
             DashboardResult result = await GetAtPath(path, parameters, apiPath);
             return result.RetrieveObject<T>(StrictMode);
         }

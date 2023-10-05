@@ -664,7 +664,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="edge">implementation dependency</param>
         /// <returns>true if edge should be considered in the reflexion analysis</returns>
-        private bool IsRelevant(Edge edge)
+        private static bool IsRelevant(Edge edge)
         {
             return IsRelevant(edge.Source) && IsRelevant(edge.Target);
             // FIXME: For the time being, we consider every edge to be relevant as long as their

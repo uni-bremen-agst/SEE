@@ -84,7 +84,7 @@ namespace SEE.Utils
         /// <summary>
         /// Event that is triggered when a camera is available.
         /// </summary>
-        private static event OnCameraAvailableCallback onCameraAvailable;
+        private static event OnCameraAvailableCallback OnCameraAvailableCallBack;
 
         /// <summary>
         /// Registers <paramref name="callback"/> to be called when a camera becomes
@@ -98,22 +98,22 @@ namespace SEE.Utils
         /// <param name="callback">callback to be called when the camera becomes available</param>
         public static void OnCameraAvailable(OnCameraAvailableCallback callback)
         {
-            onCameraAvailable += callback;
+            OnCameraAvailableCallBack += callback;
         }
 
         /// <summary>
-        /// Notifies all listeners of <see cref="onCameraAvailable"/>. After that all
-        /// notified listeners will be unregistered from <see cref="onCameraAvailable"/>.
+        /// Notifies all listeners of <see cref="OnCameraAvailableCallBack"/>. After that all
+        /// notified listeners will be unregistered from <see cref="OnCameraAvailableCallBack"/>.
         /// </summary>
         private static void NotifyAll()
         {
-            if (onCameraAvailable != null)
+            if (OnCameraAvailableCallBack != null)
             {
-                onCameraAvailable.Invoke(camera);
+                OnCameraAvailableCallBack.Invoke(camera);
 
-                foreach (Delegate callback in onCameraAvailable.GetInvocationList())
+                foreach (Delegate callback in OnCameraAvailableCallBack.GetInvocationList())
                 {
-                    onCameraAvailable -= (OnCameraAvailableCallback)callback;
+                    OnCameraAvailableCallBack -= (OnCameraAvailableCallback)callback;
                 }
             }
         }

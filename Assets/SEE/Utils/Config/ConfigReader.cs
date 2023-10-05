@@ -81,7 +81,7 @@ namespace SEE.Utils.Config
         /// Implied by System.Globalization.NumberStyles.Float are AllowLeadingWhite, AllowTrailingWhite,
         /// AllowLeadingSign, AllowDecimalPoint, AllowExponent. We also allow AllowThousands.
         /// </summary>
-        private const System.Globalization.NumberStyles FloatStyle = System.Globalization.NumberStyles.Float
+        private const System.Globalization.NumberStyles floatStyle = System.Globalization.NumberStyles.Float
                     | System.Globalization.NumberStyles.AllowThousands;
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace SEE.Utils.Config
         /// <returns>true if a float could be parsed</returns>
         private static bool TryParseFloat(string s, out float value)
         {
-            return Single.TryParse(s: s, style: FloatStyle,
+            return Single.TryParse(s: s, style: floatStyle,
                                    System.Globalization.CultureInfo.InvariantCulture, out value);
         }
     }

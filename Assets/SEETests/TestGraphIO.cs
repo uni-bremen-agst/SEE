@@ -99,7 +99,6 @@ namespace SEE.DataModel.DG.IO
         [Test, Sequential]
         public void TestRandomGraphWriter([Values(true, false)] bool compress)
         {
-            RandomGraphs random = new();
             Constraint leafConstraint = new("Routine", 10, "calls", 0.01f);
             Constraint innerNodesConstraint = new("File", 3, "imports", 0.01f);
             List<RandomAttributeDescriptor> attributeConstraints = new()
@@ -115,7 +114,7 @@ namespace SEE.DataModel.DG.IO
                 innerNodesConstraint.NodeNumber += i;
 
                 // Create and save the initial graph
-                Graph outGraph = random.Create(leafConstraint, innerNodesConstraint, attributeConstraints);
+                Graph outGraph = RandomGraphs.Create(leafConstraint, innerNodesConstraint, attributeConstraints);
                 // When floating point node metrics are stored, they will be rounded and may then differ
                 // from the more precise values we have in memory. Hence, we round the memory values.
                 RoundMetrics(outGraph);
