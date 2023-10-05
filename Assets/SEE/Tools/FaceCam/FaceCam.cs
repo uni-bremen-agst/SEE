@@ -659,7 +659,7 @@ namespace SEE.Tools.FaceCam
         /// </summary>
         /// <remarks>
         /// This call will be sent to the server. The default [ServerRpc] attribute
-        /// setting allows onlya client owner (client that owns the NetworkObject associated
+        /// setting allows only a client owner (client that owns the NetworkObject associated
         /// with the NetworkBehaviour containing the ServerRpc method) invocation rights.
         /// Any client that isn't the owner won't be allowed to invoke the ServerRpc.
         /// By setting the ServerRpc attribute's RequireOwnership parameter to false,
