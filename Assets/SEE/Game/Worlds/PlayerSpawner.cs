@@ -47,11 +47,6 @@ namespace SEE.Game.Worlds
         }
 
         /// <summary>
-        /// The NetworkManager, used to spawn the FaceCam.
-        /// </summary>
-        private readonly NetworkManager networkManager = NetworkManager.Singleton;
-
-        /// <summary>
         /// This co-routine sets <see cref="dissonanceComms"/>, registers <see cref="Spawn(ulong)"/>
         /// on the <see cref="NetworkManager.Singleton.OnClientConnectedCallback"/> and spawns
         /// the first local client.
@@ -117,7 +112,7 @@ namespace SEE.Game.Worlds
                 // unless otherwise specified.
                 net.SpawnAsPlayerObject(owner, destroyWithScene: true);
 
-                Debug.Log($"Owner of player {player.name} is server: {net.IsOwnedByServer} or is local client: {net.IsOwner}\n");
+                Debug.Log($"Is local player: {net.IsLocalPlayer}. Owner of player {player.name} is server: {net.IsOwnedByServer} or is local client: {net.IsOwner}\n");
                 // A network Prefab is any unity Prefab asset that has one NetworkObject
                 // component attached to a GameObject within the prefab.
                 // player is a network Prefab, i.e., it has a NetworkObject attached to it.
