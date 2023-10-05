@@ -181,9 +181,12 @@ namespace SEE.Controls.Actions
         /// <seealso cref="SelectionOn"/>
         private void Off()
         {
-            LabelAttributes settings = GetLabelSettings(nodeOperator.Node, nodeOperator.City);
-            nodeOperator.FadeLabel(0f, settings.AnimationFactor);
-            DisplayedLabelOperators.Remove(nodeOperator);
+            if (nodeOperator.Node != null)
+            {
+                LabelAttributes settings = GetLabelSettings(nodeOperator.Node, nodeOperator.City);
+                nodeOperator.FadeLabel(0f, settings.AnimationFactor);
+                DisplayedLabelOperators.Remove(nodeOperator);
+            }
         }
 
         /// <summary>

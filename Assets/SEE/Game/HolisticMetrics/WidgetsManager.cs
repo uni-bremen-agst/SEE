@@ -155,8 +155,8 @@ namespace SEE.Game.HolisticMetrics
                 {
                     ShowNotification.Error("Metric-board error",
                                            "There was an error when displaying the metric on the newly created "
-                                           + $"widget, this is the exception: {exception.Message}");
-                    throw exception;
+                                           + $"widget, this is the exception: {exception.Message}", log: false);
+                    throw;
                 }
             }
         }
