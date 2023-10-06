@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
+using SEE.Game;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
+using Color = UnityEngine.Color;
+using Transform = UnityEngine.Transform;
 
 namespace SEE.UI.Window.TreeWindow
 {
@@ -44,10 +47,12 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="node">The node to be added.</param>
         private void AddNode(Node node)
         {
+            GameObject nodeGameObject = GraphElementIDMap.Find(node.ID, mustFindElement: true);
+            Color? nodeColor = nodeGameObject.GetComponent<Renderer>()?.material?.color;
             int children = node.NumberOfChildren() + Mathf.Min(node.Outgoings.Count, 1) + Mathf.Min(node.Incomings.Count, 1);
             AddItem(CleanupID(node.ID), CleanupID(node.Parent?.ID),
-                    children, node.ToShortString(), node.Level,
-                    nodeTypeUnicode, i => CollapseNode(node, i), i => ExpandNode(node, i));
+                    children, node.ToShortString(), node.Level, nodeTypeUnicode, nodeColor,
+                    i => CollapseNode(node, i), i => ExpandNode(node, i, nodeColor));
         }
 
         /// <summary>
@@ -59,30 +64,47 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="text">The text of the item to be added.</param>
         /// <param name="level">The level of the item to be added.</param>
         /// <param name="icon">The icon of the item to be added, given as a unicode character.</param>
+        /// <param name="color">The color of the item to be added.</param>
         /// <param name="collapseItem">A function that collapses the item.</param>
         /// <param name="expandItem">A function that expands the item.</param>
         private void AddItem(string id, string parentId, int children, string text, int level,
-                             char icon, Action<GameObject> collapseItem, Action<GameObject> expandItem)
+                             char icon, Color? color, Action<GameObject> collapseItem, Action<GameObject> expandItem)
         {
             GameObject item = PrefabInstantiator.InstantiatePrefab(treeItemPrefab, content, false);
+            Transform foreground = item.transform.Find("Foreground");
+            GameObject expandIcon = foreground.Find("Expand Icon").gameObject;
+            TMPro.TextMeshProUGUI textMesh = foreground.Find("Text").gameObject.GetComponent<TMPro.TextMeshProUGUI>();
+            TMPro.TextMeshProUGUI iconMesh = foreground.Find("Type Icon").gameObject.GetComponent<TMPro.TextMeshProUGUI>();
+
+            textMesh.text = text;
+            iconMesh.text = icon.ToString();
+
             if (parentId != null)
             {
                 // Position the item below its parent.
-                // TODO: Use colors from the city (e.g., depending on node type).
                 // TODO: Include number badge in title.
                 item.transform.SetSiblingIndex(content.Find(parentId).GetSiblingIndex() + 1);
-                item.transform.Find("Foreground").localPosition += new Vector3(indentShift * level, 0, 0);
+                foreground.localPosition += new Vector3(indentShift * level, 0, 0);
+                // TODO: If there is no color, inherit it from the parent.
+                if (color.HasValue)
+                {
+                    item.transform.Find("Background").GetComponent<Graphic>().color = color.Value;
+
+                    // We also need to set the text color to a color that is readable on the background color.
+                    Color foregroundColor = color.Value.IdealTextColor();
+                    textMesh.color = foregroundColor;
+                    iconMesh.color = foregroundColor;
+                    expandIcon.GetComponent<Graphic>().color = foregroundColor;
+                }
             }
             // Slashes will cause problems later on, so we replace them with backslashes.
             // NOTE: This becomes a problem if two nodes A and B exist where node A's name contains slashes and node B
             //       has an identical name, except for all slashes being replaced by backslashes.
             //       I hope this is unlikely enough to not be a problem for now.
             item.name = CleanupID(id);
-            item.transform.Find("Foreground/Text").gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = text;
-            item.transform.Find("Foreground/Type Icon").gameObject.GetComponent<TMPro.TextMeshProUGUI>().text = icon.ToString();
             if (children <= 0)
             {
-                item.transform.Find("Foreground/Expand Icon").gameObject.SetActive(false);
+                expandIcon.SetActive(false);
             }
             else if (item.TryGetComponentOrLog(out Button button))
             {
@@ -211,7 +233,8 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         /// <param name="node">The node represented by the item.</param>
         /// <param name="item">The item to be expanded.</param>
-        private void ExpandNode(Node node, GameObject item)
+        /// <param name="nodeColor">The color of the node.</param>
+        private void ExpandNode(Node node, GameObject item, Color? nodeColor)
         {
             ExpandItem(item);
 
@@ -237,7 +260,7 @@ namespace SEE.UI.Window.TreeWindow
                 // Note that an edge may appear multiple times in the tree view,
                 // hence we make its ID dependent on the node it is connected to,
                 // and whether it is an incoming or outgoing edge (to cover self-loops).
-                AddItem(id, cleanedId, edges.Count, $"{edgesType} Edges", node.Level + 1, icon,
+                AddItem(id, cleanedId, edges.Count, $"{edgesType} Edges", node.Level + 1, icon, nodeColor,
                         i =>
                         {
                             CollapseItem(i);
@@ -250,7 +273,7 @@ namespace SEE.UI.Window.TreeWindow
                             ExpandItem(i);
                             foreach (Edge edge in edges)
                             {
-                                AddItem($"{id}#{CleanupID(edge.ID)}", id, 0, edge.ToShortString(), node.Level + 2, edgeTypeUnicode, null, null);
+                                AddItem($"{id}#{CleanupID(edge.ID)}", id, 0, edge.ToShortString(), node.Level + 2, edgeTypeUnicode, nodeColor, null, null);
                             }
                         });
             }
