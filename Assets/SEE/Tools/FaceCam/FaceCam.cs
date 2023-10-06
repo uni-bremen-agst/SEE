@@ -670,7 +670,9 @@ namespace SEE.Tools.FaceCam
         {
             // A ServerRpc is a remote procedure call (RPC) that can be only invoked
             // by a client and will always be received and executed on the server/host.
+#if DEBUG
             Debug.Log($"[RPC] Server received FaceCamOnOffServerRpc from {serverRpcParams.Receive.SenderClientId} with networkFaceCamOn={networkFaceCamOn}\n");
+#endif
             FaceCamOnOffClientRpc(networkFaceCamOn);
         }
 
@@ -682,7 +684,9 @@ namespace SEE.Tools.FaceCam
         [ClientRpc]
         private void FaceCamOnOffClientRpc(bool networkFaceCamOn)
         {
+#if DEBUG
             Debug.Log($"[RPC] Client {NetworkManager.Singleton.LocalClientId} received FaceCamOnOffClientRpc from server with networkFaceCamOn={networkFaceCamOn}\n");
+#endif
 
             // Note: The host is both a client and a server. If a host invokes a client RPC,
             // it triggers the call on all clients, including the host.
@@ -724,7 +728,9 @@ namespace SEE.Tools.FaceCam
         [ServerRpc(RequireOwnership = false)]
         private void FaceCamOnFrontToggleServerRpc(bool networkFaceCamOnFront, ServerRpcParams serverRpcParams = default)
         {
+#if DEBUG
             Debug.Log($"[RPC] Server received FaceCamOnFrontToggleServerRpc from {serverRpcParams.Receive.SenderClientId} with networkFaceCamOn={networkFaceCamOnFront}\n");
+#endif
             FaceCamOnFrontToggleClientRpc(networkFaceCamOnFront);
         }
 
@@ -735,7 +741,9 @@ namespace SEE.Tools.FaceCam
         [ClientRpc]
         private void FaceCamOnFrontToggleClientRpc(bool networkFaceCamOnFront)
         {
+#if DEBUG
             Debug.Log($"[RPC] Client {NetworkManager.Singleton.LocalClientId} received FaceCamOnFrontToggleClientRpc from server with networkFaceCamOnFront={networkFaceCamOnFront}\n");
+#endif
 
             if (faceCamOnFront == networkFaceCamOnFront)
             {
@@ -749,7 +757,9 @@ namespace SEE.Tools.FaceCam
         [ServerRpc(RequireOwnership = false)]
         private void GetFaceCamStatusServerRpc(ServerRpcParams serverRpcParams = default)
         {
+#if DEBUG
             Debug.Log($"[RPC] Server received GetFaceCamStatusServerRpc from {serverRpcParams.Receive.SenderClientId}\n");
+#endif
             SetFaceCamStatusClientRpc(faceCamOn, faceCamOnFront);
         }
 
@@ -760,7 +770,9 @@ namespace SEE.Tools.FaceCam
         [ClientRpc]
         private void SetFaceCamStatusClientRpc(bool faceCamOn, bool faceCamOnFront)
         {
+#if DEBUG
             Debug.Log($"[RPC] Client {NetworkManager.Singleton.LocalClientId} received SetFaceCamStatusClientRpc from server with faceCamOn={faceCamOn} and faceCamOnFront={faceCamOnFront}\n");
+#endif
             this.faceCamOn = faceCamOn;
             this.faceCamOnFront = faceCamOnFront;
             // Make the FaceCam visible/invisible and/or start/stop it.
@@ -819,7 +831,9 @@ namespace SEE.Tools.FaceCam
         [ServerRpc]
         private void GetVideoFromClientAndSendItToClientsToRenderItServerRPC(byte[] videoFrame, ServerRpcParams serverRpcParams = default)
         {
+#if DEBUG
             Debug.Log($"[RPC] Server received GetVideoFromClientAndSendItToClientsToRenderItServerRPC from {serverRpcParams.Receive.SenderClientId}\n");
+#endif
 
             // The server will render this video onto his instance of the FaceCam.
             RenderNetworkFrameOnFaceCam(videoFrame);
@@ -838,7 +852,9 @@ namespace SEE.Tools.FaceCam
         [ClientRpc]
         private void SendVideoToClientsToRenderItClientRPC(byte[] videoFrame)
         {
+#if DEBUG
             Debug.Log($"[RPC] Client {NetworkManager.Singleton.LocalClientId} received SendVideoToClientsToRenderItClientRPC from server\n");
+#endif
             RenderNetworkFrameOnFaceCam(videoFrame);
         }
 
@@ -891,7 +907,9 @@ namespace SEE.Tools.FaceCam
         [ServerRpc(RequireOwnership = false)]
         private void AddClientIdToListServerRPC(ulong clientId, ServerRpcParams serverRpcParams = default)
         {
+#if DEBUG
             Debug.Log($"[RPC] Server received AddClientIdToListServerRPC from {serverRpcParams.Receive.SenderClientId} with clientId={clientId}\n");
+#endif
             clientsIdsList.Add(clientId);
             // Create the RpcParams from the list to make the list usable as RpcParams.
             CreateClientRpcParams();
@@ -903,7 +921,9 @@ namespace SEE.Tools.FaceCam
         [ServerRpc(RequireOwnership = false)]
         private void RemoveClientFromListServerRPC(ulong clientId, ServerRpcParams serverRpcParams = default)
         {
+#if DEBUG
             Debug.Log($"[RPC] Server received RemoveClientFromListServerRPC from {serverRpcParams.Receive.SenderClientId} with clientId={clientId}\n");
+#endif
             clientsIdsList.Remove(clientId);
             // Create the RpcParams to make this list usable.
             CreateClientRpcParams();

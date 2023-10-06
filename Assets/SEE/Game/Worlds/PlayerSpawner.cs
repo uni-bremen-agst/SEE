@@ -105,14 +105,17 @@ namespace SEE.Game.Worlds
                                             Quaternion.Euler(new Vector3(0, playerSpawns[index].Rotation, 0)));
             numberOfSpawnedPlayers++;
             player.name = "Player " + numberOfSpawnedPlayers;
+#if DEBUG
             Debug.Log($"Spawned {player.name} (network id of owner: {owner}, local: {IsLocal(owner)}) at position {player.transform.position}.\n");
+#endif
             if (player.TryGetComponent(out NetworkObject net))
             {
                 // By default a newly spawned network Prefab instance is owned by the server
                 // unless otherwise specified.
                 net.SpawnAsPlayerObject(owner, destroyWithScene: true);
-
+#if DEBUG
                 Debug.Log($"Is local player: {net.IsLocalPlayer}. Owner of player {player.name} is server: {net.IsOwnedByServer} or is local client: {net.IsOwner}\n");
+#endif
                 // A network Prefab is any unity Prefab asset that has one NetworkObject
                 // component attached to a GameObject within the prefab.
                 // player is a network Prefab, i.e., it has a NetworkObject attached to it.
