@@ -15,6 +15,16 @@ namespace SEE.Game
     public class LabelAttributes
     {
         /// <summary>
+        /// The default value for <see cref="Show"/>.
+        /// </summary>
+        public const float DefaultFontSize = 0.4f;
+
+        /// <summary>
+        /// The default value for <see cref="Distance"/>.
+        /// </summary>
+        public const float DefaultDistance = 0.2f;
+
+        /// <summary>
         /// If true, a label with the node's SourceName will be displayed above each node.
         /// </summary>
         [Tooltip("Whether the label should be shown during hovering.")]
@@ -24,13 +34,13 @@ namespace SEE.Game
         /// The distance between the top of the node and its label.
         /// </summary>
         [Tooltip("The distance between the top of the node and its label.")]
-        public float Distance = 0.2f;
+        public float Distance = DefaultDistance;
 
         /// <summary>
         /// The font size of the node's label.
         /// </summary>
         [Tooltip("The font size of the label.")]
-        public float FontSize = 0.4f;
+        public float FontSize = DefaultFontSize;
 
         /// <summary>
         /// How fast the label should (dis)appear.

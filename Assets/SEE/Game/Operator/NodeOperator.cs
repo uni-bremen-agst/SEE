@@ -78,6 +78,8 @@ namespace SEE.Game.Operator
 
         /// <summary>
         /// The node to which this node operator belongs.
+        ///
+        /// <em>Be aware that this may be null if the node operator is attached to an artificial node.</em>
         /// </summary>
         public Node Node
         {
@@ -461,7 +463,8 @@ namespace SEE.Game.Operator
 
             static Node GetNode(GameObject gameObject)
             {
-                if (!gameObject.TryGetComponent(out NodeRef nodeRef) || nodeRef.Value == null)
+                // We allow a null value for artificial nodes, but at least a NodeRef must be attached.
+                if (!gameObject.TryGetComponent(out NodeRef nodeRef))
                 {
                     throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have {nameof(NodeRef)} attached!");
                 }
