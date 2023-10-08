@@ -21,7 +21,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Settings for the <see cref="SEE.Layout.NodeLayouts.IncrementalTreeMapLayout"/>.
         /// </summary>
-        public IncrementalTreeMapSetting IncrementalTreeMapSetting = new();
+        public IncrementalTreeMapAttributes IncrementalTreeMap = new();
 
         /// <summary>
         /// The path for the layout file containing the node layout information.
@@ -32,12 +32,13 @@ namespace SEE.Game.City
         /// </summary>
         [OdinSerialize]
         public FilePath LayoutPath = new();
+
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
             writer.Save(Kind.ToString(), nodeLayoutLabel);
             LayoutPath.Save(writer, layoutPathLabel);
-            IncrementalTreeMapSetting.Save(writer, incrementalTreeMapLabel);
+            IncrementalTreeMap.Save(writer, incrementalTreeMapLabel);
             writer.EndGroup();
         }
 
@@ -49,7 +50,7 @@ namespace SEE.Game.City
 
                 ConfigIO.RestoreEnum(values, nodeLayoutLabel, ref Kind);
                 LayoutPath.Restore(values, layoutPathLabel);
-                IncrementalTreeMapSetting.Restore(values, incrementalTreeMapLabel);
+                IncrementalTreeMap.Restore(values, incrementalTreeMapLabel);
             }
         }
 
@@ -58,7 +59,7 @@ namespace SEE.Game.City
         /// </summary>
         private const string layoutPathLabel = "LayoutPath";
         /// <summary>
-        /// Configuration label for <see cref="IncrementalTreeMapSetting"/>.
+        /// Configuration label for <see cref="IncrementalTreeMap"/>.
         /// </summary>
         private const string incrementalTreeMapLabel = "IncrementalTreeMap";
         /// <summary>

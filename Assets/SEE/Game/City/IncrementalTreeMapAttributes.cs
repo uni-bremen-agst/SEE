@@ -11,7 +11,7 @@ namespace SEE.Game.City
     /// The settings for <see cref="Layout.NodeLayouts.IncrementalTreeMapLayout"/>.
     /// </summary>
     [Serializable]
-    public class IncrementalTreeMapSetting : ConfigIO.IPersistentConfigItem
+    public class IncrementalTreeMapAttributes : ConfigIO.IPersistentConfigItem
     {
         /// <summary>
         /// The depth of the local moves search.
@@ -67,7 +67,7 @@ namespace SEE.Game.City
         [Range(-7, -2)]
         [LabelText("Gradient Descent Precision (10^n)")]
         [Tooltip("The maximal error for the gradient descent method as power of 10")]
-        public int GradientDescentPrecisionExponent = -4;
+        public int GradientDescentPrecision = -4;
 
         /// <summary>
         /// Maps <see cref="pNorm"/> to a double.
@@ -88,7 +88,7 @@ namespace SEE.Game.City
             writer.Save(LocalMovesDepth, localMovesDepthLabel);
             writer.Save(LocalMovesBranchingLimit, localMovesBranchingLimitLabel);
             writer.Save(pNorm.ToString(), pNormLabel);
-            writer.Save(GradientDescentPrecisionExponent, gradientDescentPrecisionLabel);
+            writer.Save(GradientDescentPrecision, gradientDescentPrecisionLabel);
             writer.Save(PaddingMm, paddingLabel);
             writer.EndGroup();
         }
@@ -103,7 +103,7 @@ namespace SEE.Game.City
             bool result = ConfigIO.Restore(values, localMovesDepthLabel, ref LocalMovesDepth);
             result |= ConfigIO.Restore(values, localMovesBranchingLimitLabel, ref LocalMovesBranchingLimit);
             result |= ConfigIO.RestoreEnum(values, pNormLabel, ref pNorm);
-            result |= ConfigIO.Restore(values, gradientDescentPrecisionLabel, ref GradientDescentPrecisionExponent);
+            result |= ConfigIO.Restore(values, gradientDescentPrecisionLabel, ref GradientDescentPrecision);
             result |= ConfigIO.Restore(values, paddingLabel, ref PaddingMm);
             return result;
         }
@@ -121,7 +121,7 @@ namespace SEE.Game.City
         /// </summary>
         private const string pNormLabel = "PNorm";
         /// <summary>
-        /// Configuration label for <see cref="GradientDescentPrecisionExponent"/>.
+        /// Configuration label for <see cref="GradientDescentPrecision"/>.
         /// </summary>
         private const string gradientDescentPrecisionLabel = "GradientDescentPrecision";
         /// <summary>
@@ -132,7 +132,7 @@ namespace SEE.Game.City
 
     /// <summary>
     /// Selection of possible PNorms. Used for better access in Unity Editor for the field
-    /// <see cref="IncrementalTreeMapSetting.pNorm"/>.
+    /// <see cref="IncrementalTreeMapAttributes.pNorm"/>.
     /// </summary>
     public enum PNormRange
     {

@@ -581,6 +581,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 case EdgeSelectionAttributes:
                 case ErosionAttributes:
                 case BoardAttributes:
+                case IncrementalTreeMapAttributes:
                     parent = CreateNestedSetting(settingName, parent);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
