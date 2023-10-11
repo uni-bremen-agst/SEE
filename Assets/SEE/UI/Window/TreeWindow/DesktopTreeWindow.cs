@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Michsky.UI.ModernUIPack;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Color = UnityEngine.Color;
@@ -44,6 +46,11 @@ namespace SEE.UI.Window.TreeWindow
         private static string CleanupID(string id) => id?.Replace('/', '\\');
 
         /// <summary>
+        /// The alpha keys for the gradient of a menu item (fully opaque).
+        /// </summary>
+        private static readonly GradientAlphaKey[] alphaKeys = { new(1, 0), new(1, 1) };
+
+        /// <summary>
         /// Adds the given <paramref name="node"/> to the bottom of the tree window.
         /// </summary>
         /// <param name="node">The node to be added.</param>
@@ -66,17 +73,19 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="text">The text of the item to be added.</param>
         /// <param name="level">The level of the item to be added.</param>
         /// <param name="icon">The icon of the item to be added, given as a unicode character.</param>
-        /// <param name="nodeGameObject">The game object of the element represented by the item. May be null.</param>
+        /// <param name="itemGameObject">The game object of the element represented by the item. May be null.</param>
         /// <param name="collapseItem">A function that collapses the item.</param>
         /// <param name="expandItem">A function that expands the item.</param>
         private void AddItem(string id, string parentId, int children, string text, int level,
-                             char icon, GameObject nodeGameObject, Action<GameObject> collapseItem, Action<GameObject> expandItem)
+                             char icon, GameObject itemGameObject, Action<GameObject> collapseItem, Action<GameObject> expandItem)
         {
             GameObject item = PrefabInstantiator.InstantiatePrefab(treeItemPrefab, content, false);
             Transform foreground = item.transform.Find("Foreground");
             GameObject expandIcon = foreground.Find("Expand Icon").gameObject;
             TMPro.TextMeshProUGUI textMesh = foreground.Find("Text").gameObject.GetComponent<TMPro.TextMeshProUGUI>();
             TMPro.TextMeshProUGUI iconMesh = foreground.Find("Type Icon").gameObject.GetComponent<TMPro.TextMeshProUGUI>();
+            Color[] gradient = null;
+            Transform parent = null;
 
             textMesh.text = text;
             iconMesh.text = icon.ToString();
@@ -84,27 +93,42 @@ namespace SEE.UI.Window.TreeWindow
             if (parentId != null)
             {
                 // Position the item below its parent.
-                Transform parent = content.Find(parentId);
+                parent = content.Find(parentId);
                 item.transform.SetSiblingIndex(parent.GetSiblingIndex() + 1);
                 foreground.localPosition += new Vector3(indentShift * level, 0, 0);
                 // TODO: Include number badge in title.
             }
 
-            if (nodeGameObject != null)
+            if (itemGameObject != null)
             {
-                Color nodeColor = nodeGameObject.GetComponent<Renderer>().material.color;
-                item.transform.Find("Background").GetComponent<Graphic>().color = nodeColor;
+                if (itemGameObject.CompareTag(Tags.Node))
+                {
+                    // We add a slight gradient to make it look nicer.
+                    Color color = itemGameObject.GetComponent<Renderer>().material.color;
+                    gradient = new[] { color, color.Darker(0.3f) };
+                }
+                else if (itemGameObject.CompareTag(Tags.Edge))
+                {
+                    (Color start, Color end) = itemGameObject.AddOrGetComponent<EdgeOperator>().TargetColor;
+                    gradient = new[] { start, end };
+                }
+            }
 
-                // We also need to set the text color to a color that is readable on the background color.
-                Color foregroundColor = nodeColor.IdealTextColor();
-                textMesh.color = foregroundColor;
-                iconMesh.color = foregroundColor;
-                expandIcon.GetComponent<Graphic>().color = foregroundColor;
-            }
-            else
+            if (gradient == null)
             {
-                // TODO: If there is no color, inherit it from the parent.
+                // If there is no color, inherit it from the parent.
+                Assert.IsTrue(parent != null, "Parent must not be null if color is null.");
+                gradient = parent.Find("Background").GetComponent<UIGradient>().EffectGradient.colorKeys.ToColors().ToArray();
             }
+
+            item.transform.Find("Background").GetComponent<UIGradient>().EffectGradient.SetKeys(gradient.ToGradientColorKeys().ToArray(), alphaKeys);
+
+            // We also need to set the text color to a color that is readable on the background color.
+            Color foregroundColor = gradient.Aggregate((x, y) => (x + y)/2).IdealTextColor();
+            textMesh.color = foregroundColor;
+            iconMesh.color = foregroundColor;
+            expandIcon.GetComponent<Graphic>().color = foregroundColor;
+
             // Slashes will cause problems later on, so we replace them with backslashes.
             // NOTE: This becomes a problem if two nodes A and B exist where node A's name contains slashes and node B
             //       has an identical name, except for all slashes being replaced by backslashes.
@@ -114,6 +138,7 @@ namespace SEE.UI.Window.TreeWindow
             {
                 expandIcon.SetActive(false);
             }
+            // FIXME: There's a bug here which makes scrolling impossible. The EventTrigger is at fault.
             else if (item.TryGetComponentOrLog(out EventTrigger eventTrigger))
             {
                 eventTrigger.triggers.Single().callback.AddListener(e =>
@@ -121,9 +146,9 @@ namespace SEE.UI.Window.TreeWindow
                     // TODO: In the future, highlighting the node should be one available option in a right-click menu.
                     if (((PointerEventData)e).button == PointerEventData.InputButton.Right)
                     {
-                        if (nodeGameObject != null)
+                        if (itemGameObject != null)
                         {
-                            nodeGameObject.AddOrGetComponent<NodeOperator>().Highlight(duration: 10);
+                            itemGameObject.AddOrGetComponent<NodeOperator>().Highlight(duration: 10);
                         }
                     }
                     else
@@ -290,8 +315,8 @@ namespace SEE.UI.Window.TreeWindow
                             ExpandItem(i);
                             foreach (Edge edge in edges)
                             {
-                                // TODO: Pass in edge
-                                AddItem($"{id}#{CleanupID(edge.ID)}", id, 0, edge.ToShortString(), node.Level + 2, edgeTypeUnicode, null, null, null);
+                                GameObject edgeObject = GraphElementIDMap.Find(edge.ID, mustFindElement: true);
+                                AddItem($"{id}#{CleanupID(edge.ID)}", id, 0, edge.ToShortString(), node.Level + 2, edgeTypeUnicode, edgeObject, null, null);
                             }
                         });
             }

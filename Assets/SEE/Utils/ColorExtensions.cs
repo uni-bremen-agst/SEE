@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -9,18 +11,20 @@ namespace SEE.Utils
     public static class ColorExtensions
     {
         /// <summary>
-        /// Returns given <paramref name="color"/> lightened by 50%.
+        /// Returns given <paramref name="color"/> lightened by the given <paramref name="factor"/>.
         /// </summary>
         /// <param name="color">base color to be lightened</param>
-        /// <returns>given <paramref name="color"/> lightened by 50%</returns>
-        public static Color Lighter(this Color color) => Color.Lerp(color, Color.white, 0.5f); // To lighten by 50 %
+        /// <param name="factor">lightening factor</param>
+        /// <returns>given <paramref name="color"/> lightened by <paramref name="factor"/></returns>
+        public static Color Lighter(this Color color, float factor = 0.5f) => Color.Lerp(color, Color.white, factor);
 
         /// <summary>
-        /// Returns given <paramref name="color"/> darkened by 50%.
+        /// Returns given <paramref name="color"/> darkened by the given <paramref name="factor"/>.
         /// </summary>
         /// <param name="color">base color to be darkened</param>
-        /// <returns>given <paramref name="color"/> darkened by 50%</returns>
-        public static Color Darker(this Color color) => Color.Lerp(color, Color.black, 0.5f); // To darken by 50 %
+        /// <param name="factor">darkening factor</param>
+        /// <returns>given <paramref name="color"/> darkened by <paramref name="factor"/></returns>
+        public static Color Darker(this Color color, float factor = 0.5f) => Color.Lerp(color, Color.black, factor);
 
         /// <summary>
         /// Returns this color with the given <paramref name="alpha"/> value.
@@ -68,6 +72,27 @@ namespace SEE.Utils
             // An alternative approach to invert the color is as follows:
             // Color.RGBToHSV(color, out float H, out float S, out float V);
             // return Color.HSVToRGB((H + 0.5f) % 1f, S, V);
+        }
+
+        /// <summary>
+        /// Converts the given <paramref name="colors"/> to linearly distributed gradient color keys.
+        /// </summary>
+        /// <param name="colors">The colors to convert</param>
+        /// <returns>The converted colors as gradient color keys.</returns>
+        public static IEnumerable<GradientColorKey> ToGradientColorKeys(this ICollection<Color> colors)
+        {
+            return colors.Select((c, i) => new GradientColorKey(c, (float)i / colors.Count));
+        }
+
+        /// <summary>
+        /// Converts the given <paramref name="keys"/> to a list of colors.
+        /// This simply extracts the colors from the keys.
+        /// </summary>
+        /// <param name="keys">The keys to convert</param>
+        /// <returns>The converted keys as colors.</returns>
+        public static IEnumerable<Color> ToColors(this IEnumerable<GradientColorKey> keys)
+        {
+            return keys.Select(c => c.color);
         }
     }
 }

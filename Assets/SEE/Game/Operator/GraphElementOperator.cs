@@ -58,6 +58,11 @@ namespace SEE.Game.Operator
 
         protected override float BaseAnimationDuration => City.BaseAnimationDuration;
 
+        /// <summary>
+        /// The current color of the element.
+        /// </summary>
+        public C TargetColor => Color.TargetValue;
+
         #region Abstract Methods
 
         /// <summary>
