@@ -7,6 +7,7 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -119,12 +120,18 @@ namespace SEE.Game.Operator
         /// </summary>
         /// <param name="duration">The amount of time in seconds the node should be highlighted.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> Highlight(float duration, float blinkCount)
+        public IOperationCallback<Action> Highlight(float duration)
         {
+            ShowNotification.Info($"Highlighting '{name}'",
+                                  $"The selected node will be blinking and marked by a spear for {duration} seconds.",
+                                  log: false);
             // Display marker above the node
             MarkerFactory marker = new(markerWidth: 0.01f, markerHeight: 1f, UnityEngine.Color.red, default, default);
             marker.MarkBorn(gameObject);
-            return Blink(blinkCount: 20, ToDuration(duration)).OnComplete(() => marker.Clear());
+            // The factor of 1.3 causes the node to blink slightly more than once per second,
+            // which seems visually fitting.
+            int blinkCount = Mathf.RoundToInt(duration * 1.3f);
+            return Blink(blinkCount: blinkCount, ToDuration(duration)).OnComplete(() => marker.Clear());
         }
 
         /// <summary>

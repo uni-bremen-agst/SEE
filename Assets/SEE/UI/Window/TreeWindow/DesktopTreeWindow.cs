@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Game;
+using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Color = UnityEngine.Color;
 using Transform = UnityEngine.Transform;
@@ -48,11 +50,11 @@ namespace SEE.UI.Window.TreeWindow
         private void AddNode(Node node)
         {
             GameObject nodeGameObject = GraphElementIDMap.Find(node.ID, mustFindElement: true);
-            Color? nodeColor = nodeGameObject.GetComponent<Renderer>()?.material?.color;
             int children = node.NumberOfChildren() + Mathf.Min(node.Outgoings.Count, 1) + Mathf.Min(node.Incomings.Count, 1);
+
             AddItem(CleanupID(node.ID), CleanupID(node.Parent?.ID),
-                    children, node.ToShortString(), node.Level, nodeTypeUnicode, nodeColor,
-                    i => CollapseNode(node, i), i => ExpandNode(node, i, nodeColor));
+                    children, node.ToShortString(), node.Level, nodeTypeUnicode, nodeGameObject,
+                    i => CollapseNode(node, i), i => ExpandNode(node, i, nodeGameObject));
         }
 
         /// <summary>
@@ -64,11 +66,11 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="text">The text of the item to be added.</param>
         /// <param name="level">The level of the item to be added.</param>
         /// <param name="icon">The icon of the item to be added, given as a unicode character.</param>
-        /// <param name="color">The color of the item to be added.</param>
+        /// <param name="nodeGameObject">The game object of the element represented by the item. May be null.</param>
         /// <param name="collapseItem">A function that collapses the item.</param>
         /// <param name="expandItem">A function that expands the item.</param>
         private void AddItem(string id, string parentId, int children, string text, int level,
-                             char icon, Color? color, Action<GameObject> collapseItem, Action<GameObject> expandItem)
+                             char icon, GameObject nodeGameObject, Action<GameObject> collapseItem, Action<GameObject> expandItem)
         {
             GameObject item = PrefabInstantiator.InstantiatePrefab(treeItemPrefab, content, false);
             Transform foreground = item.transform.Find("Foreground");
@@ -82,20 +84,26 @@ namespace SEE.UI.Window.TreeWindow
             if (parentId != null)
             {
                 // Position the item below its parent.
-                // TODO: Include number badge in title.
-                item.transform.SetSiblingIndex(content.Find(parentId).GetSiblingIndex() + 1);
+                Transform parent = content.Find(parentId);
+                item.transform.SetSiblingIndex(parent.GetSiblingIndex() + 1);
                 foreground.localPosition += new Vector3(indentShift * level, 0, 0);
-                // TODO: If there is no color, inherit it from the parent.
-                if (color.HasValue)
-                {
-                    item.transform.Find("Background").GetComponent<Graphic>().color = color.Value;
+                // TODO: Include number badge in title.
+            }
 
-                    // We also need to set the text color to a color that is readable on the background color.
-                    Color foregroundColor = color.Value.IdealTextColor();
-                    textMesh.color = foregroundColor;
-                    iconMesh.color = foregroundColor;
-                    expandIcon.GetComponent<Graphic>().color = foregroundColor;
-                }
+            if (nodeGameObject != null)
+            {
+                Color nodeColor = nodeGameObject.GetComponent<Renderer>().material.color;
+                item.transform.Find("Background").GetComponent<Graphic>().color = nodeColor;
+
+                // We also need to set the text color to a color that is readable on the background color.
+                Color foregroundColor = nodeColor.IdealTextColor();
+                textMesh.color = foregroundColor;
+                iconMesh.color = foregroundColor;
+                expandIcon.GetComponent<Graphic>().color = foregroundColor;
+            }
+            else
+            {
+                // TODO: If there is no color, inherit it from the parent.
             }
             // Slashes will cause problems later on, so we replace them with backslashes.
             // NOTE: This becomes a problem if two nodes A and B exist where node A's name contains slashes and node B
@@ -106,17 +114,28 @@ namespace SEE.UI.Window.TreeWindow
             {
                 expandIcon.SetActive(false);
             }
-            else if (item.TryGetComponentOrLog(out Button button))
+            else if (item.TryGetComponentOrLog(out EventTrigger eventTrigger))
             {
-                button.onClick.AddListener(() =>
+                eventTrigger.triggers.Single().callback.AddListener(e =>
                 {
-                    if (expandedItems.Contains(id))
+                    // TODO: In the future, highlighting the node should be one available option in a right-click menu.
+                    if (((PointerEventData)e).button == PointerEventData.InputButton.Right)
                     {
-                        collapseItem(item);
+                        if (nodeGameObject != null)
+                        {
+                            nodeGameObject.AddOrGetComponent<NodeOperator>().Highlight(duration: 10);
+                        }
                     }
                     else
                     {
-                        expandItem(item);
+                        if (expandedItems.Contains(id))
+                        {
+                            collapseItem(item);
+                        }
+                        else
+                        {
+                            expandItem(item);
+                        }
                     }
                 });
 
@@ -158,9 +177,7 @@ namespace SEE.UI.Window.TreeWindow
                 IEnumerable<(string, Node)> appendEdgeChildren(string edgeType, IEnumerable<Edge> edges)
                 {
                     return children.Append((cleanId + "#" + edgeType, null))
-                                   .Concat(edges.Select<Edge, (string, Node)>(
-                                               x => ($"{cleanId}#{edgeType}#{CleanupID(x.ID)}", null))
-                                           );
+                                   .Concat(edges.Select<Edge, (string, Node)>(x => ($"{cleanId}#{edgeType}#{CleanupID(x.ID)}", null)));
                 }
             }
         }
@@ -173,7 +190,7 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="initial">The initial item whose children will be removed.</param>
         /// <param name="getChildItems">A function that returns the children, along with their ID, of an item.</param>
         /// <typeparam name="T">The type of the item.</typeparam>
-        private void RemoveItem<T>(string id, T initial, Func<T,IEnumerable<(string ID, T child)>> getChildItems)
+        private void RemoveItem<T>(string id, T initial, Func<T, IEnumerable<(string ID, T child)>> getChildItems)
         {
             GameObject item = content.Find(id)?.gameObject;
             if (item == null)
@@ -233,8 +250,8 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         /// <param name="node">The node represented by the item.</param>
         /// <param name="item">The item to be expanded.</param>
-        /// <param name="nodeColor">The color of the node.</param>
-        private void ExpandNode(Node node, GameObject item, Color? nodeColor)
+        /// <param name="nodeGameObject">The game object of the element represented by the node.</param>
+        private void ExpandNode(Node node, GameObject item, GameObject nodeGameObject)
         {
             ExpandItem(item);
 
@@ -260,7 +277,7 @@ namespace SEE.UI.Window.TreeWindow
                 // Note that an edge may appear multiple times in the tree view,
                 // hence we make its ID dependent on the node it is connected to,
                 // and whether it is an incoming or outgoing edge (to cover self-loops).
-                AddItem(id, cleanedId, edges.Count, $"{edgesType} Edges", node.Level + 1, icon, nodeColor,
+                AddItem(id, cleanedId, edges.Count, $"{edgesType} Edges", node.Level + 1, icon, nodeGameObject,
                         i =>
                         {
                             CollapseItem(i);
@@ -273,7 +290,8 @@ namespace SEE.UI.Window.TreeWindow
                             ExpandItem(i);
                             foreach (Edge edge in edges)
                             {
-                                AddItem($"{id}#{CleanupID(edge.ID)}", id, 0, edge.ToShortString(), node.Level + 2, edgeTypeUnicode, nodeColor, null, null);
+                                // TODO: Pass in edge
+                                AddItem($"{id}#{CleanupID(edge.ID)}", id, 0, edge.ToShortString(), node.Level + 2, edgeTypeUnicode, null, null, null);
                             }
                         });
             }
