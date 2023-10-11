@@ -38,6 +38,11 @@ namespace SEE.GO.Menu
         private const float markerWidth = 0.01f;
 
         /// <summary>
+        /// The color of the marker pointing to the found node.
+        /// </summary>
+        private static readonly Color markerColor = Color.red;
+
+        /// <summary>
         /// The dialog in which the search query can be entered.
         /// </summary>
         private PropertyDialog searchDialog;
@@ -52,11 +57,6 @@ namespace SEE.GO.Menu
         /// The user can select the desired node here.
         /// </summary>
         private SimpleListMenu resultMenu;
-
-        /// <summary>
-        /// The color of the marker pointing to the found node.
-        /// </summary>
-        private static readonly Color markerColor = Color.red;
 
         /// <summary>
         /// A mapping from names to a list of nodes with that name.
@@ -180,12 +180,7 @@ namespace SEE.GO.Menu
                                   "The selected node will be blinking and marked by a spear "
                                   + $"for {blinkSeconds} seconds.");
             NodeOperator nodeOperator = result.AddOrGetComponent<NodeOperator>();
-            // Display marker above the node
-            MarkerFactory marker = new(markerWidth, markerHeight, markerColor, default, default);
-            marker.MarkBorn(result);
-            nodeOperator.Blink(blinkCount, blinkSeconds).SetOnComplete(RemoveMarker);
-
-            void RemoveMarker() => marker.Clear();
+            nodeOperator.Highlight(blinkSeconds, blinkCount);
         }
 
         /// <summary>

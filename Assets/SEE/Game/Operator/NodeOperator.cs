@@ -114,6 +114,20 @@ namespace SEE.Game.Operator
         #region Public API
 
         /// <summary>
+        /// Displays a marker above the node and makes it blink <paramref name="blinkCount"/> times
+        /// within the given <paramref name="duration"/>.
+        /// </summary>
+        /// <param name="duration">The amount of time in seconds the node should be highlighted.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> Highlight(float duration, float blinkCount)
+        {
+            // Display marker above the node
+            MarkerFactory marker = new(markerWidth: 0.01f, markerHeight: 1f, UnityEngine.Color.red, default, default);
+            marker.MarkBorn(gameObject);
+            return Blink(blinkCount: 20, ToDuration(duration)).OnComplete(() => marker.Clear());
+        }
+
+        /// <summary>
         /// Moves the node to the <paramref name="newXPosition"/> in world space.
         /// </summary>
         /// <param name="newXPosition">the desired new target X coordinate in world space</param>
