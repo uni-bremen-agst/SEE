@@ -23,8 +23,8 @@ namespace SEE.GO
             TransparentLine = 1, // for lines with transparency
             OpaqueMetallic = 2,  // for opaque meshes with a more realistic metallic effect
             PortalFree = 3,       // not limited by a portal (seen everywhere)
-            DrawableLine = 4,
-            DrawableDashedLine = 5,
+            DrawableLine = 4,       // for drawable lines
+            DrawableDashedLine = 5, // for drawable dashed lines
         }
 
         /// <summary>

@@ -3,13 +3,15 @@ using SEE.Game;
 using SEE.Game.UI.Notification;
 using System;
 using System.Collections;
+using SEE.Game.Drawable.Configurations;
+using TMPro;
 using UnityEngine;
 
 namespace Assets.SEE.Game.Drawable
 {
     /// <summary>
-    /// This GameLayerChanger allows to change the order in layer of a <see cref="DrawableTypes"/>
-    /// The <see cref="DrawableTypes"/> needs a <see cref="OrderInLayerValueHolder"/> component.
+    /// This GameLayerChanger allows to change the order in layer of a <see cref="DrawableType"/>
+    /// The <see cref="DrawableType"/> needs a <see cref="OrderInLayerValueHolder"/> component.
     /// </summary>
     public static class GameLayerChanger
     {
@@ -35,7 +37,7 @@ namespace Assets.SEE.Game.Drawable
             if (obj.GetComponent<OrderInLayerValueHolder>() != null)
             {
                 OrderInLayerValueHolder holder = obj.GetComponent<OrderInLayerValueHolder>();
-                if (holder.GetOrderInLayer() >= DrawableHelper.orderInLayer)
+                if (holder.GetOrderInLayer() >= ValueHolder.currentOrderInLayer)
                 {
                     ShowNotification.Warn("Maximum layer order", obj.name + " has reached the maximum layer order: " + holder.GetOrderInLayer());
                 }
@@ -43,6 +45,10 @@ namespace Assets.SEE.Game.Drawable
                 {
                     holder.SetOrderInLayer(order);
                     MoveObjectZ(obj, order);
+                    if (obj.GetComponent<TextMeshPro>() != null)
+                    {
+                        obj.GetComponent<TextMeshPro>().sortingOrder = order;
+                    }
                 }
             }
         }
@@ -65,6 +71,10 @@ namespace Assets.SEE.Game.Drawable
                 {
                     holder.SetOrderInLayer(order);
                     MoveObjectZ(obj, order);
+                    if (obj.GetComponent<TextMeshPro>() != null)
+                    {
+                        obj.GetComponent<TextMeshPro>().sortingOrder = order;
+                    }
                 }
             }
         }
@@ -82,7 +92,7 @@ namespace Assets.SEE.Game.Drawable
             {
                 multiplyValue = 0.5f;
             }
-            obj.transform.localPosition = new Vector3(oldPos.x, oldPos.y, multiplyValue * -DrawableHelper.distanceToDrawable.z);;
+            obj.transform.localPosition = new Vector3(oldPos.x, oldPos.y, multiplyValue * -ValueHolder.distanceToDrawable.z);;
         }
     }
 }

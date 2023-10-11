@@ -6,12 +6,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.Game.Drawable.Configurations;
 
 namespace Assets.SEE.Game.Drawable
 {
     public static class GameLineSplit
     {
-        public static bool GetSplittedPositions(bool isActive, Line originLine, List<int> matchedIndexes, List<Vector3> positions, List<Line> lines, bool removeMatchedIndex)
+        public static bool GetSplittedPositions(bool isActive, GameObject drawable, Line originLine, List<int> matchedIndexes, List<Vector3> positions, List<Line> lines, bool removeMatchedIndex)
         {
             int removeCounter = removeMatchedIndex ? 1 : 0;
 
@@ -22,8 +23,8 @@ namespace Assets.SEE.Game.Drawable
                 int lastArrayIndex = matchedIndexes[matchedIndexes.Count - 1];
                 int lastListIndex = positions.Count - removeCounter - lastArrayIndex;
                 Vector3[] lastPart = positions.GetRange(lastArrayIndex + removeCounter, lastListIndex).ToArray();
-                TryReDraw(originLine, firstPart, lines);
-                TryReDraw(originLine, lastPart, lines);
+                TryReDraw(drawable, originLine, firstPart, lines);
+                TryReDraw(drawable, originLine, lastPart, lines);
                 positions.RemoveRange(0, (matchedIndexes[0] - 1) + removeCounter);
                 int removedCount = (matchedIndexes[0] - 1) + removeCounter;
                 bool firstRun = true;
@@ -45,7 +46,7 @@ namespace Assets.SEE.Game.Drawable
                         {
                             matchedIndexes[k] -= removedCount;
                         }
-                        TryReDraw(originLine, middlePart, lines);
+                        TryReDraw(drawable, originLine, middlePart, lines);
                     }
                 }
             }
@@ -64,26 +65,26 @@ namespace Assets.SEE.Game.Drawable
                     int lastIndex = positions.Count - removeCounter - matchedIndexes[0];
                     Vector3[] end = positions.GetRange(matchedIndexes[0] + removeCounter, lastIndex).ToArray();
 
-                    TryReDraw(originLine, begin, lines);
-                    TryReDraw(originLine, end, lines);
+                    TryReDraw(drawable, originLine, begin, lines);
+                    TryReDraw(drawable, originLine, end, lines);
                 }
             }
 
             return isActive;
         }
 
-        private static void TryReDraw(Line originLine, Vector3[] positions, List<Line> lines)
+        private static void TryReDraw(GameObject drawable, Line originLine, Vector3[] positions, List<Line> lines)
         {
             if (positions.Length > 1)
             {
-                lines.Add(ReDraw(originLine, positions));
+                lines.Add(ReDraw(drawable, originLine, positions));
             }
         }
-        private static Line ReDraw(Line originLine, Vector3[] positions)
+        private static Line ReDraw(GameObject drawable, Line originLine, Vector3[] positions)
         {
-            LineRenderer renderer = originLine.gameObject.GetComponent<LineRenderer>();
-            GameObject drawable = GameDrawableFinder.FindDrawable(originLine.gameObject);
-            
+            //LineRenderer renderer = originObj.GetComponent<LineRenderer>();
+            //GameObject drawable = GameDrawableFinder.FindDrawable(originLine.gameObject);
+
             Line lineToCreate = (Line)originLine.Clone();
             lineToCreate.id = "";
             lineToCreate.rendererPositions = positions;

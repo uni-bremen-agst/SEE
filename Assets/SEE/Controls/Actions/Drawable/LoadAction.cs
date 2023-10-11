@@ -16,13 +16,15 @@ using static SimpleFileBrowser.FileBrowser;
 using SimpleFileBrowser;
 using Assets.SEE.Game.UI.Drawable;
 using UnityEngine.UI;
+using SEE.Game.Drawable.Configurations;
+using Text = SEE.Game.Drawable.Configurations.Text;
 
 namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
-    /// Adds the <see cref="DrawableTypes"/> to the scene from one or more drawable configs saved in a file on the disk.
+    /// Adds the <see cref="DrawableType"/> to the scene from one or more drawable configs saved in a file on the disk.
     /// </summary>
-    class LoadAction : AbstractPlayerAction
+    public class LoadAction : AbstractPlayerAction
     {
         /// <summary>
         /// Represents how the file was loaded.
@@ -30,7 +32,7 @@ namespace SEE.Controls.Actions.Drawable
         /// LoadState.OneSpecific is one drawbale in the file and it will be load the attached objects to a specific (maybe other) drawable.
         /// LoadState.More is for more drawbales in the file and it will be load the attached objects to that drawables.
         /// </summary>
-        private enum LoadState
+        public enum LoadState
         {
             One,
             OneSpecific,
@@ -61,9 +63,9 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Ensures that per click is only load once.
+        /// The file path of the file that should be loaded.
         /// </summary>
-        private static bool clicked = false;
+        public static string filePath = "";
 
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.Load"/>.
@@ -75,58 +77,64 @@ namespace SEE.Controls.Actions.Drawable
 
             if (!Raycasting.IsMouseOverGUI())
             {
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !Input.GetKey(KeyCode.LeftControl) && !clicked)
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift))
                 {
-                    clicked = true;
-                    DrawableConfig config = DrawableConfigManager.LoadDrawable("Test");
-                    GameObject drawable = GameDrawableFinder.Find(config.DrawableName, config.DrawableParentName);
-                    Restore(drawable, config);
+                    GameObject.Find("UI Canvas").AddComponent<DrawableFileBrowser>().LoadDrawableConfiguration(LoadState.One);
                     memento = new Memento(LoadState.One);
-                    memento.config = config;
-                    currentState = ReversibleAction.Progress.Completed;
-                    result = true;
+                    currentState = ReversibleAction.Progress.InProgress;
                 }
 
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && Input.GetKey(KeyCode.LeftControl) && !clicked &&
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) && 
                     Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
                     (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
                     GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject)))
                 {
-                    clicked = true;
-                    DrawableConfig config = DrawableConfigManager.LoadDrawable("Test");
+                    GameObject.Find("UI Canvas").AddComponent<DrawableFileBrowser>().LoadDrawableConfiguration(LoadState.OneSpecific);
                     GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
                         raycastHit.collider.gameObject : GameDrawableFinder.FindDrawable(raycastHit.collider.gameObject);
-                    Restore(drawable, config);
                     memento = new Memento(LoadState.OneSpecific);
-                    memento.config = config;
                     memento.specificDrawable = drawable;
-                    currentState = ReversibleAction.Progress.Completed;
-                    result = true;
+                    currentState = ReversibleAction.Progress.InProgress;
                 }
                 
-                if ((Input.GetMouseButtonDown(1) || Input.GetMouseButton(1))&& !clicked)
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftShift))
                 {
-                    clicked = true;
-                    DrawablesConfigs configs = DrawableConfigManager.LoadDrawables("Test1");
-                    foreach(DrawableConfig config  in configs.Drawables) 
-                    {
-                        GameObject drawable = GameDrawableFinder.Find(config.DrawableName, config.DrawableParentName);
-                        Restore(drawable, config);
-                    }
+                    GameObject.Find("UI Canvas").AddComponent<DrawableFileBrowser>().LoadDrawableConfiguration(LoadState.More);
                     memento = new Memento(LoadState.More);
-                    memento.configs = configs;
-                    currentState = ReversibleAction.Progress.Completed;
-                    result = true;
+                    currentState = ReversibleAction.Progress.InProgress;
                 }
 
-                if (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1))
+                if (!filePath.Equals("") && memento != null)
                 {
-                    clicked = false;
-                }
-
-                if(Input.GetMouseButtonDown(2))
-                {
-                    GameObject.Find("UI Canvas").AddComponent<Test>();
+                    switch(memento.state)
+                    {
+                        case LoadState.One:
+                            DrawableConfig config = DrawableConfigManager.LoadDrawable(new FilePath(filePath));
+                            GameObject drawable = GameDrawableFinder.Find(config.DrawableName, config.DrawableParentName);
+                            Restore(drawable, config);
+                            memento.config = config;
+                            currentState = ReversibleAction.Progress.Completed;
+                            result = true;
+                            break;
+                        case LoadState.OneSpecific:
+                            DrawableConfig configSpecific = DrawableConfigManager.LoadDrawable(new FilePath(filePath));
+                            Restore(memento.specificDrawable, configSpecific);
+                            memento.config = configSpecific;
+                            currentState = ReversibleAction.Progress.Completed;
+                            result = true;
+                            break;
+                        case LoadState.More:
+                            DrawablesConfigs configs = DrawableConfigManager.LoadDrawables(new FilePath(filePath));
+                            foreach (DrawableConfig drawableConfig in configs.Drawables)
+                            {
+                                GameObject drawableOfFile = GameDrawableFinder.Find(drawableConfig.DrawableName, drawableConfig.DrawableParentName);
+                                Restore(drawableOfFile, drawableConfig);
+                            }
+                            memento.configs = configs;
+                            currentState = ReversibleAction.Progress.Completed;
+                            result = true;
+                            break;
+                    }
                 }
             }
             return result;
@@ -140,6 +148,7 @@ namespace SEE.Controls.Actions.Drawable
         private void Restore(GameObject drawable, DrawableConfig config)
         {
             RestoreLines(drawable, config.LineConfigs);
+            RestoreTexts(drawable, config.TextConfigs);
         }
 
         /// <summary>
@@ -156,7 +165,16 @@ namespace SEE.Controls.Actions.Drawable
             }
         }
 
-        //TODO ADD THE OTHER DRAWABLETYPES!
+        private void RestoreTexts(GameObject drawable, List<Text> texts)
+        {
+            foreach(Text text in texts)
+            {
+                GameTexter.ReWriteText(drawable, text);
+                new WriteTextNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), text).Execute();
+            }
+        }
+
+        
         /// <summary>
         /// Destroyes the objects, which was loaded from the configuration.
         /// </summary>
@@ -168,11 +186,14 @@ namespace SEE.Controls.Actions.Drawable
             {
                 GameObject drawable = GameDrawableFinder.FindDrawable(attachedObjects);
                 string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
-                foreach (Line line in config.LineConfigs)
+                List<DrawableType> allConfigs = new(config.LineConfigs);
+                allConfigs.AddRange(config.TextConfigs); //TODO ADD THE OTHER DRAWABLE TYPES Configs!
+
+                foreach (DrawableType type in allConfigs)
                 {
-                    GameObject lineObj = GameDrawableFinder.FindChild(attachedObjects, line.id);
-                    new EraseNetAction(drawable.name, drawableParentName, lineObj.name).Execute();
-                    Destroyer.Destroy(lineObj);
+                    GameObject typeObj = GameDrawableFinder.FindChild(attachedObjects, type.id);
+                    new EraseNetAction(drawable.name, drawableParentName, typeObj.name).Execute();
+                    Destroyer.Destroy(typeObj);
                 }
             }
         }
@@ -230,9 +251,12 @@ namespace SEE.Controls.Actions.Drawable
             }
         }
 
+        /// <summary>
+        /// Stops the <see cref="LoadAction"/>. Resets the file path.
+        /// </summary>
         public override void Stop()
         {
-            Destroyer.Destroy(GameObject.Find("UI Canvas").GetComponent<Test>());
+            filePath = "";
         }
 
 

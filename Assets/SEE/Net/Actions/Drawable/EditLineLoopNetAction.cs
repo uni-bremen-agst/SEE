@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for changing the loop (<see cref="EditLineAction"/>) of a line on all clients.
+    /// This class is responsible for changing the loop (<see cref="EditAction"/>) of a line on all clients.
     /// </summary>
     public class EditLineLoopNetAction : AbstractNetAction
     {
@@ -63,7 +63,7 @@ namespace SEE.Net.Actions.Drawable
                 GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
                 if (drawable != null && GameDrawableFinder.FindChild(drawable, LineName) != null)
                 {
-                    GameEditLine.ChangeLoop(GameDrawableFinder.FindChild(drawable, LineName), Loop);
+                    GameEdit.ChangeLoop(GameDrawableFinder.FindChild(drawable, LineName), Loop);
                 }
                 else
                 {

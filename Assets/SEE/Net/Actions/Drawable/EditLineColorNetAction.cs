@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for changing the order in layer (<see cref="EditLineAction"/>) of a line on all clients.
+    /// This class is responsible for changing the order in layer (<see cref="EditAction"/>) of a line on all clients.
     /// </summary>
     public class EditLineColorNetAction : AbstractNetAction
     {
@@ -64,7 +64,7 @@ namespace SEE.Net.Actions.Drawable
                     GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
                     if (drawable != null && GameDrawableFinder.FindChild(drawable, LineName) != null)
                     {
-                        GameEditLine.ChangeColor(GameDrawableFinder.FindChild(drawable, LineName), color);
+                        GameEdit.ChangeColor(GameDrawableFinder.FindChild(drawable, LineName), color);
                     }
                     else
                     {

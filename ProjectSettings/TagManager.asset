@@ -36,6 +36,8 @@ TagManager:
   - Left
   - Right
   - AttachedObjects
+  - DText
+  - Image
   layers:
   - Default
   - TransparentFX

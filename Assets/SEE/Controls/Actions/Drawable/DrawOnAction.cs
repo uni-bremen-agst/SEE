@@ -8,6 +8,8 @@ using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game;
 using System.Linq;
 using SEE.Controls.Actions;
+using Assets.SEE.Game.UI.Drawable;
+using SEE.Game.Drawable.Configurations;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -43,7 +45,8 @@ namespace SEE.Controls.Actions.Drawable
 
         private HSVPicker.ColorPicker picker;
         private ThicknessSliderController thicknessSlider;
-       private bool drawing = false;
+        private bool drawing = false;
+        private bool finishDrawing = false;
 
         public override void Start()
         {
@@ -52,35 +55,35 @@ namespace SEE.Controls.Actions.Drawable
 
         public override void Awake()
         {
-            DrawableHelper.enableDrawableMenu(withoutMenuPoints: new DrawableHelper.MenuPoint[] { DrawableHelper.MenuPoint.Layer, DrawableHelper.MenuPoint.Loop });
+            LineMenu.enableLineMenu(withoutMenuLayer: new LineMenu.MenuLayer[] { LineMenu.MenuLayer.Layer, LineMenu.MenuLayer.Loop });
 
-            DrawableHelper.GetTilingSlider().onValueChanged.AddListener(DrawableHelper.tilingAction = tiling =>
+            LineMenu.GetTilingSliderController().onValueChanged.AddListener(LineMenu.tilingAction = tiling =>
             {
-                DrawableHelper.currentTiling = tiling;
+                ValueHolder.currentTiling = tiling;
             });
-            DrawableHelper.GetNextBtn().onClick.RemoveAllListeners();
-            DrawableHelper.GetNextBtn().onClick.AddListener(() => DrawableHelper.currentLineKind = DrawableHelper.NextLineKind());
-            DrawableHelper.GetPreviousBtn().onClick.RemoveAllListeners();
-            DrawableHelper.GetPreviousBtn().onClick.AddListener(() => DrawableHelper.currentLineKind = DrawableHelper.PreviousLineKind());
+            LineMenu.GetNextLineKindBtn().onClick.RemoveAllListeners();
+            LineMenu.GetNextLineKindBtn().onClick.AddListener(() => ValueHolder.currentLineKind = LineMenu.NextLineKind());
+            LineMenu.GetPreviousLineKindBtn().onClick.RemoveAllListeners();
+            LineMenu.GetPreviousLineKindBtn().onClick.AddListener(() => ValueHolder.currentLineKind = LineMenu.PreviousLineKind());
 
-            thicknessSlider = DrawableHelper.drawableMenu.GetComponentInChildren<ThicknessSliderController>();
-            thicknessSlider.AssignValue(DrawableHelper.currentThickness);
+            thicknessSlider = LineMenu.instance.GetComponentInChildren<ThicknessSliderController>();
+            thicknessSlider.AssignValue(ValueHolder.currentThickness);
             thicknessSlider.onValueChanged.AddListener(thickness =>
             {
-                DrawableHelper.currentThickness = thickness;
+                ValueHolder.currentThickness = thickness;
             });
 
-            picker = DrawableHelper.drawableMenu.GetComponent<HSVPicker.ColorPicker>();
-            picker.AssignColor(DrawableHelper.currentColor);
-            picker.onValueChanged.AddListener(DrawableHelper.colorAction = color =>
+            picker = LineMenu.instance.GetComponent<HSVPicker.ColorPicker>();
+            picker.AssignColor(ValueHolder.currentColor);
+            picker.onValueChanged.AddListener(LineMenu.colorAction = color =>
             {
-                DrawableHelper.currentColor = color;
+                ValueHolder.currentColor = color;
             });
         }
 
         public override void Stop()
         {
-            DrawableHelper.disableDrawableMenu();
+            LineMenu.disableLineMenu();
         }
 
         /// <summary>
@@ -89,32 +92,30 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            bool result = false;
-
             if (!Raycasting.IsMouseOverGUI())
             {
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !finishDrawing &&
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                    GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject)))
+                    GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject))
+                    && (drawable == null || drawable != null && GameDrawableFinder.FindDrawable(raycastHit.collider.gameObject).Equals(drawable)))
                 {
-                    drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                        raycastHit.collider.gameObject : GameDrawableFinder.FindDrawable(raycastHit.collider.gameObject);
-                    drawing = true;
-
                     switch (progressState)
                     {
                         case ProgressState.StartDrawing:
+                            drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
+                                    raycastHit.collider.gameObject : GameDrawableFinder.FindDrawable(raycastHit.collider.gameObject);
+                            drawing = true;
                             progressState = ProgressState.Drawing;
                             positions[0] = raycastHit.point;
-                            line = GameDrawer.StartDrawing(drawable, positions, DrawableHelper.currentColor, DrawableHelper.currentThickness, 
-                                DrawableHelper.currentLineKind, DrawableHelper.currentTiling);
-                            positions[0] = line.transform.InverseTransformPoint(positions[0]) - DrawableHelper.distanceToDrawable;
+                            line = GameDrawer.StartDrawing(drawable, positions, ValueHolder.currentColor, ValueHolder.currentThickness,
+                                ValueHolder.currentLineKind, ValueHolder.currentTiling);
+                            positions[0] = line.transform.InverseTransformPoint(positions[0]) - ValueHolder.distanceToDrawable;
                             break;
 
                         case ProgressState.Drawing:
                             // The position at which to continue the line.
-                            Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - DrawableHelper.distanceToDrawable;
+                            Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - ValueHolder.distanceToDrawable;
                             if (newPosition != positions.Last())
                             {
                                 // Add newPosition to the line renderer.
@@ -131,8 +132,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                 }
 
-                bool isMouseButtonUp = Input.GetMouseButtonUp(0);
-                if (isMouseButtonUp || (!Input.GetMouseButton(0) && drawing))
+                if (Input.GetMouseButtonUp(0) && drawing)
                 {
                     progressState = ProgressState.FinishDrawing;
                     drawing = false;
@@ -141,25 +141,25 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         if (GameDrawer.DifferentMeshVerticesCounter(line) >= 3)
                         {
+                            finishDrawing = true;
                             line = GameDrawer.SetPivot(line);
                             Line currentLine = Line.GetLine(line);
                             memento = new Memento(drawable, currentLine);
                             new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), currentLine).Execute();
-                            Debug.Log("Created: " + line);
-                            result = true;
                             currentState = ReversibleAction.Progress.Completed;
-                            progressState = ProgressState.StartDrawing;
-                            positions = new Vector3[1];
+                            return true; 
                         }
                         else
                         {
-                            Destroyer.Destroy(line);//.transform.parent.gameObject);
+                            Destroyer.Destroy(line);
+                            progressState = ProgressState.StartDrawing;
+                            positions = new Vector3[1];
                         }
                     }
-                    return isMouseButtonUp;
+                    return false;
                 }
             }
-            return result;
+            return false;
         }
 
         private struct Memento
@@ -180,16 +180,13 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Undo()
         {
-            base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            Debug.Log("Undo: " + line + ", id:" + memento.line.id);
+            base.Undo();
             if (line == null)
             {
                 line = GameDrawableFinder.FindChild(memento.drawable, memento.line.id);
-                Debug.Log("Try to find: " + line);
             }
             if (line != null)
             {
-                Debug.Log("Delete: " + line);
                 new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.line.id).Execute();
                 Destroyer.Destroy(line);//.transform.parent.gameObject);
                 line = null;

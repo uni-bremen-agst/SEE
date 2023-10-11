@@ -1,4 +1,7 @@
-﻿namespace SEE.Game
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace SEE.Game
 {
     /// <summary>
     /// The Unity tags for the graph entities represented by the GameObjects.
@@ -81,6 +84,8 @@
         /// </summary>
         public const string Drawable = "Drawable";
         public const string Line = "Line";
+        public const string DText = "DText";
+        public const string Image = "Image";
         public const string AttachedObjects = "AttachedObjects";
 
         public const string Top = "Top";
@@ -92,6 +97,15 @@
         /// All existing tags in one.
         /// </summary>
         public static readonly string[] All = { Graph, Node, Edge, Text, Erosion, Decoration,
-              Path, Runtime, FunctionCall, CullingPlane, ChartManager, MainCamera, Drawable, Line, AttachedObjects, Top, Bottom, Left, Right};
+              Path, Runtime, FunctionCall, CullingPlane, ChartManager, MainCamera, Drawable, Line, DText, Image, AttachedObjects, Top, Bottom, Left, Right};
+
+        /// <summary>
+        /// All existing drawable types tags in one.
+        /// </summary>
+        public static readonly string[] DTypes = { Line, DText, Image };
+        /// <summary>
+        /// All existing drawable types tags in one list.
+        /// </summary>
+        public static readonly List<string> DrawableTypes = DTypes.ToList();
     }
 }

@@ -4,21 +4,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game;
+using OpenAI.Files;
+using HighlightPlus;
+using Sirenix.OdinInspector;
+using Assets.SEE.Game.UI.Drawable;
+using static SEE.Controls.Actions.Drawable.LoadAction;
+using System.IO;
 
 namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
     /// Saves one or more drawable configuration's to a file.
     /// </summary>
-    class SaveAction : AbstractPlayerAction
+    public class SaveAction : AbstractPlayerAction
     {
         /// <summary>
         /// Represents if one or more drawables has been saved in the file.
         /// </summary>
-        private enum SavedCounter
+        public enum SaveState
         {
             One,
-            More
+            More,
+            All
         }
         /// <summary>
         /// Saves all the information needed to revert or repeat this action.
@@ -28,12 +35,12 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// This struct can store all the information needed to revert or repeat a <see cref="SaveAction"/>.
         /// </summary>
-        private struct Memento
+        private class Memento
         {
             /// <summary>
-            /// The name of the file in which the drawable's config has been written.
+            /// The path of the file in which the drawable's config has been written.
             /// </summary>
-            internal readonly string fileName;
+            internal FilePath filePath;
 
             /// <summary>
             /// The drawables configs that was saved here.
@@ -41,21 +48,19 @@ namespace SEE.Controls.Actions.Drawable
             internal readonly GameObject[] drawables;
 
             /// <summary>
-            /// The counter if one or more drawables has been saved in this file.
+            /// The state if one or more drawables has been saved in this file.
             /// </summary>
-            internal readonly SavedCounter savedCounter;
+            internal readonly SaveState savedState;
 
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
-            /// <param name="fileName">The filename to save into this Memento</param>
             /// <param name="drawables">The drawables to save into this file</param>
-            /// <param name="savedCounter">Represents if one or more drawables saved in this file.</param>
-            internal Memento(string fileName, GameObject[] drawables, SavedCounter savedCounter)
+            /// <param name="savedState">Represents if one or more drawables saved in this file.</param>
+            internal Memento(GameObject[] drawables, SaveState savedState)
             {
-                this.fileName = fileName;
                 this.drawables = drawables;
-                this.savedCounter = savedCounter;
+                this.savedState = savedState;
             }
         }
 
@@ -63,6 +68,37 @@ namespace SEE.Controls.Actions.Drawable
         /// Ensures that per click is only saved once.
         /// </summary>
         private static bool clicked = false;
+
+        /// <summary>
+        /// The file path of the to saved file.
+        /// </summary>
+        public static string filePath = "";
+
+        /// <summary>
+        /// List of all selected drawable for saving.
+        /// </summary>
+        private static List<GameObject> selectedDrawables = new();
+
+        private static DrawableFileBrowser browser;
+
+        /// <summary>
+        /// Stops the <see cref="SaveAction"/>.
+        /// Resets the file path.
+        /// </summary>
+        public override void Stop()
+        {
+            filePath = "";
+            Reset();
+        }
+
+        /// <summary>
+        /// This method will called, when the Action will be leaved and some drawable are still selected.
+        /// </summary>
+        public static void Reset()
+        {
+            selectedDrawables.Clear();
+            browser = null;
+        }
 
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.Save"/>.
@@ -74,29 +110,102 @@ namespace SEE.Controls.Actions.Drawable
 
             if (!Raycasting.IsMouseOverGUI())
             {
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !clicked &&
-                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&// && // Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                    (GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject) || raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) &&
+                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) && selectedDrawables.Count == 0 &&
+                    (GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject) || raycastHit.collider.gameObject.CompareTag(Tags.Drawable))
+                    && (browser == null || (browser != null && !browser.IsOpen())))
                 {
-                    clicked = true;
                     GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
                         raycastHit.collider.gameObject : GameDrawableFinder.FindDrawable(raycastHit.collider.gameObject);
-                    DrawableConfigManager.SaveDrawable(drawable, "Test");
-                    memento = new Memento("Test", new GameObject[] { drawable }, SavedCounter.One);
-                    currentState = ReversibleAction.Progress.Completed;
-                    result = true;
-                }
-                if (Input.GetMouseButtonDown(1) || Input.GetMouseButton(1) && !clicked)
-                {
-                    clicked = true;
-                    List<GameObject> drawables = new (GameObject.FindGameObjectsWithTag(Tags.Drawable));
-                    DrawableConfigManager.SaveDrawables(drawables.ToArray(), "Test1");
-                    memento = new Memento("Test1", drawables.ToArray(), SavedCounter.More);
-                    currentState = ReversibleAction.Progress.Completed;
-                    result = true;
+                    browser = GameObject.Find("UI Canvas").AddComponent<DrawableFileBrowser>();
+                    browser.SaveDrawableConfiguration(SaveState.One);
+                    memento = new Memento(new GameObject[] { drawable }, SaveState.One);
+                    currentState = ReversibleAction.Progress.InProgress;
                 }
 
-                if (Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1))
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) && !clicked &&
+                Raycasting.RaycastAnythingBackface(out RaycastHit hit) &&
+                (GameDrawableFinder.hasDrawable(hit.collider.gameObject) || hit.collider.gameObject.CompareTag(Tags.Drawable))
+                && (browser == null || (browser != null && !browser.IsOpen())))
+                {
+                    clicked = true;
+                    GameObject drawable = hit.collider.gameObject.CompareTag(Tags.Drawable) ?
+                        hit.collider.gameObject : GameDrawableFinder.FindDrawable(hit.collider.gameObject);
+
+                    if (drawable.GetComponent<HighlightEffect>() == null)
+                    {
+                        selectedDrawables.Add(drawable);
+                        HighlightEffect effect = drawable.AddComponent<HighlightEffect>();
+                        drawable.AddComponent<HighlightEffectDestroyer>().SetAllowedState(GetActionStateType());
+                        effect.highlighted = true;
+                        effect.previewInEditor = false;
+                        effect.outline = 0;
+                        effect.glowQuality = HighlightPlus.QualityLevel.Highest;
+                        effect.glow = 1.0f;
+                        effect.glowHQColor = Color.yellow;
+                        effect.overlay = 1.0f;
+                        effect.overlayColor = Color.magenta;
+                    }
+                    else
+                    {
+                        Destroyer.Destroy(drawable.GetComponent<HighlightEffect>());
+                        Destroyer.Destroy(drawable.GetComponent<HighlightEffectDestroyer>());
+                        selectedDrawables.Remove(drawable);
+                    }
+                }
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) && selectedDrawables.Count > 0
+                    && (browser == null || (browser != null && !browser.IsOpen())))
+                {
+                    browser = GameObject.Find("UI Canvas").AddComponent<DrawableFileBrowser>();
+                    browser.SaveDrawableConfiguration(SaveState.More);
+                    memento = new Memento(selectedDrawables.ToArray(), SaveState.More);
+                    currentState = ReversibleAction.Progress.InProgress;
+                }
+
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftShift)
+                    && (browser == null || (browser != null && !browser.IsOpen())))
+                {
+                    //clicked = true;s
+                    browser = GameObject.Find("UI Canvas").AddComponent<DrawableFileBrowser>();
+                    browser.SaveDrawableConfiguration(SaveState.All);
+                    List<GameObject> drawables = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
+                    memento = new Memento(drawables.ToArray(), SaveState.All);
+                    currentState = ReversibleAction.Progress.InProgress;
+                }
+
+                if (!filePath.Equals("") && memento != null)
+                {
+                    switch (memento.savedState)
+                    {
+                        case SaveState.One:
+                            memento.filePath = new FilePath(filePath);
+                            DrawableConfigManager.SaveDrawable(memento.drawables[0], memento.filePath);
+                            currentState = ReversibleAction.Progress.Completed;
+                            result = true;
+                            break;
+                        case SaveState.More:
+                            memento.filePath = new FilePath(filePath);
+                            DrawableConfigManager.SaveDrawables(memento.drawables, memento.filePath);
+                            foreach(GameObject selectedDrawable in selectedDrawables)
+                            {
+                                Destroyer.Destroy(selectedDrawable.GetComponent<HighlightEffect>());
+                                Destroyer.Destroy(selectedDrawable.GetComponent<HighlightEffectDestroyer>());
+                            }
+                            selectedDrawables.Clear();
+                            currentState = ReversibleAction.Progress.Completed;
+                            result = true;
+                            break;
+                        case SaveState.All:
+                            memento.filePath = new FilePath(filePath);
+                            DrawableConfigManager.SaveDrawables(memento.drawables, memento.filePath);
+                            currentState = ReversibleAction.Progress.Completed;
+                            result = true;
+                            break;
+                    }
+                    browser = null;
+                }
+
+                if (Input.GetMouseButtonUp(0))
                 {
                     clicked = false;
                 }
@@ -110,7 +219,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            DrawableConfigManager.DeleteDrawables(memento.fileName);
+            DrawableConfigManager.DeleteDrawables(memento.filePath);
         }
 
         /// <summary>
@@ -120,12 +229,13 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            if (memento.savedCounter == SavedCounter.One)
+            if (memento.savedState == SaveState.One)
             {
-                DrawableConfigManager.SaveDrawable(memento.drawables[0], memento.fileName);
-            } else
+                DrawableConfigManager.SaveDrawable(memento.drawables[0], memento.filePath);
+            }
+            else
             {
-                DrawableConfigManager.SaveDrawables(memento.drawables, memento.fileName);
+                DrawableConfigManager.SaveDrawables(memento.drawables, memento.filePath);
             }
         }
 

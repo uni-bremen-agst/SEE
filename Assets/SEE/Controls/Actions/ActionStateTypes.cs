@@ -182,16 +182,22 @@ namespace SEE.Controls.Actions
                     DrawShapesAction.CreateReversibleAction,
                     parent: Whiteboard);
 
+            WriteText =
+                new("Write Text", "Writes a text on a drawable",
+                    Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                    WriteTextAction.CreateReversibleAction,
+                    parent: Whiteboard);
+
             ColorPicker =
                 new("Color picker", "Picks a color",
                     Color.yellow.Darker(), "Materials/ModernUIPack/Pencil",
                     ColorPickerAction.CreateReversibleAction,
                     parent: Whiteboard);
 
-            EditLine =
-                new("Edit line", "Edit the selected line.",
+            Edit =
+                new("Edit", "Edits a drawable type.",
                     Color.green.Darker(), "Materials/ModernUIPack/Pencil",
-                    EditLineAction.CreateReversibleAction,
+                    EditAction.CreateReversibleAction,
                     parent: Whiteboard);
 
             MoveRotator =
@@ -279,8 +285,9 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateTypeGroup Whiteboard;
         public readonly static ActionStateType DrawOn;
         public readonly static ActionStateType DrawShapes;
+        public readonly static ActionStateType WriteText;
         public readonly static ActionStateType ColorPicker;
-        public readonly static ActionStateType EditLine;
+        public readonly static ActionStateType Edit;
         public readonly static ActionStateType MoveRotator;
         public readonly static ActionStateType MovePoint;
         public readonly static ActionStateType LayerChanger;

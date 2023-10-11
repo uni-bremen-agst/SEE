@@ -200,20 +200,20 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// A new instance of <see cref="EditLineAction"/>.
+        /// A new instance of <see cref="EditAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="EditLineAction"/></returns>
+        /// <returns>new instance of <see cref="EditAction"/></returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new ScaleAction();
         }
 
         /// <summary>
-        /// A new instance of <see cref="EditLineAction"/>.
+        /// A new instance of <see cref="EditAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="EditLineAction"/></returns>
+        /// <returns>new instance of <see cref="EditAction"/></returns>
         public override ReversibleAction NewInstance()
         {
             return CreateReversibleAction();

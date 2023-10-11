@@ -21,14 +21,7 @@ namespace Assets.SEE.Game.UI.Drawable
         {
             if (GlobalActionHistory.Current() != allowedState)
             {
-                if (this.gameObject.CompareTag(Tags.Line))
-                {
-                    Destroy(this.gameObject.transform.parent.gameObject);
-                }
-                else
-                {
-                    Destroy(this.gameObject);
-                }
+                Destroy(this.gameObject);
             }
         }
 
@@ -38,7 +31,7 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 MoveRotatorAction.Reset();
             }
-            
+
             if (allowedState == ActionStateTypes.DrawShapes && !this.gameObject.CompareTag(Tags.Line))
             {
                 DrawShapesAction.Reset();

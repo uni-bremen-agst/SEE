@@ -6,9 +6,9 @@ using UnityEngine;
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for changing the order in layer (<see cref="EditLineAction"/>) of a line on all clients.
+    /// This class is responsible for changing the order in layer (<see cref="EditAction"/>) of a drawable type on all clients.
     /// </summary>
-    public class EditLineLayerNetAction : AbstractNetAction
+    public class EditLayerNetAction : AbstractNetAction
     {
         /// <summary>
         /// The id of the drawable on which the object is located
@@ -19,11 +19,11 @@ namespace SEE.Net.Actions.Drawable
         /// </summary>
         public string ParentDrawableID;
         /// <summary>
-        /// The id of the line that should be changed
+        /// The id of the drawable type that should be changed
         /// </summary>
-        public string LineName;
+        public string TypeName;
         /// <summary>
-        /// The new order in layer for the line.
+        /// The new order in layer for the drawable type.
         /// </summary>
         public int OrderInLayer;
 
@@ -32,13 +32,13 @@ namespace SEE.Net.Actions.Drawable
         /// </summary>
         /// <param name="drawableID">The id of the drawable on which the object is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
-        /// <param name="lineName">The id of the line that should be changed.</param>
-        /// <param name="thickness">The new order in layer for the line.</param>
-        public EditLineLayerNetAction(string drawableID, string parentDrawableID, string lineName, int oderInLayer) : base()
+        /// <param name="typeName">The id of the drawable type that should be changed.</param>
+        /// <param name="orderInLayer">The new order in layer for the drawable type.</param>
+        public EditLayerNetAction(string drawableID, string parentDrawableID, string typeName, int oderInLayer) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
-            LineName = lineName;
+            TypeName = typeName;
             this.OrderInLayer = oderInLayer;
         }
 
@@ -62,13 +62,13 @@ namespace SEE.Net.Actions.Drawable
                 if (!IsRequester())
                 {
                     GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
-                    if (drawable != null && GameDrawableFinder.FindChild(drawable, LineName) != null)
+                    if (drawable != null && GameDrawableFinder.FindChild(drawable, TypeName) != null)
                     {
-                        GameEditLine.ChangeLayer(GameDrawableFinder.FindChild(drawable, LineName), OrderInLayer);
+                        GameEdit.ChangeLayer(GameDrawableFinder.FindChild(drawable, TypeName), OrderInLayer);
                     }
                     else
                     {
-                        throw new System.Exception($"There is no drawable with the ID {DrawableID} or line with the ID {LineName}.");
+                        throw new System.Exception($"There is no drawable with the ID {DrawableID} or drawable type with the ID {TypeName}.");
                     }
                 }
             }

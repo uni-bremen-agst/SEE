@@ -5,6 +5,8 @@ using SEE.Game;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.Game.Drawable.Configurations;
+using System.Linq;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -15,8 +17,6 @@ namespace SEE.Controls.Actions.Drawable
     /// </summary>
     class EraseAction : AbstractPlayerAction
     {
-
-
         /// <summary>
         /// Continues the line at the point of the mouse position and draws it.
         /// See <see cref="ReversibleAction.Awake"/>.
@@ -30,18 +30,25 @@ namespace SEE.Controls.Actions.Drawable
                     GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject))
                 {
                     GameObject hittedObject = raycastHit.collider.gameObject;
+                    //TODO ADD Other TAGS.
+
+                    if (Tags.DrawableTypes.Contains(hittedObject.tag))
+                    {
+                        memento = new Memento(GameDrawableFinder.FindDrawable(hittedObject), new DrawableType().Get(hittedObject));
+                        mementoList.Add(memento);
+
+                        new EraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, hittedObject.name).Execute();
+                        Destroyer.Destroy(hittedObject);
+                    }
+                    /*
                     if (hittedObject.CompareTag(Tags.Line))
                     {
-                        LineRenderer lineRenderer = hittedObject.GetComponent<LineRenderer>();
-                        Vector3[] positions = new Vector3[lineRenderer.positionCount];
-                        lineRenderer.GetPositions(positions);
                         memento = new Memento(GameDrawableFinder.FindDrawable(hittedObject), Line.GetLine(hittedObject));
                         mementoList.Add(memento);
 
                         new EraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.line.id).Execute();
                         Destroyer.Destroy(hittedObject);
-                       // Destroyer.Destroy(hittedObject.transform.parent.gameObject);
-                    }
+                    }*/
                 }
                 bool isMouseButtonUp = Input.GetMouseButtonUp(0);
                 // The action is considered complete if the mouse button is no longer pressed.
@@ -61,12 +68,12 @@ namespace SEE.Controls.Actions.Drawable
         private class Memento
         {
             public readonly GameObject drawable;
-            public Line line;
+            public DrawableType drawableType;
 
-            public Memento(GameObject drawable, Line line)
+            public Memento(GameObject drawable, DrawableType drawableType)
             {
                 this.drawable = drawable;
-                this.line = line;
+                this.drawableType = drawableType;
             }
         }
 
@@ -79,8 +86,17 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
             foreach (Memento mem in mementoList)
             {
-                mem.line.gameObject = GameDrawer.ReDrawLine(mem.drawable, mem.line);
-                new DrawOnNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.line).Execute();
+                string drawableParent = GameDrawableFinder.GetDrawableParentName(mem.drawable);
+                if (mem.drawableType is Line line)
+                {
+                    GameDrawer.ReDrawLine(mem.drawable, line);
+                    new DrawOnNetAction(mem.drawable.name, drawableParent, line).Execute();
+                }
+                else if (mem.drawableType is Text text)
+                {
+                    GameTexter.ReWriteText(mem.drawable, text);
+                    new WriteTextNetAction(mem.drawable.name, drawableParent, text).Execute();
+                }
             }
         }
 
@@ -91,16 +107,12 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Redo()
         {
-            base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
+            base.Redo();
             foreach (Memento mem in mementoList)
             {
-                if (mem.line.gameObject == null && mem.line.id != null)
-                {
-                    mem.line.gameObject = GameDrawableFinder.FindChild(mem.drawable, mem.line.id);
-                }
-                new EraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.line.id).Execute();
-                Destroyer.Destroy(mem.line.gameObject);
-              //  Destroyer.Destroy(mem.line.gameObject.transform.parent.gameObject);
+                GameObject toDelete = GameDrawableFinder.FindChild(mem.drawable, mem.drawableType.id); ;
+                new EraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.drawableType.id).Execute();
+                Destroyer.Destroy(toDelete);
             }
         }
 
@@ -152,7 +164,7 @@ namespace SEE.Controls.Actions.Drawable
                 changedObjects.Add(memento.drawable.name);
                 foreach (Memento mem in mementoList)
                 {
-                    changedObjects.Add(mem.line.id);
+                    changedObjects.Add(mem.drawableType.id);
                 }
                 return changedObjects;
             }

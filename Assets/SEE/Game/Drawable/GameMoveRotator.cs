@@ -111,8 +111,8 @@ namespace Assets.SEE.Game.Drawable
                 transform = obj.transform;
             }*/
             transform.Rotate(moveDirection, degree, Space.Self);
-            obj.GetComponent<MeshCollider>().enabled = false;
-            obj.GetComponent<MeshCollider>().enabled = true;
+            obj.GetComponent<Collider>().enabled = false;
+            obj.GetComponent<Collider>().enabled = true;
         }
 
         public static void RotateObject(GameObject obj, Vector3 moveDirection, float degree, Vector3 point)
@@ -130,8 +130,8 @@ namespace Assets.SEE.Game.Drawable
                 transform = obj.transform;
             }
             transform.RotateAround(point, moveDirection, degree);
-            obj.GetComponent<MeshCollider>().enabled = false;
-            obj.GetComponent<MeshCollider>().enabled = true;
+            obj.GetComponent<Collider>().enabled = false;
+            obj.GetComponent<Collider>().enabled = true;
         }
         /*
         public static void SetRotate(GameObject obj, float localEulerAngleZ, Vector3 holderPosition, Vector3 objPosition)

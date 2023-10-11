@@ -1,0 +1,335 @@
+﻿using Newtonsoft.Json.Linq;
+using Assets.SEE.Game.Drawable;
+using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using SEE.Utils;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.Assertions;
+using UnityEngine.UIElements;
+
+namespace SEE.Game.Drawable.Configurations
+{
+    /// <summary>
+    /// The configuration class for a drawable line.
+    /// </summary>
+    [Serializable]
+    public class Line : DrawableType, ICloneable
+    {
+        /// <summary>
+        /// The position of the line.
+        /// </summary>
+        public Vector3 position;
+
+        /// <summary>
+        /// The scale of the line.
+        /// </summary>
+        public Vector3 scale;
+
+        /// <summary>
+        /// The renderer positions of the drawed points.
+        /// </summary>
+        public Vector3[] rendererPositions;
+
+        /// <summary>
+        /// The configurations of the drawed points.
+        /// Will be needed for correct saving / loading.
+        /// </summary>
+        private List<Vector3Config> rendererPositionConfigs = new();
+
+        /// <summary>
+        /// Is the option, if the line should loop.
+        /// </summary>
+        public bool loop;
+
+        /// <summary>
+        /// The color of the line.
+        /// </summary>
+        public Color color;
+
+        /// <summary>
+        /// The order in layer for this drawable object.
+        /// </summary>
+        public int orderInLayer;
+
+        /// <summary>
+        /// The thickness of the line.
+        /// </summary>
+        public float thickness;
+
+        /// <summary>
+        /// The euler angles of the line.
+        /// </summary>
+        public Vector3 eulerAngles;
+
+        /// <summary>
+        /// The line kind of the line (Solid/Dashed/Dashed25/Dashed50/Dashed75/Dashed100)
+        /// </summary>
+        public GameDrawer.LineKind lineKind;
+
+        /// <summary>
+        /// The tiling of a dashed line. Only used for "Dashed" line kind.
+        /// </summary>
+        public float tiling;
+
+        /// <summary>
+        /// Label in the configuration file for the id of a line.
+        /// </summary>
+        private const string IDLabel = "IDLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the position of a line.
+        /// </summary>
+        private const string PositionLabel = "PositionLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the scale of a line.
+        /// </summary>
+        private const string ScaleLabel = "ScaleLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the positions of the line renderer for a line.
+        /// </summary>
+        private const string RendererPositionsLabel = "RendererPositions";
+
+        /// <summary>
+        /// Label in the configuration file for the loop option of a line.
+        /// </summary>
+        private const string LoopLabel = "LoopLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the color of a line.
+        /// </summary>
+        private const string ColorLabel = "ColorLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the order in layer of a line.
+        /// </summary>
+        private const string OrderInLayerLabel = "OrderInLayerLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the thickness of a line.
+        /// </summary>
+        private const string ThicknessLabel = "ThicknessLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the euler angles of a line.
+        /// </summary>
+        private const string EulerAnglesLabel = "EulerAnglesLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the line kind of a line.
+        /// </summary>
+        private const string LineKindLabel = "LineKindLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the tiling of a line with a "Dashed" line kind.
+        /// </summary>
+        private const string TilingLabel = "TilingLabel";
+
+        /// <summary>
+        /// Creates a <see cref="Line"/> for the given game object.
+        /// </summary>
+        /// <param name="lineGameObject">The game object with the <see cref="LineRenderer"/> component</param>
+        /// <returns>The created <see cref="Line"/> object</returns>
+        public static Line GetLine(GameObject lineGameObject)
+        {
+            Line line = null;
+            if (lineGameObject != null && lineGameObject.CompareTag(Tags.Line))
+            {
+                line = new();
+                line.id = lineGameObject.name;
+                line.position = lineGameObject.transform.localPosition;
+                line.scale = lineGameObject.transform.localScale;
+                LineRenderer renderer = lineGameObject.GetComponent<LineRenderer>();
+                line.rendererPositions = new Vector3[renderer.positionCount];
+                renderer.GetPositions(line.rendererPositions);
+                line.loop = renderer.loop;
+                line.eulerAngles = lineGameObject.transform.localEulerAngles;
+                line.color = renderer.material.color;
+                line.orderInLayer = lineGameObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+                line.thickness = renderer.startWidth;
+                line.tiling = renderer.textureScale.x;
+                line.lineKind = lineGameObject.GetComponent<LineKindHolder>().GetLineKind();
+            }
+            return line;
+        }
+
+        /// <summary>
+        /// Clons the line object.
+        /// </summary>
+        /// <returns>A copy of this line object.</returns>
+        public object Clone()
+        {
+            return new Line
+            {
+                id = this.id,
+                position = this.position,
+                rendererPositions = this.rendererPositions,
+                loop = this.loop,
+                color = this.color,
+                orderInLayer = this.orderInLayer,
+                thickness = this.thickness,
+                eulerAngles = this.eulerAngles,
+                scale = this.scale,
+                lineKind = this.lineKind,
+                tiling = this.tiling,
+            };
+        }
+
+        /// <summary>
+        /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
+        /// </summary>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
+        internal void Save(ConfigWriter writer)
+        {
+            writer.BeginGroup();
+            writer.Save(id, IDLabel);
+            writer.Save(position, PositionLabel);
+            writer.Save(scale, ScaleLabel);
+            writer.Save(color, ColorLabel);
+            writer.Save(orderInLayer, OrderInLayerLabel);
+            writer.Save(thickness, ThicknessLabel);
+            writer.Save(loop, LoopLabel);
+            writer.Save(lineKind.ToString(), LineKindLabel);
+            writer.Save(tiling, TilingLabel);
+            foreach(Vector3 pos in rendererPositions)
+            {
+                rendererPositionConfigs.Add(new Vector3Config() { vector = pos });
+            }
+            writer.Save(rendererPositionConfigs, RendererPositionsLabel);
+            writer.Save(eulerAngles, EulerAnglesLabel);
+            writer.EndGroup();
+        }
+
+        /// <summary>
+        /// Given the representation of a <see cref="Line"/> as created by the <see cref="ConfigWriter"/>, this
+        /// method parses the attributes from that representation and puts them into this <see cref="Line"/>
+        /// instance.
+        /// </summary>
+        /// <param name="attributes">A list of labels (strings) of attributes and their values (objects). This
+        /// has to be the representation of a <see cref="Line"/> as created by
+        /// <see cref="ConfigWriter"/>.</param>
+        /// <returns>Whether or not the <see cref="Line"/> was loaded without errors.</returns>
+        internal bool Restore(Dictionary<string, object> attributes)
+        {
+            bool errors = false;
+            if (attributes.TryGetValue(IDLabel, out object name))
+            {
+                id = (string)name;
+            }
+            else
+            {
+                errors = true;
+            }
+            Vector3 loadedPosition = Vector3.zero;
+            if (ConfigIO.Restore(attributes, PositionLabel, ref loadedPosition))
+            {
+                position = loadedPosition;
+            }
+            else
+            {
+                position = Vector3.zero;
+                errors = true;
+            }
+            Vector3 loadedScale = Vector3.zero;
+            if (ConfigIO.Restore(attributes, ScaleLabel, ref loadedScale))
+            {
+                scale = loadedScale;
+            }
+            else
+            {
+                scale = Vector3.zero;
+                errors = true;
+            }
+
+            Color loadedColor = Color.black;
+            if (ConfigIO.Restore(attributes, ColorLabel, ref loadedColor))
+            {
+                color = loadedColor;
+            }
+            else
+            {
+                color = Color.black;
+                errors = true;
+            }
+
+            if (!ConfigIO.Restore(attributes, OrderInLayerLabel, ref orderInLayer))
+            {
+                orderInLayer = ValueHolder.currentOrderInLayer;
+                ValueHolder.currentOrderInLayer++;
+                errors = true;
+            }
+
+            if (attributes.TryGetValue(ThicknessLabel, out object thick))
+            {
+                thickness = (float)thick;
+            }
+            else
+            {
+                thickness = ValueHolder.currentThickness;
+                errors = true;
+            }
+
+            if (attributes.TryGetValue(LoopLabel, out object loadedLoop))
+            {
+                loop = (bool)loadedLoop;
+            }
+            else
+            {
+                loop = false;
+                errors = true;
+            }
+            
+            List<Vector3> listRendererPositions = new();
+            
+            if (attributes.TryGetValue(RendererPositionsLabel, out object positionList))
+            {
+                foreach (object item in (List<object>) positionList)
+                {
+                    Dictionary<string, object> dict = (Dictionary<string, object>)item;
+                    Vector3Config config = new();
+                    config.Restore(dict);
+                    listRendererPositions.Add(config.vector);
+                }
+                rendererPositions = listRendererPositions.ToArray();
+            }
+
+            Vector3 loadedEulerAngles = Vector3.zero;
+            if (ConfigIO.Restore(attributes, EulerAnglesLabel, ref loadedEulerAngles))
+            {
+                eulerAngles = loadedEulerAngles;
+            }
+            else
+            {
+                eulerAngles = Vector3.zero;
+                errors = true;
+            }
+
+            if (attributes.TryGetValue(TilingLabel, out object til))
+            {
+                tiling = (float)til;
+            }
+            else
+            {
+                tiling = 1;
+                errors = true;
+            }
+
+            if (attributes.TryGetValue(LineKindLabel, out object kind) && Enum.TryParse<GameDrawer.LineKind>((string)kind, out GameDrawer.LineKind result))
+            {
+                lineKind = result;
+            }
+            else
+            {
+                lineKind = GameDrawer.LineKind.Solid;
+                errors = true;
+            }
+
+            return !errors;
+        }
+    }
+}

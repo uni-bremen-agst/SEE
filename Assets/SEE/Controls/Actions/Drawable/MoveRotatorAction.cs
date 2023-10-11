@@ -8,6 +8,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using MoveNetAction = SEE.Net.Actions.Drawable.MoveNetAction;
+using TMPro;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -31,10 +32,10 @@ namespace SEE.Controls.Actions.Drawable
         private static Vector3 firstPoint;
         private static Vector3 oldObjectPosition;
         private static Vector3 oldObjectLocalEulerAngles;
-       // private static Vector3 oldHandlerPosition = Vector3.zero;
+        // private static Vector3 oldHandlerPosition = Vector3.zero;
         private static Vector3 direction = Vector3.zero;
         private static float degree = 0;
-        private const string rotationMenuPrefab = "Prefabs/UI/Drawable/DrawableRotate";
+        private const string rotationMenuPrefab = "Prefabs/UI/Drawable/Rotate";
         private static GameObject rotationMenu;
         private static bool moveByMouse = true;
 
@@ -107,22 +108,8 @@ namespace SEE.Controls.Actions.Drawable
 
                     GameObject drawable = GameDrawableFinder.FindDrawable(selectedObject);
                     string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
-                    /*
-                    bool isTriggered = false;
 
-                    BorderTriggerController[] controllers = drawable.transform.parent.GetComponentsInChildren<BorderTriggerController>();
-                    if (controllers.Length > 0)
-                    {
-                        for (int i = 0; i < controllers.Length; i++)
-                        {
-                            if (i == 0)
-                            {
-                                isTriggered = controllers[0].Trigger();
-                            }
-                            isTriggered = isTriggered || controllers[i].Trigger();
-                        }
-                    }*/
-                    if (Input.GetKey(KeyCode.LeftArrow)|| Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow))
+                    if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.DownArrow))
                     {
                         bool turbo = false;
                         if (Input.GetKey(KeyCode.LeftControl))
@@ -141,15 +128,13 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     if (moveByMouse && Raycasting.RaycastAnything(out RaycastHit hit))
                     {
-                      //  if (!isTriggered)
-                      //  {
-                            if (hit.collider.gameObject.CompareTag(Tags.Drawable))//|| GameDrawableFinder.hasDrawableParent(hit.collider.gameObject))
-                            {
-                                didSomething = true;
-                                newObjectPosition = GameMoveRotator.MoveObject(selectedObject, hit.point, firstPoint, oldObjectPosition);
-                                new MoveNetAction(drawable.name, drawableParentName, selectedObject.name, newObjectPosition).Execute();
-                            }
-                      //  }
+                        if (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
+                        (GameDrawableFinder.hasDrawable(hit.collider.gameObject) && GameDrawableFinder.FindDrawable(hit.collider.gameObject).Equals(drawable)))
+                        {
+                            didSomething = true;
+                            newObjectPosition = GameMoveRotator.MoveObject(selectedObject, hit.point, firstPoint, oldObjectPosition);
+                            new MoveNetAction(drawable.name, drawableParentName, selectedObject.name, newObjectPosition).Execute();
+                        }
                     }
                 }
                 // Rotate
@@ -211,7 +196,7 @@ namespace SEE.Controls.Actions.Drawable
                         //GameMoveRotator.RotateObject(selectedObject, direction, degree, firstPoint);
                         if (selectedObject.CompareTag(Tags.Line))
                         {
-                          //  newHandlerPosition = selectedObject.transform.parent.localPosition;
+                            //  newHandlerPosition = selectedObject.transform.parent.localPosition;
                             newObjectPosition = selectedObject.transform.localPosition;
                         }
                         new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, direction, degree).Execute();
@@ -256,13 +241,16 @@ namespace SEE.Controls.Actions.Drawable
             if (Input.GetKey(KeyCode.LeftArrow))
             {
                 return KeyCode.LeftArrow;
-            } else if (Input.GetKey(KeyCode.RightArrow))
+            }
+            else if (Input.GetKey(KeyCode.RightArrow))
             {
                 return KeyCode.RightArrow;
-            } else if(Input.GetKey(KeyCode.UpArrow))
+            }
+            else if (Input.GetKey(KeyCode.UpArrow))
             {
                 return KeyCode.UpArrow;
-            } else
+            }
+            else
             {
                 return KeyCode.DownArrow;
             }
@@ -324,8 +312,8 @@ namespace SEE.Controls.Actions.Drawable
             public readonly float degree;
             public readonly ClickState clickState;
             public readonly Vector3 firstPoint;
-          //  public readonly Vector3 oldHandlerPosition;
-          //  public readonly Vector3 newHandlerPosition;
+            //  public readonly Vector3 oldHandlerPosition;
+            //  public readonly Vector3 newHandlerPosition;
 
             public Memento(GameObject selectedObject, GameObject drawable, string id,
                 Vector3 oldObjectPosition, Vector3 newObjectPosition, Vector3 oldObjectLocalEulerAngles, float degree, ClickState clickState,
@@ -340,8 +328,8 @@ namespace SEE.Controls.Actions.Drawable
                 this.degree = degree;
                 this.clickState = clickState;
                 this.firstPoint = firstPoint;
-              //  this.oldHandlerPosition = oldHandlerPosition;
-              //  this.newHandlerPosition = newHandlerPosition;
+                //  this.oldHandlerPosition = oldHandlerPosition;
+                //  this.newHandlerPosition = newHandlerPosition;
             }
         }
 
@@ -413,20 +401,20 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// A new instance of <see cref="EditLineAction"/>.
+        /// A new instance of <see cref="EditAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="EditLineAction"/></returns>
+        /// <returns>new instance of <see cref="EditAction"/></returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new MoveRotatorAction();
         }
 
         /// <summary>
-        /// A new instance of <see cref="EditLineAction"/>.
+        /// A new instance of <see cref="EditAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="EditLineAction"/></returns>
+        /// <returns>new instance of <see cref="EditAction"/></returns>
         public override ReversibleAction NewInstance()
         {
             return CreateReversibleAction();

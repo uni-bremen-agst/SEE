@@ -5,6 +5,8 @@ using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.Game.Drawable.Configurations;
+using System.Linq;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -40,20 +42,28 @@ namespace SEE.Controls.Actions.Drawable
             {
                 GameObject child = childsTransform.gameObject;
                 // TODO implement the other types
+                if (Tags.DrawableTypes.Contains(child.tag))
+                {
+                    memento = new Memento(drawable, new DrawableType().Get(child));
+                    mementoList.Add(memento);
+
+                    new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.type.id).Execute();
+                    Destroyer.Destroy(child);
+                }
+                /*
                 if (child.CompareTag(Tags.Line))
                 {
                     LineRenderer lineRenderer = child.GetComponent<LineRenderer>();
                     Vector3[] positions = new Vector3[lineRenderer.positionCount];
                     lineRenderer.GetPositions(positions);
-                    memento = new Memento(child, drawable, DrawableTypes.Line, child.name);
+                    memento = new Memento(child, drawable, DrawableTypesEnum.Line, child.name);
                     memento.line = Line.GetLine(child);
                     mementoList.Add(memento);
 
                     new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id).Execute();
                     Destroyer.Destroy(child);
-                    //Destroyer.Destroy(child.transform.parent.gameObject);
-                    
-                }
+                    //Destroyer.Destroy(child.transform.parent.gameObject);  
+                }*/
             }
             currentState = ReversibleAction.Progress.Completed;
         }
@@ -63,19 +73,25 @@ namespace SEE.Controls.Actions.Drawable
 
         private class Memento
         {
-            public GameObject gameObject;
+           // public GameObject gameObject;
             public readonly GameObject drawable;
-            public readonly DrawableTypes type;
-            public readonly string id;
-            public Line line;
-
-            public Memento(GameObject gameObject, GameObject drawable, DrawableTypes type, string id)
+            public readonly DrawableType type;
+           // public readonly DrawableTypesEnum type;
+           // public readonly string id;
+           // public Line line;
+           public Memento(GameObject drawable, DrawableType type)
+            {
+                this.drawable = drawable;
+                this.type = type;
+            }
+            /*
+            public Memento(GameObject gameObject, GameObject drawable, DrawableTypesEnum type, string id)
             {
                 this.gameObject = gameObject;
                 this.drawable = drawable;
                 this.type = type;
                 this.id = id;
-            }
+            }*/
         }
 
         /// <summary>
@@ -84,17 +100,19 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Undo()
         {
-            base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
+            base.Undo();
             foreach (Memento mem in mementoList)
             {
-                // TODO implement the other types
-                switch (mem.type)
+                string drawableParent = GameDrawableFinder.GetDrawableParentName(mem.drawable);
+                if (mem.type is Line line)
                 {
-                    case DrawableTypes.Line:
-                        mem.gameObject = GameDrawer.ReDrawLine(mem.drawable, mem.line);
-                        new DrawOnNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.line).Execute();
-                        break;
-                    default: break;
+                    GameDrawer.ReDrawLine(mem.drawable, line);
+                    new DrawOnNetAction(mem.drawable.name, drawableParent, line).Execute();
+                }
+                else if (mem.type is Text text)
+                {
+                    GameTexter.ReWriteText(mem.drawable, text);
+                    new WriteTextNetAction(mem.drawable.name, drawableParent, text).Execute();
                 }
             }
         }
@@ -106,24 +124,12 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Redo()
         {
-            base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
+            base.Redo();
             foreach (Memento mem in mementoList)
             {
-                if (mem.gameObject == null && mem.id != null)
-                {
-                    mem.gameObject = GameDrawableFinder.FindChild(mem.drawable, mem.id);
-                }
-                new EraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.id).Execute();
-                Destroyer.Destroy(mem.gameObject);
-                /*
-                if (mem.gameObject.CompareTag(Tags.Line))
-                {
-                    Destroyer.Destroy(mem.gameObject.transform.parent.gameObject);
-                }
-                else
-                {
-                    Destroyer.Destroy(mem.gameObject);
-                }*/
+                GameObject toDelete = GameDrawableFinder.FindChild(mem.drawable, mem.type.id); ;
+                new EraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.type.id).Execute();
+                Destroyer.Destroy(toDelete);
             }
         }
 
@@ -160,7 +166,7 @@ namespace SEE.Controls.Actions.Drawable
                 changedObjects.Add(memento.drawable.name);
                 foreach (Memento mem in mementoList)
                 {
-                    changedObjects.Add(mem.id);
+                    changedObjects.Add(mem.type.id);
                 }
                 return changedObjects;
             }

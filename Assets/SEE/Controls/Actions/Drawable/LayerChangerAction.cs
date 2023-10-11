@@ -2,13 +2,14 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Net.Actions.Drawable;
-using Assets.SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
 using Assets.SEE.Game;
+using Assets.SEE.Game.Drawable;
 
 namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for changing the layer order of a <see cref="DrawableTypes"/>
+    /// This class is responsible for changing the layer order of a <see cref="DrawableType"/>
     /// </summary>
     class LayerChangerAction : AbstractPlayerAction
     {

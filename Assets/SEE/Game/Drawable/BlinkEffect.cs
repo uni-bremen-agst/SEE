@@ -5,6 +5,7 @@ using SEE.Utils;
 using System;
 using System.Collections;
 using UnityEngine;
+using Assets.SEE.Game.UI.Drawable;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -29,7 +30,7 @@ namespace Assets.SEE.Game.Drawable
                 yield return new WaitForSeconds(0.2f);
                 renderer.enabled = true;
                 yield return new WaitForSeconds(0.5f);
-                
+
                 if (GlobalActionHistory.Current() != allowedState)
                 {
                     Deactivate();
@@ -39,10 +40,16 @@ namespace Assets.SEE.Game.Drawable
 
         private void OnDestroy()
         {
-            if (GlobalActionHistory.Current() != ActionStateTypes.EditLine && allowedState == ActionStateTypes.EditLine 
-                && !DrawableHelper.usedIn.Contains(GlobalActionHistory.Current()))
+            if (GlobalActionHistory.Current() != ActionStateTypes.Edit && allowedState == ActionStateTypes.Edit)
             {
-                DrawableHelper.disableDrawableMenu();
+                if (!LineMenu.usedIn.Contains(GlobalActionHistory.Current()))
+                {
+                    LineMenu.disableLineMenu();
+                }
+                if (!TextMenu.usedIn.Contains(GlobalActionHistory.Current()))
+                {
+                    TextMenu.disableTextMenu();
+                }
             }
             if (GlobalActionHistory.Current() != ActionStateTypes.MoveRotator && allowedState == ActionStateTypes.MoveRotator)
             {
@@ -66,7 +73,7 @@ namespace Assets.SEE.Game.Drawable
             {
                 collider.isTrigger = false;
                 collider.convex = false;
-            } 
+            }
             Destroy(this);
         }
 
@@ -76,7 +83,8 @@ namespace Assets.SEE.Game.Drawable
             if (loopOn)
             {
                 Activate();
-            } else
+            }
+            else
             {
                 Deactivate();
             }
@@ -89,9 +97,9 @@ namespace Assets.SEE.Game.Drawable
 
         public void Activate(GameObject line)
         {
-            if (renderer == null && line.CompareTag(Tags.Line))
+            if (renderer == null)
             {
-                renderer = line.GetComponent<LineRenderer>();
+                renderer = line.GetComponent<Renderer>();
                 collider = line.GetComponent<MeshCollider>();
             }
             loopOn = true;
@@ -100,7 +108,7 @@ namespace Assets.SEE.Game.Drawable
 
         private void Activate()
         {
-            renderer = gameObject.GetComponent<LineRenderer>();
+            renderer = gameObject.GetComponent<Renderer>();
             loopOn = true;
             StartCoroutine(Blink());
         }

@@ -1,4 +1,6 @@
-﻿using SEE.Game;
+﻿using OpenAI.Files;
+using SEE.Controls.Actions.Drawable;
+using SEE.Game;
 using SEE.Game.HolisticMetrics;
 using SEE.Game.HolisticMetrics.WidgetControllers;
 using SEE.Game.UI.Notification;
@@ -8,29 +10,40 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using SEE.Game.Drawable.Configurations;
 
 namespace Assets.SEE.Game.Drawable
-{    
-     /// <summary>
-     /// This class can be used to load and save the drawables.
-     /// </summary>
+{
+    /// <summary>
+    /// This class can be used to load and save the drawables.
+    /// </summary>
     public static class DrawableConfigManager
     {
         /// <summary>
-        /// The path to the folder containing the saved drawables. This is saved in a field because multiple
+        /// The path to the configuration folder of the saved drawables. This is saved in a field because multiple
         /// methods of this class and other classes use it.
         /// </summary>
-        public static readonly string drawablePath = Application.persistentDataPath + "/Drawable/";
+        public static readonly string configurationPath = ValueHolder.drawablePath + "Configuration/";
+
+        /// <summary>
+        /// The path to the folder of saved drawable (single).
+        /// </summary>
+        public static readonly string singleConfPath = configurationPath + "1. Single Drawable/";
+
+        /// <summary>
+        /// The path to the folder of saved drawables (multiple).
+        /// </summary>
+        public static readonly string multipleConfPath = configurationPath + "2. Multiple Drawables/";
 
         /// <summary>
         /// This method checks whether the directory for the saved drawable exists. If not, then it creates
         /// that directory.
         /// </summary>
-        public static void EnsureDrawableDirectoryExists()
+        public static void EnsureDrawableDirectoryExists(string path)
         {
-            if (!Directory.Exists(drawablePath))
+            if (!Directory.Exists(path))
             {
-                Directory.CreateDirectory(drawablePath);
+                Directory.CreateDirectory(path);
             }
         }
 
@@ -95,8 +108,8 @@ namespace Assets.SEE.Game.Drawable
         /// <returns>The GameObject that represents the metrics displays</returns>
         internal static DrawableConfig LoadDrawable(string fileName)
         {
-            EnsureDrawableDirectoryExists();
-            return LoadDrawable(new FilePath(drawablePath + fileName + Filenames.ConfigExtension));
+            EnsureDrawableDirectoryExists(singleConfPath);
+            return LoadDrawable(new FilePath(singleConfPath + fileName + Filenames.ConfigExtension));
         }
 
         /// <summary>
@@ -106,8 +119,24 @@ namespace Assets.SEE.Game.Drawable
         /// <returns>The GameObject that represents the metrics displays</returns>
         internal static DrawablesConfigs LoadDrawables(string fileName)
         {
-            EnsureDrawableDirectoryExists();
-            return LoadDrawables(new FilePath(drawablePath + fileName + Filenames.ConfigExtension));
+            EnsureDrawableDirectoryExists(multipleConfPath);
+            return LoadDrawables(new FilePath(multipleConfPath + fileName + Filenames.ConfigExtension));
+        }
+
+        internal static void SaveDrawable(GameObject drawable, FilePath filePath)
+        {
+            EnsureDrawableDirectoryExists(filePath.RootPath);
+            if(!Path.HasExtension(filePath.Path))
+            {
+                filePath = new FilePath(filePath.Path + Filenames.ConfigExtension);
+            } else if (Path.GetExtension(filePath.Path) != Filenames.ConfigExtension)
+            {
+                Path.ChangeExtension(filePath.Path, Filenames.ConfigExtension);
+            }
+            using ConfigWriter writer = new(filePath.Path);
+            DrawableConfig config = GetDrawableConfig(drawable);
+            config.Save(writer);
+            Debug.Log($"Saved drawable configuration to file {filePath.Path}.\n");
         }
 
         /// <summary>
@@ -117,12 +146,29 @@ namespace Assets.SEE.Game.Drawable
         /// <param name="fileName">The file name for the configuration.</param>
         internal static void SaveDrawable(GameObject drawable, string fileName)
         {
-            EnsureDrawableDirectoryExists();
-            string filePath = drawablePath + fileName + Filenames.ConfigExtension;
+            EnsureDrawableDirectoryExists(singleConfPath);
+            string filePath = singleConfPath + fileName + Filenames.ConfigExtension;
             using ConfigWriter writer = new(filePath);
             DrawableConfig config = GetDrawableConfig(drawable);
             config.Save(writer);
             Debug.Log($"Saved drawable configuration to file {filePath}.\n");
+        }
+
+        internal static void SaveDrawables(GameObject[] drawables, FilePath filePath)
+        {
+            EnsureDrawableDirectoryExists(filePath.RootPath);
+            if (!Path.HasExtension(filePath.Path))
+            {
+                filePath = new FilePath(filePath.Path + Filenames.ConfigExtension);
+            }
+            else if (Path.GetExtension(filePath.Path) != Filenames.ConfigExtension)
+            {
+                Path.ChangeExtension(filePath.Path, Filenames.ConfigExtension);
+            }
+            using ConfigWriter writer = new(filePath.Path);
+            DrawablesConfigs configs = GetDrawablesConfigs(drawables);
+            configs.Save(writer);
+            Debug.Log($"Saved drawable configuration to file {filePath.Path}.\n");
         }
 
         /// <summary>
@@ -132,8 +178,8 @@ namespace Assets.SEE.Game.Drawable
         /// <param name="fileName">The file name for the configuration.</param>
         internal static void SaveDrawables(GameObject[] drawables, string fileName)
         {
-            EnsureDrawableDirectoryExists();
-            string filePath = drawablePath + fileName + Filenames.ConfigExtension;
+            EnsureDrawableDirectoryExists(multipleConfPath);
+            string filePath = multipleConfPath + fileName + Filenames.ConfigExtension;
             using ConfigWriter writer = new(filePath);
             DrawablesConfigs configs = GetDrawablesConfigs(drawables);
             configs.Save(writer);
@@ -141,14 +187,15 @@ namespace Assets.SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Deletes the <see cref="DrawableConfig"/> or <see cref="DrawablesConfigs"/> file with the given <paramref name="filename"/>.
+        /// Deletes the <see cref="DrawableConfig"/> or <see cref="DrawablesConfigs"/> file with the given <paramref name="path"/>.
         /// </summary>
-        /// <param name="filename">The name of the file to delete</param>
-        internal static void DeleteDrawables(string filename)
+        /// <param name="path">The path of the file to delete</param>
+        internal static void DeleteDrawables(FilePath path)
         {
-            EnsureDrawableDirectoryExists();
-            string filePath = drawablePath + filename + Filenames.ConfigExtension;
-            File.Delete(filePath);
+            if (File.Exists(path.Path))
+            {
+                File.Delete(path.Path);
+            }
         }
 
         /// <summary>
@@ -178,6 +225,13 @@ namespace Assets.SEE.Game.Drawable
                 {
                     Line lineConfig = Line.GetLine(line);
                     config.LineConfigs.Add(lineConfig);
+                }
+
+                GameObject[] texts = GameDrawableFinder.FindAllChildrenWithTag(attachedObjects, Tags.DText).ToArray();
+                foreach (GameObject text in texts)
+                {
+                    Text textConfig = Text.GetText(text);
+                    config.TextConfigs.Add(textConfig);
                 }
             }
             return config;

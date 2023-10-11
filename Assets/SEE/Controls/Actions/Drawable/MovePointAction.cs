@@ -7,6 +7,7 @@ using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.Game.Drawable.ActionHelpers;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -54,7 +55,7 @@ namespace SEE.Controls.Actions.Drawable
                     Vector3[] transformedPositions = new Vector3[positions.Length];
                     Array.Copy(sourceArray: positions, destinationArray: transformedPositions, length: positions.Length);
                     selectedLine.transform.TransformPoints(transformedPositions);
-                    indexes = DrawableHelper.GetNearestIndexes(transformedPositions, raycastHit.point);
+                    indexes = NearestPoints.GetNearestIndexes(transformedPositions, raycastHit.point);
 
                     oldPointPosition = positions[indexes[0]];
                 }
@@ -175,20 +176,20 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// A new instance of <see cref="EditLineAction"/>.
+        /// A new instance of <see cref="EditAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="EditLineAction"/></returns>
+        /// <returns>new instance of <see cref="EditAction"/></returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new MovePointAction();
         }
 
         /// <summary>
-        /// A new instance of <see cref="EditLineAction"/>.
+        /// A new instance of <see cref="EditAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="EditLineAction"/></returns>
+        /// <returns>new instance of <see cref="EditAction"/></returns>
         public override ReversibleAction NewInstance()
         {
             return CreateReversibleAction();

@@ -1,11 +1,12 @@
 ﻿using SEE.Game;
 using System.Collections;
 using UnityEngine;
+using SEE.Game.Drawable.Configurations;
 
 namespace Assets.SEE.Game.Drawable
 {
     /// <summary>
-    /// This class represents a value holder component for the order in layer value of the <see cref="DrawableTypes"/>drawable types.
+    /// This class represents a value holder component for the order in layer value of the <see cref="DrawableType"/>drawable types.
     /// </summary>
     public class OrderInLayerValueHolder : MonoBehaviour
     {

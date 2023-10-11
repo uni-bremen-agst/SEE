@@ -8,7 +8,7 @@ using UnityEngine;
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for changing the thickness (<see cref="EditLineAction"/>) of a line on all clients.
+    /// This class is responsible for changing the thickness (<see cref="EditAction"/>) of a line on all clients.
     /// </summary>
     public class EditLineThicknessNetAction : AbstractNetAction
     {
@@ -64,7 +64,7 @@ namespace SEE.Net.Actions.Drawable
                 GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
                 if (drawable != null && GameDrawableFinder.FindChild(drawable, LineName) != null)
                 {
-                    GameEditLine.ChangeThickness(GameDrawableFinder.FindChild(drawable, LineName), thickness);
+                    GameEdit.ChangeThickness(GameDrawableFinder.FindChild(drawable, LineName), thickness);
                 }
                 else
                 {

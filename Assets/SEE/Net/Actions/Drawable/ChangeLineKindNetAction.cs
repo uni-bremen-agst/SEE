@@ -6,7 +6,7 @@ using SEE.Controls.Actions.Drawable;
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for changing the line kind (<see cref="EditLineAction"/>) of a line on all clients.
+    /// This class is responsible for changing the line kind (<see cref="EditAction"/>) of a line on all clients.
     /// </summary>
     public class ChangeLineKindNetAction : AbstractNetAction
     {

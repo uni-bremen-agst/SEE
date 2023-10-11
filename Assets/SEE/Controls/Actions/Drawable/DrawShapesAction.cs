@@ -10,6 +10,7 @@ using SEE.Game;
 using System;
 using UnityEngine.UI;
 using Assets.SEE.Game.UI.Drawable;
+using SEE.Game.Drawable.Configurations;
 using TMPro;
 
 
@@ -36,8 +37,8 @@ namespace SEE.Controls.Actions.Drawable
 
         private static HSVPicker.ColorPicker picker;
         private static ThicknessSliderController thicknessSlider;
-        private const string drawableSwitchPrefab = "Prefabs/UI/Drawable/DrawableSwitch";
-        private const string drawableShapePrefab = "Prefabs/UI/Drawable/DrawableShapeMenu";
+        private const string drawableSwitchPrefab = "Prefabs/UI/Drawable/Switch";
+        private const string drawableShapePrefab = "Prefabs/UI/Drawable/ShapeMenu";
         private static GameObject drawableSwitch;
         private static GameObject shapeMenu;
         private static Button previousBtn;
@@ -178,28 +179,28 @@ namespace SEE.Controls.Actions.Drawable
 
         private void InitConfigMenu()
         {
-            DrawableHelper.GetTilingSlider().onValueChanged.AddListener(DrawableHelper.tilingAction = tiling =>
+            LineMenu.GetTilingSliderController().onValueChanged.AddListener(LineMenu.tilingAction = tiling =>
             {
-                DrawableHelper.currentTiling = tiling;
+                ValueHolder.currentTiling = tiling;
             });
 
-            DrawableHelper.GetNextBtn().onClick.RemoveAllListeners();
-            DrawableHelper.GetNextBtn().onClick.AddListener(() => DrawableHelper.currentLineKind = DrawableHelper.NextLineKind());
-            DrawableHelper.GetPreviousBtn().onClick.RemoveAllListeners();
-            DrawableHelper.GetPreviousBtn().onClick.AddListener(() => DrawableHelper.currentLineKind = DrawableHelper.PreviousLineKind());
+            LineMenu.GetNextLineKindBtn().onClick.RemoveAllListeners();
+            LineMenu.GetNextLineKindBtn().onClick.AddListener(() => ValueHolder.currentLineKind = LineMenu.NextLineKind());
+            LineMenu.GetPreviousLineKindBtn().onClick.RemoveAllListeners();
+            LineMenu.GetPreviousLineKindBtn().onClick.AddListener(() => ValueHolder.currentLineKind = LineMenu.PreviousLineKind());
 
-            thicknessSlider = DrawableHelper.drawableMenu.GetComponentInChildren<ThicknessSliderController>();
-            thicknessSlider.AssignValue(DrawableHelper.currentThickness);
+            thicknessSlider = LineMenu.instance.GetComponentInChildren<ThicknessSliderController>();
+            thicknessSlider.AssignValue(ValueHolder.currentThickness);
             thicknessSlider.onValueChanged.AddListener(thickness =>
             {
-                DrawableHelper.currentThickness = thickness;
+                ValueHolder.currentThickness = thickness;
             });
 
-            picker = DrawableHelper.drawableMenu.GetComponent<HSVPicker.ColorPicker>();
-            picker.AssignColor(DrawableHelper.currentColor);
-            picker.onValueChanged.AddListener(DrawableHelper.colorAction = color =>
+            picker = LineMenu.instance.GetComponent<HSVPicker.ColorPicker>();
+            picker.AssignColor(ValueHolder.currentColor);
+            picker.onValueChanged.AddListener(LineMenu.colorAction = color =>
             {
-                DrawableHelper.currentColor = color;
+                ValueHolder.currentColor = color;
             });
         }
 
@@ -220,7 +221,7 @@ namespace SEE.Controls.Actions.Drawable
                 } else
                 {
                     shapeMenu.SetActive(false);
-                    DrawableHelper.enableDrawableMenu(false, new DrawableHelper.MenuPoint[] {DrawableHelper.MenuPoint.Layer, DrawableHelper.MenuPoint.Loop});
+                    LineMenu.enableLineMenu(false, new LineMenu.MenuLayer[] { LineMenu.MenuLayer.Layer, LineMenu.MenuLayer.Loop});
                 }
             }
         }
@@ -369,7 +370,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             configBtn.interactable = false;
             shapeBtn.interactable = true;
-            DrawableHelper.enableDrawableMenu(false, new DrawableHelper.MenuPoint[] { DrawableHelper.MenuPoint.Layer, DrawableHelper.MenuPoint.Loop });
+            LineMenu.enableLineMenu(false, new LineMenu.MenuLayer[] { LineMenu.MenuLayer.Layer, LineMenu.MenuLayer.Loop });
             shapeMenu.SetActive(false);
         }
 
@@ -377,13 +378,13 @@ namespace SEE.Controls.Actions.Drawable
         {
             shapeBtn.interactable = false;
             configBtn.interactable = true;
-            DrawableHelper.disableDrawableMenu();
+            LineMenu.disableLineMenu();
             shapeMenu.SetActive(true);
         }
 
         public override void Stop()
         {
-            DrawableHelper.disableDrawableMenu();
+            LineMenu.disableLineMenu();
         }
 
         public static void Reset()
@@ -419,9 +420,9 @@ namespace SEE.Controls.Actions.Drawable
                         case GameShapesCalculator.Shapes.Line:
 
                             positions[0] = raycastHit.point;
-                            shape = GameDrawer.StartDrawing(drawable, positions, DrawableHelper.currentColor, DrawableHelper.currentThickness,
-                                DrawableHelper.currentLineKind, DrawableHelper.currentTiling);
-                            positions[0] = shape.transform.InverseTransformPoint(positions[0]) - DrawableHelper.distanceToDrawable;
+                            shape = GameDrawer.StartDrawing(drawable, positions, ValueHolder.currentColor, ValueHolder.currentThickness,
+                                ValueHolder.currentLineKind, ValueHolder.currentTiling);
+                            positions[0] = shape.transform.InverseTransformPoint(positions[0]) - ValueHolder.distanceToDrawable;
                             shape.AddComponent<MenuDestroyer>().SetAllowedState(GetActionStateType());
                             break;
                         case GameShapesCalculator.Shapes.Square:
@@ -460,20 +461,13 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         if (GameDrawer.DifferentPositionCounter(positions) > 1)
                         {
-                            shape = GameDrawer.DrawLine(drawable, "", positions, DrawableHelper.currentColor, DrawableHelper.currentThickness, true,
-                                DrawableHelper.currentLineKind, DrawableHelper.currentTiling);
+                            shape = GameDrawer.DrawLine(drawable, "", positions, ValueHolder.currentColor, ValueHolder.currentThickness, true,
+                                ValueHolder.currentLineKind, ValueHolder.currentTiling);
                             shape.GetComponent<LineRenderer>().loop = true;
                             shape = GameDrawer.SetPivot(shape);
                             Line currentShape = Line.GetLine(shape);
                             memento = new Memento(drawable, currentShape);
                             new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), currentShape).Execute();
-                            /*
-                            memento = new Memento(drawable, shape.name, positions, DrawableHelper.currentColor,
-                               DrawableHelper.currentThickness, shape.GetComponent<LineRenderer>().sortingOrder);
-                            memento.loop = true;
-                            new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id,
-                            memento.positions, memento.color, memento.thickness, memento.loop).Execute();
-                            */
                             result = true;
                             currentState = ReversibleAction.Progress.Completed;
                             positions = new Vector3[1];
@@ -491,26 +485,26 @@ namespace SEE.Controls.Actions.Drawable
                     Raycasting.RaycastAnything(out RaycastHit rh) &&
                     (rh.collider.gameObject.CompareTag(Tags.Drawable) ||
                     GameDrawableFinder.hasDrawable(rh.collider.gameObject)) &&
-                    selectedShape == GameShapesCalculator.Shapes.Line)
+                    selectedShape == GameShapesCalculator.Shapes.Line
+                    && (drawable == null || drawable != null && GameDrawableFinder.FindDrawable(rh.collider.gameObject).Equals(drawable)))
                 {
-                    Vector3 newPosition = shape.transform.InverseTransformPoint(rh.point) - DrawableHelper.distanceToDrawable;
+                    Vector3 newPosition = shape.transform.InverseTransformPoint(rh.point) - ValueHolder.distanceToDrawable;
                     // Add newPosition to the line renderer.
                     Vector3[] newPositions = new Vector3[positions.Length + 1];
                     Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
                     newPositions[newPositions.Length - 1] = newPosition;
                     GameDrawer.Drawing(shape ,newPositions);
-                    new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable),
-                            shape.name, newPositions, DrawableHelper.currentColor, DrawableHelper.currentThickness, false, 
-                            DrawableHelper.currentLineKind, DrawableHelper.currentTiling).Execute();
+                    new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), Line.GetLine(shape)).Execute();
                 }
 
-                if (Input.GetMouseButtonDown(0) &&
+                if (Input.GetMouseButtonDown(0) && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) &&
                     Raycasting.RaycastAnything(out RaycastHit hit) &&
                     (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
                     GameDrawableFinder.hasDrawable(hit.collider.gameObject))
-                    && drawing && selectedShape == GameShapesCalculator.Shapes.Line)
+                    && drawing && selectedShape == GameShapesCalculator.Shapes.Line
+                    && (drawable == null || drawable != null && GameDrawableFinder.FindDrawable(hit.collider.gameObject).Equals(drawable)))
                 {
-                    Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - DrawableHelper.distanceToDrawable;
+                    Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.distanceToDrawable;
                     if (newPosition != positions.Last())
                     {
                         // Add newPosition to the line renderer.
@@ -521,14 +515,6 @@ namespace SEE.Controls.Actions.Drawable
 
                         GameDrawer.Drawing(shape, positions);
                         new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), Line.GetLine(shape)).Execute();
-                        /*
-                        memento = new Memento(drawable, shape.name, positions, DrawableHelper.currentColor,
-                            DrawableHelper.currentThickness, shape.GetComponent<LineRenderer>().sortingOrder);
-                        memento.loop = false;
-                        
-                        new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable),
-                            memento.id, memento.positions, memento.color, memento.thickness, memento.loop).Execute();
-                        */
                         currentState = ReversibleAction.Progress.InProgress;
                         if (shape.GetComponent<MenuDestroyer>() != null)
                         {
@@ -537,18 +523,20 @@ namespace SEE.Controls.Actions.Drawable
                     }
                 }
 
-                if (Input.GetMouseButtonUp(1) && !Input.GetKey(KeyCode.LeftControl) && drawing && positions.Length > 1 && selectedShape == GameShapesCalculator.Shapes.Line)
+                if (Input.GetMouseButtonUp(0) && Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) 
+                    && drawing && positions.Length > 1 && selectedShape == GameShapesCalculator.Shapes.Line)
                 {
                     result = true;
                     EndLineShapeDrawing(false);
-                    return Input.GetMouseButtonUp(1);
+                    return Input.GetMouseButtonUp(0);
                 }
 
-                if (Input.GetMouseButtonUp(1) && Input.GetKey(KeyCode.LeftControl) && drawing && positions.Length > 1 && selectedShape == GameShapesCalculator.Shapes.Line)
+                if (Input.GetMouseButtonUp(0) && !Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftShift) 
+                    && drawing && positions.Length > 1 && selectedShape == GameShapesCalculator.Shapes.Line)
                 {   
                     result = true;
                     EndLineShapeDrawing(true);
-                    return Input.GetMouseButtonUp(1);
+                    return Input.GetMouseButtonUp(0);
                 }
             }
             return result;
@@ -562,15 +550,6 @@ namespace SEE.Controls.Actions.Drawable
             Line currentShape = Line.GetLine(shape);
             memento = new Memento(drawable, currentShape);
             new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), currentShape).Execute();
-            /*
-            GameDrawer.Drawing(shape, positions);
-            memento.positions = positions;
-            memento.loop = loop;
-            GameDrawer.FinishDrawing(shape, memento.loop);
-            
-            new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id,
-                memento.positions, memento.color, memento.thickness, memento.loop).Execute();
-            */
             currentState = ReversibleAction.Progress.Completed;
             positions = new Vector3[1];
             drawing = false;

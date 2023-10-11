@@ -100,7 +100,7 @@ namespace Assets.SEE.Game.UI.Drawable
 
         /// <summary>
         /// This method will be used from the preset boxes in the line configuration menu.
-        /// It's select the choosen color to the color picker.
+        /// It's select the chosen color to the color picker.
         /// </summary>
         public void PresetSelect(Image sender)
         {
@@ -118,7 +118,7 @@ namespace Assets.SEE.Game.UI.Drawable
 
         /// <summary>
         /// This method will be used for the preset boxes in the line configuration menu.
-        /// It's removed the choosen color from the list.
+        /// It's removed the chosen color from the list.
         /// </summary>
         public void RemoveColor(Image sender)
         {
@@ -127,7 +127,7 @@ namespace Assets.SEE.Game.UI.Drawable
 
         /// <summary>
         /// This method will be used for the preset boxes in the line configuration menu.
-        /// It's changed the choosen color from the list to the current color of the color picker.
+        /// It's changed the chosen color from the list to the current color of the color picker.
         /// </summary>
         public void ChangeColor(int index)
         {

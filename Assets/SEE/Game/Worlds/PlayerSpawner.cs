@@ -109,8 +109,10 @@ namespace SEE.Game.Worlds
             if (player.TryGetComponent(out NetworkObject net))
             {
                 net.SpawnAsPlayerObject(owner, destroyWithScene: true);
-                //TODO right position?
-                DrawableSynchronizer.Synchronize();
+                if (numberOfSpawnedPlayers > 1)
+                {
+                    DrawableSynchronizer.Synchronize();
+                }
             }
             else
             {

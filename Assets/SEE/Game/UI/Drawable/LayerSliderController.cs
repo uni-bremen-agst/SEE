@@ -32,7 +32,7 @@ public class LayerSliderController : MonoBehaviour
 
     private void Start()
     {
-        slider.maxValue = DrawableHelper.orderInLayer;
+        slider.maxValue = ValueHolder.currentOrderInLayer;
     }
 
     private void OnDestroy()

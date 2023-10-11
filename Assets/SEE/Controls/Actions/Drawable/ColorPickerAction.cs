@@ -4,30 +4,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game;
+using Assets.SEE.Game.UI.Drawable;
 
 namespace SEE.Controls.Actions.Drawable
 {
-    /// <summary>
-    /// Allows to create drawings by the mouse cursor.
-    /// It serves as an example for a continuous action that modifies the
-    /// scene while active.
-    /// </summary>
     class ColorPickerAction : AbstractPlayerAction
     {
-        private Color oldChoosenColor;
+        private Color oldChosenColor;
 
         private Color pickedColor;
-
-        private Material material;
 
         private Memento memento;
 
         private HSVPicker.ColorPicker picker;
 
-        /// <summary>
-        /// Undo and Redo only used when a object is clicked! Don't support the color picker. Because the color picker would make to many states.
-        /// </summary>
-        /// <returns>true if completed</returns>
+
         public override bool Update()
         {
             bool result = false;
@@ -35,117 +26,81 @@ namespace SEE.Controls.Actions.Drawable
             if (!Raycasting.IsMouseOverGUI())
             {
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
-                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) && // Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
+                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
                     GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject))
                 {
                     pickedColor = raycastHit.collider.gameObject.GetColor();
                     picker.AssignColor(pickedColor);
-                    DrawableHelper.currentColor = pickedColor;
+                    ValueHolder.currentColor = pickedColor;
 
-                    memento = new(oldChoosenColor, pickedColor);
+                    memento = new(oldChosenColor, pickedColor);
                     result = true;
                     currentState = ReversibleAction.Progress.Completed;
-                }/* Materials picker, nicht sinnvoll, da vieles keine Materials aufweisen
-                  * else if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
-                    Raycasting.RaycastAnything(out RaycastHit raycastHite))
-                {
-                    material = raycastHite.collider.gameObject.GetComponent<Renderer>().materials[0];
-                    Debug.Log("Choosen Material: " + material);
-                    DrawableConfigurator.currentMaterial = material;
-                }*/
-                
-                //return Input.GetMouseButtonUp(0);
+                }
             }
             return result;
         }
 
         public override void Awake()
         {
-            oldChoosenColor = DrawableHelper.currentColor;
-            DrawableHelper.enableDrawableMenu(withoutMenuPoints: new DrawableHelper.MenuPoint[] {DrawableHelper.MenuPoint.All});
-            picker = DrawableHelper.drawableMenu.GetComponent<HSVPicker.ColorPicker>();
-            picker.AssignColor(DrawableHelper.currentColor);
-            picker.onValueChanged.AddListener(DrawableHelper.colorAction = color =>
+            oldChosenColor = ValueHolder.currentColor;
+            LineMenu.enableLineMenu(withoutMenuLayer: new LineMenu.MenuLayer[] { LineMenu.MenuLayer.All});
+            picker = LineMenu.instance.GetComponent<HSVPicker.ColorPicker>();
+            picker.AssignColor(ValueHolder.currentColor);
+            picker.onValueChanged.AddListener(LineMenu.colorAction = color =>
             {
-                DrawableHelper.currentColor = color;
+                ValueHolder.currentColor = color;
             });
         }
 
         public override void Stop()
         {
-            DrawableHelper.disableDrawableMenu();
+            LineMenu.disableLineMenu();
         }
 
         struct Memento
         {
-            public readonly Color oldChoosenColor;
+            public readonly Color oldChosenColor;
             public readonly Color pickedColor;
 
-            public Memento (Color oldChoosenColor, Color pickedColor)
+            public Memento (Color oldChosenColor, Color pickedColor)
             {
-                this.oldChoosenColor = oldChoosenColor;
+                this.oldChosenColor = oldChosenColor;
                 this.pickedColor = pickedColor;
             }
         }
 
-        /// <summary>
-        /// Destroys the drawn line.
-        /// See <see cref="ReversibleAction.Undo()"/>.
-        /// </summary>
         public override void Undo()
         {
-            base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            DrawableHelper.currentColor = memento.oldChoosenColor;
-            picker.AssignColor (memento.oldChoosenColor);
+            base.Undo();
+            ValueHolder.currentColor = memento.oldChosenColor;
+            picker.AssignColor (memento.oldChosenColor);
         }
 
-        /// <summary>
-        /// Redraws the drawn line (setting up <see cref="line"/> and adds <see cref="renderer"/> 
-        /// before that).
-        /// See <see cref="ReversibleAction.Undo()"/>.
-        /// </summary>
+
         public override void Redo()
         {
-            base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            DrawableHelper.currentColor = memento.pickedColor;
+            base.Redo();
+            ValueHolder.currentColor = memento.pickedColor;
         }
 
-        /// <summary>
-        /// A new instance of <see cref="DrawOnAction"/>.
-        /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
-        /// </summary>
-        /// <returns>new instance of <see cref="DrawOnAction"/></returns>
+
         public static ReversibleAction CreateReversibleAction()
         {
             return new ColorPickerAction();
         }
 
-        /// <summary>
-        /// A new instance of <see cref="DrawOnAction"/>.
-        /// See <see cref="ReversibleAction.NewInstance"/>.
-        /// </summary>
-        /// <returns>new instance of <see cref="DrawOnAction"/></returns>
+
         public override ReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }
 
-        /// <summary>
-        /// Returns the <see cref="ActionStateType"/> of this action.
-        /// </summary>
-        /// <returns><see cref="ActionStateType.DrawOnWhiteboard"/></returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.ColorPicker;
         }
 
-        /// <summary>
-        /// The set of IDs of all gameObjects changed by this action.
-        /// <see cref="ReversibleAction.GetActionStateType"/>
-        /// Because this action does not actually change any game object, 
-        /// an empty set is always returned.
-        /// </summary>
-        /// <returns>an empty set</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string>();

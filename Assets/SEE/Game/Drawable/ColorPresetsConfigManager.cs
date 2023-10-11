@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using SEE.Game.Drawable.Configurations;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -18,7 +19,7 @@ namespace Assets.SEE.Game.Drawable
         /// The path to the file containing the saved color presets. This is saved in a field because multiple
         /// methods of this class use it.
         /// </summary>
-        private static readonly string colorPresetsFile = DrawableConfigManager.drawablePath + "ColorPresets" + Filenames.ConfigExtension;
+        private static readonly string colorPresetsFile = DrawableConfigManager.configurationPath + "ColorPresets" + Filenames.ConfigExtension;
 
         /// <summary>
         /// This method checks whether the directory for the saved drawable exists. If not, then it creates
@@ -26,7 +27,7 @@ namespace Assets.SEE.Game.Drawable
         /// </summary>
         private static void EnsureDrawableDirectoryExists()
         {
-            DrawableConfigManager.EnsureDrawableDirectoryExists();
+            DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.configurationPath);
         }
 
         public static bool IsFileExists()

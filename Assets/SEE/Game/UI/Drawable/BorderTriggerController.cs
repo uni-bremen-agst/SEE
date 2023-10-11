@@ -4,6 +4,7 @@ using SEE.Game;
 using System;
 using System.Collections;
 using UnityEngine;
+using System.Linq;
 
 namespace Assets.SEE.Game.UI.Drawable
 {
@@ -24,8 +25,7 @@ namespace Assets.SEE.Game.UI.Drawable
 
         private void OnTriggerStay(Collider other)
         {
-            //FIXEME ADD OTHER TAGS.
-            if (other.gameObject.CompareTag(Tags.Line))
+            if (Tags.DrawableTypes.Contains(other.gameObject.tag))
             {
                 GameObject drawable = GameDrawableFinder.FindDrawable(other.gameObject);
                 string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
