@@ -2,7 +2,7 @@
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using System.Collections.Generic;
-
+using System.Diagnostics;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
@@ -12,7 +12,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         private float phi;
 
-        private Dictionary<string, int> overallValues;
+        private Dictionary<string, double> overallValues;
 
         private Dictionary<string, int> mappingCount;
 
@@ -23,7 +23,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public CountAttract(ReflexionGraph graph, string targetType) : base(graph, targetType)
         {
-            overallValues = new Dictionary<string, int>();
+            overallValues = new Dictionary<string, double>();
             mappingCount = new Dictionary<string, int>();
             delta = 0;
             Phi = 1f;
@@ -32,18 +32,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         public override double GetAttractionValue(Node candidateNode, Node cluster)
         {
             if (!candidateNode.Type.Equals(targetType)) return 0;
-            if (overallValues.TryGetValue(candidateNode.ID, out int overall))
+            if (overallValues.TryGetValue(candidateNode.ID, out double overall))
             {
-                UnityEngine.Debug.Log($"Overall({candidateNode.ID}) = {overall}");
                 double toOthers = GetToOthersValue(candidateNode, cluster);
 
-                UnityEngine.Debug.Log($"CountAttract({candidateNode.ID},{cluster.ID}) = {overall - toOthers}");
+                UnityEngine.Debug.Log($"CountAttract({candidateNode.ID},{cluster.ID}) = {overall}(overall) - {toOthers}(toOthers) = {overall - toOthers}");
                 return overall - toOthers;
             } 
             else
             {
                 // TODO: dirty? does no overall value imply always 0?
                 // TODO: add exception here
+                UnityEngine.Debug.LogWarning($"Couldn't find overall value for the candidate {candidateNode.ID}");
                 return 0;
             };
         }
@@ -64,9 +64,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 // TODO: Equals does not work? Use IDs instead.
                 if (neighborCluster == null || neighborCluster.ID.Equals(cluster.ID)) continue;
 
-                double weight = 1.0;
+                double weight = GetEdgeWeight(edge);
                 
-                UnityEngine.Debug.Log($"{edge.ID} Get Reflexion.State = {edge.State()}");
                 if (edge.State() == State.Allowed || edge.State() == State.ImplicitlyAllowed)
                 {
                     UnityEngine.Debug.Log($"State is allowed. Phi value will be applied.");
@@ -79,7 +78,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             this.reflexionGraph.RemoveFromMapping(candidateNode);
             this.reflexionGraph.SuppressNotifications = false;
 
-            UnityEngine.Debug.Log($"ToOthers({candidateNode.ID},{cluster.ID}) = {toOthers}");
+            // UnityEngine.Debug.Log($"ToOthers({candidateNode.ID},{cluster.ID}) = {toOthers}");
             return toOthers;
         }
 
@@ -102,7 +101,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         public void UpdateOverallTable(Node NeighborOfMappedEntity, Edge edge, ChangeType changeType)
         {
             if (!overallValues.ContainsKey(NeighborOfMappedEntity.ID)) overallValues.Add(NeighborOfMappedEntity.ID, 0);
-            int edgeWeight = GetEdgeWeight(edge);
+            double edgeWeight = GetEdgeWeight(edge);
             if (changeType == ChangeType.Removal) edgeWeight *= -1;
             overallValues[NeighborOfMappedEntity.ID] += edgeWeight;
         }
@@ -115,10 +114,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             mappingCount[NeighborOfMappedEntity.ID] += count;
         }
 
-        private int GetEdgeWeight(Edge edge)
+        private double GetEdgeWeight(Edge edge)
         {
             // TODO: get correct Edge Weight
-            return 1;
+            return 1.0;
         }
     }
 }

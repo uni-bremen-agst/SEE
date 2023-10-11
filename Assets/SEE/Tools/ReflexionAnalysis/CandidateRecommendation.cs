@@ -1,4 +1,5 @@
 ﻿using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
+using Newtonsoft.Json;
 using SEE.DataModel;
 using SEE.Tools.ReflexionAnalysis;
 using System;
@@ -14,14 +15,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
     {
         private ReflexionGraph reflexionGraph;
 
+        private static double AttractionValueDelta = 0.001;
+
         // Dictionary representing the the mapping of nodes and their clusters regarding the highest 
         // attraction value
-        private Dictionary<Node, HashSet<Node>> recommendations;
+        private Dictionary<Node, HashSet<MappingPair>> recommendations;
 
         /// <summary>
         /// 
         /// </summary>
-        public Dictionary<Node, HashSet<Node>> Recommendations { get => recommendations; set => recommendations = value; }
+        public Dictionary<Node, HashSet<MappingPair>> Recommendations { get => recommendations; set => recommendations = value; }
+
+        public List<MappingPair> MappingPairs { get; private set; }
 
         public string TargetType
         {
@@ -64,7 +69,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         public CandidateRecommendation()
         {
-            recommendations = new Dictionary<Node, HashSet<Node>>();
+            recommendations = new Dictionary<Node, HashSet<MappingPair>>();
+            MappingPairs = new List<MappingPair>();
         }
 
         public ReflexionGraph ReflexionGraph
@@ -108,20 +114,22 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             double maxAttractionValue = double.MinValue;
 
             recommendations.Clear();
-
-            double delta = 0.01;
-
-            Debug.Log("Calculate attraction values...");
+            MappingPairs.Clear();
+            Debug.Log($"Calculate attraction values... targetedNodes.Count={targetedNodes.Count} clusters.Count={clusters.Count}");
 
             foreach (Node cluster in clusters)
             {
-                foreach (Node node in targetedNodes)
+                foreach (Node candidate in targetedNodes)
                 {
                     // Skip already mapped nodes
-                    if (reflexionGraph.MapsTo(node) != null) continue;
-
+                    if (reflexionGraph.MapsTo(candidate) != null) continue;
+                    
                     // Calculate the attraction value for current node and current cluster
-                    double attractionValue = AttractFunction.GetAttractionValue(node, cluster);
+                    double attractionValue = AttractFunction.GetAttractionValue(candidate, cluster);
+
+                    // Keep track of all attractions for statistical purposes
+                    MappingPair mappingPair = new MappingPair(candidate: candidate, cluster: cluster, attractionValue: attractionValue);
+                    MappingPairs.Add(mappingPair);
 
                     // Only do a recommendation if attraction is above 0
                     if (attractionValue <= 0) continue;
@@ -129,66 +137,136 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     if (maxAttractionValue < attractionValue)
                     {
                         recommendations.Clear();
-                        recommendations.Add(cluster, new HashSet<Node>() { node });
+                        recommendations.Add(cluster, new HashSet<MappingPair>() { mappingPair });
                         maxAttractionValue = attractionValue;
                     }
-                    else if (Math.Abs(maxAttractionValue - attractionValue) < delta)
+                    else if (Math.Abs(maxAttractionValue - attractionValue) < AttractionValueDelta)
                     {
-                        HashSet<Node> nodes;
+                        HashSet<MappingPair> nodes;
                         if (recommendations.TryGetValue(cluster, out nodes))
                         {
-                            nodes.Add(node);
+                            nodes.Add(mappingPair);
                         }
                         else
                         {
-                            recommendations.Add(cluster, new HashSet<Node>() { node });
+                            recommendations.Add(cluster, new HashSet<MappingPair>() { mappingPair });
                         }
                     }
                 }
             }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public Dictionary<Node, HashSet<Node>> CloneRecommendations()
+        public bool IsRecommendationDefinite()
         {
-            Dictionary<Node, HashSet<Node>> clone  = new Dictionary<Node, HashSet<Node>>();
-            foreach (Node cluster in Recommendations.Keys)
-            {
-                clone[cluster] = Recommendations[cluster];
-            }
-            return clone;
+            Node cluster = Recommendations.Keys.First<Node>();
+            HashSet<MappingPair> candidates = Recommendations[cluster];
+            return Recommendations.Keys.Count == 1 && candidates.Count == 1;
         }
 
-        // Currently not used.
-        public class Recommendation : IComparable<Recommendation>
+        public MappingPair GetDefiniteRecommendation()
         {
-            private HashSet<Node> cluster;
-
-            private Dictionary<Node, Node> recommendations;
-
-            double attractionValue;
-
-            public HashSet<Node> Node { get { return cluster; } }
-            public double AttractionValue { get { return attractionValue; } }
-
-            private Recommendation(Node node, double attractionValue)
+            if(IsRecommendationDefinite())
             {
-                this.cluster = new HashSet<Node>() { node };
+                Node cluster = Recommendations.Keys.First<Node>();
+                return Recommendations[cluster].FirstOrDefault<MappingPair>();
+            } 
+            else
+            {
+                return null;
+            }
+        }
+
+        public class MappingPair : IComparable<MappingPair>
+        {
+            private double? attractionValue;
+
+            public double AttractionValue
+            {   
+                get
+                {
+                    return attractionValue ?? -1.0;
+                }
+                set
+                {
+                    if(attractionValue == null)
+                    {
+                        attractionValue = value;
+                    } 
+                    else
+                    {
+                        throw new Exception("Cannot override Attractionvalue.");
+                    }
+                } 
+            }
+
+            [JsonIgnore]
+            public Node Candidate { get; }
+
+            [JsonIgnore]
+            public Node Cluster { get; }
+
+            private string clusterID;
+
+            private string candidateID;
+
+            public string ClusterID 
+            { 
+                get 
+                { 
+                    return Cluster != null ? Cluster.ID : clusterID; 
+                }
+                set 
+                {
+                    if (Cluster != null || clusterID != null) throw new Exception("Cannot override ClusterID"); 
+                    clusterID = value; 
+                }
+            }
+
+            public string CandidateID 
+            { 
+                get 
+                { 
+                    return Candidate != null ? Candidate.ID : candidateID; 
+                }
+                set
+                {
+                    if (Candidate != null || candidateID != null) throw new Exception("Cannot override CandidateID");
+                    candidateID = value;
+                }
+            }
+
+            public MappingPair(Node candidate, Node cluster, double attractionValue)
+            {
+                this.Cluster = cluster;
+                this.Candidate = candidate;
                 this.attractionValue = attractionValue;
             }
 
-            private void Add(Node node)
-            {
-
-            }
-
-            public int CompareTo(Recommendation other)
+            public int CompareTo(MappingPair other)
             {
                 if (this == other) return 0;
                 return this.AttractionValue.CompareTo(other.AttractionValue);
+            }
+
+            public override bool Equals(object obj)
+            {
+                if(obj == null || GetType() != obj.GetType())
+                {
+                    return false;
+                } 
+
+                MappingPair mappingPair = (MappingPair)obj;
+
+                return this.Cluster.Equals(mappingPair.Cluster)
+                    && this.Candidate.Equals(mappingPair.Candidate)
+                    && Math.Abs(this.AttractionValue - mappingPair.AttractionValue) < AttractionValueDelta;
+            }
+
+            public override int GetHashCode()
+            {
+                // truncate value depending on the defined delta to erase decimal places
+                double truncatedValue = Math.Truncate(AttractionValue / AttractionValueDelta) * AttractionValueDelta;
+                return HashCode.Combine(this.Cluster.ID, this.Candidate.ID, truncatedValue);
             }
         }
     }

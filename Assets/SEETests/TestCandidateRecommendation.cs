@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Assets.SEE.Tools.ReflexionAnalysis;
 using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
+using static Assets.SEE.Tools.ReflexionAnalysis.CandidateRecommendation;
 
 namespace SEE.Tools.Architecture
 {
@@ -247,10 +248,10 @@ namespace SEE.Tools.Architecture
             bool DIsRecommendedForH1AndH2()
             {
                 return CheckRecommendations(candidateRecommendation.Recommendations,
-                                    new Dictionary<Node, HashSet<Node>>()
+                                    new Dictionary<Node, HashSet<MappingPair>>()
                                     {
-                                        {a[1], new HashSet<Node>() { i[4] } },
-                                        {a[2], new HashSet<Node>() { i[4] } }
+                                        {a[1], new HashSet<MappingPair>() { new MappingPair(i[4], a[1], -1.0) } },
+                                        {a[2], new HashSet<MappingPair>() { new MappingPair(i[4], a[2], -1.0) } }
                                     },
                                     null);
             }
@@ -258,26 +259,26 @@ namespace SEE.Tools.Architecture
             bool DIsRecommendedForH1ButNotH2()
             {
                 return CheckRecommendations(candidateRecommendation.Recommendations,
-                                    new Dictionary<Node, HashSet<Node>>()
+                                    new Dictionary<Node, HashSet<MappingPair>>()
                                     {
-                                        {a[1], new HashSet<Node>() { i[4] } },
+                                        {a[1], new HashSet<MappingPair>() { new MappingPair(i[4], a[1], -1.0) } },
                                     },
-                                    new Dictionary<Node, HashSet<Node>>()
+                                    new Dictionary<Node, HashSet<MappingPair>>()
                                     {
-                                        {a[2], new HashSet<Node>() { i[4] } },
+                                        {a[2], new HashSet<MappingPair>() { new MappingPair(i[4], a[2], -1.0) } },
                                     });
             }
 
             bool DIsRecommendedForH2ButNotH1()
             {
                 return CheckRecommendations(candidateRecommendation.Recommendations,
-                    new Dictionary<Node, HashSet<Node>>()
+                    new Dictionary<Node, HashSet<MappingPair>>()
                     {
-                                        {a[2], new HashSet<Node>() { i[4] } },
+                                        {a[2], new HashSet<MappingPair>() { new MappingPair(i[4], a[2], -1.0) } },
                     },
-                    new Dictionary<Node, HashSet<Node>>()
+                    new Dictionary<Node, HashSet<MappingPair>>()
                     {
-                                        {a[1], new HashSet<Node>() { i[4] } },
+                                        {a[1], new HashSet<MappingPair>() { new MappingPair(i[4], a[1], -1.0) } },
                     });
             } 
             #endregion
@@ -291,16 +292,16 @@ namespace SEE.Tools.Architecture
         /// <param name="mustNotBeRecommended">Forbidden recommendation. If null this parameter is ignored.
         /// If this parameter is not null it must not contain null values.</param>
         /// <returns></returns>
-        public bool CheckRecommendations(Dictionary<Node, HashSet<Node>> recommendations, 
-                                         Dictionary<Node, HashSet<Node>> mustBeRecommended,
-                                         Dictionary<Node, HashSet<Node>> mustNotBeRecommended)
+        public bool CheckRecommendations(Dictionary<Node, HashSet<MappingPair>> recommendations, 
+                                         Dictionary<Node, HashSet<MappingPair>> mustBeRecommended,
+                                         Dictionary<Node, HashSet<MappingPair>> mustNotBeRecommended)
         {
             // Check mustRecommended
             if (mustBeRecommended != null)
             {
                 foreach (Node cluster in mustBeRecommended.Keys)
                 {
-                    HashSet<Node> recommendationsForCluster;
+                    HashSet<MappingPair> recommendationsForCluster;
                     if (!recommendations.TryGetValue(cluster, out recommendationsForCluster)) return false;
 
                     if (recommendationsForCluster == null && mustBeRecommended[cluster] == null) continue;
@@ -314,7 +315,7 @@ namespace SEE.Tools.Architecture
             {
                 foreach (Node cluster in mustNotBeRecommended.Keys)
                 {
-                    HashSet<Node> recommendationsForCluster;
+                    HashSet<MappingPair> recommendationsForCluster;
                     if (!recommendations.TryGetValue(cluster, out recommendationsForCluster)) continue;
                     if (mustNotBeRecommended[cluster] == null) throw new Exception("Error in while comparing Recommendations. Forbidden recommendations cannot be null.");
                     if(recommendationsForCluster.Intersect(mustNotBeRecommended[cluster]).Count() > 0) return false;

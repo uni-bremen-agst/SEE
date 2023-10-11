@@ -10,6 +10,8 @@ using SEE.Tools.ReflexionAnalysis;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using Assets.SEE.Tools.ReflexionAnalysis;
+using System.IO;
+using System;
 
 namespace SEE.Game.City
 {
@@ -37,6 +39,12 @@ namespace SEE.Game.City
         /// </summary>
         [SerializeField, ShowInInspector, Tooltip("Path of CSV file for the metrics of the architecture"), FoldoutGroup(DataFoldoutGroup)]
         public FilePath CsvArchitecturePath = new();
+
+        /// <summary>
+        /// The path to the GXL file containing the graph data for an oracle mapping used by the candidate recommendation components.
+        /// </summary>
+        [SerializeField, ShowInInspector, Tooltip("Path of GXL file for the oracle mapping from the implementation onto the architecture. Used by the candidate recommendation components."), FoldoutGroup(DataFoldoutGroup)]
+        public FilePath GxlOracleMappingPath = new();
 
         /// <summary>
         /// Name of this code city.
@@ -102,6 +110,8 @@ namespace SEE.Game.City
                 Graph ArchitectureGraph = LoadGraph(GxlArchitecturePath.Path, "");
                 Graph ImplementationGraph = LoadGraph(GXLPath.Path, "");
                 Graph MappingGraph;
+                Graph OracleMappingGraph = null;
+
                 if (string.IsNullOrEmpty(GxlMappingPath.Path))
                 {
                     Debug.LogWarning("Mapping graph path is empty. Will create new mapping from scratch.\n");
@@ -113,6 +123,22 @@ namespace SEE.Game.City
                 else
                 {
                     MappingGraph = LoadGraph(GxlMappingPath.Path, "");
+                }
+
+                try
+                {
+                    if (!File.Exists(GxlOracleMappingPath.Path))
+                    {
+                        Debug.Log("No Oracle mapping loaded.");
+                    }
+                    else
+                    {
+                        OracleMappingGraph = LoadGraph(GxlOracleMappingPath.Path, "");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.Log(e.ToString());
                 }
 
                 // We collect the tasks here so we can wait on them both at the same time instead of sequentially
@@ -142,6 +168,7 @@ namespace SEE.Game.City
                 if (candidateRecommendationViz != null)
                 {
                     candidateRecommendationViz.ReflexionGraph = reflexionGraph;
+                    candidateRecommendationViz.OracleMapping = OracleMappingGraph;
                     LoadedGraph.Subscribe(candidateRecommendationViz);
                     Debug.Log("Registered CandidateRecommendation.");
                 }
