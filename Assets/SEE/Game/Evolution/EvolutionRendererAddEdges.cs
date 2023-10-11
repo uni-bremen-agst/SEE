@@ -34,7 +34,7 @@ namespace SEE.Game.Evolution
                     }
                     edgeObject.AddOrGetComponent<EdgeOperator>()
                               .Show(animationKind, AnimationLagFactor)
-                              .SetOnComplete(animationWatchDog.Finished);
+                              .OnComplete(animationWatchDog.Finished);
                 }
             }
             else

@@ -64,7 +64,7 @@ namespace SEE.Game.Evolution
 
                 gameNode.AddOrGetComponent<NodeOperator>()
                     .MoveTo(layoutNode.CenterPosition, AnimationLagFactor, updateEdges: false)
-                    .SetOnComplete(animationWatchDog.Finished);
+                    .OnComplete(animationWatchDog.Finished);
             }
         }
     }

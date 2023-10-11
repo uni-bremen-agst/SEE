@@ -74,7 +74,7 @@ namespace SEE.Game.Evolution
 
                 gameNode.AddOrGetComponent<NodeOperator>()
                     .ScaleTo(localScale, AnimationLagFactor, updateEdges: false)
-                    .SetOnComplete(() => OnScalingFinished(gameNode));
+                    .OnComplete(() => OnScalingFinished(gameNode));
             }
         }
 
