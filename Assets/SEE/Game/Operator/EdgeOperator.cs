@@ -157,6 +157,10 @@ namespace SEE.Game.Operator
             go.MustGetComponent(out spline);
             base.OnEnable();
 
+            morphism = new MorphismOperation(AnimateToMorphismAction, spline.Spline, null);
+            construction = new TweenOperation<bool>(ConstructAction, spline.SubsplineEndT >= 1);
+            return;
+
             SplineMorphism AnimateToMorphismAction((BSpline targetSpline, GameObject temporaryGameObject) s, float d)
             {
                 SplineMorphism animator = go.AddOrGetComponent<SplineMorphism>();
@@ -182,8 +186,6 @@ namespace SEE.Game.Operator
                 return animator;
             }
 
-            morphism = new MorphismOperation(AnimateToMorphismAction, spline.Spline, null);
-
             Tween[] ConstructAction(bool extending, float duration)
             {
                 return new Tween[]
@@ -194,8 +196,6 @@ namespace SEE.Game.Operator
                                duration).SetEase(Ease.InOutExpo).Play()
                 };
             }
-
-            construction = new TweenOperation<bool>(ConstructAction, spline.SubsplineEndT >= 1);
         }
 
         protected override TweenOperation<(Color start, Color end)> InitializeColorOperation()

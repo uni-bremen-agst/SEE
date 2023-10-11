@@ -25,9 +25,9 @@ namespace SEE.Game.Operator
         /// The base animation duration for this operator.
         /// May be set from outside.
         /// </summary>
-        public float TheBaseAnimationDuration
+        private float TheBaseAnimationDuration
         {
-            private get;
+            get;
             set;
         } = 1f;
 
@@ -50,13 +50,13 @@ namespace SEE.Game.Operator
         private void OnEnable()
         {
             RectTransform rectTransform = (RectTransform)transform;
+            positionY = new TweenOperation<float>(PositionYAction, rectTransform.anchoredPosition.y);
+            return;
 
             Tween[] PositionYAction(float p, float d) => new Tween[]
             {
                 rectTransform.DOAnchorPosY(p, d).Play()
             };
-
-            positionY = new TweenOperation<float>(PositionYAction, rectTransform.anchoredPosition.y);
         }
 
         private void OnDisable()

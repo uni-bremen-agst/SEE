@@ -424,16 +424,10 @@ namespace SEE.Game.Operator
             Vector3 currentScale = transform.localScale;
             Quaternion currentRotation = transform.rotation;
 
-            Tween[] AnimateToXAction(float x, float d) => new Tween[] { transform.DOMoveX(x, d).Play() };
-            Tween[] AnimateToYAction(float y, float d) => new Tween[] { transform.DOMoveY(y, d).Play() };
-            Tween[] AnimateToZAction(float z, float d) => new Tween[] { transform.DOMoveZ(z, d).Play() };
-            Tween[] AnimateToRotationAction(Quaternion r, float d) => new Tween[] { transform.DORotateQuaternion(r, d).Play() };
             positionX = new TweenOperation<float>(AnimateToXAction, currentPosition.x);
             positionY = new TweenOperation<float>(AnimateToYAction, currentPosition.y);
             positionZ = new TweenOperation<float>(AnimateToZAction, currentPosition.z);
             rotation = new TweenOperation<Quaternion>(AnimateToRotationAction, currentRotation);
-
-            Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] { transform.DOScale(s, d).Play() };
             scale = new TweenOperation<Vector3>(AnimateToScaleAction, currentScale);
 
             PrepareLabel();
@@ -442,12 +436,18 @@ namespace SEE.Game.Operator
             labelStartLinePosition = new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction, DesiredLabelStartLinePosition);
             labelEndLinePosition = new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction, DesiredLabelEndLinePosition);
 
+            blinking = new TweenOperation<int>(BlinkAction, 0, equalityComparer: new AlwaysFalseEqualityComparer<int>(),
+                                               conflictingOperations: new[] { Color });
+            return;
+
+            Tween[] AnimateToXAction(float x, float d) => new Tween[] { transform.DOMoveX(x, d).Play() };
+            Tween[] AnimateToYAction(float y, float d) => new Tween[] { transform.DOMoveY(y, d).Play() };
+            Tween[] AnimateToZAction(float z, float d) => new Tween[] { transform.DOMoveZ(z, d).Play() };
+            Tween[] AnimateToRotationAction(Quaternion r, float d) => new Tween[] { transform.DORotateQuaternion(r, d).Play() };
+            Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] { transform.DOScale(s, d).Play() };
+
             Tween[] BlinkAction(int count, float duration)
             {
-                if (Color.IsRunning)
-                {
-                    Color.KillAnimator(true);
-                }
                 // If we're interrupting another blinking, we need to make sure the color still has the correct value.
                 material.color = Color.TargetValue;
 
@@ -456,10 +456,6 @@ namespace SEE.Game.Operator
                     material.DOColor(Color.TargetValue.Invert(), duration / (2 * count)).SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play()
                 };
             }
-
-            blinking = new TweenOperation<int>(BlinkAction, 0, equalityComparer: new AlwaysFalseEqualityComparer<int>());
-
-            #region Local Methods
 
             static Node GetNode(GameObject gameObject)
             {
@@ -471,8 +467,6 @@ namespace SEE.Game.Operator
 
                 return nodeRef.Value;
             }
-
-            #endregion
         }
 
         /// <summary>
