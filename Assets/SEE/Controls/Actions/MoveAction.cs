@@ -352,7 +352,7 @@ namespace SEE.Controls.Actions
             internal void Redo()
             {
                 MoveToLastUserRequestedPosition();
-                Reparent(newParent, grabbedObject);
+                Reparent(newParent, GrabbedGameObject);
             }
 
             /// <summary>
@@ -540,7 +540,6 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The currently grabbed object if any.
         /// </summary>
-        // TODO (Yvo): Was previously static
         private GrabbedObject grabbedObject;
 
         /// <summary>
@@ -625,7 +624,7 @@ namespace SEE.Controls.Actions
             return false;
         }
 
-        // FIXME: parts of this needs to be fixed in the future.
+        // FIXME: parts of this needs to be fixed in the future. TODO Doku (William)
         private bool MoveActionVR()
         {
             if (VrGrabAction.IsGrabbed)
@@ -636,13 +635,13 @@ namespace SEE.Controls.Actions
 
                     if (grabbedObj.TryGetNode(out Node node) && !node.IsRoot())
                     {
+                        grabbedObj.GetComponent<VrGrabAction>().Reparent = StartReparentProcess;
                         grabbedObject.Grab(grabbedObj);
                         // Remember the current distance from the pointing device to the grabbed object.
                         //distanceToUser = Vector3.Distance(Raycasting.UserPointsTo().origin, grabbedObject.Position);
                         //currentState = ReversibleAction.Progress.InProgress;
                     }
                 }
-                //UpdateHierarchy();
             }
             else if (grabbedObject.IsGrabbed)
             {
@@ -659,7 +658,7 @@ namespace SEE.Controls.Actions
         /// Is called from OnCollisionEnter() in <see cref="VrGrabAction"/>.
         /// </summary>
         /// <param name="target"></param>
-        public static void StartReparentProcess(GameObject newBigParent, GameObject originalBigParent)
+        public void StartReparentProcess(GameObject newBigParent, GameObject originalBigParent)
         {
             grabbedObject.Reparent(newBigParent, originalBigParent);
         }
@@ -703,7 +702,7 @@ namespace SEE.Controls.Actions
                     if (raycastHit.HasValue)
                     {
                         // The user is currently aiming at a node. The grabbed node is reparented onto this aimed node.
-                        StartReparentProcess(raycastHit.Value.transform.gameObject, grabbedObject.Node.gameObject);
+                        this.StartReparentProcess(raycastHit.Value.transform.gameObject, grabbedObject.Node.gameObject);
                     }
                     else
                     {

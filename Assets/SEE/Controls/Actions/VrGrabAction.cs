@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using Autohand;
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -20,8 +21,15 @@ namespace SEE.Controls.Actions
         /// </summary>
         public static bool IsGrabbed { get; private set; } = false;
 
+
+        /// <summary>
+        /// TODO
+        /// </summary>
+        public Action<GameObject, GameObject> Reparent { get; set; } 
+
         /// <summary>
         /// The currently grabbed game object
+        /// //TODO Testen ob hier ein Fehler passiert (William)
         /// </summary>
         public static GameObject GrabbedObject { get; private set; }
 
@@ -205,7 +213,7 @@ namespace SEE.Controls.Actions
                 if (GrabbedObject.transform.parent.gameObject != collisionInfo.gameObject && IsInCollision())
                 {
                     //Debug.LogWarning("Collision with node: " + collisionInfo.gameObject.name);
-                    MoveAction.StartReparentProcess(collisionInfo.gameObject, GrabbedObject);
+                    Reparent(collisionInfo.gameObject, GrabbedObject);
                     // Set the new initial position and rotation of the object
                     initialPosition = GrabbedObject.transform.position;
                     initialRotation = GrabbedObject.transform.rotation;
