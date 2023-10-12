@@ -19,19 +19,23 @@ namespace SEE.Utils
         /// <param name="mustFindGameObject">Whether to throw an exception
         /// if no corresponding game object was found.</param>
         /// <returns>The <see cref="NodeOperator"/> responsible for this <paramref name="node"/>.</returns>
-        public static NodeOperator Operator(this Node node, bool mustFindGameObject = true)
-            => node.GameObject(mustFindGameObject).AddOrGetComponent<NodeOperator>();
+        public static NodeOperator Operator(this Node node) => node.GameObject().NodeOperator();
 
         /// <summary>
         /// Returns the <see cref="EdgeOperator"/> for this <paramref name="edge"/>.
         /// If no operator exists yet, it will be added.
         /// </summary>
         /// <param name="edge">The edge whose operator to retrieve.</param>
-        /// <param name="mustFindGameObject">Whether to throw an exception
-        /// if no corresponding game object was found.</param>
         /// <returns>The <see cref="EdgeOperator"/> responsible for this <paramref name="edge"/>.</returns>
-        public static EdgeOperator Operator(this Edge edge, bool mustFindGameObject = true)
-            => edge.GameObject(mustFindGameObject).AddOrGetComponent<EdgeOperator>();
+        public static EdgeOperator Operator(this Edge edge) => edge.GameObject().EdgeOperator();
+
+        /// <summary>
+        /// Returns the <see cref="GraphElementOperator"/> for this graph <paramref name="element"/>.
+        /// If no operator exists yet, it will be added.
+        /// </summary>
+        /// <param name="element">The graph element whose operator to retrieve.</param>
+        /// <returns>The <see cref="GraphElementOperator"/> responsible for this <paramref name="element"/>.</returns>
+        public static GraphElementOperator Operator(this GraphElement element) => element.GameObject().Operator();
 
         /// <summary>
         /// Returns the <see cref="GameObject"/> for this graph <paramref name="element"/>.
