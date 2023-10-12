@@ -115,10 +115,12 @@ namespace SEE.Game.Operator
         #region Public API
 
         /// <summary>
-        /// Displays a marker above the node and makes it blink <paramref name="blinkCount"/> times
-        /// within the given <paramref name="duration"/>.
+        /// Displays a marker above the node and makes it blink for <paramref name="duration"/> seconds.
         /// </summary>
-        /// <param name="duration">The amount of time in seconds the node should be highlighted.</param>
+        /// <param name="duration">The amount of time in seconds the node should be highlighted.
+        /// If this is set to a negative value, the node will be highlighted indefinitely, with a blink rate
+        /// proportional to the absolute value of <paramref name="duration"/>.
+        /// </param>
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> Highlight(float duration)
         {
@@ -130,8 +132,8 @@ namespace SEE.Game.Operator
             marker.MarkBorn(gameObject);
             // The factor of 1.3 causes the node to blink slightly more than once per second,
             // which seems visually fitting.
-            int blinkCount = Mathf.RoundToInt(duration * 1.3f);
-            return Blink(blinkCount: blinkCount, ToDuration(duration)).OnComplete(() => marker.Clear());
+            int blinkCount = duration >= 0 ? Mathf.RoundToInt(duration * 1.3f) : -1;
+            return Blink(blinkCount: blinkCount, ToFactor(Mathf.Abs(duration))).OnComplete(() => marker.Clear());
         }
 
         /// <summary>
@@ -263,7 +265,9 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Makes the node blink <paramref name="blinkCount"/> times.
         /// </summary>
-        /// <param name="blinkCount">The number of times the node should blink.</param>
+        /// <param name="blinkCount">The number of times the node should blink.
+        /// If set to -1, the node will blink indefinitely.
+        /// </param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
         /// that controls the blinking duration.
         /// If set to 0, will execute directly, that is, the blinking is stopped
@@ -436,7 +440,7 @@ namespace SEE.Game.Operator
             return new[] { color };
         }
 
-        protected void OnEnable()
+        protected override void OnEnable()
         {
             base.OnEnable();
             Node = GetNode(gameObject);
@@ -474,7 +478,7 @@ namespace SEE.Game.Operator
 
                 return new Tween[]
                 {
-                    material.DOColor(Color.TargetValue.Invert(), duration / (2 * count)).SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play()
+                    material.DOColor(Color.TargetValue.Invert(), duration / (2 * Mathf.Abs(count))).SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play()
                 };
             }
 
