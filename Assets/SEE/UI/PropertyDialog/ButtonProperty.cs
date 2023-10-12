@@ -110,8 +110,8 @@ namespace SEE.UI.PropertyDialog
 
                 buttonManager.buttonText = Name;
                 buttonManager.clickEvent.AddListener(Clicked);
-                pointerHelper.EnterEvent.AddListener(() => tooltip.Show(Description));
-                pointerHelper.ExitEvent.AddListener(() => tooltip.Hide());
+                pointerHelper.EnterEvent.AddListener(_ => tooltip.Show(Description));
+                pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
             }
 
             void Clicked()
@@ -130,8 +130,8 @@ namespace SEE.UI.PropertyDialog
             if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
             {
                 // Register listeners on entry and exit events, respectively
-                pointerHelper.EnterEvent.AddListener(() => tooltip.Show(Description));
-                pointerHelper.ExitEvent.AddListener(tooltip.Hide);
+                pointerHelper.EnterEvent.AddListener(_ => tooltip.Show(Description));
+                pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
             }
         }
 
