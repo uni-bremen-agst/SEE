@@ -1,8 +1,8 @@
-﻿using DG.Tweening;
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Layout;
+using SEE.Utils;
 using Sirenix.Utilities;
 using System.Collections.Generic;
 using UnityEngine;
@@ -19,6 +19,12 @@ namespace SEE.Game.Evolution
     public partial class EvolutionRenderer
     {
         /// <summary>
+        /// A <see cref="CountingJoin"/> triggering the next animation phase when phase 2 has been
+        /// completed, that is, if all awaited events have occurred.
+        /// </summary>
+        private CountingJoin phase2Join;
+
+        /// <summary>
         /// Implements the second phase in the transition from the <see cref="currentCity"/>
         /// to the <paramref name="nextCity"/>.
         /// In this phase, all existing nodes (nodes in both graphs, no matter whether they were
@@ -33,27 +39,32 @@ namespace SEE.Game.Evolution
         private void Phase2MoveExistingGraphElements(LaidOutGraph next)
         {
             /// We need to assign nextCity because the callbacks <see cref="RenderPlane"/>
-            /// and <see cref="RenderExistingNode(Node)"/> will access it.
+            /// and <see cref="MoveNode(Node)"/> will access it.
             nextCity = next;
 
             int existingElements = equalNodes.Count + changedNodes.Count;
+            Debug.Log($"Moving {existingElements} existing equal or changed nodes.\n");
+            Dump(equalNodes, "equal nodes");
+            Dump(changedNodes, "changed nodes");
             if (edgesAreDrawn)
             {
+                Debug.Log($"Moving {equalEdges.Count + changedEdges.Count} existing equal or changed edges.\n");
                 existingElements += equalEdges.Count + changedEdges.Count;
             }
-            Debug.Log($"Phase2: Moving {existingElements} existing graph elements.\n");
-            animationWatchDog.Await(existingElements, Phase3AdjustExistingGraphElements);
+            AssertAllJoinsAreZero();
+            phase2Join.Await(existingElements, () => Phase3AdjustExistingGraphElements(next), $"Graph {next.Graph.Name} Phase 2: Moving {existingElements} existing graph elements.");
             if (existingElements > 0)
             {
                 if (edgesAreDrawn)
                 {
                     ISet<Edge> equalAndChangedEdges = new HashSet<Edge>(equalEdges);
                     equalAndChangedEdges.UnionWith(changedEdges);
+                    Debug.Log($"Moving creates {equalAndChangedEdges.Count} edges.\n");
                     CreateEdges(equalAndChangedEdges);
                     SetUpEdgeAnimation(equalAndChangedEdges);
                 }
-                equalNodes.ForEach(RenderExistingNode);
-                changedNodes.ForEach(RenderExistingNode);
+                equalNodes.ForEach(MoveNode);
+                changedNodes.ForEach(MoveNode);
             }
 
             // Creates the game edges for all given graph edges and applies their layout.
@@ -85,7 +96,7 @@ namespace SEE.Game.Evolution
                         {
                             objectManager.GetEdge(edge, out GameObject gameEdge);
                             gameEdge.AddOrGetComponent<EdgeOperator>().MorphTo(newLayoutEdge.Spline, AnimationLagFactor)
-                                .SetOnComplete(animationWatchDog.Finished);
+                                .SetOnComplete(phase2Join.Finished);
                         }
                         else
                         {
@@ -105,9 +116,10 @@ namespace SEE.Game.Evolution
         /// in the current and next graph) to its new location according to <see cref="NextLayoutToBeShown"/>.
         /// </summary>
         /// <param name="graphNode">graph node whose corresponding game node is to be moved</param>
-        private void RenderExistingNode(Node graphNode)
+        private void MoveNode(Node graphNode)
         {
             Assert.IsNotNull(graphNode);
+            Debug.Log($"MoveNode({graphNode.ID})\n");
             ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.ID];
             // The game node representing the graphNode if there is any; null if there is none
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject gameNode);
@@ -127,7 +139,7 @@ namespace SEE.Game.Evolution
                 // currentGameNode is shifted to its new position through the animator.
                 gameNode.AddOrGetComponent<NodeOperator>()
                          .MoveTo(layoutNode.CenterPosition, AnimationLagFactor, updateEdges: false)
-                         .SetOnComplete(animationWatchDog.Finished);
+                         .SetOnComplete(phase2Join.Finished);
             }
         }
     }

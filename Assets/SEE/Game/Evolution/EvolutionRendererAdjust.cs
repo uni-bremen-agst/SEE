@@ -2,6 +2,7 @@
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Layout;
+using SEE.Utils;
 using Sirenix.Utilities;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -17,6 +18,12 @@ namespace SEE.Game.Evolution
     public partial class EvolutionRenderer
     {
         /// <summary>
+        /// A <see cref="CountingJoin"/> triggering the next animation phase when phase 3 has been
+        /// completed, that is, if all awaited events have occurred.
+        /// </summary>
+        private CountingJoin phase3Join;
+
+        /// <summary>
         /// Implements the third phase in the transition from the <see cref="currentCity"/>
         /// to the <paramref name="nextCity"/>.
         /// In this phase, the scale and style of all existing nodes (nodes in both graphs,
@@ -24,13 +31,17 @@ namespace SEE.Game.Evolution
         /// When this phase has been completed, <see cref="Phase4AddNewNodes"/>
         /// will be called.
         /// </summary>
-        private void Phase3AdjustExistingGraphElements()
+        /// <param name="next">the next graph to be drawn</param>
+        private void Phase3AdjustExistingGraphElements(LaidOutGraph next)
         {
+            AssertAllJoinsAreZero();
+            Debug.Log($"Adjusting {equalNodes.Count + changedNodes.Count} existing equal or changed nodes.\n");
+            Dump(equalNodes, "equal nodes");
+            Dump(changedNodes, "changed nodes");
             // Even the equal nodes need adjustments because the layout could have
             // changed their dimensions. The treemap layout, for instance, may do that.
             int changedElements = equalNodes.Count + changedNodes.Count;
-            Debug.Log($"Phase 3: Adjusting {changedElements} changed graph elements.\n");
-            animationWatchDog.Await(changedElements, Phase4AddNewNodes);
+            phase3Join.Await(changedElements, () => Phase4AddNewNodes(next), $"Graph {next.Graph.Name} Phase 3: Adjusting {changedElements} changed graph elements.");
             if (changedElements > 0)
             {
                 equalNodes.ForEach(AdjustExistingNode);
@@ -45,22 +56,32 @@ namespace SEE.Game.Evolution
         /// <param name="graphNode">graph node whose game node is to be adjusted</param>
         private void AdjustExistingNode(Node graphNode)
         {
-            Assert.IsNotNull(graphNode);
-            ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.ID];
-            // The game node representing the graphNode if there is any; null if there is none
-            Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject gameNode);
-            Assert.IsTrue(gameNode.HasNodeRef());
-            Assert.IsNotNull(formerGraphNode);
-            Assert.AreEqual(gameNode.transform.parent, gameObject.transform);
+            try
+            {
+                Assert.IsNotNull(graphNode);
+                Debug.Log($"AdjustExistingNode({graphNode.ID})\n");
+                ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.ID];
+                // The game node representing the graphNode if there is any; null if there is none
+                Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject gameNode);
+                Assert.IsTrue(gameNode.HasNodeRef());
+                Assert.IsNotNull(formerGraphNode);
+                Assert.AreEqual(gameNode.transform.parent, gameObject.transform);
 
-            // There is a change. It may or may not be the metric determining the style.
-            // We will not further check that and just call the following method.
-            // If there is no change, this method does not need to be called because then
-            // we know that the metric values determining the style and antenna of the former
-            // and the new graph node are the same.
-            Renderer.AdjustStyle(gameNode);
+                // There is a change. It may or may not be the metric determining the style.
+                // We will not further check that and just call the following method.
+                // If there is no change, this method does not need to be called because then
+                // we know that the metric values determining the style and antenna of the former
+                // and the new graph node are the same.
+                Renderer.AdjustStyle(gameNode);
 
-            ScaleTo(gameNode, layoutNode);
+                ScaleTo(gameNode, layoutNode);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Exception for graph node {graphNode.ID}: {e.Message}\n");
+                Debug.LogException(e);
+                //throw;
+            }
 
             void ScaleTo(GameObject gameNode, ILayoutNode layoutNode)
             {
@@ -89,10 +110,23 @@ namespace SEE.Game.Evolution
         {
             if (gameNode is GameObject go)
             {
+                Debug.Log($"OnScalingFinished({go.FullName()}\n");
                 Renderer.AdjustAntenna(go);
                 markerFactory.AdjustMarkerY(go);
+                try
+                {
+                    phase3Join.Finished();
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError("Exception for game object " + go.FullName());
+                    Debug.LogException(e);
+                }
             }
-            animationWatchDog.Finished();
+            else
+            {
+                Debug.LogError($"Expected a game object. Got a {nameof(gameNode)}.\n");
+            }
         }
     }
 }

@@ -17,6 +17,7 @@
 //TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 //USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
@@ -150,8 +151,10 @@ namespace SEE.Game.Evolution
         /// such a game object existed or <c>null</c> if the game node was newly created</returns>
         public Node GetNode(Node node, out GameObject gameNode)
         {
+            Dump(nodes);
             if (nodes.TryGetValue(node.ID, out gameNode))
             {
+                Debug.Log($"[ObjectManager] {node.ID} exists.\n");
                 // A game node with the requested ID exists already, which can
                 // be re-used.
 
@@ -162,6 +165,7 @@ namespace SEE.Game.Evolution
             }
             else
             {
+                Debug.Log($"[ObjectManager] {node.ID} did not exist. Created.\n");
                 // There is no game node with the given node ID, hence, we need to
                 // create a new one.
                 gameNode = graphRenderer.DrawNode(node, city);
@@ -169,6 +173,16 @@ namespace SEE.Game.Evolution
                 nodes[node.ID] = gameNode;
                 return null;
             }
+        }
+
+        private static void Dump(Dictionary<string, GameObject> nodes)
+        {
+            Debug.Log("[ObjectManager.nodes] ");
+            foreach (KeyValuePair<string, GameObject> nodePair in nodes)
+            {
+                Debug.Log(nodePair.Key);
+            }
+            Debug.Log("\n");
         }
 
         /// <summary>

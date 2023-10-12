@@ -2,7 +2,11 @@
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Layout;
+using SEE.Utils;
 using Sirenix.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -15,17 +19,38 @@ namespace SEE.Game.Evolution
     public partial class EvolutionRenderer
     {
         /// <summary>
+        /// A <see cref="CountingJoin"/> triggering the next animation phase when phase 4 has been
+        /// completed, that is, if all awaited events have occurred.
+        /// </summary>
+        private CountingJoin phase4Join;
+
+        /// <summary>
         /// Implements the fourth phase in the transition from the <see cref="currentCity"/>
         /// to the <paramref name="nextCity"/>.
         /// In this phase, all <see cref="addedNodes"/> will be rendered by new game objects.
         /// When their animated appearance has finished, <see cref="Phase5AddNewEdges"/>
         /// will be called.
         /// </summary>
-        private void Phase4AddNewNodes()
+        /// <param name="next">the next graph to be drawn</param>
+        private void Phase4AddNewNodes(LaidOutGraph next)
         {
-            Debug.Log($"Phase 4: Adding {addedNodes.Count} new nodes.\n");
-            animationWatchDog.Await(addedNodes.Count, Phase5AddNewEdges);
-            addedNodes.ForEach(AddNode);
+            AssertAllJoinsAreZero();
+            Dump(addedNodes, "added nodes");
+            phase4Join.Await(addedNodes.Count, () => Phase5AddNewEdges(next), $"Graph {next.Graph.Name} Phase 4: Adding {addedNodes.Count} new nodes.");
+            if (addedNodes.Count > 0)
+            {
+                addedNodes.ForEach(AddNode);
+            }
+        }
+
+        private static void Dump(ISet<Node> nodes, string message)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (Node n in nodes)
+            {
+                sb.Append(n.ID + ", ");
+            }
+            Debug.Log(message + ": " + sb.ToString());
         }
 
         /// <summary>
@@ -36,6 +61,7 @@ namespace SEE.Game.Evolution
         private void AddNode(Node graphNode)
         {
             Assert.IsNotNull(graphNode);
+            Debug.Log($"AddNode({graphNode.ID})\n");
             ILayoutNode layoutNode = NextLayoutToBeShown[graphNode.ID];
             // The game node representing the graphNode if there is any; null if there is none
             Node formerGraphNode = objectManager.GetNode(graphNode, out GameObject gameNode);
@@ -64,7 +90,7 @@ namespace SEE.Game.Evolution
 
                 gameNode.AddOrGetComponent<NodeOperator>()
                     .MoveTo(layoutNode.CenterPosition, AnimationLagFactor, updateEdges: false)
-                    .SetOnComplete(animationWatchDog.Finished);
+                    .SetOnComplete(phase4Join.Finished);
             }
         }
     }

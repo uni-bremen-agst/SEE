@@ -3,6 +3,7 @@ using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Utils;
 using Sirenix.Utilities;
+using System;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -15,6 +16,12 @@ namespace SEE.Game.Evolution
     /// </summary>
     public partial class EvolutionRenderer
     {
+        /// <summary>
+        /// A <see cref="CountingJoin"/> triggering the next animation phase when phase 1 has been
+        /// completed, that is, if all awaited events have occurred.
+        /// </summary>
+        private CountingJoin phase1Join;
+
         /// <summary>
         /// Implements the first phase of the transition from the <paramref name="current"/> graph to
         /// the <paramref name="next"/> graph in which nodes and edges present in <paramref name="current"/>
@@ -39,9 +46,10 @@ namespace SEE.Game.Evolution
         /// <param name="next">the next graph to be shown</param>
         private void Phase1RemoveDeletedGraphElements(LaidOutGraph next)
         {
+            AssertAllJoinsAreZero();
+            Dump(removedNodes, "removed nodes");
             int deletedGraphElements = removedNodes.Count + removedEdges.Count;
-            Debug.Log($"Phase 1: Removing {deletedGraphElements} graph elements.\n");
-            animationWatchDog.Await(deletedGraphElements, () => Phase2MoveExistingGraphElements(next));
+            phase1Join.Await(deletedGraphElements, () => Phase2MoveExistingGraphElements(next), $"Graph {next.Graph.Name} Phase 1: Removing {deletedGraphElements} graph elements.");
             if (deletedGraphElements > 0)
             {
                 // Remove those edges.
@@ -53,12 +61,29 @@ namespace SEE.Game.Evolution
             /// when phase 1 has completed (or skipped).
         }
 
+        private void AssertAllJoinsAreZero()
+        {
+            IsTrue(phase5Join.OutstandingEvents == 0, "phase5Join.OutstandingEvents == 0");
+            IsTrue(phase4Join.OutstandingEvents == 0, "phase4Join.OutstandingEvents == 0");
+            IsTrue(phase3Join.OutstandingEvents == 0, "phase3Join.OutstandingEvents == 0");
+            IsTrue(phase2Join.OutstandingEvents == 0, "phase2Join.OutstandingEvents == 0");
+            IsTrue(phase1Join.OutstandingEvents == 0, "phase1Join.OutstandingEvents == 0");
+
+            static void IsTrue(bool condition, string message) 
+            { 
+                if (!condition) 
+                {
+                    Debug.LogError(message + " is not true.\n");
+                }
+            }
+        }
+
         /// <summary>
         /// Removes the given node. The removal is animated by raising the
         /// node to <see cref="skyLevel"/> (y dimension). The node is not
         /// destroyed when the animation has finished.
         /// </summary>
-        /// <param name="node">leaf node to be removed</param>
+        /// <param name="node">node to be removed</param>
         private void RenderRemovedNode(Node node)
         {
             if (objectManager.RemoveNode(node, out GameObject nodeObject))
@@ -71,7 +96,7 @@ namespace SEE.Game.Evolution
             }
             else
             {
-                animationWatchDog.Finished();
+                phase1Join.Finished();
             }
         }
 
@@ -88,9 +113,9 @@ namespace SEE.Game.Evolution
             Vector3 newPosition = gameObject.transform.position;
             newPosition.y = skyLevel;
 
-            MoveTo(gameObject, newPosition);
+            Kill(gameObject, newPosition);
 
-            void MoveTo(GameObject gameObject, Vector3 newPosition)
+            void Kill(GameObject gameObject, Vector3 newPosition)
             {
                 if (gameObject.IsNode())
                 {
@@ -128,7 +153,7 @@ namespace SEE.Game.Evolution
             }
             else
             {
-                animationWatchDog.Finished();
+                phase1Join.Finished();
             }
         }
 
@@ -142,7 +167,7 @@ namespace SEE.Game.Evolution
         {
             GameObject go = gameObject as GameObject;
             Destroyer.Destroy(go);
-            animationWatchDog.Finished();
+            phase1Join.Finished();
         }
     }
 }

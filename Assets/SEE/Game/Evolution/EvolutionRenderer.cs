@@ -48,12 +48,6 @@ namespace SEE.Game.Evolution
     public partial class EvolutionRenderer : MonoBehaviour, IGraphRenderer
     {
         /// <summary>
-        /// Watchdog triggering the next animation phase when the previous phase has been
-        /// completed, that is, if all awaited events have occurred.
-        /// </summary>
-        private CountingJoin animationWatchDog;
-
-        /// <summary>
         /// The series of underlying graphs to be rendered.
         /// </summary>
         private IList<Graph> graphs;
@@ -276,7 +270,11 @@ namespace SEE.Game.Evolution
                                     additionColor: cityEvolution.AdditionBeamColor,
                                     changeColor: cityEvolution.ChangeBeamColor,
                                     deletionColor: cityEvolution.DeletionBeamColor);
-                animationWatchDog = new CountingJoin();
+                phase1Join = new CountingJoin();
+                phase2Join = new CountingJoin();
+                phase3Join = new CountingJoin();
+                phase4Join = new CountingJoin();
+                phase5Join = new CountingJoin();
             }
             else
             {
@@ -453,6 +451,7 @@ namespace SEE.Game.Evolution
         /// Otherwise we make the transition from the currently shown graph to its
         /// direct successor graph in the graph series.
         /// </summary>
+        /// <remarks>This method is expected to be called only upon explicit user request.</remarks>
         public void ShowNextGraph()
         {
             if (IsStillAnimating)
@@ -536,6 +535,7 @@ namespace SEE.Game.Evolution
         /// direct predecessor graph in the graph series. CurrentGraphIndex is decreased
         /// by one accordingly.
         /// </summary>
+        /// <remarks>This method is expected to be called only upon explicit user request.</remarks>
         public void ShowPreviousGraph()
         {
             if (IsStillAnimating || IsAutoPlay || IsAutoPlayReverse)
@@ -576,6 +576,14 @@ namespace SEE.Game.Evolution
                           out changedNodes,
                           out equalNodes);
 
+            // FIXME: Can be removed before merging.
+            Assert.IsFalse(addedNodes.Overlaps(removedNodes));
+            Assert.IsFalse(addedNodes.Overlaps(changedNodes));
+            Assert.IsFalse(addedNodes.Overlaps(equalNodes));
+            Assert.IsFalse(removedNodes.Overlaps(changedNodes));
+            Assert.IsFalse(removedNodes.Overlaps(equalNodes));
+            Assert.IsFalse(changedNodes.Overlaps(equalNodes));
+
             // Edge comparison.
             newGraph.Diff(oldGraph,
                           g => g.Edges(),
@@ -587,7 +595,22 @@ namespace SEE.Game.Evolution
                           out changedEdges,
                           out equalEdges);
 
+            Debug.Log("------------------------------------------------------------------------\n");
+            Debug.Log($"Moving from graph {Name(current)} to graph {Name(next)}.\n");
+            AssertAllJoinsAreZero();
             Phase1RemoveDeletedGraphElements(next);
+
+            static string Name(LaidOutGraph g)
+            {
+                if (g == null)
+                {
+                    return "<NULL_LAYOUT_GRAPH>";
+                }
+                else
+                {
+                    return g.Graph == null ? "<NULL_GRAPH>" : g.Graph.Name;
+                }
+            }
         }
 
         /// <summary>
@@ -603,16 +626,19 @@ namespace SEE.Game.Evolution
         private void OnAnimationsFinished()
         {
             Debug.Log("Animation cycle has finished.\n");
+            AssertAllJoinsAreZero();
             MarkNodes();
             UpdateNodeChangeBuffer();
             UpdateGameNodeHierarchy();
             RenderPlane();
 
             IsStillAnimating = false;
-            animationFinishedEvent.Invoke();
+            
 
             // We have made the transition to the next graph.
             currentCity = nextCity;
+
+            animationFinishedEvent.Invoke();
 
             /// <summary>
             /// Updates the hierarchy of game nodes so that it is isomorphic to the node
@@ -705,7 +731,7 @@ namespace SEE.Game.Evolution
             }
 
             /// <summary>
-            /// Markes all <see cref="addedNodes"/> and <see cref="changedNodes"/>.
+            /// Marks all <see cref="addedNodes"/> and <see cref="changedNodes"/>.
             /// </summary>
             void MarkNodes()
             {
