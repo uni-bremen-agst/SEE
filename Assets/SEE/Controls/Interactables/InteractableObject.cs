@@ -54,36 +54,34 @@ namespace SEE.Controls
         /// <summary>
         /// The interactable objects.
         /// </summary>
-        private static readonly Dictionary<string, InteractableObject> idToInteractableObjectDict =
-            new Dictionary<string, InteractableObject>();
+        private static readonly Dictionary<string, InteractableObject> idToInteractableObjectDict = new();
 
         /// <summary>
         /// The hovered objects.
         /// </summary>
-        public static readonly HashSet<InteractableObject> HoveredObjects = new HashSet<InteractableObject>();
+        public static readonly HashSet<InteractableObject> HoveredObjects = new();
 
         /// <summary>
         /// The object, that is currently hovered by this player. There is always only ever
         /// one object hovered by this player with the flag <see cref="HoverFlag.World"/>
         /// set.
         /// </summary>
-        public static InteractableObject HoveredObjectWithWorldFlag { get; private set; } = null;
+        public static InteractableObject HoveredObjectWithWorldFlag { get; private set; }
 
         /// <summary>
         /// The selected objects.
         /// </summary>
-        public static readonly HashSet<InteractableObject> SelectedObjects = new HashSet<InteractableObject>();
+        public static readonly HashSet<InteractableObject> SelectedObjects = new();
 
         /// <summary>
         /// The grabbed objects.
         /// </summary>
-        public static readonly HashSet<InteractableObject> GrabbedObjects = new HashSet<InteractableObject>();
+        public static readonly HashSet<InteractableObject> GrabbedObjects = new();
 
         /// <summary>
         /// The selected objects per graph.
         /// </summary>
-        private static readonly Dictionary<Graph, HashSet<InteractableObject>> graphToSelectedIOs =
-            new Dictionary<Graph, HashSet<InteractableObject>>();
+        private static readonly Dictionary<Graph, HashSet<InteractableObject>> graphToSelectedIOs = new();
 
         /// <summary>
         /// The graph element, this interactable object is attached to.
@@ -517,7 +515,7 @@ namespace SEE.Controls
         private static void UnselectAllInternal(bool isInitiator, bool invokeReplaceEvent)
         {
             List<InteractableObject> replaced = SelectedObjects.ToList();
-            List<InteractableObject> by = new List<InteractableObject>();
+            List<InteractableObject> by = new();
             if (replaced.Count > 0 || by.Count > 0)
             {
                 // Note: This is no endless loop because SetSelect will remove this
@@ -543,7 +541,7 @@ namespace SEE.Controls
         public static void ReplaceSelection(InteractableObject interactableObject, bool isInitiator)
         {
             List<InteractableObject> replaced = SelectedObjects.ToList();
-            List<InteractableObject> by = new List<InteractableObject>(1);
+            List<InteractableObject> by = new(1);
             if (interactableObject)
             {
                 by.Add(interactableObject);
