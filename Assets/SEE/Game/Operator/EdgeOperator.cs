@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using SEE.Game.City;
 using SEE.GO;
@@ -212,6 +213,23 @@ namespace SEE.Game.Operator
             }
 
             return new TweenOperation<(Color start, Color end)>(AnimateToColorAction, spline.GradientColors);
+        }
+
+        protected override Tween[] BlinkAction(int count, float duration)
+        {
+            // If we're interrupting another blinking, we need to make sure the color still has the correct value.
+            spline.GradientColors = Color.TargetValue;
+            Color newStart = Color.TargetValue.start.Invert();
+            Color newEnd = Color.TargetValue.end.Invert();
+            float loopDuration = duration / (2 * Mathf.Abs(count));
+
+            Tween startTween = DOTween.To(() => spline.GradientColors.start,
+                                          c => spline.GradientColors = (c, spline.GradientColors.end),
+                                          newStart, loopDuration);
+            Tween endTween = DOTween.To(() => spline.GradientColors.end,
+                                        c => spline.GradientColors = (spline.GradientColors.start, c),
+                                        newEnd, loopDuration);
+            return new[] { startTween, endTween }.Select(x => x.SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play()).ToArray();
         }
 
         protected override (Color start, Color end) ModifyColor((Color start, Color end) color, Func<Color, Color> modifier)

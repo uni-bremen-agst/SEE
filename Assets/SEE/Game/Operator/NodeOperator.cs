@@ -52,12 +52,6 @@ namespace SEE.Game.Operator
         private TweenOperation<float> labelAlpha;
 
         /// <summary>
-        /// Operation handling the blinking of the node.
-        /// The parameter specifies the number of blinks.
-        /// </summary>
-        private TweenOperation<int> blinking;
-
-        /// <summary>
         /// Operation handling the starting position of the label's line.
         /// </summary>
         private TweenOperation<Vector3> labelStartLinePosition;
@@ -101,6 +95,11 @@ namespace SEE.Game.Operator
         private bool updateEdges;
 
         /// <summary>
+        /// The material of the node.
+        /// </summary>
+        private Material material;
+
+        /// <summary>
         /// The position this node is supposed to be at.
         /// </summary>
         /// <seealso cref="AbstractOperator"/>
@@ -113,28 +112,6 @@ namespace SEE.Game.Operator
         public Vector3 TargetScale => scale.TargetValue;
 
         #region Public API
-
-        /// <summary>
-        /// Displays a marker above the node and makes it blink for <paramref name="duration"/> seconds.
-        /// </summary>
-        /// <param name="duration">The amount of time in seconds the node should be highlighted.
-        /// If this is set to a negative value, the node will be highlighted indefinitely, with a blink rate
-        /// proportional to the absolute value of <paramref name="duration"/>.
-        /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> Highlight(float duration)
-        {
-            ShowNotification.Info($"Highlighting '{name}'",
-                                  $"The selected node will be blinking and marked by a spear for {duration} seconds.",
-                                  log: false);
-            // Display marker above the node
-            MarkerFactory marker = new(markerWidth: 0.01f, markerHeight: 1f, UnityEngine.Color.red, default, default);
-            marker.MarkBorn(gameObject);
-            // The factor of 1.3 causes the node to blink slightly more than once per second,
-            // which seems visually fitting.
-            int blinkCount = duration >= 0 ? Mathf.RoundToInt(duration * 1.3f) : -1;
-            return Blink(blinkCount: blinkCount, ToFactor(Mathf.Abs(duration))).OnComplete(() => marker.Clear());
-        }
 
         /// <summary>
         /// Moves the node to the <paramref name="newXPosition"/> in world space.
@@ -260,23 +237,6 @@ namespace SEE.Game.Operator
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
             return scale.AnimateTo(newLocalScale, duration);
-        }
-
-        /// <summary>
-        /// Makes the node blink <paramref name="blinkCount"/> times.
-        /// </summary>
-        /// <param name="blinkCount">The number of times the node should blink.
-        /// If set to -1, the node will blink indefinitely.
-        /// </param>
-        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
-        /// that controls the blinking duration.
-        /// If set to 0, will execute directly, that is, the blinking is stopped
-        /// before control is returned to the caller.
-        /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> Blink(int blinkCount, float factor = 1)
-        {
-            return blinking.AnimateTo(blinkCount, ToDuration(factor));
         }
 
         /// <summary>
@@ -417,7 +377,7 @@ namespace SEE.Game.Operator
 
         protected override TweenOperation<Color> InitializeColorOperation()
         {
-            Material material = GetRenderer(gameObject).material;
+            return new TweenOperation<Color>(AnimateToColorAction, material.color);
 
             Tween[] AnimateToColorAction(Color color, float d)
             {
@@ -426,8 +386,17 @@ namespace SEE.Game.Operator
                     material.DOColor(color, d).Play()
                 };
             }
+        }
 
-            return new TweenOperation<Color>(AnimateToColorAction, material.color);
+        protected override Tween[] BlinkAction(int count, float duration)
+        {
+            // If we're interrupting another blinking, we need to make sure the color still has the correct value.
+            material.color = Color.TargetValue;
+
+            return new Tween[]
+            {
+                material.DOColor(Color.TargetValue.Invert(), duration / (2 * Mathf.Abs(count))).SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play()
+            };
         }
 
         protected override Color ModifyColor(Color color, Func<Color, Color> modifier)
@@ -442,9 +411,11 @@ namespace SEE.Game.Operator
 
         protected override void OnEnable()
         {
+            // Material needs to be assigned before calling base.OnEnable()
+            // because it is used in InitializeColorOperation().
+            material = GetRenderer(gameObject).material;
             base.OnEnable();
             Node = GetNode(gameObject);
-            Material material = GetRenderer(gameObject).material;
             Vector3 currentPosition = transform.position;
             Vector3 currentScale = transform.localScale;
             Quaternion currentRotation = transform.rotation;
@@ -460,9 +431,6 @@ namespace SEE.Game.Operator
             labelTextPosition = new TweenOperation<Vector3>(AnimateLabelTextPositionAction, DesiredLabelTextPosition);
             labelStartLinePosition = new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction, DesiredLabelStartLinePosition);
             labelEndLinePosition = new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction, DesiredLabelEndLinePosition);
-
-            blinking = new TweenOperation<int>(BlinkAction, 0, equalityComparer: new AlwaysFalseEqualityComparer<int>(),
-                                               conflictingOperations: new[] { Color });
             return;
 
             Tween[] AnimateToXAction(float x, float d) => new Tween[] { transform.DOMoveX(x, d).Play() };
@@ -470,17 +438,6 @@ namespace SEE.Game.Operator
             Tween[] AnimateToZAction(float z, float d) => new Tween[] { transform.DOMoveZ(z, d).Play() };
             Tween[] AnimateToRotationAction(Quaternion r, float d) => new Tween[] { transform.DORotateQuaternion(r, d).Play() };
             Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] { transform.DOScale(s, d).Play() };
-
-            Tween[] BlinkAction(int count, float duration)
-            {
-                // If we're interrupting another blinking, we need to make sure the color still has the correct value.
-                material.color = Color.TargetValue;
-
-                return new Tween[]
-                {
-                    material.DOColor(Color.TargetValue.Invert(), duration / (2 * Mathf.Abs(count))).SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play()
-                };
-            }
 
             static Node GetNode(GameObject gameObject)
             {
