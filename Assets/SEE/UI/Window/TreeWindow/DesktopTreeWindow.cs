@@ -138,20 +138,26 @@ namespace SEE.UI.Window.TreeWindow
             {
                 expandIcon.SetActive(false);
             }
-            // FIXME: There's a bug here which makes scrolling impossible. The EventTrigger is at fault.
-            else if (item.TryGetComponentOrLog(out EventTrigger eventTrigger))
+            else if (expandedItems.Contains(id))
             {
-                eventTrigger.triggers.Single().callback.AddListener(e =>
+                // If this item was previously expanded, we need to expand it again.
+                expandItem(item);
+            }
+
+            if (item.TryGetComponentOrLog(out PointerHelper pointerHelper))
+            {
+                // Right click highlights the node, left/middle click expands/collapses it.
+                pointerHelper.ClickEvent.AddListener(e =>
                 {
                     // TODO: In the future, highlighting the node should be one available option in a right-click menu.
-                    if (((PointerEventData)e).button == PointerEventData.InputButton.Right)
+                    if (e.button == PointerEventData.InputButton.Right)
                     {
                         if (itemGameObject != null)
                         {
-                            itemGameObject.AddOrGetComponent<NodeOperator>().Highlight(duration: 10);
+                            itemGameObject.Operator().Highlight(duration: 10);
                         }
                     }
-                    else
+                    else if (children > 0)
                     {
                         if (expandedItems.Contains(id))
                         {
@@ -163,12 +169,6 @@ namespace SEE.UI.Window.TreeWindow
                         }
                     }
                 });
-
-                // If this item was previously expanded, we need to expand it again.
-                if (expandedItems.Contains(id))
-                {
-                    expandItem(item);
-                }
             }
         }
 
