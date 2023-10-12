@@ -70,6 +70,13 @@ namespace SEE.Game.Operator
             /// Whether the operation is currently running.
             /// </summary>
             bool IsRunning { get; }
+
+            /// <summary>
+            /// A list of all operations that are conflicting with this one.
+            /// If an operation in this list is running at the time this operation is started,
+            /// the conflicting operation will be killed.
+            /// </summary>
+            public IList<IOperation> ConflictingOperations { get; }
         }
 
         /// <summary>
@@ -97,7 +104,7 @@ namespace SEE.Game.Operator
             /// If an operation in this set is running at the time this operation is started,
             /// the conflicting operation will be killed.
             /// </summary>
-            protected readonly IList<IOperation> ConflictingOperations;
+            public IList<IOperation> ConflictingOperations { get; }
 
             /// <summary>
             /// The animator that is controlling the current animation.
@@ -131,6 +138,8 @@ namespace SEE.Game.Operator
             /// </param>
             /// <param name="conflictingOperations">
             /// The operations that are conflicting with this one.
+            /// Note that this operation will also be added to the conflicting operations of the given operations.
+            /// Hence, this is always a bidirectional relationship.
             /// </param>
             protected Operation(Func<V, float, T> animateToAction, V targetValue,
                                 IEqualityComparer<V> equalityComparer = null,
@@ -140,6 +149,10 @@ namespace SEE.Game.Operator
                 TargetValue = targetValue;
                 EqualityComparer = equalityComparer ?? EqualityComparer<V>.Default;
                 ConflictingOperations = conflictingOperations?.ToList() ?? new List<IOperation>();
+                foreach (IOperation conflictingOperation in ConflictingOperations)
+                {
+                    conflictingOperation.ConflictingOperations.Add(this);
+                }
             }
 
             /// <summary>
