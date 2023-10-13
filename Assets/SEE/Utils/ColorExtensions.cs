@@ -54,7 +54,7 @@ namespace SEE.Utils
         /// <returns>the optimal text color for the given <paramref name="backgroundColor"/>.</returns>
         public static Color IdealTextColor(this Color backgroundColor)
         {
-            const int nThreshold = 110;
+            const int nThreshold = 130;
             int bgDelta = Convert.ToInt32((backgroundColor.r * 255 * 0.299) + (backgroundColor.g * 255 * 0.587)
                                                                             + (backgroundColor.b * 255 * 0.114));
             return (255 - bgDelta < nThreshold) ? Color.black : Color.white;
