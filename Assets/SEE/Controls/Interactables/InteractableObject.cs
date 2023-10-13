@@ -9,7 +9,6 @@ using UnityEngine.Assertions;
 #if INCLUDE_STEAM_VR
 using Valve.VR.InteractionSystem;
 #endif
-using SEE.Game.SceneManipulation;
 using SEE.Net.Actions;
 using SEE.Audio;
 
@@ -142,18 +141,12 @@ namespace SEE.Controls
         /// </summary>
         public Synchronizer InteractableSynchronizer { get; private set; }
 
-        /// <summary>
-        /// Will be used to flash the selected object while it is selected.
-        /// </summary>
-        private GameObjectFlasher flasher;
-
         private void Awake()
         {
 #if INCLUDE_STEAM_VR
             gameObject.TryGetComponentOrLog(out interactable);
 #endif
             GraphElemRef = GetComponent<GraphElementRef>();
-            flasher = new GameObjectFlasher(gameObject);
         }
 
         private void OnDestroy()
@@ -377,7 +370,8 @@ namespace SEE.Controls
 
                 graphToSelectedIOs[graph].Add(this);
 
-                flasher.StartFlashing();
+                // Start blinking indefinitely.
+                gameObject.Operator().Blink(-1);
 
                 // Invoke events
                 SelectIn?.Invoke(this, isInitiator);
@@ -398,7 +392,8 @@ namespace SEE.Controls
                 // Update all selected object list per graph
                 graphToSelectedIOs[GraphElemRef.Elem.ItsGraph].Remove(this);
 
-                flasher.StopFlashing();
+                // Stop blinking.
+                gameObject.Operator().Blink(0);
 
                 // Invoke events
                 SelectOut?.Invoke(this, isInitiator);
