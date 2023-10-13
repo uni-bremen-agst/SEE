@@ -239,12 +239,7 @@ namespace SEE.GO
         /// </exception>
         public static Color GetColor(this GameObject gameObject)
         {
-            if (gameObject.TryGetComponent(out Renderer renderer))
-            {
-                return renderer.sharedMaterial.color;
-            }
-
-            throw new InvalidOperationException($"GameObject {gameObject.name} has no renderer component.");
+            return gameObject.MustGetComponent<Renderer>().sharedMaterial.color;
         }
 
         /// <summary>
@@ -474,11 +469,11 @@ namespace SEE.GO
         public static bool IsInArea(this GameObject block, GameObject parentBlock, float outerEdgeMargin)
         {
             // FIXME: Support node types other than cubes
-            block.MustGetComponent(out Collider collider);
+            Collider collider = block.MustGetComponent<Collider>();
             Vector3 blockCenter = collider.bounds.center;
             // We only care about the XZ-plane. Setting z to zero here makes it consistent with the bounds setup below.
             Bounds blockBounds = new(new Vector3(blockCenter.x, blockCenter.z, 0), collider.bounds.extents);
-            parentBlock.MustGetComponent(out Collider parentCollider);
+            Collider parentCollider = parentBlock.MustGetComponent<Collider>();
             Bounds parentBlockBounds = parentCollider.bounds;
 
             Vector2 topRight = parentBlockBounds.max.XZ();
@@ -552,21 +547,21 @@ namespace SEE.GO
 
         /// <summary>
         /// Tries to get the component of the given type <typeparamref name="T"/> of this <paramref name="gameObject"/>.
-        /// If the component was found, it will be stored in <paramref name="component"/>.
-        /// If it wasn't found, <paramref name="component"/> will be <code>null</code> and
-        /// <see cref="InvalidOperationException"/> will be thrown.
+        /// If the component was found, it will be returned.
+        /// If it wasn't found, <see cref="InvalidOperationException"/> will be thrown.
         /// </summary>
         /// <param name="gameObject">The game object the component should be gotten from. Must not be null.</param>
-        /// <param name="component">The variable in which to save the component.</param>
         /// <typeparam name="T">The type of the component.</typeparam>
         /// <exception cref="InvalidOperationException">thrown if <paramref name="gameObject"/> has no
         /// component of type <typeparamref name="T"/></exception>
-        public static void MustGetComponent<T>(this GameObject gameObject, out T component)
+        public static T MustGetComponent<T>(this GameObject gameObject)
         {
-            if (!gameObject.TryGetComponent(out component))
+            if (!gameObject.TryGetComponent(out T component))
             {
                 throw new InvalidOperationException($"Couldn't find component '{typeof(T).GetNiceName()}' on game object '{gameObject.name}'");
             }
+
+            return component;
         }
 
         /// <summary>

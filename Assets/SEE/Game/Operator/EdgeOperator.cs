@@ -155,7 +155,7 @@ namespace SEE.Game.Operator
         {
             // Assigned so that the expensive getter isn't called everytime.
             GameObject go = gameObject;
-            go.MustGetComponent(out spline);
+            spline = go.MustGetComponent<SEESpline>();
             base.OnEnable();
 
             morphism = new MorphismOperation(AnimateToMorphismAction, spline.Spline, null);
@@ -173,7 +173,7 @@ namespace SEE.Game.Operator
                 }
                 else
                 {
-                    go.MustGetComponent(out SEESpline sourceSpline);
+                    SEESpline sourceSpline = go.MustGetComponent<SEESpline>();
                     animator.CreateTween(sourceSpline.Spline, s.targetSpline, d)
                             .OnComplete(() =>
                             {

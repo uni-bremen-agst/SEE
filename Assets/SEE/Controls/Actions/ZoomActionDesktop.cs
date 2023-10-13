@@ -67,7 +67,7 @@ namespace SEE.Controls.Actions
                     // request of SEEInput.ZoomInto().
                     if (zoomInto)
                     {
-                        rootTransform.parent.gameObject.MustGetComponent(out CityCursor cursor);
+                        CityCursor cursor = rootTransform.parent.gameObject.MustGetComponent<CityCursor>();
                         if (cursor.E.HasFocus())
                         {
                             float optimalTargetZoomFactor = clippingPlane.MinLengthXZ / (cursor.E.ComputeDiameterXZ() / zoomState.CurrentZoomFactor);
