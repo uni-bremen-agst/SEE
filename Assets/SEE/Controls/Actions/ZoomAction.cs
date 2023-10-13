@@ -242,7 +242,7 @@ namespace SEE.Controls.Actions
         protected void UpdateZoomState(Transform transform, ZoomState zoomState)
         {
             rootTransformToZoomStates[transform] = zoomState;
-            rootTransformToOperator[transform] = transform.gameObject.AddOrGetComponent<NodeOperator>();
+            rootTransformToOperator[transform] = transform.gameObject.NodeOperator();
         }
 
         /// <summary>

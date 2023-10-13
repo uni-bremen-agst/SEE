@@ -32,7 +32,7 @@ namespace SEE.Game.Evolution
                     {
                         spline.Spline = nextCity.EdgeLayout[edge.ID].Spline;
                     }
-                    edgeObject.AddOrGetComponent<EdgeOperator>()
+                    edgeObject.EdgeOperator()
                               .Show(animationKind, AnimationLagFactor)
                               .OnComplete(animationWatchDog.Finished);
                 }

@@ -370,8 +370,7 @@ namespace SEE.Game.Operator
             // Let each game edge morph to the splines according to the layout.
             foreach (GameObject gameEdge in gameEdges)
             {
-                EdgeOperator edgeOperator = gameEdge.AddOrGetComponent<EdgeOperator>();
-                edgeOperator.MorphTo(layoutEdges[gameEdge.name].Spline, ToFactor(duration));
+                gameEdge.EdgeOperator().MorphTo(layoutEdges[gameEdge.name].Spline, ToFactor(duration));
             }
         }
 

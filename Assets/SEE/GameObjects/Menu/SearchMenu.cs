@@ -156,7 +156,7 @@ namespace SEE.GO.Menu
         /// <param name="resultName">The name of the node which shall be highlighted.</param>
         private static void HighlightNode(GameObject result)
         {
-            NodeOperator nodeOperator = result.AddOrGetComponent<NodeOperator>();
+            NodeOperator nodeOperator = result.NodeOperator();
             nodeOperator.Highlight(blinkSeconds);
         }
 

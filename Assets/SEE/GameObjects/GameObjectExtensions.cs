@@ -324,7 +324,7 @@ namespace SEE.GO
         /// <param name="gameObject">object whose scale should be set</param>
         /// <param name="worldScale">the new scale in world space</param>
         /// <param name="animate">if true and <paramref name="gameObject"/> is a graph node,
-        /// a <see cref="NodeOperator"/> will be used to animate the scaling; otherwise the
+        /// a <see cref="Game.Operator.NodeOperator"/> will be used to animate the scaling; otherwise the
         /// scale of <paramref name="gameObject"/> is set immediately without any animation</param>
         public static void SetAbsoluteScale(this GameObject gameObject, Vector3 worldScale, bool animate = true)
         {
@@ -332,7 +332,7 @@ namespace SEE.GO
             gameObject.transform.parent = null;
             if (animate && gameObject.HasNodeRef())
             {
-                NodeOperator @operator = gameObject.AddOrGetComponent<NodeOperator>();
+                NodeOperator @operator = gameObject.NodeOperator();
                 @operator.ScaleTo(worldScale, 0f);
             }
             else
@@ -592,6 +592,7 @@ namespace SEE.GO
         /// component attached to it</returns>
         public static bool IsNode(this GameObject gameObject)
         {
+            // TODO: Does comparing the tag work too? It would be a lot more efficient.
             return gameObject.TryGetComponent(out NodeRef _);
         }
 
@@ -876,6 +877,76 @@ namespace SEE.GO
             else
             {
                 Debug.LogError($"Game object '{gameObject.FullName()}' does not have child with name '{childName}'.\n");
+            }
+        }
+
+        /// <summary>
+        /// Returns the <see cref="NodeOperator"/> for this <paramref name="gameObject"/>.
+        /// If no operator exists yet, it will be added.
+        /// If the game object is not a node, an exception will be thrown.
+        /// </summary>
+        /// <param name="gameObject">The game object whose operator to retrieve.</param>
+        /// <returns>The <see cref="NodeOperator"/> responsible for this <paramref name="gameObject"/>.</returns>
+        public static NodeOperator NodeOperator(this GameObject gameObject)
+        {
+            if (gameObject.CompareTag(Tags.Node))
+            {
+                return gameObject.AddOrGetComponent<NodeOperator>();
+            }
+            else
+            {
+                throw new InvalidOperationException($"Cannot get NodeOperator for game object {gameObject.name} because it is not a node.");
+            }
+        }
+
+        /// <summary>
+        /// Returns the <see cref="EdgeOperator"/> for this <paramref name="gameObject"/>.
+        /// If no operator exists yet, it will be added.
+        /// If the game object is not an edge, an exception will be thrown.
+        /// </summary>
+        /// <param name="gameObject">The game object whose operator to retrieve.</param>
+        /// <returns>The <see cref="EdgeOperator"/> responsible for this <paramref name="gameObject"/>.</returns>
+        public static EdgeOperator EdgeOperator(this GameObject gameObject)
+        {
+            if (gameObject.CompareTag(Tags.Edge))
+            {
+                return gameObject.AddOrGetComponent<EdgeOperator>();
+            }
+            else
+            {
+                throw new InvalidOperationException($"Cannot get EdgeOperator for game object {gameObject.name} because it is not an edge.");
+            }
+        }
+
+        /// <summary>
+        /// Returns the <see cref="GraphElementOperator"/> for this <paramref name="gameObject"/>.
+        /// If no operator exists yet, a fitting operator will be added.
+        /// If the game object is neither a node nor an edge, an exception will be thrown.
+        /// </summary>
+        /// <param name="gameObject">The game object whose operator to retrieve.</param>
+        /// <returns>The <see cref="GraphElementOperator"/> responsible for this <paramref name="gameObject"/>.</returns>
+        public static GraphElementOperator Operator(this GameObject gameObject)
+        {
+            if (gameObject.TryGetComponent(out GraphElementOperator elementOperator))
+            {
+                return elementOperator;
+            }
+            else
+            {
+                // We may need to add the appropriate operator first.
+                if (gameObject.IsNode())
+                {
+                    return gameObject.AddComponent<NodeOperator>();
+                }
+                else if (gameObject.IsEdge())
+                {
+                    return gameObject.AddComponent<EdgeOperator>();
+                }
+                else
+                {
+                    throw new InvalidOperationException("Cannot get GraphElementOperator for game object "
+                                                        + $"{gameObject.name} because it is neither a node nor an edge.");
+                }
             }
         }
     }

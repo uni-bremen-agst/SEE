@@ -2,6 +2,7 @@
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Layout;
+using SEE.Utils;
 using Sirenix.Utilities;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -62,9 +63,9 @@ namespace SEE.Game.Evolution
                 // in a code city though; otherwise the NodeOperator would not work.
                 gameNode.transform.SetParent(gameObject.transform);
 
-                gameNode.AddOrGetComponent<NodeOperator>()
-                    .MoveTo(layoutNode.CenterPosition, AnimationLagFactor, updateEdges: false)
-                    .OnComplete(animationWatchDog.Finished);
+                gameNode.NodeOperator()
+                        .MoveTo(layoutNode.CenterPosition, AnimationLagFactor, updateEdges: false)
+                        .OnComplete(animationWatchDog.Finished);
             }
         }
     }

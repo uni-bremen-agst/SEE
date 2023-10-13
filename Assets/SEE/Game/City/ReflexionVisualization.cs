@@ -98,7 +98,7 @@ namespace SEE.Game.City
                     if (edge.HasToggle(Edge.IsHiddenToggle))
                     {
                         // We will instantly hide this edge. It should not show up yet.
-                        edgeObject.AddOrGetComponent<EdgeOperator>().Hide(animationKind, 0f);
+                        edgeObject.EdgeOperator().Hide(animationKind, 0f);
                     }
                 }
                 else
@@ -149,10 +149,10 @@ namespace SEE.Game.City
                         && edge.IsInImplementation()
                         && edge.State() == State.Divergent)
                     {
-                        GameObject gameEdge = GraphElementIDMap.Find(edge.ID);
+                        GameObject gameEdge = edge.GameObject();
                         if (gameEdge != null)
                         {
-                            EdgeOperator edgeOperator = gameEdge.AddOrGetComponent<EdgeOperator>();
+                            EdgeOperator edgeOperator = gameEdge.EdgeOperator();
                             edgeOperator.ShowOrHide(allDivergencesAreShown, city.EdgeLayoutSettings.AnimationKind);
                         }
                     }
@@ -291,7 +291,7 @@ namespace SEE.Game.City
                 edgeChange.Edge.UnsetToggle(Edge.IsHiddenToggle);
             }
 
-            GameObject edge = GraphElementIDMap.Find(edgeChange.Edge.ID);
+            GameObject edge = edgeChange.Edge.GameObject();
 
             if (edge == null)
             {
@@ -300,13 +300,13 @@ namespace SEE.Game.City
                 // TODO: In the future, the GraphRenderer should be an observer to the Graph,
                 //       so that these cases are handled properly.
                 await UniTask.WaitForEndOfFrame();
-                edge = GraphElementIDMap.Find(edgeChange.Edge.ID);
+                edge = edgeChange.Edge.GameObject();
             }
 
             if (edge != null)
             {
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge);
-                EdgeOperator edgeOperator = edge.AddOrGetComponent<EdgeOperator>();
+                EdgeOperator edgeOperator = edge.EdgeOperator();
                 edgeOperator.ShowOrHide(!edgeChange.Edge.HasToggle(Edge.IsHiddenToggle), city.EdgeLayoutSettings.AnimationKind);
                 edgeOperator.ChangeColorsTo((newColors.start, newColors.end), useAlpha: false);
 

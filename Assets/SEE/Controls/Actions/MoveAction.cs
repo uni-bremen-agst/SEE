@@ -485,7 +485,7 @@ namespace SEE.Controls.Actions
             {
                 UnmarkAsTarget();
                 MoveToOrigin();
-                GrabbedGameObject.AddOrGetComponent<NodeOperator>().ScaleTo(originalLocalScale);
+                GrabbedGameObject.NodeOperator().ScaleTo(originalLocalScale);
                 new ScaleNodeNetAction(GrabbedGameObject.name, originalLocalScale).Execute();
             }
         }

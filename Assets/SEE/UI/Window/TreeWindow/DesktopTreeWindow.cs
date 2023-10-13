@@ -96,7 +96,6 @@ namespace SEE.UI.Window.TreeWindow
                 parent = content.Find(parentId);
                 item.transform.SetSiblingIndex(parent.GetSiblingIndex() + 1);
                 foreground.localPosition += new Vector3(indentShift * level, 0, 0);
-                // TODO: Include number badge in title.
             }
 
             if (itemGameObject != null)
@@ -109,7 +108,7 @@ namespace SEE.UI.Window.TreeWindow
                 }
                 else if (itemGameObject.CompareTag(Tags.Edge))
                 {
-                    (Color start, Color end) = itemGameObject.AddOrGetComponent<EdgeOperator>().TargetColor;
+                    (Color start, Color end) = itemGameObject.EdgeOperator().TargetColor;
                     gradient = new[] { start, end };
                 }
             }
