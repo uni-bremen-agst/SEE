@@ -14,7 +14,6 @@ using ArgumentException = System.ArgumentException;
 
 namespace SEE.Game.Operator
 {
-
     /// <summary>
     /// A component managing operations done on the graph element (i.e., node or edge) it is attached to.
     /// Available operations consist of the public methods exported by this class.
@@ -74,6 +73,7 @@ namespace SEE.Game.Operator
         /// </summary>
         /// <param name="blinkCount">The number of times the element should blink.
         /// If set to -1, the element will blink indefinitely.
+        /// If set to 0, the element will not blink at all.
         /// </param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
         /// that controls the blinking duration.
@@ -137,7 +137,7 @@ namespace SEE.Game.Operator
             int blinkCount = duration >= 0 ? Mathf.RoundToInt(duration * 1.3f) : -1;
             return new AndCombinedOperationCallback<Action>(new[]
             {
-                GlowIn(ToFactor(Mathf.Abs(duration/blinkCount))),
+                GlowIn(ToFactor(Mathf.Abs(duration / blinkCount))),
                 Blink(blinkCount: blinkCount, ToFactor(Mathf.Abs(duration)))
             }).OnComplete(() =>
             {

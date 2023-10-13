@@ -159,7 +159,7 @@ namespace SEE.Game.Operator
         /// </param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveZTo(float newZPosition, float factor =1, bool updateEdges = true)
+        public IOperationCallback<Action> MoveZTo(float newZPosition, float factor = 1, bool updateEdges = true)
         {
             float duration = ToDuration(factor);
             updateLayoutDuration = duration;
@@ -392,10 +392,17 @@ namespace SEE.Game.Operator
             // If we're interrupting another blinking, we need to make sure the color still has the correct value.
             material.color = Color.TargetValue;
 
-            return new Tween[]
+            if (count != 0)
             {
-                material.DOColor(Color.TargetValue.Invert(), duration / (2 * Mathf.Abs(count))).SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play()
-            };
+                return new Tween[]
+                {
+                    material.DOColor(Color.TargetValue.Invert(), duration / (2 * Mathf.Abs(count))).SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play()
+                };
+            }
+            else
+            {
+                return new Tween[] { };
+            }
         }
 
         protected override Color ModifyColor(Color color, Func<Color, Color> modifier)
