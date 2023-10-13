@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using SEE.DataModel.DG;
 using SEE.Game;
-using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -98,35 +98,7 @@ namespace SEE.UI.Window.TreeWindow
                 foreground.localPosition += new Vector3(indentShift * level, 0, 0);
             }
 
-            if (itemGameObject != null)
-            {
-                if (itemGameObject.CompareTag(Tags.Node))
-                {
-                    // We add a slight gradient to make it look nicer.
-                    Color color = itemGameObject.GetComponent<Renderer>().material.color;
-                    gradient = new[] { color, color.Darker(0.3f) };
-                }
-                else if (itemGameObject.CompareTag(Tags.Edge))
-                {
-                    (Color start, Color end) = itemGameObject.EdgeOperator().TargetColor;
-                    gradient = new[] { start, end };
-                }
-            }
-
-            if (gradient == null)
-            {
-                // If there is no color, inherit it from the parent.
-                Assert.IsTrue(parent != null, "Parent must not be null if color is null.");
-                gradient = parent.Find("Background").GetComponent<UIGradient>().EffectGradient.colorKeys.ToColors().ToArray();
-            }
-
-            item.transform.Find("Background").GetComponent<UIGradient>().EffectGradient.SetKeys(gradient.ToGradientColorKeys().ToArray(), alphaKeys);
-
-            // We also need to set the text color to a color that is readable on the background color.
-            Color foregroundColor = gradient.Aggregate((x, y) => (x + y)/2).IdealTextColor();
-            textMesh.color = foregroundColor;
-            iconMesh.color = foregroundColor;
-            expandIcon.GetComponent<Graphic>().color = foregroundColor;
+            ColorItem();
 
             // Slashes will cause problems later on, so we replace them with backslashes.
             // NOTE: This becomes a problem if two nodes A and B exist where node A's name contains slashes and node B
@@ -143,31 +115,77 @@ namespace SEE.UI.Window.TreeWindow
                 expandItem(item);
             }
 
-            if (item.TryGetComponentOrLog(out PointerHelper pointerHelper))
+            RegisterClickHandler();
+            AnimateIn();
+            return;
+
+            void ColorItem()
             {
-                // Right click highlights the node, left/middle click expands/collapses it.
-                pointerHelper.ClickEvent.AddListener(e =>
+                if (itemGameObject != null)
                 {
-                    // TODO: In the future, highlighting the node should be one available option in a right-click menu.
-                    if (e.button == PointerEventData.InputButton.Right)
+                    if (itemGameObject.IsNode())
                     {
-                        if (itemGameObject != null)
-                        {
-                            itemGameObject.Operator().Highlight(duration: 10);
-                        }
+                        // We add a slight gradient to make it look nicer.
+                        Color color = itemGameObject.GetComponent<Renderer>().material.color;
+                        gradient = new[] { color, color.Darker(0.3f) };
                     }
-                    else if (children > 0)
+                    else if (itemGameObject.IsEdge())
                     {
-                        if (expandedItems.Contains(id))
-                        {
-                            collapseItem(item);
-                        }
-                        else
-                        {
-                            expandItem(item);
-                        }
+                        (Color start, Color end) = itemGameObject.EdgeOperator().TargetColor;
+                        gradient = new[] { start, end };
                     }
-                });
+                }
+
+                if (gradient == null)
+                {
+                    // If there is no color, inherit it from the parent.
+                    Assert.IsTrue(parent != null, "Parent must not be null if color is null.");
+                    gradient = parent.Find("Background").GetComponent<UIGradient>().EffectGradient.colorKeys.ToColors().ToArray();
+                }
+
+                item.transform.Find("Background").GetComponent<UIGradient>().EffectGradient.SetKeys(gradient.ToGradientColorKeys().ToArray(), alphaKeys);
+
+                // We also need to set the text color to a color that is readable on the background color.
+                Color foregroundColor = gradient.Aggregate((x, y) => (x + y) / 2).IdealTextColor();
+                textMesh.color = foregroundColor;
+                iconMesh.color = foregroundColor;
+                expandIcon.GetComponent<Graphic>().color = foregroundColor;
+            }
+
+            void AnimateIn()
+            {
+                item.transform.localScale = new Vector3(1, 0, 1);
+                item.transform.DOScaleY(1, duration: 0.5f);
+            }
+
+            void RegisterClickHandler()
+            {
+                if (item.TryGetComponentOrLog(out PointerHelper pointerHelper))
+                {
+                    // Right click highlights the node, left/middle click expands/collapses it.
+                    pointerHelper.ClickEvent.AddListener(e =>
+                    {
+                        // TODO: In the future, highlighting the node should be one available option in a right-click menu.
+                        if (e.button == PointerEventData.InputButton.Right)
+                        {
+                            if (itemGameObject != null)
+                            {
+                                itemGameObject.Operator().Highlight(duration: 10);
+                            }
+                        }
+                        else if (children > 0)
+                        {
+                            if (expandedItems.Contains(id))
+                            {
+                                collapseItem(item);
+                            }
+                            else
+                            {
+                                expandItem(item);
+                            }
+                        }
+                    });
+                }
             }
         }
 
@@ -249,8 +267,7 @@ namespace SEE.UI.Window.TreeWindow
             expandedItems.Add(item.name);
             if (item.transform.Find("Foreground/Expand Icon").gameObject.TryGetComponentOrLog(out RectTransform rectTransform))
             {
-                // TODO: Animate this.
-                rectTransform.Rotate(0, 0, -90);
+                rectTransform.DORotate(new Vector3(0, 0, -180), duration: 0.5f);
             }
         }
 
@@ -264,7 +281,7 @@ namespace SEE.UI.Window.TreeWindow
             expandedItems.Remove(item.name);
             if (item.transform.Find("Foreground/Expand Icon").gameObject.TryGetComponentOrLog(out RectTransform rectTransform))
             {
-                rectTransform.Rotate(0, 0, 90);
+                rectTransform.DORotate(new Vector3(0, 0, -90), duration: 0.5f);
             }
         }
 
