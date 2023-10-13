@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using Assets.SEE.Game.UI.Drawable;
+using SEE.Game.Drawable.Configurations;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -14,7 +15,7 @@ namespace Assets.SEE.Game.Drawable
         private bool loopOn;
         private ActionStateType allowedState;
         new Renderer renderer;
-        private MeshCollider collider;
+        new MeshCollider collider;
 
 
         public void SetAllowedActionStateType(ActionStateType allowedState)
@@ -31,37 +32,10 @@ namespace Assets.SEE.Game.Drawable
                 renderer.enabled = true;
                 yield return new WaitForSeconds(0.5f);
 
-                if (GlobalActionHistory.Current() != allowedState)
+                if (allowedState != null && GlobalActionHistory.Current() != allowedState)
                 {
                     Deactivate();
                 }
-            }
-        }
-
-        private void OnDestroy()
-        {
-            if (GlobalActionHistory.Current() != ActionStateTypes.Edit && allowedState == ActionStateTypes.Edit)
-            {
-                if (!LineMenu.usedIn.Contains(GlobalActionHistory.Current()))
-                {
-                    LineMenu.disableLineMenu();
-                }
-                if (!TextMenu.usedIn.Contains(GlobalActionHistory.Current()))
-                {
-                    TextMenu.disableTextMenu();
-                }
-            }
-            if (GlobalActionHistory.Current() != ActionStateTypes.MoveRotator && allowedState == ActionStateTypes.MoveRotator)
-            {
-                MoveRotatorAction.Reset();
-            }
-            if (GlobalActionHistory.Current() != ActionStateTypes.Scale && allowedState == ActionStateTypes.Scale)
-            {
-                ScaleAction.Reset();
-            }
-            if (GlobalActionHistory.Current() != ActionStateTypes.MovePoint && allowedState == ActionStateTypes.MovePoint)
-            {
-                MovePointAction.Reset();
             }
         }
 
@@ -77,38 +51,22 @@ namespace Assets.SEE.Game.Drawable
             Destroy(this);
         }
 
-        public void LoopReverse()
-        {
-            loopOn = !loopOn;
-            if (loopOn)
-            {
-                Activate();
-            }
-            else
-            {
-                Deactivate();
-            }
-        }
-
         public bool GetLoopStatus()
         {
             return loopOn;
         }
 
-        public void Activate(GameObject line)
+        private void Start()
         {
-            if (renderer == null)
+            GameObject obj = this.gameObject;
+            if (renderer == null && obj.GetComponent<Renderer>() != null)
             {
-                renderer = line.GetComponent<Renderer>();
-                collider = line.GetComponent<MeshCollider>();
+                renderer = obj.GetComponent<Renderer>();
             }
-            loopOn = true;
-            StartCoroutine(Blink());
-        }
-
-        private void Activate()
-        {
-            renderer = gameObject.GetComponent<Renderer>();
+            if (collider == null && obj.GetComponent<MeshCollider>() != null)
+            {
+                collider = obj.GetComponent<MeshCollider>();
+            }
             loopOn = true;
             StartCoroutine(Blink());
         }

@@ -25,20 +25,19 @@ namespace Assets.SEE.Game.UI.Drawable
 
         private void OnDestroy()
         {
-            /*
-            if (allowedState == ActionStateTypes.MoveRotator)
-            {
-                MoveRotatorAction.Reset();
-            }
-
-            if (allowedState == ActionStateTypes.DrawShapes && !this.gameObject.CompareTag(Tags.Line))
-            {
-                DrawShapesAction.Reset();
-            }
-            */
             if (allowedState == ActionStateTypes.WriteText)
             {
                 WriteTextAction.Reset();
+            }
+
+            if (allowedState == ActionStateTypes.Edit)
+            {
+                EditAction.Reset();
+            }
+
+            if (allowedState == ActionStateTypes.Scale)
+            {
+                ScaleAction.Reset();
             }
         }
     }

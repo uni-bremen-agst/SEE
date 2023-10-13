@@ -2,408 +2,111 @@
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Net.Actions.Drawable;
-using SEE.Net.Actions;
 using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game;
 using System.Linq;
 using SEE.Game;
 using System;
-using UnityEngine.UI;
 using Assets.SEE.Game.UI.Drawable;
 using SEE.Game.Drawable.Configurations;
-using TMPro;
 
 
 namespace SEE.Controls.Actions.Drawable
 {
+    /// <summary>
+    /// Allows the user to draw a shape.
+    /// </summary>
     public class DrawShapesAction : AbstractPlayerAction
     {
         /// <summary>
         /// The object holding the line renderer.
         /// </summary>
-        private static GameObject shape;
+        private GameObject shape;
 
-        private static GameObject drawable;
+        /// <summary>
+        /// The drawable where the shape is displayed.
+        /// </summary>
+        private GameObject drawable;
 
         /// <summary>
         /// The positions of the line in local space.
         /// </summary>
         private Vector3[] positions = new Vector3[1];
 
+        /// <summary>
+        /// Saves all the information needed to revert or repeat this action.
+        /// </summary>
         private Memento memento;
 
-        private static bool drawing = false;
-        private static bool firstStart = true;
-
-        private static HSVPicker.ColorPicker picker;
-        private static ThicknessSliderController thicknessSlider;
-        private const string drawableSwitchPrefab = "Prefabs/UI/Drawable/Switch";
-        private const string drawableShapePrefab = "Prefabs/UI/Drawable/ShapeMenu";
-        private static GameObject drawableSwitch;
-        private static GameObject shapeMenu;
-        private static Button previousBtn;
-        private static Button nextBtn;
-        private static TMP_Text shapeLabel;
-        private static GameShapesCalculator.Shapes selectedShape;
-        private static Button shapeBtn;
-        private static Button configBtn;
-        private static GameObject objValue1;
-        private static FloatValueSliderController sliderValue1;
-        private static GameObject objValue2;
-        private static FloatValueSliderController sliderValue2;
-        private static GameObject objValue3;
-        private static FloatValueSliderController sliderValue3;
-        private static GameObject objValue4;
-        private static FloatValueSliderController sliderValue4;
-        private static GameObject objVertices;
-        private static IntValueSliderController sliderVertices;
-        private static GameObject objInfo;
-        private static Button infoBtn;
-        private static GameObject objImage;
-        private static Image infoImage;
-
-        private static float value1;
-        private static float value2;
-        private static float value3;
-        private static float value4;
-        private static int vertices;
-        private static bool infoVisibility;
-        
-        private void InitSwitchMenu()
+        /// <summary>
+        /// This struct can store all the information needed to revert or repeat a <see cref="DrawShapesAction"/>.
+        /// </summary>
+        private struct Memento
         {
-            drawableSwitch = PrefabInstantiator.InstantiatePrefab(drawableSwitchPrefab,
-                                    GameObject.Find("UI Canvas").transform, false);
-            drawableSwitch.AddComponent<MenuDestroyer>().SetAllowedState(GetActionStateType());
+            /// <summary>
+            /// The drawable where the shape is displayed.
+            /// </summary>
+            public readonly GameObject drawable;
+            /// <summary>
+            /// The configuration of the shape.
+            /// </summary>
+            public readonly Line shape;
 
-            shapeBtn = drawableSwitch.GetComponentsInChildren<Button>()[0];
-            shapeBtn.onClick.AddListener(ShapeOnClick);
-            configBtn = drawableSwitch.GetComponentsInChildren<Button>()[1];
-            configBtn.onClick.AddListener(ConfigOnClick);
-            shapeBtn.interactable = false;
-        }
-        private void InitShapeMenu()
-        {
-            shapeMenu = PrefabInstantiator.InstantiatePrefab(drawableShapePrefab,
-                                                GameObject.Find("UI Canvas").transform, false);
-            shapeMenu.AddComponent<MenuDestroyer>().SetAllowedState(GetActionStateType());
-
-            GameObject shapeSelection = GameDrawableFinder.FindChild(shapeMenu, "ShapeSelection");
-            previousBtn = shapeSelection.GetComponentsInChildren<Button>()[0];
-            previousBtn.onClick.AddListener(PreviousShape);
-            nextBtn = shapeSelection.GetComponentsInChildren<Button>()[1];
-            nextBtn.onClick.AddListener(NextShape);
-            shapeLabel = shapeMenu.GetComponentInChildren<TMP_Text>();
-
-            objValue1 = GameDrawableFinder.FindChild(shapeMenu, "Value1");
-            sliderValue1 = objValue1.GetComponent<FloatValueSliderController>();
-            sliderValue1.onValueChanged.AddListener(value => { value1 = value; });
-
-            objValue2 = GameDrawableFinder.FindChild(shapeMenu, "Value2");
-            sliderValue2 = objValue2.GetComponent<FloatValueSliderController>();
-            sliderValue2.onValueChanged.AddListener(value => { value2 = value; });
-
-            objValue3 = GameDrawableFinder.FindChild(shapeMenu, "Value3");
-            sliderValue3 = objValue3.GetComponent<FloatValueSliderController>();
-            sliderValue3.onValueChanged.AddListener(value => { value3 = value; });
-
-            objValue4 = GameDrawableFinder.FindChild(shapeMenu, "Value4");
-            sliderValue4 = objValue4.GetComponent<FloatValueSliderController>();
-            sliderValue4.onValueChanged.AddListener(value => { value4 = value; });
-
-            objVertices = GameDrawableFinder.FindChild(shapeMenu, "Vertices");
-            sliderVertices = objVertices.GetComponent<IntValueSliderController>();
-            vertices = sliderVertices.GetValue();
-            sliderVertices.onValueChanged.AddListener(value => { vertices = value; });
-
-            objInfo = GameDrawableFinder.FindChild(shapeMenu, "Info");
-            infoBtn = objInfo.GetComponentInChildren<Button>();
-            infoVisibility = false;
-            infoBtn.onClick.AddListener(ToggleInfo);
-
-            objImage = GameDrawableFinder.FindChild(shapeMenu, "Image");
-            infoImage = objImage.GetComponent<Image>();
-
-
-            SetSelectedShape(GameShapesCalculator.GetShapes()[0]);
-        }
-
-        private void ToggleInfo()
-        {
-            infoVisibility = !infoVisibility;
-            objImage.SetActive(infoVisibility);
-            if (infoVisibility)
+            /// <summary>
+            /// The constructor, which simply assigns its only parameter to a field in this class.
+            /// </summary>
+            /// <param name="drawable">The drawable where the shape is displayed.</param>
+            /// <param name="shape">The configuration of the shape.</param>
+            public Memento(GameObject drawable, Line shape)
             {
-                LoadImage();
+                this.drawable = drawable;
+                this.shape = shape;
             }
         }
 
-        private void LoadImage()
-        {
-            string path = "";
-            switch (selectedShape)
-            {
-                case GameShapesCalculator.Shapes.Square:
-                    path = "Textures/Drawable/Test";
-                    break;
-                case GameShapesCalculator.Shapes.Rectangle:
-                    path = "Textures/Drawable/Rectangle";
-                    break;
-                case GameShapesCalculator.Shapes.Rhombus:
-                    path = "Textures/Drawable/Rhombus";
-                    break;
-                case GameShapesCalculator.Shapes.Kite:
-                    path = "Textures/Drawable/Kite";
-                    break;
-                case GameShapesCalculator.Shapes.Triangle:
-                    path = "Textures/Drawable/Triangle";
-                    break;
-                case GameShapesCalculator.Shapes.Circle:
-                    path = "Textures/Drawable/Circle";
-                    break;
-                case GameShapesCalculator.Shapes.Ellipse:
-                    path = "Textures/Drawable/Ellipse";
-                    break;
-                case GameShapesCalculator.Shapes.Parallelogram:
-                    path = "Textures/Drawable/Parallelogram";
-                    break;
-                case GameShapesCalculator.Shapes.Trapezoid:
-                    path = "Textures/Drawable/Trapezoid";
-                    break;
-                case GameShapesCalculator.Shapes.Polygon:
-                    path = "Textures/Drawable/Polygon";
-                    break;
-            }
-            infoImage.sprite = Resources.Load<Sprite>(path); ;
-            Debug.Log(infoImage.sprite.name);
-        }
+        /// <summary>
+        /// Representing if the action is drawing. 
+        /// Also necressary to identifier if the line shape was successfully drawed.
+        /// </summary>
+        private bool drawing = false;
 
-        private void InitConfigMenu()
-        {
-            LineMenu.GetTilingSliderController().onValueChanged.AddListener(LineMenu.tilingAction = tiling =>
-            {
-                ValueHolder.currentTiling = tiling;
-            });
-
-            LineMenu.GetNextLineKindBtn().onClick.RemoveAllListeners();
-            LineMenu.GetNextLineKindBtn().onClick.AddListener(() => ValueHolder.currentLineKind = LineMenu.NextLineKind());
-            LineMenu.GetPreviousLineKindBtn().onClick.RemoveAllListeners();
-            LineMenu.GetPreviousLineKindBtn().onClick.AddListener(() => ValueHolder.currentLineKind = LineMenu.PreviousLineKind());
-
-            thicknessSlider = LineMenu.instance.GetComponentInChildren<ThicknessSliderController>();
-            thicknessSlider.AssignValue(ValueHolder.currentThickness);
-            thicknessSlider.onValueChanged.AddListener(thickness =>
-            {
-                ValueHolder.currentThickness = thickness;
-            });
-
-            picker = LineMenu.instance.GetComponent<HSVPicker.ColorPicker>();
-            picker.AssignColor(ValueHolder.currentColor);
-            picker.onValueChanged.AddListener(LineMenu.colorAction = color =>
-            {
-                ValueHolder.currentColor = color;
-            });
-        }
-
+        /// <summary>
+        /// Enables the shape menu
+        /// </summary>
         public override void Awake()
         {
-            if (firstStart)
-            {
-                InitSwitchMenu();
-                InitShapeMenu();
-                InitConfigMenu();
-                firstStart = false; 
-            } else
-            {
-                drawableSwitch.SetActive(true);
-                if (!shapeBtn.interactable)
-                {
-                    shapeMenu.SetActive(true);
-                } else
-                {
-                    shapeMenu.SetActive(false);
-                    LineMenu.enableLineMenu(false, new LineMenu.MenuLayer[] { LineMenu.MenuLayer.Layer, LineMenu.MenuLayer.Loop});
-                }
-            }
+            ShapeMenu.Enable();
         }
 
-        private int GetIndexOfSelectedShape()
-        {
-            return GameShapesCalculator.GetShapes().IndexOf(selectedShape);
-        }
 
-        private void NextShape()
-        {
-            int index = GetIndexOfSelectedShape() + 1;
-            if (index >= GameShapesCalculator.GetShapes().Count)
-            {
-                index = 0;
-            }
-            SetSelectedShape(GameShapesCalculator.GetShapes()[index]);
-
-        }
-
-        private void PreviousShape()
-        {
-            int index = GetIndexOfSelectedShape() - 1;
-            if (index < 0)
-            {
-                index = GameShapesCalculator.GetShapes().Count - 1;
-            }
-            SetSelectedShape(GameShapesCalculator.GetShapes()[index]);
-        }
-
-        private void SetSelectedShape(GameShapesCalculator.Shapes shape)
-        {
-            selectedShape = shape;
-            shapeLabel.text = shape.ToString();
-            ChangeMenu();
-        }
-
-        private void AllValuesReset()
-        {
-            objValue1.SetActive(true);
-            objValue2.SetActive(true);
-            objValue3.SetActive(true);
-            objValue4.SetActive(true);
-            objVertices.SetActive(true);
-
-            sliderValue1.ResetToMin();
-            sliderValue2.ResetToMin();
-            sliderValue3.ResetToMin();
-            sliderValue4.ResetToMin();
-            sliderVertices.ResetToMin();
-            infoVisibility = false;
-        }
-        private void AllValuesDisable()
-        {
-            objValue1.SetActive(false);
-            objValue2.SetActive(false);
-            objValue3.SetActive(false);
-            objValue4.SetActive(false);
-            objVertices.SetActive(false);
-            objInfo.SetActive(false);
-            objImage.SetActive(false);
-        }
-        private void ChangeMenu()
-        {
-            AllValuesReset();
-            AllValuesDisable();
-            switch (selectedShape)
-            {
-                case GameShapesCalculator.Shapes.Line:
-                    break;
-                case GameShapesCalculator.Shapes.Square:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "a";
-                    objInfo.SetActive(true);
-                    break;
-                case GameShapesCalculator.Shapes.Rectangle:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "a";
-                    objValue2.SetActive(true);
-                    objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "b";
-                    objInfo.SetActive(true);
-                    break;
-                case GameShapesCalculator.Shapes.Rhombus:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "f";
-                    objValue2.SetActive(true);
-                    objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "e";
-                    objInfo.SetActive(true);
-                    break;
-                case GameShapesCalculator.Shapes.Kite:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "f1";
-                    objValue2.SetActive(true);
-                    objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "f2";
-                    objValue3.SetActive(true);
-                    objValue3.GetComponentsInChildren<TMP_Text>()[0].text = "e";
-                    objInfo.SetActive(true);
-                    break;
-                case GameShapesCalculator.Shapes.Triangle:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "c";
-                    objValue2.SetActive(true);
-                    objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "h";
-                    objInfo.SetActive(true);
-                    break;
-                case GameShapesCalculator.Shapes.Circle:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "Radius";
-                    objInfo.SetActive(true);
-                    break;
-                case GameShapesCalculator.Shapes.Ellipse:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "X-Scale";
-                    objValue2.SetActive(true);
-                    objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "Y-Scale";
-                    objInfo.SetActive(true);
-                    break;
-                case GameShapesCalculator.Shapes.Parallelogram:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "a";
-                    objValue2.SetActive(true);
-                    objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "h";
-                    objValue4.SetActive(true);
-                    objValue4.GetComponentsInChildren<TMP_Text>()[0].text = "Shift";
-                    objInfo.SetActive(true);
-                    break;
-                case GameShapesCalculator.Shapes.Trapezoid:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "a";
-                    objValue2.SetActive(true);
-                    objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "c";
-                    objValue3.SetActive(true);
-                    objValue3.GetComponentsInChildren<TMP_Text>()[0].text = "h";
-                    objInfo.SetActive(true);
-                    break;
-                case GameShapesCalculator.Shapes.Polygon:
-                    objValue1.SetActive(true);
-                    objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "Length";
-                    objVertices.SetActive(true);
-                    objInfo.SetActive(true);
-                    break;
-            }
-        }
-
-        private void ConfigOnClick()
-        {
-            configBtn.interactable = false;
-            shapeBtn.interactable = true;
-            LineMenu.enableLineMenu(false, new LineMenu.MenuLayer[] { LineMenu.MenuLayer.Layer, LineMenu.MenuLayer.Loop });
-            shapeMenu.SetActive(false);
-        }
-
-        private void ShapeOnClick()
-        {
-            shapeBtn.interactable = false;
-            configBtn.interactable = true;
-            LineMenu.disableLineMenu();
-            shapeMenu.SetActive(true);
-        }
-
+        /// <summary>
+        /// Stops the action. It disable the shape menu and 
+        /// destroys the line shape if it is not successfully completed.
+        /// </summary>
         public override void Stop()
         {
-            LineMenu.disableLineMenu();
+            ShapeMenu.Disable();
+            if (drawing && shape != null)
+            {
+                Destroyer.Destroy(shape);
+            }
         }
 
-        public static void Reset()
-        {
-            firstStart = true;
-            drawing = false;
-            shape = null;
-        }
-        
         /// <summary>
-        /// Continues the line at the point of the mouse position and draws it.
+        /// This method manages the player's interaction with the mode <see cref="ActionStateType.DrawShapes"/>.
+        /// Specifically: Allows the user to draw a shape. 
+        /// For all shapes except Line, a single click on the drawable is sufficient to draw the desired shape. 
+        /// Simply enter the desired values in the Shape Menu. 
+        /// For the Line shape type, multiple clicks (one for each point) are required.
         /// </summary>
-        /// <returns>true if completed</returns>
+        /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
-            bool result = false;
-
             if (!Raycasting.IsMouseOverGUI())
             {
+                /// Block for initiating drawing, the lower if blocks are relevant for the line shape type, 
+                /// for all others, the drawing is completed within this block. 
+                /// The shape selected from the Shape Menu is then drawn based on the entered values (except for line).
                 if (Input.GetMouseButtonDown(0) &&
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
@@ -415,81 +118,80 @@ namespace SEE.Controls.Actions.Drawable
                     drawing = true;
                     Vector3 convertedHitPoint = GameDrawer.GetConvertedPosition(drawable, raycastHit.point);
                    
-                    switch (selectedShape)
+                    switch (ShapeMenu.GetSelectedShape())
                     {
                         case GameShapesCalculator.Shapes.Line:
 
                             positions[0] = raycastHit.point;
-                            shape = GameDrawer.StartDrawing(drawable, positions, ValueHolder.currentColor, ValueHolder.currentThickness,
+                            shape = GameDrawer.StartDrawing(drawable, positions, ValueHolder.currentPrimaryColor, ValueHolder.currentThickness,
                                 ValueHolder.currentLineKind, ValueHolder.currentTiling);
                             positions[0] = shape.transform.InverseTransformPoint(positions[0]) - ValueHolder.distanceToDrawable;
-                            shape.AddComponent<MenuDestroyer>().SetAllowedState(GetActionStateType());
                             break;
                         case GameShapesCalculator.Shapes.Square:
-                            positions = GameShapesCalculator.Square(convertedHitPoint, value1);
+                            positions = GameShapesCalculator.Square(convertedHitPoint, ShapeMenu.GetValue1());
                             break;
                         case GameShapesCalculator.Shapes.Rectangle:
-                            positions = GameShapesCalculator.Rectanlge(convertedHitPoint, value1, value2);
+                            positions = GameShapesCalculator.Rectanlge(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2());
                             break;
                         case GameShapesCalculator.Shapes.Rhombus:
-                            positions = GameShapesCalculator.Rhombus(convertedHitPoint, value1, value2);
+                            positions = GameShapesCalculator.Rhombus(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2());
                             break;
                         case GameShapesCalculator.Shapes.Kite:
-                            positions = GameShapesCalculator.Kite(convertedHitPoint, value1, value2, value3);
+                            positions = GameShapesCalculator.Kite(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetValue3());
                             break;
                         case GameShapesCalculator.Shapes.Triangle:
-                            positions = GameShapesCalculator.Triangle(convertedHitPoint, value1, value2);
+                            positions = GameShapesCalculator.Triangle(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2());
                             break;
                         case GameShapesCalculator.Shapes.Circle:
-                            positions = GameShapesCalculator.Circle(convertedHitPoint, value1);
+                            positions = GameShapesCalculator.Circle(convertedHitPoint, ShapeMenu.GetValue1());
                             break;
                         case GameShapesCalculator.Shapes.Ellipse:
-                            positions = GameShapesCalculator.Ellipse(convertedHitPoint, value1, value2);
+                            positions = GameShapesCalculator.Ellipse(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2());
                             break;
                         case GameShapesCalculator.Shapes.Parallelogram:
-                            positions = GameShapesCalculator.Parallelogram(convertedHitPoint, value1, value2, value4);
+                            positions = GameShapesCalculator.Parallelogram(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetValue4());
                             break;
                         case GameShapesCalculator.Shapes.Trapezoid:
-                            positions = GameShapesCalculator.Trapezoid(convertedHitPoint, value1, value2, value3);
+                            positions = GameShapesCalculator.Trapezoid(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetValue3());
                             break;
                         case GameShapesCalculator.Shapes.Polygon:
-                            positions = GameShapesCalculator.Polygon(convertedHitPoint, value1, vertices);
+                            positions = GameShapesCalculator.Polygon(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetVertices());
                             break;
                     }
 
-                    if (selectedShape != GameShapesCalculator.Shapes.Line)
+                    /// This block draws and completes the action for all shapes except lines.
+                    if (ShapeMenu.GetSelectedShape() != GameShapesCalculator.Shapes.Line)
                     {
                         if (GameDrawer.DifferentPositionCounter(positions) > 1)
                         {
-                            shape = GameDrawer.DrawLine(drawable, "", positions, ValueHolder.currentColor, ValueHolder.currentThickness, true,
+                            shape = GameDrawer.DrawLine(drawable, "", positions, ValueHolder.currentPrimaryColor, ValueHolder.currentThickness, true,
                                 ValueHolder.currentLineKind, ValueHolder.currentTiling);
                             shape.GetComponent<LineRenderer>().loop = true;
                             shape = GameDrawer.SetPivot(shape);
                             Line currentShape = Line.GetLine(shape);
                             memento = new Memento(drawable, currentShape);
                             new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), currentShape).Execute();
-                            result = true;
                             currentState = ReversibleAction.Progress.Completed;
+                            drawing = false;
+                            return true;
+                        } else
+                        {
                             positions = new Vector3[1];
                             drawing = false;
                             shape = null;
-
-                            return Input.GetMouseButtonDown(0);
-                        } else
-                        {
-                            drawing = false;
                         }
                     }
                 }
+
+                /// This block provides a line preview to select the desired position of the next line point.
                 if (drawing && !Input.GetMouseButton(0) && !Input.GetMouseButtonDown(0) &&
                     Raycasting.RaycastAnything(out RaycastHit rh) &&
                     (rh.collider.gameObject.CompareTag(Tags.Drawable) ||
                     GameDrawableFinder.hasDrawable(rh.collider.gameObject)) &&
-                    selectedShape == GameShapesCalculator.Shapes.Line
+                    ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shapes.Line
                     && (drawable == null || drawable != null && GameDrawableFinder.FindDrawable(rh.collider.gameObject).Equals(drawable)))
                 {
                     Vector3 newPosition = shape.transform.InverseTransformPoint(rh.point) - ValueHolder.distanceToDrawable;
-                    // Add newPosition to the line renderer.
                     Vector3[] newPositions = new Vector3[positions.Length + 1];
                     Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
                     newPositions[newPositions.Length - 1] = newPosition;
@@ -497,17 +199,18 @@ namespace SEE.Controls.Actions.Drawable
                     new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), Line.GetLine(shape)).Execute();
                 }
 
+                /// With this block, the user can add a new point to the line. 
+                /// This requires a left mouse click, with neither the left Shift nor the left Ctrl key pressed.
                 if (Input.GetMouseButtonDown(0) && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) &&
                     Raycasting.RaycastAnything(out RaycastHit hit) &&
                     (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
                     GameDrawableFinder.hasDrawable(hit.collider.gameObject))
-                    && drawing && selectedShape == GameShapesCalculator.Shapes.Line
+                    && drawing && ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shapes.Line
                     && (drawable == null || drawable != null && GameDrawableFinder.FindDrawable(hit.collider.gameObject).Equals(drawable)))
                 {
                     Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.distanceToDrawable;
                     if (newPosition != positions.Last())
                     {
-                        // Add newPosition to the line renderer.
                         Vector3[] newPositions = new Vector3[positions.Length + 1];
                         Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
                         newPositions[newPositions.Length - 1] = newPosition;
@@ -515,33 +218,34 @@ namespace SEE.Controls.Actions.Drawable
 
                         GameDrawer.Drawing(shape, positions);
                         new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), Line.GetLine(shape)).Execute();
-                        currentState = ReversibleAction.Progress.InProgress;
-                        if (shape.GetComponent<MenuDestroyer>() != null)
-                        {
-                            Destroyer.Destroy(shape.GetComponent<MenuDestroyer>());
-                        }
                     }
                 }
 
+                /// Block for successfully completing a non looped line. It requires a left-click with the left Ctrl key held down.
+                /// The left shift key must not be pressed.
                 if (Input.GetMouseButtonUp(0) && Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) 
-                    && drawing && positions.Length > 1 && selectedShape == GameShapesCalculator.Shapes.Line)
+                    && drawing && positions.Length > 1 && ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shapes.Line)
                 {
-                    result = true;
                     EndLineShapeDrawing(false);
-                    return Input.GetMouseButtonUp(0);
+                    return true;
                 }
 
+                /// Block for successfully completing a looped line. It requires a left-click with the left Shift key held down.
+                /// The left Ctrl key must not be pressed
                 if (Input.GetMouseButtonUp(0) && !Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftShift) 
-                    && drawing && positions.Length > 1 && selectedShape == GameShapesCalculator.Shapes.Line)
+                    && drawing && positions.Length > 1 && ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shapes.Line)
                 {   
-                    result = true;
                     EndLineShapeDrawing(true);
-                    return Input.GetMouseButtonUp(0);
+                    return true;
                 }
             }
-            return result;
+            return false;
         }
 
+        /// <summary>
+        /// Completes the action. It redraws the line shape because the original line was altered by the line preview.
+        /// </summary>
+        /// <param name="loop">Indicates whether the line should form a loop, in other words, whether the end and start points should be connected.</param>
         private void EndLineShapeDrawing(bool loop)
         {
             GameDrawer.Drawing(shape, positions);
@@ -551,58 +255,15 @@ namespace SEE.Controls.Actions.Drawable
             memento = new Memento(drawable, currentShape);
             new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), currentShape).Execute();
             currentState = ReversibleAction.Progress.Completed;
-            positions = new Vector3[1];
             drawing = false;
-            shape = null;
         }
 
-        private struct Memento
-        {
-            public readonly GameObject drawable;
-            public readonly Line shape;
-
-            public Memento(GameObject drawable, Line shape)
-            {
-                this.drawable = drawable;
-                this.shape = shape;
-            }
-        }
-        /*
-        private struct Memento
-        {
-            public readonly GameObject drawable;
-
-            public Vector3[] positions;
-
-            public readonly Color color;
-
-            public readonly float thickness;
-
-            public readonly int orderInLayer;
-
-            public readonly string id;
-
-            public bool loop;
-
-            public Memento(GameObject drawable, string id, Vector3[] positions, Color color, float thickness, int orderInLayer)
-            {
-                this.drawable = drawable;
-                this.positions = positions;
-                this.color = color;
-                this.thickness = thickness;
-                this.orderInLayer = orderInLayer;
-                this.id = id;
-                this.loop = false;
-            }
-        }
-        */
         /// <summary>
-        /// Destroys the drawn line.
-        /// See <see cref="ReversibleAction.Undo()"/>.
+        /// Reverts this action, i.e., deletes the drawed shape.
         /// </summary>
         public override void Undo()
         {
-            base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
+            base.Undo();
             if (shape == null)
             {
                 shape = GameDrawableFinder.FindChild(memento.drawable, memento.shape.id);
@@ -610,49 +271,38 @@ namespace SEE.Controls.Actions.Drawable
             if (shape != null)
             {
                 new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.shape.id).Execute();
-                Destroyer.Destroy(shape);//.transform.parent.gameObject);
-                shape = null;
+                Destroyer.Destroy(shape);
             }
         }
 
         /// <summary>
-        /// Redraws the drawn line (setting up <see cref="line"/> and adds <see cref="renderer"/> 
-        /// before that).
-        /// See <see cref="ReversibleAction.Undo()"/>.
+        /// Repeats this action, i.e., redraws the shape.
         /// </summary>
         public override void Redo()
         {
-            base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
+            base.Redo();
             shape = GameDrawer.ReDrawLine(memento.drawable, memento.shape);
             if (shape != null)
             {
                 new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), Line.GetLine(shape)).Execute();
             }
-            /*GameDrawer.ReDrawRawLine(memento.drawable, memento.id, memento.positions, memento.color,
-                memento.thickness, memento.orderInLayer, memento.loop);
-            if (shape != null)
-            {
-                new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable),
-                    memento.id, memento.positions, memento.color,
-                    memento.thickness, memento.orderInLayer, memento.loop).Execute();
-            }*/
         }
 
         /// <summary>
-        /// A new instance of <see cref="DrawOnAction"/>.
+        /// A new instance of <see cref="DrawShapesAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="DrawOnAction"/></returns>
+        /// <returns>new instance of <see cref="DrawShapesAction"/></returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new DrawShapesAction();
         }
 
         /// <summary>
-        /// A new instance of <see cref="DrawOnAction"/>.
+        /// A new instance of <see cref="DrawShapesAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="DrawOnAction"/></returns>
+        /// <returns>new instance of <see cref="DrawShapesAction"/></returns>
         public override ReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -661,7 +311,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.DrawOnWhiteboard"/></returns>
+        /// <returns><see cref="ActionStateType.DrawShapes"/></returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.DrawShapes;
@@ -673,7 +323,7 @@ namespace SEE.Controls.Actions.Drawable
         /// Because this action does not actually change any game object, 
         /// an empty set is always returned.
         /// </summary>
-        /// <returns>an empty set</returns>
+        /// <returns>The id of the created shape</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.drawable == null)
@@ -684,7 +334,6 @@ namespace SEE.Controls.Actions.Drawable
             {
                 return new HashSet<string>
                 {
-                    memento.drawable.name,
                     memento.shape.id
                 };
             }

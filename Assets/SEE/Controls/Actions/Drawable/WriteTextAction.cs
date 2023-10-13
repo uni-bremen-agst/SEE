@@ -71,8 +71,21 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private class Memento
         {
+            /// <summary>
+            /// The drawable on that the text should be displayed
+            /// </summary>
             public GameObject drawable;
+
+            /// <summary>
+            /// The written text.
+            /// </summary>
             public Text text;
+            
+            /// <summary>
+            /// The constructor, which simply assigns its only parameter to a field in this class.
+            /// </summary>
+            /// <param name="drawable">The drawable on that the text should be displayed.</param>
+            /// <param name="text">The written text</param>
             public Memento(GameObject drawable, Text text)
             {
                 this.drawable = drawable;
@@ -89,18 +102,19 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Enables the text menu
+        /// Enables the text menu.
+        /// When it starts the first time, it will add necressary listeners.
         /// </summary>
         public override void Awake()
         {
             if (firstStart)
             {
-                TextMenu.enableTextMenu((color => ValueHolder.currentColor = color), ValueHolder.currentColor, true);
+                TextMenu.enableTextMenu((color => ValueHolder.currentPrimaryColor = color), ValueHolder.currentPrimaryColor, true);
                 GameObject.Find("UI Canvas").AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
 
                 TextMenu.GetFontColorButton().onClick.AddListener(() =>
                 {
-                    TextMenu.AssignColorArea((color => ValueHolder.currentColor = color), ValueHolder.currentColor);
+                    TextMenu.AssignColorArea((color => ValueHolder.currentPrimaryColor = color), ValueHolder.currentPrimaryColor);
                 });
                 TextMenu.GetOutlineColorButton().onClick.AddListener(() =>
                 {
@@ -135,6 +149,8 @@ namespace SEE.Controls.Actions.Drawable
             {
                 switch (progress)
                 {
+                    /// Block for identifying where to place the text. The <see cref="WriteEditTextDialog"/> is then opened.
+                    /// You can enter the text in it.
                     case ProgressState.GettingPosition:
                         if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
                              Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
@@ -149,12 +165,15 @@ namespace SEE.Controls.Actions.Drawable
                         }
                         return false;
 
+                    /// Block for getting the text for the drawable text and create the drawable text if the text is not empty.
+                    /// Because the MeshRenderer of TextMeshPro takes some time to generate the mesh, the MeshCollider of the text must be refreshed.
+                    /// When the text for the drawable text is not empty the action will be finished.
                     case ProgressState.GettingText:
                         if (writeTextDialog.GetUserInput(out string textOut))
                         {
                             if (textOut != null && textOut != "")
                             {
-                                textObj = GameTexter.WriteText(drawable, textOut, position, ValueHolder.currentColor, ValueHolder.currentSecondColor,
+                                textObj = GameTexter.WriteText(drawable, textOut, position, ValueHolder.currentPrimaryColor, ValueHolder.currentSecondColor,
                                     ValueHolder.currentOutlineThickness, ValueHolder.currentFontSize, ValueHolder.currentOrderInLayer, TextMenu.GetFontStyle());
                                 new WriteTextNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), Text.GetText(textObj)).Execute();
                                 memento = new Memento(drawable, Text.GetText(textObj));
@@ -169,7 +188,7 @@ namespace SEE.Controls.Actions.Drawable
                                 return false;
                             }
                         }
-
+                        /// If the dialog was canceled the action will starts from beginning.
                         if (writeTextDialog.WasCanceled())
                         {
                             progress = ProgressState.GettingPosition;
@@ -251,10 +270,10 @@ namespace SEE.Controls.Actions.Drawable
         /// Because this action does not actually change any game object, 
         /// an empty set is always returned.
         /// </summary>
-        /// <returns>an empty set</returns>
+        /// <returns>the id of the created drawable text</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string>();
+            return new HashSet<string> { memento.text.id };
         }
     }
 }

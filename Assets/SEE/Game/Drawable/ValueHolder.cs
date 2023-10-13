@@ -19,9 +19,9 @@ namespace Assets.SEE.Game.Drawable
     {
         #region current values
         /// <summary>
-        /// The current chosen color for drawing.
+        /// The current chosen primary color for drawing.
         /// </summary>
-        public static Color currentColor { get; set; }
+        public static Color currentPrimaryColor { get; set; }
 
         /// <summary>
         /// The current chosen second color for drawing.
@@ -102,7 +102,7 @@ namespace Assets.SEE.Game.Drawable
         /// </summary>
         static ValueHolder()
         {
-            currentColor = UnityEngine.Random.ColorHSV();
+            currentPrimaryColor = UnityEngine.Random.ColorHSV();
             currentSecondColor = Color.clear;
             currentOutlineThickness = 0.4f;
             currentFontSize = 0.5f;

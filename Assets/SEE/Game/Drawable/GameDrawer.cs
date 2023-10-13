@@ -309,7 +309,7 @@ namespace SEE.Game
         public static Vector3 GetConvertedPosition(GameObject drawable, Vector3 position)
         {
             Vector3 convertedPosition;
-            Setup(drawable, "", new Vector3[] { position }, ValueHolder.currentColor, ValueHolder.currentThickness, 0, ValueHolder.currentLineKind, 1,
+            Setup(drawable, "", new Vector3[] { position }, ValueHolder.currentPrimaryColor, ValueHolder.currentThickness, 0, ValueHolder.currentLineKind, 1,
                 out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
             convertedPosition = line.transform.InverseTransformPoint(position) - ValueHolder.distanceToDrawable;
             Destroyer.Destroy(line);
@@ -319,7 +319,7 @@ namespace SEE.Game
         public static Vector3[] GetConvertedPositions(GameObject drawable, Vector3[] positions)
         {
             Vector3[] convertedPosition = new Vector3[positions.Length];
-            Setup(drawable, "", positions, ValueHolder.currentColor, ValueHolder.currentThickness, 0, ValueHolder.currentLineKind, 1,
+            Setup(drawable, "", positions, ValueHolder.currentPrimaryColor, ValueHolder.currentThickness, 0, ValueHolder.currentLineKind, 1,
                 out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
             for (int i = 0; i < positions.Length; i++)
             {

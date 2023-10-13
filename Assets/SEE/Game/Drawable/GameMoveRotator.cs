@@ -95,7 +95,7 @@ namespace Assets.SEE.Game.Drawable
             GameDrawer.RefreshCollider(line);
         }
 
-        public static void RotateObject(GameObject obj, Vector3 moveDirection, float degree)
+        public static Vector3 RotateObject(GameObject obj, Vector3 moveDirection, float degree)
         {
             Transform transform = obj.transform;//Transform transform;
             /*
@@ -113,6 +113,7 @@ namespace Assets.SEE.Game.Drawable
             transform.Rotate(moveDirection, degree, Space.Self);
             obj.GetComponent<Collider>().enabled = false;
             obj.GetComponent<Collider>().enabled = true;
+            return obj.transform.localEulerAngles;
         }
 
         public static void RotateObject(GameObject obj, Vector3 moveDirection, float degree, Vector3 point)

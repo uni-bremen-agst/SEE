@@ -40,6 +40,7 @@ namespace Assets.SEE.Game.Drawable
             {
                 LineRenderer renderer = line.GetComponent<LineRenderer>();
                 renderer.loop = loop;
+                GameDrawer.RefreshCollider(line);
             }
         }
 

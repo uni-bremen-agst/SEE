@@ -11,7 +11,49 @@ using System.Linq;
 namespace SEE.Controls.Actions.Drawable
 {
     public class CleanerAction : AbstractPlayerAction
-    {       
+    {
+        /// <summary>
+        /// A list of memento's for this action.
+        /// It will be needed, because a memento saves one deleted drawable type.
+        /// </summary>
+        private List<Memento> mementoList = new();
+
+        /// <summary>
+        /// Saves all the information needed to revert or repeat this action on one drawable type.
+        /// </summary>
+        private Memento memento;
+
+        /// <summary>
+        /// This class can store all the information needed to revert or repeat a <see cref="CleanerAction"/>.
+        /// </summary>
+        private class Memento
+        {
+            /// <summary>
+            /// The drawable on that the drawable type is displayed.
+            /// </summary>
+            public readonly GameObject drawable;
+            /// <summary>
+            /// The drawable type object.
+            /// </summary>
+            public readonly DrawableType type;
+
+            /// <summary>
+            /// The constructor, which simply assigns its only parameter to a field in this class.
+            /// </summary>
+            /// <param name="drawable">The drawable on that the drawable type is displayed</param>
+            /// <param name="drawableType">The drawable type of the deleted object</param>
+            public Memento(GameObject drawable, DrawableType type)
+            {
+                this.drawable = drawable;
+                this.type = type;
+            }
+        }
+
+        /// <summary>
+        /// This method manages the player's interaction with the mode <see cref="ActionStateType.Cleaner"/>.
+        /// It cleans a complete drawable. In other words: it's deletes all drawable types that are on a selected drawable.
+        /// </summary>
+        /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -23,25 +65,33 @@ namespace SEE.Controls.Actions.Drawable
 
                     if (hittedObject.CompareTag(Tags.Drawable))
                     {
-                        DeleteDrawableChilds(hittedObject);
+                        return DeleteDrawableChilds(hittedObject);
                     } else if (GameDrawableFinder.hasDrawable(hittedObject))
                     {
-                        DeleteDrawableChilds(GameDrawableFinder.FindDrawable(hittedObject));
+                        return DeleteDrawableChilds(GameDrawableFinder.FindDrawable(hittedObject));
                     }
                 }
-                // The action is considered complete if the mouse button is no longer pressed.
-                return Input.GetMouseButtonUp(0);
+                return false;
             }
             return false;
         }
 
-        private void DeleteDrawableChilds(GameObject drawable)
+        /// <summary>
+        /// This method finds and deletes all drawable types that are placed on the given drawable.
+        /// </summary>
+        /// <param name="drawable">is the drawable which should be cleaned.</param>
+        /// <returns>true if the drawable was successfull cleaned, false if the drawable was already cleaned</returns>
+        private bool DeleteDrawableChilds(GameObject drawable)
         {
             Transform[] allChildren = GameDrawableFinder.GetAttachedObjectsObject(drawable).GetComponentsInChildren<Transform>();
+            /// A cleaned drawable has only one transform (AttachedObject-Transform itself)
+            if (allChildren.Length == 1)
+            {
+                return false;
+            }
             foreach (Transform childsTransform in allChildren)
             {
                 GameObject child = childsTransform.gameObject;
-                // TODO implement the other types
                 if (Tags.DrawableTypes.Contains(child.tag))
                 {
                     memento = new Memento(drawable, new DrawableType().Get(child));
@@ -50,53 +100,13 @@ namespace SEE.Controls.Actions.Drawable
                     new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.type.id).Execute();
                     Destroyer.Destroy(child);
                 }
-                /*
-                if (child.CompareTag(Tags.Line))
-                {
-                    LineRenderer lineRenderer = child.GetComponent<LineRenderer>();
-                    Vector3[] positions = new Vector3[lineRenderer.positionCount];
-                    lineRenderer.GetPositions(positions);
-                    memento = new Memento(child, drawable, DrawableTypesEnum.Line, child.name);
-                    memento.line = Line.GetLine(child);
-                    mementoList.Add(memento);
-
-                    new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.id).Execute();
-                    Destroyer.Destroy(child);
-                    //Destroyer.Destroy(child.transform.parent.gameObject);  
-                }*/
             }
             currentState = ReversibleAction.Progress.Completed;
-        }
-
-        private List<Memento> mementoList = new List<Memento>();
-        private Memento memento;
-
-        private class Memento
-        {
-           // public GameObject gameObject;
-            public readonly GameObject drawable;
-            public readonly DrawableType type;
-           // public readonly DrawableTypesEnum type;
-           // public readonly string id;
-           // public Line line;
-           public Memento(GameObject drawable, DrawableType type)
-            {
-                this.drawable = drawable;
-                this.type = type;
-            }
-            /*
-            public Memento(GameObject gameObject, GameObject drawable, DrawableTypesEnum type, string id)
-            {
-                this.gameObject = gameObject;
-                this.drawable = drawable;
-                this.type = type;
-                this.id = id;
-            }*/
+            return true;
         }
 
         /// <summary>
-        /// Destroys the drawn line.
-        /// See <see cref="ReversibleAction.Undo()"/>.
+        /// Reverts this action, i.e., restores the deleted drawable types of the selected drawable.
         /// </summary>
         public override void Undo()
         {
@@ -118,9 +128,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Redraws the drawn line (setting up <see cref="line"/> and adds <see cref="renderer"/> 
-        /// before that).
-        /// See <see cref="ReversibleAction.Undo()"/>.
+        /// Repeats this action, i.e., deletes again all the drawable types that are placed on the selected drawable.
         /// </summary>
         public override void Redo()
         {
@@ -134,26 +142,41 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// A new instance of <see cref="EraseAction"/>.
+        /// A new instance of <see cref="CleanerAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="EraseAction"/></returns>
+        /// <returns>new instance of <see cref="CleanerAction"/></returns>
         public static ReversibleAction CreateReversibleAction()
         {
             return new CleanerAction();
         }
 
-
+        /// <summary>
+        /// A new instance of <see cref="CleanerAction"/>.
+        /// See <see cref="ReversibleAction.NewInstance"/>.
+        /// </summary>
+        /// <returns>new instance of <see cref="CleanerAction"/></returns>
         public override ReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }
 
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns><see cref="ActionStateType.Cleaner"/></returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.Cleaner;
         }
 
+        /// <summary>
+        /// The set of IDs of all gameObjects changed by this action.
+        /// <see cref="ReversibleAction.GetActionStateType"/>
+        /// Because this action does not actually change any game object, 
+        /// an empty set is always returned.
+        /// </summary>
+        /// <returns>id's of the deletes drawable types</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento == null || memento.drawable == null)

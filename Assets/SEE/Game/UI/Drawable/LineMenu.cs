@@ -61,7 +61,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <summary>
         /// A list of actions where the line menu is already displayed at awake.
         /// </summary>
-        public static List<ActionStateType> usedIn = new() { ActionStateTypes.DrawOn, ActionStateTypes.ColorPicker };
+        public static List<ActionStateType> usedIn = new() { ActionStateTypes.DrawOn};
 
         /// <summary>
         /// An enum with the menu points that can be hide.

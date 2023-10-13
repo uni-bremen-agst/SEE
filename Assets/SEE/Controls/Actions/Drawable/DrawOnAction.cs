@@ -14,12 +14,13 @@ using SEE.Game.Drawable.Configurations;
 namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
-    /// Allows to create drawings by the mouse cursor.
-    /// It serves as an example for a continuous action that modifies the
-    /// scene while active.
+    /// This action allows drawing on a drawable.
     /// </summary>
     class DrawOnAction : AbstractPlayerAction
     {
+        /// <summary>
+        /// The different progress states of this action.
+        /// </summary>
         private enum ProgressState
         {
             StartDrawing,
@@ -27,32 +28,64 @@ namespace SEE.Controls.Actions.Drawable
             FinishDrawing
         }
 
+        /// <summary>
+        /// Holds the current progress state.
+        /// </summary>
         private ProgressState progressState;
 
         /// <summary>
-        /// The object holding the line renderer.
+        /// The line game object. It holds the line renderer and the mesh collider.
         /// </summary>
         private GameObject line;
 
+        /// <summary>
+        /// The drawable on that the line should be displayed.
+        /// </summary>
         private GameObject drawable;
 
         /// <summary>
         /// The positions of the line in local space.
+        /// It's used for the line renderer.
         /// </summary>
         private Vector3[] positions = new Vector3[1];
 
+        /// <summary>
+        /// Saves all the information needed to revert or repeat this action.
+        /// </summary>
         private Memento memento;
 
-        private HSVPicker.ColorPicker picker;
-        private ThicknessSliderController thicknessSlider;
+        /// <summary>
+        /// The state
+        /// </summary>
         private bool drawing = false;
+        /// <summary>
+        /// Represents that drawing has been finished.
+        /// It will be needed to ensure, that completes this action.
+        /// </summary>
         private bool finishDrawing = false;
 
+        /// <summary>
+        /// The HSV ColorPicker for the color field in the line menu.
+        /// </summary>
+        private HSVPicker.ColorPicker picker;
+
+        /// <summary>
+        /// The thickness slider controller for the line thickness.
+        /// </summary>
+        private ThicknessSliderController thicknessSlider;
+
+        /// <summary>
+        /// Starts the <see cref="DrawOnAction"/>.
+        /// It sets the progress state to start drawing.
+        /// </summary>
         public override void Start()
         {
             progressState = ProgressState.StartDrawing;
         }
 
+        /// <summary>
+        /// Enables the line menu and initializes the required AddListeners.
+        /// </summary>
         public override void Awake()
         {
             LineMenu.enableLineMenu(withoutMenuLayer: new LineMenu.MenuLayer[] { LineMenu.MenuLayer.Layer, LineMenu.MenuLayer.Loop });
@@ -74,26 +107,37 @@ namespace SEE.Controls.Actions.Drawable
             });
 
             picker = LineMenu.instance.GetComponent<HSVPicker.ColorPicker>();
-            picker.AssignColor(ValueHolder.currentColor);
+            picker.AssignColor(ValueHolder.currentPrimaryColor);
             picker.onValueChanged.AddListener(LineMenu.colorAction = color =>
             {
-                ValueHolder.currentColor = color;
+                ValueHolder.currentPrimaryColor = color;
             });
         }
 
+        /// <summary>
+        /// Stops the <see cref="DrawOnAction"/> and hides the line menu.
+        /// </summary>
         public override void Stop()
         {
             LineMenu.disableLineMenu();
+            if (progressState != ProgressState.FinishDrawing)
+            {
+                Destroyer.Destroy(line);
+            }
         }
 
         /// <summary>
-        /// Continues the line at the point of the mouse position and draws it.
+        /// This method manages the player's interaction with the mode <see cref="ActionStateType.DrawOn"/>.
+        /// Specifically: Allows the user to draw. For this, the left mouse button must be held down as long as you want to draw. 
+        /// To finish, release the left mouse button.
         /// </summary>
-        /// <returns>true if completed</returns>
+        /// <returns>Whether this Action is finished</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
             {
+                /// This block draws the line when the left mouse button is held down.
+                /// Drawing is only possible when targeting a drawable or an object placed on a drawable, and the drawable remains unchanged during drawing.
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !finishDrawing &&
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
@@ -103,22 +147,27 @@ namespace SEE.Controls.Actions.Drawable
                     switch (progressState)
                     {
                         case ProgressState.StartDrawing:
+                            /// Find the drawable for this line.
                             drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
                                     raycastHit.collider.gameObject : GameDrawableFinder.FindDrawable(raycastHit.collider.gameObject);
                             drawing = true;
                             progressState = ProgressState.Drawing;
                             positions[0] = raycastHit.point;
-                            line = GameDrawer.StartDrawing(drawable, positions, ValueHolder.currentColor, ValueHolder.currentThickness,
+                            /// Create the line object.
+                            line = GameDrawer.StartDrawing(drawable, positions, ValueHolder.currentPrimaryColor, ValueHolder.currentThickness,
                                 ValueHolder.currentLineKind, ValueHolder.currentTiling);
+                            /// Transform the first position in local space.
+                            /// Beforehand, it's not possible because there is no line object on which 'InverseTransformPoint' can be applied.
                             positions[0] = line.transform.InverseTransformPoint(positions[0]) - ValueHolder.distanceToDrawable;
                             break;
 
                         case ProgressState.Drawing:
-                            // The position at which to continue the line.
+                            /// The position at which to continue the line in local space.
+                            /// To maintain the distance from the drawable, the minimum distance on the Z-axis is subtracted.
                             Vector3 newPosition = line.transform.InverseTransformPoint(raycastHit.point) - ValueHolder.distanceToDrawable;
                             if (newPosition != positions.Last())
                             {
-                                // Add newPosition to the line renderer.
+                                /// Add newPosition to the line renderer and and start drawing over the network.
                                 Vector3[] newPositions = new Vector3[positions.Length + 1];
                                 Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
                                 newPositions[newPositions.Length - 1] = newPosition;
@@ -126,19 +175,22 @@ namespace SEE.Controls.Actions.Drawable
 
                                 GameDrawer.Drawing(line, positions);
                                 new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), Line.GetLine(line)).Execute();
-                                currentState = ReversibleAction.Progress.InProgress;
                             }
                             break;
                     }
                 }
 
-                if (Input.GetMouseButtonUp(0) && drawing)
+                /// This block is executed when the drawing should be completed.
+                if ((Input.GetMouseButtonUp(0) || !Input.GetMouseButton(0)) && drawing)
                 {
                     progressState = ProgressState.FinishDrawing;
                     drawing = false;
 
                     if (progressState == ProgressState.FinishDrawing)
                     {
+                        /// A functional mesh requires a minimum of three vertices. 
+                        /// Therefore, lines with fewer than three points are deleted, and the drawing cycle starts again. 
+                        /// If at least three vertices exist, the pivot of the line is set to the middle of the line, and the action is completed.
                         if (GameDrawer.DifferentMeshVerticesCounter(line) >= 3)
                         {
                             finishDrawing = true;
@@ -162,11 +214,25 @@ namespace SEE.Controls.Actions.Drawable
             return false;
         }
 
+        /// <summary>
+        /// This struct can store all the information needed to revert or repeat a <see cref="DrawOnAction"/>.
+        /// </summary>
         private struct Memento
         {
+            /// <summary>
+            /// The drawable on that the line should be displayed.
+            /// </summary>
             public readonly GameObject drawable;
+            /// <summary>
+            /// The line. The line configuration <see cref="Line"/> contains all required values to redraw.
+            /// </summary>
             public Line line;
 
+            /// <summary>
+            /// The constructor, which simply assigns its only parameter to a field in this class.
+            /// </summary>
+            /// <param name="drawable">The drawable where the line should be placed</param>
+            /// <param name="line">Line configuration for redrawing.</param>
             public Memento(GameObject drawable, Line line)
             {
                 this.drawable = drawable;
@@ -175,8 +241,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Destroys the drawn line.
-        /// See <see cref="ReversibleAction.Undo()"/>.
+        /// Reverts this action, i.e., deletes the drawed line.
         /// </summary>
         public override void Undo()
         {
@@ -188,19 +253,17 @@ namespace SEE.Controls.Actions.Drawable
             if (line != null)
             {
                 new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.line.id).Execute();
-                Destroyer.Destroy(line);//.transform.parent.gameObject);
+                Destroyer.Destroy(line);
                 line = null;
             }
         }
 
         /// <summary>
-        /// Redraws the drawn line (setting up <see cref="line"/> and adds <see cref="renderer"/> 
-        /// before that).
-        /// See <see cref="ReversibleAction.Undo()"/>.
+        /// Repeats this action, i.e., redraws the line.
         /// </summary>
         public override void Redo()
         {
-            base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
+            base.Redo();
             line = GameDrawer.ReDrawLine(memento.drawable, memento.line);
             if (line != null)
             {
@@ -243,7 +306,7 @@ namespace SEE.Controls.Actions.Drawable
         /// Because this action does not actually change any game object, 
         /// an empty set is always returned.
         /// </summary>
-        /// <returns>an empty set</returns>
+        /// <returns>an empty set or the drawable id and the line id</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.drawable == null)

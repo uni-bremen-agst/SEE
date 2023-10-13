@@ -21,19 +21,129 @@ namespace SEE.Controls.Actions.Drawable
 {
     public class EditAction : AbstractPlayerAction
     {
-        private HSVPicker.ColorPicker picker;
-        private LayerSliderController layerSlider;
-        private ThicknessSliderController thicknessSlider;
-        private Memento memento;
-        private bool isActive = false;
-        private bool finish = false;
+        /// <summary>
+        /// Holds the current progress state.
+        /// </summary>
+        private ProgressState progressState = ProgressState.SelectObject;
 
+        /// <summary>
+        /// The progress states of the <see cref="EditAction"/>
+        /// </summary>
+        private enum ProgressState
+        {
+            SelectObject,
+            OpenEditMenu,
+            Edit,
+            Finish
+        }
+
+        /// <summary>
+        /// This struct can store all the information needed to revert or repeat a <see cref="EditAction"/>
+        /// </summary>
+        private Memento memento;
+
+        /// <summary>
+        /// This struct can store all the information needed to revert or repeat a <see cref="EditAction"/>
+        /// </summary>
+        private struct Memento
+        {
+            /// <summary>
+            /// Is the selected drawable type object that should be edit.
+            /// </summary>
+            public GameObject selectedObj;
+            /// <summary>
+            /// The old values of the drawable type object.
+            /// </summary>
+            public readonly DrawableType oldValueHolder;
+            /// <summary>
+            /// The new edited values of the drawable type object.
+            /// </summary>
+            public readonly DrawableType newValueHolder;
+            /// <summary>
+            /// The drawable on that the drawable type object is displayed.
+            /// </summary>
+            public readonly GameObject drawable;
+            /// <summary>
+            /// The id of the drawable type object.
+            /// </summary>
+            public readonly string id;
+
+            /// <summary>
+            /// The constructor, which simply assigns its only parameter to a field in this class.
+            /// </summary>
+            /// <param name="obj">Is the selected drawable type object that should be edit</param>
+            /// <param name="oldValueHolder">The old values of the drawable type object.</param>
+            /// <param name="newValueHolder">The new edited values of the drawable type object.</param>
+            /// <param name="drawable">The drawable on that the drawable type object is displayed.</param>
+            /// <param name="id">The id of the drawable type object.</param>
+            public Memento(GameObject obj, DrawableType oldValueHolder,
+                DrawableType newValueHolder, GameObject drawable, string id)
+            {
+                this.selectedObj = obj;
+                this.oldValueHolder = oldValueHolder;
+                this.newValueHolder = newValueHolder;
+                this.drawable = drawable;
+                this.id = id;
+            }
+        }
+        /// <summary>
+        /// The selected drawable type object that should be edit.
+        /// </summary>
         private GameObject selectedObj;
 
+        /// <summary>
+        /// The selected object of the last run.
+        /// </summary>
+        private static GameObject oldSelectedObj;
+
+        /// <summary>
+        /// Bool that represents that the left mouse button was released after finish.
+        /// It is necessary to prevent the previously selected object from being accidentally selected again. 
+        /// After the action has successfully completed, it starts again, allowing for the selection of a new object. 
+        /// This option enables the immediate selection of another object while holding down the mouse button.
+        /// </summary>
+        private static bool mouseWasReleased = true;
+
+        /// <summary>
+        /// The old values of the selected drawable type.
+        /// </summary>
         private DrawableType oldValueHolder;
 
+        /// <summary>
+        /// The new edited values of the selected drawable type.
+        /// </summary>
         private DrawableType newValueHolder;
 
+        /// <summary>
+        /// The HSV color picker for the line menu.
+        /// </summary>
+        private HSVPicker.ColorPicker picker;
+
+        /// <summary>
+        /// The layer slider controller for the line menu.
+        /// </summary>
+        private LayerSliderController layerSlider;
+
+        /// <summary>
+        /// The thickness slider controller for the line menu.
+        /// </summary>
+        private ThicknessSliderController thicknessSlider;
+
+        /// <summary>
+        /// Resets the old selected object, if the action state will leave.
+        /// </summary>
+        public static void Reset()
+        {
+            oldSelectedObj = null;
+            mouseWasReleased = true;
+        }
+
+        /// <summary>
+        /// This method checks if there are any changes in the editable values.
+        /// </summary>
+        /// <param name="oldHolder">The holder for the old values.</param>
+        /// <param name="newHolder">The holder for the new values.</param>
+        /// <returns></returns>
         private bool CheckEquals(DrawableType oldHolder, DrawableType newHolder)
         {
             if (oldHolder is Line oldLineHolder && newHolder is Line newLineHolder)
@@ -59,99 +169,129 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// 
+        /// Deactivates the blink effect if, it is still active and hides the text and line menu.
+        /// If the action was not completed in full, the changes are reset.
         /// </summary>
-        /// <returns>true if completed</returns>
-        public override bool Update()
+        public override void Stop()
         {
-            bool result = false;
-            if (!Raycasting.IsMouseOverGUI())
+            base.Stop();
+            if (selectedObj != null && selectedObj.GetComponent<BlinkEffect>() != null)
             {
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && isActive == false && !finish &&
-                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) && // Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                    Tags.DrawableTypes.Contains(raycastHit.collider.gameObject.tag))
-                {
-                    GameObject currentSelectedObj = raycastHit.collider.gameObject;
-                    GameObject oldObj = selectedObj;
-                    isActive = true;
-
-                    if (oldObj != null && !CheckEquals(oldValueHolder, newValueHolder))
-                    {
-                        finish = true;
-                        oldObj.GetComponent<BlinkEffect>().Deactivate();
-                       // TextMenu.disableTextMenu();
-                       // LineMenu.disableLineMenu();
-                        memento = new Memento(oldObj, oldValueHolder, newValueHolder,
-                                     GameDrawableFinder.FindDrawable(oldObj), oldObj.name);
-                        currentState = ReversibleAction.Progress.InProgress;
-                      //  return false;
-                    }
-
-                    oldValueHolder = new DrawableType().Get(currentSelectedObj);
-                    newValueHolder = new DrawableType().Get(currentSelectedObj);
-
-
-                    BlinkEffect effect = currentSelectedObj.AddOrGetComponent<BlinkEffect>();
-                    effect.SetAllowedActionStateType(GetActionStateType());
-
-                    if (oldObj != null)
-                    {
-                        if (currentSelectedObj.name.Equals(oldObj.name))
-                        {
-                            effect.LoopReverse();
-                            selectedObj = null;
-                            if (!effect.GetLoopStatus())
-                            {
-                                TextMenu.disableTextMenu();
-                                LineMenu.disableLineMenu();
-                            }
-                        }
-                        else
-                        {
-                            if (oldObj.GetComponent<BlinkEffect>() != null)
-                            {
-                                oldObj.GetComponent<BlinkEffect>().Deactivate();
-                                TextMenu.disableTextMenu();
-                                LineMenu.disableLineMenu();
-                            }
-                        }
-                    }
-                    if (oldObj == null || !currentSelectedObj.name.Equals(oldObj.name))
-                    {
-                        effect.Activate(currentSelectedObj);
-                        selectedObj = currentSelectedObj;
-                    }
-
-                    if (currentSelectedObj.GetComponent<BlinkEffect>() != null && currentSelectedObj.GetComponent<BlinkEffect>().GetLoopStatus())
-                    {
-                        //TODO add MMNode Tags if that are differents.
-                        if (currentSelectedObj.CompareTag(Tags.Line))
-                        {
-                            enableLineMenu(currentSelectedObj);
-                        }
-                        if (currentSelectedObj.CompareTag(Tags.DText))
-                        {
-                            enableTextMenu(currentSelectedObj);
-                        }
-                    }
-                }
-                if (Input.GetMouseButtonUp(0))
-                {
-                    if (isActive)
-                    {
-                        isActive = false;
-                    }
-                    if (finish)
-                    {
-                        currentState = ReversibleAction.Progress.Completed;
-                        return true;
-                    }
-                }
-                return false;
+                selectedObj.GetComponent<BlinkEffect>().Deactivate();
             }
-            return result;
+            if (progressState != ProgressState.Finish && selectedObj != null)
+            {
+                GameObject drawable = GameDrawableFinder.FindDrawable(selectedObj);
+                string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
+                if (oldValueHolder is Line oldLineHolder)
+                {
+                    GameEdit.ChangeLine(selectedObj, oldLineHolder);
+                    new EditLineNetAction(drawable.name, drawableParent, oldLineHolder).Execute();
+                }
+                if (oldValueHolder is Text oldTextHolder)
+                {
+                    GameEdit.ChangeText(selectedObj, oldTextHolder);
+                    new EditTextNetAction(drawable.name, drawableParent, oldTextHolder).Execute();
+                }
+            }
+            TextMenu.disableTextMenu();
+            LineMenu.disableLineMenu();
         }
 
+        /// <summary>
+        /// This method manages the player's interaction with the mode <see cref="ActionStateType.Edit"/>.
+        /// It allows editing of the drawable type objects.
+        /// </summary>
+        /// <returns>Whether this Action is finished</returns>
+        public override bool Update()
+        {
+            if (!Raycasting.IsMouseOverGUI())
+            {
+                switch (progressState)
+                {
+                    /// This block allows the selection of a drawable type object for editing, taking into account the object edited in the last run. 
+                    /// It prevents the same object from being accidentally selected again when the left mouse button is not released. 
+                    /// Therefore, after the last action has been successfully completed, the left mouse button must be released to select the same object again. 
+                    /// Additionally, a ValueResetter component is added to the UI Canvas to reset the two static variables after exiting this action type.
+                    case ProgressState.SelectObject:
+                        if (Input.GetMouseButtonUp(0))
+                        {
+                            mouseWasReleased = true;
+                        }
+                        if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj == null &&
+                            Raycasting.RaycastAnything(out RaycastHit raycastHit) && 
+                            (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased)) &&
+                            Tags.DrawableTypes.Contains(raycastHit.collider.gameObject.tag))
+                        {
+                            selectedObj = raycastHit.collider.gameObject;
+                            oldSelectedObj = selectedObj;
+                            oldValueHolder = new DrawableType().Get(selectedObj);
+                            newValueHolder = new DrawableType().Get(selectedObj);
+                            BlinkEffect effect = selectedObj.AddOrGetComponent<BlinkEffect>();
+                            effect.SetAllowedActionStateType(GetActionStateType());
+
+                            if (GameObject.Find("UI Canvas").GetComponent<ValueResetter>() == null)
+                            {
+                                GameObject.Find("UI Canvas").AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
+                            }
+                            progressState = ProgressState.OpenEditMenu;
+                        }
+                        
+                        break;
+                    /// In this block the right menu for the chosen drawable type will be opened.
+                    case ProgressState.OpenEditMenu:
+                        if (selectedObj.CompareTag(Tags.Line))
+                        {
+                            enableLineMenu(selectedObj);
+                        }
+                        if (selectedObj.CompareTag(Tags.DText))
+                        {
+                            enableTextMenu(selectedObj);
+                        }
+                        if (Input.GetMouseButtonUp(0))
+                        {
+                            progressState = ProgressState.Edit;
+                        }
+                        
+                        break;
+                    /// This block provides the completion of the action. As soon as the left mouse button is pressed, the completion is initiated.
+                    case ProgressState.Edit:
+                        if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj.GetComponent<BlinkEffect>() != null)
+                        {
+                            selectedObj.GetComponent<BlinkEffect>().Deactivate();
+                            progressState = ProgressState.Finish;
+                        }
+                        break;
+                    /// This block completes or resets this action.
+                    /// If no changes were made, it resets.
+                    /// If there are changes the action will be successfull completed.
+                    case ProgressState.Finish:
+                        mouseWasReleased = false;
+                        if (!CheckEquals(oldValueHolder, newValueHolder))
+                        {
+                            memento = new Memento(selectedObj, oldValueHolder, newValueHolder,
+                                     GameDrawableFinder.FindDrawable(selectedObj), selectedObj.name);
+                            currentState = ReversibleAction.Progress.Completed;
+                            return true;
+                        } else
+                        {
+                            selectedObj = null;
+                            progressState = ProgressState.SelectObject;
+                            LineMenu.disableLineMenu();
+                            TextMenu.disableTextMenu();
+                        }
+                        break;
+                    default:
+                        return false;
+                }
+            }
+            return false;     
+        }
+
+        /// <summary>
+        /// This method provides the text menu for editing, adding the necessary AddListeners to the respective components.
+        /// </summary>
+        /// <param name="selectedText">The selected text object for editing.</param>
         private void enableTextMenu(GameObject selectedText)
         {
             if (newValueHolder is Text textHolder)
@@ -198,7 +338,8 @@ namespace SEE.Controls.Actions.Drawable
                 }, textHolder.outlineThickness);
 
 
-                TextMenu.AssignFontSize(size => {
+                TextMenu.AssignFontSize(size =>
+                {
                     GameEdit.ChangeFontSize(selectedText, size);
                     textHolder.fontSize = size;
                     new EditTextNetAction(drawable.name, drawableParentName, Text.GetText(selectedText)).Execute();
@@ -215,7 +356,8 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     WriteEditTextDialog writeTextDialog = new();
                     writeTextDialog.SetStringInit(textHolder.text);
-                    UnityAction<string> stringAction = (textOut => {
+                    UnityAction<string> stringAction = (textOut =>
+                    {
                         if (textOut != null && textOut != "")
                         {
                             TextMeshPro tmp = selectedText.GetComponent<TextMeshPro>();
@@ -242,6 +384,10 @@ namespace SEE.Controls.Actions.Drawable
             }
         }
 
+        /// <summary>
+        /// This method provides the line menu for editing, adding the necessary AddListeners to the respective components.
+        /// </summary>
+        /// <param name="selectedLine">The selected line object for editing.</param>
         private void enableLineMenu(GameObject selectedLine)
         {
             if (newValueHolder is Line lineHolder)
@@ -328,79 +474,57 @@ namespace SEE.Controls.Actions.Drawable
             }
         }
 
-        private struct Memento
-        {
-            public GameObject obj;
-            public readonly DrawableType oldValueHolder;
-            public readonly DrawableType newValueHolder;
-            public readonly GameObject drawable;
-            public readonly string id;
-
-            public Memento(GameObject obj, DrawableType oldValueHolder,
-                DrawableType newValueHolder, GameObject drawable, string id)
-            {
-                this.obj = obj;
-                this.oldValueHolder = oldValueHolder;
-                this.newValueHolder = newValueHolder;
-                this.drawable = drawable;
-                this.id = id;
-            }
-        }
-
         /// <summary>
-        /// Destroys the drawn line.
-        /// See <see cref="ReversibleAction.Undo()"/>.
+        /// Reverts this action, i.e., restores the old values of the selected object.
         /// </summary>
         public override void Undo()
         {
-            base.Undo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            if (memento.obj == null && memento.id != null)
+            base.Undo();
+            if (memento.selectedObj == null && memento.id != null)
             {
-                memento.obj = GameDrawableFinder.FindChild(memento.drawable, memento.id);
+                memento.selectedObj = GameDrawableFinder.FindChild(memento.drawable, memento.id);
             }
 
-            if (memento.obj != null)
+            if (memento.selectedObj != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawable(memento.obj);
+                GameObject drawable = GameDrawableFinder.FindDrawable(memento.selectedObj);
                 string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
                 if (memento.oldValueHolder is Line oldLineHolder)
                 {
-                    GameEdit.ChangeLine(memento.obj, oldLineHolder);
+                    GameEdit.ChangeLine(memento.selectedObj, oldLineHolder);
                     new EditLineNetAction(drawable.name, drawableParent, oldLineHolder).Execute();
                 }
                 if (memento.oldValueHolder is Text oldTextHolder)
                 {
-                    GameEdit.ChangeText(memento.obj, oldTextHolder);
+                    GameEdit.ChangeText(memento.selectedObj, oldTextHolder);
                     new EditTextNetAction(drawable.name, drawableParent, oldTextHolder).Execute();
                 }
             }
         }
 
         /// <summary>
-        /// Redraws the drawn line (setting up <see cref="line"/> and adds <see cref="renderer"/> 
-        /// before that).
-        /// See <see cref="ReversibleAction.Undo()"/>.
+        /// Repeats this action, i.e., assigns the new changed values to the selected object.
         /// </summary>
         public override void Redo()
         {
-            base.Redo(); // required to set <see cref="AbstractPlayerAction.hadAnEffect"/> properly.
-            if (memento.obj == null && memento.id != null)
+            base.Redo();
+            if (memento.selectedObj == null && memento.id != null)
             {
-                memento.obj = GameDrawableFinder.FindChild(memento.drawable, memento.id);
+                memento.selectedObj = GameDrawableFinder.FindChild(memento.drawable, memento.id);
             }
 
-            if (memento.obj != null)
+            if (memento.selectedObj != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawable(memento.obj);
+                GameObject drawable = GameDrawableFinder.FindDrawable(memento.selectedObj);
                 string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
                 if (memento.newValueHolder is Line newLineValueHolder)
                 {
-                    GameEdit.ChangeLine(memento.obj, newLineValueHolder);
+                    GameEdit.ChangeLine(memento.selectedObj, newLineValueHolder);
                     new EditLineNetAction(drawable.name, drawableParent, newLineValueHolder).Execute();
                 }
                 if (memento.newValueHolder is Text newTextHolder)
                 {
-                    GameEdit.ChangeText(memento.obj, newTextHolder);
+                    GameEdit.ChangeText(memento.selectedObj, newTextHolder);
                     new EditTextNetAction(drawable.name, drawableParent, newTextHolder).Execute();
                 }
             }
@@ -430,9 +554,16 @@ namespace SEE.Controls.Actions.Drawable
             return ActionStateTypes.Edit;
         }
 
+        /// <summary>
+        /// The set of IDs of all gameObjects changed by this action.
+        /// <see cref="ReversibleAction.GetActionStateType"/>
+        /// Because this action does not actually change any game object, 
+        /// an empty set is always returned.
+        /// </summary>
+        /// <returns>The object id of the changed object.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (memento.obj == null && memento.obj == null)
+            if (memento.selectedObj == null && memento.selectedObj == null)
             {
                 return new HashSet<string>();
             }
@@ -440,7 +571,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 return new HashSet<string>
                 {
-                    memento.obj.name
+                    memento.selectedObj.name
                 };
             }
         }
