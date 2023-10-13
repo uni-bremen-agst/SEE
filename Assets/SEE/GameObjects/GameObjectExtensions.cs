@@ -578,17 +578,13 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
-        /// component attached to it. Unlike <see cref="HasNodeRef(GameObject)"/>, the
-        /// node reference may be null.
+        /// Returns true if <paramref name="gameObject"/> is tagged by <see cref="Tags.Node"/>.
         /// </summary>
-        /// <param name="gameObject">the game object whose NodeRef is checked</param>
-        /// <returns>true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
-        /// component attached to it</returns>
+        /// <param name="gameObject">the game object to check</param>
+        /// <returns>true if <paramref name="gameObject"/> is tagged by <see cref="Tags.Node"/></returns>
         public static bool IsNode(this GameObject gameObject)
         {
-            // TODO: Does comparing the tag work too? It would be a lot more efficient.
-            return gameObject.TryGetComponent(out NodeRef _);
+            return gameObject.CompareTag(Tags.Node);
         }
 
         /// <summary>
@@ -673,16 +669,13 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
-        /// component attached to it. Unlike <see cref="HasEdgeRef(GameObject)"/> the
-        /// value of this edge reference may be null
+        /// Returns true if <paramref name="gameObject"/> is tagged by <see cref="Tags.Edge"/>.
         /// </summary>
-        /// <param name="gameObject">the game object whose EdgeRef is checked</param>
-        /// <returns>true if <paramref name="gameObject"/> has an <see cref="EdgeRef"/>
-        /// component attached to it</returns>
+        /// <param name="gameObject">the game object to check</param>
+        /// <returns>true if <paramref name="gameObject"/> is tagged by <see cref="Tags.Edge"/></returns>
         public static bool IsEdge(this GameObject gameObject)
         {
-            return gameObject.TryGetComponent(out EdgeRef _);
+            return gameObject.CompareTag(Tags.Edge);
         }
 
         /// <summary>
