@@ -7,6 +7,7 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -51,12 +52,6 @@ namespace SEE.Game.Operator
         private TweenOperation<float> labelAlpha;
 
         /// <summary>
-        /// Operation handling the blinking of the node.
-        /// The parameter specifies the number of blinks.
-        /// </summary>
-        private TweenOperation<int> blinking;
-
-        /// <summary>
         /// Operation handling the starting position of the label's line.
         /// </summary>
         private TweenOperation<Vector3> labelStartLinePosition;
@@ -98,6 +93,11 @@ namespace SEE.Game.Operator
         /// If true, the incoming and outgoing edges will be adjusted, too.
         /// </summary>
         private bool updateEdges;
+
+        /// <summary>
+        /// The material of the node.
+        /// </summary>
+        private Material material;
 
         /// <summary>
         /// The position this node is supposed to be at.
@@ -159,7 +159,7 @@ namespace SEE.Game.Operator
         /// </param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveZTo(float newZPosition, float factor =1, bool updateEdges = true)
+        public IOperationCallback<Action> MoveZTo(float newZPosition, float factor = 1, bool updateEdges = true)
         {
             float duration = ToDuration(factor);
             updateLayoutDuration = duration;
@@ -237,21 +237,6 @@ namespace SEE.Game.Operator
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
             return scale.AnimateTo(newLocalScale, duration);
-        }
-
-        /// <summary>
-        /// Makes the node blink <paramref name="blinkCount"/> times.
-        /// </summary>
-        /// <param name="blinkCount">The number of times the node should blink.</param>
-        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
-        /// that controls the blinking duration.
-        /// If set to 0, will execute directly, that is, the blinking is stopped
-        /// before control is returned to the caller.
-        /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> Blink(int blinkCount, float factor = 1)
-        {
-            return blinking.AnimateTo(blinkCount, ToDuration(factor));
         }
 
         /// <summary>
@@ -385,14 +370,13 @@ namespace SEE.Game.Operator
             // Let each game edge morph to the splines according to the layout.
             foreach (GameObject gameEdge in gameEdges)
             {
-                EdgeOperator edgeOperator = gameEdge.AddOrGetComponent<EdgeOperator>();
-                edgeOperator.MorphTo(layoutEdges[gameEdge.name].Spline, ToFactor(duration));
+                gameEdge.EdgeOperator().MorphTo(layoutEdges[gameEdge.name].Spline, ToFactor(duration));
             }
         }
 
         protected override TweenOperation<Color> InitializeColorOperation()
         {
-            Material material = GetRenderer(gameObject).material;
+            return new TweenOperation<Color>(AnimateToColorAction, material.color);
 
             Tween[] AnimateToColorAction(Color color, float d)
             {
@@ -401,8 +385,24 @@ namespace SEE.Game.Operator
                     material.DOColor(color, d).Play()
                 };
             }
+        }
 
-            return new TweenOperation<Color>(AnimateToColorAction, material.color);
+        protected override Tween[] BlinkAction(int count, float duration)
+        {
+            // If we're interrupting another blinking, we need to make sure the color still has the correct value.
+            material.color = Color.TargetValue;
+
+            if (count != 0)
+            {
+                return new Tween[]
+                {
+                    material.DOColor(Color.TargetValue.Invert(), duration / (2 * Mathf.Abs(count))).SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play()
+                };
+            }
+            else
+            {
+                return new Tween[] { };
+            }
         }
 
         protected override Color ModifyColor(Color color, Func<Color, Color> modifier)
@@ -415,25 +415,21 @@ namespace SEE.Game.Operator
             return new[] { color };
         }
 
-        protected void OnEnable()
+        protected override void OnEnable()
         {
+            // Material needs to be assigned before calling base.OnEnable()
+            // because it is used in InitializeColorOperation().
+            material = GetRenderer(gameObject).material;
             base.OnEnable();
             Node = GetNode(gameObject);
-            Material material = GetRenderer(gameObject).material;
             Vector3 currentPosition = transform.position;
             Vector3 currentScale = transform.localScale;
             Quaternion currentRotation = transform.rotation;
 
-            Tween[] AnimateToXAction(float x, float d) => new Tween[] { transform.DOMoveX(x, d).Play() };
-            Tween[] AnimateToYAction(float y, float d) => new Tween[] { transform.DOMoveY(y, d).Play() };
-            Tween[] AnimateToZAction(float z, float d) => new Tween[] { transform.DOMoveZ(z, d).Play() };
-            Tween[] AnimateToRotationAction(Quaternion r, float d) => new Tween[] { transform.DORotateQuaternion(r, d).Play() };
             positionX = new TweenOperation<float>(AnimateToXAction, currentPosition.x);
             positionY = new TweenOperation<float>(AnimateToYAction, currentPosition.y);
             positionZ = new TweenOperation<float>(AnimateToZAction, currentPosition.z);
             rotation = new TweenOperation<Quaternion>(AnimateToRotationAction, currentRotation);
-
-            Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] { transform.DOScale(s, d).Play() };
             scale = new TweenOperation<Vector3>(AnimateToScaleAction, currentScale);
 
             PrepareLabel();
@@ -441,25 +437,13 @@ namespace SEE.Game.Operator
             labelTextPosition = new TweenOperation<Vector3>(AnimateLabelTextPositionAction, DesiredLabelTextPosition);
             labelStartLinePosition = new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction, DesiredLabelStartLinePosition);
             labelEndLinePosition = new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction, DesiredLabelEndLinePosition);
+            return;
 
-            Tween[] BlinkAction(int count, float duration)
-            {
-                if (Color.IsRunning)
-                {
-                    Color.KillAnimator(true);
-                }
-                // If we're interrupting another blinking, we need to make sure the color still has the correct value.
-                material.color = Color.TargetValue;
-
-                return new Tween[]
-                {
-                    material.DOColor(Color.TargetValue.Invert(), duration / (2 * count)).SetEase(Ease.Linear).SetLoops(2 * count, LoopType.Yoyo).Play()
-                };
-            }
-
-            blinking = new TweenOperation<int>(BlinkAction, 0, equalityComparer: new AlwaysFalseEqualityComparer<int>());
-
-            #region Local Methods
+            Tween[] AnimateToXAction(float x, float d) => new Tween[] { transform.DOMoveX(x, d).Play() };
+            Tween[] AnimateToYAction(float y, float d) => new Tween[] { transform.DOMoveY(y, d).Play() };
+            Tween[] AnimateToZAction(float z, float d) => new Tween[] { transform.DOMoveZ(z, d).Play() };
+            Tween[] AnimateToRotationAction(Quaternion r, float d) => new Tween[] { transform.DORotateQuaternion(r, d).Play() };
+            Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] { transform.DOScale(s, d).Play() };
 
             static Node GetNode(GameObject gameObject)
             {
@@ -471,8 +455,6 @@ namespace SEE.Game.Operator
 
                 return nodeRef.Value;
             }
-
-            #endregion
         }
 
         /// <summary>

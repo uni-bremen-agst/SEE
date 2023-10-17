@@ -13,23 +13,27 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Sets a callback that will be fired the moment the animator reaches completion, all loops included.
         /// </summary>
-        void SetOnComplete(T callback);
+        /// <returns>Returns a reference to this object for chaining.</returns>
+        IOperationCallback<T> OnComplete(T callback);
 
         /// <summary>
         /// Sets a callback that will be fired the moment the animator is killed.
         /// </summary>
-        void SetOnKill(T callback);
+        /// <returns>Returns a reference to this object for chaining.</returns>
+        IOperationCallback<T> OnKill(T callback);
 
         /// <summary>
         /// Sets a callback that will be fired when the animator is set in a playing state, after any eventual delay.
         /// Also called each time the animator resumes playing from a paused state.
         /// </summary>
-        void SetOnPlay(T callback);
+        /// <returns>Returns a reference to this object for chaining.</returns>
+        IOperationCallback<T> OnPlay(T callback);
 
         /// <summary>
         /// Sets a callback that will be fired when the animator state changes from playing to paused.
         /// </summary>
-        void SetOnPause(T callback);
+        /// <returns>Returns a reference to this object for chaining.</returns>
+        IOperationCallback<T> OnPause(T callback);
 
         /// <summary>
         /// Sets a callback that will be fired when the animator is rewinded,
@@ -38,19 +42,21 @@ namespace SEE.Game.Operator
         /// <remarks>
         /// Rewinding an animator that is already rewinded will not fire this callback.
         /// </remarks>
-        void SetOnRewind(T callback);
+        /// <returns>Returns a reference to this object for chaining.</returns>
+        IOperationCallback<T> OnRewind(T callback);
 
         /// <summary>
         /// Sets a callback that will be fired once when the animator starts (meaning when the animator is set in a
         /// playing state the first time, after any eventual delay).
         /// </summary>
-        void SetOnStart(T callback);
+        /// <returns>Returns a reference to this object for chaining.</returns>
+        IOperationCallback<T> OnStart(T callback);
 
         /// <summary>
         /// Sets a callback that will be fired every time the animator updates.
         /// </summary>
-        /// <param name="callback"></param>
-        void SetOnUpdate(T callback);
+        /// <returns>Returns a reference to this object for chaining.</returns>
+        IOperationCallback<T> OnUpdate(T callback);
 
         // Missing from DOTween, we can add them once we need them: OnStepComplete, OnWaypointChange
     }

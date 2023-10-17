@@ -160,7 +160,7 @@ namespace SEE.Controls.Actions
         {
             if (nodeOperator == null)
             {
-                nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+                nodeOperator = gameObject.NodeOperator();
             }
 
             if (nodeOperator.Node != null)

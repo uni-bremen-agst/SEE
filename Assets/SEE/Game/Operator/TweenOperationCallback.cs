@@ -24,34 +24,40 @@ namespace SEE.Game.Operator
             this.targetTween = targetTween;
         }
 
-        public void SetOnComplete(TweenCallback callback)
+        public IOperationCallback<TweenCallback> OnComplete(TweenCallback callback)
         {
             targetTween.OnComplete((TweenCallback)Delegate.Combine(targetTween.onComplete, callback));
+            return this;
         }
 
-        public void SetOnKill(TweenCallback callback)
+        public IOperationCallback<TweenCallback> OnKill(TweenCallback callback)
         {
             targetTween.OnKill((TweenCallback)Delegate.Combine(targetTween.onKill, callback));
+            return this;
         }
 
-        public void SetOnPlay(TweenCallback callback)
+        public IOperationCallback<TweenCallback> OnPlay(TweenCallback callback)
         {
             targetTween.OnPlay((TweenCallback)Delegate.Combine(targetTween.onPlay, callback));
+            return this;
         }
 
-        public void SetOnPause(TweenCallback callback)
+        public IOperationCallback<TweenCallback> OnPause(TweenCallback callback)
         {
             targetTween.OnPause((TweenCallback)Delegate.Combine(targetTween.onPause, callback));
+            return this;
         }
 
-        public void SetOnRewind(TweenCallback callback)
+        public IOperationCallback<TweenCallback> OnRewind(TweenCallback callback)
         {
             targetTween.OnRewind((TweenCallback)Delegate.Combine(targetTween.onRewind, callback));
+            return this;
         }
 
-        public void SetOnUpdate(TweenCallback callback)
+        public IOperationCallback<TweenCallback> OnUpdate(TweenCallback callback)
         {
             targetTween.OnUpdate((TweenCallback)Delegate.Combine(targetTween.onUpdate, callback));
+            return this;
         }
 
         /// <summary>
@@ -59,10 +65,11 @@ namespace SEE.Game.Operator
         /// playing state the first time, after any eventual delay).
         /// **All existing callbacks for `OnStart` will be removed.**
         /// </summary>
-        public void SetOnStart(TweenCallback callback)
+        public IOperationCallback<TweenCallback> OnStart(TweenCallback callback)
         {
             // We can't combine delegates here because `onStart` is an internal property in DOTween.
             targetTween.OnStart(callback);
+            return this;
         }
     }
 }

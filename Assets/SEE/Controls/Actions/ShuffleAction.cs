@@ -114,7 +114,7 @@ namespace SEE.Controls.Actions
                         // to its original position.
                         originalPosition = cityRootNode.position;
                         // The node operator that is going to be used to move the city-root node
-                        nodeOperator = cityRootNode.gameObject.AddOrGetComponent<NodeOperator>();
+                        nodeOperator = cityRootNode.gameObject.NodeOperator();
 
                         // Where exactly have we hit the plane containing cideRootNode (if at all)?
                         if (Raycasting.RaycastPlane(new UnityEngine.Plane(Vector3.up, cityRootNode.position), out Vector3 cityPlaneHitPoint))

@@ -133,67 +133,74 @@ namespace SEE.Game.Operator
             }
         }
 
-        public void SetOnComplete(Action callback)
+        public IOperationCallback<Action> OnComplete(Action callback)
         {
             onComplete = callback;
             foreach (IOperationCallback<C> operationCallback in callbacks)
             {
-                operationCallback.SetOnComplete(callbackConverter(() => HandleSingleCallback(operationCallback, 0)));
+                operationCallback.OnComplete(callbackConverter(() => HandleSingleCallback(operationCallback, 0)));
             }
+            return this;
         }
 
-        public void SetOnKill(Action callback)
+        public IOperationCallback<Action> OnKill(Action callback)
         {
             onKill = callback;
             foreach (IOperationCallback<C> operationCallback in callbacks)
             {
-                operationCallback.SetOnKill(callbackConverter(() => HandleSingleCallback(operationCallback, 1)));
+                operationCallback.OnKill(callbackConverter(() => HandleSingleCallback(operationCallback, 1)));
             }
+            return this;
         }
 
-        public void SetOnPlay(Action callback)
+        public IOperationCallback<Action> OnPlay(Action callback)
         {
             onPlay = callback;
             foreach (IOperationCallback<C> operationCallback in callbacks)
             {
-                operationCallback.SetOnPlay(callbackConverter(() => HandleSingleCallback(operationCallback, 2)));
+                operationCallback.OnPlay(callbackConverter(() => HandleSingleCallback(operationCallback, 2)));
             }
+            return this;
         }
 
-        public void SetOnPause(Action callback)
+        public IOperationCallback<Action> OnPause(Action callback)
         {
             onPause = callback;
             foreach (IOperationCallback<C> operationCallback in callbacks)
             {
-                operationCallback.SetOnPause(callbackConverter(() => HandleSingleCallback(operationCallback, 3)));
+                operationCallback.OnPause(callbackConverter(() => HandleSingleCallback(operationCallback, 3)));
             }
+            return this;
         }
 
-        public void SetOnRewind(Action callback)
+        public IOperationCallback<Action> OnRewind(Action callback)
         {
             onRewind = callback;
             foreach (IOperationCallback<C> operationCallback in callbacks)
             {
-                operationCallback.SetOnRewind(callbackConverter(() => HandleSingleCallback(operationCallback, 4)));
+                operationCallback.OnRewind(callbackConverter(() => HandleSingleCallback(operationCallback, 4)));
             }
+            return this;
         }
 
-        public void SetOnStart(Action callback)
+        public IOperationCallback<Action> OnStart(Action callback)
         {
             onStart = callback;
             foreach (IOperationCallback<C> operationCallback in callbacks)
             {
-                operationCallback.SetOnStart(callbackConverter(() => HandleSingleCallback(operationCallback, 5)));
+                operationCallback.OnStart(callbackConverter(() => HandleSingleCallback(operationCallback, 5)));
             }
+            return this;
         }
 
-        public void SetOnUpdate(Action callback)
+        public IOperationCallback<Action> OnUpdate(Action callback)
         {
             onUpdate = callback;
             foreach (IOperationCallback<C> operationCallback in callbacks)
             {
-                operationCallback.SetOnUpdate(callbackConverter(() => HandleSingleCallback(operationCallback, 6)));
+                operationCallback.OnUpdate(callbackConverter(() => HandleSingleCallback(operationCallback, 6)));
             }
+            return this;
         }
     }
 }
