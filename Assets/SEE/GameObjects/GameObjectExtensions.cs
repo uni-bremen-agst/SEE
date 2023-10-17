@@ -883,7 +883,7 @@ namespace SEE.GO
             }
             else
             {
-                throw new InvalidOperationException($"Cannot get NodeOperator for game object {gameObject.name} because it is not a node.");
+                throw new InvalidOperationException($"Cannot get {nameof(NodeOperator)} for game object {gameObject.name} because it is not a node.");
             }
         }
 
@@ -902,7 +902,7 @@ namespace SEE.GO
             }
             else
             {
-                throw new InvalidOperationException($"Cannot get EdgeOperator for game object {gameObject.name} because it is not an edge.");
+                throw new InvalidOperationException($"Cannot get {nameof(EdgeOperator)} for game object {gameObject.name} because it is not an edge.");
             }
         }
 
@@ -932,7 +932,7 @@ namespace SEE.GO
                 }
                 else
                 {
-                    throw new InvalidOperationException("Cannot get GraphElementOperator for game object "
+                    throw new InvalidOperationException($"Cannot get {nameof(GraphElementOperator)} for game object "
                                                         + $"{gameObject.name} because it is neither a node nor an edge.");
                 }
             }
