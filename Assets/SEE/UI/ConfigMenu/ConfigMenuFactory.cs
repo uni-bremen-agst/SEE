@@ -82,7 +82,7 @@ namespace SEE.UI.ConfigMenu
             GameObject configMenuGo = Instantiate(configMenuPrefab);
             configMenuGo.name = configMenuPrefab.name;
             configMenuGo.transform.SetSiblingIndex(0);
-            configMenuGo.MustGetComponent(out configMenu);
+            configMenu = configMenuGo.MustGetComponent<ConfigMenu>();
             configMenu.CurrentlyEditing = instanceToEdit;
             configMenu.OnInstanceChangeRequest.AddListener(ReplaceMenu);
             if (turnMenuOn)

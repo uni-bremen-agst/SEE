@@ -69,8 +69,8 @@ namespace SEE.UI.PropertyDialog
                 if (field.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
                     // Register listeners on entry and exit events, respectively
-                    pointerHelper.EnterEvent.AddListener(() => tooltip.Show(Description));
-                    pointerHelper.ExitEvent.AddListener(tooltip.Hide);
+                    pointerHelper.EnterEvent.AddListener(_ => tooltip.Show(Description));
+                    pointerHelper.ExitEvent.AddListener(_ => tooltip.Hide());
                     // FIXME scrolling doesn't work while hovering above the field, because
                     // the Modern UI Pack uses an Event Trigger (see Utils/PointerHelper for an explanation.)
                     // It is unclear how to resolve this without either abstaining from using the Modern UI Pack

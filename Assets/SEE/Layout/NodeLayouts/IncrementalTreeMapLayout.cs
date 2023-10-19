@@ -29,7 +29,7 @@ namespace SEE.Layout.NodeLayouts
         public IncrementalTreeMapLayout(float groundLevel,
             float width,
             float depth,
-            IncrementalTreeMapSetting settings)
+            IncrementalTreeMapAttributes settings)
             : base(groundLevel)
         {
             Name = "IncrementalTreeMap";
@@ -41,7 +41,7 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// The adjustable parameters for the layout.
         /// </summary>
-        private readonly IncrementalTreeMapSetting settings;
+        private readonly IncrementalTreeMapAttributes settings;
 
         /// <summary>
         /// The width of the rectangle in which to place all nodes in Unity units.

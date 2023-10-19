@@ -1,7 +1,5 @@
-﻿using Sirenix.Serialization;
-using SEE.Game;
+﻿using SEE.Game;
 using SEE.GO;
-using SEE.Utils;
 using System;
 using DG.Tweening;
 using UnityEngine;
@@ -10,6 +8,12 @@ using System.IO;
 
 namespace SEE.Controls
 {
+    /// <summary>
+    /// Manages the kind of environment (desktop or VR).
+    /// </summary>
+    /// <remarks>This component is assumed to be attached to a game object in the
+    /// main scene. The user can select the environment in the Unity editor.
+    /// The selection can also be made during run-time.</remarks>
     public class SceneSettings : MonoBehaviour
     {
         //-----------------------------------------------
@@ -110,30 +114,6 @@ namespace SEE.Controls
             }
         }
 
-        private static GameObject localPlayer;
-        /// <summary>
-        /// The game object representing the active local player, that is, the player
-        /// executing on this local instance of Unity.
-        /// </summary>
-        public static GameObject LocalPlayer
-        {
-            get
-            {
-                if (localPlayer == null)
-                {
-                    localPlayer = CreatePlayer(InputType);
-                }
-                return localPlayer;
-            }
-            private set
-            {
-                if (LocalPlayer == null)
-                {
-                    localPlayer = value;
-                }
-            }
-        }
-
         /// <summary>
         /// Depending on the user's selection, turns VR mode on or off and activates/deactivates
         /// the game objects representing the player in the scene.
@@ -164,55 +144,6 @@ namespace SEE.Controls
         private static void SetDoTweenSettings()
         {
             DOTween.defaultEaseType = Ease.OutExpo;
-        }
-
-        /// <summary>
-        /// Finds or creates the kind of player required for the given <paramref name="inputType"/>.
-        /// For some players, additional game objects and/or components will be added to the
-        /// scene required for the particular player to work correctly.
-        /// </summary>
-        /// <param name="inputType">the kind of environment the player is to run</param>
-        /// <returns>new player for given <paramref name="inputType"/>, <c>null</c>
-        /// if <paramref name="inputType"/> equals <see cref="PlayerInputType.DesktopPlayer"/></returns>
-        [Obsolete("Do not use. This method will be superseded by SEE.Game.Avatars.AvatarAdapter.")]
-        private static GameObject CreatePlayer(PlayerInputType inputType)
-        {
-            GameObject player;
-
-            switch (inputType)
-            {
-                case PlayerInputType.DesktopPlayer:
-                    // position and rotation of the local desktop player are set
-                    // elsewhere by the player spawner. That is why we can return
-                    // this local player immediately.
-                    return LocalPlayer();
-                case PlayerInputType.VRPlayer:
-                    {
-                        /// FIXME: Move this code to <see cref="SEE.Game.Avatars.AvatarAdapter"/>.
-                        player = LocalPlayer();
-                    }
-                    break;
-                case PlayerInputType.TouchGamepadPlayer:
-                    /// FIXME: Move this code to <see cref="SEE.Game.Avatars.AvatarAdapter"/>.
-                    player = LocalPlayer();
-                    break;
-                case PlayerInputType.None: return null; // No player needs to be created
-                default:
-                    throw new NotImplementedException($"Unhandled case {inputType}.");
-            }
-            return player;
-
-            static GameObject LocalPlayer()
-            {
-                // The local player is holding the main camera. Remote players do not have
-                // a camera attached. Hence, we only need to retrieve that camera.
-
-                /// FIXME: This should be the case for all environments as soon as we
-                /// migrated <see cref="CreatePlayer(PlayerInputType)"/> to
-                /// <see cref="Game.Avatars.AvatarAdapter"/>
-                return InputType == PlayerInputType.DesktopPlayer ?
-                    MainCamera.Camera.gameObject : null;
-            }
         }
     }
 }

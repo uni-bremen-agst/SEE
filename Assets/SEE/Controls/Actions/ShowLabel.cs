@@ -160,7 +160,7 @@ namespace SEE.Controls.Actions
         {
             if (nodeOperator == null)
             {
-                nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+                nodeOperator = gameObject.NodeOperator();
             }
 
             if (nodeOperator.Node != null)
@@ -181,9 +181,12 @@ namespace SEE.Controls.Actions
         /// <seealso cref="SelectionOn"/>
         private void Off()
         {
-            LabelAttributes settings = GetLabelSettings(nodeOperator.Node, nodeOperator.City);
-            nodeOperator.FadeLabel(0f, settings.AnimationFactor);
-            DisplayedLabelOperators.Remove(nodeOperator);
+            if (nodeOperator.Node != null)
+            {
+                LabelAttributes settings = GetLabelSettings(nodeOperator.Node, nodeOperator.City);
+                nodeOperator.FadeLabel(0f, settings.AnimationFactor);
+                DisplayedLabelOperators.Remove(nodeOperator);
+            }
         }
 
         /// <summary>

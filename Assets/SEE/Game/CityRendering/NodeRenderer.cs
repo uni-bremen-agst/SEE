@@ -413,7 +413,7 @@ namespace SEE.Game.CityRendering
                     if (node != null)
                     {
                         NodeTransform nodeTransform = item.Value;
-                        NodeOperator nodeOperator = node.AddOrGetComponent<NodeOperator>();
+                        NodeOperator nodeOperator = node.NodeOperator();
                         // nodeTransform.position.y relates to the ground of the node;
                         // the node operator's y co-ordinate is meant to be the center
                         nodeTransform.Position.y += nodeTransform.Scale.y / 2;

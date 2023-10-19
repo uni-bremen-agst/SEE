@@ -181,7 +181,7 @@ namespace SEE.UI.Notification
         protected override void StartDesktop()
         {
             ManagedNotification = PrefabInstantiator.InstantiatePrefab(notificationPrefab, Canvas.transform, false);
-            ManagedNotification.MustGetComponent(out notificationOperator);
+            notificationOperator = ManagedNotification.MustGetComponent<NotificationOperator>();
 
             // Setup anchoring
             RectTransform rectTransform = (RectTransform)ManagedNotification.transform;

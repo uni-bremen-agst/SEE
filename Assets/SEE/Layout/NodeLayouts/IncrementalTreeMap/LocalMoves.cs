@@ -198,7 +198,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// </summary>
         /// <param name="nodes">nodes that represent a layout</param>
         /// <param name="settings">settings for search</param>
-        public static void LocalMovesSearch(List<Node> nodes, IncrementalTreeMapSetting settings)
+        public static void LocalMovesSearch(List<Node> nodes, IncrementalTreeMapAttributes settings)
         {
             List<(List<Node> nodes, double visualQuality, List<LocalMove> movesList)> allResults = RecursiveMakeMoves(
                 nodes,
@@ -228,7 +228,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         private static List<(List<Node> nodes, double visualQuality, List<LocalMove> movesList)> RecursiveMakeMoves(
             IList<Node> nodes,
             IList<LocalMove> movesUntilNow,
-            IncrementalTreeMapSetting settings)
+            IncrementalTreeMapAttributes settings)
         {
             List<(List<Node> nodes, double visualQuality, List<LocalMove> movesList)> resultThisRecursion = new();
             if (movesUntilNow.Count >= settings.LocalMovesDepth)

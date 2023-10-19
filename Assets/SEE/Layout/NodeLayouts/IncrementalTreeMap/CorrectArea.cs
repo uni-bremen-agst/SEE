@@ -20,7 +20,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <param name="nodes">nodes with layout</param>
         /// <param name="settings">the settings of the incremental tree map layout</param>
         /// <returns>true if correction was successful, else false</returns>
-        public static bool Correct(IList<Node> nodes, IncrementalTreeMapSetting settings)
+        public static bool Correct(IList<Node> nodes, IncrementalTreeMapAttributes settings)
         {
             if (nodes.Count == 1)
             {
@@ -49,7 +49,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                     Vector<double>.Build.DenseOfArray(nodes.Select(node => node.Rectangle.Area()).ToArray());
                 double error = (nodesSizesWanted - nodesSizesCurrent).Norm(p: 1);
 
-                return error <= Math.Pow(10, settings.GradientDescentPrecisionExponent) && CheckPositiveLength(nodes);
+                return error <= Math.Pow(10, settings.GradientDescentPrecision) && CheckPositiveLength(nodes);
             }
             else
             {
@@ -213,7 +213,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <param name="settings">the settings of the incremental tree map layout,
         /// especially including the maximal error between the desired layout and the result</param>
         /// <returns>true if correction was successful, else false</returns>
-        private static bool GradientDecent(IList<Node> nodes, IncrementalTreeMapSetting settings)
+        private static bool GradientDecent(IList<Node> nodes, IncrementalTreeMapAttributes settings)
         {
             HashSet<Segment> segments = nodes.SelectMany(n => n.SegmentsDictionary().Values).ToHashSet();
             segments.RemoveWhere(s => s.IsConst);
@@ -222,7 +222,7 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
                 = segments.ToDictionary(s => s, _ => i++);
 
             double distance = 0;
-            double maximalError = Math.Pow(10, settings.GradientDescentPrecisionExponent);
+            double maximalError = Math.Pow(10, settings.GradientDescentPrecision);
             const int numberOfIterations = 50;
             for (int j = 0; j < numberOfIterations; j++)
             {

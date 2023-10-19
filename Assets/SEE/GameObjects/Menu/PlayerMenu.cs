@@ -2,6 +2,7 @@
 using System.Linq;
 using SEE.Controls;
 using SEE.Controls.Actions;
+using SEE.Game;
 using SEE.UI.Menu;
 using SEE.UI.StateIndicator;
 using SEE.Utils;
@@ -219,10 +220,10 @@ namespace SEE.GO.Menu
         /// <summary>
         /// Sets the currently selected menu entry in PlayerMenu to the action with given <paramref name="actionName"/>.
         /// </summary>
-        /// <param name="actionName">name of the menu entry to be </param>
+        /// <param name="actionName">name of the menu entry to be set</param>
         private static void SetPlayerMenu(string actionName)
         {
-            if (SceneSettings.LocalPlayer.TryGetComponentOrLog(out PlayerMenu playerMenu))
+            if (LocalPlayer.TryGetPlayerMenu(out PlayerMenu playerMenu))
             {
                 // We cannot use PlayerActionHistory.Current here
                 playerMenu.modeMenu.ActiveEntry = playerMenu.modeMenu.Entries.First(x => x.Title.Equals(actionName));

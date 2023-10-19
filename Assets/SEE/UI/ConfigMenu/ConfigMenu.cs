@@ -125,7 +125,7 @@ namespace SEE.UI.ConfigMenu
             colorPickerControl.gameObject.SetActive(false);
 
             // Reset (hide) the color picker on page changes.
-            tabButtons.MustGetComponent(out TabGroup tabGroupController);
+            TabGroup tabGroupController = tabButtons.MustGetComponent<TabGroup>();
             tabGroupController.SubscribeToUpdates(colorPickerControl.Reset);
         }
 
@@ -168,7 +168,7 @@ namespace SEE.UI.ConfigMenu
             GameObject instanceGameObject = GameObject.Find(instanceToEdit.GameObjectName);
             if (instanceGameObject != null)
             {
-                instanceGameObject.MustGetComponent(out city);
+                city = instanceGameObject.MustGetComponent<SEECity>();
             }
             else
             {
@@ -219,7 +219,7 @@ namespace SEE.UI.ConfigMenu
         private void CreateActionButton(string buttonText, UnityAction onClick)
         {
             GameObject deleteGraphButtonGo = Instantiate(actionButtonPrefab, actions.transform, false);
-            deleteGraphButtonGo.MustGetComponent(out ButtonManagerBasic deleteGraphButton);
+            ButtonManagerBasic deleteGraphButton = deleteGraphButtonGo.MustGetComponent<ButtonManagerBasic>();
             deleteGraphButton.buttonText = buttonText;
             deleteGraphButton.clickEvent.AddListener(onClick);
         }
@@ -586,7 +586,7 @@ namespace SEE.UI.ConfigMenu
         private GameObject CreateAndInsertPage(string headline)
         {
             GameObject page = Instantiate(pagePrefab, tabOutlet.transform, false);
-            page.MustGetComponent(out PageController pageController);
+            PageController pageController = page.MustGetComponent<PageController>();
             pageController.HeadlineText = headline;
             return page;
         }
@@ -596,7 +596,7 @@ namespace SEE.UI.ConfigMenu
         {
             GameObject tabButton = Instantiate(tabButtonPrefab, tabButtons.transform, false);
             tabButton.name = $"{label}Button";
-            tabButton.MustGetComponent(out TabButton button);
+            TabButton button = tabButton.MustGetComponent<TabButton>();
             button.ButtonText = label;
             if (initialState == TabButtonState.InitialActive)
             {

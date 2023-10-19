@@ -168,6 +168,7 @@ namespace SEE.GO
             {
                 materials[renderer.sharedMaterial] = renderer.sharedMaterial.color;
                 renderer.sharedMaterial.SetFloat(emissionStrengthProperty, emissionStrength);
+                // FIXME: Gradual fade does not work. The marker blinks in and out of existence.
                 renderer.sharedMaterial.DOFade(0.0f, animationDuration).SetEase(Ease.Linear).SetLoops(-1, LoopType.Yoyo);
             }
         }
@@ -195,7 +196,7 @@ namespace SEE.GO
             foreach (Transform child in gameNode.transform)
             {
                 if (child.CompareTag(Tags.Decoration)
-                    && (child.name == changeMarkerName || child.name == bornMarkerName || child.name == deadMarkerName))
+                    && child.name is changeMarkerName or bornMarkerName or deadMarkerName)
                 {
                     GameObject marker = child.gameObject;
                     // The scale of gameNode may have changed, but we want our markers to

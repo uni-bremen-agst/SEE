@@ -42,6 +42,8 @@ namespace SEE.Game.Avatars
             if (IsLocalPlayer)
             {
                 // I am the avatar of the local player.
+                LocalPlayer.Instance = gameObject;
+
                 if (!gameObject.TryGetComponent(out WindowSpaceManager _))
                 {
                     gameObject.AddComponent<WindowSpaceManager>();
@@ -67,6 +69,11 @@ namespace SEE.Game.Avatars
                 gameObject.name = "Remote " + gameObject.name;
                 // Remote players need to be set up for Dissonance and SALSA lip sync.
                 StartCoroutine(SetUpSALSA());
+            }
+
+            if (gameObject.TryGetComponentOrLog(out NetworkObject net))
+            {
+                Debug.Log($"Avatar {gameObject.name} is local player: {net.IsLocalPlayer}. Owner of avatar is server: {net.IsOwnedByServer} or is local client: {net.IsOwner}\n");
             }
 
             EnableLocalControl(IsLocalPlayer);

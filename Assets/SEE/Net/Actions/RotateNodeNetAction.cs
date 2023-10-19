@@ -1,5 +1,6 @@
 ﻿using SEE.Game.Operator;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -40,7 +41,7 @@ namespace SEE.Net.Actions
             if (!IsRequester())
             {
                 GameObject gameObject = Find(GameObjectID);
-                NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+                NodeOperator nodeOperator = gameObject.NodeOperator();
                 nodeOperator.RotateTo(Rotation, 0);
             }
         }
