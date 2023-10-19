@@ -42,7 +42,6 @@ namespace SEE.Net.Actions
         /// <param name="scale">the scale of the new node in world space</param>
         public MarkNetAction
             (string parentID,
-             string newNodeID,
              Vector3 position,
              Vector3 scale)
             : base()
@@ -73,7 +72,8 @@ namespace SEE.Net.Actions
                 {
                     throw new System.Exception($"There is no node with the ID {ParentID}.");
                 }
-                GameNodeMarker.AddMark(parent);
+
+                GameNodeMarker.NodeMarker(parent);
             }
         }
     }

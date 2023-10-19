@@ -59,8 +59,10 @@ namespace SEE.Controls.Actions
         /// important for action state groups which are used in the initialization of all
         /// action state types and groups contained in them.
         /// </summary>
+
         static ActionStateTypes()
         {
+
             Move =
               new("Move", "Move a node within a graph",
                   Color.red.Darker(), "Materials/Charts/MoveIcon",
@@ -168,9 +170,14 @@ namespace SEE.Controls.Actions
                   Color.blue.Darker(), "Materials/ModernUIPack/Document",
                   SaveBoardAction.CreateReversibleAction,
                   parent: MetricBoard);
+
+            MarkNode =
+          new("Mark Node", "Marks the selected node.",
+                Color.black, "Materials/ModernUIPack/Document",
+                MarkAction.CreateReversibleAction);
         }
 
-
+        public static ActionStateType MarkNode;
         public readonly static ActionStateType Move;
         public readonly static ActionStateType Rotate;
         public readonly static ActionStateType Hide;
