@@ -76,6 +76,10 @@ namespace SEE.Controls.Actions
                   Color.yellow.Darker(), "Materials/ModernUIPack/Eye",
                   HideAction.CreateReversibleAction);
 
+            MarkNode =
+                new("Mark Node", "Add a sphere on top of the selected Node, delete sphere if node was selected before",
+                    Color.blue.Darker(),"",MarkAction.CreateReversibleAction);
+
             NewEdge =
               new("New Edge", "Draw a new edge between two nodes",
                   Color.green.Darker(), "Materials/ModernUIPack/Minus",
@@ -175,6 +179,7 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType Rotate;
         public readonly static ActionStateType Hide;
         public readonly static ActionStateType NewEdge;
+        public readonly static ActionStateType MarkNode; // ERGÄNZUNG
         public readonly static ActionStateType NewNode;
         public readonly static ActionStateType EditNode;
         public readonly static ActionStateType ScaleNode;
