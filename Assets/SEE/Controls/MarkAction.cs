@@ -40,7 +40,6 @@ namespace SEE.Controls.Actions
                 new MarkNetAction(parentID: memento.Parent.name, memento.Position, memento.Scale).Execute();
                 result = true;
                 CurrentState = IReversibleAction.Progress.Completed;
-                
             }
             return result;
         }
