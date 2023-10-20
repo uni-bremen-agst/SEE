@@ -19,17 +19,20 @@ namespace SEE.Game.Drawable.Configurations
         /// This class gets the drawable type of the given object.
         /// </summary>
         /// <param name="obj">The object from which the drawable type is to be determined.</param>
-        /// <returns>The drawable type</returns>
+        /// <returns>The drawable type</returns> 
         public DrawableType Get(GameObject obj)
         {
             DrawableType type;
             switch(obj.tag)
             {
                 case Tags.Line:
-                    type = Line.GetLine(obj);
+                    type = LineConf.GetLine(obj);
                     break;
                 case Tags.DText:
-                    type = Text.GetText(obj);
+                    type = TextConf.GetText(obj);
+                    break;
+                case Tags.Image:
+                    type = ImageConf.GetImageConf(obj);
                     break;
                 default:
                     type = null;

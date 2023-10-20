@@ -30,12 +30,14 @@ namespace Assets.SEE.Game.Drawable
                         switch (child.tag)
                         {
                             case Tags.Line:
-                                new DrawOnNetAction(drawable.name, drawableParent, Line.GetLine(child)).Execute();
+                                new DrawOnNetAction(drawable.name, drawableParent, LineConf.GetLine(child)).Execute();
                                 break;
                             case Tags.DText:
-                                new WriteTextNetAction(drawable.name, drawableParent, Text.GetText(child)).Execute();
+                                new WriteTextNetAction(drawable.name, drawableParent, TextConf.GetText(child)).Execute();
                                 break;
-                                // TODO Add other DrawableTypes
+                            case Tags.Image:
+                                new AddImageNetAction(drawable.name, drawableParent, ImageConf.GetImageConf(child)).Execute();
+                                break;
                         }
                     }
                 }

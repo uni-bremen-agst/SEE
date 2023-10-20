@@ -14,7 +14,7 @@ namespace SEE.Game.Drawable.Configurations
     /// The configuration class for a drawable text.
     /// </summary>
     [Serializable]
-    public class Text : DrawableType, ICloneable
+    public class TextConf : DrawableType, ICloneable
     {
         /// <summary>
         /// The position of the text.
@@ -122,14 +122,14 @@ namespace SEE.Game.Drawable.Configurations
         private const string OrderInLayerLabel = "OrderInLayerLabel";
 
         /// <summary>
-        /// Creates a <see cref="Text"/> for the given game object.
+        /// Creates a <see cref="TextConf"/> for the given game object.
         /// </summary>
         /// <param name="textObject">The game object with the <see cref="TextMeshPro"/> component</param>
-        /// <returns>The created <see cref="Text"/> object</returns>
-        public static Text GetText(GameObject textObject)
+        /// <returns>The created <see cref="TextConf"/> object</returns>
+        public static TextConf GetText(GameObject textObject)
         {
-            Text text = null;
-            if (textObject != null && textObject.CompareTag("DText"))
+            TextConf text = null;
+            if (textObject != null && textObject.CompareTag(Tags.DText))
             {
                 text = new();
                 text.id = textObject.name;
@@ -150,12 +150,12 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// This method clons the <see cref="Text"/> object.
+        /// This method clons the <see cref="TextConf"/> object.
         /// </summary>
-        /// <returns>A new <see cref="Text"/> with the values of this object.</returns>
+        /// <returns>A new <see cref="TextConf"/> with the values of this object.</returns>
         public object Clone()
         {
-            return new Text
+            return new TextConf
             {
                 id = this.id,
                 position = this.position,
@@ -193,14 +193,14 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Given the representation of a <see cref="Line"/> as created by the <see cref="ConfigWriter"/>, this
-        /// method parses the attributes from that representation and puts them into this <see cref="Line"/>
+        /// Given the representation of a <see cref="LineConf"/> as created by the <see cref="ConfigWriter"/>, this
+        /// method parses the attributes from that representation and puts them into this <see cref="LineConf"/>
         /// instance.
         /// </summary>
         /// <param name="attributes">A list of labels (strings) of attributes and their values (objects). This
-        /// has to be the representation of a <see cref="Line"/> as created by
+        /// has to be the representation of a <see cref="LineConf"/> as created by
         /// <see cref="ConfigWriter"/>.</param>
-        /// <returns>Whether or not the <see cref="Line"/> was loaded without errors.</returns>
+        /// <returns>Whether or not the <see cref="LineConf"/> was loaded without errors.</returns>
         internal bool Restore(Dictionary<string, object> attributes)
         {
             bool errors = false;

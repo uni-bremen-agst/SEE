@@ -223,15 +223,22 @@ namespace Assets.SEE.Game.Drawable
                 GameObject[] lines = GameDrawableFinder.FindAllChildrenWithTag(attachedObjects, Tags.Line).ToArray();
                 foreach (GameObject line in lines)
                 {
-                    Line lineConfig = Line.GetLine(line);
+                    LineConf lineConfig = LineConf.GetLine(line);
                     config.LineConfigs.Add(lineConfig);
                 }
 
                 GameObject[] texts = GameDrawableFinder.FindAllChildrenWithTag(attachedObjects, Tags.DText).ToArray();
                 foreach (GameObject text in texts)
                 {
-                    Text textConfig = Text.GetText(text);
+                    TextConf textConfig = TextConf.GetText(text);
                     config.TextConfigs.Add(textConfig);
+                }
+
+                GameObject[] images = GameDrawableFinder.FindAllChildrenWithTag(attachedObjects, Tags.Image).ToArray();
+                foreach (GameObject image in images)
+                {
+                    ImageConf imageConf = ImageConf.GetImageConf(image);
+                    config.ImageConfigs.Add(imageConf);
                 }
             }
             return config;

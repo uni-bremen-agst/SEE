@@ -24,7 +24,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The Line that should be changed. The Line object contains all relevant values to change.
         /// </summary>
-        public Line Line;
+        public LineConf Line;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
@@ -32,7 +32,7 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The id of the drawable on which the object is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="line">The line that contains the values to change the associated game object.</param>
-        public EditLineNetAction(string drawableID, string parentDrawableID, Line line) : base()
+        public EditLineNetAction(string drawableID, string parentDrawableID, LineConf line) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;

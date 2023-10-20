@@ -18,6 +18,25 @@ namespace SEE.Game
     public static class GameDrawer
     {
         [Serializable]
+        public enum ColorKind
+        {
+            Monochrome,
+            Gradient,
+            TwoDashed
+        }
+        public static List<ColorKind> GetColorKinds(bool isDashedLineKind)
+        {
+            if (isDashedLineKind)
+            {
+                return Enum.GetValues(typeof(ColorKind)).Cast<ColorKind>().ToList();
+            } else
+            {
+                return new List<ColorKind>() { ColorKind.Monochrome, ColorKind.Gradient};
+            }
+        }
+
+
+        [Serializable]
         public enum LineKind
         {
             Solid,
@@ -32,7 +51,8 @@ namespace SEE.Game
             return Enum.GetValues(typeof(LineKind)).Cast<LineKind>().ToList();
         }
 
-        private static void Setup(GameObject drawable, string name, Vector3[] positions, Color color, float thickness, int order, LineKind lineKind, float tiling,
+        private static void Setup(GameObject drawable, string name, Vector3[] positions, ColorKind colorKind, 
+            Color primaryColor, Color secondaryColor, float thickness, int order, LineKind lineKind, float tiling,
             out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider)
         {
             if (name.Length > 4)
@@ -59,25 +79,38 @@ namespace SEE.Game
             renderer = line.AddComponent<LineRenderer>();
             meshCollider = line.AddComponent<MeshCollider>();
             renderer.alignment = LineAlignment.TransformZ;
-            renderer.sharedMaterial = GetMaterial(color, lineKind);
-            // then color of material white
-            // only use for two colors (color gradient), then one color use material color -> for dashed two diff colors.
-            //renderer.startColor = Color.red;
-            //renderer.endColor = Color.yellow;
+            renderer.sharedMaterial = GetMaterial(primaryColor, lineKind);
+            line.AddComponent<LineValueHolder>().SetColorKind(colorKind);
+            switch (colorKind)
+            {
+                case ColorKind.Monochrome:
+                    break;
+                case ColorKind.Gradient:
+                    renderer.material.color = Color.white;
+                    renderer.startColor = primaryColor;
+                    renderer.endColor = secondaryColor;
+                    break;
+                case ColorKind.TwoDashed:
+                    Material[] materials = new Material[2];
+                    materials[0] = renderer.materials[0];
+                    materials[1] = GetMaterial(Color.white, LineKind.Solid);
+                    GetRenderer(line).materials = materials;
+                    renderer.materials[1].color = secondaryColor;
+                    break;
+            }
             SetRendererTextrueScale(renderer, lineKind, tiling);
             renderer.startWidth = thickness;
             renderer.endWidth = renderer.startWidth;
             renderer.useWorldSpace = false;
             renderer.positionCount = positions.Length;
             renderer.numCapVertices = 90;
-            
 
             line.transform.position = attachedObjects.transform.position;
             line.transform.rotation = attachedObjects.transform.rotation;
             line.transform.position -= line.transform.forward * ValueHolder.distanceToDrawable.z * order;
 
             line.AddComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
-            line.AddComponent<LineKindHolder>().SetLineKind(lineKind);
+            line.GetComponent<LineValueHolder>().SetLineKind(lineKind);
         }
 
         private static LineRenderer GetRenderer(GameObject line)
@@ -89,9 +122,11 @@ namespace SEE.Game
         {
             return line.GetComponent<MeshCollider>();
         }
-        public static GameObject StartDrawing(GameObject drawable, Vector3[] positions, Color color, float thickness, LineKind lineKind, float tiling)
+        public static GameObject StartDrawing(GameObject drawable, Vector3[] positions, ColorKind colorKind, 
+            Color primaryColor, Color secondaryColor, float thickness, LineKind lineKind, float tiling)
         {
-            Setup(drawable, "", positions, color, thickness, ValueHolder.currentOrderInLayer, lineKind, tiling, out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
+            Setup(drawable, "", positions, colorKind, primaryColor, secondaryColor, thickness, 
+                ValueHolder.currentOrderInLayer, lineKind, tiling, out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
             ValueHolder.currentOrderInLayer++;
 
             return line;
@@ -122,7 +157,8 @@ namespace SEE.Game
 
         }
 
-        public static GameObject DrawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness, bool loop, LineKind lineKind, float tiling)
+        public static GameObject DrawLine(GameObject drawable, String name, Vector3[] positions, ColorKind colorKind, 
+            Color primaryColor, Color secondaryColor, float thickness, bool loop, LineKind lineKind, float tiling)
         {
             GameObject l;
             UpdateZPositions(ref positions);
@@ -134,7 +170,8 @@ namespace SEE.Game
             }
             else
             {
-                Setup(drawable, name, positions, color, thickness, ValueHolder.currentOrderInLayer, lineKind, tiling, out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
+                Setup(drawable, name, positions, colorKind, primaryColor, secondaryColor, thickness, 
+                    ValueHolder.currentOrderInLayer, lineKind, tiling, out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
                 l = line;
                 renderer.SetPositions(positions);
                 ValueHolder.currentOrderInLayer++;
@@ -143,8 +180,9 @@ namespace SEE.Game
             return l;
         }
 
-        public static GameObject ReDrawLine(GameObject drawable, String name, Vector3[] positions, Color color, float thickness, int orderInLayer, Vector3 position,
-            Vector3 eulerAngles, Vector3 scale, bool loop, LineKind lineKind, float tiling)//, Vector3 holderLocalPosition, Vector3 holderScale, bool loop)
+        public static GameObject ReDrawLine(GameObject drawable, String name, Vector3[] positions, 
+            ColorKind colorKind, Color primaryColor, Color secondaryColor, float thickness, int orderInLayer, Vector3 position,
+            Vector3 eulerAngles, Vector3 scale, bool loop, LineKind lineKind, float tiling)
         {
             UpdateZPositions(ref positions);
             if (orderInLayer >= ValueHolder.currentOrderInLayer)
@@ -165,7 +203,8 @@ namespace SEE.Game
             }
             else
             {
-                Setup(drawable, name, positions, color, thickness, orderInLayer, lineKind, tiling, out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
+                Setup(drawable, name, positions, colorKind, primaryColor, secondaryColor, thickness, 
+                    orderInLayer, lineKind, tiling, out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
                 line.transform.localScale = scale;
                 line.transform.localEulerAngles = eulerAngles;
                 line.transform.localPosition = position;
@@ -177,12 +216,14 @@ namespace SEE.Game
             }
         }
 
-        public static GameObject ReDrawLine(GameObject drawable, Line lineToRedraw)
+        public static GameObject ReDrawLine(GameObject drawable, LineConf lineToRedraw)
         {
             GameObject line = ReDrawLine(drawable,
                  lineToRedraw.id,
                  lineToRedraw.rendererPositions,
-                 lineToRedraw.color,
+                 lineToRedraw.colorKind,
+                 lineToRedraw.primaryColor,
+                 lineToRedraw.secondaryColor,
                  lineToRedraw.thickness,
                  lineToRedraw.orderInLayer,
                  lineToRedraw.position,
@@ -234,11 +275,47 @@ namespace SEE.Game
 
         public static void ChangeLineKind(GameObject line, LineKind lineKind, float tiling)
         {
-            LineKindHolder holder = line.GetComponent<LineKindHolder>();
+            LineValueHolder holder = line.GetComponent<LineValueHolder>();
             LineRenderer renderer = GetRenderer(line);
             renderer.sharedMaterial = GetMaterial(renderer.material.color, lineKind);
             SetRendererTextrueScale(renderer, lineKind, tiling);
             holder.SetLineKind(lineKind);
+        }
+
+        public static void ChangeColorKind(GameObject line, ColorKind colorKind, LineConf l)
+        {
+            LineValueHolder holder = line.GetComponent<LineValueHolder>();
+            if (colorKind == ColorKind.TwoDashed)
+            {
+                GetRenderer(line).startColor = Color.white;
+                GetRenderer(line).endColor = Color.white;
+                if (GetRenderer(line).materials.Length == 1)
+                {
+                    Material[] materials = new Material[2];
+                    materials[0] = GetRenderer(line).materials[0];
+                    materials[1] = GetMaterial(Color.white, LineKind.Solid);
+                    GetRenderer(line).materials = materials;
+                }
+            } else
+            {
+                if (GetRenderer(line).materials.Length > 1)
+                {
+                    Material[] materials = new Material[1];
+                    materials[0] = GetRenderer(line).materials[0];
+                    GetRenderer(line).materials = materials;
+                }
+                if (colorKind == ColorKind.Gradient)
+                {
+                    GetRenderer(line).material.color = Color.white;
+                } else
+                {
+                    GetRenderer(line).startColor = Color.white;
+                    GetRenderer(line).endColor = Color.white;
+                }
+            }
+            holder.SetColorKind(colorKind);
+            GameEdit.ChangePrimaryColor(line, l.primaryColor);
+            GameEdit.ChangeSecondaryColor(line, l.secondaryColor);
         }
 
         private static void SetRendererTextrueScale(LineRenderer renderer, LineKind kind, float tiling)
@@ -309,7 +386,8 @@ namespace SEE.Game
         public static Vector3 GetConvertedPosition(GameObject drawable, Vector3 position)
         {
             Vector3 convertedPosition;
-            Setup(drawable, "", new Vector3[] { position }, ValueHolder.currentPrimaryColor, ValueHolder.currentThickness, 0, ValueHolder.currentLineKind, 1,
+            Setup(drawable, "", new Vector3[] { position }, ColorKind.Monochrome, ValueHolder.currentPrimaryColor, 
+                Color.clear, ValueHolder.currentThickness, 0, ValueHolder.currentLineKind, 1,
                 out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
             convertedPosition = line.transform.InverseTransformPoint(position) - ValueHolder.distanceToDrawable;
             Destroyer.Destroy(line);
@@ -319,7 +397,8 @@ namespace SEE.Game
         public static Vector3[] GetConvertedPositions(GameObject drawable, Vector3[] positions)
         {
             Vector3[] convertedPosition = new Vector3[positions.Length];
-            Setup(drawable, "", positions, ValueHolder.currentPrimaryColor, ValueHolder.currentThickness, 0, ValueHolder.currentLineKind, 1,
+            Setup(drawable, "", positions, ColorKind.Monochrome, ValueHolder.currentPrimaryColor, 
+                Color.clear, ValueHolder.currentThickness, 0, ValueHolder.currentLineKind, 1,
                 out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
             for (int i = 0; i < positions.Length; i++)
             {

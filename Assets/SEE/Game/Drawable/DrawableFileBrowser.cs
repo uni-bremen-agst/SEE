@@ -106,6 +106,33 @@ namespace Assets.SEE.Game.Drawable
             Destroy(this);
         }
 
+        public void LoadImage()
+        {
+            SEEInput.KeyboardShortcutsEnabled = false;
+            StartCoroutine(ShowLoadImageDialogCoroutine());
+        }
+
+        private IEnumerator ShowLoadImageDialogCoroutine()
+        {
+            DrawableConfigManager.EnsureDrawableDirectoryExists(ValueHolder.imagePath);
+            initPath = ValueHolder.imagePath;
+            string title = "Load an image";
+            
+            AddImageAction.filePath = "";
+            FileBrowser.SetFilters(true, Filenames.PNGExtension, Filenames.JPGExtension);
+            yield return FileBrowser.WaitForSaveDialog(FileBrowser.PickMode.Files, false, initPath, null, title, "Load");
+            SEEInput.KeyboardShortcutsEnabled = true;
+
+            if (FileBrowser.Success)
+            {
+                AddImageAction.filePath = FileBrowser.Result[0];
+            }
+            GameObject UICanvas = GameObject.Find("UI Canvas");
+            UICanvas.SetActive(false);
+            UICanvas.SetActive(true);
+            Destroy(this);
+        }
+
         public bool IsOpen()
         {
             return FileBrowser.IsOpen;

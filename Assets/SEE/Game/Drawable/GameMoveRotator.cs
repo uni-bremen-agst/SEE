@@ -148,12 +148,18 @@ namespace Assets.SEE.Game.Drawable
         public static void SetRotate(GameObject obj, float localEulerAngleZ)
         {
             Transform transform = obj.transform;
-            transform.localEulerAngles = new Vector3(0, 0, localEulerAngleZ);
+            transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, localEulerAngleZ);
             /*if (obj.CompareTag(Tags.Line))
             {
                 transform.localPosition = holderPosition;
                 obj.transform.localPosition = objPosition;
             }*/
+        }
+
+        public static void SetRotateY(GameObject obj, float localEulerAngleY)
+        {
+            Transform transform = obj.transform;
+            transform.localEulerAngles = new Vector3(0, localEulerAngleY, transform.localEulerAngles.z);
         }
     }
 }

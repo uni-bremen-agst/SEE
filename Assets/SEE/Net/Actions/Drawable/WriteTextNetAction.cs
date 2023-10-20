@@ -26,7 +26,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The text that should be written as <see cref="Text"/> object.
         /// </summary>
-        public Text Text;
+        public TextConf Text;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
@@ -34,7 +34,7 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The id of the drawable on which the object is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="text">The text that should be written.</param>
-        public WriteTextNetAction(string drawableID, string parentDrawableID, Text text)
+        public WriteTextNetAction(string drawableID, string parentDrawableID, TextConf text)
         {
             this.DrawableID = drawableID;
             this.ParentDrawableID = parentDrawableID;

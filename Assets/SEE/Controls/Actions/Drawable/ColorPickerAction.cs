@@ -9,6 +9,7 @@ using SEE.Game;
 using TMPro;
 using HSVPicker;
 using UnityEngine.UI;
+using SEE.Game.Drawable.Configurations;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -74,7 +75,7 @@ namespace SEE.Controls.Actions.Drawable
                 bool pickForSecondColor = false;
 
                 /// Block for picking the (main) color of the object.
-                /// If left control is pressed the main color will be picked for the <see cref="ValueHolder.currentSecondColor"/>
+                /// If left control is pressed the main color will be picked for the <see cref="ValueHolder.currentSecondaryColor"/>
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !isInAction &&
                     Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
                     GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject) &&
@@ -86,7 +87,8 @@ namespace SEE.Controls.Actions.Drawable
                     switch (hittedObject.tag)
                     {
                         case Tags.Line:
-                            pickedColor = hittedObject.GetColor(); // TODO work with color kind ... 
+                            LineConf line = LineConf.GetLine(hittedObject);
+                            pickedColor = line.primaryColor;
                             break;
                         case Tags.DText:
                             pickedColor = hittedObject.GetComponent<TextMeshPro>().color;
@@ -102,7 +104,7 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         pickForSecondColor = true;
                         pickerForSecondColor.AssignColor(pickedColor);
-                        ValueHolder.currentSecondColor = pickedColor;
+                        ValueHolder.currentSecondaryColor = pickedColor;
                     }
                     memento = new(oldChosenPrimaryColor, oldChosenSecondColor, pickedColor, pickForSecondColor);
                 }
@@ -120,7 +122,12 @@ namespace SEE.Controls.Actions.Drawable
                     switch (hittedObject.tag)
                     {
                         case Tags.Line:
-                            pickedColor = hittedObject.GetColor(); // TODO work with color kind ... 
+                            LineConf line = LineConf.GetLine(hittedObject);
+                            pickedColor = line.secondaryColor;
+                            if (line.colorKind == GameDrawer.ColorKind.Monochrome)
+                            {
+                                pickedColor = line.primaryColor;
+                            }
                             break;
                         case Tags.DText:
                             pickedColor = hittedObject.GetComponent<TextMeshPro>().outlineColor;
@@ -137,7 +144,7 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         pickForSecondColor = true;
                         pickerForSecondColor.AssignColor(pickedColor);
-                        ValueHolder.currentSecondColor = pickedColor;
+                        ValueHolder.currentSecondaryColor = pickedColor;
                     }
                     memento = new(oldChosenPrimaryColor, oldChosenSecondColor, pickedColor, pickForSecondColor);
                 }
@@ -153,19 +160,19 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// At beginning of this action, it saves the current color values 
-        /// (<see cref="ValueHolder.currentPrimaryColor>"/> and <see cref="ValueHolder.currentSecondColor"/> of the <see cref="ValueHolder"/>.
+        /// (<see cref="ValueHolder.currentPrimaryColor>"/> and <see cref="ValueHolder.currentSecondaryColor"/> of the <see cref="ValueHolder"/>.
         /// Then it loads the color picker menu.
         /// </summary>
         public override void Awake()
         {
             oldChosenPrimaryColor = ValueHolder.currentPrimaryColor;
-            oldChosenSecondColor = ValueHolder.currentSecondColor;
+            oldChosenSecondColor = ValueHolder.currentSecondaryColor;
             colorPickerMenu = PrefabInstantiator.InstantiatePrefab(colorPickerMenuPrefab,
                 GameObject.Find("UI Canvas").transform, false);
             pickerForPrimaryColor = colorPickerMenu.transform.Find("Primary").GetComponent<HSVPicker.ColorPicker>();
             pickerForPrimaryColor.AssignColor(ValueHolder.currentPrimaryColor);
             pickerForSecondColor = colorPickerMenu.transform.Find("Second").GetComponent<HSVPicker.ColorPicker>();
-            pickerForSecondColor.AssignColor(ValueHolder.currentSecondColor);
+            pickerForSecondColor.AssignColor(ValueHolder.currentSecondaryColor);
         }
 
         /// <summary>
@@ -186,7 +193,7 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public readonly Color oldChosenPrimaryColor;
             /// <summary>
-            /// The old chosen <see cref="ValueHolder.currentSecondColor"/>
+            /// The old chosen <see cref="ValueHolder.currentSecondaryColor"/>
             /// </summary>
             public readonly Color oldChosenSecondColor;
             /// <summary>
@@ -194,7 +201,7 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public readonly Color pickedColor;
             /// <summary>
-            /// A boolean representing that the selected color has been picked for the <see cref="ValueHolder.currentSecondColor"/>
+            /// A boolean representing that the selected color has been picked for the <see cref="ValueHolder.currentSecondaryColor"/>
             /// </summary>
             public readonly bool pickForSecondColor;
 
@@ -202,9 +209,9 @@ namespace SEE.Controls.Actions.Drawable
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
             /// <param name="oldChosenPrimaryColor">The old chosen <see cref="ValueHolder.currentPrimaryColor"/></param>
-            /// <param name="oldChosenSecondColor">The old chosen <see cref="ValueHolder.currentSecondColor"/></param>
+            /// <param name="oldChosenSecondColor">The old chosen <see cref="ValueHolder.currentSecondaryColor"/></param>
             /// <param name="pickedColor">The picked color</param>
-            /// <param name="pickForSecondColor">Color was picked for <see cref="ValueHolder.currentSecondColor"/></param>
+            /// <param name="pickForSecondColor">Color was picked for <see cref="ValueHolder.currentSecondaryColor"/></param>
             /// 
             public Memento(Color oldChosenPrimaryColor, Color oldChosenSecondColor, Color pickedColor, bool pickForSecondColor)
             {
@@ -222,7 +229,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Undo();
             ValueHolder.currentPrimaryColor = memento.oldChosenPrimaryColor;
-            ValueHolder.currentSecondColor = memento.oldChosenSecondColor;
+            ValueHolder.currentSecondaryColor = memento.oldChosenSecondColor;
         }
 
         /// <summary>
@@ -237,7 +244,7 @@ namespace SEE.Controls.Actions.Drawable
             }
             else
             {
-                ValueHolder.currentSecondColor = memento.pickedColor;
+                ValueHolder.currentSecondaryColor = memento.pickedColor;
             }
         }
 

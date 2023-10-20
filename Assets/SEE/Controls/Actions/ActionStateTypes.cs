@@ -2,6 +2,7 @@
 using UnityEngine;
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Controls.Actions.Drawable;
+using Assets.SEE.Controls.Actions.Drawable;
 
 namespace SEE.Controls.Actions
 {
@@ -188,6 +189,12 @@ namespace SEE.Controls.Actions
                     WriteTextAction.CreateReversibleAction,
                     parent: Whiteboard);
 
+            AddImage =
+                new("Adds an Image", "Adds an image to a drawable",
+                    Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                    AddImageAction.CreateReversibleAction,
+                    parent: Whiteboard);
+
             ColorPicker =
                 new("Color picker", "Picks a color",
                     Color.yellow.Darker(), "Materials/ModernUIPack/Pencil",
@@ -206,10 +213,10 @@ namespace SEE.Controls.Actions
                     MoveRotatorAction.CreateReversibleAction,
                     parent: Whiteboard);
 
-            MovePoint =
-                new("Moves a point", "Moves a point of a line.",
+            Scale =
+                new("Scale", "Scales a drawable type. Mouse wheel up to scale up, mouse wheel down to scale down.",
                     Color.green.Darker(), "Materials/ModernUIPack/Pencil",
-                    MovePointAction.CreateReversibleAction,
+                    ScaleAction.CreateReversibleAction,
                     parent: Whiteboard);
 
             LayerChanger =
@@ -218,10 +225,15 @@ namespace SEE.Controls.Actions
                     LayerChangerAction.CreateReversibleAction,
                     parent: Whiteboard);
 
-            Scale =
-                new("Scale", "Scales a drawable type. Mouse wheel up to scale up, mouse wheel down to scale down.",
+            CutCopyPaste = new("Cut, Copy, Paste", "Cut or Copy a drawable type and paste it on the selected position.",
                     Color.green.Darker(), "Materials/ModernUIPack/Pencil",
-                    ScaleAction.CreateReversibleAction,
+                    CutCopyPasteAction.CreateReversibleAction,
+                    parent: Whiteboard);
+
+            MovePoint =
+                new("Moves a point", "Moves a point of a line.",
+                    Color.green.Darker(), "Materials/ModernUIPack/Pencil",
+                    MovePointAction.CreateReversibleAction,
                     parent: Whiteboard);
 
             LineSplit =
@@ -286,11 +298,13 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType DrawOn;
         public readonly static ActionStateType DrawShapes;
         public readonly static ActionStateType WriteText;
+        public readonly static ActionStateType AddImage;
         public readonly static ActionStateType ColorPicker;
         public readonly static ActionStateType Edit;
         public readonly static ActionStateType MoveRotator;
         public readonly static ActionStateType MovePoint;
         public readonly static ActionStateType LayerChanger;
+        public readonly static ActionStateType CutCopyPaste;
         public readonly static ActionStateType Scale;
         public readonly static ActionStateType LineSplit;
         public readonly static ActionStateType Load;

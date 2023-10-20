@@ -8,10 +8,23 @@ using UnityEngine.Events;
 /// </summary>
 public class GUIClickController : MonoBehaviour, IPointerClickHandler
 {
+    /// <summary>
+    /// The event that should be executed if the left mouse button is clicked.
+    /// </summary>
     public UnityEvent onLeft;
+    /// <summary>
+    /// The event that should be executed if the right mouse button is clicked.
+    /// </summary>
     public UnityEvent onRight;
+    /// <summary>
+    /// The event that should be executed if the middle mouse button is clicked.
+    /// </summary>
     public UnityEvent onMiddle;
 
+    /// <summary>
+    /// This method register the mouse button click and will execute the right action for the click.
+    /// </summary>
+    /// <param name="eventData">Contains the information about which button was pressed.</param>
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button == PointerEventData.InputButton.Left)

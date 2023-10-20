@@ -1,4 +1,5 @@
 ﻿using SEE.Game.UI.Notification;
+using System;
 using System.Collections;
 using System.Xml;
 using TMPro;
@@ -51,6 +52,12 @@ namespace Assets.SEE.Game.UI.Drawable
         public UnityEvent<float> onValueChanged = new UnityEvent<float>();
 
         /// <summary>
+        /// An onValueChange event for another input field.
+        /// </summary>
+        [Header("Event")]
+        public UnityEvent<float> onProportionalValueChanged = null;
+
+        /// <summary>
         /// Get and sets up the input field and the buttons.
         /// </summary>
         private void Awake()
@@ -59,19 +66,20 @@ namespace Assets.SEE.Game.UI.Drawable
             upBtn = transform.Find("UpDown").Find("UpBtn").GetComponent<Button>();
             downBtn = transform.Find("UpDown").Find("DownBtn").GetComponent<Button>();
             upBtn.onClick.AddListener(clickUp);
+            transform.Find("UpDown").Find("UpBtn").gameObject.AddComponent<ButtonHolded>().SetAction(clickUp);
             downBtn.onClick.AddListener(clickDown);
-           // inputField.onSubmit.AddListener(ValueChanged);
-           // inputField.onDeselect.AddListener(ValueChanged);
+            transform.Find("UpDown").Find("DownBtn").gameObject.AddComponent<ButtonHolded>().SetAction(clickDown);
             inputField.onEndEdit.AddListener(ValueChanged);
         }
 
         /// <summary>
-        /// The initial onChangeEvent for the input field.
+        /// The initial onEndEditEvent for the input field.
         /// It displayed the value and invoke the specific onValueChanged Event
         /// </summary>
         /// <param name="newValue">is the new value for the input field. It must be between the minimum and maximum range. Otherwise it is set of the respective limit.</param>
         private void ValueChanged(string newValue)
         {
+            float oldValue = value;
             newValue = inputField.text;
             if (!float.TryParse(newValue, out value))
             {
@@ -88,6 +96,10 @@ namespace Assets.SEE.Game.UI.Drawable
                 value = maxValue;
                 inputField.text = value.ToString();
             }
+            if(onProportionalValueChanged != null)
+            {
+                onProportionalValueChanged.Invoke(value - oldValue);
+            }
             onValueChanged.Invoke(value);
         }
 
@@ -97,6 +109,14 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <param name="assignValue">The value that should assigned.</param>
         public void AssignValue(float assignValue)
         {
+            if (assignValue < minValue)
+            {
+                assignValue = minValue;
+            }
+            if (assignValue > maxValue)
+            {
+                assignValue = maxValue;
+            }
             value = assignValue;
             inputField.text = value.ToString();
         }
@@ -107,8 +127,14 @@ namespace Assets.SEE.Game.UI.Drawable
         private void clickUp()
         {
             value += upAndDownValue;
+            value = (float)Decimal.Round((decimal)value, 2);
             if (value > maxValue) { value = maxValue; }
             AssignValue(value);
+            if (onProportionalValueChanged != null)
+            {
+                onProportionalValueChanged.Invoke(+upAndDownValue);
+            }
+            onValueChanged.Invoke(value);
         }
 
         /// <summary>
@@ -117,8 +143,23 @@ namespace Assets.SEE.Game.UI.Drawable
         private void clickDown()
         {
             value -= upAndDownValue;
+            value = (float)Decimal.Round((decimal)value, 2);
             if (value < minValue) { value = minValue; }
             AssignValue(value);
+            if (onProportionalValueChanged != null)
+            {
+                onProportionalValueChanged.Invoke(-upAndDownValue);
+            }
+            onValueChanged.Invoke(value);
+        }
+
+        /// <summary>
+        /// Gets the current value.
+        /// </summary>
+        /// <returns>The value.</returns>
+        public float GetValue()
+        {
+            return value;
         }
     }
 }

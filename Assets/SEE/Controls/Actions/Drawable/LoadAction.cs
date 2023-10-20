@@ -6,7 +6,7 @@ using SEE.Net.Actions.Drawable;
 using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game;
 using SEE.Game.Drawable.Configurations;
-using Text = SEE.Game.Drawable.Configurations.Text;
+using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -147,6 +147,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             RestoreLines(drawable, config.LineConfigs);
             RestoreTexts(drawable, config.TextConfigs);
+            RestoreImages(drawable, config.ImageConfigs);
         }
 
         /// <summary>
@@ -154,21 +155,40 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         /// <param name="drawable">The drawable on which the lines should be restored.</param>
         /// <param name="lines">The lines to be restored.</param>
-        private void RestoreLines(GameObject drawable, List<Line> lines)
+        private void RestoreLines(GameObject drawable, List<LineConf> lines)
         {
-            foreach (Line line in lines)
+            foreach (LineConf line in lines)
             {
                 GameDrawer.ReDrawLine(drawable, line);
                 new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), line).Execute();
             }
         }
 
-        private void RestoreTexts(GameObject drawable, List<Text> texts)
+        /// <summary>
+        /// This method restores the texts of the drawable configuration to the given drawable.
+        /// </summary>
+        /// <param name="drawable">The drawable on which the texts should be restored.</param>
+        /// <param name="texts">The texts to be restored.</param>
+        private void RestoreTexts(GameObject drawable, List<TextConf> texts)
         {
-            foreach (Text text in texts)
+            foreach (TextConf text in texts)
             {
                 GameTexter.ReWriteText(drawable, text);
                 new WriteTextNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), text).Execute();
+            }
+        }
+
+        /// <summary>
+        /// This method restores the images of the drawable configuration to the given drawable.
+        /// </summary>
+        /// <param name="drawable">The drawable on which the texts should be restored.</param>
+        /// <param name="images">The images to be restored.</param>
+        private void RestoreImages(GameObject drawable, List<ImageConf> images)
+        {
+            foreach (ImageConf image in images)
+            {
+                GameImage.RePlaceImage(drawable, image);
+                new AddImageNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), image).Execute();
             }
         }
 

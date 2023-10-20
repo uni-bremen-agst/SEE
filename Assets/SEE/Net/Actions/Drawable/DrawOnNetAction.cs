@@ -26,7 +26,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The line that should be drawn as <see cref="Line"/> object.
         /// </summary>
-        public Line Line;
+        public LineConf Line;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
@@ -34,7 +34,7 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The id of the drawable on which the object is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="line">The line that should be drawn.</param>
-        public DrawOnNetAction(string drawableID, string parentDrawableID, Line line)
+        public DrawOnNetAction(string drawableID, string parentDrawableID, LineConf line)
         {
             this.DrawableID = drawableID;
             this.ParentDrawableID = parentDrawableID;

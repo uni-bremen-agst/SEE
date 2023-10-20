@@ -6,9 +6,9 @@ using UnityEngine;
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// This class is responsible for changing the order in layer (<see cref="EditAction"/>) of a line on all clients.
+    /// This class is responsible for changing the secondary color (<see cref="EditAction"/>) of a line on all clients.
     /// </summary>
-    public class EditLineColorNetAction : AbstractNetAction
+    public class EditLineSecondaryColorNetAction : AbstractNetAction
     {
         /// <summary>
         /// The id of the drawable on which the object is located
@@ -34,7 +34,7 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="lineName">The id of the line that should be changed.</param>
         /// <param name="color">The new color for the line.</param>
-        public EditLineColorNetAction(string drawableID, string parentDrawableID, string lineName, Color color) : base()
+        public EditLineSecondaryColorNetAction(string drawableID, string parentDrawableID, string lineName, Color color) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
@@ -64,7 +64,7 @@ namespace SEE.Net.Actions.Drawable
                     GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
                     if (drawable != null && GameDrawableFinder.FindChild(drawable, LineName) != null)
                     {
-                        GameEdit.ChangeColor(GameDrawableFinder.FindChild(drawable, LineName), color);
+                        GameEdit.ChangeSecondaryColor(GameDrawableFinder.FindChild(drawable, LineName), color);
                     }
                     else
                     {

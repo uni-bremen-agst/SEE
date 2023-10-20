@@ -24,9 +24,9 @@ namespace Assets.SEE.Game.Drawable
         public static Color currentPrimaryColor { get; set; }
 
         /// <summary>
-        /// The current chosen second color for drawing.
+        /// The current chosen secondary color for drawing.
         /// </summary>
-        public static Color currentSecondColor { get; set; }
+        public static Color currentSecondaryColor { get; set; }
 
         /// <summary>
         /// The current chosen thickness for drawing.
@@ -47,6 +47,11 @@ namespace Assets.SEE.Game.Drawable
         /// The current chosen line kind for drawing.
         /// </summary>
         public static GameDrawer.LineKind currentLineKind { get; set; }
+
+        /// <summary>
+        /// The current chosen color kind for drawing.
+        /// </summary>
+        public static GameDrawer.ColorKind currentColorKind { get; set; }
 
         /// <summary>
         /// The current chosen tiling for drawing a dashed line kind.
@@ -98,16 +103,23 @@ namespace Assets.SEE.Game.Drawable
         public static readonly string drawablePath = Application.persistentDataPath + "/Drawable/";
 
         /// <summary>
+        /// The path to the drawable image folder. This is saved in a field because multiple
+        /// methods of this class and other classes use it.
+        /// </summary>
+        public static readonly string imagePath = drawablePath + "Image/";
+
+        /// <summary>
         /// The constructor, it loads the default values for the current values.
         /// </summary>
         static ValueHolder()
         {
             currentPrimaryColor = UnityEngine.Random.ColorHSV();
-            currentSecondColor = Color.clear;
+            currentSecondaryColor = Color.clear;
             currentOutlineThickness = 0.4f;
             currentFontSize = 0.5f;
             currentThickness = 0.01f;
             currentLineKind = GameDrawer.LineKind.Solid;
+            currentColorKind = GameDrawer.ColorKind.Monochrome;
             currentTiling = 1f;
             currentOrderInLayer = 1;
         }

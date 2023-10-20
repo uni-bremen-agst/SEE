@@ -94,15 +94,20 @@ namespace SEE.Controls.Actions.Drawable
             foreach (Memento mem in mementoList)
             {
                 string drawableParent = GameDrawableFinder.GetDrawableParentName(mem.drawable);
-                if (mem.drawableType is Line line)
+                if (mem.drawableType is LineConf line)
                 {
                     GameDrawer.ReDrawLine(mem.drawable, line);
                     new DrawOnNetAction(mem.drawable.name, drawableParent, line).Execute();
                 }
-                else if (mem.drawableType is Text text)
+                else if (mem.drawableType is TextConf text)
                 {
                     GameTexter.ReWriteText(mem.drawable, text);
                     new WriteTextNetAction(mem.drawable.name, drawableParent, text).Execute();
+                }
+                else if (mem.drawableType is ImageConf image)
+                {
+                    GameImage.RePlaceImage(mem.drawable, image);
+                    new AddImageNetAction(mem.drawable.name, drawableParent, image).Execute();
                 }
             }
         }

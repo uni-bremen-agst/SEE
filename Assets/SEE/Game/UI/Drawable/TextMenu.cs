@@ -1,6 +1,11 @@
-﻿using Crosstales;
+﻿using Assets.SEE.Game.Drawable;
+using Crosstales;
 using SEE.Controls;
 using SEE.Controls.Actions;
+using SEE.Game.Drawable.Configurations;
+using SEE.Game.UI.Notification;
+using SEE.Game.UI.PropertyDialog.Drawable;
+using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +14,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 
 namespace Assets.SEE.Game.UI.Drawable
 {
@@ -155,11 +161,6 @@ namespace Assets.SEE.Game.UI.Drawable
         private static InputFieldWithButtons fontSizeInput;
 
         /// <summary>
-        /// A list of actions where the text menu is already displayed at awake.
-        /// </summary>
-        public static List<ActionStateType> usedIn = new() { ActionStateTypes.WriteText};
-
-        /// <summary>
         /// The init constructor that create the instance for the text menu.
         /// It hides the text menu by default.
         /// </summary>
@@ -173,7 +174,7 @@ namespace Assets.SEE.Game.UI.Drawable
 
         /// <summary>
         /// This method assigns the corresponding objects of the TextMenu instance to the buttons, sliders and other GameObjects.
-        /// It also adds their initial AddListeners to the objects.
+        /// It also adds their initial Handler to the components.
         /// </summary>
         private static void initBtn()
         {
@@ -210,7 +211,7 @@ namespace Assets.SEE.Game.UI.Drawable
         }
 
         /// <summary>
-        /// This method adds the inital AddListeners to the font style buttons.
+        /// This method adds the inital Handler to the font style buttons.
         /// </summary>
         private static void initFontStyleButtons()
         {
@@ -304,7 +305,133 @@ namespace Assets.SEE.Game.UI.Drawable
         }
 
         /// <summary>
-        /// This method will be used as an action for the AddListener of the color buttons (font/outline).
+        /// Provides the text menu for writing action. It's adding the needed Handler to the respective components.
+        /// </summary>
+        public static void EnableForWriting()
+        {
+            enableTextMenu((color => ValueHolder.currentPrimaryColor = color), ValueHolder.currentPrimaryColor, true);
+
+            GetFontColorButton().onClick.AddListener(() =>
+            {
+                AssignColorArea((color => ValueHolder.currentPrimaryColor = color), ValueHolder.currentPrimaryColor);
+            });
+            GetOutlineColorButton().onClick.AddListener(() =>
+            {
+                if (ValueHolder.currentSecondaryColor == Color.clear)
+                {
+                    ValueHolder.currentSecondaryColor = Random.ColorHSV();
+                }
+                if (ValueHolder.currentSecondaryColor.a == 0)
+                {
+                    ValueHolder.currentSecondaryColor = new Color(ValueHolder.currentSecondaryColor.r, ValueHolder.currentSecondaryColor.g, ValueHolder.currentSecondaryColor.b, 255);
+                }
+                AssignColorArea((color => ValueHolder.currentSecondaryColor = color), ValueHolder.currentSecondaryColor);
+            });
+            AssignOutlineThickness((thickness => ValueHolder.currentOutlineThickness = thickness), ValueHolder.currentOutlineThickness);
+            AssignFontSize(size => ValueHolder.currentFontSize = size, ValueHolder.currentFontSize);
+        }
+
+        /// <summary>
+        /// This method provides the text menu for editing, adding the necessary Handler to the respective components.
+        /// </summary>
+        /// <param name="selectedText">The selected text object for editing.</param>
+        public static void EnableForEditing(GameObject selectedText, DrawableType newValueHolder)
+        {
+            if (newValueHolder is TextConf textHolder)
+            {
+                GameObject drawable = GameDrawableFinder.FindDrawable(selectedText);
+                string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
+
+                enableTextMenu(color =>
+                {
+                    GameEdit.ChangeFontColor(selectedText, color);
+                    textHolder.fontColor = color;
+                    new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                }, textHolder.fontColor, true, true);
+                GetFontColorButton().onClick.AddListener(() =>
+                {
+                    AssignColorArea(color =>
+                    {
+                        GameEdit.ChangeFontColor(selectedText, color);
+                        textHolder.fontColor = color;
+                        new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                    }, textHolder.fontColor);
+                });
+
+                GetOutlineColorButton().onClick.AddListener(() =>
+                {
+                    if (textHolder.outlineColor == Color.clear)
+                    {
+                        textHolder.outlineColor = Random.ColorHSV();
+                    }
+                    if (textHolder.outlineColor.a == 0)
+                    {
+                        textHolder.outlineColor = new Color(textHolder.outlineColor.r, textHolder.outlineColor.g, textHolder.outlineColor.b, 255);
+                    }
+                    AssignColorArea(color =>
+                    {
+                        GameEdit.ChangeOutlineColor(selectedText, color);
+                        textHolder.outlineColor = color;
+                        new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                    }, textHolder.outlineColor);
+                });
+
+                AssignOutlineThickness(thickness =>
+                {
+                    GameEdit.ChangeOutlineThickness(selectedText, thickness);
+                    textHolder.outlineThickness = thickness;
+                    new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                }, textHolder.outlineThickness);
+
+
+                AssignFontSize(size =>
+                {
+                    GameEdit.ChangeFontSize(selectedText, size);
+                    textHolder.fontSize = size;
+                    new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                }, textHolder.fontSize);
+
+                AssignFontStyles(style =>
+                {
+                    GameEdit.ChangeFontStyles(selectedText, style);
+                    textHolder.fontStyles = style;
+                    new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                }, textHolder.fontStyles);
+
+                AssignEditTextButton(() =>
+                {
+                    WriteEditTextDialog writeTextDialog = new();
+                    writeTextDialog.SetStringInit(textHolder.text);
+                    UnityAction<string> stringAction = (textOut =>
+                    {
+                        if (textOut != null && textOut != "")
+                        {
+                            TextMeshPro tmp = selectedText.GetComponent<TextMeshPro>();
+                            tmp.rectTransform.sizeDelta = GameTexter.CalculateWidthAndHeight(textOut, tmp.font, textHolder.fontSize, textHolder.fontStyles);
+                            GameEdit.ChangeText(selectedText, textOut);
+                            textHolder.text = textOut;
+                            new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                        }
+                        else
+                        {
+                            ShowNotification.Warn("Empty text", "The text to write is empty. Please add one.");
+                        }
+                    });
+
+                    writeTextDialog.Open(stringAction);
+                });
+
+                AssignOrderInLayer(order =>
+                {
+                    GameEdit.ChangeLayer(selectedText, order);
+                    textHolder.orderInLayer = order;
+                    new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
+                }, textHolder.orderInLayer);
+            }
+        }
+
+        /// <summary>
+        /// This method will be used as an action for the Handler of the color buttons (font/outline).
         /// This allows only one color to be active at a time.
         /// </summary>
         private static void MutuallyExclusiveColorButtons()
@@ -412,7 +539,7 @@ namespace Assets.SEE.Game.UI.Drawable
         }
 
         /// <summary>
-        /// This method will be used as inital AddListener action for the font style buttons.
+        /// This method will be used as inital Handler action for the font style buttons.
         /// It enters the status of the selected font style into the dictionary and ensures that mutually exclusive font styles remain exclusive.
         /// </summary>
         /// <param name="pressedStyle"></param>

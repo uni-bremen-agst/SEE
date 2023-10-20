@@ -23,7 +23,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The Text that should be changed. The Text object contains all relevant values to change.
         /// </summary>
-        public Text Text;
+        public TextConf Text;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
@@ -31,7 +31,7 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The id of the drawable on which the object is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="text">The text that contains the values to change the associated game object.</param>
-        public EditTextNetAction(string drawableID, string parentDrawableID, Text text) : base()
+        public EditTextNetAction(string drawableID, string parentDrawableID, TextConf text) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;

@@ -80,6 +80,9 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private static List<GameObject> selectedDrawables = new();
 
+        /// <summary>
+        /// The instance for the drawable file browser
+        /// </summary>
         private static DrawableFileBrowser browser;
 
         /// <summary>

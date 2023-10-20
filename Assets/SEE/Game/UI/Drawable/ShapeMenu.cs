@@ -225,7 +225,7 @@ namespace Assets.SEE.Game.UI.Drawable
         }
 
         /// <summary>
-        /// Init the switch menu. It adds the AddListeners for the shape menu and for the config menu.
+        /// Init the switch menu. It adds the Handler for the shape menu and for the config menu.
         /// By default, the shape menu is selected.
         /// </summary>
         private static void InitSwitchMenu()
@@ -241,7 +241,7 @@ namespace Assets.SEE.Game.UI.Drawable
         }
         /// <summary>
         /// Init the shape menu.
-        /// It adds the necessary AddListeners to the components and sets the selected shape to line.
+        /// It adds the necessary Handler to the components and sets the selected shape to line.
         /// </summary>
         private static void InitShapeMenu()
         {
@@ -340,38 +340,16 @@ namespace Assets.SEE.Game.UI.Drawable
                     path = "Textures/Drawable/Polygon";
                     break;
             }
-            infoImage.sprite = Resources.Load<Sprite>(path); ;
+            infoImage.sprite = Resources.Load<Sprite>(path);
         }
 
         /// <summary>
         /// Init the config menu. 
-        /// It adds the necressary AddListeners to the components.
+        /// It adds the necressary Handler to the components.
         /// </summary>
         private static void InitConfigMenu()
         {
-            LineMenu.GetTilingSliderController().onValueChanged.AddListener(LineMenu.tilingAction = tiling =>
-            {
-                ValueHolder.currentTiling = tiling;
-            });
-
-            LineMenu.GetNextLineKindBtn().onClick.RemoveAllListeners();
-            LineMenu.GetNextLineKindBtn().onClick.AddListener(() => ValueHolder.currentLineKind = LineMenu.NextLineKind());
-            LineMenu.GetPreviousLineKindBtn().onClick.RemoveAllListeners();
-            LineMenu.GetPreviousLineKindBtn().onClick.AddListener(() => ValueHolder.currentLineKind = LineMenu.PreviousLineKind());
-
-            thicknessSlider = LineMenu.instance.GetComponentInChildren<ThicknessSliderController>();
-            thicknessSlider.AssignValue(ValueHolder.currentThickness);
-            thicknessSlider.onValueChanged.AddListener(thickness =>
-            {
-                ValueHolder.currentThickness = thickness;
-            });
-
-            picker = LineMenu.instance.GetComponent<HSVPicker.ColorPicker>();
-            picker.AssignColor(ValueHolder.currentPrimaryColor);
-            picker.onValueChanged.AddListener(LineMenu.colorAction = color =>
-            {
-                ValueHolder.currentPrimaryColor = color;
-            });
+            LineMenu.InitDrawing();
         }
 
         /// <summary>

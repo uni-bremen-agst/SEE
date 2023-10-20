@@ -247,16 +247,15 @@ namespace Assets.SEE.Game.Drawable
             textObject.transform.localPosition = position;
             textObject.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(order);
             return textObject;
-
         }
 
         /// <summary>
-        /// Rewrites a given <see cref="Text"/> configuration.
+        /// Rewrites a given <see cref="TextConf"/> configuration.
         /// </summary>
         /// <param name="drawable">The drawable on that the text should be displayed.</param>
         /// <param name="text">The text configuration which contains the necressary values.</param>
         /// <returns>The created drawable text object</returns>
-        public static GameObject ReWriteText(GameObject drawable, Text text)
+        public static GameObject ReWriteText(GameObject drawable, TextConf text)
         {
             return ReWriteText(drawable,
                 text.id,

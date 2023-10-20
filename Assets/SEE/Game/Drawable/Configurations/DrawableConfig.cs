@@ -92,12 +92,17 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// All the lines that should be displayed on this drawable.
         /// </summary>
-        public List<Line> LineConfigs = new();
+        public List<LineConf> LineConfigs = new();
 
         /// <summary>
         /// All the texts that should be displayed on this drawable.
         /// </summary>
-        public List<Text> TextConfigs = new();
+        public List<TextConf> TextConfigs = new();
+
+        /// <summary>
+        /// All the images that should be displayed on this drawable.
+        /// </summary>
+        public List<ImageConf> ImageConfigs = new();
 
         /// <summary>
         /// The label for the drawable name in the configuration file.
@@ -130,6 +135,11 @@ namespace SEE.Game.Drawable.Configurations
         private const string TextConfigsLabel = "TextConfigs";
 
         /// <summary>
+        /// The label for the group of image configurations in the configuration file.
+        /// </summary>
+        private const string ImageConfigsLabel = "ImageConfigs";
+
+        /// <summary>
         /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
@@ -143,7 +153,7 @@ namespace SEE.Game.Drawable.Configurations
             if (LineConfigs != null && LineConfigs.Count > 0)
             {
                 writer.BeginList(LineConfigsLabel);
-                foreach (Line lineConfig in LineConfigs)
+                foreach (LineConf lineConfig in LineConfigs)
                 {
                     lineConfig.Save(writer);
                 }
@@ -153,9 +163,19 @@ namespace SEE.Game.Drawable.Configurations
             if (TextConfigs != null && TextConfigs.Count > 0)
             {
                 writer.BeginList(TextConfigsLabel);
-                foreach (Text textConfig in TextConfigs)
+                foreach (TextConf textConfig in TextConfigs)
                 {
                     textConfig.Save(writer);
+                }
+                writer.EndList();
+            }
+
+            if (ImageConfigs != null && ImageConfigs.Count > 0)
+            {
+                writer.BeginList(ImageConfigsLabel);
+                foreach (ImageConf imageConfig in ImageConfigs)
+                {
+                    imageConfig.Save(writer);
                 }
                 writer.EndList();
             }
@@ -213,7 +233,7 @@ namespace SEE.Game.Drawable.Configurations
                 foreach (object item in (List<object>)lineList)
                 {
                     Dictionary<string, object> dict = (Dictionary<string, object>)item;
-                    Line config = new Line();
+                    LineConf config = new LineConf();
                     config.Restore(dict);
                     LineConfigs.Add(config);
                 }
@@ -226,9 +246,22 @@ namespace SEE.Game.Drawable.Configurations
                 {
                     i++;
                     Dictionary<string, object> dict = (Dictionary<string, object>)item;
-                    Text config = new Text();
+                    TextConf config = new TextConf();
                     config.Restore(dict);
                     TextConfigs.Add(config);
+                }
+            }
+
+            if (attributes.TryGetValue(ImageConfigsLabel, out object imageList))
+            {
+                int i = 0;
+                foreach (object item in (List<object>)imageList)
+                {
+                    i++;
+                    Dictionary<string, object> dict = (Dictionary<string, object>)item;
+                    ImageConf config = new ImageConf();
+                    config.Restore(dict);
+                    ImageConfigs.Add(config);
                 }
             }
 

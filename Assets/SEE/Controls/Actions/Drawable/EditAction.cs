@@ -10,7 +10,7 @@ using UnityEngine.UI;
 using static SEE.Game.GameDrawer;
 using Assets.SEE.Game.UI.Drawable;
 using SEE.Game.Drawable.Configurations;
-using Text = SEE.Game.Drawable.Configurations.Text;
+using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 using UnityEngine.Events;
 using SEE.Game.UI.PropertyDialog.Drawable;
 using SEE.Game.UI.Notification;
@@ -115,21 +115,6 @@ namespace SEE.Controls.Actions.Drawable
         private DrawableType newValueHolder;
 
         /// <summary>
-        /// The HSV color picker for the line menu.
-        /// </summary>
-        private HSVPicker.ColorPicker picker;
-
-        /// <summary>
-        /// The layer slider controller for the line menu.
-        /// </summary>
-        private LayerSliderController layerSlider;
-
-        /// <summary>
-        /// The thickness slider controller for the line menu.
-        /// </summary>
-        private ThicknessSliderController thicknessSlider;
-
-        /// <summary>
         /// Resets the old selected object, if the action state will leave.
         /// </summary>
         public static void Reset()
@@ -146,16 +131,16 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns></returns>
         private bool CheckEquals(DrawableType oldHolder, DrawableType newHolder)
         {
-            if (oldHolder is Line oldLineHolder && newHolder is Line newLineHolder)
+            if (oldHolder is LineConf oldLineHolder && newHolder is LineConf newLineHolder)
             {
-                return oldLineHolder.color.Equals(newLineHolder.color) &&
+                return oldLineHolder.primaryColor.Equals(newLineHolder.primaryColor) &&
                     oldLineHolder.orderInLayer.Equals(newLineHolder.orderInLayer) &&
                     oldLineHolder.thickness.Equals(newLineHolder.thickness) &&
                     oldLineHolder.loop.Equals(newLineHolder.loop) &&
                     oldLineHolder.lineKind.Equals(newLineHolder.lineKind) &&
                     oldLineHolder.tiling.Equals(newLineHolder.tiling);
             }
-            if (oldHolder is Text oldTextHolder && newHolder is Text newTextHolder)
+            if (oldHolder is TextConf oldTextHolder && newHolder is TextConf newTextHolder)
             {
                 return oldTextHolder.text.Equals(newTextHolder.text) &&
                     oldTextHolder.fontSize.Equals(newTextHolder.fontSize) &&
@@ -164,6 +149,11 @@ namespace SEE.Controls.Actions.Drawable
                     oldTextHolder.fontColor.Equals(newTextHolder.fontColor) &&
                     oldTextHolder.outlineColor.Equals(newTextHolder.outlineColor) &&
                     oldTextHolder.outlineThickness.Equals(newTextHolder.outlineThickness);
+            }
+            if (oldHolder is ImageConf oldImageHolder && newHolder is ImageConf newImageHolder)
+            {
+                return oldImageHolder.orderInLayer.Equals(newImageHolder.orderInLayer) &&
+                    oldImageHolder.imageColor.Equals(newImageHolder.imageColor);
             }
             return false;
         }
@@ -183,19 +173,25 @@ namespace SEE.Controls.Actions.Drawable
             {
                 GameObject drawable = GameDrawableFinder.FindDrawable(selectedObj);
                 string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
-                if (oldValueHolder is Line oldLineHolder)
+                if (oldValueHolder is LineConf oldLineHolder)
                 {
                     GameEdit.ChangeLine(selectedObj, oldLineHolder);
                     new EditLineNetAction(drawable.name, drawableParent, oldLineHolder).Execute();
                 }
-                if (oldValueHolder is Text oldTextHolder)
+                if (oldValueHolder is TextConf oldTextHolder)
                 {
                     GameEdit.ChangeText(selectedObj, oldTextHolder);
                     new EditTextNetAction(drawable.name, drawableParent, oldTextHolder).Execute();
                 }
+                if (oldValueHolder is ImageConf oldImageHolder)
+                {
+                    GameEdit.ChangeImage(selectedObj, oldImageHolder);
+                    new EditImageNetAction(drawable.name, drawableParent, oldImageHolder).Execute();
+                }
             }
             TextMenu.disableTextMenu();
             LineMenu.disableLineMenu();
+            ImageMenu.Disable();
         }
 
         /// <summary>
@@ -227,6 +223,7 @@ namespace SEE.Controls.Actions.Drawable
                             oldSelectedObj = selectedObj;
                             oldValueHolder = new DrawableType().Get(selectedObj);
                             newValueHolder = new DrawableType().Get(selectedObj);
+
                             BlinkEffect effect = selectedObj.AddOrGetComponent<BlinkEffect>();
                             effect.SetAllowedActionStateType(GetActionStateType());
 
@@ -242,11 +239,15 @@ namespace SEE.Controls.Actions.Drawable
                     case ProgressState.OpenEditMenu:
                         if (selectedObj.CompareTag(Tags.Line))
                         {
-                            enableLineMenu(selectedObj);
+                            LineMenu.EnableForEditing(selectedObj, newValueHolder);
                         }
                         if (selectedObj.CompareTag(Tags.DText))
                         {
-                            enableTextMenu(selectedObj);
+                            TextMenu.EnableForEditing(selectedObj, newValueHolder);
+                        }
+                        if (selectedObj.CompareTag(Tags.Image))
+                        {
+                            ImageMenu.Enable(selectedObj, newValueHolder);
                         }
                         if (Input.GetMouseButtonUp(0))
                         {
@@ -279,6 +280,7 @@ namespace SEE.Controls.Actions.Drawable
                             progressState = ProgressState.SelectObject;
                             LineMenu.disableLineMenu();
                             TextMenu.disableTextMenu();
+                            ImageMenu.Disable();
                         }
                         break;
                     default:
@@ -286,192 +288,6 @@ namespace SEE.Controls.Actions.Drawable
                 }
             }
             return false;     
-        }
-
-        /// <summary>
-        /// This method provides the text menu for editing, adding the necessary AddListeners to the respective components.
-        /// </summary>
-        /// <param name="selectedText">The selected text object for editing.</param>
-        private void enableTextMenu(GameObject selectedText)
-        {
-            if (newValueHolder is Text textHolder)
-            {
-                GameObject drawable = GameDrawableFinder.FindDrawable(selectedText);
-                string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
-
-                UnityAction<Color> pickerAction = color =>
-                {
-                    GameEdit.ChangeFontColor(selectedText, color);
-                    textHolder.fontColor = color;
-                    new EditTextNetAction(drawable.name, drawableParentName, Text.GetText(selectedText)).Execute();
-                };
-
-                TextMenu.enableTextMenu(pickerAction, textHolder.fontColor, true, true);
-                TextMenu.GetFontColorButton().onClick.AddListener(() =>
-                {
-                    TextMenu.AssignColorArea(pickerAction, textHolder.fontColor);
-                });
-
-                TextMenu.GetOutlineColorButton().onClick.AddListener(() =>
-                {
-                    if (textHolder.outlineColor == Color.clear)
-                    {
-                        textHolder.outlineColor = Random.ColorHSV();
-                    }
-                    if (textHolder.outlineColor.a == 0)
-                    {
-                        textHolder.outlineColor = new Color(textHolder.outlineColor.r, textHolder.outlineColor.g, textHolder.outlineColor.b, 255);
-                    }
-                    TextMenu.AssignColorArea(color =>
-                    {
-                        GameEdit.ChangeOutlineColor(selectedText, color);
-                        textHolder.outlineColor = color;
-                        new EditTextNetAction(drawable.name, drawableParentName, Text.GetText(selectedText)).Execute();
-                    }, textHolder.outlineColor);
-                });
-
-                TextMenu.AssignOutlineThickness(thickness =>
-                {
-                    GameEdit.ChangeOutlineThickness(selectedText, thickness);
-                    textHolder.outlineThickness = thickness;
-                    new EditTextNetAction(drawable.name, drawableParentName, Text.GetText(selectedText)).Execute();
-                }, textHolder.outlineThickness);
-
-
-                TextMenu.AssignFontSize(size =>
-                {
-                    GameEdit.ChangeFontSize(selectedText, size);
-                    textHolder.fontSize = size;
-                    new EditTextNetAction(drawable.name, drawableParentName, Text.GetText(selectedText)).Execute();
-                }, textHolder.fontSize);
-
-                TextMenu.AssignFontStyles(style =>
-                {
-                    GameEdit.ChangeFontStyles(selectedText, style);
-                    textHolder.fontStyles = style;
-                    new EditTextNetAction(drawable.name, drawableParentName, Text.GetText(selectedText)).Execute();
-                }, textHolder.fontStyles);
-
-                TextMenu.AssignEditTextButton(() =>
-                {
-                    WriteEditTextDialog writeTextDialog = new();
-                    writeTextDialog.SetStringInit(textHolder.text);
-                    UnityAction<string> stringAction = (textOut =>
-                    {
-                        if (textOut != null && textOut != "")
-                        {
-                            TextMeshPro tmp = selectedText.GetComponent<TextMeshPro>();
-                            tmp.rectTransform.sizeDelta = GameTexter.CalculateWidthAndHeight(textOut, tmp.font, textHolder.fontSize, textHolder.fontStyles);
-                            GameEdit.ChangeText(selectedText, textOut);
-                            textHolder.text = textOut;
-                            new EditTextNetAction(drawable.name, drawableParentName, Text.GetText(selectedText)).Execute();
-                        }
-                        else
-                        {
-                            ShowNotification.Warn("Empty text", "The text to write is empty. Please add one.");
-                        }
-                    });
-
-                    writeTextDialog.Open(stringAction);
-                });
-
-                TextMenu.AssignOrderInLayer(order =>
-                {
-                    GameEdit.ChangeLayer(selectedText, order);
-                    textHolder.orderInLayer = order;
-                    new EditTextNetAction(drawable.name, drawableParentName, Text.GetText(selectedText)).Execute();
-                }, textHolder.orderInLayer);
-            }
-        }
-
-        /// <summary>
-        /// This method provides the line menu for editing, adding the necessary AddListeners to the respective components.
-        /// </summary>
-        /// <param name="selectedLine">The selected line object for editing.</param>
-        private void enableLineMenu(GameObject selectedLine)
-        {
-            if (newValueHolder is Line lineHolder)
-            {
-                LineMenu.enableLineMenu();
-                LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
-                GameObject drawable = GameDrawableFinder.FindDrawable(selectedLine);
-                string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
-
-                LineMenu.AssignLineKind(selectedLine.GetComponent<LineKindHolder>().GetLineKind(), renderer.textureScale.x);
-
-                LineMenu.GetTilingSliderController().onValueChanged.AddListener(LineMenu.tilingAction = tiling =>
-                {
-                    GameDrawer.ChangeLineKind(selectedLine, LineKind.Dashed, tiling);
-                    lineHolder.lineKind = LineKind.Dashed;
-                    lineHolder.tiling = tiling;
-                    new ChangeLineKindNetAction(drawable.name, drawableParentName, selectedLine.name,
-                            LineKind.Dashed, tiling).Execute();
-                });
-
-                LineMenu.GetNextLineKindBtn().onClick.RemoveAllListeners();
-                LineMenu.GetNextLineKindBtn().onClick.AddListener(() =>
-                {
-                    LineKind kind = LineMenu.NextLineKind();
-                    if (kind != LineKind.Dashed)
-                    {
-                        GameDrawer.ChangeLineKind(selectedObj, kind, lineHolder.tiling);
-                        lineHolder.lineKind = kind;
-                        new ChangeLineKindNetAction(drawable.name, drawableParentName, selectedLine.name,
-                            kind, lineHolder.tiling).Execute();
-                    }
-                });
-                LineMenu.GetPreviousLineKindBtn().onClick.RemoveAllListeners();
-                LineMenu.GetPreviousLineKindBtn().onClick.AddListener(() =>
-                {
-                    LineKind kind = LineMenu.PreviousLineKind();
-                    if (kind != LineKind.Dashed)
-                    {
-                        GameDrawer.ChangeLineKind(selectedObj, kind, lineHolder.tiling);
-                        lineHolder.lineKind = kind;
-                        new ChangeLineKindNetAction(drawable.name, drawableParentName, selectedLine.name,
-                            kind, lineHolder.tiling).Execute();
-                    }
-                });
-
-                thicknessSlider = LineMenu.instance.GetComponentInChildren<ThicknessSliderController>();
-                thicknessSlider.AssignValue(renderer.startWidth);
-                thicknessSlider.onValueChanged.AddListener(thickness =>
-                {
-                    if (thickness > 0.0f)
-                    {
-                        GameEdit.ChangeThickness(selectedLine, thickness);
-                        lineHolder.thickness = thickness;
-                        new EditLineThicknessNetAction(drawable.name, drawableParentName, selectedLine.name, thickness).Execute();
-                    }
-                });
-
-                layerSlider = LineMenu.instance.GetComponentInChildren<LayerSliderController>();
-                layerSlider.AssignValue(renderer.sortingOrder);
-                layerSlider.onValueChanged.AddListener(layerOrder =>
-                {
-                    GameEdit.ChangeLayer(selectedLine, layerOrder);
-                    lineHolder.orderInLayer = layerOrder;
-                    new EditLayerNetAction(drawable.name, drawableParentName, selectedLine.name, layerOrder).Execute();
-                });
-
-                Toggle toggle = LineMenu.instance.GetComponentInChildren<Toggle>();
-                toggle.isOn = renderer.loop;
-                toggle.onValueChanged.AddListener(loop =>
-                {
-                    GameEdit.ChangeLoop(selectedLine, loop);
-                    lineHolder.loop = loop;
-                    new EditLineLoopNetAction(drawable.name, drawableParentName, selectedLine.name, loop).Execute();
-                });
-
-                picker = LineMenu.instance.GetComponent<HSVPicker.ColorPicker>();
-                picker.AssignColor(renderer.material.color);
-                picker.onValueChanged.AddListener(LineMenu.colorAction = color =>
-                {
-                    GameEdit.ChangeColor(selectedLine, color);
-                    lineHolder.color = color;
-                    new EditLineColorNetAction(drawable.name, drawableParentName, selectedLine.name, color).Execute();
-                });
-            }
         }
 
         /// <summary>
@@ -489,15 +305,20 @@ namespace SEE.Controls.Actions.Drawable
             {
                 GameObject drawable = GameDrawableFinder.FindDrawable(memento.selectedObj);
                 string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
-                if (memento.oldValueHolder is Line oldLineHolder)
+                if (memento.oldValueHolder is LineConf oldLineHolder)
                 {
                     GameEdit.ChangeLine(memento.selectedObj, oldLineHolder);
                     new EditLineNetAction(drawable.name, drawableParent, oldLineHolder).Execute();
                 }
-                if (memento.oldValueHolder is Text oldTextHolder)
+                if (memento.oldValueHolder is TextConf oldTextHolder)
                 {
                     GameEdit.ChangeText(memento.selectedObj, oldTextHolder);
                     new EditTextNetAction(drawable.name, drawableParent, oldTextHolder).Execute();
+                }
+                if (memento.oldValueHolder is ImageConf oldImageHolder)
+                {
+                    GameEdit.ChangeImage(memento.selectedObj, oldImageHolder);
+                    new EditImageNetAction(drawable.name, drawableParent, oldImageHolder).Execute();
                 }
             }
         }
@@ -517,15 +338,20 @@ namespace SEE.Controls.Actions.Drawable
             {
                 GameObject drawable = GameDrawableFinder.FindDrawable(memento.selectedObj);
                 string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
-                if (memento.newValueHolder is Line newLineValueHolder)
+                if (memento.newValueHolder is LineConf newLineValueHolder)
                 {
                     GameEdit.ChangeLine(memento.selectedObj, newLineValueHolder);
                     new EditLineNetAction(drawable.name, drawableParent, newLineValueHolder).Execute();
                 }
-                if (memento.newValueHolder is Text newTextHolder)
+                if (memento.newValueHolder is TextConf newTextHolder)
                 {
                     GameEdit.ChangeText(memento.selectedObj, newTextHolder);
                     new EditTextNetAction(drawable.name, drawableParent, newTextHolder).Execute();
+                }
+                if (memento.newValueHolder is ImageConf newImageHolder)
+                {
+                    GameEdit.ChangeImage(memento.selectedObj, newImageHolder);
+                    new EditImageNetAction(drawable.name, drawableParent, newImageHolder).Execute();
                 }
             }
         }
@@ -549,6 +375,11 @@ namespace SEE.Controls.Actions.Drawable
         {
             return CreateReversibleAction();
         }
+
+        /// <summary>
+        /// Returns the <see cref="ActionStateType"/> of this action.
+        /// </summary>
+        /// <returns><see cref="ActionStateType.Edit"/></returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.Edit;

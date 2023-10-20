@@ -12,7 +12,7 @@ namespace Assets.SEE.Game.Drawable
 {
     public static class GameLineSplit
     {
-        public static void Split(GameObject drawable, Line originLine, List<int> matchedIndexes, List<Vector3> positions, List<Line> lines, bool removeMatchedIndex)
+        public static void Split(GameObject drawable, LineConf originLine, List<int> matchedIndexes, List<Vector3> positions, List<LineConf> lines, bool removeMatchedIndex)
         {
             int removeCounter = removeMatchedIndex ? 1 : 0;
 
@@ -70,23 +70,23 @@ namespace Assets.SEE.Game.Drawable
             }
         }
 
-        private static void TryReDraw(GameObject drawable, Line originLine, Vector3[] positions, List<Line> lines)
+        private static void TryReDraw(GameObject drawable, LineConf originLine, Vector3[] positions, List<LineConf> lines)
         {
             if (positions.Length > 1)
             {
                 lines.Add(ReDraw(drawable, originLine, positions));
             }
         }
-        private static Line ReDraw(GameObject drawable, Line originLine, Vector3[] positions)
+        private static LineConf ReDraw(GameObject drawable, LineConf originLine, Vector3[] positions)
         {
-            Line lineToCreate = (Line)originLine.Clone();
+            LineConf lineToCreate = (LineConf)originLine.Clone();
             lineToCreate.id = "";
             lineToCreate.rendererPositions = positions;
 
             GameObject newLine = GameDrawer.ReDrawLine(drawable, lineToCreate);
-            new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), Line.GetLine(newLine)).Execute();
+            new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), LineConf.GetLine(newLine)).Execute();
 
-            return Line.GetLine(newLine);
+            return LineConf.GetLine(newLine);
         }
     }
 }

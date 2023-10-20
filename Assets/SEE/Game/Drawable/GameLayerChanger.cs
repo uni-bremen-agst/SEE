@@ -32,14 +32,17 @@ namespace Assets.SEE.Game.Drawable
         /// </summary>
         /// <param name="obj">The object whose order in layer is to be changed</param>
         /// <param name="order">The new order of the object.</param>
-        public static void Increase(GameObject obj, int order)
+        public static void Increase(GameObject obj, int order, bool showInformation = true)
         {
             if (obj.GetComponent<OrderInLayerValueHolder>() != null)
             {
                 OrderInLayerValueHolder holder = obj.GetComponent<OrderInLayerValueHolder>();
                 if (holder.GetOrderInLayer() >= ValueHolder.currentOrderInLayer)
                 {
-                    ShowNotification.Warn("Maximum layer order", obj.name + " has reached the maximum layer order: " + holder.GetOrderInLayer());
+                    if (showInformation)
+                    {
+                        ShowNotification.Warn("Maximum layer order", obj.name + " has reached the maximum layer order: " + holder.GetOrderInLayer());
+                    }
                 }
                 else
                 {
@@ -48,6 +51,10 @@ namespace Assets.SEE.Game.Drawable
                     if (obj.GetComponent<TextMeshPro>() != null)
                     {
                         obj.GetComponent<TextMeshPro>().sortingOrder = order;
+                    }
+                    if (obj.GetComponent<Canvas>() != null)
+                    {
+                        obj.GetComponent<Canvas>().sortingOrder = order;
                     }
                 }
             }
@@ -58,14 +65,17 @@ namespace Assets.SEE.Game.Drawable
         /// </summary>
         /// <param name="obj">The object whose order in layer is to be changed</param>
         /// <param name="order">The new order of the object.</param>
-        public static void Decrease(GameObject obj, int order)
+        public static void Decrease(GameObject obj, int order, bool showInformation = true)
         {
             if (obj.GetComponent<OrderInLayerValueHolder>() != null)
             {
                 OrderInLayerValueHolder holder = obj.GetComponent<OrderInLayerValueHolder>();
                 if (holder.GetOrderInLayer() == 0)
                 {
-                    ShowNotification.Warn("Minimum layer order", obj.name + " has reached the minimum layer order: " + holder.GetOrderInLayer());
+                    if (showInformation)
+                    {
+                        ShowNotification.Warn("Minimum layer order", obj.name + " has reached the minimum layer order: " + holder.GetOrderInLayer());
+                    }
                 }
                 else
                 {
@@ -74,6 +84,10 @@ namespace Assets.SEE.Game.Drawable
                     if (obj.GetComponent<TextMeshPro>() != null)
                     {
                         obj.GetComponent<TextMeshPro>().sortingOrder = order;
+                    }
+                    if (obj.GetComponent<Canvas>() != null)
+                    {
+                        obj.GetComponent<Canvas>().sortingOrder = order;
                     }
                 }
             }

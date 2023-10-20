@@ -69,7 +69,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// This struct can store all the information needed to revert or repeat a <see cref="WriteTextAction"/>
         /// </summary>
-        private class Memento
+        private struct Memento
         {
             /// <summary>
             /// The drawable on that the text should be displayed
@@ -79,14 +79,14 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The written text.
             /// </summary>
-            public Text text;
+            public TextConf text;
             
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
             /// <param name="drawable">The drawable on that the text should be displayed.</param>
             /// <param name="text">The written text</param>
-            public Memento(GameObject drawable, Text text)
+            public Memento(GameObject drawable, TextConf text)
             {
                 this.drawable = drawable;
                 this.text = text;
@@ -109,28 +109,8 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (firstStart)
             {
-                TextMenu.enableTextMenu((color => ValueHolder.currentPrimaryColor = color), ValueHolder.currentPrimaryColor, true);
                 GameObject.Find("UI Canvas").AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
-
-                TextMenu.GetFontColorButton().onClick.AddListener(() =>
-                {
-                    TextMenu.AssignColorArea((color => ValueHolder.currentPrimaryColor = color), ValueHolder.currentPrimaryColor);
-                });
-                TextMenu.GetOutlineColorButton().onClick.AddListener(() =>
-                {
-                    if (ValueHolder.currentSecondColor == Color.clear)
-                    {
-                        ValueHolder.currentSecondColor = Random.ColorHSV();
-                    }
-                    if (ValueHolder.currentSecondColor.a == 0)
-                    {
-                        ValueHolder.currentSecondColor = new Color(ValueHolder.currentSecondColor.r, ValueHolder.currentSecondColor.g, ValueHolder.currentSecondColor.b, 255);
-                    }
-                    TextMenu.AssignColorArea((color => ValueHolder.currentSecondColor = color), ValueHolder.currentSecondColor);
-                });
-                TextMenu.AssignOutlineThickness((thickness => ValueHolder.currentOutlineThickness = thickness), ValueHolder.currentOutlineThickness);
-                TextMenu.AssignFontSize(size => ValueHolder.currentFontSize = size, ValueHolder.currentFontSize);
-
+                TextMenu.EnableForWriting();
                 firstStart = false;
             }
             else
@@ -173,10 +153,10 @@ namespace SEE.Controls.Actions.Drawable
                         {
                             if (textOut != null && textOut != "")
                             {
-                                textObj = GameTexter.WriteText(drawable, textOut, position, ValueHolder.currentPrimaryColor, ValueHolder.currentSecondColor,
+                                textObj = GameTexter.WriteText(drawable, textOut, position, ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor,
                                     ValueHolder.currentOutlineThickness, ValueHolder.currentFontSize, ValueHolder.currentOrderInLayer, TextMenu.GetFontStyle());
-                                new WriteTextNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), Text.GetText(textObj)).Execute();
-                                memento = new Memento(drawable, Text.GetText(textObj));
+                                new WriteTextNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), TextConf.GetText(textObj)).Execute();
+                                memento = new Memento(drawable, TextConf.GetText(textObj));
                                 GameTexter.RefreshMeshCollider(textObj);
                                 currentState = ReversibleAction.Progress.Completed;
                                 return true;

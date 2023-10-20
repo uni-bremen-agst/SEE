@@ -50,14 +50,14 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The configuration of the shape.
             /// </summary>
-            public readonly Line shape;
+            public readonly LineConf shape;
 
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
             /// <param name="drawable">The drawable where the shape is displayed.</param>
             /// <param name="shape">The configuration of the shape.</param>
-            public Memento(GameObject drawable, Line shape)
+            public Memento(GameObject drawable, LineConf shape)
             {
                 this.drawable = drawable;
                 this.shape = shape;
@@ -123,7 +123,8 @@ namespace SEE.Controls.Actions.Drawable
                         case GameShapesCalculator.Shapes.Line:
 
                             positions[0] = raycastHit.point;
-                            shape = GameDrawer.StartDrawing(drawable, positions, ValueHolder.currentPrimaryColor, ValueHolder.currentThickness,
+                            shape = GameDrawer.StartDrawing(drawable, positions, ValueHolder.currentColorKind, 
+                                ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor, ValueHolder.currentThickness,
                                 ValueHolder.currentLineKind, ValueHolder.currentTiling);
                             positions[0] = shape.transform.InverseTransformPoint(positions[0]) - ValueHolder.distanceToDrawable;
                             break;
@@ -164,11 +165,12 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         if (GameDrawer.DifferentPositionCounter(positions) > 1)
                         {
-                            shape = GameDrawer.DrawLine(drawable, "", positions, ValueHolder.currentPrimaryColor, ValueHolder.currentThickness, true,
+                            shape = GameDrawer.DrawLine(drawable, "", positions, ValueHolder.currentColorKind,
+                                ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor, ValueHolder.currentThickness, true,
                                 ValueHolder.currentLineKind, ValueHolder.currentTiling);
                             shape.GetComponent<LineRenderer>().loop = true;
                             shape = GameDrawer.SetPivot(shape);
-                            Line currentShape = Line.GetLine(shape);
+                            LineConf currentShape = LineConf.GetLine(shape);
                             memento = new Memento(drawable, currentShape);
                             new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), currentShape).Execute();
                             currentState = ReversibleAction.Progress.Completed;
@@ -196,7 +198,7 @@ namespace SEE.Controls.Actions.Drawable
                     Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
                     newPositions[newPositions.Length - 1] = newPosition;
                     GameDrawer.Drawing(shape ,newPositions);
-                    new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), Line.GetLine(shape)).Execute();
+                    new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), LineConf.GetLine(shape)).Execute();
                 }
 
                 /// With this block, the user can add a new point to the line. 
@@ -217,7 +219,7 @@ namespace SEE.Controls.Actions.Drawable
                         positions = newPositions;
 
                         GameDrawer.Drawing(shape, positions);
-                        new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), Line.GetLine(shape)).Execute();
+                        new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), LineConf.GetLine(shape)).Execute();
                     }
                 }
 
@@ -251,7 +253,7 @@ namespace SEE.Controls.Actions.Drawable
             GameDrawer.Drawing(shape, positions);
             shape.GetComponent<LineRenderer>().loop = loop;
             shape = GameDrawer.SetPivot(shape);
-            Line currentShape = Line.GetLine(shape);
+            LineConf currentShape = LineConf.GetLine(shape);
             memento = new Memento(drawable, currentShape);
             new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), currentShape).Execute();
             currentState = ReversibleAction.Progress.Completed;
@@ -284,7 +286,7 @@ namespace SEE.Controls.Actions.Drawable
             shape = GameDrawer.ReDrawLine(memento.drawable, memento.shape);
             if (shape != null)
             {
-                new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), Line.GetLine(shape)).Execute();
+                new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), LineConf.GetLine(shape)).Execute();
             }
         }
 

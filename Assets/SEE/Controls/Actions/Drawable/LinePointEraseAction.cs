@@ -37,7 +37,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// Is the configuration of line before a point was removed.
             /// </summary>
-            public Line originalLine;
+            public LineConf originalLine;
             /// <summary>
             /// Is the drawable on that the lines are displayed.
             /// </summary>
@@ -45,7 +45,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The list of lines that resulted from point remove of the original line.
             /// </summary>
-            public List<Line> lines;
+            public List<LineConf> lines;
 
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
@@ -53,9 +53,9 @@ namespace SEE.Controls.Actions.Drawable
             /// <param name="originalLine">Is the configuration of line before a point was removed.</param>
             /// <param name="drawable">The drawable where the lines are displayed</param>
             /// <param name="lines">The list of lines that resulted from remove a point of the original line</param>
-            public Memento(GameObject originalLine, GameObject drawable, List<Line> lines)
+            public Memento(GameObject originalLine, GameObject drawable, List<LineConf> lines)
             {
-                this.originalLine = Line.GetLine(originalLine);
+                this.originalLine = LineConf.GetLine(originalLine);
                 this.drawable = drawable;
                 this.lines = lines;
             }
@@ -88,12 +88,12 @@ namespace SEE.Controls.Actions.Drawable
                         Vector3[] positions = new Vector3[lineRenderer.positionCount];
                         lineRenderer.GetPositions(positions);
                         List<Vector3> positionsList = positions.ToList();
-                        Line originLine = Line.GetLine(hittedObject);
+                        LineConf originLine = LineConf.GetLine(hittedObject);
 
                         Vector3[] transformedPositions = new Vector3[positions.Length];
                         Array.Copy(sourceArray: positions, destinationArray: transformedPositions, length: positions.Length);
                         hittedObject.transform.TransformPoints(transformedPositions);
-                        List<Line> lines = new();
+                        List<LineConf> lines = new();
                         List<int> matchedIndexes = NearestPoints.GetNearestIndexes(transformedPositions, raycastHit.point);
                         GameLineSplit.Split(GameDrawableFinder.FindDrawable(hittedObject), originLine, matchedIndexes, positionsList, lines, true);
 
@@ -128,7 +128,7 @@ namespace SEE.Controls.Actions.Drawable
                 GameDrawer.ReDrawLine(mem.drawable, mem.originalLine);
                 new DrawOnNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.originalLine).Execute();
 
-                foreach (Line line in mem.lines)
+                foreach (LineConf line in mem.lines)
                 {
                     GameObject lineObj = GameDrawableFinder.FindChild(mem.drawable, line.id);
                     new EraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), line.id).Execute();
@@ -148,7 +148,7 @@ namespace SEE.Controls.Actions.Drawable
                 new EraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.originalLine.id).Execute();
                 Destroyer.Destroy(originObj);
 
-                foreach (Line line in mem.lines)
+                foreach (LineConf line in mem.lines)
                 {
                     GameDrawer.ReDrawLine(mem.drawable, line);
                     new DrawOnNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), line).Execute();

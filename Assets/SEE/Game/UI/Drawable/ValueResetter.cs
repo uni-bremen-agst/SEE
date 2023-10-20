@@ -4,6 +4,7 @@ using SEE.Game;
 using System.Collections;
 using UnityEngine;
 using SEE.Utils;
+using Assets.SEE.Controls.Actions.Drawable;
 
 namespace Assets.SEE.Game.UI.Drawable
 {
@@ -33,6 +34,11 @@ namespace Assets.SEE.Game.UI.Drawable
             if (allowedState == ActionStateTypes.Edit)
             {
                 EditAction.Reset();
+            }
+
+            if (allowedState == ActionStateTypes.CutCopyPaste)
+            {
+                CutCopyPasteAction.Reset();
             }
 
             if (allowedState == ActionStateTypes.Scale)

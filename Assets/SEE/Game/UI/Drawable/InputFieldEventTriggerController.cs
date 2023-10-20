@@ -16,7 +16,7 @@ namespace Assets.SEE.Game.UI.Drawable
         private void Awake()
         {
             inputField = GetComponent<TMP_InputField>();
-            inputField.onSubmit.AddListener(ActivateInput);
+            inputField.onDeselect.AddListener(ActivateInput);
             inputField.onSelect.AddListener(DeactivateInput);
         }
         private void DeactivateInput(string hex)

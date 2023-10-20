@@ -95,6 +95,7 @@ namespace SEE.Controls.Actions.Drawable
                 GameScaler.SetScale(selectedObj, oldScale);
                 new ScaleNetAction(drawable.name, drawableParent, selectedObj.name, oldScale).Execute();
             }
+            ScaleMenu.Disable();
         }
 
         /// <summary>
@@ -137,6 +138,7 @@ namespace SEE.Controls.Actions.Drawable
                         }
                         if (Input.GetMouseButtonUp(0) && selectedObj != null)
                         {
+                            ScaleMenu.Enable(selectedObj);
                             progressState = ProgressState.Scale;
                         }
                         break;
@@ -175,6 +177,7 @@ namespace SEE.Controls.Actions.Drawable
                             if (isScaled)
                             {
                                 newScale = GameScaler.Scale(selectedObj, scaleFactor);
+                                ScaleMenu.AssignValue(selectedObj);
                                 new ScaleNetAction(drawable.name, drawableParentName, selectedObj.name, newScale).Execute();
                             }
                             if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj.GetComponent<BlinkEffect>() != null)
@@ -190,6 +193,7 @@ namespace SEE.Controls.Actions.Drawable
                     /// If there are changes the action will be successfull completed.
                     case ProgressState.Finish:
                         mouseWasReleased = false;
+                        ScaleMenu.Disable();
                         if (oldScale != newScale)
                         {
                             memento = new Memento(selectedObj, GameDrawableFinder.FindDrawable(selectedObj), selectedObj.name, oldScale, newScale);

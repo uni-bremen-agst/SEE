@@ -5,6 +5,8 @@ using System.Collections;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
+using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -45,16 +47,51 @@ namespace Assets.SEE.Game.Drawable
         }
 
         /// <summary>
-        /// This method changes the color of a drawbale type.
+        /// This method changes the primary color of a drawbale type.
         /// </summary>
         /// <param name="obj">The drawable type whose color should be changed.</param>
         /// <param name="color">The new color.</param>
-        public static void ChangeColor(GameObject obj, Color color)
+        public static void ChangePrimaryColor(GameObject obj, Color color)
         {
             if (obj.CompareTag(Tags.Line))
             {
                 LineRenderer renderer = obj.GetComponent<LineRenderer>();
-                renderer.material.color = color;
+                switch (obj.GetComponent<LineValueHolder>().GetColorKind())
+                {
+                    case GameDrawer.ColorKind.Monochrome:
+                        renderer.material.color = color;
+                        break;
+                    case GameDrawer.ColorKind.Gradient:
+                        renderer.material.color = Color.white;
+                        renderer.startColor = color;
+                        break;
+                    case GameDrawer.ColorKind.TwoDashed:
+                        renderer.material.color = color;
+                        break;
+                }  
+            }
+        }
+
+        /// <summary>
+        /// This method changes the secondary color of a drawbale type.
+        /// </summary>
+        /// <param name="obj">The drawable type whose color should be changed.</param>
+        /// <param name="color">The new color.</param>
+        public static void ChangeSecondaryColor(GameObject obj, Color color)
+        {
+            if (obj.CompareTag(Tags.Line))
+            {
+                LineRenderer renderer = obj.GetComponent<LineRenderer>();
+                switch (obj.GetComponent<LineValueHolder>().GetColorKind())
+                {
+                    case GameDrawer.ColorKind.Gradient:
+                        renderer.material.color = Color.white;
+                        renderer.endColor = color;
+                        break;
+                    case GameDrawer.ColorKind.TwoDashed:
+                        renderer.materials[1].color = color;
+                        break;
+                }
             }
         }
 
@@ -63,11 +100,13 @@ namespace Assets.SEE.Game.Drawable
         /// </summary>
         /// <param name="line">The line whose values should be changed.</param>
         /// <param name="line">Contains the new values.</param>
-        public static void ChangeLine(GameObject lineObj, Line line)
+        public static void ChangeLine(GameObject lineObj, LineConf line)
         {
             ChangeThickness(lineObj, line.thickness);
             ChangeLayer(lineObj, line.orderInLayer);
-            ChangeColor(lineObj, line.color);
+            GameDrawer.ChangeColorKind(lineObj, line.colorKind, line);
+            ChangePrimaryColor(lineObj, line.primaryColor);
+            ChangeSecondaryColor(lineObj, line.secondaryColor);
             ChangeLoop(lineObj, line.loop);
             GameDrawer.ChangeLineKind(lineObj, line.lineKind, line.tiling);
         }
@@ -76,15 +115,18 @@ namespace Assets.SEE.Game.Drawable
         /// This method changes the order in layer of a <see cref="DrawableType"/>.
         /// </summary>
         /// <param name="obj">The <see cref="DrawableType"/> whose color should be changed.</param>
-        /// <param name="layer">The new order in layer.</param>
-        public static void ChangeLayer(GameObject obj, int layer)
+        /// <param name="newLayer">The new order in layer.</param>
+        public static void ChangeLayer(GameObject obj, int newLayer)
         {
             if (Tags.DrawableTypes.Contains(obj.tag))
             {
-                obj.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(layer);
-                if (obj.CompareTag(Tags.DText))
+                int oldLayer = obj.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+                if (newLayer - oldLayer > 0)
                 {
-                    obj.GetComponent<TextMeshPro>().sortingOrder = layer;
+                    GameLayerChanger.Increase(obj, newLayer, false);
+                } else
+                {
+                    GameLayerChanger.Decrease(obj, newLayer, false);
                 }
             }
         }
@@ -94,7 +136,7 @@ namespace Assets.SEE.Game.Drawable
         /// </summary>
         /// <param name="textObj">The text whose values should be changed.</param>
         /// <param name="text">Contains the new values.</param>
-        public static void ChangeText(GameObject textObj, Text text)
+        public static void ChangeText(GameObject textObj, TextConf text)
         {
             ChangeText(textObj, text.text);
             ChangeFontSize(textObj, text.fontSize);
@@ -196,6 +238,30 @@ namespace Assets.SEE.Game.Drawable
                 textObj.GetComponent<TextMeshPro>().ForceMeshUpdate(true);
                 GameTexter.RefreshMeshCollider(textObj);
             }
+        }
+
+        /// <summary>
+        /// This method changes the image color of a image.
+        /// </summary>
+        /// <param name="imageObj">The image object whose image should be changed.</param>
+        /// <param name="color">The new color for the image</param>
+        public static void ChangeImageColor(GameObject imageObj, Color color)
+        {
+            if (imageObj.CompareTag(Tags.Image))
+            {
+                imageObj.GetComponent<Image>().color = color;
+            }
+        }
+
+        /// <summary>
+        /// This method changes all editable values of a drawable image at once.
+        /// </summary>
+        /// <param name="imageObj">The image object whose values should be changed.</param>
+        /// <param name="conf">The configuration which holds the necressary values.</param>
+        public static void ChangeImage(GameObject imageObj, ImageConf conf)
+        {
+            ChangeLayer(imageObj, conf.orderInLayer);
+            ChangeImageColor(imageObj, conf.imageColor);
         }
     }
 }

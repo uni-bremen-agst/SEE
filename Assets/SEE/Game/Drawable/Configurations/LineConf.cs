@@ -17,7 +17,7 @@ namespace SEE.Game.Drawable.Configurations
     /// The configuration class for a drawable line.
     /// </summary>
     [Serializable]
-    public class Line : DrawableType, ICloneable
+    public class LineConf : DrawableType, ICloneable
     {
         /// <summary>
         /// The position of the line.
@@ -46,9 +46,19 @@ namespace SEE.Game.Drawable.Configurations
         public bool loop;
 
         /// <summary>
-        /// The color of the line.
+        /// The primary color of the line.
         /// </summary>
-        public Color color;
+        public Color primaryColor;
+
+        /// <summary>
+        /// The secondary color of the line.
+        /// </summary>
+        public Color secondaryColor;
+
+        /// <summary>
+        /// The color kind of the line (Monochrome/Gradient/Two-color dashed)
+        /// </summary>
+        public GameDrawer.ColorKind colorKind;
 
         /// <summary>
         /// The order in layer for this drawable object.
@@ -101,9 +111,19 @@ namespace SEE.Game.Drawable.Configurations
         private const string LoopLabel = "LoopLabel";
 
         /// <summary>
-        /// Label in the configuration file for the color of a line.
+        /// Label in the configuration file for the primary color of a line.
         /// </summary>
-        private const string ColorLabel = "ColorLabel";
+        private const string PrimaryColorLabel = "PrimaryColorLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the secondary color of a line.
+        /// </summary>
+        private const string SecondaryColorLabel = "SecondaryColorLabel";
+
+        /// <summary>
+        /// Label in the configuration file for the color kind of a line.
+        /// </summary>
+        private const string ColorKindLabel = "ColorKindLabel";
 
         /// <summary>
         /// Label in the configuration file for the order in layer of a line.
@@ -131,13 +151,13 @@ namespace SEE.Game.Drawable.Configurations
         private const string TilingLabel = "TilingLabel";
 
         /// <summary>
-        /// Creates a <see cref="Line"/> for the given game object.
+        /// Creates a <see cref="LineConf"/> for the given game object.
         /// </summary>
         /// <param name="lineGameObject">The game object with the <see cref="LineRenderer"/> component</param>
-        /// <returns>The created <see cref="Line"/> object</returns>
-        public static Line GetLine(GameObject lineGameObject)
+        /// <returns>The created <see cref="LineConf"/> object</returns>
+        public static LineConf GetLine(GameObject lineGameObject)
         {
-            Line line = null;
+            LineConf line = null;
             if (lineGameObject != null && lineGameObject.CompareTag(Tags.Line))
             {
                 line = new();
@@ -149,11 +169,26 @@ namespace SEE.Game.Drawable.Configurations
                 renderer.GetPositions(line.rendererPositions);
                 line.loop = renderer.loop;
                 line.eulerAngles = lineGameObject.transform.localEulerAngles;
-                line.color = renderer.material.color;
+                line.colorKind = lineGameObject.GetComponent<LineValueHolder>().GetColorKind();
+                switch (line.colorKind)
+                {
+                    case GameDrawer.ColorKind.Monochrome:
+                        line.primaryColor = renderer.material.color;
+                        line.secondaryColor = Color.clear;
+                        break;
+                    case GameDrawer.ColorKind.Gradient:
+                        line.primaryColor = renderer.startColor;
+                        line.secondaryColor = renderer.endColor;
+                        break;
+                    case GameDrawer.ColorKind.TwoDashed:
+                        line.primaryColor = renderer.materials[0].color;
+                        line.secondaryColor = renderer.materials[1].color;
+                        break;
+                }
                 line.orderInLayer = lineGameObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
                 line.thickness = renderer.startWidth;
                 line.tiling = renderer.textureScale.x;
-                line.lineKind = lineGameObject.GetComponent<LineKindHolder>().GetLineKind();
+                line.lineKind = lineGameObject.GetComponent<LineValueHolder>().GetLineKind();
             }
             return line;
         }
@@ -164,13 +199,15 @@ namespace SEE.Game.Drawable.Configurations
         /// <returns>A copy of this line object.</returns>
         public object Clone()
         {
-            return new Line
+            return new LineConf
             {
                 id = this.id,
                 position = this.position,
                 rendererPositions = this.rendererPositions,
                 loop = this.loop,
-                color = this.color,
+                primaryColor = this.primaryColor,
+                secondaryColor = this.secondaryColor,
+                colorKind = this.colorKind,
                 orderInLayer = this.orderInLayer,
                 thickness = this.thickness,
                 eulerAngles = this.eulerAngles,
@@ -190,7 +227,9 @@ namespace SEE.Game.Drawable.Configurations
             writer.Save(id, IDLabel);
             writer.Save(position, PositionLabel);
             writer.Save(scale, ScaleLabel);
-            writer.Save(color, ColorLabel);
+            writer.Save(colorKind.ToString(), ColorKindLabel);
+            writer.Save(primaryColor, PrimaryColorLabel);
+            writer.Save(secondaryColor, SecondaryColorLabel);
             writer.Save(orderInLayer, OrderInLayerLabel);
             writer.Save(thickness, ThicknessLabel);
             writer.Save(loop, LoopLabel);
@@ -206,14 +245,14 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
-        /// Given the representation of a <see cref="Line"/> as created by the <see cref="ConfigWriter"/>, this
-        /// method parses the attributes from that representation and puts them into this <see cref="Line"/>
+        /// Given the representation of a <see cref="LineConf"/> as created by the <see cref="ConfigWriter"/>, this
+        /// method parses the attributes from that representation and puts them into this <see cref="LineConf"/>
         /// instance.
         /// </summary>
         /// <param name="attributes">A list of labels (strings) of attributes and their values (objects). This
-        /// has to be the representation of a <see cref="Line"/> as created by
+        /// has to be the representation of a <see cref="LineConf"/> as created by
         /// <see cref="ConfigWriter"/>.</param>
-        /// <returns>Whether or not the <see cref="Line"/> was loaded without errors.</returns>
+        /// <returns>Whether or not the <see cref="LineConf"/> was loaded without errors.</returns>
         internal bool Restore(Dictionary<string, object> attributes)
         {
             bool errors = false;
@@ -246,14 +285,35 @@ namespace SEE.Game.Drawable.Configurations
                 errors = true;
             }
 
-            Color loadedColor = Color.black;
-            if (ConfigIO.Restore(attributes, ColorLabel, ref loadedColor))
+            if (attributes.TryGetValue(ColorKindLabel, out object cKind) && Enum.TryParse((string)cKind, out GameDrawer.ColorKind colorResult))
             {
-                color = loadedColor;
+                colorKind = colorResult;
             }
             else
             {
-                color = Color.black;
+                colorKind = GameDrawer.ColorKind.Monochrome;
+                errors = true;
+            }
+
+            Color loadedColor = Color.black;
+            if (ConfigIO.Restore(attributes, PrimaryColorLabel, ref loadedColor))
+            {
+                primaryColor = loadedColor;
+            }
+            else
+            {
+                primaryColor = Color.black;
+                errors = true;
+            }
+
+            Color loadedSecColor = Color.black;
+            if (ConfigIO.Restore(attributes, SecondaryColorLabel, ref loadedSecColor))
+            {
+                secondaryColor = loadedSecColor;
+            }
+            else
+            {
+                secondaryColor = Color.black;
                 errors = true;
             }
 

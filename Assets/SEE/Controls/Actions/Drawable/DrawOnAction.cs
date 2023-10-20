@@ -65,16 +65,6 @@ namespace SEE.Controls.Actions.Drawable
         private bool finishDrawing = false;
 
         /// <summary>
-        /// The HSV ColorPicker for the color field in the line menu.
-        /// </summary>
-        private HSVPicker.ColorPicker picker;
-
-        /// <summary>
-        /// The thickness slider controller for the line thickness.
-        /// </summary>
-        private ThicknessSliderController thicknessSlider;
-
-        /// <summary>
         /// Starts the <see cref="DrawOnAction"/>.
         /// It sets the progress state to start drawing.
         /// </summary>
@@ -84,34 +74,11 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Enables the line menu and initializes the required AddListeners.
+        /// Enables the line menu and initializes the required Handler.
         /// </summary>
         public override void Awake()
         {
-            LineMenu.enableLineMenu(withoutMenuLayer: new LineMenu.MenuLayer[] { LineMenu.MenuLayer.Layer, LineMenu.MenuLayer.Loop });
-
-            LineMenu.GetTilingSliderController().onValueChanged.AddListener(LineMenu.tilingAction = tiling =>
-            {
-                ValueHolder.currentTiling = tiling;
-            });
-            LineMenu.GetNextLineKindBtn().onClick.RemoveAllListeners();
-            LineMenu.GetNextLineKindBtn().onClick.AddListener(() => ValueHolder.currentLineKind = LineMenu.NextLineKind());
-            LineMenu.GetPreviousLineKindBtn().onClick.RemoveAllListeners();
-            LineMenu.GetPreviousLineKindBtn().onClick.AddListener(() => ValueHolder.currentLineKind = LineMenu.PreviousLineKind());
-
-            thicknessSlider = LineMenu.instance.GetComponentInChildren<ThicknessSliderController>();
-            thicknessSlider.AssignValue(ValueHolder.currentThickness);
-            thicknessSlider.onValueChanged.AddListener(thickness =>
-            {
-                ValueHolder.currentThickness = thickness;
-            });
-
-            picker = LineMenu.instance.GetComponent<HSVPicker.ColorPicker>();
-            picker.AssignColor(ValueHolder.currentPrimaryColor);
-            picker.onValueChanged.AddListener(LineMenu.colorAction = color =>
-            {
-                ValueHolder.currentPrimaryColor = color;
-            });
+            LineMenu.EnableForDrawing();
         }
 
         /// <summary>
@@ -154,7 +121,8 @@ namespace SEE.Controls.Actions.Drawable
                             progressState = ProgressState.Drawing;
                             positions[0] = raycastHit.point;
                             /// Create the line object.
-                            line = GameDrawer.StartDrawing(drawable, positions, ValueHolder.currentPrimaryColor, ValueHolder.currentThickness,
+                            line = GameDrawer.StartDrawing(drawable, positions, ValueHolder.currentColorKind, 
+                                ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor, ValueHolder.currentThickness,
                                 ValueHolder.currentLineKind, ValueHolder.currentTiling);
                             /// Transform the first position in local space.
                             /// Beforehand, it's not possible because there is no line object on which 'InverseTransformPoint' can be applied.
@@ -174,7 +142,7 @@ namespace SEE.Controls.Actions.Drawable
                                 positions = newPositions;
 
                                 GameDrawer.Drawing(line, positions);
-                                new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), Line.GetLine(line)).Execute();
+                                new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), LineConf.GetLine(line)).Execute();
                             }
                             break;
                     }
@@ -195,11 +163,11 @@ namespace SEE.Controls.Actions.Drawable
                         {
                             finishDrawing = true;
                             line = GameDrawer.SetPivot(line);
-                            Line currentLine = Line.GetLine(line);
+                            LineConf currentLine = LineConf.GetLine(line);
                             memento = new Memento(drawable, currentLine);
                             new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), currentLine).Execute();
                             currentState = ReversibleAction.Progress.Completed;
-                            return true; 
+                            return true;
                         }
                         else
                         {
@@ -224,16 +192,16 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public readonly GameObject drawable;
             /// <summary>
-            /// The line. The line configuration <see cref="Line"/> contains all required values to redraw.
+            /// The line. The line configuration <see cref="LineConf"/> contains all required values to redraw.
             /// </summary>
-            public Line line;
+            public LineConf line;
 
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
             /// <param name="drawable">The drawable where the line should be placed</param>
             /// <param name="line">Line configuration for redrawing.</param>
-            public Memento(GameObject drawable, Line line)
+            public Memento(GameObject drawable, LineConf line)
             {
                 this.drawable = drawable;
                 this.line = line;
@@ -267,7 +235,7 @@ namespace SEE.Controls.Actions.Drawable
             line = GameDrawer.ReDrawLine(memento.drawable, memento.line);
             if (line != null)
             {
-                new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), Line.GetLine(line)).Execute();
+                new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), LineConf.GetLine(line)).Execute();
             }
         }
 
