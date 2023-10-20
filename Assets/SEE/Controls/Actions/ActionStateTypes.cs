@@ -168,6 +168,11 @@ namespace SEE.Controls.Actions
                   Color.blue.Darker(), "Materials/ModernUIPack/Document",
                   SaveBoardAction.CreateReversibleAction,
                   parent: MetricBoard);
+            MarkNode =
+                new("Mark Node", "Mark a Node",
+                    Color.grey.Darker(), "Marerials/ModernUIPack/Document",
+                    MarkNodeAction.CreateReversibleAction,
+                    parent: MarkNode);
         }
 
 
@@ -192,6 +197,8 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType DeleteWidget;
         public readonly static ActionStateType LoadBoard;
         public readonly static ActionStateType SaveBoard;
+        public readonly static ActionStateType MarkNode;
+
 
         #endregion
 
