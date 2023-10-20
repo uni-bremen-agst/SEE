@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
+using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
+using SEE.UI.Notification;
 using SEE.Utils;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using Color = UnityEngine.Color;
-using Transform = UnityEngine.Transform;
 
 namespace SEE.UI.Window.TreeWindow
 {
@@ -77,13 +78,14 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="collapseItem">A function that collapses the item.</param>
         /// <param name="expandItem">A function that expands the item.</param>
         private void AddItem(string id, string parentId, int children, string text, int level,
-                             char icon, GameObject itemGameObject, Action<GameObject> collapseItem, Action<GameObject> expandItem)
+                             char icon, GameObject itemGameObject,
+                             Action<GameObject> collapseItem, Action<GameObject> expandItem)
         {
             GameObject item = PrefabInstantiator.InstantiatePrefab(treeItemPrefab, content, false);
             Transform foreground = item.transform.Find("Foreground");
             GameObject expandIcon = foreground.Find("Expand Icon").gameObject;
-            TMPro.TextMeshProUGUI textMesh = foreground.Find("Text").gameObject.GetComponent<TMPro.TextMeshProUGUI>();
-            TMPro.TextMeshProUGUI iconMesh = foreground.Find("Type Icon").gameObject.GetComponent<TMPro.TextMeshProUGUI>();
+            TextMeshProUGUI textMesh = foreground.Find("Text").gameObject.MustGetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI iconMesh = foreground.Find("Type Icon").gameObject.MustGetComponent<TextMeshProUGUI>();
             Color[] gradient = null;
             Transform parent = null;
 
@@ -173,15 +175,15 @@ namespace SEE.UI.Window.TreeWindow
                                 itemGameObject.Operator().Highlight(duration: 10);
                             }
                         }
-                        else if (children > 0)
+                        else
                         {
                             if (expandedItems.Contains(id))
                             {
-                                collapseItem(item);
+                                collapseItem?.Invoke(item);
                             }
                             else
                             {
-                                expandItem(item);
+                                expandItem?.Invoke(item);
                             }
                         }
                     });
@@ -294,6 +296,11 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="nodeGameObject">The game object of the element represented by the node.</param>
         private void ExpandNode(Node node, GameObject item, GameObject nodeGameObject)
         {
+            if (node.NumberOfChildren() == 0)
+            {
+                return;
+            }
+
             ExpandItem(item);
 
             foreach (Node child in node.Children())
@@ -350,6 +357,62 @@ namespace SEE.UI.Window.TreeWindow
             RemoveNodeChildren(node);
         }
 
+        /// <summary>
+        /// Searches for the given <paramref name="searchTerm"/> in the graph
+        /// and displays the results in the tree window.
+        /// </summary>
+        /// <param name="searchTerm">The search term to be searched for.</param>
+        private void SearchFor(string searchTerm)
+        {
+            ClearTree();
+            if (searchTerm == null || searchTerm.Trim().Length == 0)
+            {
+                AddRoots();
+            }
+
+            foreach (Node node in searcher.Search(searchTerm))
+            {
+                GameObject nodeGameObject = GraphElementIDMap.Find(node.ID, mustFindElement: true);
+                AddItem(CleanupID(node.ID), null,
+                        0, node.ToShortString(), 0, nodeTypeUnicode, nodeGameObject,
+                        null, null); // TODO: Reveal in hierarchy on click (& clear search field)
+            }
+        }
+
+        /// <summary>
+        /// Clears the tree view of all items.
+        /// </summary>
+        private void ClearTree()
+        {
+            foreach (Transform child in content)
+            {
+                if (child.name == "Search")
+                {
+                    continue;
+                }
+                Destroyer.Destroy(child.gameObject);
+                expandedItems.Clear();
+            }
+        }
+
+        /// <summary>
+        /// Adds the roots of the graph to the tree view.
+        /// </summary>
+        private void AddRoots()
+        {
+            // We will traverse the graph and add each node to the tree view.
+            IList<Node> roots = Graph.GetRoots();
+            foreach (Node root in roots)
+            {
+                AddNode(root);
+            }
+
+            if (roots.Count == 0)
+            {
+                ShowNotification.Warn("Empty graph", "Graph has no roots. TreeView will be empty.");
+            }
+        }
+
         protected override void StartDesktop()
         {
             if (Graph == null)
@@ -362,17 +425,12 @@ namespace SEE.UI.Window.TreeWindow
             base.StartDesktop();
             content = PrefabInstantiator.InstantiatePrefab(treeWindowPrefab, Window.transform.Find("Content"), false).transform.Find("Content");
 
-            // We will traverse the graph and add each node to the tree view.
-            IList<Node> roots = Graph.GetRoots();
-            foreach (Node root in roots)
-            {
-                AddNode(root);
-            }
+            TMP_InputField search = content.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
+            search.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
+            search.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
+            search.onValueChanged.AddListener(SearchFor);
 
-            if (roots.Count == 0)
-            {
-                Debug.LogWarning("Graph has no roots. TreeView will be empty.");
-            }
+            AddRoots();
         }
     }
 }
