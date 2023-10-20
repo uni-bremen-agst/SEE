@@ -34,7 +34,7 @@ namespace SEE.Controls.Actions
                 Vector3 scale = parent.transform.lossyScale;
                 addedSphere = GameNodeMarker.AddSphere(parent, position: position, worldSpaceScale: scale);
                 // addedSphere has the scale and position of Vector3.
-                // The position at which the parent was hit will be the center point of the addedSphere.  
+                // The position at which the parent was hit will be the center point of the addedSphere.
                 momento = new Momento(parent, position: position, scale: scale);
                 memento.NodeID = addedSphere.name;
                 new MarkNetAction(parentID: memento.Parent.name, memento.Position, memento.Scale).Execute();
