@@ -246,6 +246,7 @@ namespace SEE.Net.Dashboard
         private async UniTaskVoid VerifyVersionNumber()
         {
             DashboardVersion version = await GetDashboardVersion();
+            Debug.Log($"Axivion Dashboard version {version}\n");
             switch (version.DifferenceToSupportedVersion)
             {
                 case DashboardVersion.Difference.MajorOlder:
