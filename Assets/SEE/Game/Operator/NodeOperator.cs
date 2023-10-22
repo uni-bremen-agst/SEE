@@ -7,7 +7,6 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Tools.ReflexionAnalysis;
-using SEE.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
