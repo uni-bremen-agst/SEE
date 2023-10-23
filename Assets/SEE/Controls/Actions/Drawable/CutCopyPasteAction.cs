@@ -195,28 +195,15 @@ namespace Assets.SEE.Controls.Actions.Drawable
             Transform content = menu.transform.Find("Content");
             ButtonManagerBasic cut = content.Find("Cut").GetComponent<ButtonManagerBasic>();
             ButtonManagerBasic copy = content.Find("Copy").GetComponent<ButtonManagerBasic>();
-            GameObject pasteObj = content.Find("Paste").gameObject;
-            ButtonManagerBasic paste = pasteObj.GetComponent<ButtonManagerBasic>();
 
             cut.clickEvent.AddListener(()=>
             {
                 state = CutCopy.Cut;
-                paste.enabled = true;
-                pasteObj.GetComponent<Button>().interactable = true;
-                pasteObj.GetComponent<Image>().enabled = true;
             });
 
             copy.clickEvent.AddListener(() =>
             {
                 state = CutCopy.Copy;
-                paste.enabled = true; 
-                pasteObj.GetComponent<Button>().interactable = true;
-                pasteObj.GetComponent<Image>().enabled = true;
-            });
-
-            paste.clickEvent.AddListener(() =>
-            {
-                pastePressed = true;
             });
         }
 
@@ -268,7 +255,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                     /// Block in which the object is duplicated at the desired location, and the original may be deleted if necessary.
                     case ProgressState.CutCopyPaste:
                         if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj != null && 
-                            selectedObj.GetComponent<BlinkEffect>() != null && pastePressed &&
+                            selectedObj.GetComponent<BlinkEffect>() != null && state != CutCopy.None &&
                             Raycasting.RaycastAnything(out RaycastHit hit) && 
                             (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
                             GameDrawableFinder.hasDrawable(hit.collider.gameObject)))
@@ -309,15 +296,17 @@ namespace Assets.SEE.Controls.Actions.Drawable
                                 new EraseNetAction(oldDrawable.name, GameDrawableFinder.GetDrawableParentName(oldDrawable), selectedObj.name).Execute();
                             }
                         }
-                        if (Input.GetMouseButtonUp(0) && pastePressed && newObject != null)
+                        if (Input.GetMouseButtonUp(0) && state != CutCopy.None && newObject != null)
                         {
                             progressState = ProgressState.Finish;
                         }
 
-                        if (Input.GetMouseButtonUp(0) && !pastePressed) {
+                        if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && state == CutCopy.None) {
                             Destroyer.Destroy(cutCopyPasteMenu);
                             selectedObj.GetComponent<BlinkEffect>().Deactivate();
                             selectedObj = null;
+                            mouseWasReleased = false;
+                            state = CutCopy.None;
                             progressState = ProgressState.SelectObject;
                         }
                         break;
