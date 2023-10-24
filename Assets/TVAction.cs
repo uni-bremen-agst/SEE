@@ -1,43 +1,20 @@
-using System;
-
-using System.Collections;
-
-using System.Collections.Generic;
-
 using UnityEngine;
 
-
-
 public class DialogueCanvas : MonoBehaviour
-
 {
-
-    //variable to store canvas
-
-   // public Behaviour Dialogue_Canvas;
-
-
-
-
+    /// <summary>
+    /// A Toggle to switch the Browser on and off with the key F10.
+    /// </summary>
 
     private void Update()
-
     {
-
         if (Input.GetKeyDown(KeyCode.F3))
-
         {
-
-            //disables/enables the canvas
+            //disables/enables the Browser
             for (int i=0;i<=5;i++)
             {
                 transform.GetChild(i).gameObject.SetActive(!transform.GetChild(i).gameObject.activeSelf);
             }
-            //transform.GetChild(0).gameObject.SetActive(!transform.GetChild(0).gameObject.activeSelf);
-            //Dialogue_Canvas.enabled = !Dialogue_Canvas.enabled;
-
         }
-
     }
-
 }
