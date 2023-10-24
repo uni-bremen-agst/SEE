@@ -34884,6 +34884,7 @@ GameObject:
   - component: {fileID: 1968741444}
   - component: {fileID: 1968741443}
   - component: {fileID: 1968741442}
+  - component: {fileID: 1968741446}
   m_Layer: 5
   m_Name: BrowserCanvas
   m_TagString: Untagged
@@ -34979,6 +34980,18 @@ RectTransform:
   m_AnchoredPosition: {x: -31, y: 1.4}
   m_SizeDelta: {x: 1800, y: 800}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1968741446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1968741441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a16c24e19989c674099e0cd52e23e3b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1971628120
 GameObject:
   m_ObjectHideFlags: 0
@@ -35621,6 +35634,10 @@ PrefabInstance:
     - target: {fileID: 478616, guid: 2960794954986c848beff393ae3614ef, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2381306, guid: 2960794954986c848beff393ae3614ef, type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 11491030, guid: 2960794954986c848beff393ae3614ef, type: 3}
       propertyPath: _url
