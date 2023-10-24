@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style type="text/css">
+	body {
+		-webkit-user-select: none;
+	}
+	div.make div, div.nuke div {
+		border: 1px solid black;
+		cursor: pointer;
+		margin: 6px;
+		padding: 6px;
+		font-size: 140%;
+		display: inline-block;
+
+	}
+	</style>
+</head>
+<body>
+	<h2>Click some!</h2>
+	<div class='make'>
+		<div>red</div>
+		<div>green</div>
+		<div>blue</div>
+		<div>yellow</div>
+		<div>white</div>
+	</div>
+
+	<p>Every ball that drops is a new browser tab.</p>
+
+	<div class='nuke'>
+	</div>
+
+	<script type="text/javascript">
+	"use strict";
+	Array.from(document.querySelectorAll("div.make div")).forEach(function(el) {
+		el.style.background = el.textContent;
+		el.addEventListener("click", function() {
+			//add new tab
+			var url = `NewWindowChild.html?color=${el.textContent}&text=I%20am%20${el.textContent}`;
+			var childWindow = window.open(url);
+
+			//add button to close it
+			var killEl = document.createElement("div");
+			killEl.textContent = `Close ${el.textContent} child`;
+			killEl.addEventListener("click", function() {
+				childWindow.close();
+				killEl.parentNode.removeChild(killEl);
+			});
+
+			document.querySelector("div.nuke").appendChild(killEl);
+		});
+	});
+
+
+	</script>
+</body>
+</html>

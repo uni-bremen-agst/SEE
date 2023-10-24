@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="Terminal.css">
+</head>
+<body>
+	<div id='messages'></div>
+
+	<div id='pauseMenu'>
+		<div class='panel'>
+			<h1>Paused!</h1>
+			<span class='aside'>This game is paused.</span>
+			<br><br>
+
+			<table><tr><td>
+				<button onclick="unpause()">Unpause</button>
+			</td><td>
+				<button onclick="browserMode()">Browser Mode</button>
+			</td><td>
+				<button class='negative' onclick="quit()">Quit</button>
+			</td></tr></table>
+
+		</div>
+	</div>
+
+	<div class='inventory'>
+		<div id="coins">
+			<span>0</span>
+			<img src="Coin.png">
+		</div>
+	</div>
+
+
+	<script type="application/javascript">
+		"use strict";
+		var $ = document.querySelector.bind(document);
+
+		function setCoinCount(count) {
+			$("#coins span").textContent = count;
+
+			//(re-)trigger CSS animation
+			var el = $("#coins");
+			el.classList.remove("collectCoin");
+			el.parentNode.replaceChild(el.cloneNode(true), el);
+			$("#coins").classList.add("collectCoin");
+		}
+
+		function setPaused(isPaused) {
+			$('#pauseMenu').style.display = isPaused ? "block" : "none";
+		}
+
+		function say(html, dwellTime) {
+			var el = document.createElement("div");
+			el.className = "message entering";
+			el.innerHTML = html;
+
+			$('#messages').appendChild(el);
+
+			setTimeout(() => el.classList.remove("entering"), 20);
+			setTimeout(() => {
+				el.classList.add("fading");
+			}, dwellTime * 1000);
+
+			setTimeout(() => {
+				el.remove();
+			}, (dwellTime + 5) * 1000);
+		}
+	</script>
+</body>
+</html>

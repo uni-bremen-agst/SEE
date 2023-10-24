@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" type="text/css" href="Terminal.css"></head>
+	<style type="text/css">
+	body { width: initial; background: white; }
+	button {
+		margin: 0;
+	}
+
+	button.main { font-size: 45px;}
+
+	button.secondary {
+		font-size: 50%;
+	}
+
+	.small {
+		font-size: 12px;
+	}
+
+	div#url {
+		font-size: 12px;
+		word-wrap: break-word;
+		margin-top: 8px;
+		font-family: monospace;
+		user-select: text;
+		cursor: initial;
+	}
+	</style>
+<body>
+	<button class="main" onclick="go(1)">Next Demo</button>
+	<button class="secondary" onclick="go(-1)">Prev Demo</button>
+	<div class="small" style="margin-top: 8px;">
+		Some demos have sound,<br>others require a strong GPU.
+	</div>
+	<div id="url">[url]</div>
+
+	<script type="application/javascript">
+	function setDisplayedUrl(url) {
+		document.getElementById("url").textContent = url;
+	}
+
+	document.getElementById("url").addEventListener("click", ev => {
+		document.getSelection().selectAllChildren(document.getElementById("url"));
+	});
+	</script>
+
+
+</body>
+</html>
