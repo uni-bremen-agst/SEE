@@ -77,7 +77,7 @@ namespace SEE.Controls.Actions
                   HideAction.CreateReversibleAction);
 
             MarkNode =
-                new("Mark Node", "Add a sphere on top of the selected Node, delete sphere if node was selected before",
+                new("Mark Node", "Mark or unmark a node within a graph",
                     Color.blue.Darker(),"",MarkAction.CreateReversibleAction);
 
             NewEdge =
@@ -179,7 +179,7 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType Rotate;
         public readonly static ActionStateType Hide;
         public readonly static ActionStateType NewEdge;
-        public readonly static ActionStateType MarkNode; // ERGÄNZUNG
+        public readonly static ActionStateType MarkNode;
         public readonly static ActionStateType NewNode;
         public readonly static ActionStateType EditNode;
         public readonly static ActionStateType ScaleNode;

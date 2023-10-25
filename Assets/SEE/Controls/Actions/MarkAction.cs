@@ -5,7 +5,6 @@ using UnityEngine;
 using SEE.Game.SceneManipulation;
 using SEE.Utils;
 using SEE.Net;
-using System.Linq;
 
 namespace SEE.Controls.Actions
 {
@@ -13,7 +12,7 @@ namespace SEE.Controls.Actions
     {
         /// <summary>
         /// The node that was marked when this action was executed. It is saved so
-        /// that it can be removed on Undo().
+        /// action can be removed on Undo().
         /// </summary>
         private GameObject markedNode;
 
@@ -31,32 +30,14 @@ namespace SEE.Controls.Actions
             /// The parent of the marker.
             /// </summary>
             public readonly GameObject Parent;
-            /// <summary>
-            /// The position of the marker in world space.
-            /// </summary>
-            public readonly Vector3 Position;
-            /// <summary>
-            /// The scale of the marker in world space.
-            /// </summary>
-            public readonly Vector3 Scale;
-            /// <summary>
-            /// The node ID for the marker
-            /// </summary>
-            public string NodeID;
 
             /// <summary>
             /// Constructor setting the information necessary to re-do this action.
             /// </summary>
             /// <param name="Parent">parent of <paramref name="child"/></param>
-            /// <param name="Position">position of the marked node</param>
-            /// <param name="Scale">position of the marked node</param>
-            /// <param name="NodeID">NodeID of the marker</param>
             public Memento(GameObject parent)
             {
                 Parent = parent;
-                Position = parent.transform.position;
-                Scale = parent.transform.lossyScale;
-                NodeID = null;
             }
         }
 
@@ -77,8 +58,7 @@ namespace SEE.Controls.Actions
         {
             return new HashSet<string>
             {
-                memento.Parent.name,
-                memento.NodeID
+                memento.Parent.name
             };
         }
 
@@ -98,21 +78,11 @@ namespace SEE.Controls.Actions
                 // the hit object is the parent of the marker-sphere
                 GameObject parent = raycastHit.collider.gameObject;
 
-                // search for marked node
-                foreach (Transform node in
-                from Transform node in parent.transform
-                where node.name == "Sphere"
-                select node)
-                {
-                    return GameNodeMarker.DeleteMarker(node.gameObject);
-                }
-
                 markedNode = GameNodeMarker.AddMarker(parent);
                     // Node has the scale and position of parent, which is set in the AddMarker-method.
 
                 memento = new Memento(parent: parent);
-                memento.NodeID = markedNode.name;
-                new MarkNetAction(parent.name ,memento.NodeID).Execute();
+                new MarkNetAction(parent.name).Execute();
                 result = true;
                 CurrentState = IReversibleAction.Progress.Completed;
                 }
@@ -128,8 +98,9 @@ namespace SEE.Controls.Actions
             if (markedNode != null)
             {
                 //Object will be destroyed
-                //FIXME: Change doesn't work for client yet
+                new MarkNetAction(memento.Parent.name).Execute();
                 Destroyer.Destroy(markedNode);
+
                 markedNode = null;
             }
         }
