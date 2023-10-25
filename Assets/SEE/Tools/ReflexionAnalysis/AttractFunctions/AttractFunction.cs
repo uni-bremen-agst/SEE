@@ -1,8 +1,10 @@
-﻿using SEE.DataModel;
+﻿using RTG;
+using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
@@ -23,47 +25,22 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <summary>
         /// 
         /// </summary>
-        protected string targetType;
+        protected string candidateType;
 
         protected ReflexionGraph reflexionGraph;
+
+        protected Dictionary<string, double> edgeWeights = new Dictionary<string, double>();
 
         public AttractFunction(ReflexionGraph reflexionGraph, string targetType)
         {
             this.reflexionGraph= reflexionGraph;
-            this.targetType = targetType;
+            this.candidateType = targetType;
         }
-
-        public void MappingChanged(EdgeEvent edgeEvent)
+        public AttractFunction(ReflexionGraph reflexionGraph, 
+                                string targetType, 
+                                Dictionary<string, double> edgeWeights) : this(reflexionGraph, targetType)
         {
-            // Can source be a cluster? Are they other types than cluster which are representing
-            // architecture packages, Use HashSet?
-            if (!edgeEvent.Edge.Target.Type.Equals("Cluster")) return;
-            
-            // TODO: is this safe?
-            if (edgeEvent.Change == null) return;
-
-            Node cluster = edgeEvent.Edge.Target;
-            Node entity = edgeEvent.Edge.Source;
-
-            // Get targeted childs of currently mapped node
-            List<Node> mappedEntities = new List<Node>();
-            GetTargetedChilds(entity, mappedEntities, targetType, ReflexionSubgraph.Implementation);
-
-            this.HandleMappedEntities(cluster, mappedEntities, (ChangeType)edgeEvent.Change);
-        }
-
-        // TODO: was this done before? Do as Linq?
-        private void GetTargetedChilds(Node node, List<Node> entities, string type, ReflexionSubgraph subgraph)
-        {
-            if (node.Type.Equals(type) && node.IsIn(subgraph))
-            {
-                entities.Add(node);
-            }
-            foreach (Node child in node.Children())
-            {
-                GetTargetedChilds(child, entities, type, subgraph);
-            }
-            return;
+            this.edgeWeights = edgeWeights;
         }
 
         public static AttractFunction Create(AttractFunctionType attractFunctionType, ReflexionGraph reflexionGraph, string targetType)
@@ -76,7 +53,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             throw new ArgumentException("Given attractFunctionType is currently not implemented");
         }
 
-        public abstract void HandleMappedEntities(Node cluster, List<Node> targetedEntities, ChangeType changeType);
+        protected double GetEdgeWeight(Edge edge)
+        {
+            return this.edgeWeights.TryGetValue(edge.ID, out var weight) ? weight : 1.0;
+        }
+
+        public abstract void HandleMappedEntities(Node cluster, List<Node> nodesChangedInMapping, ChangeType changeType);
 
         public abstract double GetAttractionValue(Node node, Node cluster);
     }

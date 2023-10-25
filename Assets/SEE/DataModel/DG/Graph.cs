@@ -174,7 +174,6 @@ namespace SEE.DataModel.DG
 
             if (nodes.Remove(node.ID))
             {
-
                 // We need to send out this event here, before the node is modified but after it has been removed.
                 Notify(new NodeEvent(version, node, ChangeType.Removal));
 
@@ -182,19 +181,19 @@ namespace SEE.DataModel.DG
                 // in the node's neighbor's data structure.
                 foreach (Edge outgoing in node.Outgoings)
                 {
-                    Notify(new EdgeEvent(version, outgoing, ChangeType.Removal));
                     Node successor = outgoing.Target;
                     successor.RemoveIncoming(outgoing);
                     edges.Remove(outgoing.ID);
+                    Notify(new EdgeEvent(version, outgoing, ChangeType.Removal));
                     outgoing.ItsGraph = null;
                 }
 
                 foreach (Edge incoming in node.Incomings)
                 {
-                    Notify(new EdgeEvent(version, incoming, ChangeType.Removal));
                     Node predecessor = incoming.Source;
                     predecessor.RemoveOutgoing(incoming);
                     edges.Remove(incoming.ID);
+                    Notify(new EdgeEvent(version, incoming, ChangeType.Removal));
                     incoming.ItsGraph = null;
                 }
 
@@ -422,10 +421,10 @@ namespace SEE.DataModel.DG
                 throw new InvalidOperationException($"Edge {edge} is not contained in graph {Name}.");
             }
 
-            Notify(new EdgeEvent(version, edge, ChangeType.Removal));
             edge.Source.RemoveOutgoing(edge);
             edge.Target.RemoveIncoming(edge);
             edges.Remove(edge.ID);
+            Notify(new EdgeEvent(version, edge, ChangeType.Removal));
             edge.ItsGraph = null;
         }
 

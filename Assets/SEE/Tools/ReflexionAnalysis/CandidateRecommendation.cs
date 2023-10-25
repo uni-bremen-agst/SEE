@@ -1,6 +1,7 @@
 ﻿using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
 using Newtonsoft.Json;
 using SEE.DataModel;
+using SEE.Net.Dashboard.Model.Metric;
 using SEE.Tools.ReflexionAnalysis;
 using System;
 using System.Collections.Generic;
@@ -13,12 +14,30 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 {
     public class CandidateRecommendation : IObserver<ChangeEvent>
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        private static double ATTRACTION_VALUE_DELTA = 0.001;
+        
+        /// <summary>
+        /// 
+        /// </summary>
         private ReflexionGraph reflexionGraph;
 
-        private static double AttractionValueDelta = 0.001;
+        /// <summary>
+        /// Object representing the attractFunction
+        /// </summary>
+        private AttractFunction attractFunction;
 
-        // Dictionary representing the the mapping of nodes and their clusters regarding the highest 
-        // attraction value
+        /// <summary>
+        /// 
+        /// </summary>
+        private string candidateType;
+
+        /// <summary>
+        /// Dictionary representing the the mapping of nodes and their clusters regarding the highest 
+        /// attraction value
+        /// </summary>
         private Dictionary<Node, HashSet<MappingPair>> recommendations;
 
         /// <summary>
@@ -26,30 +45,36 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// </summary>
         public Dictionary<Node, HashSet<MappingPair>> Recommendations { get => recommendations; set => recommendations = value; }
 
-        public List<MappingPair> MappingPairs { get; private set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public List<MappingPair> MappingPairs { get { return mappingPairs.Values.ToList(); } }
 
-        public string TargetType
-        {
-            get;
-            set;
-        }
+        private Dictionary<string, MappingPair> mappingPairs; 
 
         /// <summary>
-        /// Object representing the attractFunction
+        /// 
         /// </summary>
-        private AttractFunction attractFunction;
-
         public AttractFunction AttractFunction { get => attractFunction; }
 
+        /// <summary>
+        /// TODO: integrate into configuration
+        /// </summary>
         public bool UseCDA
         {
             get;
             set;
         }
 
-        private AttractFunctionType attractFunctionType;
+        /// <summary>
+        /// 
+        /// </summary>
+        private AttractFunctionType? attractFunctionType;
 
-        public AttractFunctionType AttractFunctionType
+        /// <summary>
+        /// 
+        /// </summary>
+        public AttractFunctionType? AttractFunctionType
         {
             get
             {
@@ -57,20 +82,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
             set
             {
-                attractFunctionType = value;
-                if (reflexionGraph != null)
-                {
-                    Debug.Log("created attract function");
-                    // TODO: How to update the attractfuction. How to compensate the missing onNext callbacks if attractFunction changes.
-                    attractFunction = AttractFunction.Create(attractFunctionType, reflexionGraph, TargetType);
-                }
+                UpdateConfiguration(ReflexionGraph, value, CandidateType);
             }
-        }
-
-        public CandidateRecommendation()
-        {
-            recommendations = new Dictionary<Node, HashSet<MappingPair>>();
-            MappingPairs = new List<MappingPair>();
         }
 
         public ReflexionGraph ReflexionGraph
@@ -78,11 +91,51 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             get => reflexionGraph;
             set
             {
-                reflexionGraph = value;
-
-                // TODO: Can a ReflexionGraph change after loading? How to update the attractfuction.           
-                attractFunction = AttractFunction.Create(attractFunctionType, value, TargetType);
+                UpdateConfiguration(value, AttractFunctionType, CandidateType);
             }
+        }
+
+        public string CandidateType
+        {
+            get => candidateType;
+            set
+            {
+                UpdateConfiguration(ReflexionGraph, AttractFunctionType, value);
+            }
+        }
+
+        public CandidateRecommendationStatistics Statistics { get; private set; }
+
+        public CandidateRecommendation()
+        {
+            recommendations = new Dictionary<Node, HashSet<MappingPair>>();
+            mappingPairs = new Dictionary<string, MappingPair>();
+            Statistics = new CandidateRecommendationStatistics();
+        }
+
+        public void UpdateConfiguration(ReflexionGraph reflexionGraph, 
+                                        AttractFunctionType? attractFunctionType, 
+                                        string candidateType)
+        {
+            this.reflexionGraph = reflexionGraph;
+            this.attractFunctionType = attractFunctionType;
+            this.candidateType = candidateType;
+            if (reflexionGraph == null || candidateType == null || attractFunctionType == null) return;
+            attractFunction = AttractFunction.Create((AttractFunctionType)attractFunctionType, 
+                                                      reflexionGraph, 
+                                                      CandidateType);
+            bool wasActive = Statistics.Active;
+
+            // Stop and reset the recording
+            Statistics.Reset();
+            Statistics.SetCandidateRecommendation(this);
+            recommendations.Clear();
+            mappingPairs.Clear();
+            ReflexionGraph.RunAnalysis();
+
+            // Restart after the analysis was run, so initially/already
+            // mapped candidates will not recorded twice
+            if(wasActive) Statistics.StartRecording();
         }
 
         public void OnCompleted()
@@ -99,27 +152,58 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             if (value is EdgeEvent edgeEvent && edgeEvent.Affected == ReflexionSubgraph.Mapping)
             {
-                Debug.Log(edgeEvent.ToString());
-                Debug.Log("Handle Change in Mapping...");
-                AttractFunction.MappingChanged(edgeEvent);
-                UpdateRecommendations();
+                Debug.Log("Handle Change in Mapping... " + edgeEvent.ToString());
+
+                // TODO: is this safe?
+                if (edgeEvent.Change == null) return;
+
+                // Get targeted childs of currently mapped node
+                List<Node> nodesChangedInMapping = new List<Node>();
+                edgeEvent.Edge.Source.GetTargetedChilds(nodesChangedInMapping, 
+                                   node => node.Type.Equals(candidateType) && node.IsInImplementation());
+
+                if (Statistics.Active)
+                {
+                    // Update and calculate attraction values for each mapped node
+                    // to make sure the statistic is consistent
+                    foreach (Node nodeChangedInMapping in nodesChangedInMapping)
+                    {
+                        MappingPair chosenMappingPair;
+                        if (!mappingPairs.TryGetValue(nodeChangedInMapping.ID + edgeEvent.Edge.Target.ID, out chosenMappingPair))
+                        {
+                            // For the very first mapped node and nodes removed form the mapping
+                            // there is no previously calculated mappingpair available.
+                            // So we create a corresponding mapping pair manually
+                            chosenMappingPair = new MappingPair(nodeChangedInMapping, edgeEvent.Edge.Target, -1.0d);
+                        }
+
+                        AttractFunction.HandleMappedEntities(edgeEvent.Edge.Target, new List<Node> { nodeChangedInMapping }, (ChangeType)edgeEvent.Change);
+                        UpdateRecommendations();
+                        Statistics.RecordChosenMappingPair(chosenMappingPair, (ChangeType)edgeEvent.Change);
+                    }
+                } 
+                else
+                {
+                    AttractFunction.HandleMappedEntities(edgeEvent.Edge.Target, nodesChangedInMapping, (ChangeType)edgeEvent.Change);
+                    UpdateRecommendations();
+                }
             }
         }
 
         private void UpdateRecommendations()
         {
-            List<Node> targetedNodes = reflexionGraph.Nodes().Where(n => n.Type.Equals(TargetType) && n.IsInImplementation()).ToList();
+            List<Node> candidates = reflexionGraph.Nodes().Where(n => n.Type.Equals(CandidateType) && n.IsInImplementation()).ToList();
             List<Node> clusters = reflexionGraph.Nodes().Where(n => n.Type.Equals("Cluster") && n.IsInArchitecture()).ToList();
 
             double maxAttractionValue = double.MinValue;
 
             recommendations.Clear();
-            MappingPairs.Clear();
-            Debug.Log($"Calculate attraction values... targetedNodes.Count={targetedNodes.Count} clusters.Count={clusters.Count}");
+            mappingPairs.Clear();
+            Debug.Log($"Calculate attraction values... candidates.Count={candidates.Count} clusters.Count={clusters.Count}");
 
             foreach (Node cluster in clusters)
             {
-                foreach (Node candidate in targetedNodes)
+                foreach (Node candidate in candidates)
                 {
                     // Skip already mapped nodes
                     if (reflexionGraph.MapsTo(candidate) != null) continue;
@@ -129,7 +213,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
                     // Keep track of all attractions for statistical purposes
                     MappingPair mappingPair = new MappingPair(candidate: candidate, cluster: cluster, attractionValue: attractionValue);
-                    MappingPairs.Add(mappingPair);
+                    mappingPairs.Add(candidate.ID + cluster.ID, mappingPair);
 
                     // Only do a recommendation if attraction is above 0
                     if (attractionValue <= 0) continue;
@@ -140,7 +224,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                         recommendations.Add(cluster, new HashSet<MappingPair>() { mappingPair });
                         maxAttractionValue = attractionValue;
                     }
-                    else if (Math.Abs(maxAttractionValue - attractionValue) < AttractionValueDelta)
+                    else if (Math.Abs(maxAttractionValue - attractionValue) < ATTRACTION_VALUE_DELTA)
                     {
                         HashSet<MappingPair> nodes;
                         if (recommendations.TryGetValue(cluster, out nodes))
@@ -153,6 +237,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                         }
                     }
                 }
+            }
+
+            if (Statistics?.Active ?? false)
+            {
+                Statistics.RecordMappingPairs(MappingPairs);
             }
         }
 
@@ -209,6 +298,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             private string candidateID;
 
+            [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+            public ChangeType? ChangeType { get; set; }
+
+            [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
+            public DateTime? ChosenAt { get; set; }
+
             public string ClusterID 
             { 
                 get 
@@ -259,15 +354,16 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
                 return this.Cluster.Equals(mappingPair.Cluster)
                     && this.Candidate.Equals(mappingPair.Candidate)
-                    && Math.Abs(this.AttractionValue - mappingPair.AttractionValue) < AttractionValueDelta;
+                    && Math.Abs(this.AttractionValue - mappingPair.AttractionValue) < ATTRACTION_VALUE_DELTA;
             }
 
             public override int GetHashCode()
             {
                 // truncate value depending on the defined delta to erase decimal places
-                double truncatedValue = Math.Truncate(AttractionValue / AttractionValueDelta) * AttractionValueDelta;
+                double truncatedValue = Math.Truncate(AttractionValue / ATTRACTION_VALUE_DELTA) * ATTRACTION_VALUE_DELTA;
                 return HashCode.Combine(this.Cluster.ID, this.Candidate.ID, truncatedValue);
             }
         }
+
     }
 }

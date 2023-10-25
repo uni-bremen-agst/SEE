@@ -5,6 +5,7 @@ using SEE.Utils;
 using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -16,54 +17,95 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 {
     public class CandidateRecommendationStatistics
     {
+        /// <summary>
+        /// 
+        /// </summary>
         private readonly static int FLUSH_TRESHOLD = 5000;
 
+        /// <summary>
+        /// 
+        /// </summary>
         int mappingStep = 0;
 
+        /// <summary>
+        /// 
+        /// </summary>
+        int numberMappedPairs;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public FilePath CsvPath { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         List<List<MappingPair>> mappingProcess;
 
-        int numberMappingPairs;
+        /// <summary>
+        /// 
+        /// </summary>
+        Dictionary<string, CandidateStatisticResult> results;
 
-        FilePath csvPath;
+        /// <summary>
+        /// 
+        /// </summary>
+        public string CandidateType { get; set; }
 
-        Dictionary<string, CandidateStatisticResult> results = new Dictionary<string, CandidateStatisticResult>();
-
+        /// <summary>
+        /// 
+        /// </summary>
         public ReflexionGraph ReflexionGraph { get; private set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public ReflexionGraph OracleGraph { get; private set; }
-
-        private static string MAPS_TO_TYPE = "Maps_To";
-
-        public string TargetType { get; private set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool Active { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="oracleMappingPath"></param>
-        public CandidateRecommendationStatistics(FilePath csvPath,
-                                                 ReflexionGraph reflexionGraph,
-                                                 Graph oracleMapping,
-                                                 string targetType)
+        public CandidateRecommendationStatistics()
         {
-            TargetType = targetType;
-            this.csvPath = csvPath;
-            mappingProcess = new List<List<MappingPair>>
-            {
-                new List<MappingPair>()
-            };
-            ReflexionGraph = reflexionGraph;
-            (Graph implementation, Graph architecture, _) = reflexionGraph.Disassemble();
+            results = new Dictionary<string, CandidateStatisticResult>();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="candidateRecommendation"></param>
+        public void SetCandidateRecommendation(CandidateRecommendation candidateRecommendation)
+        {
+            ReflexionGraph = candidateRecommendation.ReflexionGraph;
+            CandidateType = candidateRecommendation.CandidateType;
+            Reset();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="oracleMapping"></param>
+        public void SetOracleMapping(Graph oracleMapping)
+        {
+            Reset(); 
+            (Graph implementation, Graph architecture, _) = ReflexionGraph.Disassemble();
             OracleGraph = new ReflexionGraph(implementation, architecture, oracleMapping);
-
-            UnityEngine.Debug.Log("Oracle implementation nodes: ");
-            implementation.Nodes().ForEach(n => UnityEngine.Debug.Log($"{n.ID} has Parent {n.Parent?.ID}({n.Parent.GetSubgraph()})"));
-
             OracleGraph.RunAnalysis();
         }
 
         public void Reset()
         {
             mappingStep = 0;
-            mappingProcess.Clear();
+            mappingProcess = new List<List<MappingPair>>
+            {
+                new List<MappingPair>()
+            };
             results.Clear();
         }
 
@@ -72,13 +114,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             mappingProcess[mappingStep].AddRange(attractionValues);
         }
 
-        public void RecordChosenMappingPair(MappingPair chosenMappingPair)
+        public void RecordChosenMappingPair(MappingPair chosenMappingPair, global::SEE.DataModel.ChangeType change)
         {
             // Add chosen pair to the start of the list, so the chosenMappingPair should be contained twice
+            chosenMappingPair.ChosenAt = DateTime.UtcNow;
+            chosenMappingPair.ChangeType = change;
             mappingProcess[mappingStep].Insert(0, chosenMappingPair);
-            numberMappingPairs += mappingProcess[mappingStep].Count;
+            numberMappedPairs += mappingProcess[mappingStep].Count;
             mappingStep++;
-            if (numberMappingPairs > FLUSH_TRESHOLD)
+            if (numberMappedPairs > FLUSH_TRESHOLD)
             {
                 this.Flush();
             }
@@ -102,15 +146,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
             mappingProcess.Clear();
             mappingStep = 0;
-            numberMappingPairs = 0;
-            File.WriteAllText(csvPath.Path, csv);
+            numberMappedPairs = 0;
+            File.AppendAllText(CsvPath.Path, csv);
         }
 
         public void ProcessMappingData(string csvFile, string xmlFile)
         {
             if (!File.Exists(csvFile))
             {
-                File.Create(csvFile);
+                // TODO: Inform User here?
+                UnityEngine.Debug.LogWarning($"No Data found to be processed. File {csvFile} is not existing.");
+                return;
             }
             CreateCandidateResults(csvFile);
             CreateXml(results.Values.ToList(), xmlFile);
@@ -166,7 +212,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
                 // set lists of percentile ranks
                 // TODO: remove PercentileRanks as second dictionary, all data should be saved directly to the results objects
-                percentileRanks.Keys.ForEach(candidateID => results[candidateID].PercentileRanks = percentileRanks[candidateID]);
+                foreach(string candidateID in percentileRanks.Keys)
+                {
+                    if(results.ContainsKey(candidateID))
+                    {
+                        results[candidateID].PercentileRanks = percentileRanks[candidateID];
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -197,7 +249,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 new XElement("fails", fails),
                 new XElement("initiallyMapped", initiallyMapped),
                 new XElement("chosen", chosen),
-                new XElement("targetType", TargetType));
+                new XElement("candidateType", CandidateType));
 
             XElement percentileRanksElement = new XElement("percentileRanksElement");
 
@@ -213,7 +265,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                                               List<MappingPair> mappingPairs)
         {
             List<Node> candidates = implementation.Nodes()
-                                .Where(n => n.Type.Equals(TargetType))
+                                .Where(n => n.Type.Equals(CandidateType))
                                 .ToList();
 
             // iterate all candidates within oracle mapping
@@ -264,9 +316,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         public void StartRecording()
         {
+            if (Active) return;
+            this.Reset();
+            if(this.OracleGraph == null)
+            {
+                // TODO: Is it really necessary to have the Oracle Graph selected during starting?
+                UnityEngine.Debug.LogWarning("No OracleGraph selected. No Data will be saved.");
+                return;
+            }
+            if (!File.Exists(CsvPath.Path)) File.Create(CsvPath.Path);
             IEnumerable<Node> implementationNodes = OracleGraph.Nodes().Where(n => n.IsInImplementation()
-                                                                            && n.Type.Equals(TargetType));
-
+                                                                            && n.Type.Equals(CandidateType));
             foreach (Node node in implementationNodes)
             {
                 Node mapsTo = ReflexionGraph.MapsTo(node);
@@ -278,6 +338,16 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     statisticResult.Hit = IsHit(statisticResult);
                     results.Add(node.ID, statisticResult);
                 }
+            }
+            Active = true;
+        }
+
+        public void StopRecording()
+        {
+            if (Active)
+            {
+                this.Flush();
+                Active = false;
             }
         }
 

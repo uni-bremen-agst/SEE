@@ -1,5 +1,6 @@
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -32,6 +33,27 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             reflexionGraph.SuppressNotifications = true;
             reflexionGraph.RemoveFromMapping(candidate, cluster);
             reflexionGraph.SuppressNotifications = suppressNotifications;
+        }
+
+        public static void RemoveFromMappingSilent(this ReflexionGraph reflexionGraph, Node candidate)
+        {
+            bool suppressNotifications = reflexionGraph.SuppressNotifications;
+            reflexionGraph.SuppressNotifications = true;
+            reflexionGraph.RemoveFromMapping(candidate);
+            reflexionGraph.SuppressNotifications = suppressNotifications;
+        }
+
+        public static void GetTargetedChilds(this Node node, List<Node> entities, Func<Node,bool> selector)
+        {
+            if (selector.Invoke(node))
+            {
+                entities.Add(node);
+            }
+            foreach (Node child in node.Children())
+            {
+                GetTargetedChilds(child, entities, selector);
+            }
+            return;
         }
     }
 }

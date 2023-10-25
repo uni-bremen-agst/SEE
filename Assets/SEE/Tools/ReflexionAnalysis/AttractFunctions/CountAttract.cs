@@ -2,12 +2,12 @@
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
     public class CountAttract : AttractFunction
     {
+        // TODO: Implementation of delta
         private float delta;
 
         private float phi;
@@ -21,7 +21,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// </summary>
         public float Phi { get => phi; set => phi = value; }
 
-        public CountAttract(ReflexionGraph graph, string targetType) : base(graph, targetType)
+        public CountAttract(ReflexionGraph graph, string candidateType) : base(graph, candidateType)
         {
             overallValues = new Dictionary<string, double>();
             mappingCount = new Dictionary<string, int>();
@@ -31,7 +31,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public override double GetAttractionValue(Node candidateNode, Node cluster)
         {
-            if (!candidateNode.Type.Equals(targetType)) return 0;
+            if (!candidateNode.Type.Equals(candidateType)) return 0;
             if (overallValues.TryGetValue(candidateNode.ID, out double overall))
             {
                 double toOthers = GetToOthersValue(candidateNode, cluster);
@@ -42,7 +42,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             else
             {
                 // TODO: dirty? does no overall value imply always 0?
-                // TODO: add exception here
                 UnityEngine.Debug.LogWarning($"Couldn't find overall value for the candidate {candidateNode.ID}");
                 return 0;
             };
@@ -61,7 +60,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 Node neighborOfCandidate = edge.Source.Equals(candidateNode) ? edge.Target : edge.Source;
                 Node neighborCluster = reflexionGraph.MapsTo(neighborOfCandidate);
   
-                // TODO: Equals does not work? Use IDs instead.
                 if (neighborCluster == null || neighborCluster.ID.Equals(cluster.ID)) continue;
 
                 double weight = GetEdgeWeight(edge);
@@ -82,42 +80,36 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return toOthers;
         }
 
-        public override void HandleMappedEntities(Node cluster, List<Node> mappedEntities, ChangeType changeType)
+        public override void HandleMappedEntities(Node cluster, List<Node> nodesChangedInMapping, ChangeType changeType)
         {
-            foreach (Node mappedEntity in mappedEntities)
+            foreach (Node nodeChangedInMapping in nodesChangedInMapping)
             {
-                List<Edge> implementationEdges = mappedEntity.GetImplementationEdges();
+                List<Edge> implementationEdges = nodeChangedInMapping.GetImplementationEdges();
                 foreach (Edge edge in implementationEdges)
                 {
-                    Node neighborOfMappedEntity = edge.Source.Equals(mappedEntity) ? edge.Target : edge.Source;
-                    UpdateOverallTable(neighborOfMappedEntity, edge, changeType);
+                    Node neighborOfAffectedNode = edge.Source.Equals(nodeChangedInMapping) ? edge.Target : edge.Source;
+                    UpdateOverallTable(neighborOfAffectedNode, edge, changeType);
                     
                     // TODO: Is there a way to also update a datastructure for the ToOthers value efficiently?
-                    UpdateMappingCountTable(neighborOfMappedEntity, changeType);
+                    UpdateMappingCountTable(neighborOfAffectedNode, changeType);
                 }
             }
         }
 
-        public void UpdateOverallTable(Node NeighborOfMappedEntity, Edge edge, ChangeType changeType)
+        public void UpdateOverallTable(Node NeighborOfMappedNode, Edge edge, ChangeType changeType)
         {
-            if (!overallValues.ContainsKey(NeighborOfMappedEntity.ID)) overallValues.Add(NeighborOfMappedEntity.ID, 0);
+            if (!overallValues.ContainsKey(NeighborOfMappedNode.ID)) overallValues.Add(NeighborOfMappedNode.ID, 0);
             double edgeWeight = GetEdgeWeight(edge);
             if (changeType == ChangeType.Removal) edgeWeight *= -1;
-            overallValues[NeighborOfMappedEntity.ID] += edgeWeight;
+            overallValues[NeighborOfMappedNode.ID] += edgeWeight;
         }
 
-        public void UpdateMappingCountTable(Node NeighborOfMappedEntity, ChangeType changeType)
+        public void UpdateMappingCountTable(Node NeighborOfMappedNode, ChangeType changeType)
         {
-            if (!mappingCount.ContainsKey(NeighborOfMappedEntity.ID)) mappingCount.Add(NeighborOfMappedEntity.ID, 0);
+            if (!mappingCount.ContainsKey(NeighborOfMappedNode.ID)) mappingCount.Add(NeighborOfMappedNode.ID, 0);
             int count = 1;
             if (changeType == ChangeType.Removal) count *= -1;
-            mappingCount[NeighborOfMappedEntity.ID] += count;
-        }
-
-        private double GetEdgeWeight(Edge edge)
-        {
-            // TODO: get correct Edge Weight
-            return 1.0;
+            mappingCount[NeighborOfMappedNode.ID] += count;
         }
     }
 }

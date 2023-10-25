@@ -23,6 +23,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// </summary>
         private CandidateRecommendation candidateRecommendation;
 
+        private static float BLINK_EFFECT_DELAY = 0.1f;
+
+        private Coroutine blinkEffectCoroutine;
+
         CandidateRecommendation CandidateRecommendation
         {
             get 
@@ -30,6 +34,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 if (candidateRecommendation == null)
                 {
                     candidateRecommendation = new CandidateRecommendation();
+                    AttractFunctionTypePropertyChanged();
+                    CandidateTypePropertyChanged();
+                    UseCDAPropertyChanged();
+                    candidateRecommendation.Statistics.CsvPath = csvPath; 
                 }
                 return candidateRecommendation; 
             }
@@ -45,9 +53,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         }
 
         [SerializeField]
-        public bool RecordStatistic = true;
-
-        [SerializeField]
         [OnValueChanged("AttractFunctionTypePropertyChanged")]
         public AttractFunctionType attractFunctionType = AttractFunctionType.CountAttract;
 
@@ -57,12 +62,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         }
 
         [SerializeField]
-        [OnValueChanged("AttractFunctionTypePropertyChanged")]
-        public string targetType = "Class";
+        [OnValueChanged("CandidateTypePropertyChanged")]
+        public string candidateType = "Class";
 
-        private void TargetTypePropertyChanged()
+        private void CandidateTypePropertyChanged()
         {
-            CandidateRecommendation.TargetType = targetType;
+            CandidateRecommendation.CandidateType = candidateType;
         }
 
         [SerializeField]
@@ -75,50 +80,45 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             set 
             {
-                if (CandidateRecommendation.ReflexionGraph == null)
-                {
-                    Debug.Log("created attract function.");
-                    CandidateRecommendation.ReflexionGraph = value;
-                    CandidateRecommendation.TargetType = targetType;
-                    CandidateRecommendation.AttractFunctionType = attractFunctionType;
-                    CandidateRecommendation.UseCDA = useCDA;
-                }
+                CandidateRecommendation.ReflexionGraph = value;
             }
         }
 
         public Graph OracleMapping
         {
-            set;
-            get;
+            set
+            {
+                CandidateRecommendation.Statistics.SetOracleMapping(value);
+            }
+            get
+            {
+                return CandidateRecommendation.Statistics.OracleGraph;
+            }
         }
-
-        private static float BLINK_EFFECT_DELAY = 0.1f;
-
-        private Coroutine blinkEffectCoroutine;
 
         public void OnCompleted()
         {
-            candidateRecommendation.OnCompleted();
+            CandidateRecommendation.OnCompleted();
         }
 
         public void OnError(Exception error)
         {
-            candidateRecommendation.OnError(error);
+            CandidateRecommendation.OnError(error);
         }
 
         public void OnNext(ChangeEvent value)
         {
-            candidateRecommendation.OnNext(value);
+            CandidateRecommendation.OnNext(value);
 
             List<NodeOperator> nodeOperators = new List<NodeOperator>();
-            foreach (Node cluster in candidateRecommendation.Recommendations.Keys)
+            foreach (Node cluster in CandidateRecommendation.Recommendations.Keys)
             {
                 NodeOperator nodeOperator;
 
                 nodeOperator = cluster.GameObject().AddOrGetComponent<NodeOperator>();
                 nodeOperators.Add(nodeOperator);
 
-                foreach (MappingPair mappingPair in candidateRecommendation.Recommendations[cluster])
+                foreach (MappingPair mappingPair in CandidateRecommendation.Recommendations[cluster])
                 {
                     nodeOperators.Add(mappingPair.Candidate.GameObject().AddOrGetComponent<NodeOperator>());
                 }
@@ -138,26 +138,32 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             nodeOperators.ForEach((n) => n.Blink(10, 2));
         }
 
+        [Button(ButtonSizes.Small)]
+        public void StartRecording()
+        {
+            CandidateRecommendation.Statistics.StartRecording();
+        }
+
+        [Button(ButtonSizes.Small)]
+        public void StopRecording()
+        {
+            CandidateRecommendation.Statistics.StopRecording();
+        }
+
+        [Button(ButtonSizes.Small)]
+        public void ProcessRecordedData()
+        {
+            CandidateRecommendation.Statistics.StopRecording();
+            CandidateRecommendation.Statistics.ProcessMappingData(csvPath.Path, xmlPath.Path);
+        }
+
         /// <summary>
         /// 
         /// </summary>
         [Button(ButtonSizes.Small)]
         public void AutomaticallyMapEntities()
         {
-            CandidateRecommendationStatistics statistics = null;
-            if (RecordStatistic)
-            {
-                if(!File.Exists(csvPath.Path)) File.Create(csvPath.Path);
-                // TODO: Refactor structural relationship of CandidateRecommendationStatistics,
-                // CandidateRecommendation and CandidateRecommenVisualization to make it more testable
-                statistics = new CandidateRecommendationStatistics(csvPath, 
-                                                                   candidateRecommendation.ReflexionGraph, 
-                                                                   OracleMapping,
-                                                                   candidateRecommendation.TargetType);
-                statistics.StartRecording();
-            }
-
-            // While recommendation exists
+            // While next recommendation still exists
             while(CandidateRecommendation.Recommendations.Count != 0)
             {
                 MappingPair chosenMappingPair;
@@ -172,23 +178,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     // TODO: handle ambigous mapping steps
                     Debug.Log("Warning: Ambigous recommendation.");
                 }
-                StartCoroutine(MapRecommendation(chosenMappingPair, statistics));
-            }
-
-            if(RecordStatistic
-               && OracleMapping != null)
-            {
-                statistics.Flush();
-                statistics.ProcessMappingData(csvPath.Path, xmlPath.Path);
+                StartCoroutine(MapRecommendation(chosenMappingPair));
             }
         }
 
-        private IEnumerator MapRecommendation(MappingPair chosenMappingPair, CandidateRecommendationStatistics statistics)
+        private IEnumerator MapRecommendation(MappingPair chosenMappingPair)
         {
             // TODO: Implement as Commando to visualize mapping/ Trigger Animation.
-            statistics.RecordMappingPairs(CandidateRecommendation.MappingPairs);
             CandidateRecommendation.ReflexionGraph.AddToMapping(chosenMappingPair.Candidate, chosenMappingPair.Cluster);
-            statistics.RecordChosenMappingPair(chosenMappingPair);
             yield return new WaitForSeconds(0.3f);
         }
     }

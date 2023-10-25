@@ -20,9 +20,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         bool useStandardTerms;
 
         public NBAttract(ReflexionGraph reflexionGraph, 
-                        string targetType,
+                        string candidateType,
                         bool useStandardTerms,
-                        bool useCda) : base(reflexionGraph, targetType)
+                        bool useCda) : base(reflexionGraph, candidateType)
         {
             this.naiveBayes = new NaiveBayes();   
             this.useCda = useCda;
@@ -67,17 +67,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return attraction;
         }
 
-        public override void HandleMappedEntities(Node cluster, List<Node> mappedEntities, ChangeType changeType)
+        public override void HandleMappedEntities(Node cluster, List<Node> nodesChangedInMapping, ChangeType changeType)
         {
-            foreach(Node mappedEntity in mappedEntities)
+            foreach(Node nodeChangedInMapping in nodesChangedInMapping)
             {
-                if (!mappedEntity.Type.Equals(targetType)) continue;
+                if (!nodeChangedInMapping.Type.Equals(candidateType)) continue;
 
                 Document docStandardTerms = new Document();
-                if(useStandardTerms) this.AddStandardTerms(mappedEntity, docStandardTerms);
+                if(useStandardTerms) this.AddStandardTerms(nodeChangedInMapping, docStandardTerms);
 
                 Dictionary<string, Document> docCdaTerms = new Dictionary<string, Document>();
-                if (useCda) this.CreateCdaTerms(cluster, mappedEntity, docCdaTerms);
+                if (useCda) this.CreateCdaTerms(cluster, nodeChangedInMapping, docCdaTerms);
 
                 if(changeType == ChangeType.Addition)
                 {
@@ -100,17 +100,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             }
         }
 
-        private void CreateCdaTerms(Node cluster, Node mappedEntity, Dictionary<string, Document> documents)
+        private void CreateCdaTerms(Node cluster, Node nodeChangedInMapping, Dictionary<string, Document> documents)
         {
-            Debug.Log($"Try to create CDA Terms for {mappedEntity.ID} and cluster {cluster.ID}...");
+            Debug.Log($"Try to create CDA Terms for {nodeChangedInMapping.ID} and cluster {cluster.ID}...");
 
-            List<Edge> edges = mappedEntity.GetImplementationEdges();
+            List<Edge> edges = nodeChangedInMapping.GetImplementationEdges();
 
             documents.Add(cluster.ID, new Document());
 
             foreach (Edge edge in edges)
             {
-                bool mappedEntityIsSource = edge.Source == mappedEntity;
+                bool mappedEntityIsSource = edge.Source == nodeChangedInMapping;
 
                 Node neighbor = mappedEntityIsSource ? edge.Target : edge.Source;
 

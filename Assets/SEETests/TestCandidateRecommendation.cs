@@ -71,8 +71,9 @@ namespace SEE.Tools.Architecture
         private void SetupCandidateRecommendation()
         {
             candidateRecommendation = new CandidateRecommendation();
-            candidateRecommendation.TargetType = "Class";
+            candidateRecommendation.CandidateType = "Class";
             candidateRecommendation.ReflexionGraph = graph;
+            candidateRecommendation.AttractFunctionType = AttractFunction.AttractFunctionType.CountAttract;
             graph.Subscribe(candidateRecommendation);
         }
 
@@ -230,16 +231,11 @@ namespace SEE.Tools.Architecture
 
             Assert.That(DIsRecommendedForH2ButNotH1());
 
-            //// remove all mappings // TODO: Why does this provoke an Exception?
-            //for (int j = 1; j <= i.Count; ++j)
-            //{
-            //    graph.RemoveFromMapping(i[j], ignoreUnmapped: true);
-            //}
-
-            // Remove A, B and C from Mapping 
-            graph.RemoveFromMapping(i[1]);
-            graph.RemoveFromMapping(i[2]);
-            graph.RemoveFromMapping(i[3]);
+            //// remove all mappings
+            for (int j = 1; j < i.Count; ++j)
+            {
+                graph.RemoveFromMapping(i[j], ignoreUnmapped: true);
+            }
 
             Assert.That(candidateRecommendation.Recommendations.Keys.Count == 0 &&
                         candidateRecommendation.Recommendations.Values.Count == 0);
@@ -306,7 +302,9 @@ namespace SEE.Tools.Architecture
 
                     if (recommendationsForCluster == null && mustBeRecommended[cluster] == null) continue;
                     if (recommendationsForCluster == null || mustBeRecommended == null) return false;
-                    if (!mustBeRecommended[cluster].IsSubsetOf(recommendationsForCluster)) return false;
+                    // Cannot compare MappingPairs directly, because the attraction values might differ
+                    if (!mustBeRecommended[cluster].Select(p => p.CandidateID).ToHashSet()
+                        .IsSubsetOf(recommendationsForCluster.Select(p => p.CandidateID).ToHashSet())) return false;
                 } 
             }
 
@@ -318,7 +316,9 @@ namespace SEE.Tools.Architecture
                     HashSet<MappingPair> recommendationsForCluster;
                     if (!recommendations.TryGetValue(cluster, out recommendationsForCluster)) continue;
                     if (mustNotBeRecommended[cluster] == null) throw new Exception("Error in while comparing Recommendations. Forbidden recommendations cannot be null.");
-                    if(recommendationsForCluster.Intersect(mustNotBeRecommended[cluster]).Count() > 0) return false;
+                    // Cannot compare MappingPairs directly, because the attraction values might differ
+                    if (recommendationsForCluster.Select(p => p.CandidateID).ToHashSet()
+                        .Intersect(mustNotBeRecommended[cluster].Select(p => p.CandidateID).ToHashSet()).Count() > 0) return false;
                 }
             }
 

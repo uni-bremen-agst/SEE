@@ -714,7 +714,11 @@ namespace SEE.Tools.ReflexionAnalysis
                 AssertOrThrow(source.IsInImplementation(), () => new NotInSubgraphException(Implementation, source));
                 AssertOrThrow(target.IsInArchitecture(), () => new NotInSubgraphException(Architecture, target));
                 AddSubtreeToImplicitMap(source, target);
+            }
 
+            // Notify after the the implicit and explicit mapping are complete
+            foreach (Edge mapsTo in Edges().Where(x => x.IsInMapping()))
+            {
                 // We'll now also notify our observer's that a "new" mapping edge exists.
                 Notify(new EdgeEvent(version, mapsTo, ChangeType.Addition, Mapping));
                 // TODO: Unsure whether we still need the above notification?
@@ -755,7 +759,6 @@ namespace SEE.Tools.ReflexionAnalysis
                     AddSubtreeToImplicitMap(child, target);
                 }
             }
-            UnityEngine.Debug.Log($"implicitMapsToTable[{root.ID}] = {target};");
             implicitMapsToTable[root.ID] = target;
         }
 
