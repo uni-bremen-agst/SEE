@@ -10,6 +10,8 @@ using TMPro;
 using HSVPicker;
 using UnityEngine.UI;
 using SEE.Game.Drawable.Configurations;
+using Crosstales;
+using Michsky.UI.ModernUIPack;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -18,11 +20,6 @@ namespace SEE.Controls.Actions.Drawable
     /// </summary>
     class ColorPickerAction : AbstractPlayerAction
     {
-        /// <summary>
-        /// The location where the color picker menu prefeb is placed.
-        /// </summary>
-        private const string colorPickerMenuPrefab = "Prefabs/UI/Drawable/ColorPickerMenu";
-
         /// <summary>
         /// The old chosen primary color of the <see cref="ValueHolder"/>
         /// </summary>
@@ -42,21 +39,6 @@ namespace SEE.Controls.Actions.Drawable
         /// Saves all the information needed to revert or repeat this action.
         /// </summary>
         private Memento memento;
-
-        /// <summary>
-        /// The instance for the colorPickerMenu
-        /// </summary>
-        private GameObject colorPickerMenu;
-
-        /// <summary>
-        /// The HSV color picker to show the selected primary color.
-        /// </summary>
-        private ColorPicker pickerForPrimaryColor;
-
-        /// <summary>
-        /// The HSV color picker to show the selected second color.
-        /// </summary>
-        private ColorPicker pickerForSecondColor;
 
         /// <summary>
         /// Bool to identifiy if the action is running.
@@ -95,15 +77,15 @@ namespace SEE.Controls.Actions.Drawable
                             break;
                     }
 
-                    if (!Input.GetKey(KeyCode.LeftControl))
+                    if (!ColorPickerMenu.GetSwitchStatus())//Input.GetKey(KeyCode.LeftControl))
                     {
                         ValueHolder.currentPrimaryColor = pickedColor;
-                        pickerForPrimaryColor.AssignColor(pickedColor);
+                        ColorPickerMenu.AssignPrimaryColor(pickedColor);
                     }
                     else
                     {
                         pickForSecondColor = true;
-                        pickerForSecondColor.AssignColor(pickedColor);
+                        ColorPickerMenu.AssignSecondaryColor(pickedColor);
                         ValueHolder.currentSecondaryColor = pickedColor;
                     }
                     memento = new(oldChosenPrimaryColor, oldChosenSecondColor, pickedColor, pickForSecondColor);
@@ -133,17 +115,17 @@ namespace SEE.Controls.Actions.Drawable
                             pickedColor = hittedObject.GetComponent<TextMeshPro>().outlineColor;
                             break;
                     }
-                    
 
-                    if (!Input.GetKey(KeyCode.LeftControl))
+
+                    if (!ColorPickerMenu.GetSwitchStatus())//Input.GetKey(KeyCode.LeftControl))
                     {
-                        pickerForPrimaryColor.AssignColor(pickedColor);
+                        ColorPickerMenu.AssignPrimaryColor(pickedColor);
                         ValueHolder.currentPrimaryColor = pickedColor;
                     }
                     else
                     {
                         pickForSecondColor = true;
-                        pickerForSecondColor.AssignColor(pickedColor);
+                        ColorPickerMenu.AssignSecondaryColor(pickedColor);
                         ValueHolder.currentSecondaryColor = pickedColor;
                     }
                     memento = new(oldChosenPrimaryColor, oldChosenSecondColor, pickedColor, pickForSecondColor);
@@ -161,26 +143,20 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// At beginning of this action, it saves the current color values 
         /// (<see cref="ValueHolder.currentPrimaryColor>"/> and <see cref="ValueHolder.currentSecondaryColor"/> of the <see cref="ValueHolder"/>.
-        /// Then it loads the color picker menu.
+        /// It also adds the UICanvas a color picker menu disabler. 
+        /// This is required to prevent a display error when displaying the color picker menu. 
+        /// (When it is displayed, the switch status is initialized once. It is activated once and then returns to its original position.)
+        /// Then it enables the color picker menu.
         /// </summary>
         public override void Awake()
         {
             oldChosenPrimaryColor = ValueHolder.currentPrimaryColor;
             oldChosenSecondColor = ValueHolder.currentSecondaryColor;
-            colorPickerMenu = PrefabInstantiator.InstantiatePrefab(colorPickerMenuPrefab,
-                GameObject.Find("UI Canvas").transform, false);
-            pickerForPrimaryColor = colorPickerMenu.transform.Find("Primary").GetComponent<HSVPicker.ColorPicker>();
-            pickerForPrimaryColor.AssignColor(ValueHolder.currentPrimaryColor);
-            pickerForSecondColor = colorPickerMenu.transform.Find("Second").GetComponent<HSVPicker.ColorPicker>();
-            pickerForSecondColor.AssignColor(ValueHolder.currentSecondaryColor);
-        }
-
-        /// <summary>
-        /// Stops the <see cref="ColorPickerAction"/> and deletes the color picker menu.
-        /// </summary>
-        public override void Stop()
-        {
-            Destroyer.Destroy(colorPickerMenu);
+            if (GameObject.Find("UI Canvas").GetComponent<ColorPickerMenuDisabler>() == null)
+            {
+                GameObject.Find("UI Canvas").AddComponent<ColorPickerMenuDisabler>();
+                ColorPickerMenu.Enable();
+            }
         }
 
         /// <summary>

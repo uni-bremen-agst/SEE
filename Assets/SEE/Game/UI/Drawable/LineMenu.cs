@@ -1,4 +1,5 @@
 ﻿using Assets.SEE.Game.Drawable;
+using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions;
 using SEE.Game;
 using SEE.Game.Drawable.Configurations;
@@ -23,28 +24,36 @@ namespace Assets.SEE.Game.UI.Drawable
         /// The location where the line menu prefeb is placed.
         /// </summary>
         private const string lineMenuPrefab = "Prefabs/UI/Drawable/LineMenu";
+
         /// <summary>
         /// The instance of the line menu.
         /// </summary>
         public static readonly GameObject instance;
+
         /// <summary>
         /// The color action to be executed additionally during the onChangeValue of the HSV Color Picker.
         /// </summary>
         public static UnityAction<Color> colorAction;
+
         /// <summary>
         /// The float action to be executed additionally during the onChangeValue of the tiling slider.
         /// </summary>
         public static UnityAction<float> tilingAction;
 
         /// <summary>
-        /// The text component for the displayed line kind text
+        /// The additionally action for the line kind selector.
         /// </summary>
-        private static TMP_Text lineKindText;
+        private static UnityAction<int> lineKindAction;
 
         /// <summary>
-        /// The text component for the displayed color kind text
+        /// The additionally action for the color kind selector.
         /// </summary>
-        private static TMP_Text colorKindText;
+        private static UnityAction<int> colorKindAction;
+
+        /// <summary>
+        /// The transform of the content object.
+        /// </summary>
+        private static Transform content;
 
         /// <summary>
         /// Holds the current selected line kind.
@@ -62,34 +71,29 @@ namespace Assets.SEE.Game.UI.Drawable
         private static FloatValueSliderController tilingSlider;
 
         /// <summary>
-        /// The next button for the line kind selection.
+        /// The selector for the line kind.
         /// </summary>
-        private static Button nextLineKindBtn;
+        private static HorizontalSelector lineKindSelector;
 
         /// <summary>
-        /// The previous button for the line kind selection.
+        /// The selector for the color kind.
         /// </summary>
-        private static Button previousLineKindBtn;
+        private static HorizontalSelector colorKindSelector;
 
         /// <summary>
-        /// The next button for the color kind selection.
+        /// The switch manager for the loop.
         /// </summary>
-        private static Button nextColorKindBtn;
+        private static SwitchManager loopManager;
 
         /// <summary>
-        /// The previous button for the color kind selection.
+        /// Button manager for chose primary color.
         /// </summary>
-        private static Button previousColorKindBtn;
+        private static ButtonManagerBasic primaryColorBMB;
 
         /// <summary>
-        /// Button for chose primary color.
+        /// Button manager for chose secondary color.
         /// </summary>
-        private static Button primaryColorBtn;
-
-        /// <summary>
-        /// Button for chose secondary color.
-        /// </summary>
-        private static Button secondaryColorBtn;
+        private static ButtonManagerBasic secondaryColorBMB;
 
         /// <summary>
         /// The HSVPicker ColorPicker component of the line menu.
@@ -115,23 +119,77 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         static LineMenu()
         {
+
             instance = PrefabInstantiator.InstantiatePrefab(lineMenuPrefab,
                 GameObject.Find("UI Canvas").transform, false);
-            lineKindText = instance.transform.Find("LineKindSelection").Find("KindSelection").GetComponent<TMP_Text>();
-            colorKindText = instance.transform.Find("ColorKindSelection").Find("KindSelection").GetComponent<TMP_Text>();
-            AssignLineKind(ValueHolder.currentLineKind);
-            AssignColorKind(ValueHolder.currentColorKind);
-            previousLineKindBtn = instance.transform.Find("LineKindSelection").Find("PreviousBtn").GetComponent<Button>();
-            nextLineKindBtn = instance.transform.Find("LineKindSelection").Find("NextBtn").GetComponent<Button>();
-            previousColorKindBtn = instance.transform.Find("ColorKindSelection").Find("PreviousBtn").GetComponent<Button>();
-            nextColorKindBtn = instance.transform.Find("ColorKindSelection").Find("NextBtn").GetComponent<Button>();
-            primaryColorBtn = instance.transform.Find("ColorAreaSelector").Find("PrimaryColorBtn").GetComponent <Button>();
-            primaryColorBtn.onClick.AddListener(MutuallyExclusiveColorButtons);
-            primaryColorBtn.interactable = false;
-            secondaryColorBtn = instance.transform.Find("ColorAreaSelector").Find("SecondaryColorBtn").GetComponent <Button>();
-            secondaryColorBtn.onClick.AddListener(MutuallyExclusiveColorButtons);
-            tilingSlider = instance.transform.Find("Tiling").GetComponentInChildren<FloatValueSliderController>();
-            picker = instance.GetComponent<HSVPicker.ColorPicker>();
+            content = instance.transform.Find("Content");
+
+            lineKindSelector = GameDrawableFinder.FindChild(instance, "LineKindSelection").GetComponent<HorizontalSelector>();
+            foreach (LineKind kind in GameDrawer.GetLineKinds())
+            {
+                lineKindSelector.CreateNewItem(kind.ToString());
+            }
+            lineKindSelector.selectorEvent.AddListener(index =>
+            {
+                if (GameDrawer.GetLineKinds()[index] == GameDrawer.LineKind.Dashed)
+                {
+                    enableTilingFromLineMenu();
+                }
+                else
+                {
+                    disableTilingFromLineMenu();
+                }
+                if (GameDrawer.GetLineKinds()[index] == GameDrawer.LineKind.Solid &&
+                    selectedColorKind == GameDrawer.ColorKind.TwoDashed)
+                {
+                    AssignColorKind(GameDrawer.ColorKind.Monochrome);
+                    colorKindSelector.label.text = ColorKind.Monochrome.ToString();
+                    colorKindSelector.index = 0;
+                    colorKindSelector.UpdateUI();
+                }
+                AssignLineKind(GameDrawer.GetLineKinds()[index]);
+            });
+            lineKindSelector.defaultIndex = 0;
+
+            colorKindSelector = GameDrawableFinder.FindChild(instance, "ColorKindSelection").GetComponent<HorizontalSelector>();
+            bool isDashed = selectedLineKind != GameDrawer.LineKind.Solid;
+            foreach (ColorKind kind in GameDrawer.GetColorKinds(true))
+            {
+                colorKindSelector.CreateNewItem(kind.ToString());
+            }
+            colorKindSelector.selectorEvent.AddListener(index =>
+            {
+                bool isDashed = selectedLineKind != GameDrawer.LineKind.Solid;
+                ColorKind newColorKind = GameDrawer.GetColorKinds(true)[index];
+                if (!isDashed && newColorKind == ColorKind.TwoDashed)
+                {
+                    if (selectedColorKind == ColorKind.Monochrome)
+                    {
+                        newColorKind = ColorKind.Gradient;
+                        colorKindSelector.label.text = ColorKind.Gradient.ToString();
+                    }
+                    else
+                    {
+                        newColorKind = ColorKind.Monochrome;
+                        colorKindSelector.label.text = ColorKind.Monochrome.ToString();
+                    }
+                }
+                AssignColorKind(newColorKind);
+                colorKindSelector.index = GetIndexOfSelectedColorKind();
+
+            });
+            colorKindSelector.defaultIndex = 0;
+
+            loopManager = GameDrawableFinder.FindChild(instance, "Loop").GetComponentInChildren<SwitchManager>();
+            primaryColorBMB = GameDrawableFinder.FindChild(instance, "PrimaryColorBtn").GetComponent<ButtonManagerBasic>();
+            primaryColorBMB.buttonVar = GameDrawableFinder.FindChild(instance, "PrimaryColorBtn").GetComponent<Button>();
+            primaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+            primaryColorBMB.buttonVar.interactable = false;
+            secondaryColorBMB = GameDrawableFinder.FindChild(instance, "SecondaryColorBtn").GetComponent<ButtonManagerBasic>();
+            secondaryColorBMB.buttonVar = GameDrawableFinder.FindChild(instance, "SecondaryColorBtn").GetComponent<Button>();
+            secondaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+            tilingSlider = GameDrawableFinder.FindChild(instance, "Tiling").GetComponentInChildren<FloatValueSliderController>();
+            picker = instance.GetComponentInChildren<HSVPicker.ColorPicker>();
             instance.SetActive(false);
         }
 
@@ -144,6 +202,7 @@ namespace Assets.SEE.Game.UI.Drawable
             enableLineMenuLayers();
             instance.SetActive(false);
         }
+
         #region Enable Line Menu
         /// <summary>
         /// Enables the line menu. And resets the additional Handler if the parameter for that is true.
@@ -211,29 +270,45 @@ namespace Assets.SEE.Game.UI.Drawable
                 ValueHolder.currentTiling = tiling;
             });
 
-            nextLineKindBtn.onClick.RemoveAllListeners();
-            nextLineKindBtn.onClick.AddListener(() => ValueHolder.currentLineKind = NextLineKind());
+            AssignLineKind(ValueHolder.currentLineKind);
+            lineKindSelector.index = GetIndexOfSelectedLineKind();
+            lineKindSelector.UpdateUI();
+            if (lineKindAction != null)
+            {
+                lineKindSelector.selectorEvent.RemoveListener(lineKindAction);
+            }
+            lineKindAction = index =>
+            {
+                ValueHolder.currentLineKind = GameDrawer.GetLineKinds()[index];
+                if (ValueHolder.currentLineKind == GameDrawer.LineKind.Solid &&
+                    ValueHolder.currentColorKind == GameDrawer.ColorKind.TwoDashed)
+                {
+                    ValueHolder.currentColorKind = ColorKind.Monochrome;
+                }
+            };
+            lineKindSelector.selectorEvent.AddListener(lineKindAction);
 
-            previousLineKindBtn.onClick.RemoveAllListeners();
-            previousLineKindBtn.onClick.AddListener(() => ValueHolder.currentLineKind = PreviousLineKind());
+            AssignColorKind(ValueHolder.currentColorKind);
+            colorKindSelector.index = GetIndexOfSelectedColorKind();
+            colorKindSelector.UpdateUI();
+            if (colorKindAction != null)
+            {
+                colorKindSelector.selectorEvent.RemoveListener(colorKindAction);
+            }
+            colorKindAction = index => { ValueHolder.currentColorKind = GameDrawer.GetColorKinds(true)[index]; };
+            colorKindSelector.selectorEvent.AddListener(colorKindAction);
 
-            nextColorKindBtn.onClick.RemoveAllListeners();
-            nextColorKindBtn.onClick.AddListener(() => ValueHolder.currentColorKind = NextColorKind());
-
-            previousColorKindBtn.onClick.RemoveAllListeners();
-            previousColorKindBtn.onClick.AddListener(() => ValueHolder.currentColorKind = PreviousColorKind());
-
-            primaryColorBtn.onClick.RemoveAllListeners();
-            primaryColorBtn.onClick.AddListener(MutuallyExclusiveColorButtons);
-            primaryColorBtn.onClick.AddListener(() =>
+            primaryColorBMB.clickEvent.RemoveAllListeners();
+            primaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+            primaryColorBMB.clickEvent.AddListener(() =>
             {
                 AssignColorArea((color => ValueHolder.currentPrimaryColor = color), ValueHolder.currentPrimaryColor);
             });
-            primaryColorBtn.interactable = false;
+            primaryColorBMB.buttonVar.interactable = false;
 
-            secondaryColorBtn.onClick.RemoveAllListeners();
-            secondaryColorBtn.onClick.AddListener(MutuallyExclusiveColorButtons);
-            secondaryColorBtn.onClick.AddListener(() =>
+            secondaryColorBMB.clickEvent.RemoveAllListeners();
+            secondaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+            secondaryColorBMB.clickEvent.AddListener(() =>
             {
                 if (ValueHolder.currentSecondaryColor == Color.clear)
                 {
@@ -245,7 +320,7 @@ namespace Assets.SEE.Game.UI.Drawable
                 }
                 AssignColorArea((color => { ValueHolder.currentSecondaryColor = color; }), ValueHolder.currentSecondaryColor);
             });
-            secondaryColorBtn.interactable = true;
+            secondaryColorBMB.buttonVar.interactable = true;
 
             ThicknessSliderController thicknessSlider = instance.GetComponentInChildren<ThicknessSliderController>();
             thicknessSlider.AssignValue(ValueHolder.currentThickness);
@@ -272,6 +347,45 @@ namespace Assets.SEE.Game.UI.Drawable
                 string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
 
                 AssignLineKind(selectedLine.GetComponent<LineValueHolder>().GetLineKind(), renderer.textureScale.x);
+                lineKindSelector.index = GetIndexOfSelectedLineKind();
+                lineKindSelector.UpdateUI();
+                if (lineKindAction != null)
+                {
+                    lineKindSelector.selectorEvent.RemoveListener(lineKindAction);
+                }
+                lineKindAction = index =>
+                {
+                    if (GameDrawer.GetLineKinds()[index] != LineKind.Dashed)
+                    {
+                        lineHolder.lineKind = GameDrawer.GetLineKinds()[index];
+                        if (lineHolder.lineKind == GameDrawer.LineKind.Solid &&
+                            lineHolder.colorKind == GameDrawer.ColorKind.TwoDashed)
+                        {
+                            lineHolder.colorKind = ColorKind.Monochrome;
+                            ChangeColorKind(selectedLine, lineHolder.colorKind, lineHolder);
+                            new ChangeColorKindNetAction(drawable.name, drawableParentName, LineConf.GetLine(selectedLine), lineHolder.colorKind).Execute();
+                        }
+                        ChangeLineKind(selectedLine, lineHolder.lineKind, lineHolder.tiling);
+                        new ChangeLineKindNetAction(drawable.name, drawableParentName, selectedLine.name,
+                                lineHolder.lineKind, lineHolder.tiling).Execute();
+                    }
+                };
+                lineKindSelector.selectorEvent.AddListener(lineKindAction);
+
+                AssignColorKind(lineHolder.colorKind);
+                colorKindSelector.index = GetIndexOfSelectedColorKind();
+                colorKindSelector.UpdateUI();
+                if (colorKindAction != null)
+                {
+                    colorKindSelector.selectorEvent.RemoveListener(colorKindAction);
+                }
+                colorKindAction = index =>
+                {
+                    lineHolder.colorKind = GameDrawer.GetColorKinds(true)[index];
+                    ChangeColorKind(selectedLine, lineHolder.colorKind, lineHolder);
+                    new ChangeColorKindNetAction(drawable.name, drawableParentName, LineConf.GetLine(selectedLine), lineHolder.colorKind).Execute();
+                };
+                colorKindSelector.selectorEvent.AddListener(colorKindAction);
 
                 tilingSlider.onValueChanged.AddListener(tilingAction = tiling =>
                 {
@@ -282,54 +396,9 @@ namespace Assets.SEE.Game.UI.Drawable
                             LineKind.Dashed, tiling).Execute();
                 });
 
-                nextLineKindBtn.onClick.RemoveAllListeners();
-                nextLineKindBtn.onClick.AddListener(() =>
-                {
-                    LineKind kind = NextLineKind();
-                    if (kind != LineKind.Dashed)
-                    {
-                        ChangeLineKind(selectedLine, kind, lineHolder.tiling);
-                        lineHolder.lineKind = kind;
-                        new ChangeLineKindNetAction(drawable.name, drawableParentName, selectedLine.name,
-                            kind, lineHolder.tiling).Execute();
-                    }
-                });
-                previousLineKindBtn.onClick.RemoveAllListeners();
-                previousLineKindBtn.onClick.AddListener(() =>
-                {
-                    LineKind kind = PreviousLineKind();
-                    if (kind != LineKind.Dashed)
-                    {
-                        ChangeLineKind(selectedLine, kind, lineHolder.tiling);
-                        lineHolder.lineKind = kind;
-                        new ChangeLineKindNetAction(drawable.name, drawableParentName, selectedLine.name,
-                            kind, lineHolder.tiling).Execute();
-                    }
-                });
-
-                AssignColorKind(lineHolder.colorKind);
-
-                nextColorKindBtn.onClick.RemoveAllListeners();
-                nextColorKindBtn.onClick.AddListener(() =>
-                {
-                    ColorKind kind = NextColorKind();
-                    lineHolder.colorKind = kind;
-                    ChangeColorKind(selectedLine, kind, lineHolder);
-                    new ChangeColorKindNetAction(drawable.name, drawableParentName, LineConf.GetLine(selectedLine), kind).Execute();
-                });
-
-                previousColorKindBtn.onClick.RemoveAllListeners();
-                previousColorKindBtn.onClick.AddListener(() => 
-                {
-                    ColorKind kind = PreviousColorKind();
-                    lineHolder.colorKind = kind;
-                    ChangeColorKind(selectedLine, kind, lineHolder);
-                    new ChangeColorKindNetAction(drawable.name, drawableParentName, LineConf.GetLine(selectedLine), kind).Execute();
-                });
-
-                primaryColorBtn.onClick.RemoveAllListeners();
-                primaryColorBtn.onClick.AddListener(MutuallyExclusiveColorButtons);
-                primaryColorBtn.onClick.AddListener(() =>
+                primaryColorBMB.clickEvent.RemoveAllListeners();
+                primaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+                primaryColorBMB.clickEvent.AddListener(() =>
                 {
                     AssignColorArea((color =>
                     {
@@ -338,11 +407,11 @@ namespace Assets.SEE.Game.UI.Drawable
                         new EditLinePrimaryColorNetAction(drawable.name, drawableParentName, selectedLine.name, color).Execute();
                     }), lineHolder.primaryColor);
                 });
-                primaryColorBtn.interactable = false;
+                primaryColorBMB.buttonVar.interactable = false;
 
-                secondaryColorBtn.onClick.RemoveAllListeners();
-                secondaryColorBtn.onClick.AddListener(MutuallyExclusiveColorButtons);
-                secondaryColorBtn.onClick.AddListener(() =>
+                secondaryColorBMB.clickEvent.RemoveAllListeners();
+                secondaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+                secondaryColorBMB.clickEvent.AddListener(() =>
                 {
                     if (lineHolder.secondaryColor == Color.clear)
                     {
@@ -352,13 +421,14 @@ namespace Assets.SEE.Game.UI.Drawable
                     {
                         lineHolder.secondaryColor = new Color(lineHolder.secondaryColor.r, lineHolder.secondaryColor.g, lineHolder.secondaryColor.b, 255);
                     }
-                    AssignColorArea((color => {
+                    AssignColorArea((color =>
+                    {
                         GameEdit.ChangeSecondaryColor(selectedLine, color);
                         lineHolder.secondaryColor = color;
                         new EditLineSecondaryColorNetAction(drawable.name, drawableParentName, selectedLine.name, color).Execute();
                     }), lineHolder.secondaryColor);
                 });
-                secondaryColorBtn.interactable = true;
+                secondaryColorBMB.buttonVar.interactable = true;
 
                 ThicknessSliderController thicknessSlider = instance.GetComponentInChildren<ThicknessSliderController>();
                 thicknessSlider.AssignValue(renderer.startWidth);
@@ -381,16 +451,23 @@ namespace Assets.SEE.Game.UI.Drawable
                     new EditLayerNetAction(drawable.name, drawableParentName, selectedLine.name, layerOrder).Execute();
                 });
 
-                Toggle toggle = instance.GetComponentInChildren<Toggle>();
-                toggle.isOn = lineHolder.loop;
-                toggle.onValueChanged.AddListener(loop =>
+                loopManager.isOn = lineHolder.loop;
+                loopManager.OnEvents.RemoveAllListeners();
+                loopManager.OnEvents.AddListener(() => 
                 {
-                    GameEdit.ChangeLoop(selectedLine, loop);
-                    lineHolder.loop = loop;
-                    new EditLineLoopNetAction(drawable.name, drawableParentName, selectedLine.name, loop).Execute();
+                    GameEdit.ChangeLoop(selectedLine, true);
+                    lineHolder.loop = true;
+                    new EditLineLoopNetAction(drawable.name, drawableParentName, selectedLine.name, true).Execute();
+                });
+                loopManager.OffEvents.RemoveAllListeners();
+                loopManager.OffEvents.AddListener(() =>
+                {
+                    GameEdit.ChangeLoop(selectedLine, false);
+                    lineHolder.loop = false;
+                    new EditLineLoopNetAction(drawable.name, drawableParentName, selectedLine.name, false).Execute();
                 });
 
-                switch(lineHolder.colorKind)
+                switch (lineHolder.colorKind)
                 {
                     case ColorKind.Monochrome:
                         picker.AssignColor(renderer.material.color);
@@ -421,8 +498,16 @@ namespace Assets.SEE.Game.UI.Drawable
         private static void RemoveListeners()
         {
             enableLineMenuLayers();
-            previousLineKindBtn.onClick.RemoveAllListeners();
-            nextLineKindBtn.onClick.RemoveAllListeners();
+            if (lineKindAction != null)
+            {
+                lineKindSelector.selectorEvent.RemoveListener(lineKindAction);
+            }
+
+            if (colorKindAction != null)
+            {
+                colorKindSelector.selectorEvent.RemoveListener(colorKindAction);
+            }
+
             if (tilingAction != null)
             {
                 if (selectedLineKind != GameDrawer.LineKind.Dashed)
@@ -431,13 +516,12 @@ namespace Assets.SEE.Game.UI.Drawable
                 }
                 instance.GetComponentInChildren<FloatValueSliderController>().onValueChanged.RemoveListener(tilingAction);
             }
-            previousColorKindBtn.onClick.RemoveAllListeners();
-            nextColorKindBtn.onClick.RemoveAllListeners();
-            primaryColorBtn.onClick.RemoveAllListeners();
-            secondaryColorBtn.onClick.RemoveAllListeners();
+            primaryColorBMB.clickEvent.RemoveAllListeners();
+            secondaryColorBMB.clickEvent.RemoveAllListeners();
             instance.GetComponentInChildren<ThicknessSliderController>().onValueChanged.RemoveAllListeners();
             instance.GetComponentInChildren<LayerSliderController>().onValueChanged.RemoveAllListeners();
-            instance.GetComponentInChildren<Toggle>().onValueChanged.RemoveAllListeners();
+            loopManager.OffEvents.RemoveAllListeners();
+            loopManager.OnEvents.RemoveAllListeners();
             if (colorAction != null)
             {
                 instance.GetComponentInChildren<HSVPicker.ColorPicker>().onValueChanged.RemoveListener(colorAction);
@@ -476,7 +560,6 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <param name="kind">The line kind that should be assigned</param>
         public static void AssignLineKind(GameDrawer.LineKind kind)
         {
-            lineKindText.text = kind.ToString();
             selectedLineKind = kind;
         }
 
@@ -487,7 +570,6 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <param name="tiling"></param>
         public static void AssignLineKind(GameDrawer.LineKind kind, float tiling)
         {
-            lineKindText.text = kind.ToString();
             selectedLineKind = kind;
             if (kind == GameDrawer.LineKind.Dashed)
             {
@@ -498,64 +580,6 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 disableTilingFromLineMenu();
             }
-        }
-
-        /// <summary>
-        /// Returns the next line kind.
-        /// Used for the line kind selection.
-        /// </summary>
-        /// <returns>The next line kind of the list</returns>
-        public static GameDrawer.LineKind NextLineKind()
-        {
-            int index = GetIndexOfSelectedLineKind() + 1;
-            if (index >= GameDrawer.GetLineKinds().Count)
-            {
-                index = 0;
-            }
-            if (GameDrawer.GetLineKinds()[index] == GameDrawer.LineKind.Dashed)
-            {
-                enableTilingFromLineMenu();
-            }
-            else
-            {
-                disableTilingFromLineMenu();
-            }
-            if (GameDrawer.GetLineKinds()[index] == GameDrawer.LineKind.Solid && 
-                selectedColorKind == GameDrawer.ColorKind.TwoDashed)
-            {
-                AssignColorKind(GameDrawer.ColorKind.Monochrome);
-            }
-            AssignLineKind(GameDrawer.GetLineKinds()[index]);
-            return GameDrawer.GetLineKinds()[index];
-        }
-
-        /// <summary>
-        /// Returns the previous line kind.
-        /// Used for the line kind selection.
-        /// </summary>
-        /// <returns>The previous line kind of the list</returns>
-        public static GameDrawer.LineKind PreviousLineKind()
-        {
-            int index = GetIndexOfSelectedLineKind() - 1;
-            if (index < 0)
-            {
-                index = GameDrawer.GetLineKinds().Count - 1;
-            }
-            if (GameDrawer.GetLineKinds()[index] == GameDrawer.LineKind.Dashed)
-            {
-                enableTilingFromLineMenu();
-            }
-            else
-            {
-                disableTilingFromLineMenu();
-            }
-            if (GameDrawer.GetLineKinds()[index] == GameDrawer.LineKind.Solid &&
-                selectedColorKind == GameDrawer.ColorKind.TwoDashed)
-            {
-                AssignColorKind(GameDrawer.ColorKind.Monochrome);
-            }
-            AssignLineKind(GameDrawer.GetLineKinds()[index]);
-            return GameDrawer.GetLineKinds()[index];
         }
         #endregion
 
@@ -575,49 +599,15 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <param name="kind">The line kind that should be assigned</param>
         public static void AssignColorKind(GameDrawer.ColorKind kind)
         {
-            colorKindText.text = kind.ToString();
             selectedColorKind = kind;
             if (kind == GameDrawer.ColorKind.Monochrome)
             {
                 disableColorAreaFromLineMenu();
-            } else
+            }
+            else
             {
                 enableColorAreaFromLineMenu();
             }
-        }
-
-        /// <summary>
-        /// Returns the next color kind.
-        /// Used for the color kind selection.
-        /// </summary>
-        /// <returns>the selected color kind</returns>
-        public static ColorKind NextColorKind()
-        {
-            int index = GetIndexOfSelectedColorKind() + 1;
-            bool isDashed = selectedLineKind != GameDrawer.LineKind.Solid;
-            if (index >= GameDrawer.GetColorKinds(isDashed).Count)
-            {
-                index = 0;
-            }
-            AssignColorKind(GameDrawer.GetColorKinds(isDashed)[index]);
-            return GetColorKinds(isDashed)[index];
-        }
-
-        /// <summary>
-        /// Returns the previous color kind.
-        /// Used for the color kind selection.
-        /// </summary>
-        /// <returns>the selected color kind</returns>
-        public static ColorKind PreviousColorKind()
-        {
-            int index = GetIndexOfSelectedColorKind() - 1;
-            bool isDashed = selectedLineKind != GameDrawer.LineKind.Solid;
-            if (index < 0)
-            {
-                index = GameDrawer.GetColorKinds(isDashed).Count - 1;
-            }
-            AssignColorKind(GameDrawer.GetColorKinds(isDashed)[index]);
-            return GetColorKinds(isDashed)[index];
         }
         #endregion
 
@@ -627,8 +617,8 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private static void MutuallyExclusiveColorButtons()
         {
-            primaryColorBtn.interactable = !primaryColorBtn.IsInteractable();
-            secondaryColorBtn.interactable = !secondaryColorBtn.IsInteractable();
+            primaryColorBMB.buttonVar.interactable = !primaryColorBMB.buttonVar.IsInteractable();
+            secondaryColorBMB.buttonVar.interactable = !secondaryColorBMB.buttonVar.IsInteractable();
         }
 
         #region Enable/Disable Layer
@@ -649,7 +639,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private static void disableLineKindFromLineMenu()
         {
-            instance.transform.Find("LineKindSelection").gameObject.SetActive(false);
+            content.Find("LineKindSelection").gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -661,7 +651,7 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 tilingSlider.ResetToMin();
             }
-            instance.transform.Find("LineKindSelection").gameObject.SetActive(true);
+            content.Find("LineKindSelection").gameObject.SetActive(true);
         }
 
         /// <summary>
@@ -670,7 +660,7 @@ namespace Assets.SEE.Game.UI.Drawable
         private static void disableTilingFromLineMenu()
         {
             tilingSlider.ResetToMin();
-            instance.transform.Find("Tiling").gameObject.SetActive(false);
+            content.Find("Tiling").gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -678,7 +668,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private static void enableTilingFromLineMenu()
         {
-            instance.transform.Find("Tiling").gameObject.SetActive(true);
+            content.Find("Tiling").gameObject.SetActive(true);
         }
 
         /// <summary>
@@ -686,7 +676,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private static void disableLayerFromLineMenu()
         {
-            instance.transform.Find("Layer").gameObject.SetActive(false);
+            content.Find("Layer").gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -694,7 +684,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private static void enableLayerFromLineMenu()
         {
-            instance.transform.Find("Layer").gameObject.SetActive(true);
+            content.Find("Layer").gameObject.SetActive(true);
         }
 
         /// <summary>
@@ -702,7 +692,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private static void disableThicknessFromLineMenu()
         {
-            instance.transform.Find("Thickness").gameObject.SetActive(false);
+            content.Find("Thickness").gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -710,7 +700,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private static void enableThicknessFromLineMenu()
         {
-            instance.transform.Find("Thickness").gameObject.SetActive(true);
+            content.Find("Thickness").gameObject.SetActive(true);
         }
 
         /// <summary>
@@ -718,7 +708,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private static void disableLoopFromLineMenu()
         {
-            instance.transform.Find("Loop").gameObject.SetActive(false);
+            content.Find("Loop").gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -726,7 +716,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private static void enableLoopFromLineMenu()
         {
-            instance.transform.Find("Loop").gameObject.SetActive(true);
+            content.Find("Loop").gameObject.SetActive(true);
         }
 
         /// <summary>
@@ -734,7 +724,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private static void disableColorAreaFromLineMenu()
         {
-            instance.transform.Find("ColorAreaSelector").gameObject.SetActive(false);
+            content.Find("ColorAreaSelector").gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -742,7 +732,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private static void enableColorAreaFromLineMenu()
         {
-            instance.transform.Find("ColorAreaSelector").gameObject.SetActive(true);
+            content.Find("ColorAreaSelector").gameObject.SetActive(true);
         }
         #endregion
     }

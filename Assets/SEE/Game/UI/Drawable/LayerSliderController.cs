@@ -10,11 +10,13 @@ using UnityEngine.UI;
 public class LayerSliderController : MonoBehaviour
 {
     /// <summary>
-    /// The slider object. When its value changes (meaning the player moved the slider), the layer of the selected line
+    /// The slider manager. 
+    /// It contains the slider.
+    /// When its value changes (meaning the player moved the slider), the layer of the selected drawable type object
     /// will be set to the value of this slider.
     /// </summary>
     [SerializeField] 
-    private Slider slider;
+    private SliderManager manager;
 
     [SerializeField]
     private TMP_Text tmpText;
@@ -24,25 +26,25 @@ public class LayerSliderController : MonoBehaviour
 
     private void Awake()
     {
-        slider = GetComponentInChildren<Slider>();
+        manager = GetComponentInChildren<SliderManager>();
         tmpText = GetComponentsInChildren<TMP_Text>()[1];
-        slider.onValueChanged.AddListener(SliderChanged);
-        slider.minValue = 0;
+        manager.mainSlider.onValueChanged.AddListener(SliderChanged);
+        manager.mainSlider.minValue = 0;
     }
 
     private void Start()
     {
-        slider.maxValue = ValueHolder.currentOrderInLayer;
+        manager.mainSlider.maxValue = ValueHolder.currentOrderInLayer;
     }
 
     private void OnDestroy()
     {
-        slider.onValueChanged.RemoveListener(SliderChanged);
+        manager.mainSlider.onValueChanged.RemoveListener(SliderChanged);
     }
 
     private void SliderChanged(float newValue)
     {
-        newValue = slider.value;
+        newValue = manager.mainSlider.value;
         tmpText.text = ((int)newValue).ToString();
         onValueChanged.Invoke((int)newValue);
     }
@@ -50,6 +52,6 @@ public class LayerSliderController : MonoBehaviour
     public void AssignValue(int value)
     {
         tmpText.text = value.ToString();
-        slider.value = value;
+        manager.mainSlider.value = value;
     }
 }

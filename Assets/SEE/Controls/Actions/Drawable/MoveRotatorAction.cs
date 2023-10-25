@@ -327,7 +327,7 @@ namespace SEE.Controls.Actions.Drawable
                             if (rotate)
                             {
                                 newObjectLocalEulerAngles = GameMoveRotator.RotateObject(selectedObject, direction, degree);
-                                if (selectedObject.CompareTag(Tags.Line))
+                                if (Tags.DrawableTypes.Contains(selectedObject.tag))
                                 {
                                     newObjectPosition = selectedObject.transform.localPosition;
                                 }

@@ -11,11 +11,12 @@ using System.Globalization;
 public class RotationSliderController : MonoBehaviour
 {
     /// <summary>
-    /// The slider object. When its value changes (meaning the player moved the slider), the layer of the selected line
+    /// The slider manager. It contains the slider. 
+    /// When the value of the slider changes (meaning the player moved the slider), the rotation of the selected drawable type object
     /// will be set to the value of this slider.
     /// </summary>
     [SerializeField]
-    private Slider slider;
+    private SliderManager manager;
 
     [SerializeField]
     private TMP_InputField inputField;
@@ -25,23 +26,23 @@ public class RotationSliderController : MonoBehaviour
 
     private void Awake()
     {
-        slider = GetComponentInChildren<Slider>();
+        manager = GetComponentInChildren<SliderManager>();
         inputField = GetComponentInChildren<TMP_InputField>();
-        slider.onValueChanged.AddListener(SliderChanged);
+        manager.mainSlider.onValueChanged.AddListener(SliderChanged);
         inputField.onEndEdit.AddListener(InputChanged);
-        slider.minValue = 0f;
-        slider.maxValue = 359.9f;
+        manager.mainSlider.minValue = 0f;
+        manager.mainSlider.maxValue = 359.9f;
     }
 
     private void OnDestroy()
     {
-        slider.onValueChanged.RemoveListener(SliderChanged);
+        manager.mainSlider.onValueChanged.RemoveListener(SliderChanged);
         inputField.onEndEdit.RemoveListener(InputChanged);
     }
 
     private void SliderChanged(float newValue)
     {
-        newValue = slider.value;
+        newValue = manager.mainSlider.value;
         inputField.text = newValue.ToString("F1");
         onValueChanged.Invoke(newValue);
     }
@@ -51,7 +52,7 @@ public class RotationSliderController : MonoBehaviour
         text = text.Replace(",", ".");
         if (float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out float value))
         {
-            slider.value = value;
+            manager.mainSlider.value = value;
             SliderChanged(value);
         } else
         {
@@ -62,6 +63,6 @@ public class RotationSliderController : MonoBehaviour
     public void AssignValue(float value)
     {
         inputField.text = value.ToString();
-        slider.value = value;
+        manager.mainSlider.value = value;
     }
 }

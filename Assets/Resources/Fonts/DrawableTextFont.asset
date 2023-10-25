@@ -110,14 +110,14 @@ Material:
     - _Mode: 0
     - _OcclusionStrength: 1
     - _OutlineShininess: 0
-    - _OutlineSoftness: 0
+    - _OutlineSoftness: 0.3
     - _OutlineUVSpeedX: 0
     - _OutlineUVSpeedY: 0
     - _OutlineWidth: 0
     - _Parallax: 0.02
     - _PerspectiveFilter: 0.875
     - _Reflectivity: 10
-    - _ScaleRatioA: 0.75789475
+    - _ScaleRatioA: 0.60504204
     - _ScaleRatioB: 0.13004999
     - _ScaleRatioC: 0
     - _ScaleX: 1

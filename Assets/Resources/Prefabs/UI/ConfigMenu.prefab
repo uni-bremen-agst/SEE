@@ -2447,7 +2447,7 @@ MonoBehaviour:
   m_BlockingObjects: 0
   m_BlockingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 4160750583
 --- !u!1 &6299520938435610395
 GameObject:
   m_ObjectHideFlags: 0
@@ -4158,6 +4158,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6574345135934814335, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: m_fontColor.b
+      value: 0.9843137
+      objectReference: {fileID: 0}
+    - target: {fileID: 6574345135934814335, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: m_fontColor.g
+      value: 0.9843137
+      objectReference: {fileID: 0}
+    - target: {fileID: 6574345135934814335, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: m_fontColor.r
+      value: 0.99215686
+      objectReference: {fileID: 0}
+    - target: {fileID: 6574345135934814335, guid: 916ee089a0d7b63419075f91e1c657ec,
+        type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294704125
       objectReference: {fileID: 0}
     - target: {fileID: 6902966852220138908, guid: 916ee089a0d7b63419075f91e1c657ec,
         type: 3}

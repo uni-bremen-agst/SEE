@@ -11,6 +11,10 @@ using UnityEngine.UI;
 
 namespace Assets.SEE.Game.Drawable
 {
+    /// <summary>
+    /// Component that is required to show which 
+    /// drawable type object has been selected. It makes the respective object blink.
+    /// </summary>
     public class BlinkEffect : MonoBehaviour
     {
         private bool loopOn;

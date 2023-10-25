@@ -1,4 +1,5 @@
-﻿using SEE.Game.UI.Notification;
+﻿using Michsky.UI.ModernUIPack;
+using SEE.Game.UI.Notification;
 using System;
 using System.Collections;
 using System.Xml;
@@ -21,11 +22,11 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <summary>
         /// Is the displayed up button of this component.
         /// </summary>
-        private Button upBtn;
+        private ButtonManagerBasic upBtn;
         /// <summary>
         /// Is the displayed down button of this component.
         /// </summary>
-        private Button downBtn;
+        private ButtonManagerBasic downBtn;
         /// <summary>
         /// Is the current value of the input field.
         /// </summary>
@@ -63,11 +64,11 @@ namespace Assets.SEE.Game.UI.Drawable
         private void Awake()
         {
             inputField = GetComponentInChildren<TMP_InputField>();
-            upBtn = transform.Find("UpDown").Find("UpBtn").GetComponent<Button>();
-            downBtn = transform.Find("UpDown").Find("DownBtn").GetComponent<Button>();
-            upBtn.onClick.AddListener(clickUp);
+            upBtn = transform.Find("UpDown").Find("UpBtn").GetComponent<ButtonManagerBasic>();
+            downBtn = transform.Find("UpDown").Find("DownBtn").GetComponent<ButtonManagerBasic>();
+            upBtn.clickEvent.AddListener(clickUp);
             transform.Find("UpDown").Find("UpBtn").gameObject.AddComponent<ButtonHolded>().SetAction(clickUp);
-            downBtn.onClick.AddListener(clickDown);
+            downBtn.clickEvent.AddListener(clickDown);
             transform.Find("UpDown").Find("DownBtn").gameObject.AddComponent<ButtonHolded>().SetAction(clickDown);
             inputField.onEndEdit.AddListener(ValueChanged);
         }

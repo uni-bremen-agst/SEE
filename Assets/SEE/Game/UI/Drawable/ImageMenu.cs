@@ -1,4 +1,5 @@
 ﻿using Assets.SEE.Game.Drawable;
+using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
@@ -37,9 +38,9 @@ namespace Assets.SEE.Game.UI.Drawable
         private static HSVPicker.ColorPicker picker;
 
         /// <summary>
-        /// The mirror toggle. It will needed to mirror the image on the y axis at 180°.
+        /// The mirror switch. It will needed to mirror the image on the y axis at 180°.
         /// </summary>
-        private static Toggle mirrorToggle;
+        private static SwitchManager mirrorSwitch;
 
         /// <summary>
         /// The thubnail image of the chosen image.
@@ -56,8 +57,8 @@ namespace Assets.SEE.Game.UI.Drawable
                 GameObject.Find("UI Canvas").transform, false);
             orderInLayerSlider = instance.GetComponentInChildren<LayerSliderController>();
             picker = instance.GetComponentInChildren<HSVPicker.ColorPicker>();
-            mirrorToggle = instance.GetComponentInChildren<Toggle>();
-            thumbnail = instance.transform.Find("ImageLayer").GetComponentInChildren<Image>();
+            mirrorSwitch = instance.GetComponentInChildren<SwitchManager>();
+            thumbnail = GameDrawableFinder.FindChild(instance, "Image").GetComponent<Image>();
             instance.SetActive(false);
         }
 
@@ -89,27 +90,27 @@ namespace Assets.SEE.Game.UI.Drawable
                     conf.fileData = null;
                     new EditImageNetAction(drawable.name, drawableParentName, conf).Execute();
                 }, image.orderInLayer);
-                AssignColorArea(color => {
+                AssignColorArea(color =>
+                {
                     GameEdit.ChangeImageColor(imageObj, color);
                     image.imageColor = color;
                     ImageConf conf = ImageConf.GetImageConf(imageObj);
                     conf.fileData = null;
                     new EditImageNetAction(drawable.name, drawableParentName, conf).Execute();
                 }, image.imageColor);
-                mirrorToggle.onValueChanged.RemoveAllListeners();
-                mirrorToggle.onValueChanged.AddListener(value =>
+                mirrorSwitch.OnEvents.RemoveAllListeners();
+                mirrorSwitch.OffEvents.RemoveAllListeners();
+                mirrorSwitch.OnEvents.AddListener(() =>
                 {
-                    if (value)
-                    {
-                        GameMoveRotator.SetRotateY(imageObj, 180f);
-                        image.eulerAngles = new Vector3(0, 180, image.eulerAngles.z);
-                        new RotatorYNetAction(drawable.name, drawableParentName, imageObj.name, 180f).Execute();
-                    } else
-                    {
-                        GameMoveRotator.SetRotateY(imageObj, 0);
-                        image.eulerAngles = new Vector3(0, 0, image.eulerAngles.z);
-                        new RotatorYNetAction(drawable.name, drawableParentName, imageObj.name, 0).Execute();
-                    }
+                    GameMoveRotator.SetRotateY(imageObj, 180f);
+                    image.eulerAngles = new Vector3(0, 180, image.eulerAngles.z);
+                    new RotatorYNetAction(drawable.name, drawableParentName, imageObj.name, 180f).Execute();
+                });
+                mirrorSwitch.OffEvents.AddListener(() =>
+                {
+                    GameMoveRotator.SetRotateY(imageObj, 0);
+                    image.eulerAngles = new Vector3(0, 0, image.eulerAngles.z);
+                    new RotatorYNetAction(drawable.name, drawableParentName, imageObj.name, 0).Execute();
                 });
                 thumbnail.sprite = imageObj.GetComponent<Image>().sprite;
                 instance.SetActive(true);

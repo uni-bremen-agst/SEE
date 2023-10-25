@@ -9,11 +9,7 @@ using UnityEngine.UI;
 
 public class IntValueSliderController : MonoBehaviour
 {
-    /// <summary>
-    /// The slider object. When its value changes (meaning the player moved the slider), the layer of the selected line
-    /// will be set to the value of this slider.
-    /// </summary>
-    private Slider slider;
+    private SliderManager manager;
 
     private TMP_Text tmpText;
 
@@ -22,21 +18,21 @@ public class IntValueSliderController : MonoBehaviour
 
     private void Awake()
     {
-        slider = GetComponentInChildren<Slider>();
+        manager = GetComponentInChildren<SliderManager>();
         tmpText = GetComponentsInChildren<TMP_Text>()[1];
-        tmpText.text = slider.value.ToString();
-        slider.onValueChanged.AddListener(SliderChanged);
-        slider.wholeNumbers = true;
+        tmpText.text = manager.mainSlider.value.ToString();
+        manager.mainSlider.onValueChanged.AddListener(SliderChanged);
+        manager.mainSlider.wholeNumbers = true;
     }
 
     private void OnDestroy()
     {
-        slider.onValueChanged.RemoveListener(SliderChanged);
+        manager.mainSlider.onValueChanged.RemoveListener(SliderChanged);
     }
 
     private void SliderChanged(float newValue)
     {
-        newValue = slider.value;
+        newValue = manager.mainSlider.value;
         tmpText.text = ((int)newValue).ToString();
         onValueChanged.Invoke((int)newValue);
     }
@@ -44,15 +40,15 @@ public class IntValueSliderController : MonoBehaviour
     public void AssignValue(int value)
     {
         tmpText.text = value.ToString();
-        slider.value = value;
+        manager.mainSlider.value = value;
     }
     public void ResetToMin()
     {
-        slider.value = slider.minValue;
+        manager.mainSlider.value = manager.mainSlider.minValue;
     }
 
     public int GetValue()
     {
-        return (int)slider.value;
+        return (int)manager.mainSlider.value;
     }
 }

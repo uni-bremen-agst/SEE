@@ -1,9 +1,12 @@
 ﻿using Assets.SEE.Game.Drawable;
+using Michsky.UI.ModernUIPack;
 using SEE.Utils;
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static Assets.SEE.Game.Drawable.GameShapesCalculator;
 
 namespace Assets.SEE.Game.UI.Drawable
 {
@@ -25,15 +28,6 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private const string drawableShapePrefab = "Prefabs/UI/Drawable/ShapeMenu";
         /// <summary>
-        /// Is the color picker for the config menu (line menu)
-        /// </summary>
-        private static HSVPicker.ColorPicker picker;
-        /// <summary>
-        /// Is the thickness slider controller for the config menu (line menu)
-        /// </summary>
-        private static ThicknessSliderController thicknessSlider;
-
-        /// <summary>
         /// The instance of the switch.
         /// </summary>
         private static GameObject drawableSwitch;
@@ -42,25 +36,25 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private static GameObject shapeMenu;
         /// <summary>
-        /// The instance for the previous shape type button.
+        /// The selector for the shape kind.
         /// </summary>
-        private static Button previousBtn;
-        /// <summary>
-        /// The instance for the next shape type button.
-        /// </summary>
-        private static Button nextBtn;
-        /// <summary>
-        /// The label for the shape type name.
-        /// </summary>
-        private static TMP_Text shapeLabel;
+        private static HorizontalSelector selector;
         /// <summary>
         /// The instance for the open shape menu button.
         /// </summary>
         private static Button shapeBtn;
         /// <summary>
+        /// The instance for the open shape menu button manager.
+        /// </summary>
+        private static ButtonManagerBasic shapeBMB;
+        /// <summary>
         /// The instance for the open config menu (line menu) button.
         /// </summary>
         private static Button configBtn;
+        /// <summary>
+        /// The instance for the open config menu button manager.
+        /// </summary>
+        private static ButtonManagerBasic configBMB;
         /// <summary>
         /// The instance for the layer of the value1.
         /// </summary>
@@ -108,7 +102,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <summary>
         /// The instance for the information button. It can open or close the information box.
         /// </summary>
-        private static Button infoBtn;
+        private static ButtonManagerBasic infoBMB;
         /// <summary>
         /// The instance for the layer for the image.
         /// </summary>
@@ -234,10 +228,14 @@ namespace Assets.SEE.Game.UI.Drawable
                                     GameObject.Find("UI Canvas").transform, false);
 
             shapeBtn = drawableSwitch.GetComponentsInChildren<Button>()[0];
-            shapeBtn.onClick.AddListener(ShapeOnClick);
+            shapeBMB = drawableSwitch.GetComponentsInChildren<ButtonManagerBasic>()[0];
+            shapeBMB.clickEvent.AddListener(ShapeOnClick);
+            
             configBtn = drawableSwitch.GetComponentsInChildren<Button>()[1];
-            configBtn.onClick.AddListener(ConfigOnClick);
+            configBMB = drawableSwitch.GetComponentsInChildren<ButtonManagerBasic>()[1];
+            configBMB.clickEvent.AddListener(ConfigOnClick);
             shapeBtn.interactable = false;
+            shapeBMB.enabled = false;
         }
         /// <summary>
         /// Init the shape menu.
@@ -247,13 +245,16 @@ namespace Assets.SEE.Game.UI.Drawable
         {
             shapeMenu = PrefabInstantiator.InstantiatePrefab(drawableShapePrefab,
                                                 GameObject.Find("UI Canvas").transform, false);
-
-            GameObject shapeSelection = GameDrawableFinder.FindChild(shapeMenu, "ShapeSelection");
-            previousBtn = shapeSelection.GetComponentsInChildren<Button>()[0];
-            previousBtn.onClick.AddListener(PreviousShape);
-            nextBtn = shapeSelection.GetComponentsInChildren<Button>()[1];
-            nextBtn.onClick.AddListener(NextShape);
-            shapeLabel = shapeMenu.GetComponentInChildren<TMP_Text>();
+            selector = shapeMenu.GetComponentInChildren<HorizontalSelector>();
+            foreach (Shapes shape in GameShapesCalculator.GetShapes())
+            {
+                selector.CreateNewItem(shape.ToString());
+            }
+            selector.selectorEvent.AddListener(index =>
+            {
+                SetSelectedShape(GameShapesCalculator.GetShapes()[index]);
+            });
+            selector.defaultIndex = 0;
 
             objValue1 = GameDrawableFinder.FindChild(shapeMenu, "Value1");
             sliderValue1 = objValue1.GetComponent<FloatValueSliderController>();
@@ -277,9 +278,9 @@ namespace Assets.SEE.Game.UI.Drawable
             sliderVertices.onValueChanged.AddListener(value => { vertices = value; });
 
             objInfo = GameDrawableFinder.FindChild(shapeMenu, "Info");
-            infoBtn = objInfo.GetComponentInChildren<Button>();
+            infoBMB = objInfo.GetComponent<ButtonManagerBasic>();
             infoVisibility = false;
-            infoBtn.onClick.AddListener(ToggleInfo);
+            infoBMB.clickEvent.AddListener(ToggleInfo);
 
             objImage = GameDrawableFinder.FindChild(shapeMenu, "Image");
             infoImage = objImage.GetComponent<Image>();
@@ -310,7 +311,7 @@ namespace Assets.SEE.Game.UI.Drawable
             switch (selectedShape)
             {
                 case GameShapesCalculator.Shapes.Square:
-                    path = "Textures/Drawable/Test";
+                    path = "Textures/Drawable/Square";
                     break;
                 case GameShapesCalculator.Shapes.Rectangle:
                     path = "Textures/Drawable/Rectangle";
@@ -353,44 +354,6 @@ namespace Assets.SEE.Game.UI.Drawable
         }
 
         /// <summary>
-        /// Gets the index of the selected shape type
-        /// </summary>
-        /// <returns>The index of the selected shape</returns>
-        private static int GetIndexOfSelectedShape()
-        {
-            return GameShapesCalculator.GetShapes().IndexOf(selectedShape);
-        }
-
-        /// <summary>
-        /// Sets the next shape type.
-        /// When the end of the shape type list is reached, it starts over from the beginning.
-        /// </summary>
-        private static void NextShape()
-        {
-            int index = GetIndexOfSelectedShape() + 1;
-            if (index >= GameShapesCalculator.GetShapes().Count)
-            {
-                index = 0;
-            }
-            SetSelectedShape(GameShapesCalculator.GetShapes()[index]);
-
-        }
-
-        /// <summary>
-        /// Sets the previous shape type.
-        /// When the beginning of the shape type list is reached, it jumps to the end of the list.
-        /// </summary>
-        private static void PreviousShape()
-        {
-            int index = GetIndexOfSelectedShape() - 1;
-            if (index < 0)
-            {
-                index = GameShapesCalculator.GetShapes().Count - 1;
-            }
-            SetSelectedShape(GameShapesCalculator.GetShapes()[index]);
-        }
-
-        /// <summary>
         /// This method sets the selected shape type.
         /// The name will be displayed in the shape label.
         /// </summary>
@@ -398,7 +361,6 @@ namespace Assets.SEE.Game.UI.Drawable
         private static void SetSelectedShape(GameShapesCalculator.Shapes shape)
         {
             selectedShape = shape;
-            shapeLabel.text = shape.ToString();
             ChangeMenu();
         }
 
@@ -527,6 +489,8 @@ namespace Assets.SEE.Game.UI.Drawable
         private static void ConfigOnClick()
         {
             configBtn.interactable = false;
+            configBMB.enabled = false;
+            shapeBMB.enabled = true;
             shapeBtn.interactable = true;
             LineMenu.enableLineMenu(false, new LineMenu.MenuLayer[] { LineMenu.MenuLayer.Layer, LineMenu.MenuLayer.Loop });
             shapeMenu.SetActive(false);
@@ -538,7 +502,9 @@ namespace Assets.SEE.Game.UI.Drawable
         private static void ShapeOnClick()
         {
             shapeBtn.interactable = false;
+            shapeBMB.enabled = false;
             configBtn.interactable = true;
+            configBMB.enabled = true;
             LineMenu.disableLineMenu();
             shapeMenu.SetActive(true);
         }

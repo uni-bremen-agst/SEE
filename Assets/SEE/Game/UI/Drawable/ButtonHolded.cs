@@ -13,7 +13,7 @@ namespace Assets.SEE.Game.UI.Drawable
     /// Inspired by Ahsanhabibrafy, Jul. 2020
     /// https://discussions.unity.com/t/how-to-make-the-button-respond-to-touch-and-hold-feature/213417/6
     /// </summary>
-    public class ButtonHolded : MonoBehaviour, IUpdateSelectedHandler, IPointerDownHandler, IPointerUpHandler
+    public class ButtonHolded : MonoBehaviour, IPointerDownHandler, IPointerUpHandler
     {
         /// <summary>
         /// State of clicked the button with right click.
@@ -34,18 +34,6 @@ namespace Assets.SEE.Game.UI.Drawable
         }
 
         /// <summary>
-        /// Will be check every frame
-        /// </summary>
-        /// <param name="data">the base event data</param>
-        public void OnUpdateSelected(BaseEventData data)
-        {
-            if (isPressed)
-            {
-                action();
-            }
-        }
-
-        /// <summary>
         /// Will be called when the button is pressed.
         /// </summary>
         /// <param name="data">The data of the pointer event</param>
@@ -54,6 +42,7 @@ namespace Assets.SEE.Game.UI.Drawable
             if (data.button == PointerEventData.InputButton.Right)
             {
                 isPressed = true;
+                StartCoroutine(Pressed());
             }
         }
         /// <summary>
@@ -63,6 +52,19 @@ namespace Assets.SEE.Game.UI.Drawable
         public void OnPointerUp(PointerEventData data)
         {
             isPressed = false;
+        }
+
+        /// <summary>
+        /// Will be executed as long as the right mouse button is clicked.
+        /// </summary>
+        /// <returns>the wait value</returns>
+        IEnumerator Pressed()
+        {
+            while (isPressed)
+            {
+                action();
+                yield return new WaitForSeconds(0.1f);
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Assets.SEE.Game.Drawable;
+using Michsky.UI.ModernUIPack;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections;
@@ -30,9 +31,9 @@ namespace Assets.SEE.Game.UI.Drawable
         private static InputFieldWithButtons yScale;
 
         /// <summary>
-        /// The toogle for scale proportional or unproportional.
+        /// The switch for scale proportional or unproportional.
         /// </summary>
-        private static Toggle propToggle;
+        private static SwitchManager switchManager;
 
         /// <summary>
         /// Holds the scale menu instance
@@ -49,7 +50,7 @@ namespace Assets.SEE.Game.UI.Drawable
 
             xScale = GameDrawableFinder.FindChild(instance, "XScale").GetComponent<InputFieldWithButtons>();
             yScale = GameDrawableFinder.FindChild(instance, "YScale").GetComponent<InputFieldWithButtons>();
-            propToggle = GameDrawableFinder.FindChild(instance, "Toggle").GetComponent<Toggle>();
+            switchManager = GameDrawableFinder.FindChild(instance, "Switch").GetComponent<SwitchManager>();
         }
 
         /// <summary>
@@ -78,8 +79,6 @@ namespace Assets.SEE.Game.UI.Drawable
                 new ScaleNetAction(drawable.name, drawableParent, objToScale.name, newScale);
             });
 
-            
-
             xScale.onProportionalValueChanged = new UnityEvent<float>();
             xScale.onProportionalValueChanged.AddListener(diff =>
             {
@@ -92,27 +91,25 @@ namespace Assets.SEE.Game.UI.Drawable
                 xScale.AssignValue(xScale.GetValue() + diff);
             });
 
-            propToggle.isOn = true;
-            propToggle.onValueChanged.AddListener(proportional =>
-            {   
-                if(proportional)
+            switchManager.isOn = true;
+            switchManager.OnEvents.AddListener(() =>
+            {
+                xScale.onProportionalValueChanged = new UnityEvent<float>();
+                xScale.onProportionalValueChanged.AddListener(diff =>
                 {
-                    xScale.onProportionalValueChanged = new UnityEvent<float>();
-                    xScale.onProportionalValueChanged.AddListener(diff =>
-                    {
-                        yScale.AssignValue(yScale.GetValue() + diff);
-                    });
+                    yScale.AssignValue(yScale.GetValue() + diff);
+                });
 
-                    yScale.onProportionalValueChanged = new UnityEvent<float>();
-                    yScale.onProportionalValueChanged.AddListener(diff =>
-                    {
-                        xScale.AssignValue(xScale.GetValue() + diff);
-                    });
-                } else
+                yScale.onProportionalValueChanged = new UnityEvent<float>();
+                yScale.onProportionalValueChanged.AddListener(diff =>
                 {
-                    xScale.onProportionalValueChanged = null;
-                    yScale.onProportionalValueChanged = null;
-                }
+                    xScale.AssignValue(xScale.GetValue() + diff);
+                });
+            });
+            switchManager.OffEvents.AddListener(() =>
+            {
+                xScale.onProportionalValueChanged = null;
+                yScale.onProportionalValueChanged = null;
             });
             instance.SetActive(true);
         }

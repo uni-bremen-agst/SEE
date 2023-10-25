@@ -1,5 +1,6 @@
 ﻿using Assets.SEE.Game.Drawable;
 using Crosstales;
+using Michsky.UI.ModernUIPack;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.Game.Drawable.Configurations;
@@ -87,29 +88,57 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private static Button boldBtn;
         /// <summary>
+        /// The button manager for the bold button.
+        /// </summary>
+        private static ButtonManagerBasic boldBMB;
+        /// <summary>
         /// The button for the italic font style
         /// </summary>
         private static Button italicBtn;
+        /// <summary>
+        /// The button manager for the italic button.
+        /// </summary>
+        private static ButtonManagerBasic italicBMB;
         /// <summary>
         /// The button for the underline font style
         /// </summary>
         private static Button underlineBtn;
         /// <summary>
+        /// The button manager for the underline button.
+        /// </summary>
+        private static ButtonManagerBasic underlineBMB;
+        /// <summary>
         /// The button for the strikethrough font style
         /// </summary>
         private static Button strikethroughBtn;
+        /// <summary>
+        /// The button manager for the strikethrough button.
+        /// </summary>
+        private static ButtonManagerBasic strikethroughBMB;
         /// <summary>
         /// The button for the lower case font style
         /// </summary>
         private static Button lowerCaseBtn;
         /// <summary>
+        /// The button manager for the lower case button.
+        /// </summary>
+        private static ButtonManagerBasic lowerCaseBMB;
+        /// <summary>
         /// The button for the upper case font style
         /// </summary>
         private static Button upperCaseBtn;
         /// <summary>
+        /// The button manager for the upper case button.
+        /// </summary>
+        private static ButtonManagerBasic upperCaseBMB;
+        /// <summary>
         /// The button for the small caps font style
         /// </summary>
         private static Button smallCapsBtn;
+        /// <summary>
+        /// The button manager for the small caps button.
+        /// </summary>
+        private static ButtonManagerBasic smallCapsBMB;
         /// <summary>
         /// The color block for the colors if a font style button is not selected.
         /// </summary>
@@ -124,17 +153,25 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private static GameObject editText;
         /// <summary>
-        /// The edit text button.
+        /// The button manager for the edit text button.
         /// </summary>
-        private static Button editTextBtn;
+        private static ButtonManagerBasic editTextBMB;
         /// <summary>
         /// The font color button.
         /// </summary>
         private static Button fontColorBtn;
         /// <summary>
+        /// The button manager for the font color button.
+        /// </summary>
+        private static ButtonManagerBasic fontColorBMB;
+        /// <summary>
         /// The outline color button.
         /// </summary>
         private static Button outlineColorBtn;
+        /// <summary>
+        /// The button manager for the outline color button.
+        /// </summary>
+        private static ButtonManagerBasic outlineColorBMB;
         /// <summary>
         /// The HSV color picker.
         /// </summary>
@@ -178,35 +215,46 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private static void initBtn()
         {
-            boldBtn = instance.transform.Find("FontStyles").Find("Bold").GetComponent<Button>();
-            italicBtn = instance.transform.Find("FontStyles").Find("Italic").GetComponent<Button>();
-            underlineBtn = instance.transform.Find("FontStyles").Find("Underline").GetComponent<Button>();
-            strikethroughBtn = instance.transform.Find("FontStyles").Find("Strikethrough").GetComponent<Button>();
-            lowerCaseBtn = instance.transform.Find("FontStyles").Find("LowerCase").GetComponent<Button>();
-            upperCaseBtn = instance.transform.Find("FontStyles").Find("UpperCase").GetComponent<Button>();
-            smallCapsBtn = instance.transform.Find("FontStyles").Find("SmallCaps").GetComponent<Button>();
+
+            boldBtn = GameDrawableFinder.FindChild(instance, "Bold").GetComponent<Button>();
+            boldBMB = GameDrawableFinder.FindChild(instance, "Bold").GetComponent<ButtonManagerBasic>();
+            italicBtn = GameDrawableFinder.FindChild(instance, "Italic").GetComponent<Button>();
+            italicBMB = GameDrawableFinder.FindChild(instance, "Italic").GetComponent<ButtonManagerBasic>();
+            underlineBtn = GameDrawableFinder.FindChild(instance, "Underline").GetComponent<Button>();
+            underlineBMB = GameDrawableFinder.FindChild(instance, "Underline").GetComponent<ButtonManagerBasic>();
+            strikethroughBtn = GameDrawableFinder.FindChild(instance, "Strikethrough").GetComponent<Button>();
+            strikethroughBMB = GameDrawableFinder.FindChild(instance, "Strikethrough").GetComponent<ButtonManagerBasic>();
+            lowerCaseBtn = GameDrawableFinder.FindChild(instance, "LowerCase").GetComponent<Button>();
+            lowerCaseBMB = GameDrawableFinder.FindChild(instance, "LowerCase").GetComponent<ButtonManagerBasic>();
+            upperCaseBtn = GameDrawableFinder.FindChild(instance, "UpperCase").GetComponent<Button>();
+            upperCaseBMB = GameDrawableFinder.FindChild(instance, "UpperCase").GetComponent<ButtonManagerBasic>();
+            smallCapsBtn = GameDrawableFinder.FindChild(instance, "SmallCaps").GetComponent<Button>();
+            smallCapsBMB = GameDrawableFinder.FindChild(instance, "SmallCaps").GetComponent<ButtonManagerBasic>();
 
             initFontStyleButtons();
 
             notSelectedBlock = boldBtn.colors;
             selectedBlock = notSelectedBlock;
             selectedBlock.normalColor = selectedBlock.selectedColor = selectedBlock.disabledColor = selectedBlock.highlightedColor = selectedBlock.pressedColor = Color.gray;
-            
-            fontColorBtn = instance.transform.Find("ColorAreaSelector").Find("FontColorBtn").GetComponent<Button>();
-            fontColorBtn.interactable = false;
-            fontColorBtn.onClick.AddListener(MutuallyExclusiveColorButtons);
 
-            outlineColorBtn = instance.transform.Find("ColorAreaSelector").Find("OutlineColorBtn").GetComponent<Button>();
-            outlineColorBtn.onClick.AddListener(MutuallyExclusiveColorButtons);
-            thicknessLayer = instance.transform.Find("Thickness").gameObject;
+            fontColorBtn = GameDrawableFinder.FindChild(instance, "FontColorBtn").GetComponent<Button>();
+            fontColorBMB = GameDrawableFinder.FindChild(instance, "FontColorBtn").GetComponent<ButtonManagerBasic>();
+            fontColorBtn.interactable = false;
+            fontColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+
+            outlineColorBtn = GameDrawableFinder.FindChild(instance, "OutlineColorBtn").GetComponent<Button>();
+            outlineColorBMB = GameDrawableFinder.FindChild(instance, "OutlineColorBtn").GetComponent<ButtonManagerBasic>();
+            outlineColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+
+            thicknessLayer = GameDrawableFinder.FindChild(instance, "Thickness").gameObject;
             thicknessSlider = thicknessLayer.GetComponentInChildren<FloatValueSliderController>();
             thicknessLayer.SetActive(false);
-            
+
             picker = instance.GetComponentInChildren<HSVPicker.ColorPicker>();
-            fontSizeInput = instance.transform.Find("FontSize").GetComponentInChildren<InputFieldWithButtons>();
-            editText = instance.transform.Find("EditText").gameObject;
-            editTextBtn = editText.GetComponentInChildren<Button>();
-            orderInLayer = instance.transform.Find("Layer").gameObject;
+            fontSizeInput = GameDrawableFinder.FindChild(instance, "FontSize").GetComponentInChildren<InputFieldWithButtons>();
+            editText = GameDrawableFinder.FindChild(instance, "EditText").gameObject;
+            editTextBMB = editText.GetComponentInChildren<ButtonManagerBasic>();
+            orderInLayer = GameDrawableFinder.FindChild(instance, "Layer").gameObject;
             orderInLayerSlider = orderInLayer.GetComponentInChildren<LayerSliderController>();
         }
 
@@ -215,20 +263,20 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private static void initFontStyleButtons()
         {
-            boldBtn.onClick.AddListener(() => Press(Bold));
-            italicBtn.onClick.AddListener(() => Press(Italic));
-            underlineBtn.onClick.AddListener(() => Press(Underline));
-            strikethroughBtn.onClick.AddListener(() => Press(Strikethrough));
-            lowerCaseBtn.onClick.AddListener(() => Press(LowerCase));
-            upperCaseBtn.onClick.AddListener(() => Press(UpperCase));
-            smallCapsBtn.onClick.AddListener(() => Press(SmallCaps));
+            boldBMB.clickEvent.AddListener(() => Press(Bold));
+            italicBMB.clickEvent.AddListener(() => Press(Italic));
+            underlineBMB.clickEvent.AddListener(() => Press(Underline));
+            strikethroughBMB.clickEvent.AddListener(() => Press(Strikethrough));
+            lowerCaseBMB.clickEvent.AddListener(() => Press(LowerCase));
+            upperCaseBMB.clickEvent.AddListener(() => Press(UpperCase));
+            smallCapsBMB.clickEvent.AddListener(() => Press(SmallCaps));
         }
 
         /// <summary>
         /// To hide the text menu.
         /// It's enable the keyboard shortcuts.
         /// </summary>
-        public static void disableTextMenu()
+        public static void Disable()
         {
             instance.SetActive(false);
             SEEInput.KeyboardShortcutsEnabled = true;
@@ -240,10 +288,11 @@ namespace Assets.SEE.Game.UI.Drawable
         private static void Reset()
         {
             ResetStyles();
-            fontColorBtn.onClick.RemoveAllListeners();
-            fontColorBtn.onClick.AddListener(MutuallyExclusiveColorButtons);
-            outlineColorBtn.onClick.RemoveAllListeners();
-            outlineColorBtn.onClick.AddListener(MutuallyExclusiveColorButtons);
+
+            fontColorBMB.clickEvent.RemoveAllListeners();
+            fontColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
+            outlineColorBMB.clickEvent.RemoveAllListeners();
+            outlineColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
             thicknessSlider.onValueChanged.RemoveAllListeners();
             fontSizeInput.onValueChanged.RemoveAllListeners();
             orderInLayerSlider.onValueChanged.RemoveAllListeners();
@@ -254,7 +303,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         /// <param name="reset">Specifies whether the menu should be reset to its initial state</param>
         /// <param name="showEditMode">Specifies whether the menu should be opened for edit mode. Otherwise it will be opened for the WriteTextAction</param>
-        public static void enableTextMenu(bool reset = true, bool showEditMode = false)
+        public static void Enable(bool reset = true, bool showEditMode = false)
         {
             if (reset)
             {
@@ -264,11 +313,20 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 orderInLayer.SetActive(true);
                 editText.SetActive(true);
+                instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 635);
             }
             else
             {
                 orderInLayer.SetActive(false);
                 editText.SetActive(false);
+                if (thicknessLayer.activeSelf)
+                {
+                    instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 585);
+                }
+                else
+                {
+                    instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 555);
+                }
             }
             instance.SetActive(true);
         }
@@ -280,7 +338,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <param name="color">The inital color for the hsv color picker.</param>
         /// <param name="reset">Specifies whether the menu should be reset to its initial state.</param>
         /// <param name="showEditMode">Specifies whether the menu should be opened for edit mode. Otherwise it will be opened for the WriteTextAction</param>
-        public static void enableTextMenu(UnityAction<Color> colorAction, Color color, bool reset = true, bool showEditMode = false)
+        private static void enableTextMenu(UnityAction<Color> colorAction, Color color, bool reset = true, bool showEditMode = false)
         {
             if (reset)
             {
@@ -290,11 +348,13 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 orderInLayer.SetActive(true);
                 editText.SetActive(true);
+                instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 635);
             }
             else
             {
                 orderInLayer.SetActive(false);
                 editText.SetActive(false);
+                instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 555);
             }
             instance.SetActive(true);
             if (fontColorBtn.interactable)
@@ -311,11 +371,13 @@ namespace Assets.SEE.Game.UI.Drawable
         {
             enableTextMenu((color => ValueHolder.currentPrimaryColor = color), ValueHolder.currentPrimaryColor, true);
 
-            GetFontColorButton().onClick.AddListener(() =>
+            fontColorBMB.clickEvent.AddListener(() =>
             {
                 AssignColorArea((color => ValueHolder.currentPrimaryColor = color), ValueHolder.currentPrimaryColor);
+                instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 555);
             });
-            GetOutlineColorButton().onClick.AddListener(() =>
+
+            outlineColorBMB.clickEvent.AddListener(() =>
             {
                 if (ValueHolder.currentSecondaryColor == Color.clear)
                 {
@@ -326,6 +388,7 @@ namespace Assets.SEE.Game.UI.Drawable
                     ValueHolder.currentSecondaryColor = new Color(ValueHolder.currentSecondaryColor.r, ValueHolder.currentSecondaryColor.g, ValueHolder.currentSecondaryColor.b, 255);
                 }
                 AssignColorArea((color => ValueHolder.currentSecondaryColor = color), ValueHolder.currentSecondaryColor);
+                instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 585);
             });
             AssignOutlineThickness((thickness => ValueHolder.currentOutlineThickness = thickness), ValueHolder.currentOutlineThickness);
             AssignFontSize(size => ValueHolder.currentFontSize = size, ValueHolder.currentFontSize);
@@ -348,7 +411,8 @@ namespace Assets.SEE.Game.UI.Drawable
                     textHolder.fontColor = color;
                     new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
                 }, textHolder.fontColor, true, true);
-                GetFontColorButton().onClick.AddListener(() =>
+
+                fontColorBMB.clickEvent.AddListener(() =>
                 {
                     AssignColorArea(color =>
                     {
@@ -356,9 +420,10 @@ namespace Assets.SEE.Game.UI.Drawable
                         textHolder.fontColor = color;
                         new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
                     }, textHolder.fontColor);
+                    instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 635);
                 });
 
-                GetOutlineColorButton().onClick.AddListener(() =>
+                outlineColorBMB.clickEvent.AddListener(() =>
                 {
                     if (textHolder.outlineColor == Color.clear)
                     {
@@ -374,6 +439,7 @@ namespace Assets.SEE.Game.UI.Drawable
                         textHolder.outlineColor = color;
                         new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
                     }, textHolder.outlineColor);
+                    instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 665);
                 });
 
                 AssignOutlineThickness(thickness =>
@@ -441,7 +507,8 @@ namespace Assets.SEE.Game.UI.Drawable
             if (!outlineColorBtn.interactable)
             {
                 thicknessLayer.SetActive(true);
-            } else
+            }
+            else
             {
                 thicknessLayer.SetActive(false);
             }
@@ -505,8 +572,10 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <param name="action">The action that should be assigned</param>
         public static void AssignEditTextButton(UnityAction action)
         {
-            editTextBtn.onClick.RemoveAllListeners();
-            editTextBtn.onClick.AddListener(action);
+            //editTextBtn.onClick.RemoveAllListeners();
+            //editTextBtn.onClick.AddListener(action);
+            editTextBMB.clickEvent.RemoveAllListeners();
+            editTextBMB.clickEvent.AddListener(action);
         }
 
         /// <summary>
@@ -521,31 +590,14 @@ namespace Assets.SEE.Game.UI.Drawable
         }
 
         /// <summary>
-        /// Returns the font color button
-        /// </summary>
-        /// <returns>The font color button</returns>
-        public static Button GetFontColorButton()
-        {
-            return fontColorBtn;
-        }
-
-        /// <summary>
-        /// Returns the outline color button
-        /// </summary>
-        /// <returns>The outline color button</returns>
-        public static Button GetOutlineColorButton()
-        {
-            return outlineColorBtn;
-        }
-
-        /// <summary>
         /// This method will be used as inital Handler action for the font style buttons.
         /// It enters the status of the selected font style into the dictionary and ensures that mutually exclusive font styles remain exclusive.
         /// </summary>
         /// <param name="pressedStyle"></param>
         public static void Press(string pressedStyle)
         {
-            if (styles.TryGetValue(pressedStyle, out bool value)) {
+            if (styles.TryGetValue(pressedStyle, out bool value))
+            {
                 styles[pressedStyle] = !value;
                 if (styles[pressedStyle])
                 {
@@ -555,10 +607,14 @@ namespace Assets.SEE.Game.UI.Drawable
                     {
                         fontStyleAction.Invoke(GetFontStyle());
                     }
-                } else
+                }
+                else
                 {
                     GetPressedButton(pressedStyle).colors = notSelectedBlock;
-                    fontStyleAction.Invoke(GetFontStyle());
+                    if (fontStyleAction != null)
+                    {
+                        fontStyleAction.Invoke(GetFontStyle());
+                    }
                 }
             }
         }
@@ -569,7 +625,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <param name="selectedStyle">The chosen font style.</param>
         private static void MutuallyExclusiveStyles(string selectedStyle)
         {
-            switch(selectedStyle)
+            switch (selectedStyle)
             {
                 case LowerCase:
                     styles[UpperCase] = false;

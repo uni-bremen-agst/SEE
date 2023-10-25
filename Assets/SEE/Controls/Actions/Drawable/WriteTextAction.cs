@@ -115,7 +115,7 @@ namespace SEE.Controls.Actions.Drawable
             }
             else
             {
-                TextMenu.enableTextMenu(false);
+                TextMenu.Enable(false);
             }
         }
 
@@ -189,7 +189,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Stop()
         {
-            TextMenu.disableTextMenu();
+            TextMenu.Disable();
         }
 
 

@@ -189,7 +189,7 @@ namespace SEE.Controls.Actions.Drawable
                     new EditImageNetAction(drawable.name, drawableParent, oldImageHolder).Execute();
                 }
             }
-            TextMenu.disableTextMenu();
+            TextMenu.Disable();
             LineMenu.disableLineMenu();
             ImageMenu.Disable();
         }
@@ -279,7 +279,7 @@ namespace SEE.Controls.Actions.Drawable
                             selectedObj = null;
                             progressState = ProgressState.SelectObject;
                             LineMenu.disableLineMenu();
-                            TextMenu.disableTextMenu();
+                            TextMenu.Disable();
                             ImageMenu.Disable();
                         }
                         break;
