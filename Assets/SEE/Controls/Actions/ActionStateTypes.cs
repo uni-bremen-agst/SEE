@@ -178,8 +178,8 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType Move;
         public readonly static ActionStateType Rotate;
         public readonly static ActionStateType Hide;
-        public readonly static ActionStateType NewEdge;
         public readonly static ActionStateType MarkNode;
+        public readonly static ActionStateType NewEdge;
         public readonly static ActionStateType NewNode;
         public readonly static ActionStateType EditNode;
         public readonly static ActionStateType ScaleNode;
