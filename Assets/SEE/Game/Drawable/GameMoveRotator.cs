@@ -48,13 +48,13 @@ namespace Assets.SEE.Game.Drawable
             return new Vector3(a.x * b.x, a.y * b.y, a.z * b.z);
         }
 
-        public static Vector3 MoveObjectByKeyboard(GameObject obj, KeyCode key, bool turbo)
+        public static Vector3 MoveObjectByKeyboard(GameObject obj, KeyCode key, bool speedUp)
         {
             Vector3 newPosition = obj.transform.position;
             Vector3 eulerAngles = obj.transform.localEulerAngles;
             obj.transform.localEulerAngles = Vector3.zero;
             float multiplyValue = 0.001f;
-            if (turbo)
+            if (speedUp)
             {
                 multiplyValue = 0.01f;
             }

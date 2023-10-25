@@ -18,19 +18,25 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <summary>
         /// State of clicked the button with right click.
         /// </summary>
-        private bool isPressed;
+        private bool isPressed = false;
         /// <summary>
         /// The action that will be executed.
         /// </summary>
         private UnityAction action;
+
+        /// <summary>
+        /// Bool for hold left mouse click.
+        /// </summary>
+        private bool leftMouseClick;
         
         /// <summary>
         /// Sets the action that should be executed when the right mouse button is pressed.
         /// </summary>
         /// <param name="action"></param>
-        public void SetAction(UnityAction action)
+        public void SetAction(UnityAction action, bool leftMouseClick = false)
         {
             this.action = action;
+            this.leftMouseClick = leftMouseClick;
         }
 
         /// <summary>
@@ -39,7 +45,23 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <param name="data">The data of the pointer event</param>
         public void OnPointerDown(PointerEventData data)
         {
-            if (data.button == PointerEventData.InputButton.Right)
+            bool pressedRightButton = false;
+            if (leftMouseClick)
+            {
+                if (data.button == PointerEventData.InputButton.Left)
+                {
+                    pressedRightButton = true;
+                }
+            }
+            else
+            {
+                if (data.button == PointerEventData.InputButton.Right)
+                {
+                    pressedRightButton = true;
+                }
+            }
+
+            if (pressedRightButton)
             {
                 isPressed = true;
                 StartCoroutine(Pressed());

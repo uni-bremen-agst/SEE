@@ -261,6 +261,22 @@ namespace SEE.Game
             return line;
         }
 
+        public static GameObject SetPivotShape(GameObject line, Vector3 middlePos)
+        {
+            LineRenderer renderer = GetRenderer(line);
+            Vector3[] positions = new Vector3[renderer.positionCount];
+            renderer.GetPositions(positions);
+            middlePos.z = line.transform.localPosition.z;
+            Vector3[] convertedPositions = new Vector3[positions.Length];
+            Array.Copy(sourceArray: positions, destinationArray: convertedPositions, length: positions.Length);
+            line.transform.TransformPoints(convertedPositions);
+            line.transform.localPosition = middlePos;
+            line.transform.InverseTransformPoints(convertedPositions);
+            Drawing(line, convertedPositions);
+            FinishDrawing(line, renderer.loop);
+            return line;
+        }
+
         public static void RefreshCollider(GameObject line)
         {
             LineRenderer lineRenderer = line.GetComponent<LineRenderer>();

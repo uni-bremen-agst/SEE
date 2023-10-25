@@ -22,7 +22,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <summary>
         /// The prefab for the switch that can open the shape menu and the config menu (line menu).
         /// </summary>
-        private const string drawableSwitchPrefab = "Prefabs/UI/Drawable/Switch";
+        private const string drawableSwitchPrefab = "Prefabs/UI/Drawable/ShapeSwitch";
         /// <summary>
         /// The prefab for the shape menu, it contains the shape type, the necressary values and a info box.
         /// </summary>

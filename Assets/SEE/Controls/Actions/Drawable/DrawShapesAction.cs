@@ -169,7 +169,7 @@ namespace SEE.Controls.Actions.Drawable
                                 ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor, ValueHolder.currentThickness, true,
                                 ValueHolder.currentLineKind, ValueHolder.currentTiling);
                             shape.GetComponent<LineRenderer>().loop = true;
-                            shape = GameDrawer.SetPivot(shape);
+                            shape = GameDrawer.SetPivotShape(shape, convertedHitPoint);
                             LineConf currentShape = LineConf.GetLine(shape);
                             memento = new Memento(drawable, currentShape);
                             new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), currentShape).Execute();
