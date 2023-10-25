@@ -9,7 +9,9 @@ using SEE.Utils;
 namespace SEE.Game.SceneManipulation
 {
     /// <summary>
-    /// Creates new game objects representing marker.
+    /// Creates new game objects representing a marker.
+    /// The position is over the marked Node.
+    /// The scale is proportional to the marked Node.
     /// </summary>
     public static class GameNodeMarker
     {
@@ -22,24 +24,23 @@ namespace SEE.Game.SceneManipulation
 
         private static GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         //[SerializeField] private static List<GameObject> markedNodes;
-        public static GameObject NewSphere(GameObject parent, Vector3 scale)
+        public static GameObject NewSphere(GameObject parent)
         {
             if (parent == null)
             {
                 throw new Exception("Parent must not be null.");
             }
-            else if (existing(parent) && (sphere.activeSelf != false))
+            else if (Existing(parent) && !sphere.activeSelf)
             {
                 sphere.SetActive(false);
                 return null;
             }
 
             sphere.GetComponent<Renderer>().material.color = Color.red;
-            float realScale = Math.Min(scale.x, scale.y);
-            Vector3 position = GameObjectExtensions.GetTop(parent);
-            sphere.transform.position = position; //parent.transform.position;
-            sphere.transform.localScale = new Vector3(realScale, realScale, realScale); //parent.transform.lossyScale;
-            //bool hm = parent.transform.GetChild(parent.transform.childCount) == sphere;
+            float realScale = Math.Min(parent.transform.lossyScale.x, parent.transform.lossyScale.y);
+            Vector3 position = parent.GetTop();
+            sphere.transform.position = position;
+            sphere.transform.localScale = new Vector3(realScale, realScale, realScale);
             sphere.transform.SetParent(parent.transform);
             sphere.SetActive(true);
             return sphere;
@@ -50,14 +51,11 @@ namespace SEE.Game.SceneManipulation
         /// </summary>
         /// <param name="parent">the parent node of the sphere</param>
         /// <returns>true if the parent already has a sphere</returns>
-        public static bool existing(GameObject parent)
+        public static bool Existing(GameObject parent)
         {
-            for (int i = 0; i <= parent.transform.childCount - 1; i++)
+            if (parent.transform.Find("Sphere"))
             {
-                if (parent.transform.GetChild(i).transform.name == "Sphere")
-                {
-                    return true;
-                }
+                return true;
             }
             return false;
         }

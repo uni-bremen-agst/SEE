@@ -30,12 +30,10 @@ namespace SEE.Controls.Actions
             {
                 // the hit object is the parent in which to create the new node
                 GameObject parent = raycastHit.collider.gameObject;
-                Vector3 position = GameObjectExtensions.GetTop(parent);
-                Vector3 scale = parent.transform.lossyScale;
-                addedSphere = GameNodeMarker.NewSphere(parent, scale);
+                addedSphere = GameNodeMarker.NewSphere(parent);
                 // addedSphere has the scale of parent and position on top of the parent.
-                memento = new Memento(parent, position, scale);
-                new MarkNetAction(memento.Parent.name, position, scale).Execute(); //ID: memento.Parent.name, memento.Position, memento.Scale
+                memento = new Memento(parent, addedSphere.transform.position, addedSphere.transform.position);
+                new MarkNetAction(memento.Parent.name, addedSphere.transform.position, addedSphere.transform.position).Execute();
                 result = true;
                 CurrentState = IReversibleAction.Progress.Completed;
                 AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewNodeSound, parent);
@@ -111,7 +109,7 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            addedSphere = GameNodeMarker.NewSphere(memento.Parent, memento.Scale);
+            addedSphere = GameNodeMarker.NewSphere(memento.Parent);
             if (addedSphere != null)
             {
                 new MarkNetAction(memento.Parent.name, memento.Position, memento.Scale).Execute();
@@ -153,7 +151,6 @@ namespace SEE.Controls.Actions
         {
             return new HashSet<string>
             {
-                memento.Parent.name,
                 memento.ParentID
             };
         }

@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SEE.Net.Actions
 {
     /// <summary>
-    /// This class is responsible for adding a node via network from one client to all others and
+    /// This class is responsible for marking a node via network from one client to all others and
     /// to the server.
     /// </summary>
     public class MarkNetAction : AbstractNetAction
