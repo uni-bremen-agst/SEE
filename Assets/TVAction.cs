@@ -3,7 +3,7 @@ using UnityEngine;
 public class DialogueCanvas : MonoBehaviour
 {
     /// <summary>
-    /// A Toggle to switch the Browser on and off with the key F10.
+    /// A Toggle to switch the Browser on and off with the key F3.
     /// </summary>
 
     private void Update()
