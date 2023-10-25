@@ -97,7 +97,7 @@ namespace SEE.Controls.Actions
             base.Undo();
             if (addedSphere != null)
             {
-                new DeleteNetAction(addedSphere.name).Execute();
+                new DeleteNetAction(memento.Parent.name).Execute();
                 Destroyer.Destroy(addedSphere);
                 addedSphere = null;
             }
