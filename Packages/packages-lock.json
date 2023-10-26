@@ -12,7 +12,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "3f5fc0c5be962957b11caf0b0772ca013ef27f02"
+      "hash": "5a1fa96bd2d75e8402a66b4e8480105472a9aca7"
     },
     "com.cysharp.unitask": {
       "version": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask#2.2.5",
@@ -22,12 +22,12 @@
       "hash": "72e620d169841f32bc6110ad0e12ee9eae6f1aaf"
     },
     "com.openai.unity": {
-      "version": "5.0.9",
+      "version": "5.0.10",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.utilities.rest": "2.1.6",
-        "com.utilities.encoder.wav": "1.0.4"
+        "com.utilities.rest": "2.1.7",
+        "com.utilities.encoder.wav": "1.0.6"
       },
       "url": "https://package.openupm.com"
     },
@@ -47,7 +47,7 @@
       }
     },
     "com.unity.ai.navigation": {
-      "version": "1.1.4",
+      "version": "1.1.5",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -99,7 +99,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.rider": {
-      "version": "3.0.25",
+      "version": "3.0.26",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -108,7 +108,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.visualstudio": {
-      "version": "2.0.21",
+      "version": "2.0.22",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -173,7 +173,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.render-pipelines.core": {
-      "version": "14.0.8",
+      "version": "14.0.9",
       "depth": 1,
       "source": "builtin",
       "dependencies": {
@@ -198,11 +198,11 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.shadergraph": {
-      "version": "14.0.8",
+      "version": "14.0.9",
       "depth": 0,
       "source": "builtin",
       "dependencies": {
-        "com.unity.render-pipelines.core": "14.0.8",
+        "com.unity.render-pipelines.core": "14.0.9",
         "com.unity.searcher": "4.9.2"
       }
     },
@@ -253,7 +253,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.timeline": {
-      "version": "1.7.5",
+      "version": "1.7.6",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -304,7 +304,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.interaction.toolkit": {
-      "version": "2.5.1",
+      "version": "2.5.2",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -342,7 +342,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.openxr": {
-      "version": "1.8.1",
+      "version": "1.8.2",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -365,22 +365,22 @@
       "url": "https://package.openupm.com"
     },
     "com.utilities.audio": {
-      "version": "1.0.5",
+      "version": "1.0.6",
       "depth": 2,
       "source": "registry",
       "dependencies": {
         "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.unitywebrequestaudio": "1.0.0",
-        "com.utilities.async": "1.2.3"
+        "com.utilities.async": "2.0.1"
       },
       "url": "https://package.openupm.com"
     },
     "com.utilities.encoder.wav": {
-      "version": "1.0.4",
+      "version": "1.0.6",
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.utilities.audio": "1.0.5"
+        "com.utilities.audio": "1.0.6"
       },
       "url": "https://package.openupm.com"
     },
@@ -395,7 +395,7 @@
       "url": "https://package.openupm.com"
     },
     "com.utilities.rest": {
-      "version": "2.1.6",
+      "version": "2.1.7",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -560,6 +560,15 @@
       "depth": 0,
       "source": "builtin",
       "dependencies": {}
+    },
+    "com.unity.modules.unityanalytics": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {
+        "com.unity.modules.unitywebrequest": "1.0.0",
+        "com.unity.modules.jsonserialize": "1.0.0"
+      }
     },
     "com.unity.modules.unitywebrequest": {
       "version": "1.0.0",

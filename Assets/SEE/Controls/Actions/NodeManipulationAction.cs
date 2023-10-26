@@ -250,7 +250,7 @@ namespace SEE.Controls.Actions
             /// <param name="gameObject">game object to be transformed</param>
             public Memento(GameObject gameObject)
             {
-                NodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+                NodeOperator = gameObject.NodeOperator();
             }
 
             /// <summary>

@@ -146,8 +146,8 @@ namespace SEE.UI.StateIndicator
             buttonManager.buttonText = ButtonNameDone;
 
             buttonManager.clickEvent.AddListener(() => SetSelectionType(SelectionTypeDone));
-            pointerHelper.EnterEvent.AddListener(() => tooltipDone.Show(DescriptionDone));
-            pointerHelper.ExitEvent.AddListener(() => tooltipDone.Hide());
+            pointerHelper.EnterEvent.AddListener(_ => tooltipDone.Show(DescriptionDone));
+            pointerHelper.ExitEvent.AddListener(_ => tooltipDone.Hide());
         }
 
         /// <summary>
@@ -181,8 +181,8 @@ namespace SEE.UI.StateIndicator
             buttonManager.buttonText = ButtonNameBack;
 
             buttonManager.clickEvent.AddListener(() => SetSelectionType(SelectionTypeBack));
-            pointerHelper.EnterEvent.AddListener(() => tooltipBack.Show(DescriptionBack));
-            pointerHelper.ExitEvent.AddListener(() => tooltipBack.Hide());
+            pointerHelper.EnterEvent.AddListener(_ => tooltipBack.Show(DescriptionBack));
+            pointerHelper.ExitEvent.AddListener(_ => tooltipBack.Hide());
         }
 
         /// <summary>
@@ -196,8 +196,8 @@ namespace SEE.UI.StateIndicator
             if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
             {
                 // Register listeners on entry and exit events, respectively
-                pointerHelper.EnterEvent.AddListener(() => tooltipDone.Show(DescriptionDone));
-                pointerHelper.ExitEvent.AddListener(tooltipDone.Hide);
+                pointerHelper.EnterEvent.AddListener(_ => tooltipDone.Show(DescriptionDone));
+                pointerHelper.ExitEvent.AddListener(_ => tooltipDone.Hide());
             }
         }
 
@@ -212,8 +212,8 @@ namespace SEE.UI.StateIndicator
             if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
             {
                 // Register listeners on entry and exit events, respectively
-                pointerHelper.EnterEvent.AddListener(() => tooltipBack.Show(DescriptionBack));
-                pointerHelper.ExitEvent.AddListener(tooltipBack.Hide);
+                pointerHelper.EnterEvent.AddListener(_ => tooltipBack.Show(DescriptionBack));
+                pointerHelper.ExitEvent.AddListener(_ => tooltipBack.Hide());
             }
         }
 

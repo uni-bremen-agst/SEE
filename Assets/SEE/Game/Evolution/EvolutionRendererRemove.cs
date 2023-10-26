@@ -94,15 +94,15 @@ namespace SEE.Game.Evolution
             {
                 if (gameObject.IsNode())
                 {
-                    gameObject.AddOrGetComponent<NodeOperator>()
+                    gameObject.NodeOperator()
                               .MoveTo(newPosition, AnimationLagFactor, updateEdges: false)
-                              .SetOnComplete(() => OnRemoveFinishedAnimation(gameObject));
+                              .OnComplete(() => OnRemoveFinishedAnimation(gameObject));
                 }
                 else if (gameObject.IsEdge())
                 {
-                    gameObject.AddOrGetComponent<EdgeOperator>()
-                        .FadeTo(0, AnimationLagFactor)
-                        .SetOnComplete(() => OnRemoveFinishedAnimation(gameObject));
+                    gameObject.EdgeOperator()
+                              .FadeTo(0, AnimationLagFactor)
+                              .OnComplete(() => OnRemoveFinishedAnimation(gameObject));
                 }
                 else
                 {

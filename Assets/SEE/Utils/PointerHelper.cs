@@ -11,36 +11,42 @@ namespace SEE.Utils
     /// While an <see cref="EventTrigger"/> could also be used, this leads to bugs with scrolling in certain cases.
     /// See http://answers.unity.com/answers/1024120/view.html (https://archive.vn/ZScfd) for more information.
     /// </summary>
-    public class PointerHelper: MonoBehaviour, IPointerExitHandler, IPointerEnterHandler
+    public class PointerHelper: MonoBehaviour, IPointerExitHandler, IPointerEnterHandler, IPointerClickHandler
     {
         /// <summary>
         /// This event will be triggered whenever the mouse pointer leaves the area over the GameObject
         /// this component is attached to.
         /// </summary>
-        public readonly UnityEvent ExitEvent = new UnityEvent();
+        public readonly UnityEvent<PointerEventData> ExitEvent = new();
 
         /// <summary>
         /// This event will be triggered whenever the mouse pointer enters the area over the GameObject
         /// this component is attached to.
         /// </summary>
-        public readonly UnityEvent EnterEvent = new UnityEvent();
+        public readonly UnityEvent<PointerEventData> EnterEvent = new();
+
+        /// <summary>
+        /// This event will be triggered whenever the mouse pointer clicks the GameObject
+        /// this component is attached to.
+        /// </summary>
+        public readonly UnityEvent<PointerEventData> ClickEvent = new();
 
         /// <summary>
         /// Invokes the <see cref="ExitEvent"/>.
         /// </summary>
-        /// <param name="eventData">Data about the pointer. Currently unused.</param>
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            ExitEvent.Invoke();
-        }
+        /// <param name="eventData">Data about the pointer.</param>
+        public void OnPointerExit(PointerEventData eventData) => ExitEvent.Invoke(eventData);
 
         /// <summary>
         /// Invokes the <see cref="EnterEvent"/>.
         /// </summary>
-        /// <param name="eventData">Data about the pointer. Currently unused.</param>
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            EnterEvent.Invoke();
-        }
+        /// <param name="eventData">Data about the pointer.</param>
+        public void OnPointerEnter(PointerEventData eventData) => EnterEvent.Invoke(eventData);
+
+        /// <summary>
+        /// Invokes the <see cref="ClickEvent"/>.
+        /// </summary>
+        /// <param name="eventData">Data about the pointer.</param>
+        public void OnPointerClick(PointerEventData eventData) => ClickEvent.Invoke(eventData);
     }
 }

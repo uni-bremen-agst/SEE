@@ -2,6 +2,7 @@
 using SEE.Game;
 using SEE.Game.Operator;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -49,7 +50,7 @@ namespace SEE.Net.Actions
                 GameObject gameObject = GraphElementIDMap.Find(GameObjectID);
                 if (gameObject != null)
                 {
-                    NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+                    NodeOperator nodeOperator = gameObject.NodeOperator();
                     nodeOperator.MoveTo(Position, ZoomAction.AnimationFactor);
                     nodeOperator.ScaleTo(LocalScale, ZoomAction.AnimationFactor);
                 }

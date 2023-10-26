@@ -70,7 +70,7 @@ namespace SEE.UI.ConfigMenu
         protected void MustGetComponentInChild<T>(string pathToChild, out T component)
         {
             MustGetChild(pathToChild, out GameObject child);
-            child.MustGetComponent(out component);
+            component = child.MustGetComponent<T>();
         }
 
         /// <summary>
@@ -80,7 +80,7 @@ namespace SEE.UI.ConfigMenu
         /// <typeparam name="T">The type of the component to search for.</typeparam>
         protected void MustGetComponent<T>(out T component)
         {
-            gameObject.MustGetComponent(out component);
+            component = gameObject.MustGetComponent<T>();
         }
 
         /// <summary>
