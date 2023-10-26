@@ -7,6 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -84,7 +85,7 @@ namespace Assets.SEE.Game.Drawable
             lineToCreate.rendererPositions = positions;
 
             GameObject newLine = GameDrawer.ReDrawLine(drawable, lineToCreate);
-            new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), LineConf.GetLine(newLine)).Execute();
+            new DrawOnNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), LineConf.GetLine(newLine)).Execute();
 
             return LineConf.GetLine(newLine);
         }

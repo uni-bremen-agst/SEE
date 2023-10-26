@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game;
-using Assets.SEE.Game.Drawable;
+﻿using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game.UI.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.Game;
@@ -10,6 +9,7 @@ using UnityEngine;
 using MoveNetAction = SEE.Net.Actions.Drawable.MoveNetAction;
 using RTG;
 using Michsky.UI.ModernUIPack;
+using SEE.Game.Drawable;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -110,6 +110,8 @@ namespace SEE.Controls.Actions.Drawable
         /// The selected drawable type object for moveing or rotating.
         /// </summary>
         private GameObject selectedObject;
+
+        private GameObject oldSelectedObj;
         /// <summary>
         /// The hit point of the object selection.
         /// </summary>
@@ -151,10 +153,6 @@ namespace SEE.Controls.Actions.Drawable
         /// Represents that the left mouse button was released after selecting a object.
         /// </summary>
         private bool mouseWasReleased = true;
-        /// <summary>
-        /// The state of moving, true will be moved by mouse, false by arrow keys
-        /// </summary>
-        private bool moveByMouse = true;
 
         /// <summary>
         /// The new object position.
@@ -180,8 +178,8 @@ namespace SEE.Controls.Actions.Drawable
             }
             if (progressState != ProgressState.Finish && selectedObject != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawable(selectedObject);
-                string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
+                GameObject drawable = GameFinder.FindDrawable(selectedObject);
+                string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 if (progressState == ProgressState.Move)
                 {
                     GameMoveRotator.MoveObject(selectedObject, oldObjectPosition);
@@ -220,8 +218,9 @@ namespace SEE.Controls.Actions.Drawable
                     /// The mouse button must be released after selecting to start the chosen option.
                     case ProgressState.SelectObject:
                         if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
-                            && Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) && selectedObject == null && 
-                            GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject))
+                            && Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) && selectedObject == null &&
+                            (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased)) &&
+                            GameFinder.hasDrawable(raycastHit.collider.gameObject))
                         {
                             selectedObject = raycastHit.collider.gameObject;
                             oldObjectPosition = selectedObject.transform.position;
@@ -232,21 +231,15 @@ namespace SEE.Controls.Actions.Drawable
                             firstPoint = raycastHit.point;
                             mouseWasReleased = false;
 
-                            if (selectedObject.GetComponent<MeshCollider>() != null)
-                            {
-                                MeshCollider collider = selectedObject.GetComponent<MeshCollider>();
-                                collider.convex = true;
-                                collider.isTrigger = true;
-                            }
                             switchMenu = PrefabInstantiator.InstantiatePrefab(switchMenuPrefab,
                                         GameObject.Find("UI Canvas").transform, false);
-                            GameDrawableFinder.FindChild(switchMenu, "Move").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(()=>
+                            GameFinder.FindChild(switchMenu, "Move").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(()=>
                             {
                                 progressState = ProgressState.Move;
                                 executedOperation = ProgressState.Move;
                                 Destroyer.Destroy(switchMenu);
                             });
-                            GameDrawableFinder.FindChild(switchMenu, "Rotate").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+                            GameFinder.FindChild(switchMenu, "Rotate").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
                             {
                                 progressState = ProgressState.Rotate;
                                 executedOperation = ProgressState.Rotate;
@@ -254,15 +247,27 @@ namespace SEE.Controls.Actions.Drawable
                                 Destroyer.Destroy(switchMenu);
                             });
                         }
-                        if (Input.GetMouseButtonUp(0) && selectedObject != null && !mouseWasReleased) {
+
+                        if (Input.GetMouseButtonUp(0) && !mouseWasReleased) {
                             mouseWasReleased = true;
                         }
 
+                        /// This block ensures that a change of the Drawable type object is possible before the operation selection.
                         if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&  selectedObject != null && mouseWasReleased)
                         {
                             Destroyer.Destroy(switchMenu);
                             Destroyer.Destroy(selectedObject.GetComponent<BlinkEffect>());
+                            if (selectedObject.GetComponent<Renderer>()!= null)
+                            {
+                                selectedObject.GetComponent<Renderer>().enabled = true;
+                            }
+                            if (selectedObject.GetComponent<Canvas>() != null)
+                            {
+                                selectedObject.GetComponent<Canvas>().enabled = true;
+                            }
+                            oldSelectedObj = selectedObject;
                             selectedObject = null;
+                            mouseWasReleased = false;
                         }
                         break;
 
@@ -275,8 +280,8 @@ namespace SEE.Controls.Actions.Drawable
                     case ProgressState.Move:
                         if (selectedObject.GetComponent<BlinkEffect>() != null && selectedObject.GetComponent<BlinkEffect>().GetLoopStatus())
                         {
-                            GameObject drawable = GameDrawableFinder.FindDrawable(selectedObject);
-                            string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
+                            GameObject drawable = GameFinder.FindDrawable(selectedObject);
+                            string drawableParentName = GameFinder.GetDrawableParentName(drawable);
                             
                             if (moveMenu == null)
                             {
@@ -284,8 +289,8 @@ namespace SEE.Controls.Actions.Drawable
                                         GameObject.Find("UI Canvas").transform, false);
                                 InitMoveMenu(drawable.name, drawableParentName);
                             }
-                            SwitchManager speedUp = GameDrawableFinder.FindChild(moveMenu, "SpeedSwitch").GetComponent<SwitchManager>();
-                            SwitchManager moveByMouse = GameDrawableFinder.FindChild(moveMenu, "MoveSwitch").GetComponent<SwitchManager>();
+                            SwitchManager speedUp = GameFinder.FindChild(moveMenu, "SpeedSwitch").GetComponent<SwitchManager>();
+                            SwitchManager moveByMouse = GameFinder.FindChild(moveMenu, "MoveSwitch").GetComponent<SwitchManager>();
 
                             if (Input.GetKeyDown(KeyCode.LeftControl))
                             {
@@ -309,7 +314,7 @@ namespace SEE.Controls.Actions.Drawable
                             if (moveByMouse.isOn && Raycasting.RaycastAnything(out RaycastHit hit))
                             {
                                 if (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                                (GameDrawableFinder.hasDrawable(hit.collider.gameObject) && GameDrawableFinder.FindDrawable(hit.collider.gameObject).Equals(drawable)))
+                                (GameFinder.hasDrawable(hit.collider.gameObject) && GameFinder.FindDrawable(hit.collider.gameObject).Equals(drawable)))
                                 {
                                     newObjectPosition = GameMoveRotator.MoveObject(selectedObject, hit.point, firstPoint, oldObjectPosition);
                                     new MoveNetAction(drawable.name, drawableParentName, selectedObject.name, newObjectPosition).Execute();
@@ -333,8 +338,8 @@ namespace SEE.Controls.Actions.Drawable
                     case ProgressState.Rotate:
                         if (selectedObject.GetComponent<BlinkEffect>() != null && selectedObject.GetComponent<BlinkEffect>().GetLoopStatus())
                         {
-                            GameObject drawable = GameDrawableFinder.FindDrawable(selectedObject);
-                            string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
+                            GameObject drawable = GameFinder.FindDrawable(selectedObject);
+                            string drawableParentName = GameFinder.GetDrawableParentName(drawable);
                             bool rotate = false;
                             Vector3 direction = Vector3.zero;
                             float degree = 0;
@@ -405,15 +410,8 @@ namespace SEE.Controls.Actions.Drawable
                         if (oldObjectPosition != newObjectPosition || oldObjectLocalEulerAngles != newObjectLocalEulerAngles)
                         {
                             float degree = selectedObject.transform.localEulerAngles.z;
-                            memento = new Memento(selectedObject, GameDrawableFinder.FindDrawable(selectedObject), selectedObject.name,
+                            memento = new Memento(selectedObject, GameFinder.FindDrawable(selectedObject), selectedObject.name,
                                 oldObjectPosition, newObjectPosition, oldObjectLocalEulerAngles, degree, executedOperation);
-
-                            if (selectedObject.GetComponent<MeshCollider>() != null)
-                            {
-                                MeshCollider collider = selectedObject.GetComponent<MeshCollider>();
-                                collider.isTrigger = false;
-                                collider.convex = false;
-                            }
                             Destroyer.Destroy(rotationMenu);
                             Destroyer.Destroy(moveMenu);
                             currentState = ReversibleAction.Progress.Completed;
@@ -437,10 +435,10 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void InitMoveMenu(string drawableName, string drawableParent)
         {
-            SwitchManager speedUpManager = GameDrawableFinder.FindChild(moveMenu, "SpeedSwitch").GetComponent<SwitchManager>();
-            SwitchManager moveByMouseManager = GameDrawableFinder.FindChild(moveMenu, "MoveSwitch").GetComponent<SwitchManager>();
+            SwitchManager speedUpManager = GameFinder.FindChild(moveMenu, "SpeedSwitch").GetComponent<SwitchManager>();
+            SwitchManager moveByMouseManager = GameFinder.FindChild(moveMenu, "MoveSwitch").GetComponent<SwitchManager>();
 
-            GameDrawableFinder.FindChild(moveMenu, "Left").AddComponent<ButtonHolded>().SetAction((() =>
+            GameFinder.FindChild(moveMenu, "Left").AddComponent<ButtonHolded>().SetAction((() =>
             {
                 moveByMouseManager.isOn = false;
                 moveByMouseManager.UpdateUI();
@@ -448,7 +446,7 @@ namespace SEE.Controls.Actions.Drawable
                 new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition).Execute();
             }), true);
 
-            GameDrawableFinder.FindChild(moveMenu, "Right").AddComponent<ButtonHolded>().SetAction((() =>
+            GameFinder.FindChild(moveMenu, "Right").AddComponent<ButtonHolded>().SetAction((() =>
             {
                 moveByMouseManager.isOn = false;
                 moveByMouseManager.UpdateUI();
@@ -456,7 +454,7 @@ namespace SEE.Controls.Actions.Drawable
                 new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition).Execute();
             }), true);
 
-            GameDrawableFinder.FindChild(moveMenu, "Up").AddComponent<ButtonHolded>().SetAction((() =>
+            GameFinder.FindChild(moveMenu, "Up").AddComponent<ButtonHolded>().SetAction((() =>
             {
                 moveByMouseManager.isOn = false;
                 moveByMouseManager.UpdateUI();
@@ -464,7 +462,7 @@ namespace SEE.Controls.Actions.Drawable
                 new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition).Execute();
             }), true);
 
-            GameDrawableFinder.FindChild(moveMenu, "Down").AddComponent<ButtonHolded>().SetAction((() =>
+            GameFinder.FindChild(moveMenu, "Down").AddComponent<ButtonHolded>().SetAction((() =>
             {
                 moveByMouseManager.isOn = false;
                 moveByMouseManager.UpdateUI();
@@ -504,8 +502,8 @@ namespace SEE.Controls.Actions.Drawable
         /// <param name="selectedObject">The selected object to rotate</param>
         private void SliderListener(RotationSliderController slider, GameObject selectedObject)
         {
-            GameObject drawable = GameDrawableFinder.FindDrawable(selectedObject);
-            string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
+            GameObject drawable = GameFinder.FindDrawable(selectedObject);
+            string drawableParentName = GameFinder.GetDrawableParentName(drawable);
             Transform transform = selectedObject.transform;
 
             slider.AssignValue(transform.localEulerAngles.z);
@@ -542,13 +540,13 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (memento.selectedObject == null && memento.id != null)
             {
-                memento.selectedObject = GameDrawableFinder.FindChild(memento.drawable, memento.id);
+                memento.selectedObject = GameFinder.FindChild(memento.drawable, memento.id);
             }
 
             if (memento.selectedObject != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawable(memento.selectedObject);
-                string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
+                GameObject drawable = GameFinder.FindDrawable(memento.selectedObject);
+                string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 if (memento.moveOrRotate == ProgressState.Move)
                 {
                     GameMoveRotator.MoveObject(memento.selectedObject, memento.oldObjectPosition);
@@ -570,12 +568,12 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (memento.selectedObject == null && memento.id != null)
             {
-                memento.selectedObject = GameDrawableFinder.FindChild(memento.drawable, memento.id);
+                memento.selectedObject = GameFinder.FindChild(memento.drawable, memento.id);
             }
             if (memento.selectedObject != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawable(memento.selectedObject);
-                string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
+                GameObject drawable = GameFinder.FindDrawable(memento.selectedObject);
+                string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 if (memento.moveOrRotate == ProgressState.Move)
                 {
                     GameMoveRotator.MoveObject(memento.selectedObject, memento.newObjectPosition);

@@ -1,5 +1,6 @@
 ﻿using Assets.SEE.Game.Drawable;
 using Michsky.UI.ModernUIPack;
+using SEE.Game.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections;
@@ -48,9 +49,9 @@ namespace Assets.SEE.Game.UI.Drawable
             instance = PrefabInstantiator.InstantiatePrefab(drawableScalePrefab,
                                     GameObject.Find("UI Canvas").transform, false);
 
-            xScale = GameDrawableFinder.FindChild(instance, "XScale").GetComponent<InputFieldWithButtons>();
-            yScale = GameDrawableFinder.FindChild(instance, "YScale").GetComponent<InputFieldWithButtons>();
-            switchManager = GameDrawableFinder.FindChild(instance, "Switch").GetComponent<SwitchManager>();
+            xScale = GameFinder.FindChild(instance, "XScale").GetComponent<InputFieldWithButtons>();
+            yScale = GameFinder.FindChild(instance, "YScale").GetComponent<InputFieldWithButtons>();
+            switchManager = GameFinder.FindChild(instance, "Switch").GetComponent<SwitchManager>();
         }
 
         /// <summary>
@@ -64,8 +65,8 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 Vector3 newScale = new Vector3(xScale, yScale.GetValue(), 1);
                 GameScaler.SetScale(objToScale, newScale);
-                GameObject drawable = GameDrawableFinder.FindDrawable(objToScale);
-                string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
+                GameObject drawable = GameFinder.FindDrawable(objToScale);
+                string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 new ScaleNetAction(drawable.name, drawableParent, objToScale.name, newScale);
             });
 
@@ -74,8 +75,8 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 Vector3 newScale = new Vector3(xScale.GetValue(), yScale, 1);
                 GameScaler.SetScale(objToScale, newScale);
-                GameObject drawable = GameDrawableFinder.FindDrawable(objToScale);
-                string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
+                GameObject drawable = GameFinder.FindDrawable(objToScale);
+                string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 new ScaleNetAction(drawable.name, drawableParent, objToScale.name, newScale);
             });
 

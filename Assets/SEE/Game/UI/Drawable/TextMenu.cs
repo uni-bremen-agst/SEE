@@ -3,6 +3,7 @@ using Crosstales;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
 using SEE.Controls.Actions;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog.Drawable;
@@ -216,20 +217,20 @@ namespace Assets.SEE.Game.UI.Drawable
         private static void initBtn()
         {
 
-            boldBtn = GameDrawableFinder.FindChild(instance, "Bold").GetComponent<Button>();
-            boldBMB = GameDrawableFinder.FindChild(instance, "Bold").GetComponent<ButtonManagerBasic>();
-            italicBtn = GameDrawableFinder.FindChild(instance, "Italic").GetComponent<Button>();
-            italicBMB = GameDrawableFinder.FindChild(instance, "Italic").GetComponent<ButtonManagerBasic>();
-            underlineBtn = GameDrawableFinder.FindChild(instance, "Underline").GetComponent<Button>();
-            underlineBMB = GameDrawableFinder.FindChild(instance, "Underline").GetComponent<ButtonManagerBasic>();
-            strikethroughBtn = GameDrawableFinder.FindChild(instance, "Strikethrough").GetComponent<Button>();
-            strikethroughBMB = GameDrawableFinder.FindChild(instance, "Strikethrough").GetComponent<ButtonManagerBasic>();
-            lowerCaseBtn = GameDrawableFinder.FindChild(instance, "LowerCase").GetComponent<Button>();
-            lowerCaseBMB = GameDrawableFinder.FindChild(instance, "LowerCase").GetComponent<ButtonManagerBasic>();
-            upperCaseBtn = GameDrawableFinder.FindChild(instance, "UpperCase").GetComponent<Button>();
-            upperCaseBMB = GameDrawableFinder.FindChild(instance, "UpperCase").GetComponent<ButtonManagerBasic>();
-            smallCapsBtn = GameDrawableFinder.FindChild(instance, "SmallCaps").GetComponent<Button>();
-            smallCapsBMB = GameDrawableFinder.FindChild(instance, "SmallCaps").GetComponent<ButtonManagerBasic>();
+            boldBtn = GameFinder.FindChild(instance, "Bold").GetComponent<Button>();
+            boldBMB = GameFinder.FindChild(instance, "Bold").GetComponent<ButtonManagerBasic>();
+            italicBtn = GameFinder.FindChild(instance, "Italic").GetComponent<Button>();
+            italicBMB = GameFinder.FindChild(instance, "Italic").GetComponent<ButtonManagerBasic>();
+            underlineBtn = GameFinder.FindChild(instance, "Underline").GetComponent<Button>();
+            underlineBMB = GameFinder.FindChild(instance, "Underline").GetComponent<ButtonManagerBasic>();
+            strikethroughBtn = GameFinder.FindChild(instance, "Strikethrough").GetComponent<Button>();
+            strikethroughBMB = GameFinder.FindChild(instance, "Strikethrough").GetComponent<ButtonManagerBasic>();
+            lowerCaseBtn = GameFinder.FindChild(instance, "LowerCase").GetComponent<Button>();
+            lowerCaseBMB = GameFinder.FindChild(instance, "LowerCase").GetComponent<ButtonManagerBasic>();
+            upperCaseBtn = GameFinder.FindChild(instance, "UpperCase").GetComponent<Button>();
+            upperCaseBMB = GameFinder.FindChild(instance, "UpperCase").GetComponent<ButtonManagerBasic>();
+            smallCapsBtn = GameFinder.FindChild(instance, "SmallCaps").GetComponent<Button>();
+            smallCapsBMB = GameFinder.FindChild(instance, "SmallCaps").GetComponent<ButtonManagerBasic>();
 
             initFontStyleButtons();
 
@@ -237,24 +238,24 @@ namespace Assets.SEE.Game.UI.Drawable
             selectedBlock = notSelectedBlock;
             selectedBlock.normalColor = selectedBlock.selectedColor = selectedBlock.disabledColor = selectedBlock.highlightedColor = selectedBlock.pressedColor = Color.gray;
 
-            fontColorBtn = GameDrawableFinder.FindChild(instance, "FontColorBtn").GetComponent<Button>();
-            fontColorBMB = GameDrawableFinder.FindChild(instance, "FontColorBtn").GetComponent<ButtonManagerBasic>();
+            fontColorBtn = GameFinder.FindChild(instance, "FontColorBtn").GetComponent<Button>();
+            fontColorBMB = GameFinder.FindChild(instance, "FontColorBtn").GetComponent<ButtonManagerBasic>();
             fontColorBtn.interactable = false;
             fontColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
 
-            outlineColorBtn = GameDrawableFinder.FindChild(instance, "OutlineColorBtn").GetComponent<Button>();
-            outlineColorBMB = GameDrawableFinder.FindChild(instance, "OutlineColorBtn").GetComponent<ButtonManagerBasic>();
+            outlineColorBtn = GameFinder.FindChild(instance, "OutlineColorBtn").GetComponent<Button>();
+            outlineColorBMB = GameFinder.FindChild(instance, "OutlineColorBtn").GetComponent<ButtonManagerBasic>();
             outlineColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
 
-            thicknessLayer = GameDrawableFinder.FindChild(instance, "Thickness").gameObject;
+            thicknessLayer = GameFinder.FindChild(instance, "Thickness").gameObject;
             thicknessSlider = thicknessLayer.GetComponentInChildren<FloatValueSliderController>();
             thicknessLayer.SetActive(false);
 
             picker = instance.GetComponentInChildren<HSVPicker.ColorPicker>();
-            fontSizeInput = GameDrawableFinder.FindChild(instance, "FontSize").GetComponentInChildren<InputFieldWithButtons>();
-            editText = GameDrawableFinder.FindChild(instance, "EditText").gameObject;
+            fontSizeInput = GameFinder.FindChild(instance, "FontSize").GetComponentInChildren<InputFieldWithButtons>();
+            editText = GameFinder.FindChild(instance, "EditText").gameObject;
             editTextBMB = editText.GetComponentInChildren<ButtonManagerBasic>();
-            orderInLayer = GameDrawableFinder.FindChild(instance, "Layer").gameObject;
+            orderInLayer = GameFinder.FindChild(instance, "Layer").gameObject;
             orderInLayerSlider = orderInLayer.GetComponentInChildren<LayerSliderController>();
         }
 
@@ -402,8 +403,8 @@ namespace Assets.SEE.Game.UI.Drawable
         {
             if (newValueHolder is TextConf textHolder)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawable(selectedText);
-                string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
+                GameObject drawable = GameFinder.FindDrawable(selectedText);
+                string drawableParentName = GameFinder.GetDrawableParentName(drawable);
 
                 enableTextMenu(color =>
                 {
@@ -572,8 +573,6 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <param name="action">The action that should be assigned</param>
         public static void AssignEditTextButton(UnityAction action)
         {
-            //editTextBtn.onClick.RemoveAllListeners();
-            //editTextBtn.onClick.AddListener(action);
             editTextBMB.clickEvent.RemoveAllListeners();
             editTextBMB.clickEvent.AddListener(action);
         }

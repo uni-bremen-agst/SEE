@@ -1,6 +1,7 @@
 ﻿using SEE.Game;
 using UnityEngine;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -72,9 +73,9 @@ namespace Assets.SEE.Game.Drawable
         /// <param name="attachedObjects">Is the parent object of <see cref="DrawableType"/></param>
         public static void Setup(GameObject drawable, out GameObject highestParent, out GameObject attachedObjects)
         {
-            if (GameDrawableFinder.hasAParent(drawable))
+            if (GameFinder.hasAParent(drawable))
             {
-                GameObject parent = GameDrawableFinder.GetHighestParent(drawable);
+                GameObject parent = GameFinder.GetHighestParent(drawable);
                 if (!parent.name.StartsWith(ValueHolder.DrawableHolderPrefix))
                 {
                     highestParent = new GameObject(ValueHolder.DrawableHolderPrefix + "-" + parent.name);//drawable.GetInstanceID());
@@ -91,7 +92,7 @@ namespace Assets.SEE.Game.Drawable
                 else
                 {
                     highestParent = parent;
-                    attachedObjects = GameDrawableFinder.FindChildWithTag(highestParent, Tags.AttachedObjects);
+                    attachedObjects = GameFinder.FindChildWithTag(highestParent, Tags.AttachedObjects);
                 }
             }
             else

@@ -1,6 +1,6 @@
 ﻿using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game;
 using SEE.Controls.Actions.Drawable;
+using SEE.Game.Drawable;
 using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
@@ -61,10 +61,10 @@ namespace SEE.Net.Actions.Drawable
             {
                 if (!IsRequester())
                 {
-                    GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
-                    if (drawable != null && GameDrawableFinder.FindChild(drawable, LineName) != null)
+                    GameObject drawable = GameFinder.Find(DrawableID, ParentDrawableID);
+                    if (drawable != null && GameFinder.FindChild(drawable, LineName) != null)
                     {
-                        GameEdit.ChangeSecondaryColor(GameDrawableFinder.FindChild(drawable, LineName), color);
+                        GameEdit.ChangeSecondaryColor(GameFinder.FindChild(drawable, LineName), color);
                     }
                     else
                     {

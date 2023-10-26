@@ -1,10 +1,10 @@
-﻿using Assets.SEE.Game;
-using Assets.SEE.Game.Drawable;
+﻿using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game.UI.Drawable;
 using RTG;
 using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.Game;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog.Drawable;
@@ -134,10 +134,10 @@ namespace SEE.Controls.Actions.Drawable
                     case ProgressState.GettingPosition:
                         if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
                              Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
-                            (GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject) || raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
+                            (GameFinder.hasDrawable(raycastHit.collider.gameObject) || raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
                         {
                             drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                                raycastHit.collider.gameObject : GameDrawableFinder.FindDrawable(raycastHit.collider.gameObject);
+                                raycastHit.collider.gameObject : GameFinder.FindDrawable(raycastHit.collider.gameObject);
                             position = raycastHit.point;
                             progress = ProgressState.GettingText;
                             writeTextDialog = new WriteEditTextDialog();
@@ -155,7 +155,7 @@ namespace SEE.Controls.Actions.Drawable
                             {
                                 textObj = GameTexter.WriteText(drawable, textOut, position, ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor,
                                     ValueHolder.currentOutlineThickness, ValueHolder.currentFontSize, ValueHolder.currentOrderInLayer, TextMenu.GetFontStyle());
-                                new WriteTextNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), TextConf.GetText(textObj)).Execute();
+                                new WriteTextNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), TextConf.GetText(textObj)).Execute();
                                 memento = new Memento(drawable, TextConf.GetText(textObj));
                                 GameTexter.RefreshMeshCollider(textObj);
                                 currentState = ReversibleAction.Progress.Completed;
@@ -199,8 +199,8 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            GameObject obj = GameDrawableFinder.FindChild(memento.drawable, memento.text.id);
-            new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.text.id).Execute();
+            GameObject obj = GameFinder.FindChild(memento.drawable, memento.text.id);
+            new EraseNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), memento.text.id).Execute();
             Destroyer.Destroy(obj);
         }
 
@@ -211,7 +211,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Redo();
             GameTexter.ReWriteText(memento.drawable, memento.text);
-            new WriteTextNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.text).Execute();
+            new WriteTextNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), memento.text).Execute();
 
         }
 

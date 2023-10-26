@@ -1,5 +1,5 @@
 ﻿using SEE.Controls.Actions;
-using SEE.Game;
+using SEE.Game.Drawable;
 using SEE.GO;
 using SEE.Utils;
 using System;

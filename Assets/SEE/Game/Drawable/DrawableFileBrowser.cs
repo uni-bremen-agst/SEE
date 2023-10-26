@@ -33,20 +33,15 @@ namespace Assets.SEE.Game.Drawable
         {
             string title = "";
             switch (loadState) {
-                case LoadState.One:
-                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.singleConfPath);
-                    initPath = DrawableConfigManager.singleConfPath;
-                    title = "Load Drawable";
-                    break;
-                case LoadState.OneSpecific:
-                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.singleConfPath);
-                    initPath = DrawableConfigManager.singleConfPath;
+                case LoadState.Specific:
+                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.configurationPath);
+                    initPath = DrawableConfigManager.configurationPath;
                     title = "Load on specific Drawable";
                     break;
-                case LoadState.More:
-                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.multipleConfPath);
-                    initPath = DrawableConfigManager.multipleConfPath;
-                    title = "Load Drawables";
+                case LoadState.Regular:
+                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.configurationPath);
+                    initPath = DrawableConfigManager.configurationPath;
+                    title = "Load Drawable(s)";
                     break;
             }
 

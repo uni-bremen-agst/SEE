@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game;
-using Assets.SEE.Game.Drawable;
+﻿using Assets.SEE.Game.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.Game;
 using SEE.GO;
@@ -8,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Game.Drawable.ActionHelpers;
+using SEE.Game.Drawable;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -124,11 +124,11 @@ namespace SEE.Controls.Actions.Drawable
                     case ProgressState.SelectLine:
                         if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
                             && Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
-                            GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject) &&
+                            GameFinder.hasDrawable(raycastHit.collider.gameObject) &&
                             raycastHit.collider.gameObject.CompareTag(Tags.Line))
                         {
                             selectedLine = raycastHit.collider.gameObject;
-                            drawable = GameDrawableFinder.FindDrawable(selectedLine);
+                            drawable = GameFinder.FindDrawable(selectedLine);
 
                             BlinkEffect effect = selectedLine.AddOrGetComponent<BlinkEffect>();
                             effect.SetAllowedActionStateType(GetActionStateType());
@@ -153,12 +153,12 @@ namespace SEE.Controls.Actions.Drawable
 
                     /// With this block the user can move the point of the line to the desired point.
                     case ProgressState.MovePoint:
-                        string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
+                        string drawableParentName = GameFinder.GetDrawableParentName(drawable);
                         if (selectedLine.GetComponent<BlinkEffect>() != null && selectedLine.GetComponent<BlinkEffect>().GetLoopStatus())
                         {
                             if (Raycasting.RaycastAnything(out RaycastHit hit))
                             {
-                                if (hit.collider.gameObject.CompareTag(Tags.Drawable) || GameDrawableFinder.hasDrawable(hit.collider.gameObject))
+                                if (hit.collider.gameObject.CompareTag(Tags.Drawable) || GameFinder.hasDrawable(hit.collider.gameObject))
                                 {
                                     newPointPosition = selectedLine.transform.InverseTransformPoint(hit.point);
                                     GameMoveRotator.MovePoint(selectedLine, indexes, newPointPosition);
@@ -181,7 +181,7 @@ namespace SEE.Controls.Actions.Drawable
                         }
                         break;
                     case ProgressState.Finish:
-                        memento = new Memento(selectedLine, GameDrawableFinder.FindDrawable(selectedLine), selectedLine.name,
+                        memento = new Memento(selectedLine, GameFinder.FindDrawable(selectedLine), selectedLine.name,
                                 indexes, oldPointPosition, newPointPosition);
                         currentState = ReversibleAction.Progress.Completed;
                         return true;
@@ -199,13 +199,13 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (memento.line == null && memento.id != null)
             {
-                memento.line = GameDrawableFinder.FindChild(memento.drawable, memento.id);
+                memento.line = GameFinder.FindChild(memento.drawable, memento.id);
             }
 
             if (memento.line != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawable(memento.line);
-                string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
+                GameObject drawable = GameFinder.FindDrawable(memento.line);
+                string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 GameMoveRotator.MovePoint(memento.line, memento.indexes, memento.oldPointPosition);
                 new MovePointNetAction(drawable.name, drawableParent, memento.line.name, memento.indexes, memento.oldPointPosition).Execute();
             }
@@ -219,12 +219,12 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (memento.line == null && memento.id != null)
             {
-                memento.line = GameDrawableFinder.FindChild(memento.drawable, memento.id);
+                memento.line = GameFinder.FindChild(memento.drawable, memento.id);
             }
             if (memento.line != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawable(memento.line);
-                string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
+                GameObject drawable = GameFinder.FindDrawable(memento.line);
+                string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 GameMoveRotator.MovePoint(memento.line, memento.indexes, memento.newPointPosition);
                 new MovePointNetAction(drawable.name, drawableParent, memento.line.name, memento.indexes, memento.newPointPosition).Execute();
             }

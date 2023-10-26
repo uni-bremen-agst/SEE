@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using UnityEngine;
 using System.Linq;
+using SEE.Game.Drawable;
 
 namespace Assets.SEE.Game.UI.Drawable
 {
@@ -27,8 +28,8 @@ namespace Assets.SEE.Game.UI.Drawable
         {
             if (Tags.DrawableTypes.Contains(other.gameObject.tag))
             {
-                GameObject drawable = GameDrawableFinder.FindDrawable(other.gameObject);
-                string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
+                GameObject drawable = GameFinder.FindDrawable(other.gameObject);
+                string drawableParentName = GameFinder.GetDrawableParentName(drawable);
                 Transform transform = other.gameObject.transform;
                 Vector3 eulerAngles = transform.localEulerAngles;
                 transform.localEulerAngles = Vector3.zero;

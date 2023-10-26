@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game;
-using Assets.SEE.Game.Drawable;
+﻿using Assets.SEE.Game.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.Game;
 using SEE.GO;
@@ -7,7 +6,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static SEE.Game.GameDrawer;
+using static Assets.SEE.Game.Drawable.GameDrawer;
 using Assets.SEE.Game.UI.Drawable;
 using SEE.Game.Drawable.Configurations;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
@@ -16,6 +15,7 @@ using SEE.Game.UI.PropertyDialog.Drawable;
 using SEE.Game.UI.Notification;
 using Toggle = UnityEngine.UI.Toggle;
 using TMPro;
+using SEE.Game.Drawable;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -171,8 +171,8 @@ namespace SEE.Controls.Actions.Drawable
             }
             if (progressState != ProgressState.Finish && selectedObj != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawable(selectedObj);
-                string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
+                GameObject drawable = GameFinder.FindDrawable(selectedObj);
+                string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 if (oldValueHolder is LineConf oldLineHolder)
                 {
                     GameEdit.ChangeLine(selectedObj, oldLineHolder);
@@ -271,7 +271,7 @@ namespace SEE.Controls.Actions.Drawable
                         if (!CheckEquals(oldValueHolder, newValueHolder))
                         {
                             memento = new Memento(selectedObj, oldValueHolder, newValueHolder,
-                                     GameDrawableFinder.FindDrawable(selectedObj), selectedObj.name);
+                                     GameFinder.FindDrawable(selectedObj), selectedObj.name);
                             currentState = ReversibleAction.Progress.Completed;
                             return true;
                         } else
@@ -298,13 +298,13 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (memento.selectedObj == null && memento.id != null)
             {
-                memento.selectedObj = GameDrawableFinder.FindChild(memento.drawable, memento.id);
+                memento.selectedObj = GameFinder.FindChild(memento.drawable, memento.id);
             }
 
             if (memento.selectedObj != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawable(memento.selectedObj);
-                string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
+                GameObject drawable = GameFinder.FindDrawable(memento.selectedObj);
+                string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 if (memento.oldValueHolder is LineConf oldLineHolder)
                 {
                     GameEdit.ChangeLine(memento.selectedObj, oldLineHolder);
@@ -331,13 +331,13 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (memento.selectedObj == null && memento.id != null)
             {
-                memento.selectedObj = GameDrawableFinder.FindChild(memento.drawable, memento.id);
+                memento.selectedObj = GameFinder.FindChild(memento.drawable, memento.id);
             }
 
             if (memento.selectedObj != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawable(memento.selectedObj);
-                string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
+                GameObject drawable = GameFinder.FindDrawable(memento.selectedObj);
+                string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 if (memento.newValueHolder is LineConf newLineValueHolder)
                 {
                     GameEdit.ChangeLine(memento.selectedObj, newLineValueHolder);

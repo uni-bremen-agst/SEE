@@ -6,6 +6,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
 using SEE.Controls.Actions.Drawable;
+using SEE.Game.Drawable;
 
 namespace Assets.SEE.Game.UI.Drawable
 {
@@ -47,10 +48,10 @@ namespace Assets.SEE.Game.UI.Drawable
         static ColorPickerMenu (){
             instance = PrefabInstantiator.InstantiatePrefab(colorPickerMenuPrefab,
                     GameObject.Find("UI Canvas").transform, false);
-            switchManager = GameDrawableFinder.FindChild(instance, "Switch").GetComponent<SwitchManager>();
-            pickerForPrimaryColor = GameDrawableFinder.FindChild(instance, "Primary").GetComponent<HSVPicker.ColorPicker>();
+            switchManager = GameFinder.FindChild(instance, "Switch").GetComponent<SwitchManager>();
+            pickerForPrimaryColor = GameFinder.FindChild(instance, "Primary").GetComponent<HSVPicker.ColorPicker>();
             pickerForPrimaryColor.AssignColor(ValueHolder.currentPrimaryColor);
-            pickerForSecondColor = GameDrawableFinder.FindChild(instance, "Second").GetComponent<HSVPicker.ColorPicker>();
+            pickerForSecondColor = GameFinder.FindChild(instance, "Second").GetComponent<HSVPicker.ColorPicker>();
             pickerForSecondColor.AssignColor(ValueHolder.currentSecondaryColor);
             instance.SetActive(false);
         }

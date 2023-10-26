@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.Net.Actions.Drawable;
 using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game;
 using System.Linq;
 using SEE.Controls.Actions;
 using Assets.SEE.Game.UI.Drawable;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -108,15 +108,15 @@ namespace SEE.Controls.Actions.Drawable
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !finishDrawing &&
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                    GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject))
-                    && (drawable == null || drawable != null && GameDrawableFinder.FindDrawable(raycastHit.collider.gameObject).Equals(drawable)))
+                    GameFinder.hasDrawable(raycastHit.collider.gameObject))
+                    && (drawable == null || drawable != null && GameFinder.FindDrawable(raycastHit.collider.gameObject).Equals(drawable)))
                 {
                     switch (progressState)
                     {
                         case ProgressState.StartDrawing:
                             /// Find the drawable for this line.
                             drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                                    raycastHit.collider.gameObject : GameDrawableFinder.FindDrawable(raycastHit.collider.gameObject);
+                                    raycastHit.collider.gameObject : GameFinder.FindDrawable(raycastHit.collider.gameObject);
                             drawing = true;
                             progressState = ProgressState.Drawing;
                             positions[0] = raycastHit.point;
@@ -142,7 +142,7 @@ namespace SEE.Controls.Actions.Drawable
                                 positions = newPositions;
 
                                 GameDrawer.Drawing(line, positions);
-                                new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), LineConf.GetLine(line)).Execute();
+                                new DrawOnNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), LineConf.GetLine(line)).Execute();
                             }
                             break;
                     }
@@ -165,7 +165,7 @@ namespace SEE.Controls.Actions.Drawable
                             line = GameDrawer.SetPivot(line);
                             LineConf currentLine = LineConf.GetLine(line);
                             memento = new Memento(drawable, currentLine);
-                            new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), currentLine).Execute();
+                            new DrawOnNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), currentLine).Execute();
                             currentState = ReversibleAction.Progress.Completed;
                             return true;
                         }
@@ -216,11 +216,11 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (line == null)
             {
-                line = GameDrawableFinder.FindChild(memento.drawable, memento.line.id);
+                line = GameFinder.FindChild(memento.drawable, memento.line.id);
             }
             if (line != null)
             {
-                new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.line.id).Execute();
+                new EraseNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), memento.line.id).Execute();
                 Destroyer.Destroy(line);
                 line = null;
             }
@@ -235,7 +235,7 @@ namespace SEE.Controls.Actions.Drawable
             line = GameDrawer.ReDrawLine(memento.drawable, memento.line);
             if (line != null)
             {
-                new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), LineConf.GetLine(line)).Execute();
+                new DrawOnNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), LineConf.GetLine(line)).Execute();
             }
         }
 

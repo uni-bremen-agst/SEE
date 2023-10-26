@@ -1,5 +1,6 @@
 ﻿using Assets.SEE.Game.Drawable;
 using Michsky.UI.ModernUIPack;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
@@ -58,7 +59,7 @@ namespace Assets.SEE.Game.UI.Drawable
             orderInLayerSlider = instance.GetComponentInChildren<LayerSliderController>();
             picker = instance.GetComponentInChildren<HSVPicker.ColorPicker>();
             mirrorSwitch = instance.GetComponentInChildren<SwitchManager>();
-            thumbnail = GameDrawableFinder.FindChild(instance, "Image").GetComponent<Image>();
+            thumbnail = GameFinder.FindChild(instance, "Image").GetComponent<Image>();
             instance.SetActive(false);
         }
 
@@ -79,8 +80,8 @@ namespace Assets.SEE.Game.UI.Drawable
         {
             if (newValueHolder is ImageConf image)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawable(imageObj);
-                string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
+                GameObject drawable = GameFinder.FindDrawable(imageObj);
+                string drawableParentName = GameFinder.GetDrawableParentName(drawable);
 
                 AssignOrderInLayer(order =>
                 {

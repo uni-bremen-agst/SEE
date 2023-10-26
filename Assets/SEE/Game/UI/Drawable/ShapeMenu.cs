@@ -1,10 +1,12 @@
 ﻿using Assets.SEE.Game.Drawable;
 using Michsky.UI.ModernUIPack;
+using SEE.Game.Drawable;
 using SEE.Utils;
 using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 using static Assets.SEE.Game.Drawable.GameShapesCalculator;
 
@@ -111,6 +113,22 @@ namespace Assets.SEE.Game.UI.Drawable
         /// The instance of the image.
         /// </summary>
         private static Image infoImage;
+        /// <summary>
+        /// The instance for the layer for the finish button.
+        /// </summary>
+        private static GameObject objFinish;
+        /// <summary>
+        /// The instance of the finish button.
+        /// </summary>
+        private static ButtonManagerBasic finishBMB;
+        /// <summary>
+        /// The instance for the layer for the switch.
+        /// </summary>
+        private static GameObject objLoop;
+        /// <summary>
+        /// The instance of the loop manager.
+        /// </summary>
+        private static SwitchManager loopManager;
 
 
         /// The following block are the value holders for the chosen values:
@@ -256,34 +274,40 @@ namespace Assets.SEE.Game.UI.Drawable
             });
             selector.defaultIndex = 0;
 
-            objValue1 = GameDrawableFinder.FindChild(shapeMenu, "Value1");
+            objValue1 = GameFinder.FindChild(shapeMenu, "Value1");
             sliderValue1 = objValue1.GetComponent<FloatValueSliderController>();
             sliderValue1.onValueChanged.AddListener(value => { value1 = value; });
 
-            objValue2 = GameDrawableFinder.FindChild(shapeMenu, "Value2");
+            objValue2 = GameFinder.FindChild(shapeMenu, "Value2");
             sliderValue2 = objValue2.GetComponent<FloatValueSliderController>();
             sliderValue2.onValueChanged.AddListener(value => { value2 = value; });
 
-            objValue3 = GameDrawableFinder.FindChild(shapeMenu, "Value3");
+            objValue3 = GameFinder.FindChild(shapeMenu, "Value3");
             sliderValue3 = objValue3.GetComponent<FloatValueSliderController>();
             sliderValue3.onValueChanged.AddListener(value => { value3 = value; });
 
-            objValue4 = GameDrawableFinder.FindChild(shapeMenu, "Value4");
+            objValue4 = GameFinder.FindChild(shapeMenu, "Value4");
             sliderValue4 = objValue4.GetComponent<FloatValueSliderController>();
             sliderValue4.onValueChanged.AddListener(value => { value4 = value; });
 
-            objVertices = GameDrawableFinder.FindChild(shapeMenu, "Vertices");
+            objVertices = GameFinder.FindChild(shapeMenu, "Vertices");
             sliderVertices = objVertices.GetComponent<IntValueSliderController>();
             vertices = sliderVertices.GetValue();
             sliderVertices.onValueChanged.AddListener(value => { vertices = value; });
 
-            objInfo = GameDrawableFinder.FindChild(shapeMenu, "Info");
+            objInfo = GameFinder.FindChild(shapeMenu, "Info");
             infoBMB = objInfo.GetComponent<ButtonManagerBasic>();
             infoVisibility = false;
             infoBMB.clickEvent.AddListener(ToggleInfo);
 
-            objImage = GameDrawableFinder.FindChild(shapeMenu, "Image");
+            objImage = GameFinder.FindChild(shapeMenu, "Image");
             infoImage = objImage.GetComponent<Image>();
+
+            objLoop = GameFinder.FindChild(shapeMenu, "Loop");
+            loopManager = objLoop.GetComponentInChildren<SwitchManager>();
+
+            objFinish = GameFinder.FindChild(shapeMenu, "FinishBtn");
+            finishBMB = objFinish.GetComponent<ButtonManagerBasic>();
 
             SetSelectedShape(GameShapesCalculator.GetShapes()[0]);
         }
@@ -374,12 +398,15 @@ namespace Assets.SEE.Game.UI.Drawable
             objValue3.SetActive(true);
             objValue4.SetActive(true);
             objVertices.SetActive(true);
+            objLoop.SetActive(true);
+            objFinish.SetActive(true);
 
             sliderValue1.ResetToMin();
             sliderValue2.ResetToMin();
             sliderValue3.ResetToMin();
             sliderValue4.ResetToMin();
             sliderVertices.ResetToMin();
+            loopManager.isOn = false;
             infoVisibility = false;
         }
         /// <summary>
@@ -394,6 +421,8 @@ namespace Assets.SEE.Game.UI.Drawable
             objVertices.SetActive(false);
             objInfo.SetActive(false);
             objImage.SetActive(false);
+            objFinish.SetActive(false);
+            objLoop.SetActive(false);
         }
         /// <summary>
         /// Changes the menu for the selected shape.
@@ -408,6 +437,8 @@ namespace Assets.SEE.Game.UI.Drawable
             switch (selectedShape)
             {
                 case GameShapesCalculator.Shapes.Line:
+                    objFinish.SetActive(true);
+                    objLoop.SetActive(true);
                     break;
                 case GameShapesCalculator.Shapes.Square:
                     objValue1.SetActive(true);
@@ -507,6 +538,25 @@ namespace Assets.SEE.Game.UI.Drawable
             configBMB.enabled = true;
             LineMenu.disableLineMenu();
             shapeMenu.SetActive(true);
+        }
+
+        /// <summary>
+        /// Assigns an action to the finish button.
+        /// </summary>
+        /// <param name="action">The action that should be assigned</param>
+        public static void AssignFinishButton(UnityAction action)
+        {
+            finishBMB.clickEvent.RemoveAllListeners();
+            finishBMB.clickEvent.AddListener(action);
+        }
+
+        /// <summary>
+        /// Retruns the switch manager for the loop attribut.
+        /// </summary>
+        /// <returns>the switch manager for the loop.</returns>
+        public static SwitchManager GetLoopManager()
+        {
+            return loopManager;
         }
     }
 }

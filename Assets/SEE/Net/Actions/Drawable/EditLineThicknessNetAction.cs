@@ -1,9 +1,9 @@
-﻿using Assets.SEE.Game;
-using Assets.SEE.Game.Drawable;
+﻿using Assets.SEE.Game.Drawable;
 using SEE.Net.Actions;
 using SEE.Utils;
 using SEE.Controls.Actions.Drawable;
 using UnityEngine;
+using SEE.Game.Drawable;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -61,10 +61,10 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
-                if (drawable != null && GameDrawableFinder.FindChild(drawable, LineName) != null)
+                GameObject drawable = GameFinder.Find(DrawableID, ParentDrawableID);
+                if (drawable != null && GameFinder.FindChild(drawable, LineName) != null)
                 {
-                    GameEdit.ChangeThickness(GameDrawableFinder.FindChild(drawable, LineName), thickness);
+                    GameEdit.ChangeThickness(GameFinder.FindChild(drawable, LineName), thickness);
                 }
                 else
                 {

@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game;
-using Assets.SEE.Game.Drawable;
+﻿using Assets.SEE.Game.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.Game;
 using SEE.GO;
@@ -7,6 +6,7 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using Assets.SEE.Game.UI.Drawable;
+using SEE.Game.Drawable;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -90,8 +90,8 @@ namespace SEE.Controls.Actions.Drawable
             }
             if (progressState != ProgressState.Finish && selectedObj != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawable(selectedObj);
-                string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
+                GameObject drawable = GameFinder.FindDrawable(selectedObj);
+                string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 GameScaler.SetScale(selectedObj, oldScale);
                 new ScaleNetAction(drawable.name, drawableParent, selectedObj.name, oldScale).Execute();
             }
@@ -122,10 +122,10 @@ namespace SEE.Controls.Actions.Drawable
                         if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj == null
                             && Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
                             (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased)) &&
-                            GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject))
+                            GameFinder.hasDrawable(raycastHit.collider.gameObject))
                         {
                             selectedObj = raycastHit.collider.gameObject;
-                            drawable = GameDrawableFinder.FindDrawable(selectedObj);
+                            drawable = GameFinder.FindDrawable(selectedObj);
                             oldSelectedObj = selectedObj;
 
                             BlinkEffect effect = selectedObj.AddOrGetComponent<BlinkEffect>();
@@ -148,7 +148,7 @@ namespace SEE.Controls.Actions.Drawable
                     case ProgressState.Scale:
                         if (selectedObj.GetComponent<BlinkEffect>() != null && selectedObj.GetComponent<BlinkEffect>().GetLoopStatus())
                         {
-                            string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
+                            string drawableParentName = GameFinder.GetDrawableParentName(drawable);
                             float scaleFactor = 0f;
                             bool isScaled = false;
 
@@ -196,7 +196,7 @@ namespace SEE.Controls.Actions.Drawable
                         ScaleMenu.Disable();
                         if (oldScale != newScale)
                         {
-                            memento = new Memento(selectedObj, GameDrawableFinder.FindDrawable(selectedObj), selectedObj.name, oldScale, newScale);
+                            memento = new Memento(selectedObj, GameFinder.FindDrawable(selectedObj), selectedObj.name, oldScale, newScale);
                             currentState = ReversibleAction.Progress.Completed;
                             return true;
                         } else
@@ -266,13 +266,13 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (memento.selectedObject == null && memento.id != null)
             {
-                memento.selectedObject = GameDrawableFinder.FindChild(memento.drawable, memento.id);
+                memento.selectedObject = GameFinder.FindChild(memento.drawable, memento.id);
             }
 
             if (memento.selectedObject != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawable(memento.selectedObject);
-                string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
+                GameObject drawable = GameFinder.FindDrawable(memento.selectedObject);
+                string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 GameScaler.SetScale(memento.selectedObject, memento.oldScale);
                 new ScaleNetAction(drawable.name, drawableParent, memento.selectedObject.name, memento.oldScale).Execute();
             }
@@ -290,12 +290,12 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (memento.selectedObject == null && memento.id != null)
             {
-                memento.selectedObject = GameDrawableFinder.FindChild(memento.drawable, memento.id);
+                memento.selectedObject = GameFinder.FindChild(memento.drawable, memento.id);
             }
             if (memento.selectedObject != null)
             {
-                GameObject drawable = GameDrawableFinder.FindDrawable(memento.selectedObject);
-                string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
+                GameObject drawable = GameFinder.FindDrawable(memento.selectedObject);
+                string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 GameScaler.SetScale(memento.selectedObject, memento.newScale);
                 new ScaleNetAction(drawable.name, drawableParent, memento.selectedObject.name, memento.newScale).Execute();
             }

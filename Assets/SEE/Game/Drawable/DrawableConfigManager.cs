@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -88,9 +89,17 @@ namespace Assets.SEE.Game.Drawable
                 Dictionary<string, object> attributes = stream.Read();
                 if (!config.Restore(attributes))
                 {
-                    ShowNotification.Warn(
-                        "Error loading drawables",
-                        "Not all drawables attributes were loaded correctly.");
+                    DrawableConfig singleConfig = new();
+                    if (singleConfig.Restore(attributes))
+                    {
+                        config.Drawables.Add(singleConfig);
+                    }
+                    else
+                    {
+                        ShowNotification.Warn(
+                            "Error loading drawables",
+                            "Not all drawables attributes were loaded correctly.");
+                    }
                 }
             }
             catch (Exception e)
@@ -126,10 +135,11 @@ namespace Assets.SEE.Game.Drawable
         internal static void SaveDrawable(GameObject drawable, FilePath filePath)
         {
             EnsureDrawableDirectoryExists(filePath.RootPath);
-            if(!Path.HasExtension(filePath.Path))
+            if (!Path.HasExtension(filePath.Path))
             {
                 filePath = new FilePath(filePath.Path + Filenames.ConfigExtension);
-            } else if (Path.GetExtension(filePath.Path) != Filenames.ConfigExtension)
+            }
+            else if (Path.GetExtension(filePath.Path) != Filenames.ConfigExtension)
             {
                 Path.ChangeExtension(filePath.Path, Filenames.ConfigExtension);
             }
@@ -206,35 +216,35 @@ namespace Assets.SEE.Game.Drawable
         internal static DrawableConfig GetDrawableConfig(GameObject drawable)
         {
             Transform transform = drawable.transform;
-            if (GameDrawableFinder.GetDrawableParentName(drawable) != "")
+            if (GameFinder.GetDrawableParentName(drawable) != "")
             {
                 transform = drawable.transform.parent;
             }
             DrawableConfig config = new()
             {
                 DrawableName = drawable.name,
-                DrawableParentName = GameDrawableFinder.GetDrawableParentName(drawable),
+                DrawableParentName = GameFinder.GetDrawableParentName(drawable),
                 Position = transform.position,
                 Rotation = transform.eulerAngles
             };
-            GameObject attachedObjects = GameDrawableFinder.GetAttachedObjectsObject(drawable);
+            GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(drawable);
             if (attachedObjects != null)
             {
-                GameObject[] lines = GameDrawableFinder.FindAllChildrenWithTag(attachedObjects, Tags.Line).ToArray();
+                GameObject[] lines = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.Line).ToArray();
                 foreach (GameObject line in lines)
                 {
                     LineConf lineConfig = LineConf.GetLine(line);
                     config.LineConfigs.Add(lineConfig);
                 }
 
-                GameObject[] texts = GameDrawableFinder.FindAllChildrenWithTag(attachedObjects, Tags.DText).ToArray();
+                GameObject[] texts = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.DText).ToArray();
                 foreach (GameObject text in texts)
                 {
                     TextConf textConfig = TextConf.GetText(text);
                     config.TextConfigs.Add(textConfig);
                 }
 
-                GameObject[] images = GameDrawableFinder.FindAllChildrenWithTag(attachedObjects, Tags.Image).ToArray();
+                GameObject[] images = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.Image).ToArray();
                 foreach (GameObject image in images)
                 {
                     ImageConf imageConf = ImageConf.GetImageConf(image);

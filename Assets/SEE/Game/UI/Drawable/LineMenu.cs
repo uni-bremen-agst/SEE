@@ -1,7 +1,7 @@
 ﻿using Assets.SEE.Game.Drawable;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions;
-using SEE.Game;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
@@ -11,7 +11,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using static SEE.Game.GameDrawer;
+using static Assets.SEE.Game.Drawable.GameDrawer;
 
 namespace Assets.SEE.Game.UI.Drawable
 {
@@ -124,7 +124,7 @@ namespace Assets.SEE.Game.UI.Drawable
                 GameObject.Find("UI Canvas").transform, false);
             content = instance.transform.Find("Content");
 
-            lineKindSelector = GameDrawableFinder.FindChild(instance, "LineKindSelection").GetComponent<HorizontalSelector>();
+            lineKindSelector = GameFinder.FindChild(instance, "LineKindSelection").GetComponent<HorizontalSelector>();
             foreach (LineKind kind in GameDrawer.GetLineKinds())
             {
                 lineKindSelector.CreateNewItem(kind.ToString());
@@ -151,7 +151,7 @@ namespace Assets.SEE.Game.UI.Drawable
             });
             lineKindSelector.defaultIndex = 0;
 
-            colorKindSelector = GameDrawableFinder.FindChild(instance, "ColorKindSelection").GetComponent<HorizontalSelector>();
+            colorKindSelector = GameFinder.FindChild(instance, "ColorKindSelection").GetComponent<HorizontalSelector>();
             bool isDashed = selectedLineKind != GameDrawer.LineKind.Solid;
             foreach (ColorKind kind in GameDrawer.GetColorKinds(true))
             {
@@ -180,15 +180,15 @@ namespace Assets.SEE.Game.UI.Drawable
             });
             colorKindSelector.defaultIndex = 0;
 
-            loopManager = GameDrawableFinder.FindChild(instance, "Loop").GetComponentInChildren<SwitchManager>();
-            primaryColorBMB = GameDrawableFinder.FindChild(instance, "PrimaryColorBtn").GetComponent<ButtonManagerBasic>();
-            primaryColorBMB.buttonVar = GameDrawableFinder.FindChild(instance, "PrimaryColorBtn").GetComponent<Button>();
+            loopManager = GameFinder.FindChild(instance, "Loop").GetComponentInChildren<SwitchManager>();
+            primaryColorBMB = GameFinder.FindChild(instance, "PrimaryColorBtn").GetComponent<ButtonManagerBasic>();
+            primaryColorBMB.buttonVar = GameFinder.FindChild(instance, "PrimaryColorBtn").GetComponent<Button>();
             primaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
             primaryColorBMB.buttonVar.interactable = false;
-            secondaryColorBMB = GameDrawableFinder.FindChild(instance, "SecondaryColorBtn").GetComponent<ButtonManagerBasic>();
-            secondaryColorBMB.buttonVar = GameDrawableFinder.FindChild(instance, "SecondaryColorBtn").GetComponent<Button>();
+            secondaryColorBMB = GameFinder.FindChild(instance, "SecondaryColorBtn").GetComponent<ButtonManagerBasic>();
+            secondaryColorBMB.buttonVar = GameFinder.FindChild(instance, "SecondaryColorBtn").GetComponent<Button>();
             secondaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
-            tilingSlider = GameDrawableFinder.FindChild(instance, "Tiling").GetComponentInChildren<FloatValueSliderController>();
+            tilingSlider = GameFinder.FindChild(instance, "Tiling").GetComponentInChildren<FloatValueSliderController>();
             picker = instance.GetComponentInChildren<HSVPicker.ColorPicker>();
             instance.SetActive(false);
         }
@@ -343,8 +343,8 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 enableLineMenu();
                 LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
-                GameObject drawable = GameDrawableFinder.FindDrawable(selectedLine);
-                string drawableParentName = GameDrawableFinder.GetDrawableParentName(drawable);
+                GameObject drawable = GameFinder.FindDrawable(selectedLine);
+                string drawableParentName = GameFinder.GetDrawableParentName(drawable);
 
                 AssignLineKind(selectedLine.GetComponent<LineValueHolder>().GetLineKind(), renderer.textureScale.x);
                 lineKindSelector.index = GetIndexOfSelectedLineKind();

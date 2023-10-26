@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.Net.Actions.Drawable;
 using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game;
 using System.Linq;
 using SEE.Game;
 using System;
 using Assets.SEE.Game.UI.Drawable;
 using SEE.Game.Drawable.Configurations;
-
+using SEE.Game.Drawable;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -70,12 +69,21 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private bool drawing = false;
 
+        private bool finishDrawingViaButton = false;
+
         /// <summary>
         /// Enables the shape menu
         /// </summary>
         public override void Awake()
         {
             ShapeMenu.Enable();
+            ShapeMenu.AssignFinishButton(() => 
+            {
+                if (drawing && positions.Length > 1 && ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shapes.Line)
+                {
+                    finishDrawingViaButton = true;
+                }
+            });
         }
 
 
@@ -110,11 +118,11 @@ namespace SEE.Controls.Actions.Drawable
                 if (Input.GetMouseButtonDown(0) &&
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                    GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject))
+                    GameFinder.hasDrawable(raycastHit.collider.gameObject))
                     && !drawing)
                 {
                     drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                        raycastHit.collider.gameObject : GameDrawableFinder.FindDrawable(raycastHit.collider.gameObject);
+                        raycastHit.collider.gameObject : GameFinder.FindDrawable(raycastHit.collider.gameObject);
                     drawing = true;
                     Vector3 convertedHitPoint = GameDrawer.GetConvertedPosition(drawable, raycastHit.point);
                    
@@ -172,7 +180,7 @@ namespace SEE.Controls.Actions.Drawable
                             shape = GameDrawer.SetPivotShape(shape, convertedHitPoint);
                             LineConf currentShape = LineConf.GetLine(shape);
                             memento = new Memento(drawable, currentShape);
-                            new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), currentShape).Execute();
+                            new DrawOnNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), currentShape).Execute();
                             currentState = ReversibleAction.Progress.Completed;
                             drawing = false;
                             return true;
@@ -189,16 +197,16 @@ namespace SEE.Controls.Actions.Drawable
                 if (drawing && !Input.GetMouseButton(0) && !Input.GetMouseButtonDown(0) &&
                     Raycasting.RaycastAnything(out RaycastHit rh) &&
                     (rh.collider.gameObject.CompareTag(Tags.Drawable) ||
-                    GameDrawableFinder.hasDrawable(rh.collider.gameObject)) &&
+                    GameFinder.hasDrawable(rh.collider.gameObject)) &&
                     ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shapes.Line
-                    && (drawable == null || drawable != null && GameDrawableFinder.FindDrawable(rh.collider.gameObject).Equals(drawable)))
+                    && (drawable == null || drawable != null && GameFinder.FindDrawable(rh.collider.gameObject).Equals(drawable)))
                 {
                     Vector3 newPosition = shape.transform.InverseTransformPoint(rh.point) - ValueHolder.distanceToDrawable;
                     Vector3[] newPositions = new Vector3[positions.Length + 1];
                     Array.Copy(sourceArray: positions, destinationArray: newPositions, length: positions.Length);
                     newPositions[newPositions.Length - 1] = newPosition;
                     GameDrawer.Drawing(shape ,newPositions);
-                    new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), LineConf.GetLine(shape)).Execute();
+                    new DrawOnNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), LineConf.GetLine(shape)).Execute();
                 }
 
                 /// With this block, the user can add a new point to the line. 
@@ -206,9 +214,9 @@ namespace SEE.Controls.Actions.Drawable
                 if (Input.GetMouseButtonDown(0) && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) &&
                     Raycasting.RaycastAnything(out RaycastHit hit) &&
                     (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                    GameDrawableFinder.hasDrawable(hit.collider.gameObject))
+                    GameFinder.hasDrawable(hit.collider.gameObject))
                     && drawing && ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shapes.Line
-                    && (drawable == null || drawable != null && GameDrawableFinder.FindDrawable(hit.collider.gameObject).Equals(drawable)))
+                    && (drawable == null || drawable != null && GameFinder.FindDrawable(hit.collider.gameObject).Equals(drawable)))
                 {
                     Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.distanceToDrawable;
                     if (newPosition != positions.Last())
@@ -219,43 +227,45 @@ namespace SEE.Controls.Actions.Drawable
                         positions = newPositions;
 
                         GameDrawer.Drawing(shape, positions);
-                        new DrawOnNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), LineConf.GetLine(shape)).Execute();
+                        new DrawOnNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), LineConf.GetLine(shape)).Execute();
                     }
                 }
+                
+                /// With left shift key can the loop option of the shape menu be toggled.
+                if (Input.GetKeyDown(KeyCode.LeftShift))
+                {
+                    ShapeMenu.GetLoopManager().isOn = !ShapeMenu.GetLoopManager().isOn;
+                    ShapeMenu.GetLoopManager().UpdateUI();
+                }
 
-                /// Block for successfully completing a non looped line. It requires a left-click with the left Ctrl key held down.
-                /// The left shift key must not be pressed.
-                if (Input.GetMouseButtonUp(0) && Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) 
+                /// Block for successfully completing the line. It requires a left-click with the left Ctrl key held down.
+                if (Input.GetMouseButtonUp(0) && Input.GetKey(KeyCode.LeftControl)
                     && drawing && positions.Length > 1 && ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shapes.Line)
                 {
-                    EndLineShapeDrawing(false);
+                    FinishDrawing();
                     return true;
                 }
-
-                /// Block for successfully completing a looped line. It requires a left-click with the left Shift key held down.
-                /// The left Ctrl key must not be pressed
-                if (Input.GetMouseButtonUp(0) && !Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftShift) 
-                    && drawing && positions.Length > 1 && ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shapes.Line)
-                {   
-                    EndLineShapeDrawing(true);
-                    return true;
-                }
+            }
+            if (finishDrawingViaButton)
+            {
+                FinishDrawing();
+                return true;
             }
             return false;
         }
 
         /// <summary>
-        /// Completes the action. It redraws the line shape because the original line was altered by the line preview.
+        /// Finish the drawing of the line shape. 
+        /// It must be a separate method as it can be called from two different points.
         /// </summary>
-        /// <param name="loop">Indicates whether the line should form a loop, in other words, whether the end and start points should be connected.</param>
-        private void EndLineShapeDrawing(bool loop)
+        private void FinishDrawing()
         {
             GameDrawer.Drawing(shape, positions);
-            shape.GetComponent<LineRenderer>().loop = loop;
+            shape.GetComponent<LineRenderer>().loop = ShapeMenu.GetLoopManager().isOn;
             shape = GameDrawer.SetPivot(shape);
             LineConf currentShape = LineConf.GetLine(shape);
             memento = new Memento(drawable, currentShape);
-            new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), currentShape).Execute();
+            new DrawOnNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), currentShape).Execute();
             currentState = ReversibleAction.Progress.Completed;
             drawing = false;
         }
@@ -268,11 +278,11 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (shape == null)
             {
-                shape = GameDrawableFinder.FindChild(memento.drawable, memento.shape.id);
+                shape = GameFinder.FindChild(memento.drawable, memento.shape.id);
             }
             if (shape != null)
             {
-                new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.shape.id).Execute();
+                new EraseNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), memento.shape.id).Execute();
                 Destroyer.Destroy(shape);
             }
         }
@@ -286,7 +296,7 @@ namespace SEE.Controls.Actions.Drawable
             shape = GameDrawer.ReDrawLine(memento.drawable, memento.shape);
             if (shape != null)
             {
-                new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), LineConf.GetLine(shape)).Execute();
+                new DrawOnNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), LineConf.GetLine(shape)).Execute();
             }
         }
 

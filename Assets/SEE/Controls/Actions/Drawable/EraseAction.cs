@@ -1,4 +1,3 @@
-using Assets.SEE.Game;
 using Assets.SEE.Game.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.Game;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.Game.Drawable.Configurations;
 using System.Linq;
+using SEE.Game.Drawable;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -61,13 +61,13 @@ namespace SEE.Controls.Actions.Drawable
                 /// Block to get the drawable object to delete.
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
                     Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
-                    GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject))
+                    GameFinder.hasDrawable(raycastHit.collider.gameObject))
                 {
                     GameObject hittedObject = raycastHit.collider.gameObject;
 
                     if (Tags.DrawableTypes.Contains(hittedObject.tag))
                     {
-                        memento = new Memento(GameDrawableFinder.FindDrawable(hittedObject), new DrawableType().Get(hittedObject));
+                        memento = new Memento(GameFinder.FindDrawable(hittedObject), new DrawableType().Get(hittedObject));
                         mementoList.Add(memento);
 
                         new EraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, hittedObject.name).Execute();
@@ -93,7 +93,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             foreach (Memento mem in mementoList)
             {
-                string drawableParent = GameDrawableFinder.GetDrawableParentName(mem.drawable);
+                string drawableParent = GameFinder.GetDrawableParentName(mem.drawable);
                 if (mem.drawableType is LineConf line)
                 {
                     GameDrawer.ReDrawLine(mem.drawable, line);
@@ -120,8 +120,8 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             foreach (Memento mem in mementoList)
             {
-                GameObject toDelete = GameDrawableFinder.FindChild(mem.drawable, mem.drawableType.id); ;
-                new EraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.drawableType.id).Execute();
+                GameObject toDelete = GameFinder.FindChild(mem.drawable, mem.drawableType.id); ;
+                new EraseNetAction(mem.drawable.name, GameFinder.GetDrawableParentName(mem.drawable), mem.drawableType.id).Execute();
                 Destroyer.Destroy(toDelete);
             }
         }

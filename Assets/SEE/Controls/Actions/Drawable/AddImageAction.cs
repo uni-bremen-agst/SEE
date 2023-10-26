@@ -1,5 +1,4 @@
 ﻿using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game;
 using SEE.Controls.Actions;
 using SEE.Controls.Actions.Drawable;
 using SEE.Net.Actions.Drawable;
@@ -15,6 +14,7 @@ using SEE.Game.Drawable.Configurations;
 using Assets.SEE.Game.Drawable.ActionHelpers;
 using System;
 using System.IO;
+using SEE.Game.Drawable;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -114,11 +114,11 @@ namespace SEE.Controls.Actions.Drawable
                 /// Block for 
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
                      Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
-                    (GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject) || raycastHit.collider.gameObject.CompareTag(Tags.Drawable))
+                    (GameFinder.hasDrawable(raycastHit.collider.gameObject) || raycastHit.collider.gameObject.CompareTag(Tags.Drawable))
                     && (browser == null || (browser != null && !browser.IsOpen())) && (webImageDialog == null || (webImageDialog != null && !isDialogOpen)))
                 {
                     drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                        raycastHit.collider.gameObject : GameDrawableFinder.FindDrawable(raycastHit.collider.gameObject);
+                        raycastHit.collider.gameObject : GameFinder.FindDrawable(raycastHit.collider.gameObject);
                     position = raycastHit.point;
                     if (!Input.GetKey(KeyCode.LeftControl))
                     {
@@ -165,7 +165,7 @@ namespace SEE.Controls.Actions.Drawable
                 if (filePath != "" && (browser == null || (browser != null && !browser.IsOpen())))
                 {
                     imageObj = GameImage.PlaceImage(drawable, filePath, position, ValueHolder.currentOrderInLayer);
-                    new AddImageNetAction(drawable.name, GameDrawableFinder.GetDrawableParentName(drawable), ImageConf.GetImageConf(imageObj)).Execute();
+                    new AddImageNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), ImageConf.GetImageConf(imageObj)).Execute();
                     memento = new Memento(drawable, ImageConf.GetImageConf(imageObj));
                     currentState = ReversibleAction.Progress.Completed;
                     return true;
@@ -181,8 +181,8 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            GameObject obj = GameDrawableFinder.FindChild(memento.drawable, memento.image.id);
-            new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.image.id).Execute();
+            GameObject obj = GameFinder.FindChild(memento.drawable, memento.image.id);
+            new EraseNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), memento.image.id).Execute();
             Destroyer.Destroy(obj);
         }
 
@@ -193,7 +193,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Redo();
             GameImage.RePlaceImage(memento.drawable, memento.image);
-            string drawableParent = GameDrawableFinder.GetDrawableParentName(memento.drawable);
+            string drawableParent = GameFinder.GetDrawableParentName(memento.drawable);
             new AddImageNetAction(memento.drawable.name, drawableParent, memento.image).Execute();
         }
 

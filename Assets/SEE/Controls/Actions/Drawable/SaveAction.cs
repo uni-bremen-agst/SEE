@@ -3,13 +3,16 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game;
 using OpenAI.Files;
 using HighlightPlus;
 using Sirenix.OdinInspector;
 using Assets.SEE.Game.UI.Drawable;
 using static SEE.Controls.Actions.Drawable.LoadAction;
 using System.IO;
+using SEE.Game.Drawable;
+using Michsky.UI.ModernUIPack;
+using SEE.Game.UI.Notification;
+using SEE.GO;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -68,7 +71,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Ensures that per click is only saved once.
         /// </summary>
-        private static bool clicked = false;
+        private bool clicked = false;
 
         /// <summary>
         /// The file path of the to saved file.
@@ -78,12 +81,27 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// List of all selected drawable for saving.
         /// </summary>
-        private static List<GameObject> selectedDrawables = new();
+        private List<GameObject> selectedDrawables = new();
 
         /// <summary>
         /// The instance for the drawable file browser
         /// </summary>
-        private static DrawableFileBrowser browser;
+        private DrawableFileBrowser browser;
+
+        /// <summary>
+        /// The location where the text menu prefeb is placed.
+        /// </summary>
+        private const string saveMenuPrefab = "Prefabs/UI/Drawable/SaveMenu";
+
+        /// <summary>
+        /// The instance for the save menu.
+        /// </summary>
+        private GameObject saveMenu;
+
+        /// <summary>
+        /// The instance for the save single or more drawable button.
+        /// </summary>
+        private ButtonManagerBasic saveButton;
 
         /// <summary>
         /// Stops the <see cref="SaveAction"/>.
@@ -92,16 +110,58 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             filePath = "";
-            Reset();
+            foreach (GameObject drawable in selectedDrawables)
+            {
+                if (drawable.GetComponent<HighlightEffect>() != null)
+                {
+                    Destroyer.Destroy(drawable.GetComponent<HighlightEffect>());
+                }
+            }
+            Destroyer.Destroy(saveMenu);
         }
 
         /// <summary>
-        /// This method will called, when the Action will be leaved and some drawable are still selected.
+        /// Enables the save menu and adds the required Handler.
         /// </summary>
-        public static void Reset()
+        public override void Awake()
         {
-            selectedDrawables.Clear();
-            browser = null;
+            saveMenu = PrefabInstantiator.InstantiatePrefab(saveMenuPrefab,
+                GameObject.Find("UI Canvas").transform, false);
+            saveButton = GameFinder.FindChild(saveMenu, "Save").GetComponent<ButtonManagerBasic>();
+            saveButton.clickEvent.AddListener(() =>
+            {
+                if (browser == null || (browser != null && !browser.IsOpen()))
+                {
+                    if (selectedDrawables.Count > 0)
+                    {
+                        browser = GameObject.Find("UI Canvas").AddOrGetComponent<DrawableFileBrowser>();
+                        if (selectedDrawables.Count == 1)
+                        {
+                            browser.SaveDrawableConfiguration(SaveState.One);
+                            memento = new Memento(new GameObject[] { selectedDrawables[0] }, SaveState.One);
+                        }
+                        else 
+                        {
+                            browser.SaveDrawableConfiguration(SaveState.More);
+                            memento = new Memento(selectedDrawables.ToArray(), SaveState.More);
+                        }
+                    } else
+                    {
+                        ShowNotification.Warn("No drawable selected.", "Select one or more drawables to save.");
+                    }
+                }
+            });
+            ButtonManagerBasic saveAllButton = GameFinder.FindChild(saveMenu, "SaveAll").GetComponent<ButtonManagerBasic>();
+            saveAllButton.clickEvent.AddListener(() =>
+            {
+                if (browser == null || (browser != null && !browser.IsOpen()))
+                {
+                    browser = GameObject.Find("UI Canvas").AddOrGetComponent<DrawableFileBrowser>();
+                    browser.SaveDrawableConfiguration(SaveState.All);
+                    List<GameObject> drawables = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
+                    memento = new Memento(drawables.ToArray(), SaveState.All);
+                }
+            });
         }
 
         /// <summary>
@@ -114,42 +174,23 @@ namespace SEE.Controls.Actions.Drawable
             bool result = false;
 
             if (!Raycasting.IsMouseOverGUI())
-            {
-                /// This block is executed when a drawable or an object on a drawable is targeted, 
-                /// and only the left mouse button is pressed. 
-                /// This saves the selected drawable and opens a file browser to select a file for saving.
+            { 
+                /// This block marks the selected drawable and adds it to a list. If it has already been selected, it is removed from the list, and the marking is cleared.
                 /// For execution, no open file browser should exist.
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) &&
-                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) && selectedDrawables.Count == 0 &&
-                    (GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject) || raycastHit.collider.gameObject.CompareTag(Tags.Drawable))
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
+                    && !clicked &&
+                    Raycasting.RaycastAnythingBackface(out RaycastHit hit) &&
+                    (GameFinder.hasDrawable(hit.collider.gameObject) || hit.collider.gameObject.CompareTag(Tags.Drawable))
                     && (browser == null || (browser != null && !browser.IsOpen())))
-                {
-                    GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                        raycastHit.collider.gameObject : GameDrawableFinder.FindDrawable(raycastHit.collider.gameObject);
-                    browser = GameObject.Find("UI Canvas").AddComponent<DrawableFileBrowser>();
-                    browser.SaveDrawableConfiguration(SaveState.One);
-                    memento = new Memento(new GameObject[] { drawable }, SaveState.One);
-                    currentState = ReversibleAction.Progress.InProgress;
-                }
-
-                /// This block is executed when a drawable or an object on a drawable is targeted, 
-                /// and both the left mouse button and the left Ctrl key but not the left shift key are pressed. 
-                /// This marks the selected drawable and adds it to a list. If it has already been selected, it is removed from the list, and the marking is cleared.
-                /// For execution, no open file browser should exist.
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) && !clicked &&
-                Raycasting.RaycastAnythingBackface(out RaycastHit hit) &&
-                (GameDrawableFinder.hasDrawable(hit.collider.gameObject) || hit.collider.gameObject.CompareTag(Tags.Drawable))
-                && (browser == null || (browser != null && !browser.IsOpen())))
                 {
                     clicked = true;
                     GameObject drawable = hit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                        hit.collider.gameObject : GameDrawableFinder.FindDrawable(hit.collider.gameObject);
+                        hit.collider.gameObject : GameFinder.FindDrawable(hit.collider.gameObject);
 
                     if (drawable.GetComponent<HighlightEffect>() == null)
                     {
                         selectedDrawables.Add(drawable);
                         HighlightEffect effect = drawable.AddComponent<HighlightEffect>();
-                        drawable.AddComponent<HighlightEffectDestroyer>().SetAllowedState(GetActionStateType());
                         effect.highlighted = true;
                         effect.previewInEditor = false;
                         effect.outline = 0;
@@ -162,31 +203,14 @@ namespace SEE.Controls.Actions.Drawable
                     else
                     {
                         Destroyer.Destroy(drawable.GetComponent<HighlightEffect>());
-                        Destroyer.Destroy(drawable.GetComponent<HighlightEffectDestroyer>());
                         selectedDrawables.Remove(drawable);
                     }
                 }
-                /// This block will executed when some drawables was selected and no file browser is opened.
-                /// It saves the drawable list to the memento and open a file browser for select a file for saving.
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift) && selectedDrawables.Count > 0
-                    && (browser == null || (browser != null && !browser.IsOpen())))
-                {
-                    browser = GameObject.Find("UI Canvas").AddComponent<DrawableFileBrowser>();
-                    browser.SaveDrawableConfiguration(SaveState.More);
-                    memento = new Memento(selectedDrawables.ToArray(), SaveState.More);
-                    currentState = ReversibleAction.Progress.InProgress;
-                }
 
-                /// This block is executed when the left mouse button and the left shift key are pressed. The left Ctrl key must not be pressed.
-                /// Additionally, no file browser should be open. This marks all drawables in the scene for saving, and a file browser opens again.
-                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !Input.GetKey(KeyCode.LeftControl) && Input.GetKey(KeyCode.LeftShift)
-                    && (browser == null || (browser != null && !browser.IsOpen())))
+                /// Needed for select more drawables to save.
+                if (Input.GetMouseButtonUp(0))
                 {
-                    browser = GameObject.Find("UI Canvas").AddComponent<DrawableFileBrowser>();
-                    browser.SaveDrawableConfiguration(SaveState.All);
-                    List<GameObject> drawables = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
-                    memento = new Memento(drawables.ToArray(), SaveState.All);
-                    currentState = ReversibleAction.Progress.InProgress;
+                    clicked = false;
                 }
 
                 /// If a file to save was successfully chosen this block will be executed.
@@ -204,12 +228,6 @@ namespace SEE.Controls.Actions.Drawable
                         case SaveState.More:
                             memento.filePath = new FilePath(filePath);
                             DrawableConfigManager.SaveDrawables(memento.drawables, memento.filePath);
-                            foreach(GameObject selectedDrawable in selectedDrawables)
-                            {
-                                Destroyer.Destroy(selectedDrawable.GetComponent<HighlightEffect>());
-                                Destroyer.Destroy(selectedDrawable.GetComponent<HighlightEffectDestroyer>());
-                            }
-                            selectedDrawables.Clear();
                             currentState = ReversibleAction.Progress.Completed;
                             result = true;
                             break;
@@ -221,12 +239,6 @@ namespace SEE.Controls.Actions.Drawable
                             break;
                     }
                     browser = null;
-                }
-
-                /// Needed for select more specific drawables to save.
-                if (Input.GetMouseButtonUp(0))
-                {
-                    clicked = false;
                 }
             }
             return result;

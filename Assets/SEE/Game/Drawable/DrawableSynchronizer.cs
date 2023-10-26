@@ -3,6 +3,7 @@ using SEE.Game;
 using System.Collections;
 using UnityEngine;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -18,10 +19,10 @@ namespace Assets.SEE.Game.Drawable
             ArrayList drawables = new ArrayList(GameObject.FindGameObjectsWithTag(Tags.Drawable));
             foreach (GameObject drawable in drawables)
             {
-                if (GameDrawableFinder.GetAttachedObjectsObject(drawable) != null)
+                if (GameFinder.GetAttachedObjectsObject(drawable) != null)
                 {
-                    string drawableParent = GameDrawableFinder.GetDrawableParentName(drawable);
-                    Transform[] allChildren = GameDrawableFinder.GetAttachedObjectsObject(drawable).GetComponentsInChildren<Transform>();
+                    string drawableParent = GameFinder.GetDrawableParentName(drawable);
+                    Transform[] allChildren = GameFinder.GetAttachedObjectsObject(drawable).GetComponentsInChildren<Transform>();
 
                     foreach (Transform childTransform in allChildren)
                     {

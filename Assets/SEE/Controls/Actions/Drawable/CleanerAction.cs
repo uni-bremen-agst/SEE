@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Game;
-using Assets.SEE.Game.Drawable;
+﻿using Assets.SEE.Game.Drawable;
 using SEE.Game;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
@@ -7,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.Game.Drawable.Configurations;
 using System.Linq;
+using SEE.Game.Drawable;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -66,9 +66,9 @@ namespace SEE.Controls.Actions.Drawable
                     if (hittedObject.CompareTag(Tags.Drawable))
                     {
                         return DeleteDrawableChilds(hittedObject);
-                    } else if (GameDrawableFinder.hasDrawable(hittedObject))
+                    } else if (GameFinder.hasDrawable(hittedObject))
                     {
-                        return DeleteDrawableChilds(GameDrawableFinder.FindDrawable(hittedObject));
+                        return DeleteDrawableChilds(GameFinder.FindDrawable(hittedObject));
                     }
                 }
                 return false;
@@ -83,7 +83,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>true if the drawable was successfull cleaned, false if the drawable was already cleaned</returns>
         private bool DeleteDrawableChilds(GameObject drawable)
         {
-            Transform[] allChildren = GameDrawableFinder.GetAttachedObjectsObject(drawable).GetComponentsInChildren<Transform>();
+            Transform[] allChildren = GameFinder.GetAttachedObjectsObject(drawable).GetComponentsInChildren<Transform>();
             /// A cleaned drawable has only one transform (AttachedObject-Transform itself)
             if (allChildren.Length == 1)
             {
@@ -97,7 +97,7 @@ namespace SEE.Controls.Actions.Drawable
                     memento = new Memento(drawable, new DrawableType().Get(child));
                     mementoList.Add(memento);
 
-                    new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.type.id).Execute();
+                    new EraseNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), memento.type.id).Execute();
                     Destroyer.Destroy(child);
                 }
             }
@@ -113,7 +113,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             foreach (Memento mem in mementoList)
             {
-                string drawableParent = GameDrawableFinder.GetDrawableParentName(mem.drawable);
+                string drawableParent = GameFinder.GetDrawableParentName(mem.drawable);
                 if (mem.type is LineConf line)
                 {
                     GameDrawer.ReDrawLine(mem.drawable, line);
@@ -140,8 +140,8 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             foreach (Memento mem in mementoList)
             {
-                GameObject toDelete = GameDrawableFinder.FindChild(mem.drawable, mem.type.id); ;
-                new EraseNetAction(mem.drawable.name, GameDrawableFinder.GetDrawableParentName(mem.drawable), mem.type.id).Execute();
+                GameObject toDelete = GameFinder.FindChild(mem.drawable, mem.type.id); ;
+                new EraseNetAction(mem.drawable.name, GameFinder.GetDrawableParentName(mem.drawable), mem.type.id).Execute();
                 Destroyer.Destroy(toDelete);
             }
         }

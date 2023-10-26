@@ -1,10 +1,10 @@
 ﻿using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game;
 using SEE.Net.Actions;
 using System.Collections;
 using UnityEngine;
 using System.Collections.Generic;
 using SEE.Controls.Actions.Drawable;
+using SEE.Game.Drawable;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -70,10 +70,10 @@ namespace SEE.Net.Actions.Drawable
             {
                 if (!IsRequester())
                 {
-                    GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
-                    if (drawable != null && GameDrawableFinder.FindChild(drawable, LineName) != null)
+                    GameObject drawable = GameFinder.Find(DrawableID, ParentDrawableID);
+                    if (drawable != null && GameFinder.FindChild(drawable, LineName) != null)
                     {
-                        GameMoveRotator.MovePoint(GameDrawableFinder.FindChild(drawable, LineName), Indexes, Position);
+                        GameMoveRotator.MovePoint(GameFinder.FindChild(drawable, LineName), Indexes, Position);
                     }
                     else
                     {

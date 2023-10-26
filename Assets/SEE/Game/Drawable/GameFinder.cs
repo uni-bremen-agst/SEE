@@ -4,14 +4,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.SEE.Game
+namespace SEE.Game.Drawable
 {
-    public static class GameDrawableFinder
+    public static class GameFinder
     {
         public static GameObject Find(string drawableID, string parentDrawableID)
         {
             GameObject searchedDrawable = null;
-            List<GameObject> drawables = new (GameObject.FindGameObjectsWithTag(Tags.Drawable));
+            List<GameObject> drawables = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
 
             foreach (GameObject drawable in drawables)
             {
@@ -23,7 +23,8 @@ namespace Assets.SEE.Game
                     {
                         searchedDrawable = drawable;
                     }
-                } else
+                }
+                else
                 {
                     if (string.Equals(drawableID, drawable.name))
                     {
@@ -40,15 +41,17 @@ namespace Assets.SEE.Game
             Transform[] allChildren;
             if (parent.CompareTag(Tags.Drawable))
             {
-                GameObject attachedObjects = FindChildWithTag(GetHighestParent(parent), Tags.AttachedObjects); //neu
+                GameObject attachedObjects = FindChildWithTag(GetHighestParent(parent), Tags.AttachedObjects);
                 if (attachedObjects != null)
                 {
-                    allChildren = attachedObjects.GetComponentsInChildren<Transform>();//parent.GetComponentsInChildren<Transform>();
-                } else
+                    allChildren = attachedObjects.GetComponentsInChildren<Transform>();
+                }
+                else
                 {
                     allChildren = parent.GetComponentsInChildren<Transform>();
                 }
-            } else
+            }
+            else
             {
                 allChildren = parent.GetComponentsInChildren<Transform>();
             }
@@ -64,30 +67,20 @@ namespace Assets.SEE.Game
 
         public static GameObject FindDrawable(GameObject child)
         {
-            /*
-            Transform transform = child.transform;
-            while(transform.parent != null)
-            {
-                if (transform.parent.gameObject.CompareTag(Tags.Drawable))
-                {
-                    return transform.parent.gameObject;
-                }
-                transform = transform.parent;
-            }
-            return null;
-            */
             return FindChildWithTag(GetHighestParent(child), Tags.Drawable);
         }
 
         public static bool hasDrawable(GameObject child)
         {
-            if (hasParentWithTag(child, Tags.AttachedObjects)) {
+            if (hasParentWithTag(child, Tags.AttachedObjects))
+            {
                 return FindDrawable(child) != null;
-            } else
+            }
+            else
             {
                 return false;
             }
-            
+
         }
 
         public static GameObject FindChildWithTag(GameObject parent, string tag)
@@ -142,7 +135,7 @@ namespace Assets.SEE.Game
             return child.transform.parent != null;
         }
 
-        public static bool hasParentWithTag(GameObject child, String tag)
+        public static bool hasParentWithTag(GameObject child, string tag)
         {
             Transform transform = child.transform;
             while (transform.parent != null)
@@ -161,30 +154,20 @@ namespace Assets.SEE.Game
             if (drawable.CompareTag(Tags.Drawable))
             {
                 return hasAParent(drawable) ? drawable.transform.parent.name : "";
-            } else
+            }
+            else
             {
                 return "";
             }
         }
 
         public static GameObject GetHighestParent(GameObject child)
-        {/*
-            if (drawable.CompareTag(Tags.Drawable))
-            {
-                if (drawable.transform.parent != null)
-                {
-                    return drawable.transform.parent.gameObject;
-                }
-            } else
-            {
-                drawable = GetHighestParent(FindDrawableParent(drawable));
-            }
-            return drawable;
-            */
+        {
             if (child.transform.parent != null)
             {
                 return GetHighestParent(child.transform.parent.gameObject);
-            } else
+            }
+            else
             {
                 return child;
             }

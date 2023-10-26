@@ -4,13 +4,14 @@ using SEE.Game;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using static SEE.Game.GameDrawer;
+using static Assets.SEE.Game.Drawable.GameDrawer;
 using System.IO;
 using OpenAI.Files;
 using TMPro;
 using SEE.Utils;
 using System.Linq;
 using SEE.GO;
+using SEE.Game.Drawable;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -49,7 +50,7 @@ namespace Assets.SEE.Game.Drawable
             {
                 image = new("");
                 name = ValueHolder.ImagePrefix + image.GetInstanceID() + DrawableHolder.GetRandomString(4);
-                while (GameDrawableFinder.FindChild(drawable, name) != null)
+                while (GameFinder.FindChild(drawable, name) != null)
                 {
                     name = ValueHolder.ImagePrefix + image.GetInstanceID() + DrawableHolder.GetRandomString(4);
                 }
@@ -131,9 +132,9 @@ namespace Assets.SEE.Game.Drawable
                 ValueHolder.currentOrderInLayer = order + 1;
             }
             GameObject imageObj;
-            if (GameDrawableFinder.FindChild(drawable, name) != null)
+            if (GameFinder.FindChild(drawable, name) != null)
             {
-                imageObj = GameDrawableFinder.FindChild(drawable, name);
+                imageObj = GameFinder.FindChild(drawable, name);
                 imageObj.GetComponent<Canvas>().sortingOrder = order;
             }
             else

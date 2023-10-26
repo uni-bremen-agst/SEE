@@ -1,10 +1,9 @@
-﻿using Assets.SEE.Game;
-using Assets.SEE.Game.Drawable;
+﻿using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game.UI.Drawable;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls.Actions;
-using SEE.Controls.Actions.Drawable;
 using SEE.Game;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
@@ -15,7 +14,7 @@ using System.Linq.Expressions;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Assets.SEE.Controls.Actions.Drawable
+namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
     /// This action provides the cut and copy functionality for drawable types.
@@ -99,7 +98,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                 this.newValueHolder = newValueHolder;
                 this.oldDrawable = oldDrawable;
                 this.newDrawable = newDrawable;
-                this.state = cutCopy;
+                state = cutCopy;
             }
         }
 
@@ -196,7 +195,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
             ButtonManagerBasic cut = content.Find("Cut").GetComponent<ButtonManagerBasic>();
             ButtonManagerBasic copy = content.Find("Copy").GetComponent<ButtonManagerBasic>();
 
-            cut.clickEvent.AddListener(()=>
+            cut.clickEvent.AddListener(() =>
             {
                 state = CutCopy.Cut;
             });
@@ -226,11 +225,11 @@ namespace Assets.SEE.Controls.Actions.Drawable
                         }
                         if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj == null &&
                             Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                            (oldSelectedId == "" || oldSelectedId != raycastHit.collider.gameObject.name || (oldSelectedId == raycastHit.collider.gameObject.name && mouseWasReleased)) &&
+                            (oldSelectedId == "" || oldSelectedId != raycastHit.collider.gameObject.name || oldSelectedId == raycastHit.collider.gameObject.name && mouseWasReleased) &&
                             Tags.DrawableTypes.Contains(raycastHit.collider.gameObject.tag))
                         {
                             selectedObj = raycastHit.collider.gameObject;
-                            oldDrawable = GameDrawableFinder.FindDrawable(selectedObj);
+                            oldDrawable = GameFinder.FindDrawable(selectedObj);
                             oldSelectedId = selectedObj.name;
                             oldValueHolder = new DrawableType().Get(selectedObj);
 
@@ -244,7 +243,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
                             cutCopyPasteMenu = PrefabInstantiator.InstantiatePrefab(cutCopyPasteMenuPrefab,
                                         GameObject.Find("UI Canvas").transform, false);
                             SetupButtons(cutCopyPasteMenu);
-                            
+
                         }
                         if (Input.GetMouseButtonUp(0) && selectedObj != null)
                         {
@@ -254,46 +253,46 @@ namespace Assets.SEE.Controls.Actions.Drawable
 
                     /// Block in which the object is duplicated at the desired location, and the original may be deleted if necessary.
                     case ProgressState.CutCopyPaste:
-                        if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj != null && 
+                        if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj != null &&
                             selectedObj.GetComponent<BlinkEffect>() != null && state != CutCopy.None &&
-                            Raycasting.RaycastAnything(out RaycastHit hit) && 
+                            Raycasting.RaycastAnything(out RaycastHit hit) &&
                             (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                            GameDrawableFinder.hasDrawable(hit.collider.gameObject)))
+                            GameFinder.hasDrawable(hit.collider.gameObject)))
                         {
                             Destroyer.Destroy(cutCopyPasteMenu);
                             selectedObj.GetComponent<BlinkEffect>().Deactivate();
                             Vector3 newPosition = hit.point;
                             newDrawable = hit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                                    hit.collider.gameObject : GameDrawableFinder.FindDrawable(hit.collider.gameObject);
-                            switch(new DrawableType().Get(selectedObj)) 
+                                    hit.collider.gameObject : GameFinder.FindDrawable(hit.collider.gameObject);
+                            switch (new DrawableType().Get(selectedObj))
                             {
                                 case LineConf:
                                     LineConf lineConf = LineConf.GetLine(selectedObj);
                                     lineConf.id = "";
                                     newObject = GameDrawer.ReDrawLine(newDrawable, lineConf);
                                     newObject.transform.position = newPosition - newObject.transform.forward * ValueHolder.distanceToDrawable.z * lineConf.orderInLayer;
-                                    new DrawOnNetAction(newDrawable.name, GameDrawableFinder.GetDrawableParentName(newDrawable), LineConf.GetLine(newObject)).Execute();
+                                    new DrawOnNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable), LineConf.GetLine(newObject)).Execute();
                                     break;
                                 case TextConf:
                                     TextConf textConf = TextConf.GetText(selectedObj);
                                     textConf.id = "";
                                     newObject = GameTexter.ReWriteText(newDrawable, textConf);
                                     newObject.transform.position = newPosition - newObject.transform.forward * ValueHolder.distanceToDrawable.z * textConf.orderInLayer;
-                                    new WriteTextNetAction(newDrawable.name, GameDrawableFinder.GetDrawableParentName(newDrawable), TextConf.GetText(newObject)).Execute();
+                                    new WriteTextNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable), TextConf.GetText(newObject)).Execute();
                                     break;
                                 case ImageConf:
                                     ImageConf imageConf = ImageConf.GetImageConf(selectedObj);
                                     imageConf.id = "";
                                     newObject = GameImage.RePlaceImage(newDrawable, imageConf);
                                     newObject.transform.position = newPosition - newObject.transform.forward * ValueHolder.distanceToDrawable.z * imageConf.orderInLayer;
-                                    new AddImageNetAction(newDrawable.name, GameDrawableFinder.GetDrawableParentName(newDrawable), ImageConf.GetImageConf(newObject)).Execute();
+                                    new AddImageNetAction(newDrawable.name, GameFinder.GetDrawableParentName(newDrawable), ImageConf.GetImageConf(newObject)).Execute();
                                     break;
                             }
                             newValueHolder = new DrawableType().Get(newObject);
                             if (state == CutCopy.Cut)
                             {
                                 Destroyer.Destroy(selectedObj);
-                                new EraseNetAction(oldDrawable.name, GameDrawableFinder.GetDrawableParentName(oldDrawable), selectedObj.name).Execute();
+                                new EraseNetAction(oldDrawable.name, GameFinder.GetDrawableParentName(oldDrawable), selectedObj.name).Execute();
                             }
                         }
                         if (Input.GetMouseButtonUp(0) && state != CutCopy.None && newObject != null)
@@ -301,7 +300,8 @@ namespace Assets.SEE.Controls.Actions.Drawable
                             progressState = ProgressState.Finish;
                         }
 
-                        if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && state == CutCopy.None) {
+                        if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && state == CutCopy.None)
+                        {
                             Destroyer.Destroy(cutCopyPasteMenu);
                             selectedObj.GetComponent<BlinkEffect>().Deactivate();
                             selectedObj = null;
@@ -334,23 +334,23 @@ namespace Assets.SEE.Controls.Actions.Drawable
             if (memento.oldValueHolder is LineConf lineConf)
             {
                 GameDrawer.ReDrawLine(memento.oldDrawable, lineConf);
-                new DrawOnNetAction(memento.oldDrawable.name, GameDrawableFinder.GetDrawableParentName(memento.oldDrawable), lineConf).Execute();
+                new DrawOnNetAction(memento.oldDrawable.name, GameFinder.GetDrawableParentName(memento.oldDrawable), lineConf).Execute();
             }
 
             if (memento.oldValueHolder is TextConf textConf)
             {
                 GameTexter.ReWriteText(memento.oldDrawable, textConf);
-                new WriteTextNetAction(memento.oldDrawable.name, GameDrawableFinder.GetDrawableParentName(memento.oldDrawable), textConf).Execute();
+                new WriteTextNetAction(memento.oldDrawable.name, GameFinder.GetDrawableParentName(memento.oldDrawable), textConf).Execute();
             }
 
             if (memento.oldValueHolder is ImageConf imageConf)
             {
                 GameImage.RePlaceImage(memento.oldDrawable, imageConf);
-                new AddImageNetAction(memento.oldDrawable.name, GameDrawableFinder.GetDrawableParentName(memento.oldDrawable), imageConf).Execute();
+                new AddImageNetAction(memento.oldDrawable.name, GameFinder.GetDrawableParentName(memento.oldDrawable), imageConf).Execute();
             }
 
-            GameObject newObject = GameDrawableFinder.FindChild(memento.newDrawable, memento.newValueHolder.id);
-            new EraseNetAction(memento.newDrawable.name, GameDrawableFinder.GetDrawableParentName(memento.newDrawable), newObject.name);
+            GameObject newObject = GameFinder.FindChild(memento.newDrawable, memento.newValueHolder.id);
+            new EraseNetAction(memento.newDrawable.name, GameFinder.GetDrawableParentName(memento.newDrawable), newObject.name);
             Destroyer.Destroy(newObject);
         }
 
@@ -363,25 +363,25 @@ namespace Assets.SEE.Controls.Actions.Drawable
             if (memento.newValueHolder is LineConf lineConf)
             {
                 GameDrawer.ReDrawLine(memento.newDrawable, lineConf);
-                new DrawOnNetAction(memento.newDrawable.name, GameDrawableFinder.GetDrawableParentName(memento.newDrawable), lineConf).Execute();
+                new DrawOnNetAction(memento.newDrawable.name, GameFinder.GetDrawableParentName(memento.newDrawable), lineConf).Execute();
             }
 
             if (memento.newValueHolder is TextConf textConf)
             {
                 GameTexter.ReWriteText(memento.newDrawable, textConf);
-                new WriteTextNetAction(memento.newDrawable.name, GameDrawableFinder.GetDrawableParentName(memento.newDrawable), textConf).Execute();
+                new WriteTextNetAction(memento.newDrawable.name, GameFinder.GetDrawableParentName(memento.newDrawable), textConf).Execute();
             }
 
             if (memento.newValueHolder is ImageConf imageConf)
             {
                 GameImage.RePlaceImage(memento.newDrawable, imageConf);
-                new AddImageNetAction(memento.newDrawable.name, GameDrawableFinder.GetDrawableParentName(memento.newDrawable), imageConf).Execute();
+                new AddImageNetAction(memento.newDrawable.name, GameFinder.GetDrawableParentName(memento.newDrawable), imageConf).Execute();
             }
 
             if (memento.state == CutCopy.Cut)
             {
-                GameObject selected = GameDrawableFinder.FindChild(memento.oldDrawable, memento.oldValueHolder.id);
-                new EraseNetAction(memento.oldDrawable.name, GameDrawableFinder.GetDrawableParentName(memento.oldDrawable), selected.name);
+                GameObject selected = GameFinder.FindChild(memento.oldDrawable, memento.oldValueHolder.id);
+                new EraseNetAction(memento.oldDrawable.name, GameFinder.GetDrawableParentName(memento.oldDrawable), selected.name);
                 Destroyer.Destroy(selected);
             }
         }
@@ -425,7 +425,7 @@ namespace Assets.SEE.Controls.Actions.Drawable
         /// <returns>The object id of the changed object.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-                return new HashSet<string>
+            return new HashSet<string>
                 {
                     memento.oldValueHolder.id,
                     memento.newValueHolder.id

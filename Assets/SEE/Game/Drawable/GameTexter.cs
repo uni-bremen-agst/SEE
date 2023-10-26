@@ -2,6 +2,7 @@
 using HtmlAgilityPack;
 using RTG;
 using SEE.Game;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using System;
 using System.Collections;
@@ -9,7 +10,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UIElements;
-using static SEE.Game.GameDrawer;
+using static Assets.SEE.Game.Drawable.GameDrawer;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -151,7 +152,7 @@ namespace Assets.SEE.Game.Drawable
             {
                 textObj = new("");
                 name = ValueHolder.TextPrefix + textObj.GetInstanceID() + DrawableHolder.GetRandomString(4);
-                while (GameDrawableFinder.FindChild(drawable, name) != null)
+                while (GameFinder.FindChild(drawable, name) != null)
                 {
                     name = ValueHolder.TextPrefix + textObj.GetInstanceID() + DrawableHolder.GetRandomString(4);
                 }
@@ -231,9 +232,9 @@ namespace Assets.SEE.Game.Drawable
                 ValueHolder.currentOrderInLayer = order + 1;
             }
             GameObject textObject;
-            if (GameDrawableFinder.FindChild(drawable, id) != null)
+            if (GameFinder.FindChild(drawable, id) != null)
             {
-                textObject = GameDrawableFinder.FindChild(drawable, id);
+                textObject = GameFinder.FindChild(drawable, id);
                 textObject.GetComponent<TextMeshPro>().sortingOrder = order;
             }
             else

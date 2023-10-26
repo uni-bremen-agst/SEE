@@ -3,7 +3,6 @@ using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
 using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game;
 using Assets.SEE.Game.UI.Drawable;
 using SEE.Game;
 using TMPro;
@@ -12,6 +11,7 @@ using UnityEngine.UI;
 using SEE.Game.Drawable.Configurations;
 using Crosstales;
 using Michsky.UI.ModernUIPack;
+using SEE.Game.Drawable;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -60,7 +60,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// If left control is pressed the main color will be picked for the <see cref="ValueHolder.currentSecondaryColor"/>
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !isInAction &&
                     Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
-                    GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject) &&
+                    GameFinder.hasDrawable(raycastHit.collider.gameObject) &&
                     (raycastHit.collider.gameObject.CompareTag(Tags.Line) || raycastHit.collider.gameObject.CompareTag(Tags.DText)))
                 {
                     isInAction = true;
@@ -95,7 +95,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// /// If left control is pressed the second color will be loaded as main color
                 if ((Input.GetMouseButtonDown(1) || Input.GetMouseButton(1)) && !isInAction &&
                     Raycasting.RaycastAnythingBackface(out RaycastHit hit) &&
-                    GameDrawableFinder.hasDrawable(hit.collider.gameObject) &&
+                    GameFinder.hasDrawable(hit.collider.gameObject) &&
                     (hit.collider.gameObject.CompareTag(Tags.Line) || hit.collider.gameObject.CompareTag(Tags.DText)))
                 {
                     isInAction = true;

@@ -1,8 +1,8 @@
 ﻿using Assets.SEE.Game.Drawable;
-using Assets.SEE.Game;
 using SEE.Net.Actions;
 using SEE.Controls.Actions.Drawable;
 using UnityEngine;
+using SEE.Game.Drawable;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -62,10 +62,10 @@ namespace SEE.Net.Actions.Drawable
             {
                 if (!IsRequester())
                 {
-                    GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
-                    if (drawable != null && GameDrawableFinder.FindChild(drawable, ObjectName) != null)
+                    GameObject drawable = GameFinder.Find(DrawableID, ParentDrawableID);
+                    if (drawable != null && GameFinder.FindChild(drawable, ObjectName) != null)
                     {
-                        GameMoveRotator.MoveObject(GameDrawableFinder.FindChild(drawable, ObjectName), Position);
+                        GameMoveRotator.MoveObject(GameFinder.FindChild(drawable, ObjectName), Position);
                     }
                     else
                     {

@@ -1,7 +1,6 @@
-﻿using Assets.SEE.Game;
-using Assets.SEE.Game.Drawable;
-using SEE.Game;
-using static SEE.Game.GameDrawer;
+﻿using Assets.SEE.Game.Drawable;
+using SEE.Game.Drawable;
+using static Assets.SEE.Game.Drawable.GameDrawer;
 using SEE.Controls.Actions.Drawable;
 using UnityEngine;
 using SEE.Game.Drawable.Configurations;
@@ -49,7 +48,7 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
+                GameObject drawable = GameFinder.Find(DrawableID, ParentDrawableID);
                 if (drawable == null)
                 {
                     throw new System.Exception($"There is no drawable with the ID {DrawableID}.");

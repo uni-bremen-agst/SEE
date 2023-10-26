@@ -1,8 +1,8 @@
-﻿using Assets.SEE.Game;
-using Assets.SEE.Game.Drawable;
+﻿using Assets.SEE.Game.Drawable;
 using SEE.Net.Actions;
 using SEE.Controls.Actions.Drawable;
 using UnityEngine;
+using SEE.Game.Drawable;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -60,10 +60,10 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
-                if (drawable != null && GameDrawableFinder.FindChild(drawable, LineName) != null)
+                GameObject drawable = GameFinder.Find(DrawableID, ParentDrawableID);
+                if (drawable != null && GameFinder.FindChild(drawable, LineName) != null)
                 {
-                    GameEdit.ChangeLoop(GameDrawableFinder.FindChild(drawable, LineName), Loop);
+                    GameEdit.ChangeLoop(GameFinder.FindChild(drawable, LineName), Loop);
                 }
                 else
                 {

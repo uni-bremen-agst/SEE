@@ -1,4 +1,3 @@
-using Assets.SEE.Game;
 using Assets.SEE.Game.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.Game;
@@ -10,6 +9,7 @@ using System.Linq;
 using UnityEngine;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.Game.Drawable;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -75,7 +75,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// with their starting and ending points corresponding to the splitting point.
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !isActive &&
                     Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
-                    GameDrawableFinder.hasDrawable(raycastHit.collider.gameObject))
+                    GameFinder.hasDrawable(raycastHit.collider.gameObject))
                 {
                     isActive = true;
                     GameObject hittedObject = raycastHit.collider.gameObject;
@@ -93,9 +93,9 @@ namespace SEE.Controls.Actions.Drawable
                         hittedObject.transform.TransformPoints(transformedPositions);
                         List<LineConf> lines = new();
                         List<int> matchedIndexes = NearestPoints.GetNearestIndexes(transformedPositions, raycastHit.point);
-                        GameLineSplit.Split(GameDrawableFinder.FindDrawable(hittedObject), originLine, matchedIndexes, positionsList, lines, false);
+                        GameLineSplit.Split(GameFinder.FindDrawable(hittedObject), originLine, matchedIndexes, positionsList, lines, false);
 
-                        memento = new Memento(hittedObject, GameDrawableFinder.FindDrawable(hittedObject), lines);
+                        memento = new Memento(hittedObject, GameFinder.FindDrawable(hittedObject), lines);
                         new EraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.originalLine.id).Execute();
                         Destroyer.Destroy(hittedObject);
                     }
@@ -118,12 +118,12 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Undo();
             GameDrawer.ReDrawLine(memento.drawable, memento.originalLine);
-            new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.originalLine).Execute();
+            new DrawOnNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), memento.originalLine).Execute();
 
             foreach (LineConf line in memento.lines)
             {
-                GameObject lineObj = GameDrawableFinder.FindChild(memento.drawable, line.id);
-                new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), line.id).Execute();
+                GameObject lineObj = GameFinder.FindChild(memento.drawable, line.id);
+                new EraseNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), line.id).Execute();
                 Destroyer.Destroy(lineObj);
             }
         }
@@ -134,14 +134,14 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            GameObject originObj = GameDrawableFinder.FindChild(memento.drawable, memento.originalLine.id);
-            new EraseNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), memento.originalLine.id).Execute();
+            GameObject originObj = GameFinder.FindChild(memento.drawable, memento.originalLine.id);
+            new EraseNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), memento.originalLine.id).Execute();
             Destroyer.Destroy(originObj);
 
             foreach (LineConf line in memento.lines)
             {
                 GameDrawer.ReDrawLine(memento.drawable, line);
-                new DrawOnNetAction(memento.drawable.name, GameDrawableFinder.GetDrawableParentName(memento.drawable), line).Execute();
+                new DrawOnNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), line).Execute();
             }
         }
 

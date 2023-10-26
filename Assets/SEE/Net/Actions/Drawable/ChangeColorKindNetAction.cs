@@ -1,8 +1,8 @@
-﻿using Assets.SEE.Game;
-using UnityEngine;
-using SEE.Game;
+﻿using UnityEngine;
+using SEE.Game.Drawable;
 using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable.Configurations;
+using Assets.SEE.Game.Drawable;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -62,10 +62,10 @@ namespace SEE.Net.Actions.Drawable
             {
                 if (!IsRequester())
                 {
-                    GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
-                    if (drawable != null && GameDrawableFinder.FindChild(drawable, Line.id) != null)
+                    GameObject drawable = GameFinder.Find(DrawableID, ParentDrawableID);
+                    if (drawable != null && GameFinder.FindChild(drawable, Line.id) != null)
                     {
-                        GameDrawer.ChangeColorKind(GameDrawableFinder.FindChild(drawable, Line.id), ColorKind, Line);
+                        GameDrawer.ChangeColorKind(GameFinder.FindChild(drawable, Line.id), ColorKind, Line);
                     }
                     else
                     {

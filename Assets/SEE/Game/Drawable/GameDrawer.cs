@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Assets.SEE.Game;
-using Assets.SEE.Game.Drawable;
 using RTG;
 using SEE.DataModel.DG;
 using SEE.Game.City;
@@ -12,8 +10,10 @@ using UnityEngine;
 using UnityEngine.UIElements;
 using SEE.Game.Drawable.Configurations;
 using static Assets.SEE.Game.Drawable.GameShapesCalculator;
+using SEE.Game.Drawable;
+using SEE.Game;
 
-namespace SEE.Game
+namespace Assets.SEE.Game.Drawable
 {
     public static class GameDrawer
     {
@@ -63,7 +63,7 @@ namespace SEE.Game
             {
                 line = new("");
                 name = ValueHolder.LinePrefix + line.GetInstanceID() + DrawableHolder.GetRandomString(4);
-                while(GameDrawableFinder.FindChild(drawable, name) != null)
+                while(GameFinder.FindChild(drawable, name) != null)
                 {
                     name = ValueHolder.LinePrefix + line.GetInstanceID() + DrawableHolder.GetRandomString(4);
                 }
@@ -162,9 +162,9 @@ namespace SEE.Game
         {
             GameObject l;
             UpdateZPositions(ref positions);
-            if (GameDrawableFinder.FindChild(drawable, name) != null)
+            if (GameFinder.FindChild(drawable, name) != null)
             {
-                l = GameDrawableFinder.FindChild(drawable, name);
+                l = GameFinder.FindChild(drawable, name);
                 Drawing(l, positions);
                 FinishDrawing(l, loop);
             }
@@ -189,9 +189,9 @@ namespace SEE.Game
             {
                 ValueHolder.currentOrderInLayer = orderInLayer + 1;
             }
-            if (GameDrawableFinder.FindChild(drawable, name) != null)
+            if (GameFinder.FindChild(drawable, name) != null)
             {
-                GameObject line = GameDrawableFinder.FindChild(drawable, name);
+                GameObject line = GameFinder.FindChild(drawable, name);
                 line.transform.localScale = scale;
                 line.transform.localEulerAngles = eulerAngles;
                 line.transform.localPosition = position;

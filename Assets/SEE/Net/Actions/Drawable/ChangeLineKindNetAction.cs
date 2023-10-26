@@ -1,7 +1,7 @@
-﻿using Assets.SEE.Game;
-using UnityEngine;
-using SEE.Game;
+﻿using UnityEngine;
+using SEE.Game.Drawable;
 using SEE.Controls.Actions.Drawable;
+using Assets.SEE.Game.Drawable;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -67,10 +67,10 @@ namespace SEE.Net.Actions.Drawable
             {
                 if (!IsRequester())
                 {
-                    GameObject drawable = GameDrawableFinder.Find(DrawableID, ParentDrawableID);
-                    if (drawable != null && GameDrawableFinder.FindChild(drawable, LineName) != null)
+                    GameObject drawable = GameFinder.Find(DrawableID, ParentDrawableID);
+                    if (drawable != null && GameFinder.FindChild(drawable, LineName) != null)
                     {
-                        GameDrawer.ChangeLineKind(GameDrawableFinder.FindChild(drawable, LineName), LineKind, Tiling);
+                        GameDrawer.ChangeLineKind(GameFinder.FindChild(drawable, LineName), LineKind, Tiling);
                     }
                     else
                     {

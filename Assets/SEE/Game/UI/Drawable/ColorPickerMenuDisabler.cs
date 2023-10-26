@@ -1,6 +1,5 @@
-﻿using Assets.SEE.Controls.Actions.Drawable;
+﻿using SEE.Controls.Actions.Drawable;
 using SEE.Controls.Actions;
-using SEE.Controls.Actions.Drawable;
 using System.Collections;
 using UnityEngine;
 
