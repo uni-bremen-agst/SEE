@@ -51,7 +51,7 @@
         "NetworkCommsDotNetComplete.dll",
         "DOTween.dll",
         "Joveler.Compression.XZ.dll",
-        "MathNet.Numerics.dll"
+        "MathNet.Numerics.dll",
 		"Accord.Text.dll"
     ],
     "autoReferenced": false,
