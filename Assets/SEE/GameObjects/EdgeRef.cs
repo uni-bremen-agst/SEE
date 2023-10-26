@@ -13,27 +13,27 @@ namespace SEE.GO
         [NonSerialized] private static readonly Dictionary<Edge, EdgeRef> edgeToEdgeRefDict = new();
 
         /// <summary>
-		/// The graph edge this edge reference is referring to. It will be set either
-		/// by a graph renderer while in editor mode or at runtime by way of an
-		/// AbstractSEECity object.
-		/// It will not be serialized to prevent duplicating and endless serialization
-		/// by both Unity and Odin.
+        /// The graph edge this edge reference is referring to. It will be set either
+        /// by a graph renderer while in editor mode or at runtime by way of an
+        /// AbstractSEECity object.
+        /// It will not be serialized to prevent duplicating and endless serialization
+        /// by both Unity and Odin.
         /// </summary>
         public Edge Value
         {
-            get => (Edge)elem;
+            get => (Edge)Elem;
             set
             {
-                if (elem != value)
+                if (Elem != value)
                 {
-                    if (elem != null)
+                    if (Elem != null)
                     {
-                        edgeToEdgeRefDict.Remove((Edge)elem);
+                        edgeToEdgeRefDict.Remove((Edge)Elem);
                     }
-                    elem = value;
-                    if (elem != null)
+                    Elem = value;
+                    if (Elem != null)
                     {
-                        edgeToEdgeRefDict[(Edge)elem] = this;
+                        edgeToEdgeRefDict[(Edge)Elem] = this;
                     }
                 }
             }

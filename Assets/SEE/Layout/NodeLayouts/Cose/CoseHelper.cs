@@ -32,13 +32,13 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// checks if the node with the given id is a sublayout root node
         /// </summary>
         /// <param name="sublayoutNodes">all sublayout nodes</param>
-        /// <param name="ID">the id</param>
+        /// <param name="id">the id</param>
         /// <returns>true if the node with the given id is a sublayout root node</returns>
-        public static SublayoutNode CheckIfNodeIsSublayouRoot(ICollection<SublayoutNode> sublayoutNodes, string ID)
+        public static SublayoutNode CheckIfNodeIsSublayouRoot(ICollection<SublayoutNode> sublayoutNodes, string id)
         {
             foreach (SublayoutNode subLayoutNode in sublayoutNodes)
             {
-                if (subLayoutNode.Node.ID == ID)
+                if (subLayoutNode.Node.ID == id)
                 {
                     return subLayoutNode;
                 }
@@ -50,13 +50,13 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// checks if the node with the given id is a sublayout root node
         /// </summary>
         /// <param name="sublayoutNodes">all sublayout nodes</param>
-        /// <param name="ID">the id</param>
+        /// <param name="id">the id</param>
         /// <returns>true if the node with the given id is a sublayout root node</returns>
-        public static SublayoutLayoutNode CheckIfNodeIsSublayouRoot(ICollection<SublayoutLayoutNode> sublayoutNodes, string ID)
+        public static SublayoutLayoutNode CheckIfNodeIsSublayouRoot(ICollection<SublayoutLayoutNode> sublayoutNodes, string id)
         {
             foreach (SublayoutLayoutNode subLayoutNode in sublayoutNodes)
             {
-                if (subLayoutNode.Node.ID == ID)
+                if (subLayoutNode.Node.ID == id)
                 {
                     return subLayoutNode;
                 }
@@ -122,6 +122,12 @@ namespace SEE.Layout.NodeLayouts.Cose
                     return new EvoStreetsNodeLayout(groundLevel);
                 case NodeLayoutKind.Treemap:
                     return new TreemapLayout(groundLevel, 1000.0f, 1000.0f);
+                case NodeLayoutKind.IncrementalTreeMap:
+                    return new IncrementalTreeMapLayout(
+                        groundLevel,
+                        1000.0f,
+                        1000.0f,
+                        settings.NodeLayoutSettings.IncrementalTreeMap);
                 case NodeLayoutKind.Balloon:
                     return new BalloonNodeLayout(groundLevel);
                 case NodeLayoutKind.CirclePacking:
@@ -196,11 +202,11 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <summary>
         /// Returns the layout node with the given ID
         /// </summary>
-        /// <param name="ID">the ID</param>
+        /// <param name="id">the ID</param>
         /// <returns>layout node with the given ID</returns>
-        public static ILayoutNode GetLayoutNodeFromLinkname(String ID, ICollection<ILayoutNode> layoutNodes)
+        public static ILayoutNode GetLayoutNodeFromLinkname(String id, ICollection<ILayoutNode> layoutNodes)
         {
-            List<ILayoutNode> nodes = layoutNodes.Where(layoutNode => layoutNode.ID == ID).ToList();
+            List<ILayoutNode> nodes = layoutNodes.Where(layoutNode => layoutNode.ID == id).ToList();
 
             if (nodes.Count > 1)
             {

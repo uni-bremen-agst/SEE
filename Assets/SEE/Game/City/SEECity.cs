@@ -2,15 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using InControl;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
-using SEE.Game.UI.RuntimeConfigMenu;
+using SEE.UI.RuntimeConfigMenu;
 using SEE.GO;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Assertions;
+using SEE.Game.CityRendering;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
 
 namespace SEE.Game.City
 {
@@ -509,25 +511,25 @@ namespace SEE.Game.City
         /// <summary>
         /// Label of attribute <see cref="GXLPath"/> in the configuration file.
         /// </summary>
-        private const string GXLPathLabel = "GXLPath";
+        private const string gxlPathLabel = "GXLPath";
 
         /// <summary>
         /// Label of attribute <see cref="CSVPath"/> in the configuration file.
         /// </summary>
-        private const string CSVPathLabel = "CSVPath";
+        private const string csvPathLabel = "CSVPath";
 
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
-            GXLPath.Save(writer, GXLPathLabel);
-            CSVPath.Save(writer, CSVPathLabel);
+            GXLPath.Save(writer, gxlPathLabel);
+            CSVPath.Save(writer, csvPathLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            GXLPath.Restore(attributes, GXLPathLabel);
-            CSVPath.Restore(attributes, CSVPathLabel);
+            GXLPath.Restore(attributes, gxlPathLabel);
+            CSVPath.Restore(attributes, csvPathLabel);
         }
     }
 }

@@ -4,9 +4,9 @@ using FuzzySharp;
 using SEE.Controls;
 using SEE.Game;
 using SEE.Game.Operator;
-using SEE.Game.UI.Menu;
-using SEE.Game.UI.Notification;
-using SEE.Game.UI.PropertyDialog;
+using SEE.UI.Menu;
+using SEE.UI.Notification;
+using SEE.UI.PropertyDialog;
 using UnityEngine;
 
 namespace SEE.GO.Menu
@@ -20,22 +20,7 @@ namespace SEE.GO.Menu
         /// <summary>
         /// The time (in seconds) the found node will blink.
         /// </summary>
-        private const float BLINK_SECONDS = 15;
-
-        /// <summary>
-        /// The number of times the found node will blink.
-        /// </summary>
-        private const int BLINK_COUNT = 20;
-
-        /// <summary>
-        /// The height of the marker used to mark the found node.
-        /// </summary>
-        private const float MARKER_HEIGHT = 1f;
-
-        /// <summary>
-        /// The width of the marker used to mark the found node.
-        /// </summary>
-        private const float MARKER_WIDTH = 0.01f;
+        private const float blinkSeconds = 15;
 
         /// <summary>
         /// The dialog in which the search query can be entered.
@@ -52,11 +37,6 @@ namespace SEE.GO.Menu
         /// The user can select the desired node here.
         /// </summary>
         private SimpleListMenu resultMenu;
-
-        /// <summary>
-        /// The color of the marker pointing to the found node.
-        /// </summary>
-        private static readonly Color MARKER_COLOR = Color.red;
 
         /// <summary>
         /// A mapping from names to a list of nodes with that name.
@@ -121,7 +101,7 @@ namespace SEE.GO.Menu
                                           + $"'{FilterString(searchString.Value)}'.");
                     break;
                 case 1:
-                    HighlightNode(results.First().Item3, results.First().Item2);
+                    HighlightNode(results.First().Item3);
                     break;
                 default:
                     ShowResultsMenu(results);
@@ -148,15 +128,15 @@ namespace SEE.GO.Menu
             // Entries will be greyed out the further they go.
             resultMenuEntries.ForEach(resultMenu.RemoveEntry); // Clean up previous entries.
             resultMenuEntries.Clear();
-            resultMenuEntries.AddRange(results.Select(x => new MenuEntry(() => MenuEntryAction(x.Item3, x.Item2), null,
+            resultMenuEntries.AddRange(results.Select(x => new MenuEntry(() => MenuEntryAction(x.Item3), null,
                                                                          x.Item2, entryColor: ScoreColor(x.Item1))));
             resultMenuEntries.ForEach(resultMenu.AddEntry);
             resultMenu.ShowMenu = true;
 
             // Highlight node and close menu when entry was chosen.
-            void MenuEntryAction(GameObject chosen, string chosenName)
+            void MenuEntryAction(GameObject chosen)
             {
-                HighlightNode(chosen, chosenName);
+                HighlightNode(chosen);
                 resultMenu.ShowMenu = false;
             }
         }
@@ -174,18 +154,10 @@ namespace SEE.GO.Menu
         /// </summary>
         /// <param name="result">The game object of the node which shall be highlighted.</param>
         /// <param name="resultName">The name of the node which shall be highlighted.</param>
-        private static void HighlightNode(GameObject result, string resultName)
+        private static void HighlightNode(GameObject result)
         {
-            ShowNotification.Info($"Highlighting '{resultName}'",
-                                  "The selected node will be blinking and marked by a spear "
-                                  + $"for {BLINK_SECONDS} seconds.");
-            NodeOperator nodeOperator = result.AddOrGetComponent<NodeOperator>();
-            // Display marker above the node
-            MarkerFactory marker = new(MARKER_WIDTH, MARKER_HEIGHT, MARKER_COLOR, default, default);
-            marker.MarkBorn(result);
-            nodeOperator.Blink(BLINK_COUNT, BLINK_SECONDS).SetOnComplete(RemoveMarker);
-
-            void RemoveMarker() => marker.Clear();
+            NodeOperator nodeOperator = result.NodeOperator();
+            nodeOperator.Highlight(blinkSeconds);
         }
 
         /// <summary>

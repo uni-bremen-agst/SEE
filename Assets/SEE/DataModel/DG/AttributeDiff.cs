@@ -6,7 +6,7 @@ namespace SEE.DataModel.DG
     /// Allows one to determine whether there is any difference between two
     /// graph elements in terms of selected attributes.
     /// </summary>
-    public class AttributeDiff : GraphElementDiff
+    public class AttributeDiff : IGraphElementDiff
     {
         /// <summary>
         /// Constructor.
@@ -55,7 +55,7 @@ namespace SEE.DataModel.DG
         /// <param name="left">left graph element to be compared</param>
         /// <param name="right">right graph element to be compared</param>
         /// <returns>true if there is any difference</returns>
-        bool GraphElementDiff.AreDifferent(GraphElement left, GraphElement right)
+        bool IGraphElementDiff.AreDifferent(GraphElement left, GraphElement right)
         {
             if (left == null)
             {
@@ -81,7 +81,7 @@ namespace SEE.DataModel.DG
         /// <param name="attributeName">name of the toggle attribute</param>
         /// <param name="value">true if <paramref name="element"/> has the toggle attribute <paramref name="attributeName"/></param>
         /// <returns>true if <paramref name="element"/> has the toggle attribute <paramref name="attributeName"/></returns>
-        private bool TryGetToggle(GraphElement element, string attributeName, out bool value)
+        private static bool TryGetToggle(GraphElement element, string attributeName, out bool value)
         {
             value = element.HasToggle(attributeName);
             return value;

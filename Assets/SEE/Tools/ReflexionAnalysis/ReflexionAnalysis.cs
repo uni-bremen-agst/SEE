@@ -39,7 +39,7 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using UnityEngine;
 using UnityEngine.Assertions;
-using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
+using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraphs;
 
 namespace SEE.Tools.ReflexionAnalysis
 {
@@ -150,7 +150,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Name of the edge attribute for the state of a dependency.
         /// </summary>
-        private const string StateAttribute = "Reflexion.State";
+        private const string stateAttribute = "Reflexion.State";
 
         /// <summary>
         /// Sets the state of <paramref name="edge"/> to <paramref name="newState"/>.
@@ -159,8 +159,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="newState">the state to be set</param>
         private static void SetState(Edge edge, State newState)
         {
-            // Debug.Log($"{edge.ID} Set Reflexion.State = {newState}");
-            edge.SetInt(StateAttribute, (int)newState);
+            edge.SetInt(stateAttribute, (int)newState);
         }
 
         /// <summary>
@@ -190,7 +189,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 }
                 else
                 {
-                    Notify(new EdgeChange(version, edge, state, newState, edge.GetSubgraphs()));
+                    Notify(new EdgeChange(Version, edge, state, newState, edge.GetSubgraphs()));
                 }
             }
         }
@@ -209,6 +208,19 @@ namespace SEE.Tools.ReflexionAnalysis
             return state == State.Specified || state == State.Convergent || state == State.Absent || state == State.AllowedAbsent;
         }
 
+        /// <summary>
+        /// Returns true if <paramref name="edge"/> is a divergent
+        /// edge (present in the implementation graph, but missing in
+        /// the architecture graph).
+        /// Precondition: <paramref name="edge"/> must be in the implementation graph.
+        /// </summary>
+        /// <param name="edge">architecture dependency</param>
+        /// <returns>true if edge is a divergent architecture dependency</returns>
+        public static bool IsDivergent(Edge edge)
+        {
+            AssertOrThrow(edge.IsInReflexion(), () => new NotInSubgraphException(Implementation, edge));
+            return edge.State() == State.Divergent;
+        }
         #endregion
 
         #region Edge counter attribute
@@ -219,7 +231,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <remarks>
         /// The counter counts the number of propagations.
         /// </remarks>
-        private const string CounterAttribute = "Reflexion.Counter";
+        private const string counterAttribute = "Reflexion.Counter";
 
         /// <summary>
         /// Sets counter of given architecture dependency <paramref name="edge"/> to given <paramref name="value"/>.
@@ -230,7 +242,7 @@ namespace SEE.Tools.ReflexionAnalysis
         private static void SetCounter(Edge edge, int value)
         {
             AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
-            edge.SetInt(CounterAttribute, value);
+            edge.SetInt(counterAttribute, value);
         }
 
         /// <summary>
@@ -240,16 +252,16 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="edge">an architecture dependency whose counter is to be changed</param>
         /// <param name="value">value to be added</param>
-        private void AddToCounter(Edge edge, int value)
+        private static void AddToCounter(Edge edge, int value)
         {
             AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
-            if (edge.TryGetInt(CounterAttribute, out int oldValue))
+            if (edge.TryGetInt(counterAttribute, out int oldValue))
             {
-                edge.SetInt(CounterAttribute, oldValue + value);
+                edge.SetInt(counterAttribute, oldValue + value);
             }
             else
             {
-                edge.SetInt(CounterAttribute, value);
+                edge.SetInt(counterAttribute, value);
             }
         }
 
@@ -262,7 +274,7 @@ namespace SEE.Tools.ReflexionAnalysis
         private static int GetArchCounter(Edge edge)
         {
             AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
-            return edge.TryGetInt(CounterAttribute, out int value) ? value : 0;
+            return edge.TryGetInt(counterAttribute, out int value) ? value : 0;
         }
 
         /// <summary>
@@ -606,7 +618,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Whether descendants may implicitly access their ancestors.
         /// </summary>
-        private readonly bool AllowDependenciesToParents;
+        private readonly bool allowDependenciesToParents;
 
         #endregion
 
@@ -620,7 +632,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="node">implementation node</param>
         /// <returns>true if node should be considered in the reflexion analysis</returns>
-        private bool IsRelevant(Node node)
+        private static bool IsRelevant(Node node)
         {
             return true;
             // FIXME: For the time being, we consider every node to be relevant.
@@ -652,7 +664,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="edge">implementation dependency</param>
         /// <returns>true if edge should be considered in the reflexion analysis</returns>
-        private bool IsRelevant(Edge edge)
+        private static bool IsRelevant(Edge edge)
         {
             return IsRelevant(edge.Source) && IsRelevant(edge.Target);
             // FIXME: For the time being, we consider every edge to be relevant as long as their
@@ -720,7 +732,7 @@ namespace SEE.Tools.ReflexionAnalysis
             foreach (Edge mapsTo in Edges().Where(x => x.IsInMapping()))
             {
                 // We'll now also notify our observer's that a "new" mapping edge exists.
-                Notify(new EdgeEvent(version, mapsTo, ChangeType.Addition, Mapping));
+                Notify(new EdgeEvent(Version, mapsTo, ChangeType.Addition, Mapping));
                 // TODO: Unsure whether we still need the above notification?
                 //       Graph sends it out on creation of the edge anyway.
             }
@@ -1063,7 +1075,7 @@ namespace SEE.Tools.ReflexionAnalysis
 
         /// <summary>
         /// Returns true if this causing implementation edge is a dependency from child to
-        /// parent in the sense of the <see cref="AllowDependenciesToParents"/> option.
+        /// parent in the sense of the <see cref="allowDependenciesToParents"/> option.
         ///
         /// Precondition: <paramref name="edge"/> is in implementation graph.
         /// </summary>
@@ -1218,7 +1230,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 // dependency. Self dependencies are implicitly allowed.
                 allowingEdgeOut = null;
             }
-            else if (AllowDependenciesToParents
+            else if (allowDependenciesToParents
                      && IsDescendantOf(propagatedArchitectureDep.Source, propagatedArchitectureDep.Target))
             {
                 Transition(propagatedArchitectureDep, State.ImplicitlyAllowed);

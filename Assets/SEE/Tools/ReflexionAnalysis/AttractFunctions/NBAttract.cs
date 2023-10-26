@@ -6,8 +6,8 @@ using System;
 using System.Collections.Generic;
 using Accord.MachineLearning.Text.Stemmers;
 using System.Text;
-using SEE.Game.UI.Window.CodeWindow;
 using UnityEngine;
+using SEE.UI.Window.CodeWindow;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {

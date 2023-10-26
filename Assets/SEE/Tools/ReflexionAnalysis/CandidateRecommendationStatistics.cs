@@ -1,12 +1,9 @@
 ﻿using Newtonsoft.Json;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
-using SEE.Utils;
-using Sirenix.Utilities;
+using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -93,10 +90,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <param name="oracleMapping"></param>
         public void SetOracleMapping(Graph oracleMapping)
         {
-            Reset(); 
-            (Graph implementation, Graph architecture, _) = ReflexionGraph.Disassemble();
-            OracleGraph = new ReflexionGraph(implementation, architecture, oracleMapping);
-            OracleGraph.RunAnalysis();
+            if (oracleMapping != null)
+            {
+                Reset();
+                (Graph implementation, Graph architecture, _) = ReflexionGraph.Disassemble();
+                OracleGraph = new ReflexionGraph(implementation, architecture, oracleMapping);
+                OracleGraph.RunAnalysis(); 
+            }
         }
 
         public void Reset()

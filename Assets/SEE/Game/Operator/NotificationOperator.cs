@@ -14,20 +14,20 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Operation handling position on the Y axis.
         /// </summary>
-        private TweenOperation<float> PositionY;
+        private TweenOperation<float> positionY;
 
         /// <summary>
         /// The Y position this notification is supposed to be at.
         /// </summary>
-        public float TargetPositionY => PositionY.TargetValue;
+        public float TargetPositionY => positionY.TargetValue;
 
         /// <summary>
         /// The base animation duration for this operator.
         /// May be set from outside.
         /// </summary>
-        public float TheBaseAnimationDuration
+        private float TheBaseAnimationDuration
         {
-            private get;
+            get;
             set;
         } = 1f;
 
@@ -44,25 +44,25 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> MoveToY(float newY, float factor = 1)
         {
-            return PositionY.AnimateTo(newY, ToDuration(factor));
+            return positionY.AnimateTo(newY, ToDuration(factor));
         }
 
         private void OnEnable()
         {
             RectTransform rectTransform = (RectTransform)transform;
+            positionY = new TweenOperation<float>(PositionYAction, rectTransform.anchoredPosition.y);
+            return;
 
             Tween[] PositionYAction(float p, float d) => new Tween[]
             {
                 rectTransform.DOAnchorPosY(p, d).Play()
             };
-
-            PositionY = new TweenOperation<float>(PositionYAction, rectTransform.anchoredPosition.y);
         }
 
         private void OnDisable()
         {
-            PositionY?.KillAnimator();
-            PositionY = null;
+            positionY?.KillAnimator();
+            positionY = null;
         }
     }
 }

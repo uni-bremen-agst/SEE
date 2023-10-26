@@ -95,10 +95,10 @@ namespace SEE.Layout
                 {
                     GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     go.name = layoutNode.Key;
-                    go.transform.localScale = layoutNode.Value.scale;
+                    go.transform.localScale = layoutNode.Value.Scale;
                     // position.y of a NodeTransform relates to the ground, while a
                     // game objects position.y relates to the center; we need to lift it
-                    Vector3 position = layoutNode.Value.position;
+                    Vector3 position = layoutNode.Value.Position;
                     position.y += go.transform.localScale.y / 2;
                     go.transform.position = position;
                     result.Add(go);
@@ -155,19 +155,19 @@ namespace SEE.Layout
 
                 //Debug.Log($"Comparing node with ID {node.ID}\n");
                 NodeTransform savedTransform = originalLayout[node.ID];
-                Assert.That(readTransform.scale.x, Is.EqualTo(savedTransform.scale.x).Within(floatTolerance));
+                Assert.That(readTransform.Scale.x, Is.EqualTo(savedTransform.Scale.x).Within(floatTolerance));
                 if (compareY)
                 {
-                    Assert.That(readTransform.scale.y, Is.EqualTo(savedTransform.scale.y).Within(floatTolerance));
+                    Assert.That(readTransform.Scale.y, Is.EqualTo(savedTransform.Scale.y).Within(floatTolerance));
                 }
-                Assert.That(readTransform.scale.z, Is.EqualTo(savedTransform.scale.z).Within(floatTolerance));
-                Assert.That(readTransform.position.x, Is.EqualTo(savedTransform.position.x).Within(floatTolerance));
+                Assert.That(readTransform.Scale.z, Is.EqualTo(savedTransform.Scale.z).Within(floatTolerance));
+                Assert.That(readTransform.Position.x, Is.EqualTo(savedTransform.Position.x).Within(floatTolerance));
                 if (compareY)
                 {
-                    Assert.That(readTransform.position.y, Is.EqualTo(savedTransform.position.y).Within(floatTolerance));
+                    Assert.That(readTransform.Position.y, Is.EqualTo(savedTransform.Position.y).Within(floatTolerance));
                 }
-                Assert.That(readTransform.position.z, Is.EqualTo(savedTransform.position.z).Within(floatTolerance));
-                Assert.AreEqual(savedTransform.rotation, readTransform.rotation);
+                Assert.That(readTransform.Position.z, Is.EqualTo(savedTransform.Position.z).Within(floatTolerance));
+                Assert.AreEqual(savedTransform.Rotation, readTransform.Rotation);
             }
         }
 
@@ -194,10 +194,10 @@ namespace SEE.Layout
             {
                 ILayoutNode node = entry.Key;
                 NodeTransform transform = entry.Value;
-                node.LocalScale = transform.scale;
-                Vector3 position = transform.position;
+                node.LocalScale = transform.Scale;
+                Vector3 position = transform.Position;
                 // from ground to center position along the y axis
-                position.y += transform.scale.y / 2.0f;
+                position.y += transform.Scale.y / 2.0f;
                 node.CenterPosition = position;
                 layoutMap[node.ID] = new NodeTransform(node.CenterPosition, node.LocalScale, node.Rotation);
             }

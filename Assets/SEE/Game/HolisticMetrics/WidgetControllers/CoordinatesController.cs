@@ -47,7 +47,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 IList<MetricValueRange> metricValues = valueCollection.MetricValues;
 
                 // Set the title of the widget
-                titleText.text = valueCollection.Name;
+                TitleText.text = valueCollection.Name;
 
                 if (metricValues.Count == 0)
                 {

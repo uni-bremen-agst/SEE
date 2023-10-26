@@ -12,7 +12,10 @@ using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
-using SEE.Game.UI.RuntimeConfigMenu;
+using SEE.UI.RuntimeConfigMenu;
+using SEE.Game.CityRendering;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
 
 namespace SEE.Game.City
 {
@@ -290,7 +293,7 @@ namespace SEE.Game.City
         /// <param name="filename">name of the file from which the settings are restored</param>
         public void Load(string filename)
         {
-            using ConfigReader stream = new(filename);
+            using Utils.Config.ConfigReader stream = new(filename);
             Restore(stream.Read());
         }
 
@@ -491,7 +494,7 @@ namespace SEE.Game.City
                 ErosionSettings.ArchitectureIssue,
                 ErosionSettings.CloneIssue,
                 ErosionSettings.CycleIssue,
-                ErosionSettings.Dead_CodeIssue,
+                ErosionSettings.DeadCodeIssue,
                 ErosionSettings.MetricIssue,
                 ErosionSettings.StyleIssue,
                 ErosionSettings.UniversalIssue
@@ -505,13 +508,13 @@ namespace SEE.Game.City
         public IList<string> AllInnerNodeIssues() =>
             new List<string>
             {
-                ErosionSettings.ArchitectureIssue_SUM,
-                ErosionSettings.CloneIssue_SUM,
-                ErosionSettings.CycleIssue_SUM,
-                ErosionSettings.Dead_CodeIssue_SUM,
-                ErosionSettings.MetricIssue_SUM,
-                ErosionSettings.StyleIssue_SUM,
-                ErosionSettings.UniversalIssue_SUM
+                ErosionSettings.ArchitectureIssueSum,
+                ErosionSettings.CloneIssueSum,
+                ErosionSettings.CycleIssueSum,
+                ErosionSettings.DeadCodeIssueSum,
+                ErosionSettings.MetricIssueSum,
+                ErosionSettings.StyleIssueSum,
+                ErosionSettings.UniversalIssueSum
             };
 
         /// <summary>
@@ -530,10 +533,10 @@ namespace SEE.Game.City
         public Dictionary<string, IconFactory.Erosion> LeafIssueMap() =>
             new()
             {
-                { ErosionSettings.ArchitectureIssue, IconFactory.Erosion.Architecture_Violation },
+                { ErosionSettings.ArchitectureIssue, IconFactory.Erosion.ArchitectureViolation },
                 { ErosionSettings.CloneIssue, IconFactory.Erosion.Clone },
                 { ErosionSettings.CycleIssue, IconFactory.Erosion.Cycle },
-                { ErosionSettings.Dead_CodeIssue, IconFactory.Erosion.Dead_Code },
+                { ErosionSettings.DeadCodeIssue, IconFactory.Erosion.DeadCode },
                 { ErosionSettings.MetricIssue, IconFactory.Erosion.Metric },
                 { ErosionSettings.StyleIssue, IconFactory.Erosion.Style },
                 { ErosionSettings.UniversalIssue, IconFactory.Erosion.Universal }
@@ -543,11 +546,11 @@ namespace SEE.Game.City
         /// Yields a mapping of all node attribute names that define erosion issues
         /// for inner nodes onto the icons to be used for visualizing them.
         /// These are usually the same attributes from <see cref="LeafIssueMap"/>, appended with
-        /// <see cref="MetricAggregator.SUM_EXTENSION"/>, i.e., they represent the aggregated issue metrics.
+        /// <see cref="MetricAggregator.SumExtension"/>, i.e., they represent the aggregated issue metrics.
         /// </summary>
         /// <returns>mapping of all node attribute names for inner nodes onto icon ids</returns>
         public Dictionary<string, IconFactory.Erosion> InnerIssueMap() =>
-            LeafIssueMap().Select(x => (Key: x.Key + MetricAggregator.SUM_EXTENSION, x.Value))
+            LeafIssueMap().Select(x => (Key: x.Key + MetricAggregator.SumExtension, x.Value))
                           .ToDictionary(x => x.Key, x => x.Value);
 
         /// <summary>

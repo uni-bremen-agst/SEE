@@ -117,9 +117,14 @@ namespace SEE.Controls
         internal static readonly KeyCode Redo = Register(KeyCode.Y, Scope.Always, "Re-does the last action.");
 
         /// <summary>
-        /// Opens/Closes the configuration menu.
+        /// Opens/closes the configuration menu.
         /// </summary>
-        internal static readonly KeyCode ConfigMenu = Register(KeyCode.K, Scope.Always, "Opens/Closes the configuration menu.");
+        internal static readonly KeyCode ConfigMenu = Register(KeyCode.K, Scope.Always, "Opens/closes the configuration menu.");
+
+        /// <summary>
+        /// Opens/closes the tree view window.
+        /// </summary>
+        internal static readonly KeyCode TreeView = Register(KeyCode.Tab, Scope.Always, "Opens/closes the tree view window.");
 
         #endregion
 
@@ -271,7 +276,7 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles auto play of the animation.
         /// </summary>
-        internal static readonly KeyCode ToggleAutoPlay = Register(KeyCode.Tab, Scope.Animation, "Toggles auto play of the animation.");
+        internal static readonly KeyCode ToggleAutoPlay = Register(KeyCode.Pause, Scope.Animation, "Toggles auto play of the animation.");
         /// <summary>
         /// Double animation speed.
         /// </summary>
@@ -352,6 +357,22 @@ namespace SEE.Controls
         /// Closes all open notifications.
         /// </summary>
         internal static readonly KeyCode CloseNotifications = Register(KeyCode.X, Scope.Always, "Clears all notifications.");
+
+        #endregion
+
+        #region FaceCam
+
+        /// <summary>
+        /// Toggles the face camera.
+        /// </summary>
+        internal static readonly KeyCode ToggleFaceCam
+            = Register(KeyCode.I, Scope.Always, "Toggles the face camera on or off.");
+
+        /// <summary>
+        /// Toggles the position of the FaceCam on the player's face.
+        /// </summary>
+        internal static readonly KeyCode ToggleFaceCamPosition
+            = Register(KeyCode.F3, Scope.Always, "Toggles the position of the FaceCam on the player's face.");
 
         #endregion
 

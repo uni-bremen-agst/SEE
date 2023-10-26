@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Cysharp.Threading.Tasks;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Utils;
 using UnityEngine;
@@ -36,34 +36,33 @@ namespace SEE.Net.Dashboard
         [EnvironmentVariable("DASHBOARD_PUBLIC_KEY")]
         [TextArea]
         [Tooltip("The public key for the X.509 certificate authority from the dashboard's certificate.")]
-        public string PublicKey = "3082020A0282020100B20ACB6E1639D673B6AF9E9F36578F66068AFDA50327DC2AB0F804E2F8"
-                                  + "3765BCB7AD74FED31EC8812FF9AA9C2461D53F7DC08449C765F0ECFA9C0787B9D1E1AE92F8D"
-                                  + "1919EDB6871E70601DB0834FF34389EDBA30BFF48F3EA8D07786E976B04F5232AC3A63D07DA"
-                                  + "5EAD5F5450026C9E2FB9294D32FC0172E9F0DFF33CDCB35180DB22E6985C15B02BBFAD02499"
-                                  + "D0E52AA916ADD5F9E7A40E22B8EC5427E02E47FD78CFEF30B5A2EDB53EA47E8B70230FB9EAE"
-                                  + "57B4B7042BD8829F67F4DCDA0230BB933741AF42992CD9164C4F5E2C126A46DC42AE5BD2268"
-                                  + "2C97880F8D0A82FA36FEC89CE9318E0DE2CAA3352F92F6231B18DF29913445AA323931106B0"
-                                  + "764066DB4A2F8764CE4FAC2500F5A084AE3133C6C82D18181655FC1050629257A54B44FBACB"
-                                  + "1BE43E51C7FA80DD7CE68D2F86AF448CA2E03B3C81A1289AA355E926CF221D881BFCD82BE7B"
-                                  + "0FA99F1B04A95D23F9B030B6CDF81E90197868BC72F314E2DFBA5F9965517F8C33BF056C005"
-                                  + "0DB08D285C988EFF7F212CC9D652E70B8FE67BC632F17ECFAE57603F5592C831951442F8215"
-                                  + "75139D193B4DC4F2EB46FEE09495CCF67259A3F4516873612582B84512019A1157F621B46D4"
-                                  + "5BCEE471BCE855C068B701F40C4CBB78F8E11550C83D7E6897967FD0B90C4BD25B0E3884492"
-                                  + "66293CF52814112B7F1A95A8EC3D6CBB5567B6B0916A995D5EB8254E31647B2F810203010001";
+        public string PublicKey = "3082018A0282018100D5EB3F1B3AB0ABCE827FA70BA32FCF8C834B1206464B785B7AE1"
+                                + "3D962F19887D6733B0A555651F130BCDB04D8BF6F199EF76DB7932C001B6916D0E3F0C"
+                                + "84C9A7DDB7BC62C93590E49C5DD97109B01B2CFAFD183A45DD8E02F86EBAFB4C74DF24"
+                                + "449D582DFC03D8E783DA035BB2985907EC00774D748AFC9A0195E05E2B992A7877F437"
+                                + "DB6088E2490A53D83D8F729482A383142AE5FBAFA4F2C3112E5A5C16D520ADFCF5E0F0"
+                                + "C9FF865126AFC8B97EAEFD77CE31A431F0E66C2200CDF70BC56B478FB7B56858CE605E"
+                                + "3313A876E4B719529DB929D9D7A966B16A9656FF639AE7382B6B7591E19D05A0B35468"
+                                + "03007DCE8354FDFDFC0DAB4E5103C0ED67A6BFD42E810C78A649DD419A0E4C1BB15267"
+                                + "A85DB4336D101F3799B71A654C5A8422875EE4ADCF7FD7D684D5B71AC4C0E392A533DE"
+                                + "143AACC68CCDD77F3FB47AFCF59F058E3873FCF454CED0EF1B5DF8A18A14C4D56A4C81"
+                                + "E6F3D3D8246BDF2E402C78AB50DCA8CC603E2681B9E28A032BFE156DDC04C266986E31"
+                                + "10112A86CC01C5150203010001";
 
         /// <summary>
         /// The URL to the Axivion Dashboard, up to the project name.
         /// </summary>
         [EnvironmentVariable("DASHBOARD_BASE_URL")]
         [Tooltip("The URL to the Axivion Dashboard, up to the project name.")]
-        public string BaseUrl = "https://stvive.informatik.uni-bremen.de:9443/axivion/projects/SEE/";
+        public string BaseUrl = "https://stvr2.informatik.uni-bremen.de:9443/axivion/projects/SEE/";
 
         /// <summary>
         /// The API token for the Axivion Dashboard.
         /// </summary>
+        /// <remarks>This must be a log-in token to have the necessary rights.</remarks>
         [EnvironmentVariable("DASHBOARD_TOKEN")]
         [Tooltip("The API token for the Axivion Dashboard.")]
-        public string Token = "0.0000000000016.9SGjXPqUhOKygmJuKLo63yNhyx6bx4RQbMD2h2BlIEU";
+        public string Token = "0.000000000000Q.2Jb6PIgB1pk4g8ss-DtnfdtDp0xlcugYQHFRcRvBRH4";
 
         /// <summary>
         /// When true, receiving Dashboard models which have more fields than the C# models will throw an error
@@ -130,7 +129,7 @@ namespace SEE.Net.Dashboard
         /// </summary>
         /// <seealso cref="Lazy{T}"/>
         private static readonly Lazy<DashboardRetriever> instance =
-            new Lazy<DashboardRetriever>(FindObjectOfType<DashboardRetriever>);
+            new(FindObjectOfType<DashboardRetriever>);
 
         /// <summary>
         /// Will automatically search for this component when it's accessed first, afterwards the single instance
@@ -165,7 +164,7 @@ namespace SEE.Net.Dashboard
             request.certificateHandler = new AxivionCertificateHandler(PublicKey);
             request.SetRequestHeader("Accept", accept);
             request.SetRequestHeader("Authorization", $"AxToken {Token}");
-            #pragma warning disable CS4014
+#pragma warning disable CS4014
             request.SendWebRequest(); // we don't need to await this, because of the next line
             #pragma warning restore CS4014
             await UniTask.WaitUntil(() => request.isDone);
@@ -249,8 +248,8 @@ namespace SEE.Net.Dashboard
             DashboardVersion version = await GetDashboardVersion();
             switch (version.DifferenceToSupportedVersion)
             {
-                case DashboardVersion.Difference.MAJOR_OLDER:
-                case DashboardVersion.Difference.MINOR_OLDER:
+                case DashboardVersion.Difference.MajorOlder:
+                case DashboardVersion.Difference.MinorOlder:
                     // If major or minor version of the dashboard is older, we may use features that aren't existent
                     // in it yet, so we have to notify the user with a warning.
                     ShowNotification.Error("Dashboard Version too old",
@@ -258,35 +257,35 @@ namespace SEE.Net.Dashboard
                                            + $"has been written for version {DashboardVersion.SupportedVersion}."
                                            + $" Please update your dashboard.");
                     break;
-                case DashboardVersion.Difference.PATCH_OLDER:
+                case DashboardVersion.Difference.PathOlder:
                     // If patch version is older, there may be some bugfixes / security problems not accounted for.
                     ShowNotification.Warn("Dashboard Version outdated",
                                           $"Your dashboard has version {version} but this API supports "
                                           + $"{DashboardVersion.SupportedVersion}. The difference in versions is small,"
                                           + "so this shouldn't be too critical, but please update your dashboard to avoid any issues.");
                     break;
-                case DashboardVersion.Difference.MAJOR_NEWER:
+                case DashboardVersion.Difference.MajorNewer:
                     // Major new version can introduce breaking changes
                     ShowNotification.Error("Dashboard Version unsupported",
                                            $"Your dashboard has a major new version ({version}) compared to the supported version "
                                            + $"({DashboardVersion.SupportedVersion}), which may have introduced breaking changes. "
                                            + "Please update SEE's retrieval code accordingly.");
                     break;
-                case DashboardVersion.Difference.MINOR_NEWER:
-                case DashboardVersion.Difference.PATCH_NEWER:
+                case DashboardVersion.Difference.MinorNewer:
+                case DashboardVersion.Difference.PatchNewer:
                     // Minor and patch updates shouldn't impact existing functionality, but the retrieval code
                     // should still be updated by a developer.
                     Debug.LogWarning($"The dashboard uses version {version} while the retrieval code has been "
                                      + $"written for version {DashboardVersion.SupportedVersion}. Please update SEE's retrieval "
                                      + "code accordingly.");
                     break;
-                case DashboardVersion.Difference.EXTRA_OLDER:
-                case DashboardVersion.Difference.EXTRA_NEWER:
+                case DashboardVersion.Difference.ExtraOlder:
+                case DashboardVersion.Difference.ExtraNewer:
                     // Extra changes are assumed to be small enough to not even warrant a warning.
                     Debug.Log($"Dashboard version {version} differs slightly from supported version "
                               + $"{DashboardVersion.SupportedVersion}.");
                     break;
-                case DashboardVersion.Difference.EQUAL:
+                case DashboardVersion.Difference.Equal:
                     // No need to do anything
                     break;
                 default: throw new ArgumentOutOfRangeException();
@@ -350,7 +349,7 @@ namespace SEE.Net.Dashboard
             /// <summary>
             /// Public key of the accepted certificate.
             /// </summary>
-            private readonly string AcceptKey;
+            private readonly string acceptKey;
 
             /// <summary>
             /// Instantiates a new <see cref="AxivionCertificateHandler"/> with the given <paramref name="acceptKey"/>
@@ -359,11 +358,11 @@ namespace SEE.Net.Dashboard
             /// <param name="acceptKey">The public key of the accepted certificate.</param>
             public AxivionCertificateHandler(string acceptKey)
             {
-                AcceptKey = acceptKey;
+                this.acceptKey = acceptKey;
             }
 
             /// <summary>
-            /// Validates the given <paramref name="certificateData"/> by comparing it with <see cref="AcceptKey"/>.
+            /// Validates the given <paramref name="certificateData"/> by comparing it with <see cref="acceptKey"/>.
             /// </summary>
             /// <param name="certificateData">Certificate which shall be validated</param>
             /// <returns>True iff the certificate's validation was successful</returns>
@@ -371,9 +370,9 @@ namespace SEE.Net.Dashboard
             {
                 // Code adapted from:
                 // https://docs.unity3d.com/ScriptReference/Networking.CertificateHandler.ValidateCertificate.html
-                X509Certificate2 certificate = new X509Certificate2(certificateData);
+                X509Certificate2 certificate = new(certificateData);
                 string certPublicKey = certificate.GetPublicKeyString();
-                return certPublicKey?.Equals(AcceptKey) ?? false;
+                return certPublicKey?.Equals(acceptKey) ?? false;
             }
         }
     }

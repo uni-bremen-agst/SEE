@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using SEE.Game.HolisticMetrics;
 using SEE.Game.HolisticMetrics.ActionHelpers;
-using SEE.Game.UI.PropertyDialog.HolisticMetrics;
+using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Net.Actions.HolisticMetrics;
-using SEE.Utils;
 using UnityEngine;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions.HolisticMetrics
 {
@@ -48,12 +48,12 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <summary>
             /// The name of the board on which to create the widget.
             /// </summary>
-            internal readonly string boardName;
+            internal readonly string BoardName;
 
             /// <summary>
             /// The configuration of the widget that knows how the widget should be created.
             /// </summary>
-            internal readonly WidgetConfig config;
+            internal readonly WidgetConfig Config;
 
             /// <summary>
             /// Assigns the configuration of the widget to create and the name of the board on which to create it to
@@ -63,8 +63,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <param name="config">The configuration; this is how the widget will be configured</param>
             internal Memento(string boardName, WidgetConfig config)
             {
-                this.boardName = boardName;
-                this.config = config;
+                this.BoardName = boardName;
+                this.Config = config;
             }
         }
 
@@ -104,23 +104,23 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     }
                     if (addWidgetDialog.TryGetConfig(out string metric, out string widget))
                     {
-                        memento.config.MetricType = metric;
-                        memento.config.WidgetName = widget;
+                        memento.Config.MetricType = metric;
+                        memento.Config.WidgetName = widget;
 
-                        WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
+                        WidgetsManager widgetsManager = BoardsManager.Find(memento.BoardName);
                         if (widgetsManager != null)
                         {
-                            widgetsManager.Create(memento.config);
-                            new CreateWidgetNetAction(memento.boardName, memento.config).Execute();
+                            widgetsManager.Create(memento.Config);
+                            new CreateWidgetNetAction(memento.BoardName, memento.Config).Execute();
                         }
                         else
                         {
                             Debug.LogError(
-                                $"No board found with the name {memento.boardName} for adding the widget.\n");
+                                $"No board found with the name {memento.BoardName} for adding the widget.\n");
                         }
 
                         progress = ProgressState.Finished;
-                        currentState = ReversibleAction.Progress.Completed;
+                        CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
 
@@ -146,15 +146,15 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Undo()
         {
             base.Undo();
-            WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
+            WidgetsManager widgetsManager = BoardsManager.Find(memento.BoardName);
             if (widgetsManager != null)
             {
-                widgetsManager.Delete(memento.config.ID);
-                new DeleteWidgetNetAction(memento.boardName, memento.config.ID).Execute();
+                widgetsManager.Delete(memento.Config.ID);
+                new DeleteWidgetNetAction(memento.BoardName, memento.Config.ID).Execute();
             }
             else
             {
-                Debug.LogError($"No board found with the name {memento.boardName} for deleting the widget.\n");
+                Debug.LogError($"No board found with the name {memento.BoardName} for deleting the widget.\n");
             }
         }
 
@@ -164,15 +164,15 @@ namespace SEE.Controls.Actions.HolisticMetrics
         public override void Redo()
         {
             base.Redo();
-            WidgetsManager widgetsManager = BoardsManager.Find(memento.boardName);
+            WidgetsManager widgetsManager = BoardsManager.Find(memento.BoardName);
             if (widgetsManager != null)
             {
-                widgetsManager.Create(memento.config);
-                new CreateWidgetNetAction(memento.boardName, memento.config).Execute();
+                widgetsManager.Create(memento.Config);
+                new CreateWidgetNetAction(memento.BoardName, memento.Config).Execute();
             }
             else
             {
-                Debug.LogError($"No board found with the name {memento.boardName} for adding the widget.\n");
+                Debug.LogError($"No board found with the name {memento.BoardName} for adding the widget.\n");
             }
         }
 
@@ -180,7 +180,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Returns a new instance of <see cref="AddWidgetAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new AddWidgetAction();
         }
@@ -189,7 +189,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// Returns a new instance of <see cref="AddWidgetAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }
@@ -201,7 +201,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string> { memento.boardName, memento.config.ID.ToString() };
+            return new HashSet<string> { memento.BoardName, memento.Config.ID.ToString() };
         }
 
         /// <summary>

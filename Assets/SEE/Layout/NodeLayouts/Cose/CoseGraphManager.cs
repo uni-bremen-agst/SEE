@@ -23,12 +23,12 @@ namespace SEE.Layout.NodeLayouts.Cose
     public class CoseGraphManager
     {
         /// <summary>
-        /// the layout 
+        /// the layout
         /// </summary>
         private CoseLayout layout;
 
         /// <summary>
-        /// all graphs 
+        /// all graphs
         /// </summary>
         private List<CoseGraph> graphs;
 
@@ -53,7 +53,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         private CoseGraph rootGraph;
 
         /// <summary>
-        /// nodes to which gravitation is applied to 
+        /// nodes to which gravitation is applied to
         /// </summary>
         private List<CoseNode> nodesToApplyGravitation;
 
@@ -103,7 +103,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// Sets this graph to root graph
         /// </summary>
         /// <param name="graph">the graph</param>
-        public void setRootGraph(CoseGraph graph)
+        public void SetRootGraph(CoseGraph graph)
         {
             if (graph.GraphManager != this)
             {
@@ -433,7 +433,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// </summary>
         /// <param name="lastM">the "old" graphManager</param>
         /// <param name="newM">the new graphManager</param>
-        private void AddEdges(CoseGraphManager lastM, CoseGraphManager newM)
+        private static void AddEdges(CoseGraphManager lastM, CoseGraphManager newM)
         {
             foreach (CoseEdge edge in lastM.GetAllEdges())
             {
@@ -524,7 +524,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Removes an edge from this graphManager
+        /// Removes an edge from its graphManager
         /// </summary>
         /// <param name="edge">the edge to remove</param>
         public void Remove(CoseEdge edge)
@@ -560,7 +560,5 @@ namespace SEE.Layout.NodeLayouts.Cose
 
             edge.Source.Owner.GraphManager.Edges.Remove(edge);
         }
-
     }
 }
-

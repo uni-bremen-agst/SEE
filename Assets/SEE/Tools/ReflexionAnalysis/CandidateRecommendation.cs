@@ -150,7 +150,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         public void OnNext(ChangeEvent value)
         {
-            if (value is EdgeEvent edgeEvent && edgeEvent.Affected == ReflexionSubgraph.Mapping)
+            if (value is EdgeEvent edgeEvent && edgeEvent.Affected == ReflexionSubgraphs.Mapping)
             {
                 Debug.Log("Handle Change in Mapping... " + edgeEvent.ToString());
 

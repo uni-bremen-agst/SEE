@@ -1,4 +1,5 @@
 ﻿using SEE.Utils;
+using SEE.Utils.Paths;
 
 namespace SEE.DataModel.DG
 {
@@ -26,7 +27,7 @@ namespace SEE.DataModel.DG
         /// IMPORTANT NOTE: This attribute will not be serialized. It may
         /// be null at run-time or in the editor inspection view.
         /// </summary>
-        protected Graph graph;
+        protected Graph ContainingGraph;
 
         /// <summary>
         /// The graph this graph element is contained in. May be null if
@@ -39,21 +40,21 @@ namespace SEE.DataModel.DG
         /// </summary>
         public Graph ItsGraph
         {
-            get => graph;
-            set => graph = value;
+            get => ContainingGraph;
+            set => ContainingGraph = value;
         }
 
         /// <summary>
         /// The type of this graph element.
         /// </summary>
-        public virtual string Type
+        public string Type
         {
             get => type;
             set
             {
                 string oldType = type;
                 type = !string.IsNullOrEmpty(value) ? value : Graph.UnknownType;
-                Notify(new GraphElementTypeEvent(version, oldType, type, this));
+                Notify(new GraphElementTypeEvent(Version, oldType, type, this));
             }
         }
 
@@ -220,7 +221,7 @@ namespace SEE.DataModel.DG
             base.HandleCloned(clone);
             GraphElement target = (GraphElement)clone;
             target.type = type;
-            target.graph = null;
+            target.ContainingGraph = null;
         }
 
         /// <summary>

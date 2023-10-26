@@ -22,10 +22,10 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// Retrieves dashboard information from the dashboard configured for this <see cref="DashboardRetriever"/>.
         /// IMPORTANT NOTE: This will only work if your token has full permissions, i.e., when it's not just
-        /// an IDE token. If you simply want to retrieve the dashboard version, use
+        /// an IDE token. If you simply want to retrieve the dashboard version, use ... FIXME: how does this sentence continue?
         /// </summary>
         /// <returns>Dashboard information about the queried dashboard.</returns>
-        public async UniTask<DashboardInfo> GetDashboardInfo() => await QueryDashboard<DashboardInfo>("/../../", apiPath: false);
+        public async UniTask<DashboardInfo> GetDashboardInfo() => await QueryDashboard<DashboardInfo>("../../", apiPath: false);
 
         /// <summary>
         /// Returns the version number of the dashboard that's being queried.
@@ -40,7 +40,7 @@ namespace SEE.Net.Dashboard
             DashboardVersion version;
             try
             {
-                version = new DashboardVersion((await GetDashboardInfo()).dashboardVersionNumber);
+                version = new DashboardVersion((await GetDashboardInfo()).DashboardVersionNumber);
             }
             catch (DashboardException e)
             {
@@ -49,7 +49,7 @@ namespace SEE.Net.Dashboard
                     throw;
                 }
 
-                version = new DashboardVersion(e.Error.dashboardVersionNumber);
+                version = new DashboardVersion(e.Error.DashboardVersionNumber);
             }
 
             return version;
@@ -106,7 +106,7 @@ namespace SEE.Net.Dashboard
                                                          int offset = 0, bool computeTotalRowCount = false)
             where T : Issue, new()
         {
-            const string ANY_PATH = "filter_any path";
+            const string anyPath = "filter_any path";
             // add non-nullable parameters
             Dictionary<string, string> parameters = new Dictionary<string, string>
             {
@@ -128,7 +128,7 @@ namespace SEE.Net.Dashboard
                     throw new ArgumentNullException();
                 }
 
-                if (columnFilters.ContainsKey(ANY_PATH))
+                if (columnFilters.ContainsKey(anyPath))
                 {
                     throw new ArgumentException($"When filtering for file paths, use the {nameof(fileFilter)} parameter!");
                 }
@@ -146,7 +146,7 @@ namespace SEE.Net.Dashboard
 
             if (fileFilter != null)
             {
-                parameters[ANY_PATH] = fileFilter;
+                parameters[anyPath] = fileFilter;
             }
 
             return await QueryDashboard<IssueTable<T>>("/issues/", parameters, false);
@@ -201,12 +201,13 @@ namespace SEE.Net.Dashboard
 
         /// <summary>
         /// Queries a <paramref name="metric"/> for a particular <paramref name="entity"/>.
+        /// If the <paramref name="entity"/> does not exist, the metric values will be <c>null</c>.
         /// </summary>
         /// <param name="entity">The Entity ID to fetch the values for.</param>
         /// <param name="metric">The Metric ID to fetch the values for.</param>
         /// <param name="start">The result Version range start specifier.</param>
         /// <param name="end">The result Version range end (inclusive) specifier.</param>
-        /// <returns></returns>
+        /// <returns>the <paramref name="metric"/> value range for the <paramref name="entity"/></returns>
         public async UniTask<MetricValueRange> GetMetricValueRange(string entity, string metric, string start = null,
                                                                    string end = null) =>
             await QueryDashboard<MetricValueRange>("/queryMetricValueRange", new[] {entity, metric, start, end});
@@ -229,7 +230,7 @@ namespace SEE.Net.Dashboard
         /// Retrieves the issue description for the given <paramref name="issueName"/>.
         /// This will return an empty string if the retrieved issue description contains HTML tags.
         /// Note that this implementation is very hacky and may easily break for more complex descriptions
-        /// or for older/more recent versions of the Axivion Dashboard. 
+        /// or for older/more recent versions of the Axivion Dashboard.
         /// </summary>
         /// <param name="issueName">The ID of the issue whose rule text shall be displayed</param>
         /// <param name="version">The optional analysis version of the issue.</param>
@@ -288,7 +289,7 @@ namespace SEE.Net.Dashboard
         /// <returns>A list of <see cref="MetricValueTableRow"/>s which matches the given parameters.</returns>
         public async UniTask<List<MetricValueTableRow>> GetSpecificMetricRows(string path, string entityName)
         {
-            metrics ??= (await GetMetricValueTable()).rows.GroupBy(x => (x.path, x.entity))
+            metrics ??= (await GetMetricValueTable()).Rows.GroupBy(x => (x.Path, x.Entity))
                                                      .ToDictionary(x => x.Key, x => x.ToList());
 
             return metrics.ContainsKey((path, entityName)) ? metrics[(path, entityName)] : new List<MetricValueTableRow>();
@@ -300,7 +301,7 @@ namespace SEE.Net.Dashboard
         /// <returns></returns>
         public async UniTask<IDictionary<(string path, string entity), List<MetricValueTableRow>>> GetAllMetricRows()
         {
-            metrics ??= (await GetMetricValueTable()).rows.GroupBy(x => (x.path, x.entity))
+            metrics ??= (await GetMetricValueTable()).Rows.GroupBy(x => (x.Path, x.Entity))
                                                      .ToDictionary(x => x.Key, x => x.ToList());
             return metrics;
         }
@@ -323,37 +324,37 @@ namespace SEE.Net.Dashboard
             if (ArchitectureViolationIssues)
             {
                 issues.AddRange((await GetIssues<ArchitectureViolationIssue>(start, end, state, user, fileFilter,
-                                                                             columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                                             columnFilters, limit, offset, computeTotalRowCount)).Rows);
             }
 
             if (CloneIssues)
             {
                 issues.AddRange((await GetIssues<CloneIssue>(start, end, state, user, fileFilter,
-                                                             columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                             columnFilters, limit, offset, computeTotalRowCount)).Rows);
             }
 
             if (CycleIssues)
             {
                 issues.AddRange((await GetIssues<CycleIssue>(start, end, state, user, fileFilter,
-                                                             columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                             columnFilters, limit, offset, computeTotalRowCount)).Rows);
             }
 
             if (DeadEntityIssues)
             {
                 issues.AddRange((await GetIssues<DeadEntityIssue>(start, end, state, user, fileFilter,
-                                                                  columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                                  columnFilters, limit, offset, computeTotalRowCount)).Rows);
             }
 
             if (MetricViolationIssues)
             {
                 issues.AddRange((await GetIssues<MetricViolationIssue>(start, end, state, user, fileFilter,
-                                                                       columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                                       columnFilters, limit, offset, computeTotalRowCount)).Rows);
             }
 
             if (StyleViolationIssues)
             {
                 issues.AddRange((await GetIssues<StyleViolationIssue>(start, end, state, user, fileFilter,
-                                                                      columnFilters, limit, offset, computeTotalRowCount)).rows);
+                                                                      columnFilters, limit, offset, computeTotalRowCount)).Rows);
             }
 
             return issues;

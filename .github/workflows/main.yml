@@ -26,7 +26,7 @@ jobs:
     name: Setup Repository
     # The following condition filters out pull requests that are closed, but not merged.
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.state != 'closed' || github.event.pull_request.merged }}
-    runs-on: self-hosted
+    runs-on: [self-hosted, see-ci]
     outputs:
       runner: ${{ steps.remember.outputs.runner }}
     steps:
@@ -62,7 +62,7 @@ jobs:
         run: ./GitScripts/run_all
   static:
     name: Run static checks
-    runs-on: self-hosted
+    runs-on: [self-hosted, see-ci]
     if: ${{ !github.event.pull_request.draft && github.event_name != 'workflow_dispatch' && !github.event.pull_request.merged }}
     permissions:
       contents: read
@@ -142,7 +142,7 @@ jobs:
           restore-keys: |
             Library-SEE-Tests
             Library-SEE
-      - uses: game-ci/unity-test-runner@v2
+      - uses: game-ci/unity-test-runner@v3
         timeout-minutes: 45
         name: Run Tests
         id: tests
@@ -173,7 +173,7 @@ jobs:
   setup_build_targets:
     name: Setup build targets
     if: ${{ ! github.event.pull_request.draft }}
-    runs-on: self-hosted
+    runs-on: [self-hosted, see-ci]
     outputs:
       targetPlatforms: ${{ steps.rememberPlatforms.outputs.targetPlatforms }}
     steps:
@@ -186,10 +186,10 @@ jobs:
           else
             # Set targetPlatform based on inputs.
             targetPlatforms=()
-            if ${{ github.event.inputs.windows == true }}; then
+            if ${{ inputs.windows == true }}; then
                 targetPlatforms+=("StandaloneWindows64")
             fi
-            if ${{ github.event.inputs.linux == true }}; then
+            if ${{ inputs.linux == true }}; then
                 targetPlatforms+=("StandaloneLinux64")
             fi
             echo "targetPlatforms=$(jq --compact-output --null-input '$ARGS.positional' --args -- ${targetPlatforms[@]})" >> $GITHUB_OUTPUT
@@ -212,7 +212,7 @@ jobs:
           # Try deleting any previous build, but not other zip files that we may need later.
           git clean -fd -e 'build-*.zip'
           rm -rf build "build-${{ matrix.targetPlatform }}.zip" || true
-      - uses: game-ci/unity-builder@v2
+      - uses: game-ci/unity-builder@v3
         timeout-minutes: 45
         name: Build project
         id: build
@@ -221,6 +221,7 @@ jobs:
         with:
           targetPlatform: ${{ matrix.targetPlatform }}
           buildName: ${{ matrix.targetPlatform }}
+          buildMethod: CITools.BuildScript.Build
           allowDirtyBuild: true
       - name: Compress build
         # Compress only if manually triggered or merged into master, otherwise we won't upload.

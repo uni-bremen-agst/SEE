@@ -1,6 +1,6 @@
 using RTG;
 using SEE.Net.Actions;
-using SEE.Utils;
+using SEE.Utils.History;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -39,8 +39,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void Initialize()
         {
-            currentState = ReversibleAction.Progress.NoEffect;
-            gizmo = new RotateGizmo();
+            CurrentState = IReversibleAction.Progress.NoEffect;
+            UsedGizmo = new RotateGizmo();
         }
 
         #endregion Constructors
@@ -51,7 +51,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="RotateAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new RotateAction();
         }
@@ -60,11 +60,11 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="RotateAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
-            if (gameNodeToBeContinuedInNextAction)
+            if (GameNodeToBeContinuedInNextAction)
             {
-                return new RotateAction(gameNodeToBeContinuedInNextAction);
+                return new RotateAction(GameNodeToBeContinuedInNextAction);
             }
             else
             {
@@ -115,7 +115,7 @@ namespace SEE.Controls.Actions
             protected override void Transform(Quaternion rotation)
             {
                 base.Transform(rotation);
-                nodeOperator.RotateTo(rotation);
+                NodeOperator.RotateTo(rotation);
             }
 
             /// <summary>
@@ -124,7 +124,7 @@ namespace SEE.Controls.Actions
             /// <param name="rotation">rotation to be broadcast</param>
             protected override void BroadcastState(Quaternion rotation)
             {
-                new RotateNodeNetAction(nodeOperator.name, rotation).Execute();
+                new RotateNodeNetAction(NodeOperator.name, rotation).Execute();
             }
         }
 
@@ -135,7 +135,7 @@ namespace SEE.Controls.Actions
         protected override void FinalizeAction()
         {
             base.FinalizeAction();
-            memento.Finalize(gameNodeSelected.transform.rotation);
+            GameNodeMemento.Finalize(GameNodeSelected.transform.rotation);
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace SEE.Controls.Actions
         /// <returns>true if the object to be manipulated has had a change</returns>
         protected override bool HasChanges()
         {
-            return gameNodeSelected.transform.rotation != memento.InitialState;
+            return GameNodeSelected.transform.rotation != GameNodeMemento.InitialState;
         }
 
         protected override Memento<Quaternion> CreateMemento(GameObject gameNode)
@@ -167,7 +167,7 @@ namespace SEE.Controls.Actions
             /// </summary>
             public RotateGizmo()
             {
-                objectTransformationGizmo = RTGizmosEngine.Get.CreateObjectRotationGizmo();
+                ObjectTransformationGizmo = RTGizmosEngine.Get.CreateObjectRotationGizmo();
             }
         }
         #endregion

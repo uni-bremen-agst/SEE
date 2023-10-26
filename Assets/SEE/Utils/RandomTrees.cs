@@ -11,11 +11,11 @@ namespace SEE.Utils
         /// <summary>
         /// Creates a random tree based on a random Prüfer sequence given as <paramref name="prufer"/>.
         /// For details on the implementation, see https://en.wikipedia.org/wiki/Prüfer_sequence.
-        /// 
+        ///
         /// The resulting tree, T, will have prufer.Length + 2 many nodes and a single <paramref name="root"/>.
         /// The nodes of T will be represented by integer values in the range [0, prufer.Length + 1].
         /// Let parent be the result of this method; then parent[i] denotes the parent of i in T
-        /// for every i different from <paramref name="root"/> and parent[<paramref name="root"/>] = -1. 
+        /// for every i different from <paramref name="root"/> and parent[<paramref name="root"/>] = -1.
         /// Thus, the value range of parent[i] is [-1, prufer.Length + 1].
         /// </summary>
         /// <param name="prufer">a Prüfer sequence, where prufer[i] > 0 for i in [0, pruefer.Length-1]</param>
@@ -32,15 +32,15 @@ namespace SEE.Utils
             // If parent[i] = -1, i is the root of the tree.
             int[] parent = new int[numberOfNodes];
 
-            // For each node, set its degree to the number of times it appears in the sequence. 
+            // For each node, set its degree to the number of times it appears in the sequence.
             for (int i = 0; i < numberOfNodes - 2; i++)
             {
                 degree[prufer[i] - 1]++;
             }
 
             // Note: an edge (c, p) added to T means that c is a child of p in the following.
-            // Next, for each number in the sequence a[i], find the first (lowest-numbered) node, j, 
-            // with degree equal to 0, add the edge (j, a[i]) to the tree, and decrement the degrees 
+            // Next, for each number in the sequence a[i], find the first (lowest-numbered) node, j,
+            // with degree equal to 0, add the edge (j, a[i]) to the tree, and decrement the degrees
             // of j and a[i].
             int j = 0;
             // Find the smallest label not present in prufer[].
@@ -50,7 +50,7 @@ namespace SEE.Utils
                 // For each node j in T (T is the tree)
                 for (j = 0; j < numberOfNodes; j++)
                 {
-                    // If j + 1 is not present in prufer set 
+                    // If j + 1 is not present in prufer set
                     if (degree[j] == 0)
                     {
                         // Remove from Prufer set and add edge.
@@ -141,15 +141,15 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Returns a random tree with <paramref name="numberOfNodes"/> many nodes with the 
+        /// Returns a random tree with <paramref name="numberOfNodes"/> many nodes with the
         /// resulting <paramref name="root"/>.
-        /// 
+        ///
         /// The resulting tree, T, will have numberOfNodes many nodes and a single <paramref name="root"/>.
         /// The nodes of T will be represented by integer values in the range [0, numberOfNodes-1].
         /// Let parent be the result of this method; then parent[i] denotes the parent of i in T
-        /// for every i different from <paramref name="root"/> and parent[<paramref name="root"/>] = -1. 
+        /// for every i different from <paramref name="root"/> and parent[<paramref name="root"/>] = -1.
         /// Thus, the value range of parent[i] is [-1, numberOfNodes-1].
-        /// 
+        ///
         /// Precondition: <paramref name="numberOfNodes"/> >= 0.
         /// </summary>
         /// <param name="numberOfNodes">the requested number of nodes</param>

@@ -6,27 +6,28 @@ from bauhaus.rfg import Graph, View, Node, EdgeType, NodeSet, EdgeSet, misc, rfg
 # file:///C:/Program%20Files%20(x86)/Bauhaus/doc/html/project_configuration/tool_reference/80_rfg_and_ir_operations_with_bauhaustool/index.html
 
 INPUTS = {
-    'graph' :   { 'doc'     : 'the input rfg',
-                  'type'    : 'rfg',
-                  'switches'  : ['--graph', '--rfg', '-r', '--input', '-i'],
-                },
-   }
+    'graph': {'doc': 'the input rfg',
+              'type': 'rfg',
+              'switches': ['--graph', '--rfg', '-r', '--input', '-i'],
+              },
+}
 OUTPUT = 'rfg'
 
 # All node types that define the nodes to be kept
 NODE_TYPES = ["Namespace", "Class"]
 # All node names (Source.Name) that define the nodes to be kept
-NODE_NAMES = ["SEE", "DG", "URPMaterialSwitcher"]
+NODE_NAMES = ["SEE"]
 # All view names to be reduced
-VIEW_NAMES = ["Code Facts", "Call"]
+VIEW_NAMES = ["Code Facts"]
 # Name of the super type of all hierarchical edges
 BELONGS_TO = "Belongs_To"
+
 
 def reduce(graph: Graph):
     """ Reduces all views in VIEW_NAMES for given graph as follows:
     Let R (for roots) be the set of nodes in a view that have a Source.Name in NODE_NAMES
     and a node type in NODE_TYPES. Let descendants(root) be a function yielding
-    all ancestor nodes of node root in the node hierarchy spanned by any edge type 
+    all descendants nodes of node root in the node hierarchy spanned by any edge type 
     of either BELONGS_TO or derived from BELONGS_TO; in other words, descendants(root)
     consists of the transitive closure of all nodes reachable from root along
     BELONGS_TO edges in backward direction. Similarly, function ancestors(n) yields
@@ -58,61 +59,81 @@ def reduce(graph: Graph):
         print("Edge type %s does not exist in RFG" % BELONGS_TO)
     return graph
 
+
 def reduce_view(v: View, belongs_to: EdgeType):
     """See also the documentation on function reduce. This function reduces
     the given view v as described there. The given edge type belongs_to
     defines the edge types forming the node hierarchy.
     """
+    # All nodes in the hierarchy H, i.e., descendants of the nodes with Source.Name
+    # in NODE_NAMES and of a type in NODE_TYPES.
     nodes_in_hierarchy = NodeSet()
+    # The nodes in the fringes, i.e., nodes not in nodes_in_hierarchy that
+    # are connected with a non-hierarchical edge to any node in nodes_in_hierarchy.
     neighbors = NodeSet()
     # gather nodes to keep
     for n in v.xnodes():
         if n.node_type().name() in NODE_TYPES and n["Source.Name"] in NODE_NAMES:
-            print("Found relevant node %s." % n["Source.Name"])
+            print("Found relevant node %s (%s)." % (n["Source.Name"], n["Linkage.Name"]))
             gather_nodes(v, n, belongs_to, nodes_in_hierarchy, neighbors)
     fringes = neighbors - nodes_in_hierarchy
     ancestors = gather_ancestors(v, belongs_to, fringes)
     fringes = fringes + ancestors
     # We keep the nodes in the hierarchy and the fringes. Note that removing
     # a node will also remove its incoming and outgoing edges.
-    nodes_to_keep = nodes_in_hierarchy + fringes    
+    nodes_to_keep = nodes_in_hierarchy + fringes
     for n in v.xnodes():
         if n not in nodes_to_keep:
             v.remove(n)
+    # Remove all non-hierarchical edges that are only between nodes in fringes
+    for e in v.xedges():
+        if not e.is_of_subtype(belongs_to) and e.source() in fringes and e.target() in fringes:
+            v.remove(e)
 
-def gather_ancestors(v: View, belongs_to: EdgeType, nodes: NodeSet):
-    """ Yields the he transitive closure of all nodes reachable from any node
-    contained in the given set of nodes along belongs_to edges in backward direction.
-    In other words, the descendants are returned.
+
+def dump(message: str, nodes: NodeSet):
+    """Prints the message and the given nodes. Intended for debugging."""
+    print(message)
+    for n in nodes:
+        print("  %s (%s)." % (n["Source.Name"], n["Linkage.Name"]))
+
+
+def gather_ancestors(v: View, belongs_to: EdgeType, nodes: NodeSet) -> NodeSet:
+    """ Yields the transitive closure of all nodes reachable from any node
+    contained in the given set of nodes along belongs_to edges in forward direction.
+    In other words, the ancestors are returned.
     """
     edge_predicate = misc.create_edge_predicate(v.graph, belongs_to)
     return misc.transitive_neighbors(nodes, v, edge_predicate, "forward")
 
-def gather_nodes(v: View, n: Node, belongs_to: EdgeType, nodes_in_hierarchy: NodeSet, neighbors: NodeSet):
+
+def gather_nodes(v: View, n: Node, belongs_to: EdgeType, nodes_in_hierarchy: NodeSet, neighbors: NodeSet) -> NodeSet:
     """ Adds node n and all its descendants to nodes_in_hierarchy (the hierarchy
     is defined by the given edge type belongs_to). In addition, every neighbor of 
-    n reachable by a non-hierarchical edge will be added to the given edge set neighbors.
+    n reachable by a non-hierarchical edge will be added to the given neighbors.
     """
     nodes_in_hierarchy.add(n)
     for incoming in n.incomings(v):
+        # note: the direction of belongs_to is from the child to its parent
         if incoming.is_of_subtype(belongs_to):
             # childhood
             gather_nodes(v, incoming.source(), belongs_to, nodes_in_hierarchy, neighbors)
         else:
             # incoming non-hierarchical edge => keep only the source of the edge
-            nodes_in_hierarchy.add(incoming.source())
             neighbors.add(incoming.source())
     for outgoing in n.outgoings(v):
         neighbors.add(outgoing.target())
+
 
 @rfgtool.with_rfg_types
 @bauhaustool.BauhausTool(INPUTS, OUTPUT)
 def perform(**kwargs):
     graph = kwargs['graph']
-    reduce(graph)         
+    reduce(graph)
     return graph
 
+
 if __name__ == '__main__':
-    perform.execute_as_command_line_tool\
+    perform.execute_as_command_line_tool \
         (usage='%prog [options] <resultrfg>',
-         description = 'Reduces the graph to SEE and its immediate neighbors.')
+         description='Reduces the graph to SEE and its immediate neighbors.')

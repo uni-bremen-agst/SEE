@@ -21,7 +21,7 @@ namespace SEE.Layout.NodeLayouts
         public CirclePackingNodeLayout(float groundLevel)
             : base(groundLevel)
         {
-            name = "Circle Packing";
+            Name = "Circle Packing";
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace SEE.Layout.NodeLayouts
                 // exactly one root
                 ILayoutNode root = roots.FirstOrDefault();
                 float outRadius = PlaceNodes(root);
-                Vector3 position = new(0.0f, groundLevel, 0.0f);
+                Vector3 position = new(0.0f, GroundLevel, 0.0f);
                 layoutResult[root] = new NodeTransform(position,
                                                         GetScale(root, outRadius));
                 MakeGlobal(layoutResult, position, root.Children());
@@ -78,9 +78,9 @@ namespace SEE.Layout.NodeLayouts
                     // tree depth so that they can be stacked visually (level 0 is at the bottom).
                     position.y += LevelLift(child);
                 }
-                childTransform.position += position;
+                childTransform.Position += position;
                 layoutResult[child] = childTransform;
-                MakeGlobal(layoutResult, childTransform.position, child.Children());
+                MakeGlobal(layoutResult, childTransform.Position, child.Children());
             }
         }
 
@@ -131,9 +131,9 @@ namespace SEE.Layout.NodeLayouts
                 {
                     // Note: The position of the transform is currently only local, relative to the zero center
                     // within the parent node. The co-ordinates will later be adjusted to the world scope.
-                    layoutResult[circle.gameObject]
-                         = new NodeTransform(new Vector3(circle.center.x, groundLevel, circle.center.y),
-                                             GetScale(circle.gameObject, circle.radius));
+                    layoutResult[circle.GameObject]
+                         = new NodeTransform(new Vector3(circle.Center.x, GroundLevel, circle.Center.y),
+                                             GetScale(circle.GameObject, circle.Radius));
                 }
                 return outOuterRadius;
             }
@@ -149,7 +149,7 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="node">game node whose size is to be determined</param>
         /// <param name="radius">the radius for the game node if it is an inner node</param>
         /// <returns>the scale of <paramref name="node"/></returns>
-        private Vector3 GetScale(ILayoutNode node, float radius)
+        private static Vector3 GetScale(ILayoutNode node, float radius)
         {
             return node.IsLeaf ? node.LocalScale
                                : new Vector3(2 * radius, node.LocalScale.y, 2 * radius);
@@ -162,7 +162,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="block">block whose radius is required</param>
         /// <returns>radius of the minimal circle containing the given block</returns>
-        private float LeafRadius(ILayoutNode block)
+        private static float LeafRadius(ILayoutNode block)
         {
             Vector3 extent = block.LocalScale / 2.0f;
             return Mathf.Sqrt(extent.x * extent.x + extent.z * extent.z);

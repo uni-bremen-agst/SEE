@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using SEE.Game.HolisticMetrics;
-using SEE.Utils;
+using SEE.Utils.Paths;
+using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -40,8 +41,8 @@ namespace SEE.Game.City
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(LoadBoardOnStartup, LoadBoardOnStartupLabel);
-            BoardPath.Save(writer, BoardPathLabel);
+            writer.Save(LoadBoardOnStartup, loadBoardOnStartupLabel);
+            BoardPath.Save(writer, boardPathLabel);
             writer.EndGroup();
         }
 
@@ -57,19 +58,19 @@ namespace SEE.Game.City
             if (attributes.TryGetValue(label, out object dictionary))
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-                ConfigIO.Restore(attributes, LoadBoardOnStartupLabel, ref LoadBoardOnStartup);
-                BoardPath.Restore(values, BoardPathLabel);
+                ConfigIO.Restore(attributes, loadBoardOnStartupLabel, ref LoadBoardOnStartup);
+                BoardPath.Restore(values, boardPathLabel);
             }
         }
 
         /// <summary>
         /// Label for <see cref="BoardPath"/> in the configuration file.
         /// </summary>
-        private const string BoardPathLabel = "BoardPath";
+        private const string boardPathLabel = "BoardPath";
 
         /// <summary>
         /// Label for <see cref="LoadBoardOnStartup"/> in the configuration file.
         /// </summary>
-        private const string LoadBoardOnStartupLabel = "LoadBoardOnStartup";
+        private const string loadBoardOnStartupLabel = "LoadBoardOnStartup";
     }
 }

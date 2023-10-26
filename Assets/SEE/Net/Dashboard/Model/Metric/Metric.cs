@@ -12,35 +12,35 @@ namespace SEE.Net.Dashboard.Model.Metric
         /// <summary>
         /// The ID of the metric.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string name;
+        [JsonProperty(PropertyName = "name", Required = Required.Always)]
+        public readonly string Name;
 
         /// <summary>
         /// A more descriptive name of the metric.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string displayName;
+        [JsonProperty(PropertyName = "displayName", Required = Required.Always)]
+        public readonly string DisplayName;
 
         /// <summary>
         /// The configured minimum threshold for the metric.
         /// If not configured, this field will not be available.
         /// </summary>
-        [JsonProperty(Required = Required.Default)]
-        public readonly float? minValue;
+        [JsonProperty(PropertyName = "minValue", Required = Required.Default)]
+        public readonly float? MinValue;
 
         /// <summary>
         /// The configured maximum threshold for the metric.
         /// If not configured, this field will not be available.
         /// </summary>
-        [JsonProperty(Required = Required.Default)]
-        public readonly float? maxValue;
+        [JsonProperty(PropertyName = "maxValue", Required = Required.Default)]
+        public readonly float? MaxValue;
 
         public Metric(string name, string displayName, float? minValue, float? maxValue)
         {
-            this.name = name;
-            this.displayName = displayName;
-            this.minValue = minValue;
-            this.maxValue = maxValue;
+            this.Name = name;
+            this.DisplayName = displayName;
+            this.MinValue = minValue;
+            this.MaxValue = maxValue;
         }
     }
 }

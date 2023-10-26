@@ -12,7 +12,7 @@ namespace SEE.Utils
         /// <summary>
         /// Returns the bounding box (2D rectangle) enclosing all given <paramref name="gameObjects"/>
         /// in terms of world space.
-        /// 
+        ///
         /// Precondition: All <paramref name="gameObjects"/> have a renderer component attached to them.
         /// </summary>
         /// <param name="gameObjects">the list of objects that are enclosed in the resulting bounding box</param>

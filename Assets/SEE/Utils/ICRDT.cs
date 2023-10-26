@@ -1,7 +1,7 @@
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net;
-using SEE.Game.UI.Window.CodeWindow;
+using SEE.UI.Window.CodeWindow;
 using UnityEngine.Events;
 using static SEE.Utils.CRDT;
 
@@ -184,7 +184,7 @@ namespace SEE.Utils
         /// <returns>the position</returns>
         public static Identifier[] StringToPosition(string s, string file)
         {
-            return GetInstanceByName(file).StringToPosition(s);
+            return CRDT.StringToPosition(s);
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace SEE.Utils
         /// <returns>the position as a string</returns>
         public static string PositionToString(Identifier[] position, string file)
         {
-            return GetInstanceByName(file).PositionToString(position);
+            return CRDT.PositionToString(position);
         }
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace SEE.Utils
         /// <returns>A change event that notifies the user when the content of the crdt changes.</returns>
         public static UnityEvent<char, int, CodeWindow.OperationType> GetChangeEvent(string file)
         {
-            return GetInstanceByName(file).changeEvent;
+            return GetInstanceByName(file).ChangeEvent;
         }
 
         /// <summary>

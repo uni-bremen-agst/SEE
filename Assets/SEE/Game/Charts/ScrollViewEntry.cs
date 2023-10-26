@@ -47,7 +47,7 @@ namespace SEE.Game.Charts
             private readonly InteractableObject interactableObject; // The object, whose events are subscribed to
 
             /// <summary>
-            /// The color the label of the scroll view entry 
+            /// The color the label of the scroll view entry
             /// </summary>
             private Color originalLabelColor;
 
@@ -79,7 +79,7 @@ namespace SEE.Game.Charts
             #region InteractableObject Events
 
             /// <summary>
-            /// 
+            /// Sets the color on hovering.
             /// </summary>
             /// <param name="_0">unused</param>
             /// <param name="_1">unused</param>
@@ -94,18 +94,18 @@ namespace SEE.Game.Charts
 
                         Color color = UIColorScheme.GetLight(colorIndex);
                         // Store old colors
-                        originalLabelColor = entry.label.color;
+                        originalLabelColor = entry.Label.color;
                         // Set new colors
-                        ColorBlock colors = entry.toggle.colors;
+                        ColorBlock colors = entry.UIToggle.colors;
                         colors.normalColor = color;
-                        entry.label.color = color;
-                        entry.toggle.colors = colors;
+                        entry.Label.color = color;
+                        entry.UIToggle.colors = colors;
                     }
                 }
             }
 
             /// <summary>
-            /// 
+            ///
             /// </summary>
             /// <param name="_0">unused</param>
             /// <param name="_1">unused</param>
@@ -116,16 +116,16 @@ namespace SEE.Game.Charts
                     ScrollViewEntry entry = chartContent.GetScrollViewEntry(index);
                     if (entry != null)
                     {
-                        entry.label.color = originalLabelColor;
-                        ColorBlock block = entry.toggle.colors;
+                        entry.Label.color = originalLabelColor;
+                        ColorBlock block = entry.UIToggle.colors;
                         block.normalColor = originalLabelColor;
-                        entry.toggle.colors = block;
+                        entry.UIToggle.colors = block;
                     }
                 }
             }
 
             /// <summary>
-            /// 
+            ///
             /// </summary>
             /// <param name="_0">unused</param>
             /// <param name="_1">unused</param>
@@ -137,15 +137,15 @@ namespace SEE.Game.Charts
                     const int colorIndex = 2;
 
                     Color color = UIColorScheme.GetLight(colorIndex);
-                    ColorBlock colors = entry.toggle.colors;
+                    ColorBlock colors = entry.UIToggle.colors;
                     colors.normalColor = color;
-                    entry.toggle.colors = colors;
-                    entry.label.color = color;
+                    entry.UIToggle.colors = colors;
+                    entry.Label.color = color;
                 }
             }
 
             /// <summary>
-            /// 
+            ///
             /// </summary>
             /// <param name="o">the unselected interactable object</param>
             /// <param name="_1">unused</param>
@@ -157,10 +157,10 @@ namespace SEE.Game.Charts
                     int colorIndex = o.IsHovered ? 1 : 0;
 
                     Color color = UIColorScheme.GetLight(colorIndex);
-                    UnityEngine.UI.ColorBlock colors = entry.toggle.colors;
+                    UnityEngine.UI.ColorBlock colors = entry.UIToggle.colors;
                     colors.normalColor = color;
-                    entry.toggle.colors = colors;
-                    entry.label.color = color;
+                    entry.UIToggle.colors = colors;
+                    entry.Label.color = color;
                 }
             }
 
@@ -183,23 +183,23 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Unique index within the chart content. Every
         /// <see cref="ScrollViewEntryData"/> gets assigned a unique index, so that
-        /// elements can be retrieved fast through <see cref="chartContent"/>. This index
+        /// elements can be retrieved fast through <see cref="ChartContent"/>. This index
         /// always equals the index of corresponding <see cref="ScrollViewEntry"/>, if it
         /// currently exists. @UniqueIndexWithingChartContent
         /// </summary>
-        public readonly int index;
-        public readonly ChartContent chartContent;
-        public readonly InteractableObject interactableObject;
-        public readonly int parentIndex;                       // <see cref="ScrollViewEntryData.NoParentIndex"/>, if this is a root
-        public readonly int[] childIndices;                    // <code>null</code>, if this has no children
-        public bool isOn;                                      // Whether the toggle of the entry is turned on
+        internal readonly int Index;
+        internal readonly ChartContent ChartContent;
+        internal readonly InteractableObject InteractableObject;
+        internal readonly int ParentIndex;                       // <see cref="ScrollViewEntryData.NoParentIndex"/>, if this is a root
+        internal readonly int[] ChildIndices;                    // <code>null</code>, if this has no children
+        internal bool IsOn;                                      // Whether the toggle of the entry is turned on
 
         private readonly EventHandler eventHandler;            // Handles the events, as this is a struct
         private static bool toggleParents = true;              // Used for propagation of <see cref="isOn"/> for parents/children
         private static bool toggleChildren = true;             // Used for propagation of <see cref="isOn"/> for parents/children
 
-        /// <param name="index">The unique index within <see cref="chartContent"/>.</param>
-        /// <param name="parentIndex">The unique index of the parent within <see cref="chartContent"/> or <see cref="NoParentIndex"/>, if this is a root.</param>
+        /// <param name="index">The unique index within <see cref="ChartContent"/>.</param>
+        /// <param name="parentIndex">The unique index of the parent within <see cref="ChartContent"/> or <see cref="NoParentIndex"/>, if this is a root.</param>
         /// <param name="childCount">The number of child-indices of this nodes' entry.</param>
         public ScrollViewEntryData(int index, ChartContent chartContent, InteractableObject interactableObject, int parentIndex, int childCount)
         {
@@ -207,14 +207,14 @@ namespace SEE.Game.Charts
             Assert.IsNotNull(chartContent);
             Assert.IsTrue(childCount >= 0);
 
-            this.index = index;
-            this.chartContent = chartContent;
-            this.interactableObject = interactableObject;
-            this.parentIndex = parentIndex;
-            childIndices = childCount == 0 ? null : new int[childCount];
-            isOn = true;
+            this.Index = index;
+            this.ChartContent = chartContent;
+            this.InteractableObject = interactableObject;
+            this.ParentIndex = parentIndex;
+            ChildIndices = childCount == 0 ? null : new int[childCount];
+            IsOn = true;
 
-            eventHandler = new EventHandler(this.chartContent, this.index, this.interactableObject);
+            eventHandler = new EventHandler(this.ChartContent, this.Index, this.InteractableObject);
         }
 
         internal void OnDestroy()
@@ -226,44 +226,44 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Called by <see cref="ScrollViewEntry.Toggle"/> through Unity, if the toggle button was clicked.
+        /// Called by <see cref="ScrollViewEntry.UIToggle"/> through Unity, if the toggle button was clicked.
         /// </summary>
         internal void Toggle(bool value)
         {
-            isOn = value;
+            IsOn = value;
 
-            if (interactableObject != null)
+            if (InteractableObject != null)
             {
-                chartContent.SetShowInChart(interactableObject, isOn);
+                ChartContent.SetShowInChart(InteractableObject, IsOn);
             }
 
             // Propagate changes through parents
-            if (toggleParents && parentIndex != NoParentIndex)
+            if (toggleParents && ParentIndex != NoParentIndex)
             {
                 bool resetToggleChildren = toggleChildren;
                 toggleChildren = false;
 
-                ScrollViewEntry parent = chartContent.GetScrollViewEntry(parentIndex);
-                ref ScrollViewEntryData parentData = ref chartContent.GetScrollViewEntryData(parentIndex);
-                if (parentData.isOn)
+                ScrollViewEntry parent = ChartContent.GetScrollViewEntry(ParentIndex);
+                ref ScrollViewEntryData parentData = ref ChartContent.GetScrollViewEntryData(ParentIndex);
+                if (parentData.IsOn)
                 {
-                    if (!isOn)
+                    if (!IsOn)
                     {
                         if (parent)
                         {
-                            parent.toggle.isOn = false;
+                            parent.UIToggle.isOn = false;
                         }
                         else
                         {
                             parentData.Toggle(false);
                         }
                     }
-                    else if (parentData.childIndices != null)
+                    else if (parentData.ChildIndices != null)
                     {
-                        foreach (int childIdx in parentData.childIndices)
+                        foreach (int childIdx in parentData.ChildIndices)
                         {
-                            ref ScrollViewEntryData childData = ref chartContent.GetScrollViewEntryData(childIdx);
-                            if (!chartContent.ShowInChart(childData.interactableObject))
+                            ref ScrollViewEntryData childData = ref ChartContent.GetScrollViewEntryData(childIdx);
+                            if (!ChartContent.ShowInChart(childData.InteractableObject))
                             {
                                 // Note: This automatically calls Toggle() for the
                                 // parent's ScrollViewEntry. As 'toggleChildren' is
@@ -271,7 +271,7 @@ namespace SEE.Game.Charts
                                 // not back down the children.
                                 if (parent)
                                 {
-                                    parent.toggle.isOn = false;
+                                    parent.UIToggle.isOn = false;
                                 }
                                 else
                                 {
@@ -285,12 +285,12 @@ namespace SEE.Game.Charts
                 else
                 {
                     bool activate = true;
-                    if (parentData.childIndices != null)
+                    if (parentData.ChildIndices != null)
                     {
-                        foreach (int siblingIdx in parentData.childIndices)
+                        foreach (int siblingIdx in parentData.ChildIndices)
                         {
-                            ref ScrollViewEntryData siblingData = ref chartContent.GetScrollViewEntryData(siblingIdx);
-                            if (!chartContent.ShowInChart(siblingData.interactableObject))
+                            ref ScrollViewEntryData siblingData = ref ChartContent.GetScrollViewEntryData(siblingIdx);
+                            if (!ChartContent.ShowInChart(siblingData.InteractableObject))
                             {
                                 activate = false;
                                 break;
@@ -305,7 +305,7 @@ namespace SEE.Game.Charts
                             // ScrollViewEntry. As 'toggleChildren' is 'false', this
                             // propagates only through the parents and not back down the
                             // children. @AutoToggle
-                            parent.toggle.isOn = true;
+                            parent.UIToggle.isOn = true;
                         }
                         else
                         {
@@ -321,25 +321,25 @@ namespace SEE.Game.Charts
             }
 
             // Propagate changes through children
-            if (toggleChildren && childIndices != null)
+            if (toggleChildren && ChildIndices != null)
             {
                 bool resetToggleParents = toggleParents;
                 toggleParents = false;
 
-                foreach (int childIdx in childIndices)
+                foreach (int childIdx in ChildIndices)
                 {
-                    ref ScrollViewEntryData childData = ref chartContent.GetScrollViewEntryData(childIdx);
-                    if (childData.isOn != isOn)
+                    ref ScrollViewEntryData childData = ref ChartContent.GetScrollViewEntryData(childIdx);
+                    if (childData.IsOn != IsOn)
                     {
-                        ScrollViewEntry child = chartContent.GetScrollViewEntry(childIdx);
+                        ScrollViewEntry child = ChartContent.GetScrollViewEntry(childIdx);
                         if (child)
                         {
                             // See: @AutoToggle
-                            child.toggle.isOn = isOn;
+                            child.UIToggle.isOn = IsOn;
                         }
                         else
                         {
-                            childData.Toggle(isOn);
+                            childData.Toggle(IsOn);
                         }
                     }
                 }
@@ -355,16 +355,16 @@ namespace SEE.Game.Charts
         /// Called by <see cref="ScrollViewEntry.OnPointerEnter(PointerEventData)"/> and
         /// <see cref="ScrollViewEntry.OnPointerExit(PointerEventData)"/> through Unity,
         /// if the input device hovers over the entry. Updates the hover flags of this
-        /// handled <see cref="InteractableObject"/>, depending on the value of
+        /// handled <see cref="Controls.InteractableObject"/>, depending on the value of
         /// <see cref="enter"/>.
         /// </summary>
         internal void OnPointerEvent(bool enter)
         {
-            if (interactableObject != null)
+            if (InteractableObject != null)
             {
-                if (interactableObject.IsHovered != enter)
+                if (InteractableObject.IsHovered != enter)
                 {
-                    interactableObject.SetHoverFlag(HoverFlag.ChartScrollViewToggle, enter, true);
+                    InteractableObject.SetHoverFlag(HoverFlag.ChartScrollViewToggle, enter, true);
                 }
             }
             else if (eventHandler != null)
@@ -394,24 +394,24 @@ namespace SEE.Game.Charts
         private ChartContent chartContent;
         private int index;                 // See: @UniqueIndexWithingChartContent
 
-        [SerializeField] public TMPro.TextMeshProUGUI label;  // This text field displays the label of the entry
-        [SerializeField] public UnityEngine.UI.Toggle toggle; // This toggle hints, whether the corresponding marker should be enabled.
+        [SerializeField] public TMPro.TextMeshProUGUI Label;  // This text field displays the label of the entry
+        [SerializeField] public UnityEngine.UI.Toggle UIToggle; // This toggle hints, whether the corresponding marker should be enabled.
 
         /// <summary>
-        /// Sets <see cref="label"/> and <see cref="toggle"/>.
+        /// Sets <see cref="Label"/> and <see cref="UIToggle"/>.
         /// </summary>
         private void Awake()
         {
             // The following code must be run in Awake(). Start() would be too late.
 
             // toggle is another component attached to the same game object as this ScrollViewEntry
-            if (!TryGetComponent(out toggle))
+            if (!TryGetComponent(out UIToggle))
             {
                 Debug.LogError($"ScrollViewEntry {name} of has no Toggle.\n");
             }
             // label is a child of the game object this ScrollViewEntry is attached to
-            label = GetComponentInChildren<TMPro.TextMeshProUGUI>();
-            if (label == null)
+            Label = GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            if (Label == null)
             {
                 Debug.LogError($"ScrollViewEntry of {name} of has no child with a TMPro.TextMeshProUGUI component.\n");
             }
@@ -420,17 +420,17 @@ namespace SEE.Game.Charts
         public void Init(ChartContent chartContent, ScrollViewEntryData data, string label)
         {
             this.chartContent = chartContent;
-            index = data.index;
-            this.label.text = label;
-            toggle.SetIsOnWithoutNotify(data.isOn);
+            index = data.Index;
+            this.Label.text = label;
+            UIToggle.SetIsOnWithoutNotify(data.IsOn);
         }
 
         public void OnDestroy()
         {
             OnPointerExit(null);
 #if UNITY_EDITOR
-            toggle?.SetIsOnWithoutNotify(true);
-            label.text = "Pooled ScrollViewEntry, previously: " + label.text;
+            UIToggle?.SetIsOnWithoutNotify(true);
+            Label.text = "Pooled ScrollViewEntry, previously: " + Label.text;
             index = 0;
             chartContent = null;
 #endif
@@ -443,7 +443,7 @@ namespace SEE.Game.Charts
         /// </summary>
         public void Toggle()
         {
-            chartContent.GetScrollViewEntryData(index).Toggle(toggle.isOn);
+            chartContent.GetScrollViewEntryData(index).Toggle(UIToggle.isOn);
         }
 
         /// <summary>

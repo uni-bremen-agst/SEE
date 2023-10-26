@@ -26,8 +26,8 @@ class Level(str, Enum):
     ERROR = ":x:"
 
 
-# Extensions that a pattern will be applied to by default.
-DEFAULT_EXTENSIONS = ("cs",)
+# Filenames that a pattern will be applied to by default.
+DEFAULT_FILENAMES = (r".*\.cs$",)
 
 # List of matches to be printed as a JSON array at the end of the script.
 collected_matches: List[Dict[str, Union[str, int]]] = []
@@ -39,18 +39,18 @@ class BadPattern:
     """
 
     def __init__(
-            self,
-            regex,
-            message,
-            extensions=DEFAULT_EXTENSIONS,
-            suggestion=None,
-            level=Level.INFO,
-            see_only=True,
+        self,
+        regex,
+        message,
+        filenames=DEFAULT_FILENAMES,
+        suggestion=None,
+        level=Level.INFO,
+        see_only=True,
     ):
         """
         Takes a compiled regular expression `regex` that is checked against
-        every line within changed files having an extension contained in
-        `extensions`, a `message` that shall be displayed to the user in case
+        every line within changed files having a filename matched by a regex contained in
+        `filenames`, a `message` that shall be displayed to the user in case
         a match has been found, a regex substitution `suggestion` for a found
         bad pattern, and a severity `level`.
         If `see_only` is set to `True`, the pattern will only be applied to
@@ -62,24 +62,28 @@ class BadPattern:
             regex = re.compile(r".*")
         self.regex = regex
         self.message = message
-        self.extensions = extensions
+        self.filenames = [re.compile(x) for x in filenames]
         self.suggestion = suggestion
         self.level = level
         self.see_only = see_only
 
-    def applies_to(self, filename: str, line: str = '') -> bool:
+    def applies_to(self, filename: str, line: str = "") -> bool:
         """
         Returns whether the given pattern applies to the given filename.
         A pattern applies to a filename if:
-        * The filename has an extension contained in `extensions`.
+        * The filename matches one of the regexes in `filenames`.
         * The filename starts with `Assets/SEE/` if `see_only` is set to `True`.
         * The line matches the regular expression `regex`.
         """
-        extension = filename.rsplit(".", 1)[1] if "." in filename else ""
-        return (not self.see_only or filename.startswith("Assets/SEE/")) \
-            and extension in self.extensions and self.regex.match(line)
+        return (
+            (not self.see_only or filename.startswith("Assets/SEE/"))
+            and any(x.match(filename) is not None for x in self.filenames)
+            and self.regex.match(line) is not None
+        )
 
-    def to_json(self, filename: str, line_number: int, suggestion: Optional[str]) -> Dict[str, Union[str, int]]:
+    def to_json(
+        self, filename: str, line_number: int, suggestion: Optional[str]
+    ) -> Dict[str, Union[str, int]]:
         """
         Turns this bad pattern match into a dictionary representing a GitHub comment.
         """
@@ -87,7 +91,7 @@ class BadPattern:
         if suggestion is not None:
             body_text += f"\n\n```suggestion\n{suggestion}\n```"
         if self.regex is not None:
-            body_text += f"\n> This bad pattern was detected by the following regular expression:\n> ```regex\n> {self.regex.pattern}\n> ```"
+            body_text += f"\n> This bad pattern was detected by the following regular expression:\n > ```regex\n> {self.regex.pattern}\n> ```"
         return {
             "path": filename,
             "line": line_number,
@@ -113,27 +117,37 @@ BAD_PATTERNS = [
         level=Level.ERROR,
     ),
     BadPattern(
-        re.compile(r"(^\s*ActionManifestFileRelativeFilePath: StreamingAssets)/SteamVR/actions\.json(\s*)$"),
+        re.compile(
+            r"(^\s*ActionManifestFileRelativeFilePath: StreamingAssets)/SteamVR/actions\.json(\s*)$"
+        ),
         """Slashes were unnecessarily changed to forward slashes.
 This happens on Linux systems automatically, but Windows systems will change this back.
 We should just leave it as a backslash.""",
         suggestion=r"\1\SteamVR\actions.json\2",
-        extensions=["asset"],
+        filenames=[r".*\.asset$"],
         level=Level.WARN,
-        see_only=False
+        see_only=False,
     ),
     BadPattern(
         re.compile(r"^\s*(\s|Object\.)Destroy\(.*$"),
         "Make sure to use `Destroyer.Destroy` (`Destroyer` class is in `SEE.Utils`) instead of `Object.Destroy`!",
-        level=Level.WARN
+        filenames=[r".*(?<!/Destroyer)\.cs$"],
+        level=Level.WARN,
     ),
     BadPattern(
         # For trailing whitespace
         re.compile(r"^(.*\S)?\s+$"),
         "Trailing whitespace detected! Please remove it.",
         level=Level.WARN,
-        suggestion=r"\1"
-    )
+        suggestion=r"\1",
+    ),
+    BadPattern(
+        re.compile(r"^\s*m_Loaders:(?! \[\])"),
+        "You must not enable OpenXR on any PR that is planned to be merged, otherwise Linux builds will break!",
+        filenames=[r".*\.asset$"],
+        level=Level.ERROR,
+        see_only=False,
+    ),
 ]
 
 
@@ -174,8 +188,13 @@ def handle_missing_newline(filename: str, linenumber: int, last_line: Optional[s
     :param last_line: The last line in the file.
     """
     if NO_NEWLINE_BAD_PATTERN.applies_to(filename):
-        collected_matches.append(NO_NEWLINE_BAD_PATTERN.to_json(filename, linenumber,
-                                                                f"{last_line[1:] if last_line is not None else ''}\n"))
+        collected_matches.append(
+            NO_NEWLINE_BAD_PATTERN.to_json(
+                filename,
+                linenumber,
+                f"{last_line[1:] if last_line is not None else ''}\n",
+            )
+        )
 
 
 def main():
@@ -187,14 +206,14 @@ def main():
         skip_file = False
         hunk_indicator = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@.*$")
         missing_newline_at_eof = False
-        while line := diff.readline().rstrip('\n\r'):
+        while line := diff.readline().rstrip("\n\r"):
             if line.startswith("+++"):
                 # New file here.
                 if missing_newline_at_eof:
                     handle_missing_newline(filename, diff_line - 1, last_line)
                     missing_newline_at_eof = False
                 filename = line.split("/", 1)[1]
-                skip_file = filename == 'dev/null'
+                skip_file = filename == "dev/null"
             elif skip_file:
                 continue
             elif line.startswith("@@"):
@@ -209,7 +228,8 @@ def main():
                     warn(f"Invalid unified diff hunk in {filename}: {line}")
                     # Nonetheless, this is not a fatal error, so we can continue.
                     continue
-                diff_line = int(m.group(1))  # Next line is starting line indicated by this line range
+                # Next line is starting line indicated by this line range
+                diff_line = int(m.group(1))
             elif line.startswith("+"):
                 # This is an actual added line within the hunk denoted by start_line.
                 assert filename is not None
@@ -230,9 +250,11 @@ def main():
                 # We can't report this immediately, as this string may occur twice.
                 # Instead, we will report this once the next file / hunk starts.
                 missing_newline_at_eof = True
-            elif line != "" and line[0] not in ("-", "d", "i", "n", "o", "r", "B"):
+            elif line != "" and line[0] not in ("-", "d", "i", "n", "o", "r", "B", "s"):
                 # We ignore empty lines, removed lines, and diff metadata lines (starting with "diff" or "index" etc).
-                warn(f'Unrecognized unified diff line indicator for line "{line}", skipping.')
+                warn(
+                    f'Unrecognized unified diff line indicator for line "{line}", skipping.'
+                )
 
         if missing_newline_at_eof:
             handle_missing_newline(filename, diff_line, last_line)

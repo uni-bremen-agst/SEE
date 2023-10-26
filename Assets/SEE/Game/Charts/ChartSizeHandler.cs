@@ -32,7 +32,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// The script attached to the chart.
         /// </summary>
-        private ChartContent _chartContent;
+        private ChartContent chartContent;
 
         /// <summary>
         /// The minimum size a chart can have for width and height.
@@ -99,7 +99,7 @@ namespace SEE.Game.Charts
         {
             GetSettingData();
             Transform parent = transform.parent;
-            _chartContent = parent.GetComponent<ChartContent>();
+            chartContent = parent.GetComponent<ChartContent>();
             Chart = parent.GetComponent<RectTransform>();
         }
 
@@ -139,20 +139,20 @@ namespace SEE.Game.Charts
         /// <param name="height">The new height of the chart.</param>
         protected virtual void ChangeSize(float width, float height)
         {
-            RectTransform dataPanel = _chartContent.dataPanel;
+            RectTransform dataPanel = chartContent.DataPanel;
             dataPanel.sizeDelta = new Vector2(width - 80, height - 80);
             dataPanel.anchoredPosition = new Vector2(width / 2, height / 2);
             noDataWarning.sizeDelta = new Vector2(width - 150, height - 150);
 
-            RectTransform labelsPanel = _chartContent.labelsPanel;
+            RectTransform labelsPanel = chartContent.LabelsPanel;
             labelsPanel.sizeDelta = new Vector2(width, height);
             labelsPanel.anchoredPosition = new Vector2(width / 2, height / 2);
 
-            RectTransform xDropdown = _chartContent.axisDropdownX.GetComponent<RectTransform>();
+            RectTransform xDropdown = chartContent.AxisDropdownX.GetComponent<RectTransform>();
             xDropdown.anchoredPosition = new Vector2(width / 2, xDropdown.anchoredPosition.y);
             xDropdown.sizeDelta = new Vector2(width / 2, xDropdown.sizeDelta.y);
 
-            RectTransform yDropdown = _chartContent.axisDropdownY.GetComponent<RectTransform>();
+            RectTransform yDropdown = chartContent.AxisDropdownY.GetComponent<RectTransform>();
             yDropdown.anchoredPosition = new Vector2(yDropdown.anchoredPosition.x, height / 2);
             yDropdown.sizeDelta = new Vector2(height / 2, yDropdown.sizeDelta.y);
 
@@ -166,7 +166,7 @@ namespace SEE.Game.Charts
             contentSelection.sizeDelta = new Vector2(contentSelection.sizeDelta.x, height);
             scrollView.sizeDelta = new Vector2(scrollView.sizeDelta.x, height - 50);
             contentSelectionHeader.anchoredPosition = new Vector2(0, height / 2 - 20);
-            _chartContent.DrawData();
+            chartContent.DrawData();
         }
 
         /// <summary>

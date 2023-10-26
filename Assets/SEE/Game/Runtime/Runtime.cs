@@ -18,19 +18,19 @@ namespace SEE.Game.Runtime
         /// <summary>
         /// Time in seconds for building animation loop.
         /// </summary>
-        private const float LOOP_TIME = 1.0f;
+        private const float loopTime = 1.0f;
 
         /// <summary>
         /// The first function call to be visualized. The call to main will not be
         /// visualized.
         /// </summary>
-        private const int FIRST_FUNCTION_CALL = 1;
+        private const int firstFunctionCall = 1;
 
         /// <summary>
         /// The call tree to be visualized.
         /// </summary>
         [NonSerialized, OdinSerialize]
-        public CallTree callTree;
+        public CallTree CallTree;
 
         /// <summary>
         /// States whether the visualization is currently running or not.
@@ -40,7 +40,7 @@ namespace SEE.Game.Runtime
         /// <summary>
         /// The currently visualized function call.
         /// </summary>
-        private int currentFunctionCall = FIRST_FUNCTION_CALL;
+        private int currentFunctionCall = firstFunctionCall;
 
         /// <summary>
         /// The current time in the loop.
@@ -58,7 +58,7 @@ namespace SEE.Game.Runtime
         /// </summary>
         private void Start()
         {
-            if (callTree == null)
+            if (CallTree == null)
             {
                 throw new Exception("'callTree' is null!");
             }
@@ -68,7 +68,7 @@ namespace SEE.Game.Runtime
             string[] tags = new string[] { Tags.Node };
 
             // Generates non serializable parts of call tree.
-            callTree.GenerateTree();
+            CallTree.GenerateTree();
 
             // Finds GameObjects, that represent functions and maps them onto call tree.
             Dictionary<string, GameObject> gameObjects = new Dictionary<string, GameObject>(FindObjectsOfType<GameObject>().Length);
@@ -103,7 +103,7 @@ namespace SEE.Game.Runtime
                     }
                 }
             }
-            callTree.MapGameObjects(gameObjects);
+            CallTree.MapGameObjects(gameObjects);
         }
 
         /// <summary>
@@ -144,8 +144,8 @@ namespace SEE.Game.Runtime
                 }
             }
 
-            functionCalls.ForEach(e => e.UpdateSimulation(currentTimeInLoop / LOOP_TIME));
-            currentTimeInLoop = (currentTimeInLoop + Time.deltaTime) % LOOP_TIME;
+            functionCalls.ForEach(e => e.UpdateSimulation(currentTimeInLoop / loopTime));
+            currentTimeInLoop = (currentTimeInLoop + Time.deltaTime) % loopTime;
         }
 
         /// <summary>
@@ -154,11 +154,11 @@ namespace SEE.Game.Runtime
         /// </summary>
         private void Forwards()
         {
-            if (currentFunctionCall == callTree.FunctionCallCount - 1)
+            if (currentFunctionCall == CallTree.FunctionCallCount - 1)
             {
                 return;
             }
-            currentFunctionCall = Mathf.Min(currentFunctionCall + 1, callTree.FunctionCallCount - 1);
+            currentFunctionCall = Mathf.Min(currentFunctionCall + 1, CallTree.FunctionCallCount - 1);
             ClearFunctionCalls();
             GenerateFunctionCalls();
         }
@@ -169,11 +169,11 @@ namespace SEE.Game.Runtime
         /// </summary>
         private void Backwards()
         {
-            if (currentFunctionCall == FIRST_FUNCTION_CALL)
+            if (currentFunctionCall == firstFunctionCall)
             {
                 return;
             }
-            currentFunctionCall = Mathf.Max(currentFunctionCall - 1, FIRST_FUNCTION_CALL);
+            currentFunctionCall = Mathf.Max(currentFunctionCall - 1, firstFunctionCall);
             ClearFunctionCalls();
             GenerateFunctionCalls();
         }
@@ -183,20 +183,20 @@ namespace SEE.Game.Runtime
         /// </summary>
         private void GenerateFunctionCalls()
         {
-            CallTreeFunctionCall call = callTree.GetFunctionCall(currentFunctionCall);
+            CallTreeFunctionCall call = CallTree.GetFunctionCall(currentFunctionCall);
             while (call != null)
             {
-                if (call.predecessor != null)
+                if (call.Predecessor != null)
                 {
-                    GameObject go = new GameObject("FunctionCall: " + call.GetAttributeForCategory(CallTree.LINKAGE_NAME), typeof(FunctionCallSimulator))
+                    GameObject go = new GameObject("FunctionCall: " + call.GetAttributeForCategory(CallTree.LinkageName), typeof(FunctionCallSimulator))
                     {
                         tag = Tags.FunctionCall
                     };
                     FunctionCallSimulator sim = go.GetComponent<FunctionCallSimulator>();
-                    sim.Initialize(call.predecessor.node, call.node, currentTimeInLoop);
+                    sim.Initialize(call.Predecessor.Node, call.Node, currentTimeInLoop);
                     functionCalls.Add(sim);
                 }
-                call = call.predecessor;
+                call = call.Predecessor;
             }
         }
 

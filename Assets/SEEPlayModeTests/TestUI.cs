@@ -7,7 +7,7 @@ using NUnit.Framework.Interfaces;
 using NUnit.Framework;
 using UnityEngine;
 
-namespace SEE.Game.UI
+namespace SEE.UI
 {
     /// <summary>
     /// Abstract super class of all UI tests. It takes care of the setup

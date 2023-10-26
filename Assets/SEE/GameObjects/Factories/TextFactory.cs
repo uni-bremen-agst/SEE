@@ -13,12 +13,12 @@ namespace SEE.GO
         /// <summary>
         /// Color of the text.
         /// </summary>
-        private static readonly Color TextColorDefault = Color.white;
+        private static readonly Color textColorDefault = Color.white;
 
         /// <summary>
         /// Name of the font used for the text.
         /// </summary>
-        private const string PortalFontName = "Fonts & Materials/LiberationSans SDF - Portal";
+        private const string portalFontName = "Fonts & Materials/LiberationSans SDF - Portal";
 
         /// <summary>
         /// This will apply an outline effect across <em>all</em> TextMeshPro instances with the same
@@ -89,7 +89,7 @@ namespace SEE.GO
         /// the text width); the font size will be chosen appropriately</param>
         /// <param name="lift">if true, the text will be lifted up by its extent; that is, its y position is actually
         /// the bottom line (position.y + extents.y)</param>
-        /// <param name="textColor">the color of the text (default: <see cref="TextColorDefault"/>)</param>
+        /// <param name="textColor">the color of the text (default: <see cref="textColorDefault"/>)</param>
         /// <returns>the game object representing the text</returns>
         public static GameObject GetTextWithWidth(string text, Vector3 position, float width, bool lift = true,
             Color? textColor = null)
@@ -137,9 +137,9 @@ namespace SEE.GO
             result.transform.position = position;
 
             tm = result.AddComponent<TextMeshPro>();
-            tm.font = Resources.Load<TMP_FontAsset>(PortalFontName);
+            tm.font = Resources.Load<TMP_FontAsset>(portalFontName);
             tm.text = text;
-            tm.color = textColor ?? TextColorDefault;
+            tm.color = textColor ?? textColorDefault;
             tm.alignment = TextAlignmentOptions.Center;
         }
 

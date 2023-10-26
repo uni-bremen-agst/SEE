@@ -39,14 +39,14 @@ namespace SEE.Game.Charts.VR
         /// The minimum distance between the players head and the <see cref="GameObject" /> the charts are
         /// attached to to trigger it to follow the players head.
         /// </summary>
-        private float _distanceThreshold;
+        private float distanceThreshold;
 
         /// <summary>
         /// The <see cref="Coroutine" /> that moves the <see cref="GameObject" /> containing the charts.
         /// </summary>
-        private Coroutine _movingChart;
+        private Coroutine movingChart;
 
-        private const float ChartSpeed = 2f; //TODO: Move to manager
+        private const float chartSpeed = 2f; //TODO: Move to manager
 
         /// <summary>
         /// Calls methods for initialization.
@@ -61,28 +61,28 @@ namespace SEE.Game.Charts.VR
         /// </summary>
         private void GetSettingData()
         {
-            _distanceThreshold = ChartManager.Instance.DistanceThreshold;
+            distanceThreshold = ChartManager.Instance.DistanceThreshold;
         }
 
         /// <summary>
-        /// Checks if the player moved more than <see cref="_distanceThreshold" />. If so, the charts will
+        /// Checks if the player moved more than <see cref="distanceThreshold" />. If so, the charts will
         /// follow the player.
         /// </summary>
         private void Update()
         {
             if (Vector3.Distance(transform.position, CameraTransform.position) <=
-                _distanceThreshold)
+                distanceThreshold)
             {
                 return;
             }
 
-            if (_movingChart != null)
+            if (movingChart != null)
             {
-                StopCoroutine(_movingChart);
+                StopCoroutine(movingChart);
                 gameObject.SetActive(true);
             }
 
-            _movingChart = StartCoroutine(MoveChart());
+            movingChart = StartCoroutine(MoveChart());
         }
 
         /// <summary>
@@ -92,14 +92,14 @@ namespace SEE.Game.Charts.VR
         private IEnumerator MoveChart()
         {
             Vector3 startPosition = transform.position;
-            for (float time = 0f; time < 1f; time += Time.deltaTime * ChartSpeed)
+            for (float time = 0f; time < 1f; time += Time.deltaTime * chartSpeed)
             {
                 transform.position = Vector3.Lerp(startPosition, CameraTransform.position, time);
                 yield return new WaitForEndOfFrame();
             }
 
             gameObject.SetActive(true);
-            _movingChart = null;
+            movingChart = null;
         }
     }
 }

@@ -153,10 +153,10 @@ namespace SEE.DataModel.DG
                     case null when oldParent == null: // Nothing to be done.
                         break;
                     case null: // value is null while parent is not, so the parent has been removed.
-                        Notify(new HierarchyEvent(version, oldParent, this, ChangeType.Removal));
+                        Notify(new HierarchyEvent(Version, oldParent, this, ChangeType.Removal));
                         break;
                     default: // value != null, so the parent has been added or changed
-                        Notify(new HierarchyEvent(version, value, this, ChangeType.Addition));
+                        Notify(new HierarchyEvent(Version, value, this, ChangeType.Addition));
                         break;
                 }
             }
@@ -178,7 +178,7 @@ namespace SEE.DataModel.DG
         /// <returns>ascendants of this node in the hierarchy including the node itself</returns>
         public IList<Node> Ascendants()
         {
-            List<Node> result = new List<Node>();
+            List<Node> result = new();
             Node cursor = this;
             while (cursor != null)
             {
@@ -316,6 +316,11 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// All edges connected to this node, i.e., the union of its incoming and outgoing edges.
+        /// </summary>
+        public ISet<Edge> Edges => Incomings.Union(Outgoings).ToHashSet();
+
+        /// <summary>
         /// Resets this node, i.e., removes all incoming and outgoing edges
         /// and children from this node. Resets its graph and parent to null.
         ///
@@ -417,7 +422,7 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// The list of immediate children of this node in the hierarchy.
         /// </summary>
-        private List<Node> children = new List<Node>();
+        private List<Node> children = new();
 
         /// <summary>
         /// The number of immediate children of this node in the hierarchy.
@@ -662,7 +667,7 @@ namespace SEE.DataModel.DG
         /// <returns>all deleted nodes and edges including this node</returns>
         public SubgraphMemento DeleteTree()
         {
-            SubgraphMemento result = new SubgraphMemento(ItsGraph);
+            SubgraphMemento result = new(ItsGraph);
             foreach (Node node in PostOrderDescendants())
             {
                 result.Parents[node] = node.Parent;

@@ -34,7 +34,7 @@ namespace SEE.DataModel.DG
         /// Observer for graph elements. This way, changes in each element (e.g., attribute changes) are also
         /// propagated through the graph's own observable implementation.
         /// </summary>
-        private readonly ProxyObserver ElementObserver;
+        private readonly ProxyObserver elementObserver;
 
         /// <summary>
         /// Indicates whether the node hierarchy has changed and, hence,
@@ -84,7 +84,7 @@ namespace SEE.DataModel.DG
         {
             Name = name;
             BasePath = basePath;
-            ElementObserver = new ProxyObserver(this, x => x.CopyWithGuid(version));
+            elementObserver = new ProxyObserver(this, x => x.CopyWithGuid(Version));
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace SEE.DataModel.DG
         /// <param name="graph">The graph to copy from. Note that this will be a deep copy.</param>
         public Graph(Graph copyFrom)
         {
-            ElementObserver = new ProxyObserver(this, x => x.CopyWithGuid(version));
+            elementObserver = new ProxyObserver(this, x => x.CopyWithGuid(Version));
             copyFrom.HandleCloned(this);
         }
 
@@ -138,8 +138,8 @@ namespace SEE.DataModel.DG
             nodes[node.ID] = node;
             node.ItsGraph = this;
             NodeHierarchyHasChanged = true;
-            Notify(new NodeEvent(version, node, ChangeType.Addition));
-            ElementObserver.AddDisposable(node.Subscribe(ElementObserver));
+            Notify(new NodeEvent(Version, node, ChangeType.Addition));
+            elementObserver.AddDisposable(node.Subscribe(elementObserver));
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace SEE.DataModel.DG
             if (nodes.Remove(node.ID))
             {
                 // We need to send out this event here, before the node is modified but after it has been removed.
-                Notify(new NodeEvent(version, node, ChangeType.Removal));
+                Notify(new NodeEvent(Version, node, ChangeType.Removal));
 
                 // The edges of node are stored in the node's data structure as well as
                 // in the node's neighbor's data structure.
@@ -184,7 +184,7 @@ namespace SEE.DataModel.DG
                     Node successor = outgoing.Target;
                     successor.RemoveIncoming(outgoing);
                     edges.Remove(outgoing.ID);
-                    Notify(new EdgeEvent(version, outgoing, ChangeType.Removal));
+                    Notify(new EdgeEvent(Version, outgoing, ChangeType.Removal));
                     outgoing.ItsGraph = null;
                 }
 
@@ -193,7 +193,7 @@ namespace SEE.DataModel.DG
                     Node predecessor = incoming.Source;
                     predecessor.RemoveOutgoing(incoming);
                     edges.Remove(incoming.ID);
-                    Notify(new EdgeEvent(version, incoming, ChangeType.Removal));
+                    Notify(new EdgeEvent(Version, incoming, ChangeType.Removal));
                     incoming.ItsGraph = null;
                 }
 
@@ -271,41 +271,68 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// If the graph has only a single root, nothing happens. Otherwise
-        /// all current roots become an immediate child of a newly added
-        /// root node with given <paramref name="name"/> and <paramref name="type"/>.
+        /// If the graph has no root, false is returned and <paramref name="root"/>
+        /// will be null.
+        ///
+        /// If the graph has exactly one root, nothing happens and false is returned.
+        /// In this case, <paramref name="root"/> refers to the single root.
+        ///
+        /// Otherwise all current roots become an immediate child of a newly added
+        /// root node with given <paramref name="name"/> and <paramref name="type"/>
+        /// and true is returned. The new root will have toggle attribute
+        /// <see cref="RootToggle"/>. The given <paramref name="name"/> will be used for
+        /// the source name and ID of the new root node.
+        ///
+        /// If <paramref name="name"/> is null or empty, a unique ID will be used.
+        /// If <paramref name="type"/> is null or empty, <see cref="Graph.UnknownType"/> will be used.
         /// </summary>
+        /// <param name="root">the resulting (new or existing) root or null if there is no root</param>
         /// <param name="name">ID of new root node</param>
         /// <param name="type">type of new root node</param>
-        public virtual void AddSingleRoot(string name, string type)
+        /// <returns>true if a new root node was created</returns>
+        public virtual bool AddSingleRoot(out Node root, string name = null, string type = null)
         {
             List<Node> roots = GetRoots();
-            if (roots.Count > 0)
+            if (roots.Count > 1)
             {
-                Node newRoot = new Node { SourceName = name, ID = name, Type = type };
-                AddNode(newRoot);
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    name = Guid.NewGuid().ToString();
+                }
+                if (string.IsNullOrWhiteSpace(type))
+                {
+                    type = Graph.UnknownType;
+                }
+                root = new() { SourceName = name, ID = name, Type = type, ToggleAttributes = { RootToggle } };
+                AddNode(root);
                 foreach (Node oldRoot in roots)
                 {
-                    newRoot.AddChild(oldRoot);
+                    root.AddChild(oldRoot);
                 }
 
                 NodeHierarchyHasChanged = true;
+                return true;
+            }
+            else
+            {
+                root = roots.FirstOrDefault();
+                return false;
             }
         }
 
         /// <summary>
         /// Returns the node with the given unique ID if it exists; otherwise null.
         /// </summary>
-        /// <param name="ID">unique ID</param>
+        /// <param name="id">unique ID</param>
         /// <returns>node with the given unique ID if it exists; otherwise null</returns>
-        public Node GetNode(string ID)
+        public Node GetNode(string id)
         {
-            if (string.IsNullOrEmpty(ID))
+            if (string.IsNullOrEmpty(id))
             {
                 throw new ArgumentException("ID must neither be null nor empty");
             }
 
-            if (nodes.TryGetValue(ID, out Node node))
+            if (nodes.TryGetValue(id, out Node node))
             {
                 return node;
             }
@@ -316,16 +343,16 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Returns the edge with the given unique ID if it exists; otherwise null.
         /// </summary>
-        /// <param name="ID">unique ID</param>
+        /// <param name="id">unique ID</param>
         /// <returns>edge with the given unique ID if it exists; otherwise null</returns>
-        public Edge GetEdge(string ID)
+        public Edge GetEdge(string id)
         {
-            if (string.IsNullOrEmpty(ID))
+            if (string.IsNullOrEmpty(id))
             {
                 throw new ArgumentException("ID must neither be null nor empty");
             }
 
-            if (edges.TryGetValue(ID, out Edge edge))
+            if (edges.TryGetValue(id, out Edge edge))
             {
                 return edge;
             }
@@ -386,8 +413,8 @@ namespace SEE.DataModel.DG
                 edges[edge.ID] = edge;
                 edge.Source.AddOutgoing(edge);
                 edge.Target.AddIncoming(edge);
-                Notify(new EdgeEvent(version, edge, ChangeType.Addition));
-                ElementObserver.AddDisposable(edge.Subscribe(ElementObserver));
+                Notify(new EdgeEvent(Version, edge, ChangeType.Addition));
+                elementObserver.AddDisposable(edge.Subscribe(elementObserver));
             }
             else
             {
@@ -424,7 +451,7 @@ namespace SEE.DataModel.DG
             edge.Source.RemoveOutgoing(edge);
             edge.Target.RemoveIncoming(edge);
             edges.Remove(edge.ID);
-            Notify(new EdgeEvent(version, edge, ChangeType.Removal));
+            Notify(new EdgeEvent(Version, edge, ChangeType.Removal));
             edge.ItsGraph = null;
         }
 
@@ -492,13 +519,13 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns true if a node with the given <paramref name="ID"/> is part of the graph.
+        /// Returns true if a node with the given <paramref name="id"/> is part of the graph.
         /// </summary>
-        /// <param name="ID">unique ID of the node searched</param>
-        /// <returns>true if a node with the given <paramref name="ID"/> is part of the graph</returns>
-        public bool ContainsNodeID(string ID)
+        /// <param name="id">unique ID of the node searched</param>
+        /// <returns>true if a node with the given <paramref name="id"/> is part of the graph</returns>
+        public bool ContainsNodeID(string id)
         {
-            return nodes.ContainsKey(ID);
+            return nodes.ContainsKey(id);
         }
 
         /// <summary>
@@ -506,12 +533,12 @@ namespace SEE.DataModel.DG
         /// such node, node will be null and false will be returned; otherwise
         /// true will be returned.
         /// </summary>
-        /// <param name="ID">unique ID of the searched node</param>
+        /// <param name="id">unique ID of the searched node</param>
         /// <param name="node">the found node, otherwise null</param>
         /// <returns>true if a node could be found</returns>
-        public bool TryGetNode(string ID, out Node node)
+        public bool TryGetNode(string id, out Node node)
         {
-            return nodes.TryGetValue(ID, out node);
+            return nodes.TryGetValue(id, out node);
         }
 
         /// <summary>
@@ -612,7 +639,7 @@ namespace SEE.DataModel.DG
             edges.Clear();
             nodes.Clear();
             NotifyComplete();
-            ElementObserver.Reset();
+            elementObserver.Reset();
         }
 
         /// <summary>
@@ -1369,44 +1396,6 @@ namespace SEE.DataModel.DG
         public override int GetHashCode()
         {
             return HashCode.Combine(Name, Path);
-        }
-
-        /// <summary>
-        /// If <paramref name="graph"/> has a single root, nothing is done. Otherwise
-        /// an artificial root is created and added to the <paramref name="graph"/>
-        /// All true roots of <paramref name="graph"/> will
-        /// become children of this artificial root.
-        /// </summary>
-        /// <param name="graph">graph where a unique root node should be added</param>
-        /// <returns>the new artificial root or null if <paramref name="graph"/> has
-        /// already a single root</returns>
-        public Node AddRootNodeIfNecessary()
-        {
-            // Note: Because this method is called only when a hierarchical layout is to
-            // be applied (and then both leaves and inner nodes were added to nodeMap), we
-            // could traverse through graph.GetRoots() or nodeMaps.Keys. It would not make
-            // a difference. If -- for any reason --, we decide not to create a game object
-            // for some inner nodes, we should rather iterate on nodeMaps.Keys.
-            ICollection<Node> graphRoots = GetRoots();
-
-            if (graphRoots.Count > 1)
-            {
-                Node artificialRoot = new Node
-                {
-                    ID = $"{Name}#ROOT",
-                    SourceName = $"{Name} (Root)",
-                    Type = graphRoots.First().Type,
-                    ToggleAttributes = { RootToggle }
-                };
-                AddNode(artificialRoot);
-                foreach (Node root in graphRoots)
-                {
-                    artificialRoot.AddChild(root);
-                }
-                return artificialRoot;
-            }
-
-            return null;
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.Utils;
+using SEE.Utils.Config;
 
 namespace SEE.Game.City
 {
@@ -30,10 +30,10 @@ namespace SEE.Game.City
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(TubularSegments, TubularSegmentsLabel);
-            writer.Save(Radius, RadiusLabel);
-            writer.Save(RadialSegments, RadialSegmentsLabel);
-            writer.Save(AreSelectable, AreSelectableLabel);
+            writer.Save(TubularSegments, tubularSegmentsLabel);
+            writer.Save(Radius, radiusLabel);
+            writer.Save(RadialSegments, radialSegmentsLabel);
+            writer.Save(AreSelectable, areSelectableLabel);
             writer.EndGroup();
         }
 
@@ -43,16 +43,16 @@ namespace SEE.Game.City
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
-                ConfigIO.Restore(values, TubularSegmentsLabel, ref TubularSegments);
-                ConfigIO.Restore(values, RadialSegmentsLabel, ref RadialSegments);
-                ConfigIO.Restore(values, RadiusLabel, ref Radius);
-                ConfigIO.Restore(values, AreSelectableLabel, ref AreSelectable);
+                ConfigIO.Restore(values, tubularSegmentsLabel, ref TubularSegments);
+                ConfigIO.Restore(values, radialSegmentsLabel, ref RadialSegments);
+                ConfigIO.Restore(values, radiusLabel, ref Radius);
+                ConfigIO.Restore(values, areSelectableLabel, ref AreSelectable);
             }
         }
 
-        private const string TubularSegmentsLabel = "TubularSegments";
-        private const string RadialSegmentsLabel = "RadialSegments";
-        private const string RadiusLabel = "Radius";
-        private const string AreSelectableLabel = "AreSelectable";
+        private const string tubularSegmentsLabel = "TubularSegments";
+        private const string radialSegmentsLabel = "RadialSegments";
+        private const string radiusLabel = "Radius";
+        private const string areSelectableLabel = "AreSelectable";
     }
 }

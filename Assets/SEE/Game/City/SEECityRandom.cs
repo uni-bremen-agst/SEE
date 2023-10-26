@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
 using SEE.GO;
-using SEE.Tools;
-using SEE.Utils;
+using SEE.Tools.RandomGraphs;
+using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -97,9 +97,7 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public override void LoadData()
         {
-            // generate graph randomly
-            RandomGraphs randomGraphs = new RandomGraphs();
-            LoadedGraph = randomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes, true);
+            LoadedGraph = RandomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes, true);
         }
 
         /// <summary>
@@ -200,15 +198,15 @@ namespace SEE.Game.City
         /// <summary>
         /// Label of LeafConstraint in the configuration file.
         /// </summary>
-        private const string LeafConstraintLabel = "LeafConstraint";
+        private const string leafConstraintLabel = "LeafConstraint";
         /// <summary>
         /// Label of InnerNodeConstraint in the configuration file.
         /// </summary>
-        private const string InnerNodeConstraintLabel = "InnerNodeConstraint";
+        private const string innerNodeConstraintLabel = "InnerNodeConstraint";
         /// <summary>
         /// Label of LeafAttributes in the configuration file.
         /// </summary>
-        private const string LeafAttributesLabel = "LeafAttributes";
+        private const string leafAttributesLabel = "LeafAttributes";
 
         /// <summary>
         /// <see cref="City.AbstractSEECity.Save(ConfigWriter)"/>
@@ -216,9 +214,9 @@ namespace SEE.Game.City
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
-            LeafConstraint.Save(writer, LeafConstraintLabel);
-            InnerNodeConstraint.Save(writer, InnerNodeConstraintLabel);
-            writer.Save(LeafAttributes, LeafAttributesLabel); // LeafAttributes are stored as a list
+            LeafConstraint.Save(writer, leafConstraintLabel);
+            InnerNodeConstraint.Save(writer, innerNodeConstraintLabel);
+            writer.Save(LeafAttributes, leafAttributesLabel); // LeafAttributes are stored as a list
         }
 
         /// <summary>
@@ -227,14 +225,14 @@ namespace SEE.Game.City
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            LeafConstraint.Restore(attributes, LeafConstraintLabel);
-            InnerNodeConstraint.Restore(attributes, InnerNodeConstraintLabel);
+            LeafConstraint.Restore(attributes, leafConstraintLabel);
+            InnerNodeConstraint.Restore(attributes, innerNodeConstraintLabel);
             // LeafAttributes are stored as a list
             {
                 /// This is a bit akward because attribute <see cref="LeafAttributes"/>
                 /// must be a <see cref="List{T}"/> and cannot be a <see cref="IList{T}"/>.
                 IList<RandomAttributeDescriptor> leafAttributes = LeafAttributes;
-                ConfigIO.RestoreList(attributes, LeafAttributesLabel, ref leafAttributes);
+                ConfigIO.RestoreList(attributes, leafAttributesLabel, ref leafAttributes);
                 LeafAttributes = leafAttributes as List<RandomAttributeDescriptor>;
             }
         }

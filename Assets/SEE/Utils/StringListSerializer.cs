@@ -15,7 +15,7 @@ namespace SEE.Utils
         [System.Serializable]
         private class Wrapper
         {
-            public List<string> stringList;
+            public List<string> StringList;
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace SEE.Utils
             }
             return JsonUtility.ToJson(new Wrapper
             {
-                stringList = stringList
+                StringList = stringList
             });
         }
 
@@ -60,7 +60,7 @@ namespace SEE.Utils
         /// <returns>original list of strings that was serialized by <see cref="Serialize(List{string})"/></returns>
         public static List<string> Unserialize(string serializedList)
         {
-            return JsonUtility.FromJson<Wrapper>(serializedList).stringList;
+            return JsonUtility.FromJson<Wrapper>(serializedList).StringList;
         }
     }
 }

@@ -108,14 +108,14 @@ namespace SEE.CameraPaths
 
             foreach (PathData d in data)
             {
-                Vector3 rotation = d.rotation.eulerAngles;
-                string output = FloatToString(d.position.x)
-                              + delimiter + FloatToString(d.position.y)
-                              + delimiter + FloatToString(d.position.z)
+                Vector3 rotation = d.Rotation.eulerAngles;
+                string output = FloatToString(d.Position.x)
+                              + delimiter + FloatToString(d.Position.y)
+                              + delimiter + FloatToString(d.Position.z)
                               + delimiter + FloatToString(rotation.x)
                               + delimiter + FloatToString(rotation.y)
                               + delimiter + FloatToString(rotation.z)
-                              + delimiter + FloatToString(d.time);
+                              + delimiter + FloatToString(d.Time);
                 outputs.Add(output);
             }
 
@@ -167,7 +167,7 @@ namespace SEE.CameraPaths
         public static CameraPath ReadPath(string filename)
         {
             string[] data = System.IO.File.ReadAllLines(filename);
-            CameraPath result = new CameraPath(filename);
+            CameraPath result = new(filename);
 
             int i = 0;
             foreach (string line in data)
@@ -227,7 +227,7 @@ namespace SEE.CameraPaths
         /// <returns>game object representing the path</returns>
         public GameObject Draw()
         {
-            GameObject result = new GameObject(string.IsNullOrEmpty(path) ? "anonymous path" : path)
+            GameObject result = new(string.IsNullOrEmpty(path) ? "anonymous path" : path)
             {
                 tag = Tags.Path,
                 isStatic = true
@@ -253,58 +253,38 @@ namespace SEE.CameraPaths
             int i = 0;
             foreach (PathData d in Aggregate(data))
             {
-                /*
-                {
-                    float sphereRadius = 0.5f;
-                    // draw a sphere whose size is proportional to the time the camera has
-                    // spent at this location
-                    GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    sphere.name = "location " + i.ToString();
-                    sphere.isStatic = true;
-                    Renderer renderer = sphere.GetComponent<Renderer>();
-
-                    // Object should not cast shadows: too expensive and may hide information.
-                    renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                    renderer.receiveShadows = false;
-                    renderer.lightProbeUsage = UnityEngine.Rendering.LightProbeUsage.Off;
-
-                    sphere.transform.localScale = 2 * sphereRadius * Vector3.one;
-                    sphere.transform.parent = result.transform;
-                    sphere.transform.position = d.position;
-                }
-                */
                 // draw a line towards the look out whose length is proportional to the
                 // time the camera has looked into this direction
+                GameObject direction = new("direction " + i.ToString())
                 {
-                    GameObject direction = new GameObject("direction " + i.ToString());
-                    direction.isStatic = true;
-                    direction.transform.parent = pathGameObject.transform;
-                    direction.transform.position = d.position;
+                    isStatic = true
+                };
+                direction.transform.parent = pathGameObject.transform;
+                direction.transform.position = d.Position;
 
-                    LineRenderer line = direction.AddComponent<LineRenderer>();
+                LineRenderer line = direction.AddComponent<LineRenderer>();
 
-                    LineFactory.SetDefaults(line);
-                    LineFactory.SetColor(line, Color.red);
-                    LineFactory.SetWidth(line, lineWidth);
+                LineFactory.SetDefaults(line);
+                LineFactory.SetColor(line, Color.red);
+                LineFactory.SetWidth(line, lineWidth);
 
-                    line.useWorldSpace = true;
+                line.useWorldSpace = true;
 
-                    // All path lines have the same material to reduce the number of drawing calls.
-                    if (lookoutMaterial == null)
-                    {
-                        lookoutMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
-                    }
-                    line.sharedMaterial = lookoutMaterial;
-
-                    // Line from the surface of the sphere along the direction of the lookout
-                    // proportional to the length of the lookout
-                    Vector3[] positions = new Vector3[2];
-                    positions[0] = d.position;
-                    positions[1] = positions[0] + d.rotation * Vector3.forward * d.time * timeFactor;
-
-                    line.positionCount = positions.Length;
-                    line.SetPositions(positions);
+                // All path lines have the same material to reduce the number of drawing calls.
+                if (lookoutMaterial == null)
+                {
+                    lookoutMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
                 }
+                line.sharedMaterial = lookoutMaterial;
+
+                // Line from the surface of the sphere along the direction of the lookout
+                // proportional to the length of the lookout
+                Vector3[] positions = new Vector3[2];
+                positions[0] = d.Position;
+                positions[1] = positions[0] + d.Rotation * Vector3.forward * d.Time * timeFactor;
+
+                line.positionCount = positions.Length;
+                line.SetPositions(positions);
                 i++;
             }
         }
@@ -317,8 +297,8 @@ namespace SEE.CameraPaths
         /// <param name="me">one vector to be compared</param>
         /// <param name="other">other vector to be compared against the first one</param>
         /// <param name="allowedDifference">allowable difference between co-ordinates</param>
-        /// <returns></returns>
-        private int CompareTo(Vector3 me, Vector3 other, float allowedDifference)
+        /// <returns>0 if similar, -1 or 1 if dissimilar</returns>
+        private static int CompareTo(Vector3 me, Vector3 other, float allowedDifference)
         {
             {
                 float delta = me.x - other.x;
@@ -355,7 +335,7 @@ namespace SEE.CameraPaths
         /// </summary>
         /// <param name="path"></param>
         /// <returns>path aggregation</returns>
-        private List<PathData> Aggregate(List<PathData> path)
+        private static List<PathData> Aggregate(List<PathData> path)
         {
             if (path.Count <= 1)
             {
@@ -387,7 +367,7 @@ namespace SEE.CameraPaths
                 else if (CompareTo(d, current) == 0)
                 {
                     // d and current are in the same group
-                    current.time += d.time;
+                    current.Time += d.Time;
                 }
                 else
                 {
@@ -408,7 +388,7 @@ namespace SEE.CameraPaths
         /// <param name="y">second argument to be compared to the first argument</param>
         /// <returns>0 if x and y are similar, 1 if x is before y, otherwise -1 (the 'before'
         /// relation is arbitrary)</returns>
-        private int CompareTo(PathData x, PathData y)
+        private static int CompareTo(PathData x, PathData y)
         {
             // The following value defines the difference below we still consider two
             // corresponding co-ordinates similar enough.
@@ -416,12 +396,12 @@ namespace SEE.CameraPaths
             // We do not really care about the precise order as we use this order only
             // for the aggregation. The main concern is that all path entries with
             // similar position and rotation are neighbors in the resulting order.
-            int positionCompareTo = CompareTo(x.position, y.position, allowedDifference);
+            int positionCompareTo = CompareTo(x.Position, y.Position, allowedDifference);
             if (positionCompareTo != 0)
             {
                 return positionCompareTo;
             }
-            return CompareTo(x.rotation.eulerAngles, y.rotation.eulerAngles, allowedDifference);
+            return CompareTo(x.Rotation.eulerAngles, y.Rotation.eulerAngles, allowedDifference);
         }
 
         /// <summary>
@@ -452,7 +432,7 @@ namespace SEE.CameraPaths
             int i = 0;
             foreach (PathData d in data)
             {
-                positions[i] = d.position;
+                positions[i] = d.Position;
                 i++;
             }
 
@@ -460,23 +440,28 @@ namespace SEE.CameraPaths
             line.SetPositions(positions);
         }
 
-        private string Dump(Vector3 v)
+        /// <summary>
+        /// Returns <paramref name="v"/> as a string for debugging.
+        /// </summary>
+        /// <param name="v">vector to be turned into a string</param>
+        /// <returns><paramref name="v"/> as a string</returns>
+        private static string Dump(Vector3 v)
         {
             return ("(" + v.x.ToString("0.00000")
                     + ", " + v.y.ToString("0.00000")
                     + ", " + v.z.ToString("0.00000") + ")");
         }
 
+        /// <summary>
+        /// Dumps all paths in <see cref="data"/>
+        /// </summary>
         public void Dump()
         {
             foreach (PathData d in data)
             {
-                Debug.LogFormat("position(x,y,z)={0} rotation={1}, rotation(x, y, z, w)= ({2}, {3}, {4}, {5}), rotation(Euler angles)={6}, time={7})\n",
-                                d.position,
-                                d.rotation,
-                                d.rotation.x.ToString("0.000"), d.rotation.y.ToString("0.000"), d.rotation.z.ToString("0.000"), d.rotation.w.ToString("0.000"),
-                                Dump(d.rotation.eulerAngles),
-                                d.time);
+                Debug.LogFormat($"position(x,y,z)={d.Position} rotation={d.Rotation}, "
+                    + $"rotation(x, y, z, w)= ({d.Rotation.x:0.000}, {d.Rotation.y:0.000}, {d.Rotation.z:0.000}, {d.Rotation.w:0.000}), "
+                    + $"rotation(Euler angles)={Dump(d.Rotation.eulerAngles)}, time={d.Time})\n");
             }
         }
     }

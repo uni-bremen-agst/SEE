@@ -37,15 +37,15 @@ namespace SEE.Game.Charts
         /// <summary>
         ///  Visualizes the content displayed in the chart.
         /// </summary>
-        private ChartContent _chartContent;
+        private ChartContent chartContent;
 
         /// <summary>
         ///     A dropdown containing options for different metrics to display on a charts axes.
         /// </summary>
-        private TMP_Dropdown _dropdown;
+        private TMP_Dropdown dropdown;
 
         /// <summary>
-        ///     The currently selected option of the <see cref="_dropdown" />.
+        ///     The currently selected option of the <see cref="dropdown" />.
         /// </summary>
         public string CurrentlySelectedMetric { get; private set; }
 
@@ -54,19 +54,19 @@ namespace SEE.Game.Charts
         /// </summary>
         public void Initialize()
         {
-            _chartContent = transform.parent.parent.GetComponent<ChartContent>();
-            _dropdown = GetComponent<TMP_Dropdown>();
+            chartContent = transform.parent.parent.GetComponent<ChartContent>();
+            dropdown = GetComponent<TMP_Dropdown>();
             UpdateInternal();
         }
 
         private void UpdateInternal()
         {
             FillDropDown();
-            if (_dropdown.options.Count > 0)
+            if (dropdown.options.Count > 0)
             {
-                CurrentlySelectedMetric = GetEntry(_dropdown.options[0].text);
-                _chartContent.SetInfoText();
-                _dropdown.captionText.text = CurrentlySelectedMetric;
+                CurrentlySelectedMetric = GetEntry(dropdown.options[0].text);
+                chartContent.SetInfoText();
+                dropdown.captionText.text = CurrentlySelectedMetric;
             }
             else
             {
@@ -110,40 +110,40 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// First the special entry that was added by AddEntry() and only then all 
+        /// First the special entry that was added by AddEntry() and only then all
         /// node metrics are added to the dropdown. The MetricPrefix of the node metrics (not those
-        /// added by AddEntry()) will be removed for the labels added to the 
+        /// added by AddEntry()) will be removed for the labels added to the
         /// dropdown box.
         /// </summary>
         private void FillDropDown()
         {
-            _dropdown.ClearOptions();
+            dropdown.ClearOptions();
             if (!string.IsNullOrEmpty(specialEntry))
             {
                 List<string> options = new List<string>() { specialEntry };
-                _dropdown.AddOptions(options);
+                dropdown.AddOptions(options);
             }
             {
                 // Add all node metrics without their prefix
-                string[] options = _chartContent.allMetricNames.ToArray();
-                int MetricPrefixLength = ChartManager.MetricPrefix.Length;
+                string[] options = chartContent.AllMetricNames.ToArray();
+                int metricPrefixLength = ChartManager.MetricPrefix.Length;
                 for (int i = 0; i < options.Length; i++)
                 {
-                    options[i] = options[i].Remove(0, MetricPrefixLength);
+                    options[i] = options[i].Remove(0, metricPrefixLength);
                 }
-                _dropdown.AddOptions(options.ToList());
+                dropdown.AddOptions(options.ToList());
             }
         }
 
         /// <summary>
-        ///     Updates <see cref="CurrentlySelectedMetric" /> to match the selected option of <see cref="_dropdown" />
+        ///     Updates <see cref="CurrentlySelectedMetric" /> to match the selected option of <see cref="dropdown" />
         /// </summary>
         public void ChangeValue()
         {
-            string currentValue = _dropdown.options[_dropdown.value].text;
+            string currentValue = dropdown.options[dropdown.value].text;
             CurrentlySelectedMetric = GetEntry(currentValue);
-            _chartContent.DrawData();
-            _chartContent.SetInfoText();
+            chartContent.DrawData();
+            chartContent.SetInfoText();
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace SEE.Game.Charts
         /// <param name="text"></param>
         public void SetText(string text)
         {
-            _dropdown.captionText.text = text;
+            dropdown.captionText.text = text;
         }
     }
 }

@@ -216,6 +216,15 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleEdges);
         }
 
+        /// <summary>
+        /// The user wants to toggle the visibility of the tree view window.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        internal static bool ToggleTreeView()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.TreeView);
+        }
+
         #endregion
 
         //-----------------------------------------------------
@@ -355,7 +364,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action</returns>
         internal static bool Drag()
         {
-            return Input.GetMouseButton(MiddleMouseButton);
+            return Input.GetMouseButton(middleMouseButton);
         }
 
         #endregion
@@ -424,17 +433,17 @@ namespace SEE.Controls
         /// <summary>
         /// Index of the left mouse button.
         /// </summary>
-        private const int LeftMouseButton = 0;
+        private const int leftMouseButton = 0;
 
         /// <summary>
         /// Index of the right mouse button.
         /// </summary>
-        private const int RightMouseButton = 1;
+        private const int rightMouseButton = 1;
 
         /// <summary>
         /// Index of the middle mouse button.
         /// </summary>
-        private const int MiddleMouseButton = 2;
+        private const int middleMouseButton = 2;
 
         /// <summary>
         /// Rotates the camera.
@@ -442,8 +451,8 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action</returns>
         public static bool RotateCamera()
         {
-            return Input.GetMouseButton(RightMouseButton)
-                || (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButton(LeftMouseButton));
+            return Input.GetMouseButton(rightMouseButton)
+                || (Input.GetKey(KeyCode.LeftControl) && Input.GetMouseButton(leftMouseButton));
         }
 
         /// <summary>
@@ -632,9 +641,31 @@ namespace SEE.Controls
         /// <summary>
         /// True if the user wants to close all notifications.
         /// </summary>
+        /// <returns>True if the user wants to close all notifications.</returns>
         public static bool CloseAllNotifications()
         {
             return KeyboardShortcutsEnabled && Input.GetKey(KeyBindings.CloseNotifications);
+        }
+
+        #endregion
+
+        #region FaceCam
+        /// <summary>
+        /// True if the user wants to turn the FaceCam on or off (toggling).
+        /// </summary>
+        /// <returns>True if the user wants to turn the FaceCam on or off.</returns>
+        internal static bool ToggleFaceCam()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleFaceCam);
+        }
+
+        /// <summary>
+        /// True if the user wants to switch the position of the FaceCam on the player's face (toggling).
+        /// </summary>
+        /// <returns>True if the user wants to switch the position of the FaceCam.</returns>
+        internal static bool ToggleFaceCamPosition()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleFaceCamPosition);
         }
 
         #endregion

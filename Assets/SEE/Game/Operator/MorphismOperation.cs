@@ -24,7 +24,7 @@ namespace SEE.Game.Operator
             {
                 if (Animator != null && Animator.IsActive())
                 {
-                    Animator.tween.Kill(complete);
+                    Animator.Tween.Kill(complete);
                     Destroyer.Destroy(Animator);
                     Animator = null;
                 }
@@ -39,11 +39,11 @@ namespace SEE.Game.Operator
                     // We execute the first step immediately. This way, callers can expect the change to
                     // be implemented when control is returned to them, the same way it would work when
                     // setting the target value manually.
-                    Animator.tween.ManualUpdate(Time.deltaTime, Time.unscaledDeltaTime);
+                    Animator.Tween.ManualUpdate(Time.deltaTime, Time.unscaledDeltaTime);
                 }
             }
 
-            protected override IOperationCallback<TweenCallback> AnimatorCallback => new TweenOperationCallback(Animator.tween);
+            protected override IOperationCallback<TweenCallback> AnimatorCallback => new TweenOperationCallback(Animator.Tween);
 
             public MorphismOperation(Func<(BSpline targetSpline, GameObject temporaryGameObject), float, SplineMorphism> animateToAction,
                                      BSpline targetSpline, GameObject temporaryGameObject)

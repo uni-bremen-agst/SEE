@@ -13,22 +13,22 @@ namespace SEE.DataModel.Runtime.IO
         /// <summary>
         /// Name of the linkage name attribute label.
         /// </summary>
-        public const string LINKAGE_NAME = "Linkage.Name";
+        public const string LinkageName = "Linkage.Name";
 
         /// <summary>
         /// Name of the level attribute label.
         /// </summary>
-        public const string LEVEL = "Level";
+        public const string Level = "Level";
 
         /// <summary>
         /// The filename to be parsed. Can not be set to <code>null</code>.
         /// </summary>
-        protected string filename;
+        protected string Filename;
 
         /// <summary>
         /// The debug logger.
         /// </summary>
-        protected ILogger logger;
+        protected ILogger Logger;
 
         /// <summary>
         /// The current line-number while parsing the predefined file. Is only used for
@@ -43,8 +43,8 @@ namespace SEE.DataModel.Runtime.IO
         /// <param name="logger">The debug logger.</param>
         public DYNParser(string filename, ILogger logger = null)
         {
-            this.filename = filename ?? throw new ArgumentException("'filename' must not be null!");
-            this.logger = logger;
+            this.Filename = filename ?? throw new ArgumentException("'filename' must not be null!");
+            this.Logger = logger;
             currentLineNumber = 0;
         }
 
@@ -52,35 +52,35 @@ namespace SEE.DataModel.Runtime.IO
 
         protected virtual void LogDebug(string message)
         {
-            logger?.LogDebug(message);
+            Logger?.LogDebug(message);
         }
 
         protected virtual void LogError(string message)
         {
-            logger?.LogError(filename + ":" + currentLineNumber + ": " + message);
+            Logger?.LogError(Filename + ":" + currentLineNumber + ": " + message);
         }
 
         protected virtual void LogException(Exception exception)
         {
-            logger?.LogException(exception);
+            Logger?.LogException(exception);
         }
 
         protected virtual void LogInfo(string message)
         {
-            logger?.LogInfo(message);
+            Logger?.LogInfo(message);
         }
 
         #endregion
 
         /// <summary>
-        /// Parses file of <see cref="filename"/> and calls for each element either
+        /// Parses file of <see cref="Filename"/> and calls for each element either
         /// <see cref="Categories(string[])"/> or <see cref="FunctionCall(string[])"/>.
         /// </summary>
         public void Load()
         {
             try
             {
-                string[] lines = File.ReadAllLines(filename);
+                string[] lines = File.ReadAllLines(Filename);
                 if (lines.Length < 2)
                 {
                     throw new ArgumentException("Not enough entries!");
@@ -116,7 +116,7 @@ namespace SEE.DataModel.Runtime.IO
         /// </summary>
         /// <param name="line">The line to be tokenized.</param>
         /// <returns>The tokens.</returns>
-        private string[] Tokenize(string line)
+        private static string[] Tokenize(string line)
         {
             List<string> tokens = new List<string>();
 
@@ -162,8 +162,8 @@ namespace SEE.DataModel.Runtime.IO
         {
             if (!disposed)
             {
-                logger = null;
-                filename = null;
+                Logger = null;
+                Filename = null;
                 disposed = true;
             }
         }

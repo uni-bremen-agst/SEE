@@ -22,7 +22,7 @@ namespace SEE.Layout
 
         /// <summary>
         /// True if the given node is to be interpreted as a leaf by the layouter.
-        /// 
+        ///
         /// Note: Even leaves may have children. What to do with those is the decision of the
         /// layouter. It may or may not lay them out.
         /// </summary>

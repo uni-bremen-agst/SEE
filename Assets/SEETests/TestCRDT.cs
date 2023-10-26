@@ -13,9 +13,8 @@ namespace SEETests
         [Test]
         public void TestPositionToString()
         {
-            CRDT crdt = new(new GUID().ToString(), "test");
             Identifier[] pos = { new Identifier(1, "1"), new Identifier(2, "1"), new Identifier(3, "1") };
-            Assert.AreEqual("(1, 1), (2, 1), (3, 1)", crdt.PositionToString(pos));
+            Assert.AreEqual("(1, 1), (2, 1), (3, 1)", CRDT.PositionToString(pos));
         }
 
         [Test]
@@ -23,7 +22,7 @@ namespace SEETests
         {
             CRDT crdt = new(new GUID().ToString(), "test");
             Identifier[] pos = {new Identifier(1, "1"), new Identifier(2, "1"), new Identifier(3, "1") };
-            Assert.AreEqual(0, crdt.ComparePosition(pos, crdt.StringToPosition("(1, 1), (2, 1), (3, 1)")));
+            Assert.AreEqual(0, crdt.ComparePosition(pos, CRDT.StringToPosition("(1, 1), (2, 1), (3, 1)")));
         }
     }
 }

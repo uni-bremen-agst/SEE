@@ -52,12 +52,12 @@ namespace SEE.Net
         /// correct execution order of incoming packets. The first id for every
         /// connection is always zero and is increased after each incoming packet.
         /// </summary>
-        public static Dictionary<Connection, ulong> incomingPacketSequenceIDs;
+        public static Dictionary<Connection, ulong> IncomingPacketSequenceIDs;
 
         /// <summary>
         /// The next id per connecting for outgoing packets.
         /// </summary>
-        public static Dictionary<Connection, ulong> outgoingPacketSequenceIDs;
+        public static Dictionary<Connection, ulong> OutgoingPacketSequenceIDs;
 
         /// <summary>
         /// Whether the server is currently initialized.
@@ -77,11 +77,11 @@ namespace SEE.Net
                 packetHandler = new PacketHandler(true);
                 pendingEstablishedConnections = new Stack<Connection>();
                 pendingClosedConnections = new Stack<Connection>();
-                incomingPacketSequenceIDs = new Dictionary<Connection, ulong>();
-                outgoingPacketSequenceIDs = new Dictionary<Connection, ulong>();
+                IncomingPacketSequenceIDs = new Dictionary<Connection, ulong>();
+                OutgoingPacketSequenceIDs = new Dictionary<Connection, ulong>();
 
-                NetworkComms.AppendGlobalConnectionEstablishHandler((Connection c) => { if (c != null) pendingEstablishedConnections.Push(c); });
-                NetworkComms.AppendGlobalConnectionCloseHandler((Connection c) => { if (c != null) pendingClosedConnections.Push(c); });
+                NetworkComms.AppendGlobalConnectionEstablishHandler((Connection c) => { if (c != null) { pendingEstablishedConnections.Push(c); } });
+                NetworkComms.AppendGlobalConnectionCloseHandler((Connection c) => { if (c != null) { pendingClosedConnections.Push(c); } });
 
                 void OnIncomingPacket(PacketHeader packetHeader, Connection connection, string data) => packetHandler.Push(packetHeader, connection, data);
                 NetworkComms.AppendGlobalIncomingPacketHandler<string>(PacketType, OnIncomingPacket);
@@ -139,8 +139,8 @@ namespace SEE.Net
                 {
                     initialized = false;
 
-                    outgoingPacketSequenceIDs = null;
-                    incomingPacketSequenceIDs = null;
+                    OutgoingPacketSequenceIDs = null;
+                    IncomingPacketSequenceIDs = null;
                     pendingClosedConnections = null;
                     pendingEstablishedConnections = null;
                     packetHandler = null;
@@ -217,8 +217,8 @@ namespace SEE.Net
 
                     // recognize client
                     Connections.Add(connection);
-                    incomingPacketSequenceIDs.Add(connection, 0);
-                    outgoingPacketSequenceIDs.Add(connection, 0);
+                    IncomingPacketSequenceIDs.Add(connection, 0);
+                    OutgoingPacketSequenceIDs.Add(connection, 0);
                 }
                 else
                 {
@@ -240,8 +240,8 @@ namespace SEE.Net
                 lock (Connections)
                 {
                     Connections.Remove(connection);
-                    incomingPacketSequenceIDs.Remove(connection);
-                    outgoingPacketSequenceIDs.Remove(connection);
+                    IncomingPacketSequenceIDs.Remove(connection);
+                    OutgoingPacketSequenceIDs.Remove(connection);
 
                     IPEndPoint remoteEndPoint = (IPEndPoint)connection.ConnectionInfo.RemoteEndPoint;
 

@@ -22,13 +22,13 @@ namespace SEE.Layout.NodeLayouts.Cose
     public class CoseNodeSublayoutValues
     {
         /// <summary>
-        /// the scale of the calculated sublayout. If the node layout is not enclosing all its childnodes, 
+        /// the scale of the calculated sublayout. If the node layout is not enclosing all its childnodes,
         /// the position and scale of the root node will be adaped.
         /// </summary>
         private Vector3 relativeScale;
 
         /// <summary>
-        /// the centerposition of the calculated sublayout. If the node layout is not enclosing all 
+        /// the centerposition of the calculated sublayout. If the node layout is not enclosing all
         /// its childnodes, the position and scale of the root node will be adaped.
         /// </summary>
         private Vector3 relativeCenterPosition;
@@ -44,12 +44,12 @@ namespace SEE.Layout.NodeLayouts.Cose
         private bool isSubLayoutNode = false;
 
         /// <summary>
-        /// The root node of the sublayout the node is part of 
+        /// The root node of the sublayout the node is part of
         /// </summary>
         private CoseNode subLayoutRoot = null;
 
         /// <summary>
-        /// is the node is sublayoutRoot, the sublayout if this node 
+        /// is the node is sublayoutRoot, the sublayout if this node
         /// </summary>
         private Sublayout sublayout;
 
@@ -83,4 +83,3 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
     }
 }
-

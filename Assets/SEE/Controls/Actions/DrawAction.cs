@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using SEE.Audio;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions
 {
@@ -17,20 +18,20 @@ namespace SEE.Controls.Actions
     {
         /// <summary>
         /// A new instance of <see cref="DrawAction"/>.
-        /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
+        /// See <see cref="IReversibleAction.CreateReversibleAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="DrawAction"/></returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new DrawAction();
         }
 
         /// <summary>
         /// A new instance of <see cref="DrawAction"/>.
-        /// See <see cref="ReversibleAction.NewInstance"/>.
+        /// See <see cref="IReversibleAction.NewInstance"/>.
         /// </summary>
         /// <returns>new instance of <see cref="DrawAction"/></returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }
@@ -73,7 +74,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Initializes <see cref="positions"/>, <see cref="line"/>, and <see cref="renderer"/>.
-        /// See <see cref="ReversibleAction.Awake"/>.
+        /// See <see cref="IReversibleAction.Awake"/>.
         /// </summary>
         public override void Awake()
         {
@@ -99,7 +100,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Continues the line at the point of the mouse position and draws it.
-        /// See <see cref="ReversibleAction.Awake"/>.
+        /// See <see cref="IReversibleAction.Awake"/>.
         /// </summary>
         public override bool Update()
         {
@@ -127,11 +128,11 @@ namespace SEE.Controls.Actions
 
                     DrawLine();
                     // The line has been continued so this action has had a visible effect.
-                    currentState = ReversibleAction.Progress.Completed;
+                    CurrentState = IReversibleAction.Progress.Completed;
                 }
                 if (Input.GetMouseButtonDown(0))
                 {
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.SCRIBBLE);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.ScribbleSound);
                 }
                 // The action is considered complete if the mouse button is no longer pressed.
                 return Input.GetMouseButtonUp(0);
@@ -150,7 +151,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Destroys the drawn line.
-        /// See <see cref="ReversibleAction.Undo()"/>.
+        /// See <see cref="IReversibleAction.Undo()"/>.
         /// </summary>
         public override void Undo()
         {
@@ -163,7 +164,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Redraws the drawn line (setting up <see cref="line"/> and adds <see cref="renderer"/>
         /// before that).
-        /// See <see cref="ReversibleAction.Undo()"/>.
+        /// See <see cref="IReversibleAction.Undo()"/>.
         /// </summary>
         public override void Redo()
         {
@@ -183,7 +184,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// The set of IDs of all gameObjects changed by this action.
-        /// <see cref="ReversibleAction.GetActionStateType"/>
+        /// <see cref="IReversibleAction.GetActionStateType"/>
         /// Because this action does not actually change any game object,
         /// an empty set is always returned.
         /// </summary>

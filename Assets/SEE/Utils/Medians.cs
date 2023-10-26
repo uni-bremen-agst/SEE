@@ -14,11 +14,11 @@ namespace SEE.Utils
         /// where each element (x/y/z) of the resulting vector is the median
         /// of the respective elements (x/y/z) of the input <paramref name="vectors"/>.
         /// To put it differently (let result be the returned value):
-        /// 
+        ///
         ///   result.x = median over set {v.x | v in <paramref name="vectors"/>}
         ///   result.y = median over set {v.y | v in <paramref name="vectors"/>}
         ///   result.z = median over set {v.z | v in <paramref name="vectors"/>}
-        ///   
+        ///
         /// Precondition: vectors != null && vectors.Count > 0. Otherwise an
         /// ArgumentException will be thrown.
         /// </summary>
@@ -62,10 +62,10 @@ namespace SEE.Utils
         /// has an odd number of elements, the value in the middle of the sorted list
         /// will be returned. If there is an even number instead, we return the
         /// average of the two values in the middle of the sorted list of values.
-        /// 
+        ///
         /// Precondition: <paramref name="values"/> must neither be null
         /// nor empty. Otherwise an ArgumentException is thrown.
-        /// 
+        ///
         /// Note: <paramref name="values"/> may or may not be sorted. <paramref name="values"/>
         /// will not be modified.
         /// <param name="values">list of values for which to calculate the median</param>
@@ -95,7 +95,7 @@ namespace SEE.Utils
                     // Note that the integer division will truncate to the next lower integer value.
                     int indexOfMedian = values.Count / 2;
 
-                    // If the lists has an odd number of elements, we can just return the entry stored 
+                    // If the lists has an odd number of elements, we can just return the entry stored
                     // directly "in the middle".
                     if ((values.Count % 2 != 0))
                     {

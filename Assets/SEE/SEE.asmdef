@@ -14,8 +14,6 @@
         "GUID:c685d05731421f64287ad6d13be5af0e",
         "GUID:413a95a52ca644b7dac76988ad8915af",
         "GUID:61106e8dfb7a4e64a96af0eccfe1209f",
-        "GUID:1491147abca9d7d4bb7105af628b223e",
-        "GUID:3b8ed52f1b5c64994af4c4e0aa4b6c4b",
         "GUID:26ea63ed790ab644cab0eb6640e30170",
         "GUID:46a21e0309a070340b48841dea4af81b",
         "GUID:75469ad4d38634e559750d17036d5f7c",
@@ -28,7 +26,13 @@
         "GUID:e40ba710768534012815d3193fa296cb",
         "GUID:3248779d86bd31747b5d2214f30b01ac",
         "GUID:de77a0e64339fbc47b51a11858912a47",
-        "GUID:7958db66189566541a6363568aee1575"
+        "GUID:7958db66189566541a6363568aee1575",
+        "GUID:7166fda719c99694d9297ead935e2a9d",
+        "GUID:cef0e9dabbfe59a4790acbf31c21f33e",
+        "GUID:a8cce43e97e592144b989ad4056cbc17",
+        "GUID:1491147abca9d7d4bb7105af628b223e",
+        "GUID:3b8ed52f1b5c64994af4c4e0aa4b6c4b",
+        "GUID:4d1e63f328d08c14b8f0029b5bb1aa40"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -47,6 +51,7 @@
         "NetworkCommsDotNetComplete.dll",
         "DOTween.dll",
         "Joveler.Compression.XZ.dll",
+        "MathNet.Numerics.dll"
 		"Accord.Text.dll"
     ],
     "autoReferenced": false,

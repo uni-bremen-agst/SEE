@@ -36,7 +36,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 Color color = MapPercentToColor(percentage);
                 circle.color = color;
                 water.color = color;
-                titleText.text = metricValueRange.Name;
+                TitleText.text = metricValueRange.Name;
                 percentage *= 100;
                 if (metricValueRange.DecimalPlaces < 2)
                 {
@@ -46,7 +46,7 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
                 {
                     metricValueRange.DecimalPlaces -= 2;
                 }
-                valueText.text = $"{percentage.ToString($"F{metricValueRange.DecimalPlaces}")}%";
+                ValueText.text = $"{percentage.ToString($"F{metricValueRange.DecimalPlaces}")}%";
             }
             else if (metricValue is MetricValueCollection metricValueCollection)
             {

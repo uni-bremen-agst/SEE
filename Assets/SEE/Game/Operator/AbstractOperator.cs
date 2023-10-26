@@ -65,6 +65,18 @@ namespace SEE.Game.Operator
             /// <param name="complete">Whether to stop at the current value (<c>false</c>)
             /// or at the target (<c>true</c>)</param>
             void KillAnimator(bool complete = false);
+
+            /// <summary>
+            /// Whether the operation is currently running.
+            /// </summary>
+            bool IsRunning { get; }
+
+            /// <summary>
+            /// A list of all operations that are conflicting with this one.
+            /// If an operation in this list is running at the time this operation is started,
+            /// the conflicting operation will be killed.
+            /// </summary>
+            public IList<IOperation> ConflictingOperations { get; }
         }
 
         /// <summary>
@@ -86,6 +98,13 @@ namespace SEE.Game.Operator
             /// The return value is the animator controlling this animation.
             /// </summary>
             protected readonly Func<V, float, T> AnimateToAction;
+
+            /// <summary>
+            /// A set of all operations that are conflicting with this one.
+            /// If an operation in this set is running at the time this operation is started,
+            /// the conflicting operation will be killed.
+            /// </summary>
+            public IList<IOperation> ConflictingOperations { get; }
 
             /// <summary>
             /// The animator that is controlling the current animation.
@@ -117,12 +136,23 @@ namespace SEE.Game.Operator
             /// The equality comparer used to check whether the target value has changed.
             /// If <c>null</c>, the default equality comparer for <typeparamref name="V"/> is used.
             /// </param>
+            /// <param name="conflictingOperations">
+            /// The operations that are conflicting with this one.
+            /// Note that this operation will also be added to the conflicting operations of the given operations.
+            /// Hence, this is always a bidirectional relationship.
+            /// </param>
             protected Operation(Func<V, float, T> animateToAction, V targetValue,
-                                IEqualityComparer<V> equalityComparer = null)
+                                IEqualityComparer<V> equalityComparer = null,
+                                IEnumerable<IOperation> conflictingOperations = null)
             {
                 AnimateToAction = animateToAction;
                 TargetValue = targetValue;
                 EqualityComparer = equalityComparer ?? EqualityComparer<V>.Default;
+                ConflictingOperations = conflictingOperations?.ToList() ?? new List<IOperation>();
+                foreach (IOperation conflictingOperation in ConflictingOperations)
+                {
+                    conflictingOperation.ConflictingOperations.Add(this);
+                }
             }
 
             /// <summary>
@@ -142,6 +172,11 @@ namespace SEE.Game.Operator
             {
                 // Usual approach: Kill old animator and replace it with new one
                 KillAnimator(complete);
+                // We also need to kill any currently running, conflicting operations.
+                foreach (IOperation operation in ConflictingOperations.Where(x => x.IsRunning))
+                {
+                    operation.KillAnimator(true);
+                }
                 Animator = AnimateToAction(newTarget, duration);
             }
 
@@ -224,8 +259,8 @@ namespace SEE.Game.Operator
                 new AndCombinedOperationCallback<TweenCallback>(Animator.Select(x => new TweenOperationCallback(x)), x => new TweenCallback(x));
 
             public TweenOperation(Func<V, float, IList<Tween>> animateToAction, V targetValue,
-                                  IEqualityComparer<V> equalityComparer = null)
-                : base(animateToAction, targetValue, equalityComparer)
+                                  IEqualityComparer<V> equalityComparer = null, IEnumerable<IOperation> conflictingOperations = null)
+                : base(animateToAction, targetValue, equalityComparer, conflictingOperations)
             {
             }
         }

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using SEE.DataModel.DG;
-using SEE.Game.UI.PropertyDialog;
+using SEE.UI.PropertyDialog;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions
 {
@@ -38,23 +39,23 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Node whose state is represented here.
             /// </summary>
-            public readonly Node node;
+            public readonly Node Node;
             /// <summary>
             /// The original source name of the node that should be used when the state is to be restored.
             /// </summary>
-            public readonly string originalName;
+            public readonly string OriginalName;
             /// <summary>
             /// The original type of the node that should be used when the state is to be restored.
             /// </summary>
-            public readonly string originalType;
+            public readonly string OriginalType;
             /// <summary>
             /// The new source name of the node that should be used for Redo().
             /// </summary>
-            public string newName;
+            public string NewName;
             /// <summary>
             /// The new type of the node that should be used for Redo().
             /// </summary>
-            public string newType;
+            public string NewType;
             /// <summary>
             /// Constructor setting the information necessary to re-set an edited node to
             /// its original state.
@@ -62,11 +63,11 @@ namespace SEE.Controls.Actions
             /// <param name="node">the node that was edited</param>
             public Memento(Node node)
             {
-                this.node = node;
-                this.originalName = node.SourceName;
-                this.originalType = node.Type;
-                this.newName = string.Empty;
-                this.newType = string.Empty;
+                this.Node = node;
+                this.OriginalName = node.SourceName;
+                this.OriginalType = node.Type;
+                this.NewName = string.Empty;
+                this.NewType = string.Empty;
             }
         }
 
@@ -81,7 +82,7 @@ namespace SEE.Controls.Actions
         /// NodeSelected: Instantiates the canvasObject if a gameNode is selected.
         /// ValuesAreGiven: Saves the new values of the node in a memento and updates the specific node.
         /// EditIsCanceled: Removes the canvas and resets all values if the process is canceled.
-        /// See <see cref="ReversibleAction.Update"/>.
+        /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
@@ -116,8 +117,8 @@ namespace SEE.Controls.Actions
                 case ProgressState.ValuesAreGiven:
                     progress = ProgressState.NoNodeSelected;
                     result = true;
-                    currentState = ReversibleAction.Progress.Completed;
-                    NotifyClients(memento.node);
+                    CurrentState = IReversibleAction.Progress.Completed;
+                    NotifyClients(memento.Node);
                     break;
 
                 case ProgressState.EditIsCanceled:
@@ -146,9 +147,9 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
-            memento.node.SourceName = memento.originalName;
-            memento.node.Type = memento.originalType;
-            NotifyClients(memento.node);
+            memento.Node.SourceName = memento.OriginalName;
+            memento.Node.Type = memento.OriginalType;
+            NotifyClients(memento.Node);
         }
 
         /// <summary>
@@ -157,22 +158,22 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            memento.node.SourceName = memento.newName;
-            memento.node.Type = memento.newType;
-            NotifyClients(memento.node);
+            memento.Node.SourceName = memento.NewName;
+            memento.Node.Type = memento.NewType;
+            NotifyClients(memento.Node);
         }
 
         /// <summary>
         /// Returns a new instance of <see cref="EditNodeAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction() => new EditNodeAction();
+        public static IReversibleAction CreateReversibleAction() => new EditNodeAction();
 
         /// <summary>
         /// Returns a new instance of <see cref="EditNodeAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public override ReversibleAction NewInstance() => CreateReversibleAction();
+        public override IReversibleAction NewInstance() => CreateReversibleAction();
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
@@ -185,7 +186,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <returns>all IDs of gameObjects manipulated by this action</returns>
         public override HashSet<string> GetChangedObjects() =>
-            memento.node == null ? new HashSet<string>() : new HashSet<string> { memento.node.ID };
+            memento.Node == null ? new HashSet<string>() : new HashSet<string> { memento.Node.ID };
 
         /// <summary>
         /// Opens a dialog where the user can enter the node name and type.
@@ -202,7 +203,7 @@ namespace SEE.Controls.Actions
         private void OpenDialog()
         {
             // This dialog will set the source name and type of memento.node.
-            NodePropertyDialog dialog = new NodePropertyDialog(memento.node);
+            NodePropertyDialog dialog = new NodePropertyDialog(memento.Node);
             dialog.OnConfirm.AddListener(OKButtonPressed);
             dialog.OnCancel.AddListener(CancelButtonPressed);
             dialog.Open();
@@ -211,8 +212,8 @@ namespace SEE.Controls.Actions
             void OKButtonPressed()
             {
                 progress = ProgressState.ValuesAreGiven;
-                memento.newName = memento.node.SourceName;
-                memento.newType = memento.node.Type;
+                memento.NewName = memento.Node.SourceName;
+                memento.NewType = memento.Node.Type;
                 InteractableObject.UnselectAll(true);
                 SEEInput.KeyboardShortcutsEnabled = true;
             }

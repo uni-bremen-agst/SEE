@@ -43,9 +43,9 @@ namespace SEE.GO
             {
                 Vector3 position = transform.position;
                 Vector3 scale = GetScale();
-                float MinX = position.x - scale.x / 2.0f;
-                float MinZ = position.z - scale.z / 2.0f;
-                return new Vector2(MinX, MinZ);
+                float minX = position.x - scale.x / 2.0f;
+                float minZ = position.z - scale.z / 2.0f;
+                return new Vector2(minX, minZ);
             }
         }
 
@@ -59,9 +59,9 @@ namespace SEE.GO
             {
                 Vector3 position = transform.position;
                 Vector3 scale = GetScale();
-                float MaxX = position.x + scale.x / 2.0f;
-                float MaxZ = position.z + scale.z / 2.0f;
-                return new Vector2(MaxX, MaxZ);
+                float maxX = position.x + scale.x / 2.0f;
+                float maxZ = position.z + scale.z / 2.0f;
+                return new Vector2(maxX, maxZ);
             }
         }
 
