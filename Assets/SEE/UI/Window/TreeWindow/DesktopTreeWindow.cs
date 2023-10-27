@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
@@ -11,7 +12,6 @@ using SEE.UI.Notification;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -23,9 +23,14 @@ namespace SEE.UI.Window.TreeWindow
     public partial class TreeWindow
     {
         /// <summary>
-        /// Transform of the content of the tree window.
+        /// Transform of the object containing the items of the tree window.
         /// </summary>
-        private Transform content;
+        private RectTransform items;
+
+        /// <summary>
+        /// Component that allows scrolling through the items of the tree window.
+        /// </summary>
+        private ScrollRect scrollRect;
 
         /// <summary>
         /// A set of all items (node IDs) that have been expanded.
@@ -52,12 +57,17 @@ namespace SEE.UI.Window.TreeWindow
         private static readonly GradientAlphaKey[] alphaKeys = { new(1, 0), new(1, 1) };
 
         /// <summary>
+        /// The input field in which the user can enter a search term.
+        /// </summary>
+        private TMP_InputField SearchField;
+
+        /// <summary>
         /// Adds the given <paramref name="node"/> to the bottom of the tree window.
         /// </summary>
         /// <param name="node">The node to be added.</param>
         private void AddNode(Node node)
         {
-            GameObject nodeGameObject = GraphElementIDMap.Find(node.ID, mustFindElement: true);
+            GameObject nodeGameObject = GraphElementIDMap.Find(node.ID);
             int children = node.NumberOfChildren() + Mathf.Min(node.Outgoings.Count, 1) + Mathf.Min(node.Incomings.Count, 1);
 
             AddItem(CleanupID(node.ID), CleanupID(node.Parent?.ID),
@@ -81,7 +91,7 @@ namespace SEE.UI.Window.TreeWindow
                              char icon, GameObject itemGameObject,
                              Action<GameObject> collapseItem, Action<GameObject> expandItem)
         {
-            GameObject item = PrefabInstantiator.InstantiatePrefab(treeItemPrefab, content, false);
+            GameObject item = PrefabInstantiator.InstantiatePrefab(treeItemPrefab, items, false);
             Transform foreground = item.transform.Find("Foreground");
             GameObject expandIcon = foreground.Find("Expand Icon").gameObject;
             TextMeshProUGUI textMesh = foreground.Find("Text").gameObject.MustGetComponent<TextMeshProUGUI>();
@@ -95,7 +105,7 @@ namespace SEE.UI.Window.TreeWindow
             if (parentId != null)
             {
                 // Position the item below its parent.
-                parent = content.Find(parentId);
+                parent = items.Find(parentId);
                 item.transform.SetSiblingIndex(parent.GetSiblingIndex() + 1);
                 foreground.localPosition += new Vector3(indentShift * level, 0, 0);
             }
@@ -136,13 +146,14 @@ namespace SEE.UI.Window.TreeWindow
                         (Color start, Color end) = itemGameObject.EdgeOperator().TargetColor;
                         gradient = new[] { start, end };
                     }
+                    else
+                    {
+                        throw new ArgumentException("Item must be either a node or an edge.");
+                    }
                 }
-
-                if (gradient == null)
+                else
                 {
-                    // If there is no color, inherit it from the parent.
-                    Assert.IsTrue(parent != null, "Parent must not be null if color is null.");
-                    gradient = parent.Find("Background").GetComponent<UIGradient>().EffectGradient.colorKeys.ToColors().ToArray();
+                    gradient = new[] { Color.gray, Color.gray.Darker() };
                 }
 
                 item.transform.Find("Background").GetComponent<UIGradient>().EffectGradient.SetKeys(gradient.ToGradientColorKeys().ToArray(), alphaKeys);
@@ -173,6 +184,10 @@ namespace SEE.UI.Window.TreeWindow
                             if (itemGameObject != null)
                             {
                                 itemGameObject.Operator().Highlight(duration: 10);
+                            }
+                            else
+                            {
+                                ShowNotification.Warn("No game object", "There is nothing to highlight for this item.");
                             }
                         }
                         else
@@ -236,7 +251,7 @@ namespace SEE.UI.Window.TreeWindow
         /// <typeparam name="T">The type of the item.</typeparam>
         private void RemoveItem<T>(string id, T initial, Func<T, IEnumerable<(string ID, T child)>> getChildItems)
         {
-            GameObject item = content.Find(id)?.gameObject;
+            GameObject item = items.Find(id)?.gameObject;
             if (item == null)
             {
                 Debug.LogWarning($"Item {id} not found.");
@@ -296,11 +311,6 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="nodeGameObject">The game object of the element represented by the node.</param>
         private void ExpandNode(Node node, GameObject item, GameObject nodeGameObject)
         {
-            if (node.NumberOfChildren() == 0)
-            {
-                return;
-            }
-
             ExpandItem(item);
 
             foreach (Node child in node.Children())
@@ -338,7 +348,7 @@ namespace SEE.UI.Window.TreeWindow
                             ExpandItem(i);
                             foreach (Edge edge in edges)
                             {
-                                GameObject edgeObject = GraphElementIDMap.Find(edge.ID, mustFindElement: true);
+                                GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
                                 AddItem($"{id}#{CleanupID(edge.ID)}", id, 0, edge.ToShortString(), node.Level + 2, edgeTypeUnicode, edgeObject, null, null);
                             }
                         });
@@ -375,8 +385,58 @@ namespace SEE.UI.Window.TreeWindow
                 GameObject nodeGameObject = GraphElementIDMap.Find(node.ID, mustFindElement: true);
                 AddItem(CleanupID(node.ID), null,
                         0, node.ToShortString(), 0, nodeTypeUnicode, nodeGameObject,
-                        null, null); // TODO: Reveal in hierarchy on click (& clear search field)
+                        null, _ => MakeVisible(node).Forget());
             }
+
+            items.position = items.position.WithXYZ(y: 0);
+        }
+
+        /// <summary>
+        /// Makes the given <paramref name="node"/> visible in the tree window by expanding all its parents
+        /// and scrolling to it.
+        /// </summary>
+        /// <param name="node">The node to be made visible.</param>
+        private async UniTaskVoid MakeVisible(Node node)
+        {
+            SearchField.onValueChanged.RemoveListener(SearchFor);
+            SearchField.text = string.Empty;
+            SearchField.ReleaseSelection();
+            SearchField.onValueChanged.AddListener(SearchFor);
+            ClearTree();
+
+            // We need to find a path from the root to the node, which we do by working our way up the hierarchy.
+            // We then expand all nodes on the path.
+            Node current = node;
+            while (current.Parent != null)
+            {
+                current = current.Parent;
+                expandedItems.Add(CleanupID(current.ID));
+            }
+
+            // FIXME: Node sometimes gets placed at wrong spot. This seems to be a very annoying racing condition.
+            //        The only fix I can think of involves creating a data structure that represents the tree view
+            //        and then using that to set the sibling indices of the items all at once.
+            AddRoots();
+
+            // We need to wait until the transform actually exists.
+            await UniTask.Yield();
+            RectTransform item = (RectTransform)items.Find(CleanupID(node.ID));
+            scrollRect.ScrollTo(item, duration: 1f);
+
+            // Make element blink.
+            UIGradient uiGradient = item.Find("Background").GetComponent<UIGradient>();
+            Gradient gradient = uiGradient.EffectGradient;
+            DOTween.To(() => uiGradient.EffectGradient.colorKeys[0].color, x =>
+                       {
+                           gradient.SetKeys(new[]
+                           {
+                               new GradientColorKey(x, 0), new GradientColorKey(x.Darker(), 1)
+                           }, alphaKeys);
+                           uiGradient.EffectGradient = gradient;
+                       },
+                       gradient.colorKeys[0].color.Invert(), duration: 0.5f)
+                   .SetEase(Ease.Linear)
+                   .SetLoops(6, LoopType.Yoyo).Play();
         }
 
         /// <summary>
@@ -384,14 +444,9 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         private void ClearTree()
         {
-            foreach (Transform child in content)
+            foreach (Transform child in items)
             {
-                if (child.name == "Search")
-                {
-                    continue;
-                }
                 Destroyer.Destroy(child.gameObject);
-                expandedItems.Clear();
             }
         }
 
@@ -423,12 +478,14 @@ namespace SEE.UI.Window.TreeWindow
 
             Title = $"{Graph.Name} – Tree View";
             base.StartDesktop();
-            content = PrefabInstantiator.InstantiatePrefab(treeWindowPrefab, Window.transform.Find("Content"), false).transform.Find("Content");
+            Transform root = PrefabInstantiator.InstantiatePrefab(treeWindowPrefab, Window.transform.Find("Content"), false).transform;
+            items = (RectTransform)root.Find("Content/Items");
+            scrollRect = root.gameObject.MustGetComponent<ScrollRect>();
 
-            TMP_InputField search = content.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
-            search.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
-            search.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
-            search.onValueChanged.AddListener(SearchFor);
+            SearchField = root.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
+            SearchField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
+            SearchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
+            SearchField.onValueChanged.AddListener(SearchFor);
 
             AddRoots();
         }
