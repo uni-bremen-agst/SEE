@@ -62,6 +62,67 @@ namespace SEE.UI.Window.TreeWindow
         private TMP_InputField SearchField;
 
         /// <summary>
+        /// Orders the tree below the given <paramref name="orderBelow"/> node according to the graph hierarchy.
+        /// This needs to be called whenever the tree is expanded.
+        /// </summary>
+        /// <param name="orderBelow">The node below which the tree should be ordered.</param>
+        private void OrderTree(Node orderBelow)
+        {
+            Debug.Log("Ordering tree.");
+            int index = items.Find(CleanupID(orderBelow.ID)).GetSiblingIndex();
+            OrderTreeRecursive(orderBelow);
+
+            return;
+
+            // Orders the item with the given id to the current index and increments the index.
+            void OrderItemHere(string id)
+            {
+                Transform item = items.Find(id);
+                if (item == null)
+                {
+                    Debug.LogError($"Item {id} not found.");
+                }
+                else
+                {
+                    item.SetSiblingIndex(index++);
+                }
+            }
+
+            // Recurses over the tree in pre-order and assigns indices to each node.
+            void OrderTreeRecursive(Node node)
+            {
+                string id = CleanupID(node.ID);
+                OrderItemHere(id);
+                if (expandedItems.Contains(id))
+                {
+                    foreach (Node child in node.Children().OrderBy(x => x.SourceName))
+                    {
+                        OrderTreeRecursive(child);
+                    }
+
+                    HandleEdges($"{id}#Outgoing", node.Outgoings);
+                    HandleEdges($"{id}#Incoming", node.Incomings);
+                }
+            }
+
+            // Orders the edges under the given id (outgoing/incoming) to the current index and increments the index.
+            void HandleEdges(string edgesId, ICollection<Edge> edges)
+            {
+                if (edges.Count > 0)
+                {
+                    OrderItemHere(edgesId);
+                    if (expandedItems.Contains(edgesId))
+                    {
+                        foreach (Edge edge in edges)
+                        {
+                            OrderItemHere($"{edgesId}#{CleanupID(edge.ID)}");
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Adds the given <paramref name="node"/> to the bottom of the tree window.
         /// </summary>
         /// <param name="node">The node to be added.</param>
@@ -70,45 +131,41 @@ namespace SEE.UI.Window.TreeWindow
             GameObject nodeGameObject = GraphElementIDMap.Find(node.ID);
             int children = node.NumberOfChildren() + Mathf.Min(node.Outgoings.Count, 1) + Mathf.Min(node.Incomings.Count, 1);
 
-            AddItem(CleanupID(node.ID), CleanupID(node.Parent?.ID),
-                    children, node.ToShortString(), node.Level, nodeTypeUnicode, nodeGameObject,
-                    i => CollapseNode(node, i), i => ExpandNode(node, i, nodeGameObject));
+            AddItem(CleanupID(node.ID), children, node.ToShortString(), node.Level, nodeTypeUnicode, nodeGameObject,
+                    item => CollapseNode(node, item),
+                    (item, order) => ExpandNode(node, item, orderTree: order));
         }
 
         /// <summary>
-        /// Adds the given item beneath its parent to the tree window.
+        /// Adds the given item to the tree window.
         /// </summary>
         /// <param name="id">The ID of the item to be added.</param>
-        /// <param name="parentId">The ID of the parent of the item to be added.</param>
         /// <param name="children">The number of children of the item to be added.</param>
         /// <param name="text">The text of the item to be added.</param>
         /// <param name="level">The level of the item to be added.</param>
         /// <param name="icon">The icon of the item to be added, given as a unicode character.</param>
         /// <param name="itemGameObject">The game object of the element represented by the item. May be null.</param>
-        /// <param name="collapseItem">A function that collapses the item.</param>
-        /// <param name="expandItem">A function that expands the item.</param>
-        private void AddItem(string id, string parentId, int children, string text, int level,
+        /// <param name="collapseItem">A function that collapses the item.
+        /// It takes the item that was collapsed as an argument.</param>
+        /// <param name="expandItem">A function that expands the item.
+        /// It takes the item that was expanded and a boolean indicating whether the
+        /// tree should be ordered after expanding the item as arguments.</param>
+        private void AddItem(string id, int children, string text, int level,
                              char icon, GameObject itemGameObject,
-                             Action<GameObject> collapseItem, Action<GameObject> expandItem)
+                             Action<GameObject> collapseItem, Action<GameObject, bool> expandItem)
         {
             GameObject item = PrefabInstantiator.InstantiatePrefab(treeItemPrefab, items, false);
+            Transform background = item.transform.Find("Background");
             Transform foreground = item.transform.Find("Foreground");
             GameObject expandIcon = foreground.Find("Expand Icon").gameObject;
             TextMeshProUGUI textMesh = foreground.Find("Text").gameObject.MustGetComponent<TextMeshProUGUI>();
             TextMeshProUGUI iconMesh = foreground.Find("Type Icon").gameObject.MustGetComponent<TextMeshProUGUI>();
-            Color[] gradient = null;
-            Transform parent = null;
 
             textMesh.text = text;
             iconMesh.text = icon.ToString();
 
-            if (parentId != null)
-            {
-                // Position the item below its parent.
-                parent = items.Find(parentId);
-                item.transform.SetSiblingIndex(parent.GetSiblingIndex() + 1);
-                foreground.localPosition += new Vector3(indentShift * level, 0, 0);
-            }
+            foreground.localPosition += new Vector3(indentShift * level, 0, 0);
+            background.localPosition += new Vector3(indentShift * level, 0, 0);
 
             ColorItem();
 
@@ -124,15 +181,19 @@ namespace SEE.UI.Window.TreeWindow
             else if (expandedItems.Contains(id))
             {
                 // If this item was previously expanded, we need to expand it again.
-                expandItem(item);
+                // The tree should not be reordered after this – this should only happen at the end of the expansion,
+                // and thus needs to be done at the originating call.
+                expandItem(item, false);
             }
 
             RegisterClickHandler();
             AnimateIn();
             return;
 
+            // Colors the item according to its game object.
             void ColorItem()
             {
+                Color[] gradient;
                 if (itemGameObject != null)
                 {
                     if (itemGameObject.IsNode())
@@ -156,7 +217,7 @@ namespace SEE.UI.Window.TreeWindow
                     gradient = new[] { Color.gray, Color.gray.Darker() };
                 }
 
-                item.transform.Find("Background").GetComponent<UIGradient>().EffectGradient.SetKeys(gradient.ToGradientColorKeys().ToArray(), alphaKeys);
+                background.GetComponent<UIGradient>().EffectGradient.SetKeys(gradient.ToGradientColorKeys().ToArray(), alphaKeys);
 
                 // We also need to set the text color to a color that is readable on the background color.
                 Color foregroundColor = gradient.Aggregate((x, y) => (x + y) / 2).IdealTextColor();
@@ -165,12 +226,14 @@ namespace SEE.UI.Window.TreeWindow
                 expandIcon.GetComponent<Graphic>().color = foregroundColor;
             }
 
+            // Expands the item by animating its scale.
             void AnimateIn()
             {
                 item.transform.localScale = new Vector3(1, 0, 1);
                 item.transform.DOScaleY(1, duration: 0.5f);
             }
 
+            // Registers a click handler for the item.
             void RegisterClickHandler()
             {
                 if (item.TryGetComponentOrLog(out PointerHelper pointerHelper))
@@ -198,7 +261,9 @@ namespace SEE.UI.Window.TreeWindow
                             }
                             else
                             {
-                                expandItem?.Invoke(item);
+                                // Tree should be reordered after this, since the expansion
+                                // originated from the user here.
+                                expandItem?.Invoke(item, true);
                             }
                         }
                     });
@@ -225,15 +290,15 @@ namespace SEE.UI.Window.TreeWindow
                 // We need to remove the "Outgoing" and "Incoming" buttons if they exist, along with their children.
                 if (n.Outgoings.Count > 0)
                 {
-                    children = appendEdgeChildren("Outgoing", n.Outgoings);
+                    children = AppendEdgeChildren("Outgoing", n.Outgoings);
                 }
                 if (n.Incomings.Count > 0)
                 {
-                    children = appendEdgeChildren("Incoming", n.Incomings);
+                    children = AppendEdgeChildren("Incoming", n.Incomings);
                 }
                 return children;
 
-                IEnumerable<(string, Node)> appendEdgeChildren(string edgeType, IEnumerable<Edge> edges)
+                IEnumerable<(string, Node)> AppendEdgeChildren(string edgeType, IEnumerable<Edge> edges)
                 {
                     return children.Append((cleanId + "#" + edgeType, null))
                                    .Concat(edges.Select<Edge, (string, Node)>(x => ($"{cleanId}#{edgeType}#{CleanupID(x.ID)}", null)));
@@ -308,8 +373,8 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         /// <param name="node">The node represented by the item.</param>
         /// <param name="item">The item to be expanded.</param>
-        /// <param name="nodeGameObject">The game object of the element represented by the node.</param>
-        private void ExpandNode(Node node, GameObject item, GameObject nodeGameObject)
+        /// <param name="orderTree">Whether to order the tree after expanding the node.</param>
+        private void ExpandNode(Node node, GameObject item, bool orderTree = false)
         {
             ExpandItem(item);
 
@@ -326,6 +391,10 @@ namespace SEE.UI.Window.TreeWindow
             {
                 AddEdgeButton("Incoming", incomingEdgeUnicode, node.Incomings);
             }
+            if (orderTree)
+            {
+                OrderTree(node);
+            }
             return;
 
             void AddEdgeButton(string edgesType, char icon, ICollection<Edge> edges)
@@ -335,21 +404,25 @@ namespace SEE.UI.Window.TreeWindow
                 // Note that an edge may appear multiple times in the tree view,
                 // hence we make its ID dependent on the node it is connected to,
                 // and whether it is an incoming or outgoing edge (to cover self-loops).
-                AddItem(id, cleanedId, edges.Count, $"{edgesType} Edges", node.Level + 1, icon, nodeGameObject,
-                        i =>
+                AddItem(id, edges.Count, $"{edgesType} Edges", node.Level + 1, icon, itemGameObject: null,
+                        collapsedItem =>
                         {
-                            CollapseItem(i);
+                            CollapseItem(collapsedItem);
                             foreach (Edge edge in edges)
                             {
                                 RemoveItem($"{id}#{CleanupID(edge.ID)}");
                             }
-                        }, i =>
+                        }, (expandedItem, order) =>
                         {
-                            ExpandItem(i);
+                            ExpandItem(expandedItem);
                             foreach (Edge edge in edges)
                             {
                                 GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
-                                AddItem($"{id}#{CleanupID(edge.ID)}", id, 0, edge.ToShortString(), node.Level + 2, edgeTypeUnicode, edgeObject, null, null);
+                                AddItem($"{id}#{CleanupID(edge.ID)}", 0, edge.ToShortString(), node.Level + 2, edgeTypeUnicode, edgeObject, null, null);
+                            }
+                            if (order)
+                            {
+                                OrderTree(node);
                             }
                         });
             }
@@ -378,14 +451,15 @@ namespace SEE.UI.Window.TreeWindow
             if (searchTerm == null || searchTerm.Trim().Length == 0)
             {
                 AddRoots();
+                return;
             }
 
             foreach (Node node in searcher.Search(searchTerm))
             {
                 GameObject nodeGameObject = GraphElementIDMap.Find(node.ID, mustFindElement: true);
-                AddItem(CleanupID(node.ID), null,
+                AddItem(CleanupID(node.ID),
                         0, node.ToShortString(), 0, nodeTypeUnicode, nodeGameObject,
-                        null, _ => MakeVisible(node).Forget());
+                        null, (_, _) => MakeVisible(node).Forget());
             }
 
             items.position = items.position.WithXYZ(y: 0);
@@ -413,12 +487,9 @@ namespace SEE.UI.Window.TreeWindow
                 expandedItems.Add(CleanupID(current.ID));
             }
 
-            // FIXME: Node sometimes gets placed at wrong spot. This seems to be a very annoying racing condition.
-            //        The only fix I can think of involves creating a data structure that represents the tree view
-            //        and then using that to set the sibling indices of the items all at once.
             AddRoots();
 
-            // We need to wait until the transform actually exists.
+            // We need to wait until the transform actually exists, hence the yield.
             await UniTask.Yield();
             RectTransform item = (RectTransform)items.Find(CleanupID(node.ID));
             scrollRect.ScrollTo(item, duration: 1f);
