@@ -43929,6 +43929,11 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 4300008, guid: 3425c4877057caf4aa9cd335ae7c98af, type: 3}
+    - target: {fileID: 6666001597356407949, guid: 6fff76cee990e864eb550fecff6155d0,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 4300006, guid: 3425c4877057caf4aa9cd335ae7c98af, type: 3}
     - target: {fileID: 6666001597356407958, guid: 6fff76cee990e864eb550fecff6155d0,
         type: 3}
       propertyPath: m_CastShadows
@@ -43939,6 +43944,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6666001597356408673, guid: 6fff76cee990e864eb550fecff6155d0,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 4300008, guid: 3425c4877057caf4aa9cd335ae7c98af, type: 3}
     - target: {fileID: 7389820191239957574, guid: 6fff76cee990e864eb550fecff6155d0,
         type: 3}
       propertyPath: m_Mesh

@@ -270,6 +270,12 @@ namespace SEE.Controls.Actions
                     Color.red.Darker(), "Materials/ModernUIPack/Pencil",
                     CleanerAction.CreateReversibleAction,
                     parent: Whiteboard);
+
+            StickyNote =
+                new("Sticky Note", "Manage sticky notes (spawn/move/edit/delete)",
+                 Color.blue.Darker(), "Materials/ModernUIPack/Pencil",
+                    StickyNoteAction.CreateReversibleAction,
+                    parent: Whiteboard);
         }
 
         public readonly static ActionStateType Move;
@@ -311,6 +317,7 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType Erase;
         public readonly static ActionStateType LinePointErase;
         public readonly static ActionStateType Cleaner;
+        public readonly static ActionStateType StickyNote;
 
         #endregion
 
