@@ -54,14 +54,14 @@ namespace SEE.DataModel.DG
 
         /// <summary>
         /// Removes zero-width-spaces from the given <paramref name="input"/>, as well as whitespace at the
-        /// beginning and end.
+        /// beginning and end, and converts the string to lowercase.
         /// </summary>
         /// <param name="input">The string which shall be filtered.</param>
         /// <returns>The filtered string.</returns>
         public static string FilterString(string input)
         {
             const string zeroWidthSpace = "\u200B";
-            return input.Trim().Replace(zeroWidthSpace, string.Empty);
+            return input.Trim().Replace(zeroWidthSpace, string.Empty).ToLowerInvariant();
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace SEE.DataModel.DG
         /// <returns>The string representation of the element.</returns>
         private static string ElementToString(Node element)
         {
-            return element.SourceName;
+            return element.SourceName.ToLowerInvariant();
         }
 
         public void OnCompleted()
