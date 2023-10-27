@@ -81,7 +81,7 @@ namespace SEE.Utils
         /// <returns>The converted colors as gradient color keys.</returns>
         public static IEnumerable<GradientColorKey> ToGradientColorKeys(this ICollection<Color> colors)
         {
-            return colors.Select((c, i) => new GradientColorKey(c, (float)i / colors.Count));
+            return colors.Select((c, i) => new GradientColorKey(c, (float) i / (colors.Count-1)));
         }
 
         /// <summary>
