@@ -68,7 +68,6 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="orderBelow">The node below which the tree should be ordered.</param>
         private void OrderTree(Node orderBelow)
         {
-            Debug.Log("Ordering tree.");
             int index = items.Find(CleanupID(orderBelow.ID)).GetSiblingIndex();
             OrderTreeRecursive(orderBelow);
 

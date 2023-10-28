@@ -6,7 +6,7 @@ using FuzzySharp;
 namespace SEE.DataModel.DG
 {
     /// <summary>
-    /// Allows searching for nodes by their string representation.
+    /// Allows searching for nodes by their source name.
     /// The graph associated to this search may be dynamic – that is, when the graph changes
     /// (for example, when a node is added), the search index will be updated accordingly.
     /// Searches are fuzzy, i.e., they will return results even if the query does not match the
@@ -40,7 +40,9 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Performs a fuzzy search for the given <paramref name="query"/> in the graph.
+        /// Performs a fuzzy search for the given <paramref name="query"/> in the graph,
+        /// by comparing it to the source name of the nodes.
+        /// Case will be ignored, and the query may be a substring of the source name (this is a fuzzy search).
         /// </summary>
         /// <param name="query">The query to be searched for.</param>
         /// <returns>A list of nodes which match the query.</returns>
@@ -108,16 +110,27 @@ namespace SEE.DataModel.DG
             return element.SourceName.ToLowerInvariant();
         }
 
+        /// <summary>
+        /// Called when no more events will be fired from the graph.
+        /// </summary>
         public void OnCompleted()
         {
             // Nothing to be done.
         }
 
+        /// <summary>
+        /// Called when an error occurs in the graph.
+        /// </summary>
+        /// <param name="error">The error which occurred.</param>
         public void OnError(Exception error)
         {
             throw error;
         }
 
+        /// <summary>
+        /// Called when a new event is fired from the graph.
+        /// </summary>
+        /// <param name="changeEvent">The event which was fired.</param>
         public void OnNext(ChangeEvent changeEvent)
         {
             // We want to update our mapping of names to nodes whenever a node is added or removed.
