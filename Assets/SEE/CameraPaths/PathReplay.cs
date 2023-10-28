@@ -73,15 +73,15 @@ namespace SEE.CameraPaths
         /// </summary>
         /// <param name="path">path to be serialized</param>
         /// <returns>serialized position and timing data of path</returns>
-        private IList<double> VectorsToList(CameraPath path)
+        private static IList<double> VectorsToList(CameraPath path)
         {
             List<double> list = new List<double>();
             foreach (PathData pathData in path)
             {
-                list.Add(pathData.position.x);
-                list.Add(pathData.position.y);
-                list.Add(pathData.position.z);
-                list.Add(pathData.time);
+                list.Add(pathData.Position.x);
+                list.Add(pathData.Position.y);
+                list.Add(pathData.Position.z);
+                list.Add(pathData.Time);
             }
             return list;
         }
@@ -92,7 +92,7 @@ namespace SEE.CameraPaths
         /// <param name="list">list to be deserialized</param>
         /// <returns>list of Vectors4 (x,y,z,w) where x,y,z are
         /// 3D co-ordinates and w is the time deserialized from given list</returns>
-        private Vector4[] ListToVectors(IList<double> list)
+        private static Vector4[] ListToVectors(IList<double> list)
         {
             int num = list.Count / 4;
             Vector4[] vectors = new Vector4[num];
@@ -175,7 +175,7 @@ namespace SEE.CameraPaths
                 enabled = false;
             }
             MovedObject.transform.position = ListToVectors(spline.ControlPoints)[0];
-            MovedObject.transform.rotation = path[0].rotation;
+            MovedObject.transform.rotation = path[0].Rotation;
         }
 
         /// <summary>
@@ -228,13 +228,13 @@ namespace SEE.CameraPaths
         /// <returns>the interpolated rotation on the way between two subsequent path points</returns>
         private Quaternion Forward(ref int current, float time)
         {
-            while (current < path.Count && path[current].time < time)
+            while (current < path.Count && path[current].Time < time)
             {
                 current++;
             }
             if (current == 0)
             {
-                return path[0].rotation;
+                return path[0].Rotation;
             }
             if (current == path.Count)
             {
@@ -245,11 +245,11 @@ namespace SEE.CameraPaths
             // Assert: path[current].time >= time
 
             // Normalize the time window so that the left time is 0.
-            float previousTime = path[current - 1].time;
-            float rightTime = path[current].time - previousTime;
+            float previousTime = path[current - 1].Time;
+            float rightTime = path[current].Time - previousTime;
             time -= previousTime;
             float relativeTime = time / rightTime;
-            return Quaternion.Slerp(path[current - 1].rotation, path[current].rotation, relativeTime);
+            return Quaternion.Slerp(path[current - 1].Rotation, path[current].Rotation, relativeTime);
         }
     }
 }

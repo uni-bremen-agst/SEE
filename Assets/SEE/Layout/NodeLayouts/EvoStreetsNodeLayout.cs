@@ -18,21 +18,21 @@ namespace SEE.Layout.NodeLayouts
         public EvoStreetsNodeLayout(float groundLevel)
             : base(groundLevel)
         {
-            name = "EvoStreets";
+            Name = "EvoStreets";
         }
 
         /// <summary>
         /// <see cref="CalculateStreetWidth(IList{ILayoutNode})"/> determines a statistical
         /// parameter of the widths and depths of all leaf nodes (the average) and adjusts
-        /// this statistical parameter by multiplying it with this factor <see cref="StreetWidthPercentage"/>.
+        /// this statistical parameter by multiplying it with this factor <see cref="streetWidthPercentage"/>.
         /// </summary>
-        private const float StreetWidthPercentage = 0.3f;
+        private const float streetWidthPercentage = 0.3f;
 
         /// <summary>
         /// Is used to calculate the offset between buildings as this factor multiplied by
         /// the absolute street width for the root node.
         /// </summary>
-        private const float OffsetBetweenBuildingsPercentage = 0.3f;
+        private const float offsetBetweenBuildingsPercentage = 0.3f;
 
         /// <summary>
         /// The height (y co-ordinate) of game objects (inner tree nodes) represented by streets.
@@ -58,13 +58,13 @@ namespace SEE.Layout.NodeLayouts
                 return layoutResult;
             }
 
-            roots = LayoutNodes.GetRoots(layoutNodes);
-            if (roots.Count == 0)
+            Roots = LayoutNodes.GetRoots(layoutNodes);
+            if (Roots.Count == 0)
             {
                 throw new Exception("Graph has no root node.");
             }
 
-            if (roots.Count > 1)
+            if (Roots.Count > 1)
             {
                 throw new Exception("Graph has multiple roots.");
             }
@@ -72,8 +72,8 @@ namespace SEE.Layout.NodeLayouts
             {
                 LayoutDescriptor treeDescriptor;
                 treeDescriptor.StreetWidth = CalculateStreetWidth(layoutNodes);
-                treeDescriptor.OffsetBetweenBuildings = treeDescriptor.StreetWidth * OffsetBetweenBuildingsPercentage;
-                ILayoutNode root = roots.FirstOrDefault();
+                treeDescriptor.OffsetBetweenBuildings = treeDescriptor.StreetWidth * offsetBetweenBuildingsPercentage;
+                ILayoutNode root = Roots.FirstOrDefault();
                 ENode rootNode = GenerateHierarchy(root);
                 treeDescriptor.MaximalDepth = MaxDepth(root);
 
@@ -81,13 +81,13 @@ namespace SEE.Layout.NodeLayouts
                 rootNode.SetLocation(Orientation.East, new Location(0, 0));
 
                 Dictionary<ILayoutNode, NodeTransform> layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
-                rootNode.ToLayout(ref layoutResult, groundLevel, streetHeight);
+                rootNode.ToLayout(ref layoutResult, GroundLevel, streetHeight);
                 return layoutResult;
             }
         }
 
         /// <summary>
-        /// Returns the width of the street for the root as a percentage <see cref="StreetWidthPercentage"/>
+        /// Returns the width of the street for the root as a percentage <see cref="streetWidthPercentage"/>
         /// of the average of all widths and depths of leaf nodes in <paramref name="layoutNodes"/>.
         /// </summary>
         /// <param name="layoutNodes">the nodes to be laid out</param>
@@ -107,7 +107,7 @@ namespace SEE.Layout.NodeLayouts
             UnityEngine.Assertions.Assert.IsTrue(numberOfLeaves > 0);
             result /= numberOfLeaves;
             // result is now the average length over all widths and depths of all leaf nodes.
-            return result * StreetWidthPercentage;
+            return result * streetWidthPercentage;
         }
 
         /// <summary>

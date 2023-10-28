@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
-using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
+using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraphs;
 
 namespace SEE.Tools.ReflexionAnalysis
 {
@@ -11,7 +11,7 @@ namespace SEE.Tools.ReflexionAnalysis
     /// Type of a reflexion subgraph.
     /// </summary>
     [Flags]
-    public enum ReflexionSubgraph
+    public enum ReflexionSubgraphs
     {
         /// <summary>
         /// No reflexion subgraph.
@@ -48,11 +48,11 @@ namespace SEE.Tools.ReflexionAnalysis
     {
         /// <summary>
         /// Returns the label of this <paramref name="subgraph"/>, or <c>null</c> if this subgraph is not identified
-        /// by a label (such as <see cref="ReflexionSubgraph.Mapping"/>).
+        /// by a label (such as <see cref="ReflexionSubgraphs.Mapping"/>).
         /// </summary>
         /// <param name="subgraph">Subgraph type for which the label shall be returned</param>
         /// <returns>Label of this subgraph type</returns>
-        public static string GetLabel(this ReflexionSubgraph subgraph)
+        public static string GetLabel(this ReflexionSubgraphs subgraph)
         {
             return subgraph switch
             {
@@ -70,7 +70,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="subgraph">Subgraph type for which a short human-readable string shall be returned</param>
         /// <returns>Short, human-readable string for this subgraph type</returns>
-        public static string ToShortString(this ReflexionSubgraph subgraph)
+        public static string ToShortString(this ReflexionSubgraphs subgraph)
         {
             return subgraph switch
             {
@@ -138,7 +138,7 @@ namespace SEE.Tools.ReflexionAnalysis
 
         private static IList<ChangeEvent> IncorporateVersionEvent(this IList<ChangeEvent> events, VersionChangeEvent versionChangeEvent)
         {
-            // We will simply retain the most recent version change event. 
+            // We will simply retain the most recent version change event.
             // Keeping the others doesn't make much sense, as we've "compacted" previous events already.
             return events.Where(x => !(x is VersionChangeEvent)).Append(versionChangeEvent).ToList();
         }
@@ -151,7 +151,7 @@ namespace SEE.Tools.ReflexionAnalysis
                                        && a.AttributeName == attributeEvent.AttributeName
                                        && a.Attributable == attributeEvent.Attributable)).Append(attributeEvent).ToList();
         }
-        
+
         /// <summary>
         /// Removes all EdgeChange events with the same edge as <paramref name="edgeChange"/>
         /// from <paramref name="events"/> and adds a modified version of
@@ -221,7 +221,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Name of the edge attribute for the state of a dependency.
         /// </summary>
-        private const string StateAttribute = "Reflexion.State";
+        private const string stateAttribute = "Reflexion.State";
 
         /// <summary>
         /// Returns the state of a dependency.
@@ -231,7 +231,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <returns>the state of <paramref name="edge"/></returns>
         public static State State(this Edge edge)
         {
-            if (edge.TryGetInt(StateAttribute, out int value))
+            if (edge.TryGetInt(stateAttribute, out int value))
             {
                 return (State)value;
             }
@@ -245,15 +245,15 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Returns all subgraphs this <paramref name="element"/> is in.
         /// Use <c>Enum.HasFlag</c> to check the resulting value.
         /// </summary>
-        public static ReflexionSubgraph GetSubgraphs(this GraphElement element) =>
-            Enum.GetValues(typeof(ReflexionSubgraph))
-                .Cast<ReflexionSubgraph>()
+        public static ReflexionSubgraphs GetSubgraphs(this GraphElement element) =>
+            Enum.GetValues(typeof(ReflexionSubgraphs))
+                .Cast<ReflexionSubgraphs>()
                 .Where(element.IsIn)
                 .Aggregate(None, (acc, x) => acc & x);
 
-        public static ReflexionSubgraph GetSubgraph(this GraphElement element) =>
-            Enum.GetValues(typeof(ReflexionSubgraph))
-                .Cast<ReflexionSubgraph>()
+        public static ReflexionSubgraphs GetSubgraph(this GraphElement element) =>
+            Enum.GetValues(typeof(ReflexionSubgraphs))
+                .Cast<ReflexionSubgraphs>()
                 .First(element.IsIn);
 
         /// <summary>
@@ -266,7 +266,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <exception cref="ArgumentOutOfRangeException">
         /// If the given <paramref name="subgraph"/> is unknown
         /// </exception>
-        public static bool IsIn(this GraphElement element, ReflexionSubgraph subgraph)
+        public static bool IsIn(this GraphElement element, ReflexionSubgraphs subgraph)
         {
             if (element == null)
             {
@@ -297,8 +297,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <param name="subgraph">The subgraph this <paramref name="element"/> shall get assigned to.</param>
         /// <exception cref="InvalidOperationException">If <paramref name="subgraph"/> is
-        /// <see cref="Mapping"/> or <see cref="ReflexionSubgraph.FullReflexion"/>.</exception>
-        public static void SetIn(this GraphElement element, ReflexionSubgraph subgraph)
+        /// <see cref="Mapping"/> or <see cref="ReflexionSubgraphs.FullReflexion"/>.</exception>
+        public static void SetIn(this GraphElement element, ReflexionSubgraphs subgraph)
         {
             switch (subgraph)
             {
@@ -358,7 +358,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="graph">The graph whose nodes and edges shall be marked</param>
         /// <param name="subgraph">The subgraph the nodes and edges will be marked with</param>
         /// <param name="markRootNode">Whether to mark the root node of the <paramref name="graph"/>, too</param>
-        public static void MarkGraphNodesIn(this Graph graph, ReflexionSubgraph subgraph, bool markRootNode = true)
+        public static void MarkGraphNodesIn(this Graph graph, ReflexionSubgraphs subgraph, bool markRootNode = true)
         {
             IEnumerable<GraphElement> graphElements = graph.Nodes()
                                                            .Where(node => markRootNode || node.HasToggle(Graph.RootToggle))

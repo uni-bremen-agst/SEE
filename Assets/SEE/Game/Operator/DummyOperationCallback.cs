@@ -1,4 +1,5 @@
 ﻿using System;
+using RTG;
 
 namespace SEE.Game.Operator
 {
@@ -7,49 +8,59 @@ namespace SEE.Game.Operator
     /// Corresponding callbacks (e.g., OnComplete) will thus be called instantly.
     /// </summary>
     /// <typeparam name="T">the type of the callback delegate</typeparam>
+    /// <remarks>
+    /// Use callbacks of this type sparingly, as they are very inefficient.
+    /// </remarks>
     public class DummyOperationCallback<T> : IOperationCallback<T> where T : MulticastDelegate
     {
         // NOTE: We use reflection to invoke the callback because of the generic type parameter.
         //       This is very inefficient (by a factor of ~200, see https://stackoverflow.com/a/3465152),
         //       but AFAIK there is no good way around this.
 
-        public void SetOnComplete(T callback)
+        public IOperationCallback<T> OnComplete(T callback)
         {
             // Happens instantly.
             callback.DynamicInvoke();
+            return this;
         }
 
-        public void SetOnKill(T callback)
+        public IOperationCallback<T> OnKill(T callback)
         {
             // Happens instantly.
             callback.DynamicInvoke();
+            return this;
         }
 
-        public void SetOnPlay(T callback)
+        public IOperationCallback<T> OnPlay(T callback)
         {
             // Happens instantly.
             callback.DynamicInvoke();
+            return this;
         }
 
-        public void SetOnPause(T callback)
+        public IOperationCallback<T> OnPause(T callback)
         {
             // Nothing to be done.
+            return this;
         }
 
-        public void SetOnRewind(T callback)
+        public IOperationCallback<T> OnRewind(T callback)
         {
             // Nothing to be done.
+            return this;
         }
 
-        public void SetOnStart(T callback)
+        public IOperationCallback<T> OnStart(T callback)
         {
             // Happens instantly.
             callback.DynamicInvoke();
+            return this;
         }
 
-        public void SetOnUpdate(T callback)
+        public IOperationCallback<T> OnUpdate(T callback)
         {
             // Nothing to be done.
+            return this;
         }
     }
 }

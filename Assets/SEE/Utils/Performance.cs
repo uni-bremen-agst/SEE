@@ -6,9 +6,9 @@ namespace SEE.Utils
 {
     /// <summary>
     /// Allows us to measure and emit the elapsed time for long-running actions.
-    /// 
+    ///
     /// Example use:
-    /// 
+    ///
     ///   Performance p = Performance.Begin("loading graph data");
     ///   ... do something
     ///   p.End();

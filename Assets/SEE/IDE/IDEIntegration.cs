@@ -33,12 +33,12 @@ using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.GO;
 using SEE.Utils;
-using SEE.Utils.RPC;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using SEE.Utils.IdeRPC;
 
 namespace SEE.IDE
 {
@@ -528,7 +528,10 @@ namespace SEE.IDE
                     string project = await ideCalls.GetProjectPath(connection);
                     connection.AddTarget(new RemoteProcedureCalls(this, project));
 
-                    if (project == null) return;
+                    if (project == null)
+                    {
+                        return;
+                    }
 
                     if (!cachedConnections.ContainsKey(project))
                     {

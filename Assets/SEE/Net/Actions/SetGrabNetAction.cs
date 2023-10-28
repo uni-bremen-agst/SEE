@@ -21,12 +21,12 @@ namespace SEE.Net.Actions
         /// <summary>
         /// The id of the interactable.
         /// </summary>
-        public string id;
+        public string ID;
 
         /// <summary>
         /// Whether the interactable should be grabbed.
         /// </summary>
-        public bool grab;
+        public bool Grab;
 
         /// <summary>
         /// Constructor.
@@ -37,8 +37,8 @@ namespace SEE.Net.Actions
         {
             Assert.IsNotNull(interactable);
 
-            id = interactable.name;
-            this.grab = grab;
+            ID = interactable.name;
+            Grab = grab;
         }
 
         /// <summary>
@@ -47,9 +47,9 @@ namespace SEE.Net.Actions
         /// </summary>
         protected override void ExecuteOnServer()
         {
-            if (grab)
+            if (Grab)
             {
-                InteractableObject interactable = InteractableObject.Get(id);
+                InteractableObject interactable = InteractableObject.Get(ID);
                 if (interactable)
                 {
                     IPEndPoint requester = GetRequester();
@@ -63,7 +63,7 @@ namespace SEE.Net.Actions
             }
             else
             {
-                InteractableObject interactable = InteractableObject.Get(id);
+                InteractableObject interactable = InteractableObject.Get(ID);
                 if (interactable)
                 {
                     IPEndPoint requester = GetRequester();
@@ -86,10 +86,10 @@ namespace SEE.Net.Actions
         {
             if (!IsRequester())
             {
-                InteractableObject interactable = InteractableObject.Get(id);
+                InteractableObject interactable = InteractableObject.Get(ID);
                 if (interactable)
                 {
-                    interactable.SetGrab(grab, false);
+                    interactable.SetGrab(Grab, false);
                 }
             }
         }

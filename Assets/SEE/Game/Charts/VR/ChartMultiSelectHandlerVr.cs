@@ -37,27 +37,27 @@ namespace SEE.Game.Charts.VR
         /// <summary>
         /// The position of the <see cref="reference" />.
         /// </summary>
-        private Vector3 _referencePos;
+        private Vector3 referencePos;
 
         /// <summary>
-        /// Sets the starting positions of <see cref="ChartMultiSelectHandler.selectionRect" /> and
+        /// Sets the starting positions of <see cref="ChartMultiSelectHandler.SelectionRect" /> and
         /// <see cref="reference" />.
         /// </summary>
         /// <param name="eventData">Contains position data of the pointer.</param>
         public override void OnPointerDown(PointerEventData eventData)
         {
-            selectionRect.gameObject.SetActive(true);
-            selectionRect.position = eventData.pointerCurrentRaycast.worldPosition;
-            selectionRect.anchoredPosition3D = new Vector3(selectionRect.anchoredPosition.x,
-                selectionRect.anchoredPosition.y, 0);
-            startingPos = selectionRect.anchoredPosition;
-            selectionRect.sizeDelta = new Vector2(0f, 0f);
-            reference.anchoredPosition3D = selectionRect.anchoredPosition3D;
+            SelectionRect.gameObject.SetActive(true);
+            SelectionRect.position = eventData.pointerCurrentRaycast.worldPosition;
+            SelectionRect.anchoredPosition3D = new Vector3(SelectionRect.anchoredPosition.x,
+                SelectionRect.anchoredPosition.y, 0);
+            StartingPos = SelectionRect.anchoredPosition;
+            SelectionRect.sizeDelta = new Vector2(0f, 0f);
+            reference.anchoredPosition3D = SelectionRect.anchoredPosition3D;
         }
 
         /// <summary>
-        /// Updates the <see cref="_referencePos" /> and the
-        /// <see cref="ChartMultiSelectHandler.selectionRect" />.
+        /// Updates the <see cref="referencePos" /> and the
+        /// <see cref="ChartMultiSelectHandler.SelectionRect" />.
         /// </summary>
         /// <param name="eventData">Contains position data of the pointer.</param>
         public override void OnDrag(PointerEventData eventData)
@@ -67,34 +67,34 @@ namespace SEE.Game.Charts.VR
             reference.position = eventData.pointerCurrentRaycast.worldPosition;
             reference.anchoredPosition3D = new Vector3(reference.anchoredPosition.x,
                 reference.anchoredPosition.y, 0);
-            _referencePos = reference.anchoredPosition;
+            referencePos = reference.anchoredPosition;
 
-            if (_referencePos.x - startingPos.x < 0)
+            if (referencePos.x - StartingPos.x < 0)
             {
-                selectionRect.sizeDelta = new Vector2(Mathf.Abs(_referencePos.x - startingPos.x),
-                    _referencePos.y - startingPos.y);
-                sizeDelta = selectionRect.sizeDelta;
-                selectionRect.anchoredPosition = new Vector3(startingPos.x - sizeDelta.x / 2,
-                    startingPos.y + sizeDelta.y / 2, 0);
+                SelectionRect.sizeDelta = new Vector2(Mathf.Abs(referencePos.x - StartingPos.x),
+                    referencePos.y - StartingPos.y);
+                sizeDelta = SelectionRect.sizeDelta;
+                SelectionRect.anchoredPosition = new Vector3(StartingPos.x - sizeDelta.x / 2,
+                    StartingPos.y + sizeDelta.y / 2, 0);
                 negative = true;
             }
 
-            if (_referencePos.y - startingPos.y < 0)
+            if (referencePos.y - StartingPos.y < 0)
             {
                 if (negative)
                 {
-                    selectionRect.sizeDelta = new Vector2(selectionRect.sizeDelta.x,
-                        Mathf.Abs(_referencePos.y - startingPos.y));
-                    selectionRect.anchoredPosition = new Vector3(selectionRect.anchoredPosition.x,
-                        startingPos.y - selectionRect.sizeDelta.y / 2, 0);
+                    SelectionRect.sizeDelta = new Vector2(SelectionRect.sizeDelta.x,
+                        Mathf.Abs(referencePos.y - StartingPos.y));
+                    SelectionRect.anchoredPosition = new Vector3(SelectionRect.anchoredPosition.x,
+                        StartingPos.y - SelectionRect.sizeDelta.y / 2, 0);
                 }
                 else
                 {
-                    selectionRect.sizeDelta = new Vector2(_referencePos.x - startingPos.x,
-                        Mathf.Abs(_referencePos.y - startingPos.y));
-                    sizeDelta = selectionRect.sizeDelta;
-                    selectionRect.anchoredPosition = new Vector3(startingPos.x + sizeDelta.x / 2,
-                        startingPos.y - sizeDelta.y / 2, 0);
+                    SelectionRect.sizeDelta = new Vector2(referencePos.x - StartingPos.x,
+                        Mathf.Abs(referencePos.y - StartingPos.y));
+                    sizeDelta = SelectionRect.sizeDelta;
+                    SelectionRect.anchoredPosition = new Vector3(StartingPos.x + sizeDelta.x / 2,
+                        StartingPos.y - sizeDelta.y / 2, 0);
                     negative = true;
                 }
             }
@@ -104,11 +104,11 @@ namespace SEE.Game.Charts.VR
                 return;
             }
 
-            selectionRect.sizeDelta = new Vector2(_referencePos.x - startingPos.x,
-                _referencePos.y - startingPos.y);
-            sizeDelta = selectionRect.sizeDelta;
-            selectionRect.anchoredPosition = new Vector3(startingPos.x + sizeDelta.x / 2,
-                startingPos.y + sizeDelta.y / 2, 0);
+            SelectionRect.sizeDelta = new Vector2(referencePos.x - StartingPos.x,
+                referencePos.y - StartingPos.y);
+            sizeDelta = SelectionRect.sizeDelta;
+            SelectionRect.anchoredPosition = new Vector3(StartingPos.x + sizeDelta.x / 2,
+                StartingPos.y + sizeDelta.y / 2, 0);
         }
 
         /// <summary>
@@ -117,10 +117,10 @@ namespace SEE.Game.Charts.VR
         /// <param name="eventData">Contains position data of the pointer.</param>
         public override void OnPointerUp(PointerEventData eventData)
         {
-            Vector2 min = Vector2.Min(startingPos, _referencePos);
-            Vector2 max = Vector2.Max(startingPos, _referencePos);
-            chartContent.AreaSelection(min, max);
-            selectionRect.gameObject.SetActive(false);
+            Vector2 min = Vector2.Min(StartingPos, referencePos);
+            Vector2 max = Vector2.Max(StartingPos, referencePos);
+            ChartContent.AreaSelection(min, max);
+            SelectionRect.gameObject.SetActive(false);
         }
     }
 }

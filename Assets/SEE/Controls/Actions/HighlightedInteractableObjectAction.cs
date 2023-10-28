@@ -20,12 +20,12 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Outline of the game object being activated.
         /// </summary>
-        protected Outline outline;
+        protected Outline Outline;
 
         /// <summary>
         /// Color of the initial outline before being activated.
         /// </summary>
-        protected Color initialOutlineColor = Color.black;
+        protected Color InitialOutlineColor = Color.black;
 
         /// <summary>
         /// Initializes this component by creating an outline, if necessary.
@@ -37,15 +37,15 @@ namespace SEE.Controls.Actions
         /// It is called after <see cref="Awake"/> and before <see cref="Start"/>.</remarks>
         protected virtual void OnEnable()
         {
-            if (!TryGetComponent(out outline))
+            if (!TryGetComponent(out Outline))
             {
-                outline = Outline.Create(gameObject, initialOutlineColor);
+                Outline = Outline.Create(gameObject, InitialOutlineColor);
             }
         }
 
         /// <summary>
         /// Remembers the original value of <see cref="outline.OutlineColor"/> in
-        /// <see cref="initialOutlineColor"/> and sets it to either <see cref="LocalOutlineColor"/>
+        /// <see cref="InitialOutlineColor"/> and sets it to either <see cref="LocalOutlineColor"/>
         /// or <see cref="RemoteOutlineColor"/> depending upon <paramref name="isInitiator"/>.
         /// </summary>
         /// <param name="isInitiator">true if the caller is the initiator, that is, the one
@@ -53,7 +53,7 @@ namespace SEE.Controls.Actions
         /// through the network to other connected clients</param>
         protected void SetInitialAndNewOutlineColor(bool isInitiator)
         {
-            initialOutlineColor = outline.OutlineColor;
+            InitialOutlineColor = Outline.OutlineColor;
             SetOutlineColor(isInitiator);
         }
 
@@ -66,20 +66,20 @@ namespace SEE.Controls.Actions
         /// through the network to other connected clients</param>
         protected void SetOutlineColor(bool isInitiator)
         {
-            if (outline)
+            if (Outline)
             {
-                outline.OutlineColor = isInitiator ? LocalOutlineColor : RemoteOutlineColor;
+                Outline.OutlineColor = isInitiator ? LocalOutlineColor : RemoteOutlineColor;
             }
         }
 
         /// <summary>
-        /// Resets <see cref="outline.OutlineColor"/> to <see cref="initialOutlineColor"/>.
+        /// Resets <see cref="outline.OutlineColor"/> to <see cref="InitialOutlineColor"/>.
         /// </summary>
         protected void ResetOutlineColor()
         {
-            if (outline)
+            if (Outline)
             {
-                outline.OutlineColor = initialOutlineColor;
+                Outline.OutlineColor = InitialOutlineColor;
             }
         }
 

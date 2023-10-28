@@ -13,7 +13,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// The action to be executed.
         /// </summary>
-        public AbstractNetAction action;
+        public AbstractNetAction Action;
 
         /// <summary>
         /// Empty constructor is necessary for JsonUtility-serialization.
@@ -28,19 +28,19 @@ namespace SEE.Net.Actions
         /// <param name="action">The action to be executed.</param>
         public ExecuteActionPacket(AbstractNetAction action)
         {
-            this.action = action;
+            this.Action = action;
         }
 
         internal override string Serialize()
         {
-            string result = ActionSerializer.Serialize(action);
+            string result = ActionSerializer.Serialize(Action);
             return result;
         }
 
         internal override void Deserialize(string serializedPacket)
         {
             ExecuteActionPacket deserializedPacket = new ExecuteActionPacket(ActionSerializer.Deserialize(serializedPacket));
-            action = deserializedPacket.action;
+            Action = deserializedPacket.Action;
         }
 
         /// <summary>
@@ -53,9 +53,9 @@ namespace SEE.Net.Actions
         {
             Assert.IsNotNull(connection);
 
-            action.ExecuteOnServerBase();
+            Action.ExecuteOnServerBase();
 
-            IPEndPoint[] recipients = action.GetRecipients();
+            IPEndPoint[] recipients = Action.GetRecipients();
             if (recipients == null)
             {
                 foreach (Connection c in Server.Connections)
@@ -86,10 +86,10 @@ namespace SEE.Net.Actions
         internal override bool ExecuteOnClient(Connection connection)
         {
             Assert.IsNotNull(connection);
-            Assert.IsNotNull(action.RequesterIPAddress);
-            Assert.IsTrue(action.RequesterPort != -1);
+            Assert.IsNotNull(Action.RequesterIPAddress);
+            Assert.IsTrue(Action.RequesterPort != -1);
 
-            action.ExecuteOnClientBase();
+            Action.ExecuteOnClientBase();
             return true;
         }
     }

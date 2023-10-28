@@ -55,8 +55,8 @@ namespace SEE.GO
         /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
         private void DetermineStatistics(ICollection<Graph> graphs, bool leavesOnly)
         {
-            Dictionary<string, float> sum = Initial(metrics);
-            Dictionary<string, float> count = Initial(metrics);
+            Dictionary<string, float> sum = Initial(Metrics);
+            Dictionary<string, float> count = Initial(Metrics);
 
             // Count the number of metric values and sum them up for each metric.
             foreach (Graph graph in graphs)
@@ -65,7 +65,7 @@ namespace SEE.GO
                 {
                     if (!leavesOnly || node.IsLeaf())
                     {
-                        foreach (string metric in metrics)
+                        foreach (string metric in Metrics)
                         {
                             if (node.TryGetNumeric(metric, out float value))
                             {
@@ -78,16 +78,16 @@ namespace SEE.GO
             }
             // Initialize statistics
             statistics = new Dictionary<string, Statistics>();
-            foreach (string metric in metrics)
+            foreach (string metric in Metrics)
             {
                 statistics[metric] = new Statistics(0.0f, 0.0f);
             }
 
             // Calculate the mean value of each metric
-            foreach (string metric in metrics)
+            foreach (string metric in Metrics)
             {
                 float c = count[metric];
-                statistics[metric].mean = c > 0 ? sum[metric] / c : 0.0f;
+                statistics[metric].Mean = c > 0 ? sum[metric] / c : 0.0f;
             }
 
             // Calculate sum((x_i - mean)^2) over all i in [1..n]
@@ -97,12 +97,12 @@ namespace SEE.GO
                 {
                     if (!leavesOnly || node.IsLeaf())
                     {
-                        foreach (string metric in metrics)
+                        foreach (string metric in Metrics)
                         {
                             if (node.TryGetNumeric(metric, out float value))
                             {
-                                float diff = value - statistics[metric].mean;
-                                statistics[metric].standard_deviation += diff * diff;
+                                float diff = value - statistics[metric].Mean;
+                                statistics[metric].StandardDeviation += diff * diff;
                             }
                         }
                     }
@@ -111,28 +111,28 @@ namespace SEE.GO
 
             // Calculate standard deviation sd = sqrt(var(X)) where var(X) = S/n
             // is the variance of X = {x_1, ..., x_n} and S = sum((x_i - mean)^2) over all i in [1..n]
-            foreach (string metric in metrics)
+            foreach (string metric in Metrics)
             {
                 float c = count[metric];
-                statistics[metric].standard_deviation
-                     = c > 0 ? Mathf.Sqrt(statistics[metric].standard_deviation / c) : 0.0f;
+                statistics[metric].StandardDeviation
+                     = c > 0 ? Mathf.Sqrt(statistics[metric].StandardDeviation / c) : 0.0f;
             }
             // DumpStatistics();
         }
 
         private class Statistics
         {
-            public float mean;
-            public float standard_deviation;
+            public float Mean;
+            public float StandardDeviation;
 
-            public Statistics(float mean, float standard_deviation)
+            public Statistics(float mean, float standardDeviation)
             {
-                this.mean = mean;
-                this.standard_deviation = standard_deviation;
+                this.Mean = mean;
+                this.StandardDeviation = standardDeviation;
             }
             public override string ToString()
             {
-                return $"mean={mean}, sd={standard_deviation}";
+                return $"mean={Mean}, sd={StandardDeviation}";
             }
         }
 
@@ -141,7 +141,7 @@ namespace SEE.GO
         /// </summary>
         private void DumpStatistics()
         {
-            foreach (string metric in metrics)
+            foreach (string metric in Metrics)
             {
                 Debug.Log($"statistics of metric {metric}: {statistics[metric]}\n");
             }
@@ -160,14 +160,14 @@ namespace SEE.GO
             // 1/sd * x - mean/sd where z-score(mean) = 0.
             // Note: There is no maximal value for z-score, but larger values get increasingly
             // unlikely.
-            float sd = statistics[metric].standard_deviation;
+            float sd = statistics[metric].StandardDeviation;
             if (sd == 0.0f)
             {
                 return 0;
             }
             else
             {
-                return (value - statistics[metric].mean) / sd;
+                return (value - statistics[metric].Mean) / sd;
             }
         }
 

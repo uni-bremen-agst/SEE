@@ -1,4 +1,4 @@
-﻿using SEE.Utils;
+﻿using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -51,9 +51,9 @@ namespace SEE.Game
             return new ColorRange(Color.white, Color.black, 10);
         }
 
-        private const string LowerLabel = "Lower";
-        private const string UpperLabel = "Upper";
-        private const string NumberOfColorsLabel = "NumberOfColors";
+        private const string lowerLabel = "Lower";
+        private const string upperLabel = "Upper";
+        private const string numberOfColorsLabel = "NumberOfColors";
 
         /// <summary>
         /// Saves this <see cref="ColorRange"/> using <paramref name="writer"/> under the given <paramref name="label"/>.
@@ -63,9 +63,9 @@ namespace SEE.Game
         internal void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(Lower, LowerLabel);
-            writer.Save(Upper, UpperLabel);
-            writer.Save((int)NumberOfColors, NumberOfColorsLabel);
+            writer.Save(Lower, lowerLabel);
+            writer.Save(Upper, upperLabel);
+            writer.Save((int)NumberOfColors, numberOfColorsLabel);
             writer.EndGroup();
         }
 
@@ -83,10 +83,10 @@ namespace SEE.Game
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
                 {
-                    ConfigIO.Restore(values, LowerLabel, ref Lower);
-                    ConfigIO.Restore(values, UpperLabel, ref Upper);
+                    ConfigIO.Restore(values, lowerLabel, ref Lower);
+                    ConfigIO.Restore(values, upperLabel, ref Upper);
                     long storedNumberOfColors = 0;
-                    if (ConfigIO.Restore(values, NumberOfColorsLabel, ref storedNumberOfColors))
+                    if (ConfigIO.Restore(values, numberOfColorsLabel, ref storedNumberOfColors))
                     {
                         NumberOfColors = (uint)storedNumberOfColors;
                     }

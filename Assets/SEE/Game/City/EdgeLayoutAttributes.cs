@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.Utils;
+using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -65,12 +65,12 @@ namespace SEE.Game.City
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(Kind.ToString(), EdgeLayoutLabel);
-            writer.Save(AnimationKind.ToString(), AnimationKindLabel);
-            writer.Save(AnimateInnerEdges, AnimateInnerEdgesLabel);
-            writer.Save(EdgeWidth, EdgeWidthLabel);
-            writer.Save(EdgesAboveBlocks, EdgesAboveBlocksLabel);
-            writer.Save(Tension, TensionLabel);
+            writer.Save(Kind.ToString(), edgeLayoutLabel);
+            writer.Save(AnimationKind.ToString(), animationKindLabel);
+            writer.Save(AnimateInnerEdges, animateInnerEdgesLabel);
+            writer.Save(EdgeWidth, edgeWidthLabel);
+            writer.Save(EdgesAboveBlocks, edgesAboveBlocksLabel);
+            writer.Save(Tension, tensionLabel);
             writer.EndGroup();
         }
 
@@ -80,20 +80,20 @@ namespace SEE.Game.City
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
-                ConfigIO.RestoreEnum(values, EdgeLayoutLabel, ref Kind);
-                ConfigIO.RestoreEnum(values, AnimationKindLabel, ref AnimationKind);
-                ConfigIO.Restore(values, AnimateInnerEdgesLabel, ref AnimateInnerEdges);
-                ConfigIO.Restore(values, EdgeWidthLabel, ref EdgeWidth);
-                ConfigIO.Restore(values, EdgesAboveBlocksLabel, ref EdgesAboveBlocks);
-                ConfigIO.Restore(values, TensionLabel, ref Tension);
+                ConfigIO.RestoreEnum(values, edgeLayoutLabel, ref Kind);
+                ConfigIO.RestoreEnum(values, animationKindLabel, ref AnimationKind);
+                ConfigIO.Restore(values, animateInnerEdgesLabel, ref AnimateInnerEdges);
+                ConfigIO.Restore(values, edgeWidthLabel, ref EdgeWidth);
+                ConfigIO.Restore(values, edgesAboveBlocksLabel, ref EdgesAboveBlocks);
+                ConfigIO.Restore(values, tensionLabel, ref Tension);
             }
         }
 
-        private const string EdgeLayoutLabel = "EdgeLayout";
-        private const string EdgeWidthLabel = "EdgeWidth";
-        private const string EdgesAboveBlocksLabel = "EdgesAboveBlocks";
-        private const string TensionLabel = "Tension";
-        private const string AnimationKindLabel = "AnimationKind";
-        private const string AnimateInnerEdgesLabel = "AnimateInnerEdges";
+        private const string edgeLayoutLabel = "EdgeLayout";
+        private const string edgeWidthLabel = "EdgeWidth";
+        private const string edgesAboveBlocksLabel = "EdgesAboveBlocks";
+        private const string tensionLabel = "Tension";
+        private const string animationKindLabel = "AnimationKind";
+        private const string animateInnerEdgesLabel = "AnimateInnerEdges";
     }
 }

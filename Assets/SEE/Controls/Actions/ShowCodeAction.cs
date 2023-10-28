@@ -3,14 +3,15 @@ using System.IO;
 using System.Linq;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.UI.Window.CodeWindow;
-using SEE.Game.UI.Notification;
+using SEE.UI.Window.CodeWindow;
+using SEE.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
 using SEE.DataModel.DG;
 using System;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions
 {
@@ -41,9 +42,9 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="ShowCodeAction"/>.
         /// </summary>
         /// <returns>new instance</returns>
-        public static ReversibleAction CreateReversibleAction() => new ShowCodeAction();
+        public static IReversibleAction CreateReversibleAction() => new ShowCodeAction();
 
-        public override ReversibleAction NewInstance() => CreateReversibleAction();
+        public override IReversibleAction NewInstance() => CreateReversibleAction();
 
         public override void Awake()
         {
@@ -57,13 +58,13 @@ namespace SEE.Controls.Actions
         public override void Start()
         {
             syncAction = new SyncWindowSpaceAction();
-            spaceManager.OnActiveWindowChanged.AddListener(() => syncAction.UpdateSpace(spaceManager[WindowSpaceManager.LOCAL_PLAYER]));
+            spaceManager.OnActiveWindowChanged.AddListener(() => syncAction.UpdateSpace(spaceManager[WindowSpaceManager.LocalPlayer]));
         }
 
         public override bool Update()
         {
             // Only allow local player to open new code windows
-            if (spaceManager.CurrentPlayer == WindowSpaceManager.LOCAL_PLAYER
+            if (spaceManager.CurrentPlayer == WindowSpaceManager.LocalPlayer
                 && SEEInput.Select()
                 && Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef graphElementRef) != HitGraphElement.None)
             {
@@ -105,12 +106,12 @@ namespace SEE.Controls.Actions
                 codeWindow.SolutionPath = city.SolutionPath.Path;
 
                 // Add code window to our space of code window, if it isn't in there yet
-                if (!spaceManager[WindowSpaceManager.LOCAL_PLAYER].Windows.Contains(codeWindow))
+                if (!spaceManager[WindowSpaceManager.LocalPlayer].Windows.Contains(codeWindow))
                 {
-                    spaceManager[WindowSpaceManager.LOCAL_PLAYER].AddWindow(codeWindow);
-                    codeWindow.ScrollEvent.AddListener(() => syncAction.UpdateSpace(spaceManager[WindowSpaceManager.LOCAL_PLAYER]));
+                    spaceManager[WindowSpaceManager.LocalPlayer].AddWindow(codeWindow);
+                    codeWindow.ScrollEvent.AddListener(() => syncAction.UpdateSpace(spaceManager[WindowSpaceManager.LocalPlayer]));
                 }
-                spaceManager[WindowSpaceManager.LOCAL_PLAYER].ActiveWindow = codeWindow;
+                spaceManager[WindowSpaceManager.LocalPlayer].ActiveWindow = codeWindow;
                 // TODO: Set font size etc in settings (maybe, or maybe that's too much)
             }
 
@@ -131,7 +132,7 @@ namespace SEE.Controls.Actions
                                                  targetAbsolutePlatformPath, targetStartLine, targetEndLine);
                 CodeWindow codeWindow = GetOrCreateCodeWindow(edge, graphElementRef, sourceFilename);
                 codeWindow.EnterFromText(diff, true);
-                codeWindow.VisibleLine = 1;
+                codeWindow.ScrolledVisibleLine = 1;
                 return codeWindow;
             }
 
@@ -215,7 +216,7 @@ namespace SEE.Controls.Actions
                 int? line = graphElement.SourceLine();
                 if (line.HasValue)
                 {
-                    codeWindow.VisibleLine = line.Value;
+                    codeWindow.ScrolledVisibleLine = line.Value;
                 }
                 else
                 {

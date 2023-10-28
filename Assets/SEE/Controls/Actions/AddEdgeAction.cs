@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 ﻿using SEE.Game;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
+using SEE.Utils.History;
 using System;
 using UnityEngine;
 using SEE.Audio;
@@ -21,7 +22,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="AddEdgeAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="AddEdgeAction"/></returns>
-        public static ReversibleAction CreateReversibleAction()
+        public static IReversibleAction CreateReversibleAction()
         {
             return new AddEdgeAction();
         }
@@ -30,7 +31,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="AddEdgeAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="AddEdgeAction"/></returns>
-        public override ReversibleAction NewInstance()
+        public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
         }
@@ -53,25 +54,25 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The source of the edge.
             /// </summary>
-            public GameObject from;
+            public GameObject From;
             /// <summary>
             /// The unique ID of the source of the edge. It may be needed
-            /// in situations in which <see cref="from"/> was destroyed.
+            /// in situations in which <see cref="From"/> was destroyed.
             /// </summary>
-            public readonly string fromID;
+            public readonly string FromID;
             /// <summary>
             /// The target of the edge.
             /// </summary>
-            public GameObject to;
+            public GameObject To;
             /// <summary>
             /// The unique ID of the target of the edge. It may be needed
-            /// in situations in which <see cref="to"/> was destroyed.
+            /// in situations in which <see cref="To"/> was destroyed.
             /// </summary>
-            public readonly string toID;
+            public readonly string ToID;
             /// <summary>
             /// The type of the edge.
             /// </summary>
-            public string edgeType;
+            public string EdgeType;
             /// <summary>
             /// Constructor.
             /// </summary>
@@ -80,11 +81,11 @@ namespace SEE.Controls.Actions
             /// <param name="edgeType">the edge type</param>
             public Memento(GameObject from, GameObject to, string edgeType)
             {
-                this.from = from;
-                this.fromID = from.name;
-                this.to = to;
-                this.toID = to.name;
-                this.edgeType = edgeType;
+                this.From = from;
+                this.FromID = from.name;
+                this.To = to;
+                this.ToID = to.name;
+                this.EdgeType = edgeType;
             }
         }
 
@@ -123,10 +124,10 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The default type of an added edge.
         /// </summary>
-        private const string DefaultEdgeType = Edge.SourceDependency;
+        private const string defaultEdgeType = Edge.SourceDependency;
 
         /// <summary>
-        /// <see cref="ReversibleAction.Update"/>.
+        /// <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
@@ -136,20 +137,18 @@ namespace SEE.Controls.Actions
             // Assigning the game objects to be connected.
             // Checking whether the two game objects are not null and whether they are
             // actually nodes.
-            // FIXME: Needs adaptation for VR where no mouse is available.
-            if (Input.GetMouseButtonDown(0)
-                && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
+            // FIXME: We need an interaction for VR, too.
+            if (HoveredObject != null && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI() && HoveredObject.HasNodeRef())
             {
-                GameObject hoveredObject = raycastHit.collider.gameObject;
                 if (from == null)
                 {
                     // No source selected yet; this interaction is meant to set the source.
-                    from = hoveredObject;
+                    from = HoveredObject;
                 }
                 else if (to == null)
                 {
                     // Source is already set; this interaction is meant to set the target.
-                    to = hoveredObject;
+                    to = HoveredObject;
                 }
             }
             // Note: from == to may be possible.
@@ -157,15 +156,15 @@ namespace SEE.Controls.Actions
             {
                 // We have both source and target of the edge.
                 // FIXME: In the future, we need to query the edge type from the user.
-                memento = new Memento(from, to, DefaultEdgeType);
+                memento = new Memento(from, to, defaultEdgeType);
                 createdEdge = CreateEdge(memento);
 
                 // action is completed (successfully or not; it does not matter)
                 from = null;
                 to = null;
                 result = createdEdge != null;
-                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NEW_EDGE_SOUND);
-                currentState = result ? ReversibleAction.Progress.Completed : ReversibleAction.Progress.NoEffect;
+                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound);
+                CurrentState = result ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
             }
             // Forget from and to upon user request.
             if (SEEInput.Unselect())
@@ -211,13 +210,13 @@ namespace SEE.Controls.Actions
             // were created. If that happened, the source and/or target in the
             // memento are already destroyed. We need to retrieve the new
             // game objects for these from the scene using their IDs.
-            if (memento.from == null)
+            if (memento.From == null)
             {
-                memento.from = GraphElementIDMap.Find(memento.fromID);
+                memento.From = GraphElementIDMap.Find(memento.FromID);
             }
-            if (memento.to == null)
+            if (memento.To == null)
             {
-                memento.to = GraphElementIDMap.Find(memento.toID);
+                memento.To = GraphElementIDMap.Find(memento.ToID);
             }
             try
             {
@@ -227,9 +226,9 @@ namespace SEE.Controls.Actions
                 /// will create a new unique id for the edge. If <see cref="CreateEdge(Memento)"/>
                 /// is called from <see cref="Redo"/>, <see cref="memento.edgeID"/> has
                 /// a valid edge id (set by the previous call to <see cref="CreateEdge(Memento)"/>.
-                GameObject result = GameEdgeAdder.Add(memento.from, memento.to, memento.edgeType);
+                GameObject result = GameEdgeAdder.Add(memento.From, memento.To, memento.EdgeType);
                 UnityEngine.Assertions.Assert.IsNotNull(result);
-                new AddEdgeNetAction(memento.from.name, memento.to.name, memento.edgeType).Execute();
+                new AddEdgeNetAction(memento.From.name, memento.To.name, memento.EdgeType).Execute();
                 return result;
             }
             catch (Exception e)
@@ -257,8 +256,8 @@ namespace SEE.Controls.Actions
         {
             return new HashSet<string>
             {
-                memento.from.name,
-                memento.to.name,
+                memento.From.name,
+                memento.To.name,
                 createdEdge.name
             };
         }

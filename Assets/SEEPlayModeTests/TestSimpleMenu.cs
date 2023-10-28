@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.TestTools;
 
-namespace SEE.Game.UI.Menu
+namespace SEE.UI.Menu
 {
     /// <summary>
     /// Test cases for <see cref="SimpleListMenu"/>.

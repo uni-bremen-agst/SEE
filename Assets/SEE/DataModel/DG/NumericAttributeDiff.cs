@@ -6,7 +6,7 @@ namespace SEE.DataModel.DG
     /// Allows one to determine whether there is any difference between two
     /// graph elements in terms of selected numeric attributes.
     /// </summary>
-    public class NumericAttributeDiff : GraphElementDiff
+    public class NumericAttributeDiff : IGraphElementDiff
     {
         /// <summary>
         /// Constructor.
@@ -33,7 +33,7 @@ namespace SEE.DataModel.DG
         /// <param name="left">left graph element to be compared</param>
         /// <param name="right">right graph element to be compared</param>
         /// <returns>true if there is any difference</returns>
-        bool GraphElementDiff.AreDifferent(GraphElement left, GraphElement right)
+        bool IGraphElementDiff.AreDifferent(GraphElement left, GraphElement right)
         {
             if (left == null)
             {

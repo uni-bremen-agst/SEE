@@ -82,14 +82,14 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Subgraph the <see cref="Element"/> was expected to be in.
         /// </summary>
-        public readonly ReflexionSubgraph ExpectedSubgraph;
+        public readonly ReflexionSubgraphs ExpectedSubgraph;
 
         /// <summary>
         /// The graph element that was not contained in <see cref="ExpectedSubgraph"/>.
         /// </summary>
         public readonly GraphElement Element;
 
-        public NotInSubgraphException(ReflexionSubgraph expectedSubgraph, GraphElement element)
+        public NotInSubgraphException(ReflexionSubgraphs expectedSubgraph, GraphElement element)
             : base($"Given {element.GetType().Name} '{element.ToShortString()}' must be contained in the {expectedSubgraph} graph!")
         {
             ExpectedSubgraph = expectedSubgraph;

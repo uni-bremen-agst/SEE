@@ -1,6 +1,6 @@
 ﻿using System;
 using SEE.Controls;
-using SEE.Game.UI.Window;
+using SEE.UI.Window;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -15,7 +15,7 @@ namespace SEE.Net.Actions
         /// The value object of the window space which shall be transmitted over the network.
         /// </summary>
         [field: SerializeField]
-        private WindowSpace.WindowSpaceValues Space;
+        private WindowSpace.WindowSpaceValues space;
 
         /// <summary>
         /// For the given <paramref name="space"/>, create a value object, and depending on <paramref name="execute"/>,
@@ -30,7 +30,7 @@ namespace SEE.Net.Actions
                 return;
             }
 
-            Space = space.ToValueObject();
+            this.space = space.ToValueObject();
 
             if (execute)
             {
@@ -53,7 +53,7 @@ namespace SEE.Net.Actions
                     return;
                 }
 
-                WindowSpaceManager.ManagerInstance.UpdateSpaceFromValueObject(RequesterIPAddress, Space);
+                WindowSpaceManager.ManagerInstance.UpdateSpaceFromValueObject(RequesterIPAddress, space);
             }
         }
     }

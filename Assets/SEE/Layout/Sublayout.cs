@@ -71,12 +71,12 @@ namespace SEE.Layout
         /// <summary>
         /// A Mapping from ILayoutNodes to ILayoutSublayoutNodes
         /// </summary>
-        private readonly Dictionary<ILayoutNode, LayoutSublayoutNode> ILayout_to_CoseSublayoutNode = new Dictionary<ILayoutNode, LayoutSublayoutNode>();
+        private readonly Dictionary<ILayoutNode, LayoutSublayoutNode> iLayoutToCoseSublayoutNode = new();
 
         /// <summary>
         /// abstract see city settings
         /// </summary>
-        public AbstractSEECity settings;
+        public AbstractSEECity Settings;
 
         /// <summary>
         /// the edges of the sublayout
@@ -102,7 +102,7 @@ namespace SEE.Layout
             this.groundLevel = groundLevel;
             this.sublayout = sublayout;
             this.graph = graph;
-            this.settings = settings;
+            this.Settings = settings;
 
             if (sublayout.Node.Children().Count > 0)
             {
@@ -136,14 +136,14 @@ namespace SEE.Layout
             }
             else
             {
-                sublayoutNodes.Add(new LayoutSublayoutNode(sublayout.Node, ILayout_to_CoseSublayoutNode));
+                sublayoutNodes.Add(new LayoutSublayoutNode(sublayout.Node, iLayoutToCoseSublayoutNode));
 
                 // bei einem subsubLayout wird der root wieder hinzugefügt
                 foreach (ILayoutNode node in sublayout.RemovedChildren)
                 {
                     if (node.IsSublayoutRoot)
                     {
-                        sublayoutNodes.Add(new LayoutSublayoutNode(node, new List<ILayoutNode>(), true, node.Parent, node.Sublayout.layoutScale, ILayout_to_CoseSublayoutNode));
+                        sublayoutNodes.Add(new LayoutSublayoutNode(node, new List<ILayoutNode>(), true, node.Parent, node.Sublayout.layoutScale, iLayoutToCoseSublayoutNode));
                     }
                 }
             }
@@ -160,7 +160,7 @@ namespace SEE.Layout
             List<ILayoutNode> sublayoutNodes = new List<ILayoutNode>();
             layoutNodes.ForEach(layoutNode =>
             {
-                sublayoutNodes.Add(new LayoutSublayoutNode(layoutNode, ILayout_to_CoseSublayoutNode));
+                sublayoutNodes.Add(new LayoutSublayoutNode(layoutNode, iLayoutToCoseSublayoutNode));
             });
 
             return sublayoutNodes;
@@ -180,13 +180,13 @@ namespace SEE.Layout
                 ILayoutNode sublayoutNode = (layoutNode as LayoutSublayoutNode).Node;
                 NodeTransform transform = layout[layoutNode];
 
-                Vector3 position = transform.position;
-                Vector3 scale = transform.scale;
+                Vector3 position = transform.Position;
+                Vector3 scale = transform.Scale;
 
                 sublayoutNode.RelativePosition = position;
                 sublayoutNode.CenterPosition = position;
                 sublayoutNode.LocalScale = scale;
-                sublayoutNode.Rotation = transform.rotation;
+                sublayoutNode.Rotation = transform.Rotation;
 
                 if (sublayoutNode.IsSublayoutRoot)
                 {
@@ -207,7 +207,7 @@ namespace SEE.Layout
                                 subSubNode.SetOrigin();
                                 subSubNode.RelativePosition = subSubNode.CenterPosition;
 
-                                sublayoutNodes.Add(new LayoutSublayoutNode(subSubNode, ILayout_to_CoseSublayoutNode));
+                                sublayoutNodes.Add(new LayoutSublayoutNode(subSubNode, iLayoutToCoseSublayoutNode));
 
                             }
                         }
@@ -311,7 +311,7 @@ namespace SEE.Layout
         /// <returns>a mapping from iLayoutNode to the calcualted nodeTransform</returns>
         private Dictionary<ILayoutNode, NodeTransform> CalculateSublayout()
         {
-            NodeLayout layout = CoseHelper.GetNodelayout(nodeLayout, groundLevel, settings);
+            NodeLayout layout = CoseHelper.GetNodelayout(nodeLayout, groundLevel, Settings);
             if (layout.UsesEdgesAndSublayoutNodes())
             {
                 return layout.Layout(sublayoutNodes, edges, new List<SublayoutLayoutNode>());

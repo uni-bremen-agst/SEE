@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using SEE.Game.UI.Window.CodeWindow;
+using SEE.UI.Window.CodeWindow;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -248,7 +248,7 @@ namespace SEE.Utils
         /// <summary>
         /// A buffer to reduce the initial network traffic when oppening a file.
         /// </summary>
-        public string networkbuffer = "";
+        public string Networkbuffer = "";
 
         /// <summary>
         /// The site ID, that is, the user that inserted the character.
@@ -263,7 +263,7 @@ namespace SEE.Utils
         /// <summary>
         /// Broadcasts if there is a change in the CRDT via the network.
         /// </summary>
-        public UnityEvent<char, int, CodeWindow.OperationType> changeEvent = new();
+        public UnityEvent<char, int, CodeWindow.OperationType> ChangeEvent = new();
 
         /// <summary>
         /// Constructs a CRDT.
@@ -317,15 +317,15 @@ namespace SEE.Utils
         /// <param name="text">The remote changes as a string.</param>
         public void RemoteAddString(string text)
         {
-            bool CharSet = false;
+            bool charSet = false;
             char ch = '\0';
             string tmpPos = "";
             foreach (char c in text)
             {
-                if (!CharSet)
+                if (!charSet)
                 {
                     ch = c;
-                    CharSet = true;
+                    charSet = true;
                 }
                 else
                 {
@@ -334,7 +334,7 @@ namespace SEE.Utils
                         RemoteAddChar(ch, StringToPosition(tmpPos));
                         tmpPos = "";
                         ch = '\0';
-                        CharSet = false;
+                        charSet = false;
                         continue;
                     }
 
@@ -370,7 +370,7 @@ namespace SEE.Utils
                 if (crdt.Count == 0)
                 {
                     crdt.Add(new CharObj(c, position));
-                    changeEvent.Invoke(c, crdt.Count - 1, CodeWindow.OperationType.Add);
+                    ChangeEvent.Invoke(c, crdt.Count - 1, CodeWindow.OperationType.Add);
                     return;
                 }
 
@@ -383,12 +383,12 @@ namespace SEE.Utils
                 if (insertIdx >= crdt.Count)
                 {
                     crdt.Add(new CharObj(c, position));
-                    changeEvent.Invoke(c, insertIdx, CodeWindow.OperationType.Add);
+                    ChangeEvent.Invoke(c, insertIdx, CodeWindow.OperationType.Add);
                     return;
                 }
 
                 crdt.Insert(insertIdx, new CharObj(c, position));
-                changeEvent.Invoke(c, insertIdx, CodeWindow.OperationType.Add);
+                ChangeEvent.Invoke(c, insertIdx, CodeWindow.OperationType.Add);
             }
             else
             {
@@ -406,7 +406,7 @@ namespace SEE.Utils
             (int, CharObj) found = Find(position);
             if (-1 < found.Item1)
             {
-                changeEvent.Invoke(' ', found.Item1, CodeWindow.OperationType.Delete);
+                ChangeEvent.Invoke(' ', found.Item1, CodeWindow.OperationType.Delete);
                 crdt.RemoveAt(found.Item1);
             }
             else
@@ -511,7 +511,7 @@ namespace SEE.Utils
             }
             else
             {
-                new NetCRDT().AddString(networkbuffer, filename);
+                new NetCRDT().AddString(Networkbuffer, filename);
             }
         }
 
@@ -552,7 +552,7 @@ namespace SEE.Utils
 
             if (startUp)
             {
-                networkbuffer += addition + PositionToString(position) + "\n";
+                Networkbuffer += addition + PositionToString(position) + "\n";
             }
             else
             {
@@ -612,7 +612,7 @@ namespace SEE.Utils
         /// <returns>-1 if <paramref name="first"/> < <paramref name="second"/>;
         /// 0 if <paramref name="first"/> == <paramref name="second"/>;
         /// 1 if <paramref name="first"/> > <paramref name="second"/></returns>
-        public int CompareIdentifier(Identifier first, Identifier second)
+        public static int CompareIdentifier(Identifier first, Identifier second)
         {
             if (first.GetDigit() < second.GetDigit())
             {
@@ -764,7 +764,7 @@ namespace SEE.Utils
         /// <param name="value">The value that should be incremented</param>
         /// <param name="delta">The referenze size</param>
         /// <returns>The incremented value</returns>
-        private int[] Increment(int[] value, int[] delta)
+        private static int[] Increment(int[] value, int[] delta)
         {
             int[] tmp = { 0, 1 };
             IEnumerable<int> incE = delta.Take(Array.FindIndex(delta, x => x != 0)).Concat(tmp);
@@ -967,7 +967,7 @@ namespace SEE.Utils
                         int idx = GetIndexByPosition(c.GetIdentifier());
                         if (idx > -1)
                         {
-                            changeEvent.Invoke(' ', idx, CodeWindow.OperationType.Delete);
+                            ChangeEvent.Invoke(' ', idx, CodeWindow.OperationType.Delete);
                             DeleteChar(idx);
                         }
                         else
@@ -1009,7 +1009,7 @@ namespace SEE.Utils
                         int idx = GetIndexByPosition(c.GetIdentifier());
                         if (idx > -1)
                         {
-                            changeEvent.Invoke(' ', idx, CodeWindow.OperationType.Delete);
+                            ChangeEvent.Invoke(' ', idx, CodeWindow.OperationType.Delete);
                             DeleteChar(idx);
                         }
                         else
@@ -1048,7 +1048,7 @@ namespace SEE.Utils
             }
 
             new NetCRDT().AddChar(c.GetValue(), c.GetIdentifier(), filename);
-            changeEvent.Invoke(c.GetValue(), index, CodeWindow.OperationType.Add);
+            ChangeEvent.Invoke(c.GetValue(), index, CodeWindow.OperationType.Add);
         }
 
         /// <summary>
@@ -1074,11 +1074,11 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Transforms a string into a position-
+        /// Transforms a string into a position.
         /// </summary>
-        /// <param name="s">The string contianing the position</param>
+        /// <param name="s">The string containing the position</param>
         /// <returns>a position - Identifier[]</returns>
-        public Identifier[] StringToPosition(string s)
+        public static Identifier[] StringToPosition(string s)
         {
             if (string.IsNullOrEmpty(s))
             {
@@ -1145,7 +1145,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="position">The position that should be converted to a string</param>
         /// <returns>A string of a position</returns>
-        public string PositionToString(Identifier[] position)
+        public static string PositionToString(Identifier[] position)
         {
             if (position == null)
             {

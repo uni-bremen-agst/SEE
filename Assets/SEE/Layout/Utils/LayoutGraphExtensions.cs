@@ -45,16 +45,16 @@ namespace SEE.Layout.Utils
         }
 
         /// <summary>
-        /// Returns true if there is a node with the given <paramref name="ID"/> contained in <paramref name="layoutNodes"/>.
+        /// Returns true if there is a node with the given <paramref name="id"/> contained in <paramref name="layoutNodes"/>.
         /// </summary>
-        /// <param name="ID">the requested node ID</param>
+        /// <param name="id">the requested node ID</param>
         /// <param name="layoutNodes">the set of nodes for which to determine whether they have a matching ID</param>
-        /// <returns>true if the node with the given <paramref name="ID"/> is contained in <paramref name="layoutNodes"/></returns>
-        private static bool FilterListForLayoutNode(string ID, ICollection<ILayoutNode> layoutNodes)
+        /// <returns>true if the node with the given <paramref name="id"/> is contained in <paramref name="layoutNodes"/></returns>
+        private static bool FilterListForLayoutNode(string id, ICollection<ILayoutNode> layoutNodes)
         {
             foreach (ILayoutNode gameNode in layoutNodes)
             {
-                if (gameNode.ID == ID)
+                if (gameNode.ID == id)
                 {
                     return true;
                 }

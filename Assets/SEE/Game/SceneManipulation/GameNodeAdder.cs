@@ -21,10 +21,10 @@ namespace SEE.Game.SceneManipulation
         /// <returns>new graph node</returns>
         private static Node NewGraphNode(string nodeID)
         {
-            string ID = string.IsNullOrEmpty(nodeID) ? Guid.NewGuid().ToString() : nodeID;
+            string id = string.IsNullOrEmpty(nodeID) ? Guid.NewGuid().ToString() : nodeID;
             return new Node()
             {
-                ID = ID,
+                ID = id,
                 SourceName = string.Empty,
                 Type = Graph.UnknownType
             };

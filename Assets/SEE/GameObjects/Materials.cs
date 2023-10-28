@@ -28,25 +28,25 @@ namespace SEE.GO
         /// <summary>
         /// Name of the material for opaque objects (located in folder Resources).
         /// </summary>
-        private const string OpaqueMaterialName = "Materials/OpaquePortalMaterial";
+        private const string opaqueMaterialName = "Materials/OpaquePortalMaterial";
         /// <summary>
         /// Name of the material for transparent lines (located in folder Resources).
         /// </summary>
-        private const string TransparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
+        private const string transparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
         /// <summary>
         /// Name of the material for opaque, metallic meshes (located in folder Resources).
         /// </summary>
-        private const string OpaqueMetallicMaterialName = "Materials/SEEMaterial";
+        private const string opaqueMetallicMaterialName = "Materials/SEEMaterial";
         /// <summary>
         /// Name of the material for materials seen everywhere, i.e., not only within a portal
         /// (located in folder Resources).
         /// </summary>
-        private const string PortalFreeMaterialName = "Materials/PortalFreeMaterial";
+        private const string portalFreeMaterialName = "Materials/PortalFreeMaterial";
 
         /// <summary>
         /// The id of the shader property for the texture.
         /// </summary>
-        private static readonly int TexturePropertyID = Shader.PropertyToID("_Texture");
+        private static readonly int texturePropertyID = Shader.PropertyToID("_Texture");
 
         /// <summary>
         /// The type of the shaders of this material instance.
@@ -192,24 +192,24 @@ namespace SEE.GO
         /// <param name="material">material to which a texture should be added</param>
         private static void AddTexture(Material material)
         {
-            if (material.HasProperty(TexturePropertyID))
+            if (material.HasProperty(texturePropertyID))
             {
                 if (false)
                 {
-                    material.SetTexture(TexturePropertyID, NewTexture());
+                    material.SetTexture(texturePropertyID, NewTexture());
                 }
                 else
                 {
-                    const string TextureName = "Textures/TestTexture";
-                    Texture texture = Resources.Load<Texture>(TextureName);
+                    const string textureName = "Textures/TestTexture";
+                    Texture texture = Resources.Load<Texture>(textureName);
                     if (texture == null)
                     {
-                        Debug.LogError($"No such texture {TextureName}\n");
+                        Debug.LogError($"No such texture {textureName}\n");
                     }
                     else
                     {
                         //Debug.Log($"_Texture: {texture.name}\n");
-                        material.SetTexture(TexturePropertyID, texture);
+                        material.SetTexture(texturePropertyID, texture);
                     }
                 }
             }
@@ -224,9 +224,9 @@ namespace SEE.GO
         /// <param name="texture">texture to be added; can be null</param>
         private static void AddTexture(Material material, Texture texture)
         {
-            if (texture != null && material.HasProperty(TexturePropertyID))
+            if (texture != null && material.HasProperty(texturePropertyID))
             {
-                material.SetTexture(TexturePropertyID, texture);
+                material.SetTexture(texturePropertyID, texture);
             }
         }
 
@@ -310,16 +310,16 @@ namespace SEE.GO
             switch (shaderType)
             {
                 case ShaderType.Opaque:
-                    name = OpaqueMaterialName;
+                    name = opaqueMaterialName;
                     break;
                 case ShaderType.TransparentLine:
-                    name = TransparentLineMaterialName;
+                    name = transparentLineMaterialName;
                     break;
                 case ShaderType.OpaqueMetallic:
-                    name = OpaqueMetallicMaterialName;
+                    name = opaqueMetallicMaterialName;
                     break;
                 case ShaderType.PortalFree:
-                    name = PortalFreeMaterialName;
+                    name = portalFreeMaterialName;
                     break;
                 default:
                     Assertions.InvalidCodePath();

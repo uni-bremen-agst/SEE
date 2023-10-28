@@ -270,7 +270,7 @@ namespace SEE.Tools.Architecture
         private void CommonImplicitlyAllowed(Node fromImpl, Node toImpl)
         {
             // 1 propagated edge
-            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
 
             // 1 implicitly allowed propagated dependency
             Assert.That(IsImplicitlyAllowed(fromImpl, toImpl, call));
@@ -283,7 +283,7 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeChange>(5);
 
             // 0 removed edges
-            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);
         }
 
         [Test]
@@ -333,7 +333,7 @@ namespace SEE.Tools.Architecture
         private void CommonHierarchyAccess()
         {
             // 1 propagated edges
-            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
 
             // 4 absences
             Assert.That(IsAbsent(N2, N1, call));
@@ -344,7 +344,7 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeChange>(5);
 
             // 0 removed edges
-            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);
         }
 
         [Test]
@@ -413,7 +413,7 @@ namespace SEE.Tools.Architecture
             graph.RunAnalysis();
 
             // 4 propagated edges
-            AssertEventCountEquals<EdgeEvent>(4, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(4, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
 
             // 4 convergences
             Assert.That(IsConvergent(N2, N1, call));
@@ -433,7 +433,7 @@ namespace SEE.Tools.Architecture
             
             AssertEventCountEquals<EdgeChange>(9);
             // 0 removed edges
-            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);
         }
 
         [Test]
@@ -443,7 +443,7 @@ namespace SEE.Tools.Architecture
             graph.RunAnalysis();
 
             // 1 propagated edges
-            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
 
             // 1 convergences
             Assert.That(IsConvergent(N2, N1, call));
@@ -456,13 +456,13 @@ namespace SEE.Tools.Architecture
             // 0 divergences
             AssertEventCountEquals<EdgeChange>(5);
             // 0 removed edges
-            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);
         }
 
         private void CommonTestConvergences345()
         {
             // 1 propagated edges
-            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
 
             // 1 convergences
             Assert.That(IsConvergent(N2, N1, call));
@@ -473,7 +473,7 @@ namespace SEE.Tools.Architecture
             // 0 divergences
             AssertEventCountEquals<EdgeChange>(5);
             // 0 removed edges
-            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);
         }
 
         [Test]
@@ -519,7 +519,7 @@ namespace SEE.Tools.Architecture
         private void CommonAbsences(int divergences = 1)
         {
             // 1 propagated edges
-            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(1, ChangeType.Addition, ReflexionSubgraphs.Architecture, ignorePropagated: false);
 
             // 4 absences
             Assert.That(IsAbsent(N2, N1, call));
@@ -530,7 +530,7 @@ namespace SEE.Tools.Architecture
             AssertEventCountEquals<EdgeChange>(4 + divergences);
 
             // 0 removed edges
-            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraph.Architecture, ignorePropagated: false);
+            AssertEventCountEquals<EdgeEvent>(0, ChangeType.Removal, ReflexionSubgraphs.Architecture, ignorePropagated: false);
         }
 
         [Test]

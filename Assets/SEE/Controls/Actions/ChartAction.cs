@@ -28,16 +28,16 @@ namespace SEE.Controls.Actions
     /// </summary>
     public abstract class ChartAction : MonoBehaviour
     {
-        [HideInInspector] public float move;
+        [HideInInspector] public float Move;
 
         /// <summary>
         /// Click was false in the last update and true in this update.
         /// </summary>
-        [HideInInspector] public bool clickDown;
+        [HideInInspector] public bool ClickDown;
 
         /// <summary>
         /// Click was true in the last update and false in this update.
         /// </summary>
-        [HideInInspector] public bool clickUp;
+        [HideInInspector] public bool ClickUp;
     }
 }

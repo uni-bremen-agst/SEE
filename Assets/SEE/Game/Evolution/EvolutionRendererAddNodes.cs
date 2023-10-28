@@ -2,6 +2,7 @@
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Layout;
+using SEE.Utils;
 using Sirenix.Utilities;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -53,7 +54,7 @@ namespace SEE.Game.Evolution
                 // A new node has no layout applied to it yet.
                 // If the node is new, we animate it by moving it out from the sky.
                 Vector3 initialPosition = layoutNode.CenterPosition;
-                initialPosition.y = SkyLevel + layoutNode.AbsoluteScale.y;
+                initialPosition.y = skyLevel + layoutNode.AbsoluteScale.y;
                 gameNode.transform.position = initialPosition;
 
                 gameNode.SetAbsoluteScale(layoutNode.AbsoluteScale, animate: false);
@@ -62,9 +63,9 @@ namespace SEE.Game.Evolution
                 // in a code city though; otherwise the NodeOperator would not work.
                 gameNode.transform.SetParent(gameObject.transform);
 
-                gameNode.AddOrGetComponent<NodeOperator>()
-                    .MoveTo(layoutNode.CenterPosition, AnimationLagFactor, updateEdges: false)
-                    .SetOnComplete(animationWatchDog.Finished);
+                gameNode.NodeOperator()
+                        .MoveTo(layoutNode.CenterPosition, AnimationLagFactor, updateEdges: false)
+                        .OnComplete(animationWatchDog.Finished);
             }
         }
     }

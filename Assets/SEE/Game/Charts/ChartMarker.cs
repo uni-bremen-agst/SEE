@@ -38,7 +38,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// The chart content, on which this marker is displayed.
         /// </summary>
-        [HideInInspector] public ChartContent chartContent;
+        [HideInInspector] public ChartContent ChartContent;
 
         /// <summary>
         /// The icon of the marker.
@@ -59,12 +59,12 @@ namespace SEE.Game.Charts
         /// <summary>
         /// The ids of the handled <see cref="InteractableObject"/>.
         /// </summary>
-        public readonly List<string> ids = new List<string>();
+        public readonly List<string> Ids = new();
 
         /// <summary>
         /// The ids of the hovered or selected handled <see cref="InteractableObject"/>.
         /// </summary>
-        public readonly HashSet<string> hoveredOrSelectedIds = new HashSet<string>();
+        public readonly HashSet<string> HoveredOrSelectedIds = new();
 
         /// <summary>
         /// Dictionary converts between <see cref="InteractableObject.name"/> and the
@@ -97,10 +97,10 @@ namespace SEE.Game.Charts
 
         internal void OnDestroy()
         {
-            foreach (string id in ids)
+            foreach (string id in Ids)
             {
                 InteractableObject o = InteractableObject.Get(id);
-                chartContent.DetachShowInChartCallbackFn(o, OnShowInChartEvent);
+                ChartContent.DetachShowInChartCallbackFn(o, OnShowInChartEvent);
                 o.HoverIn -= OnHoverIn;
                 o.HoverOut -= OnHoverOut;
                 o.SelectIn -= OnSelectIn;
@@ -109,8 +109,8 @@ namespace SEE.Game.Charts
             selectedCount = 0;
             showInChartCount = 0;
             id2TextDict.Clear();
-            hoveredOrSelectedIds.Clear();
-            ids.Clear();
+            HoveredOrSelectedIds.Clear();
+            Ids.Clear();
         }
 
         /// <summary>
@@ -120,15 +120,15 @@ namespace SEE.Game.Charts
         /// <param name="infoText">The text to be displayed for the given object.</param>
         public void PushInteractableObject(InteractableObject o, string infoText)
         {
-            Assert.IsTrue(!ids.Contains(o.name));
+            Assert.IsTrue(!Ids.Contains(o.name));
 
-            ids.Add(o.name);
+            Ids.Add(o.name);
             if (o.IsHovered || o.IsSelected)
             {
-                hoveredOrSelectedIds.Add(o.name);
+                HoveredOrSelectedIds.Add(o.name);
             }
             id2TextDict.Add(o.name, infoText);
-            if (chartContent.ShowInChart(o))
+            if (ChartContent.ShowInChart(o))
             {
                 showInChartCount++;
             }
@@ -138,7 +138,7 @@ namespace SEE.Game.Charts
             o.SelectIn += OnSelectIn;
             o.SelectOut += OnSelectOut;
 
-            chartContent.AttachShowInChartCallbackFn(o, OnShowInChartEvent);
+            ChartContent.AttachShowInChartCallbackFn(o, OnShowInChartEvent);
 
             // Note: This if-else-statepent only works, because 'OnSelectIn' does everything
             // 'OnHoverIn' does, but more.
@@ -161,23 +161,23 @@ namespace SEE.Game.Charts
         /// </summary>
         private void UpdateInfoText()
         {
-            bool showInfoText = hoveredOrSelectedIds.Count > 0;
+            bool showInfoText = HoveredOrSelectedIds.Count > 0;
             infoText.gameObject.SetActive(showInfoText);
             if (showInfoText)
             {
                 sharedStringBuilder.Clear();
                 int count = 0;
                 const int maxLines = 3;
-                foreach (string id in hoveredOrSelectedIds)
+                foreach (string id in HoveredOrSelectedIds)
                 {
                     InteractableObject o = InteractableObject.Get(id);
-                    bool showInChart = chartContent.ShowInChart(o);
+                    bool showInChart = ChartContent.ShowInChart(o);
                     if (showInChart)
                     {
-                        if (hoveredOrSelectedIds.Count > maxLines && ++count == maxLines)
+                        if (HoveredOrSelectedIds.Count > maxLines && ++count == maxLines)
                         {
                             sharedStringBuilder.Append("and ");
-                            sharedStringBuilder.Append((hoveredOrSelectedIds.Count - maxLines + 1).ToString());
+                            sharedStringBuilder.Append((HoveredOrSelectedIds.Count - maxLines + 1).ToString());
                             sharedStringBuilder.Append(" more...");
                             break;
                         }
@@ -215,10 +215,10 @@ namespace SEE.Game.Charts
                     InteractableObject.UnselectAll(true);
                 }
 
-                foreach (string id in ids)
+                foreach (string id in Ids)
                 {
                     InteractableObject o = InteractableObject.Get(id);
-                    if (chartContent.ShowInChart(o))
+                    if (ChartContent.ShowInChart(o))
                     {
                         o.SetSelect(!o.IsSelected, true);
                     }
@@ -234,7 +234,7 @@ namespace SEE.Game.Charts
         /// <param name="eventData">Ignored.</param>
         public void OnPointerEnter(PointerEventData eventData)
         {
-            foreach (string id in ids)
+            foreach (string id in Ids)
             {
                 InteractableObject o = InteractableObject.Get(id);
                 o.SetHoverFlag(HoverFlag.ChartMarker, true, true);
@@ -249,7 +249,7 @@ namespace SEE.Game.Charts
         /// <param name="eventData">Ignored.</param>
         public void OnPointerExit(PointerEventData eventData)
         {
-            foreach (string id in ids)
+            foreach (string id in Ids)
             {
                 InteractableObject o = InteractableObject.Get(id);
                 o.SetHoverFlag(HoverFlag.ChartMarker, false, true);
@@ -271,7 +271,7 @@ namespace SEE.Game.Charts
         {
             if (!interactableObject.IsSelected)
             {
-                hoveredOrSelectedIds.Add(interactableObject.name);
+                HoveredOrSelectedIds.Add(interactableObject.name);
             }
             UpdateInfoText();
         }
@@ -287,7 +287,7 @@ namespace SEE.Game.Charts
         {
             if (!interactableObject.IsSelected)
             {
-                hoveredOrSelectedIds.Remove(interactableObject.name);
+                HoveredOrSelectedIds.Remove(interactableObject.name);
             }
             UpdateInfoText();
         }
@@ -304,7 +304,7 @@ namespace SEE.Game.Charts
             selectedCount++;
             if (!interactableObject.IsHovered)
             {
-                hoveredOrSelectedIds.Add(interactableObject.name);
+                HoveredOrSelectedIds.Add(interactableObject.name);
             }
             UpdateInfoText();
             markerHighlight.SetActive(true);
@@ -323,7 +323,7 @@ namespace SEE.Game.Charts
             selectedCount--;
             if (!interactableObject.IsHovered)
             {
-                hoveredOrSelectedIds.Remove(interactableObject.name);
+                HoveredOrSelectedIds.Remove(interactableObject.name);
             }
             UpdateInfoText();
             markerHighlight.SetActive(selectedCount > 0);
@@ -331,7 +331,7 @@ namespace SEE.Game.Charts
 
         /// <summary>
         /// Called by <see cref="ChartContent.ShowInChartCallbackFn"/>, if one of the
-        /// <see cref="InteractableObject"/>s with the <see cref="ids"/> should be shown
+        /// <see cref="InteractableObject"/>s with the <see cref="Ids"/> should be shown
         /// or should no longer be shown within the chart.
         /// </summary>
         private void OnShowInChartEvent(bool value)

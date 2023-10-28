@@ -3,12 +3,12 @@ using System.Runtime.Serialization;
 using UnityEngine;
 
 /// <summary>
-/// A dictionary that can be serialized by Unity. 
-/// 
+/// A dictionary that can be serialized by Unity.
+///
 /// How to use it:
-/// 
+///
 /// For primitive keys and values:
-/// 
+///
 /// Create a SerializableDictionary subclass
 ///  [System.Serializable]
 ///  public class StringStringDictionary : SerializableDictionary<string, string>  {}
@@ -16,22 +16,22 @@ using UnityEngine;
 /// Declare attributes of that type that are to be serialized as serialized field as follows:
 ///  [UnityEngine.SerializeField]
 ///  private StringStringDictionary stringDict = new StringStringDictionary();
-///  
+///
 /// For types that are not serialized by Unity directly:
-/// 
+///
 ///   E.g., to create a serializable dictionary of type <string, List<Color>>:
-/// 
+///
 ///   Create a SerializableDictionary.Storage subclass to hold the list
 ///     [Serializable]
 ///     public class ColorListStorage : SerializableDictionary.Storage<List<Color>> {}
-///   
+///
 ///   Create a SerializableDictionary subclass using the previous subclass
 ///     [Serializable]
 ///     public class StringColorListDictionary : SerializableDictionary<string, List<Color>, ColorListStorage> {}
-///    
+///
 /// Note: This code stems from https://assetstore.unity.com/packages/tools/integration/serializabledictionary-90477
 /// and was published under the MIT license.
-/// 
+///
 /// </summary>
 /// <typeparam name="TKey">key of the dictionary</typeparam>
 /// <typeparam name="TValue">value of the dictionary</typeparam>
@@ -39,9 +39,9 @@ using UnityEngine;
 public abstract class SerializableDictionaryBase<TKey, TValue, TValueStorage> : Dictionary<TKey, TValue>, ISerializationCallbackReceiver
 {
     [SerializeField]
-    private TKey[] m_keys;
+    private TKey[] keys;
     [SerializeField]
-    private TValueStorage[] m_values;
+    private TValueStorage[] values;
 
     public SerializableDictionaryBase()
     {
@@ -71,17 +71,17 @@ public abstract class SerializableDictionaryBase<TKey, TValue, TValueStorage> : 
 
     public void OnAfterDeserialize()
     {
-        if (m_keys != null && m_values != null && m_keys.Length == m_values.Length)
+        if (keys != null && values != null && keys.Length == values.Length)
         {
             Clear();
-            int n = m_keys.Length;
+            int n = keys.Length;
             for (int i = 0; i < n; ++i)
             {
-                this[m_keys[i]] = GetValue(m_values, i);
+                this[keys[i]] = GetValue(values, i);
             }
 
-            m_keys = null;
-            m_values = null;
+            keys = null;
+            values = null;
         }
 
     }
@@ -89,14 +89,14 @@ public abstract class SerializableDictionaryBase<TKey, TValue, TValueStorage> : 
     public void OnBeforeSerialize()
     {
         int n = Count;
-        m_keys = new TKey[n];
-        m_values = new TValueStorage[n];
+        keys = new TKey[n];
+        values = new TValueStorage[n];
 
         int i = 0;
         foreach (KeyValuePair<TKey, TValue> kvp in this)
         {
-            m_keys[i] = kvp.Key;
-            SetValue(m_values, i, kvp.Value);
+            keys[i] = kvp.Key;
+            SetValue(values, i, kvp.Value);
             ++i;
         }
     }
@@ -129,7 +129,7 @@ public static class SerializableDictionary
 {
     public class Storage<T>
     {
-        public T data;
+        public T Data;
     }
 }
 
@@ -147,12 +147,12 @@ public class SerializableDictionary<TKey, TValue, TValueStorage> : SerializableD
 
     protected override TValue GetValue(TValueStorage[] storage, int i)
     {
-        return storage[i].data;
+        return storage[i].Data;
     }
 
     protected override void SetValue(TValueStorage[] storage, int i, TValue value)
     {
         storage[i] = new TValueStorage();
-        storage[i].data = value;
+        storage[i].Data = value;
     }
 }

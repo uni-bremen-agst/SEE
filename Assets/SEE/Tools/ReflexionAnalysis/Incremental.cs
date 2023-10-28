@@ -6,7 +6,7 @@ using JetBrains.Annotations;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using UnityEngine.Assertions;
-using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraph;
+using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraphs;
 
 namespace SEE.Tools.ReflexionAnalysis
 {

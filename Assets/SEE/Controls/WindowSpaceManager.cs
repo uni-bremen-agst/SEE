@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using SEE.Game.UI.Window;
-using SEE.Game.UI.Menu;
-using SEE.Game.UI.StateIndicator;
+using SEE.UI.Window;
+using SEE.UI.Menu;
+using SEE.UI.StateIndicator;
 using SEE.GO;
 using UnityEngine;
 using UnityEngine.Events;
@@ -22,25 +22,25 @@ namespace SEE.Controls
         /// <summary>
         /// String representing the local player.
         /// </summary>
-        public const string LOCAL_PLAYER = "Local player";
+        public const string LocalPlayer = "Local player";
 
         /// <summary>
         /// String representing no player, i.e. no windows being displayed.
         /// </summary>
-        public const string NO_PLAYER = "None";
+        public const string NoPlayer = "None";
 
         /// <summary>
         /// The name of the player whose window is currently displayed.
         /// </summary>
-        public string CurrentPlayer { get; private set; } = LOCAL_PLAYER;
+        public string CurrentPlayer { get; private set; } = LocalPlayer;
 
         /// <summary>
         /// A dictionary mapping player names to their code spaces.
         /// </summary>
-        private readonly Dictionary<string, WindowSpace> WindowSpaces = new();
+        private readonly Dictionary<string, WindowSpace> windowSpaces = new();
 
         /// <summary>
-        /// This event will be invoked whenever the active window for the <see cref="LOCAL_PLAYER"/> is changed.
+        /// This event will be invoked whenever the active window for the <see cref="LocalPlayer"/> is changed.
         /// This includes changing the active window to nothing (i.e. closing all of them.)
         /// </summary>
         [FormerlySerializedAs("OnActiveCodeWindowChanged")]
@@ -49,12 +49,12 @@ namespace SEE.Controls
         /// <summary>
         /// The menu from which the user can select the player whose windows they want to see.
         /// </summary>
-        private SelectionMenu WindowMenu;
+        private SelectionMenu windowMenu;
 
         /// <summary>
         /// A <see cref="StateIndicator"/> which displays the IP address of the window we're currently viewing.
         /// </summary>
-        private StateIndicator SpaceIndicator;
+        private StateIndicator spaceIndicator;
 
         /// <summary>
         /// Represents the space manager currently active in the scene.
@@ -68,8 +68,8 @@ namespace SEE.Controls
         /// <param name="playerName">The name of the player whose space should be returned.</param>
         public WindowSpace this[string playerName]
         {
-            get => WindowSpaces.ContainsKey(playerName) ? WindowSpaces[playerName] : null;
-            set => WindowSpaces[playerName] = value;
+            get => windowSpaces.ContainsKey(playerName) ? windowSpaces[playerName] : null;
+            set => windowSpaces[playerName] = value;
         }
 
         /// Updates the space of the player specified by <paramref name="playerName"/> using the values
@@ -79,36 +79,36 @@ namespace SEE.Controls
         /// <param name="valueObject">The value object which represents the new space of the player.</param>
         public void UpdateSpaceFromValueObject(string playerName, WindowSpace.WindowSpaceValues valueObject)
         {
-            if (!WindowSpaces.ContainsKey(playerName))
+            if (!windowSpaces.ContainsKey(playerName))
             {
-                WindowSpaces[playerName] = WindowSpace.FromValueObject(valueObject, gameObject);
-                WindowMenu.AddEntry(new MenuEntry(() => ActivateSpace(playerName),
+                windowSpaces[playerName] = WindowSpace.FromValueObject(valueObject, gameObject);
+                windowMenu.AddEntry(new MenuEntry(() => ActivateSpace(playerName),
                                                   DeactivateCurrentSpace, playerName,
                                                   $"Code window from player with IP address '{playerName}'.", Color.white));
-                WindowSpaces[playerName].WindowSpaceName += $" ({playerName})";
-                WindowSpaces[playerName].enabled = false;
-                WindowSpaces[playerName].CanClose = false;  // User may only close their own windows
+                windowSpaces[playerName].WindowSpaceName += $" ({playerName})";
+                windowSpaces[playerName].enabled = false;
+                windowSpaces[playerName].CanClose = false;  // User may only close their own windows
             }
             else
             {
                 // We will try to do a partial update, otherwise we'd have to re-read each file on every update
 
                 // Check for new entries
-                List<BaseWindow> closedWindows = new(WindowSpaces[playerName].Windows);
+                List<BaseWindow> closedWindows = new(windowSpaces[playerName].Windows);
                 foreach (WindowValues windowValue in valueObject.Windows)
                 {
-                    if (WindowSpaces[playerName].Windows.All(x => windowValue.Title != x.Title))
+                    if (windowSpaces[playerName].Windows.All(x => windowValue.Title != x.Title))
                     {
                         // Window is new and has to be re-created
                         BaseWindow window = BaseWindow.FromValueObject<BaseWindow>(windowValue);
-                        WindowSpaces[playerName].AddWindow(window);
+                        windowSpaces[playerName].AddWindow(window);
                         // Only enable window if space is enabled as well
-                        window.enabled = WindowSpaces[playerName].enabled;
+                        window.enabled = windowSpaces[playerName].enabled;
                     }
                     else
                     {
                         // Layout may have changed
-                        BaseWindow window = WindowSpaces[playerName].Windows.First(x => x.Title == windowValue.Title);
+                        BaseWindow window = windowSpaces[playerName].Windows.First(x => x.Title == windowValue.Title);
                         window.UpdateFromNetworkValueObject(windowValue);
                         // Window is still open, so it's not closed
                         closedWindows.RemoveAll(x => x.Title == windowValue.Title);
@@ -116,12 +116,12 @@ namespace SEE.Controls
                 }
 
                 // Close windows which are no longer open
-                closedWindows.ForEach(WindowSpaces[playerName].CloseWindow);
+                closedWindows.ForEach(windowSpaces[playerName].CloseWindow);
 
                 // Set active window if it changed
-                if (WindowSpaces[playerName].ActiveWindow.Title != valueObject.ActiveWindow.Title)
+                if (windowSpaces[playerName].ActiveWindow.Title != valueObject.ActiveWindow.Title)
                 {
-                    WindowSpaces[playerName].ActiveWindow = WindowSpaces[playerName].Windows.First(x => x.Title == valueObject.ActiveWindow.Title);
+                    windowSpaces[playerName].ActiveWindow = windowSpaces[playerName].Windows.First(x => x.Title == valueObject.ActiveWindow.Title);
                 }
             }
         }
@@ -130,7 +130,7 @@ namespace SEE.Controls
         {
             if (FindObjectsOfType<WindowSpaceManager>().Length > 1)
             {
-                Debug.LogError($"Warning: More than one  {nameof(WindowSpaceManager)} is present in the scene! "
+                Debug.LogError($"More than one {nameof(WindowSpaceManager)} is present in the scene! "
                                + "This will lead to undefined behaviour when synchronizing "
                                + "windows across the network! No new indicator will be created.\n");
                 foreach (WindowSpaceManager manager in FindObjectsOfType<WindowSpaceManager>())
@@ -140,19 +140,19 @@ namespace SEE.Controls
             }
             else
             {
-                SpaceIndicator = gameObject.AddComponent<StateIndicator>();
+                spaceIndicator = gameObject.AddComponent<StateIndicator>();
                 // Anchor to lower left
-                SpaceIndicator.AnchorMin = Vector2.zero;
-                SpaceIndicator.AnchorMax = Vector2.zero;
-                SpaceIndicator.Pivot = Vector2.zero;
+                spaceIndicator.AnchorMin = Vector2.zero;
+                spaceIndicator.AnchorMax = Vector2.zero;
+                spaceIndicator.Pivot = Vector2.zero;
                 ManagerInstance = this;
             }
 
             // Create local code space and associate it with current player
-            WindowSpace space = WindowSpaces[LOCAL_PLAYER] = gameObject.AddOrGetComponent<WindowSpace>();
+            WindowSpace space = windowSpaces[LocalPlayer] = gameObject.AddOrGetComponent<WindowSpace>();
             space.OnActiveWindowChanged.AddListener(OnActiveWindowChanged.Invoke);
 
-            ManagerInstance.SpaceIndicator.ChangeState(LOCAL_PLAYER, Color.black);
+            ManagerInstance.spaceIndicator.ChangeState(LocalPlayer, Color.black);
 
             SetUpWindowSelectionMenu();
         }
@@ -161,7 +161,7 @@ namespace SEE.Controls
         {
             if (SEEInput.ShowWindowMenu())
             {
-                WindowMenu.ToggleMenu();
+                windowMenu.ToggleMenu();
             }
         }
 
@@ -172,25 +172,25 @@ namespace SEE.Controls
         private void SetUpWindowSelectionMenu()
         {
             //TODO: Icons
-            WindowMenu = gameObject.AddComponent<SelectionMenu>();
-            MenuEntry localEntry = new(selectAction: () => ActivateSpace(LOCAL_PLAYER),
+            windowMenu = gameObject.AddComponent<SelectionMenu>();
+            MenuEntry localEntry = new(selectAction: () => ActivateSpace(LocalPlayer),
                                        unselectAction: DeactivateCurrentSpace,
-                                       title: LOCAL_PLAYER,
+                                       title: LocalPlayer,
                                        description: "Windows for the local player (you).",
                                        entryColor: Color.black);
-            MenuEntry noneEntry = new(() => CurrentPlayer = NO_PLAYER, () => { }, NO_PLAYER,
+            MenuEntry noneEntry = new(() => CurrentPlayer = NoPlayer, () => { }, NoPlayer,
                                       "This option hides all windows.", Color.grey);
-            WindowMenu.AddEntry(noneEntry);
-            WindowMenu.AddEntry(localEntry);
-            WindowMenu.SelectEntry(localEntry);
-            foreach (KeyValuePair<string, WindowSpace> space in WindowSpaces.Where(space => space.Key != LOCAL_PLAYER))
+            windowMenu.AddEntry(noneEntry);
+            windowMenu.AddEntry(localEntry);
+            windowMenu.SelectEntry(localEntry);
+            foreach (KeyValuePair<string, WindowSpace> space in windowSpaces.Where(space => space.Key != LocalPlayer))
             {
-                WindowMenu.AddEntry(new MenuEntry(() => ActivateSpace(space.Key),
+                windowMenu.AddEntry(new MenuEntry(() => ActivateSpace(space.Key),
                                                   DeactivateCurrentSpace, space.Key,
                                                   $"Window from player with IP address '{space.Key}'.", Color.white));
             }
-            WindowMenu.Title = "Window Selection";
-            WindowMenu.Description = "Select the player whose windows you want to see.";
+            windowMenu.Title = "Window Selection";
+            windowMenu.Description = "Select the player whose windows you want to see.";
         }
 
         /// <summary>
@@ -198,8 +198,8 @@ namespace SEE.Controls
         /// </summary>
         private void DeactivateCurrentSpace()
         {
-            WindowSpaces[CurrentPlayer].enabled = false;
-            ManagerInstance.SpaceIndicator.enabled = false;
+            windowSpaces[CurrentPlayer].enabled = false;
+            ManagerInstance.spaceIndicator.enabled = false;
         }
 
         /// <summary>
@@ -209,10 +209,10 @@ namespace SEE.Controls
         /// <param name="playerName">The player whose space to activate</param>
         private void ActivateSpace(string playerName)
         {
-            WindowSpaces[playerName].enabled = true;
+            windowSpaces[playerName].enabled = true;
             CurrentPlayer = playerName;
-            ManagerInstance.SpaceIndicator.enabled = true;
-            ManagerInstance.SpaceIndicator.ChangeState(playerName, Color.black);
+            ManagerInstance.spaceIndicator.enabled = true;
+            ManagerInstance.spaceIndicator.ChangeState(playerName, Color.black);
         }
     }
 }

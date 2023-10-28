@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 using Cysharp.Threading.Tasks;
-using SEE.Utils.RPC;
+using SEE.Utils.IdeRPC;
 using UnityEngine;
 
 namespace SEE.IDE

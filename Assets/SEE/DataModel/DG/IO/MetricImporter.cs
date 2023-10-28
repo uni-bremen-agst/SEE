@@ -4,7 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using SEE.Utils;
+using SEE.Utils.Paths;
 using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Net.Dashboard.Model.Metric;
@@ -45,9 +45,9 @@ namespace SEE.DataModel.DG.IO
                     foreach (MetricValueTableRow metricValue in metricValues)
                     {
                         // Only set if value doesn't already exist, or if we're supposed to override and the value differs
-                        if (!node.TryGetFloat(metricValue.metric, out float value) || @override && !Mathf.Approximately(metricValue.value, value))
+                        if (!node.TryGetFloat(metricValue.Metric, out float value) || @override && !Mathf.Approximately(metricValue.Value, value))
                         {
-                            node.SetFloat(metricValue.metric, metricValue.value);
+                            node.SetFloat(metricValue.Metric, metricValue.Value);
                             updatedMetrics++;
                         }
                     }
@@ -69,8 +69,8 @@ namespace SEE.DataModel.DG.IO
                         HashSet<int> lineRange = new HashSet<int>(Enumerable.Range(line.Value, length ?? 1), null);
                         // Relevant issues are those which are entirely contained by the source region of this node
                         relevantIssues = issueList.Where(
-                            x => x.Entities.Any(e => lineRange.Contains(e.line) &&
-                                                     (!e.endLine.HasValue || lineRange.Contains(e.endLine.Value))));
+                            x => x.Entities.Any(e => lineRange.Contains(e.Line) &&
+                                                     (!e.EndLine.HasValue || lineRange.Contains(e.EndLine.Value))));
                     }
 
                     foreach (Issue issue in relevantIssues)
@@ -107,7 +107,7 @@ namespace SEE.DataModel.DG.IO
             {
                 NumericAttributeNames.Clone, NumericAttributeNames.Complexity, NumericAttributeNames.Cycle,
                 NumericAttributeNames.Metric, NumericAttributeNames.Style,
-                NumericAttributeNames.Architecture_Violations, NumericAttributeNames.Dead_Code
+                NumericAttributeNames.ArchitectureViolations, NumericAttributeNames.DeadCode
             };
             //FIXME: Aggregation from lower levels to classes doesn't work due to issues spanning multiple lines
             // Maybe simply ignore aggregated value when a non-aggregated value is present (which it would be)
@@ -126,11 +126,11 @@ namespace SEE.DataModel.DG.IO
                 {
                     foreach (SourceCodeEntity entity in issue.Entities)
                     {
-                        if (!issues.ContainsKey(entity.path))
+                        if (!issues.ContainsKey(entity.Path))
                         {
-                            issues[entity.path] = new List<Issue>();
+                            issues[entity.Path] = new List<Issue>();
                         }
-                        issues[entity.path].Add(issue);
+                        issues[entity.Path].Add(issue);
                     }
                 }
 

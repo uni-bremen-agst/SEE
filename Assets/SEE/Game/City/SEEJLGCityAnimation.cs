@@ -6,6 +6,7 @@ using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game.Runtime;
 using SEE.GO;
+using SEE.Runtime.JLG;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using TMPro;
@@ -29,13 +30,13 @@ namespace SEE.Game.City
         /// <summary>
         /// The class the breakpoint is contained in.
         /// </summary>
-        [Tooltip("The class the breakpoint is contained in."), FoldoutGroup(JLGFoldoutGroup)]
+        [Tooltip("The class the breakpoint is contained in."), FoldoutGroup(jlgFoldoutGroup)]
         public string BreakpointClass = "classname";
 
         /// <summary>
         /// The source line of the breakpoint.
         /// </summary>
-        [Tooltip("The source line of the breakpoint."), FoldoutGroup(JLGFoldoutGroup)]
+        [Tooltip("The source line of the breakpoint."), FoldoutGroup(jlgFoldoutGroup)]
         public int BreakpointLine = 0;
 
         /// <summary>
@@ -43,7 +44,7 @@ namespace SEE.Game.City
         /// in Unity units.
         /// </summary>
         [Tooltip("The distance between the code city and the source-code window."),
-         FoldoutGroup(JLGFoldoutGroup)]
+         FoldoutGroup(jlgFoldoutGroup)]
         public float DistanceAboveCity = 0.3f;
 
         /// <summary>
@@ -51,7 +52,7 @@ namespace SEE.Game.City
         /// in Unity units.
         /// </summary>
         [Tooltip("The distance between the line connecting the code city and the source-code window."),
-         FoldoutGroup(JLGFoldoutGroup)]
+         FoldoutGroup(jlgFoldoutGroup)]
         public float DistanceBehindCity = 0.3f;
 
         /// <summary>
@@ -59,7 +60,7 @@ namespace SEE.Game.City
         /// whose source code is currently shown.
         /// </summary>
         [Tooltip("The width of the line connecting the source-code window and the game objects whose source code is currently shown."),
-         FoldoutGroup(JLGFoldoutGroup)]
+         FoldoutGroup(jlgFoldoutGroup)]
         public float LineWidth = 0.01f;
 
         /// <summary>
@@ -70,20 +71,20 @@ namespace SEE.Game.City
         [Tooltip("If true, we always move to the next/previous call statement in the execution"
                  + " (depending upon whether the execution is forward or backward, respectively),"
                  + " that is, only interprocedural control flow will be shown."),
-         FoldoutGroup(JLGFoldoutGroup)]
+         FoldoutGroup(jlgFoldoutGroup)]
         public bool ShowOnlyCalls = false;
 
         //-------------------------------------------------------
         // Private attributes not saved in the configuration file
         //-------------------------------------------------------
 
-        private const string JLGFoldoutGroup = "JLG Settings";
+        private const string jlgFoldoutGroup = "JLG Settings";
 
         /// <summary>
         /// This name will be added at the end of every game object representing a
         /// source-code viewer for an executed node.
         /// </summary>
-        private const string FileContentNamePostfix = "FileContent";
+        private const string fileContentNamePostfix = "FileContent";
 
         /// <summary>
         /// A ParsedJLG object that contains a parsed JLG file. This object contains all
@@ -492,7 +493,7 @@ namespace SEE.Game.City
             {
                 foreach (GameObject go in textWindows)
                 {
-                    go.SetActive(go.name == nodeGameObject.name + FileContentNamePostfix);
+                    go.SetActive(go.name == nodeGameObject.name + fileContentNamePostfix);
                 }
             }
         }
@@ -538,20 +539,20 @@ namespace SEE.Game.City
         /// <returns>true if there is an existing scrollable text window for a given <paramref name="node"/></returns>
         private bool TextWindowForNodeExists(GameObject node)
         {
-            return textWindows.Count != 0 && textWindows.Any(go => go.name.Equals(node.name + FileContentNamePostfix));
+            return textWindows.Count != 0 && textWindows.Any(go => go.name.Equals(node.name + fileContentNamePostfix));
         }
 
         /// <summary>
         /// The prefab to be instantiated for the composite object containing the variables
         /// and source code window.
         /// </summary>
-        private const string TracingDisplayPrefab = "TracingDisplay";
+        private const string tracingDisplayPrefab = "TracingDisplay";
 
         /// <summary>
         /// Name of the scroll container where the source code currently being executed
-        /// is shown. This name is used in the prefab <see cref="TracingDisplayPrefab"/>.
+        /// is shown. This name is used in the prefab <see cref="tracingDisplayPrefab"/>.
         /// </summary>
-        private const string ScrollContainerFileContent = "ScrollContainerFileContent";
+        private const string scrollContainerFileContent = "ScrollContainerFileContent";
 
         /// <summary>
         /// This method generates a new ScrollableTextMeshProWindow above the code city.
@@ -567,10 +568,10 @@ namespace SEE.Game.City
             // The tracing display consists of two parts: (1) a window where the source code of
             // the currently executed code is shown and (2) a window where the values of the
             // currently visible variables at that source-code location are shown.
-            GameObject tracingDisplay = Instantiate((GameObject)Resources.Load(TracingDisplayPrefab),
+            GameObject tracingDisplay = Instantiate((GameObject)Resources.Load(tracingDisplayPrefab),
                                                 Vector3.zero,
                                                 rotation: Quaternion.identity);
-            tracingDisplay.name = currentGO.name + FileContentNamePostfix;
+            tracingDisplay.name = currentGO.name + fileContentNamePostfix;
             ///set canvas order in layer to textwindows.count so that the text windows can be rendered in front of each other
             tracingDisplay.transform.GetChild(0).GetChild(0).GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = GetFileContentForNode(currentGO);
 
@@ -612,19 +613,19 @@ namespace SEE.Game.City
         /// where the source code is shown.
         ///
         /// Assumption: <paramref name="tracingDisplay"/> has an immediate child named
-        /// <see cref="ScrollContainerFileContent"/>.
+        /// <see cref="scrollContainerFileContent"/>.
         /// </summary>
         /// <param name="tracingDisplay">composite game object representing the tracing display
         /// consisting of a source-code window and window showing the variable values</param>
         /// <returns>the scroll container where the source code is displayed</returns>
         /// <exception cref="Exception">thrown if <paramref name="tracingDisplay"/> does not have
-        /// an immediate child named <see cref="ScrollContainerFileContent"/></exception>
+        /// an immediate child named <see cref="scrollContainerFileContent"/></exception>
         private static Transform GetCodeWindow(GameObject tracingDisplay)
         {
-            Transform codeWindow = tracingDisplay.transform.Find(ScrollContainerFileContent);
+            Transform codeWindow = tracingDisplay.transform.Find(scrollContainerFileContent);
             if (codeWindow == null)
             {
-                throw new Exception($"Text window {tracingDisplay.FullName()} has no child {ScrollContainerFileContent}.");
+                throw new Exception($"Text window {tracingDisplay.FullName()} has no child {scrollContainerFileContent}.");
             }
             else
             {
@@ -670,7 +671,7 @@ namespace SEE.Game.City
         /// </summary>
         /// <param name="go">the game object representing the class whose source code is to be returned</param>
         /// <returns>the file content of the corresponding source-code file (line numbers are appended)</returns>
-        private string GetFileContentForNode(GameObject go)
+        private static string GetFileContentForNode(GameObject go)
         {
             if (go.TryGetNode(out Node node))
             {
@@ -721,7 +722,7 @@ namespace SEE.Game.City
         /// <returns>FileContent for node</returns>
         private GameObject GetFileContentGOForNode(GameObject classGO)
         {
-            return textWindows.FirstOrDefault(fc => fc.name.Equals(classGO.name + FileContentNamePostfix));
+            return textWindows.FirstOrDefault(fc => fc.name.Equals(classGO.name + fileContentNamePostfix));
         }
 
         /// <summary>
@@ -843,7 +844,7 @@ namespace SEE.Game.City
             foreach (GameObject go in textWindows)
             {
                 // text window of currentGO is always active
-                go.SetActive(go.name == currentGO.name + FileContentNamePostfix);
+                go.SetActive(go.name == currentGO.name + fileContentNamePostfix);
             }
         }
 
@@ -926,8 +927,8 @@ namespace SEE.Game.City
         {
             // The enumerator of a stack iterates from the top element to the very first element added to the stack.
             return functionCalls.FirstOrDefault(go => go.activeSelf == active &&
-                                                      go.GetComponent<FunctionCallSimulator>().src == srcGO &&
-                                                      go.GetComponent<FunctionCallSimulator>().dst == dstGO);
+                                                      go.GetComponent<FunctionCallSimulator>().Source == srcGO &&
+                                                      go.GetComponent<FunctionCallSimulator>().Destination == dstGO);
         }
 
         /// <summary>

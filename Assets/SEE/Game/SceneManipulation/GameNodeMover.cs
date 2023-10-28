@@ -1,6 +1,7 @@
 ﻿using SEE.Controls;
 using SEE.Game.Operator;
 using SEE.GO;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -14,7 +15,7 @@ namespace SEE.Game.SceneManipulation
         /// <summary>
         /// Factor by which nodes should be scaled relative to their parents in <see cref="PutOn"/>.
         /// </summary>
-        public const float SCALING_FACTOR = 0.2f;
+        public const float ScalingFactor = 0.2f;
 
         /// <summary>
         /// Sets the <paramref name="newParent"/> for <paramref name="child"/> both in the
@@ -72,7 +73,7 @@ namespace SEE.Game.SceneManipulation
         {
             // This assignment must take place before we set the parent of child to null
             // because a newly created node operator attempts to derive its code city.
-            NodeOperator nodeOperator = child.gameObject.AddOrGetComponent<NodeOperator>();
+            NodeOperator nodeOperator = child.gameObject.NodeOperator();
 
             // Release child from its current parent so that local position and scale
             // and world-space position and scale are the same, respectively.
@@ -132,7 +133,7 @@ namespace SEE.Game.SceneManipulation
                 // TODO: We need a strategy to scale down a node to the maximal size that is still
                 // fitting into the area where the nodes has been placed.
                 // We want to shrink only the ground area, but maintain the height.
-                return new Vector3(SCALING_FACTOR * parent.transform.lossyScale.x, child.lossyScale.y, SCALING_FACTOR * parent.transform.lossyScale.z);
+                return new Vector3(ScalingFactor * parent.transform.lossyScale.x, child.lossyScale.y, ScalingFactor * parent.transform.lossyScale.z);
             }
         }
 
@@ -174,7 +175,7 @@ namespace SEE.Game.SceneManipulation
                 targetPosition = child.position;
             }
             targetPosition.y = parent.GetRoof() + childExtent.y + topPadding;
-            NodeOperator nodeOperator = child.gameObject.AddOrGetComponent<NodeOperator>();
+            NodeOperator nodeOperator = child.gameObject.NodeOperator();
             nodeOperator.MoveTo(targetPosition, 0);
 
             // From now on, we assume that child's center is contained in the
@@ -265,7 +266,7 @@ namespace SEE.Game.SceneManipulation
             {
                 // The gameObject may have already been scaled down, hence,
                 // we need to restore its original scale.
-                child.gameObject.AddOrGetComponent<NodeOperator>().ScaleTo(originalLocalScale, 0);
+                child.gameObject.NodeOperator().ScaleTo(originalLocalScale, 0);
             }
             PutOn(child, newParent, scaleDown: scaleDown);
         }
@@ -279,7 +280,7 @@ namespace SEE.Game.SceneManipulation
         /// <param name="factor">the factor by which the animation duration is multiplied</param>
         internal static void MoveTo(GameObject gameObject, Vector3 targetPosition, float factor)
         {
-            gameObject.AddOrGetComponent<NodeOperator>().MoveTo(targetPosition, factor);
+            gameObject.NodeOperator().MoveTo(targetPosition, factor);
         }
     }
 }

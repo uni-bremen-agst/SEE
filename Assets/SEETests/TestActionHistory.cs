@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using SEE.Controls.Actions;
 using SEE.Utils;
+using SEE.Utils.History;
 using System;
 using System.Collections.Generic;
 
@@ -32,7 +33,7 @@ namespace SEETests
         /// <summary>
         /// A substitute reversible action for testing.
         /// </summary>
-        private class TestAction : ReversibleAction
+        private class TestAction : IReversibleAction
         {
             public bool IsOn = false;
 
@@ -105,28 +106,28 @@ namespace SEETests
             /// Returns a new instance of <see cref="TestAction"/>.
             /// </summary>
             /// <returns>new instance</returns>
-            public ReversibleAction NewInstance()
+            public IReversibleAction NewInstance()
             {
                 return new TestAction();
             }
 
             /// <summary>
-            /// Returns <see cref="ReversibleAction.Progress.InProgress"/> if this action has
+            /// Returns <see cref="IReversibleAction.Progress.InProgress"/> if this action has
             /// had an effect, that is, if <see cref="Update"/> has been called before;
-            /// otherwise <see cref="ReversibleAction.Progress.NoEffect"/> is returned.
-            /// It will never return <see cref="ReversibleAction.Progress.Completed"/>
+            /// otherwise <see cref="IReversibleAction.Progress.NoEffect"/> is returned.
+            /// It will never return <see cref="IReversibleAction.Progress.Completed"/>
             /// because <see cref="Update"/> always yields false.
             /// </summary>
             /// <returns>current progress state</returns>
-            public ReversibleAction.Progress CurrentProgress()
+            public IReversibleAction.Progress CurrentProgress()
             {
                 if (UpdateCalls > 0)
                 {
-                    return ReversibleAction.Progress.InProgress;
+                    return IReversibleAction.Progress.InProgress;
                 }
                 else
                 {
-                    return ReversibleAction.Progress.NoEffect;
+                    return IReversibleAction.Progress.NoEffect;
                 }
             }
 
@@ -138,7 +139,7 @@ namespace SEETests
 
             private static ActionStateType actionStateType = new MyTestActionStateType();
 
-            private static ReversibleAction CreateReversibleAction()
+            private static IReversibleAction CreateReversibleAction()
             {
                 return new TestAction();
             }
@@ -182,8 +183,8 @@ namespace SEETests
         {
             /// Note: TestAction is an action that continues forever, that is,
             /// no Update call will ever return true and its progress state
-            /// is initially <see cref="ReversibleAction.Progress.NoEffect"/>
-            /// and after the first Update call <see cref="ReversibleAction.Progress.InProgress"/>
+            /// is initially <see cref="IReversibleAction.Progress.NoEffect"/>
+            /// and after the first Update call <see cref="IReversibleAction.Progress.InProgress"/>
             /// for the rest of its life.
             TestAction c = new();
             CheckCalls(c, value: false, awake: 0, start: 0, update: 0, stop: 0);
@@ -440,7 +441,7 @@ namespace SEETests
         /// <summary>
         /// Provides a counter.
         /// </summary>
-        private abstract class Counter : ReversibleAction
+        private abstract class Counter : IReversibleAction
         {
             protected static int counter = 0;
 
@@ -466,14 +467,14 @@ namespace SEETests
                 // nothing to be done
             }
 
-            protected ReversibleAction.Progress currentProgress = ReversibleAction.Progress.NoEffect;
+            protected IReversibleAction.Progress currentProgress = IReversibleAction.Progress.NoEffect;
 
-            public ReversibleAction.Progress CurrentProgress()
+            public IReversibleAction.Progress CurrentProgress()
             {
                 return currentProgress;
             }
 
-            public abstract ReversibleAction NewInstance();
+            public abstract IReversibleAction NewInstance();
             public abstract void Redo();
             public abstract void Undo();
             public abstract bool Update();
@@ -498,7 +499,7 @@ namespace SEETests
         /// </summary>
         private class Increment : Counter
         {
-            public override ReversibleAction NewInstance()
+            public override IReversibleAction NewInstance()
             {
                 return new Increment();
             }
@@ -515,7 +516,7 @@ namespace SEETests
 
             public override bool Update()
             {
-                currentProgress = ReversibleAction.Progress.Completed;
+                currentProgress = IReversibleAction.Progress.Completed;
                 counter++;
                 return true;
             }
@@ -528,7 +529,7 @@ namespace SEETests
 
             private static readonly ActionStateType actionStateType = new IncrementActionStateType();
 
-            private static ReversibleAction CreateReversibleAction()
+            private static IReversibleAction CreateReversibleAction()
             {
                 return new Increment();
             }
@@ -548,7 +549,7 @@ namespace SEETests
         /// </summary>
         private class Decrement : Counter
         {
-            public override ReversibleAction NewInstance()
+            public override IReversibleAction NewInstance()
             {
                 return new Decrement();
             }
@@ -565,7 +566,7 @@ namespace SEETests
 
             public override bool Update()
             {
-                currentProgress = ReversibleAction.Progress.Completed;
+                currentProgress = IReversibleAction.Progress.Completed;
                 counter--;
                 return true;
             }
@@ -578,7 +579,7 @@ namespace SEETests
 
             private static ActionStateType actionStateType = new DecrementActionStateType();
 
-            private static ReversibleAction CreateReversibleAction()
+            private static IReversibleAction CreateReversibleAction()
             {
                 return new Decrement();
             }
@@ -596,8 +597,8 @@ namespace SEETests
         /// <summary>
         /// Test scenario for a non-continuous action with immediate effect.
         /// Every Update call for Decrement and Increment will yield true.
-        /// Thus, their progress state is initially <see cref="ReversibleAction.Progress.NoEffect"/>
-        /// and after the first Update call <see cref="ReversibleAction.Progress.Completed"/>
+        /// Thus, their progress state is initially <see cref="IReversibleAction.Progress.NoEffect"/>
+        /// and after the first Update call <see cref="IReversibleAction.Progress.Completed"/>
         /// for the rest of their life.
         /// </summary>
         [Test]

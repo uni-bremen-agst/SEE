@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Game.HolisticMetrics.ActionHelpers;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using UnityEngine;
 using SEE.Utils;
 using Object = UnityEngine.Object;

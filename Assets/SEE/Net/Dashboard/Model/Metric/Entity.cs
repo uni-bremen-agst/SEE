@@ -12,40 +12,40 @@ namespace SEE.Net.Dashboard.Model.Metric
         /// <summary>
         /// The project-wide ID used to refer to this entity.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string id;
+        [JsonProperty(PropertyName = "id", Required = Required.Always)]
+        public readonly string ID;
 
         /// <summary>
         /// A non-unique name of the entity.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string name;
+        [JsonProperty(PropertyName = "name", Required = Required.Always)]
+        public readonly string Name;
 
         /// <summary>
         /// The type of the entity.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string type;
+        [JsonProperty(PropertyName = "type", Required = Required.Always)]
+        public readonly string Type;
 
         /// <summary>
         /// The file path of an entity if it can be associated with a file.
         /// </summary>
-        [JsonProperty(Required = Required.Default)]
-        public readonly string path;
+        [JsonProperty(PropertyName = "path", Required = Required.Default)]
+        public readonly string Path;
 
         /// <summary>
         /// The line number of an entity if it can be associated with a file location.
         /// </summary>
-        [JsonProperty(Required = Required.Default)]
-        public readonly uint? line;
+        [JsonProperty(PropertyName = "line", Required = Required.Default)]
+        public readonly uint? Line;
 
         public Entity(string id, string name, string type, string path, uint? line)
         {
-            this.id = id;
-            this.name = name;
-            this.type = type;
-            this.path = path;
-            this.line = line;
+            this.ID = id;
+            this.Name = name;
+            this.Type = type;
+            this.Path = path;
+            this.Line = line;
         }
     }
 }

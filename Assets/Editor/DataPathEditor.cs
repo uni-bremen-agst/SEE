@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
 
-using SEE.Utils;
+using SEE.Utils.Paths;
 using UnityEditor;
 using UnityEngine;
 

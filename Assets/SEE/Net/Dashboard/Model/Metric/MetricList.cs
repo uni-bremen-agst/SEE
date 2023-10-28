@@ -13,19 +13,19 @@ namespace SEE.Net.Dashboard.Model.Metric
         /// <summary>
         /// The version this metric list was queried with.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly AnalysisVersion version;
+        [JsonProperty(PropertyName = "version", Required = Required.Always)]
+        public readonly AnalysisVersion Version;
 
         /// <summary>
         /// List of queried metrics.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly IList<Metric> metrics;
+        [JsonProperty(PropertyName = "metrics", Required = Required.Always)]
+        public readonly IList<Metric> Metrics;
 
         public MetricList(AnalysisVersion version, IList<Metric> metrics)
         {
-            this.version = version;
-            this.metrics = metrics;
+            this.Version = version;
+            this.Metrics = metrics;
         }
     }
 }

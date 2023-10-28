@@ -211,8 +211,8 @@ namespace SEE.Controls.Actions
 
             string Name(AbstractActionStateType type)
             {
-                const string None = "<NONE>";
-                return type == null ? None : type.Name;
+                const string none = "<NONE>";
+                return type == null ? none : type.Name;
             }
         }
     }

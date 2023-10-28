@@ -1,13 +1,13 @@
 ﻿using SEE.Controls;
 using SEE.GO;
-using SEE.Utils;
+using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using Cysharp.Threading.Tasks;
 using OpenAI;
 using OpenAI.Chat;
-using SEE.Game.UI.Notification;
+using SEE.UI.Notification;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
 
@@ -64,14 +64,14 @@ namespace SEE.Game.Avatars
         /// </summary>
         private readonly IList<Message> chatGptHistory = new List<Message>
         {
-            new(Role.System, string.Format(PROMPT, DateTime.Now.Year))
+            new(Role.System, string.Format(prompt, DateTime.Now.Year))
         };
 
         /// <summary>
         /// The prompt to use for ChatGPT.
         /// Note that the string should be formatted with the current year.
         /// </summary>
-        private const string PROMPT = "You are the digital assistant for SEE, which stands for "
+        private const string prompt = "You are the digital assistant for SEE, which stands for "
             + "Software Engineering Experience. You are also named SEE yourself. "
             + "You are helpful, concise and friendly. You will not hallucinate features that don't exist.\n"
             + "SEE let's you visualize your software as code cities in 3D, using the Unity game engine. "

@@ -7,6 +7,7 @@ using HighlightPlus;
 using SEE.DataModel;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
 using ArgumentException = System.ArgumentException;
@@ -17,35 +18,32 @@ namespace SEE.Game.Operator
     /// A component managing operations done on the graph element (i.e., node or edge) it is attached to.
     /// Available operations consist of the public methods exported by this class.
     /// Operations can be animated or executed directly, by setting the duration to 0.
+    /// Note that this only contains non-color operations. Color operations are handled by
+    /// the generic <see cref="GraphElementOperator{C}"/> class.
     /// </summary>
-    /// <typeparam name="C">The type of the color of the graph element</typeparam>
-    public abstract class GraphElementOperator<C> : AbstractOperator, IObserver<ChangeEvent> where C : struct
+    public abstract class GraphElementOperator : AbstractOperator
     {
         /// <summary>
-        /// Operation handling changes to the color of the element.
+        /// Operation handling the blinking of the element.
+        /// The parameter specifies the number of blinks.
         /// </summary>
-        protected TweenOperation<C> color { get; private set; }
+        protected TweenOperation<int> blinking;
 
         /// <summary>
         /// Operation handling the glow effect around the element.
         /// </summary>
-        private TweenOperation<float> glow;
+        protected TweenOperation<float> glow;
 
         /// <summary>
         /// Amount of glow that should be animated towards.
         /// </summary>
         /// <remarks>Its value must be greater than 0 and not greater than 5.</remarks>
-        private const float fullGlow = 2;
+        protected const float fullGlow = 2;
 
         /// <summary>
         /// Whether the glow effect is currently (supposed to be) enabled.
         /// </summary>
-        private bool glowEnabled;
-
-        /// <summary>
-        /// The highlight effect of the element.
-        /// </summary>
-        private HighlightEffect highlightEffect;
+        protected bool glowEnabled;
 
         /// <summary>
         /// The city to which the element belongs.
@@ -53,10 +51,124 @@ namespace SEE.Game.Operator
         public AbstractSEECity City
         {
             get;
-            private set;
+            protected set;
         }
 
         protected override float BaseAnimationDuration => City.BaseAnimationDuration;
+
+        protected abstract float GetTargetGlow();
+
+        /// <summary>
+        /// Returns an array of tweens that animate the element to blink <paramref name="blinkCount"/> times
+        /// for the given <paramref name="duration"/>.
+        /// </summary>
+        /// <param name="blinkCount">the number of times the element should blink</param>
+        /// <param name="duration">the duration of the blinking animation</param>
+        /// <returns>an array of tweens that animate the element to blink <paramref name="blinkCount"/> times
+        /// for the given <paramref name="duration"/></returns>
+        protected abstract Tween[] BlinkAction(int blinkCount, float duration);
+
+        /// <summary>
+        /// Makes the element blink <paramref name="blinkCount"/> times.
+        /// </summary>
+        /// <param name="blinkCount">The number of times the element should blink.
+        /// If set to -1, the element will blink indefinitely.
+        /// If set to 0, the element will not blink at all.
+        /// </param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the blinking duration.
+        /// If set to 0, will execute directly, that is, the blinking is stopped
+        /// before control is returned to the caller.
+        /// </param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> Blink(int blinkCount, float factor = 1)
+        {
+            return blinking.AnimateTo(blinkCount, ToDuration(factor));
+        }
+
+        /// <summary>
+        /// Fade in the glow effect on this element.
+        /// </summary>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public virtual IOperationCallback<Action> GlowIn(float factor = 1)
+        {
+            float targetGlow = GetTargetGlow();
+            glowEnabled = true;
+            return glow.AnimateTo(targetGlow, ToDuration(factor));
+        }
+
+        /// <summary>
+        /// Fade out the glow effect on this element.
+        /// </summary>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> GlowOut(float factor = 1)
+        {
+            glowEnabled = false;
+            return glow.AnimateTo(0, ToDuration(factor));
+        }
+
+        /// <summary>
+        /// Displays a marker above the element and makes it blink and glow for <paramref name="duration"/> seconds.
+        /// </summary>
+        /// <param name="duration">The amount of time in seconds the element should be highlighted.
+        /// If this is set to a negative value, the element will be highlighted indefinitely, with a blink rate
+        /// proportional to the absolute value of <paramref name="duration"/>.
+        /// </param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> Highlight(float duration)
+        {
+            ShowNotification.Info($"Highlighting '{name}'",
+                                  $"The selected element will be blinking and marked by a spear for {duration} seconds.",
+                                  log: false);
+            // Display marker above the element
+            // FIXME: marker is not displayed above edge.
+            MarkerFactory marker = new(markerWidth: 0.01f, markerHeight: 1f, Color.red, default, default);
+            marker.MarkBorn(gameObject);
+            // The factor of 1.3 causes the element to blink slightly more than once per second,
+            // which seems visually fitting.
+            int blinkCount = duration >= 0 ? Mathf.RoundToInt(duration * 1.3f) : -1;
+            return new AndCombinedOperationCallback<Action>(new[]
+            {
+                GlowIn(ToFactor(Mathf.Abs(duration / blinkCount))),
+                Blink(blinkCount: blinkCount, ToFactor(Mathf.Abs(duration)))
+            }).OnComplete(() =>
+            {
+                GlowOut(ToFactor(0.5f));
+                marker.Clear();
+            });
+        }
+    }
+
+    /// <summary>
+    /// A component managing operations done on the graph element (i.e., node or edge) it is attached to.
+    /// Available operations consist of the public methods exported by this class.
+    /// Operations can be animated or executed directly, by setting the duration to 0.
+    /// </summary>
+    /// <typeparam name="C">The type of the color of the graph element</typeparam>
+    public abstract class GraphElementOperator<C> : GraphElementOperator, IObserver<ChangeEvent> where C : struct
+    {
+        /// <summary>
+        /// Operation handling changes to the color of the element.
+        /// </summary>
+        protected TweenOperation<C> Color { get; private set; }
+
+        /// <summary>
+        /// The highlight effect of the element.
+        /// </summary>
+        private HighlightEffect highlightEffect;
+
+        /// <summary>
+        /// The current color of the element.
+        /// </summary>
+        public C TargetColor => Color.TargetValue;
 
         #region Abstract Methods
 
@@ -111,7 +223,7 @@ namespace SEE.Game.Operator
                     return c.WithAlpha(alphas.Current);
                 });
             }
-            return color.AnimateTo(targetColor, ToDuration(factor));
+            return Color.AnimateTo(targetColor, ToDuration(factor));
         }
 
         /// <summary>
@@ -133,45 +245,16 @@ namespace SEE.Game.Operator
                 throw new ArgumentException("Given alpha value must be greater than zero and not more than one!");
             }
 
-            C targetColor = ModifyColor(color.TargetValue, c => c.WithAlpha(alpha));
+            C targetColor = ModifyColor(Color.TargetValue, c => c.WithAlpha(alpha));
             // Elements being faded should also lead to highlights being faded.
             float targetGlow = GetTargetGlow(glowEnabled ? fullGlow : 0, alpha);
 
             float duration = ToDuration(factor);
             return new AndCombinedOperationCallback<Action>(new[]
             {
-                color.AnimateTo(targetColor, duration),
+                Color.AnimateTo(targetColor, duration),
                 glow.AnimateTo(targetGlow, duration)
             });
-        }
-
-        /// <summary>
-        /// Fade in the glow effect on this element.
-        /// </summary>
-        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
-        /// that controls the animation duration.
-        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
-        /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> GlowIn(float factor = 1)
-        {
-            float targetGlow = GetTargetGlow(fullGlow, AsEnumerable(color.TargetValue).Max(x => x.a));
-            glowEnabled = true;
-            return glow.AnimateTo(targetGlow, ToDuration(factor));
-        }
-
-        /// <summary>
-        /// Fade out the glow effect on this element.
-        /// </summary>
-        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
-        /// that controls the animation duration.
-        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
-        /// </param>
-        /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> GlowOut(float factor = 1)
-        {
-            glowEnabled = false;
-            return glow.AnimateTo(0, ToDuration(factor));
         }
 
         /// <summary>
@@ -188,36 +271,12 @@ namespace SEE.Game.Operator
             //       Should be alright because overlapping animations aren't a big problem here.
             highlightEffect.hitFxFadeOutDuration = ToDuration(factor);
 
-            Color targetColor = AsEnumerable(color.TargetValue).Aggregate((c1, c2) => Color.Lerp(c1, c2, 0.5f)).Invert();
+            Color targetColor = AsEnumerable(Color.TargetValue).Aggregate((c1, c2) => UnityEngine.Color.Lerp(c1, c2, 0.5f)).Invert();
             highlightEffect.hitFxColor = targetColor;
             highlightEffect.HitFX();
         }
 
         #endregion
-
-        /// <summary>
-        /// Refreshes the glow effect properties.
-        ///
-        /// Needs to be called whenever the material changes. Hierarchy changes are handled automatically.
-        /// </summary>
-        public async UniTaskVoid RefreshGlow(bool fullRefresh = false)
-        {
-            if (highlightEffect != null && glow != null)
-            {
-                if (fullRefresh)
-                {
-                    glow.KillAnimator();
-                    Destroyer.Destroy(highlightEffect);
-                    await UniTask.WaitForEndOfFrame(); // component is only destroyed by the end of the frame.
-                    highlightEffect = Highlighter.GetHighlightEffect(gameObject);
-                    SetupGlow();
-                }
-                else
-                {
-                    highlightEffect.Refresh();
-                }
-            }
-        }
 
         /// <summary>
         /// Sets up the <see cref="highlightEffect"/>, assuming it has been assigned
@@ -234,6 +293,9 @@ namespace SEE.Game.Operator
 
             highlightEffect.outline = 0;
 
+            glow = new TweenOperation<float>(AnimateToGlowAction, highlightEffect.glow);
+            return;
+
             Tween[] AnimateToGlowAction(float endGlow, float duration) => new Tween[]
             {
                 DOTween.To(() => highlightEffect.glow, g =>
@@ -245,8 +307,6 @@ namespace SEE.Game.Operator
                     highlightEffect.Refresh();
                 }).Play()
             };
-
-            glow = new TweenOperation<float>(AnimateToGlowAction, highlightEffect.glow);
         }
 
         /// <summary>
@@ -262,6 +322,16 @@ namespace SEE.Game.Operator
         {
             // Normalized glow (i.e., glow expressed as value in [0,1]) must not be higher than alpha.
             return Mathf.Min(glowTarget / fullGlow, alphaTarget) * fullGlow;
+        }
+
+        /// <summary>
+        /// Calculates a value for the <see cref="glow"/> operation according to the following formula:
+        /// min(1, colorAlpha) * fullGlow
+        /// </summary>
+        /// <returns>Glow value which doesn't exceed alpha value</returns>
+        protected override float GetTargetGlow()
+        {
+            return GetTargetGlow(fullGlow, AsEnumerable(Color.TargetValue).Max(x => x.a));
         }
 
         /// <summary>
@@ -288,39 +358,6 @@ namespace SEE.Game.Operator
             }
         }
 
-        protected virtual void OnEnable()
-        {
-            City = GetCity(gameObject);
-            color = InitializeColorOperation();
-
-            if (TryGetComponent(out highlightEffect))
-            {
-                // If the component already exists, we need to rebuild it to be sure it fits our material.
-                RefreshGlow(true).Forget();
-            }
-            else
-            {
-                highlightEffect = Highlighter.GetHighlightEffect(gameObject);
-                highlightEffect.Refresh();
-            }
-
-            SetupGlow();
-
-            if (gameObject.TryGetComponentOrLog(out GraphElementRef elementRef) && elementRef.elem != null)
-            {
-                // When the hierarchy changes, we need to refresh the glow effect properties.
-                elementRef.elem.Subscribe(this);
-            }
-        }
-
-        protected virtual void OnDisable()
-        {
-            color.KillAnimator();
-            color = null;
-            glow.KillAnimator();
-            glow = null;
-        }
-
         /// <summary>
         /// Handles hierarchy changes by refreshing the glow effect.
         /// </summary>
@@ -335,6 +372,30 @@ namespace SEE.Game.Operator
             }
         }
 
+        /// <summary>
+        /// Refreshes the glow effect properties.
+        ///
+        /// Needs to be called whenever the material changes. Hierarchy changes are handled automatically.
+        /// </summary>
+        public async UniTaskVoid RefreshGlow(bool fullRefresh = false)
+        {
+            if (highlightEffect != null && glow != null)
+            {
+                if (fullRefresh)
+                {
+                    glow.KillAnimator();
+                    Destroyer.Destroy(highlightEffect);
+                    await UniTask.WaitForEndOfFrame(); // component is only destroyed by the end of the frame.
+                    highlightEffect = Highlighter.GetHighlightEffect(gameObject);
+                    SetupGlow();
+                }
+                else
+                {
+                    highlightEffect.Refresh();
+                }
+            }
+        }
+
         public void OnCompleted()
         {
             // Nothing to be done.
@@ -343,6 +404,43 @@ namespace SEE.Game.Operator
         public void OnError(Exception error)
         {
             throw error;
+        }
+
+
+        protected virtual void OnEnable()
+        {
+            City = GetCity(gameObject);
+            Color = InitializeColorOperation();
+
+            blinking = new TweenOperation<int>(BlinkAction, 0, equalityComparer: new AlwaysFalseEqualityComparer<int>(),
+                                               conflictingOperations: new[] { Color });
+
+            if (TryGetComponent(out highlightEffect))
+            {
+                // If the component already exists, we need to rebuild it to be sure it fits our material.
+                RefreshGlow(true).Forget();
+            }
+            else
+            {
+                highlightEffect = Highlighter.GetHighlightEffect(gameObject);
+                highlightEffect.Refresh();
+            }
+
+            SetupGlow();
+
+            if (gameObject.TryGetComponentOrLog(out GraphElementRef elementRef) && elementRef.Elem != null)
+            {
+                // When the hierarchy changes, we need to refresh the glow effect properties.
+                elementRef.Elem.Subscribe(this);
+            }
+        }
+
+        protected virtual void OnDisable()
+        {
+            Color.KillAnimator();
+            Color = null;
+            glow.KillAnimator();
+            glow = null;
         }
     }
 }

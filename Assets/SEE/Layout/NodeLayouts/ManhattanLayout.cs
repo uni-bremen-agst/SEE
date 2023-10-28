@@ -22,14 +22,14 @@ namespace SEE.Layout.NodeLayouts
         public ManhattanLayout(float groundLevel)
             : base(groundLevel)
         {
-            name = "Manhattan";
+            Name = "Manhattan";
         }
 
         /// <summary>
         /// The factor to be multiplied with the default distance between buildings.
         /// If game objects are 'naturally' larger, the distances between them should be larger, too.
         /// </summary>
-        private readonly float Unit;
+        private readonly float unit;
 
         public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> gameNodes)
         {
@@ -40,7 +40,7 @@ namespace SEE.Layout.NodeLayouts
             int numberOfBuildingsPerRow = (int)Mathf.Sqrt(layoutNodes.Count);
             int column = 0;
             int row = 1;
-            float distanceBetweenBuildings = Unit * 3.0f;
+            float distanceBetweenBuildings = unit * 3.0f;
             float maxZ = 0.0f;         // maximal depth of a building in a row
             float positionX = 0.0f;    // co-ordinate in a column of the grid
             float positionZ = 0.0f;    // co-ordinate in a row of the grid
@@ -71,7 +71,7 @@ namespace SEE.Layout.NodeLayouts
                 // (position.X, position.Y) is the left lower corner of the game object in the X,Z plane.
                 // We want all GameObjects be placed at the same ground level 0.
                 // We maintain the original scaleof the gameNode.
-                result[gameNode] = new NodeTransform(new Vector3(positionX, groundLevel, positionZ + size.z / 2.0f), size);
+                result[gameNode] = new NodeTransform(new Vector3(positionX, GroundLevel, positionZ + size.z / 2.0f), size);
                 // right border position of the block to be placed + space in between buildings
                 positionX += size.x / 2.0f + distanceBetweenBuildings;
             }

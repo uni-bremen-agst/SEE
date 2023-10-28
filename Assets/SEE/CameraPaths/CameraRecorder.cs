@@ -1,6 +1,5 @@
 ﻿using SEE.Controls;
 using SEE.Utils;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -13,7 +12,7 @@ namespace SEE.CameraPaths
     ///  the user presses the key KeyBindings.SavePathPosition or periodically.
     /// </summary>
     public class CameraRecorder : MonoBehaviour
-    {        
+    {
         /// <summary>
         /// The directory in which to store path files.
         /// </summary>
@@ -94,7 +93,7 @@ namespace SEE.CameraPaths
         /// <param name="take">the number of the take</param>
         /// <param name="extension">file extension</param>
         /// <returns>filename for the recording as a concatenation of all given input parameters</returns>
-        private string NewName(string path, string basename, string objectName, int take, string extension)
+        private static string NewName(string path, string basename, string objectName, int take, string extension)
         {
             if (!path.EndsWith(Path.DirectorySeparatorChar.ToString()))
             {
@@ -190,8 +189,8 @@ namespace SEE.CameraPaths
 
         /// <summary>
         /// Saves the recorded points in a file.
-        /// 
-        /// This function is called on all game objects before the application is quit. 
+        ///
+        /// This function is called on all game objects before the application is quit.
         /// In the editor it is called when the user stops playmode.
         /// </summary>
         private void OnApplicationQuit()

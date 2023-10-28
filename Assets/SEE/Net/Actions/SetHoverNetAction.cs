@@ -16,17 +16,17 @@ namespace SEE.Net.Actions
         /// the server.
         /// </summary>
         internal static readonly Dictionary<IPEndPoint, HashSet<InteractableObject>> HoveredObjects
-            = new Dictionary<IPEndPoint, HashSet<InteractableObject>>();
+            = new ();
 
         /// <summary>
         /// The id of the interactable.
         /// </summary>
-        public string id;
+        public string ID;
 
         /// <summary>
         /// The hover flags of the interactable.
         /// </summary>
-        public uint hoverFlags;
+        public uint HoverFlags;
 
         /// <summary>
         /// Constructor.
@@ -37,8 +37,8 @@ namespace SEE.Net.Actions
         {
             Assert.IsNotNull(interactable);
 
-            id = interactable.name;
-            this.hoverFlags = hoverFlags;
+            ID = interactable.name;
+            this.HoverFlags = hoverFlags;
         }
 
         /// <summary>
@@ -47,9 +47,9 @@ namespace SEE.Net.Actions
         /// </summary>
         protected override void ExecuteOnServer()
         {
-            if (hoverFlags != 0)
+            if (HoverFlags != 0)
             {
-                InteractableObject interactable = InteractableObject.Get(id);
+                InteractableObject interactable = InteractableObject.Get(ID);
                 if (interactable)
                 {
                     IPEndPoint requester = GetRequester();
@@ -63,7 +63,7 @@ namespace SEE.Net.Actions
             }
             else
             {
-                InteractableObject interactable = InteractableObject.Get(id);
+                InteractableObject interactable = InteractableObject.Get(ID);
                 if (interactable)
                 {
                     IPEndPoint requester = GetRequester();
@@ -86,10 +86,10 @@ namespace SEE.Net.Actions
         {
             if (!IsRequester())
             {
-                InteractableObject interactable = InteractableObject.Get(id);
+                InteractableObject interactable = InteractableObject.Get(ID);
                 if (interactable)
                 {
-                    interactable.SetHoverFlags(hoverFlags, false);
+                    interactable.SetHoverFlags(HoverFlags, false);
                 }
             }
         }

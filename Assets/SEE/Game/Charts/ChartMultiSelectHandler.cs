@@ -33,38 +33,38 @@ namespace SEE.Game.Charts
         /// <summary>
         /// The rectangle used to visualize the selection process for the user.
         /// </summary>
-        [SerializeField] protected RectTransform selectionRect;
+        [SerializeField] protected RectTransform SelectionRect;
 
         /// <summary>
         /// Needed for access to <see cref="Scripts.ChartContent.AreaSelection"/>.
         /// </summary>
-        protected ChartContent chartContent;
+        protected ChartContent ChartContent;
 
         /// <summary>
         /// The position the user started the drag at.
         /// </summary>
-        protected Vector3 startingPos;
+        protected Vector3 StartingPos;
 
         /// <summary>
-        /// Assigns <see cref="chartContent"/>.
+        /// Assigns <see cref="ChartContent"/>.
         /// </summary>
         private void Awake()
         {
-            chartContent = transform.parent.GetComponent<ChartContent>();
+            ChartContent = transform.parent.GetComponent<ChartContent>();
         }
 
         #region UnityEngine Callbacks
 
         /// <summary>
-        /// Activates and sets starting position of <see cref="selectionRect"/>.
+        /// Activates and sets starting position of <see cref="SelectionRect"/>.
         /// </summary>
         /// <param name="eventData">Contains the position data.</param>
         public virtual void OnPointerDown(PointerEventData eventData)
         {
-            selectionRect.gameObject.SetActive(true);
-            selectionRect.position = eventData.pressPosition;
-            startingPos = selectionRect.position;
-            selectionRect.sizeDelta = new Vector2(0.0f, 0.0f);
+            SelectionRect.gameObject.SetActive(true);
+            SelectionRect.position = eventData.pressPosition;
+            StartingPos = SelectionRect.position;
+            SelectionRect.sizeDelta = new Vector2(0.0f, 0.0f);
             if (!SEEInput.ToggleMetricHoveringSelection())
             {
                 InteractableObject.UnhoverAll(true);
@@ -73,55 +73,55 @@ namespace SEE.Game.Charts
         }
 
         /// <summary>
-        /// Resizes the <see cref="selectionRect"/> to make it span from <see cref="startingPos"/> to
+        /// Resizes the <see cref="SelectionRect"/> to make it span from <see cref="StartingPos"/> to
         /// <see cref="PointerEventData.position"/>.
         /// </summary>
         /// <param name="eventData">Contains the position data.</param>
         public virtual void OnDrag(PointerEventData eventData)
         {
             bool negative = false;
-            Vector3 lossyScale = selectionRect.lossyScale;
+            Vector3 lossyScale = SelectionRect.lossyScale;
             Vector2 sizeDelta = Vector2.zero;
 
-            if (eventData.position.x - startingPos.x < 0)
+            if (eventData.position.x - StartingPos.x < 0)
             {
-                selectionRect.sizeDelta = new Vector2(
-                    Mathf.Abs(eventData.position.x - startingPos.x) / selectionRect.lossyScale.x,
-                    (eventData.position.y - startingPos.y) / lossyScale.y
+                SelectionRect.sizeDelta = new Vector2(
+                    Mathf.Abs(eventData.position.x - StartingPos.x) / SelectionRect.lossyScale.x,
+                    (eventData.position.y - StartingPos.y) / lossyScale.y
                 );
-                sizeDelta = selectionRect.sizeDelta;
-                selectionRect.position = new Vector3(
-                    startingPos.x - sizeDelta.x / 2 * lossyScale.x,
-                    startingPos.y + sizeDelta.y / 2 * lossyScale.y,
+                sizeDelta = SelectionRect.sizeDelta;
+                SelectionRect.position = new Vector3(
+                    StartingPos.x - sizeDelta.x / 2 * lossyScale.x,
+                    StartingPos.y + sizeDelta.y / 2 * lossyScale.y,
                     0
                 );
                 negative = true;
             }
 
-            if (eventData.position.y - startingPos.y < 0)
+            if (eventData.position.y - StartingPos.y < 0)
             {
                 if (negative)
                 {
-                    selectionRect.sizeDelta = new Vector2(
-                        selectionRect.sizeDelta.x,
-                        Mathf.Abs(eventData.position.y - startingPos.y) / selectionRect.lossyScale.y
+                    SelectionRect.sizeDelta = new Vector2(
+                        SelectionRect.sizeDelta.x,
+                        Mathf.Abs(eventData.position.y - StartingPos.y) / SelectionRect.lossyScale.y
                     );
-                    selectionRect.position = new Vector3(
-                        selectionRect.position.x,
-                        startingPos.y - selectionRect.sizeDelta.y / 2 * lossyScale.y,
+                    SelectionRect.position = new Vector3(
+                        SelectionRect.position.x,
+                        StartingPos.y - SelectionRect.sizeDelta.y / 2 * lossyScale.y,
                         0
                     );
                 }
                 else
                 {
-                    selectionRect.sizeDelta = new Vector2(
-                        (eventData.position.x - startingPos.x) / lossyScale.x,
-                        Mathf.Abs(eventData.position.y - startingPos.y) / lossyScale.y
+                    SelectionRect.sizeDelta = new Vector2(
+                        (eventData.position.x - StartingPos.x) / lossyScale.x,
+                        Mathf.Abs(eventData.position.y - StartingPos.y) / lossyScale.y
                     );
-                    sizeDelta = selectionRect.sizeDelta;
-                    selectionRect.position = new Vector3(
-                        startingPos.x + sizeDelta.x / 2 * lossyScale.x,
-                        startingPos.y - sizeDelta.y / 2 * lossyScale.y,
+                    sizeDelta = SelectionRect.sizeDelta;
+                    SelectionRect.position = new Vector3(
+                        StartingPos.x + sizeDelta.x / 2 * lossyScale.x,
+                        StartingPos.y - sizeDelta.y / 2 * lossyScale.y,
                         0
                     );
                     negative = true;
@@ -130,34 +130,34 @@ namespace SEE.Game.Charts
 
             if (!negative)
             {
-                selectionRect.sizeDelta = new Vector2(
-                    (eventData.position.x - startingPos.x) / lossyScale.x,
-                    (eventData.position.y - startingPos.y) / lossyScale.y
+                SelectionRect.sizeDelta = new Vector2(
+                    (eventData.position.x - StartingPos.x) / lossyScale.x,
+                    (eventData.position.y - StartingPos.y) / lossyScale.y
                 );
-                sizeDelta = selectionRect.sizeDelta;
-                selectionRect.position = new Vector3(
-                    startingPos.x + sizeDelta.x / 2 * lossyScale.x,
-                    startingPos.y + sizeDelta.y / 2 * lossyScale.y,
+                sizeDelta = SelectionRect.sizeDelta;
+                SelectionRect.position = new Vector3(
+                    StartingPos.x + sizeDelta.x / 2 * lossyScale.x,
+                    StartingPos.y + sizeDelta.y / 2 * lossyScale.y,
                     0
                 );
             }
 
-            Vector2 min = Vector2.Min(startingPos, eventData.position);
-            Vector2 max = Vector2.Max(startingPos, eventData.position);
-            chartContent.AreaHover(min, max);
+            Vector2 min = Vector2.Min(StartingPos, eventData.position);
+            Vector2 max = Vector2.Max(StartingPos, eventData.position);
+            ChartContent.AreaHover(min, max);
         }
 
         /// <summary>
-        /// Highlights all markers in <see cref="selectionRect"/> and deactivates it.
+        /// Highlights all markers in <see cref="SelectionRect"/> and deactivates it.
         /// </summary>
         /// <param name="eventData">Contains the position data.</param>
         public virtual void OnPointerUp(PointerEventData eventData)
         {
             InteractableObject.UnhoverAll(true);
-            Vector2 min = Vector2.Min(startingPos, eventData.position);
-            Vector2 max = Vector2.Max(startingPos, eventData.position);
-            chartContent.AreaSelection(min, max);
-            selectionRect.gameObject.SetActive(false);
+            Vector2 min = Vector2.Min(StartingPos, eventData.position);
+            Vector2 max = Vector2.Max(StartingPos, eventData.position);
+            ChartContent.AreaSelection(min, max);
+            SelectionRect.gameObject.SetActive(false);
         }
 
         #endregion

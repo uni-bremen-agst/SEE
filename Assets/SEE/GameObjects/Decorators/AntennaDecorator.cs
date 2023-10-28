@@ -67,13 +67,13 @@ namespace SEE.GO.Decorators
         /// will be an immediate child of the node to be decorated. The antenna
         /// segments are the immediate children of this antenna game object.
         /// </summary>
-        private const string AntennaGameObjectName = "Antenna";
+        private const string antennaGameObjectName = "Antenna";
 
         /// <summary>
         /// Adds an antenna above <paramref name="gameNode"/>. The antenna consists of
         /// antenna segments as specified by the <see cref="AntennaAttributes"/> passed
         /// to the constructor. All created antenna segments will be children of a new
-        /// empty game object named <see cref="AntennaGameObjectName"/>, which in turn
+        /// empty game object named <see cref="antennaGameObjectName"/>, which in turn
         /// will be an immediate child of <paramref name="gameNode"/>. If <paramref name="gameNode"/>
         /// does not have any of the metrics specified in <see cref="antennaAttributes"/>,
         /// nothing happens.
@@ -130,7 +130,7 @@ namespace SEE.GO.Decorators
             {
                 if (antenna == null)
                 {
-                    antenna = new GameObject(AntennaGameObjectName);
+                    antenna = new GameObject(antennaGameObjectName);
                     antenna.tag = Tags.Decoration;
                     antenna.transform.localScale = Vector3.one;
                 }
@@ -154,11 +154,11 @@ namespace SEE.GO.Decorators
         /// node attached)</param>
         /// <exception cref="Exception">thrown if <paramref name="gameNode"/> does
         /// not have a graph node attached</exception>
-        public void RemoveAntenna(GameObject gameNode)
+        public static void RemoveAntenna(GameObject gameNode)
         {
             foreach (Transform child in gameNode.transform)
             {
-                if (child.name == AntennaGameObjectName && child.CompareTag(Tags.Decoration))
+                if (child.name == antennaGameObjectName && child.CompareTag(Tags.Decoration))
                 {
                     child.transform.SetParent(null);
                     Destroyer.Destroy(child.gameObject);

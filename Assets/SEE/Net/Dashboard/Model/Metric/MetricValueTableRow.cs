@@ -12,54 +12,54 @@ namespace SEE.Net.Dashboard.Model.Metric
         /// <summary>
         /// The Metric ID.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string metric;
+        [JsonProperty(PropertyName = "metric", Required = Required.Always)]
+        public readonly string Metric;
 
         /// <summary>
         /// The source file of the entity definition if available.
         /// </summary>
-        [JsonProperty(Required = Required.Default)]
-        public readonly string path;
+        [JsonProperty(PropertyName = "path", Required = Required.Default)]
+        public readonly string Path;
 
         /// <summary>
         /// The source file line number of the entity definition if available.
         /// </summary>
-        [JsonProperty(Required = Required.Default)]
-        public readonly uint? line;
+        [JsonProperty(PropertyName = "line", Required = Required.Default)]
+        public readonly uint? Line;
 
         /// <summary>
         /// The measured or aggregated metric value.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly float value;
+        [JsonProperty(PropertyName = "value", Required = Required.Always)]
+        public readonly float Value;
 
         /// <summary>
         /// The non-unique entity name.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string entity;
+        [JsonProperty(PropertyName = "entity", Required = Required.Always)]
+        public readonly string Entity;
 
         /// <summary>
         /// The entity type.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string entityType;
+        [JsonProperty(PropertyName = "entityType", Required = Required.Always)]
+        public readonly string EntityType;
 
         /// <summary>
         /// The project-wide entity ID.
         /// </summary>
-        [JsonProperty(Required = Required.Always)]
-        public readonly string entityId;
+        [JsonProperty(PropertyName = "entityId", Required = Required.Always)]
+        public readonly string EntityId;
 
         public MetricValueTableRow(string metric, string path, uint? line, float value, string entity, string entityType, string entityId)
         {
-            this.metric = metric;
-            this.path = path;
-            this.line = line;
-            this.value = value;
-            this.entity = entity;
-            this.entityType = entityType;
-            this.entityId = entityId;
+            this.Metric = metric;
+            this.Path = path;
+            this.Line = line;
+            this.Value = value;
+            this.Entity = entity;
+            this.EntityType = entityType;
+            this.EntityId = entityId;
         }
     }
 }

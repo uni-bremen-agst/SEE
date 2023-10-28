@@ -2,6 +2,7 @@
 using SEE.Game.Avatars;
 using SEE.Utils;
 using UnityEngine;
+using SEE.Utils.Paths;
 
 #if UNITY_EDITOR
 

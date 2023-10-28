@@ -28,7 +28,7 @@ namespace SEE.Layout.EdgeLayouts
         public BundledEdgeLayout(bool edgesAboveBlocks, float minLevelDistance, float tension = 0.85f)
             : base(edgesAboveBlocks, minLevelDistance)
         {
-            name = "Hierarchically Bundled";
+            Name = "Hierarchically Bundled";
             Debug.Assert(0.0f <= tension && tension <= 1.0f);
             this.tension = tension;
             levelDistance = minLevelDistance;
@@ -82,7 +82,7 @@ namespace SEE.Layout.EdgeLayouts
 
                 MinMaxBlockY(nodes, out float minY, out float maxY, out float maxHeight);
                 levelDistance = Math.Max(levelDistance, maxHeight / 5.0f);
-                levelOffset = edgesAboveBlocks ? maxY + levelDistance : minY - levelDistance;
+                levelOffset = EdgesAboveBlocks ? maxY + levelDistance : minY - levelDistance;
 
                 LCAFinder<ILayoutNode> lca = new LCAFinder<ILayoutNode>(roots.Cast<ILayoutNode>().ToList());
 
@@ -190,7 +190,7 @@ namespace SEE.Layout.EdgeLayouts
             EqualityComparer<T> comparer = EqualityComparer<T>.Default;
             if (comparer.Equals(source, target))
             {
-                return SelfLoop(source, edgesAboveBlocks, levelDistance);
+                return SelfLoop(source, EdgesAboveBlocks, levelDistance);
             }
 
             // Lowest common ancestor
@@ -245,7 +245,7 @@ namespace SEE.Layout.EdgeLayouts
             }
             // Calculate control points along the node hierarchy
             Vector3[] controlPoints = new Vector3[fullPath.Length];
-            controlPoints[0] = edgesAboveBlocks ? source.Roof : source.Ground;
+            controlPoints[0] = EdgesAboveBlocks ? source.Roof : source.Ground;
             for (int i = 1; i < fullPath.Length - 1; i++)
             {
                 // We consider the height of intermediate nodes.
@@ -259,7 +259,7 @@ namespace SEE.Layout.EdgeLayouts
 
             }
 
-            controlPoints[controlPoints.Length - 1] = edgesAboveBlocks ? target.Roof : target.Ground;
+            controlPoints[controlPoints.Length - 1] = EdgesAboveBlocks ? target.Roof : target.Ground;
             uint degree = controlPoints.Length >= 4 ? 3 : (uint)controlPoints.Length - 1;
             return new TinySpline.BSpline((uint)controlPoints.Length, 3, degree)
             {
@@ -282,8 +282,8 @@ namespace SEE.Layout.EdgeLayouts
         /// <returns>control points for a direct spline between the two nodes</returns>
         private TinySpline.BSpline DirectSpline(ILayoutNode source, ILayoutNode target, float yLevel)
         {
-            Vector3 start = edgesAboveBlocks ? source.Roof : source.Ground;
-            Vector3 end = edgesAboveBlocks ? target.Roof : target.Ground;
+            Vector3 start = EdgesAboveBlocks ? source.Roof : source.Ground;
+            Vector3 end = EdgesAboveBlocks ? target.Roof : target.Ground;
             // position in between start and end
             Vector3 middle = Vector3.Lerp(start, end, 0.5f);
             middle.y = yLevel;
@@ -308,7 +308,7 @@ namespace SEE.Layout.EdgeLayouts
         private float GetLevelHeight(int level)
         {
             float relativeLevelDistance = (maxLevel - level) * levelDistance;
-            if (edgesAboveBlocks)
+            if (EdgesAboveBlocks)
             {
                 return levelOffset + relativeLevelDistance;
             }

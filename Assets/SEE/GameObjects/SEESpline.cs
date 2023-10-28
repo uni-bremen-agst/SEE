@@ -52,7 +52,7 @@ namespace SEE.GO
         /// What the name says.
         /// </summary>
         [NonSerialized]
-        private const float PI2 = Mathf.PI * 2f;
+        private const float doublePi = Mathf.PI * 2f;
 
         /// <summary>
         /// Indicates whether the rendering of <see cref="spline"/> must be
@@ -232,7 +232,7 @@ namespace SEE.GO
         /// The material this edge uses, if it uses a mesh renderer.
         /// If it does not, using this property causes a mesh to be created.
         /// </summary>
-        public Material meshMaterial
+        public Material MeshMaterial
         {
             get
             {
@@ -245,7 +245,7 @@ namespace SEE.GO
             }
             set
             {
-                if (meshMaterial != value)
+                if (MeshMaterial != value)
                 {
                     meshRenderer.sharedMaterial = value;
                     UpdateMaterial();
@@ -401,9 +401,9 @@ namespace SEE.GO
 
             for (int j = 0; j <= radialSegments; j++)
             {
-                float V = j * radialSegmentsInv * PI2;
-                sinValues[j] = Mathf.Sin(V);
-                cosValues[j] = Mathf.Cos(V);
+                float v = j * radialSegmentsInv * doublePi;
+                sinValues[j] = Mathf.Sin(v);
+                cosValues[j] = Mathf.Cos(v);
             }
             // TODO: This loop is the main culprit for the performance issues when splines are modified.
             //       I have already tried optimizing it (see PR #622), which resulted in promising improvements, more
@@ -668,7 +668,7 @@ namespace SEE.GO
     /// spline. To evaluate the morphism at a certain point, call
     /// <see cref="Morph(double)"/> with corresponding time parameter.
     ///
-    /// <see cref="CreateTween"/> can be used to create a <see cref="Tween"/>
+    /// <see cref="CreateTween"/> can be used to create a <see cref="DG.Tweening.Tween"/>
     /// object with which the morphism can be played as an animation.
     /// The animation can be controlled using the tween object.
     /// </summary>
@@ -678,10 +678,10 @@ namespace SEE.GO
         /// Origin of the spline morphism.
         /// </summary>
         [NonSerialized]
-        private BSpline Source;
+        private BSpline source;
 
         /// <summary>
-        /// Serializable representation of <see cref="Source"/>.
+        /// Serializable representation of <see cref="source"/>.
         /// </summary>
         [SerializeField]
         private SerializableSpline serializableSource;
@@ -690,10 +690,10 @@ namespace SEE.GO
         /// Target of the spline morphism.
         /// </summary>
         [NonSerialized]
-        private BSpline Target;
+        private BSpline target;
 
         /// <summary>
-        /// Serializable representation of <see cref="Target"/>.
+        /// Serializable representation of <see cref="target"/>.
         /// </summary>
         [SerializeField]
         private SerializableSpline serializableTarget;
@@ -705,13 +705,13 @@ namespace SEE.GO
         private Morphism morphism;
 
         /// <summary>
-        /// The tween which can play the spline morphism from <see cref="Source"/>
-        /// to <see cref="Target"/>, created by <see cref="CreateTween"/>.
+        /// The tween which can play the spline morphism from <see cref="source"/>
+        /// to <see cref="target"/>, created by <see cref="CreateTween"/>.
         /// </summary>
-        public Tween tween;
+        public Tween Tween;
 
         /// <summary>
-        /// Creates a new <see cref="Tween"/> which can play the spline morphism from <paramref name="source"/>
+        /// Creates a new <see cref="DG.Tweening.Tween"/> which can play the spline morphism from <paramref name="source"/>
         /// to <see name="target"/>, taking <paramref name="duration"/> seconds.
         /// </summary>
         /// <param name="source">Origin of the spline morphism</param>
@@ -724,7 +724,7 @@ namespace SEE.GO
         public Tween CreateTween(BSpline source, BSpline target, float duration)
         {
             Init(source, target);
-            return tween = DOTween.To(t => Morph(t), 0f, 1f, Math.Max(duration, 0.01f));
+            return Tween = DOTween.To(t => Morph(t), 0f, 1f, Math.Max(duration, 0.01f));
         }
 
         /// <summary>
@@ -733,15 +733,15 @@ namespace SEE.GO
         /// <param name="newTarget">The new target of this morphism.</param>
         public void ChangeTarget(BSpline newTarget)
         {
-            Target = newTarget;
-            morphism = Source.MorphTo(Target);
+            target = newTarget;
+            morphism = source.MorphTo(target);
         }
 
         /// <summary>
         /// Whether the <paramref name="tween"/> belonging to this morphism is active.
         /// If no tween exists, <c>false</c> will be returned.
         /// </summary>
-        public bool IsActive() => tween?.IsActive() ?? false;
+        public bool IsActive() => Tween?.IsActive() ?? false;
 
         /// <summary>
         /// Initializes the spline morphism.
@@ -753,8 +753,8 @@ namespace SEE.GO
         /// <param name="target">Target of the spline morphism</param>
         public void Init(BSpline source, BSpline target)
         {
-            Source = source;
-            Target = target;
+            this.source = source;
+            this.target = target;
             morphism = source.MorphTo(target);
             Morph(0); // Morph to source.
         }
@@ -788,16 +788,16 @@ namespace SEE.GO
         protected override void OnBeforeSerialize()
         {
             base.OnBeforeSerialize();
-            serializableSource = TinySplineInterop.Serialize(Source);
-            serializableTarget = TinySplineInterop.Serialize(Target);
+            serializableSource = TinySplineInterop.Serialize(source);
+            serializableTarget = TinySplineInterop.Serialize(target);
         }
 
         protected override void OnAfterDeserialize()
         {
             base.OnAfterDeserialize();
-            Source = TinySplineInterop.Deserialize(serializableSource);
-            Target = TinySplineInterop.Deserialize(serializableTarget);
-            morphism = Source.MorphTo(Target);
+            source = TinySplineInterop.Deserialize(serializableSource);
+            target = TinySplineInterop.Deserialize(serializableTarget);
+            morphism = source.MorphTo(target);
         }
     }
 }

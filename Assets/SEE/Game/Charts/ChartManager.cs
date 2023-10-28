@@ -40,7 +40,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// The instance of the <see cref="ChartManager" />, to ensure there will be only one.
         /// </summary>
-        private static ChartManager _instance;
+        private static ChartManager instance;
 
         /// <summary>
         /// Returns the unique chart manager component in the scene.
@@ -54,7 +54,7 @@ namespace SEE.Game.Charts
         {
             get
             {
-                if (_instance == null)
+                if (instance == null)
                 {
                     GameObject[] chartManagers = GameObject.FindGameObjectsWithTag(Tags.ChartManager);
                     if (chartManagers.Length == 0)
@@ -66,14 +66,14 @@ namespace SEE.Game.Charts
                     {
                         Debug.LogError($"There are multiple chart managers named {Tags.ChartManager} in the scene.\n");
                     }
-                    _instance = chartManagers[0].GetComponent<ChartManager>();
-                    if (_instance == null)
+                    instance = chartManagers[0].GetComponent<ChartManager>();
+                    if (instance == null)
                     {
                         Debug.LogWarning($"The game object named {Tags.ChartManager} does not have a ChartManager component. Will be added.\n");
-                        _instance = chartManagers[0].AddComponent<ChartManager>();
+                        instance = chartManagers[0].AddComponent<ChartManager>();
                     }
                 }
-                return _instance;
+                return instance;
             }
         }
 
@@ -116,7 +116,7 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Determines if the scene is being played in VR or not.
         /// </summary>
-        private bool _isVirtualReality;
+        private bool isVirtualReality;
 
         [Header("Virtual Reality")]
 
@@ -169,17 +169,17 @@ namespace SEE.Game.Charts
         /// <summary>
         /// Contains the chart UI.
         /// </summary>
-        private GameObject _chartsOpen;
+        private GameObject chartsOpen;
 
         /// <summary>
         /// Checks if the scene is started in VR and initializes it accordingly.
         /// </summary>
         private void Start()
         {
-            _isVirtualReality = SceneSettings.InputType == PlayerInputType.VRPlayer;
-            if (!_isVirtualReality)
+            isVirtualReality = SceneSettings.InputType == PlayerInputType.VRPlayer;
+            if (!isVirtualReality)
             {
-                _chartsOpen = GameObject.Find("ChartCanvas") != null
+                chartsOpen = GameObject.Find("ChartCanvas") != null
                     ? GameObject.Find("ChartCanvas").transform.Find("ChartsOpen").gameObject
                     : Instantiate(chartsPrefab).transform.Find("ChartsOpen").gameObject;
             }
@@ -206,8 +206,8 @@ namespace SEE.Game.Charts
         /// <returns>Whether the charts are currently opened.</returns>
         public bool ToggleCharts()
         {
-            bool result = !_chartsOpen.activeInHierarchy;
-            _chartsOpen.SetActive(result);
+            bool result = !chartsOpen.activeInHierarchy;
+            chartsOpen.SetActive(result);
             return result;
         }
 
@@ -217,7 +217,7 @@ namespace SEE.Game.Charts
         /// <returns></returns>
         public bool IsOpened()
         {
-            return _chartsOpen.activeInHierarchy;
+            return chartsOpen.activeInHierarchy;
         }
 
         /// <summary>

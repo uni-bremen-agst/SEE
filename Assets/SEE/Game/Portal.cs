@@ -13,12 +13,12 @@ namespace SEE.Game
         /// <summary>
         /// Cached property index for the _PortalMin shader property (Portal Left Front Corner).
         /// </summary>
-        private static readonly int PortalMin = Shader.PropertyToID("_PortalMin");
+        private static readonly int portalMin = Shader.PropertyToID("_PortalMin");
 
         /// <summary>
         /// Cached property index for the _PortalMax shader property (Portal Right Back Corner).
         /// </summary>
-        private static readonly int PortalMax = Shader.PropertyToID("_PortalMax");
+        private static readonly int portalMax = Shader.PropertyToID("_PortalMax");
 
         /// <summary>
         /// Sets the culling area (portal) of all children of <paramref name="parent"/> to the
@@ -82,7 +82,7 @@ namespace SEE.Game
         /// with <paramref name="leftFront"/> corner and <paramref name="rightBack"/> corner.
         ///
         /// Precondition: <paramref name="material"/> must have a the attributes
-        /// <see cref="PortalMin"/> and <see cref="PortalMax"/>. If they do not
+        /// <see cref="portalMin"/> and <see cref="portalMax"/>. If they do not
         /// exist, the result is undefined.
         /// </summary>
         /// <param name="gameObject">game objects whose portal is requested</param>
@@ -93,8 +93,8 @@ namespace SEE.Game
             // Although PortalMin and PortalMax are Vector4, only their x and y component
             // is set. The x component is the x axis in Unity space, but the y component
             // is the z axis in Unity space.
-            Vector4 portalLeftFrontCorner = material.GetVector(PortalMin);
-            Vector4 portalRightBackCorner = material.GetVector(PortalMax);
+            Vector4 portalLeftFrontCorner = material.GetVector(portalMin);
+            Vector4 portalRightBackCorner = material.GetVector(portalMax);
             leftFront.x = portalLeftFrontCorner.x;
             leftFront.y = portalLeftFrontCorner.y;
             rightBack.x = portalRightBackCorner.x;
@@ -173,22 +173,22 @@ namespace SEE.Game
         /// Whether to also set the portal for descendants of <paramref name="gameObject"/> too
         /// </param>
         public static void SetPortal(GameObject root, GameObject gameObject,
-                                     IncludeDescendants includeDescendants = IncludeDescendants.ONLY_SELF)
+                                     IncludeDescendants includeDescendants = IncludeDescendants.OnlySelf)
         {
             GetDimensions(root, out Vector2 leftFront, out Vector2 rightBack);
 
             switch (includeDescendants)
             {
-                case IncludeDescendants.DIRECT_DESCENDANTS:
+                case IncludeDescendants.DirectDescendants:
                     foreach (Transform child in gameObject.transform)
                     {
                         SetPortalOfMaterials(child.gameObject, leftFront, rightBack);
                     }
 
                     // We also need to set the portal of the gameObject itself
-                    goto case IncludeDescendants.ONLY_SELF;
+                    goto case IncludeDescendants.OnlySelf;
 
-                case IncludeDescendants.ALL_DESCENDANTS:
+                case IncludeDescendants.AllDescendants:
                     // We will go through the children of gameObject using pre-order-traversal.
                     static void SetPortalOfMaterialsRecursive(GameObject go, Vector2 leftFront, Vector2 rightBack)
                     {
@@ -202,7 +202,7 @@ namespace SEE.Game
                     SetPortalOfMaterialsRecursive(gameObject, leftFront, rightBack);
                     break;
 
-                case IncludeDescendants.ONLY_SELF:
+                case IncludeDescendants.OnlySelf:
                     SetPortalOfMaterials(gameObject, leftFront, rightBack);
                     break;
 
@@ -221,17 +221,17 @@ namespace SEE.Game
             /// <summary>
             /// Will only set the portal of this game object.
             /// </summary>
-            ONLY_SELF,
+            OnlySelf,
 
             /// <summary>
             /// Will set the portal of the direct descendants of this game object.
             /// </summary>
-            DIRECT_DESCENDANTS,
+            DirectDescendants,
 
             /// <summary>
             /// Will set the portal of all descendants (recursively) of this game object.
             /// </summary>
-            ALL_DESCENDANTS
+            AllDescendants
         }
 
         /// <summary>
@@ -273,16 +273,16 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Sets <see cref="PortalMin"/> of <paramref name="material"/> to <paramref name="leftFrontCorner"/>
-        /// and <see cref="PortalMax"/> of <paramref name="material"/> to <paramref name="rightBackCorner"/>.
+        /// Sets <see cref="portalMin"/> of <paramref name="material"/> to <paramref name="leftFrontCorner"/>
+        /// and <see cref="portalMax"/> of <paramref name="material"/> to <paramref name="rightBackCorner"/>.
         /// </summary>
         /// <param name="material">the material whose portal is to be set</param>
         /// <param name="leftFrontCorner">left front corner of the portal</param>
         /// <param name="rightBackCorner">right back corner of the portal</param>
         private static void SetPortal(Material material, Vector2 leftFrontCorner, Vector2 rightBackCorner)
         {
-            material.SetVector(PortalMin, new Vector4(leftFrontCorner.x, leftFrontCorner.y));
-            material.SetVector(PortalMax, new Vector4(rightBackCorner.x, rightBackCorner.y));
+            material.SetVector(portalMin, new Vector4(leftFrontCorner.x, leftFrontCorner.y));
+            material.SetVector(portalMax, new Vector4(rightBackCorner.x, rightBackCorner.y));
         }
     }
 }

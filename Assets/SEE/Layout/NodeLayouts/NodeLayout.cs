@@ -18,26 +18,21 @@ namespace SEE.Layout.NodeLayouts
         /// placed on this level</param>
         public NodeLayout(float groundLevel)
         {
-            this.groundLevel = groundLevel;
+            this.GroundLevel = groundLevel;
         }
 
         /// <summary>
-        /// Name of the layout. Must be set by all concrete subclasses.
-        /// </summary>
-        protected string name = "";
-
-        /// <summary>
-        /// The unique name of a layout.
+        /// The unique name of a layout.  Must be set by all concrete subclasses.
         /// </summary>
         public string Name
         {
-            get => name;
-        }
+            get; protected set;
+        } = string.Empty;
 
         /// <summary>
         /// The y co-ordinate of the ground where blocks are placed.
         /// </summary>
-        protected readonly float groundLevel;
+        protected readonly float GroundLevel;
 
         /// <summary>
         /// If inner nodes are represented as visible objects covering their total area
@@ -49,7 +44,7 @@ namespace SEE.Layout.NodeLayouts
         /// height factor for each level. It will be multiplied by the level to obtain
         /// an inner node's y co-ordinate.
         /// </summary>
-        protected const float levelIncreaseForInnerNodes = 0.015f;
+        protected const float LevelIncreaseForInnerNodes = 0.015f;
 
         /// <summary>
         /// Returns the lift for an innner node as a product of its tree level
@@ -62,7 +57,7 @@ namespace SEE.Layout.NodeLayouts
         /// <returns>lift for an innner node</returns>
         protected static float LevelLift(ILayoutNode node)
         {
-            return node.Level * levelIncreaseForInnerNodes;
+            return node.Level * LevelIncreaseForInnerNodes;
         }
 
         /// <summary>
@@ -104,7 +99,7 @@ namespace SEE.Layout.NodeLayouts
             foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
             {
                 NodeTransform transform = entry.Value;
-                transform.position += offset;
+                transform.Position += offset;
                 result[entry.Key] = transform;
             }
             return result;
@@ -328,18 +323,18 @@ namespace SEE.Layout.NodeLayouts
         /// Applies the <see cref="NodeTransform"/> values to its corresponding <see cref="ILayoutNode"/>.
         /// </summary>
         /// <param name="layout">the calculated layout to be applied</param>
-        private void ApplyLayoutNodeTransform<T>(Dictionary<T, NodeTransform> layout) where T : ILayoutNode
+        private static void ApplyLayoutNodeTransform<T>(Dictionary<T, NodeTransform> layout) where T : ILayoutNode
         {
             foreach (KeyValuePair<T, NodeTransform> entry in layout)
             {
                 T node = entry.Key;
                 NodeTransform transform = entry.Value;
                 // y co-ordinate of transform.position refers to the ground
-                Vector3 position = transform.position;
-                position.y += transform.scale.y / 2.0f;
+                Vector3 position = transform.Position;
+                position.y += transform.Scale.y / 2.0f;
                 node.CenterPosition = position;
-                node.LocalScale = transform.scale;
-                node.Rotation = transform.rotation;
+                node.LocalScale = transform.Scale;
+                node.Rotation = transform.Rotation;
             }
         }
     }

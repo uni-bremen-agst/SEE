@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SEE.DataModel.DG;
-using SEE.Utils;
+using SEE.Utils.Config;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -58,7 +58,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The attribute name of the metric representing architecture violations.
         /// </summary>
-        public string ArchitectureIssue = NumericAttributeNames.Architecture_Violations.Name(); // serialized by Unity
+        public string ArchitectureIssue = NumericAttributeNames.ArchitectureViolations.Name(); // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing duplicated code.
         /// </summary>
@@ -70,7 +70,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The attribute name of the metric representing dead code.
         /// </summary>
-        public string Dead_CodeIssue = NumericAttributeNames.Dead_Code.Name(); // serialized by Unity
+        public string DeadCodeIssue = NumericAttributeNames.DeadCode.Name(); // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing metric violations.
         /// </summary>
@@ -87,69 +87,69 @@ namespace SEE.Game.City
         //-----------------------------------------------------------------------
         // Software erosion issues shown as icons on Donut charts for inner nodes
         //-----------------------------------------------------------------------
-        public const string SUM_Postfix = "_SUM";
+        public const string SumPostfix = "_SUM";
         /// <summary>
         /// The attribute name of the metric representing the sum of all architecture violations
         /// for an inner node.
         /// </summary>
-        public string ArchitectureIssue_SUM = NumericAttributeNames.Architecture_Violations.Name() + SUM_Postfix; // serialized by Unity
+        public string ArchitectureIssueSum = NumericAttributeNames.ArchitectureViolations.Name() + SumPostfix; // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing the sum of all clones
         /// for an inner node.
         /// </summary>
-        public string CloneIssue_SUM = NumericAttributeNames.Clone.Name() + SUM_Postfix; // serialized by Unity
+        public string CloneIssueSum = NumericAttributeNames.Clone.Name() + SumPostfix; // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing the sum of all cycles
         /// for an inner node.
         /// </summary>
-        public string CycleIssue_SUM = NumericAttributeNames.Cycle.Name() + SUM_Postfix; // serialized by Unity
+        public string CycleIssueSum = NumericAttributeNames.Cycle.Name() + SumPostfix; // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing the sum of all dead entities
         /// for an inner node.
         /// </summary>
-        public string Dead_CodeIssue_SUM = NumericAttributeNames.Dead_Code.Name() + SUM_Postfix; // serialized by Unity
+        public string DeadCodeIssueSum = NumericAttributeNames.DeadCode.Name() + SumPostfix; // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing the sum of all metric violations
         /// for an inner node.
         /// </summary>
-        public string MetricIssue_SUM = NumericAttributeNames.Metric.Name() + SUM_Postfix; // serialized by Unity
+        public string MetricIssueSum = NumericAttributeNames.Metric.Name() + SumPostfix; // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing the sum of all style violations
         /// for an inner node.
         /// </summary>
-        public string StyleIssue_SUM = NumericAttributeNames.Style.Name() + SUM_Postfix; // serialized by Unity
+        public string StyleIssueSum = NumericAttributeNames.Style.Name() + SumPostfix; // serialized by Unity
         /// <summary>
         /// The attribute name of the metric representing the sum of all other kinds of
         /// software erosions for an inner node.
         /// </summary>
-        public string UniversalIssue_SUM = NumericAttributeNames.Universal.Name() + SUM_Postfix; // serialized by Unity
+        public string UniversalIssueSum = NumericAttributeNames.Universal.Name() + SumPostfix; // serialized by Unity
 
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(ShowInnerErosions, ShowInnerErosionsLabel);
-            writer.Save(ShowLeafErosions, ShowLeafErosionsLabel);
-            writer.Save(LoadDashboardMetrics, LoadDashboardMetricsLabel);
-            writer.Save(OverrideMetrics, OverrideMetricsLabel);
-            writer.Save(ShowIssuesInCodeWindow, ShowIssuesInCodeWindowLabel);
-            writer.Save(IssuesAddedFromVersion, IssuesFromVersionLabel);
-            writer.Save(ErosionScalingFactor, ErosionScalingFactorLabel);
+            writer.Save(ShowInnerErosions, showInnerErosionsLabel);
+            writer.Save(ShowLeafErosions, showLeafErosionsLabel);
+            writer.Save(LoadDashboardMetrics, loadDashboardMetricsLabel);
+            writer.Save(OverrideMetrics, overrideMetricsLabel);
+            writer.Save(ShowIssuesInCodeWindow, showIssuesInCodeWindowLabel);
+            writer.Save(IssuesAddedFromVersion, issuesFromVersionLabel);
+            writer.Save(ErosionScalingFactor, erosionScalingFactorLabel);
 
-            writer.Save(StyleIssue, StyleIssueLabel);
-            writer.Save(UniversalIssue, UniversalIssueLabel);
-            writer.Save(MetricIssue, MetricIssueLabel);
-            writer.Save(Dead_CodeIssue, Dead_CodeIssueLabel);
-            writer.Save(CycleIssue, CycleIssueLabel);
-            writer.Save(CloneIssue, CloneIssueLabel);
-            writer.Save(ArchitectureIssue, ArchitectureIssueLabel);
+            writer.Save(StyleIssue, styleIssueLabel);
+            writer.Save(UniversalIssue, universalIssueLabel);
+            writer.Save(MetricIssue, metricIssueLabel);
+            writer.Save(DeadCodeIssue, deadCodeIssueLabel);
+            writer.Save(CycleIssue, cycleIssueLabel);
+            writer.Save(CloneIssue, cloneIssueLabel);
+            writer.Save(ArchitectureIssue, architectureIssueLabel);
 
-            writer.Save(StyleIssue_SUM, StyleIssue_SUMLabel);
-            writer.Save(UniversalIssue_SUM, UniversalIssue_SUMLabel);
-            writer.Save(MetricIssue_SUM, MetricIssue_SUMLabel);
-            writer.Save(Dead_CodeIssue_SUM, Dead_CodeIssue_SUMLabel);
-            writer.Save(CycleIssue_SUM, CycleIssue_SUMLabel);
-            writer.Save(CloneIssue_SUM, CloneIssue_SUMLabel);
-            writer.Save(ArchitectureIssue_SUM, ArchitectureIssue_SUMLabel);
+            writer.Save(StyleIssueSum, styleIssueSumLabel);
+            writer.Save(UniversalIssueSum, universalIssueSumLabel);
+            writer.Save(MetricIssueSum, metricIssueSumLabel);
+            writer.Save(DeadCodeIssueSum, deadCodeIssueSumLabel);
+            writer.Save(CycleIssueSum, cycleIssueSumLabel);
+            writer.Save(CloneIssueSum, cloneIssueSumLabel);
+            writer.Save(ArchitectureIssueSum, architectureIssueSumLabel);
             writer.EndGroup();
         }
 
@@ -159,54 +159,54 @@ namespace SEE.Game.City
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
-                ConfigIO.Restore(values, ShowInnerErosionsLabel, ref ShowInnerErosions);
-                ConfigIO.Restore(values, ShowLeafErosionsLabel, ref ShowLeafErosions);
-                ConfigIO.Restore(values, LoadDashboardMetricsLabel, ref LoadDashboardMetrics);
-                ConfigIO.Restore(values, OverrideMetricsLabel, ref OverrideMetrics);
-                ConfigIO.Restore(values, ShowIssuesInCodeWindowLabel, ref ShowIssuesInCodeWindow);
-                ConfigIO.Restore(values, IssuesFromVersionLabel, ref IssuesAddedFromVersion);
-                ConfigIO.Restore(values, ErosionScalingFactorLabel, ref ErosionScalingFactor);
+                ConfigIO.Restore(values, showInnerErosionsLabel, ref ShowInnerErosions);
+                ConfigIO.Restore(values, showLeafErosionsLabel, ref ShowLeafErosions);
+                ConfigIO.Restore(values, loadDashboardMetricsLabel, ref LoadDashboardMetrics);
+                ConfigIO.Restore(values, overrideMetricsLabel, ref OverrideMetrics);
+                ConfigIO.Restore(values, showIssuesInCodeWindowLabel, ref ShowIssuesInCodeWindow);
+                ConfigIO.Restore(values, issuesFromVersionLabel, ref IssuesAddedFromVersion);
+                ConfigIO.Restore(values, erosionScalingFactorLabel, ref ErosionScalingFactor);
 
-                ConfigIO.Restore(values, StyleIssueLabel, ref StyleIssue);
-                ConfigIO.Restore(values, UniversalIssueLabel, ref UniversalIssue);
-                ConfigIO.Restore(values, MetricIssueLabel, ref MetricIssue);
-                ConfigIO.Restore(values, Dead_CodeIssueLabel, ref Dead_CodeIssue);
-                ConfigIO.Restore(values, CycleIssueLabel, ref CycleIssue);
-                ConfigIO.Restore(values, CloneIssueLabel, ref CloneIssue);
-                ConfigIO.Restore(values, ArchitectureIssueLabel, ref ArchitectureIssue);
+                ConfigIO.Restore(values, styleIssueLabel, ref StyleIssue);
+                ConfigIO.Restore(values, universalIssueLabel, ref UniversalIssue);
+                ConfigIO.Restore(values, metricIssueLabel, ref MetricIssue);
+                ConfigIO.Restore(values, deadCodeIssueLabel, ref DeadCodeIssue);
+                ConfigIO.Restore(values, cycleIssueLabel, ref CycleIssue);
+                ConfigIO.Restore(values, cloneIssueLabel, ref CloneIssue);
+                ConfigIO.Restore(values, architectureIssueLabel, ref ArchitectureIssue);
 
-                ConfigIO.Restore(values, StyleIssue_SUMLabel, ref StyleIssue_SUM);
-                ConfigIO.Restore(values, UniversalIssue_SUMLabel, ref UniversalIssue_SUM);
-                ConfigIO.Restore(values, MetricIssue_SUMLabel, ref MetricIssue_SUM);
-                ConfigIO.Restore(values, Dead_CodeIssue_SUMLabel, ref Dead_CodeIssue_SUM);
-                ConfigIO.Restore(values, CycleIssue_SUMLabel, ref CycleIssue_SUM);
-                ConfigIO.Restore(values, CloneIssue_SUMLabel, ref CloneIssue_SUM);
-                ConfigIO.Restore(values, ArchitectureIssue_SUMLabel, ref ArchitectureIssue_SUM);
+                ConfigIO.Restore(values, styleIssueSumLabel, ref StyleIssueSum);
+                ConfigIO.Restore(values, universalIssueSumLabel, ref UniversalIssueSum);
+                ConfigIO.Restore(values, metricIssueSumLabel, ref MetricIssueSum);
+                ConfigIO.Restore(values, deadCodeIssueSumLabel, ref DeadCodeIssueSum);
+                ConfigIO.Restore(values, cycleIssueSumLabel, ref CycleIssueSum);
+                ConfigIO.Restore(values, cloneIssueSumLabel, ref CloneIssueSum);
+                ConfigIO.Restore(values, architectureIssueSumLabel, ref ArchitectureIssueSum);
             }
         }
 
-        private const string ShowLeafErosionsLabel = "ShowLeafErosions";
-        private const string ShowInnerErosionsLabel = "ShowInnerErosions";
-        private const string ErosionScalingFactorLabel = "ErosionScalingFactor";
-        private const string LoadDashboardMetricsLabel = "LoadDashboardMetrics";
-        private const string IssuesFromVersionLabel = "IssuesAddedFromVersion";
-        private const string OverrideMetricsLabel = "OverrideMetrics";
-        private const string ShowIssuesInCodeWindowLabel = "ShowIssuesInCodeWindow";
+        private const string showLeafErosionsLabel = "ShowLeafErosions";
+        private const string showInnerErosionsLabel = "ShowInnerErosions";
+        private const string erosionScalingFactorLabel = "ErosionScalingFactor";
+        private const string loadDashboardMetricsLabel = "LoadDashboardMetrics";
+        private const string issuesFromVersionLabel = "IssuesAddedFromVersion";
+        private const string overrideMetricsLabel = "OverrideMetrics";
+        private const string showIssuesInCodeWindowLabel = "ShowIssuesInCodeWindow";
 
-        private const string StyleIssueLabel = "StyleIssue";
-        private const string UniversalIssueLabel = "UniversalIssue";
-        private const string MetricIssueLabel = "MetricIssue";
-        private const string Dead_CodeIssueLabel = "Dead_CodeIssue";
-        private const string CycleIssueLabel = "CycleIssue";
-        private const string CloneIssueLabel = "CloneIssue";
-        private const string ArchitectureIssueLabel = "ArchitectureIssue";
+        private const string styleIssueLabel = "StyleIssue";
+        private const string universalIssueLabel = "UniversalIssue";
+        private const string metricIssueLabel = "MetricIssue";
+        private const string deadCodeIssueLabel = "Dead_CodeIssue";
+        private const string cycleIssueLabel = "CycleIssue";
+        private const string cloneIssueLabel = "CloneIssue";
+        private const string architectureIssueLabel = "ArchitectureIssue";
 
-        private const string StyleIssue_SUMLabel = "StyleIssue_SUM";
-        private const string UniversalIssue_SUMLabel = "UniversalIssue_SUM";
-        private const string MetricIssue_SUMLabel = "MetricIssue_SUM";
-        private const string Dead_CodeIssue_SUMLabel = "Dead_CodeIssue_SUM";
-        private const string CycleIssue_SUMLabel = "CycleIssue_SUM";
-        private const string CloneIssue_SUMLabel = "CloneIssue_SUM";
-        private const string ArchitectureIssue_SUMLabel = "ArchitectureIssue_SUM";
+        private const string styleIssueSumLabel = "StyleIssue_SUM";
+        private const string universalIssueSumLabel = "UniversalIssue_SUM";
+        private const string metricIssueSumLabel = "MetricIssue_SUM";
+        private const string deadCodeIssueSumLabel = "Dead_CodeIssue_SUM";
+        private const string cycleIssueSumLabel = "CycleIssue_SUM";
+        private const string cloneIssueSumLabel = "CloneIssue_SUM";
+        private const string architectureIssueSumLabel = "ArchitectureIssue_SUM";
     }
 }

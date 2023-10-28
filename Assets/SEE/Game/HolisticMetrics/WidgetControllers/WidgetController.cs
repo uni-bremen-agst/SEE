@@ -20,12 +20,12 @@ namespace SEE.Game.HolisticMetrics.WidgetControllers
         /// <summary>
         /// The title text stating what metric is being displayed by the widget.
         /// </summary>
-        [SerializeField] protected Text titleText;
+        [SerializeField] protected Text TitleText;
 
         /// <summary>
         /// The text showing the value of the metric.
         /// </summary>
-        [SerializeField] protected Text valueText;
+        [SerializeField] protected Text ValueText;
 
         /// <summary>
         /// The field that saves the ID of this widget.

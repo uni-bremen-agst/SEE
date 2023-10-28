@@ -313,7 +313,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ServerActionPort: 55555
-  GameScene: SEEReflexion
+  GameScene: SEEWorld
   loadCityOnStart: 0
   internalLoggingEnabled: 1
   minimalSeverity: 2

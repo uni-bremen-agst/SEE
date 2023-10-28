@@ -44,12 +44,12 @@ namespace SEE.Layout.NodeLayouts.Cose
         private CoseGraph child;
 
         /// <summary>
-        /// The graph to with the node belongs to 
+        /// The graph to with the node belongs to
         /// </summary>
         private CoseGraph owner;
 
         /// <summary>
-        /// The incoming/ outgoing edges 
+        /// The incoming/ outgoing edges
         /// </summary>
         private List<CoseEdge> edges = new List<CoseEdge>();
 
@@ -148,7 +148,7 @@ namespace SEE.Layout.NodeLayouts.Cose
 
             if (rectA.Overlaps(rectB))
             {
-                CoseGeometry.CalcSeparationAmount(rectA, rectB, overlapAmount, CoseLayoutSettings.Edge_Length / 2.0);
+                CoseGeometry.CalcSeparationAmount(rectA, rectB, overlapAmount, CoseLayoutSettings.EdgeLength / 2.0);
                 return true;
             }
             else
@@ -195,7 +195,7 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
 
         /// <summary>
-        /// Moves the node according to the forces 
+        /// Moves the node according to the forces
         /// </summary>
         public void Move()
         {
@@ -422,10 +422,10 @@ namespace SEE.Layout.NodeLayouts.Cose
 
             if (sublayoutValues.IsSubLayoutNode) // durch das vorherige return werden die root knoten ausgeschlossen
             {
-                // diese knoten haben relativ positionen zu subLayoutRoot, d.h. diese müssen wieder auf origin gesetzt werden, 
+                // diese knoten haben relativ positionen zu subLayoutRoot, d.h. diese müssen wieder auf origin gesetzt werden,
                 // damit das von anderen richtig berechnet werden kann
 
-                // set position to origin by using the relativ values 
+                // set position to origin by using the relativ values
                 centerPosition.x = sublayoutValues.RelativeCenterPosition.x + sublayoutValues.SubLayoutRoot.centerPosition.x;
                 centerPosition.z = sublayoutValues.RelativeCenterPosition.z + sublayoutValues.SubLayoutRoot.centerPosition.z;
                 SetWidth(sublayoutValues.RelativeScale.x);
@@ -441,8 +441,8 @@ namespace SEE.Layout.NodeLayouts.Cose
                 centerPosition.x = child.LeftFrontCorner.x + child.Extend.x;
                 centerPosition.z = child.RightBackCorner.y + child.Extend.z;
 
-                SetWidth(child.Scale.x + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);
-                SetHeight(child.Scale.z + CoseLayoutSettings.Compound_Node_Margin + CoseLayoutSettings.Compound_Node_Margin);
+                SetWidth(child.Scale.x + CoseLayoutSettings.CompoundNodeMargin + CoseLayoutSettings.CompoundNodeMargin);
+                SetHeight(child.Scale.z + CoseLayoutSettings.CompoundNodeMargin + CoseLayoutSettings.CompoundNodeMargin);
             }
         }
 
@@ -620,4 +620,3 @@ namespace SEE.Layout.NodeLayouts.Cose
         }
     }
 }
-

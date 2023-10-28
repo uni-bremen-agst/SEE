@@ -32,31 +32,31 @@ namespace SEE.Game.Charts.VR
         /// <summary>
         /// The VR version of <see cref="ChartContent" />.
         /// </summary>
-        private ChartContentVr _chartContentVr;
+        private ChartContentVr chartContentVr;
 
         /// <summary>
         /// A world space canvas to use the charts in VR.
         /// </summary>
-        private RectTransform _virtualRealityCanvas;
+        private RectTransform virtualRealityCanvas;
 
         /// <summary>
         /// A 3D cube serving as background of the chart to not look flat in 3D space.
         /// </summary>
-        private GameObject _physicalOpen;
+        private GameObject physicalOpen;
 
         /// <summary>
         /// The 3D cube representing the chart when minimized.
         /// </summary>
-        private GameObject _physicalClosed;
+        private GameObject physicalClosed;
 
         /// <summary>
         /// The background of the content selection.
         /// </summary>
         [SerializeField] private GameObject contentSelectionBackground;
 
-        private const float OriginalSize = 600f;
-        private const float DropdownThickness = 100f;
-        private const float PhysicalClosedPosition = 0.4575f;
+        private const float originalSize = 600f;
+        private const float dropdownThickness = 100f;
+        private const float physicalClosedPosition = 0.4575f;
 
         /// <summary>
         /// Initializes some attributes.
@@ -64,10 +64,10 @@ namespace SEE.Game.Charts.VR
         protected override void Awake()
         {
             base.Awake();
-            _chartContentVr = transform.parent.GetComponent<ChartContentVr>();
-            _virtualRealityCanvas = Chart.parent.GetComponent<RectTransform>();
-            _physicalOpen = _chartContentVr.physicalOpen;
-            _physicalClosed = _chartContentVr.physicalClosed;
+            chartContentVr = transform.parent.GetComponent<ChartContentVr>();
+            virtualRealityCanvas = Chart.parent.GetComponent<RectTransform>();
+            physicalOpen = chartContentVr.PhysicalOpen;
+            physicalClosed = chartContentVr.PhysicalClosed;
         }
 
         /// <summary>
@@ -102,13 +102,13 @@ namespace SEE.Game.Charts.VR
         protected override void ChangeSize(float width, float height)
         {
             base.ChangeSize(width, height);
-            _virtualRealityCanvas.sizeDelta =
-                new Vector2(width + DropdownThickness, height + DropdownThickness);
-            _physicalOpen.transform.localScale =
-                new Vector2(width / OriginalSize, height / OriginalSize);
-            _physicalClosed.transform.localPosition = new Vector2(
-                width / OriginalSize * PhysicalClosedPosition,
-                -(height / OriginalSize * PhysicalClosedPosition));
+            virtualRealityCanvas.sizeDelta =
+                new Vector2(width + dropdownThickness, height + dropdownThickness);
+            physicalOpen.transform.localScale =
+                new Vector2(width / originalSize, height / originalSize);
+            physicalClosed.transform.localPosition = new Vector2(
+                width / originalSize * physicalClosedPosition,
+                -(height / originalSize * physicalClosedPosition));
             contentSelectionBackground.transform.localScale =
                 new Vector2(contentSelectionBackground.transform.localScale.x, height);
         }

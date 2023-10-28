@@ -34,12 +34,12 @@ namespace SEE.GO.NodeFactories
         //----------------------------------------------------------------------------------
 
         // constants
-        private const int DEFAULT_RADIAL_SEGMENTS = 40;
-        private const int DEFAULT_HEIGHT_SEGMENTS = 30;
-        private const int MIN_RADIAL_SEGMENTS = 3;
-        private const int MIN_HEIGHT_SEGMENTS = 1;
-        private const float DEFAULT_RADIUS = 0.5f;
-        private const float DEFAULT_HEIGHT = 1.0f;
+        private const int defaultRadialSegments = 40;
+        private const int defaultHeightSegments = 30;
+        private const int minRadialSegments = 3;
+        private const int minHeightSegments = 1;
+        private const float defaultRadius = 0.5f;
+        private const float defaultHeight = 1.0f;
 
         /// <summary>
         /// Model mesh for a game object to be re-used for all instances.
@@ -64,21 +64,21 @@ namespace SEE.GO.NodeFactories
                 name = "SEECylinderMesh"
             };
 
-            int radialSegments = DEFAULT_RADIAL_SEGMENTS;
-            int heightSegments = DEFAULT_HEIGHT_SEGMENTS;
+            int radialSegments = defaultRadialSegments;
+            int heightSegments = defaultHeightSegments;
 
-            float radius = DEFAULT_RADIUS;
-            float length = DEFAULT_HEIGHT;
+            float radius = defaultRadius;
+            float length = defaultHeight;
 
             // sanity check
-            if (radialSegments < MIN_RADIAL_SEGMENTS)
+            if (radialSegments < minRadialSegments)
             {
-                radialSegments = MIN_RADIAL_SEGMENTS;
+                radialSegments = minRadialSegments;
             }
 
-            if (heightSegments < MIN_HEIGHT_SEGMENTS)
+            if (heightSegments < minHeightSegments)
             {
-                heightSegments = MIN_HEIGHT_SEGMENTS;
+                heightSegments = minHeightSegments;
             }
 
             //calculate how many vertices we need
@@ -101,7 +101,7 @@ namespace SEE.GO.NodeFactories
             // be mapped onto which triangle of the three-dimensional mesh.
             // The U coordinate represents the horizontal axis of the 2D texture,
             // and the V coordinate represents the vertical axis.
-            Vector2[] UVs = new Vector2[numUVs];
+            Vector2[] uvs = new Vector2[numUVs];
             int[] tris = new int[trisArrayLength];
 
             // precalculate increments to improve performance
@@ -130,7 +130,7 @@ namespace SEE.GO.NodeFactories
                                                                      radius * Mathf.Sin(angle));
 
                     // calculate UVs
-                    UVs[j * numVertexColumns + i] = new Vector2(i * uvStepH, j * uvStepV);
+                    uvs[j * numVertexColumns + i] = new Vector2(i * uvStepH, j * uvStepV);
 
                     // create the tris
                     if (j == 0 || i >= numVertexColumns - 1)
@@ -203,7 +203,7 @@ namespace SEE.GO.NodeFactories
 
             // assign vertices, uvs and tris
             modelMesh.vertices = vertices;
-            modelMesh.uv = UVs;
+            modelMesh.uv = uvs;
             modelMesh.triangles = tris;
 
             modelMesh.RecalculateNormals();

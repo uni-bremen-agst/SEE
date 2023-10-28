@@ -13,6 +13,8 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.Net.Util;
 using SEE.Utils;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -31,7 +33,7 @@ namespace SEE.Net
         /// <summary>
         /// The default severity of the native logger of <see cref="NetworkCommsDotNet"/>.
         /// </summary>
-        private const NetworkCommsLogger.Severity DefaultSeverity = NetworkCommsLogger.Severity.High;
+        private const NetworkCommsLogger.Severity defaultSeverity = NetworkCommsLogger.Severity.High;
 
         /// <summary>
         /// The single unique instance of the network.
@@ -41,13 +43,13 @@ namespace SEE.Net
         /// <summary>
         /// The maximal port number.
         /// </summary>
-        private const int MaxServerPort = 65535;
+        private const int maxServerPort = 65535;
 
         /// <summary>
         /// The port of the server where the server listens to SEE action requests.
         /// Note: This field is accessed in NetworkEditor, hence, the name must not change.
         /// </summary>
-        [Range(0, MaxServerPort), Tooltip("The TCP port of the server where it listens to SEE actions.")]
+        [Range(0, maxServerPort), Tooltip("The TCP port of the server where it listens to SEE actions.")]
         public int ServerActionPort = 12345;
 
         /// <summary>
@@ -58,9 +60,9 @@ namespace SEE.Net
         {
             set
             {
-                if (value < 0 || value > MaxServerPort)
+                if (value < 0 || value > maxServerPort)
                 {
-                    throw new ArgumentOutOfRangeException($"A port must be in [0..{MaxServerPort}. Received: {value}.");
+                    throw new ArgumentOutOfRangeException($"A port must be in [0..{maxServerPort}. Received: {value}.");
                 }
                 UnityTransport netTransport = GetNetworkTransport();
                 netTransport.ConnectionData.Port = (ushort)value;
@@ -80,7 +82,7 @@ namespace SEE.Net
         /// available only during run-time.
         /// </summary>
         /// <returns>underlying <see cref="UNetTransport"/> of the <see cref="NetworkManager"/></returns>
-        private UnityTransport GetNetworkTransport()
+        private static UnityTransport GetNetworkTransport()
         {
             NetworkManager networkManager = GetNetworkManager();
             NetworkConfig networkConfig = networkManager.NetworkConfig;
@@ -102,11 +104,11 @@ namespace SEE.Net
         private static NetworkManager GetNetworkManager()
         {
 #if UNITY_EDITOR
-            const string NetworkManagerName = "NetworkManager";
-            GameObject networkManagerGO = GameObject.Find(NetworkManagerName);
+            const string metworkManagerName = "NetworkManager";
+            GameObject networkManagerGO = GameObject.Find(metworkManagerName);
             if (networkManagerGO == null)
             {
-                throw new Exception($"The scene currently opened in the editor does not have a game object {NetworkManagerName}.");
+                throw new Exception($"The scene currently opened in the editor does not have a game object {metworkManagerName}.");
             }
             if (networkManagerGO.TryGetComponentOrLog(out NetworkManager result))
             {
@@ -114,7 +116,7 @@ namespace SEE.Net
             }
             else
             {
-                throw new Exception($"The game object {NetworkManagerName} in the scene currently opened in the editor does not have a component {nameof(NetworkManager)}.");
+                throw new Exception($"The game object {metworkManagerName} in the scene currently opened in the editor does not have a component {nameof(NetworkManager)}.");
             }
 #else
             // NetworkManager.Singleton is available only during run-time.
@@ -170,26 +172,26 @@ namespace SEE.Net
         /// <summary>
         /// Name of the Inspector foldout group for the logging setttings.
         /// </summary>
-        private const string LoggingFoldoutGroup = "Logging";
+        private const string loggingFoldoutGroup = "Logging";
 
         /// <summary>
         /// Whether the internal logging should be enabled.
         /// </summary>
-        [SerializeField, FoldoutGroup(LoggingFoldoutGroup)]
+        [SerializeField, FoldoutGroup(loggingFoldoutGroup)]
         [PropertyTooltip("Whether the network logging should be enabled.")]
         private bool internalLoggingEnabled = true;
 
         /// <summary>
         /// The minimal logged severity.
         /// </summary>
-        [SerializeField, FoldoutGroup(LoggingFoldoutGroup)]
+        [SerializeField, FoldoutGroup(loggingFoldoutGroup)]
         [PropertyTooltip("The minimal logged severity.")]
-        private NetworkCommsLogger.Severity minimalSeverity = DefaultSeverity;
+        private NetworkCommsLogger.Severity minimalSeverity = defaultSeverity;
 
         /// <summary>
         /// Whether the logging of NetworkComms should be enabled.
         /// </summary>
-        [SerializeField, FoldoutGroup(LoggingFoldoutGroup), LabelText("NetworkComms Logging")]
+        [SerializeField, FoldoutGroup(loggingFoldoutGroup), LabelText("NetworkComms Logging")]
         [PropertyTooltip("Whether the NetworkComms logging should be enabled. NetworkComms is the third-party network component used by SEE.")]
         private bool networkCommsLoggingEnabled = false;
 
@@ -342,7 +344,7 @@ namespace SEE.Net
         /// Enables/disables Dissonance as the voice chat system.
         /// </summary>
         /// <param name="enable">whether to enable Dissonance</param>
-        private void EnableDissonance(bool enable)
+        private static void EnableDissonance(bool enable)
         {
             // The DissonanceComms is initially active and the local player is not muted and not deafened.
             DissonanceComms dissonanceComms = FindObjectOfType<DissonanceComms>(includeInactive: true);
@@ -432,11 +434,11 @@ namespace SEE.Net
                         ulong id = ulong.MaxValue;
                         if (HostServer && Server.Connections.Contains(connection))
                         {
-                            id = Server.outgoingPacketSequenceIDs[connection]++;
+                            id = Server.OutgoingPacketSequenceIDs[connection]++;
                         }
                         else if (Client.Connection.Equals(connection))
                         {
-                            id = Client.outgoingPacketID++;
+                            id = Client.OutgoingPacketID++;
                         }
                         Assert.IsTrue(id != ulong.MaxValue);
 
@@ -528,7 +530,7 @@ namespace SEE.Net
         /// </summary>
         /// <param name="connection">The connection.</param>
         /// <param name="serializedPacket">The serialized packet to be sent.</param>
-        private void Send(Connection connection, string serializedPacket)
+        private static void Send(Connection connection, string serializedPacket)
         {
             string packetType = Client.Connection.Equals(connection) ? Server.PacketType : Client.PacketType;
 
@@ -918,7 +920,7 @@ namespace SEE.Net
         [SerializeField]
         [PropertyTooltip("Path of the file containing the network configuration.")]
         [HideReferenceObjectPicker, FoldoutGroup(ConfigurationFoldoutGroup)]
-        public FilePath ConfigPath = new FilePath();
+        public FilePath ConfigPath = new();
 
         /// <summary>
         /// Saves the settings of this network configuration to <see cref="ConfigPath()"/>.
@@ -953,27 +955,27 @@ namespace SEE.Net
         /// <summary>
         /// Label of attribute <see cref="ServerActionPort"/> in the configuration file.
         /// </summary>
-        private const string ServerActionPortLabel = "serverActionPort";
+        private const string serverActionPortLabel = "serverActionPort";
         /// <summary>
         /// Label of attribute <see cref="loadCityOnStart"/> in the configuration file.
         /// </summary>
-        private const string LoadCityOnStartLabel = "loadCityOnStart";
+        private const string loadCityOnStartLabel = "loadCityOnStart";
         /// <summary>
         /// Label of attribute <see cref="GameScene"/> in the configuration file.
         /// </summary>
-        private const string GameSceneLabel = "gameScene";
+        private const string gameSceneLabel = "gameScene";
         /// <summary>
         /// Label of attribute <see cref="VoiceChat"/> in the configuration file.
         /// </summary>
-        private const string VoiceChatLabel = "voiceChat";
+        private const string voiceChatLabel = "voiceChat";
         /// <summary>
         /// Label of attribute <see cref="ServerPort"/> in the configuration file.
         /// </summary>
-        private const string ServerPortLabel = "serverPort";
+        private const string serverPortLabel = "serverPort";
         /// <summary>
         /// Label of attribute <see cref="ServerIP4Address"/> in the configuration file.
         /// </summary>
-        private const string ServerIP4AddressLabel = "serverIP4Address";
+        private const string serverIP4AddressLabel = "serverIP4Address";
 
         /// <summary>
         /// Saves the settings of this network configuration to <paramref name="filename"/>.
@@ -1008,12 +1010,12 @@ namespace SEE.Net
         /// <param name="writer">the writer to be used to save the settings</param>
         protected virtual void Save(ConfigWriter writer)
         {
-            writer.Save(ServerActionPort, ServerActionPortLabel);
-            writer.Save(loadCityOnStart, LoadCityOnStartLabel);
-            writer.Save(GameScene, GameSceneLabel);
-            writer.Save(VoiceChat.ToString(), VoiceChatLabel);
-            writer.Save(ServerPort, ServerPortLabel);
-            writer.Save(ServerIP4Address, ServerIP4AddressLabel);
+            writer.Save(ServerActionPort, serverActionPortLabel);
+            writer.Save(loadCityOnStart, loadCityOnStartLabel);
+            writer.Save(GameScene, gameSceneLabel);
+            writer.Save(VoiceChat.ToString(), voiceChatLabel);
+            writer.Save(ServerPort, serverPortLabel);
+            writer.Save(ServerIP4Address, serverIP4AddressLabel);
         }
 
         /// <summary>
@@ -1022,18 +1024,18 @@ namespace SEE.Net
         /// <param name="attributes">the attributes from which to restore the settings</param>
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
-            ConfigIO.Restore(attributes, ServerActionPortLabel, ref ServerActionPort);
-            ConfigIO.Restore(attributes, LoadCityOnStartLabel, ref loadCityOnStart);
-            ConfigIO.Restore(attributes, GameSceneLabel, ref GameScene);
-            ConfigIO.RestoreEnum(attributes, VoiceChatLabel, ref VoiceChat);
+            ConfigIO.Restore(attributes, serverActionPortLabel, ref ServerActionPort);
+            ConfigIO.Restore(attributes, loadCityOnStartLabel, ref loadCityOnStart);
+            ConfigIO.Restore(attributes, gameSceneLabel, ref GameScene);
+            ConfigIO.RestoreEnum(attributes, voiceChatLabel, ref VoiceChat);
             {
                 int value = ServerPort;
-                ConfigIO.Restore(attributes, ServerPortLabel, ref value);
+                ConfigIO.Restore(attributes, serverPortLabel, ref value);
                 ServerPort = value;
             }
             {
                 string value = ServerIP4Address;
-                ConfigIO.Restore(attributes, ServerIP4AddressLabel, ref value);
+                ConfigIO.Restore(attributes, serverIP4AddressLabel, ref value);
                 ServerIP4Address = value;
             }
         }

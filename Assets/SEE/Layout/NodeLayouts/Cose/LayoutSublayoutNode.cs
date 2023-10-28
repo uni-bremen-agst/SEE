@@ -154,37 +154,37 @@ namespace SEE.Layout.NodeLayouts.Cose
         /// <summary>
         /// a dictinary holding a mapping from the underlying IlayoutNode to a CoseSublayoutNode
         /// </summary>
-        private readonly Dictionary<ILayoutNode, LayoutSublayoutNode> ILayout_to_CoseSublayoutNode;
+        private readonly Dictionary<ILayoutNode, LayoutSublayoutNode> iLayoutToCoseSublayoutNode;
 
-        public LayoutSublayoutNode(ILayoutNode node, ICollection<ILayoutNode> children, bool isLeaf, ILayoutNode parent, Vector3 localScale, Dictionary<ILayoutNode, LayoutSublayoutNode> ILayout_to_CoseSublayoutNode)
+        public LayoutSublayoutNode(ILayoutNode node, ICollection<ILayoutNode> children, bool isLeaf, ILayoutNode parent, Vector3 localScale, Dictionary<ILayoutNode, LayoutSublayoutNode> iLayoutToCoseSublayoutNode)
         {
             this.node = node;
             this.isLeaf = isLeaf;
             temporaryChildren = children;
             temporaryParent = parent;
             node.LocalScale = localScale;
-            this.ILayout_to_CoseSublayoutNode = ILayout_to_CoseSublayoutNode;
-            ILayout_to_CoseSublayoutNode[node] = this;
+            this.iLayoutToCoseSublayoutNode = iLayoutToCoseSublayoutNode;
+            iLayoutToCoseSublayoutNode[node] = this;
         }
 
-        public LayoutSublayoutNode(ILayoutNode node, Dictionary<ILayoutNode, LayoutSublayoutNode> ILayout_to_CoseSublayoutNode)
+        public LayoutSublayoutNode(ILayoutNode node, Dictionary<ILayoutNode, LayoutSublayoutNode> iLayoutToCoseSublayoutNode)
         {
             this.node = node;
             isLeaf = node.IsLeaf;
             temporaryChildren = node.Children();
             temporaryParent = node.Parent;
             node.LocalScale = node.LocalScale;
-            this.ILayout_to_CoseSublayoutNode = ILayout_to_CoseSublayoutNode;
-            ILayout_to_CoseSublayoutNode[node] = this;
+            this.iLayoutToCoseSublayoutNode = iLayoutToCoseSublayoutNode;
+            iLayoutToCoseSublayoutNode[node] = this;
         }
 
         private ILayoutNode GetParent()
         {
             if (parent == null && temporaryParent != null)
             {
-                if (ILayout_to_CoseSublayoutNode.ContainsKey(temporaryParent))
+                if (iLayoutToCoseSublayoutNode.ContainsKey(temporaryParent))
                 {
-                    parent = ILayout_to_CoseSublayoutNode[temporaryParent];
+                    parent = iLayoutToCoseSublayoutNode[temporaryParent];
                 }
             }
             return parent;
@@ -197,9 +197,9 @@ namespace SEE.Layout.NodeLayouts.Cose
                 ICollection<ILayoutNode> succesorsCollection = new List<ILayoutNode>();
                 foreach (ILayoutNode successor in node.Successors)
                 {
-                    if (ILayout_to_CoseSublayoutNode.ContainsKey(successor))
+                    if (iLayoutToCoseSublayoutNode.ContainsKey(successor))
                     {
-                        succesorsCollection.Add(ILayout_to_CoseSublayoutNode[successor]);
+                        succesorsCollection.Add(iLayoutToCoseSublayoutNode[successor]);
                     }
                 }
                 successors = succesorsCollection;
@@ -215,9 +215,9 @@ namespace SEE.Layout.NodeLayouts.Cose
 
                 foreach (ILayoutNode child in temporaryChildren)
                 {
-                    if (ILayout_to_CoseSublayoutNode.ContainsKey(child))
+                    if (iLayoutToCoseSublayoutNode.ContainsKey(child))
                     {
-                        childrenList.Add(ILayout_to_CoseSublayoutNode[child]);
+                        childrenList.Add(iLayoutToCoseSublayoutNode[child]);
                     }
                 }
                 children = childrenList;
