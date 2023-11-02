@@ -22,11 +22,11 @@
       "hash": "72e620d169841f32bc6110ad0e12ee9eae6f1aaf"
     },
     "com.openai.unity": {
-      "version": "5.0.10",
+      "version": "5.0.11",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.utilities.rest": "2.1.7",
+        "com.utilities.rest": "2.1.8",
         "com.utilities.encoder.wav": "1.0.6"
       },
       "url": "https://package.openupm.com"
@@ -395,7 +395,7 @@
       "url": "https://package.openupm.com"
     },
     "com.utilities.rest": {
-      "version": "2.1.7",
+      "version": "2.1.8",
       "depth": 1,
       "source": "registry",
       "dependencies": {
