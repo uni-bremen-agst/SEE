@@ -80,7 +80,6 @@ namespace SEE.Game.Drawable
             {
                 return false;
             }
-
         }
 
         public static GameObject FindChildWithTag(GameObject parent, string tag)

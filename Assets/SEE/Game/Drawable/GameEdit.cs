@@ -114,7 +114,7 @@ namespace Assets.SEE.Game.Drawable
         /// <summary>
         /// This method changes the order in layer of a <see cref="DrawableType"/>.
         /// </summary>
-        /// <param name="obj">The <see cref="DrawableType"/> whose color should be changed.</param>
+        /// <param name="obj">The <see cref="DrawableType"/> whose order should be changed.</param>
         /// <param name="newLayer">The new order in layer.</param>
         public static void ChangeLayer(GameObject obj, int newLayer)
         {

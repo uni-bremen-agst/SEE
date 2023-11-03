@@ -81,6 +81,11 @@ namespace Assets.SEE.Game.Drawable
         public const string ImagePrefix = "Image";
 
         /// <summary>
+        /// The prefix of a sticky notes.
+        /// </summary>
+        public const string StickyNotePrefix = "StickyNote";
+
+        /// <summary>
         /// The prefix of a drawable holder object.
         /// </summary>
         public const string DrawableHolderPrefix = "DrawableHolder";
@@ -107,6 +112,19 @@ namespace Assets.SEE.Game.Drawable
         /// methods of this class and other classes use it.
         /// </summary>
         public static readonly string imagePath = drawablePath + "Image/";
+
+        /// <summary>
+        /// The direction's for moving. Will needed for sticky note menu.
+        /// </summary>
+        public enum MoveDirection
+        {
+            Left,
+            Right,
+            Up,
+            Down,
+            Forward,
+            Back
+        }
 
         /// <summary>
         /// The constructor, it loads the default values for the current values.

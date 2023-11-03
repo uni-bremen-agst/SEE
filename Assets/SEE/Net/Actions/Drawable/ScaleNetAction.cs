@@ -65,10 +65,13 @@ namespace SEE.Net.Actions.Drawable
                 if (drawable != null && GameFinder.FindChild(drawable, ObjectName) != null)
                 {
                     GameScaler.SetScale(GameFinder.FindChild(drawable, ObjectName), Scale);
+                } else if (drawable != null)
+                {
+                    GameScaler.SetScale(drawable.transform.parent.gameObject, Scale);
                 }
                 else
                 {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or line with the ID {ObjectName}.");
+                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or drawable type object with the ID {ObjectName}.");
                 }
             }
         }

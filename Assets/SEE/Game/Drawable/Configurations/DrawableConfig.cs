@@ -1,6 +1,7 @@
 ﻿using Assets.SEE.Game.Drawable;
 using SEE.Game.HolisticMetrics;
 using SEE.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace SEE.Game.Drawable.Configurations
     /// <summary>
     /// This class can persist the configurations for a list of drawables.
     /// </summary>
+    [Serializable]
     public class DrawablesConfigs
     {
         /// <summary>
@@ -67,6 +69,7 @@ namespace SEE.Game.Drawable.Configurations
     /// <summary>
     /// This class can hold all the information that is needed to configure a drawable.
     /// </summary>
+    [Serializable]
     public class DrawableConfig
     {
         /// <summary>
@@ -88,6 +91,22 @@ namespace SEE.Game.Drawable.Configurations
         /// The orientation of this drawable / or of his parent.
         /// </summary>
         public Vector3 Rotation;
+
+        /// <summary>
+        /// The scale of this drawable / or of his parent.
+        /// </summary>
+        public Vector3 Scale;
+
+        /// <summary>
+        /// The color of this drawable.
+        /// </summary>
+        public Color Color;
+
+        /// <summary>
+        /// The order of the drawable.
+        /// (Only necressary for sticky notes)
+        /// </summary>
+        public int Order;
 
         /// <summary>
         /// All the lines that should be displayed on this drawable.
@@ -125,6 +144,21 @@ namespace SEE.Game.Drawable.Configurations
         private const string RotationLabel = "Rotation";
 
         /// <summary>
+        /// The label for the scale of a drawable in the configuration file.
+        /// </summary>
+        private const string ScaleLabel = "Scale";
+
+        /// <summary>
+        /// The label for the color of a drawable in the configuration file.
+        /// </summary>
+        private const string ColorLabel = "Color";
+
+        /// <summary>
+        /// The label for the order of a drawable in the configuration file.
+        /// </summary>
+        private const string OrderLabel = "Order";
+
+        /// <summary>
         /// The label for the group of line configurations in the configuration file.
         /// </summary>
         private const string LineConfigsLabel = "LineConfigs";
@@ -149,6 +183,9 @@ namespace SEE.Game.Drawable.Configurations
             writer.Save(DrawableParentName, DrawableParentNameLabel);
             writer.Save(Position, PositionLabel);
             writer.Save(Rotation, RotationLabel);
+            writer.Save(Scale, ScaleLabel);
+            writer.Save(Color, ColorLabel);
+            writer.Save(Order, OrderLabel);
 
             if (LineConfigs != null && LineConfigs.Count > 0)
             {
@@ -227,7 +264,34 @@ namespace SEE.Game.Drawable.Configurations
                 Rotation = Vector3.zero;
                 errorFree = false;
             }
-            
+
+            Vector3 scale = Vector3.zero;
+            if (ConfigIO.Restore(attributes, ScaleLabel, ref scale))
+            {
+                Scale = scale;
+            }
+            else
+            {
+                Scale = Vector3.zero;
+                errorFree = false;
+            }
+
+            Color color = Color.black;
+            if (ConfigIO.Restore(attributes, ColorLabel, ref color))
+            {
+                Color = color;
+            }
+            else
+            {
+                Color = Color.black;
+                errorFree = false;
+            }
+
+            if (!ConfigIO.Restore(attributes, OrderLabel, ref Order))
+            {
+                errorFree = false;
+            }
+
             if (attributes.TryGetValue(LineConfigsLabel, out object lineList))
             {
                 foreach (object item in (List<object>)lineList)

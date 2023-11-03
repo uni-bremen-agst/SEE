@@ -159,7 +159,7 @@ namespace Assets.SEE.Game.Drawable
         public static void SetRotateY(GameObject obj, float localEulerAngleY)
         {
             Transform transform = obj.transform;
-            transform.localEulerAngles = new Vector3(0, localEulerAngleY, transform.localEulerAngles.z);
+            transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, localEulerAngleY, transform.localEulerAngles.z);
         }
     }
 }

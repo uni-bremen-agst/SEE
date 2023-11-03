@@ -220,6 +220,13 @@ namespace SEE.Controls.Actions.Drawable
                             foreach (DrawableConfig drawableConfig in configs.Drawables)
                             {
                                 GameObject drawableOfFile = GameFinder.Find(drawableConfig.DrawableName, drawableConfig.DrawableParentName);
+                                /// If the drawable does not exist it will be spawned as a sticky note.
+                                if (drawableOfFile == null)
+                                {
+                                    GameObject stickyNote = GameStickyNoteManager.Spawn(drawableConfig);
+                                    drawableOfFile = GameFinder.FindDrawable(stickyNote);
+                                    new StickyNoteSpawnNetAction(drawableConfig).Execute();
+                                }
                                 Restore(drawableOfFile, drawableConfig);
                             }
                             memento.configs = configs;

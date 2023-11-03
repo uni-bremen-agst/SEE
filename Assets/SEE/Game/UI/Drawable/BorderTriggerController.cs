@@ -9,24 +9,22 @@ using SEE.Game.Drawable;
 
 namespace Assets.SEE.Game.UI.Drawable
 {
+    /// <summary>
+    /// The border trigger controller ensures that the 
+    /// drawable type objects stay within the Drawables 
+    /// and moves them in the respective direction when necessary.
+    /// </summary>
     public class BorderTriggerController : MonoBehaviour
     {
-        /*
-        [SerializeField]
-        private bool trigger = false;
-
-        private void OnTriggerEnter(Collider other)
-        {
-            //FIXEME ADD OTHER TAGS.
-            if (other.gameObject.CompareTag(Tags.Line))
-            {
-             //   trigger = true;  // makes problems with the reset.
-            }
-        }*/
-
+        /// <summary>
+        /// Method that will be executed when a collision stay.
+        /// It moves the collision object back in the drawable area.
+        /// </summary>
+        /// <param name="other">The object that causes the collision.</param>
         private void OnTriggerStay(Collider other)
         {
-            if (Tags.DrawableTypes.Contains(other.gameObject.tag))
+            if (Tags.DrawableTypes.Contains(other.gameObject.tag) && 
+                GameFinder.GetHighestParent(gameObject).Equals(GameFinder.GetHighestParent(other.gameObject)))
             {
                 GameObject drawable = GameFinder.FindDrawable(other.gameObject);
                 string drawableParentName = GameFinder.GetDrawableParentName(drawable);
@@ -57,18 +55,5 @@ namespace Assets.SEE.Game.UI.Drawable
                 new MoveNetAction(drawable.name, drawableParentName, other.name, newPosition).Execute();
             }
         }
-        /*
-        private void OnTriggerExit(Collider other)
-        {
-            if (other.gameObject.CompareTag(Tags.Line))
-            {
-                trigger = false;
-            }
-        }
-
-        public bool Trigger()
-        {
-            return trigger;
-        }*/
     }
 }

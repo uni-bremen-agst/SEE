@@ -2,6 +2,7 @@
 using UnityEngine;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable;
+using SEE.Utils;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -88,6 +89,15 @@ namespace Assets.SEE.Game.Drawable
                     attachedObjects.transform.rotation = highestParent.transform.rotation;
                     attachedObjects.transform.SetParent(highestParent.transform);
                     parent.transform.SetParent(highestParent.transform);
+
+                    if (parent.GetComponentInChildren<OrderInLayerValueHolder>() != null)
+                    {
+                        OrderInLayerValueHolder highestHolder = highestParent.AddComponent<OrderInLayerValueHolder>();
+                        OrderInLayerValueHolder oldHolder = parent.GetComponentInChildren<OrderInLayerValueHolder>();
+                        highestHolder.SetOrderInLayer(oldHolder.GetOrderInLayer());
+                        highestHolder.SetOriginPosition(oldHolder.GetOriginPosition());
+                        Destroyer.Destroy(oldHolder);
+                    }
                 }
                 else
                 {
@@ -108,6 +118,15 @@ namespace Assets.SEE.Game.Drawable
                 attachedObjects.transform.SetParent(highestParent.transform);
 
                 drawable.transform.SetParent(highestParent.transform);
+
+                if (drawable.GetComponentInChildren<OrderInLayerValueHolder>() != null)
+                {
+                    OrderInLayerValueHolder highestHolder = highestParent.AddComponent<OrderInLayerValueHolder>();
+                    OrderInLayerValueHolder oldHolder = drawable.GetComponentInChildren<OrderInLayerValueHolder>();
+                    highestHolder.SetOrderInLayer(oldHolder.GetOrderInLayer());
+                    highestHolder.SetOriginPosition(oldHolder.GetOriginPosition());
+                    Destroyer.Destroy(oldHolder);
+                }
             }
         }
     }

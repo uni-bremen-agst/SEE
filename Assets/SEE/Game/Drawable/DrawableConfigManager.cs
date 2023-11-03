@@ -12,6 +12,7 @@ using System.IO;
 using UnityEngine;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable;
+using VivoxUnity;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -220,12 +221,26 @@ namespace Assets.SEE.Game.Drawable
             {
                 transform = drawable.transform.parent;
             }
+
+            int order = 0;
+            if (transform.GetComponent<OrderInLayerValueHolder>() != null)
+            {
+                order = transform.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+            }
+            if (transform.GetComponentInParent<OrderInLayerValueHolder>() != null)
+            {
+                order = transform.GetComponentInParent<OrderInLayerValueHolder>().GetOrderInLayer();
+            }
+
             DrawableConfig config = new()
             {
                 DrawableName = drawable.name,
                 DrawableParentName = GameFinder.GetDrawableParentName(drawable),
                 Position = transform.position,
-                Rotation = transform.eulerAngles
+                Rotation = transform.eulerAngles,
+                Scale = transform.localScale,
+                Color = drawable.GetComponent<MeshRenderer>().material.color,
+                Order = order
             };
             GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(drawable);
             if (attachedObjects != null)

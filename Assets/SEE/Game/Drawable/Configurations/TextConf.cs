@@ -309,8 +309,6 @@ namespace SEE.Game.Drawable.Configurations
 
             if (!ConfigIO.Restore(attributes, OrderInLayerLabel, ref orderInLayer))
             {
-                orderInLayer = ValueHolder.currentOrderInLayer;
-                ValueHolder.currentOrderInLayer++;
                 errors = true;
             }
 

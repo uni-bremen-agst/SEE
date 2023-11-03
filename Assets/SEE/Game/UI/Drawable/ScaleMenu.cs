@@ -1,5 +1,6 @@
 ﻿using Assets.SEE.Game.Drawable;
 using Michsky.UI.ModernUIPack;
+using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
@@ -37,6 +38,11 @@ namespace Assets.SEE.Game.UI.Drawable
         private static SwitchManager switchManager;
 
         /// <summary>
+        /// The object which contains the button done.
+        /// </summary>
+        private static GameObject doneObject;
+
+        /// <summary>
         /// Holds the scale menu instance
         /// </summary>
         private static GameObject instance;
@@ -52,13 +58,14 @@ namespace Assets.SEE.Game.UI.Drawable
             xScale = GameFinder.FindChild(instance, "XScale").GetComponent<InputFieldWithButtons>();
             yScale = GameFinder.FindChild(instance, "YScale").GetComponent<InputFieldWithButtons>();
             switchManager = GameFinder.FindChild(instance, "Switch").GetComponent<SwitchManager>();
+            doneObject = GameFinder.FindChild(instance, "Done");
         }
 
         /// <summary>
         /// Enables the scale menu and set ups the handler for the menu components.
         /// </summary>
         /// <param name="objToScale">Is the drawable type object that should be scaled.</param>
-        public static void Enable(GameObject objToScale)
+        public static void Enable(GameObject objToScale, bool stickyNodeMode = false)
         {
             xScale.AssignValue(objToScale.transform.localScale.x);
             xScale.onValueChanged.AddListener(xScale =>
@@ -67,7 +74,7 @@ namespace Assets.SEE.Game.UI.Drawable
                 GameScaler.SetScale(objToScale, newScale);
                 GameObject drawable = GameFinder.FindDrawable(objToScale);
                 string drawableParent = GameFinder.GetDrawableParentName(drawable);
-                new ScaleNetAction(drawable.name, drawableParent, objToScale.name, newScale);
+                new ScaleNetAction(drawable.name, drawableParent, objToScale.name, newScale).Execute();
             });
 
             yScale.AssignValue(objToScale.transform.localScale.y);
@@ -77,7 +84,7 @@ namespace Assets.SEE.Game.UI.Drawable
                 GameScaler.SetScale(objToScale, newScale);
                 GameObject drawable = GameFinder.FindDrawable(objToScale);
                 string drawableParent = GameFinder.GetDrawableParentName(drawable);
-                new ScaleNetAction(drawable.name, drawableParent, objToScale.name, newScale);
+                new ScaleNetAction(drawable.name, drawableParent, objToScale.name, newScale).Execute();
             });
 
             xScale.onProportionalValueChanged = new UnityEvent<float>();
@@ -112,6 +119,20 @@ namespace Assets.SEE.Game.UI.Drawable
                 xScale.onProportionalValueChanged = null;
                 yScale.onProportionalValueChanged = null;
             });
+
+            if (stickyNodeMode)
+            {
+                doneObject.SetActive(true);
+                doneObject.GetComponent<ButtonManagerBasic>().clickEvent.RemoveAllListeners();
+                doneObject.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
+                {
+                    Disable();
+                    StickyNoteAction.finish = true;
+                });
+            } else
+            {
+                doneObject.SetActive(false);
+            }
             instance.SetActive(true);
         }
 

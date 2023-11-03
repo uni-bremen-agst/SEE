@@ -65,6 +65,9 @@ namespace SEE.Net.Actions.Drawable
                     if (drawable != null && GameFinder.FindChild(drawable, TypeName) != null)
                     {
                         GameEdit.ChangeLayer(GameFinder.FindChild(drawable, TypeName), OrderInLayer);
+                    } else if (drawable != null)
+                    {
+                        GameStickyNoteManager.ChangeLayer(GameFinder.GetHighestParent(drawable), OrderInLayer);
                     }
                     else
                     {

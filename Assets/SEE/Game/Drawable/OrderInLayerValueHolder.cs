@@ -16,6 +16,12 @@ namespace Assets.SEE.Game.Drawable
         private int orderInLayer;
 
         /// <summary>
+        /// The original position.
+        /// Only used for sticky note.
+        /// </summary>
+        private Vector3 originPos;
+
+        /// <summary>
         /// Sets the given order.
         /// </summary>
         /// <param name="order">The given order that should be set.</param>
@@ -27,10 +33,28 @@ namespace Assets.SEE.Game.Drawable
         /// <summary>
         /// Gets the current order of the drawable type.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>current order</returns>
         public int GetOrderInLayer()
         {
             return orderInLayer;
+        }
+
+        /// <summary>
+        /// Sets the given position
+        /// </summary>
+        /// <param name="pos">the position</param>
+        public void SetOriginPosition(Vector3 pos)
+        {
+            originPos = pos;
+        }
+
+        /// <summary>
+        /// Gets the origin position.
+        /// </summary>
+        /// <returns>origin position</returns>
+        public Vector3 GetOriginPosition()
+        {
+            return originPos;
         }
     }
 }
