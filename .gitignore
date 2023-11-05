@@ -120,6 +120,7 @@ GlobalConnectionShutdownDelegate*.txt
 
 # VSCode
 .vscode
+.vsconfig
 
 # Custom entries
 LinuxPlayer_s.debug
