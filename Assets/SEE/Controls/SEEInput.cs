@@ -6,7 +6,7 @@ namespace SEE.Controls
     /// <summary>
     /// Provides a logical abstraction of raw Unity inputs by the user.
     /// </summary>
-    internal static class SEEInput
+    public static class SEEInput
     {
         /// <summary>
         /// If true, all logical inputs that require keyboard interactions are enabled.
