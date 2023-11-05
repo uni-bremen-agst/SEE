@@ -112,6 +112,12 @@ ManagedThreadPoolCallBackError*.txt
 PacketHandlerErrorGlobal*.txt
 GlobalConnectionShutdownDelegate*.txt
 
+# MacOS
+.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store
+
 # Custom entries
 LinuxPlayer_s.debug
 UnityPlayer_s.debug
