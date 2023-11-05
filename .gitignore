@@ -118,6 +118,9 @@ GlobalConnectionShutdownDelegate*.txt
 **/.DS_Store
 **/._.DS_Store
 
+# VSCode
+.vscode
+
 # Custom entries
 LinuxPlayer_s.debug
 UnityPlayer_s.debug
