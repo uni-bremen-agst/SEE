@@ -9,6 +9,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using static SEE.Net.Network;
+using System.ComponentModel;
 
 namespace SEE.Game.UI.PropertyDialog
 {
@@ -82,6 +83,11 @@ namespace SEE.Game.UI.PropertyDialog
         private StringProperty serverActionPort;
 
         /// <summary>
+        /// The password to protect the server from unauthorised clients
+        /// </summary>
+        private StringProperty roomPassword;
+
+        /// <summary>
         /// The selector for the voice chat system.
         /// </summary>
         private SelectionProperty voiceChatSelector;
@@ -123,6 +129,13 @@ namespace SEE.Game.UI.PropertyDialog
                 serverActionPort.Value = networkConfig.ServerActionPort.ToString();
                 serverActionPort.Description = "Server TCP port for SEE actions";
                 group.AddProperty(serverActionPort);
+            }
+            {
+                roomPassword = dialog.AddComponent<StringProperty>();
+                roomPassword.Name = "Room Password";
+                roomPassword.Value = networkConfig.RoomPassword.ToString();
+                roomPassword.Description = "Password for a meeting room";
+                group.AddProperty(roomPassword);
             }
             {
                 voiceChatSelector = dialog.AddComponent<SelectionProperty>();
@@ -231,6 +244,11 @@ namespace SEE.Game.UI.PropertyDialog
                     ShowPortError("Server Action");
                     errorOccurred = true;
                 }
+            }
+            {
+                // Room Password               
+                networkConfig.RoomPassword = roomPassword.Value.ToString();
+                ShowNotification.Info("Password Set", "Youve set the password to " + roomPassword.Value.ToString());
             }
             {
                 // Voice Chat

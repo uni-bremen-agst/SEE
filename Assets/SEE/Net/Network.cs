@@ -5,13 +5,11 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading;
 using Dissonance;
 using SEE.Game.City;
-using SEE.Game.UI.Notification;
 using SEE.GO;
-using SEE.Net.Actions;
-using SEE.Net.Util;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using Unity.Netcode;
@@ -68,6 +66,17 @@ namespace SEE.Net
                 return netTransport.ConnectionData.Port;
             }
         }
+
+        /// <summary>
+        /// Saves the password used to enter a meeting room.
+        /// </summary>
+        public string RoomPassword = "";
+
+
+        /// <summary>
+        /// Used to tell the caller if the routine has been completed
+        /// </summary>
+        private CallBack callbackToMenu = null;
 
         /// <summary>
         /// Returns the underlying <see cref="UnityTransport"/> of the <see cref="NetworkManager"/>.
@@ -256,11 +265,13 @@ namespace SEE.Net
             Instance = this;
 
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
+            NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
 
             string[] arguments = Environment.GetCommandLineArgs();
-            foreach(string argument in arguments)
+
+            for (int i = 0; i < arguments.Length; i++)
             {
-                if(argument == "-launch-as-server")
+                if (arguments[i] == "-launch-as-server")
                 {
                     StartServer(null);
                 }
@@ -499,6 +510,7 @@ namespace SEE.Net
                 Debug.Log($"Server is starting to listen at {ServerIP4Address}:{ServerPort}...\n");
                 try
                 {
+                    NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
                     if (NetworkManager.Singleton.StartServer())
                     {
                         InitializeGame();
@@ -536,6 +548,7 @@ namespace SEE.Net
                 Debug.Log($"Local client is trying to connect to server {ServerIP4Address}:{ServerPort}...\n");
                 try
                 {
+                    NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
                     if (NetworkManager.Singleton.StartHost())
                     {
                         InitializeGame();
@@ -555,6 +568,49 @@ namespace SEE.Net
         }
 
         /// <summary>
+        /// Checks whether a specific client is authorised to establish a connection to the server.
+        /// The client sends the server a request with a password to join the room,
+        /// the server sends a corresponding response depending on whether the sent password matches the set password.
+        /// The <paramref name="request"/> contains the password
+        /// The <paramref name="response"/> contains the answer of the server.
+        /// </summary>
+        private void ApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+        {
+            if (RoomPassword == System.Text.Encoding.ASCII.GetString(request.Payload))
+            {
+                response.Approved = true;
+                Debug.Log($"Client {request.ClientNetworkId} has send right room password");
+            }
+            else
+            {
+                response.Approved = false;
+                response.Reason = "Invalid password";
+                Debug.LogWarning($"Client {request.ClientNetworkId} has send wrong room password");
+            }
+        }
+
+        /// <summary>
+        /// Removes the reference to the callback used to send the client back to the main menu
+        /// because the connection was successfully established.
+        /// The <paramref name="owner"/> is not used
+        /// </summary>
+        private void OnClientConnectedCallback(ulong owner)
+        {
+            callbackToMenu(true, "You are connected to " + ServerIP4Address);
+            callbackToMenu = null;
+        }
+
+        /// <summary>
+        /// Sends the client back to the main menu because the connection could not be established
+        /// The <paramref name="owner"/> is not used
+        /// </summary>
+        private void OnClientDisconnectCallback(ulong owner)
+        {
+            callbackToMenu(false, "The server " + ServerIP4Address + " has refused the connection due to the following reason: " + NetworkManager.Singleton.DisconnectReason);
+            callbackToMenu = null;
+        }
+
+        /// <summary>
         /// Starts a client.
         ///
         /// Note: This method starts a co-routine and then returns to the caller immediately.
@@ -565,6 +621,7 @@ namespace SEE.Net
         /// in case of success or otherwise false</param>
         public void StartClient(CallBack callBack)
         {
+            callbackToMenu = callBack;
             StartCoroutine(ShutdownNetwork(InternalStartClient));
 
             void InternalStartClient()
@@ -572,6 +629,9 @@ namespace SEE.Net
                 Debug.Log($"Client is trying to connect to server {ServerIP4Address}:{ServerPort}...\n");
                 try
                 {
+                    NetworkManager.Singleton.NetworkConfig.ConnectionData = Encoding.ASCII.GetBytes(RoomPassword);
+                    NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallback;
+                    NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
                     if (NetworkManager.Singleton.StartClient())
                     {
                         InitializeGame();
@@ -586,9 +646,9 @@ namespace SEE.Net
                     callBack(false, exception.Message);
                     throw;
                 }
-
-                StartCoroutine(WaitUntilConnected());
             }
+
+
 
             IEnumerator WaitUntilConnected()
             {
@@ -611,6 +671,7 @@ namespace SEE.Net
                 }
                 else
                 {
+                    Debug.LogWarning($"Could not connect to server (Reason: {NetworkManager.Singleton.DisconnectReason})");
                     callBack(false, $"Could not connect to server {ServerIP4Address}:{ServerPort}.");
                     throw new NoServerConnection($"Could not connect to server {ServerIP4Address}:{ServerPort}");
                 }
@@ -821,6 +882,11 @@ namespace SEE.Net
         /// Label of attribute <see cref="ServerPort"/> in the configuration file.
         /// </summary>
         private const string ServerPortLabel = "serverPort";
+
+        /// <summary>
+        /// Label of attribute <see cref="RoomPassword"/> in the configuration file.
+        /// </summary>
+        private const string RoomPasswordLabel = "roomPassword";
         /// <summary>
         /// Label of attribute <see cref="ServerIP4Address"/> in the configuration file.
         /// </summary>
@@ -864,6 +930,7 @@ namespace SEE.Net
             writer.Save(GameScene, GameSceneLabel);
             writer.Save(VoiceChat.ToString(), VoiceChatLabel);
             writer.Save(ServerPort, ServerPortLabel);
+            writer.Save(RoomPassword, RoomPasswordLabel);
             writer.Save(ServerIP4Address, ServerIP4AddressLabel);
         }
 
@@ -876,6 +943,7 @@ namespace SEE.Net
             ConfigIO.Restore(attributes, ServerActionPortLabel, ref ServerActionPort);
             ConfigIO.Restore(attributes, LoadCityOnStartLabel, ref loadCityOnStart);
             ConfigIO.Restore(attributes, GameSceneLabel, ref GameScene);
+            ConfigIO.Restore(attributes, RoomPasswordLabel, ref RoomPassword);
             ConfigIO.RestoreEnum(attributes, VoiceChatLabel, ref VoiceChat);
             {
                 int value = ServerPort;
