@@ -647,37 +647,8 @@ namespace SEE.Net
                     throw;
                 }
             }
-
-
-
-            IEnumerator WaitUntilConnected()
-            {
-                float waitingTime = 0;
-                float waitingTimePerIteration = 0.5f;
-
-                while (!NetworkManager.Singleton.IsConnectedClient)
-                {
-                    Debug.Log($"Client is waiting for connection {waitingTime}/{MaxWaitingTime}...\n");
-                    yield return new WaitForSeconds(waitingTimePerIteration);
-                    waitingTime += waitingTimePerIteration;
-                    if (waitingTime > MaxWaitingTime)
-                    {
-                        break;
-                    }
-                }
-                if (NetworkManager.Singleton.IsConnectedClient)
-                {
-                    callBack(true, $"Client is connected to server {ServerIP4Address}:{ServerPort}.");
-                }
-                else
-                {
-                    Debug.LogWarning($"Could not connect to server (Reason: {NetworkManager.Singleton.DisconnectReason})");
-                    callBack(false, $"Could not connect to server {ServerIP4Address}:{ServerPort}.");
-                    throw new NoServerConnection($"Could not connect to server {ServerIP4Address}:{ServerPort}");
-                }
-            }
         }
-
+        
         /// <summary>
         /// The maximal waiting time in seconds a client is willing to wait until a connection
         /// can be established.
