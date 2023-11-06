@@ -14,6 +14,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Node = SEE.DataModel.DG.Node;
 
 namespace SEE.UI.Window.TreeWindow
 {
@@ -458,28 +459,51 @@ namespace SEE.UI.Window.TreeWindow
                 GameObject nodeGameObject = GraphElementIDMap.Find(node.ID, mustFindElement: true);
                 AddItem(CleanupID(node.ID),
                         0, node.ToShortString(), 0, nodeTypeUnicode, nodeGameObject,
-                        null, (_, _) => MakeVisible(node).Forget());
+                        null, (_, _) => RevealElement(node).Forget());
             }
 
             items.position = items.position.WithXYZ(y: 0);
         }
 
         /// <summary>
-        /// Makes the given <paramref name="node"/> visible in the tree window by expanding all its parents
+        /// Makes the given <paramref name="element"/> visible in the tree window by expanding all its parents
         /// and scrolling to it.
+        /// If an edge is given, the source/target node will be made visible instead,
+        /// depending on the value of <paramref name="viaSource"/>.
         /// </summary>
-        /// <param name="node">The node to be made visible.</param>
-        private async UniTaskVoid MakeVisible(Node node)
+        /// <param name="element">The element to be made visible.</param>
+        /// <param name="viaSource">Whether to make the source or target node of the edge visible.</param>
+        public async UniTaskVoid RevealElement(GraphElement element, bool viaSource = false)
         {
+            if (SearchField == null)
+            {
+                // We need to wait until the window is initialized.
+                // This case may occur when the method is called from the outside.
+                await UniTask.WaitUntil(() => SearchField != null);
+            }
             SearchField.onValueChanged.RemoveListener(SearchFor);
             SearchField.text = string.Empty;
             SearchField.ReleaseSelection();
             SearchField.onValueChanged.AddListener(SearchFor);
             ClearTree();
 
+            Node current = element switch
+            {
+                Node node => node,
+                Edge edge => viaSource ? edge.Source : edge.Target,
+                _ => throw new ArgumentOutOfRangeException(nameof(element))
+            };
+            string transformID = CleanupID(current.ID);
+            if (element is Edge)
+            {
+                expandedItems.Add(transformID);
+                transformID += viaSource ? "#Outgoing" : "#Incoming";
+                expandedItems.Add(transformID);
+                transformID += $"#{CleanupID(element.ID)}";
+            }
+
             // We need to find a path from the root to the node, which we do by working our way up the hierarchy.
             // We then expand all nodes on the path.
-            Node current = node;
             while (current.Parent != null)
             {
                 current = current.Parent;
@@ -490,7 +514,8 @@ namespace SEE.UI.Window.TreeWindow
 
             // We need to wait until the transform actually exists, hence the yield.
             await UniTask.Yield();
-            RectTransform item = (RectTransform)items.Find(CleanupID(node.ID));
+            Debug.Log(transformID);
+            RectTransform item = (RectTransform)items.Find(transformID);
             scrollRect.ScrollTo(item, duration: 1f);
 
             // Make element blink.

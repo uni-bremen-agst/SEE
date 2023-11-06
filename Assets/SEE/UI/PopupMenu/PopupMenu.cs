@@ -4,6 +4,7 @@ using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using SEE.GO;
 using SEE.Utils;
+using TMPro;
 using UnityEngine;
 
 namespace SEE.UI.PopupMenu
@@ -82,13 +83,30 @@ namespace SEE.UI.PopupMenu
                 return;
             }
 
+            // TODO: Respect priority
             GameObject actionItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuButton", ActionList, false);
-            ButtonManagerBasicWithIcon button = actionItem.MustGetComponent<ButtonManagerBasicWithIcon>();
+            ButtonManagerBasic button = actionItem.MustGetComponent<ButtonManagerBasic>();
             button.buttonText = action.Name;
-            button.clickEvent.AddListener(action.Action);
-            if (action.IconPath is { Length: > 0 })
+            button.clickEvent.AddListener(() =>
             {
-                button.buttonIcon = Resources.Load<Sprite>(action.IconPath);
+                action.Action();
+                HideMenu().Forget();
+            });
+            if (action.IconGlyph != default)
+            {
+                actionItem.transform.Find("Icon").gameObject.MustGetComponent<TextMeshProUGUI>().text = action.IconGlyph.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Adds all given <paramref name="actions"/> to the menu.
+        /// </summary>
+        /// <param name="actions">The actions to be added.</param>
+        public void AddActions(IEnumerable<PopupMenuAction> actions)
+        {
+            foreach (PopupMenuAction action in actions)
+            {
+                AddAction(action);
             }
         }
 
