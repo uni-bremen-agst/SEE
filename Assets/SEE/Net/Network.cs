@@ -12,6 +12,7 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
 using Sirenix.OdinInspector;
+using Sirenix.Utilities;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEditor;
@@ -36,6 +37,11 @@ namespace SEE.Net
         /// The maximal port number.
         /// </summary>
         private const int MaxServerPort = 65535;
+
+        /// <summary>
+        /// Stores every executed Action
+        /// </summary>
+        static List<string> rpcActions;
 
         /// <summary>
         /// The port of the server where the server listens to SEE action requests.
@@ -278,16 +284,39 @@ namespace SEE.Net
             }
         }
 
+
+         public static void SyncClient(ulong recipient)
+        {
+            if(rpcActions.IsNullOrEmpty()){
+                rpcActions = new List<string>();
+                return;
+            }
+            ulong[] receiver = new ulong[1] {recipient};
+
+            Debug.Log($"Client cast to arry: {receiver[0]}\n");
+            ServerActionNetwork clientServerNetwork = GameObject.Find("Server").GetComponent<ServerActionNetwork>();
+            if(clientServerNetwork == null){
+                return;
+            }
+            foreach(string rpcAction in rpcActions){
+                clientServerNetwork.BroadcastActionServerRpc(rpcAction, receiver);
+                Debug.Log($"Action send to Client: {rpcAction}\n");
+            }
+        }
+
         /// <summary>
         /// Broadcasts a serialized action.
         /// </summary>
         /// <param name="serializedAction">Serialized action to be broadcast</param>
         /// <param name="recipients">List of recipients to broadcast to, will broadcast to all if this is null.</param>
-
         public static void BroadcastAction(String serializedAction, ulong[] recipients)
         {
+            if(rpcActions.IsNullOrEmpty()){
+                rpcActions = new List<string>();
+            }
             ServerActionNetwork clientServerNetwork = GameObject.Find("Server").GetComponent<ServerActionNetwork>();
             clientServerNetwork.BroadcastActionServerRpc(serializedAction, recipients);
+            rpcActions.Add(serializedAction);
         }
 
         /// <summary>
@@ -511,6 +540,7 @@ namespace SEE.Net
                 try
                 {
                     NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
+                    NetworkManager.Singleton.OnClientConnectedCallback += SyncServerStateToClientOnClientConnectCallback;
                     if (NetworkManager.Singleton.StartServer())
                     {
                         InitializeGame();
@@ -527,6 +557,13 @@ namespace SEE.Net
                 }
                 callBack(true, $"Server started at {ServerIP4Address}:{ServerPort}.");
             }
+        }
+
+
+        private void SyncServerStateToClientOnClientConnectCallback(ulong owner)
+        {
+            Debug.Log($"Send client {owner} newest state");
+            SyncClient(owner);
         }
 
         /// <summary>
@@ -549,6 +586,7 @@ namespace SEE.Net
                 try
                 {
                     NetworkManager.Singleton.ConnectionApprovalCallback = ApprovalCheck;
+                    NetworkManager.Singleton.OnClientConnectedCallback += SyncServerStateToClientOnClientConnectCallback;
                     if (NetworkManager.Singleton.StartHost())
                     {
                         InitializeGame();
@@ -578,8 +616,9 @@ namespace SEE.Net
         {
             if (RoomPassword == System.Text.Encoding.ASCII.GetString(request.Payload))
             {
-                response.Approved = true;
                 Debug.Log($"Client {request.ClientNetworkId} has send right room password");
+                response.Approved = true;
+                
             }
             else
             {
@@ -627,28 +666,18 @@ namespace SEE.Net
             void InternalStartClient()
             {
                 Debug.Log($"Client is trying to connect to server {ServerIP4Address}:{ServerPort}...\n");
-                try
+
+                NetworkManager.Singleton.NetworkConfig.ConnectionData = Encoding.ASCII.GetBytes(RoomPassword);
+                NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallback;
+                NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
+
+                if (NetworkManager.Singleton.StartClient())
                 {
-                    NetworkManager.Singleton.NetworkConfig.ConnectionData = Encoding.ASCII.GetBytes(RoomPassword);
-                    NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnectedCallback;
-                    NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnectCallback;
-                    if (NetworkManager.Singleton.StartClient())
-                    {
                         InitializeGame();
-                    }
-                    else
-                    {
-                        throw new NoServerConnection($"Could not connect to server {ServerIP4Address}:{ServerPort}");
-                    }
-                }
-                catch (Exception exception)
-                {
-                    callBack(false, exception.Message);
-                    throw;
                 }
             }
         }
-        
+
         /// <summary>
         /// The maximal waiting time in seconds a client is willing to wait until a connection
         /// can be established.
