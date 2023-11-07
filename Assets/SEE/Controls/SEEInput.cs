@@ -51,6 +51,15 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// Turns on/off the browser.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleBrowser()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleBrowser);
+        }
+
+        /// <summary>
         /// Opens/closes the search menu.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
