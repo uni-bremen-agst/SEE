@@ -218,11 +218,13 @@ namespace Assets.SEE.Game.UI.Drawable
             if (!shapeBtn.interactable)
             {
                 shapeMenu.SetActive(true);
+                BindShapeMenu();
             }
             else
             {
                 shapeMenu.SetActive(false);
                 LineMenu.enableLineMenu(false, new LineMenu.MenuLayer[] { LineMenu.MenuLayer.Layer, LineMenu.MenuLayer.Loop });
+                BindLineMenu();
             }
         }
 
@@ -262,7 +264,7 @@ namespace Assets.SEE.Game.UI.Drawable
         private static void InitShapeMenu()
         {
             shapeMenu = PrefabInstantiator.InstantiatePrefab(drawableShapePrefab,
-                                                GameObject.Find("UI Canvas").transform, false);
+                                GameObject.Find("UI Canvas").transform, false);
             selector = shapeMenu.GetComponentInChildren<HorizontalSelector>();
             foreach (Shapes shape in GameShapesCalculator.GetShapes())
             {
@@ -295,8 +297,8 @@ namespace Assets.SEE.Game.UI.Drawable
             vertices = sliderVertices.GetValue();
             sliderVertices.onValueChanged.AddListener(value => { vertices = value; });
 
-            objInfo = GameFinder.FindChild(shapeMenu, "Info");
-            infoBMB = objInfo.GetComponent<ButtonManagerBasic>();
+            objInfo = GameFinder.FindChild(shapeMenu, "InfoPlaceHolder");
+            infoBMB = objInfo.GetComponentInChildren<ButtonManagerBasic>();
             infoVisibility = false;
             infoBMB.clickEvent.AddListener(ToggleInfo);
 
@@ -324,6 +326,7 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 LoadImage();
             }
+            MenuHelper.CalculateHeight(shapeMenu);
         }
 
         /// <summary>
@@ -512,6 +515,7 @@ namespace Assets.SEE.Game.UI.Drawable
                     objInfo.SetActive(true);
                     break;
             }
+            MenuHelper.CalculateHeight(shapeMenu);
         }
 
         /// <summary>
@@ -524,7 +528,27 @@ namespace Assets.SEE.Game.UI.Drawable
             shapeBMB.enabled = true;
             shapeBtn.interactable = true;
             LineMenu.enableLineMenu(false, new LineMenu.MenuLayer[] { LineMenu.MenuLayer.Layer, LineMenu.MenuLayer.Loop });
+            MenuHelper.CalculateHeight(LineMenu.instance);
+            BindLineMenu();
             shapeMenu.SetActive(false);
+        }
+
+        /// <summary>
+        /// Binds the line menu on the shape switch.
+        /// </summary>
+        private static void BindLineMenu()
+        {
+            LineMenu.instance.transform.SetParent(drawableSwitch.transform.Find("Content"));
+            GameFinder.FindChild(LineMenu.instance, "Dragger").GetComponent<WindowDragger>().enabled = false;
+        }
+
+        /// <summary>
+        /// Binds the shape menu on the shape switch.
+        /// </summary>
+        private static void BindShapeMenu()
+        {
+            shapeMenu.transform.SetParent(drawableSwitch.transform.Find("Content"));
+            GameFinder.FindChild(shapeMenu, "Dragger").GetComponent<WindowDragger>().enabled = false;
         }
 
         /// <summary>
@@ -537,6 +561,7 @@ namespace Assets.SEE.Game.UI.Drawable
             configBtn.interactable = true;
             configBMB.enabled = true;
             LineMenu.disableLineMenu();
+            BindShapeMenu();
             shapeMenu.SetActive(true);
         }
 

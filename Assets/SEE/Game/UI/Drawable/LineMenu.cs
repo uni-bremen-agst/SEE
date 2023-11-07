@@ -11,6 +11,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using SEE.Controls.Actions.Drawable;
 using static Assets.SEE.Game.Drawable.GameDrawer;
 
 namespace Assets.SEE.Game.UI.Drawable
@@ -194,12 +195,16 @@ namespace Assets.SEE.Game.UI.Drawable
         }
 
         /// <summary>
-        /// Enables all line menu layers and then
-        /// hides the line menu.
+        /// Enables all line menu layers,
+        /// sets the parent back to UI Canvas, enables the window dragger 
+        /// and then hides the line menu.
+        /// The parent of the line menu can be switched through the <see cref="DrawShapesAction"/>
         /// </summary>
         public static void disableLineMenu()
         {
             enableLineMenuLayers();
+            instance.transform.SetParent(GameObject.Find("UI Canvas").transform);
+            GameFinder.FindChild(instance, "Dragger").GetComponent<WindowDragger>().enabled = true;
             instance.SetActive(false);
         }
 
@@ -248,6 +253,7 @@ namespace Assets.SEE.Game.UI.Drawable
                 disableTilingFromLineMenu();
             }
             instance.SetActive(true);
+            MenuHelper.CalculateHeight(instance);
         }
 
         /// <summary>
@@ -257,6 +263,7 @@ namespace Assets.SEE.Game.UI.Drawable
         {
             enableLineMenu(withoutMenuLayer: new MenuLayer[] { MenuLayer.Layer, MenuLayer.Loop });
             InitDrawing();
+            MenuHelper.CalculateHeight(instance);
         }
 
         /// <summary>
@@ -331,6 +338,7 @@ namespace Assets.SEE.Game.UI.Drawable
 
             picker.AssignColor(ValueHolder.currentPrimaryColor);
             picker.onValueChanged.AddListener((colorAction = color => ValueHolder.currentPrimaryColor = color));
+            MenuHelper.CalculateHeight(instance);
         }
 
         /// <summary>
@@ -485,6 +493,7 @@ namespace Assets.SEE.Game.UI.Drawable
                     lineHolder.primaryColor = color;
                     new EditLinePrimaryColorNetAction(drawable.name, drawableParentName, selectedLine.name, color).Execute();
                 });
+                MenuHelper.CalculateHeight(instance);
             }
         }
         #endregion
@@ -561,6 +570,7 @@ namespace Assets.SEE.Game.UI.Drawable
         public static void AssignLineKind(GameDrawer.LineKind kind)
         {
             selectedLineKind = kind;
+            MenuHelper.CalculateHeight(instance);
         }
 
         /// <summary>
@@ -580,6 +590,7 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 disableTilingFromLineMenu();
             }
+            MenuHelper.CalculateHeight(instance);
         }
         #endregion
 
@@ -608,6 +619,7 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 enableColorAreaFromLineMenu();
             }
+            MenuHelper.CalculateHeight(instance);
         }
         #endregion
 

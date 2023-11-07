@@ -67,7 +67,6 @@ namespace Assets.SEE.Game.Drawable
             using ConfigWriter writer = new(colorPresetsFile);
             ColorsConfig config = new() { Colors = colors };
             config.Save(writer);
-            Debug.Log($"Saved color presets configuration to file {colorPresetsFile}.\n");
         }
     }
 }

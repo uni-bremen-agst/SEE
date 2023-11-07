@@ -314,21 +314,13 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 orderInLayer.SetActive(true);
                 editText.SetActive(true);
-                instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 635);
             }
             else
             {
                 orderInLayer.SetActive(false);
                 editText.SetActive(false);
-                if (thicknessLayer.activeSelf)
-                {
-                    instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 585);
-                }
-                else
-                {
-                    instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 555);
-                }
             }
+            MenuHelper.CalculateHeight(instance);
             instance.SetActive(true);
         }
 
@@ -349,20 +341,20 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 orderInLayer.SetActive(true);
                 editText.SetActive(true);
-                instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 635);
             }
             else
             {
                 orderInLayer.SetActive(false);
                 editText.SetActive(false);
-                instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 555);
             }
+            
             instance.SetActive(true);
             if (fontColorBtn.interactable)
             {
                 MutuallyExclusiveColorButtons();
             }
             AssignColorArea(colorAction, color);
+            MenuHelper.CalculateHeight(instance);
         }
 
         /// <summary>
@@ -375,7 +367,7 @@ namespace Assets.SEE.Game.UI.Drawable
             fontColorBMB.clickEvent.AddListener(() =>
             {
                 AssignColorArea((color => ValueHolder.currentPrimaryColor = color), ValueHolder.currentPrimaryColor);
-                instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 555);
+                MenuHelper.CalculateHeight(instance);
             });
 
             outlineColorBMB.clickEvent.AddListener(() =>
@@ -389,10 +381,11 @@ namespace Assets.SEE.Game.UI.Drawable
                     ValueHolder.currentSecondaryColor = new Color(ValueHolder.currentSecondaryColor.r, ValueHolder.currentSecondaryColor.g, ValueHolder.currentSecondaryColor.b, 255);
                 }
                 AssignColorArea((color => ValueHolder.currentSecondaryColor = color), ValueHolder.currentSecondaryColor);
-                instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 585);
+                MenuHelper.CalculateHeight(instance);
             });
             AssignOutlineThickness((thickness => ValueHolder.currentOutlineThickness = thickness), ValueHolder.currentOutlineThickness);
             AssignFontSize(size => ValueHolder.currentFontSize = size, ValueHolder.currentFontSize);
+            MenuHelper.CalculateHeight(instance);
         }
 
         /// <summary>
@@ -421,7 +414,7 @@ namespace Assets.SEE.Game.UI.Drawable
                         textHolder.fontColor = color;
                         new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
                     }, textHolder.fontColor);
-                    instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 635);
+                    MenuHelper.CalculateHeight(instance);
                 });
 
                 outlineColorBMB.clickEvent.AddListener(() =>
@@ -440,7 +433,7 @@ namespace Assets.SEE.Game.UI.Drawable
                         textHolder.outlineColor = color;
                         new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
                     }, textHolder.outlineColor);
-                    instance.GetComponent<RectTransform>().sizeDelta = new Vector2(300, 665);
+                    MenuHelper.CalculateHeight(instance);
                 });
 
                 AssignOutlineThickness(thickness =>
@@ -494,6 +487,7 @@ namespace Assets.SEE.Game.UI.Drawable
                     textHolder.orderInLayer = order;
                     new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
                 }, textHolder.orderInLayer);
+                MenuHelper.CalculateHeight(instance);
             }
         }
 
