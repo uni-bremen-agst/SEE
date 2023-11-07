@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using RTG;
-using SEE.DataModel.DG;
-using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
-using UnityEngine.UIElements;
 using SEE.Game.Drawable.Configurations;
-using static Assets.SEE.Game.Drawable.GameShapesCalculator;
 using SEE.Game.Drawable;
 using SEE.Game;
 

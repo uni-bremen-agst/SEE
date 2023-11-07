@@ -1,20 +1,16 @@
 ﻿using Assets.SEE.Game.Drawable;
-using SEE.Controls.Actions;
-using SEE.Controls.Actions.Drawable;
-using SEE.Net.Actions.Drawable;
-using SEE.Utils;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using Assets.SEE.Game.Drawable.ActionHelpers;
 using Assets.SEE.Game.UI.Drawable;
+using SEE.Game;
+using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
 using SEE.Game.UI.Notification;
 using SEE.Game.UI.PropertyDialog.Drawable;
-using SEE.Game;
-using SEE.Game.Drawable.Configurations;
-using Assets.SEE.Game.Drawable.ActionHelpers;
-using System;
+using SEE.Net.Actions.Drawable;
+using SEE.Utils;
+using System.Collections.Generic;
 using System.IO;
-using SEE.Game.Drawable;
+using UnityEngine;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -38,12 +34,12 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// The file path of the image.
         /// </summary>
-        public static string filePath = "";
+        private string filePath = "";
 
         /// <summary>
         /// The file name of the downloaded image.
         /// </summary>
-        private static string fileName = "";
+        private string fileName = "";
 
         /// <summary>
         /// The instance for the drawable file browser
@@ -97,10 +93,12 @@ namespace SEE.Controls.Actions.Drawable
             }
         }
 
+        /// <summary>
+        /// Destroys the image source menu if it's still active.
+        /// </summary>
         public override void Stop()
         {
-            base.Stop();
-            filePath = "";
+            ImageSourceMenu.Disable();
         }
 
         /// <summary>
@@ -115,23 +113,31 @@ namespace SEE.Controls.Actions.Drawable
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
                      Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
                     (GameFinder.hasDrawable(raycastHit.collider.gameObject) || raycastHit.collider.gameObject.CompareTag(Tags.Drawable))
+                    && !ImageSourceMenu.IsOpen()
                     && (browser == null || (browser != null && !browser.IsOpen())) && (webImageDialog == null || (webImageDialog != null && !isDialogOpen)))
                 {
                     drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
                         raycastHit.collider.gameObject : GameFinder.FindDrawable(raycastHit.collider.gameObject);
                     position = raycastHit.point;
-                    if (!Input.GetKey(KeyCode.LeftControl))
+                    ImageSourceMenu.Enable();
+                }
+                if (ImageSourceMenu.TryGetSource(out ImageSourceMenu.Source source))
+                {
+                    switch (source)
                     {
-                        browser = GameObject.Find("UI Canvas").AddComponent<DrawableFileBrowser>();
-                        browser.LoadImage();
-                    } else
-                    {
-                        webImageDialog = new WebImageDialog();
-                        isDialogOpen = true;
-                        webImageDialog.Open();
+                        case ImageSourceMenu.Source.Local:
+                            browser = GameObject.Find("UI Canvas").AddComponent<DrawableFileBrowser>();
+                            browser.LoadImage();
+                            break;
+                        case ImageSourceMenu.Source.Web:
+                            webImageDialog = new WebImageDialog();
+                            isDialogOpen = true;
+                            webImageDialog.Open();
+                            break;
                     }
                     currentState = ReversibleAction.Progress.InProgress;
                 }
+
                 if (webImageDialog != null && webImageDialog.WasCanceled())
                 {
                     isDialogOpen = false;
@@ -162,7 +168,12 @@ namespace SEE.Controls.Actions.Drawable
                     filePath = path;
                 }
 
-                if (filePath != "" && (browser == null || (browser != null && !browser.IsOpen())))
+                if (browser != null && browser.TryGetFilePath(out string chosenPath))
+                {
+                    filePath = chosenPath;
+                }
+
+                if (filePath != "")
                 {
                     imageObj = GameImage.PlaceImage(drawable, filePath, position, ValueHolder.currentOrderInLayer);
                     new AddImageNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), ImageConf.GetImageConf(imageObj)).Execute();

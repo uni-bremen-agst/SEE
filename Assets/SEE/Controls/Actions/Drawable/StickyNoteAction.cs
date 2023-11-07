@@ -1,15 +1,14 @@
-﻿using SEE.Game.Drawable.Configurations;
+﻿using Assets.SEE.Game.Drawable;
+using Assets.SEE.Game.UI.Drawable;
+using HighlightPlus;
+using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using SEE.Game.UI.Notification;
+using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using Assets.SEE.Game.Drawable;
-using Michsky.UI.ModernUIPack;
-using SEE.Game.UI.Notification;
-using SEE.Game;
-using SEE.Net.Actions.Drawable;
-using Assets.SEE.Game.UI.Drawable;
-using HighlightPlus;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -19,24 +18,14 @@ namespace SEE.Controls.Actions.Drawable
     public class StickyNoteAction : AbstractPlayerAction
     {
         /// <summary>
-        /// The prefab of the sticky note menu.
-        /// </summary>
-        private const string stickyNoteMenuPrefab = "Prefabs/UI/Drawable/StickyNoteMenu";
-
-        /// <summary>
-        /// The instance for the sticky note menu.
-        /// </summary>
-        private GameObject stickyNoteMenu;
-
-        /// <summary>
         /// The selected operation for sticky notes.
         /// </summary>
-        private ActionStates selectedAction = ActionStates.None;
+        private Operation selectedAction = Operation.None;
 
         /// <summary>
         /// The different operations for sticky notes.
         /// </summary>
-        private enum ActionStates
+        public enum Operation
         {
             None,
             Spawn,
@@ -101,13 +90,13 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The operation that was executed.
             /// </summary>
-            public readonly ActionStates action;
+            public readonly Operation action;
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
             /// <param name="originalConfig">the original configuration of the sticky note</param>
             /// <param name="action">The executed operation.</param>
-            public Memento(DrawableConfig originalConfig, ActionStates action)
+            public Memento(DrawableConfig originalConfig, Operation action)
             {
                 this.originalConfig = originalConfig;
                 this.action = action;
@@ -116,32 +105,11 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Enables the sticky note menu in which an operation can be selected.
+        /// Enables the sticky note menu with which an operation can be selected.
         /// </summary>
         public override void Awake()
         {
-            stickyNoteMenu = PrefabInstantiator.InstantiatePrefab(stickyNoteMenuPrefab,
-                GameObject.Find("UI Canvas").transform, false);
-            ButtonManagerBasic spawn = GameFinder.FindChild(stickyNoteMenu, "Spawn").GetComponent<ButtonManagerBasic>();
-            spawn.clickEvent.AddListener(() =>
-            {
-                selectedAction = ActionStates.Spawn;
-            });
-            ButtonManagerBasic move = GameFinder.FindChild(stickyNoteMenu, "Move").GetComponent<ButtonManagerBasic>();
-            move.clickEvent.AddListener(() =>
-            {
-                selectedAction = ActionStates.Move;
-            });
-            ButtonManagerBasic edit = GameFinder.FindChild(stickyNoteMenu, "Edit").GetComponent<ButtonManagerBasic>();
-            edit.clickEvent.AddListener(() =>
-            {
-                selectedAction = ActionStates.Edit;
-            });
-            ButtonManagerBasic delete = GameFinder.FindChild(stickyNoteMenu, "Delete").GetComponent<ButtonManagerBasic>();
-            delete.clickEvent.AddListener(() =>
-            {
-                selectedAction = ActionStates.Delete;
-            });
+            StickyNoteMenu.Enable();
         }
 
         /// <summary>
@@ -149,7 +117,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Stop()
         {
-            Destroyer.Destroy(stickyNoteMenu);
+            StickyNoteMenu.Disable();
             StickyNoteRotationMenu.Disable();
             StickyNoteEditMenu.Disable();
             if (stickyNote != null && stickyNote.GetComponent<HighlightEffect>() != null)
@@ -168,21 +136,25 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (!Raycasting.IsMouseOverGUI())
             {
+                if (StickyNoteMenu.TryGetOperation(out Operation op))
+                {
+                    selectedAction = op;
+                }
                 switch (selectedAction)
                 {
-                    case ActionStates.None:
+                    case Operation.None:
                         if (Input.GetMouseButtonDown(0))
                         {
                             ShowNotification.Info("Select an operation", "First you need to select an operation from the menu.");
                         }
                         break;
-                    case ActionStates.Spawn:
+                    case Operation.Spawn:
                         return Spawn();
-                    case ActionStates.Move:
+                    case Operation.Move:
                         return Move();
-                    case ActionStates.Edit:
+                    case Operation.Edit:
                         return Edit();
-                    case ActionStates.Delete:
+                    case Operation.Delete:
                         return Delete();
                 }
             }
@@ -208,7 +180,7 @@ namespace SEE.Controls.Actions.Drawable
                 if (!raycastHit.collider.gameObject.CompareTag(Tags.Drawable) &&
                     !GameFinder.hasDrawable(raycastHit.collider.gameObject))
                 {
-                    stickyNoteMenu.SetActive(false);
+                    StickyNoteMenu.Disable();
                     StickyNoteRotationMenu.Enable(stickyNote, raycastHit.collider.gameObject);
                 }
                 else
@@ -251,7 +223,7 @@ namespace SEE.Controls.Actions.Drawable
                     inProgress = true;
                     memento = new(DrawableConfigManager.GetDrawableConfig(drawable), selectedAction);
                     memento.changedConfig = DrawableConfigManager.GetDrawableConfig(drawable);
-                    stickyNoteMenu.SetActive(false);
+                    StickyNoteMenu.Disable();
                     drawable.GetComponent<Collider>().enabled = false;
                     stickyNote = drawable.transform.parent.gameObject;
                     stickyNoteHolder = GameFinder.GetHighestParent(drawable);
@@ -357,7 +329,7 @@ namespace SEE.Controls.Actions.Drawable
 
                         memento = new(DrawableConfigManager.GetDrawableConfig(drawable), selectedAction);
                         memento.changedConfig = DrawableConfigManager.GetDrawableConfig(drawable);
-                        stickyNoteMenu.SetActive(false);
+                        StickyNoteMenu.Disable();
                         StickyNoteEditMenu.Enable(drawable.transform.parent.gameObject, memento.changedConfig);
                     }
                     else
@@ -460,28 +432,28 @@ namespace SEE.Controls.Actions.Drawable
         {
             switch (memento.action)
             {
-                case ActionStates.Spawn:
+                case Operation.Spawn:
                     GameObject toDelete = GameFinder.GetHighestParent(
                         GameFinder.Find(memento.originalConfig.DrawableName, memento.originalConfig.DrawableParentName));
                     new StickyNoteDeleterNetAction(toDelete.name).Execute();
                     Destroyer.Destroy(toDelete);
                     break;
-                case ActionStates.Move:
+                case Operation.Move:
                     GameObject stickyHolder = GameFinder.GetHighestParent(
                         GameFinder.Find(memento.originalConfig.DrawableName, memento.originalConfig.DrawableParentName));
                     GameStickyNoteManager.Move(stickyHolder, memento.originalConfig.Position, memento.originalConfig.Rotation);
                     GameObject d = GameFinder.FindDrawable(stickyHolder);
                     string drawableParentID = GameFinder.GetDrawableParentName(d);
-                    new StickyNoteMoveNetAction(d.name, drawableParentID, memento.originalConfig.Position, 
+                    new StickyNoteMoveNetAction(d.name, drawableParentID, memento.originalConfig.Position,
                         memento.originalConfig.Rotation).Execute();
                     break;
-                case ActionStates.Edit:
+                case Operation.Edit:
                     GameObject sticky = GameFinder.Find(memento.originalConfig.DrawableName, memento.originalConfig.DrawableParentName)
                         .transform.parent.gameObject;
                     GameStickyNoteManager.Change(sticky, memento.originalConfig);
                     new StickyNoteChangeNetAction(memento.originalConfig).Execute();
                     break;
-                case ActionStates.Delete:
+                case Operation.Delete:
                     GameObject stickyNote = GameStickyNoteManager.Spawn(memento.originalConfig);
                     new StickyNoteSpawnNetAction(memento.originalConfig).Execute();
                     GameObject drawable = GameFinder.FindDrawable(stickyNote);
@@ -512,27 +484,27 @@ namespace SEE.Controls.Actions.Drawable
         {
             switch (memento.action)
             {
-                case ActionStates.Spawn:
+                case Operation.Spawn:
                     GameStickyNoteManager.Spawn(memento.originalConfig);
                     new StickyNoteSpawnNetAction(memento.originalConfig).Execute();
                     break;
-                case ActionStates.Move:
+                case Operation.Move:
                     GameObject stickyHolder = GameFinder.GetHighestParent(
                         GameFinder.Find(memento.changedConfig.DrawableName, memento.changedConfig.DrawableParentName));
                     GameStickyNoteManager.Move(stickyHolder, memento.changedConfig.Position, memento.changedConfig.Rotation);
                     GameObject d = GameFinder.FindDrawable(stickyHolder);
                     string drawableParentID = GameFinder.GetDrawableParentName(d);
-                    new StickyNoteMoveNetAction(d.name, drawableParentID, memento.changedConfig.Position, 
+                    new StickyNoteMoveNetAction(d.name, drawableParentID, memento.changedConfig.Position,
                         memento.changedConfig.Rotation).Execute();
                     break;
-                case ActionStates.Edit:
+                case Operation.Edit:
                     GameObject sticky = GameFinder.Find(memento.changedConfig.DrawableName, memento.changedConfig.DrawableParentName)
                         .transform.parent.gameObject;
                     GameStickyNoteManager.Change(sticky, memento.changedConfig);
                     new StickyNoteChangeNetAction(memento.changedConfig).Execute();
                     break;
-                case ActionStates.Delete:
-                    GameObject toDelete = GameFinder.GetHighestParent(GameFinder.Find(memento.originalConfig.DrawableName, 
+                case Operation.Delete:
+                    GameObject toDelete = GameFinder.GetHighestParent(GameFinder.Find(memento.originalConfig.DrawableName,
                         memento.originalConfig.DrawableParentName));
                     new StickyNoteDeleterNetAction(toDelete.name).Execute();
                     Destroyer.Destroy(toDelete);
@@ -578,12 +550,19 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>the sticky note id</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            GameObject stickyNoteDrawable = GameFinder.Find(memento.originalConfig.DrawableName, 
+            GameObject stickyNoteDrawable = GameFinder.Find(memento.originalConfig.DrawableName,
                 memento.originalConfig.DrawableParentName);
-            return new HashSet<string>
+            if (stickyNoteDrawable != null)
             {
-                stickyNoteDrawable.transform.parent.name
-            };
+                return new HashSet<string>
+                {
+                    stickyNoteDrawable.transform.parent.name
+                };
+            }
+            else
+            {
+                return new HashSet<string>();
+            }
         }
     }
 }

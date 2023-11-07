@@ -135,11 +135,6 @@ namespace SEE.Controls.Actions.Drawable
         private static bool mouseWasReleased = true;
 
         /// <summary>
-        /// Bool that represents that the paste button was pressed.
-        /// </summary>
-        private bool pastePressed = false;
-
-        /// <summary>
         /// The old values of the selected drawable type.
         /// </summary>
         private DrawableType oldValueHolder;

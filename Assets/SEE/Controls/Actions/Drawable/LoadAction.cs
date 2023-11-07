@@ -65,11 +65,6 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// The file path of the file that should be loaded.
-        /// </summary>
-        public static string filePath = "";
-
-        /// <summary>
         /// Ensures that per click is only saved once.
         /// </summary>
         private bool clicked = false;
@@ -130,11 +125,12 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Stops the <see cref="LoadAction"/>. Resets the file path.
+        /// Stops the <see cref="LoadAction"/>.
+        /// Destroys the load menu and if there are still an activ
+        /// highlight effect
         /// </summary>
         public override void Stop()
         {
-            filePath = "";
             if (loadMenu != null)
             {
                 Destroyer.Destroy(loadMenu);
@@ -198,7 +194,7 @@ namespace SEE.Controls.Actions.Drawable
                     clicked = false;
                 }
                 /// This block will be executed when a file was successfully chosen.
-                if (!filePath.Equals("") && memento != null)
+                if (browser != null && browser.TryGetFilePath(out string filePath) && memento != null)
                 {
                     switch (memento.state)
                     {

@@ -1,18 +1,13 @@
-﻿using SEE.Game;
+﻿using Assets.SEE.Game.Drawable;
+using HighlightPlus;
+using Michsky.UI.ModernUIPack;
+using SEE.Game;
+using SEE.Game.Drawable;
+using SEE.Game.UI.Notification;
+using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using Assets.SEE.Game.Drawable;
-using OpenAI.Files;
-using HighlightPlus;
-using Sirenix.OdinInspector;
-using Assets.SEE.Game.UI.Drawable;
-using static SEE.Controls.Actions.Drawable.LoadAction;
-using System.IO;
-using SEE.Game.Drawable;
-using Michsky.UI.ModernUIPack;
-using SEE.Game.UI.Notification;
-using SEE.GO;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -74,11 +69,6 @@ namespace SEE.Controls.Actions.Drawable
         private bool clicked = false;
 
         /// <summary>
-        /// The file path of the to saved file.
-        /// </summary>
-        public static string filePath = "";
-
-        /// <summary>
         /// List of all selected drawable for saving.
         /// </summary>
         private List<GameObject> selectedDrawables = new();
@@ -105,11 +95,10 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// Stops the <see cref="SaveAction"/>.
-        /// Resets the file path.
+        /// Destroys the save menu and if there are still highlight effect
         /// </summary>
         public override void Stop()
         {
-            filePath = "";
             foreach (GameObject drawable in selectedDrawables)
             {
                 if (drawable.GetComponent<HighlightEffect>() != null)
@@ -215,7 +204,7 @@ namespace SEE.Controls.Actions.Drawable
 
                 /// If a file to save was successfully chosen this block will be executed.
                 /// It saves the selected drawable/drawables in the chosen file.
-                if (!filePath.Equals("") && memento != null)
+                if (browser != null && browser.TryGetFilePath(out string filePath) && memento != null)
                 {
                     switch (memento.savedState)
                     {

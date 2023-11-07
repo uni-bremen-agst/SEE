@@ -1,14 +1,4 @@
-﻿using SEE.Controls.Actions;
-using SEE.Game.Drawable;
-using SEE.GO;
-using SEE.Utils;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
-using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -80,6 +70,21 @@ namespace Assets.SEE.Game.Drawable
         /// </summary>
         public const string ImagePrefix = "Image";
 
+        /// <summary>
+        /// The prefix of a mind map theme node
+        /// </summary>
+        public const string MindMapTheme = "Theme";
+
+        /// <summary>
+        /// The prefix of a mind map node node
+        /// </summary>
+        public const string MindMapNode = "Node";
+
+        /// <summary>
+        /// The prefix of a mind map leaf node.
+        /// </summary>
+        public const string MindMapLeaf = "Leaf";
+ 
         /// <summary>
         /// The prefix of a sticky notes.
         /// </summary>
