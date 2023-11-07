@@ -1175,10 +1175,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1968741445}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.30353355, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -2.5, y: 160}
-  m_SizeDelta: {x: -5, y: 30}
+  m_AnchorMin: {x: 0.2876878, y: 0}
+  m_AnchorMax: {x: 0.7117469, y: 0}
+  m_AnchoredPosition: {x: 0, y: 700}
+  m_SizeDelta: {x: 0.000030517578, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &130212553
 MonoBehaviour:
@@ -21833,7 +21833,11 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 180570, guid: 386844d22c1dfdb4baea57a96fbad4db,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1581808196}
   m_SourcePrefab: {fileID: 100100000, guid: 386844d22c1dfdb4baea57a96fbad4db, type: 3}
 --- !u!1 &1581808193 stripped
 GameObject:
@@ -21853,6 +21857,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35bf0bd4ded61a34f9be34f6738e4010, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1581808196
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1581808193}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d247427dfff6304db2b292811004b23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  manageAllBrowsers: 1
+  promptForFileNames: 0
+  saveFolder: 
+  statusBar: {fileID: 130212553}
 --- !u!1 &1593819936
 GameObject:
   m_ObjectHideFlags: 0
