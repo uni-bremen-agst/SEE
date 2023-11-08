@@ -1,4 +1,5 @@
 ﻿using Assets.SEE.Game.Drawable;
+using Assets.SEE.Game.UI.Drawable;
 using HighlightPlus;
 using Michsky.UI.ModernUIPack;
 using SEE.Game;
@@ -8,6 +9,7 @@ using SEE.GO;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -79,21 +81,6 @@ namespace SEE.Controls.Actions.Drawable
         private DrawableFileBrowser browser;
 
         /// <summary>
-        /// The location where the text menu prefeb is placed.
-        /// </summary>
-        private const string saveMenuPrefab = "Prefabs/UI/Drawable/SaveMenu";
-
-        /// <summary>
-        /// The instance for the save menu.
-        /// </summary>
-        private GameObject saveMenu;
-
-        /// <summary>
-        /// The instance for the save single or more drawable button.
-        /// </summary>
-        private ButtonManagerBasic saveButton;
-
-        /// <summary>
         /// Stops the <see cref="SaveAction"/>.
         /// Destroys the save menu and if there are still highlight effect
         /// </summary>
@@ -106,18 +93,15 @@ namespace SEE.Controls.Actions.Drawable
                     Destroyer.Destroy(drawable.GetComponent<HighlightEffect>());
                 }
             }
-            Destroyer.Destroy(saveMenu);
+            SaveMenu.Disable();
         }
 
         /// <summary>
-        /// Enables the save menu and adds the required Handler.
+        /// Enables the save menu and adds the required Actions.
         /// </summary>
         public override void Awake()
         {
-            saveMenu = PrefabInstantiator.InstantiatePrefab(saveMenuPrefab,
-                GameObject.Find("UI Canvas").transform, false);
-            saveButton = GameFinder.FindChild(saveMenu, "Save").GetComponent<ButtonManagerBasic>();
-            saveButton.clickEvent.AddListener(() =>
+            UnityAction saveButtonCall = () =>
             {
                 if (browser == null || (browser != null && !browser.IsOpen()))
                 {
@@ -139,9 +123,9 @@ namespace SEE.Controls.Actions.Drawable
                         ShowNotification.Warn("No drawable selected.", "Select one or more drawables to save.");
                     }
                 }
-            });
-            ButtonManagerBasic saveAllButton = GameFinder.FindChild(saveMenu, "SaveAll").GetComponent<ButtonManagerBasic>();
-            saveAllButton.clickEvent.AddListener(() =>
+            };
+
+            UnityAction saveAllButtonCall = () =>
             {
                 if (browser == null || (browser != null && !browser.IsOpen()))
                 {
@@ -150,7 +134,9 @@ namespace SEE.Controls.Actions.Drawable
                     List<GameObject> drawables = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
                     memento = new Memento(drawables.ToArray(), SaveState.All);
                 }
-            });
+            };
+
+            SaveMenu.Enable(saveButtonCall, saveAllButtonCall);
         }
 
         /// <summary>

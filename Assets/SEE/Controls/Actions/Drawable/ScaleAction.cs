@@ -84,9 +84,20 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            if (selectedObj != null && selectedObj.GetComponent<BlinkEffect>() != null)
+            if (selectedObj != null)
             {
-                selectedObj.GetComponent<BlinkEffect>().Deactivate();
+                if (selectedObj.GetComponent<BlinkEffect>() != null)
+                {
+                    selectedObj.GetComponent<BlinkEffect>().Deactivate();
+                }
+                if (selectedObj.GetComponent<Rigidbody>() != null)
+                {
+                    Destroyer.Destroy(selectedObj.GetComponent<Rigidbody>());
+                }
+                if (selectedObj.GetComponent<CollisionController>() != null)
+                {
+                    Destroyer.Destroy(selectedObj.GetComponent<CollisionController>());
+                }
             }
             if (progressState != ProgressState.Finish && selectedObj != null)
             {
@@ -127,6 +138,9 @@ namespace SEE.Controls.Actions.Drawable
                             selectedObj = raycastHit.collider.gameObject;
                             drawable = GameFinder.FindDrawable(selectedObj);
                             oldSelectedObj = selectedObj;
+
+                            selectedObj.AddComponent<Rigidbody>().isKinematic = true;
+                            selectedObj.AddComponent<CollisionController>();
 
                             BlinkEffect effect = selectedObj.AddOrGetComponent<BlinkEffect>();
                             effect.SetAllowedActionStateType(GetActionStateType());
@@ -196,9 +210,14 @@ namespace SEE.Controls.Actions.Drawable
                         ScaleMenu.Disable();
                         if (oldScale != newScale)
                         {
-                            memento = new Memento(selectedObj, GameFinder.FindDrawable(selectedObj), selectedObj.name, oldScale, newScale);
-                            currentState = ReversibleAction.Progress.Completed;
-                            return true;
+                            if (!selectedObj.GetComponent<CollisionController>().IsInCollision())
+                            {
+                                Destroyer.Destroy(selectedObj.GetComponent<Rigidbody>());
+                                Destroyer.Destroy(selectedObj.GetComponent<CollisionController>());
+                                memento = new Memento(selectedObj, GameFinder.FindDrawable(selectedObj), selectedObj.name, oldScale, newScale);
+                                currentState = ReversibleAction.Progress.Completed;
+                                return true;
+                            }
                         } else
                         {
                             selectedObj = null;

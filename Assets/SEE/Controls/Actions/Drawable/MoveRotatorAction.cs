@@ -124,31 +124,14 @@ namespace SEE.Controls.Actions.Drawable
         /// The old local euler angles of the selected object.
         /// </summary>
         private Vector3 oldObjectLocalEulerAngles;
-
         /// <summary>
-        /// The prefab of the rotation menu.
+        /// The prefab of the move menu.
         /// </summary>
         private const string switchMenuPrefab = "Prefabs/UI/Drawable/MoveRotatorSwitch";
         /// <summary>
         /// The instance of the switch menu
         /// </summary>
         private GameObject switchMenu;
-        /// <summary>
-        /// The prefab of the rotation menu.
-        /// </summary>
-        private const string moveMenuPrefab = "Prefabs/UI/Drawable/Move";
-        /// <summary>
-        /// The instance of the move menu
-        /// </summary>
-        private GameObject moveMenu;
-        /// <summary>
-        /// The prefab of the rotation menu.
-        /// </summary>
-        private const string rotationMenuPrefab = "Prefabs/UI/Drawable/Rotate";
-        /// <summary>
-        /// The instance of the rotation menu
-        /// </summary>
-        private GameObject rotationMenu;
         /// <summary>
         /// Represents that the left mouse button was released after selecting a object.
         /// </summary>
@@ -163,18 +146,29 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private Vector3 newObjectLocalEulerAngles;
 
-
         /// <summary>
         /// Deactivates the blink effect if, it is still active.
+        /// And destroys the rigidbody if it is still active.
         /// If the action was not completed in full, the changes are reset.
         /// Destoryes the rotation menu if is still active.
         /// </summary>
         public override void Stop()
         {
             base.Stop();
-            if (selectedObject != null && selectedObject.GetComponent<BlinkEffect>() != null)
+            if (selectedObject != null)
             {
-                selectedObject.GetComponent<BlinkEffect>().Deactivate();
+                if (selectedObject.GetComponent<BlinkEffect>() != null)
+                {
+                    selectedObject.GetComponent<BlinkEffect>().Deactivate();
+                }
+                if (selectedObject.GetComponent<Rigidbody>() != null)
+                {
+                    Destroyer.Destroy(selectedObject.GetComponent<Rigidbody>());
+                }
+                if (selectedObject.GetComponent<CollisionController>() != null)
+                {
+                    Destroyer.Destroy(selectedObject.GetComponent<CollisionController>());
+                }
             }
             if (progressState != ProgressState.Finish && selectedObject != null)
             {
@@ -192,14 +186,8 @@ namespace SEE.Controls.Actions.Drawable
                     new RotatorNetAction(drawable.name, drawableParent, selectedObject.name, oldObjectLocalEulerAngles.z).Execute();
                 }
             }
-            if (rotationMenu != null)
-            {
-                Destroyer.Destroy(rotationMenu);
-            }
-            if (moveMenu != null)
-            {
-                Destroyer.Destroy(moveMenu);
-            }
+            RotationMenu.Disable();
+            MoveMenu.Disable();
         }
 
         /// <summary>
@@ -225,6 +213,9 @@ namespace SEE.Controls.Actions.Drawable
                             selectedObject = raycastHit.collider.gameObject;
                             oldObjectPosition = selectedObject.transform.position;
                             oldObjectLocalEulerAngles = selectedObject.transform.localEulerAngles;
+
+                            selectedObject.AddComponent<Rigidbody>().isKinematic = true;
+                            selectedObject.AddComponent<CollisionController>();
 
                             BlinkEffect effect = selectedObject.AddOrGetComponent<BlinkEffect>();
                             effect.SetAllowedActionStateType(GetActionStateType());
@@ -257,6 +248,7 @@ namespace SEE.Controls.Actions.Drawable
                         {
                             Destroyer.Destroy(switchMenu);
                             Destroyer.Destroy(selectedObject.GetComponent<BlinkEffect>());
+                            Destroyer.Destroy(selectedObject.GetComponent<Rigidbody>());
                             if (selectedObject.GetComponent<Renderer>()!= null)
                             {
                                 selectedObject.GetComponent<Renderer>().enabled = true;
@@ -282,16 +274,10 @@ namespace SEE.Controls.Actions.Drawable
                         {
                             GameObject drawable = GameFinder.FindDrawable(selectedObject);
                             string drawableParentName = GameFinder.GetDrawableParentName(drawable);
-                            
-                            if (moveMenu == null)
-                            {
-                                moveMenu = PrefabInstantiator.InstantiatePrefab(moveMenuPrefab,
-                                        GameObject.Find("UI Canvas").transform, false);
-                                InitMoveMenu(drawable.name, drawableParentName);
-                            }
-                            SwitchManager speedUp = GameFinder.FindChild(moveMenu, "SpeedSwitch").GetComponent<SwitchManager>();
-                            SwitchManager moveByMouse = GameFinder.FindChild(moveMenu, "MoveSwitch").GetComponent<SwitchManager>();
 
+                            MoveMenu.Enable(selectedObject);
+                            SwitchManager speedUp = MoveMenu.GetSpeedUpManager();
+                            SwitchManager moveByMouse = MoveMenu.GetMoveByMouseManager();
                             if (Input.GetKeyDown(KeyCode.LeftControl))
                             {
                                 speedUp.isOn = !speedUp.isOn;
@@ -311,10 +297,12 @@ namespace SEE.Controls.Actions.Drawable
                                 moveByMouse.isOn = !moveByMouse.isOn;
                                 moveByMouse.UpdateUI();
                             }
-                            if (moveByMouse.isOn && Raycasting.RaycastAnything(out RaycastHit hit))
+                            if (moveByMouse.isOn && Raycasting.RaycastAnything(out RaycastHit hit) &&
+                                !selectedObject.GetComponent<CollisionController>().IsInCollision())
                             {
-                                if (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                                (GameFinder.hasDrawable(hit.collider.gameObject) && GameFinder.FindDrawable(hit.collider.gameObject).Equals(drawable)))
+                                if ((hit.collider.gameObject.CompareTag(Tags.Drawable) && hit.collider.gameObject.Equals(drawable)) ||
+                                (GameFinder.hasDrawable(hit.collider.gameObject) && GameFinder.FindDrawable(hit.collider.gameObject).Equals(drawable) &&
+                                selectedObject != hit.collider.gameObject))
                                 {
                                     newObjectPosition = GameMoveRotator.MoveObject(selectedObject, hit.point, firstPoint, oldObjectPosition);
                                     new MoveNetAction(drawable.name, drawableParentName, selectedObject.name, newObjectPosition).Execute();
@@ -327,6 +315,7 @@ namespace SEE.Controls.Actions.Drawable
                         }
                         if (Input.GetMouseButtonUp(0))
                         {
+                            newObjectPosition = selectedObject.transform.position;
                             progressState = ProgressState.Finish;
                         }
                         break;
@@ -344,18 +333,7 @@ namespace SEE.Controls.Actions.Drawable
                             Vector3 direction = Vector3.zero;
                             float degree = 0;
 
-                            if (rotationMenu == null)
-                            {
-                                rotationMenu = PrefabInstantiator.InstantiatePrefab(rotationMenuPrefab,
-                                        GameObject.Find("UI Canvas").transform, false);
-                                RotationSliderController slider = rotationMenu.GetComponentInChildren<RotationSliderController>();
-                                SliderListener(slider, selectedObject);
-                            }
-                            else
-                            {
-                                RotationSliderController slider = rotationMenu.GetComponentInChildren<RotationSliderController>();
-                                slider.AssignValue(selectedObject.transform.localEulerAngles.z);
-                            }
+                            RotationMenu.Enable(selectedObject);
                             if (Input.mouseScrollDelta.y > 0 && !Input.GetKey(KeyCode.LeftControl))
                             {
                                 direction = Vector3.forward;
@@ -395,7 +373,7 @@ namespace SEE.Controls.Actions.Drawable
                             if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)))
                             {
                                 selectedObject.GetComponent<BlinkEffect>().Deactivate();
-                                
+
                             }
                         }
                         if (Input.GetMouseButtonUp(0))
@@ -409,18 +387,24 @@ namespace SEE.Controls.Actions.Drawable
                     case ProgressState.Finish:
                         if (oldObjectPosition != newObjectPosition || oldObjectLocalEulerAngles != newObjectLocalEulerAngles)
                         {
-                            float degree = selectedObject.transform.localEulerAngles.z;
-                            memento = new Memento(selectedObject, GameFinder.FindDrawable(selectedObject), selectedObject.name,
-                                oldObjectPosition, newObjectPosition, oldObjectLocalEulerAngles, degree, executedOperation);
-                            Destroyer.Destroy(rotationMenu);
-                            Destroyer.Destroy(moveMenu);
-                            currentState = ReversibleAction.Progress.Completed;
-                            return true;
+                            if (!selectedObject.GetComponent<CollisionController>().IsInCollision())
+                            {
+                                Destroyer.Destroy(selectedObject.GetComponent<Rigidbody>());
+                                Destroyer.Destroy(selectedObject.GetComponent<CollisionController>());
+                                float degree = selectedObject.transform.localEulerAngles.z;
+                                memento = new Memento(selectedObject, GameFinder.FindDrawable(selectedObject), selectedObject.name,
+                                    oldObjectPosition, newObjectPosition, oldObjectLocalEulerAngles, degree, executedOperation);
+                                RotationMenu.Disable();
+                                MoveMenu.Disable();
+                                currentState = ReversibleAction.Progress.Completed;
+                                return true;
+                            }
                         }
                         else
                         {
                             selectedObject = null;
-                            Destroyer.Destroy(rotationMenu);
+                            RotationMenu.Disable();
+                            MoveMenu.Disable();
                             progressState = ProgressState.SelectObject;
                         }
                         break;
@@ -428,47 +412,6 @@ namespace SEE.Controls.Actions.Drawable
                 return false;
             }
             return false;
-        }
-
-        /// <summary>
-        /// Add's the initial Handler to the components of the move menu.
-        /// </summary>
-        private void InitMoveMenu(string drawableName, string drawableParent)
-        {
-            SwitchManager speedUpManager = GameFinder.FindChild(moveMenu, "SpeedSwitch").GetComponent<SwitchManager>();
-            SwitchManager moveByMouseManager = GameFinder.FindChild(moveMenu, "MoveSwitch").GetComponent<SwitchManager>();
-
-            GameFinder.FindChild(moveMenu, "Left").AddComponent<ButtonHolded>().SetAction((() =>
-            {
-                moveByMouseManager.isOn = false;
-                moveByMouseManager.UpdateUI();
-                newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, KeyCode.LeftArrow, speedUpManager.isOn);
-                new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition).Execute();
-            }), true);
-
-            GameFinder.FindChild(moveMenu, "Right").AddComponent<ButtonHolded>().SetAction((() =>
-            {
-                moveByMouseManager.isOn = false;
-                moveByMouseManager.UpdateUI();
-                newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, KeyCode.RightArrow, speedUpManager.isOn);
-                new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition).Execute();
-            }), true);
-
-            GameFinder.FindChild(moveMenu, "Up").AddComponent<ButtonHolded>().SetAction((() =>
-            {
-                moveByMouseManager.isOn = false;
-                moveByMouseManager.UpdateUI();
-                newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, KeyCode.UpArrow, speedUpManager.isOn);
-                new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition).Execute();
-            }), true);
-
-            GameFinder.FindChild(moveMenu, "Down").AddComponent<ButtonHolded>().SetAction((() =>
-            {
-                moveByMouseManager.isOn = false;
-                moveByMouseManager.UpdateUI();
-                newObjectPosition = GameMoveRotator.MoveObjectByKeyboard(selectedObject, KeyCode.DownArrow, speedUpManager.isOn);
-                new MoveNetAction(drawableName, drawableParent, selectedObject.name, newObjectPosition).Execute();
-            }), true);
         }
 
         /// <summary>
@@ -493,43 +436,6 @@ namespace SEE.Controls.Actions.Drawable
             {
                 return KeyCode.DownArrow;
             }
-        }
-
-        /// <summary>
-        /// Adds the AddListener for the Rotate Slider Controller.
-        /// </summary>
-        /// <param name="slider">The slider controller where the AddListener should be add.</param>
-        /// <param name="selectedObject">The selected object to rotate</param>
-        private void SliderListener(RotationSliderController slider, GameObject selectedObject)
-        {
-            GameObject drawable = GameFinder.FindDrawable(selectedObject);
-            string drawableParentName = GameFinder.GetDrawableParentName(drawable);
-            Transform transform = selectedObject.transform;
-
-            slider.AssignValue(transform.localEulerAngles.z);
-            slider.onValueChanged.AddListener(degree =>
-            {
-                float degreeToMove = 0;
-                Vector3 currentDirection = Vector3.forward;
-                bool unequal = false;
-                if (transform.localEulerAngles.z > degree)
-                {
-                    degreeToMove = transform.localEulerAngles.z - degree;
-                    currentDirection = Vector3.back;
-                    unequal = true;
-                }
-                else if (transform.localEulerAngles.z < degree)
-                {
-                    degreeToMove = degree - transform.localEulerAngles.z;
-                    currentDirection = Vector3.forward;
-                    unequal = true;
-                }
-                if (unequal)
-                {
-                    GameMoveRotator.RotateObject(selectedObject, currentDirection, degreeToMove);
-                    new RotatorNetAction(drawable.name, drawableParentName, selectedObject.name, currentDirection, degreeToMove).Execute();;
-                }
-            });
         }
 
         /// <summary>

@@ -11,6 +11,8 @@ using Michsky.UI.ModernUIPack;
 using SEE.GO;
 using HighlightPlus;
 using SEE.Game.UI.Notification;
+using UnityEngine.Events;
+using Assets.SEE.Game.UI.Drawable;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -80,24 +82,11 @@ namespace SEE.Controls.Actions.Drawable
         private DrawableFileBrowser browser;
 
         /// <summary>
-        /// The location where the text menu prefeb is placed.
-        /// </summary>
-        private const string loadMenuPrefab = "Prefabs/UI/Drawable/LoadMenu";
-
-        /// <summary>
-        /// The instance for the save menu.
-        /// </summary>
-        private GameObject loadMenu;
-
-        /// <summary>
         /// Creates the load menu and adds the neccressary Handler for the buttons.
         /// </summary>
         public override void Awake()
         {
-            loadMenu = PrefabInstantiator.InstantiatePrefab(loadMenuPrefab,
-                GameObject.Find("UI Canvas").transform, false);
-            ButtonManagerBasic loadButton = GameFinder.FindChild(loadMenu, "Load").GetComponent<ButtonManagerBasic>();
-            loadButton.clickEvent.AddListener(() =>
+            UnityAction loadButtonCall = () =>
             {
                 if (browser == null || (browser != null && !browser.IsOpen()))
                 {
@@ -105,9 +94,8 @@ namespace SEE.Controls.Actions.Drawable
                     browser.LoadDrawableConfiguration(LoadState.Regular);
                     memento = new Memento(LoadState.Regular);
                 }
-            });
-            ButtonManagerBasic loadSpecificButton = GameFinder.FindChild(loadMenu, "LoadSpecific").GetComponent<ButtonManagerBasic>();
-            loadSpecificButton.clickEvent.AddListener(() =>
+            };
+            UnityAction loadSpecificButtonCall = () =>
             {
                 if (browser == null || (browser != null && !browser.IsOpen()))
                 {
@@ -121,7 +109,9 @@ namespace SEE.Controls.Actions.Drawable
                         ShowNotification.Warn("No drawable selected.", "Select a drawable to load specific.");
                     }
                 }
-            });
+            };
+
+            LoadMenu.Enable(loadButtonCall, loadSpecificButtonCall);
         }
 
         /// <summary>
@@ -131,10 +121,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Stop()
         {
-            if (loadMenu != null)
-            {
-                Destroyer.Destroy(loadMenu);
-            }
+            LoadMenu.Disable();
 
             if (selectedDrawable != null && selectedDrawable.GetComponent<HighlightEffect>() != null)
             {
