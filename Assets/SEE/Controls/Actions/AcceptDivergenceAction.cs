@@ -9,6 +9,7 @@ using SEE.Game.SceneManipulation;
 using SEE.Net.Actions;
 using SEE.Audio;
 using SEE.Game;
+using SEE.UI.Notification;
 using SEE.Utils;
 
 namespace SEE.Controls.Actions
@@ -38,12 +39,6 @@ namespace SEE.Controls.Actions
         {
             return CreateReversibleAction();
         }
-
-        /// <summary>
-        /// The graph that the edge which was hit by the user to be accepted into the graph is
-        /// in. Set in <see cref="Update"/>.
-        /// </summary>
-        private ReflexionGraph graph;
 
         /// <summary>
         /// The information required to (re-)create the edge that solves the divergence.
@@ -112,9 +107,6 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            // indicates whether the divergence has been solved ("true" means "solved")
-            bool divergenceSolved = false;
-
             // FIXME: Needs adaptation for VR where no mouse is available.
             if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(
@@ -122,17 +114,14 @@ namespace SEE.Controls.Actions
                     out GraphElementRef _) != HitGraphElement.None)
             {
                 // find the edge representing the divergence that should be solved.
-                GameObject selectedDivergenceEdge = raycastHit.collider.gameObject;
+                GameObject divergentEdge = raycastHit.collider.gameObject;
 
                 // check whether the object selected is an edge.
-                if (selectedDivergenceEdge.TryGetEdge(out Edge selectedEdge))
+                if (divergentEdge.TryGetEdge(out Edge selectedEdge))
                 {
                     // check if the selected edge represents a divergence
-                    if (selectedEdge.IsInImplementation() && ReflexionGraph.IsDivergent(selectedEdge))
+                    if (selectedEdge.ItsGraph is ReflexionGraph graph && ReflexionGraph.IsDivergent(selectedEdge))
                     {
-                        // acquire the containing ReflexionGraph
-                        graph = (ReflexionGraph)selectedEdge.ItsGraph;
-
                         // find that node in the architecture graph,
                         // which the divergence's source node is
                         // explicitly or implicitly mapped to
@@ -148,10 +137,10 @@ namespace SEE.Controls.Actions
                         memento = new Memento(source, target, Edge.SourceDependency);
 
                         // create the edge
-                        createdEdge = CreateEdge(memento);
+                        createdEdge = CreateConvergentEdge(memento);
 
-                        // check whether edge creation was successfull
-                        divergenceSolved = createdEdge != null;
+                        // check whether edge creation was successful
+                        bool divergenceSolved = createdEdge != null;
 
                         // add audio cue to the appearance of the new architecture edge
                         AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound);
@@ -166,7 +155,7 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    Debug.LogWarning($"Selected Element {selectedDivergenceEdge.name} is not an edge.\n");
+                    ShowNotification.Warn("Not an edge", $"Selected Element {divergentEdge.name} is not an edge.\n");
                 }
             }
             return false;
@@ -211,17 +200,15 @@ namespace SEE.Controls.Actions
         {
             base.Redo();
             // recreate the edge
-            createdEdge = CreateEdge(memento);
+            createdEdge = CreateConvergentEdge(memento);
         }
 
         /// <summary>
-        /// Creates a new edge using the given <paramref
-        /// name="memento"/>.  In case of any error, null will be
-        /// returned.
+        /// Creates a new edge using the given <paramref name="memento"/>.
         /// </summary>
         /// <param name="memento">information needed to create the edge</param>
-        /// <returns>the new edge's GameObject and a reference to itself, or both null</returns>
-        private static Edge CreateEdge(Memento memento)
+        /// <returns>the new edge</returns>
+        private static Edge CreateConvergentEdge(Memento memento)
         {
             Edge newEdge = AcceptDivergence.Accept(memento.From, memento.To, memento.Type);
 
@@ -229,6 +216,20 @@ namespace SEE.Controls.Actions
             new AcceptDivergenceNetAction(memento.From.ID, memento.To.ID, newEdge.ID, newEdge.Type).Execute();
 
             return newEdge;
+        }
+
+        /// <summary>
+        /// Creates a new edge in the architecture to allow the given <paramref name="divergence"/>.
+        /// </summary>
+        /// <param name="divergence">the edge representing the divergence</param>
+        /// <returns>the new edge</returns>
+        public static Edge CreateConvergentEdge(Edge divergence)
+        {
+            ReflexionGraph graph = (ReflexionGraph)divergence.ItsGraph;
+            Node source = graph.MapsTo(divergence.Source);
+            Node target = graph.MapsTo(divergence.Target);
+            Memento memento = new(source, target, Edge.SourceDependency);
+            return CreateConvergentEdge(memento);
         }
 
         /// <summary>
