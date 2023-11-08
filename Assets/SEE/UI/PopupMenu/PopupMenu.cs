@@ -133,6 +133,7 @@ namespace SEE.UI.PopupMenu
         /// <param name="position">The position to which the menu should be moved.</param>
         public void MoveTo(Vector2 position)
         {
+            // TODO: If the menu is too close to the bottom, expand it upwards instead.
             Menu.position = position;
         }
 

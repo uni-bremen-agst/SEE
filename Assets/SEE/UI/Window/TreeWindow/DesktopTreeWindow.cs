@@ -514,7 +514,6 @@ namespace SEE.UI.Window.TreeWindow
 
             // We need to wait until the transform actually exists, hence the yield.
             await UniTask.Yield();
-            Debug.Log(transformID);
             RectTransform item = (RectTransform)items.Find(transformID);
             scrollRect.ScrollTo(item, duration: 1f);
 

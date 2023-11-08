@@ -4,6 +4,7 @@ using System.Linq;
 using SEE.Game;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
+using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Notification;
 using SEE.UI.PopupMenu;
 using SEE.UI.Window;
@@ -64,13 +65,20 @@ namespace SEE.Controls.Actions
         /// <returns>Common options available for all graph elements</returns>
         private static IEnumerable<PopupMenuAction> GetCommonOptions(GraphElementRef graphElementRef)
         {
-            return new PopupMenuAction[]
+            IList<PopupMenuAction> actions = new List<PopupMenuAction>
             {
                 // TODO: Ask for confirmation or at least allow undo
                 new("Delete", DeleteElement, '\uF1F8'),
                 // TODO: Better properties view
                 new("Properties", ShowProperties, '\uF05A'),
             };
+
+            if (graphElementRef.Elem.Filename() != null)
+            {
+                actions.Add(new("Show Code", ShowCode, '\uF121'));
+            }
+
+            return actions;
 
             void DeleteElement()
             {
@@ -79,7 +87,12 @@ namespace SEE.Controls.Actions
 
             void ShowProperties()
             {
-                ShowNotification.Info("Node Properties", graphElementRef.Elem.ToString());
+                ShowNotification.Info("Node Properties", graphElementRef.Elem.ToString(), log: false);
+            }
+
+            void ShowCode()
+            {
+                ActivateWindow(ShowCodeAction.ShowCode(graphElementRef));
             }
         }
 
@@ -105,18 +118,32 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Activates the given window, that is, adds it to the window space and makes it the active window.
+        /// </summary>
+        /// <param name="window">The window to activate</param>
+        private static void ActivateWindow(BaseWindow window)
+        {
+            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            if (!manager.Windows.Contains(window))
+            {
+                manager.AddWindow(window);
+            }
+            manager.ActiveWindow = window;
+        }
+
+        /// <summary>
         /// Returns the options available for the given node.
         /// </summary>
         /// <param name="nodeRef">The node to get the options for</param>
         /// <returns>Options available for the given node</returns>
         private static IEnumerable<PopupMenuAction> GetNodeOptions(NodeRef nodeRef)
         {
-            return new PopupMenuAction[]
+            IList<PopupMenuAction> actions = new List<PopupMenuAction>
             {
                 new("Show in TreeView", RevealInTreeView, '\uF802'),
-                // TODO: Show Code Action
-                // TODO: Accept Divergence
             };
+
+            return actions;
 
             void RevealInTreeView()
             {
@@ -131,11 +158,23 @@ namespace SEE.Controls.Actions
         /// <returns>Options available for the given edge</returns>
         private static IEnumerable<PopupMenuAction> GetEdgeOptions(EdgeRef edgeRef)
         {
-            return new PopupMenuAction[]
+            IList<PopupMenuAction> actions = new List<PopupMenuAction>
             {
                 new("Show at Source", RevealAtSource, '\uF802'),
                 new("Show at Target", RevealAtTarget, '\uF802'),
             };
+
+            if (edgeRef.Value.Type == "Clone")
+            {
+                actions.Add(new("Show Unified Diff", ShowUnifiedDiff, '\uE13A'));
+            }
+
+            if (edgeRef.Value.IsInImplementation() && ReflexionGraph.IsDivergent(edgeRef.Value))
+            {
+                actions.Add(new("Accept Divergence", AcceptDivergence, '\uF00C'));
+            }
+
+            return actions;
 
             void RevealAtSource()
             {
@@ -145,6 +184,16 @@ namespace SEE.Controls.Actions
             void RevealAtTarget()
             {
                 ActivateTreeWindow(edgeRef).RevealElement(edgeRef.Value, viaSource: false).Forget();
+            }
+
+            void ShowUnifiedDiff()
+            {
+                ActivateWindow(ShowCodeAction.ShowUnifiedDiff(edgeRef));
+            }
+
+            void AcceptDivergence()
+            {
+                AcceptDivergenceAction.CreateConvergentEdge(edgeRef.Value);
             }
         }
     }
