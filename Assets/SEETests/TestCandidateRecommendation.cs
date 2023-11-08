@@ -71,9 +71,7 @@ namespace SEE.Tools.Architecture
         private void SetupCandidateRecommendation()
         {
             candidateRecommendation = new CandidateRecommendation();
-            candidateRecommendation.CandidateType = "Class";
-            candidateRecommendation.ReflexionGraph = graph;
-            candidateRecommendation.AttractFunctionType = AttractFunction.AttractFunctionType.CountAttract;
+            candidateRecommendation.UpdateConfiguration(graph, AttractFunction.AttractFunctionType.CountAttract, "Class");
             graph.Subscribe(candidateRecommendation);
         }
 

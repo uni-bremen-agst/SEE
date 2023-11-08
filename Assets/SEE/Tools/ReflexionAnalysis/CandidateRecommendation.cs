@@ -1,6 +1,7 @@
 ﻿using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
 using Newtonsoft.Json;
 using SEE.DataModel;
+using SEE.DataModel.DG;
 using SEE.Net.Dashboard.Model.Metric;
 using SEE.Tools.ReflexionAnalysis;
 using System;
@@ -76,32 +77,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// </summary>
         public AttractFunctionType? AttractFunctionType
         {
-            get
-            {
-                return attractFunctionType;
-            }
-            set
-            {
-                UpdateConfiguration(ReflexionGraph, value, CandidateType);
-            }
+            get => attractFunctionType;
         }
 
         public ReflexionGraph ReflexionGraph
         {
             get => reflexionGraph;
-            set
-            {
-                UpdateConfiguration(value, AttractFunctionType, CandidateType);
-            }
         }
 
         public string CandidateType
         {
             get => candidateType;
-            set
-            {
-                UpdateConfiguration(ReflexionGraph, AttractFunctionType, value);
-            }
         }
 
         public CandidateRecommendationStatistics Statistics { get; private set; }
@@ -111,6 +97,28 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             recommendations = new Dictionary<Node, HashSet<MappingPair>>();
             mappingPairs = new Dictionary<string, MappingPair>();
             Statistics = new CandidateRecommendationStatistics();
+        }
+
+        public Graph GetRecommendationsAsTree()
+        {
+            Graph graph = new Graph("", "Recommendations");
+
+            foreach (Node cluster in recommendations.Keys)
+            {
+                Node clusterClone = (Node)cluster.Clone();
+                graph.AddNode(clusterClone);
+                foreach (MappingPair mappingPair in recommendations[cluster])
+                {
+                    Node candidate = mappingPair.Candidate;
+                    Node candidateClone = (Node) candidate.Clone();
+                    Edge edge = new Edge(candidateClone, clusterClone, "RecommendedFor");
+                    clusterClone.AddChild(candidateClone);
+                    graph.AddNode(candidateClone);
+                    graph.AddEdge(edge);
+                }
+            }
+ 
+            return graph;
         }
 
         public void UpdateConfiguration(ReflexionGraph reflexionGraph, 

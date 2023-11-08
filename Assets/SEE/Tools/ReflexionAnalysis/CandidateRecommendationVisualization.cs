@@ -1,8 +1,11 @@
 ﻿using SEE.DataModel;
 using SEE.DataModel.DG;
+using SEE.Game.City;
+using SEE.Game;
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.UI.Window.TreeWindow;
 using SEE.Utils;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
@@ -13,6 +16,9 @@ using System.Linq;
 using UnityEngine;
 using static Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions.AttractFunction;
 using static Assets.SEE.Tools.ReflexionAnalysis.CandidateRecommendation;
+using Cysharp.Threading.Tasks;
+using SEE.Controls;
+using SEE.UI.Window;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis
 {
@@ -27,6 +33,16 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         private Coroutine blinkEffectCoroutine;
 
+        private ReflexionGraph reflexionGraph;
+
+        private Graph oracleMapping;
+
+        // TODO: 
+        private readonly IDictionary<string, TreeWindow> treeWindows = new Dictionary<string, TreeWindow>();
+
+        // TODO: 
+        private WindowSpace space;
+
         CandidateRecommendation CandidateRecommendation
         {
             get 
@@ -34,9 +50,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 if (candidateRecommendation == null)
                 {
                     candidateRecommendation = new CandidateRecommendation();
-                    AttractFunctionTypePropertyChanged();
-                    CandidateTypePropertyChanged();
-                    UseCDAPropertyChanged();
                     candidateRecommendation.Statistics.CsvPath = csvPath; 
                 }
                 return candidateRecommendation; 
@@ -44,7 +57,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         }
 
         [SerializeField]
-        [OnValueChanged("UseCDAPropertyChanged")]
         public bool useCDA;
 
         private void UseCDAPropertyChanged()
@@ -53,22 +65,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         }
 
         [SerializeField]
-        [OnValueChanged("AttractFunctionTypePropertyChanged")]
         public AttractFunctionType attractFunctionType = AttractFunctionType.CountAttract;
 
-        private void AttractFunctionTypePropertyChanged()
-        {
-            CandidateRecommendation.AttractFunctionType = attractFunctionType;
-        }
-
         [SerializeField]
-        [OnValueChanged("CandidateTypePropertyChanged")]
         public string candidateType = "Class";
-
-        private void CandidateTypePropertyChanged()
-        {
-            CandidateRecommendation.CandidateType = candidateType;
-        }
 
         [SerializeField]
         public FilePath csvPath;
@@ -80,7 +80,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             set 
             {
-                CandidateRecommendation.ReflexionGraph = value;
+                reflexionGraph = value;
             }
         }
 
@@ -88,7 +88,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             set
             {
-                CandidateRecommendation.Statistics.SetOracleMapping(value);
+                oracleMapping = value;
             }
             get
             {
@@ -110,6 +110,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             CandidateRecommendation.OnNext(value);
 
+            // blink effect
             List<NodeOperator> nodeOperators = new List<NodeOperator>();
             foreach (Node cluster in CandidateRecommendation.Recommendations.Keys)
             {
@@ -155,6 +156,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             CandidateRecommendation.Statistics.StopRecording();
             CandidateRecommendation.Statistics.ProcessMappingData(csvPath.Path, xmlPath.Path);
+        }
+
+        [Button(ButtonSizes.Small)]
+        public void UpdateConfiguration()
+        {
+            CandidateRecommendation.UpdateConfiguration(reflexionGraph,attractFunctionType,candidateType);
+            CandidateRecommendation.Statistics.SetOracleMapping(oracleMapping);
         }
 
         /// <summary>

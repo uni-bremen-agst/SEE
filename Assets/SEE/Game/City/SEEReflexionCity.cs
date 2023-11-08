@@ -177,6 +177,7 @@ namespace SEE.Game.City
                     LoadedGraph.Subscribe(candidateRecommendationViz);
                     Debug.Log("Registered CandidateRecommendation.");
                 }
+                candidateRecommendationViz.UpdateConfiguration();
                 Debug.Log("Initialized Reflexion Analysis.\n");
             }
 
