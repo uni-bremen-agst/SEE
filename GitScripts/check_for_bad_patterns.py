@@ -86,11 +86,9 @@ class BadPattern:
         """
         Turns this bad pattern match into a dictionary representing a GitHub comment.
         """
-        body_text = f"> [!{self.level.value}]\n> {self.message}"
+        body_text = f"> [!{self.level.value}]\n> {self.message}\n"
         if suggestion is not None:
-            body_text += f"\n\n```suggestion\n{suggestion}\n```"
-        if self.regex is not None:
-            body_text += f"\n> This bad pattern was detected by the following regular expression:\n > ```regex\n> {self.regex.pattern}\n> ```"
+            body_text += f"\n```suggestion\n{suggestion}\n```"
         return {
             "path": filename,
             "line": line_number,
@@ -102,7 +100,7 @@ class BadPattern:
 NO_NEWLINE_BAD_PATTERN = BadPattern(
     None,
     "Missing newline at end of file! Files should always end with a single newline character.",
-    level=Level.IMPORTANT,
+    level=Level.WARNING,
     suggestion=r"\n",
 )
 
@@ -124,7 +122,7 @@ This happens on Linux systems automatically, but Windows systems will change thi
 We should just leave it as a backslash.""",
         suggestion=r"\1\SteamVR\actions.json\2",
         filenames=[r".*\.asset$"],
-        level=Level.WARNING,
+        level=Level.NOTE,
         see_only=False,
     ),
     BadPattern(
@@ -147,6 +145,13 @@ We should just leave it as a backslash.""",
         level=Level.IMPORTANT,
         see_only=False,
     ),
+    BadPattern(
+        re.compile(r"^.*/(?:/|\*) (?:TODO|FIXME)(?!\s*\(#?\d{2,}\))"),
+        "Always associate a TODO/FIXME comment with an issue on GitHub, so that we can keep track of open tasks.\n"
+        "Reference either [a new issue](https://github.com/uni-bremen-agst/SEE/issues/new) or an existing (open) issue "
+        "by putting its number in parentheses after the TODO, e.g., `// TODO (#614): Fix linux builds`",
+        level=Level.WARNING
+    )
 ]
 
 
