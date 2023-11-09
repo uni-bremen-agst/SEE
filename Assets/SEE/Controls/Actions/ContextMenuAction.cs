@@ -33,7 +33,7 @@ namespace SEE.Controls.Actions
         {
             if (SEEInput.OpenContextMenu())
             {
-                // TODO: Detect multiselect and adjust options accordingly.
+                // TODO (#664): Detect if multiple elements are selected and adjust options accordingly.
                 HitGraphElement hit = Raycasting.RaycastInteractableObject(out _, out InteractableObject o);
                 if (hit == HitGraphElement.None)
                 {
@@ -51,9 +51,7 @@ namespace SEE.Controls.Actions
                 PopupMenu.AddActions(actions.Concat(GetCommonOptions(o.GraphElemRef)));
 
                 // We want to move the popup menu to the cursor position before showing it.
-                // The mouse should hover over the first menu item already rather than being just outside of it,
-                // so we move the menu up and to the left a bit.
-                PopupMenu.MoveTo(Input.mousePosition + new Vector3(-5, 5, 0));
+                PopupMenu.MoveTo(Input.mousePosition);
                 PopupMenu.ShowMenu().Forget();
             }
         }
@@ -67,9 +65,9 @@ namespace SEE.Controls.Actions
         {
             IList<PopupMenuAction> actions = new List<PopupMenuAction>
             {
-                // TODO: Ask for confirmation or at least allow undo
+                // TODO (#665): Ask for confirmation or allow undo.
                 new("Delete", DeleteElement, '\uF1F8'),
-                // TODO: Better properties view
+                // TODO (#666): Better properties view
                 new("Properties", ShowProperties, '\uF05A'),
             };
 

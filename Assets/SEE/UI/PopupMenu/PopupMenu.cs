@@ -45,6 +45,8 @@ namespace SEE.UI.PopupMenu
         /// </summary>
         private bool ShouldShowMenu;
 
+        private float menuHeight => Menu.sizeDelta.y;
+
         /// <summary>
         /// Duration of the animation that is used to show or hide the menu.
         /// </summary>
@@ -61,14 +63,16 @@ namespace SEE.UI.PopupMenu
             PointerHelper pointerHelper = Menu.gameObject.MustGetComponent<PointerHelper>();
             pointerHelper.ExitEvent.AddListener(_ => HideMenu().Forget());
 
-            // We hide the menu by default.
-            Menu.gameObject.SetActive(false);
-
             // We add all actions that were added before the menu was started.
             while (ActionsBeforeStart.Count > 0)
             {
                 AddAction(ActionsBeforeStart.Dequeue());
             }
+
+            // FIXME (#632): On the first appearance of the menu, it lacks a background.
+
+            // We hide the menu by default.
+            Menu.gameObject.SetActive(false);
         }
 
         /// <summary>
@@ -133,7 +137,21 @@ namespace SEE.UI.PopupMenu
         /// <param name="position">The position to which the menu should be moved.</param>
         public void MoveTo(Vector2 position)
         {
-            // TODO: If the menu is too close to the bottom, expand it upwards instead.
+            float scaleFactor = Canvas.MustGetComponent<Canvas>().scaleFactor;
+            if (position.y < menuHeight * scaleFactor)
+            {
+                // If the menu is too close to the bottom of the screen, expand it upwards instead.
+                position.y += menuHeight * scaleFactor;
+                // The mouse should hover over the first menu item already rather than being just outside of it,
+                // so we move the menu down and to the left a bit.
+                position += new Vector2(-5, -5);
+            }
+            else
+            {
+                // The mouse should hover over the first menu item already rather than being just outside of it,
+                // so we move the menu up and to the left a bit.
+                position += new Vector2(-5, 5);
+            }
             Menu.position = position;
         }
 
