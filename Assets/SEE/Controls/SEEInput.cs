@@ -6,7 +6,7 @@ namespace SEE.Controls
     /// <summary>
     /// Provides a logical abstraction of raw Unity inputs by the user.
     /// </summary>
-    internal static class SEEInput
+    public static class SEEInput
     {
         /// <summary>
         /// If true, all logical inputs that require keyboard interactions are enabled.
@@ -48,6 +48,15 @@ namespace SEE.Controls
         public static bool ToggleMenu()
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleMenu);
+        }
+
+        /// <summary>
+        /// Turns on/off the browser.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleBrowser()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleBrowser);
         }
 
         /// <summary>

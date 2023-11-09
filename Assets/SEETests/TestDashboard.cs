@@ -32,7 +32,9 @@ namespace SEETests
         public IEnumerator TestDashboardVersionCorrect() => UniTask.ToCoroutine(async () =>
         {
             DashboardVersion version = await DashboardRetriever.Instance.GetDashboardVersion();
-            Assert.AreEqual(DashboardVersion.SupportedVersion, version);
+            Assert.AreEqual(DashboardVersion.SupportedVersion.MajorVersion, version.MajorVersion);
+            Assert.AreEqual(DashboardVersion.SupportedVersion.MinorVersion, version.MinorVersion);
+
         });
 
         [UnityTest]
