@@ -7,7 +7,6 @@
 # Note that this script is only run on CI, not as part of the Git hooks,
 # due to it being written in Python rather than as a shell script.
 
-import fileinput
 import json
 import re
 import sys
@@ -180,13 +179,14 @@ def warn(message):
     print(f"::warning::{message}", file=sys.stderr)
 
 
-def handle_missing_newline(filename: str, linenumber: int, last_line: Optional[str]):
+def handle_missing_newline(filename: Optional[str], linenumber: int, last_line: Optional[str]):
     """
     Handles a missing newline at the end of a file.
     :param filename: The name of the file.
     :param linenumber: The line number of the last line in the file.
     :param last_line: The last line in the file.
     """
+    assert filename is not None
     if NO_NEWLINE_BAD_PATTERN.applies_to(filename):
         collected_matches.append(
             NO_NEWLINE_BAD_PATTERN.to_json(
@@ -199,65 +199,66 @@ def handle_missing_newline(filename: str, linenumber: int, last_line: Optional[s
 
 def main():
     occurrences = 0
-    with fileinput.input() as diff:
-        filename = None
-        diff_line = 0  # Current line number within a diff hunk.
-        last_line = None  # Last line read.
-        skip_file = False
-        hunk_indicator = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@.*$")
-        missing_newline_at_eof = False
-        while line := diff.readline().rstrip("\n\r"):
-            if line.startswith("+++"):
-                # New file here.
-                if missing_newline_at_eof:
-                    handle_missing_newline(filename, diff_line - 1, last_line)
-                    missing_newline_at_eof = False
-                filename = line.split("/", 1)[1]
-                skip_file = filename == "dev/null"
-            elif skip_file:
+    filename = None
+    diff_line = 0  # Current line number within a diff hunk.
+    last_line = None  # Last line read.
+    skip_file = False
+    hunk_indicator = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@.*$")
+    missing_newline_at_eof = False
+    sys.stdin.reconfigure(errors='ignore')
+    for line in sys.stdin:
+        line = line.rstrip("\r\n")
+        if line.startswith("+++"):
+            # New file here.
+            if missing_newline_at_eof:
+                handle_missing_newline(filename, diff_line - 1, last_line)
+                missing_newline_at_eof = False
+            filename = line.split("/", 1)[1]
+            skip_file = filename == "dev/null"
+        elif skip_file:
+            continue
+        elif line.startswith("@@"):
+            # New diff hunk here.
+
+            if missing_newline_at_eof:
+                handle_missing_newline(filename, diff_line, last_line)
+                missing_newline_at_eof = False
+
+            m = hunk_indicator.match(line)
+            if not m:
+                warn(f"Invalid unified diff hunk in {filename}: {line}")
+                # Nonetheless, this is not a fatal error, so we can continue.
                 continue
-            elif line.startswith("@@"):
-                # New diff hunk here.
+            # Next line is starting line indicated by this line range
+            diff_line = int(m.group(1))
+        elif line.startswith("+"):
+            # This is an actual added line within the hunk denoted by start_line.
+            assert filename is not None
+            # We skip the leading "+" character.
+            occurrences += handle_added_line(line[1:], filename, diff_line)
+            diff_line += 1
+            last_line = line
+            # We need to reset this flag. There were still added lines after the missing newline warning,
+            # so it applied to the version of the file before it was changed and can be ignored.
+            missing_newline_at_eof = False
+        elif line.startswith(" "):
+            # Lines starting with ' ' are just for context.
+            diff_line += 1
+            last_line = line
+            missing_newline_at_eof = False
+        # \ no newline at end of file
+        elif line.startswith("\\ No newline at end of file"):
+            # We can't report this immediately, as this string may occur twice.
+            # Instead, we will report this once the next file / hunk starts.
+            missing_newline_at_eof = True
+        elif line != "" and line[0] not in ("-", "d", "i", "n", "o", "r", "B", "s"):
+            # We ignore empty lines, removed lines, and diff metadata lines (starting with "diff" or "index" etc).
+            warn(
+                f'Unrecognized unified diff line indicator for line "{line}", skipping.'
+            )
 
-                if missing_newline_at_eof:
-                    handle_missing_newline(filename, diff_line, last_line)
-                    missing_newline_at_eof = False
-
-                m = hunk_indicator.match(line)
-                if not m:
-                    warn(f"Invalid unified diff hunk in {filename}: {line}")
-                    # Nonetheless, this is not a fatal error, so we can continue.
-                    continue
-                # Next line is starting line indicated by this line range
-                diff_line = int(m.group(1))
-            elif line.startswith("+"):
-                # This is an actual added line within the hunk denoted by start_line.
-                assert filename is not None
-                # We skip the leading "+" character.
-                occurrences += handle_added_line(line[1:], filename, diff_line)
-                diff_line += 1
-                last_line = line
-                # We need to reset this flag. There were still added lines after the missing newline warning,
-                # so it applied to the version of the file before it was changed and can be ignored.
-                missing_newline_at_eof = False
-            elif line.startswith(" "):
-                # Lines starting with ' ' are just for context.
-                diff_line += 1
-                last_line = line
-                missing_newline_at_eof = False
-            # \ no newline at end of file
-            elif line.startswith("\\ No newline at end of file"):
-                # We can't report this immediately, as this string may occur twice.
-                # Instead, we will report this once the next file / hunk starts.
-                missing_newline_at_eof = True
-            elif line != "" and line[0] not in ("-", "d", "i", "n", "o", "r", "B", "s"):
-                # We ignore empty lines, removed lines, and diff metadata lines (starting with "diff" or "index" etc).
-                warn(
-                    f'Unrecognized unified diff line indicator for line "{line}", skipping.'
-                )
-
-        if missing_newline_at_eof:
-            handle_missing_newline(filename, diff_line, last_line)
+    if missing_newline_at_eof:
+        handle_missing_newline(filename, diff_line, last_line)
 
     print(json.dumps(collected_matches))
     sys.exit(min(occurrences, 255))

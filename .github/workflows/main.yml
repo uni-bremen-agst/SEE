@@ -37,7 +37,7 @@ jobs:
         run: |
           echo "$CREDENTIALS" > ~/.git-credentials
           git config --global credential.helper store
-          git config --global lfs.url ${CREDENTIALS}project-see/see-lfs.git/info/lfs
+          git config --global lfs.url "${CREDENTIALS}project-see/see-lfs.git/info/lfs"
         env:
           # NOTE: must be of the form https://koschke:token-here@gitlab.informatik.uni-bremen.de/
           CREDENTIALS: ${{secrets.GITLAB_LFS_TOKEN}}
@@ -71,7 +71,7 @@ jobs:
     steps:
       - name: Collect bad patterns
         run: |
-          if [ -n $GITHUB_BASE_REF ] && ! PATTERNS=$(curl -H 'Accept: application/vnd.github.v3.diff' -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -f 'https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}' | ./GitScripts/check_for_bad_patterns.py); then
+          if [ -n "$GITHUB_BASE_REF" ] && ! PATTERNS=$(curl -H 'Accept: application/vnd.github.v3.diff' -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -f 'https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}' | ./GitScripts/check_for_bad_patterns.py); then
             DELIMITER=7MApgggGyx6C0
             echo "PATTERNS<<$DELIMITER" >> $GITHUB_ENV
             echo "$PATTERNS" >> $GITHUB_ENV
