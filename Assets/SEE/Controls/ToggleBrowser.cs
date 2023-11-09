@@ -3,20 +3,21 @@ using UnityEngine;
 namespace SEE.Controls
 {
     /// <summary>
-    /// Toggles the browser on and off with the key F4.
+    /// Toggles the browser on and off if the user requests so.
     /// </summary>
-    public class DialogueCanvas : MonoBehaviour
+    /// <remarks>This component is assumed to be attached to the browser canvas.</remarks>
+    public class ToggleBrowser : MonoBehaviour
     {
         /// <summary>
         /// The browser, which will be toggled.
         /// </summary>
+        /// <remarks>This field will be set in the inspector and is assumed
+        /// to refer to the browser to be toggled.</remarks>
         public GameObject Browser;
 
         /// <summary>
-        /// When the key F4 is pressed,
-        /// the browser and its buttons
-        /// will be activated when they
-        /// are deactivated and vice versa.
+        /// Toggles (activates/deactivates) the browser and and all immediate children
+        /// of the game object this component is attached to, if the user requests so.
         /// </summary>
         private void Update()
         {
