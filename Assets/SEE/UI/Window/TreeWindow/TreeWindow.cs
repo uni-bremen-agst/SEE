@@ -1,3 +1,4 @@
+using System;
 using SEE.DataModel.DG;
 
 namespace SEE.UI.Window.TreeWindow
@@ -48,6 +49,17 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         public Graph Graph;
 
+        /// <summary>
+        /// The search helper used to search for elements in the graph.
+        /// </summary>
+        private GraphSearch searcher;
+
+        protected override void Start()
+        {
+            searcher = new GraphSearch(Graph);
+            base.Start();
+        }
+
         public override void RebuildLayout()
         {
             // Nothing needs to be done.
@@ -56,17 +68,17 @@ namespace SEE.UI.Window.TreeWindow
         protected override void InitializeFromValueObject(WindowValues valueObject)
         {
             // TODO: Should tree windows be sent over the network?
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override void UpdateFromNetworkValueObject(WindowValues valueObject)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override WindowValues ToValueObject()
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }
