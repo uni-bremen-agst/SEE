@@ -18,12 +18,12 @@ from typing import Optional, List, Dict, Union
 
 class Level(str, Enum):
     """
-    Severity level of a bad pattern, associated to a GitHub emoji.
+    Severity level of a bad pattern, associated to a GitHub alert.
     """
 
-    INFO = ":information_source:"
-    WARN = ":warning:"
-    ERROR = ":x:"
+    NOTE = "NOTE"
+    WARNING = "WARNING"
+    IMPORTANT = "IMPORTANT"
 
 
 # Filenames that a pattern will be applied to by default.
@@ -44,7 +44,7 @@ class BadPattern:
         message,
         filenames=DEFAULT_FILENAMES,
         suggestion=None,
-        level=Level.INFO,
+        level=Level.NOTE,
         see_only=True,
     ):
         """
@@ -87,7 +87,7 @@ class BadPattern:
         """
         Turns this bad pattern match into a dictionary representing a GitHub comment.
         """
-        body_text = f"{self.level.value} {self.message}"
+        body_text = f"> [!{self.level.value}]\n> {self.message}"
         if suggestion is not None:
             body_text += f"\n\n```suggestion\n{suggestion}\n```"
         if self.regex is not None:
@@ -103,7 +103,7 @@ class BadPattern:
 NO_NEWLINE_BAD_PATTERN = BadPattern(
     None,
     "Missing newline at end of file! Files should always end with a single newline character.",
-    level=Level.ERROR,
+    level=Level.IMPORTANT,
     suggestion=r"\n",
 )
 
@@ -114,7 +114,7 @@ BAD_PATTERNS = [
         re.compile(r"^(.*(?<!= )new \w*NetAction\w*\([^()]*\))([^.].*)$"),
         "Don't forget to call `.Execute()` on newly created net actions!",
         suggestion=r"\1.Execute()\2",
-        level=Level.ERROR,
+        level=Level.IMPORTANT,
     ),
     BadPattern(
         re.compile(
@@ -125,27 +125,27 @@ This happens on Linux systems automatically, but Windows systems will change thi
 We should just leave it as a backslash.""",
         suggestion=r"\1\SteamVR\actions.json\2",
         filenames=[r".*\.asset$"],
-        level=Level.WARN,
+        level=Level.WARNING,
         see_only=False,
     ),
     BadPattern(
         re.compile(r"^\s*(\s|Object\.)Destroy\(.*$"),
         "Make sure to use `Destroyer.Destroy` (`Destroyer` class is in `SEE.Utils`) instead of `Object.Destroy`!",
         filenames=[r".*(?<!/Destroyer)\.cs$"],
-        level=Level.WARN,
+        level=Level.WARNING,
     ),
     BadPattern(
         # For trailing whitespace
         re.compile(r"^(.*\S)?\s+$"),
         "Trailing whitespace detected! Please remove it.",
-        level=Level.WARN,
+        level=Level.WARNING,
         suggestion=r"\1",
     ),
     BadPattern(
         re.compile(r"^\s*m_Loaders:(?! \[\])"),
         "You must not enable OpenXR on any PR that is planned to be merged, otherwise Linux builds will break!",
         filenames=[r".*\.asset$"],
-        level=Level.ERROR,
+        level=Level.IMPORTANT,
         see_only=False,
     ),
 ]
