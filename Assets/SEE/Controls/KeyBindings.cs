@@ -81,7 +81,7 @@ namespace SEE.Controls
         /// <returns>A string of the current key bindings and their help message.</returns>
         public static string ShowBindings()
         {
-            System.Text.StringBuilder sb = new System.Text.StringBuilder("Key Bindings:\n");
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
             foreach (var binding in bindings)
             {
                 sb.Append($"Key {binding.Key}:\n {binding.Value}\n");
