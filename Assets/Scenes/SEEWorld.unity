@@ -21344,7 +21344,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   keybindingsText: {fileID: 1474148082}
-  settings: {fileID: 1806861827}
+  settingsPanel: {fileID: 1806861827}
+  keybindingsPanel: {fileID: 1896622442}
 --- !u!114 &1429832262
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -25778,7 +25779,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   keybindingsText: {fileID: 0}
-  settings: {fileID: 0}
+  settingsPanel: {fileID: 0}
+  keybindingsPanel: {fileID: 0}
 --- !u!1001 &1767985078
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -36407,7 +36409,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1896622442}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

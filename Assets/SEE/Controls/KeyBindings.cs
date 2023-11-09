@@ -83,8 +83,7 @@ namespace SEE.Controls
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             foreach (var binding in bindings)
             {
-                sb.Append($"Key {binding.Key}:\n {binding.Value}\n");
-                sb.Append("\n");
+                sb.Append($"Key {binding.Key}:\n {binding.Value}\n\n");
             }
             return sb.ToString();
         }
@@ -117,9 +116,9 @@ namespace SEE.Controls
         internal static readonly KeyCode ToggleMenu = Register(KeyCode.Space, Scope.Always, "Turns on/off the player-action menu.");
 
         /// <summary>
-        /// Turns on the settings menu.
+        /// Turns on/off the settings menu.
         /// </summary>
-        internal static readonly KeyCode ActivateSettings = Register(KeyCode.Escape, Scope.Always, "Turns on the settings menu.");
+        internal static readonly KeyCode ToggleSettings = Register(KeyCode.Escape, Scope.Always, "Turns on/off the settings menu.");
 
         /// <summary>
         /// Turns on/off the browser.

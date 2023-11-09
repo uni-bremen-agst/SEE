@@ -51,12 +51,12 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Turns on the settings menu.
+        /// Turns on/off the settings menu.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        public static bool ActivateSettings()
+        public static bool ToggleSettings()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ActivateSettings);
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleSettings);
         }
 
         /// <summary>
