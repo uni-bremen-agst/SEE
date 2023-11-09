@@ -6,7 +6,7 @@ namespace SEE.Controls
     /// <summary>
     /// Defines the key codes for all interaction based on the keyboard in SEE.
     /// </summary>
-    internal static class KeyBindings
+    public static class KeyBindings
     {
         // IMPORTANT NOTES:
         // (1) Keep in mind that KeyCodes in Unity map directly to a
@@ -74,6 +74,22 @@ namespace SEE.Controls
             Debug.Log(sb.ToString());
         }
 
+        /// <summary>
+        /// Creates a string of the current key bindings along with their
+        /// help message.
+        /// </summary>
+        /// <returns>A string of the current key bindings and their help message.</returns>
+        public static string ShowBindings()
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder("Key Bindings:\n");
+            foreach (var binding in bindings)
+            {
+                sb.Append($"Key {binding.Key}:\n {binding.Value}\n");
+                sb.Append("\n");
+            }
+            return sb.ToString();
+        }
+
         //-----------------------------------------------------
         #region General key bindings
         //-----------------------------------------------------
@@ -100,6 +116,11 @@ namespace SEE.Controls
         /// Turns on/off the player-action menu.
         /// </summary>
         internal static readonly KeyCode ToggleMenu = Register(KeyCode.Space, Scope.Always, "Turns on/off the player-action menu.");
+
+        /// <summary>
+        /// Turns on the settings menu.
+        /// </summary>
+        internal static readonly KeyCode ActivateSettings = Register(KeyCode.Escape, Scope.Always, "Turns on the settings menu.");
 
         /// <summary>
         /// Opens the search menu.
