@@ -87,7 +87,7 @@ namespace SEE.UI.PopupMenu
                 return;
             }
 
-            // TODO: Respect priority
+            // TODO (#668): Respect priority
             GameObject actionItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuButton", ActionList, false);
             ButtonManagerBasic button = actionItem.MustGetComponent<ButtonManagerBasic>();
             button.buttonText = action.Name;

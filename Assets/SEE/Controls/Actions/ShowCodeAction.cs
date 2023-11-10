@@ -236,7 +236,7 @@ namespace SEE.Controls.Actions
                     manager.AddWindow(codeWindow);
                 }
                 manager.ActiveWindow = codeWindow;
-                // TODO: Set font size etc in settings (maybe, or maybe that's too much)
+                // TODO (#669): Set font size etc in settings (maybe, or maybe that's too much)
             }
 
             return false;

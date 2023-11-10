@@ -347,7 +347,7 @@ namespace SEE.UI.Window.CodeWindow
 
             try
             {
-                // TODO: Maybe disable syntax highlighting for huge files, as it may impact performance badly.
+                // TODO (#250): Maybe disable syntax highlighting for huge files, as it may impact performance badly.
                 if (syntaxHighlighting)
                 {
                     try
