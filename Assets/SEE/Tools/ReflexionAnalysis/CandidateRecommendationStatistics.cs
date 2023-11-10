@@ -99,6 +99,66 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
+        public Dictionary<Node, HashSet<Node>> GenerateArtificialInitialMapping(double percentage, int seed)
+        {
+            Dictionary<Node, HashSet<Node>> initialMapping = new Dictionary<Node, HashSet<Node>>();
+            if (percentage > 1 || percentage < 0) throw new Exception("Parameter percentage have to be a double value between 0.0 and 1.0");
+            if (OracleGraph == null) throw new Exception("No OracleGraph loaded. Cannot generate initial mapping.");
+            if (ReflexionGraph == null) throw new Exception("No ReflexionGraph loaded. Cannot generate initial mapping.");
+
+            List<Node> implementationNodes = ReflexionGraph.Nodes().Where(n => n.IsInImplementation() 
+                                                                          && n.Type.Equals(CandidateType)).ToList();
+
+            Random rand = new Random(seed);
+
+            int implementationNodesCount = implementationNodes.Count;
+            HashSet<int> usedIndices = new HashSet<int>();
+            double alreadyMappedNodesCount = 0;
+            double artificallyMappedNodes = 0;
+            double currentPercentage = 0;
+            for (int i = 0; i < implementationNodesCount && currentPercentage < percentage;)
+            {
+                // manage next random index
+                int randomIndex = rand.Next(implementationNodesCount);
+                if (usedIndices.Contains(randomIndex)) continue;
+                Node node = implementationNodes[randomIndex];
+                usedIndices.Add(randomIndex);
+
+                // check if the current node is already mapped
+                Node mapsTo = ReflexionGraph.MapsTo(node);
+                if (mapsTo == null)
+                {
+                    Node oracleMapsTo = OracleGraph.MapsTo(node);
+                    mapsTo = ReflexionGraph.GetNode(oracleMapsTo.ID);
+                    if(mapsTo != null)
+                    {
+                        AddToInitialMapping(mapsTo, node);
+                        artificallyMappedNodes++;
+                    }
+                }
+                else
+                {
+                    alreadyMappedNodesCount++;
+                }
+
+                currentPercentage = (artificallyMappedNodes + alreadyMappedNodesCount) / implementationNodesCount;
+                i++;
+            }
+
+            return initialMapping;
+
+            void AddToInitialMapping(Node mapsTo, Node node)
+            {
+                HashSet<Node> nodes;
+                if (!initialMapping.TryGetValue(mapsTo, out nodes))
+                {
+                    nodes = new HashSet<Node>();
+                    initialMapping[mapsTo] = nodes;
+                }
+                nodes.Add(node);
+            }
+        }
+
         public void Reset()
         {
             mappingStep = 0;

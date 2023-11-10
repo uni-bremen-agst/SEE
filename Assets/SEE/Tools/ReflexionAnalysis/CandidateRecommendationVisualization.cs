@@ -165,6 +165,19 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             CandidateRecommendation.Statistics.SetOracleMapping(oracleMapping);
         }
 
+        [Button(ButtonSizes.Small)]
+        public void GenerateArtificialInitialMapping()
+        {
+            Dictionary<Node, HashSet<Node>> initialMapping = CandidateRecommendation.Statistics.GenerateArtificialInitialMapping(0.5, 593946);
+            foreach (Node cluster in initialMapping.Keys)
+            {
+                foreach (Node candidate in initialMapping[cluster])
+                {
+                    StartCoroutine(MapRecommendation(candidate, cluster));
+                }
+            }
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -186,14 +199,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     // TODO: handle ambigous mapping steps
                     Debug.Log("Warning: Ambigous recommendation.");
                 }
-                StartCoroutine(MapRecommendation(chosenMappingPair));
+                StartCoroutine(MapRecommendation(chosenMappingPair.Candidate, chosenMappingPair.Cluster));
             }
         }
 
-        private IEnumerator MapRecommendation(MappingPair chosenMappingPair)
+        private IEnumerator MapRecommendation(Node candidate, Node cluster)
         {
             // TODO: Implement as Commando to visualize mapping/ Trigger Animation.
-            CandidateRecommendation.ReflexionGraph.AddToMapping(chosenMappingPair.Candidate, chosenMappingPair.Cluster);
+            CandidateRecommendation.ReflexionGraph.AddToMapping(candidate, cluster);
             yield return new WaitForSeconds(0.3f);
         }
     }
