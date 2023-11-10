@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
@@ -40,15 +41,10 @@ namespace SEE.Controls.Actions
                     return;
                 }
 
-                IEnumerable<PopupMenuAction> actions = o.GraphElemRef switch
-                {
-                    NodeRef nodeRef => GetNodeOptions(nodeRef),
-                    EdgeRef edgeRef => GetEdgeOptions(edgeRef),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
+                IEnumerable<PopupMenuAction> actions = GetApplicableOptions(o.GraphElemRef.Elem, o.gameObject);
 
                 PopupMenu.ClearActions();
-                PopupMenu.AddActions(actions.Concat(GetCommonOptions(o.GraphElemRef)));
+                PopupMenu.AddActions(actions);
 
                 // We want to move the popup menu to the cursor position before showing it.
                 PopupMenu.MoveTo(Input.mousePosition);
@@ -57,11 +53,30 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Returns the options available for the given graph element.
+        /// </summary>
+        /// <param name="graphElement">The graph element to get the options for</param>
+        /// <param name="gameObject">The game object that the graph element is attached to</param>
+        /// <returns>Options available for the given graph element</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the graph element is neither a node nor an edge</exception>
+        public static IEnumerable<PopupMenuAction> GetApplicableOptions(GraphElement graphElement, GameObject gameObject = null)
+        {
+            IEnumerable<PopupMenuAction> options = GetCommonOptions(graphElement, gameObject);
+            return options.Concat(graphElement switch
+            {
+                Node node => GetNodeOptions(node, gameObject),
+                Edge edge => GetEdgeOptions(edge, gameObject),
+                _ => throw new ArgumentOutOfRangeException()
+            });
+        }
+
+        /// <summary>
         /// Returns the common options available for all graph elements.
         /// </summary>
-        /// <param name="graphElementRef">The graph element to get the options for</param>
+        /// <param name="graphElement">The graph element to get the options for</param>
+        /// <param name="gameObject">The game object that the graph element is attached to</param>
         /// <returns>Common options available for all graph elements</returns>
-        private static IEnumerable<PopupMenuAction> GetCommonOptions(GraphElementRef graphElementRef)
+        private static IEnumerable<PopupMenuAction> GetCommonOptions(GraphElement graphElement, GameObject gameObject = null)
         {
             IList<PopupMenuAction> actions = new List<PopupMenuAction>
             {
@@ -71,7 +86,12 @@ namespace SEE.Controls.Actions
                 new("Properties", ShowProperties, '\uF05A'),
             };
 
-            if (graphElementRef.Elem.Filename() != null)
+            if (gameObject != null)
+            {
+                actions.Add(new("Highlight", Highlight, '\uF0EB'));
+            }
+
+            if (graphElement.Filename() != null)
             {
                 actions.Add(new("Show Code", ShowCode, '\uF121'));
             }
@@ -80,35 +100,55 @@ namespace SEE.Controls.Actions
 
             void DeleteElement()
             {
-                GameElementDeleter.Delete(graphElementRef.gameObject);
+                if (gameObject != null)
+                {
+                    GameElementDeleter.Delete(gameObject);
+                }
+                else
+                {
+                    graphElement.ItsGraph.RemoveElement(graphElement);
+                }
             }
 
             void ShowProperties()
             {
-                ShowNotification.Info("Node Properties", graphElementRef.Elem.ToString(), log: false);
+                ShowNotification.Info("Node Properties", graphElement.ToString(), log: false);
             }
 
             void ShowCode()
             {
-                ActivateWindow(ShowCodeAction.ShowCode(graphElementRef));
+                ActivateWindow(ShowCodeAction.ShowCode(gameObject.MustGetComponent<GraphElementRef>()));
+            }
+
+            void Highlight()
+            {
+                if (gameObject != null)
+                {
+                    gameObject.Operator().Highlight(duration: 10);
+                }
+                else
+                {
+                    ShowNotification.Warn("No game object", "There is nothing to highlight for this element.");
+                }
             }
         }
 
         /// <summary>
         /// Activates the tree window for the given graph element and returns it.
         /// </summary>
-        /// <param name="graphElementRef">The graph element to activate the tree window for</param>
+        /// <param name="graphElement">The graph element to activate the tree window for</param>
+        /// <param name="transform">The transform of the game object that the graph element is attached to</param>
         /// <returns>The activated tree window</returns>
-        private static TreeWindow ActivateTreeWindow(GraphElementRef graphElementRef)
+        private static TreeWindow ActivateTreeWindow(GraphElement graphElement, Transform transform)
         {
             WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
-            TreeWindow openWindow = manager.Windows.OfType<TreeWindow>().FirstOrDefault(x => x.Graph == graphElementRef.Elem.ItsGraph);
+            TreeWindow openWindow = manager.Windows.OfType<TreeWindow>().FirstOrDefault(x => x.Graph == graphElement.ItsGraph);
             if (openWindow == null)
             {
                 // Window is not open yet, so we create it.
-                GameObject city = SceneQueries.GetCodeCity(graphElementRef.transform).gameObject;
+                GameObject city = SceneQueries.GetCodeCity(transform).gameObject;
                 openWindow = city.AddComponent<TreeWindow>();
-                openWindow.Graph = graphElementRef.Elem.ItsGraph;
+                openWindow.Graph = graphElement.ItsGraph;
                 manager.AddWindow(openWindow);
             }
             manager.ActiveWindow = openWindow;
@@ -132,9 +172,10 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the options available for the given node.
         /// </summary>
-        /// <param name="nodeRef">The node to get the options for</param>
+        /// <param name="node">The node to get the options for</param>
+        /// <param name="gameObject">The game object that the node is attached to</param>
         /// <returns>Options available for the given node</returns>
-        private static IEnumerable<PopupMenuAction> GetNodeOptions(NodeRef nodeRef)
+        private static IEnumerable<PopupMenuAction> GetNodeOptions(Node node, GameObject gameObject)
         {
             IList<PopupMenuAction> actions = new List<PopupMenuAction>
             {
@@ -145,29 +186,30 @@ namespace SEE.Controls.Actions
 
             void RevealInTreeView()
             {
-                ActivateTreeWindow(nodeRef).RevealElement(nodeRef.Value).Forget();
+                ActivateTreeWindow(node, gameObject.transform).RevealElement(node).Forget();
             }
         }
 
         /// <summary>
         /// Returns the options available for the given edge.
         /// </summary>
-        /// <param name="edgeRef">The edge to get the options for</param>
+        /// <param name="edge">The edge to get the options for</param>
+        /// <param name="gameObject">The game object that the edge is attached to</param>
         /// <returns>Options available for the given edge</returns>
-        private static IEnumerable<PopupMenuAction> GetEdgeOptions(EdgeRef edgeRef)
+        private static IEnumerable<PopupMenuAction> GetEdgeOptions(Edge edge, GameObject gameObject)
         {
             IList<PopupMenuAction> actions = new List<PopupMenuAction>
             {
-                new("Show at Source", RevealAtSource, '\uF802'),
-                new("Show at Target", RevealAtTarget, '\uF802'),
+                new("Show at Source (TreeView)", RevealAtSource, '\uF802'),
+                new("Show at Target (TreeView)", RevealAtTarget, '\uF802'),
             };
 
-            if (edgeRef.Value.Type == "Clone")
+            if (edge.Type == "Clone")
             {
                 actions.Add(new("Show Unified Diff", ShowUnifiedDiff, '\uE13A'));
             }
 
-            if (edgeRef.Value.IsInImplementation() && ReflexionGraph.IsDivergent(edgeRef.Value))
+            if (edge.IsInImplementation() && ReflexionGraph.IsDivergent(edge))
             {
                 actions.Add(new("Accept Divergence", AcceptDivergence, '\uF00C'));
             }
@@ -176,22 +218,22 @@ namespace SEE.Controls.Actions
 
             void RevealAtSource()
             {
-                ActivateTreeWindow(edgeRef).RevealElement(edgeRef.Value, viaSource: true).Forget();
+                ActivateTreeWindow(edge, gameObject.transform).RevealElement(edge, viaSource: true).Forget();
             }
 
             void RevealAtTarget()
             {
-                ActivateTreeWindow(edgeRef).RevealElement(edgeRef.Value, viaSource: false).Forget();
+                ActivateTreeWindow(edge, gameObject.transform).RevealElement(edge, viaSource: false).Forget();
             }
 
             void ShowUnifiedDiff()
             {
-                ActivateWindow(ShowCodeAction.ShowUnifiedDiff(edgeRef));
+                ActivateWindow(ShowCodeAction.ShowUnifiedDiff(gameObject.MustGetComponent<EdgeRef>()));
             }
 
             void AcceptDivergence()
             {
-                AcceptDivergenceAction.CreateConvergentEdge(edgeRef.Value);
+                AcceptDivergenceAction.CreateConvergentEdge(edge);
             }
         }
     }
