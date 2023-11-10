@@ -461,12 +461,34 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Removes the given element from the graph. If the element is a node,
+        /// it is removed using <see cref="RemoveNode(Node, bool)"/>; otherwise
+        /// it is removed using <see cref="RemoveEdge(Edge)"/>.
+        /// </summary>
+        /// <param name="element">element to be removed</param>
+        /// <exception cref="ArgumentException">if the element is neither a node nor an edge</exception>
+        public void RemoveElement(GraphElement element)
+        {
+            switch (element)
+            {
+                case Node node:
+                    RemoveNode(node);
+                    break;
+                case Edge edge:
+                    RemoveEdge(edge);
+                    break;
+                default:
+                    throw new ArgumentException($"Element {element} is neither a node nor an edge.");
+            }
+        }
+
+        /// <summary>
         /// Returns the names of all node types of this graph
         /// </summary>
         /// <returns>node types of this graph</returns>
         internal HashSet<string> AllNodeTypes()
         {
-            HashSet<string> result = new HashSet<string>();
+            HashSet<string> result = new();
             foreach (Node node in Nodes())
             {
                 result.Add(node.Type);
