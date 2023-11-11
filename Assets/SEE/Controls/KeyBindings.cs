@@ -78,7 +78,7 @@ namespace SEE.Controls
         /// Creates a string of the current key bindings along
         /// with their help message.
         /// </summary>
-        public static string ShowBindings()
+        public static string GetBindingsText()
         {
             System.Text.StringBuilder sb = new System.Text.StringBuilder();
             foreach (var binding in bindings)

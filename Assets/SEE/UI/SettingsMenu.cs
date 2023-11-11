@@ -13,14 +13,14 @@ namespace SEE.UI
     public class SettingsMenu : PlatformDependentComponent
     {
         /// <summary>
-        /// Prefab for the Settingsmenu.
+        /// Prefab for the SettingsMenu.
         /// </summary>
         protected virtual string SettingsPrefab => UIPrefabFolder + "SettingsMenu";
 
         /// <summary>
         /// The SettingsMenu game object.
         /// </summary>
-        protected GameObject Settingsmenu;
+        protected GameObject SettingsMenuGameObject;
 
         /// <summary>
         /// Sets the text of the textbox and adds the onClick event ExitGame to the ExitButton.
@@ -28,13 +28,12 @@ namespace SEE.UI
         protected override void StartDesktop()
         {
             // instantiates the SettingsMenu
-            Settingsmenu = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Canvas.transform, false);
-            Button exitButton = Settingsmenu.transform.GetChild(0).transform.GetChild(3).GetComponent<Button>();
+            SettingsMenuGameObject = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Canvas.transform, false);
+            Button exitButton = SettingsMenuGameObject.transform.GetChild(0).transform.GetChild(3).GetComponent<Button>();
             // adds the ExitGame method to the button
             exitButton.onClick.AddListener(ExitGame);
-            var keybindingsText = Settingsmenu.transform.GetChild(1).transform.GetChild(2).transform.GetChild(0).transform.GetChild(0);
             // sets the text of the scrollview
-            keybindingsText.GetComponent<TextMeshProUGUI>().text = KeyBindings.ShowBindings();
+            SettingsMenuGameObject.transform.GetChild(1).transform.GetChild(2).transform.GetChild(0).transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = KeyBindings.GetBindingsText();
         }
 
         /// <summary>
@@ -42,13 +41,13 @@ namespace SEE.UI
         /// </summary>
         protected override void UpdateDesktop()
         {
-            if (Settingsmenu.transform.GetChild(1).gameObject.activeSelf == true && Settingsmenu.transform.GetChild(0).gameObject.activeSelf == false && SEEInput.ToggleSettings())
+            if (SEEInput.ToggleSettings() && SettingsMenuGameObject.transform.GetChild(1).gameObject.activeSelf == true && SettingsMenuGameObject.transform.GetChild(0).gameObject.activeSelf == false)
             {
-                Settingsmenu.transform.GetChild(1).gameObject.SetActive(false);
+                SettingsMenuGameObject.transform.GetChild(1).gameObject.SetActive(false);
             }
             else if (SEEInput.ToggleSettings())
             {
-                Settingsmenu.transform.GetChild(0).gameObject.SetActive(!Settingsmenu.transform.GetChild(0).gameObject.activeSelf);
+                SettingsMenuGameObject.transform.GetChild(0).gameObject.SetActive(!SettingsMenuGameObject.transform.GetChild(0).gameObject.activeSelf);
             }
         }
 
