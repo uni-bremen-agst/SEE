@@ -45,6 +45,9 @@ namespace SEE.UI.PopupMenu
         /// </summary>
         private bool ShouldShowMenu;
 
+        /// <summary>
+        /// The height of the menu.
+        /// </summary>
         private float menuHeight => Menu.sizeDelta.y;
 
         /// <summary>
