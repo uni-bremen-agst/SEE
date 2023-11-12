@@ -48,7 +48,7 @@ namespace SEE.UI.PopupMenu
         /// <summary>
         /// The height of the menu.
         /// </summary>
-        private float menuHeight => Menu.sizeDelta.y;
+        private float MenuHeight => Menu.sizeDelta.y;
 
         /// <summary>
         /// Duration of the animation that is used to show or hide the menu.
@@ -141,10 +141,10 @@ namespace SEE.UI.PopupMenu
         public void MoveTo(Vector2 position)
         {
             float scaleFactor = Canvas.MustGetComponent<Canvas>().scaleFactor;
-            if (position.y < menuHeight * scaleFactor)
+            if (position.y < MenuHeight * scaleFactor)
             {
                 // If the menu is too close to the bottom of the screen, expand it upwards instead.
-                position.y += menuHeight * scaleFactor;
+                position.y += MenuHeight * scaleFactor;
                 // The mouse should hover over the first menu item already rather than being just outside of it,
                 // so we move the menu down and to the left a bit.
                 position += new Vector2(-5, -5);
