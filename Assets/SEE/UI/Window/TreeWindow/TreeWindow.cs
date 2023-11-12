@@ -95,7 +95,6 @@ namespace SEE.UI.Window.TreeWindow
             }
         }
 
-
         /// <summary>
         /// Clears the tree view of all items.
         /// </summary>
