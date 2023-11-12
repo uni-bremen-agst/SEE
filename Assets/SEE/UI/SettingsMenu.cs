@@ -29,11 +29,11 @@ namespace SEE.UI
         {
             // instantiates the SettingsMenu
             SettingsMenuGameObject = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Canvas.transform, false);
-            Button exitButton = SettingsMenuGameObject.transform.GetChild(0).transform.GetChild(3).GetComponent<Button>();
+            Button exitButton = SettingsMenuGameObject.transform.Find("SettingsPanel/ExitButton").GetComponent<Button>();
             // adds the ExitGame method to the button
             exitButton.onClick.AddListener(ExitGame);
             // sets the text of the scrollview
-            SettingsMenuGameObject.transform.GetChild(1).transform.GetChild(2).transform.GetChild(0).transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = KeyBindings.GetBindingsText();
+            SettingsMenuGameObject.transform.Find("KeybindingsPanel/KeybindingsText/Viewport/Content").GetComponent<TextMeshProUGUI>().text = KeyBindings.GetBindingsText();
         }
 
         /// <summary>
@@ -41,13 +41,15 @@ namespace SEE.UI
         /// </summary>
         protected override void UpdateDesktop()
         {
-            if (SEEInput.ToggleSettings() && SettingsMenuGameObject.transform.GetChild(1).gameObject.activeSelf == true && SettingsMenuGameObject.transform.GetChild(0).gameObject.activeSelf == false)
+            // handels the case, that the user is in the KeybindingsPanel but wants to close it
+            if (SEEInput.ToggleSettings() && SettingsMenuGameObject.transform.Find("KeybindingsPanel").gameObject.activeSelf == true && SettingsMenuGameObject.transform.Find("SettingsPanel").gameObject.activeSelf == false)
             {
-                SettingsMenuGameObject.transform.GetChild(1).gameObject.SetActive(false);
+                SettingsMenuGameObject.transform.Find("KeybindingsPanel").gameObject.SetActive(false);
             }
+            // handels the case where to user wants to open/close the SettingsPanel
             else if (SEEInput.ToggleSettings())
             {
-                SettingsMenuGameObject.transform.GetChild(0).gameObject.SetActive(!SettingsMenuGameObject.transform.GetChild(0).gameObject.activeSelf);
+                SettingsMenuGameObject.transform.Find("SettingsPanel").gameObject.SetActive(!SettingsMenuGameObject.transform.Find("SettingsPanel").gameObject.activeSelf);
             }
         }
 
