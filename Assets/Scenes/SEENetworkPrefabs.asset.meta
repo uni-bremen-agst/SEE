@@ -1,15 +1,8 @@
 fileFormatVersion: 2
-<<<<<<<< HEAD:Assets/Resources/Materials/HighlightMaterial/Highlight 1.mat.meta
-guid: 256e5112c25fb0e4ab4ce90f2ea4cf19
-NativeFormatImporter:
-  externalObjects: {}
-  mainObjectFileID: 0
-========
 guid: ecc88a81cc12556498f003038d3261bb
 NativeFormatImporter:
   externalObjects: {}
   mainObjectFileID: 11400000
->>>>>>>> origin/master:Assets/Scenes/SEENetworkPrefabs.asset.meta
   userData: 
   assetBundleName: 
   assetBundleVariant: 
