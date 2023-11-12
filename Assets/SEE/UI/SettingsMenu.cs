@@ -3,6 +3,7 @@ using UnityEngine;
 using TMPro;
 using SEE.Controls;
 using SEE.Utils;
+using SEE.GO;
 
 namespace SEE.UI
 {
@@ -29,11 +30,11 @@ namespace SEE.UI
         {
             // instantiates the SettingsMenu
             SettingsMenuGameObject = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Canvas.transform, false);
-            Button exitButton = SettingsMenuGameObject.transform.Find("SettingsPanel/ExitButton").GetComponent<Button>();
+            Button exitButton = SettingsMenuGameObject.transform.Find("SettingsPanel/ExitButton").gameObject.MustGetComponent<Button>();
             // adds the ExitGame method to the button
             exitButton.onClick.AddListener(ExitGame);
             // sets the text of the scrollview
-            SettingsMenuGameObject.transform.Find("KeybindingsPanel/KeybindingsText/Viewport/Content").GetComponent<TextMeshProUGUI>().text = KeyBindings.GetBindingsText();
+            SettingsMenuGameObject.transform.Find("KeybindingsPanel/KeybindingsText/Viewport/Content").gameObject.MustGetComponent<TextMeshProUGUI>().text = KeyBindings.GetBindingsText();
         }
 
         /// <summary>
