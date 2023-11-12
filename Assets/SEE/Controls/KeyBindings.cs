@@ -102,6 +102,11 @@ namespace SEE.Controls
         internal static readonly KeyCode ToggleMenu = Register(KeyCode.Space, Scope.Always, "Turns on/off the player-action menu.");
 
         /// <summary>
+        /// Turns on/off the browser.
+        /// </summary>
+        internal static readonly KeyCode ToggleBrowser = Register(KeyCode.F4, Scope.Always, "Turns on/off the browser.");
+
+        /// <summary>
         /// Opens the search menu.
         /// </summary>
         internal static readonly KeyCode SearchMenu = Register(KeyCode.F, Scope.Always, "Opens the search menu.");

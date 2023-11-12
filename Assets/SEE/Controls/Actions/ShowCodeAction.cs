@@ -88,13 +88,6 @@ namespace SEE.Controls.Actions
                     return false;
                 }
 
-                // Edges of type Clone will be handled differently. For these, we will be
-                // showing a unified diff.
-                CodeWindow codeWindow = graphElement is Edge edge && edge.Type == "Clone" ?
-                                        ShowUnifiedDiff(edge, graphElementRef)
-                                      : ShowCode(graphElement, graphElementRef);
-
-                // Add solution path
                 GameObject cityObject = SceneQueries.GetCodeCity(graphElementRef.transform).gameObject;
                 if (cityObject == null || !cityObject.TryGetComponent(out AbstractSEECity city))
                 {
@@ -102,7 +95,13 @@ namespace SEE.Controls.Actions
                       $"Selected {GetName(graphElement)} is not contained in a code city.");
                     return false;
                 }
-                codeWindow.ShowIssues = city.ErosionSettings.ShowIssuesInCodeWindow;
+
+                // Edges of type Clone will be handled differently. For these, we will be
+                // showing a unified diff.
+                CodeWindow codeWindow = graphElement is Edge edge && edge.Type == "Clone" ?
+                                        ShowUnifiedDiff(edge, graphElementRef)
+                                      : ShowCode(graphElement, graphElementRef, city.ErosionSettings.ShowIssuesInCodeWindow);
+
                 codeWindow.SolutionPath = city.SolutionPath.Path;
 
                 // Add code window to our space of code window, if it isn't in there yet
@@ -205,11 +204,12 @@ namespace SEE.Controls.Actions
             // retrieved from a file. The path of the file is retrieved from
             // the absolute path as specified by the graphElements source location
             // attributes.
-            static CodeWindow ShowCode(GraphElement graphElement, GraphElementRef graphElementRef)
+            static CodeWindow ShowCode(GraphElement graphElement, GraphElementRef graphElementRef, bool showIssues)
             {
                 // File name of source code file to read from it
                 (string filename, string absolutePlatformPath) = GetPath(graphElement);
                 CodeWindow codeWindow = GetOrCreateCodeWindow(graphElement, graphElementRef, filename);
+                codeWindow.ShowIssues = showIssues;
                 codeWindow.EnterFromFile(absolutePlatformPath);
 
                 // Pass line number to automatically scroll to it, if it exists
