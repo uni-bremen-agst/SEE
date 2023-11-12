@@ -183,15 +183,13 @@ namespace SEE.Utils
                 raycastHit = hit;
                 if (hit.transform.TryGetComponent(out InteractableObject io))
                 {
-                    if (io.GraphElemRef.Elem is Node)
+                    result = io.GraphElemRef.Elem switch
                     {
-                        result = HitGraphElement.Node;
-                    }
-                    else
-                    {
-                        Assert.IsTrue(io.GraphElemRef.Elem is Edge);
-                        result = HitGraphElement.Edge;
-                    }
+                        null => HitGraphElement.None,
+                        Node => HitGraphElement.Node,
+                        Edge => HitGraphElement.Edge,
+                        _ => throw new System.ArgumentOutOfRangeException()
+                    };
                     obj = io;
                 }
             }

@@ -30,20 +30,10 @@ namespace SEE.UI.Window.CodeWindow
         public string FilePath;
 
         /// <summary>
-        /// Whether code issues should be downloaded and added to the shown code.
-        /// </summary>
-        public bool ShowIssues;
-
-        /// <summary>
         /// The line that was marked (1-indexed). Unlike <see cref="ScrolledVisibleLine"/>,
         /// this line is independent of scrolling.
         /// </summary>
         private int markedLine = 1;
-
-        /// <summary>
-        /// The solution path used for the IDE integration.
-        /// </summary>
-        public string SolutionPath;
 
         /// <summary>
         /// Size of the font used in the code window.
