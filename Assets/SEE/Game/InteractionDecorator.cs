@@ -18,7 +18,8 @@ namespace SEE.Game
         /// <see cref="ShowHovering"/>, <see cref="ShowSelection"/>, <see cref="ShowGrabbing"/>.
         /// If <paramref name="gameObject"/> has a <see cref="NodeRef"/>, then the following
         /// components are added in addition to the ones above:
-        /// <see cref="GameNodeScaler"/>, <see cref="ShowLabel"/>, <see cref="HighlightErosion"/>.
+        /// <see cref="GameNodeScaler"/>, <see cref="ShowLabel"/>, <see cref="EyeGazeHandler"/>,
+        /// <see cref="HighlightErosion"/>.
         ///
         /// Note: The <paramref name="gameObject"/> is assumed to represent a graph node
         /// or edge.
@@ -43,11 +44,9 @@ namespace SEE.Game
                 gameObject.AddComponentIfNecessary<ShowLabel>();
                 gameObject.AddComponentIfNecessary<ShowEdges>();
                 gameObject.AddComponentIfNecessary<HighlightErosion>();
-
                 SetupRigidbody();
                 SetupGrabbable();
                 gameObject.AddComponentIfNecessary<VrGrabAction>();
-
             }
 
             // Add AutoHand related components.

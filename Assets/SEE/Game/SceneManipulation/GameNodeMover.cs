@@ -1,5 +1,4 @@
-﻿using SEE.Controls;
-using SEE.Game.Operator;
+﻿using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -119,12 +118,7 @@ namespace SEE.Game.SceneManipulation
                     targetWorldPosition.z = parent.transform.position.z - parentWorldExtent.z + childWorldExtent.z;
                 }
             }
-
-            if (SceneSettings.InputType != PlayerInputType.VRPlayer)
-            {
-                nodeOperator.MoveTo(targetWorldPosition, 0);
-            }
-
+            // TODO if (SceneSettings.InputType != PlayerInputType.VRPlayer) if needed
             child.SetParent(parent.transform);
 
             // Returns the target world space scale of child relative to parent when child is to be put onto parent.

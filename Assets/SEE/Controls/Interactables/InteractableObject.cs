@@ -83,7 +83,7 @@ namespace SEE.Controls
         private static readonly Dictionary<Graph, HashSet<InteractableObject>> graphToSelectedIOs = new();
 
         /// <summary>
-        /// The graph element, this interactable object is attached to.
+        /// The graph element this interactable object is attached to.
         /// </summary>
         public GraphElementRef GraphElemRef { get; private set; }
 
@@ -200,7 +200,7 @@ namespace SEE.Controls
             return graphToSelectedIOs[graph];
         }
 
-#region Interaction
+        #region Interaction
 
         /// <summary>
         /// Sets <see cref="HoverFlags"/> to given <paramref name="hoverFlags"/>. Then if
@@ -504,37 +504,33 @@ namespace SEE.Controls
 
             IsGrabbed = grab;
 
-            // FIXME: This part is not working with vr right now.
-            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            if (grab)
             {
-                if (grab)
+                GrabIn?.Invoke(this, isInitiator);
+                AnyGrabIn?.Invoke(this, isInitiator);
+                if (isInitiator)
                 {
-                    GrabIn?.Invoke(this, isInitiator);
-                    AnyGrabIn?.Invoke(this, isInitiator);
-                    if (isInitiator)
-                    {
-                        // The local player has grabbed this object and needs to be informed about it.
-                        // Non-local player are not concerned here.
-                        LocalGrabIn?.Invoke(this);
-                        LocalAnyGrabIn?.Invoke(this);
-                    }
-
-                    GrabbedObjects.Add(this);
+                    // The local player has grabbed this object and needs to be informed about it.
+                    // Non-local player are not concerned here.
+                    LocalGrabIn?.Invoke(this);
+                    LocalAnyGrabIn?.Invoke(this);
                 }
-                else
+
+                GrabbedObjects.Add(this);
+            }
+            else
+            {
+                GrabOut?.Invoke(this, isInitiator);
+                AnyGrabOut?.Invoke(this, isInitiator);
+                if (isInitiator)
                 {
-                    GrabOut?.Invoke(this, isInitiator);
-                    AnyGrabOut?.Invoke(this, isInitiator);
-                    if (isInitiator)
-                    {
-                        // The local player has finished grabbing this object and needs to be informed about it.
-                        // Non-local player are not concerned here.
-                        LocalGrabOut?.Invoke(this);
-                        LocalAnyGrabOut?.Invoke(this);
-                    }
-
-                    GrabbedObjects.Remove(this);
+                    // The local player has finished grabbing this object and needs to be informed about it.
+                    // Non-local player are not concerned here.
+                    LocalGrabOut?.Invoke(this);
+                    LocalAnyGrabOut?.Invoke(this);
                 }
+
+                GrabbedObjects.Remove(this);
             }
 
             if (isInitiator)
@@ -566,9 +562,9 @@ namespace SEE.Controls
             }
         }
 
-#endregion
+        #endregion
 
-#region Events
+        #region Events
 
         ///------------------------------------------------------------------
         /// Actions can register on selection, hovering, and grabbing events.
