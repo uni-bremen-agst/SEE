@@ -194,40 +194,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Retrieves the game object representing a node with the given <paramref name="nodeID"/>.
-        ///
-        /// Precondition: Such a game object actually exists.
-        /// </summary>
-        /// <param name="nodeID">the unique ID of the node to be retrieved</param>
-        /// <returns>the game object representing the node with the given <paramref name="nodeID"/></returns>
-        /// <exception cref="Exception">thrown if there is no such object</exception>
-        public static GameObject RetrieveGameNode(string nodeID)
-        {
-            GameObject gameObject = GraphElementIDMap.Find(nodeID);
-            if (gameObject == null)
-            {
-                throw new Exception($"Node named {nodeID} not found.");
-            }
-
-            return gameObject;
-        }
-
-        /// <summary>
-        /// Retrieves the game object representing the given <paramref name="node"/>.
-        ///
-        /// Preconditions:
-        ///   (1) <paramref name="node"/> is not null.
-        ///   (2) Such a game object actually exists.
-        /// </summary>
-        /// <param name="node">the node to be retrieved</param>
-        /// <returns>the game object representing the given <paramref name="node"/></returns>
-        /// <exception cref="Exception">thrown if there is no such object</exception>
-        public static GameObject RetrieveGameNode(this Node node)
-        {
-            return RetrieveGameNode(node.ID);
-        }
-
-        /// <summary>
         /// Returns all game objects in the current scene having a name contained in <paramref name="gameObjectNames"/>.
         /// Will also return inactive game objects.
         ///

@@ -4,6 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Cysharp.Threading.Tasks;
+using SEE.Game;
+using SEE.Game.City;
+using SEE.GO;
 using SEE.UI.Notification;
 using SEE.Net.Dashboard;
 using SEE.Net.Dashboard.Model.Issues;
@@ -344,13 +347,14 @@ namespace SEE.UI.Window.CodeWindow
 
             try
             {
-                //TODO: Maybe disable syntax highlighting for huge files, as it may impact performance badly.
+                // TODO (#250): Maybe disable syntax highlighting for huge files, as it may impact performance badly.
                 if (syntaxHighlighting)
                 {
                     try
                     {
                         EnterFromTokens(SEEToken.FromFile(filename));
-                        if (ShowIssues)
+                        if (SceneQueries.GetCodeCity(transform).gameObject.TryGetComponentOrLog(out AbstractSEECity city)
+                            && city.ErosionSettings.ShowIssuesInCodeWindow)
                         {
                             MarkIssues(filename).Forget(); // initiate issue search
                         }
