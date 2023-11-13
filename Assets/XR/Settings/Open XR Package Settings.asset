@@ -137,7 +137,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c5b5af5107e35a43818d5411328bfc3, type: 3}
   m_Name: DPadInteraction Standalone
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   m_enabled: 0
   nameUi: D-Pad Binding
   version: 0.0.1
@@ -190,7 +190,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f028123e2efe1d443875bc7609b4a98b, type: 3}
   m_Name: PalmPoseInteraction Standalone
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   m_enabled: 0
   nameUi: Palm Pose
   version: 0.0.1
@@ -272,11 +272,11 @@ MonoBehaviour:
   m_Name: DPadInteraction Standalone
   m_EditorClassIdentifier: Unity.XR.OpenXR:UnityEngine.XR.OpenXR.Features.Interactions:DPadInteraction
   m_enabled: 0
-  nameUi: 
-  version: 
-  featureIdInternal: 
-  openxrExtensionStrings: 
-  company: 
+  nameUi:
+  version:
+  featureIdInternal:
+  openxrExtensionStrings:
+  company:
   priority: 0
   required: 0
   forceThresholdLeft: 0.5
@@ -459,6 +459,7 @@ MonoBehaviour:
   - {fileID: 7242976004462796141}
   m_renderMode: 0
   m_depthSubmissionMode: 0
+  m_symmetricProjection: 0
 --- !u!114 &2722789916443922232
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -533,11 +534,11 @@ MonoBehaviour:
   m_Name: PalmPoseInteraction Standalone
   m_EditorClassIdentifier: Unity.XR.OpenXR:UnityEngine.XR.OpenXR.Features.Interactions:PalmPoseInteraction
   m_enabled: 0
-  nameUi: 
-  version: 
-  featureIdInternal: 
-  openxrExtensionStrings: 
-  company: 
+  nameUi:
+  version:
+  featureIdInternal:
+  openxrExtensionStrings:
+  company:
   priority: 0
   required: 0
 --- !u!114 &7242976004462796141
@@ -571,7 +572,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9c5b5af5107e35a43818d5411328bfc3, type: 3}
   m_Name: DPadInteraction Standalone
-  m_EditorClassIdentifier: 
+  m_EditorClassIdentifier:
   m_enabled: 0
   nameUi: D-Pad Binding
   version: 0.0.1
@@ -650,3 +651,4 @@ MonoBehaviour:
   features: []
   m_renderMode: 1
   m_depthSubmissionMode: 0
+  m_symmetricProjection: 0
