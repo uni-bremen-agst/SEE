@@ -17,7 +17,7 @@ namespace SEE.Controls
         /// <summary>
         /// The registered keyboard shortcuts. The value is a help message on the shortcut.
         /// </summary>
-        private static readonly Dictionary<KeyCode, string> bindings = new Dictionary<KeyCode, string>();
+        private static readonly Dictionary<KeyCode, string> bindings = new();
 
         /// <summary>
         /// Categories for the keyboard shortcuts.
@@ -80,7 +80,7 @@ namespace SEE.Controls
         /// </summary>
         public static string GetBindingsText()
         {
-            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            System.Text.StringBuilder sb = new();
             foreach (var binding in bindings)
             {
                 sb.Append($"Key {binding.Key}:\n {binding.Value}\n\n");
