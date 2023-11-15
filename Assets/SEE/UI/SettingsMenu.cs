@@ -49,7 +49,7 @@ namespace SEE.UI
                 {
                     // handles the case where the user is in the KeybindingsPanel but wants to close it
                     keybindingsPanel.gameObject.SetActive(false);
-                }                
+                }
                 else
                 {
                     // handles the case where the user wants to open/close the SettingsPanel
