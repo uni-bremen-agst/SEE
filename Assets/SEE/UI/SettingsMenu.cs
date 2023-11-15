@@ -40,7 +40,7 @@ namespace SEE.UI
         /// Toggles the settings panel with the ESC button.
         /// </summary>
         protected override void UpdateDesktop()
-        {            
+        {
             if (SEEInput.ToggleSettings())
             {
                 Transform keybindingsPanel = settingsMenuGameObject.transform.Find("KeybindingsPanel");
