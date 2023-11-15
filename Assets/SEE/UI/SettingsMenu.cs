@@ -8,20 +8,19 @@ using SEE.GO;
 namespace SEE.UI
 {
     /// <summary>
-    /// Handles the actions in the
-    /// settings prefab.
+    /// Handles the user interactions with the settings menu.
     /// </summary>
     public class SettingsMenu : PlatformDependentComponent
     {
         /// <summary>
-        /// Prefab for the SettingsMenu.
+        /// Prefab for the <see cref="SettingsMenu"/>.
         /// </summary>
-        protected virtual string SettingsPrefab => UIPrefabFolder + "SettingsMenu";
+        private string SettingsPrefab => UIPrefabFolder + "SettingsMenu";
 
         /// <summary>
-        /// The SettingsMenu game object.
+        /// The game object instantiated for the <see cref="SettingsPrefab"/>.
         /// </summary>
-        protected GameObject SettingsMenuGameObject;
+        private GameObject settingsMenuGameObject;
 
         /// <summary>
         /// Sets the text of the textbox and adds the onClick event ExitGame to the ExitButton.
@@ -29,35 +28,40 @@ namespace SEE.UI
         protected override void StartDesktop()
         {
             // instantiates the SettingsMenu
-            SettingsMenuGameObject = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Canvas.transform, false);
-            Button exitButton = SettingsMenuGameObject.transform.Find("SettingsPanel/ExitButton").gameObject.MustGetComponent<Button>();
+            settingsMenuGameObject = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Canvas.transform, false);
+            Button exitButton = settingsMenuGameObject.transform.Find("SettingsPanel/ExitButton").gameObject.MustGetComponent<Button>();
             // adds the ExitGame method to the button
             exitButton.onClick.AddListener(ExitGame);
             // sets the text of the scrollview
-            SettingsMenuGameObject.transform.Find("KeybindingsPanel/KeybindingsText/Viewport/Content").gameObject.MustGetComponent<TextMeshProUGUI>().text = KeyBindings.GetBindingsText();
+            settingsMenuGameObject.transform.Find("KeybindingsPanel/KeybindingsText/Viewport/Content").gameObject.MustGetComponent<TextMeshProUGUI>().text = KeyBindings.GetBindingsText();
         }
 
         /// <summary>
-        /// Toggles the settings panel with the esc button.
+        /// Toggles the settings panel with the ESC button.
         /// </summary>
         protected override void UpdateDesktop()
-        {
-            // handels the case, that the user is in the KeybindingsPanel but wants to close it
-            if (SEEInput.ToggleSettings() && SettingsMenuGameObject.transform.Find("KeybindingsPanel").gameObject.activeSelf == true && SettingsMenuGameObject.transform.Find("SettingsPanel").gameObject.activeSelf == false)
+        {            
+            if (SEEInput.ToggleSettings())
             {
-                SettingsMenuGameObject.transform.Find("KeybindingsPanel").gameObject.SetActive(false);
-            }
-            // handels the case where to user wants to open/close the SettingsPanel
-            else if (SEEInput.ToggleSettings())
-            {
-                SettingsMenuGameObject.transform.Find("SettingsPanel").gameObject.SetActive(!SettingsMenuGameObject.transform.Find("SettingsPanel").gameObject.activeSelf);
+                Transform keybindingsPanel = settingsMenuGameObject.transform.Find("KeybindingsPanel");
+                GameObject settingsPanel = settingsMenuGameObject.transform.Find("SettingsPanel").gameObject;
+                if (keybindingsPanel.gameObject.activeSelf && !settingsPanel.activeSelf)
+                {
+                    // handles the case where the user is in the KeybindingsPanel but wants to close it
+                    keybindingsPanel.gameObject.SetActive(false);
+                }                
+                else
+                {
+                    // handles the case where the user wants to open/close the SettingsPanel
+                    settingsPanel.SetActive(!settingsPanel.activeSelf);
+                }
             }
         }
 
         /// <summary>
-        /// When this method is called, the application will be terminated.
+        /// Terminates the application (exits the game).
         /// </summary>
-        public void ExitGame()
+        private void ExitGame()
         {
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
