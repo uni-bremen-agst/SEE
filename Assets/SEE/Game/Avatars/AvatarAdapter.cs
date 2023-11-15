@@ -4,6 +4,7 @@ using CrazyMinnow.SALSA;
 using Dissonance;
 using Dissonance.Audio.Playback;
 using SEE.Controls;
+using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
 using Unity.Netcode;
@@ -297,6 +298,8 @@ namespace SEE.Game.Avatars
 
             GameObject rig = PrefabInstantiator.InstantiatePrefab(vrPlayerRigPrefab);
             rig.transform.position = gameObject.transform.position;
+            
+            gameObject.AddComponent<TestScript>();
             // FIXME: Only the server is allowed to spawn objects.
             //rig.AddComponent<NetworkObject>().Spawn();
             //rig.AddComponent<ClientNetworkTransform>();
@@ -326,7 +329,7 @@ namespace SEE.Game.Avatars
             /// </summary>
             void PrepareScene()
             {
-                const string groundName = "Ground";
+                const string groundName = "Floor";
 
                 GameObject ground = GameObject.Find(groundName);
                 if (ground == null)
