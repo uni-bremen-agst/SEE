@@ -5,15 +5,18 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using SEE.Controls;
+using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.GO;
 using SEE.UI.Notification;
+using SEE.UI.PopupMenu;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Node = SEE.DataModel.DG.Node;
 
 namespace SEE.UI.Window.TreeWindow
 {
@@ -22,11 +25,6 @@ namespace SEE.UI.Window.TreeWindow
     /// </summary>
     public partial class TreeWindow
     {
-        /// <summary>
-        /// Transform of the object containing the items of the tree window.
-        /// </summary>
-        private RectTransform items;
-
         /// <summary>
         /// Component that allows scrolling through the items of the tree window.
         /// </summary>
@@ -130,9 +128,8 @@ namespace SEE.UI.Window.TreeWindow
             GameObject nodeGameObject = GraphElementIDMap.Find(node.ID);
             int children = node.NumberOfChildren() + Mathf.Min(node.Outgoings.Count, 1) + Mathf.Min(node.Incomings.Count, 1);
 
-            AddItem(CleanupID(node.ID), children, node.ToShortString(), node.Level, nodeTypeUnicode, nodeGameObject,
-                    item => CollapseNode(node, item),
-                    (item, order) => ExpandNode(node, item, orderTree: order));
+            AddItem(CleanupID(node.ID), children, node.ToShortString(), node.Level, nodeTypeUnicode, nodeGameObject, node,
+                    item => CollapseNode(node, item), (item, order) => ExpandNode(node, item, orderTree: order));
         }
 
         /// <summary>
@@ -143,14 +140,15 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="text">The text of the item to be added.</param>
         /// <param name="level">The level of the item to be added.</param>
         /// <param name="icon">The icon of the item to be added, given as a unicode character.</param>
-        /// <param name="itemGameObject">The game object of the element represented by the item. May be null.</param>
+        /// <param name="representedGameObject">The game object of the element represented by the item. May be null.</param>
+        /// <param name="representedGraphElement">The graph element represented by the item. May be null.</param>
         /// <param name="collapseItem">A function that collapses the item.
         /// It takes the item that was collapsed as an argument.</param>
         /// <param name="expandItem">A function that expands the item.
         /// It takes the item that was expanded and a boolean indicating whether the
         /// tree should be ordered after expanding the item as arguments.</param>
         private void AddItem(string id, int children, string text, int level,
-                             char icon, GameObject itemGameObject,
+                             char icon, GameObject representedGameObject, GraphElement representedGraphElement,
                              Action<GameObject> collapseItem, Action<GameObject, bool> expandItem)
         {
             GameObject item = PrefabInstantiator.InstantiatePrefab(treeItemPrefab, items, false);
@@ -193,17 +191,17 @@ namespace SEE.UI.Window.TreeWindow
             void ColorItem()
             {
                 Color[] gradient;
-                if (itemGameObject != null)
+                if (representedGameObject != null)
                 {
-                    if (itemGameObject.IsNode())
+                    if (representedGameObject.IsNode())
                     {
                         // We add a slight gradient to make it look nicer.
-                        Color color = itemGameObject.GetComponent<Renderer>().material.color;
+                        Color color = representedGameObject.GetComponent<Renderer>().material.color;
                         gradient = new[] { color, color.Darker(0.3f) };
                     }
-                    else if (itemGameObject.IsEdge())
+                    else if (representedGameObject.IsEdge())
                     {
-                        (Color start, Color end) = itemGameObject.EdgeOperator().TargetColor;
+                        (Color start, Color end) = representedGameObject.EdgeOperator().TargetColor;
                         gradient = new[] { start, end };
                     }
                     else
@@ -237,20 +235,27 @@ namespace SEE.UI.Window.TreeWindow
             {
                 if (item.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
-                    // Right click highlights the node, left/middle click expands/collapses it.
+                    // Right click opens the context menu, left/middle click expands/collapses the item.
                     pointerHelper.ClickEvent.AddListener(e =>
                     {
-                        // TODO: In the future, highlighting the node should be one available option in a right-click menu.
                         if (e.button == PointerEventData.InputButton.Right)
                         {
-                            if (itemGameObject != null)
+                            if (representedGraphElement == null)
                             {
-                                itemGameObject.Operator().Highlight(duration: 10);
+                                // There are no applicable actions for this item.
+                                return;
                             }
-                            else
-                            {
-                                ShowNotification.Warn("No game object", "There is nothing to highlight for this item.");
-                            }
+
+                            // We want all applicable actions for the element, except ones where the element
+                            // element is shown in the TreeView, since we are already in the TreeView.
+                            IEnumerable<PopupMenuAction> actions = ContextMenuAction
+                                                                   .GetApplicableOptions(representedGraphElement,
+                                                                                         representedGameObject)
+                                                                   .Where(x => !x.Name.Contains("TreeView"));
+                            ContextMenu.ClearActions();
+                            ContextMenu.AddActions(actions);
+                            ContextMenu.MoveTo(e.position);
+                            ContextMenu.ShowMenu().Forget();
                         }
                         else
                         {
@@ -260,8 +265,6 @@ namespace SEE.UI.Window.TreeWindow
                             }
                             else
                             {
-                                // Tree should be reordered after this, since the expansion
-                                // originated from the user here.
                                 expandItem?.Invoke(item, true);
                             }
                         }
@@ -403,7 +406,8 @@ namespace SEE.UI.Window.TreeWindow
                 // Note that an edge may appear multiple times in the tree view,
                 // hence we make its ID dependent on the node it is connected to,
                 // and whether it is an incoming or outgoing edge (to cover self-loops).
-                AddItem(id, edges.Count, $"{edgesType} Edges", node.Level + 1, icon, itemGameObject: null,
+                AddItem(id, edges.Count, $"{edgesType} Edges", node.Level + 1, icon,
+                        representedGameObject: null, representedGraphElement: null,
                         collapsedItem =>
                         {
                             CollapseItem(collapsedItem);
@@ -417,7 +421,7 @@ namespace SEE.UI.Window.TreeWindow
                             foreach (Edge edge in edges)
                             {
                                 GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
-                                AddItem($"{id}#{CleanupID(edge.ID)}", 0, edge.ToShortString(), node.Level + 2, edgeTypeUnicode, edgeObject, null, null);
+                                AddItem($"{id}#{CleanupID(edge.ID)}", 0, edge.ToShortString(), node.Level + 2, edgeTypeUnicode, edgeObject, edge, null, null);
                             }
                             if (order)
                             {
@@ -457,29 +461,52 @@ namespace SEE.UI.Window.TreeWindow
             {
                 GameObject nodeGameObject = GraphElementIDMap.Find(node.ID, mustFindElement: true);
                 AddItem(CleanupID(node.ID),
-                        0, node.ToShortString(), 0, nodeTypeUnicode, nodeGameObject,
-                        null, (_, _) => MakeVisible(node).Forget());
+                        0, node.ToShortString(), 0, nodeTypeUnicode, nodeGameObject, node,
+                        null, (_, _) => RevealElement(node).Forget());
             }
 
             items.position = items.position.WithXYZ(y: 0);
         }
 
         /// <summary>
-        /// Makes the given <paramref name="node"/> visible in the tree window by expanding all its parents
+        /// Makes the given <paramref name="element"/> visible in the tree window by expanding all its parents
         /// and scrolling to it.
+        /// If an edge is given, the source/target node will be made visible instead,
+        /// depending on the value of <paramref name="viaSource"/>.
         /// </summary>
-        /// <param name="node">The node to be made visible.</param>
-        private async UniTaskVoid MakeVisible(Node node)
+        /// <param name="element">The element to be made visible.</param>
+        /// <param name="viaSource">Whether to make the source or target node of the edge visible.</param>
+        public async UniTaskVoid RevealElement(GraphElement element, bool viaSource = false)
         {
+            if (SearchField == null)
+            {
+                // We need to wait until the window is initialized.
+                // This case may occur when the method is called from the outside.
+                await UniTask.WaitUntil(() => SearchField != null);
+            }
             SearchField.onValueChanged.RemoveListener(SearchFor);
             SearchField.text = string.Empty;
             SearchField.ReleaseSelection();
             SearchField.onValueChanged.AddListener(SearchFor);
             ClearTree();
 
+            Node current = element switch
+            {
+                Node node => node,
+                Edge edge => viaSource ? edge.Source : edge.Target,
+                _ => throw new ArgumentOutOfRangeException(nameof(element))
+            };
+            string transformID = CleanupID(current.ID);
+            if (element is Edge)
+            {
+                expandedItems.Add(transformID);
+                transformID += viaSource ? "#Outgoing" : "#Incoming";
+                expandedItems.Add(transformID);
+                transformID += $"#{CleanupID(element.ID)}";
+            }
+
             // We need to find a path from the root to the node, which we do by working our way up the hierarchy.
             // We then expand all nodes on the path.
-            Node current = node;
             while (current.Parent != null)
             {
                 current = current.Parent;
@@ -490,7 +517,7 @@ namespace SEE.UI.Window.TreeWindow
 
             // We need to wait until the transform actually exists, hence the yield.
             await UniTask.Yield();
-            RectTransform item = (RectTransform)items.Find(CleanupID(node.ID));
+            RectTransform item = (RectTransform)items.Find(transformID);
             scrollRect.ScrollTo(item, duration: 1f);
 
             // Make element blink.
@@ -507,35 +534,6 @@ namespace SEE.UI.Window.TreeWindow
                        gradient.colorKeys[0].color.Invert(), duration: 0.5f)
                    .SetEase(Ease.Linear)
                    .SetLoops(6, LoopType.Yoyo).Play();
-        }
-
-        /// <summary>
-        /// Clears the tree view of all items.
-        /// </summary>
-        private void ClearTree()
-        {
-            foreach (Transform child in items)
-            {
-                Destroyer.Destroy(child.gameObject);
-            }
-        }
-
-        /// <summary>
-        /// Adds the roots of the graph to the tree view.
-        /// </summary>
-        private void AddRoots()
-        {
-            // We will traverse the graph and add each node to the tree view.
-            IList<Node> roots = Graph.GetRoots();
-            foreach (Node root in roots)
-            {
-                AddNode(root);
-            }
-
-            if (roots.Count == 0)
-            {
-                ShowNotification.Warn("Empty graph", "Graph has no roots. TreeView will be empty.");
-            }
         }
 
         protected override void StartDesktop()

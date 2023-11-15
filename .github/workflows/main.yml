@@ -37,7 +37,7 @@ jobs:
         run: |
           echo "$CREDENTIALS" > ~/.git-credentials
           git config --global credential.helper store
-          git config --global lfs.url ${CREDENTIALS}project-see/see-lfs.git/info/lfs
+          git config --global lfs.url "${CREDENTIALS}project-see/see-lfs.git/info/lfs"
         env:
           # NOTE: must be of the form https://koschke:token-here@gitlab.informatik.uni-bremen.de/
           CREDENTIALS: ${{secrets.GITLAB_LFS_TOKEN}}
@@ -71,7 +71,7 @@ jobs:
     steps:
       - name: Collect bad patterns
         run: |
-          if [ -n $GITHUB_BASE_REF ] && ! PATTERNS=$(curl -H 'Accept: application/vnd.github.v3.diff' -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -f 'https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}' | ./GitScripts/check_for_bad_patterns.py); then
+          if [ -n "$GITHUB_BASE_REF" ] && ! PATTERNS=$(curl -H 'Accept: application/vnd.github.v3.diff' -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -f 'https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}' | ./GitScripts/check_for_bad_patterns.py); then
             DELIMITER=7MApgggGyx6C0
             echo "PATTERNS<<$DELIMITER" >> $GITHUB_ENV
             echo "$PATTERNS" >> $GITHUB_ENV
@@ -142,7 +142,7 @@ jobs:
           restore-keys: |
             Library-SEE-Tests
             Library-SEE
-      - uses: game-ci/unity-test-runner@v3
+      - uses: game-ci/unity-test-runner@c80d9094f5f5f471d0ae6f44a8c8868a448bfb7e
         timeout-minutes: 45
         name: Run Tests
         id: tests
@@ -212,7 +212,7 @@ jobs:
           # Try deleting any previous build, but not other zip files that we may need later.
           git clean -fd -e 'build-*.zip'
           rm -rf build "build-${{ matrix.targetPlatform }}.zip" || true
-      - uses: game-ci/unity-builder@v3
+      - uses: game-ci/unity-builder@7afabe74da5227a9ecd537f5260b398258c3eb3b
         timeout-minutes: 45
         name: Build project
         id: build

@@ -41,12 +41,15 @@ namespace SEE.Controls.Actions
             {
                 if (cityObject.TryGetComponentOrLog(out AbstractSEECity city))
                 {
-                    if (city.LoadedGraph == null)
+                    if (city.LoadedGraph == null || treeWindows.ContainsKey(city.name))
                     {
                         continue;
                     }
-                    TreeWindow window = gameObject.AddComponent<TreeWindow>();
-                    window.Graph = city.LoadedGraph;
+                    if (!gameObject.TryGetComponent(out TreeWindow window))
+                    {
+                        window = gameObject.AddComponent<TreeWindow>();
+                        window.Graph = city.LoadedGraph;
+                    }
                     treeWindows.Add(city.name, window);
                 }
             }
@@ -62,7 +65,10 @@ namespace SEE.Controls.Actions
                 space = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
                 foreach (string city in treeWindows.Keys)
                 {
-                    space.AddWindow(treeWindows[city]);
+                    if (!space.Windows.Contains(treeWindows[city]))
+                    {
+                        space.AddWindow(treeWindows[city]);
+                    }
                     space.ActiveWindow = treeWindows[city];
                 }
             }

@@ -4,6 +4,8 @@ using System.Linq;
 using System.Security;
 using Cysharp.Threading.Tasks;
 using SEE.Controls;
+using SEE.Game;
+using SEE.Game.City;
 using SEE.UI.Notification;
 using SEE.GO;
 using SEE.IDE;
@@ -168,12 +170,14 @@ namespace SEE.UI.Window.CodeWindow
                 }
             }
 
-            // Get button for IDE interaction and register events.
-            Window.transform.Find("Dragger/IDEButton").gameObject.GetComponent<Button>()
-                  .onClick.AddListener(() =>
-                  {
-                      IDEIntegration.Instance?.OpenFile(FilePath, SolutionPath, markedLine).Forget();
-                  });
+            if (SceneQueries.GetCodeCity(transform).gameObject.TryGetComponentOrLog(out AbstractSEECity city)) {
+                // Get button for IDE interaction and register events.
+                Window.transform.Find("Dragger/IDEButton").gameObject.GetComponent<Button>()
+                      .onClick.AddListener(() =>
+                      {
+                          IDEIntegration.Instance?.OpenFile(FilePath, city.SolutionPath.Path, markedLine).Forget();
+                      });
+            }
 
             // Register events to find out when window was scrolled in.
             // For this, we have to register two events in two components, namely Scrollbar and ScrollRect, with

@@ -32,6 +32,11 @@ namespace SEE.UI.Window
         public string WindowSpaceName = "WindowSpace";
 
         /// <summary>
+        /// This event will be invoked whenever a new window is added to the space.
+        /// </summary>
+        public UnityEvent<BaseWindow> OnWindowAdded = new();
+
+        /// <summary>
         /// Whether to allow the user to close the tabs containing the windows.
         /// Changing this value will only have an effect when doing so before <see cref="Start"/> has been called.
         /// </summary>
@@ -75,6 +80,7 @@ namespace SEE.UI.Window
             }
 
             windows.Add(window);
+            OnWindowAdded.Invoke(window);
             // Actual UI generation happens in Update()
         }
 

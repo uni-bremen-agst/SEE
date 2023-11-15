@@ -294,16 +294,16 @@ namespace SEE.Controls
         #endregion
 
         //-----------------------------------------------------
-        #region Manipulating nodes
+        #region Context menu
         //-----------------------------------------------------
 
         /// <summary>
-        /// The user wants to scale a selected node.
+        /// True if the user wants to open the context menu.
         /// </summary>
-        /// <returns>true if the user requests this action</returns>
-        internal static bool Scale()
+        /// <returns>True if the user wants to open the context menu.</returns>
+        internal static bool OpenContextMenu()
         {
-            return Input.GetMouseButton(0);
+            return Input.GetMouseButtonUp(rightMouseButton) && !Raycasting.IsMouseOverGUI();
         }
 
         #endregion
@@ -632,7 +632,7 @@ namespace SEE.Controls
         /// <returns>true if the user selects a game object and <see cref="SelectionEnabled"/></returns>
         public static bool Select()
         {
-            return SelectionEnabled && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI();
+            return SelectionEnabled && Input.GetMouseButtonDown(leftMouseButton) && !Raycasting.IsMouseOverGUI();
         }
 
         #endregion
