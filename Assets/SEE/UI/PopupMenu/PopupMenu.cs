@@ -6,6 +6,7 @@ using SEE.GO;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SEE.UI.PopupMenu
 {
@@ -35,6 +36,11 @@ namespace SEE.UI.PopupMenu
         private RectTransform EntryList;
 
         /// <summary>
+        /// The content size fitter of the popup menu.
+        /// </summary>
+        private ContentSizeFitter contentSizeFitter;
+
+        /// <summary>
         /// A queue of entries that were added before the menu was started.
         /// These entries will be added to the menu once it is started.
         /// </summary>
@@ -59,6 +65,7 @@ namespace SEE.UI.PopupMenu
         {
             // Instantiate the menu.
             Menu = (RectTransform)PrefabInstantiator.InstantiatePrefab(MenuPrefabPath, Canvas.transform, false).transform;
+            contentSizeFitter = Menu.gameObject.MustGetComponent<ContentSizeFitter>();
             MenuCanvasGroup = Menu.gameObject.MustGetComponent<CanvasGroup>();
             EntryList = (RectTransform)Menu.Find("Action List");
 
@@ -71,8 +78,6 @@ namespace SEE.UI.PopupMenu
             {
                 AddEntry(EntriesBeforeStart.Dequeue());
             }
-
-            // FIXME (#632): On the first appearance of the menu, it lacks a background.
 
             // We hide the menu by default.
             Menu.gameObject.SetActive(false);
@@ -198,6 +203,12 @@ namespace SEE.UI.PopupMenu
             ShouldShowMenu = true;
             Menu.gameObject.SetActive(true);
             Menu.localScale = Vector3.zero;
+            // This may seem stupid, but unfortunately, due to a Unity bug,
+            // this appears to be the only way to make the content size fitter update.
+            // See https://forum.unity.com/threads/content-size-fitter-refresh-problem.498536/
+            contentSizeFitter.enabled = false;
+            await UniTask.WaitForEndOfFrame();
+            contentSizeFitter.enabled = true;
             await UniTask.WhenAll(Menu.DOScale(1, AnimationDuration).AsyncWaitForCompletion().AsUniTask(),
                                   MenuCanvasGroup.DOFade(1, AnimationDuration / 2).AsyncWaitForCompletion().AsUniTask());
         }
