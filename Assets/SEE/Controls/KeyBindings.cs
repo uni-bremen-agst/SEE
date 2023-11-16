@@ -66,7 +66,7 @@ namespace SEE.Controls
         /// </summary>
         internal static void PrintBindings()
         {
-            System.Text.StringBuilder sb = new System.Text.StringBuilder("Key Bindings:\n");
+            System.Text.StringBuilder sb = new("Key Bindings:\n");
             foreach (var binding in bindings)
             {
                 sb.Append($"Key {binding.Key}: {binding.Value}\n");
@@ -75,10 +75,9 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Creates a string of the current key bindings along
-        /// with their help message.
+        /// Returns a string of the current key bindings along with their help message.
         /// </summary>
-        public static string GetBindingsText()
+        internal static string GetBindingsText()
         {
             System.Text.StringBuilder sb = new();
             foreach (var binding in bindings)
@@ -118,7 +117,7 @@ namespace SEE.Controls
         /// <summary>
         /// Turns on/off the settings menu.
         /// </summary>
-        internal static readonly KeyCode ToggleSettings = Register(KeyCode.Escape, Scope.Always, "Turns on/off the settings menu.");
+        internal static readonly KeyCode ToggleSettings = Register(KeyCode.Pause, Scope.Always, "Turns on/off the settings menu.");
 
         /// <summary>
         /// Turns on/off the browser.
@@ -300,7 +299,7 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles auto play of the animation.
         /// </summary>
-        internal static readonly KeyCode ToggleAutoPlay = Register(KeyCode.Pause, Scope.Animation, "Toggles auto play of the animation.");
+        internal static readonly KeyCode ToggleAutoPlay = Register(KeyCode.F9, Scope.Animation, "Toggles auto play of the animation.");
         /// <summary>
         /// Double animation speed.
         /// </summary>
