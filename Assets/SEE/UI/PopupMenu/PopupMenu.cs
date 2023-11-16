@@ -30,15 +30,15 @@ namespace SEE.UI.PopupMenu
         private CanvasGroup MenuCanvasGroup;
 
         /// <summary>
-        /// The transform under which the actions are listed.
+        /// The transform under which the entries are listed.
         /// </summary>
-        private RectTransform ActionList;
+        private RectTransform EntryList;
 
         /// <summary>
-        /// A queue of actions that were added before the menu was started.
-        /// These actions will be added to the menu once it is started.
+        /// A queue of entries that were added before the menu was started.
+        /// These entries will be added to the menu once it is started.
         /// </summary>
-        private readonly Queue<PopupMenuAction> ActionsBeforeStart = new();
+        private readonly Queue<PopupMenuEntry> EntriesBeforeStart = new();
 
         /// <summary>
         /// Whether the menu should currently be shown.
@@ -60,16 +60,16 @@ namespace SEE.UI.PopupMenu
             // Instantiate the menu.
             Menu = (RectTransform)PrefabInstantiator.InstantiatePrefab(MenuPrefabPath, Canvas.transform, false).transform;
             MenuCanvasGroup = Menu.gameObject.MustGetComponent<CanvasGroup>();
-            ActionList = (RectTransform)Menu.Find("Action List");
+            EntryList = (RectTransform)Menu.Find("Action List");
 
             // The menu should be hidden when the user moves the mouse away from it.
             PointerHelper pointerHelper = Menu.gameObject.MustGetComponent<PointerHelper>();
             pointerHelper.ExitEvent.AddListener(_ => HideMenu().Forget());
 
-            // We add all actions that were added before the menu was started.
-            while (ActionsBeforeStart.Count > 0)
+            // We add all entries that were added before the menu was started.
+            while (EntriesBeforeStart.Count > 0)
             {
-                AddAction(ActionsBeforeStart.Dequeue());
+                AddEntry(EntriesBeforeStart.Dequeue());
             }
 
             // FIXME (#632): On the first appearance of the menu, it lacks a background.
@@ -79,19 +79,39 @@ namespace SEE.UI.PopupMenu
         }
 
         /// <summary>
-        /// Adds a new <paramref name="action"/> to the menu.
+        /// Adds a new <paramref name="entry"/> to the menu.
         /// </summary>
-        /// <param name="action">The action to be added.</param>
-        public void AddAction(PopupMenuAction action)
+        /// <param name="entry">The entry to be added.</param>
+        public void AddEntry(PopupMenuEntry entry)
         {
             if (Menu is null)
             {
-                ActionsBeforeStart.Enqueue(action);
+                EntriesBeforeStart.Enqueue(entry);
                 return;
             }
 
+            switch (entry)
+            {
+                case PopupMenuAction action:
+                    AddAction(action);
+                    break;
+                case PopupMenuHeading heading:
+                    AddHeading(heading);
+                    break;
+                default:
+                    throw new System.ArgumentException($"Unknown entry type: {entry.GetType()}");
+            }
+
             // TODO (#668): Respect priority
-            GameObject actionItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuButton", ActionList, false);
+        }
+
+        /// <summary>
+        /// Adds a new <paramref name="action"/> to the menu.
+        /// </summary>
+        /// <param name="action">The action to be added.</param>
+        private void AddAction(PopupMenuAction action)
+        {
+            GameObject actionItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuButton", EntryList, false);
             ButtonManagerBasic button = actionItem.MustGetComponent<ButtonManagerBasic>();
             button.buttonText = action.Name;
             button.clickEvent.AddListener(() =>
@@ -106,29 +126,40 @@ namespace SEE.UI.PopupMenu
         }
 
         /// <summary>
-        /// Adds all given <paramref name="actions"/> to the menu.
+        /// Adds a new <paramref name="heading"/> to the menu.
         /// </summary>
-        /// <param name="actions">The actions to be added.</param>
-        public void AddActions(IEnumerable<PopupMenuAction> actions)
+        /// <param name="heading">The heading to be added.</param>
+        private void AddHeading(PopupMenuHeading heading)
         {
-            foreach (PopupMenuAction action in actions)
+            GameObject headingItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuHeading", EntryList, false);
+            TextMeshProUGUI text = headingItem.MustGetComponent<TextMeshProUGUI>();
+            text.text = heading.Text;
+        }
+
+        /// <summary>
+        /// Adds all given <paramref name="entries"/> to the menu.
+        /// </summary>
+        /// <param name="entries">The entries to be added.</param>
+        public void AddEntries(IEnumerable<PopupMenuEntry> entries)
+        {
+            foreach (PopupMenuEntry entry in entries)
             {
-                AddAction(action);
+                AddEntry(entry);
             }
         }
 
         /// <summary>
-        /// Removes all actions from the menu.
+        /// Removes all entries from the menu.
         /// </summary>
-        public void ClearActions()
+        public void ClearEntries()
         {
             if (Menu is null)
             {
-                ActionsBeforeStart.Clear();
+                EntriesBeforeStart.Clear();
                 return;
             }
 
-            foreach (Transform child in ActionList)
+            foreach (Transform child in EntryList)
             {
                 Destroyer.Destroy(child.gameObject);
             }
@@ -184,6 +215,20 @@ namespace SEE.UI.PopupMenu
             {
                 Menu.gameObject.SetActive(false);
             }
+        }
+
+        /// <summary>
+        /// Convenience method that shows the menu with the given <paramref name="entries"/>
+        /// at the given <paramref name="position"/>.
+        /// </summary>
+        /// <param name="entries">The entries to be shown in the menu.</param>
+        /// <param name="position">The position at which the menu should be shown.</param>
+        public void ShowWith(IEnumerable<PopupMenuEntry> entries, Vector2 position)
+        {
+            ClearEntries();
+            AddEntries(entries);
+            MoveTo(position);
+            ShowMenu().Forget();
         }
     }
 }
