@@ -568,16 +568,16 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 834210227217582821}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.21625853, y: 0.6473011, z: 0.19191772, w: 0.7052667}
-  m_LocalPosition: {x: 0.0341, y: 0.016, z: -0.142}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0.33159068, y: -0.3261708, z: 0.7319571, w: 0.49789473}
+  m_LocalPosition: {x: 0.4202162, y: 0.9922341, z: -0.04566399}
+  m_LocalScale: {x: 1.05, y: 1.05, z: 1.05}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 614412473334819718}
-  - {fileID: 2512184898427544392}
   - {fileID: 2214904044584326421}
-  - {fileID: 6623229595479776066}
   - {fileID: 1970956193007265116}
+  - {fileID: 6623229595479776066}
+  - {fileID: 2512184898427544392}
+  - {fileID: 614412473334819718}
   - {fileID: 2259508106734114263}
   - {fileID: 14145470345066933}
   - {fileID: 2217182608308075788}
@@ -586,7 +586,7 @@ Transform:
   - {fileID: 8436543418196257140}
   - {fileID: 7897630870105765216}
   m_Father: {fileID: 5064926797633439247}
-  m_LocalEulerAnglesHint: {x: -183.244, y: 266.068, z: -146.526}
+  m_LocalEulerAnglesHint: {x: 8.47, y: -55, z: 107.136}
 --- !u!54 &3823571901905985607
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -729,7 +729,7 @@ GameObject:
   - component: {fileID: 8133031210765630215}
   - component: {fileID: 3381256755804502680}
   m_Layer: 27
-  m_Name: BipDummy L Finger22
+  m_Name: ' L Finger22'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -972,7 +972,7 @@ GameObject:
   - component: {fileID: 2902436486082446582}
   - component: {fileID: 8255743448377209429}
   m_Layer: 27
-  m_Name: BipDummy R Finger3
+  m_Name: R Finger3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -986,9 +986,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1575029933919118326}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.8688508, y: 0.28838125, z: -0.2643378, w: -0.30341396}
-  m_LocalPosition: {x: 4.01422, y: -2.1363628, z: 1.4268851}
-  m_LocalScale: {x: 1.0500004, y: 1.0500003, z: 1.0500002}
+  m_LocalRotation: {x: 0.8688508, y: 0.28838134, z: -0.2643379, w: -0.30341393}
+  m_LocalPosition: {x: 4.0142198, y: -2.1363623, z: 1.4268851}
+  m_LocalScale: {x: 1.05, y: 1.0500001, z: 1.05}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4582616782454320787}
@@ -1063,7 +1063,7 @@ GameObject:
   - component: {fileID: 1076942798592961475}
   - component: {fileID: 4619779390439797500}
   m_Layer: 27
-  m_Name: BipDummy L Finger32
+  m_Name: L Finger32
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1118,7 +1118,7 @@ GameObject:
   - component: {fileID: 1865294125542736552}
   - component: {fileID: 7108029009567489534}
   m_Layer: 27
-  m_Name: BipDummy R Finger01
+  m_Name: R Finger01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1298,7 +1298,7 @@ GameObject:
   - component: {fileID: 4520665118570599005}
   - component: {fileID: 4901473579600850057}
   m_Layer: 27
-  m_Name: BipDummy R Finger2
+  m_Name: R Finger2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1389,7 +1389,7 @@ GameObject:
   - component: {fileID: 5331244463425856799}
   - component: {fileID: 2529798268596616335}
   m_Layer: 27
-  m_Name: BipDummy L Finger42
+  m_Name: L Finger42
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1444,7 +1444,7 @@ GameObject:
   - component: {fileID: 1233788447611630457}
   - component: {fileID: 991786274595704852}
   m_Layer: 27
-  m_Name: BipDummy L Finger2
+  m_Name: L Finger 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1536,7 +1536,7 @@ GameObject:
   - component: {fileID: 4631645605620083945}
   - component: {fileID: 2674533898988191142}
   m_Layer: 27
-  m_Name: BipDummy L Finger3
+  m_Name: L Finger 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1628,7 +1628,7 @@ GameObject:
   - component: {fileID: 3909541739825059695}
   - component: {fileID: 1314514763417492545}
   m_Layer: 27
-  m_Name: BipDummy L Finger4
+  m_Name: L Finger 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1720,7 +1720,7 @@ GameObject:
   - component: {fileID: 3257075849222095903}
   - component: {fileID: 6093352722574410366}
   m_Layer: 27
-  m_Name: Bip002 L Finger0
+  m_Name: L Finger 0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1873,7 +1873,7 @@ GameObject:
   - component: {fileID: 8651086385312110718}
   - component: {fileID: 2112432814408946109}
   m_Layer: 27
-  m_Name: BipDummy R Finger11
+  m_Name: ' R Finger11'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1928,7 +1928,7 @@ GameObject:
   - component: {fileID: 1092972071982000706}
   - component: {fileID: 1621346016806761853}
   m_Layer: 27
-  m_Name: BipDummy L Finger1
+  m_Name: L Finger 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2019,7 +2019,7 @@ GameObject:
   - component: {fileID: 2979128354744367795}
   - component: {fileID: 8363954786600398003}
   m_Layer: 27
-  m_Name: BipDummy R Finger21
+  m_Name: R Finger21
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2158,7 +2158,7 @@ GameObject:
   - component: {fileID: 1699928660292180551}
   - component: {fileID: 6712160758587665129}
   m_Layer: 27
-  m_Name: Bip002 R Finger0
+  m_Name: R Finger0
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2249,7 +2249,7 @@ GameObject:
   - component: {fileID: 3538925145511639482}
   - component: {fileID: 798113823073460246}
   m_Layer: 27
-  m_Name: BipDummy L Finger12
+  m_Name: L Finger12
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2303,7 +2303,7 @@ GameObject:
   - component: {fileID: 5636399003842140388}
   - component: {fileID: 527502886560102121}
   m_Layer: 27
-  m_Name: BipDummy L Finger21
+  m_Name: L Finger21
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2483,7 +2483,7 @@ GameObject:
   - component: {fileID: 2906824102688718785}
   - component: {fileID: 3265100962565665517}
   m_Layer: 27
-  m_Name: BipDummy L Finger41
+  m_Name: L Finger41
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2600,7 +2600,7 @@ GameObject:
   - component: {fileID: 1095457996270104967}
   - component: {fileID: 5703229142305916960}
   m_Layer: 27
-  m_Name: BipDummy L Finger02
+  m_Name: ' L Finger02'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2685,7 +2685,7 @@ GameObject:
   - component: {fileID: 5929414159554643342}
   - component: {fileID: 1236408658715062364}
   m_Layer: 27
-  m_Name: BipDummy R Finger12
+  m_Name: R Finger12
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2739,7 +2739,7 @@ GameObject:
   - component: {fileID: 1527134524008148233}
   - component: {fileID: 7769003622292622380}
   m_Layer: 27
-  m_Name: BipDummy R Finger41
+  m_Name: R Finger41
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2793,7 +2793,7 @@ GameObject:
   - component: {fileID: 5177002905114525350}
   - component: {fileID: 8631925566298962619}
   m_Layer: 27
-  m_Name: BipDummy L Finger31
+  m_Name: L Finger31
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2881,7 +2881,7 @@ GameObject:
   - component: {fileID: 2876506565788116916}
   - component: {fileID: 2397618294467470833}
   m_Layer: 27
-  m_Name: BipDummy R Finger32
+  m_Name: ' R Finger32'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2935,7 +2935,7 @@ GameObject:
   - component: {fileID: 720962106440522491}
   - component: {fileID: 6732465040753959182}
   m_Layer: 27
-  m_Name: BipDummy L Finger01
+  m_Name: ' L Finger01'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3012,10 +3012,10 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1901969642356131333}
-  - {fileID: 7326072143474540286}
-  - {fileID: 5687048948682318245}
-  - {fileID: 4186831546794726267}
   - {fileID: 6515005075287810946}
+  - {fileID: 4186831546794726267}
+  - {fileID: 5687048948682318245}
+  - {fileID: 7326072143474540286}
   - {fileID: 336374630516842564}
   - {fileID: 7125630692690883972}
   - {fileID: 2465492621886175341}
@@ -3217,7 +3217,7 @@ GameObject:
   - component: {fileID: 8681239203538994567}
   - component: {fileID: 4174605430217862394}
   m_Layer: 27
-  m_Name: BipDummy R Finger22
+  m_Name: R Finger22
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3302,7 +3302,7 @@ GameObject:
   - component: {fileID: 3562126092172084208}
   - component: {fileID: 1611227050364573641}
   m_Layer: 27
-  m_Name: BipDummy R Finger02
+  m_Name: ' R Finger02'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3357,7 +3357,7 @@ GameObject:
   - component: {fileID: 3725915462480488489}
   - component: {fileID: 7662610399184696728}
   m_Layer: 27
-  m_Name: BipDummy R Finger4
+  m_Name: R Finger4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3449,7 +3449,7 @@ GameObject:
   - component: {fileID: 8877306908746721294}
   - component: {fileID: 3681985716639313594}
   m_Layer: 27
-  m_Name: BipDummy R Finger1
+  m_Name: R Finger1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4050,7 +4050,7 @@ GameObject:
   - component: {fileID: 6227538912883333032}
   - component: {fileID: 344523366422405274}
   m_Layer: 27
-  m_Name: BipDummy R Finger42
+  m_Name: R Finger42
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4247,7 +4247,7 @@ GameObject:
   - component: {fileID: 4582616782454320787}
   - component: {fileID: 1320003416775587556}
   m_Layer: 27
-  m_Name: BipDummy R Finger31
+  m_Name: R Finger31
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4301,7 +4301,7 @@ GameObject:
   - component: {fileID: 2997704654001446355}
   - component: {fileID: 965750994446948474}
   m_Layer: 27
-  m_Name: BipDummy L Finger11
+  m_Name: L Finger11
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
