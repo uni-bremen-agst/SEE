@@ -2,6 +2,7 @@
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.UI.Window.CodeWindow;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +49,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             switch(attractFunctionType)
             {
                 case AttractFunctionType.CountAttract: return new CountAttract(reflexionGraph, targetType);
-                case AttractFunctionType.NBAttract: return new NBAttract(reflexionGraph, targetType, false, true);
+                // TODO: Resolve target language properly
+                case AttractFunctionType.NBAttract: return new NBAttract(reflexionGraph, targetType, true, TokenLanguage.Java, true);
             }
             throw new ArgumentException("Given attractFunctionType is currently not implemented");
         }
@@ -61,5 +63,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         public abstract void HandleMappedEntities(Node cluster, List<Node> nodesChangedInMapping, ChangeType changeType);
 
         public abstract double GetAttractionValue(Node node, Node cluster);
+
+        public abstract string DumpTrainingData();
     }
 }

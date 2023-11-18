@@ -178,6 +178,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
+        [Button(ButtonSizes.Small)]
+        public void DumpTrainingData()
+        {
+            Debug.Log(CandidateRecommendation.AttractFunction.DumpTrainingData());
+        }
+
         /// <summary>
         /// 
         /// </summary>

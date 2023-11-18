@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace ClusteringMethods
+namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
-    internal class Document : IEnumerable<string>
+    public class Document : IEnumerable<string>
     {
         private Dictionary<string, int> wordFrequencies;
 
@@ -51,6 +51,7 @@ namespace ClusteringMethods
 
         public IEnumerator<string> GetEnumerator()
         {
+            // TODO: iterate all words once or as often as they are contained in the document
             foreach (string word in wordFrequencies.Keys)
             {
                 for (int i = 0; i < wordFrequencies[word]; i++)

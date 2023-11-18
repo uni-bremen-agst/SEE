@@ -1,15 +1,16 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 
-namespace ClusteringMethods
+namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
-    internal class NaiveBayes
+    internal class NaiveBayes : IEnumerable<string>
     {
-        Dictionary<string, ClassInformation> trainingData;
+        private Dictionary<string, ClassInformation> trainingData;
 
-        int alpha;
+        private int alpha;
 
-        int documentCountGlobal;
+        private int DocumentCountGlobal { get; set; }
 
         public int NumberClasses
         {
@@ -39,7 +40,7 @@ namespace ClusteringMethods
             this.EnsureClass(clazz);
 
             trainingData[clazz].Add(document);
-            documentCountGlobal++;
+            DocumentCountGlobal++;
         }
 
         internal void DeleteDocument(string clazz, Document document)
@@ -52,7 +53,7 @@ namespace ClusteringMethods
             }
 
             trainingData[clazz].Remove(document);
-            documentCountGlobal--;
+            DocumentCountGlobal--;
         }
 
         public string ClassifyDocument(Document document)
@@ -84,10 +85,31 @@ namespace ClusteringMethods
             return prob;
         }
 
-        private class ClassInformation
+        public Dictionary<string, int> GetTrainingsData(string clazz)
+        {
+            if (!this.trainingData.ContainsKey(clazz)) return new Dictionary<string, int>();
+            return this.trainingData[clazz].WordFrequencies;
+        }
+
+        public IEnumerator<string> GetEnumerator()
+        {
+            return trainingData.Keys.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return this.GetEnumerator();
+        }
+
+        internal class ClassInformation
         {
             private Dictionary<string, int> wordFrequencies;
-            
+
+            public Dictionary<string, int> WordFrequencies
+            {
+                get { return new Dictionary<string, int>(wordFrequencies); }
+            }
+
             private int wordCount;
 
             private int documentCount;
@@ -105,16 +127,17 @@ namespace ClusteringMethods
             public double GetWordProbability(string word)
             {
                 if (!wordFrequencies.ContainsKey(word)) return (double)classifier.Alpha / (double)wordCount;
-                double wordProbability = (double) wordFrequencies[word] / (double)wordCount;
+                double wordProbability = (double)wordFrequencies[word] / (double)wordCount;
                 return wordProbability;
             }
 
             public void Add(Document document)
             {
-                foreach(string word in document)
+                foreach (string word in document)
                 {
-                    if(!wordFrequencies.ContainsKey(word)) wordFrequencies.Add(word, this.classifier.Alpha);
-                    wordFrequencies[word] += document.GetFrequency(word);
+                    if (!wordFrequencies.ContainsKey(word)) wordFrequencies.Add(word, this.classifier.Alpha);
+                    // wordFrequencies[word] += document.GetFrequency(word);
+                    wordFrequencies[word]++;
                     wordCount++;
                 }
                 DocumentCount++;
@@ -122,11 +145,12 @@ namespace ClusteringMethods
 
             public void Remove(Document document)
             {
-                foreach(string word in document)
+                foreach (string word in document)
                 {
-                    if(wordFrequencies.ContainsKey(word))
+                    if (wordFrequencies.ContainsKey(word))
                     {
-                        wordFrequencies[word] -= document.GetFrequency(word);
+                        // wordFrequencies[word] -= document.GetFrequency(word);
+                        wordFrequencies[word]--;
                         wordCount--;
                     }
                 }
@@ -135,7 +159,7 @@ namespace ClusteringMethods
 
             public double GetPriorProbability()
             {
-                return (double)this.documentCount / (double)classifier.documentCountGlobal;
+                return (double)this.documentCount / (double)classifier.DocumentCountGlobal;
             }
         }
     }

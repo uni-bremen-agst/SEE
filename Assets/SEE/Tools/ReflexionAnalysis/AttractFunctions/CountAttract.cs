@@ -1,7 +1,9 @@
 ﻿using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
+using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
@@ -110,6 +112,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             int count = 1;
             if (changeType == ChangeType.Removal) count *= -1;
             mappingCount[NeighborOfMappedNode.ID] += count;
+        }
+
+        public override string DumpTrainingData()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append($"overall values:{Environment.NewLine}");
+            foreach (string nodeID in overallValues.Keys)
+            {
+                sb.Append(nodeID.PadRight(10));
+                sb.Append($" :{overallValues[nodeID]}{Environment.NewLine}");
+            }
+            return sb.ToString();
         }
     }
 }

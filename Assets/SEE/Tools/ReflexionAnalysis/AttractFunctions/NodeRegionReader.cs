@@ -2,63 +2,67 @@ using SEE.DataModel.DG;
 using System.IO;
 using UnityEngine;
 
-public class NodeRegionReader
+namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
-    public static string ReadRegion(Node node)
+    public class NodeRegionReader
     {
-        string fileName;
-        int sourceRegionStart;
-        int sourceColumn;
-        int sourceRegionEnd;
-        string region = string.Empty;
-
-        if(!(node.StringAttributes.ContainsKey("Source.Region_Start") 
-           && node.StringAttributes.ContainsKey("Source.Region_Length")))
+        public static string ReadRegion(Node node)
         {
-            return region;
-        }
+            string fileName;
+            int sourceRegionStart;
+            int sourceColumn;
+            int sourceRegionEnd;
+            string region = string.Empty;
 
-        try
-        {
-            // TODO: Distinguish between Source.Line and Source.Region_Start?
-            //int sourceLine = node.GetInt("Source.Line");
-            sourceColumn = node.StringAttributes.ContainsKey("Source.Column") ? node.GetInt("Source.Column") : 1;
-
-            sourceRegionStart = node.GetInt("Source.Region_Start");
-
-            // TODO: Is this length to be interpreted in lines?
-            int sourceRegionLength = node.GetInt("Source.Region_Length");
-
-            sourceRegionEnd = sourceRegionStart + sourceRegionLength;
-
-            string sourcePath = node.GetString("Source.Path");
-
-            string sourceFileName = node.GetString("Source.File");
-
-            fileName = System.IO.Path.Combine(sourcePath, sourceFileName);
-
-            // TODO: Is it possible to improve efficiency?
-            using (StreamReader streamReader = new StreamReader(new FileStream(fileName, FileMode.Open, FileAccess.Read)))
+            if (!(node.IntAttributes.ContainsKey("Source.Region_Start")
+               && node.IntAttributes.ContainsKey("Source.Region_Length")))
             {
-                for(int i = 1; i < sourceRegionStart; i++)
-                {
-                    streamReader.ReadLine();
-                }
+                return region;
+            }
 
-                region = streamReader.ReadLine().Substring(sourceColumn - 1);
+            try
+            {
+                // TODO: Distinguish between Source.Line and Source.Region_Start?
+                //int sourceLine = node.GetInt("Source.Line");
+                sourceColumn = node.StringAttributes.ContainsKey("Source.Column") ? node.GetInt("Source.Column") : 1;
 
-                for(int i = sourceRegionStart + 1; i < sourceRegionEnd; i++)
+                sourceRegionStart = node.GetInt("Source.Region_Start");
+
+                // TODO: Is this length to be interpreted in lines?
+                int sourceRegionLength = node.GetInt("Source.Region_Length");
+
+                sourceRegionEnd = sourceRegionStart + sourceRegionLength;
+
+                string sourcePath = node.GetString("Source.Path");
+
+                string sourceFileName = node.GetString("Source.File");
+
+                fileName = System.IO.Path.Combine(sourcePath, sourceFileName);
+
+                // TODO: Is it possible to improve efficiency?
+                using (StreamReader streamReader = new StreamReader(new FileStream(fileName, FileMode.Open, FileAccess.Read)))
                 {
-                    region += streamReader.ReadLine();
+                    for (int i = 1; i < sourceRegionStart; i++)
+                    {
+                        streamReader.ReadLine();
+                    }
+
+                    region = streamReader.ReadLine().Substring(sourceColumn - 1);
+
+                    for (int i = sourceRegionStart + 1; i < sourceRegionEnd; i++)
+                    {
+                        region += streamReader.ReadLine();
+                    }
                 }
             }
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError($"Failed to read code region of node {node.ID}:" + e.Message);
-            return string.Empty;
-        }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Failed to read code region of node {node.ID}:" + e.Message);
+                return string.Empty;
+            }
 
-        return region;
+            return region;
+        }
     }
+
 }
