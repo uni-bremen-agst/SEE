@@ -54,7 +54,11 @@ namespace SEE.UI
         /// <summary>
         /// Initializes the component for the current platform.
         /// </summary>
-        protected void Start()
+        /// <remarks>
+        /// Only override this if you need to execute platform-independent code on startup.
+        /// Otherwise, use <see cref="StartDesktop"/>, <see cref="StartVR"/> or <see cref="StartTouchGamepad"/>.
+        /// </remarks>
+        protected virtual void Start()
         {
             // initializes the Canvas if necessary
             if (Canvas == null)

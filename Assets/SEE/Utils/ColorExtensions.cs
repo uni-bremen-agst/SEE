@@ -56,7 +56,7 @@ namespace SEE.Utils
         {
             const int nThreshold = 130;
             int bgDelta = Convert.ToInt32((backgroundColor.r * 255 * 0.299) + (backgroundColor.g * 255 * 0.587)
-                                                                            + (backgroundColor.b * 255 * 0.114));
+                                          + (backgroundColor.b * 255 * 0.114));
             return (255 - bgDelta < nThreshold) ? Color.black : Color.white;
         }
 
@@ -81,7 +81,12 @@ namespace SEE.Utils
         /// <returns>The converted colors as gradient color keys.</returns>
         public static IEnumerable<GradientColorKey> ToGradientColorKeys(this ICollection<Color> colors)
         {
-            return colors.Select((c, i) => new GradientColorKey(c, (float)i / colors.Count));
+            return colors.Count switch
+            {
+                0 => new List<GradientColorKey>(),
+                1 => new List<GradientColorKey> { new(colors.First(), 0f) },
+                var n => colors.Select((c, i) => new GradientColorKey(c, (float)i / (n - 1)))
+            };
         }
 
         /// <summary>

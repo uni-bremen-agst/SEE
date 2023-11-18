@@ -16,12 +16,12 @@ GameObject:
   - component: {fileID: -1556465120740209359}
   - component: {fileID: 2429369898342928831}
   - component: {fileID: 6840467278216287030}
-  - component: {fileID: 6800333804276665222}
   - component: {fileID: 182833635018827598}
   - component: {fileID: 9190471872809942182}
   - component: {fileID: 403608537903628731}
   - component: {fileID: 6057182573543570773}
   - component: {fileID: 4087041085298531867}
+  - component: {fileID: 4441004167205332594}
   m_Layer: 0
   m_Name: DesktopPlayer
   m_TagString: MainCamera
@@ -122,9 +122,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49626a155a935004f985ad777a29244b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  move: 0
-  clickDown: 0
-  clickUp: 0
+  Move: 0
+  ClickDown: 0
+  ClickUp: 0
 --- !u!114 &637028239384079898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -169,18 +169,6 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6839967699279661599}
   m_Enabled: 1
---- !u!114 &6800333804276665222
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6839967699279661599}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3e7d657fc8c84c81b2d2918eac9c228e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &182833635018827598
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -268,5 +256,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cdd0e1370b84424a8e3e42e5fed19b93, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &4441004167205332594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6839967699279661599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4530286e65747b5ac0092c728359f32, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

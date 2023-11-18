@@ -102,6 +102,10 @@ namespace SEE.Game.Operator
                     labelLineRenderer.endColor = labelLineRenderer.endColor.WithAlpha(0f);
                 }
             }
+            else if (!nodeLabel.activeSelf)
+            {
+                nodeLabel.SetActive(true);
+            }
         }
 
         /// <summary>
