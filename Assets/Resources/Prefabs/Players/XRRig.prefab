@@ -585,6 +585,7 @@ Transform:
   - {fileID: 6233310176432845924}
   - {fileID: 8436543418196257140}
   - {fileID: 7897630870105765216}
+  - {fileID: 7966343389012145662}
   m_Father: {fileID: 5064926797633439247}
   m_LocalEulerAnglesHint: {x: 8.47, y: -55, z: 107.136}
 --- !u!54 &3823571901905985607
@@ -1831,6 +1832,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 987141902874095498}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3575073255985212609
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6330244521481147453}
+  m_Layer: 0
+  m_Name: (L) Follow Offset Hand
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6330244521481147453
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3575073255985212609}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.5408611, y: 0.23043188, z: -0.0527471, w: -0.80721015}
+  m_LocalPosition: {x: 0.37246728, y: 3.1944957, z: 2.6403995}
+  m_LocalScale: {x: 0.9523811, y: 0.95238096, z: 0.952381}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 987141902874095498}
+  m_LocalEulerAnglesHint: {x: -224.3, y: -23.721008, z: -103.57599}
 --- !u!1 &3901212007435471097
 GameObject:
   m_ObjectHideFlags: 0
@@ -3020,6 +3052,7 @@ Transform:
   - {fileID: 7125630692690883972}
   - {fileID: 2465492621886175341}
   - {fileID: 3978556242980299017}
+  - {fileID: 6330244521481147453}
   m_Father: {fileID: 8201329951710504269}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &4730512324160175345
@@ -3345,6 +3378,37 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.03, y: 0.015, z: 0.015}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &7510459697670517331
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7966343389012145662}
+  m_Layer: 0
+  m_Name: (R) Follow Offset Hand
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7966343389012145662
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7510459697670517331}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.58453554, y: 0.40102258, z: -0.0829216, w: 0.700445}
+  m_LocalPosition: {x: -0.2003421, y: 3.6472511, z: -1.9310377}
+  m_LocalScale: {x: 0.9523811, y: 0.9523808, z: 0.95238066}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4591358643189563944}
+  m_LocalEulerAnglesHint: {x: -135.72299, y: -147.113, z: -119.617004}
 --- !u!1 &7543308889653852408
 GameObject:
   m_ObjectHideFlags: 0
@@ -4185,9 +4249,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   defaultDevice: Oculus
   rightOffsets:
-  - {fileID: 5064926797633439247}
+  - {fileID: 7966343389012145662}
   leftOffsets:
-  - {fileID: 8201329951710504269}
+  - {fileID: 6330244521481147453}
   devices:
   - deviceNames:
     - Oculus
