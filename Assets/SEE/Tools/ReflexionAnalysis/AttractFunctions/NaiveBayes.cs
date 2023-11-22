@@ -126,8 +126,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             public double GetWordProbability(string word)
             {
-                if (!wordFrequencies.ContainsKey(word)) return (double)classifier.Alpha / (double)wordCount;
-                double wordProbability = (double)wordFrequencies[word] / (double)wordCount;
+                int wordFrequency = classifier.Alpha;
+                if (wordFrequencies.ContainsKey(word))
+                {
+                    wordFrequency += wordFrequencies[word];
+                }
+                double wordProbability = (double)wordFrequency / (double)wordCount;
                 return wordProbability;
             }
 
@@ -135,7 +139,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             {
                 foreach (string word in document)
                 {
-                    if (!wordFrequencies.ContainsKey(word)) wordFrequencies.Add(word, this.classifier.Alpha);
+                    if (!wordFrequencies.ContainsKey(word)) wordFrequencies.Add(word, 0);
                     // wordFrequencies[word] += document.GetFrequency(word);
                     wordFrequencies[word]++;
                     wordCount++;

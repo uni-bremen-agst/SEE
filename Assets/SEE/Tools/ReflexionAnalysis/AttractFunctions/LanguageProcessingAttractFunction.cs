@@ -202,15 +202,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 string word = words[i];
                 if (word.Contains('_'))
                 {
-                    splittedWords.AddRange(this.Split(word, SplitCamelCase, true));
+                    splittedWords.AddRange(this.Split(word, SplitSnakeCase, true));
                 }
                 else if (word.Contains('-'))
                 {
-                    splittedWords.AddRange(this.Split(word, SplitSnakeCase, false));
+                    splittedWords.AddRange(this.Split(word, SplitKebabCase, false));
                 }
                 else
                 {
-                    splittedWords.AddRange(this.Split(word, SplitKebabCase, false));
+                    splittedWords.AddRange(this.Split(word, SplitCamelCase, false));
                 }
             }
 
