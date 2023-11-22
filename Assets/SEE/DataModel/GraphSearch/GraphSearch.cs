@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FuzzySharp;
+using SEE.DataModel.DG;
 
-namespace SEE.DataModel.DG
+namespace SEE.DataModel.GraphSearch
 {
     /// <summary>
     /// Allows searching for nodes by their source name.
@@ -29,6 +30,11 @@ namespace SEE.DataModel.DG
         private readonly Graph graph;
 
         /// <summary>
+        /// The filter that is applied to the graph elements before they are searched.
+        /// </summary>
+        public GraphFilter Filter { get; } = new();
+
+        /// <summary>
         /// Creates a new instance of <see cref="GraphSearch"/> for the given <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">The graph to be searched.</param>
@@ -49,7 +55,7 @@ namespace SEE.DataModel.DG
         public IEnumerable<Node> Search(string query, int limit = 10, int cutoff = 40)
         {
             return Process.ExtractTop(FilterString(query), elements.Keys, limit: limit, cutoff: cutoff)
-                   .SelectMany(x => elements[x.Value].Select(Element => (x.Score, Element)))
+                   .SelectMany(x => Filter.Apply(elements[x.Value]).Select(Element => (x.Score, Element)))
                    .OrderByDescending(x => x.Score)
                    .Select(x => x.Element);
         }
