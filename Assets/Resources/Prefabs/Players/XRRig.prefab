@@ -718,7 +718,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 3724732012392018286}
   axis: 1
-  bendOffsets: []
+  bendOffsets:
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
 --- !u!1 &1279864764483445660
 GameObject:
   m_ObjectHideFlags: 0
@@ -2997,7 +3002,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   controller: {fileID: 8088821360074204646}
   axis: 1
-  bendOffsets: []
+  bendOffsets:
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
 --- !u!1 &6941429649773897135
 GameObject:
   m_ObjectHideFlags: 0
