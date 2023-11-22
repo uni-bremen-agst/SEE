@@ -52,13 +52,23 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         private RectTransform items;
 
+        /// <summary>
+        /// The subscription to the graph observable.
+        /// </summary>
+        private IDisposable subscription;
+
         protected override void Start()
         {
             Searcher = new GraphSearch(Graph);
             Searcher.Filter.IncludeToggleAttributes.UnionWith(Graph.AllToggleGraphElementAttributes());
             ContextMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
-            Graph.Subscribe(this);
+            subscription = Graph.Subscribe(this);
             base.Start();
+        }
+
+        private void OnDestroy()
+        {
+            subscription.Dispose();
         }
 
         /// <summary>
@@ -94,7 +104,10 @@ namespace SEE.UI.Window.TreeWindow
         {
             foreach (Transform child in items)
             {
-                Destroyer.Destroy(child.gameObject);
+                if (child != null)
+                {
+                    Destroyer.Destroy(child.gameObject);
+                }
             }
         }
 

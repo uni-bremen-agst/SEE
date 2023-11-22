@@ -82,6 +82,11 @@ namespace SEE.UI.Window.TreeWindow
         private void OrderTree(Node orderBelow)
         {
             Transform nodeItem = items.Find(CleanupID(orderBelow.ID));
+            if (nodeItem == null)
+            {
+                return;
+            }
+
             // We determine the node level based on the indent of the foreground.
             int nodeLevel = Mathf.RoundToInt(((RectTransform)nodeItem.Find("Foreground")).offsetMin.x) / indentShift;
             int index = nodeItem.GetSiblingIndex();
