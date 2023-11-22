@@ -4,25 +4,8 @@ using FuzzySharp.Utils;
 
 namespace SEE.Utils
 {
-    public static class ListExtensions
+    public static class CollectionExtensions
     {
-        public static void Resize<T>(this List<T> list, int count)
-        {
-            if (list.Count < count)
-            {
-                if (list.Capacity < count)
-                {
-                    list.Capacity = count;
-                }
-
-                int end = count - list.Count;
-                for (int i = 0; i < end; i++)
-                {
-                    list.Add(default);
-                }
-            }
-        }
-
         /// <summary>
         /// Returns all permutations of this <paramref name="inputList"/>.
         /// </summary>
@@ -48,6 +31,25 @@ namespace SEE.Utils
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Toggles the given <paramref name="element"/> in the given <paramref name="set"/>,
+        /// that is, if the set contains the element, it will be removed, otherwise it will be added.
+        /// </summary>
+        /// <param name="set">The set in which the element shall be toggled.</param>
+        /// <param name="element">The element which shall be toggled.</param>
+        /// <typeparam name="T">The type of the elements in the set.</typeparam>
+        public static void Toggle<T>(this ISet<T> set, T element)
+        {
+            if (set.Contains(element))
+            {
+                set.Remove(element);
+            }
+            else
+            {
+                set.Add(element);
+            }
         }
     }
 }
