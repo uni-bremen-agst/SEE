@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Cysharp.Threading.Tasks;
 using SEE.DataModel;
 using SEE.DataModel.DG;
+using SEE.DataModel.GraphSearch;
 using SEE.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
@@ -27,27 +30,6 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         private const string treeItemPrefab = "Prefabs/UI/TreeViewItem";
 
-        // TODO: In the future, distinguish by node/edge type as well for the icons.
-        /// <summary>
-        /// The unicode character for a node.
-        /// </summary>
-        private const char nodeTypeUnicode = '\uf1b2';
-
-        /// <summary>
-        /// The unicode character for an edge.
-        /// </summary>
-        private const char edgeTypeUnicode = '\uf542';
-
-        /// <summary>
-        /// The unicode character for outgoing edges.
-        /// </summary>
-        private const char outgoingEdgeUnicode = '\uf2f5';
-
-        /// <summary>
-        /// The unicode character for incoming edges.
-        /// </summary>
-        private const char incomingEdgeUnicode = '\uf2f6';
-
         /// <summary>
         /// The graph to be displayed.
         /// Must be set before starting the window.
@@ -56,8 +38,9 @@ namespace SEE.UI.Window.TreeWindow
 
         /// <summary>
         /// The search helper used to search for elements in the graph.
+        /// We also use this to keep track of the current filter, sort, and group settings.
         /// </summary>
-        private GraphSearch searcher;
+        private GraphSearch Searcher;
 
         /// <summary>
         /// The context menu that is displayed when the user right-clicks on an item.
@@ -71,7 +54,8 @@ namespace SEE.UI.Window.TreeWindow
 
         protected override void Start()
         {
-            searcher = new GraphSearch(Graph);
+            Searcher = new GraphSearch(Graph);
+            Searcher.Filter.IncludeToggleAttributes.UnionWith(Graph.AllToggleGraphElementAttributes());
             ContextMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
             Graph.Subscribe(this);
             base.Start();
@@ -79,19 +63,27 @@ namespace SEE.UI.Window.TreeWindow
 
         /// <summary>
         /// Adds the roots of the graph to the tree view.
+        /// It may take up to a frame to add and reorder all items, hence this method is asynchronous.
         /// </summary>
-        private void AddRoots()
+        private async UniTask AddRoots()
         {
             // We will traverse the graph and add each node to the tree view.
-            IList<Node> roots = Graph.GetRoots();
-            foreach (Node root in roots)
-            {
-                AddNode(root);
-            }
+            IList<Node> roots = WithHiddenChildren(Graph.GetRoots()).ToList();
 
             if (roots.Count == 0)
             {
                 ShowNotification.Warn("Empty graph", "Graph has no roots. TreeView will be empty.");
+                return;
+            }
+
+            foreach (Node root in roots)
+            {
+                AddNode(root);
+            }
+            await UniTask.Yield();
+            foreach (Node root in roots)
+            {
+                OrderTree(root);
             }
         }
 
@@ -149,7 +141,7 @@ namespace SEE.UI.Window.TreeWindow
                 case HierarchyEvent:
                 case NodeEvent:
                     ClearTree();
-                    AddRoots();
+                    AddRoots().Forget();
                     break;
             }
         }

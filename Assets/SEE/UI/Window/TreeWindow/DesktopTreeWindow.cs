@@ -60,59 +60,87 @@ namespace SEE.UI.Window.TreeWindow
         private TMP_InputField SearchField;
 
         /// <summary>
+        /// The button that opens the filter menu.
+        /// </summary>
+        private ButtonManagerBasic FilterButton;
+
+        /// <summary>
+        /// The button that opens the grouping menu.
+        /// </summary>
+        private ButtonManagerBasic GroupButton;
+
+        /// <summary>
+        /// The button that opens the sorting menu.
+        /// </summary>
+        private ButtonManagerBasic SortButton;
+
+        /// <summary>
         /// Orders the tree below the given <paramref name="orderBelow"/> node according to the graph hierarchy.
         /// This needs to be called whenever the tree is expanded.
         /// </summary>
         /// <param name="orderBelow">The node below which the tree should be ordered.</param>
         private void OrderTree(Node orderBelow)
         {
-            int index = items.Find(CleanupID(orderBelow.ID)).GetSiblingIndex();
-            OrderTreeRecursive(orderBelow);
+            Transform nodeItem = items.Find(CleanupID(orderBelow.ID));
+            // We determine the node level based on the indent of the foreground.
+            int nodeLevel = Mathf.RoundToInt(((RectTransform)nodeItem.Find("Foreground")).offsetMin.x) / indentShift;
+            int index = nodeItem.GetSiblingIndex();
+
+            OrderTreeRecursive(orderBelow, nodeLevel);
 
             return;
 
             // Orders the item with the given id to the current index and increments the index.
-            void OrderItemHere(string id)
+            void OrderItemHere(string id, int level)
             {
                 Transform item = items.Find(id);
-                if (item == null)
-                {
-                    Debug.LogError($"Item {id} not found.");
-                }
-                else
+                if (item != null)
                 {
                     item.SetSiblingIndex(index++);
+                    RectTransform foreground = (RectTransform)item.Find("Foreground");
+                    RectTransform background = (RectTransform)item.Find("Background");
+                    foreground.offsetMin = foreground.offsetMin.WithXY(x: indentShift * level);
+                    background.offsetMin = background.offsetMin.WithXY(x: indentShift * level);
                 }
             }
 
             // Recurses over the tree in pre-order and assigns indices to each node.
-            void OrderTreeRecursive(Node node)
+            void OrderTreeRecursive(Node node, int level)
             {
                 string id = CleanupID(node.ID);
-                OrderItemHere(id);
+                OrderItemHere(id, level);
                 if (expandedItems.Contains(id))
                 {
-                    foreach (Node child in node.Children().OrderBy(x => x.SourceName))
+                    IList<Node> children = WithHiddenChildren(node.Children()).OrderBy(x => x.SourceName).ToList();
+                    foreach (Node child in children)
                     {
-                        OrderTreeRecursive(child);
+                        OrderTreeRecursive(child, level + 1);
                     }
 
-                    HandleEdges($"{id}#Outgoing", node.Outgoings);
-                    HandleEdges($"{id}#Incoming", node.Incomings);
+                    List<Edge> outgoings = Searcher.Filter.Apply(node.Outgoings).ToList();
+                    List<Edge> incomings = Searcher.Filter.Apply(node.Incomings).ToList();
+                    // We need to handle lifted edges separately, since they are not children of the node.
+                    List<Node> hiddenChildren = HiddenChildren(node.Children()).ToList();
+                    List<Edge> liftedOutgoings = Searcher.Filter.Apply(hiddenChildren.SelectMany(x => x.Outgoings)).ToList();
+                    List<Edge> liftedIncomings = Searcher.Filter.Apply(hiddenChildren.SelectMany(x => x.Incomings)).ToList();
+                    HandleEdges($"{id}#Outgoing", outgoings, level + 1);
+                    HandleEdges($"{id}#Incoming", incomings, level + 1);
+                    HandleEdges($"{id}#Lifted Outgoing", liftedOutgoings, level + 1);
+                    HandleEdges($"{id}#Lifted Incoming", liftedIncomings, level + 1);
                 }
             }
 
             // Orders the edges under the given id (outgoing/incoming) to the current index and increments the index.
-            void HandleEdges(string edgesId, ICollection<Edge> edges)
+            void HandleEdges(string edgesId, ICollection<Edge> edges, int level)
             {
                 if (edges.Count > 0)
                 {
-                    OrderItemHere(edgesId);
+                    OrderItemHere(edgesId, level);
                     if (expandedItems.Contains(edgesId))
                     {
                         foreach (Edge edge in edges)
                         {
-                            OrderItemHere($"{edgesId}#{CleanupID(edge.ID)}");
+                            OrderItemHere($"{edgesId}#{CleanupID(edge.ID)}", level + 1);
                         }
                     }
                 }
@@ -128,8 +156,17 @@ namespace SEE.UI.Window.TreeWindow
             GameObject nodeGameObject = GraphElementIDMap.Find(node.ID);
             int children = node.NumberOfChildren() + Mathf.Min(node.Outgoings.Count, 1) + Mathf.Min(node.Incomings.Count, 1);
 
-            AddItem(CleanupID(node.ID), children, node.ToShortString(), node.Level, nodeTypeUnicode, nodeGameObject, node,
-                    item => CollapseNode(node, item), (item, order) => ExpandNode(node, item, orderTree: order));
+            if (Searcher.Filter.Includes(node))
+            {
+                AddItem(CleanupID(node.ID), children, node.ToShortString(), Icons.Node, nodeGameObject, node,
+                        item => CollapseNode(node, item), (item, order) => ExpandNode(node, item, orderTree: order));
+            }
+            else
+            {
+                // The node itself may not be included, but its children (or edges) could be.
+                // Thus, we assume this invisible node to be expanded by default and add its children.
+                ExpandNode(node, null);
+            }
         }
 
         /// <summary>
@@ -138,7 +175,6 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="id">The ID of the item to be added.</param>
         /// <param name="children">The number of children of the item to be added.</param>
         /// <param name="text">The text of the item to be added.</param>
-        /// <param name="level">The level of the item to be added.</param>
         /// <param name="icon">The icon of the item to be added, given as a unicode character.</param>
         /// <param name="representedGameObject">The game object of the element represented by the item. May be null.</param>
         /// <param name="representedGraphElement">The graph element represented by the item. May be null.</param>
@@ -147,8 +183,8 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="expandItem">A function that expands the item.
         /// It takes the item that was expanded and a boolean indicating whether the
         /// tree should be ordered after expanding the item as arguments.</param>
-        private void AddItem(string id, int children, string text, int level,
-                             char icon, GameObject representedGameObject, GraphElement representedGraphElement,
+        private void AddItem(string id, int children, string text, char icon,
+                             GameObject representedGameObject, GraphElement representedGraphElement,
                              Action<GameObject> collapseItem, Action<GameObject, bool> expandItem)
         {
             GameObject item = PrefabInstantiator.InstantiatePrefab(treeItemPrefab, items, false);
@@ -161,16 +197,13 @@ namespace SEE.UI.Window.TreeWindow
             textMesh.text = text;
             iconMesh.text = icon.ToString();
 
-            foreground.localPosition += new Vector3(indentShift * level, 0, 0);
-            background.localPosition += new Vector3(indentShift * level, 0, 0);
-
             ColorItem();
 
-            // Slashes will cause problems later on, so we replace them with backslashes.
+            // Slashes will cause problems later on in the `transform.Find` method, so we replace them with backslashes.
             // NOTE: This becomes a problem if two nodes A and B exist where node A's name contains slashes and node B
             //       has an identical name, except for all slashes being replaced by backslashes.
             //       I hope this is unlikely enough to not be a problem for now.
-            item.name = CleanupID(id);
+            item.name = id;
             if (children <= 0)
             {
                 expandIcon.SetActive(false);
@@ -252,10 +285,12 @@ namespace SEE.UI.Window.TreeWindow
                                                                    .GetApplicableOptions(representedGraphElement,
                                                                                          representedGameObject)
                                                                    .Where(x => !x.Name.Contains("TreeView"));
-                            ContextMenu.ClearActions();
-                            ContextMenu.AddActions(actions);
-                            ContextMenu.MoveTo(e.position);
-                            ContextMenu.ShowMenu().Forget();
+                            actions = actions.Append(new PopupMenuAction("Hide in TreeView", () =>
+                            {
+                                Searcher.Filter.ExcludeElements.Add(representedGraphElement);
+                                Rebuild();
+                            }, Icons.Hide));
+                            ContextMenu.ShowWith(actions, e.position);
                         }
                         else
                         {
@@ -274,6 +309,29 @@ namespace SEE.UI.Window.TreeWindow
         }
 
         /// <summary>
+        /// Returns those nodes within <paramref name="nodes"/> which are included in the current filter,
+        /// and transitively adds all children of those nodes within <paramref name="nodes"/>
+        /// which are not included in the current filter.
+        /// </summary>
+        /// <param name="nodes">The nodes to be filtered.</param>
+        /// <returns>The filtered nodes with any hidden transitive children.</returns>
+        private IEnumerable<Node> WithHiddenChildren(IList<Node> nodes)
+        {
+            return nodes.Where(Searcher.Filter.Includes).Concat(nodes.Where(x => !Searcher.Filter.Includes(x)).SelectMany(x => WithHiddenChildren(x.Children())));
+        }
+
+        /// <summary>
+        /// Returns those nodes within <paramref name="nodes"/> which are not included in the current filter,
+        /// transitively including all hidden children of those nodes.
+        /// </summary>
+        /// <param name="nodes">The nodes to be filtered.</param>
+        /// <returns>The transitive hidden children of the given nodes.</returns>
+        private IEnumerable<Node> HiddenChildren(IEnumerable<Node> nodes)
+        {
+            return nodes.Where(x => !Searcher.Filter.Includes(x)).SelectMany(x => HiddenChildren(x.Children()).Append(x));
+        }
+
+        /// <summary>
         /// Removes the given <paramref name="node"/>'s children from the tree window.
         /// </summary>
         /// <param name="node">The node to be removed.</param>
@@ -288,7 +346,7 @@ namespace SEE.UI.Window.TreeWindow
             IEnumerable<(string ID, Node child)> GetChildItems(Node n)
             {
                 string cleanId = CleanupID(n.ID);
-                IEnumerable<(string, Node)> children = n.Children().Select(x => (CleanupID(x.ID), x));
+                IEnumerable<(string, Node)> children = WithHiddenChildren(n.Children()).Select(x => (CleanupID(x.ID), x));
                 // We need to remove the "Outgoing" and "Incoming" buttons if they exist, along with their children.
                 if (n.Outgoings.Count > 0)
                 {
@@ -374,39 +432,67 @@ namespace SEE.UI.Window.TreeWindow
         /// Its children will be added to the tree window.
         /// </summary>
         /// <param name="node">The node represented by the item.</param>
-        /// <param name="item">The item to be expanded.</param>
+        /// <param name="item">The item to be expanded. If this is null
+        /// (i.e., no item actually exists in the TreeWindow)
+        /// only the children of the node will be added, not its connected edges.</param>
         /// <param name="orderTree">Whether to order the tree after expanding the node.</param>
         private void ExpandNode(Node node, GameObject item, bool orderTree = false)
         {
-            ExpandItem(item);
-
             foreach (Node child in node.Children())
             {
                 AddNode(child);
             }
 
-            if (node.Outgoings.Count > 0)
+            if (item != null)
             {
-                AddEdgeButton("Outgoing", outgoingEdgeUnicode, node.Outgoings);
-            }
-            if (node.Incomings.Count > 0)
-            {
-                AddEdgeButton("Incoming", incomingEdgeUnicode, node.Incomings);
-            }
-            if (orderTree)
-            {
-                OrderTree(node);
+                ExpandItem(item);
+
+                List<Edge> outgoings = Searcher.Filter.Apply(node.Outgoings).ToList();
+                List<Edge> incomings = Searcher.Filter.Apply(node.Incomings).ToList();
+                // We need to lift edges of any hidden children upwards to the first visible parent, which is
+                // this node. We then need to filter them again, since they may have been hidden by the filter.
+                List<Node> hiddenChildren = HiddenChildren(node.Children()).ToList();
+                List<Edge> liftedOutgoings = Searcher.Filter.Apply(hiddenChildren.SelectMany(x => x.Outgoings)).ToList();
+                List<Edge> liftedIncomings = Searcher.Filter.Apply(hiddenChildren.SelectMany(x => x.Incomings)).ToList();
+
+                if (outgoings.Count > 0)
+                {
+                    AddEdgeButton(outgoings, incoming: false, lifted: false);
+                }
+                if (incomings.Count > 0)
+                {
+                    AddEdgeButton(incomings, incoming: true, lifted: false);
+                }
+                if (liftedOutgoings.Count > 0)
+                {
+                    AddEdgeButton(liftedOutgoings, incoming: false, lifted: true);
+                }
+                if (liftedIncomings.Count > 0)
+                {
+                    AddEdgeButton(liftedIncomings, incoming: true, lifted: true);
+                }
+                if (orderTree)
+                {
+                    OrderTree(node);
+                }
             }
             return;
 
-            void AddEdgeButton(string edgesType, char icon, ICollection<Edge> edges)
+            void AddEdgeButton(ICollection<Edge> edges, bool incoming, bool lifted)
             {
+                (string edgesType, char icon) = (incoming, lifted) switch
+                {
+                    (true, false) => ("Incoming", Icons.IncomingEdge),
+                    (false, false) => ("Outgoing", Icons.OutgoingEdge),
+                    (true, true) => ("Lifted Incoming", Icons.LiftedIncomingEdge),
+                    (false, true) => ("Lifted Outgoing", Icons.LiftedOutgoingEdge),
+                };
                 string cleanedId = CleanupID(node.ID);
                 string id = $"{cleanedId}#{edgesType}";
                 // Note that an edge may appear multiple times in the tree view,
                 // hence we make its ID dependent on the node it is connected to,
                 // and whether it is an incoming or outgoing edge (to cover self-loops).
-                AddItem(id, edges.Count, $"{edgesType} Edges", node.Level + 1, icon,
+                AddItem(id, edges.Count, $"{edgesType} Edges", icon,
                         representedGameObject: null, representedGraphElement: null,
                         collapsedItem =>
                         {
@@ -418,16 +504,26 @@ namespace SEE.UI.Window.TreeWindow
                         }, (expandedItem, order) =>
                         {
                             ExpandItem(expandedItem);
-                            foreach (Edge edge in edges)
-                            {
-                                GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
-                                AddItem($"{id}#{CleanupID(edge.ID)}", 0, edge.ToShortString(), node.Level + 2, edgeTypeUnicode, edgeObject, edge, null, null);
-                            }
+                            AddEdges(id, edges, lifted);
                             if (order)
                             {
                                 OrderTree(node);
                             }
                         });
+            }
+
+            void AddEdges(string id, IEnumerable<Edge> edges, bool lifted)
+            {
+                foreach (Edge edge in edges)
+                {
+                    GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
+                    string title = edge.ToShortString();
+                    if (lifted)
+                    {
+                        title = $"<i>{title}</i>";
+                    }
+                    AddItem($"{id}#{CleanupID(edge.ID)}", 0, title, Icons.Edge, edgeObject, edge, null, null);
+                }
             }
         }
 
@@ -453,15 +549,15 @@ namespace SEE.UI.Window.TreeWindow
             ClearTree();
             if (searchTerm == null || searchTerm.Trim().Length == 0)
             {
-                AddRoots();
+                AddRoots().Forget();
                 return;
             }
 
-            foreach (Node node in searcher.Search(searchTerm))
+            foreach (Node node in Searcher.Search(searchTerm))
             {
                 GameObject nodeGameObject = GraphElementIDMap.Find(node.ID, mustFindElement: true);
                 AddItem(CleanupID(node.ID),
-                        0, node.ToShortString(), 0, nodeTypeUnicode, nodeGameObject, node,
+                        0, node.ToShortString(), Icons.Node, nodeGameObject, node,
                         null, (_, _) => RevealElement(node).Forget());
             }
 
@@ -483,6 +579,12 @@ namespace SEE.UI.Window.TreeWindow
                 // We need to wait until the window is initialized.
                 // This case may occur when the method is called from the outside.
                 await UniTask.WaitUntil(() => SearchField != null);
+            }
+            if (!Searcher.Filter.Includes(element))
+            {
+                ShowNotification.Warn("Element filtered out",
+                                      "Element is not included in the current filter and thus can't be shown.");
+                return;
             }
             SearchField.onValueChanged.RemoveListener(SearchFor);
             SearchField.text = string.Empty;
@@ -513,10 +615,9 @@ namespace SEE.UI.Window.TreeWindow
                 expandedItems.Add(CleanupID(current.ID));
             }
 
-            AddRoots();
+            // We need to wait until the transform actually exists, hence the await.
+            await AddRoots();
 
-            // We need to wait until the transform actually exists, hence the yield.
-            await UniTask.Yield();
             RectTransform item = (RectTransform)items.Find(transformID);
             scrollRect.ScrollTo(item, duration: 1f);
 
@@ -555,7 +656,110 @@ namespace SEE.UI.Window.TreeWindow
             SearchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
             SearchField.onValueChanged.AddListener(SearchFor);
 
-            AddRoots();
+            FilterButton = root.Find("Search/Filter").gameObject.MustGetComponent<ButtonManagerBasic>();
+            FilterButton.clickEvent.AddListener(ShowFilterMenu);
+
+            AddRoots().Forget();
+            return;
+
+            // Constructs the menu for the filter button.
+            void UpdateFilterMenuEntries()
+            {
+                ISet<string> nodeToggles = Graph.AllToggleNodeAttributes();
+                ISet<string> edgeToggles = Graph.AllToggleEdgeAttributes();
+                ISet<string> commonToggles = nodeToggles.Intersect(edgeToggles).ToHashSet();
+                // Don't include common toggles in node/edge toggles.
+                nodeToggles.ExceptWith(commonToggles);
+                edgeToggles.ExceptWith(commonToggles);
+                // TODO: Allow filtering by node type.
+
+                List<PopupMenuEntry> entries = new()
+                {
+                    new PopupMenuAction("Edges",
+                                        () =>
+                                        {
+                                            Searcher.Filter.IncludeEdges = !Searcher.Filter.IncludeEdges;
+                                            UpdateFilterMenuEntries();
+                                            Rebuild();
+                                        },
+                                        Checkbox(Searcher.Filter.IncludeEdges), CloseAfterClick: false),
+                };
+
+                if (Searcher.Filter.ExcludeElements.Count > 0)
+                {
+                    entries.Insert(0, new PopupMenuAction("Show hidden elements",
+                                                          () =>
+                                                          {
+                                                              Searcher.Filter.ExcludeElements.Clear();
+                                                              Rebuild();
+                                                          },
+                                                          Icons.Show));
+                }
+
+                if (commonToggles.Count > 0)
+                {
+                    entries.Add(new PopupMenuHeading("Common properties"));
+                    entries.AddRange(commonToggles.Select(FilterActionFor));
+                }
+                if (nodeToggles.Count > 0)
+                {
+                    entries.Add(new PopupMenuHeading("Node properties"));
+                    entries.AddRange(nodeToggles.Select(FilterActionFor));
+                }
+                if (edgeToggles.Count > 0)
+                {
+                    entries.Add(new PopupMenuHeading("Edge properties"));
+                    entries.AddRange(edgeToggles.Select(FilterActionFor));
+                }
+
+                ContextMenu.ClearEntries();
+                ContextMenu.AddEntries(entries);
+            }
+
+            void ShowFilterMenu()
+            {
+                UpdateFilterMenuEntries();
+                ContextMenu.ShowWith(position: FilterButton.transform.position);
+            }
+
+            PopupMenuAction FilterActionFor(string toggleAttribute)
+            {
+                return new PopupMenuAction(toggleAttribute,
+                                           () =>
+                                           {
+                                               // Toggle from include->exclude->none->include.
+                                               if (Searcher.Filter.IncludeToggleAttributes.Contains(toggleAttribute))
+                                               {
+                                                   Searcher.Filter.IncludeToggleAttributes.Remove(toggleAttribute);
+                                                   Searcher.Filter.ExcludeToggleAttributes.Add(toggleAttribute);
+                                               }
+                                               else if (Searcher.Filter.ExcludeToggleAttributes.Contains(toggleAttribute))
+                                               {
+                                                   Searcher.Filter.ExcludeToggleAttributes.Remove(toggleAttribute);
+                                               }
+                                               else
+                                               {
+                                                   Searcher.Filter.IncludeToggleAttributes.Add(toggleAttribute);
+                                               }
+                                               UpdateFilterMenuEntries();
+                                               Rebuild();
+                                           },
+                                           Searcher.Filter.ExcludeToggleAttributes.Contains(toggleAttribute)
+                                               ? Icons.MinusCheckbox
+                                               : Checkbox(Searcher.Filter.IncludeToggleAttributes.Contains(toggleAttribute)),
+                                           CloseAfterClick: false);
+            }
+
+            char Checkbox(bool value) => value ? Icons.CheckedCheckbox : Icons.EmptyCheckbox;
+        }
+
+        /// <summary>
+        /// Rebuilds the tree window.
+        /// </summary>
+        private void Rebuild()
+        {
+            ClearTree();
+            AddRoots().Forget();
         }
     }
 }
