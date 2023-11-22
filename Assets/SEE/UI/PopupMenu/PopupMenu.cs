@@ -71,7 +71,15 @@ namespace SEE.UI.PopupMenu
 
             // The menu should be hidden when the user moves the mouse away from it.
             PointerHelper pointerHelper = Menu.gameObject.MustGetComponent<PointerHelper>();
-            pointerHelper.ExitEvent.AddListener(_ => HideMenu().Forget());
+            pointerHelper.ExitEvent.AddListener(x =>
+            {
+                // If the mouse is not moving, this may indicate that the trigger has just been
+                // menu entries being rebuilt instead of the mouse moving outside of the menu.
+                if (x.IsPointerMoving())
+                {
+                    HideMenu().Forget();
+                }
+            });
 
             // We add all entries that were added before the menu was started.
             while (EntriesBeforeStart.Count > 0)
@@ -81,6 +89,8 @@ namespace SEE.UI.PopupMenu
 
             // We hide the menu by default.
             Menu.gameObject.SetActive(false);
+
+            // TODO: Make this scrollable once it gets too big.
         }
 
         /// <summary>
@@ -119,14 +129,21 @@ namespace SEE.UI.PopupMenu
             GameObject actionItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuButton", EntryList, false);
             ButtonManagerBasic button = actionItem.MustGetComponent<ButtonManagerBasic>();
             button.buttonText = action.Name;
-            button.clickEvent.AddListener(() =>
-            {
-                action.Action();
-                HideMenu().Forget();
-            });
+
+            button.clickEvent.AddListener(OnClick);
             if (action.IconGlyph != default)
             {
                 actionItem.transform.Find("Icon").gameObject.MustGetComponent<TextMeshProUGUI>().text = action.IconGlyph.ToString();
+            }
+            return;
+
+            void OnClick()
+            {
+                action.Action();
+                if (action.CloseAfterClick)
+                {
+                    HideMenu().Forget();
+                }
             }
         }
 
@@ -198,7 +215,7 @@ namespace SEE.UI.PopupMenu
         /// Activates the menu and fades it in.
         /// This asynchronous method will return once the menu is fully shown.
         /// </summary>
-        public async UniTaskVoid ShowMenu()
+        public async UniTask ShowMenu()
         {
             ShouldShowMenu = true;
             Menu.gameObject.SetActive(true);
@@ -217,7 +234,7 @@ namespace SEE.UI.PopupMenu
         /// Hides the menu and fades it out.
         /// This asynchronous method will return once the menu is fully hidden and deactivated.
         /// </summary>
-        public async UniTaskVoid HideMenu()
+        public async UniTask HideMenu()
         {
             ShouldShowMenu = false;
             // We use a fade effect rather than DOScale because it looks better.
@@ -232,13 +249,21 @@ namespace SEE.UI.PopupMenu
         /// Convenience method that shows the menu with the given <paramref name="entries"/>
         /// at the given <paramref name="position"/>.
         /// </summary>
-        /// <param name="entries">The entries to be shown in the menu.</param>
-        /// <param name="position">The position at which the menu should be shown.</param>
-        public void ShowWith(IEnumerable<PopupMenuEntry> entries, Vector2 position)
+        /// <param name="entries">The entries to be shown in the menu.
+        /// If null, entries will not be modified.</param>
+        /// <param name="position">The position at which the menu should be shown.
+        /// If null, menu will not be moved.</param>
+        public void ShowWith(IEnumerable<PopupMenuEntry> entries = null, Vector2? position = null)
         {
-            ClearEntries();
-            AddEntries(entries);
-            MoveTo(position);
+            if (entries != null)
+            {
+                ClearEntries();
+                AddEntries(entries);
+            }
+            if (position.HasValue)
+            {
+                MoveTo(position.Value);
+            }
             ShowMenu().Forget();
         }
     }
