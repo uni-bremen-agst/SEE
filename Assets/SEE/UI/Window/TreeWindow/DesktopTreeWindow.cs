@@ -122,16 +122,10 @@ namespace SEE.UI.Window.TreeWindow
                         OrderTreeRecursive(child, level + 1);
                     }
 
-                    List<Edge> outgoings = Searcher.Filter.Apply(node.Outgoings).ToList();
-                    List<Edge> incomings = Searcher.Filter.Apply(node.Incomings).ToList();
-                    // We need to handle lifted edges separately, since they are not children of the node.
-                    List<Node> hiddenChildren = HiddenChildren(node.Children()).ToList();
-                    List<Edge> liftedOutgoings = Searcher.Filter.Apply(hiddenChildren.SelectMany(x => x.Outgoings)).ToList();
-                    List<Edge> liftedIncomings = Searcher.Filter.Apply(hiddenChildren.SelectMany(x => x.Incomings)).ToList();
-                    HandleEdges($"{id}#Outgoing", outgoings, level + 1);
-                    HandleEdges($"{id}#Incoming", incomings, level + 1);
-                    HandleEdges($"{id}#Lifted Outgoing", liftedOutgoings, level + 1);
-                    HandleEdges($"{id}#Lifted Incoming", liftedIncomings, level + 1);
+                    foreach ((List<Edge> edges, string edgesType) in RelevantEdges(node))
+                    {
+                        HandleEdges($"{id}#{edgesType}", edges, level + 1);
+                    }
                 }
             }
 
@@ -352,22 +346,13 @@ namespace SEE.UI.Window.TreeWindow
             {
                 string cleanId = CleanupID(n.ID);
                 IEnumerable<(string, Node)> children = WithHiddenChildren(n.Children()).Select(x => (CleanupID(x.ID), x));
-                // We need to remove the "Outgoing" and "Incoming" buttons if they exist, along with their children.
-                if (n.Outgoings.Count > 0)
+                foreach ((List<Edge> edges, string edgesType) in RelevantEdges(n))
                 {
-                    children = AppendEdgeChildren("Outgoing", n.Outgoings);
-                }
-                if (n.Incomings.Count > 0)
-                {
-                    children = AppendEdgeChildren("Incoming", n.Incomings);
+                    // We need to remove the "Outgoing" and "Incoming" buttons if they exist, along with their children.
+                    children = children.Append((cleanId + "#" + edgesType, null))
+                                       .Concat(edges.Select<Edge, (string, Node)>(x => ($"{cleanId}#{edgesType}#{CleanupID(x.ID)}", null)));
                 }
                 return children;
-
-                IEnumerable<(string, Node)> AppendEdgeChildren(string edgeType, IEnumerable<Edge> edges)
-                {
-                    return children.Append((cleanId + "#" + edgeType, null))
-                                   .Concat(edges.Select<Edge, (string, Node)>(x => ($"{cleanId}#{edgeType}#{CleanupID(x.ID)}", null)));
-                }
             }
         }
 
@@ -433,6 +418,32 @@ namespace SEE.UI.Window.TreeWindow
         }
 
         /// <summary>
+        /// Returns connected and lifted edges of the given <paramref name="node"/>.
+        /// The edges are grouped by their type (outgoing, incoming, lifted outgoing, lifted incoming)
+        /// and each is returned as a list along with its type. Only those types are included that
+        /// have at least one edge.
+        /// </summary>
+        /// <param name="node">The node whose edges are requested.</param>
+        /// <returns>The edges of the node, grouped by their type.</returns>
+        private IEnumerable<(List<Edge> edges, string edgesType)> RelevantEdges(Node node)
+        {
+            List<Edge> outgoings = Searcher.Filter.Apply(node.Outgoings).ToList();
+            List<Edge> incomings = Searcher.Filter.Apply(node.Incomings).ToList();
+            // We need to lift edges of any hidden children upwards to the first visible parent, which is
+            // this node. We then need to filter them again, since they may have been hidden by the filter.
+            List<Node> hiddenChildren = HiddenChildren(node.Children()).ToList();
+            List<Edge> liftedOutgoings = Searcher.Filter.Apply(hiddenChildren.SelectMany(x => x.Outgoings)).ToList();
+            List<Edge> liftedIncomings = Searcher.Filter.Apply(hiddenChildren.SelectMany(x => x.Incomings)).ToList();
+            return new[]
+            {
+                (outgoings, "Outgoing"),
+                (incomings, "Incoming"),
+                (liftedOutgoings, "Lifted Outgoing"),
+                (liftedIncomings, "Lifted Incoming")
+            }.Where(x => x.Item1.Count > 0);
+        }
+
+        /// <summary>
         /// Expands the given <paramref name="item"/>.
         /// Its children will be added to the tree window.
         /// </summary>
@@ -452,30 +463,11 @@ namespace SEE.UI.Window.TreeWindow
             {
                 ExpandItem(item);
 
-                List<Edge> outgoings = Searcher.Filter.Apply(node.Outgoings).ToList();
-                List<Edge> incomings = Searcher.Filter.Apply(node.Incomings).ToList();
-                // We need to lift edges of any hidden children upwards to the first visible parent, which is
-                // this node. We then need to filter them again, since they may have been hidden by the filter.
-                List<Node> hiddenChildren = HiddenChildren(node.Children()).ToList();
-                List<Edge> liftedOutgoings = Searcher.Filter.Apply(hiddenChildren.SelectMany(x => x.Outgoings)).ToList();
-                List<Edge> liftedIncomings = Searcher.Filter.Apply(hiddenChildren.SelectMany(x => x.Incomings)).ToList();
+                foreach ((List<Edge> edges, string edgesType) in RelevantEdges(node))
+                {
+                    AddEdgeButton(edges, edgesType);
+                }
 
-                if (outgoings.Count > 0)
-                {
-                    AddEdgeButton(outgoings, incoming: false, lifted: false);
-                }
-                if (incomings.Count > 0)
-                {
-                    AddEdgeButton(incomings, incoming: true, lifted: false);
-                }
-                if (liftedOutgoings.Count > 0)
-                {
-                    AddEdgeButton(liftedOutgoings, incoming: false, lifted: true);
-                }
-                if (liftedIncomings.Count > 0)
-                {
-                    AddEdgeButton(liftedIncomings, incoming: true, lifted: true);
-                }
                 if (orderTree)
                 {
                     OrderTree(node);
@@ -483,14 +475,15 @@ namespace SEE.UI.Window.TreeWindow
             }
             return;
 
-            void AddEdgeButton(ICollection<Edge> edges, bool incoming, bool lifted)
+            void AddEdgeButton(ICollection<Edge> edges, string edgesType)
             {
-                (string edgesType, char icon) = (incoming, lifted) switch
+                char icon = edgesType switch
                 {
-                    (true, false) => ("Incoming", Icons.IncomingEdge),
-                    (false, false) => ("Outgoing", Icons.OutgoingEdge),
-                    (true, true) => ("Lifted Incoming", Icons.LiftedIncomingEdge),
-                    (false, true) => ("Lifted Outgoing", Icons.LiftedOutgoingEdge),
+                    "Incoming" => Icons.IncomingEdge,
+                    "Outgoing" => Icons.OutgoingEdge,
+                    "Lifted Incoming" => Icons.LiftedIncomingEdge,
+                    "Lifted Outgoing" => Icons.LiftedOutgoingEdge,
+                    _ => Icons.QuestionMark
                 };
                 string cleanedId = CleanupID(node.ID);
                 string id = $"{cleanedId}#{edgesType}";
@@ -509,7 +502,7 @@ namespace SEE.UI.Window.TreeWindow
                         }, (expandedItem, order) =>
                         {
                             ExpandItem(expandedItem);
-                            AddEdges(id, edges, lifted);
+                            AddEdges(id, edges);
                             if (order)
                             {
                                 OrderTree(node);
@@ -517,16 +510,12 @@ namespace SEE.UI.Window.TreeWindow
                         });
             }
 
-            void AddEdges(string id, IEnumerable<Edge> edges, bool lifted)
+            void AddEdges(string id, IEnumerable<Edge> edges)
             {
                 foreach (Edge edge in edges)
                 {
                     GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
                     string title = edge.ToShortString();
-                    if (lifted)
-                    {
-                        title = $"<i>{title}</i>";
-                    }
                     AddItem($"{id}#{CleanupID(edge.ID)}", 0, title, Icons.Edge, edgeObject, edge, null, null);
                 }
             }

@@ -29,5 +29,6 @@ namespace SEE.Utils
         public const char Compare = '\uE13A';
         public const char Hide = '\uF070';
         public const char Show = '\uF06E';
+        public const char QuestionMark = '?';
     }
 }
