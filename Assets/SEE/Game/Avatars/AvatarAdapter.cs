@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using Autohand;
 using CrazyMinnow.SALSA;
 using Dissonance;
 using Dissonance.Audio.Playback;
@@ -315,6 +316,7 @@ namespace SEE.Game.Avatars
             VRIKActions.ReplaceAnimator(gameObject, animatorForVRIK);
 
             SetupVRIK();
+            SetupAutohandVRIK();
 
             PrepareLipTracker();
             InitializeVrikRemote();
@@ -382,6 +384,17 @@ namespace SEE.Game.Avatars
                 Assert.IsNotNull(vrIK.solver.leftArm.target);
                 vrIK.solver.rightArm.target = rig.transform.Find(vrPlayerRightHandForVRIK);
                 Assert.IsNotNull(vrIK.solver.rightArm.target);
+            }
+            
+            void SetupAutohandVRIK()
+            {
+                AutoHandVRIK autoHandVRIK = gameObject.AddOrGetComponent<AutoHandVRIK>();
+                
+                autoHandVRIK.leftTrackedController = rig.transform.Find(XRCameraRigManager.LeftControllerName);
+                autoHandVRIK.leftHand.transform.parent = rig.transform.Find(vrPLayerLeftHandForVRIK);
+                
+                autoHandVRIK.rightTrackedController = rig.transform.Find(XRCameraRigManager.RightControllerName);
+                autoHandVRIK.rightHand.transform.parent = rig.transform.Find(vrPlayerRightHandForVRIK);
             }
 
             // Prepare HTC Facial Tracker
