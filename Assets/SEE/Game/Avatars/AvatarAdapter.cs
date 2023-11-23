@@ -390,12 +390,25 @@ namespace SEE.Game.Avatars
             void SetupAutohandVRIK()
             {
                 AutoHandVRIK autoHandVRIK = gameObject.AddOrGetComponent<AutoHandVRIK>();
+
+                autoHandVRIK.rightTrackedController = rig.GetComponent<XRHandOffset>().rightOffsets[0];
+                Assert.IsNotNull(autoHandVRIK.rightTrackedController);
+                autoHandVRIK.leftTrackedController = rig.GetComponent<XRHandOffset>().leftOffsets[0];
+                Assert.IsNotNull(autoHandVRIK.leftTrackedController);
+
+                GameObject handPlayer = rig.transform.Find("HandPlayer").gameObject;
+                autoHandVRIK.rightHand = handPlayer.GetComponent<AutoHandPlayer>().handRight;
+                Assert.IsNotNull(autoHandVRIK.rightHand);
+                autoHandVRIK.leftHand = handPlayer.GetComponent<AutoHandPlayer>().handLeft;
+                Assert.IsNotNull(autoHandVRIK.rightHand);
                 
+                /*
                 autoHandVRIK.leftTrackedController = rig.transform.Find(XRCameraRigManager.LeftControllerName);
                 autoHandVRIK.leftHand.transform.parent = rig.transform.Find(vrPLayerLeftHandForVRIK);
                 
                 autoHandVRIK.rightTrackedController = rig.transform.Find(XRCameraRigManager.RightControllerName); //TODO: Find out usefulness
                 autoHandVRIK.rightHand.transform.parent = rig.transform.Find(vrPlayerRightHandForVRIK);
+                */
             }
 
             // Prepare HTC Facial Tracker
