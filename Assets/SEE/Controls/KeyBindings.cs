@@ -6,7 +6,7 @@ namespace SEE.Controls
     /// <summary>
     /// Defines the key codes for all interaction based on the keyboard in SEE.
     /// </summary>
-    internal static class KeyBindings
+    public static class KeyBindings
     {
         // IMPORTANT NOTES:
         // (1) Keep in mind that KeyCodes in Unity map directly to a
@@ -17,7 +17,7 @@ namespace SEE.Controls
         /// <summary>
         /// The registered keyboard shortcuts. The value is a help message on the shortcut.
         /// </summary>
-        private static readonly Dictionary<KeyCode, string> bindings = new Dictionary<KeyCode, string>();
+        private static readonly Dictionary<KeyCode, string> bindings = new();
 
         /// <summary>
         /// Categories for the keyboard shortcuts.
@@ -66,12 +66,25 @@ namespace SEE.Controls
         /// </summary>
         internal static void PrintBindings()
         {
-            System.Text.StringBuilder sb = new System.Text.StringBuilder("Key Bindings:\n");
+            System.Text.StringBuilder sb = new("Key Bindings:\n");
             foreach (var binding in bindings)
             {
                 sb.Append($"Key {binding.Key}: {binding.Value}\n");
             }
             Debug.Log(sb.ToString());
+        }
+
+        /// <summary>
+        /// Returns a string of the current key bindings along with their help message.
+        /// </summary>
+        internal static string GetBindingsText()
+        {
+            System.Text.StringBuilder sb = new();
+            foreach (var binding in bindings)
+            {
+                sb.Append($"Key {binding.Key}:\n {binding.Value}\n\n");
+            }
+            return sb.ToString();
         }
 
         //-----------------------------------------------------
@@ -100,6 +113,11 @@ namespace SEE.Controls
         /// Turns on/off the player-action menu.
         /// </summary>
         internal static readonly KeyCode ToggleMenu = Register(KeyCode.Space, Scope.Always, "Turns on/off the player-action menu.");
+
+        /// <summary>
+        /// Turns on/off the settings menu.
+        /// </summary>
+        internal static readonly KeyCode ToggleSettings = Register(KeyCode.Pause, Scope.Always, "Turns on/off the settings menu.");
 
         /// <summary>
         /// Turns on/off the browser.
@@ -281,7 +299,7 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles auto play of the animation.
         /// </summary>
-        internal static readonly KeyCode ToggleAutoPlay = Register(KeyCode.Pause, Scope.Animation, "Toggles auto play of the animation.");
+        internal static readonly KeyCode ToggleAutoPlay = Register(KeyCode.F9, Scope.Animation, "Toggles auto play of the animation.");
         /// <summary>
         /// Double animation speed.
         /// </summary>
