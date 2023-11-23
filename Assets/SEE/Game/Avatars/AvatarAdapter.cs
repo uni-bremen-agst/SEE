@@ -386,6 +386,7 @@ namespace SEE.Game.Avatars
                 Assert.IsNotNull(vrIK.solver.rightArm.target);
             }
             
+            // Set up AutohandVRIK on the avatar.
             void SetupAutohandVRIK()
             {
                 AutoHandVRIK autoHandVRIK = gameObject.AddOrGetComponent<AutoHandVRIK>();
@@ -393,7 +394,7 @@ namespace SEE.Game.Avatars
                 autoHandVRIK.leftTrackedController = rig.transform.Find(XRCameraRigManager.LeftControllerName);
                 autoHandVRIK.leftHand.transform.parent = rig.transform.Find(vrPLayerLeftHandForVRIK);
                 
-                autoHandVRIK.rightTrackedController = rig.transform.Find(XRCameraRigManager.RightControllerName);
+                autoHandVRIK.rightTrackedController = rig.transform.Find(XRCameraRigManager.RightControllerName); //TODO: Find out usefulness
                 autoHandVRIK.rightHand.transform.parent = rig.transform.Find(vrPlayerRightHandForVRIK);
             }
 
