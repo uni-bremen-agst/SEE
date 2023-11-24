@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -59,7 +60,18 @@ namespace SEE.Controls
             }
             return keyCode;
         }
-
+        /// <summary>
+        /// Returns the scope of given key-binding description <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">the key-binding description from which to extract the scope</param>
+        /// <returns>the scope</returns>
+        private static string GetScope(string value)
+        {
+            // Extract the scope part from the string value.
+            int startIndex = value.IndexOf("[") + 1;
+            int endIndex = value.IndexOf("]");
+            return value[startIndex..endIndex];
+        }
         /// <summary>
         /// Prints the current key bindings to the debugging console along with their
         /// help message.
@@ -79,10 +91,19 @@ namespace SEE.Controls
         /// </summary>
         internal static string GetBindingsText()
         {
+            var groupedBindings = bindings.GroupBy(pair => GetScope(pair.Value));
             System.Text.StringBuilder sb = new();
-            foreach (var binding in bindings)
+            foreach (var group in groupedBindings)
             {
-                sb.Append($"Key {binding.Key}:\n {binding.Value}\n\n");
+                // Display the scope
+                sb.Append("\n\n\n" + new string(' ', 10) + $"—{group.Key}—\n\n\n" + new string('-', 105) + "\n");
+
+                foreach (var binding in group)
+                {
+                    int index = binding.Value.IndexOf(']')+1;
+                    // Display individual binding details
+                    sb.Append($"Key {binding.Key}:\n\n {binding.Value.Substring(index)}\n" + new string('-', 105));
+                }
             }
             return sb.ToString();
         }
