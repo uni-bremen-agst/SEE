@@ -61,13 +61,13 @@ namespace SEE.Controls
             return keyCode;
         }
         /// <summary>
-        /// Gives back the scope of a specific value in bindings
+        /// Returns the scope of given key-binding description <paramref name="value"/>.
         /// </summary>
-        /// <param name="value">the value, from which to extract the scope</param>
+        /// <param name="value">the key-binding description from which to extract the scope</param>
         /// <returns>the scope</returns>
-        static string GetScope(string value)
+        private static string GetScope(string value)
         {
-            // Extract the scope part from the string value
+            // Extract the scope part from the string value.
             int startIndex = value.IndexOf("[") + 1;
             int endIndex = value.IndexOf("]");
             return value[startIndex..endIndex];
