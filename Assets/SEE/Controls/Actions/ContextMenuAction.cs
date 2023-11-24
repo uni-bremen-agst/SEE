@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.SEE.Tools.ReflexionAnalysis;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.SceneManipulation;
@@ -155,6 +156,28 @@ namespace SEE.Controls.Actions
             return openWindow;
         }
 
+        private static TreeWindow ActivateCandidateRecommendationWindow(GraphElement graphElement, 
+                                                                        Transform transform, 
+                                                                        CandidateRecommendation candidateRecommendation) 
+        {
+            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+
+            Graph recommendationTree = candidateRecommendation.GetRecommendationTree((Node)graphElement);
+
+            // TODO: Can this actually happen? Talk to falko51
+            TreeWindow openWindow = manager.Windows.OfType<TreeWindow>().FirstOrDefault(x => x.Graph == recommendationTree);
+            if (openWindow == null)
+            {
+                // Window is not open yet, so we create it.
+                GameObject city = SceneQueries.GetCodeCity(transform).gameObject;
+                openWindow = city.AddComponent<TreeWindow>();
+                openWindow.Graph = recommendationTree;
+                manager.AddWindow(openWindow);
+            }
+            manager.ActiveWindow = openWindow;
+            return openWindow;
+        }
+
         /// <summary>
         /// Activates the given window, that is, adds it to the window space and makes it the active window.
         /// </summary>
@@ -182,11 +205,26 @@ namespace SEE.Controls.Actions
                 new("Show in TreeView", RevealInTreeView, '\uF802'),
             };
 
+            GameObject city = SceneQueries.GetCodeCity(gameObject.transform).gameObject;
+            CandidateRecommendationVisualization candidateRecommendationViz = city.GetComponent<CandidateRecommendationVisualization>();
+
+            // Add action if candidate recommendation is active and if it is unmapped and part of the implementation graph
+            if (candidateRecommendationViz != null && 
+                (!node.IsInImplementation() || ((ReflexionGraph)node.ItsGraph).MapsTo(node) == null))
+            {
+                actions.Add(new("Show Candidate Recommendation", RevealInCandidateRecommendation, '\uF802'));
+            }
+
             return actions;
 
             void RevealInTreeView()
             {
                 ActivateTreeWindow(node, gameObject.transform).RevealElement(node).Forget();
+            }
+
+            void RevealInCandidateRecommendation()
+            {
+                ActivateCandidateRecommendationWindow(node, gameObject.transform, candidateRecommendationViz.CandidateRecommendation).RevealElement(node).Forget();
             }
         }
 

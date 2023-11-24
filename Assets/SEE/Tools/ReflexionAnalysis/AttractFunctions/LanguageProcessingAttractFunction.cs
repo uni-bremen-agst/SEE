@@ -6,6 +6,7 @@ using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Window.CodeWindow;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -24,7 +25,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         protected void CreateCdaTerms(Node cluster, Node nodeChangedInMapping, Dictionary<string, Document> documents)
         {
-            Debug.Log($"Try to create CDA Terms for {nodeChangedInMapping.ID} and cluster {cluster.ID}...");
+            // Debug.Log($"Try to create CDA Terms for {nodeChangedInMapping.ID} and cluster {cluster.ID}...");
 
             List<Edge> edges = nodeChangedInMapping.GetImplementationEdges();
 
@@ -89,14 +90,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         protected void AddStandardTerms(Node node, Document document)
         {
             string codeRegion = NodeRegionReader.ReadRegion(node);
-            UnityEngine.Debug.Log("source code region: " + codeRegion);
 
-            // TODO: How to determine the right language?
             IList<SEEToken> tokens = SEEToken.FromString(codeRegion, TargetLanguage);
 
             List<string> words = new List<string>();
-
-            UnityEngine.Debug.Log($"words of ascendants: {string.Join(',', words)}");
 
             // TODO: What exactly are String literals?
             foreach (SEEToken token in tokens)
@@ -109,22 +106,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 }
             }
 
-            UnityEngine.Debug.Log($"raw words: {string.Join(',', words)}");
-
             // TODO: White splitting only necessary for comments? 
             // Maybe treat comments separately in a more complex way(depends on language)
             words = this.SplitWhiteSpaces(words);
             words = this.SplitCasing(words);
 
-            UnityEngine.Debug.Log($"splitted words: {string.Join(',', words)}");
-
             // TODO: Stemming of differences languages
             words = this.StemWords(words);
 
-            UnityEngine.Debug.Log($"stemmed words: {string.Join(',', words)}");
+            words = words.Where(x => x.Length > 3).Select(x => x.ToLower()).ToList();
 
             document.AddWords(words);
-            UnityEngine.Debug.Log(document.ToString());
         }
 
         private List<string> Split(string word, Func<char[], int, bool> splitFunction, bool keepCharAtSplit)

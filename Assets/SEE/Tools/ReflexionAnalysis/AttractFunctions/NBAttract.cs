@@ -1,12 +1,9 @@
-﻿using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
-using SEE.DataModel;
+﻿using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using System;
 using System.Collections.Generic;
-using Accord.MachineLearning.Text.Stemmers;
 using System.Text;
-using UnityEngine;
 using SEE.UI.Window.CodeWindow;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions

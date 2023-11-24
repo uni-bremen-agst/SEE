@@ -32,25 +32,25 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         protected Dictionary<string, double> edgeWeights = new Dictionary<string, double>();
 
-        public AttractFunction(ReflexionGraph reflexionGraph, string targetType)
+        public AttractFunction(ReflexionGraph reflexionGraph, string candidateType)
         {
             this.reflexionGraph= reflexionGraph;
-            this.candidateType = targetType;
+            this.candidateType = candidateType;
         }
         public AttractFunction(ReflexionGraph reflexionGraph, 
-                                string targetType, 
-                                Dictionary<string, double> edgeWeights) : this(reflexionGraph, targetType)
+                                string candidateType, 
+                                Dictionary<string, double> edgeWeights) : this(reflexionGraph, candidateType)
         {
             this.edgeWeights = edgeWeights;
         }
 
-        public static AttractFunction Create(AttractFunctionType attractFunctionType, ReflexionGraph reflexionGraph, string targetType)
+        public static AttractFunction Create(AttractFunctionType attractFunctionType, ReflexionGraph reflexionGraph, string candidateType)
         {
             switch(attractFunctionType)
             {
-                case AttractFunctionType.CountAttract: return new CountAttract(reflexionGraph, targetType);
+                case AttractFunctionType.CountAttract: return new CountAttract(reflexionGraph, candidateType);
                 // TODO: Resolve target language properly
-                case AttractFunctionType.NBAttract: return new NBAttract(reflexionGraph, targetType, true, TokenLanguage.Java, true);
+                case AttractFunctionType.NBAttract: return new NBAttract(reflexionGraph, candidateType, true, TokenLanguage.Plain, true);
             }
             throw new ArgumentException("Given attractFunctionType is currently not implemented");
         }

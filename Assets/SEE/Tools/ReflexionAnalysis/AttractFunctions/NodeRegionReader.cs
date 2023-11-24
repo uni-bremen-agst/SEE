@@ -30,14 +30,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
                 // TODO: Is this length to be interpreted in lines?
                 int sourceRegionLength = node.GetInt("Source.Region_Length");
-
                 sourceRegionEnd = sourceRegionStart + sourceRegionLength;
 
-                string sourcePath = node.GetString("Source.Path");
-
-                string sourceFileName = node.GetString("Source.File");
-
-                fileName = System.IO.Path.Combine(sourcePath, sourceFileName);
+                fileName = node.AbsolutePlatformPath();
 
                 // TODO: Is it possible to improve efficiency?
                 using (StreamReader streamReader = new StreamReader(new FileStream(fileName, FileMode.Open, FileAccess.Read)))

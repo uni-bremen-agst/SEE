@@ -43,7 +43,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         // TODO: 
         private WindowSpace space;
 
-        CandidateRecommendation CandidateRecommendation
+        public CandidateRecommendation CandidateRecommendation
         {
             get 
             {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
-    internal class NaiveBayes : IEnumerable<string>
+    public class NaiveBayes : IEnumerable<string>
     {
         private Dictionary<string, ClassInformation> trainingData;
 
@@ -112,6 +112,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             private int wordCount;
 
+            private static Dictionary<string, int> wordFrequenciesGlobal = new Dictionary<string, int>();
+
             private int documentCount;
 
             private NaiveBayes classifier;
@@ -127,11 +129,19 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             public double GetWordProbability(string word)
             {
                 int wordFrequency = classifier.Alpha;
+                int wordCountWithAlpha = wordCount + wordFrequenciesGlobal.Keys.Count * classifier.Alpha;
+                
                 if (wordFrequencies.ContainsKey(word))
                 {
                     wordFrequency += wordFrequencies[word];
+                } 
+                
+                if(!wordFrequenciesGlobal.ContainsKey(word))
+                {
+                    wordCountWithAlpha++;
                 }
-                double wordProbability = (double)wordFrequency / (double)wordCount;
+
+                double wordProbability = (double)wordFrequency / (double)wordCountWithAlpha;
                 return wordProbability;
             }
 
@@ -140,8 +150,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 foreach (string word in document)
                 {
                     if (!wordFrequencies.ContainsKey(word)) wordFrequencies.Add(word, 0);
-                    // wordFrequencies[word] += document.GetFrequency(word);
+                    if (!wordFrequenciesGlobal.ContainsKey(word)) wordFrequenciesGlobal.Add(word,0);
                     wordFrequencies[word]++;
+                    wordFrequenciesGlobal[word]++;
                     wordCount++;
                 }
                 DocumentCount++;
@@ -153,8 +164,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 {
                     if (wordFrequencies.ContainsKey(word))
                     {
-                        // wordFrequencies[word] -= document.GetFrequency(word);
                         wordFrequencies[word]--;
+                        wordFrequenciesGlobal[word]--;
+                        if (wordFrequenciesGlobal[word] == 0) wordFrequenciesGlobal.Remove(word);
                         wordCount--;
                     }
                 }
