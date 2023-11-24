@@ -116,7 +116,7 @@ namespace SEE.UI.Window.TreeWindow
                 OrderItemHere(id, level);
                 if (expandedItems.Contains(id))
                 {
-                    IList<Node> children = WithHiddenChildren(node.Children()).OrderBy(x => x.SourceName).ToList();
+                    IList<Node> children = Searcher.Sorter.Apply(WithHiddenChildren(node.Children())).ToList();
                     foreach (Node child in children)
                     {
                         OrderTreeRecursive(child, level + 1);
@@ -651,100 +651,11 @@ namespace SEE.UI.Window.TreeWindow
             SearchField.onValueChanged.AddListener(SearchFor);
 
             FilterButton = root.Find("Search/Filter").gameObject.MustGetComponent<ButtonManagerBasic>();
-            FilterButton.clickEvent.AddListener(ShowFilterMenu);
+            SortButton = root.Find("Search/Sort").gameObject.MustGetComponent<ButtonManagerBasic>();
+            PopupMenu.PopupMenu popupMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
+            ContextMenu = new TreeWindowContextMenu(popupMenu, Searcher, Rebuild, FilterButton, SortButton);
 
             AddRoots().Forget();
-            return;
-
-            // Constructs the menu for the filter button.
-            void UpdateFilterMenuEntries()
-            {
-                ISet<string> nodeToggles = Graph.AllToggleNodeAttributes();
-                ISet<string> edgeToggles = Graph.AllToggleEdgeAttributes();
-                ISet<string> commonToggles = nodeToggles.Intersect(edgeToggles).ToHashSet();
-                // Don't include common toggles in node/edge toggles.
-                nodeToggles.ExceptWith(commonToggles);
-                edgeToggles.ExceptWith(commonToggles);
-                // TODO: Allow filtering by node type.
-
-                List<PopupMenuEntry> entries = new()
-                {
-                    new PopupMenuAction("Edges",
-                                        () =>
-                                        {
-                                            Searcher.Filter.IncludeEdges = !Searcher.Filter.IncludeEdges;
-                                            UpdateFilterMenuEntries();
-                                            Rebuild();
-                                        },
-                                        Checkbox(Searcher.Filter.IncludeEdges), CloseAfterClick: false),
-                };
-
-                if (Searcher.Filter.ExcludeElements.Count > 0)
-                {
-                    entries.Insert(0, new PopupMenuAction("Show hidden elements",
-                                                          () =>
-                                                          {
-                                                              Searcher.Filter.ExcludeElements.Clear();
-                                                              Rebuild();
-                                                          },
-                                                          Icons.Show));
-                }
-
-                if (commonToggles.Count > 0)
-                {
-                    entries.Add(new PopupMenuHeading("Common properties"));
-                    entries.AddRange(commonToggles.Select(FilterActionFor));
-                }
-                if (nodeToggles.Count > 0)
-                {
-                    entries.Add(new PopupMenuHeading("Node properties"));
-                    entries.AddRange(nodeToggles.Select(FilterActionFor));
-                }
-                if (edgeToggles.Count > 0)
-                {
-                    entries.Add(new PopupMenuHeading("Edge properties"));
-                    entries.AddRange(edgeToggles.Select(FilterActionFor));
-                }
-
-                ContextMenu.ClearEntries();
-                ContextMenu.AddEntries(entries);
-            }
-
-            void ShowFilterMenu()
-            {
-                UpdateFilterMenuEntries();
-                ContextMenu.ShowWith(position: FilterButton.transform.position);
-            }
-
-            PopupMenuAction FilterActionFor(string toggleAttribute)
-            {
-                return new PopupMenuAction(toggleAttribute,
-                                           () =>
-                                           {
-                                               // Toggle from include->exclude->none->include.
-                                               if (Searcher.Filter.IncludeToggleAttributes.Contains(toggleAttribute))
-                                               {
-                                                   Searcher.Filter.IncludeToggleAttributes.Remove(toggleAttribute);
-                                                   Searcher.Filter.ExcludeToggleAttributes.Add(toggleAttribute);
-                                               }
-                                               else if (Searcher.Filter.ExcludeToggleAttributes.Contains(toggleAttribute))
-                                               {
-                                                   Searcher.Filter.ExcludeToggleAttributes.Remove(toggleAttribute);
-                                               }
-                                               else
-                                               {
-                                                   Searcher.Filter.IncludeToggleAttributes.Add(toggleAttribute);
-                                               }
-                                               UpdateFilterMenuEntries();
-                                               Rebuild();
-                                           },
-                                           Searcher.Filter.ExcludeToggleAttributes.Contains(toggleAttribute)
-                                               ? Icons.MinusCheckbox
-                                               : Checkbox(Searcher.Filter.IncludeToggleAttributes.Contains(toggleAttribute)),
-                                           CloseAfterClick: false);
-            }
-
-            char Checkbox(bool value) => value ? Icons.CheckedCheckbox : Icons.EmptyCheckbox;
         }
 
         /// <summary>

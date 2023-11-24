@@ -27,12 +27,19 @@ namespace SEE.DataModel.GraphSearch
         /// <summary>
         /// The graph to be searched.
         /// </summary>
-        private readonly Graph graph;
+        public readonly Graph Graph;
 
         /// <summary>
-        /// The filter that is applied to the graph elements before they are searched.
+        /// The filter that is applied to the graph elements when they are searched.
         /// </summary>
         public GraphFilter Filter { get; } = new();
+
+        /// <summary>
+        /// The sorter that is applied to the graph elements when they are searched.
+        /// </summary>
+        public GraphSorter Sorter { get; } = new();
+
+        private IEnumerable<IGraphModifier> Modifiers => new IGraphModifier[] { Filter, Sorter };
 
         /// <summary>
         /// Creates a new instance of <see cref="GraphSearch"/> for the given <paramref name="graph"/>.
@@ -40,7 +47,7 @@ namespace SEE.DataModel.GraphSearch
         /// <param name="graph">The graph to be searched.</param>
         public GraphSearch(Graph graph)
         {
-            this.graph = graph;
+            this.Graph = graph;
             elements = graph.Nodes().GroupBy(ElementToString).ToDictionary(g => g.Key, g => g.ToList());
             graph.Subscribe(this);
         }
@@ -54,10 +61,14 @@ namespace SEE.DataModel.GraphSearch
         /// <returns>A list of nodes which match the query.</returns>
         public IEnumerable<Node> Search(string query, int limit = 10, int cutoff = 40)
         {
-            return Process.ExtractTop(FilterString(query), elements.Keys, limit: limit, cutoff: cutoff)
-                   .SelectMany(x => Filter.Apply(elements[x.Value]).Select(Element => (x.Score, Element)))
-                   .OrderByDescending(x => x.Score)
-                   .Select(x => x.Element);
+            IEnumerable<(int Score, Node Element)> results = Process.ExtractTop(FilterString(query), elements.Keys, limit: limit, cutoff: cutoff)
+                                                                    .SelectMany(x => Modifiers.ApplyAll(elements[x.Value]).Select(Element => (x.Score, Element)));
+            if (!Sorter.IsActive())
+            {
+                // If we don't sort by any custom attribute, we sort by the fuzzy score.
+                results = results.OrderByDescending(x => x.Score);
+            }
+            return results.Select(x => x.Element);
         }
 
         /// <summary>

@@ -43,14 +43,15 @@ namespace SEE.UI.Window.TreeWindow
         private GraphSearch Searcher;
 
         /// <summary>
-        /// The context menu that is displayed when the user right-clicks on an item.
-        /// </summary>
-        private PopupMenu.PopupMenu ContextMenu;
-
-        /// <summary>
         /// Transform of the object containing the items of the tree window.
         /// </summary>
         private RectTransform items;
+
+        /// <summary>
+        /// The context menu that is displayed when the user right-clicks on an item
+        /// or uses the filter or sort buttons.
+        /// </summary>
+        private TreeWindowContextMenu ContextMenu;
 
         /// <summary>
         /// The subscription to the graph observable.
@@ -60,8 +61,6 @@ namespace SEE.UI.Window.TreeWindow
         protected override void Start()
         {
             Searcher = new GraphSearch(Graph);
-            Searcher.Filter.IncludeToggleAttributes.UnionWith(Graph.AllToggleGraphElementAttributes());
-            ContextMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
             subscription = Graph.Subscribe(this);
             base.Start();
         }

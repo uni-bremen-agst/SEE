@@ -7,7 +7,7 @@ namespace SEE.DataModel.GraphSearch
     /// <summary>
     /// A configurable filter for graph elements, mainly intended for use with <see cref="GraphSearch"/>.
     /// </summary>
-    public class GraphFilter
+    public class GraphFilter : IGraphModifier
     {
         // if empty, include all. otherwise, *at least one* must be present.
         /// <summary>
@@ -63,6 +63,18 @@ namespace SEE.DataModel.GraphSearch
         public IEnumerable<T> Apply<T>(IEnumerable<T> elements) where T : GraphElement
         {
             return elements.Where(Includes);
+        }
+
+        public bool IsActive() => !IncludeNodes || !IncludeEdges
+            || IncludeToggleAttributes.Count > 0 || ExcludeToggleAttributes.Count > 0 || ExcludeElements.Count > 0;
+
+        public void Reset()
+        {
+            IncludeToggleAttributes.Clear();
+            ExcludeToggleAttributes.Clear();
+            ExcludeElements.Clear();
+            IncludeNodes = true;
+            IncludeEdges = true;
         }
     }
 }

@@ -30,5 +30,10 @@ namespace SEE.Utils
         public const char Hide = '\uF070';
         public const char Show = '\uF06E';
         public const char QuestionMark = '?';
+        public const char ArrowRotateLeft = '\uF0E2';
+        public const char SortAlphabeticalUp = '\uF15E';
+        public const char SortAlphabeticalDown = '\uF15D';
+        public const char SortNumericUp = '\uF163';
+        public const char SortNumericDown = '\uF162';
     }
 }
