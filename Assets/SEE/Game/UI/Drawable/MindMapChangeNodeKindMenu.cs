@@ -74,6 +74,13 @@ namespace Assets.SEE.Game.UI.Drawable
                             GameObject pMenu = MindMapParentSelectionMenu.EnableForEditing(GameFinder.GetAttachedObjectsObject(drawable), addedNode, newConf, null);
                             GameFinder.FindChild(pMenu, "Dragger").GetComponent<WindowDragger>().enabled = false;
                             pMenu.transform.SetParent(GameFinder.FindChild(instance, "Content").transform);
+
+                            if (addedNode.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null)
+                            {
+                                GameObject pBranchLine = addedNode.GetComponent<MMNodeValueHolder>().GetParentBranchLine();
+                                GameEdit.ChangeLine(pBranchLine, parentBranchLineConf);
+                                new EditLineNetAction(drawable.name, drawableParent, LineConf.GetLine(pBranchLine)).Execute();
+                            }
                         }
                         else
                         {
