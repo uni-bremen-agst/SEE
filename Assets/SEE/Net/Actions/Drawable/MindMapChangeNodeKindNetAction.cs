@@ -73,8 +73,7 @@ namespace SEE.Net.Actions.Drawable
                 {
                     GameObject attached = GameFinder.GetAttachedObjectsObject(drawable);
                     GameObject node = GameFinder.FindChild(attached, Node.borderConf.id).transform.parent.gameObject;
-                    GameObject parent = GameFinder.FindChild(attached, Node.parentNode);
-                    GameMindMap.ChangeNodeKind(node, NodeKind);
+                    GameMindMap.ChangeNodeKind(node, NodeKind, Node.borderConf);
                 }
                 else
                 {

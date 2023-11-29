@@ -447,14 +447,14 @@ namespace Assets.SEE.Game.Drawable
         /// </summary>
         /// <param name="node">The node which should change the node kind.</param>
         /// <param name="newNodeKind">The new node kind for the node.</param>
+        /// <param name="borderConf">Optional parameter: To make the border look like the old one.</param>
         /// <returns>The new node kind of the node.</returns>
-        public static NodeKind ChangeNodeKind(GameObject node, NodeKind newNodeKind)
+        public static NodeKind ChangeNodeKind(GameObject node, NodeKind newNodeKind, LineConf borderConf = null)
         {
             MMNodeValueHolder nodeValueHolder = node.GetComponent<MMNodeValueHolder>();
             GameObject nodeText = GameFinder.FindChildWithTag(node, Tags.DText);
             GameObject nodeBorder = GameFinder.FindChildWithTag(node, Tags.Line);
             LineConf border = LineConf.GetLine(nodeBorder);
-            Color color = border.primaryColor == Color.clear? Color.black : border.primaryColor;
 
             if (nodeValueHolder.GetNodeKind() != newNodeKind && CheckValidNodeKindChange(node, newNodeKind, nodeValueHolder.GetNodeKind()))
             {
@@ -472,13 +472,13 @@ namespace Assets.SEE.Game.Drawable
                         GameEdit.ChangeFontStyles(nodeText, FontStyles.Bold | FontStyles.Underline);
                         GameEdit.ChangeFontSize(nodeText, 1.0f);
                         GameDrawer.ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.standardLineTiling);
-                        GameEdit.ChangePrimaryColor(nodeBorder, color);
+                        GameEdit.ChangePrimaryColor(nodeBorder, Color.black);
                         break;
                     case NodeKind.Subtheme:
                         GameEdit.ChangeFontStyles(nodeText, FontStyles.Normal);
                         GameEdit.ChangeFontSize(nodeText, 0.7f);
                         GameDrawer.ChangeLineKind(nodeBorder, LineKind.Solid, ValueHolder.standardLineTiling);
-                        GameEdit.ChangePrimaryColor(nodeBorder, color);
+                        GameEdit.ChangePrimaryColor(nodeBorder, Color.black);
                         break;
                     case NodeKind.Leaf:
                         ellipse = true;
@@ -492,6 +492,10 @@ namespace Assets.SEE.Game.Drawable
                 DisableTextAndBorderCollider(node);
                 Vector3[] positions = GetBorderPositions(ellipse, Vector3.zero, nodeText);
                 GameDrawer.Drawing(nodeBorder, positions);
+                if (newNodeKind != NodeKind.Leaf && borderConf != null)
+                {
+                    GameEdit.ChangeLine(nodeBorder, borderConf);
+                }
 
                 nodeValueHolder.SetNodeKind(newNodeKind);
                 ReDrawBranchLines(node);

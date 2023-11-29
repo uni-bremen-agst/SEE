@@ -301,14 +301,17 @@ namespace Assets.SEE.Game.Drawable
             GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(
                     GameFinder.GetDrawable(node));
             GameObject parent = GameFinder.FindChild(attachedObjects, conf.parentNode);
-            GameMindMap.ChangeNodeKind(node, conf.nodeKind);
+            GameMindMap.ChangeNodeKind(node, conf.nodeKind, conf.borderConf);
             GameMindMap.ChangeParent(node, parent);
+
             GameFinder.FindChildWithTag(node, Tags.Line).GetComponent<MeshCollider>().enabled = false;
             GameFinder.FindChildWithTag(node, Tags.DText).GetComponent<MeshCollider>().enabled = false;
-
-            GameObject branch = GameFinder.FindChild(attachedObjects, conf.branchLineToParent);
-            ChangeLine(branch, conf.branchLineConf);
-            branch.GetComponent<MeshCollider>().enabled = false;
+            if (conf.branchLineToParent != "")
+            {
+                GameObject branch = GameFinder.FindChild(attachedObjects, conf.branchLineToParent);
+                ChangeLine(branch, conf.branchLineConf);
+                branch.GetComponent<MeshCollider>().enabled = false;
+            }
         }
     }
 }

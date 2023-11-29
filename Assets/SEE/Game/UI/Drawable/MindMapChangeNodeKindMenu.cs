@@ -1,15 +1,10 @@
 ﻿using Assets.SEE.Game.Drawable;
 using Michsky.UI.ModernUIPack;
-using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.UI.Notification;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -60,11 +55,14 @@ namespace Assets.SEE.Game.UI.Drawable
                 GameObject drawable = GameFinder.GetDrawable(addedNode);
                 string drawableParent = GameFinder.GetDrawableParentName(drawable);
 
+                LineConf boarderConf = newConf.borderConf;
+                LineConf parentBranchLineConf = newConf.branchLineConf;
+
                 nodeKindSelector.selectorEvent.AddListener(index =>
                 {
                     GameMindMap.NodeKind newNodeKind = GameMindMap.GetNodeKinds()[index];
                     GameMindMap.NodeKind oldKind = newConf.nodeKind;
-                    GameMindMap.ChangeNodeKind(addedNode, newNodeKind);
+                    GameMindMap.ChangeNodeKind(addedNode, newNodeKind, boarderConf);
                     new MindMapChangeNodeKindNetAction(drawable.name, drawableParent, newConf, newNodeKind).Execute();
                     newConf.nodeKind = newNodeKind;
 
