@@ -66,7 +66,7 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameFinder.Find(DrawableID,ParentDrawableID);
+                GameObject drawable = GameFinder.FindDrawable(DrawableID,ParentDrawableID);
                 GameObject obj = GameFinder.FindChild(drawable, ObjectName);
                 if (drawable == null)
                 {

@@ -38,6 +38,7 @@ TagManager:
   - AttachedObjects
   - DText
   - Image
+  - MindMapNode
   layers:
   - Default
   - TransparentFX

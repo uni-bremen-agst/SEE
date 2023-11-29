@@ -59,7 +59,7 @@ namespace Assets.SEE.Game.Drawable
             GameObject stickyNote = PrefabInstantiator.InstantiatePrefab(stickyNotePrefabName);
             stickyNote.transform.eulerAngles = config.Rotation;
             stickyNote.transform.position = config.Position;
-            stickyNote.name = config.DrawableParentName;
+            stickyNote.name = config.ParentID;
             stickyNote.transform.localScale = config.Scale;
             stickyNote.transform.Find("Front").GetComponent<MeshRenderer>().material.color = config.Color;
 

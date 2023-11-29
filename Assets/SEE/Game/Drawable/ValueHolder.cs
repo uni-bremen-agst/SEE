@@ -73,17 +73,22 @@ namespace Assets.SEE.Game.Drawable
         /// <summary>
         /// The prefix of a mind map theme node
         /// </summary>
-        public const string MindMapTheme = "Theme";
+        public const string MindMapThemePrefix = "Theme";
 
         /// <summary>
         /// The prefix of a mind map node node
         /// </summary>
-        public const string MindMapNode = "Node";
+        public const string MindMapSubthemePrefix = "Subtheme";
 
         /// <summary>
         /// The prefix of a mind map leaf node.
         /// </summary>
-        public const string MindMapLeaf = "Leaf";
+        public const string MindMapLeafPrefix = "Leaf";
+
+        /// <summary>
+        /// The prefix of a mind map branch line.
+        /// </summary>
+        public const string MindMapBranchLine = "BranchLine";
  
         /// <summary>
         /// The prefix of a sticky notes.
@@ -105,6 +110,21 @@ namespace Assets.SEE.Game.Drawable
         /// The distance to a drawable that is used by default to place objects.
         /// </summary>
         public static readonly Vector3 distanceToDrawable = new(0, 0, 0.0001f);
+
+        /// <summary>
+        /// The standard line thickness
+        /// </summary>
+        public const float standardLineThickness = 0.01f;
+
+        /// <summary>
+        /// The standard line tiling.
+        /// </summary>
+        public const float standardLineTiling = 1.0f;
+
+        /// <summary>
+        /// The standard text outline thickness.
+        /// </summary>
+        public const float standardTextOutlineThickness = 0.4f;
 
         /// <summary>
         /// The path to the folder drawable folder of the saved files. This is saved in a field because multiple

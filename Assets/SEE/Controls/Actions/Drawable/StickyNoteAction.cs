@@ -75,7 +75,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// This struct can store all the information needed to revert or repeat a <see cref="StickyNoteAction"/>.
         /// </summary>
-        private class Memento
+        private struct Memento
         {
             /// <summary>
             /// The original configuration of the sticky note.
@@ -192,7 +192,7 @@ namespace SEE.Controls.Actions.Drawable
             /// When the spawning is finish create the sticky note on all clients and complete the current state.
             if (finish)
             {
-                DrawableConfig config = DrawableConfigManager.GetDrawableConfig(GameFinder.FindDrawable(stickyNote));
+                DrawableConfig config = DrawableConfigManager.GetDrawableConfig(GameFinder.GetDrawable(stickyNote));
                 new StickyNoteSpawnNetAction(config).Execute();
                 memento = new(config, selectedAction);
                 currentState = ReversibleAction.Progress.Completed;
@@ -217,7 +217,7 @@ namespace SEE.Controls.Actions.Drawable
                 GameFinder.hasDrawable(raycastHit.collider.gameObject)))
             {
                 GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                    raycastHit.collider.gameObject : GameFinder.FindDrawable(raycastHit.collider.gameObject);
+                    raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
                 if (GameFinder.GetDrawableParentName(drawable).Contains(ValueHolder.StickyNotePrefix))
                 {
                     inProgress = true;
@@ -251,14 +251,14 @@ namespace SEE.Controls.Actions.Drawable
                 Raycasting.RaycastAnything(out RaycastHit hit))
             {
                 GameStickyNoteManager.Move(stickyNoteHolder, hit.point, hit.collider.gameObject.transform.eulerAngles);
-                new StickyNoteMoveNetAction(GameFinder.FindDrawable(stickyNote).name, stickyNote.name,
+                new StickyNoteMoveNetAction(GameFinder.GetDrawable(stickyNote).name, stickyNote.name,
                     hit.point, hit.collider.gameObject.transform.eulerAngles).Execute();
 
                 if (Input.GetMouseButton(0))
                 {
-                    GameFinder.FindDrawable(stickyNoteHolder).GetComponent<Collider>().enabled = true;
+                    GameFinder.GetDrawable(stickyNoteHolder).GetComponent<Collider>().enabled = true;
                     Vector3 newPos = GameStickyNoteManager.FinishMoving(stickyNoteHolder);
-                    new StickyNoteMoveNetAction(GameFinder.FindDrawable(stickyNote).name, stickyNote.name,
+                    new StickyNoteMoveNetAction(GameFinder.GetDrawable(stickyNote).name, stickyNote.name,
                         newPos, stickyNoteHolder.transform.eulerAngles).Execute();
                     StickyNoteRotationMenu.Enable(stickyNoteHolder);
                     StickyNoteMoveMenu.Enable(stickyNoteHolder);
@@ -293,7 +293,7 @@ namespace SEE.Controls.Actions.Drawable
                 GameFinder.hasDrawable(raycastHit.collider.gameObject)))
             {
                 GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                    raycastHit.collider.gameObject : GameFinder.FindDrawable(raycastHit.collider.gameObject);
+                    raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
 
                 /// This block will executed if there was selected another sticky note before in this action run.
                 if (stickyNote != null)
@@ -325,7 +325,7 @@ namespace SEE.Controls.Actions.Drawable
                     /// To edit it is required that a sticky note was selected.
                     if (GameFinder.GetDrawableParentName(drawable).Contains(ValueHolder.StickyNotePrefix))
                     {
-                        EnableHighlight();
+                        GameHighlighter.Enable(stickyNote);
 
                         memento = new(DrawableConfigManager.GetDrawableConfig(drawable), selectedAction);
                         memento.changedConfig = DrawableConfigManager.GetDrawableConfig(drawable);
@@ -380,7 +380,7 @@ namespace SEE.Controls.Actions.Drawable
                 GameFinder.hasDrawable(raycastHit.collider.gameObject)))
             {
                 GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                                raycastHit.collider.gameObject : GameFinder.FindDrawable(raycastHit.collider.gameObject);
+                                raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
                 if (GameFinder.GetDrawableParentName(drawable).Contains(ValueHolder.StickyNotePrefix))
                 {
                     memento = new(DrawableConfigManager.GetDrawableConfig(drawable), selectedAction);
@@ -409,21 +409,7 @@ namespace SEE.Controls.Actions.Drawable
                 original.Rotation.Equals(changed.Rotation) && original.Order.Equals(changed.Order);
         }
 
-        /// <summary>
-        /// Enables the highlight effect for selected sticky notes.
-        /// </summary>
-        private void EnableHighlight()
-        {
-            HighlightEffect effect = stickyNote.AddComponent<HighlightEffect>();
-            effect.highlighted = true;
-            effect.previewInEditor = false;
-            effect.outline = 1;
-            effect.outlineQuality = HighlightPlus.QualityLevel.Highest;
-            effect.outlineColor = Color.yellow;
-            effect.glowQuality = HighlightPlus.QualityLevel.Highest;
-            effect.glow = 1.0f;
-            effect.glowHQColor = Color.yellow;
-        }
+
 
         /// <summary>
         /// Reverts this action, i.e., it spawn/delete the sticky note or change to old position / values.
@@ -434,21 +420,21 @@ namespace SEE.Controls.Actions.Drawable
             {
                 case Operation.Spawn:
                     GameObject toDelete = GameFinder.GetHighestParent(
-                        GameFinder.Find(memento.originalConfig.DrawableName, memento.originalConfig.DrawableParentName));
+                        GameFinder.FindDrawable(memento.originalConfig.ID, memento.originalConfig.ParentID));
                     new StickyNoteDeleterNetAction(toDelete.name).Execute();
                     Destroyer.Destroy(toDelete);
                     break;
                 case Operation.Move:
                     GameObject stickyHolder = GameFinder.GetHighestParent(
-                        GameFinder.Find(memento.originalConfig.DrawableName, memento.originalConfig.DrawableParentName));
+                        GameFinder.FindDrawable(memento.originalConfig.ID, memento.originalConfig.ParentID));
                     GameStickyNoteManager.Move(stickyHolder, memento.originalConfig.Position, memento.originalConfig.Rotation);
-                    GameObject d = GameFinder.FindDrawable(stickyHolder);
+                    GameObject d = GameFinder.GetDrawable(stickyHolder);
                     string drawableParentID = GameFinder.GetDrawableParentName(d);
                     new StickyNoteMoveNetAction(d.name, drawableParentID, memento.originalConfig.Position,
                         memento.originalConfig.Rotation).Execute();
                     break;
                 case Operation.Edit:
-                    GameObject sticky = GameFinder.Find(memento.originalConfig.DrawableName, memento.originalConfig.DrawableParentName)
+                    GameObject sticky = GameFinder.FindDrawable(memento.originalConfig.ID, memento.originalConfig.ParentID)
                         .transform.parent.gameObject;
                     GameStickyNoteManager.Change(sticky, memento.originalConfig);
                     new StickyNoteChangeNetAction(memento.originalConfig).Execute();
@@ -456,22 +442,10 @@ namespace SEE.Controls.Actions.Drawable
                 case Operation.Delete:
                     GameObject stickyNote = GameStickyNoteManager.Spawn(memento.originalConfig);
                     new StickyNoteSpawnNetAction(memento.originalConfig).Execute();
-                    GameObject drawable = GameFinder.FindDrawable(stickyNote);
-                    string drawableParent = GameFinder.GetDrawableParentName(drawable);
-                    foreach (LineConf config in memento.originalConfig.LineConfigs)
+                    GameObject drawable = GameFinder.GetDrawable(stickyNote);
+                    foreach(DrawableType type in memento.originalConfig.GetAllDrawableTypes())
                     {
-                        GameDrawer.ReDrawLine(drawable, config);
-                        new DrawOnNetAction(drawable.name, drawableParent, config).Execute();
-                    }
-                    foreach (TextConf config in memento.originalConfig.TextConfigs)
-                    {
-                        GameTexter.ReWriteText(drawable, config);
-                        new WriteTextNetAction(drawable.name, drawableParent, config).Execute();
-                    }
-                    foreach (ImageConf config in memento.originalConfig.ImageConfigs)
-                    {
-                        GameImage.RePlaceImage(drawable, config);
-                        new AddImageNetAction(drawable.name, drawableParent, config).Execute();
+                        DrawableType.Restore(type, drawable);
                     }
                     break;
             }
@@ -490,22 +464,22 @@ namespace SEE.Controls.Actions.Drawable
                     break;
                 case Operation.Move:
                     GameObject stickyHolder = GameFinder.GetHighestParent(
-                        GameFinder.Find(memento.changedConfig.DrawableName, memento.changedConfig.DrawableParentName));
+                        GameFinder.FindDrawable(memento.changedConfig.ID, memento.changedConfig.ParentID));
                     GameStickyNoteManager.Move(stickyHolder, memento.changedConfig.Position, memento.changedConfig.Rotation);
-                    GameObject d = GameFinder.FindDrawable(stickyHolder);
+                    GameObject d = GameFinder.GetDrawable(stickyHolder);
                     string drawableParentID = GameFinder.GetDrawableParentName(d);
                     new StickyNoteMoveNetAction(d.name, drawableParentID, memento.changedConfig.Position,
                         memento.changedConfig.Rotation).Execute();
                     break;
                 case Operation.Edit:
-                    GameObject sticky = GameFinder.Find(memento.changedConfig.DrawableName, memento.changedConfig.DrawableParentName)
+                    GameObject sticky = GameFinder.FindDrawable(memento.changedConfig.ID, memento.changedConfig.ParentID)
                         .transform.parent.gameObject;
                     GameStickyNoteManager.Change(sticky, memento.changedConfig);
                     new StickyNoteChangeNetAction(memento.changedConfig).Execute();
                     break;
                 case Operation.Delete:
-                    GameObject toDelete = GameFinder.GetHighestParent(GameFinder.Find(memento.originalConfig.DrawableName,
-                        memento.originalConfig.DrawableParentName));
+                    GameObject toDelete = GameFinder.GetHighestParent(GameFinder.FindDrawable(memento.originalConfig.ID,
+                        memento.originalConfig.ParentID));
                     new StickyNoteDeleterNetAction(toDelete.name).Execute();
                     Destroyer.Destroy(toDelete);
                     break;
@@ -550,8 +524,8 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>the sticky note id</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            GameObject stickyNoteDrawable = GameFinder.Find(memento.originalConfig.DrawableName,
-                memento.originalConfig.DrawableParentName);
+            GameObject stickyNoteDrawable = GameFinder.FindDrawable(memento.originalConfig.ID,
+                memento.originalConfig.ParentID);
             if (stickyNoteDrawable != null)
             {
                 return new HashSet<string>

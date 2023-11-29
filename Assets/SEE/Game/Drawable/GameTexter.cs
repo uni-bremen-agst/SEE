@@ -176,6 +176,7 @@ namespace Assets.SEE.Game.Drawable
             tmp.fontSize = fontSize;
             tmp.outlineColor = outlineColor;
             tmp.outlineWidth = outlineThickness;
+            tmp.alignment = TextAlignmentOptions.Center;
 
             textObj.transform.rotation = attachedObjects.transform.rotation;
             textObj.transform.position = position - textObj.transform.forward * ValueHolder.distanceToDrawable.z * order;
@@ -254,7 +255,7 @@ namespace Assets.SEE.Game.Drawable
         /// Rewrites a given <see cref="TextConf"/> configuration.
         /// </summary>
         /// <param name="drawable">The drawable on that the text should be displayed.</param>
-        /// <param name="text">The text configuration which contains the necressary values.</param>
+        /// <param name="text">The text configuration which contains the necessary values.</param>
         /// <returns>The created drawable text object</returns>
         public static GameObject ReWriteText(GameObject drawable, TextConf text)
         {
@@ -274,7 +275,7 @@ namespace Assets.SEE.Game.Drawable
 
         /// <summary>
         /// Refreshes the mesh collider of the game object.
-        /// It's necressary because the mesh renderer needs some time to calculates the mesh.
+        /// It's necessary because the mesh renderer needs some time to calculates the mesh.
         /// </summary>
         /// <param name="textObj">The object which contains the mesh collider.</param>
         public static void RefreshMeshCollider(GameObject textObj)

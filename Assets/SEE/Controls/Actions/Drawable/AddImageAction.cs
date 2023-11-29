@@ -74,7 +74,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The drawable on that the text should be displayed
             /// </summary>
-            public GameObject drawable;
+            public DrawableConfig drawable;
 
             /// <summary>
             /// The written text.
@@ -88,7 +88,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <param name="text">The written text</param>
             public Memento(GameObject drawable, ImageConf image)
             {
-                this.drawable = drawable;
+                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
                 this.image = image;
             }
         }
@@ -109,18 +109,20 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (!Raycasting.IsMouseOverGUI())
             {
-                /// Block for 
+                /// Block for the selection of the position and a query from which source the image should be loaded.
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
                      Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
                     (GameFinder.hasDrawable(raycastHit.collider.gameObject) || raycastHit.collider.gameObject.CompareTag(Tags.Drawable))
                     && !ImageSourceMenu.IsOpen()
-                    && (browser == null || (browser != null && !browser.IsOpen())) && (webImageDialog == null || (webImageDialog != null && !isDialogOpen)))
+                    && (browser == null || (browser != null && !browser.IsOpen())) && 
+                        (webImageDialog == null || (webImageDialog != null && !isDialogOpen)))
                 {
                     drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                        raycastHit.collider.gameObject : GameFinder.FindDrawable(raycastHit.collider.gameObject);
+                        raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
                     position = raycastHit.point;
                     ImageSourceMenu.Enable();
                 }
+                /// When a source was chosen this block opens the file browser (for local) or the web dialo (for web).
                 if (ImageSourceMenu.TryGetSource(out ImageSourceMenu.Source source))
                 {
                     switch (source)
@@ -137,7 +139,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     currentState = ReversibleAction.Progress.InProgress;
                 }
-
+                /// The following blocks are for the web source case.
                 if (webImageDialog != null && webImageDialog.WasCanceled())
                 {
                     isDialogOpen = false;
@@ -168,11 +170,14 @@ namespace SEE.Controls.Actions.Drawable
                     filePath = path;
                 }
 
+                /// The following block is for the local source case.
+                /// When the player chose a file path it will be loaded into the attribut.
                 if (browser != null && browser.TryGetFilePath(out string chosenPath))
                 {
                     filePath = chosenPath;
                 }
 
+                /// When a file path was chosen, it loads the image on the chosen position.
                 if (filePath != "")
                 {
                     imageObj = GameImage.PlaceImage(drawable, filePath, position, ValueHolder.currentOrderInLayer);
@@ -192,8 +197,8 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            GameObject obj = GameFinder.FindChild(memento.drawable, memento.image.id);
-            new EraseNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), memento.image.id).Execute();
+            GameObject obj = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.image.id);
+            new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.image.id).Execute();
             Destroyer.Destroy(obj);
         }
 
@@ -203,9 +208,8 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            GameImage.RePlaceImage(memento.drawable, memento.image);
-            string drawableParent = GameFinder.GetDrawableParentName(memento.drawable);
-            new AddImageNetAction(memento.drawable.name, drawableParent, memento.image).Execute();
+            GameImage.RePlaceImage(memento.drawable.GetDrawable(), memento.image);
+            new AddImageNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.image).Execute();
         }
 
         /// <summary>

@@ -39,7 +39,7 @@ namespace Assets.SEE.Game.UI.Drawable
 
         /// <summary>
         /// Create and enables the edit menu.
-        /// It add's the necressary Handler to the GUI areas.
+        /// It add's the necessary Handler to the GUI areas.
         /// </summary>
         public static void Enable(GameObject stickyNote, DrawableConfig newConfig)
         {
@@ -51,7 +51,7 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 newConfig.Order = order;
                 GameStickyNoteManager.ChangeLayer(stickyNote, order);
-                new EditLayerNetAction(GameFinder.FindDrawable(stickyNote).name, stickyNote.name, "", order).Execute();
+                new EditLayerNetAction(GameFinder.GetDrawable(stickyNote).name, stickyNote.name, "", order).Execute();
             });
 
             HSVPicker.ColorPicker picker = instance.GetComponentInChildren<HSVPicker.ColorPicker>();
@@ -63,18 +63,25 @@ namespace Assets.SEE.Game.UI.Drawable
                 new StickyNoteChangeColorNetAction(newConfig).Execute();
             });
 
+            UnityAction callback = () =>
+            {
+                instance.SetActive(true);
+                StickyNoteRotationMenu.Disable();
+                ScaleMenu.Disable();
+            };
+
             ButtonManagerBasic rotation = GameFinder.FindChild(instance, "Rotation").GetComponent<ButtonManagerBasic>();
             rotation.clickEvent.AddListener(() => 
             {
-                StickyNoteRotationMenu.Enable(GameFinder.GetHighestParent(stickyNote));
-                Disable();
+                instance.SetActive(false);
+                StickyNoteRotationMenu.Enable(GameFinder.GetHighestParent(stickyNote), null, callback);
             });
 
             ButtonManagerBasic scale = GameFinder.FindChild(instance, "Scale").GetComponent<ButtonManagerBasic>();
             scale.clickEvent.AddListener(() =>
             {
-                ScaleMenu.Enable(stickyNote, true);
-                Disable();
+                instance.SetActive(false);
+                ScaleMenu.Enable(stickyNote, true, callback);
             });
         }
     }

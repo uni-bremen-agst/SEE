@@ -6,6 +6,7 @@ using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Assets.SEE.Game.UI.Drawable
 {
@@ -53,13 +54,13 @@ namespace Assets.SEE.Game.UI.Drawable
         /// Enables the rotation menu. It beginns with the x - rotation menu.
         /// </summary>
         /// <param name="stickyNoteHolder">the sticky note that should be rotated.</param>
-        /// <param name="hittedObject">The object where the sticky note was placed. only necressary for spawning.</param>
-        public static void Enable(GameObject stickyNoteHolder, GameObject hittedObject = null)
+        /// <param name="hittedObject">The object where the sticky note was placed. only necessary for spawning.</param>
+        public static void Enable(GameObject stickyNoteHolder, GameObject hittedObject = null, UnityAction returnCall = null)
         {
             xRotationMenu = PrefabInstantiator.InstantiatePrefab(xRotationMenuPrefab,
                 GameObject.Find("UI Canvas").transform, false);
             Vector3 oldPos = stickyNoteHolder.transform.position;
-            GameObject drawable = GameFinder.FindDrawable(stickyNoteHolder);
+            GameObject drawable = GameFinder.GetDrawable(stickyNoteHolder);
             string drawableParentID = GameFinder.GetDrawableParentName(drawable);
             GameFinder.FindChild(xRotationMenu, "Laying").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
@@ -85,24 +86,41 @@ namespace Assets.SEE.Game.UI.Drawable
             GameFinder.FindChild(xRotationMenu, "Next").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 xRotationMenu.SetActive(false);
-                EnableYRotation(stickyNoteHolder, hittedObject != null);
+                EnableYRotation(stickyNoteHolder, hittedObject != null, returnCall);
             });
+
+            if (returnCall != null)
+            {
+                GameFinder.FindChild(xRotationMenu, "ReturnBtn").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(returnCall);
+            }
+            else
+            {
+                GameFinder.FindChild(xRotationMenu, "ReturnBtn").SetActive(false);
+            }
         }
 
         /// <summary>
         /// Enables the menu for y - rotation.
         /// </summary>
         /// <param name="stickyNoteHolder">The sticky note that should be rotated.</param>
-        private static void EnableYRotation(GameObject stickyNoteHolder, bool spawnMode = true)
+        private static void EnableYRotation(GameObject stickyNoteHolder, bool spawnMode = true, UnityAction returnCall = null)
         {
             yRotationMenu = PrefabInstantiator.InstantiatePrefab(yRotationMenuPrefab,
                 GameObject.Find("UI Canvas").transform, false);
             RotationSliderController slider = yRotationMenu.GetComponentInChildren<RotationSliderController>();
             Vector3 oldPos = stickyNoteHolder.transform.position;
             SliderListener(slider, stickyNoteHolder, oldPos, spawnMode);
-            GameObject drawable = GameFinder.FindDrawable(stickyNoteHolder);
+            GameObject drawable = GameFinder.GetDrawable(stickyNoteHolder);
             string drawableParentID = GameFinder.GetDrawableParentName(drawable);
 
+            if (returnCall != null)
+            {
+                GameFinder.FindChild(yRotationMenu, "ReturnBtn").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(returnCall);
+            }
+            else
+            {
+                GameFinder.FindChild(yRotationMenu, "ReturnBtn").SetActive(false);
+            }
 
             GameFinder.FindChild(yRotationMenu, "0").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
@@ -165,7 +183,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <param name="stickyNote">The sticky note to rotate</param>
         private static void SliderListener(RotationSliderController slider, GameObject stickyNote, Vector3 oldPos, bool spawnMode)
         {
-            GameObject drawable = GameFinder.FindDrawable(stickyNote);
+            GameObject drawable = GameFinder.GetDrawable(stickyNote);
             string drawableParentID = GameFinder.GetDrawableParentName(drawable);
 
             Transform transform = stickyNote.transform;

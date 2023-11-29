@@ -57,6 +57,11 @@ namespace Assets.SEE.Game.UI.Drawable
         private static Transform content;
 
         /// <summary>
+        /// The transform of the dragger object.
+        /// </summary>
+        private static Transform dragger;
+
+        /// <summary>
         /// Holds the current selected line kind.
         /// </summary>
         private static GameDrawer.LineKind selectedLineKind;
@@ -124,6 +129,8 @@ namespace Assets.SEE.Game.UI.Drawable
             instance = PrefabInstantiator.InstantiatePrefab(lineMenuPrefab,
                 GameObject.Find("UI Canvas").transform, false);
             content = instance.transform.Find("Content");
+            dragger = instance.transform.Find("Dragger");
+            disableReturn();
 
             lineKindSelector = GameFinder.FindChild(instance, "LineKindSelection").GetComponent<HorizontalSelector>();
             foreach (LineKind kind in GameDrawer.GetLineKinds())
@@ -205,6 +212,7 @@ namespace Assets.SEE.Game.UI.Drawable
             enableLineMenuLayers();
             instance.transform.SetParent(GameObject.Find("UI Canvas").transform);
             GameFinder.FindChild(instance, "Dragger").GetComponent<WindowDragger>().enabled = true;
+            disableReturn();
             instance.SetActive(false);
         }
 
@@ -345,13 +353,20 @@ namespace Assets.SEE.Game.UI.Drawable
         /// This method provides the line menu for editing, adding the necessary Handler to the respective components.
         /// </summary>
         /// <param name="selectedLine">The selected line object for editing.</param>
-        public static void EnableForEditing(GameObject selectedLine, DrawableType newValueHolder)
+        public static void EnableForEditing(GameObject selectedLine, DrawableType newValueHolder, UnityAction returnCall = null)
         {
             if (newValueHolder is LineConf lineHolder)
             {
                 enableLineMenu();
+                if (returnCall != null)
+                {
+                    enableReturn();
+                    ButtonManagerBasic returnBtn = GameFinder.FindChild(instance, "ReturnBtn").GetComponent<ButtonManagerBasic>();
+                    returnBtn.clickEvent.RemoveAllListeners();
+                    returnBtn.clickEvent.AddListener(returnCall);
+                }
                 LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
-                GameObject drawable = GameFinder.FindDrawable(selectedLine);
+                GameObject drawable = GameFinder.GetDrawable(selectedLine);
                 string drawableParentName = GameFinder.GetDrawableParentName(drawable);
 
                 AssignLineKind(selectedLine.GetComponent<LineValueHolder>().GetLineKind(), renderer.textureScale.x);
@@ -745,6 +760,22 @@ namespace Assets.SEE.Game.UI.Drawable
         private static void enableColorAreaFromLineMenu()
         {
             content.Find("ColorAreaSelector").gameObject.SetActive(true);
+        }
+
+        /// <summary>
+        /// Hides the return button.
+        /// </summary>
+        private static void disableReturn()
+        {
+            instance.transform.Find("ReturnBtn").gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// Enables the return button
+        /// </summary>
+        private static void enableReturn()
+        {
+            instance.transform.Find("ReturnBtn").gameObject.SetActive(true);
         }
         #endregion
     }

@@ -32,6 +32,10 @@ namespace SEE.Net.Actions.Drawable
         /// </summary>
         public float Degree;
         /// <summary>
+        /// The bool for include children, only necressary for mind map nodes.
+        /// </summary>
+        public bool IncludeChildren;
+        /// <summary>
         /// The position of the object.
         /// </summary>
         public Vector3 ObjectPosition;
@@ -44,13 +48,15 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="objectName">The id of the object that should be changed.</param>
         /// <param name="direction">The direction by which the object should be rotated.</param>
         /// <param name="degree">The value by which the object should be rotated</param>
-        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, Vector3 direction, float degree) : base()
+        /// <param name="includeChildren">Option for mind map nodes, if children should also rotated.</param>
+        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, Vector3 direction, float degree, bool includeChildren) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
             ObjectName = objectName;
             Direction = direction;
             Degree = degree;
+            IncludeChildren = includeChildren;
         }
 
         /// <summary>
@@ -61,13 +67,15 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="objectName">The id of the object that should be changed.</param>
         /// <param name="localEulerAnlgeZ">The value to which the object should be rotated</param>
-        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, float localEulerAnlgeZ) : base()
+        /// <param name="includeChildren">Option for mind map nodes, if children should also rotated.</param>
+        public RotatorNetAction(string drawableID, string parentDrawableID, string objectName, float localEulerAnlgeZ, bool includeChildren) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
             ObjectName = objectName;
             Degree = localEulerAnlgeZ;
             Direction = Vector3.zero;
+            IncludeChildren = includeChildren;
         }
 
         /// <summary>
@@ -89,16 +97,16 @@ namespace SEE.Net.Actions.Drawable
             {
                 if (!IsRequester())
                 {
-                    GameObject drawable = GameFinder.Find(DrawableID, ParentDrawableID);
+                    GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
                     if (drawable != null && GameFinder.FindChild(drawable, ObjectName) != null)
                     {
                         GameObject child = GameFinder.FindChild(drawable, ObjectName);
                         if (Direction != Vector3.zero)
                         {
-                            GameMoveRotator.RotateObject(child, Direction, Degree);
+                            GameMoveRotator.RotateObject(child, Direction, Degree, IncludeChildren);
                         } else
                         {
-                            GameMoveRotator.SetRotate(child, Degree);
+                            GameMoveRotator.SetRotate(child, Degree, IncludeChildren);
                         }
                     }
                     else

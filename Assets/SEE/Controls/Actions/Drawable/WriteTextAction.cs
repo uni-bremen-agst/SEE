@@ -74,7 +74,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The drawable on that the text should be displayed
             /// </summary>
-            public GameObject drawable;
+            public DrawableConfig drawable;
 
             /// <summary>
             /// The written text.
@@ -88,7 +88,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <param name="text">The written text</param>
             public Memento(GameObject drawable, TextConf text)
             {
-                this.drawable = drawable;
+                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
                 this.text = text;
             }
         }
@@ -103,7 +103,7 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// Enables the text menu.
-        /// When it starts the first time, it will add necressary listeners.
+        /// When it starts the first time, it will add necessary listeners.
         /// </summary>
         public override void Awake()
         {
@@ -137,7 +137,7 @@ namespace SEE.Controls.Actions.Drawable
                             (GameFinder.hasDrawable(raycastHit.collider.gameObject) || raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
                         {
                             drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                                raycastHit.collider.gameObject : GameFinder.FindDrawable(raycastHit.collider.gameObject);
+                                raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
                             position = raycastHit.point;
                             progress = ProgressState.GettingText;
                             writeTextDialog = new WriteEditTextDialog();
@@ -199,8 +199,8 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            GameObject obj = GameFinder.FindChild(memento.drawable, memento.text.id);
-            new EraseNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), memento.text.id).Execute();
+            GameObject obj = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.text.id);
+            new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.text.id).Execute();
             Destroyer.Destroy(obj);
         }
 
@@ -210,8 +210,8 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            GameTexter.ReWriteText(memento.drawable, memento.text);
-            new WriteTextNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), memento.text).Execute();
+            GameTexter.ReWriteText(memento.drawable.GetDrawable(), memento.text);
+            new WriteTextNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.text).Execute();
 
         }
 

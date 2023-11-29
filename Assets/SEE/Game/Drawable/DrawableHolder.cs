@@ -23,7 +23,7 @@ namespace Assets.SEE.Game.Drawable
         /// <summary>
         /// Const with allowed special characters.
         /// </summary>
-        private const string specialCharacters = "!?§$%&.,_-#+*@";
+        private const string specialCharacters = "!?§$%&.,_#+*@";
         /// <summary>
         /// String that contains the low and uppder letters, numbers and special characters.
         /// It will be needed for the calculation of a random string.
@@ -43,7 +43,7 @@ namespace Assets.SEE.Game.Drawable
         /// <returns>The calculated random string of given length.</returns>
         public static string GetRandomString(int size)
         {
-            string randomString = "";
+            string randomString = "-";
             for (int i = 0; i < size; i++)
             {
                 randomString += characters[Random.Range(0, characters.Length)];

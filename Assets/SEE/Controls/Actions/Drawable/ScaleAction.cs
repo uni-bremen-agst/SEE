@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Assets.SEE.Game.UI.Drawable;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -101,7 +102,7 @@ namespace SEE.Controls.Actions.Drawable
             }
             if (progressState != ProgressState.Finish && selectedObj != null)
             {
-                GameObject drawable = GameFinder.FindDrawable(selectedObj);
+                GameObject drawable = GameFinder.GetDrawable(selectedObj);
                 string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 GameScaler.SetScale(selectedObj, oldScale);
                 new ScaleNetAction(drawable.name, drawableParent, selectedObj.name, oldScale).Execute();
@@ -135,8 +136,20 @@ namespace SEE.Controls.Actions.Drawable
                             (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased)) &&
                             GameFinder.hasDrawable(raycastHit.collider.gameObject))
                         {
+                            if (oldSelectedObj != null)
+                            {
+                                if (oldSelectedObj.GetComponent<Rigidbody>() != null)
+                                {
+                                    Destroyer.Destroy(oldSelectedObj.GetComponent<Rigidbody>());
+                                }
+                                if (oldSelectedObj.GetComponent<CollisionController>() != null)
+                                {
+                                    Destroyer.Destroy(oldSelectedObj.GetComponent<CollisionController>());
+                                }
+                            }
+
                             selectedObj = raycastHit.collider.gameObject;
-                            drawable = GameFinder.FindDrawable(selectedObj);
+                            drawable = GameFinder.GetDrawable(selectedObj);
                             oldSelectedObj = selectedObj;
 
                             selectedObj.AddComponent<Rigidbody>().isKinematic = true;
@@ -192,7 +205,12 @@ namespace SEE.Controls.Actions.Drawable
                             {
                                 newScale = GameScaler.Scale(selectedObj, scaleFactor);
                                 ScaleMenu.AssignValue(selectedObj);
+                                bool refresh = GameMindMap.ReDrawBranchLines(selectedObj);
                                 new ScaleNetAction(drawable.name, drawableParentName, selectedObj.name, newScale).Execute();
+                                if (refresh)
+                                {
+                                    new MindMapRefreshBranchLinesNetAction(drawable.name, drawableParentName, MindMapNodeConf.GetNodeConf(selectedObj)).Execute();
+                                }
                             }
                             if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj.GetComponent<BlinkEffect>() != null)
                             {
@@ -214,7 +232,7 @@ namespace SEE.Controls.Actions.Drawable
                             {
                                 Destroyer.Destroy(selectedObj.GetComponent<Rigidbody>());
                                 Destroyer.Destroy(selectedObj.GetComponent<CollisionController>());
-                                memento = new Memento(selectedObj, GameFinder.FindDrawable(selectedObj), selectedObj.name, oldScale, newScale);
+                                memento = new Memento(selectedObj, GameFinder.GetDrawable(selectedObj), selectedObj.name, oldScale, newScale);
                                 currentState = ReversibleAction.Progress.Completed;
                                 return true;
                             }
@@ -244,7 +262,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The drawable on that the selected object is displayed.
             /// </summary>
-            public readonly GameObject drawable;
+            public readonly DrawableConfig drawable;
             /// <summary>
             /// The id of the selected object
             /// </summary>
@@ -270,7 +288,7 @@ namespace SEE.Controls.Actions.Drawable
                 Vector3 oldScale, Vector3 newScale)
             {
                 this.selectedObject = selectedObject;
-                this.drawable = drawable;
+                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
                 this.id = id;
                 this.oldScale = oldScale;
                 this.newScale = newScale;
@@ -285,17 +303,22 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (memento.selectedObject == null && memento.id != null)
             {
-                memento.selectedObject = GameFinder.FindChild(memento.drawable, memento.id);
+                memento.selectedObject = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.id);
             }
 
             if (memento.selectedObject != null)
             {
-                GameObject drawable = GameFinder.FindDrawable(memento.selectedObject);
-                string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 GameScaler.SetScale(memento.selectedObject, memento.oldScale);
-                new ScaleNetAction(drawable.name, drawableParent, memento.selectedObject.name, memento.oldScale).Execute();
+                bool refresh = GameMindMap.ReDrawBranchLines(memento.selectedObject);
+                new ScaleNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                    memento.selectedObject.name, memento.oldScale).Execute();
+                if (refresh)
+                {
+                    new MindMapRefreshBranchLinesNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                        MindMapNodeConf.GetNodeConf(memento.selectedObject)).Execute();
+                }
             }
-            if (memento.selectedObject != null && memento.selectedObject.TryGetComponent<BlinkEffect>(out BlinkEffect currentEffect))
+            if (memento.selectedObject != null && memento.selectedObject.TryGetComponent(out BlinkEffect currentEffect))
             {
                 currentEffect.Deactivate();
             }
@@ -309,14 +332,18 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (memento.selectedObject == null && memento.id != null)
             {
-                memento.selectedObject = GameFinder.FindChild(memento.drawable, memento.id);
+                memento.selectedObject = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.id);
             }
             if (memento.selectedObject != null)
             {
-                GameObject drawable = GameFinder.FindDrawable(memento.selectedObject);
-                string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 GameScaler.SetScale(memento.selectedObject, memento.newScale);
-                new ScaleNetAction(drawable.name, drawableParent, memento.selectedObject.name, memento.newScale).Execute();
+                bool refresh = GameMindMap.ReDrawBranchLines(memento.selectedObject);
+                new ScaleNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.selectedObject.name, memento.newScale).Execute();
+                if (refresh)
+                {
+                    new MindMapRefreshBranchLinesNetAction(memento.drawable.ID, memento.drawable.ParentID,
+                        MindMapNodeConf.GetNodeConf(memento.selectedObject)).Execute();
+                }
             }
 
             if (memento.selectedObject != null && memento.selectedObject.TryGetComponent<BlinkEffect>(out BlinkEffect currentEffect))

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -34,7 +35,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The drawable on that the line is placed.
             /// </summary>
-            public readonly GameObject drawable;
+            public readonly DrawableConfig drawable;
             /// <summary>
             /// The id of the line.
             /// </summary>
@@ -65,7 +66,7 @@ namespace SEE.Controls.Actions.Drawable
                 Vector3 oldPointPosition, Vector3 newPointPosition)
             {
                 this.line = line;
-                this.drawable = drawable;
+                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
                 this.id = id;
                 this.indexes = indexes;
                 this.oldPointPosition = oldPointPosition;
@@ -128,7 +129,7 @@ namespace SEE.Controls.Actions.Drawable
                             raycastHit.collider.gameObject.CompareTag(Tags.Line))
                         {
                             selectedLine = raycastHit.collider.gameObject;
-                            drawable = GameFinder.FindDrawable(selectedLine);
+                            drawable = GameFinder.GetDrawable(selectedLine);
 
                             BlinkEffect effect = selectedLine.AddOrGetComponent<BlinkEffect>();
                             effect.SetAllowedActionStateType(GetActionStateType());
@@ -181,7 +182,7 @@ namespace SEE.Controls.Actions.Drawable
                         }
                         break;
                     case ProgressState.Finish:
-                        memento = new Memento(selectedLine, GameFinder.FindDrawable(selectedLine), selectedLine.name,
+                        memento = new Memento(selectedLine, GameFinder.GetDrawable(selectedLine), selectedLine.name,
                                 indexes, oldPointPosition, newPointPosition);
                         currentState = ReversibleAction.Progress.Completed;
                         return true;
@@ -199,15 +200,13 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (memento.line == null && memento.id != null)
             {
-                memento.line = GameFinder.FindChild(memento.drawable, memento.id);
+                memento.line = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.id);
             }
 
             if (memento.line != null)
             {
-                GameObject drawable = GameFinder.FindDrawable(memento.line);
-                string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 GameMoveRotator.MovePoint(memento.line, memento.indexes, memento.oldPointPosition);
-                new MovePointNetAction(drawable.name, drawableParent, memento.line.name, memento.indexes, memento.oldPointPosition).Execute();
+                new MovePointNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.line.name, memento.indexes, memento.oldPointPosition).Execute();
             }
         }
 
@@ -219,14 +218,12 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (memento.line == null && memento.id != null)
             {
-                memento.line = GameFinder.FindChild(memento.drawable, memento.id);
+                memento.line = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.id);
             }
             if (memento.line != null)
             {
-                GameObject drawable = GameFinder.FindDrawable(memento.line);
-                string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 GameMoveRotator.MovePoint(memento.line, memento.indexes, memento.newPointPosition);
-                new MovePointNetAction(drawable.name, drawableParent, memento.line.name, memento.indexes, memento.newPointPosition).Execute();
+                new MovePointNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.line.name, memento.indexes, memento.newPointPosition).Execute();
             }
         }
 

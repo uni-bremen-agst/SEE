@@ -91,12 +91,10 @@ namespace Assets.SEE.Game.Drawable
 
         public static Vector3[] Parallelogram(Vector3 point, float a, float h, float offset)
         {
-            Debug.Log(DateTime.Now + ", a: " + a + ", h: " + h + ", offset: " + offset);
             Vector3 A = new Vector3(point.x - a / 2, point.y - h / 2, 0) - ValueHolder.distanceToDrawable;
             Vector3 B = new Vector3(point.x + a / 2, point.y - h / 2, 0) - ValueHolder.distanceToDrawable;
             Vector3 C = new Vector3(B.x + offset, B.y + h, 0) - ValueHolder.distanceToDrawable;
             Vector3 D = new Vector3(A.x + offset, A.y + h, 0) - ValueHolder.distanceToDrawable;
-            Debug.Log(DateTime.Now + ", A: " + A + ", B: " + B + ", C: " + C + ", D: " + D);
             return new Vector3[] { A, B, C, D };
         }
 
@@ -105,10 +103,10 @@ namespace Assets.SEE.Game.Drawable
         /// </summary>
         /// <param name="point">the middle point. get it from the raycast hit point.</param>
         /// <param name="a">the longest side.</param>
-        /// <param name="b">the side line. b = d</param>
-        /// <param name="alpha">the degree to draw. alpha = beta</param>
+        /// <param name="c">the short side.</param>
+        /// <param name="h">the height.</param>
         /// <returns>the calculated points of the trapezoid.</returns>
-        public static Vector3[] Trapezoid(Vector3 point, float a, float c, float h)//float alpha)
+        public static Vector3[] Trapezoid(Vector3 point, float a, float c, float h)
         {
             Vector3 A = new Vector3(point.x - a / 2, point.y - h / 2, 0) - ValueHolder.distanceToDrawable;
             Vector3 B = new Vector3(point.x + a / 2, point.y - h / 2, 0) - ValueHolder.distanceToDrawable;
@@ -136,6 +134,54 @@ namespace Assets.SEE.Game.Drawable
                 angle += 2f * Mathf.PI / vertices;
             }
             return positions;
+        }
+
+        public static Vector3[] MindMapRectangle(Vector3 point, float a, float b)
+        {
+            float splittedA = a / 12;
+            float splittedB = b / 12;
+
+            Vector3 A = new Vector3(point.x - a / 2, point.y - b / 2, 0) - ValueHolder.distanceToDrawable;
+            Vector3[] AB = new Vector3[14];
+            AB[0] = A;
+            for(int i = 1; i < 13; i++)
+            {
+                AB[i] = new Vector3(AB[i-1].x + splittedA, AB[i-1].y, 0) - ValueHolder.distanceToDrawable;
+            }
+            Vector3 B = new Vector3(A.x + a, A.y, 0) - ValueHolder.distanceToDrawable;
+            AB[13] = B;
+            Vector3[] BC = new Vector3[14];
+            BC[0] = B;
+            for (int i = 1; i < 13; i++)
+            {
+                BC[i] = new Vector3(BC[i - 1].x, BC[i - 1].y + splittedB, 0) - ValueHolder.distanceToDrawable;
+            }
+            
+            Vector3 C = new Vector3(B.x, B.y + b, 0) - ValueHolder.distanceToDrawable;
+            BC[13] = C;
+            Vector3[] CD = new Vector3[14];
+            CD[0] = C;
+            for (int i = 1; i < 13; i++)
+            {
+                CD[i] = new Vector3(CD[i - 1].x - splittedA, CD[i - 1].y, 0) - ValueHolder.distanceToDrawable;
+            }
+            
+            Vector3 D = new Vector3(A.x, A.y + b, 0) - ValueHolder.distanceToDrawable;
+            CD[13] = D;
+            Vector3[] DA = new Vector3[14];
+            DA[0] = D;
+            for (int i = 1; i < 13; i++)
+            {
+                DA[i] = new Vector3(DA[i - 1].x, DA[i - 1].y - splittedB, 0) - ValueHolder.distanceToDrawable;
+            }
+            DA[13] = A;
+            
+            Vector3[] all = new Vector3[AB.Length + BC.Length + CD.Length + DA.Length];
+            AB.CopyTo(all, 0);
+            BC.CopyTo(all, AB.Length);
+            CD.CopyTo(all, AB.Length + BC.Length);
+            DA.CopyTo(all, AB.Length + BC.Length + CD.Length);
+            return all;
         }
     }
 }

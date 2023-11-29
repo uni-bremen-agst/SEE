@@ -1,5 +1,6 @@
 ﻿using RTG;
 using SEE.Game;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using System.Collections;
 using System.Linq;
@@ -151,6 +152,7 @@ namespace Assets.SEE.Game.Drawable
 
         /// <summary>
         /// This method changes the text of a drawable text.
+        /// If the text object is a part of a mind map node, the border will refreshed.
         /// </summary>
         /// <param name="textObj">The textObj whose text should be changed.</param>
         /// <param name="text">The new text.</param>
@@ -162,10 +164,18 @@ namespace Assets.SEE.Game.Drawable
                 textObj.GetComponent<TextMeshPro>().ForceMeshUpdate();
                 GameTexter.RefreshMeshCollider(textObj);
             }
+
+            if (textObj.transform.parent.CompareTag(Tags.MindMapNode))
+            {
+                GameObject node = textObj.transform.parent.gameObject;
+                GameMindMap.DisableTextAndBorderCollider(node);
+                GameMindMap.ReDrawBorder(node);
+            }
         }
 
         /// <summary>
         /// This method changes the font size of a text.
+        /// If the text object is a part of a mind map node, the border will refreshed.
         /// </summary>
         /// <param name="textObj">The textObj whose text should be changed.</param>
         /// <param name="fontSize">The new font size.</param>
@@ -179,10 +189,18 @@ namespace Assets.SEE.Game.Drawable
                 textObj.GetComponent<TextMeshPro>().ForceMeshUpdate(true);
                 GameTexter.RefreshMeshCollider(textObj);
             }
+
+            if (textObj.transform.parent.CompareTag(Tags.MindMapNode))
+            {
+                GameObject node = textObj.transform.parent.gameObject;
+                GameMindMap.DisableTextAndBorderCollider(node);
+                GameMindMap.ReDrawBorder(node);
+            }
         }
 
         /// <summary>
         /// This method changes the font style of a text.
+        /// If the text object is a part of a mind map node, the border will refreshed.
         /// </summary>
         /// <param name="textObj">The textObj whose text should be changed.</param>
         /// <param name="styles">The new font style.</param>
@@ -195,6 +213,13 @@ namespace Assets.SEE.Game.Drawable
                 tmp.rectTransform.sizeDelta = GameTexter.CalculateWidthAndHeight(tmp.text, tmp.font, tmp.fontSize, tmp.fontStyle);
                 textObj.GetComponent<TextMeshPro>().ForceMeshUpdate(true);
                 GameTexter.RefreshMeshCollider(textObj);
+            }
+
+            if (textObj.transform.parent.CompareTag(Tags.MindMapNode))
+            {
+                GameObject node = textObj.transform.parent.gameObject;
+                GameMindMap.DisableTextAndBorderCollider(node);
+                GameMindMap.ReDrawBorder(node);
             }
         }
 
@@ -257,11 +282,33 @@ namespace Assets.SEE.Game.Drawable
         /// This method changes all editable values of a drawable image at once.
         /// </summary>
         /// <param name="imageObj">The image object whose values should be changed.</param>
-        /// <param name="conf">The configuration which holds the necressary values.</param>
+        /// <param name="conf">The configuration which holds the necessary values.</param>
         public static void ChangeImage(GameObject imageObj, ImageConf conf)
         {
             ChangeLayer(imageObj, conf.orderInLayer);
             ChangeImageColor(imageObj, conf.imageColor);
+        }
+
+        /// <summary>
+        /// This method changes all editable values of a drawable mind map node at once.
+        /// </summary>
+        /// <param name="node">The node object whose values should be changed.</param>
+        /// <param name="conf">The configuration which holds the necessary values.</param>
+        public static void ChangeMindMapNode(GameObject node, MindMapNodeConf conf)
+        {
+            ChangeLine(GameFinder.FindChildWithTag(node, Tags.Line), conf.borderConf);
+            ChangeText(GameFinder.FindChildWithTag(node, Tags.DText), conf.textConf);
+            GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(
+                    GameFinder.GetDrawable(node));
+            GameObject parent = GameFinder.FindChild(attachedObjects, conf.parentNode);
+            GameMindMap.ChangeNodeKind(node, conf.nodeKind);
+            GameMindMap.ChangeParent(node, parent);
+            GameFinder.FindChildWithTag(node, Tags.Line).GetComponent<MeshCollider>().enabled = false;
+            GameFinder.FindChildWithTag(node, Tags.DText).GetComponent<MeshCollider>().enabled = false;
+
+            GameObject branch = GameFinder.FindChild(attachedObjects, conf.branchLineToParent);
+            ChangeLine(branch, conf.branchLineConf);
+            branch.GetComponent<MeshCollider>().enabled = false;
         }
     }
 }

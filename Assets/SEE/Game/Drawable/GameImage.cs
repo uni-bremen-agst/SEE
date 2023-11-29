@@ -15,6 +15,9 @@ using SEE.Game.Drawable;
 
 namespace Assets.SEE.Game.Drawable
 {
+    /// <summary>
+    /// This class add's an image to a drawable.
+    /// </summary>
     public static class GameImage
     {
         /// <summary>

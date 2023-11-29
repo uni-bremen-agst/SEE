@@ -194,6 +194,12 @@ namespace SEE.Controls.Actions
                     AddImageAction.CreateReversibleAction,
                     parent: Whiteboard);
 
+            MindMap =
+                new("Mind Map", "Adds and controll mind map components",
+                    Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
+                    MindMapAction.CreateReversibleAction,
+                    parent: Whiteboard);
+
             ColorPicker =
                 new("Color picker", "Picks a color",
                     Color.yellow.Darker(), "Materials/ModernUIPack/Pencil",
@@ -304,6 +310,7 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType DrawShapes;
         public readonly static ActionStateType WriteText;
         public readonly static ActionStateType AddImage;
+        public readonly static ActionStateType MindMap;
         public readonly static ActionStateType ColorPicker;
         public readonly static ActionStateType Edit;
         public readonly static ActionStateType MoveRotator;

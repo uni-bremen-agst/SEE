@@ -21,6 +21,9 @@ namespace SEE.Game.Drawable.Configurations
         /// </summary>
         public List<DrawableConfig> Drawables = new();
 
+        /// <summary>
+        /// Label in configuration file for the drawables configurations.
+        /// </summary>
         private const string DrawablesLabel = "DrawablesConfigs";
 
         /// <summary>
@@ -75,12 +78,12 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// The name of this drawable.
         /// </summary>
-        public string DrawableName;
+        public string ID;
 
         /// <summary>
         /// The parent name of this drawable.
         /// </summary>
-        public string DrawableParentName;
+        public string ParentID;
 
         /// <summary>
         /// The position of this drawable / or of his parent.
@@ -104,7 +107,7 @@ namespace SEE.Game.Drawable.Configurations
 
         /// <summary>
         /// The order of the drawable.
-        /// (Only necressary for sticky notes)
+        /// (Only necessary for sticky notes)
         /// </summary>
         public int Order;
 
@@ -122,6 +125,11 @@ namespace SEE.Game.Drawable.Configurations
         /// All the images that should be displayed on this drawable.
         /// </summary>
         public List<ImageConf> ImageConfigs = new();
+
+        /// <summary>
+        /// All the mind map nodes that should be displayed on this drawable.
+        /// </summary>
+        public List<MindMapNodeConf> MindMapNodeConfigs = new();
 
         /// <summary>
         /// The label for the drawable name in the configuration file.
@@ -174,13 +182,18 @@ namespace SEE.Game.Drawable.Configurations
         private const string ImageConfigsLabel = "ImageConfigs";
 
         /// <summary>
+        /// The label for the group of mind map node configurations in the configuration file.
+        /// </summary>
+        private const string MindMapNodeConfigsLabel = "MindMapNodeConfigs";
+
+        /// <summary>
         /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
         internal void Save(ConfigWriter writer)
         {
-            writer.Save(DrawableName, DrawableNameLabel);
-            writer.Save(DrawableParentName, DrawableParentNameLabel);
+            writer.Save(ID, DrawableNameLabel);
+            writer.Save(ParentID, DrawableParentNameLabel);
             writer.Save(Position, PositionLabel);
             writer.Save(Rotation, RotationLabel);
             writer.Save(Scale, ScaleLabel);
@@ -216,6 +229,16 @@ namespace SEE.Game.Drawable.Configurations
                 }
                 writer.EndList();
             }
+
+            if (MindMapNodeConfigs != null && MindMapNodeConfigs.Count > 0)
+            {
+                writer.BeginList(MindMapNodeConfigsLabel);
+                foreach (MindMapNodeConf nodeConfigs in MindMapNodeConfigs)
+                {
+                    nodeConfigs.Save(writer);
+                }
+                writer.EndList();
+            }
         }
 
         /// <summary>
@@ -229,7 +252,7 @@ namespace SEE.Game.Drawable.Configurations
             bool errorFree = true;
             if (attributes.TryGetValue(DrawableNameLabel, out object name))
             {
-                DrawableName = (string)name;
+                ID = (string)name;
             }
             else
             {
@@ -237,7 +260,7 @@ namespace SEE.Game.Drawable.Configurations
             }
             if (attributes.TryGetValue(DrawableParentNameLabel, out object pName))
             {
-                DrawableParentName = (string)pName;
+                ParentID = (string)pName;
             }
             else
             {
@@ -329,7 +352,43 @@ namespace SEE.Game.Drawable.Configurations
                 }
             }
 
+            if (attributes.TryGetValue(MindMapNodeConfigsLabel, out object nodeList))
+            {
+                int i = 0;
+                foreach (object item in (List<object>)nodeList)
+                {
+                    i++;
+                    Dictionary<string, object> dict = (Dictionary<string, object>)item;
+                    MindMapNodeConf config = new();
+                    config.Restore(dict);
+                    MindMapNodeConfigs.Add(config);
+                }
+            }
+
             return errorFree;
+        }
+
+        /// <summary>
+        /// Gets the current game object of this drawable.
+        /// </summary>
+        /// <returns>the drawable game object.</returns>
+        public GameObject GetDrawable()
+        {
+            return GameFinder.FindDrawable(ID, ParentID);
+        }
+
+        /// <summary>
+        /// Gets all drawable type configs of this drawable config.
+        /// </summary>
+        /// <returns>A list that contains all drawable type configs of this drawable.</returns>
+        public List<DrawableType> GetAllDrawableTypes()
+        {
+            List<DrawableType> list = new (LineConfigs);
+            list.AddRange(TextConfigs);
+            list.AddRange(ImageConfigs);
+            list.AddRange(MindMapNodeConfigs);
+
+            return list;
         }
     }
 }

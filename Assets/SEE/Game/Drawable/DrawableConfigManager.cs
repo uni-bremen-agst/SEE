@@ -13,6 +13,8 @@ using UnityEngine;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable;
 using VivoxUnity;
+using System.Linq;
+using Assets.SEE.Game.UI.Drawable;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -234,8 +236,8 @@ namespace Assets.SEE.Game.Drawable
 
             DrawableConfig config = new()
             {
-                DrawableName = drawable.name,
-                DrawableParentName = GameFinder.GetDrawableParentName(drawable),
+                ID = drawable.name,
+                ParentID = GameFinder.GetDrawableParentName(drawable),
                 Position = transform.position,
                 Rotation = transform.eulerAngles,
                 Scale = transform.localScale,
@@ -245,14 +247,14 @@ namespace Assets.SEE.Game.Drawable
             GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(drawable);
             if (attachedObjects != null)
             {
-                GameObject[] lines = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.Line).ToArray();
+                GameObject[] lines = GameFinder.FindAllChildrenWithTagExceptParentHasTag(attachedObjects, Tags.Line, Tags.MindMapNode).ToArray();
                 foreach (GameObject line in lines)
                 {
                     LineConf lineConfig = LineConf.GetLine(line);
                     config.LineConfigs.Add(lineConfig);
                 }
 
-                GameObject[] texts = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.DText).ToArray();
+                GameObject[] texts = GameFinder.FindAllChildrenWithTagExceptParentHasTag(attachedObjects, Tags.DText, Tags.MindMapNode).ToArray();
                 foreach (GameObject text in texts)
                 {
                     TextConf textConfig = TextConf.GetText(text);
@@ -264,6 +266,14 @@ namespace Assets.SEE.Game.Drawable
                 {
                     ImageConf imageConf = ImageConf.GetImageConf(image);
                     config.ImageConfigs.Add(imageConf);
+                }
+
+                List<GameObject> nodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
+                nodes = nodes.OrderBy(o => o.GetComponent<MMNodeValueHolder>().GetLayer()).ToList();
+                foreach (GameObject node in nodes)
+                {
+                    MindMapNodeConf nodeConf = MindMapNodeConf.GetNodeConf(node);
+                    config.MindMapNodeConfigs.Add(nodeConf);
                 }
             }
             return config;

@@ -109,14 +109,14 @@ namespace SEE.Controls.Actions.Drawable
                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
                     GameFinder.hasDrawable(raycastHit.collider.gameObject))
-                    && (drawable == null || drawable != null && GameFinder.FindDrawable(raycastHit.collider.gameObject).Equals(drawable)))
+                    && (drawable == null || drawable != null && GameFinder.GetDrawable(raycastHit.collider.gameObject).Equals(drawable)))
                 {
                     switch (progressState)
                     {
                         case ProgressState.StartDrawing:
                             /// Find the drawable for this line.
                             drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                                    raycastHit.collider.gameObject : GameFinder.FindDrawable(raycastHit.collider.gameObject);
+                                    raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
                             drawing = true;
                             progressState = ProgressState.Drawing;
                             positions[0] = raycastHit.point;
@@ -165,7 +165,7 @@ namespace SEE.Controls.Actions.Drawable
                             line = GameDrawer.SetPivot(line);
                             LineConf currentLine = LineConf.GetLine(line);
                             memento = new Memento(drawable, currentLine);
-                            new DrawOnNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), currentLine).Execute();
+                            new DrawOnNetAction(memento.drawable.ID, memento.drawable.ParentID, currentLine).Execute();
                             currentState = ReversibleAction.Progress.Completed;
                             return true;
                         }
@@ -190,7 +190,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The drawable on that the line should be displayed.
             /// </summary>
-            public readonly GameObject drawable;
+            public readonly DrawableConfig drawable;
             /// <summary>
             /// The line. The line configuration <see cref="LineConf"/> contains all required values to redraw.
             /// </summary>
@@ -203,7 +203,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <param name="line">Line configuration for redrawing.</param>
             public Memento(GameObject drawable, LineConf line)
             {
-                this.drawable = drawable;
+                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
                 this.line = line;
             }
         }
@@ -216,11 +216,11 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (line == null)
             {
-                line = GameFinder.FindChild(memento.drawable, memento.line.id);
+                line = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.line.id);
             }
             if (line != null)
             {
-                new EraseNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), memento.line.id).Execute();
+                new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.line.id).Execute();
                 Destroyer.Destroy(line);
                 line = null;
             }
@@ -232,10 +232,10 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            line = GameDrawer.ReDrawLine(memento.drawable, memento.line);
+            line = GameDrawer.ReDrawLine(memento.drawable.GetDrawable(), memento.line);
             if (line != null)
             {
-                new DrawOnNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), LineConf.GetLine(line)).Execute();
+                new DrawOnNetAction(memento.drawable.ID, memento.drawable.ParentID, LineConf.GetLine(line)).Execute();
             }
         }
 
@@ -285,7 +285,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 return new HashSet<string>
                 {
-                    memento.drawable.name,
+                    memento.drawable.ID,
                     memento.line.id
                 };
             }

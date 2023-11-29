@@ -18,21 +18,6 @@ namespace SEE.Game.Drawable.ActionHelpers
     public static class NearestPoints
     {
         /// <summary>
-        /// Converts a Vector3 array to a Vector2 array.
-        /// </summary>
-        /// <param name="vector3">The Vector3 array to converts.</param>
-        /// <returns></returns>
-        private static Vector2[] castToVector2Array(Vector3[] vector3)
-        {
-            Vector2[] vector2 = new Vector2[vector3.Length];
-            for (int i = 0; i < vector3.Length; i++)
-            {
-                vector2[i] = new Vector2(vector3[i].x, vector3[i].y);
-            }
-            return vector2;
-        }
-
-        /// <summary>
         /// This method calculates the nearest points of a Vector3 array from a given point
         /// </summary>
         /// <param name="positions">The Vector3 array that holds the positions</param>
@@ -41,23 +26,40 @@ namespace SEE.Game.Drawable.ActionHelpers
         public static List<int> GetNearestIndexes(Vector3[] positions, Vector3 hitPoint)
         {
             List<int> matchedIndexes = new();
-            Vector2[] vector2 = castToVector2Array(positions);
-            Vector2 hitPoint2D = new Vector2(hitPoint.x, hitPoint.y);
             float nearestDistance = float.MaxValue;
-            for (int i = 0; i < vector2.Length; i++)
+            for (int i = 0; i < positions.Length; i++)
             {
-                if (Vector2.Distance(vector2[i], hitPoint2D) < nearestDistance)
+                if (Vector3.Distance(positions[i], hitPoint) < nearestDistance)
                 {
-                    nearestDistance = Vector2.Distance(vector2[i], hitPoint2D);
+                    nearestDistance = Vector3.Distance(positions[i], hitPoint);
                     matchedIndexes = new List<int>();
                     matchedIndexes.Add(i);
-                }
-                else if (Vector2.Distance(vector2[i], hitPoint2D) == nearestDistance)
+                } else if (Vector3.Distance(positions[i], hitPoint) == nearestDistance)
                 {
                     matchedIndexes.Add(i);
                 }
             }
             return matchedIndexes;
+        }
+
+        /// <summary>
+        /// Calculates the nearest point of a given point .
+        /// </summary>
+        /// <param name="node">Contains the line renderer in child on that the nearest point 
+        /// of the given point should be found.</param>
+        /// <param name="point">The point on that the nearest point should be found.</param>
+        /// <returns></returns>
+        public static Vector3 GetNearestPoint(GameObject node, Vector3 point)
+        {
+            LineRenderer renderer = node.GetComponentInChildren<LineRenderer>();
+            Vector3[] positions = new Vector3[renderer.positionCount];
+            renderer.GetPositions(positions);
+            Vector3[] transformedPositions = new Vector3[positions.Length];
+            Array.Copy(sourceArray: positions, destinationArray: transformedPositions, length: positions.Length);
+            node.transform.TransformPoints(transformedPositions);
+
+            List<int> indexes = NearestPoints.GetNearestIndexes(transformedPositions, point);
+            return transformedPositions[indexes[0]];
         }
     }
 }

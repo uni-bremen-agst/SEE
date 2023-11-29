@@ -40,7 +40,7 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameFinder.Find(DrawableConf.DrawableName, DrawableConf.DrawableParentName);
+                GameObject drawable = GameFinder.FindDrawable(DrawableConf.ID, DrawableConf.ParentID);
                 GameObject stickyNote = drawable.transform.parent.gameObject;
                 GameObject root = GameFinder.GetHighestParent(drawable);
 

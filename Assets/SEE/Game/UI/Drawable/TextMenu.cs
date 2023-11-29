@@ -279,6 +279,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         public static void Disable()
         {
+            instance.transform.Find("ReturnBtn").gameObject.SetActive(false);
             instance.SetActive(false);
             SEEInput.KeyboardShortcutsEnabled = true;
         }
@@ -363,6 +364,7 @@ namespace Assets.SEE.Game.UI.Drawable
         public static void EnableForWriting()
         {
             enableTextMenu((color => ValueHolder.currentPrimaryColor = color), ValueHolder.currentPrimaryColor, true);
+            instance.transform.Find("ReturnBtn").gameObject.SetActive(false);
 
             fontColorBMB.clickEvent.AddListener(() =>
             {
@@ -392,11 +394,11 @@ namespace Assets.SEE.Game.UI.Drawable
         /// This method provides the text menu for editing, adding the necessary Handler to the respective components.
         /// </summary>
         /// <param name="selectedText">The selected text object for editing.</param>
-        public static void EnableForEditing(GameObject selectedText, DrawableType newValueHolder)
+        public static void EnableForEditing(GameObject selectedText, DrawableType newValueHolder, UnityAction returnCall = null)
         {
             if (newValueHolder is TextConf textHolder)
             {
-                GameObject drawable = GameFinder.FindDrawable(selectedText);
+                GameObject drawable = GameFinder.GetDrawable(selectedText);
                 string drawableParentName = GameFinder.GetDrawableParentName(drawable);
 
                 enableTextMenu(color =>
@@ -405,6 +407,15 @@ namespace Assets.SEE.Game.UI.Drawable
                     textHolder.fontColor = color;
                     new EditTextNetAction(drawable.name, drawableParentName, TextConf.GetText(selectedText)).Execute();
                 }, textHolder.fontColor, true, true);
+
+                if (returnCall != null)
+                {
+                    GameObject obj = instance.transform.Find("ReturnBtn").gameObject;
+                    obj.SetActive(true);
+                    ButtonManagerBasic returnBtn = obj.GetComponent<ButtonManagerBasic>();
+                    returnBtn.clickEvent.RemoveAllListeners();
+                    returnBtn.clickEvent.AddListener(returnCall);
+                }
 
                 fontColorBMB.clickEvent.AddListener(() =>
                 {

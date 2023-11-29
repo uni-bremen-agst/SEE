@@ -8,6 +8,7 @@ using UnityEngine;
 using Assets.SEE.Game.UI.Drawable;
 using SEE.Game.Drawable.Configurations;
 using UnityEngine.UI;
+using HighlightPlus;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -20,9 +21,10 @@ namespace Assets.SEE.Game.Drawable
         private bool loopOn;
         private ActionStateType allowedState;
         new Renderer renderer;
+        Renderer[] renderers;
         Canvas canvas;
         new MeshCollider collider;
-
+        HighlightEffect highlight;
 
         public void SetAllowedActionStateType(ActionStateType allowedState)
         {
@@ -40,11 +42,31 @@ namespace Assets.SEE.Game.Drawable
                     renderer.enabled = true;
                     yield return new WaitForSeconds(0.5f);
                 }
-                else
+                else if(renderers != null)
+                {
+                    foreach(Renderer renderer in renderers)
+                    {
+                        renderer.enabled = false;
+                    }
+                    yield return new WaitForSeconds(0.2f);
+                    foreach (Renderer renderer in renderers)
+                    {
+                        renderer.enabled = true;
+                    }
+                    yield return new WaitForSeconds(0.5f);
+                }
+                else if (canvas != null)
                 {
                     canvas.enabled = false;
                     yield return new WaitForSeconds(0.2f);
                     canvas.enabled = true;
+                    yield return new WaitForSeconds(0.5f);
+                }
+                else
+                {
+                    highlight.enabled = false;
+                    yield return new WaitForSeconds(0.2f);
+                    highlight.enabled = true;
                     yield return new WaitForSeconds(0.5f);
                 }
 
@@ -62,9 +84,20 @@ namespace Assets.SEE.Game.Drawable
             {
                 renderer.enabled = true;
             }
-            else
+            else if (renderers != null)
+            {
+                foreach (Renderer renderer in renderers)
+                {
+                    renderer.enabled = true;
+                }
+            }
+            else if (canvas != null)
             {
                 canvas.enabled = true;
+            }
+            else
+            {
+                Destroyer.Destroy(highlight);
             }
             if (collider != null && collider.convex)
             {
@@ -86,9 +119,19 @@ namespace Assets.SEE.Game.Drawable
             {
                 renderer = obj.GetComponent<Renderer>();
             }
+            else if (obj.GetComponentsInChildren<Renderer>() != null)
+            {
+                renderers = obj.GetComponentsInChildren<Renderer>();
+            }
             else if (obj.GetComponent<Canvas>() != null)
             {
                 canvas = obj.GetComponent<Canvas>();
+            } else if (obj.GetComponent<HighlightEffect>() != null)
+            {
+                highlight = obj.GetComponent<HighlightEffect>();
+            } else
+            {
+                highlight = GameHighlighter.Enable(obj);
             }
             if (collider == null && obj.GetComponent<MeshCollider>() != null)
             {

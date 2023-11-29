@@ -3,6 +3,7 @@ using SEE.Utils;
 using UnityEngine;
 using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
+using Assets.SEE.Game.Drawable;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -54,10 +55,11 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameFinder.Find(DrawableID,ParentDrawableID);
+                GameObject drawable = GameFinder.FindDrawable(DrawableID,ParentDrawableID);
                 if (drawable != null && GameFinder.FindChild(drawable, ObjectName) != null)
                 {
-                    Destroyer.Destroy(GameFinder.FindChild(drawable, ObjectName));
+                    GameObject toDelete = GameFinder.FindChild(drawable, ObjectName);
+                    Destroyer.Destroy(toDelete);
                 }
                 else
                 {

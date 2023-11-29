@@ -27,7 +27,7 @@ namespace SEE.Net.Actions.Drawable
         /// </summary>
         public GameDrawer.LineKind LineKind;
         /// <summary>
-        /// The tiling to which the line renderer texture scale of the line should be set. Only necressary if the LinKind is dashed.
+        /// The tiling to which the line renderer texture scale of the line should be set. Only necessary if the LinKind is dashed.
         /// </summary>
         public float Tiling;
 
@@ -67,7 +67,7 @@ namespace SEE.Net.Actions.Drawable
             {
                 if (!IsRequester())
                 {
-                    GameObject drawable = GameFinder.Find(DrawableID, ParentDrawableID);
+                    GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
                     if (drawable != null && GameFinder.FindChild(drawable, LineName) != null)
                     {
                         GameDrawer.ChangeLineKind(GameFinder.FindChild(drawable, LineName), LineKind, Tiling);

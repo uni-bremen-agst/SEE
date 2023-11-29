@@ -27,6 +27,11 @@ namespace SEE.Net.Actions.Drawable
         /// The new position of the object
         /// </summary>
         public Vector3 Position;
+        /// <summary>
+        /// The state if the children should moved also.
+        /// Only necressary for mind map nodes.
+        /// </summary>
+        public bool IncludeChildren;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
@@ -35,12 +40,13 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="objectName">The id of the object that should be changed.</param>
         /// <param name="position">The new position to which the object should be set.</param>
-        public MoveNetAction(string drawableID, string parentDrawableID, string objectName, Vector3 position) : base()
+        public MoveNetAction(string drawableID, string parentDrawableID, string objectName, Vector3 position, bool includeChildren) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
             ObjectName = objectName;
             this.Position = position;
+            this.IncludeChildren = includeChildren;
         }
 
         /// <summary>
@@ -62,10 +68,10 @@ namespace SEE.Net.Actions.Drawable
             {
                 if (!IsRequester())
                 {
-                    GameObject drawable = GameFinder.Find(DrawableID, ParentDrawableID);
+                    GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
                     if (drawable != null && GameFinder.FindChild(drawable, ObjectName) != null)
                     {
-                        GameMoveRotator.MoveObject(GameFinder.FindChild(drawable, ObjectName), Position);
+                        GameMoveRotator.SetPosition(GameFinder.FindChild(drawable, ObjectName), Position, IncludeChildren);
                     }
                     else
                     {

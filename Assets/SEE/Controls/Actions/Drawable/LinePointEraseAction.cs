@@ -41,7 +41,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// Is the drawable on that the lines are displayed.
             /// </summary>
-            public readonly GameObject drawable;
+            public readonly DrawableConfig drawable;
             /// <summary>
             /// The list of lines that resulted from point remove of the original line.
             /// </summary>
@@ -56,7 +56,7 @@ namespace SEE.Controls.Actions.Drawable
             public Memento(GameObject originalLine, GameObject drawable, List<LineConf> lines)
             {
                 this.originalLine = LineConf.GetLine(originalLine);
-                this.drawable = drawable;
+                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
                 this.lines = lines;
             }
         }
@@ -95,11 +95,11 @@ namespace SEE.Controls.Actions.Drawable
                         hittedObject.transform.TransformPoints(transformedPositions);
                         List<LineConf> lines = new();
                         List<int> matchedIndexes = NearestPoints.GetNearestIndexes(transformedPositions, raycastHit.point);
-                        GameLineSplit.Split(GameFinder.FindDrawable(hittedObject), originLine, matchedIndexes, positionsList, lines, true);
+                        GameLineSplit.Split(GameFinder.GetDrawable(hittedObject), originLine, matchedIndexes, positionsList, lines, true);
 
-                        memento = new Memento(hittedObject, GameFinder.FindDrawable(hittedObject), lines);
+                        memento = new Memento(hittedObject, GameFinder.GetDrawable(hittedObject), lines);
                         mementoList.Add(memento);
-                        new EraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, memento.originalLine.id).Execute();
+                        new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.originalLine.id).Execute();
                         Destroyer.Destroy(hittedObject);
                     }
                 }
@@ -125,13 +125,14 @@ namespace SEE.Controls.Actions.Drawable
             reverseList.Reverse();
             foreach (Memento mem in reverseList)
             {
-                GameDrawer.ReDrawLine(mem.drawable, mem.originalLine);
-                new DrawOnNetAction(mem.drawable.name, GameFinder.GetDrawableParentName(mem.drawable), mem.originalLine).Execute();
+                GameObject drawable = mem.drawable.GetDrawable();
+                GameDrawer.ReDrawLine(drawable, mem.originalLine);
+                new DrawOnNetAction(mem.drawable.ID, mem.drawable.ParentID, mem.originalLine).Execute();
 
                 foreach (LineConf line in mem.lines)
                 {
-                    GameObject lineObj = GameFinder.FindChild(mem.drawable, line.id);
-                    new EraseNetAction(mem.drawable.name, GameFinder.GetDrawableParentName(mem.drawable), line.id).Execute();
+                    GameObject lineObj = GameFinder.FindChild(drawable, line.id);
+                    new EraseNetAction(mem.drawable.ID, mem.drawable.ParentID, line.id).Execute();
                     Destroyer.Destroy(lineObj);
                 }
             }
@@ -144,14 +145,15 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             foreach (Memento mem in mementoList)
             {
-                GameObject originObj = GameFinder.FindChild(mem.drawable, mem.originalLine.id);
-                new EraseNetAction(mem.drawable.name, GameFinder.GetDrawableParentName(mem.drawable), mem.originalLine.id).Execute();
+                GameObject drawable = mem.drawable.GetDrawable();
+                GameObject originObj = GameFinder.FindChild(drawable, mem.originalLine.id);
+                new EraseNetAction(mem.drawable.ID, mem.drawable.ParentID, mem.originalLine.id).Execute();
                 Destroyer.Destroy(originObj);
 
                 foreach (LineConf line in mem.lines)
                 {
-                    GameDrawer.ReDrawLine(mem.drawable, line);
-                    new DrawOnNetAction(mem.drawable.name, GameFinder.GetDrawableParentName(mem.drawable), line).Execute();
+                    GameDrawer.ReDrawLine(drawable, line);
+                    new DrawOnNetAction(mem.drawable.ID, mem.drawable.ParentID, line).Execute();
                 }
             }
         }

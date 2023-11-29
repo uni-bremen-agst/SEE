@@ -41,6 +41,9 @@ namespace Assets.SEE.Game.Drawable
                             case Tags.Image:
                                 new AddImageNetAction(drawable.name, drawableParent, ImageConf.GetImageConf(child)).Execute();
                                 break;
+                            case Tags.MindMapNode:
+                                new MindMapCreateNodeNetAction(drawable.name, drawableParent, MindMapNodeConf.GetNodeConf(child)).Execute();
+                                break;
                         }
                     }
                 }

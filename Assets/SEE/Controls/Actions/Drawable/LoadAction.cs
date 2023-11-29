@@ -48,11 +48,13 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The specific chosen drawable (needed for LoadState.Specific)
             /// </summary>
-            public GameObject specificDrawable;
+            public DrawableConfig specificDrawable;
             /// <summary>
             /// The drawable configurations.
             /// </summary>
             public DrawablesConfigs configs;
+
+            public List<DrawableConfig> addedDrawables;
 
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
@@ -63,6 +65,7 @@ namespace SEE.Controls.Actions.Drawable
                 this.state = state;
                 this.specificDrawable = null;
                 this.configs = null;
+                this.addedDrawables = new();
             }
         }
 
@@ -149,7 +152,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     clicked = true;
                     GameObject drawable = hit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                        hit.collider.gameObject : GameFinder.FindDrawable(hit.collider.gameObject);
+                        hit.collider.gameObject : GameFinder.GetDrawable(hit.collider.gameObject);
 
                     if (drawable.GetComponent<HighlightEffect>() == null)
                     {
@@ -187,11 +190,11 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         /// This block loads one drawable onto the specific chosen drawable.
                         case LoadState.Specific:
-                            memento.specificDrawable = selectedDrawable;
+                            memento.specificDrawable = DrawableConfigManager.GetDrawableConfig(selectedDrawable);
                             DrawablesConfigs configsSpecific = DrawableConfigManager.LoadDrawables(new FilePath(filePath));
                             foreach (DrawableConfig drawableConfig in configsSpecific.Drawables)
                             {
-                                Restore(memento.specificDrawable, drawableConfig);
+                                Restore(memento.specificDrawable.GetDrawable(), drawableConfig);
                             }
                             memento.configs = configsSpecific;
                             currentState = ReversibleAction.Progress.Completed;
@@ -202,12 +205,13 @@ namespace SEE.Controls.Actions.Drawable
                             DrawablesConfigs configs = DrawableConfigManager.LoadDrawables(new FilePath(filePath));
                             foreach (DrawableConfig drawableConfig in configs.Drawables)
                             {
-                                GameObject drawableOfFile = GameFinder.Find(drawableConfig.DrawableName, drawableConfig.DrawableParentName);
+                                GameObject drawableOfFile = GameFinder.FindDrawable(drawableConfig.ID, drawableConfig.ParentID);
                                 /// If the drawable does not exist it will be spawned as a sticky note.
                                 if (drawableOfFile == null)
                                 {
+                                    memento.addedDrawables.Add(drawableConfig);
                                     GameObject stickyNote = GameStickyNoteManager.Spawn(drawableConfig);
-                                    drawableOfFile = GameFinder.FindDrawable(stickyNote);
+                                    drawableOfFile = GameFinder.GetDrawable(stickyNote);
                                     new StickyNoteSpawnNetAction(drawableConfig).Execute();
                                 }
                                 Restore(drawableOfFile, drawableConfig);
@@ -217,7 +221,7 @@ namespace SEE.Controls.Actions.Drawable
                             result = true;
                             break;
                     }
-                }
+                } 
             }
             return result;
         }
@@ -225,69 +229,22 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Restores all the objects of the configuration.
         /// </summary>
-        /// <param name="drawable"></param>
-        /// <param name="config"></param>
+        /// <param name="drawable">The drawable on that the config should restore.</param>
+        /// <param name="config">The configuration which holds the drawable type configuration to restore.</param>
         private void Restore(GameObject drawable, DrawableConfig config)
         {
-            RestoreLines(drawable, config.LineConfigs);
-            RestoreTexts(drawable, config.TextConfigs);
-            RestoreImages(drawable, config.ImageConfigs);
-        }
-
-        /// <summary>
-        /// This method restores the lines of the drawable configuration to the given drawable.
-        /// </summary>
-        /// <param name="drawable">The drawable on which the lines should be restored.</param>
-        /// <param name="lines">The lines to be restored.</param>
-        private void RestoreLines(GameObject drawable, List<LineConf> lines)
-        {
             GameObject attachedObject = GameFinder.GetAttachedObjectsObject(drawable);
-            foreach (LineConf line in lines)
+            if (attachedObject != null)
             {
-                if (attachedObject != null)
-                {
-                    CheckAndChangeID(line, attachedObject, ValueHolder.LinePrefix);
-                }
-                GameDrawer.ReDrawLine(drawable, line);
-                new DrawOnNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), line).Execute();
+                GameMindMap.RenameMindMap(config, attachedObject);
             }
-        }
-
-        /// <summary>
-        /// This method restores the texts of the drawable configuration to the given drawable.
-        /// </summary>
-        /// <param name="drawable">The drawable on which the texts should be restored.</param>
-        /// <param name="texts">The texts to be restored.</param>
-        private void RestoreTexts(GameObject drawable, List<TextConf> texts)
-        {
-            GameObject attachedObject = GameFinder.GetAttachedObjectsObject(drawable);
-            foreach (TextConf text in texts)
+            foreach (DrawableType type in config.GetAllDrawableTypes())
             {
-                if (attachedObject != null)
+                if (attachedObject != null && type is not MindMapNodeConf)
                 {
-                    CheckAndChangeID(text, attachedObject, ValueHolder.TextPrefix);
+                    CheckAndChangeID(type, attachedObject, DrawableType.GetPrefix(type));
                 }
-                GameTexter.ReWriteText(drawable, text);
-                new WriteTextNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), text).Execute();
-            }
-        }
-
-        /// <summary>
-        /// This method restores the images of the drawable configuration to the given drawable.
-        /// </summary>
-        /// <param name="drawable">The drawable on which the texts should be restored.</param>
-        /// <param name="images">The images to be restored.</param>
-        private void RestoreImages(GameObject drawable, List<ImageConf> images)
-        {
-            GameObject attachedObject = GameFinder.GetAttachedObjectsObject(drawable);
-            foreach (ImageConf image in images)
-            {
-                if (attachedObject != null)
-                {
-                    CheckAndChangeID(image, attachedObject, ValueHolder.ImagePrefix);
-                }
-                GameImage.RePlaceImage(drawable, image);
-                new AddImageNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), image).Execute();
+                DrawableType.Restore(type, drawable);
             }
         }
 
@@ -299,7 +256,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <param name="prefix">The prefix for the drawable type object.</param>
         private void CheckAndChangeID (DrawableType conf, GameObject attachedObjects, string prefix)
         {
-            if (GameFinder.FindChild(attachedObjects, conf.id) != null)
+            if (GameFinder.FindChild(attachedObjects, conf.id) != null && !conf.id.Contains(ValueHolder.MindMapBranchLine))
             {
                 string newName = prefix + "-" + DrawableHolder.GetRandomString(8);
                 while (GameFinder.FindChild(attachedObjects, newName) != null)
@@ -320,18 +277,17 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (attachedObjects != null)
             {
-                GameObject drawable = GameFinder.FindDrawable(attachedObjects);
+                GameObject drawable = GameFinder.GetDrawable(attachedObjects);
                 string drawableParentName = GameFinder.GetDrawableParentName(drawable);
-                List<DrawableType> allConfigs = new(config.LineConfigs);
-                allConfigs.AddRange(config.TextConfigs);
-                allConfigs.AddRange(config.ImageConfigs);
-                // TODO ADD new drawable config types
 
-                foreach (DrawableType type in allConfigs)
+                foreach (DrawableType type in config.GetAllDrawableTypes())
                 {
                     GameObject typeObj = GameFinder.FindChild(attachedObjects, type.id);
-                    new EraseNetAction(drawable.name, drawableParentName, typeObj.name).Execute();
-                    Destroyer.Destroy(typeObj);
+                    if (typeObj != null)
+                    {
+                        new EraseNetAction(drawable.name, drawableParentName, typeObj.name).Execute();
+                        Destroyer.Destroy(typeObj);
+                    }
                 }
             }
         }
@@ -345,7 +301,7 @@ namespace SEE.Controls.Actions.Drawable
             switch (memento.state)
             {
                 case LoadState.Specific:
-                    GameObject attachedObjs = GameFinder.GetAttachedObjectsObject(memento.specificDrawable);
+                    GameObject attachedObjs = GameFinder.GetAttachedObjectsObject(memento.specificDrawable.GetDrawable());
                     foreach (DrawableConfig config in memento.configs.Drawables)
                     {
                         DestroyLoadedObjects(attachedObjs, config);
@@ -354,9 +310,18 @@ namespace SEE.Controls.Actions.Drawable
                 case LoadState.Regular:
                     foreach (DrawableConfig config in memento.configs.Drawables)
                     {
-                        GameObject drawable = GameFinder.Find(config.DrawableName, config.DrawableParentName);
-                        GameObject attachedObj = GameFinder.GetAttachedObjectsObject(drawable);
-                        DestroyLoadedObjects(attachedObj, config);
+                        if (memento.addedDrawables.Contains(config))
+                        {
+                            GameObject drawable = GameFinder.FindDrawable(config.ID, config.ParentID);
+                            new StickyNoteDeleterNetAction(GameFinder.GetHighestParent(drawable).name).Execute();
+                            Destroyer.Destroy(GameFinder.GetHighestParent(drawable));
+                        }
+                        else
+                        {
+                            GameObject drawable = GameFinder.FindDrawable(config.ID, config.ParentID);
+                            GameObject attachedObj = GameFinder.GetAttachedObjectsObject(drawable);
+                            DestroyLoadedObjects(attachedObj, config);
+                        }
                     }
                     break;
             }
@@ -371,16 +336,22 @@ namespace SEE.Controls.Actions.Drawable
             switch (memento.state)
             {
                 case LoadState.Specific:
+                    GameObject specificDrawable = memento.specificDrawable.GetDrawable();
                     foreach (DrawableConfig config in memento.configs.Drawables)
                     {
-                        Restore(memento.specificDrawable, config);
+                        Restore(specificDrawable, config);
                     }
                     break;
                 case LoadState.Regular:
                     foreach (DrawableConfig config in memento.configs.Drawables)
                     {
-                        GameObject d = GameFinder.Find(config.DrawableName, config.DrawableParentName);
-                        Restore(d, config);
+                        GameObject drawable = GameFinder.FindDrawable(config.ID, config.ParentID);
+                        if (drawable == null)
+                        {
+                            drawable = GameFinder.GetDrawable(GameStickyNoteManager.Spawn(config));
+                            new StickyNoteSpawnNetAction(config).Execute();
+                        }
+                        Restore(drawable, config);
                     }
                     break;
             }

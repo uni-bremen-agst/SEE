@@ -61,7 +61,7 @@ namespace SEE.Net.Actions.Drawable
             {
                 if (!IsRequester())
                 {
-                    GameObject drawable = GameFinder.Find(DrawableID, ParentDrawableID);
+                    GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
                     if (drawable != null && GameFinder.FindChild(drawable, LineName) != null)
                     {
                         GameEdit.ChangeSecondaryColor(GameFinder.FindChild(drawable, LineName), color);

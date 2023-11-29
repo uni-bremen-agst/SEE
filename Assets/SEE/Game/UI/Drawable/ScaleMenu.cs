@@ -65,14 +65,16 @@ namespace Assets.SEE.Game.UI.Drawable
         /// Enables the scale menu and set ups the handler for the menu components.
         /// </summary>
         /// <param name="objToScale">Is the drawable type object that should be scaled.</param>
-        public static void Enable(GameObject objToScale, bool stickyNodeMode = false)
+        /// <param name="stickyNoteMode">Enables the menu for the sticky notes.</param>
+        /// <param name="returnCall"></param>
+        public static void Enable(GameObject objToScale, bool stickyNoteMode = false, UnityAction returnCall = null)
         {
             xScale.AssignValue(objToScale.transform.localScale.x);
             xScale.onValueChanged.AddListener(xScale =>
             {
                 Vector3 newScale = new Vector3(xScale, yScale.GetValue(), 1);
                 GameScaler.SetScale(objToScale, newScale);
-                GameObject drawable = GameFinder.FindDrawable(objToScale);
+                GameObject drawable = GameFinder.GetDrawable(objToScale);
                 string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 new ScaleNetAction(drawable.name, drawableParent, objToScale.name, newScale).Execute();
             });
@@ -82,7 +84,7 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 Vector3 newScale = new Vector3(xScale.GetValue(), yScale, 1);
                 GameScaler.SetScale(objToScale, newScale);
-                GameObject drawable = GameFinder.FindDrawable(objToScale);
+                GameObject drawable = GameFinder.GetDrawable(objToScale);
                 string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 new ScaleNetAction(drawable.name, drawableParent, objToScale.name, newScale).Execute();
             });
@@ -120,7 +122,7 @@ namespace Assets.SEE.Game.UI.Drawable
                 yScale.onProportionalValueChanged = null;
             });
 
-            if (stickyNodeMode)
+            if (stickyNoteMode)
             {
                 doneObject.SetActive(true);
                 doneObject.GetComponent<ButtonManagerBasic>().clickEvent.RemoveAllListeners();
@@ -132,6 +134,15 @@ namespace Assets.SEE.Game.UI.Drawable
             } else
             {
                 doneObject.SetActive(false);
+            }
+            if (returnCall != null)
+            {
+                instance.transform.Find("ReturnBtn").gameObject.SetActive(true);
+                GameFinder.FindChild(instance, "ReturnBtn").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(returnCall);
+            }
+            else
+            {
+                instance.transform.Find("ReturnBtn").gameObject.SetActive(false);
             }
             instance.SetActive(true);
         }

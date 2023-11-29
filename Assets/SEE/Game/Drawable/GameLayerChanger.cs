@@ -116,7 +116,7 @@ namespace Assets.SEE.Game.Drawable
                 }
             }
             float multiplyValue = order;
-            if (order == 0)
+            if (order <= 0)
             {
                 multiplyValue = 0.5f;
             }

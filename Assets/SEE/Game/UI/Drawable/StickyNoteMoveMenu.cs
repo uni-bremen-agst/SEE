@@ -38,14 +38,14 @@ namespace Assets.SEE.Game.UI.Drawable
 
         /// <summary>
         /// Create and enables the sticky note move menu.
-        /// It register the necressary Handler to the menu interface.
+        /// It register the necessary Handler to the menu interface.
         /// </summary>
         /// <param name="stickyNoteHolder">The sticky note holder that should be moved.</param>
         public static void Enable(GameObject stickyNoteHolder)
         {
             moveMenu = PrefabInstantiator.InstantiatePrefab(moveMenuPrefab,
                 GameObject.Find("UI Canvas").transform, false);
-            GameObject drawable = GameFinder.FindDrawable(stickyNoteHolder);
+            GameObject drawable = GameFinder.GetDrawable(stickyNoteHolder);
             string drawableParentID = GameFinder.GetDrawableParentName(drawable);
 
             /// Register the switch for speed up option.

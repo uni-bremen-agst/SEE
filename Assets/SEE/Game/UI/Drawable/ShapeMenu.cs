@@ -15,7 +15,7 @@ namespace Assets.SEE.Game.UI.Drawable
     /// <summary>
     /// The class for the shape menu. It delievers a instance.
     /// Use ShapeMenu.Enable() and ShapeMenu.Disable()
-    /// There are Getters for the necressary values:
+    /// There are Getters for the necessary values:
     /// GetSelectedShape() for the selected shape type.
     /// GetValue1() - GetValue4(), GetVertices()
     /// </summary>
@@ -26,7 +26,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// </summary>
         private const string drawableSwitchPrefab = "Prefabs/UI/Drawable/ShapeSwitch";
         /// <summary>
-        /// The prefab for the shape menu, it contains the shape type, the necressary values and a info box.
+        /// The prefab for the shape menu, it contains the shape type, the necessary values and a info box.
         /// </summary>
         private const string drawableShapePrefab = "Prefabs/UI/Drawable/ShapeMenu";
         /// <summary>
@@ -373,7 +373,7 @@ namespace Assets.SEE.Game.UI.Drawable
 
         /// <summary>
         /// Init the config menu. 
-        /// It adds the necressary Handler to the components.
+        /// It adds the necessary Handler to the components.
         /// </summary>
         private static void InitConfigMenu()
         {
@@ -429,7 +429,7 @@ namespace Assets.SEE.Game.UI.Drawable
         }
         /// <summary>
         /// Changes the menu for the selected shape.
-        /// It displayes only the necressary values for the selected shape.
+        /// It displayes only the necessary values for the selected shape.
         /// The values are renamed to match the shape appropriately, 
         /// so that the values correspond to the explanations in the images of the information boxes.
         /// </summary>

@@ -2,8 +2,10 @@
 using Assets.SEE.Game.UI.Drawable;
 using HighlightPlus;
 using Michsky.UI.ModernUIPack;
+using OpenAI.Files;
 using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
 using SEE.Game.UI.Notification;
 using SEE.GO;
 using SEE.Utils;
@@ -46,7 +48,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The drawables that should be saved.
             /// </summary>
-            internal readonly GameObject[] drawables;
+            internal readonly DrawableConfig[] drawables;
 
             /// <summary>
             /// The state if one or more drawables has been saved in this file.
@@ -58,7 +60,7 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             /// <param name="drawables">The drawables to save into this file</param>
             /// <param name="savedState">Represents if one or more drawables saved in this file.</param>
-            internal Memento(GameObject[] drawables, SaveState savedState)
+            internal Memento(DrawableConfig[] drawables, SaveState savedState)
             {
                 this.drawables = drawables;
                 this.savedState = savedState;
@@ -111,12 +113,17 @@ namespace SEE.Controls.Actions.Drawable
                         if (selectedDrawables.Count == 1)
                         {
                             browser.SaveDrawableConfiguration(SaveState.One);
-                            memento = new Memento(new GameObject[] { selectedDrawables[0] }, SaveState.One);
+                            memento = new Memento(new DrawableConfig[] { DrawableConfigManager.GetDrawableConfig(selectedDrawables[0]) }, SaveState.One);
                         }
                         else 
                         {
                             browser.SaveDrawableConfiguration(SaveState.More);
-                            memento = new Memento(selectedDrawables.ToArray(), SaveState.More);
+                            DrawableConfig[] configs = new DrawableConfig[selectedDrawables.Count];
+                            for (int i = 0; i < configs.Length; i++)
+                            {
+                                configs[i] = DrawableConfigManager.GetDrawableConfig(selectedDrawables[i]);
+                            }
+                            memento = new Memento(configs, SaveState.More);
                         }
                     } else
                     {
@@ -132,7 +139,12 @@ namespace SEE.Controls.Actions.Drawable
                     browser = GameObject.Find("UI Canvas").AddOrGetComponent<DrawableFileBrowser>();
                     browser.SaveDrawableConfiguration(SaveState.All);
                     List<GameObject> drawables = new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
-                    memento = new Memento(drawables.ToArray(), SaveState.All);
+                    DrawableConfig[] configs = new DrawableConfig[drawables.Count];
+                    for (int i = 0; i < configs.Length; i++)
+                    {
+                        configs[i] = DrawableConfigManager.GetDrawableConfig(drawables[i]);
+                    }
+                    memento = new Memento(configs, SaveState.All);
                 }
             };
 
@@ -160,7 +172,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     clicked = true;
                     GameObject drawable = hit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                        hit.collider.gameObject : GameFinder.FindDrawable(hit.collider.gameObject);
+                        hit.collider.gameObject : GameFinder.GetDrawable(hit.collider.gameObject);
 
                     if (drawable.GetComponent<HighlightEffect>() == null)
                     {
@@ -196,19 +208,19 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         case SaveState.One:
                             memento.filePath = new FilePath(filePath);
-                            DrawableConfigManager.SaveDrawable(memento.drawables[0], memento.filePath);
+                            DrawableConfigManager.SaveDrawable(memento.drawables[0].GetDrawable(), memento.filePath);
                             currentState = ReversibleAction.Progress.Completed;
                             result = true;
                             break;
                         case SaveState.More:
-                            memento.filePath = new FilePath(filePath);
-                            DrawableConfigManager.SaveDrawables(memento.drawables, memento.filePath);
-                            currentState = ReversibleAction.Progress.Completed;
-                            result = true;
-                            break;
                         case SaveState.All:
                             memento.filePath = new FilePath(filePath);
-                            DrawableConfigManager.SaveDrawables(memento.drawables, memento.filePath);
+                            GameObject[] drawables = new GameObject[memento.drawables.Length];
+                            for (int i = 0; i < drawables.Length; i++)
+                            {
+                                drawables[i] = memento.drawables[i].GetDrawable();
+                            }
+                            DrawableConfigManager.SaveDrawables(drawables, memento.filePath);
                             currentState = ReversibleAction.Progress.Completed;
                             result = true;
                             break;
@@ -237,11 +249,16 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (memento.savedState == SaveState.One)
             {
-                DrawableConfigManager.SaveDrawable(memento.drawables[0], memento.filePath);
+                DrawableConfigManager.SaveDrawable(memento.drawables[0].GetDrawable(), memento.filePath);
             }
             else
             {
-                DrawableConfigManager.SaveDrawables(memento.drawables, memento.filePath);
+                GameObject[] drawables = new GameObject[memento.drawables.Length];
+                for (int i = 0; i < drawables.Length; i++)
+                {
+                    drawables[i] = memento.drawables[i].GetDrawable();
+                }
+                DrawableConfigManager.SaveDrawables(drawables, memento.filePath);
             }
         }
 

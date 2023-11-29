@@ -31,7 +31,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The drawable on that the drawable type is displayed.
             /// </summary>
-            public readonly GameObject drawable;
+            public readonly DrawableConfig drawable;
             /// <summary>
             /// The drawable type object.
             /// </summary>
@@ -44,7 +44,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <param name="drawableType">The drawable type of the deleted object</param>
             public Memento(GameObject drawable, DrawableType drawableType)
             {
-                this.drawable = drawable;
+                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
                 this.drawableType = drawableType;
             }
         }
@@ -67,10 +67,15 @@ namespace SEE.Controls.Actions.Drawable
 
                     if (Tags.DrawableTypes.Contains(hittedObject.tag))
                     {
-                        memento = new Memento(GameFinder.FindDrawable(hittedObject), new DrawableType().Get(hittedObject));
+                        memento = new Memento(GameFinder.GetDrawable(hittedObject), DrawableType.Get(hittedObject));
                         mementoList.Add(memento);
 
-                        new EraseNetAction(memento.drawable.name, memento.drawable.transform.parent.name, hittedObject.name).Execute();
+                        if (memento.drawableType is MindMapNodeConf conf)
+                        {
+                            DeleteChilds(hittedObject);
+                        }
+
+                        new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, hittedObject.name).Execute();
                         Destroyer.Destroy(hittedObject);
                     }
                 }
@@ -85,30 +90,52 @@ namespace SEE.Controls.Actions.Drawable
             return false;
         }
 
+        private void DeleteChilds(GameObject node, bool delete = false)
+        {
+            GameObject drawable = GameFinder.GetDrawable(node);
+            MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
+            Dictionary<GameObject, GameObject> childs = valueHolder.GetChildren().ToDictionary(entry => entry.Key, entry => entry.Value);
+            if (valueHolder.GetParentBranchLine() != null)
+            {
+                GameObject pBranchLine = valueHolder.GetParentBranchLine();
+                memento = new Memento(drawable, DrawableType.Get(pBranchLine));
+                mementoList.Add(memento);
+
+                new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, pBranchLine.name).Execute();
+                Destroyer.Destroy(pBranchLine);
+            }
+            if (valueHolder.GetParent() != null)
+            {
+                valueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(node);
+                new MindMapRemoveChildNetAction(memento.drawable.ID, memento.drawable.ParentID, MindMapNodeConf.GetNodeConf(node)).Execute();
+            }
+
+            foreach(KeyValuePair<GameObject, GameObject> pair in childs)
+            {
+                DeleteChilds(pair.Key, true);
+            }
+
+            if (delete)
+            {
+                memento = new Memento(drawable, DrawableType.Get(node));
+                mementoList.Add(memento);
+
+                new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, node.name).Execute();
+                Destroyer.Destroy(node);
+            }
+        }
+
         /// <summary>
         /// Reverts this action, i.e., it recovers the deletes drawable object's.
         /// </summary>
         public override void Undo()
         {
             base.Undo();
+            mementoList = mementoList.OrderBy(m => DrawableType.OrderOnType(m.drawableType)).ThenBy(m => DrawableType.OrderMindMap(m.drawableType)).ToList();
             foreach (Memento mem in mementoList)
             {
-                string drawableParent = GameFinder.GetDrawableParentName(mem.drawable);
-                if (mem.drawableType is LineConf line)
-                {
-                    GameDrawer.ReDrawLine(mem.drawable, line);
-                    new DrawOnNetAction(mem.drawable.name, drawableParent, line).Execute();
-                }
-                else if (mem.drawableType is TextConf text)
-                {
-                    GameTexter.ReWriteText(mem.drawable, text);
-                    new WriteTextNetAction(mem.drawable.name, drawableParent, text).Execute();
-                }
-                else if (mem.drawableType is ImageConf image)
-                {
-                    GameImage.RePlaceImage(mem.drawable, image);
-                    new AddImageNetAction(mem.drawable.name, drawableParent, image).Execute();
-                }
+                GameObject drawable = mem.drawable.GetDrawable();
+                DrawableType.Restore(mem.drawableType, drawable);
             }
         }
 
@@ -120,8 +147,17 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             foreach (Memento mem in mementoList)
             {
-                GameObject toDelete = GameFinder.FindChild(mem.drawable, mem.drawableType.id); ;
-                new EraseNetAction(mem.drawable.name, GameFinder.GetDrawableParentName(mem.drawable), mem.drawableType.id).Execute();
+                GameObject toDelete = GameFinder.FindChild(mem.drawable.GetDrawable(), mem.drawableType.id);
+                if (mem.drawableType is MindMapNodeConf conf)
+                {
+                    MMNodeValueHolder valueHolder = toDelete.GetComponent<MMNodeValueHolder>();
+                    if (valueHolder.GetParent() != null)
+                    {
+                        valueHolder.GetParent().GetComponent<MMNodeValueHolder>().RemoveChild(toDelete);
+                        new MindMapRemoveChildNetAction(memento.drawable.ID, memento.drawable.ParentID, MindMapNodeConf.GetNodeConf(toDelete)).Execute();
+                    }
+                }
+                new EraseNetAction(mem.drawable.ID, mem.drawable.ParentID, mem.drawableType.id).Execute();
                 Destroyer.Destroy(toDelete);
             }
         }
@@ -171,7 +207,7 @@ namespace SEE.Controls.Actions.Drawable
             else
             {
                 HashSet<string> changedObjects = new HashSet<string>();
-                changedObjects.Add(memento.drawable.name);
+                changedObjects.Add(memento.drawable.ID);
                 foreach (Memento mem in mementoList)
                 {
                     changedObjects.Add(mem.drawableType.id);

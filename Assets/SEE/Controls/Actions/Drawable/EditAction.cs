@@ -62,7 +62,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The drawable on that the drawable type object is displayed.
             /// </summary>
-            public readonly GameObject drawable;
+            public readonly DrawableConfig drawable;
             /// <summary>
             /// The id of the drawable type object.
             /// </summary>
@@ -82,7 +82,7 @@ namespace SEE.Controls.Actions.Drawable
                 this.selectedObj = obj;
                 this.oldValueHolder = oldValueHolder;
                 this.newValueHolder = newValueHolder;
-                this.drawable = drawable;
+                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
                 this.id = id;
             }
         }
@@ -155,6 +155,12 @@ namespace SEE.Controls.Actions.Drawable
                 return oldImageHolder.orderInLayer.Equals(newImageHolder.orderInLayer) &&
                     oldImageHolder.imageColor.Equals(newImageHolder.imageColor);
             }
+            if (oldHolder is MindMapNodeConf oldConf && newHolder is MindMapNodeConf newConf)
+            {
+                return oldConf.parentNode.Equals(newConf.parentNode) && oldConf.nodeKind.Equals(newConf.nodeKind) &&
+                    CheckEquals(oldConf.borderConf, newConf.borderConf) && CheckEquals(oldConf.textConf, newConf.textConf) &&
+                    CheckEquals(oldConf.branchLineConf, newConf.branchLineConf);
+            }
             return false;
         }
 
@@ -171,7 +177,7 @@ namespace SEE.Controls.Actions.Drawable
             }
             if (progressState != ProgressState.Finish && selectedObj != null)
             {
-                GameObject drawable = GameFinder.FindDrawable(selectedObj);
+                GameObject drawable = GameFinder.GetDrawable(selectedObj);
                 string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 if (oldValueHolder is LineConf oldLineHolder)
                 {
@@ -192,6 +198,7 @@ namespace SEE.Controls.Actions.Drawable
             TextMenu.Disable();
             LineMenu.disableLineMenu();
             ImageMenu.Disable();
+            MindMapEditMenu.Disable();
         }
 
         /// <summary>
@@ -221,8 +228,8 @@ namespace SEE.Controls.Actions.Drawable
                         {
                             selectedObj = raycastHit.collider.gameObject;
                             oldSelectedObj = selectedObj;
-                            oldValueHolder = new DrawableType().Get(selectedObj);
-                            newValueHolder = new DrawableType().Get(selectedObj);
+                            oldValueHolder = DrawableType.Get(selectedObj);
+                            newValueHolder = DrawableType.Get(selectedObj);
 
                             BlinkEffect effect = selectedObj.AddOrGetComponent<BlinkEffect>();
                             effect.SetAllowedActionStateType(GetActionStateType());
@@ -249,6 +256,10 @@ namespace SEE.Controls.Actions.Drawable
                         {
                             ImageMenu.Enable(selectedObj, newValueHolder);
                         }
+                        if (selectedObj.CompareTag(Tags.MindMapNode))
+                        {
+                            MindMapEditMenu.Enable(selectedObj, newValueHolder);
+                        }
                         if (Input.GetMouseButtonUp(0))
                         {
                             progressState = ProgressState.Edit;
@@ -271,7 +282,7 @@ namespace SEE.Controls.Actions.Drawable
                         if (!CheckEquals(oldValueHolder, newValueHolder))
                         {
                             memento = new Memento(selectedObj, oldValueHolder, newValueHolder,
-                                     GameFinder.FindDrawable(selectedObj), selectedObj.name);
+                                     GameFinder.GetDrawable(selectedObj), selectedObj.name);
                             currentState = ReversibleAction.Progress.Completed;
                             return true;
                         } else
@@ -281,6 +292,7 @@ namespace SEE.Controls.Actions.Drawable
                             LineMenu.disableLineMenu();
                             TextMenu.Disable();
                             ImageMenu.Disable();
+                            MindMapEditMenu.Disable();
                         }
                         break;
                     default:
@@ -298,12 +310,12 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (memento.selectedObj == null && memento.id != null)
             {
-                memento.selectedObj = GameFinder.FindChild(memento.drawable, memento.id);
+                memento.selectedObj = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.id);
             }
 
             if (memento.selectedObj != null)
             {
-                GameObject drawable = GameFinder.FindDrawable(memento.selectedObj);
+                GameObject drawable = GameFinder.GetDrawable(memento.selectedObj);
                 string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 if (memento.oldValueHolder is LineConf oldLineHolder)
                 {
@@ -320,6 +332,11 @@ namespace SEE.Controls.Actions.Drawable
                     GameEdit.ChangeImage(memento.selectedObj, oldImageHolder);
                     new EditImageNetAction(drawable.name, drawableParent, oldImageHolder).Execute();
                 }
+                if (memento.oldValueHolder is MindMapNodeConf oldNodeHolder)
+                {
+                    GameEdit.ChangeMindMapNode(memento.selectedObj, oldNodeHolder);
+                    new EditMMNodeNetAction(drawable.name, drawableParent, oldNodeHolder).Execute();
+                }
             }
         }
 
@@ -331,12 +348,12 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (memento.selectedObj == null && memento.id != null)
             {
-                memento.selectedObj = GameFinder.FindChild(memento.drawable, memento.id);
+                memento.selectedObj = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.id);
             }
 
             if (memento.selectedObj != null)
             {
-                GameObject drawable = GameFinder.FindDrawable(memento.selectedObj);
+                GameObject drawable = GameFinder.GetDrawable(memento.selectedObj);
                 string drawableParent = GameFinder.GetDrawableParentName(drawable);
                 if (memento.newValueHolder is LineConf newLineValueHolder)
                 {
@@ -352,6 +369,11 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     GameEdit.ChangeImage(memento.selectedObj, newImageHolder);
                     new EditImageNetAction(drawable.name, drawableParent, newImageHolder).Execute();
+                }
+                if (memento.newValueHolder is MindMapNodeConf newNodeHolder)
+                {
+                    GameEdit.ChangeMindMapNode(memento.selectedObj, newNodeHolder);
+                    new EditMMNodeNetAction(drawable.name, drawableParent, newNodeHolder).Execute();
                 }
             }
         }

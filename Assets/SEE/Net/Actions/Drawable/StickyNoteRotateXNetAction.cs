@@ -51,7 +51,7 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameFinder.Find(DrawableID, ParentDrawableID);
+                GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
                 if (drawable != null)
                 {
                     GameStickyNoteManager.SetRotateX(GameFinder.GetHighestParent(drawable), Degree);

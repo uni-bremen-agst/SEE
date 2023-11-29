@@ -45,7 +45,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The drawable where the shape is displayed.
             /// </summary>
-            public readonly GameObject drawable;
+            public readonly DrawableConfig drawable;
             /// <summary>
             /// The configuration of the shape.
             /// </summary>
@@ -58,14 +58,14 @@ namespace SEE.Controls.Actions.Drawable
             /// <param name="shape">The configuration of the shape.</param>
             public Memento(GameObject drawable, LineConf shape)
             {
-                this.drawable = drawable;
+                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
                 this.shape = shape;
             }
         }
 
         /// <summary>
         /// Representing if the action is drawing. 
-        /// Also necressary to identifier if the line shape was successfully drawed.
+        /// Also necessary to identifier if the line shape was successfully drawed.
         /// </summary>
         private bool drawing = false;
 
@@ -122,7 +122,7 @@ namespace SEE.Controls.Actions.Drawable
                     && !drawing)
                 {
                     drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
-                        raycastHit.collider.gameObject : GameFinder.FindDrawable(raycastHit.collider.gameObject);
+                        raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
                     drawing = true;
                     Vector3 convertedHitPoint = GameDrawer.GetConvertedPosition(drawable, raycastHit.point);
                    
@@ -180,7 +180,7 @@ namespace SEE.Controls.Actions.Drawable
                             shape = GameDrawer.SetPivotShape(shape, convertedHitPoint);
                             LineConf currentShape = LineConf.GetLine(shape);
                             memento = new Memento(drawable, currentShape);
-                            new DrawOnNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), currentShape).Execute();
+                            new DrawOnNetAction(memento.drawable.ID, memento.drawable.ParentID, currentShape).Execute();
                             currentState = ReversibleAction.Progress.Completed;
                             drawing = false;
                             return true;
@@ -199,7 +199,7 @@ namespace SEE.Controls.Actions.Drawable
                     (rh.collider.gameObject.CompareTag(Tags.Drawable) ||
                     GameFinder.hasDrawable(rh.collider.gameObject)) &&
                     ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shapes.Line
-                    && (drawable == null || drawable != null && GameFinder.FindDrawable(rh.collider.gameObject).Equals(drawable)))
+                    && (drawable == null || drawable != null && GameFinder.GetDrawable(rh.collider.gameObject).Equals(drawable)))
                 {
                     Vector3 newPosition = shape.transform.InverseTransformPoint(rh.point) - ValueHolder.distanceToDrawable;
                     Vector3[] newPositions = new Vector3[positions.Length + 1];
@@ -216,7 +216,7 @@ namespace SEE.Controls.Actions.Drawable
                     (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
                     GameFinder.hasDrawable(hit.collider.gameObject))
                     && drawing && ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shapes.Line
-                    && (drawable == null || drawable != null && GameFinder.FindDrawable(hit.collider.gameObject).Equals(drawable)))
+                    && (drawable == null || drawable != null && GameFinder.GetDrawable(hit.collider.gameObject).Equals(drawable)))
                 {
                     Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.distanceToDrawable;
                     if (newPosition != positions.Last())
@@ -265,7 +265,7 @@ namespace SEE.Controls.Actions.Drawable
             shape = GameDrawer.SetPivot(shape);
             LineConf currentShape = LineConf.GetLine(shape);
             memento = new Memento(drawable, currentShape);
-            new DrawOnNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), currentShape).Execute();
+            new DrawOnNetAction(memento.drawable.ID, memento.drawable.ParentID, currentShape).Execute();
             currentState = ReversibleAction.Progress.Completed;
             drawing = false;
         }
@@ -278,11 +278,11 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (shape == null)
             {
-                shape = GameFinder.FindChild(memento.drawable, memento.shape.id);
+                shape = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.shape.id);
             }
             if (shape != null)
             {
-                new EraseNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), memento.shape.id).Execute();
+                new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.shape.id).Execute();
                 Destroyer.Destroy(shape);
             }
         }
@@ -293,10 +293,10 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            shape = GameDrawer.ReDrawLine(memento.drawable, memento.shape);
+            shape = GameDrawer.ReDrawLine(memento.drawable.GetDrawable(), memento.shape);
             if (shape != null)
             {
-                new DrawOnNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), LineConf.GetLine(shape)).Execute();
+                new DrawOnNetAction(memento.drawable.ID, memento.drawable.ParentID, LineConf.GetLine(shape)).Execute();
             }
         }
 

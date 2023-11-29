@@ -41,7 +41,7 @@ namespace SEE.Net.Actions.Drawable
         {
             if (!IsRequester())
             {
-                GameObject drawable = GameFinder.Find(DrawableConf.DrawableName, DrawableConf.DrawableParentName);
+                GameObject drawable = GameFinder.FindDrawable(DrawableConf.ID, DrawableConf.ParentID);
                 GameStickyNoteManager.ChangeColor(drawable.transform.parent.gameObject, DrawableConf.Color);
             }
         }

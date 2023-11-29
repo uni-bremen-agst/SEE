@@ -39,14 +39,14 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     isInAction = true;
                     GameObject hittedObject = raycastHit.collider.gameObject;
-                    GameObject drawable = GameFinder.FindDrawable(hittedObject);
+                    GameObject drawable = GameFinder.GetDrawable(hittedObject);
 
                     int oldOrder = hittedObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
                     int newOrder = oldOrder + 1;
                     GameLayerChanger.Increase(hittedObject, newOrder);
                     memento = new Memento(drawable, GameLayerChanger.LayerChangerStates.Increase,
                                     hittedObject, hittedObject.name, oldOrder, newOrder);
-                    new LayerChangerNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable),
+                    new LayerChangerNetAction(memento.drawable.ID, memento.drawable.ParentID,
                         memento.obj.name, memento.state, memento.newOrder).Execute();
                     currentState = ReversibleAction.Progress.InProgress;
                 }
@@ -57,7 +57,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     isInAction = true;
                     GameObject hittedObject = raycastHit2.collider.gameObject;
-                    GameObject drawable = GameFinder.FindDrawable(hittedObject);
+                    GameObject drawable = GameFinder.GetDrawable(hittedObject);
 
                     int oldOrder = hittedObject.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
                     int newOrder = oldOrder - 1;
@@ -65,7 +65,7 @@ namespace SEE.Controls.Actions.Drawable
                     GameLayerChanger.Decrease(hittedObject, newOrder);
                     memento = new Memento(drawable, GameLayerChanger.LayerChangerStates.Decrease,
                                 hittedObject, hittedObject.name, oldOrder, newOrder);
-                    new LayerChangerNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable),
+                    new LayerChangerNetAction(memento.drawable.ID, memento.drawable.ParentID,
                         memento.obj.name, memento.state, memento.newOrder).Execute();
                     currentState = ReversibleAction.Progress.InProgress;
                 }
@@ -91,7 +91,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The drawable on which the object to be layer changed is located.
             /// </summary>
-            public readonly GameObject drawable;
+            public readonly DrawableConfig drawable;
             /// <summary>
             /// Is the state of the layer change.
             /// </summary>
@@ -124,7 +124,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <param name="newOrder">The new order in layer value to save into this Memento</param>
             public Memento(GameObject drawable, GameLayerChanger.LayerChangerStates state, GameObject obj, string id, int oldOrder, int newOrder)
             {
-                this.drawable = drawable;
+                this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
                 this.state = state;
                 this.obj = obj;
                 this.id = id;
@@ -141,18 +141,18 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (memento.obj == null && memento.id != null)
             {
-                memento.obj = GameFinder.FindChild(memento.drawable, memento.id);
+                memento.obj = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.id);
             }
             switch (memento.state)
             {
                 case GameLayerChanger.LayerChangerStates.Increase:
                     GameLayerChanger.Decrease(memento.obj, memento.oldOrder);
-                    new LayerChangerNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), 
+                    new LayerChangerNetAction(memento.drawable.ID, memento.drawable.ParentID, 
                         memento.obj.name, GameLayerChanger.LayerChangerStates.Decrease, memento.oldOrder).Execute();
                     break;
                 case GameLayerChanger.LayerChangerStates.Decrease:
                     GameLayerChanger.Increase(memento.obj, memento.oldOrder);
-                    new LayerChangerNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), 
+                    new LayerChangerNetAction(memento.drawable.ID, memento.drawable.ParentID, 
                         memento.obj.name, GameLayerChanger.LayerChangerStates.Increase, memento.oldOrder).Execute();
                     break;
             }
@@ -166,7 +166,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             if (memento.obj == null && memento.id != null)
             {
-                memento.obj = GameFinder.FindChild(memento.drawable, memento.id);
+                memento.obj = GameFinder.FindChild(memento.drawable.GetDrawable(), memento.id);
             }
             switch (memento.state)
             {
@@ -177,7 +177,7 @@ namespace SEE.Controls.Actions.Drawable
                     GameLayerChanger.Decrease(memento.obj, memento.newOrder);
                     break;
             }
-            new LayerChangerNetAction(memento.drawable.name, GameFinder.GetDrawableParentName(memento.drawable), 
+            new LayerChangerNetAction(memento.drawable.ID, memento.drawable.ParentID, 
                 memento.obj.name, memento.state, memento.newOrder).Execute();
         }
 

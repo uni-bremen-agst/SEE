@@ -153,26 +153,29 @@ namespace Assets.SEE.Game.Drawable
         }
 
         public static GameObject DrawLine(GameObject drawable, String name, Vector3[] positions, ColorKind colorKind, 
-            Color primaryColor, Color secondaryColor, float thickness, bool loop, LineKind lineKind, float tiling)
+            Color primaryColor, Color secondaryColor, float thickness, bool loop, LineKind lineKind, float tiling, bool increaseCurrentOrder = true)
         {
-            GameObject l;
+            GameObject lineObject;
             UpdateZPositions(ref positions);
             if (GameFinder.FindChild(drawable, name) != null)
             {
-                l = GameFinder.FindChild(drawable, name);
-                Drawing(l, positions);
-                FinishDrawing(l, loop);
+                lineObject = GameFinder.FindChild(drawable, name);
+                Drawing(lineObject, positions);
+                FinishDrawing(lineObject, loop);
             }
             else
             {
                 Setup(drawable, name, positions, colorKind, primaryColor, secondaryColor, thickness, 
                     ValueHolder.currentOrderInLayer, lineKind, tiling, out GameObject line, out LineRenderer renderer, out MeshCollider meshCollider);
-                l = line;
+                lineObject = line;
                 renderer.SetPositions(positions);
-                ValueHolder.currentOrderInLayer++;
+                if (increaseCurrentOrder)
+                {
+                    ValueHolder.currentOrderInLayer++;
+                }
                 FinishDrawing(line, loop);
             }
-            return l;
+            return lineObject;
         }
 
         public static GameObject ReDrawLine(GameObject drawable, String name, Vector3[] positions, 
@@ -355,6 +358,13 @@ namespace Assets.SEE.Game.Drawable
             }
         }
 
+        /// <summary>
+        /// Sets the z positions of a line renderer to zero.
+        /// It is needed because a Line Renderer by itself 
+        /// changes the z values in case of an overlap. 
+        /// However, this is problematic for the change order in layer variant.
+        /// </summary>
+        /// <param name="positions">The positions of the line from the line renderer</param>
         private static void UpdateZPositions(ref Vector3[] positions)
         {
             for (int i = 0; i < positions.Length; i++)

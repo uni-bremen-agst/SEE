@@ -72,7 +72,7 @@ namespace Assets.SEE.Game.UI.Drawable
         }
 
         /// <summary>
-        /// Enables the image menu and register the necressary Handler to the components.
+        /// Enables the image menu and register the necessary Handler to the components.
         /// </summary>
         /// <param name="imageObj">The image object which should be changed.</param>
         /// <param name="newValueHolder">The configuration file which should be changed.</param>
@@ -80,7 +80,7 @@ namespace Assets.SEE.Game.UI.Drawable
         {
             if (newValueHolder is ImageConf image)
             {
-                GameObject drawable = GameFinder.FindDrawable(imageObj);
+                GameObject drawable = GameFinder.GetDrawable(imageObj);
                 string drawableParentName = GameFinder.GetDrawableParentName(drawable);
 
                 AssignOrderInLayer(order =>
