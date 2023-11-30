@@ -20,6 +20,7 @@ namespace SEE.Controls.Actions
     /// </summary>
     internal class ShowCodeAction : AbstractPlayerAction
     {
+
         /// <summary>
         /// Manager object which takes care of the player selection menu and window space dictionary for us.
         /// </summary>
