@@ -143,12 +143,12 @@ namespace Assets.SEE.Game.Drawable
         /// It only works for the drawable type line.
         /// </summary>
         /// <param name="line">The line which holds the to moved point</param>
-        /// <param name="indexes">The index of the point which should be moved.</param>
+        /// <param name="Indices">The indices of the points which should be moved. (all indices have the same position)</param>
         /// <param name="point">The new point position</param>
-        public static void MovePoint(GameObject line, List<int> indexes, Vector3 point)
+        public static void MovePoint(GameObject line, List<int> Indices, Vector3 point)
         {
             LineRenderer renderer = line.GetComponent<LineRenderer>();
-            foreach (int i in indexes)
+            foreach (int i in Indices)
             {
                 float z = renderer.GetPosition(i).z;
                 Vector3 newPoint = new Vector3(point.x, point.y, z);

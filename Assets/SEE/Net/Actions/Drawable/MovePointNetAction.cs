@@ -32,7 +32,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The selected positions
         /// </summary>
-        public List<int> Indexes;
+        public List<int> Indices;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
@@ -40,15 +40,15 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The id of the drawable on which the object is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="lineName">The id of the line thats line renderer positions should be changed</param>
-        /// <param name="indexes">The selected positions of the line renderer</param>
+        /// <param name="Indices">The selected positions of the line renderer</param>
         /// <param name="position">The new position that should be set for the selected positions.</param>
-        public MovePointNetAction(string drawableID, string parentDrawableID, string lineName, List<int> indexes, Vector3 position) : base()
+        public MovePointNetAction(string drawableID, string parentDrawableID, string lineName, List<int> Indices, Vector3 position) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
             LineName = lineName;
             this.Position = position;
-            this.Indexes = indexes;
+            this.Indices = Indices;
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace SEE.Net.Actions.Drawable
                     GameObject drawable = GameFinder.FindDrawable(DrawableID, ParentDrawableID);
                     if (drawable != null && GameFinder.FindChild(drawable, LineName) != null)
                     {
-                        GameMoveRotator.MovePoint(GameFinder.FindChild(drawable, LineName), Indexes, Position);
+                        GameMoveRotator.MovePoint(GameFinder.FindChild(drawable, LineName), Indices, Position);
                     }
                     else
                     {

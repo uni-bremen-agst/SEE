@@ -41,9 +41,9 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public readonly string id;
             /// <summary>
-            /// The indexes of the founded nearest position. It can be more then one, because points can overlap.
+            /// The Indices of the founded nearest position. It can be more then one, because points can overlap.
             /// </summary>
-            public readonly List<int> indexes;
+            public readonly List<int> Indices;
             /// <summary>
             /// The old position of the selected points.
             /// </summary>
@@ -59,16 +59,16 @@ namespace SEE.Controls.Actions.Drawable
             /// <param name="line">the selected line</param>
             /// <param name="drawable">The drawable on that the line is placed.</param>
             /// <param name="id">the id of the selected line</param>
-            /// <param name="indexes">The indexes of the founded nearest position. It can be more then one, because points can overlap.</param>
+            /// <param name="Indices">The Indices of the founded nearest position. It can be more then one, because points can overlap.</param>
             /// <param name="oldPointPosition">The old position of the selected points</param>
             /// <param name="newPointPosition">The new position for the selected points</param>
-            public Memento(GameObject line, GameObject drawable, string id, List<int> indexes,
+            public Memento(GameObject line, GameObject drawable, string id, List<int> Indices,
                 Vector3 oldPointPosition, Vector3 newPointPosition)
             {
                 this.line = line;
                 this.drawable = DrawableConfigManager.GetDrawableConfig(drawable);
                 this.id = id;
-                this.indexes = indexes;
+                this.Indices = Indices;
                 this.oldPointPosition = oldPointPosition;
                 this.newPointPosition = newPointPosition;
             }
@@ -99,7 +99,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// The index of the nearest founded points. It can be more because points can be overlap.
         /// </summary>
-        private List<int> indexes;
+        private List<int> Indices;
         /// <summary>
         /// The new point position.
         /// </summary>
@@ -142,9 +142,9 @@ namespace SEE.Controls.Actions.Drawable
                             Vector3[] transformedPositions = new Vector3[positions.Length];
                             Array.Copy(sourceArray: positions, destinationArray: transformedPositions, length: positions.Length);
                             selectedLine.transform.TransformPoints(transformedPositions);
-                            indexes = NearestPoints.GetNearestIndexes(transformedPositions, raycastHit.point);
+                            Indices = NearestPoints.GetNearestIndices(transformedPositions, raycastHit.point);
 
-                            oldPointPosition = positions[indexes[0]];
+                            oldPointPosition = positions[Indices[0]];
                         }
                         if (Input.GetMouseButtonUp(0) && selectedLine != null)
                         {
@@ -162,8 +162,8 @@ namespace SEE.Controls.Actions.Drawable
                                 if (hit.collider.gameObject.CompareTag(Tags.Drawable) || GameFinder.hasDrawable(hit.collider.gameObject))
                                 {
                                     newPointPosition = selectedLine.transform.InverseTransformPoint(hit.point);
-                                    GameMoveRotator.MovePoint(selectedLine, indexes, newPointPosition);
-                                    new MovePointNetAction(drawable.name, drawableParentName, selectedLine.name, indexes, newPointPosition).Execute();
+                                    GameMoveRotator.MovePoint(selectedLine, Indices, newPointPosition);
+                                    new MovePointNetAction(drawable.name, drawableParentName, selectedLine.name, Indices, newPointPosition).Execute();
                                 }
                             }
 
@@ -176,14 +176,14 @@ namespace SEE.Controls.Actions.Drawable
                         if (Input.GetMouseButtonUp(0) && selectedLine.GetComponent<BlinkEffect>() == null)
                         {
                             progressState = ProgressState.Finish; 
-                            GameMoveRotator.MovePoint(selectedLine, indexes, newPointPosition);
-                            new MovePointNetAction(drawable.name, drawableParentName, selectedLine.name, indexes, newPointPosition).Execute();
+                            GameMoveRotator.MovePoint(selectedLine, Indices, newPointPosition);
+                            new MovePointNetAction(drawable.name, drawableParentName, selectedLine.name, Indices, newPointPosition).Execute();
                             
                         }
                         break;
                     case ProgressState.Finish:
                         memento = new Memento(selectedLine, GameFinder.GetDrawable(selectedLine), selectedLine.name,
-                                indexes, oldPointPosition, newPointPosition);
+                                Indices, oldPointPosition, newPointPosition);
                         currentState = ReversibleAction.Progress.Completed;
                         return true;
                 }
@@ -205,8 +205,8 @@ namespace SEE.Controls.Actions.Drawable
 
             if (memento.line != null)
             {
-                GameMoveRotator.MovePoint(memento.line, memento.indexes, memento.oldPointPosition);
-                new MovePointNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.line.name, memento.indexes, memento.oldPointPosition).Execute();
+                GameMoveRotator.MovePoint(memento.line, memento.Indices, memento.oldPointPosition);
+                new MovePointNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.line.name, memento.Indices, memento.oldPointPosition).Execute();
             }
         }
 
@@ -222,8 +222,8 @@ namespace SEE.Controls.Actions.Drawable
             }
             if (memento.line != null)
             {
-                GameMoveRotator.MovePoint(memento.line, memento.indexes, memento.newPointPosition);
-                new MovePointNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.line.name, memento.indexes, memento.newPointPosition).Execute();
+                GameMoveRotator.MovePoint(memento.line, memento.Indices, memento.newPointPosition);
+                new MovePointNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.line.name, memento.Indices, memento.newPointPosition).Execute();
             }
         }
 

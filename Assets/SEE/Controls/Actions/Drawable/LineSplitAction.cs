@@ -93,9 +93,12 @@ namespace SEE.Controls.Actions.Drawable
                         Array.Copy(sourceArray: positions, destinationArray: transformedPositions, length: positions.Length);
                         hittedObject.transform.TransformPoints(transformedPositions);
                         List<LineConf> lines = new();
-                        List<int> matchedIndexes = NearestPoints.GetNearestIndexes(transformedPositions, raycastHit.point);
-                        GameLineSplit.Split(GameFinder.GetDrawable(hittedObject), originLine, matchedIndexes, positionsList, lines, false);
-                        ShowNotification.Info("Line splitted", "The original line was successfully splitted in " + lines.Count + " lines");
+                        List<int> matchedIndices = NearestPoints.GetNearestIndices(transformedPositions, raycastHit.point);
+                        GameLineSplit.Split(GameFinder.GetDrawable(hittedObject), originLine, matchedIndices, positionsList, lines, false);
+                        if (lines.Count > 1)
+                        {
+                            ShowNotification.Info("Line splitted", "The original line was successfully splitted in " + lines.Count + " lines");
+                        }
 
                         memento = new Memento(hittedObject, GameFinder.GetDrawable(hittedObject), lines);
                         new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.originalLine.id).Execute();

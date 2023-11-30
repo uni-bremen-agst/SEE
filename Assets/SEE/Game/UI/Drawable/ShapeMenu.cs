@@ -136,7 +136,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <summary>
         /// Contains the current selected shape type.
         /// </summary>
-        private static GameShapesCalculator.Shapes selectedShape;
+        private static GameShapesCalculator.Shape selectedShape;
         /// <summary>
         /// Contains the current chosen value1 value.
         /// </summary>
@@ -178,7 +178,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// Gets the current selected shape type
         /// </summary>
         /// <returns>the selected shape type</returns>
-        public static GameShapesCalculator.Shapes GetSelectedShape()
+        public static GameShapesCalculator.Shape GetSelectedShape()
         {
             return selectedShape;
         }
@@ -266,7 +266,7 @@ namespace Assets.SEE.Game.UI.Drawable
             shapeMenu = PrefabInstantiator.InstantiatePrefab(drawableShapePrefab,
                                 GameObject.Find("UI Canvas").transform, false);
             selector = shapeMenu.GetComponentInChildren<HorizontalSelector>();
-            foreach (Shapes shape in GameShapesCalculator.GetShapes())
+            foreach (Shape shape in GameShapesCalculator.GetShapes())
             {
                 selector.CreateNewItem(shape.ToString());
             }
@@ -337,34 +337,34 @@ namespace Assets.SEE.Game.UI.Drawable
             string path = "";
             switch (selectedShape)
             {
-                case GameShapesCalculator.Shapes.Square:
+                case GameShapesCalculator.Shape.Square:
                     path = "Textures/Drawable/Square";
                     break;
-                case GameShapesCalculator.Shapes.Rectangle:
+                case GameShapesCalculator.Shape.Rectangle:
                     path = "Textures/Drawable/Rectangle";
                     break;
-                case GameShapesCalculator.Shapes.Rhombus:
+                case GameShapesCalculator.Shape.Rhombus:
                     path = "Textures/Drawable/Rhombus";
                     break;
-                case GameShapesCalculator.Shapes.Kite:
+                case GameShapesCalculator.Shape.Kite:
                     path = "Textures/Drawable/Kite";
                     break;
-                case GameShapesCalculator.Shapes.Triangle:
+                case GameShapesCalculator.Shape.Triangle:
                     path = "Textures/Drawable/Triangle";
                     break;
-                case GameShapesCalculator.Shapes.Circle:
+                case GameShapesCalculator.Shape.Circle:
                     path = "Textures/Drawable/Circle";
                     break;
-                case GameShapesCalculator.Shapes.Ellipse:
+                case GameShapesCalculator.Shape.Ellipse:
                     path = "Textures/Drawable/Ellipse";
                     break;
-                case GameShapesCalculator.Shapes.Parallelogram:
+                case GameShapesCalculator.Shape.Parallelogram:
                     path = "Textures/Drawable/Parallelogram";
                     break;
-                case GameShapesCalculator.Shapes.Trapezoid:
+                case GameShapesCalculator.Shape.Trapezoid:
                     path = "Textures/Drawable/Trapezoid";
                     break;
-                case GameShapesCalculator.Shapes.Polygon:
+                case GameShapesCalculator.Shape.Polygon:
                     path = "Textures/Drawable/Polygon";
                     break;
             }
@@ -385,7 +385,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// The name will be displayed in the shape label.
         /// </summary>
         /// <param name="shape">The selected shape type.</param>
-        private static void SetSelectedShape(GameShapesCalculator.Shapes shape)
+        private static void SetSelectedShape(GameShapesCalculator.Shape shape)
         {
             selectedShape = shape;
             ChangeMenu();
@@ -439,30 +439,30 @@ namespace Assets.SEE.Game.UI.Drawable
             AllValuesDisable();
             switch (selectedShape)
             {
-                case GameShapesCalculator.Shapes.Line:
+                case GameShapesCalculator.Shape.Line:
                     objFinish.SetActive(true);
                     objLoop.SetActive(true);
                     break;
-                case GameShapesCalculator.Shapes.Square:
+                case GameShapesCalculator.Shape.Square:
                     objValue1.SetActive(true);
                     objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "a";
                     objInfo.SetActive(true);
                     break;
-                case GameShapesCalculator.Shapes.Rectangle:
+                case GameShapesCalculator.Shape.Rectangle:
                     objValue1.SetActive(true);
                     objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "a";
                     objValue2.SetActive(true);
                     objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "b";
                     objInfo.SetActive(true);
                     break;
-                case GameShapesCalculator.Shapes.Rhombus:
+                case GameShapesCalculator.Shape.Rhombus:
                     objValue1.SetActive(true);
                     objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "f";
                     objValue2.SetActive(true);
                     objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "e";
                     objInfo.SetActive(true);
                     break;
-                case GameShapesCalculator.Shapes.Kite:
+                case GameShapesCalculator.Shape.Kite:
                     objValue1.SetActive(true);
                     objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "f1";
                     objValue2.SetActive(true);
@@ -471,26 +471,26 @@ namespace Assets.SEE.Game.UI.Drawable
                     objValue3.GetComponentsInChildren<TMP_Text>()[0].text = "e";
                     objInfo.SetActive(true);
                     break;
-                case GameShapesCalculator.Shapes.Triangle:
+                case GameShapesCalculator.Shape.Triangle:
                     objValue1.SetActive(true);
                     objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "c";
                     objValue2.SetActive(true);
                     objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "h";
                     objInfo.SetActive(true);
                     break;
-                case GameShapesCalculator.Shapes.Circle:
+                case GameShapesCalculator.Shape.Circle:
                     objValue1.SetActive(true);
                     objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "Radius";
                     objInfo.SetActive(true);
                     break;
-                case GameShapesCalculator.Shapes.Ellipse:
+                case GameShapesCalculator.Shape.Ellipse:
                     objValue1.SetActive(true);
                     objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "X-Scale";
                     objValue2.SetActive(true);
                     objValue2.GetComponentsInChildren<TMP_Text>()[0].text = "Y-Scale";
                     objInfo.SetActive(true);
                     break;
-                case GameShapesCalculator.Shapes.Parallelogram:
+                case GameShapesCalculator.Shape.Parallelogram:
                     objValue1.SetActive(true);
                     objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "a";
                     objValue2.SetActive(true);
@@ -499,7 +499,7 @@ namespace Assets.SEE.Game.UI.Drawable
                     objValue4.GetComponentsInChildren<TMP_Text>()[0].text = "Shift";
                     objInfo.SetActive(true);
                     break;
-                case GameShapesCalculator.Shapes.Trapezoid:
+                case GameShapesCalculator.Shape.Trapezoid:
                     objValue1.SetActive(true);
                     objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "a";
                     objValue2.SetActive(true);
@@ -508,7 +508,7 @@ namespace Assets.SEE.Game.UI.Drawable
                     objValue3.GetComponentsInChildren<TMP_Text>()[0].text = "h";
                     objInfo.SetActive(true);
                     break;
-                case GameShapesCalculator.Shapes.Polygon:
+                case GameShapesCalculator.Shape.Polygon:
                     objValue1.SetActive(true);
                     objValue1.GetComponentsInChildren<TMP_Text>()[0].text = "Length";
                     objVertices.SetActive(true);

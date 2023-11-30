@@ -79,7 +79,7 @@ namespace SEE.Controls.Actions.Drawable
             ShapeMenu.Enable();
             ShapeMenu.AssignFinishButton(() => 
             {
-                if (drawing && positions.Length > 1 && ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shapes.Line)
+                if (drawing && positions.Length > 1 && ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shape.Line)
                 {
                     finishDrawingViaButton = true;
                 }
@@ -128,7 +128,7 @@ namespace SEE.Controls.Actions.Drawable
                    
                     switch (ShapeMenu.GetSelectedShape())
                     {
-                        case GameShapesCalculator.Shapes.Line:
+                        case GameShapesCalculator.Shape.Line:
 
                             positions[0] = raycastHit.point;
                             shape = GameDrawer.StartDrawing(drawable, positions, ValueHolder.currentColorKind, 
@@ -136,47 +136,47 @@ namespace SEE.Controls.Actions.Drawable
                                 ValueHolder.currentLineKind, ValueHolder.currentTiling);
                             positions[0] = shape.transform.InverseTransformPoint(positions[0]) - ValueHolder.distanceToDrawable;
                             break;
-                        case GameShapesCalculator.Shapes.Square:
+                        case GameShapesCalculator.Shape.Square:
                             positions = GameShapesCalculator.Square(convertedHitPoint, ShapeMenu.GetValue1());
                             break;
-                        case GameShapesCalculator.Shapes.Rectangle:
+                        case GameShapesCalculator.Shape.Rectangle:
                             positions = GameShapesCalculator.Rectanlge(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2());
                             break;
-                        case GameShapesCalculator.Shapes.Rhombus:
+                        case GameShapesCalculator.Shape.Rhombus:
                             positions = GameShapesCalculator.Rhombus(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2());
                             break;
-                        case GameShapesCalculator.Shapes.Kite:
+                        case GameShapesCalculator.Shape.Kite:
                             positions = GameShapesCalculator.Kite(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetValue3());
                             break;
-                        case GameShapesCalculator.Shapes.Triangle:
+                        case GameShapesCalculator.Shape.Triangle:
                             positions = GameShapesCalculator.Triangle(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2());
                             break;
-                        case GameShapesCalculator.Shapes.Circle:
+                        case GameShapesCalculator.Shape.Circle:
                             positions = GameShapesCalculator.Circle(convertedHitPoint, ShapeMenu.GetValue1());
                             break;
-                        case GameShapesCalculator.Shapes.Ellipse:
+                        case GameShapesCalculator.Shape.Ellipse:
                             positions = GameShapesCalculator.Ellipse(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2());
                             break;
-                        case GameShapesCalculator.Shapes.Parallelogram:
+                        case GameShapesCalculator.Shape.Parallelogram:
                             positions = GameShapesCalculator.Parallelogram(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetValue4());
                             break;
-                        case GameShapesCalculator.Shapes.Trapezoid:
+                        case GameShapesCalculator.Shape.Trapezoid:
                             positions = GameShapesCalculator.Trapezoid(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetValue2(), ShapeMenu.GetValue3());
                             break;
-                        case GameShapesCalculator.Shapes.Polygon:
+                        case GameShapesCalculator.Shape.Polygon:
                             positions = GameShapesCalculator.Polygon(convertedHitPoint, ShapeMenu.GetValue1(), ShapeMenu.GetVertices());
                             break;
                     }
 
                     /// This block draws and completes the action for all shapes except lines.
-                    if (ShapeMenu.GetSelectedShape() != GameShapesCalculator.Shapes.Line)
+                    if (ShapeMenu.GetSelectedShape() != GameShapesCalculator.Shape.Line)
                     {
                         if (GameDrawer.DifferentPositionCounter(positions) > 1)
                         {
                             shape = GameDrawer.DrawLine(drawable, "", positions, ValueHolder.currentColorKind,
-                                ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor, ValueHolder.currentThickness, true,
+                                ValueHolder.currentPrimaryColor, ValueHolder.currentSecondaryColor, ValueHolder.currentThickness, false,
                                 ValueHolder.currentLineKind, ValueHolder.currentTiling);
-                            shape.GetComponent<LineRenderer>().loop = true;
+                            shape.GetComponent<LineRenderer>().loop = false;
                             shape = GameDrawer.SetPivotShape(shape, convertedHitPoint);
                             LineConf currentShape = LineConf.GetLine(shape);
                             memento = new Memento(drawable, currentShape);
@@ -198,7 +198,7 @@ namespace SEE.Controls.Actions.Drawable
                     Raycasting.RaycastAnything(out RaycastHit rh) &&
                     (rh.collider.gameObject.CompareTag(Tags.Drawable) ||
                     GameFinder.hasDrawable(rh.collider.gameObject)) &&
-                    ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shapes.Line
+                    ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shape.Line
                     && (drawable == null || drawable != null && GameFinder.GetDrawable(rh.collider.gameObject).Equals(drawable)))
                 {
                     Vector3 newPosition = shape.transform.InverseTransformPoint(rh.point) - ValueHolder.distanceToDrawable;
@@ -215,7 +215,7 @@ namespace SEE.Controls.Actions.Drawable
                     Raycasting.RaycastAnything(out RaycastHit hit) &&
                     (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
                     GameFinder.hasDrawable(hit.collider.gameObject))
-                    && drawing && ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shapes.Line
+                    && drawing && ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shape.Line
                     && (drawable == null || drawable != null && GameFinder.GetDrawable(hit.collider.gameObject).Equals(drawable)))
                 {
                     Vector3 newPosition = shape.transform.InverseTransformPoint(hit.point) - ValueHolder.distanceToDrawable;
@@ -240,7 +240,7 @@ namespace SEE.Controls.Actions.Drawable
 
                 /// Block for successfully completing the line. It requires a left-click with the left Ctrl key held down.
                 if (Input.GetMouseButtonUp(0) && Input.GetKey(KeyCode.LeftControl)
-                    && drawing && positions.Length > 1 && ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shapes.Line)
+                    && drawing && positions.Length > 1 && ShapeMenu.GetSelectedShape() == GameShapesCalculator.Shape.Line)
                 {
                     FinishDrawing();
                     return true;

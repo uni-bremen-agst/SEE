@@ -94,8 +94,8 @@ namespace SEE.Controls.Actions.Drawable
                         Array.Copy(sourceArray: positions, destinationArray: transformedPositions, length: positions.Length);
                         hittedObject.transform.TransformPoints(transformedPositions);
                         List<LineConf> lines = new();
-                        List<int> matchedIndexes = NearestPoints.GetNearestIndexes(transformedPositions, raycastHit.point);
-                        GameLineSplit.Split(GameFinder.GetDrawable(hittedObject), originLine, matchedIndexes, positionsList, lines, true);
+                        List<int> matchedIndices = NearestPoints.GetNearestIndices(transformedPositions, raycastHit.point);
+                        GameLineSplit.Split(GameFinder.GetDrawable(hittedObject), originLine, matchedIndices, positionsList, lines, true);
 
                         memento = new Memento(hittedObject, GameFinder.GetDrawable(hittedObject), lines);
                         mementoList.Add(memento);
