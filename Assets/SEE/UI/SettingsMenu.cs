@@ -120,7 +120,7 @@ namespace SEE.UI
                         //rebind the key
                         if (Input.GetKeyDown(key))
                         {
-                            // check if the key is already bound to another binding, if not, then update the key 
+                            // check if the key is already bound to another binding, if not, then update the key
                             if(KeyBindings.SetButtonForKey(buttonToRebind, key))
                             {
                                 // update the label of the button of the key
