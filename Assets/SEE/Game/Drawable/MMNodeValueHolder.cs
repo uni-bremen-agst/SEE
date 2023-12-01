@@ -170,6 +170,21 @@ namespace Assets.SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Gets a list with all parent ancestors
+        /// </summary>
+        /// <returns>A list that contains all parent ancestors</returns>
+        public List<GameObject> GetAllParentAncestors()
+        {
+            List<GameObject> parents = new();
+            if (parent != null)
+            {
+                parents.Add(parent);
+                parents.AddRange(parent.GetComponent<MMNodeValueHolder>().GetAllParentAncestors());
+            }
+            return parents;
+        }
+
+        /// <summary>
         /// Adds a new key value to the children dictionary.
         /// </summary>
         /// <param name="childNode">The child node, will used as key.</param>

@@ -95,7 +95,7 @@ namespace Assets.SEE.Game.Drawable
         /// <param name="position">The new position for the object.</param>
         public static void SetPosition(GameObject obj, Vector3 position, bool includeChildren)
         {
-            CheckPrepareNodeChilds(obj, includeChildren);
+            CheckPrepareNodeChilds(obj, includeChildren, false, true);
             obj.transform.localPosition = position;
             CheckPostProcessNode(obj, includeChildren);
         }
@@ -147,7 +147,7 @@ namespace Assets.SEE.Game.Drawable
         /// <param name="localEulerAngleZ">The new z degree</param>
         public static void SetRotate(GameObject obj, float localEulerAngleZ, bool includeChildren)
         {
-            CheckPrepareNodeChilds(obj, includeChildren, true);
+            CheckPrepareNodeChilds(obj, includeChildren, true, true);
             Transform transform = obj.transform;
             transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, localEulerAngleZ);
             CheckPostProcessNode(obj, includeChildren);
@@ -173,7 +173,7 @@ namespace Assets.SEE.Game.Drawable
         /// </summary>
         /// <param name="obj">The parent node</param>
         /// <param name="rotationSetMode">true, if this method will be called from rotation action.</param>
-        private static void PrepareNodeChilds(GameObject obj, bool rotationSetMode = false)
+        private static void PrepareNodeChilds(GameObject obj, bool setMode, bool rotationSetMode = false)
         {
             if (obj.CompareTag(Tags.MindMapNode))
             {
@@ -185,10 +185,13 @@ namespace Assets.SEE.Game.Drawable
                         pair.Key.transform.localEulerAngles = obj.transform.localEulerAngles;
                     }
                     pair.Key.transform.SetParent(obj.transform);
-                    if (pair.Key.GetComponent<Rigidbody>() == null)
+                    if (!setMode)
                     {
-                        pair.Key.AddComponent<Rigidbody>().isKinematic = true;
-                        pair.Key.AddComponent<CollisionController>();
+                        if (pair.Key.GetComponent<Rigidbody>() == null)
+                        {
+                            pair.Key.AddComponent<Rigidbody>().isKinematic = true;
+                            pair.Key.AddComponent<CollisionController>();
+                        }
                     }
                 }
             }
@@ -201,11 +204,11 @@ namespace Assets.SEE.Game.Drawable
         /// <param name="obj"></param>
         /// <param name="includeChildren"></param>
         /// <param name="rotationSetMode"></param>
-        private static void CheckPrepareNodeChilds(GameObject obj, bool includeChildren, bool rotationSetMode = false)
+        private static void CheckPrepareNodeChilds(GameObject obj, bool includeChildren, bool rotationSetMode = false, bool setMode = false)
         {
             if (includeChildren)
             {
-                PrepareNodeChilds(obj, true);
+                PrepareNodeChilds(obj, setMode, rotationSetMode);
             } else
             {
                 if (obj.CompareTag(Tags.MindMapNode))
@@ -213,13 +216,16 @@ namespace Assets.SEE.Game.Drawable
                     MMNodeValueHolder valueHolder = obj.GetComponent<MMNodeValueHolder>();
                     GameObject drawable = GameFinder.GetDrawable(obj);
                     string drawableParentName = GameFinder.GetDrawableParentName(drawable);
-                    new RbAndCCDestroyerNetAction(drawable.name, drawableParentName, obj.name).Execute();
-                    foreach(KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
+                    if (!setMode)
                     {
-                        if (pair.Key.GetComponent<Rigidbody>() != null)
+                        new RbAndCCDestroyerNetAction(drawable.name, drawableParentName, obj.name).Execute();
+                        foreach (KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
                         {
-                            Destroyer.Destroy(pair.Key.GetComponent<Rigidbody>());
-                            Destroyer.Destroy(pair.Key.GetComponent<CollisionController>());
+                            if (pair.Key.GetComponent<Rigidbody>() != null)
+                            {
+                                Destroyer.Destroy(pair.Key.GetComponent<Rigidbody>());
+                                Destroyer.Destroy(pair.Key.GetComponent<CollisionController>());
+                            }
                         }
                     }
                 }

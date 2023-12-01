@@ -29,9 +29,15 @@ namespace Assets.SEE.Game.UI.Drawable
                 if (other.gameObject.CompareTag(Tags.MindMapNode))
                 {
                     Rigidbody[] bodys = GameFinder.GetAttachedObjectsObject(other.gameObject).GetComponentsInChildren<Rigidbody>();
+                    MMNodeValueHolder valueHolder = other.gameObject.GetComponent<MMNodeValueHolder>();
                     foreach(Rigidbody body in bodys)
                     {
-                        MoveBack(body.gameObject, drawable, drawableParentName);
+                        if (body.gameObject == other.gameObject || 
+                            valueHolder.GetAllChildren().ContainsKey(body.gameObject) || 
+                            valueHolder.GetAllParentAncestors().Contains(body.gameObject))
+                        {
+                            MoveBack(body.gameObject, drawable, drawableParentName);
+                        }
                     }
                 } else
                 {
