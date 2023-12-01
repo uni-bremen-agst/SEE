@@ -2,6 +2,7 @@
 using RTG;
 using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System;
 using System.Collections;
@@ -29,10 +30,7 @@ namespace Assets.SEE.Game.Drawable
         /// <returns>The new position of the moved object</returns>
         public static Vector3 MoveObjectByMouse(GameObject obj, Vector3 hitPoint, bool includeChildren)
         {
-            if (includeChildren)
-            {
-                PrepareNodeChilds(obj);
-            }
+            CheckPrepareNodeChilds(obj, includeChildren);
             Vector3 oldPos = obj.transform.localPosition;
             ///This is needed to ensure that the correct axes are being moved. A rotation changes the axis position.
             Vector3 localEulerAngles = obj.transform.localEulerAngles;
@@ -42,17 +40,7 @@ namespace Assets.SEE.Game.Drawable
             Vector3 position = new Vector3(convertedHitPoint.x, convertedHitPoint.y, oldPos.z);
             obj.transform.localPosition = position;
             obj.transform.localEulerAngles = localEulerAngles;
-            if (includeChildren)
-            {
-                PostProcessNode(obj);
-            }
-            else
-            {
-                if (obj.CompareTag(Tags.MindMapNode))
-                {
-                    GameMindMap.ReDrawBranchLines(obj);
-                }
-            }
+            CheckPostProcessNode(obj, includeChildren);
             return position;
         }
 
@@ -68,10 +56,7 @@ namespace Assets.SEE.Game.Drawable
         /// <returns>The new position of the object</returns>
         public static Vector3 MoveObjectByKeyboard(GameObject obj, KeyCode key, bool speedUp, bool includeChildren)
         {
-            if (includeChildren)
-            {
-                PrepareNodeChilds(obj);
-            }
+            CheckPrepareNodeChilds(obj, includeChildren);
             Vector3 newPosition = obj.transform.localPosition;
             Vector3 localEulerAngles = obj.transform.localEulerAngles;
             obj.transform.localEulerAngles = Vector3.zero;
@@ -98,17 +83,7 @@ namespace Assets.SEE.Game.Drawable
             }
             obj.transform.localPosition = newPosition;
             obj.transform.localEulerAngles = localEulerAngles;
-            if (includeChildren)
-            {
-                PostProcessNode(obj);
-            }
-            else
-            {
-                if (obj.CompareTag(Tags.MindMapNode))
-                {
-                    GameMindMap.ReDrawBranchLines(obj);
-                }
-            }
+            CheckPostProcessNode(obj, includeChildren);
             return newPosition;
         }
 
@@ -120,22 +95,9 @@ namespace Assets.SEE.Game.Drawable
         /// <param name="position">The new position for the object.</param>
         public static void SetPosition(GameObject obj, Vector3 position, bool includeChildren)
         {
-            if (includeChildren)
-            {
-                PrepareNodeChilds(obj);
-            }
+            CheckPrepareNodeChilds(obj, includeChildren);
             obj.transform.localPosition = position;
-            if (includeChildren)
-            {
-                PostProcessNode(obj);
-            }
-            else
-            {
-                if (obj.CompareTag(Tags.MindMapNode))
-                {
-                    GameMindMap.ReDrawBranchLines(obj);
-                }
-            }
+            CheckPostProcessNode(obj, includeChildren);
         }
 
         /// <summary>
@@ -167,25 +129,12 @@ namespace Assets.SEE.Game.Drawable
         /// <returns>The new local euler angles of the object</returns>
         public static Vector3 RotateObject(GameObject obj, Vector3 rotateDirection, float degree, bool includeChildren)
         {
-            if (includeChildren)
-            {
-                PrepareNodeChilds(obj);
-            }
+            CheckPrepareNodeChilds(obj, includeChildren);
             Transform transform = obj.transform;
             transform.Rotate(rotateDirection, degree, Space.Self);
             obj.GetComponent<Collider>().enabled = false;
             obj.GetComponent<Collider>().enabled = true;
-            if (includeChildren)
-            {
-                PostProcessNode(obj);
-            }
-            else
-            {
-                if (obj.CompareTag(Tags.MindMapNode))
-                {
-                    GameMindMap.ReDrawBranchLines(obj);
-                }
-            }
+            CheckPostProcessNode(obj, includeChildren);
             return obj.transform.localEulerAngles;
         }
 
@@ -198,23 +147,10 @@ namespace Assets.SEE.Game.Drawable
         /// <param name="localEulerAngleZ">The new z degree</param>
         public static void SetRotate(GameObject obj, float localEulerAngleZ, bool includeChildren)
         {
-            if (includeChildren)
-            {
-                PrepareNodeChilds(obj, true);
-            }
+            CheckPrepareNodeChilds(obj, includeChildren, true);
             Transform transform = obj.transform;
             transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, localEulerAngleZ);
-            if (includeChildren)
-            {
-                PostProcessNode(obj);
-            }
-            else
-            {
-                if (obj.CompareTag(Tags.MindMapNode))
-                {
-                    GameMindMap.ReDrawBranchLines(obj);
-                }
-            }
+            CheckPostProcessNode(obj, includeChildren);
         }
 
         /// <summary>
@@ -259,6 +195,38 @@ namespace Assets.SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Checks if preparing child nodes is necessary, and if not, 
+        /// deletes all rigid bodies and collision controllers except those of the selected nodes.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="includeChildren"></param>
+        /// <param name="rotationSetMode"></param>
+        private static void CheckPrepareNodeChilds(GameObject obj, bool includeChildren, bool rotationSetMode = false)
+        {
+            if (includeChildren)
+            {
+                PrepareNodeChilds(obj, true);
+            } else
+            {
+                if (obj.CompareTag(Tags.MindMapNode))
+                {
+                    MMNodeValueHolder valueHolder = obj.GetComponent<MMNodeValueHolder>();
+                    GameObject drawable = GameFinder.GetDrawable(obj);
+                    string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+                    new RbAndCCDestroyerNetAction(drawable.name, drawableParentName).Execute();
+                    foreach(KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
+                    {
+                        if (pair.Key.GetComponent<Rigidbody>() != null)
+                        {
+                            Destroyer.Destroy(pair.Key.GetComponent<Rigidbody>());
+                            Destroyer.Destroy(pair.Key.GetComponent<CollisionController>());
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// This method separates the child nodes from the parent node 
         /// after <see cref="PrepareNodeChilds"/> has been called. 
         /// The children are assigned to the original "AttachedObjects" 
@@ -281,19 +249,41 @@ namespace Assets.SEE.Game.Drawable
             }
         }
 
-        /// <summary>
-        /// Destroys all rigid bodies and collision controllers of all children of AttachedObjects.
-        /// </summary>
-        /// <param name="attachedObjects">The attached objects object of the drawable</param>
-        public static void DestroyRigidBodysAndCollisionControllers(GameObject attachedObjects)
+        private static void CheckPostProcessNode(GameObject obj, bool includeChildren)
         {
-            foreach (Rigidbody rb in attachedObjects.GetComponentsInChildren<Rigidbody>())
+            if (includeChildren)
             {
-                Destroyer.Destroy(rb);
+                PostProcessNode(obj);
             }
-            foreach (CollisionController cc in attachedObjects.GetComponentsInChildren<CollisionController>())
+            else
             {
-                Destroyer.Destroy(cc);
+                if (obj.CompareTag(Tags.MindMapNode))
+                {
+                    GameMindMap.ReDrawBranchLines(obj);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Destroys all rigid bodies and collision controllers of all children of the selected node.
+        /// </summary>
+        /// <param name="node">The selected node</param>
+        public static void DestroyRigidBodysAndCollisionControllersOfChildren(GameObject node)
+        {
+            if (node.CompareTag(Tags.MindMapNode))
+            {
+                MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
+                foreach(KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
+                {
+                    if (pair.Key.GetComponent<Rigidbody>() != null)
+                    {
+                        Destroyer.Destroy(pair.Key.GetComponent<Rigidbody>());
+                    }
+                    if (pair.Key.GetComponent<CollisionController>() != null)
+                    {
+                        Destroyer.Destroy(pair.Key.GetComponent<CollisionController>());
+                    }
+                }
             }
         }
     }

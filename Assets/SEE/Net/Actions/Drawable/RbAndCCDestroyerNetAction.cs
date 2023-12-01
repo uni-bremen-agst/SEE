@@ -52,7 +52,7 @@ namespace SEE.Net.Actions.Drawable
                 GameObject drawable = GameFinder.FindDrawable(DrawableID,ParentDrawableID);
                 if (drawable != null)
                 {
-                    GameMoveRotator.DestroyRigidBodysAndCollisionControllers(GameFinder.GetAttachedObjectsObject(drawable));
+                    GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(GameFinder.GetAttachedObjectsObject(drawable));
                 }
                 else
                 {
