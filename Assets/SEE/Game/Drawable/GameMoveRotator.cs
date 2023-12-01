@@ -213,7 +213,7 @@ namespace Assets.SEE.Game.Drawable
                     MMNodeValueHolder valueHolder = obj.GetComponent<MMNodeValueHolder>();
                     GameObject drawable = GameFinder.GetDrawable(obj);
                     string drawableParentName = GameFinder.GetDrawableParentName(drawable);
-                    new RbAndCCDestroyerNetAction(drawable.name, drawableParentName).Execute();
+                    new RbAndCCDestroyerNetAction(drawable.name, drawableParentName, obj.name).Execute();
                     foreach(KeyValuePair<GameObject, GameObject> pair in valueHolder.GetAllChildren())
                     {
                         if (pair.Key.GetComponent<Rigidbody>() != null)

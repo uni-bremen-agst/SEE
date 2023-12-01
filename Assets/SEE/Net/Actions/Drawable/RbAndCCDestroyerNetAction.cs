@@ -20,16 +20,21 @@ namespace SEE.Net.Actions.Drawable
         /// The id of the drawable parent
         /// </summary>
         public string ParentDrawableID;
+        /// <summary>
+        /// The id of the selected node which children's rigid bodies and collision controllers should be destroyed.
+        /// </summary>
+        public string NodeID;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
         /// <param name="drawableID">The id of the drawable.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
-        public RbAndCCDestroyerNetAction(string drawableID, string parentDrawableID) : base()
+        public RbAndCCDestroyerNetAction(string drawableID, string parentDrawableID, string nodeID) : base()
         {
             DrawableID = drawableID;
             ParentDrawableID = parentDrawableID;
+            NodeID = nodeID;
         }
 
         /// <summary>
@@ -50,13 +55,14 @@ namespace SEE.Net.Actions.Drawable
             if (!IsRequester())
             {
                 GameObject drawable = GameFinder.FindDrawable(DrawableID,ParentDrawableID);
-                if (drawable != null)
+                if (drawable != null && GameFinder.FindChild(drawable, NodeID) != null)
                 {
-                    GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(GameFinder.GetAttachedObjectsObject(drawable));
+                    GameObject node = GameFinder.FindChild(drawable, NodeID);
+                    GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(node);
                 }
                 else
                 {
-                    throw new System.Exception($"There is no drawable with the ID {DrawableID}.");
+                    throw new System.Exception($"There is no drawable with the ID {DrawableID} or node with the ID {NodeID}.");
                 }
             }
         }

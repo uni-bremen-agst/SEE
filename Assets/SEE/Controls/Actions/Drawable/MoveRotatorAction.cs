@@ -432,7 +432,7 @@ namespace SEE.Controls.Actions.Drawable
                                 Destroyer.Destroy(selectedObject.GetComponent<Rigidbody>());
                                 Destroyer.Destroy(selectedObject.GetComponent<CollisionController>());
                                 GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(GameFinder.GetAttachedObjectsObject(selectedObject));
-                                new RbAndCCDestroyerNetAction(memento.drawable.ID, memento.drawable.ParentID).Execute();
+                                new RbAndCCDestroyerNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.selectedObject.name).Execute();
                                 RotationMenu.Disable();
                                 MoveMenu.Disable();
                                 currentState = ReversibleAction.Progress.Completed;
@@ -503,7 +503,7 @@ namespace SEE.Controls.Actions.Drawable
                         memento.oldObjectLocalEulerAngles.z, memento.includeChildren).Execute();
                 }
                 GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(GameFinder.GetAttachedObjectsObject(memento.selectedObject));
-                new RbAndCCDestroyerNetAction(memento.drawable.ID, memento.drawable.ParentID).Execute();
+                new RbAndCCDestroyerNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.selectedObject.name).Execute();
             }
         }
 
@@ -532,7 +532,7 @@ namespace SEE.Controls.Actions.Drawable
                         memento.degree, memento.includeChildren).Execute();
                 }
                 GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(GameFinder.GetAttachedObjectsObject(memento.selectedObject));
-                new RbAndCCDestroyerNetAction(memento.drawable.ID, memento.drawable.ParentID).Execute();
+                new RbAndCCDestroyerNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.selectedObject.name).Execute();
             }
         }
 
