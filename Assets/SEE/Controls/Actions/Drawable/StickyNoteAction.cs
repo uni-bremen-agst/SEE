@@ -214,7 +214,8 @@ namespace SEE.Controls.Actions.Drawable
             if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit) && !inProgress &&
                 (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                GameFinder.hasDrawable(raycastHit.collider.gameObject)))
+                GameFinder.hasDrawable(raycastHit.collider.gameObject) || 
+                CheckIsPartOfStickyNote(raycastHit.collider.gameObject)))
             {
                 GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
                     raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
@@ -226,6 +227,7 @@ namespace SEE.Controls.Actions.Drawable
                     StickyNoteMenu.Disable();
                     drawable.GetComponent<Collider>().enabled = false;
                     stickyNote = drawable.transform.parent.gameObject;
+                    stickyNote.transform.Find("Back").GetComponent<Collider>().enabled = false;
                     stickyNoteHolder = GameFinder.GetHighestParent(drawable);
                 }
                 else
@@ -274,6 +276,7 @@ namespace SEE.Controls.Actions.Drawable
                 StickyNoteRotationMenu.Disable();
                 memento.changedConfig.Position = stickyNoteHolder.transform.position;
                 memento.changedConfig.Rotation = stickyNoteHolder.transform.eulerAngles;
+                stickyNote.transform.Find("Back").GetComponent<Collider>().enabled = true;
                 currentState = ReversibleAction.Progress.Completed;
                 return true;
             }
@@ -290,7 +293,8 @@ namespace SEE.Controls.Actions.Drawable
             if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                 (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                GameFinder.hasDrawable(raycastHit.collider.gameObject)))
+                GameFinder.hasDrawable(raycastHit.collider.gameObject) ||
+                CheckIsPartOfStickyNote(raycastHit.collider.gameObject)))
             {
                 GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
                     raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
@@ -377,7 +381,8 @@ namespace SEE.Controls.Actions.Drawable
             if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                 (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                GameFinder.hasDrawable(raycastHit.collider.gameObject)))
+                GameFinder.hasDrawable(raycastHit.collider.gameObject) ||
+                CheckIsPartOfStickyNote(raycastHit.collider.gameObject)))
             {
                 GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
                                 raycastHit.collider.gameObject : GameFinder.GetDrawable(raycastHit.collider.gameObject);
@@ -409,7 +414,15 @@ namespace SEE.Controls.Actions.Drawable
                 original.Rotation.Equals(changed.Rotation) && original.Order.Equals(changed.Order);
         }
 
-
+        /// <summary>
+        /// Checks if the selected object is part of the sticky notes.
+        /// </summary>
+        /// <param name="selectedObject">"The object to be checked.</param>
+        /// <returns>true, if the object parent is the sticky note. Otherwise false.</returns>
+        private bool CheckIsPartOfStickyNote(GameObject selectedObject)
+        {
+            return selectedObject.transform.parent.name.StartsWith(ValueHolder.StickyNotePrefix);
+        }
 
         /// <summary>
         /// Reverts this action, i.e., it spawn/delete the sticky note or change to old position / values.
