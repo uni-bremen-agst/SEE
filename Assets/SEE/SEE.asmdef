@@ -52,7 +52,12 @@
         "DOTween.dll",
         "Joveler.Compression.XZ.dll",
         "MathNet.Numerics.dll",
-		"Accord.Text.dll"
+		"Accord.Text.dll",
+		"Accord.Statistics.dll",
+		"Accord.MachineLearning.dll",
+		"Accord.dll",
+		"Accord.Math.dll",		
+		"Accord.Math.Core.dll"		
     ],
     "autoReferenced": false,
     "defineConstraints": [],

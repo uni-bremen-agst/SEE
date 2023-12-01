@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
-    public class NaiveBayes : IEnumerable<string>
+    public class NaiveBayesIncremental : ITextClassifier, IEnumerable<string>
     {
         private Dictionary<string, ClassInformation> trainingData;
 
@@ -19,7 +19,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public int Alpha { get { return alpha; } }
 
-        public NaiveBayes(int alpha = 1)
+        public NaiveBayesIncremental(int alpha = 1)
         {
             trainingData = new Dictionary<string, ClassInformation>();
             this.alpha = alpha;
@@ -43,7 +43,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             DocumentCountGlobal++;
         }
 
-        internal void DeleteDocument(string clazz, Document document)
+        public void DeleteDocument(string clazz, Document document)
         {
             if (clazz == null) throw new Exception("Invalid class given.");
 
@@ -116,9 +116,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             private int documentCount;
 
-            private NaiveBayes classifier;
+            private NaiveBayesIncremental classifier;
 
-            public ClassInformation(NaiveBayes classifier)
+            public ClassInformation(NaiveBayesIncremental classifier)
             {
                 this.wordFrequencies = new Dictionary<string, int>();
                 this.classifier = classifier;

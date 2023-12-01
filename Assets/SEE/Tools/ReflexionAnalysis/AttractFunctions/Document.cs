@@ -8,6 +8,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
     {
         private Dictionary<string, int> wordFrequencies;
 
+        public int NumberWords { get => wordFrequencies.Keys.Count; }
+
         public Document(IEnumerable<string> words) : this()
         {
             this.AddWords(words);
@@ -23,9 +25,19 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             this.wordFrequencies = new Dictionary<string, int>();
         }
 
+        public Dictionary<string,int> GetWordFrequencies()
+        {
+            return new Dictionary<string, int>(this.wordFrequencies);
+        }
+
         public void AddWords(IEnumerable<string> words)
         {
             foreach (string word in words) this.AddWord(word);
+        }
+
+        public void RemoveWords(IEnumerable<string> words)
+        {
+            foreach (string word in words) this.RemoveWord(word);
         }
 
         public void AddWord(string word)
@@ -34,12 +46,19 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             wordFrequencies[word]++;
         }
 
-        public int GetFrequency(string word)
+        public void RemoveWord(string word) 
         {
-            return wordFrequencies[word];
+            if (!wordFrequencies.ContainsKey(word)) return;
+            if (wordFrequencies[word] > 0) wordFrequencies[word]--;
         }
 
-        public int GetNumberWords()
+        public int GetFrequency(string word)
+        {
+            if(wordFrequencies.ContainsKey(word)) return wordFrequencies[word];
+            return 0;
+        }
+
+        public int GetTotalWordFrequencies()
         {
             int totalNumber = 0;
             foreach(int frequency in wordFrequencies.Values)
@@ -59,6 +78,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                     yield return word;
                 }
             }
+        }
+
+        public IEnumerable<string> GetContainedWords()
+        {
+            return wordFrequencies.Keys;
         }
 
         public override string ToString()

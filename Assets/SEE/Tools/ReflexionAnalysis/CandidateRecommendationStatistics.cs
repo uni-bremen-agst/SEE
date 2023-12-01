@@ -298,9 +298,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         private void CreateXml(List<CandidateStatisticResult> results, string xmlFile)
         {
-            int hits = results.Where(r => r.Hit).Count();
-            int fails = results.Count - hits;
-            int initiallyMapped = results.Where((r) => r.MappedAtMappingStep < 0).Count();
+            int hits = results.Where(r => r.Hit && r.MappedAtMappingStep >= 0).Count();
+            int fails = results.Where(r => !r.Hit && r.MappedAtMappingStep >= 0).Count();
+            int initiallyMapped = results.Count - hits + fails;
             int chosen = results.Where((r) => r.Chosen == true).Count();
 
             XElement mappingStatistic = new XElement("mappingStatistic",

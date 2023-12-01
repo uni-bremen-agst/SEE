@@ -10,7 +10,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
     public class NBAttract : LanguageProcessingAttractFunction
     {
-        NaiveBayes naiveBayes;
+        ITextClassifier naiveBayes;
 
         bool useCda;
 
@@ -23,7 +23,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                         bool useCda
                         ) : base(reflexionGraph, candidateType, targetLanguage)
         {
-            this.naiveBayes = new NaiveBayes();   
+            this.naiveBayes = new NaiveBayesAccord();   
             this.useCda = useCda;
             this.useStandardTerms = useStandardTerms;     
         }
