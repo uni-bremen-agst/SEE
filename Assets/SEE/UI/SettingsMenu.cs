@@ -95,7 +95,7 @@ namespace SEE.UI
                     key.text = KeyBindings.GetKeyNameForButton(bindingName);
                     // add the label to the dictionary
                     buttonToLabel[bindingName] = key;
-                    // add the actionlistener, to be able to change the key of a binding 
+                    // add the actionlistener, to be able to change the key of a binding
                     keyBindingContent.transform.Find("Key").gameObject.MustGetComponent<Button>().onClick.AddListener( () => { StartRebindFor(bindingName); });
                 }
             }
