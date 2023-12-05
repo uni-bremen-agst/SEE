@@ -9,6 +9,7 @@ using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem.HID;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -39,7 +40,8 @@ namespace SEE.Controls.Actions.Drawable
         /// It is public and static becaus it will be changed from the menus
         /// with the finish/done button.
         /// </summary>
-        public static bool finish = false;
+        //public static bool finish = false;
+        private bool finish = false;
 
         /// <summary>
         /// Attribute that represents that the operation is in progress.
@@ -120,6 +122,7 @@ namespace SEE.Controls.Actions.Drawable
             StickyNoteMenu.Disable();
             StickyNoteRotationMenu.Disable();
             StickyNoteEditMenu.Disable();
+            StickyNoteMoveMenu.Disable();
             if (stickyNote != null && stickyNote.GetComponent<HighlightEffect>() != null)
             {
                 Destroyer.Destroy(stickyNote.GetComponent<HighlightEffect>());
@@ -177,16 +180,36 @@ namespace SEE.Controls.Actions.Drawable
 
                 /// If the detected object is not drawable, it is necessary to choose the rotation for the sticky note.
                 /// Otherwise, it is not necessary, as the provided drawables already have the correct rotation.
-                if (!raycastHit.collider.gameObject.CompareTag(Tags.Drawable) &&
-                    !GameFinder.hasDrawable(raycastHit.collider.gameObject))
+                if (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
+                    GameFinder.hasDrawable(raycastHit.collider.gameObject)
+                    || ValueHolder.SuitableObjectsForStickyNotes.Contains(raycastHit.collider.gameObject.name))
                 {
-                    StickyNoteMenu.Disable();
-                    StickyNoteRotationMenu.Enable(stickyNote, raycastHit.collider.gameObject);
+                    finish = true;
+                    
                 }
                 else
                 {
-                    finish = true;
+                    StickyNoteMenu.Disable();
+                    StickyNoteRotationMenu.Enable(stickyNote, raycastHit.collider.gameObject);
+                    StickyNoteMoveMenu.Enable(GameFinder.GetHighestParent(stickyNote), true);
                 }
+            }
+
+            if (StickyNoteMoveMenu.TryGetFinish(out bool isFinished))
+            {
+                finish = isFinished;
+            }
+            else if (stickyNote != null && StickyNoteMoveMenu.IsActive())
+            {
+                MoveByKey(stickyNote, true);
+            }
+
+            if (StickyNoteRotationMenu.TryGetFinish(out bool isRotationFinished))
+            {
+                finish = isRotationFinished;
+            } else if (stickyNote != null && StickyNoteRotationMenu.IsYActive())
+            {
+                RotateByWheel(stickyNote, true);
             }
 
             /// When the spawning is finish create the sticky note on all clients and complete the current state.
@@ -200,6 +223,8 @@ namespace SEE.Controls.Actions.Drawable
             }
             return false;
         }
+
+        Vector3 eulerAnglesBackup;
 
         /// <summary>
         /// "Enables the movement of a sticky note. 
@@ -229,6 +254,7 @@ namespace SEE.Controls.Actions.Drawable
                     stickyNote = drawable.transform.parent.gameObject;
                     stickyNote.transform.Find("Back").GetComponent<Collider>().enabled = false;
                     stickyNoteHolder = GameFinder.GetHighestParent(drawable);
+                    eulerAnglesBackup = stickyNoteHolder.transform.eulerAngles;
                 }
                 else
                 {
@@ -252,20 +278,47 @@ namespace SEE.Controls.Actions.Drawable
             if (inProgress && mouseWasReleased && !moveMenuOpened &&
                 Raycasting.RaycastAnything(out RaycastHit hit))
             {
-                GameStickyNoteManager.Move(stickyNoteHolder, hit.point, hit.collider.gameObject.transform.eulerAngles);
+                Vector3 eulerAngles = eulerAnglesBackup;
+                if (hit.collider.gameObject.CompareTag(Tags.Drawable) || 
+                    ValueHolder.SuitableObjectsForStickyNotes.Contains(hit.collider.gameObject.name))
+                {
+                    eulerAngles = hit.collider.gameObject.transform.eulerAngles;
+                }
+                Vector3 oldPos = stickyNoteHolder.transform.position;
+                GameStickyNoteManager.Move(stickyNoteHolder, hit.point, eulerAngles);
+                Vector3 newPos = stickyNoteHolder.transform.position;
+                if (oldPos != newPos)
+                {
+                    newPos = GameStickyNoteManager.FinishMoving(stickyNoteHolder);
+                }
                 new StickyNoteMoveNetAction(GameFinder.GetDrawable(stickyNote).name, stickyNote.name,
-                    hit.point, hit.collider.gameObject.transform.eulerAngles).Execute();
+                    newPos, eulerAngles).Execute();
 
                 if (Input.GetMouseButton(0))
                 {
                     GameFinder.GetDrawable(stickyNoteHolder).GetComponent<Collider>().enabled = true;
-                    Vector3 newPos = GameStickyNoteManager.FinishMoving(stickyNoteHolder);
-                    new StickyNoteMoveNetAction(GameFinder.GetDrawable(stickyNote).name, stickyNote.name,
-                        newPos, stickyNoteHolder.transform.eulerAngles).Execute();
                     StickyNoteRotationMenu.Enable(stickyNoteHolder);
                     StickyNoteMoveMenu.Enable(stickyNoteHolder);
                     moveMenuOpened = true;
                 }
+            }
+
+            if (StickyNoteMoveMenu.TryGetFinish(out bool isFinished))
+            {
+                finish = isFinished;
+            }
+            else if (stickyNoteHolder != null && StickyNoteMoveMenu.IsActive())
+            {
+                MoveByKey(stickyNoteHolder, false);
+            }
+
+            if (StickyNoteRotationMenu.TryGetFinish(out bool isRotationFinished))
+            {
+                finish = isRotationFinished;
+            }
+            else if (stickyNoteHolder != null && StickyNoteRotationMenu.IsYActive())
+            {
+                RotateByWheel(stickyNoteHolder, true);
             }
 
             /// When the moving is finish completed the current state. 
@@ -281,6 +334,61 @@ namespace SEE.Controls.Actions.Drawable
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Enables moving via the arrow keys, as well as in the <see cref="MoveRotatorAction"/>.
+        /// In addition there are the keys page up for forward and page down for back moving.
+        /// </summary>
+        /// <param name="stickyNote">The object that should be moved.</param>
+        /// <param name="spawnMode">If this method will be called of the spawn method..</param>
+        private void MoveByKey(GameObject stickyNote, bool spawnMode)
+        {
+            if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.UpArrow) 
+                || Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.PageUp) ||Input.GetKey(KeyCode.PageDown))
+            {
+                ValueHolder.MoveDirection direction = GetDirection();
+                GameObject holder = GameFinder.GetHighestParent(stickyNote);
+                Vector3 newPos = GameStickyNoteManager.MoveByMenu(holder, direction, StickyNoteMoveMenu.GetSpeed());
+                if (!spawnMode)
+                {
+                    GameObject drawable = GameFinder.GetDrawable(stickyNote);
+                    new StickyNoteMoveNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable),
+                    newPos, holder.transform.eulerAngles).Execute();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get the <see cref="ValueHolder.MoveDirection"/> of the pressed key.
+        /// </summary>
+        /// <returns>The <see cref="ValueHolder.MoveDirection"/> of the pressed key.</returns>
+        private ValueHolder.MoveDirection GetDirection()
+        {
+            if (Input.GetKey(KeyCode.LeftArrow))
+            {
+                return ValueHolder.MoveDirection.Left;
+            }
+            else if (Input.GetKey(KeyCode.RightArrow))
+            {
+                return ValueHolder.MoveDirection.Right;
+            }
+            else if (Input.GetKey(KeyCode.PageUp))
+            {
+                return ValueHolder.MoveDirection.Forward;
+            }
+            else if (Input.GetKey(KeyCode.PageDown))
+            {
+                return ValueHolder.MoveDirection.Back;
+            }
+            else if (Input.GetKey(KeyCode.UpArrow))
+            {
+                return ValueHolder.MoveDirection.Up;
+            }
+            else
+            {
+                return ValueHolder.MoveDirection.Down;
+            }
         }
 
         /// <summary>
@@ -324,11 +432,10 @@ namespace SEE.Controls.Actions.Drawable
                 /// or when the newly selected sticky note is different from the previous one.
                 if (stickyNote == null || stickyNote != drawable.transform.parent.gameObject)
                 {
-                    stickyNote = drawable.transform.parent.gameObject;
-
                     /// To edit it is required that a sticky note was selected.
                     if (GameFinder.GetDrawableParentName(drawable).Contains(ValueHolder.StickyNotePrefix))
                     {
+                        stickyNote = drawable.transform.parent.gameObject;
                         GameHighlighter.Enable(stickyNote);
 
                         memento = new(DrawableConfigManager.GetDrawableConfig(drawable), selectedAction);
@@ -338,8 +445,16 @@ namespace SEE.Controls.Actions.Drawable
                     }
                     else
                     {
-                        ShowNotification.Info("Wrong selection", "You don't selected a sticky note.");
-                        return false;
+                        if (stickyNote == null)
+                        {
+                            ShowNotification.Info("Wrong selection", "You don't selected a sticky note.");
+                            return false;
+                        } else
+                        {
+                            stickyNote = null;
+                            selectedAction = Operation.None;
+                            StickyNoteMenu.Enable();
+                        }
                     }
                 }
                 else /// Will be executed if the new selected sticky note is the same as the previous one.
@@ -355,9 +470,30 @@ namespace SEE.Controls.Actions.Drawable
                     else
                     {
                         stickyNote = null;
+                        selectedAction = Operation.None;
+                        StickyNoteMenu.Enable();
                     }
                 }
             }
+
+            if (StickyNoteRotationMenu.TryGetFinish(out bool isFinished))
+            {
+                finish = isFinished;
+            }
+            else if (stickyNote != null && StickyNoteRotationMenu.IsYActive())
+            {
+                stickyNoteHolder = GameFinder.GetHighestParent(stickyNote);
+                RotateByWheel(stickyNoteHolder, true);
+            }
+
+            if (ScaleMenu.TryGetFinish(out bool isScaleFinished))
+            {
+                finish = isScaleFinished;
+            } else if (ScaleMenu.IsActive())
+            {
+                ScaleByWheel();
+            }
+            
 
             /// When the editing is finish completed the current state. 
             /// And save the scale and rotation in memento, because they could be changed with the menu's.
@@ -369,6 +505,90 @@ namespace SEE.Controls.Actions.Drawable
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Enables scaling via the mouse wheel, as well as in the <see cref="MoveRotatorAction"/>.
+        /// </summary>
+        private void RotateByWheel(GameObject stickyNote, bool spawnMode)
+        {
+            GameObject drawable = GameFinder.GetDrawable(stickyNote);
+            string drawableParentID = GameFinder.GetDrawableParentName(drawable);
+            bool rotate = false;
+            float degree = 0;
+
+            if (Input.mouseScrollDelta.y > 0 && !Input.GetKey(KeyCode.LeftControl))
+            {
+                degree = ValueHolder.rotate;
+                rotate = true;
+            }
+            if (Input.mouseScrollDelta.y > 0 && Input.GetKey(KeyCode.LeftControl))
+            {
+                degree = ValueHolder.rotateFast;
+                rotate = true;
+            }
+
+            if (Input.mouseScrollDelta.y < 0 && !Input.GetKey(KeyCode.LeftControl))
+            {
+                degree = -ValueHolder.rotate;
+                rotate = true;
+
+            }
+            if (Input.mouseScrollDelta.y < 0 && Input.GetKey(KeyCode.LeftControl))
+            {
+                degree = -ValueHolder.rotateFast;
+                rotate = true;
+            }
+
+            if (rotate)
+            {
+                float newDegree = stickyNote.transform.localEulerAngles.y + degree;
+                GameStickyNoteManager.SetRotateY(stickyNote, newDegree, stickyNote.transform.position);
+                StickyNoteRotationMenu.AssignValueToYSlider(newDegree);
+                if (!spawnMode)
+                {
+                    new StickyNoteRoateYNetAction(drawable.name, drawableParentID, newDegree, stickyNote.transform.position).Execute();
+                }
+            }
+        }
+
+        /// <summary>
+        /// "Enables scaling via the mouse wheel, as well as in the <see cref="ScaleAction"/>.
+        /// </summary>
+        private void ScaleByWheel()
+        {
+            float scaleFactor = 0f;
+            bool isScaled = false;
+
+            if (Input.mouseScrollDelta.y > 0 && !Input.GetKey(KeyCode.LeftControl))
+            {
+                scaleFactor = ValueHolder.scaleUp;
+                isScaled = true;
+            }
+            if (Input.mouseScrollDelta.y > 0 && Input.GetKey(KeyCode.LeftControl))
+            {
+                scaleFactor = ValueHolder.scaleUpFast;
+                isScaled = true;
+            }
+
+            if (Input.mouseScrollDelta.y < 0 && !Input.GetKey(KeyCode.LeftControl))
+            {
+                scaleFactor = ValueHolder.scaleDown;
+                isScaled = true;
+
+            }
+            if (Input.mouseScrollDelta.y < 0 && Input.GetKey(KeyCode.LeftControl))
+            {
+                scaleFactor = ValueHolder.scaleDownFast;
+                isScaled = true;
+            }
+            if (isScaled)
+            {
+                memento.changedConfig.Scale = GameScaler.Scale(stickyNote, scaleFactor);
+                ScaleMenu.AssignValue(stickyNote);
+                GameObject drawable = GameFinder.GetDrawable(stickyNote);
+                new ScaleNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), stickyNote.name, memento.changedConfig.Scale).Execute();
+            }
         }
 
         /// <summary>

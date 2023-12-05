@@ -57,7 +57,7 @@ namespace Assets.SEE.Game.UI.Drawable
             Transform transform = objToMove.transform;
             Vector3 eulerAngles = transform.localEulerAngles;
             transform.localEulerAngles = Vector3.zero;
-            float moveValue = 0.01f;
+            float moveValue = ValueHolder.moveFast;
             Vector3 newPosition = transform.localPosition;
             switch (tag)
             {

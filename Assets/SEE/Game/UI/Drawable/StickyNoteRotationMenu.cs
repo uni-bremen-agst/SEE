@@ -1,8 +1,6 @@
 ﻿using Assets.SEE.Game.Drawable;
 using Michsky.UI.ModernUIPack;
-using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
-using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using UnityEngine;
@@ -36,6 +34,11 @@ namespace Assets.SEE.Game.UI.Drawable
         private static GameObject yRotationMenu;
 
         /// <summary>
+        /// Whether this class has a finished rotation in store that wasn't yet fetched.
+        /// </summary>
+        private static bool isFinish;
+
+        /// <summary>
         /// Method to disable the rotation menu's
         /// </summary>
         public static void Disable()
@@ -59,14 +62,13 @@ namespace Assets.SEE.Game.UI.Drawable
         {
             xRotationMenu = PrefabInstantiator.InstantiatePrefab(xRotationMenuPrefab,
                 GameObject.Find("UI Canvas").transform, false);
-            Vector3 oldPos = stickyNoteHolder.transform.position;
             GameObject drawable = GameFinder.GetDrawable(stickyNoteHolder);
             string drawableParentID = GameFinder.GetDrawableParentName(drawable);
             GameFinder.FindChild(xRotationMenu, "Laying").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 if (hittedObject != null)
                 {
-                    GameStickyNoteManager.SetRotateX(stickyNoteHolder, 90, oldPos, hittedObject.name.Equals("Floor"));
+                    GameStickyNoteManager.SetRotateX(stickyNoteHolder, 90, stickyNoteHolder.transform.position, hittedObject.name.Equals("Floor"));
                 } else
                 {
                     GameStickyNoteManager.SetRotateX(stickyNoteHolder, 90);
@@ -108,8 +110,7 @@ namespace Assets.SEE.Game.UI.Drawable
             yRotationMenu = PrefabInstantiator.InstantiatePrefab(yRotationMenuPrefab,
                 GameObject.Find("UI Canvas").transform, false);
             RotationSliderController slider = yRotationMenu.GetComponentInChildren<RotationSliderController>();
-            Vector3 oldPos = stickyNoteHolder.transform.position;
-            SliderListener(slider, stickyNoteHolder, oldPos, spawnMode);
+            SliderListener(slider, stickyNoteHolder, stickyNoteHolder.transform.position, spawnMode);
             GameObject drawable = GameFinder.GetDrawable(stickyNoteHolder);
             string drawableParentID = GameFinder.GetDrawableParentName(drawable);
 
@@ -125,40 +126,40 @@ namespace Assets.SEE.Game.UI.Drawable
             GameFinder.FindChild(yRotationMenu, "0").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 slider.AssignValue(0);
-                GameStickyNoteManager.SetRotateY(stickyNoteHolder, 0, oldPos);
+                GameStickyNoteManager.SetRotateY(stickyNoteHolder, 0, stickyNoteHolder.transform.position);
                 if (!spawnMode)
                 {
-                    new StickyNoteRoateYNetAction(drawable.name, drawableParentID, 0, oldPos).Execute();
+                    new StickyNoteRoateYNetAction(drawable.name, drawableParentID, 0, stickyNoteHolder.transform.position).Execute();
                 }
             });
 
             GameFinder.FindChild(yRotationMenu, "90").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 slider.AssignValue(90);
-                GameStickyNoteManager.SetRotateY(stickyNoteHolder, 90, oldPos);
+                GameStickyNoteManager.SetRotateY(stickyNoteHolder, 90, stickyNoteHolder.transform.position);
                 if (!spawnMode)
                 {
-                    new StickyNoteRoateYNetAction(drawable.name, drawableParentID, 90, oldPos).Execute();
+                    new StickyNoteRoateYNetAction(drawable.name, drawableParentID, 90, stickyNoteHolder.transform.position).Execute();
                 }
             });
 
             GameFinder.FindChild(yRotationMenu, "180").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 slider.AssignValue(180);
-                GameStickyNoteManager.SetRotateY(stickyNoteHolder, 180, oldPos);
+                GameStickyNoteManager.SetRotateY(stickyNoteHolder, 180, stickyNoteHolder.transform.position);
                 if (!spawnMode)
                 {
-                    new StickyNoteRoateYNetAction(drawable.name, drawableParentID, 180, oldPos).Execute();
+                    new StickyNoteRoateYNetAction(drawable.name, drawableParentID, 180, stickyNoteHolder.transform.position).Execute();
                 }
             });
 
             GameFinder.FindChild(yRotationMenu, "270").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 slider.AssignValue(270);
-                GameStickyNoteManager.SetRotateY(stickyNoteHolder, 270, oldPos);
+                GameStickyNoteManager.SetRotateY(stickyNoteHolder, 270, stickyNoteHolder.transform.position);
                 if (!spawnMode)
                 {
-                    new StickyNoteRoateYNetAction(drawable.name, drawableParentID, 270, oldPos).Execute();
+                    new StickyNoteRoateYNetAction(drawable.name, drawableParentID, 270, stickyNoteHolder.transform.position).Execute();
                 }
             });
 
@@ -172,7 +173,7 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 Destroyer.Destroy(xRotationMenu);
                 Destroyer.Destroy(yRotationMenu);
-                StickyNoteAction.finish = true;
+                isFinish = true;
             });
         }
 
@@ -191,12 +192,51 @@ namespace Assets.SEE.Game.UI.Drawable
             slider.AssignValue(transform.localEulerAngles.y);
             slider.onValueChanged.AddListener(degree =>
             {
-                GameStickyNoteManager.SetRotateY(stickyNote, degree, oldPos);
+                GameStickyNoteManager.SetRotateY(stickyNote, degree, stickyNote.transform.position);
                 if (!spawnMode)
                 {
-                    new StickyNoteRoateYNetAction(drawable.name, drawableParentID, degree, oldPos).Execute();
+                    new StickyNoteRoateYNetAction(drawable.name, drawableParentID, degree, stickyNote.transform.position).Execute();
                 }
             });
+        }
+
+        /// <summary>
+        /// If <see cref="isFinish"/> is true, the <paramref name="finish"/> will be the state. Otherwise it will be false.
+        /// </summary>
+        /// <param name="finish">The finish state</param>
+        /// <returns><see cref="isFinish"/></returns>
+        public static bool TryGetFinish(out bool finish)
+        {
+            if (isFinish)
+            {
+                finish = isFinish;
+                isFinish = false;
+                return true;
+            }
+
+            finish = false;
+            return false;
+        }
+
+        /// <summary>
+        /// Returns the state if the y rotation menu is enabled.
+        /// </summary>
+        /// <returns>true, if the menu not null and visible.</returns>
+        public static bool IsYActive()
+        {
+            return yRotationMenu != null && yRotationMenu.activeInHierarchy;
+        }
+
+        /// <summary>
+        /// Assigns a new degree to the <see cref="RotationSliderController"/> of the Y-Rotation Menu.
+        /// </summary>
+        /// <param name="degree">The new degree</param>
+        public static void AssignValueToYSlider(float degree)
+        {
+            if (yRotationMenu != null)
+            {
+                yRotationMenu.GetComponentInChildren<RotationSliderController>().AssignValue(degree);
+            }
         }
     }
 }

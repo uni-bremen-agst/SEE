@@ -181,24 +181,24 @@ namespace SEE.Controls.Actions.Drawable
 
                             if (Input.mouseScrollDelta.y > 0 && !Input.GetKey(KeyCode.LeftControl))
                             {
-                                scaleFactor = 1.01f;
+                                scaleFactor = ValueHolder.scaleUp;
                                 isScaled = true;
                             }
                             if (Input.mouseScrollDelta.y > 0 && Input.GetKey(KeyCode.LeftControl))
                             {
-                                scaleFactor = 1.1f;
+                                scaleFactor = ValueHolder.scaleUpFast;
                                 isScaled = true;
                             }
 
                             if (Input.mouseScrollDelta.y < 0 && !Input.GetKey(KeyCode.LeftControl))
                             {
-                                scaleFactor = 0.99f;
+                                scaleFactor = ValueHolder.scaleDown;
                                 isScaled = true;
 
                             }
                             if (Input.mouseScrollDelta.y < 0 && Input.GetKey(KeyCode.LeftControl))
                             {
-                                scaleFactor = 0.9f;
+                                scaleFactor = ValueHolder.scaleDownFast;
                                 isScaled = true;
                             }
                             if (isScaled)
@@ -226,6 +226,7 @@ namespace SEE.Controls.Actions.Drawable
                     case ProgressState.Finish:
                         mouseWasReleased = false;
                         ScaleMenu.Disable();
+                        newScale = selectedObj.transform.localScale;
                         if (oldScale != newScale)
                         {
                             if (!selectedObj.GetComponent<CollisionController>().IsInCollision())

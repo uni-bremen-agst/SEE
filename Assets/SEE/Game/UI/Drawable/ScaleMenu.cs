@@ -48,18 +48,9 @@ namespace Assets.SEE.Game.UI.Drawable
         private static GameObject instance;
 
         /// <summary>
-        /// Basic constructor. It will create the instance of the scale menu.
+        /// Whether this class has a finished rotation in store that wasn't yet fetched.
         /// </summary>
-        static ScaleMenu()
-        {
-            instance = PrefabInstantiator.InstantiatePrefab(drawableScalePrefab,
-                                    GameObject.Find("UI Canvas").transform, false);
-
-            xScale = GameFinder.FindChild(instance, "XScale").GetComponent<InputFieldWithButtons>();
-            yScale = GameFinder.FindChild(instance, "YScale").GetComponent<InputFieldWithButtons>();
-            switchManager = GameFinder.FindChild(instance, "Switch").GetComponent<SwitchManager>();
-            doneObject = GameFinder.FindChild(instance, "Done");
-        }
+        private static bool isFinish;
 
         /// <summary>
         /// Enables the scale menu and set ups the handler for the menu components.
@@ -69,6 +60,14 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <param name="returnCall"></param>
         public static void Enable(GameObject objToScale, bool stickyNoteMode = false, UnityAction returnCall = null)
         {
+            instance = PrefabInstantiator.InstantiatePrefab(drawableScalePrefab,
+                        GameObject.Find("UI Canvas").transform, false);
+
+            xScale = GameFinder.FindChild(instance, "XScale").GetComponent<InputFieldWithButtons>();
+            yScale = GameFinder.FindChild(instance, "YScale").GetComponent<InputFieldWithButtons>();
+            switchManager = GameFinder.FindChild(instance, "Switch").GetComponent<SwitchManager>();
+            doneObject = GameFinder.FindChild(instance, "Done");
+
             xScale.AssignValue(objToScale.transform.localScale.x);
             xScale.onValueChanged.AddListener(xScale =>
             {
@@ -129,7 +128,7 @@ namespace Assets.SEE.Game.UI.Drawable
                 doneObject.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
                 {
                     Disable();
-                    StickyNoteAction.finish = true;
+                    isFinish = true;
                 });
             } else
             {
@@ -148,13 +147,19 @@ namespace Assets.SEE.Game.UI.Drawable
         }
 
         /// <summary>
-        /// Hides the scale menu and removes the handler.
+        /// Destroyes the scale menu.
         /// </summary>
         public static void Disable()
         {
-            xScale.onValueChanged.RemoveAllListeners();
-            yScale.onValueChanged.RemoveAllListeners();
-            instance.SetActive(false);
+            if (instance != null)
+            {
+                /*
+                xScale.onValueChanged.RemoveAllListeners();
+                yScale.onValueChanged.RemoveAllListeners();
+                instance.SetActive(false);
+                 */
+                Destroyer.Destroy(instance);
+            }
         }
 
         /// <summary>
@@ -165,6 +170,33 @@ namespace Assets.SEE.Game.UI.Drawable
         {
             xScale.AssignValue(objToScale.transform.localScale.x);
             yScale.AssignValue(objToScale.transform.localScale.y);
+        }
+
+        /// <summary>
+        /// If <see cref="isFinish"/> is true, the <paramref name="finish"/> will be the state. Otherwise it will be false.
+        /// </summary>
+        /// <param name="finish">The finish state</param>
+        /// <returns><see cref="isFinish"/></returns>
+        public static bool TryGetFinish(out bool finish)
+        {
+            if (isFinish)
+            {
+                finish = isFinish;
+                isFinish = false;
+                return true;
+            }
+
+            finish = false;
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the state if the menu is active.
+        /// </summary>
+        /// <returns>true, if the menu is enabled.</returns>
+        public static bool IsActive()
+        {
+            return instance != null;
         }
     }
 }

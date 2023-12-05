@@ -61,10 +61,10 @@ namespace Assets.SEE.Game.Drawable
             Vector3 localEulerAngles = obj.transform.localEulerAngles;
             obj.transform.localEulerAngles = Vector3.zero;
             
-            float multiplyValue = 0.001f;
+            float multiplyValue = ValueHolder.move;
             if (speedUp)
             {
-                multiplyValue = 0.01f;
+                multiplyValue = ValueHolder.moveFast;
             }
             switch (key)
             {

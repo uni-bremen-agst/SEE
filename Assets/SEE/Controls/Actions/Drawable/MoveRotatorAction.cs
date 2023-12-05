@@ -362,27 +362,27 @@ namespace SEE.Controls.Actions.Drawable
                             if (Input.mouseScrollDelta.y > 0 && !Input.GetKey(KeyCode.LeftControl))
                             {
                                 direction = Vector3.forward;
-                                degree = 1;
+                                degree = ValueHolder.rotate;
                                 rotate = true;
                             }
                             if (Input.mouseScrollDelta.y > 0 && Input.GetKey(KeyCode.LeftControl))
                             {
                                 direction = Vector3.forward;
-                                degree = 10;
+                                degree = ValueHolder.rotateFast;
                                 rotate = true;
                             }
 
                             if (Input.mouseScrollDelta.y < 0 && !Input.GetKey(KeyCode.LeftControl))
                             {
                                 direction = Vector3.back;
-                                degree = 1;
+                                degree = ValueHolder.rotate;
                                 rotate = true;
 
                             }
                             if (Input.mouseScrollDelta.y < 0 && Input.GetKey(KeyCode.LeftControl))
                             {
                                 direction = Vector3.back;
-                                degree = 10;
+                                degree = ValueHolder.rotateFast;
                                 rotate = true;
                             }
 

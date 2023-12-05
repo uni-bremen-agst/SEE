@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -127,6 +128,46 @@ namespace Assets.SEE.Game.Drawable
         public const float standardTextOutlineThickness = 0.4f;
 
         /// <summary>
+        /// The standard scale up factor.
+        /// </summary>
+        public const float scaleUp = 1.01f;
+
+        /// <summary>
+        /// The scale up factor for fast scaling.
+        /// </summary>
+        public const float scaleUpFast = 1.1f;
+
+        /// <summary>
+        /// The standard scale down factor.
+        /// </summary>
+        public const float scaleDown = 0.99f;
+
+        /// <summary>
+        /// The scale down factor for fast scaling.
+        /// </summary>
+        public const float scaleDownFast = 0.9f;
+
+        /// <summary>
+        /// The constant for rotate by mouse wheel.
+        /// </summary>
+        public const float rotate = 1;
+
+        /// <summary>
+        /// The constant for fast rotate by mouse wheel.
+        /// </summary>
+        public const float rotateFast = 10;
+
+        /// <summary>
+        /// The constant for moving speed by key.
+        /// </summary>
+        public const float move = 0.001f;
+
+        /// <summary>
+        /// The constant for fast moving speed by key.
+        /// </summary>
+        public const float moveFast = 0.01f;
+
+        /// <summary>
         /// The path to the folder drawable folder of the saved files. This is saved in a field because multiple
         /// methods of this class and other classes use it.
         /// </summary>
@@ -137,6 +178,15 @@ namespace Assets.SEE.Game.Drawable
         /// methods of this class and other classes use it.
         /// </summary>
         public static readonly string imagePath = drawablePath + "Image/";
+
+        /// <summary>
+        /// The list of object names whose rotation is suitable for spawning/moving Sticky Notes. 
+        /// In addition to these objects, objects with the tag 'Drawable' are also suitable. 
+        /// The respective Sticky Note should then adopt its rotation.
+        /// </summary>
+        public static readonly List<string> SuitableObjectsForStickyNotes = new() { 
+            "Mirror"
+        };
 
         /// <summary>
         /// The direction's for moving. Will needed for sticky note menu.

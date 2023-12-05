@@ -26,6 +26,11 @@ namespace Assets.SEE.Game.UI.Drawable
         private static GameObject moveMenu;
 
         /// <summary>
+        /// Whether this class has a finished rotation in store that wasn't yet fetched.
+        /// </summary>
+        private static bool isFinish;
+
+        /// <summary>
         /// Method to disable the move menu
         /// </summary>
         public static void Disable()
@@ -41,7 +46,7 @@ namespace Assets.SEE.Game.UI.Drawable
         /// It register the necessary Handler to the menu interface.
         /// </summary>
         /// <param name="stickyNoteHolder">The sticky note holder that should be moved.</param>
-        public static void Enable(GameObject stickyNoteHolder)
+        public static void Enable(GameObject stickyNoteHolder, bool spawnMode = false)
         {
             moveMenu = PrefabInstantiator.InstantiatePrefab(moveMenuPrefab,
                 GameObject.Find("UI Canvas").transform, false);
@@ -50,15 +55,15 @@ namespace Assets.SEE.Game.UI.Drawable
 
             /// Register the switch for speed up option.
             SwitchManager speedUpManager = GameFinder.FindChild(moveMenu, "SpeedSwitch").GetComponent<SwitchManager>();
-            float speed = 0.001f;
-            speedUpManager.OnEvents.AddListener(() => speed = 0.01f);
-            speedUpManager.OffEvents.AddListener(() => speed = 0.001f);
+            float speed = ValueHolder.move;
+            speedUpManager.OnEvents.AddListener(() => speed = ValueHolder.moveFast);
+            speedUpManager.OffEvents.AddListener(() => speed = ValueHolder.move);
 
             /// Register the finish button. It destroys the move menu and set the finish attribut.
             GameFinder.FindChild(moveMenu, "Finish").GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 Destroyer.Destroy(moveMenu);
-                StickyNoteAction.finish = true;
+                isFinish = true;
             });
 
             /// In this region the movement buttons will be register.
@@ -67,43 +72,61 @@ namespace Assets.SEE.Game.UI.Drawable
             GameFinder.FindChild(moveMenu, "Left").AddComponent<ButtonHolded>().SetAction((() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Left, speed);
-                new StickyNoteMoveNetAction(drawable.name, drawableParentID,
-                    newPos, stickyNoteHolder.transform.eulerAngles).Execute();
+                if (!spawnMode)
+                {
+                    new StickyNoteMoveNetAction(drawable.name, drawableParentID,
+                        newPos, stickyNoteHolder.transform.eulerAngles).Execute();
+                }
             }), true);
 
             GameFinder.FindChild(moveMenu, "Right").AddComponent<ButtonHolded>().SetAction((() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Right, speed);
-                new StickyNoteMoveNetAction(drawable.name, drawableParentID,
-                    newPos, stickyNoteHolder.transform.eulerAngles).Execute();
+                if (!spawnMode)
+                {
+                    new StickyNoteMoveNetAction(drawable.name, drawableParentID,
+                        newPos, stickyNoteHolder.transform.eulerAngles).Execute();
+                }
             }), true);
 
             GameFinder.FindChild(moveMenu, "Up").AddComponent<ButtonHolded>().SetAction((() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Up, speed);
-                new StickyNoteMoveNetAction(drawable.name, drawableParentID,
-                    newPos, stickyNoteHolder.transform.eulerAngles).Execute();
+                if (!spawnMode)
+                {
+                    new StickyNoteMoveNetAction(drawable.name, drawableParentID,
+                        newPos, stickyNoteHolder.transform.eulerAngles).Execute();
+                }
             }), true);
 
             GameFinder.FindChild(moveMenu, "Down").AddComponent<ButtonHolded>().SetAction((() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Down, speed);
-                new StickyNoteMoveNetAction(drawable.name, drawableParentID,
-                    newPos, stickyNoteHolder.transform.eulerAngles).Execute();
+                if (!spawnMode)
+                {
+                    new StickyNoteMoveNetAction(drawable.name, drawableParentID,
+                        newPos, stickyNoteHolder.transform.eulerAngles).Execute();
+                }
             }), true);
 
             GameFinder.FindChild(moveMenu, "Forward").AddComponent<ButtonHolded>().SetAction((() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Forward, speed);
-                new StickyNoteMoveNetAction(drawable.name, drawableParentID,
-                    newPos, stickyNoteHolder.transform.eulerAngles).Execute();
+                if (!spawnMode)
+                {
+                    new StickyNoteMoveNetAction(drawable.name, drawableParentID,
+                        newPos, stickyNoteHolder.transform.eulerAngles).Execute();
+                }
             }), true);
 
             GameFinder.FindChild(moveMenu, "Back").AddComponent<ButtonHolded>().SetAction((() =>
             {
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(stickyNoteHolder, ValueHolder.MoveDirection.Back, speed);
-                new StickyNoteMoveNetAction(drawable.name, drawableParentID,
-                    newPos, stickyNoteHolder.transform.eulerAngles).Execute();
+                if (!spawnMode)
+                {
+                    new StickyNoteMoveNetAction(drawable.name, drawableParentID,
+                        newPos, stickyNoteHolder.transform.eulerAngles).Execute();
+                }
             }), true);
             #endregion
 
@@ -118,6 +141,42 @@ namespace Assets.SEE.Game.UI.Drawable
                     "\nForward-Button moves on Z-axis positiv." +
                     "\nBack-Button moves on Z-axis negativ.");
             });
+        }
+
+        /// <summary>
+        /// If <see cref="isFinish"/> is true, the <paramref name="finish"/> will be the state. Otherwise it will be false.
+        /// </summary>
+        /// <param name="finish">The finish state</param>
+        /// <returns><see cref="isFinish"/></returns>
+        public static bool TryGetFinish(out bool finish)
+        {
+            if (isFinish)
+            {
+                finish = isFinish;
+                isFinish = false;
+                return true;
+            }
+
+            finish = false;
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the move speed.
+        /// </summary>
+        /// <returns>The selected move speed</returns>
+        public static float GetSpeed()
+        {
+            return GameFinder.FindChild(moveMenu, "SpeedSwitch").GetComponent<SwitchManager>().isOn ? ValueHolder.moveFast : ValueHolder.move;
+        }
+
+        /// <summary>
+        /// Gets the is active state of the menu.
+        /// </summary>
+        /// <returns>true, if the menu is not null.</returns>
+        public static bool IsActive()
+        {
+            return moveMenu != null;
         }
     }
 }
