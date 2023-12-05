@@ -52,7 +52,7 @@ namespace SEE.UI
         Dictionary<string, TextMeshProUGUI> buttonToLabel;
 
         /// <summary>
-        /// Sets the content and adds the onClick event ExitGame to the ExitButton.
+        /// Sets the <see cref="KeyBindingContent"/> and adds the onClick event <see cref="ExitGame"/> to the ExitButton.
         /// </summary>
         protected override void StartDesktop()
         {
@@ -68,20 +68,18 @@ namespace SEE.UI
             Button exitButton = settingsMenuGameObject.transform.Find("SettingsPanel/ExitButton").gameObject.MustGetComponent<Button>();
             // adds the ExitGame method to the button
             exitButton.onClick.AddListener(ExitGame);
-            // set the content
+            // displays the content
             foreach (var group in groupedBindings)
             {
-                // display the scope
-                // instantiates the scrollView
+                // displays the scope
                 scrollView = PrefabInstantiator.InstantiatePrefab(ScrollPrefab, Canvas.transform, false).transform.gameObject;
                 scrollView.transform.SetParent(settingsMenuGameObject.transform.Find("KeybindingsPanel/KeybindingsText/Viewport/Content"));
                 // set the titles of the scrollViews to the scopes
                 TextMeshProUGUI groupTitle = scrollView.transform.Find("Group").gameObject.MustGetComponent<TextMeshProUGUI>();
                 groupTitle.text = $"{group.Key}";
-                // display the scrollview for each scope, with its bindings and keys
+                // displays the scrollview for each scope, with its bindings and keys
                 foreach (var binding in group)
                 {
-                    // instantiates the keyBindingContent
                     keyBindingContent = PrefabInstantiator.InstantiatePrefab(KeyBindingContent, Canvas.transform, false).transform.gameObject;
                     keyBindingContent.transform.SetParent(scrollView.transform.Find("Scroll View/Viewport/Content"));
 
@@ -102,37 +100,37 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Toggles the settings panel with the ESC button and handels
+        /// Toggles the settings panel with the Pause button and handles
         /// the case, that the user wants to change the key of a keyBinding.
         /// </summary>
         protected override void UpdateDesktop()
         {
             // when the buttonToRebind is not null, then the user clicked a button to start the rebind.
-            if(buttonToRebind != null)
+            if (bindingToRebind != null)
             {
                 SEEInput.KeyboardShortcutsEnabled = false;
                 // the next button, that gets pressed, will be the new keyBind.
                 if (Input.anyKeyDown)
                 {
                     // get the key that was pressed.
-                    foreach(KeyCode key in Enum.GetValues(typeof(KeyCode)))
+                    foreach (KeyCode key in Enum.GetValues(typeof(KeyCode)))
                     {
-                        //rebind the key
+                        // rebind the key
                         if (Input.GetKeyDown(key))
                         {
                             // check if the key is already bound to another binding, if not, then update the key
-                            if(KeyBindings.SetButtonForKey(buttonToRebind, key))
+                            if (KeyBindings.SetButtonForKey(bindingToRebind, key))
                             {
                                 // update the label of the button of the key
-                                buttonToLabel[buttonToRebind].text = key.ToString();
+                                buttonToLabel[bindingToRebind].text = key.ToString();
                             }
                             else
                             {
-                                string exceptionText = $"Cannot register key {key} for {buttonToRebind}\n Key {key} already bound to {KeyBindings.GetBindings()[key]}\n";
+                                string exceptionText = $"Cannot register key {key} for {bindingToRebind}\n Key {key} already bound to {KeyBindings.GetBindings()[key]}\n";
                                 settingsMenuGameObject.transform.Find("KeybindingsPanel/Exception/ExceptionText").gameObject.MustGetComponent<TextMeshProUGUI>().text = exceptionText;
                                 settingsMenuGameObject.transform.Find("KeybindingsPanel/Exception").gameObject.SetActive(true);
                             }
-                            buttonToRebind = null;
+                            bindingToRebind = null;
                             SEEInput.KeyboardShortcutsEnabled = true;
                             break;
                         }
@@ -157,17 +155,16 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// The keyBinding which gets updated
+        /// The keyBinding which gets updated.
         /// </summary>
-        string buttonToRebind = null;
+        private string bindingToRebind = null;
 
         /// <summary>
-        /// Sets the <see cref="buttonToRebind"/>.
+        /// Sets the <see cref="bindingToRebind"/>.
         /// </summary>
-        void StartRebindFor(string buttonName)
+        private void StartRebindFor(string binding)
         {
-            buttonToRebind = buttonName;
-            Debug.Log("StartRebindFor: " + buttonName);
+            bindingToRebind = binding;
         }
 
         /// <summary>
