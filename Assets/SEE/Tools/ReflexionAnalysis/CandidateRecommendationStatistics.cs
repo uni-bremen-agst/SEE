@@ -2,6 +2,7 @@
 using SEE.DataModel.DG;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils.Paths;
+using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -277,6 +278,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     if(results.ContainsKey(candidateID))
                     {
                         results[candidateID].PercentileRanks = percentileRanks[candidateID];
+                        results[candidateID].CalculateResults();
                     }
                 }
             }
@@ -297,22 +299,26 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         }
 
         private void CreateXml(List<CandidateStatisticResult> results, string xmlFile)
-        {
+        {   
             int hits = results.Where(r => r.Hit && r.MappedAtMappingStep >= 0).Count();
             int fails = results.Where(r => !r.Hit && r.MappedAtMappingStep >= 0).Count();
-            int initiallyMapped = results.Count - hits + fails;
+            int initiallyMapped = results.Where((r) => r.MappedAtMappingStep < 0).Count();
             int chosen = results.Where((r) => r.Chosen == true).Count();
+            
+            double averagePercentileRankGlobally = results.Where(r => r.AveragePercentileRank >= 0)
+                                                          .Select(r => r.AveragePercentileRank).Average();
 
             XElement mappingStatistic = new XElement("mappingStatistic",
                 new XAttribute(XNamespace.Xmlns + "xlink", "http://www.w3.org/1999/xlink"),
                 new XElement("hits", hits),
                 new XElement("fails", fails),
+                new XElement("AveragePercentileRankGlobally", averagePercentileRankGlobally),
                 new XElement("initiallyMapped", initiallyMapped),
                 new XElement("chosen", chosen),
                 new XElement("candidateType", CandidateType));
 
             XElement percentileRanksElement = new XElement("percentileRanksElement");
-
+            
             results.ForEach(result => percentileRanksElement.Add(result.ToXElement()));
 
             mappingStatistic.Add(percentileRanksElement);
@@ -431,9 +437,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             public string MappedClusterID { get; set; } = "Unknown";
             public string ExpectedClusterID { get; set; } = "Unknown";
             public List<double> PercentileRanks { get; set; } = new List<double>();
+            public List<double> ValidPercentileRanks { get; set; } = new List<double>();
+            public double AveragePercentileRank { get; set; }
             public int MappedAtMappingStep { get; set; } = -1;
             public bool Hit { get; set; }
             public bool? Chosen { get; set; }
+
+            public void CalculateResults()
+            {
+                ValidPercentileRanks = PercentileRanks.Where(n => n >= 0).ToList();
+                AveragePercentileRank = ValidPercentileRanks.Count > 0 ? ValidPercentileRanks.Average() : -1;
+                AveragePercentileRank = Math.Round(AveragePercentileRank, 4);
+            }
 
             public XElement ToXElement()
             {
@@ -454,11 +469,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 XAttribute chosen = new XAttribute("Chosen", this.Chosen != null ? this.Chosen : "Null");
                 XAttribute mappedAtMeppingStep = new XAttribute("MappedAtStep", this.MappedAtMappingStep);
                 XAttribute attractionValue = new XAttribute("AttractionValue", this.AttractionValue);
-
-                List<double> validpercentileRanks = PercentileRanks.Where(n => n >= 0).ToList();
-                double averageRank = validpercentileRanks.Count > 0 ? validpercentileRanks.Average() : -1;
-                averageRank = Math.Round(averageRank, 4);
-                XAttribute average = new XAttribute("average", averageRank);
+                XAttribute average = new XAttribute("averageRank", AveragePercentileRank);
 
                 candidateElement.Add(candidateID);
                 candidateElement.Add(mappedTo);
