@@ -19,6 +19,7 @@ using static Assets.SEE.Tools.ReflexionAnalysis.CandidateRecommendation;
 using Cysharp.Threading.Tasks;
 using SEE.Controls;
 using SEE.UI.Window;
+using System.Threading.Tasks;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis
 {
@@ -36,6 +37,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         private ReflexionGraph reflexionGraph;
 
         private Graph oracleMapping;
+
+        private Queue<ChangeEvent> changeEventQueue = new Queue<ChangeEvent>();
+
+        private bool ProcessingEvents { get; set; }
+
 
         // TODO: 
         private readonly IDictionary<string, TreeWindow> treeWindows = new Dictionary<string, TreeWindow>();
@@ -56,13 +62,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
+        // TODO: include cda option into the updating of the configuration
         [SerializeField]
         public bool useCDA;
-
-        private void UseCDAPropertyChanged()
-        {
-            CandidateRecommendation.UseCDA = useCDA;
-        }
 
         [SerializeField]
         public AttractFunctionType attractFunctionType = AttractFunctionType.CountAttract;
@@ -96,6 +98,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
+        #region IObserver
         public void OnCompleted()
         {
             CandidateRecommendation.OnCompleted();
@@ -108,37 +111,57 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         public void OnNext(ChangeEvent value)
         {
-            CandidateRecommendation.OnNext(value);
+            changeEventQueue.Enqueue(value);
 
-            // blink effect
-            List<NodeOperator> nodeOperators = new List<NodeOperator>();
-            foreach (Node cluster in CandidateRecommendation.Recommendations.Keys)
+            // TODO: How to solve event filtering in both classes, EventFilter class?
+            if (!ProcessingEvents && value is EdgeEvent edgeEvent && edgeEvent.Affected == ReflexionSubgraphs.Mapping)
             {
-                NodeOperator nodeOperator;
-
-                nodeOperator = cluster.GameObject().AddOrGetComponent<NodeOperator>();
-                nodeOperators.Add(nodeOperator);
-
-                foreach (MappingPair mappingPair in CandidateRecommendation.Recommendations[cluster])
-                {
-                    nodeOperators.Add(mappingPair.Candidate.GameObject().AddOrGetComponent<NodeOperator>());
-                }
+                ProcessEvents().Forget();
             }
-            if (blinkEffectCoroutine != null) StopCoroutine(blinkEffectCoroutine);
-
-            // TODO: Distinction between different hypothesized entities is required
-            blinkEffectCoroutine = StartCoroutine(StartBlinkEffect(nodeOperators));
         }
+        #endregion
 
-        private IEnumerator StartBlinkEffect(List<NodeOperator> nodeOperators)
+        public async UniTask ProcessEvents()
         {
-            // Wait for the delay duration
-            yield return new WaitForSeconds(BLINK_EFFECT_DELAY);
+            ProcessingEvents = true;
+            List<NodeOperator> nodeOperators = new List<NodeOperator>();
+            await UniTask.RunOnThreadPool(() =>
+            {
+                while (changeEventQueue.Count > 0)
+                {
+                    CandidateRecommendation.OnNext(changeEventQueue.Dequeue());
+                }
 
-            // Start blink effect
-            nodeOperators.ForEach((n) => n.Blink(10, 2));
+                ProcessingEvents = false;
+
+            }).ContinueWith(async () => 
+            {
+                await UniTask.SwitchToMainThread();
+
+                foreach (Node cluster in CandidateRecommendation.Recommendations.Keys)
+                {
+                    NodeOperator nodeOperator;
+
+                    nodeOperator = cluster.GameObject().AddOrGetComponent<NodeOperator>();
+                    nodeOperators.Add(nodeOperator);
+
+                    foreach (MappingPair mappingPair in CandidateRecommendation.Recommendations[cluster])
+                    {
+                        nodeOperators.Add(mappingPair.Candidate.GameObject().AddOrGetComponent<NodeOperator>());
+                    }
+                }
+
+                if (!ProcessingEvents)
+                {
+                    // blink effect
+                    // TODO: Distinction between different hypothesized entities is required
+                    if (blinkEffectCoroutine != null) StopCoroutine(blinkEffectCoroutine);
+                    blinkEffectCoroutine = StartCoroutine(StartBlinkEffect(nodeOperators));
+                }
+            });
         }
 
+        #region Buttons
         [Button(ButtonSizes.Small)]
         public void StartRecording()
         {
@@ -207,6 +230,16 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 }
                 StartCoroutine(MapRecommendation(chosenMappingPair.Candidate, chosenMappingPair.Cluster));
             }
+        }
+        #endregion
+
+        private IEnumerator StartBlinkEffect(List<NodeOperator> nodeOperators)
+        {
+            // Wait for the delay duration
+            yield return new WaitForSeconds(BLINK_EFFECT_DELAY);
+
+            // Start blink effect
+            nodeOperators.ForEach((n) => n.Blink(10, 2));
         }
 
         private IEnumerator MapRecommendation(Node candidate, Node cluster)
