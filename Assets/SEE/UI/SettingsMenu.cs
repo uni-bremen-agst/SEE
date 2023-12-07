@@ -56,7 +56,7 @@ namespace SEE.UI
         /// </summary>
         protected override void StartDesktop()
         {
-            string[] buttonNames = KeyBindings.GetButtonNames();
+            string[] buttonNames = KeyBindings.GetBindingNames();
             // instantiates the buttonToLabel dictionary
             buttonToLabel = new Dictionary<string, TextMeshProUGUI>();
             // instantiates the keyBindings dictionary
@@ -90,7 +90,7 @@ namespace SEE.UI
 
                     // set the label of the key button
                     TextMeshProUGUI key = keyBindingContent.transform.Find("Key/Text (TMP)").gameObject.MustGetComponent<TextMeshProUGUI>();
-                    key.text = KeyBindings.GetKeyNameForButton(bindingName);
+                    key.text = KeyBindings.GetKeyNameForBinding(bindingName);
                     // add the label to the dictionary
                     buttonToLabel[bindingName] = key;
                     // add the actionlistener, to be able to change the key of a binding
@@ -119,7 +119,7 @@ namespace SEE.UI
                         if (Input.GetKeyDown(key))
                         {
                             // check if the key is already bound to another binding, if not, then update the key
-                            if (KeyBindings.SetButtonForKey(bindingToRebind, key))
+                            if (KeyBindings.SetBindingForKey(bindingToRebind, key))
                             {
                                 // update the label of the button of the key
                                 buttonToLabel[bindingToRebind].text = key.ToString();

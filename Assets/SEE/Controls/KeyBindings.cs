@@ -45,7 +45,8 @@ namespace SEE.Controls
         /// <param name="keyCode">the key code to be registered</param>
         /// <param name="scope">the scope of the key code</param>
         /// <param name="helpMessage">the help message for the key code</param>
-        /// <returns></returns>
+        /// <param name="name">the name of the binding</param>
+        /// <returns>a new keyCode that gets added to the bindings, when it's not already present in the bindings</returns>
         private static KeyCode Register(KeyCode keyCode, string name, Scope scope, string helpMessage)
         {
             if (bindings.ContainsKey(keyCode))
@@ -74,35 +75,37 @@ namespace SEE.Controls
 
         /// <summary>
         /// Returns a string array of the binding names.
+        /// <returns>the binding names</returns>
         /// </summary>
-        public static string[] GetButtonNames()
+        public static string[] GetBindingNames()
         {
             // Extract the scope part from the string value.
-            List<string> buttons = new List<string>();
+            List<string> buttons = new();
             foreach (var binding in bindings)
             {
-                int endIndex = binding.Value.IndexOf("[")-1;
+                int endIndex = binding.Value.IndexOf("[") - 1;
                 buttons.Add(binding.Value.Substring(0, endIndex));
-
             }
             return buttons.ToArray();
         }
 
         /// <summary>
-        /// Rebinds a binding to another key and updates the keyBindings.
+        /// Rebinds a binding to another key and updates the <see cref="bindings"/>.
+        /// <param name="bindingName">the binding, which will be set to a given <param name="keyCode"></param></param>
+        /// <returns>false, when the key is already boud to another binding, and true otherwise</returns>
         /// </summary>
-        public static bool SetButtonForKey(string buttonName, KeyCode keyCode)
+        public static bool SetBindingForKey(string bindingName, KeyCode keyCode)
         {
             if (bindings.ContainsKey(keyCode))
             {
-                Debug.LogError($"Cannot register key {keyCode} for {buttonName}\n");
+                Debug.LogError($"Cannot register key {keyCode} for {bindingName}\n");
                 Debug.LogError($"Key {keyCode} already bound to {bindings[keyCode]}\n");
                 return false;
             }
             else
             {
-                string bind = bindings.FirstOrDefault(x => x.Value.Contains(buttonName)).Value.ToString();
-                KeyCode oldKey = bindings.FirstOrDefault(x => x.Value.Contains(buttonName)).Key;
+                string bind = bindings.FirstOrDefault(x => x.Value.Contains(bindingName)).Value.ToString();
+                KeyCode oldKey = bindings.FirstOrDefault(x => x.Value.Contains(bindingName)).Key;
                 bindings.Remove(oldKey);
                 bindings[keyCode] = bind;
                 SEEInput.UpdateBindings();
@@ -111,11 +114,13 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Returns a string of the keyName for a button.
+        /// Returns a string of the keyName for a binding.
+        /// <param name="bindingName">the binding, for which the key is being returned</param>
+        /// <returns>returns the key for a given binding.</returns>
         /// </summary>
-        public static string GetKeyNameForButton(string buttonName)
+        public static string GetKeyNameForBinding(string bindingName)
         {
-            return bindings.FirstOrDefault(x => x.Value.Contains(buttonName)).Key.ToString(); ;
+            return bindings.FirstOrDefault(x => x.Value.Contains(bindingName)).Key.ToString();
         }
 
         /// <summary>
@@ -133,7 +138,8 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Returns the keyBindings dictionary.
+        /// Returns the <see cref="bindings"/> dictionary.
+        /// <returns>returns the current <see cref="bindings"/>.</returns>
         /// </summary>
         public static Dictionary<KeyCode, string> GetBindings()
         {

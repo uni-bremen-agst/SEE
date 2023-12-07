@@ -28,7 +28,7 @@ namespace SEE.Controls
         public static void UpdateBindings()
         {
             SEEInput.bindings.Clear();
-            foreach (string button in KeyBindings.GetButtonNames())
+            foreach (string button in KeyBindings.GetBindingNames())
             {
                 bindings[button] = KeyBindings.GetBindings().FirstOrDefault(x => x.Value.Contains(button)).Key;
             }
@@ -40,7 +40,7 @@ namespace SEE.Controls
         private static Dictionary<string, KeyCode> BindingNamesAndKeys()
         {
             Dictionary<string, KeyCode> namesAndKeys = new();
-            foreach (string button in KeyBindings.GetButtonNames())
+            foreach (string button in KeyBindings.GetBindingNames())
             {
                 namesAndKeys[button] = KeyBindings.GetBindings().FirstOrDefault(x => x.Value.Contains(button)).Key;
             }
