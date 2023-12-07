@@ -18,19 +18,32 @@ namespace Assets.SEE.Game.Drawable
     /// </summary>
     public class BlinkEffect : MonoBehaviour
     {
+        /// <summary>
+        /// Represents the status of whether the loop is active.
+        /// </summary>
         private bool loopOn;
-        private ActionStateType allowedState;
+        /// <summary>
+        /// The render of the attached game object.
+        /// </summary>
         new Renderer renderer;
+        /// <summary>
+        /// The renders of the attached game object (for mind map nodes)
+        /// </summary>
         Renderer[] renderers;
+        /// <summary>
+        /// The canvas of the attached game object.
+        /// </summary>
         Canvas canvas;
-        new MeshCollider collider;
+        /// <summary>
+        /// The highlight effect of the attached game object.
+        /// </summary>
         HighlightEffect highlight;
 
-        public void SetAllowedActionStateType(ActionStateType allowedState)
-        {
-            this.allowedState = allowedState;
-        }
-
+        /// <summary>
+        /// Executed as long as the Blink Effect Component is active.
+        /// It ensures that the corresponding renderer/canvas/highlight effect is toggled on and off, thus creating a blinking effect.
+        /// </summary>
+        /// <returns>Nothing, only the seconds to wait.</returns>
         IEnumerator Blink()
         {
             while (loopOn)
@@ -69,14 +82,15 @@ namespace Assets.SEE.Game.Drawable
                     highlight.enabled = true;
                     yield return new WaitForSeconds(0.5f);
                 }
-
-                if (allowedState != null && GlobalActionHistory.Current() != allowedState)
-                {
-                    Deactivate();
-                }
             }
         }
 
+        /// <summary>
+        /// Deactivates the blink effect.
+        /// It enables the renderer, the canvas, or the child renderers (depending on what is present).
+        /// If a highlight effect was used it will destroyed.
+        /// Subsequently, the Blink Effect Component is destroyed.
+        /// </summary>
         public void Deactivate()
         {
             loopOn = false;
@@ -99,14 +113,15 @@ namespace Assets.SEE.Game.Drawable
             {
                 Destroyer.Destroy(highlight);
             }
-            if (collider != null && collider.convex)
-            {
-                collider.isTrigger = false;
-                collider.convex = false;
-            }
             Destroy(this);
         }
 
+        /// <summary>
+        /// Executed upon assigning the component. 
+        /// It searches for a renderer, child renderers, or a highlight effect. 
+        /// If none of these components are present, a highlight effect is created, 
+        /// and then the blink loop is initiated.
+        /// </summary>
         private void Start()
         {
             GameObject obj = this.gameObject;
@@ -114,7 +129,7 @@ namespace Assets.SEE.Game.Drawable
             {
                 renderer = obj.GetComponent<Renderer>();
             }
-            else if (obj.GetComponentsInChildren<Renderer>() != null)
+            else if (obj.GetComponentsInChildren<Renderer>().Length > 0)
             {
                 renderers = obj.GetComponentsInChildren<Renderer>();
             }
@@ -127,10 +142,6 @@ namespace Assets.SEE.Game.Drawable
             } else
             {
                 highlight = GameHighlighter.Enable(obj);
-            }
-            if (collider == null && obj.GetComponent<MeshCollider>() != null)
-            {
-                collider = obj.GetComponent<MeshCollider>();
             }
             loopOn = true;
             StartCoroutine(Blink());

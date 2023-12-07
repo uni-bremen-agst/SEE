@@ -364,6 +364,7 @@ namespace Assets.SEE.Game.UI.Drawable
                     ButtonManagerBasic returnBtn = GameFinder.FindChild(instance, "ReturnBtn").GetComponent<ButtonManagerBasic>();
                     returnBtn.clickEvent.RemoveAllListeners();
                     returnBtn.clickEvent.AddListener(returnCall);
+                    GameFinder.FindChild(instance, "Layer").GetComponentInChildren<Slider>().interactable = false;
                 }
                 LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
                 GameObject drawable = GameFinder.GetDrawable(selectedLine);
@@ -712,6 +713,7 @@ namespace Assets.SEE.Game.UI.Drawable
         private static void enableLayerFromLineMenu()
         {
             content.Find("Layer").gameObject.SetActive(true);
+            content.Find("Layer").GetComponentInChildren<Slider>().interactable = true;
         }
 
         /// <summary>

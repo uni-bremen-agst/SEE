@@ -226,9 +226,8 @@ namespace SEE.Controls.Actions.Drawable
 
                             selectedObject.AddComponent<Rigidbody>().isKinematic = true;
                             selectedObject.AddComponent<CollisionController>();
+                            selectedObject.AddOrGetComponent<BlinkEffect>();
 
-                            BlinkEffect effect = selectedObject.AddOrGetComponent<BlinkEffect>();
-                            effect.SetAllowedActionStateType(GetActionStateType());
                             firstPoint = raycastHit.point;
                             mouseWasReleased = false;
 
@@ -326,8 +325,7 @@ namespace SEE.Controls.Actions.Drawable
                                 !selectedObject.GetComponent<CollisionController>().IsInCollision() && !childInCollision)
                             {
                                 if ((hit.collider.gameObject.CompareTag(Tags.Drawable) && hit.collider.gameObject.Equals(drawable)) ||
-                                (GameFinder.hasDrawable(hit.collider.gameObject) && GameFinder.GetDrawable(hit.collider.gameObject).Equals(drawable) &&
-                                selectedObject != hit.collider.gameObject))
+                                (GameFinder.hasDrawable(hit.collider.gameObject) && GameFinder.GetDrawable(hit.collider.gameObject).Equals(drawable)))
                                 {
                                     newObjectPosition = GameMoveRotator.MoveObjectByMouse(selectedObject, hit.point, MoveMenu.includeChildren);
                                     new MoveNetAction(drawable.name, drawableParentName, selectedObject.name, newObjectPosition, MoveMenu.includeChildren).Execute();

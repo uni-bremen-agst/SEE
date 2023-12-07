@@ -78,21 +78,22 @@ namespace Assets.SEE.Game.Drawable
             node.transform.position = position;
 
             GameObject text = CreateText(drawable, position, writtenText, prefix);
-            GameObject shape = CreateMindMapBorder(drawable, position, text, prefix);
+            GameObject border = CreateMindMapBorder(drawable, position, text, prefix);
 
             text.transform.SetParent(node.transform);
-            shape.transform.SetParent(node.transform);
+            border.transform.SetParent(node.transform);
             node.transform.position = position - node.transform.forward * ValueHolder.distanceToDrawable.z *
-                            shape.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
-            node.AddComponent<OrderInLayerValueHolder>().SetOrderInLayer(shape.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer());
-            shape.transform.localPosition = Vector3.zero;
-            shape.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(0);
+                            border.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
+            node.AddComponent<OrderInLayerValueHolder>().SetOrderInLayer(border.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer());
+            border.transform.localPosition = Vector3.zero;
+            border.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(0);
+            text.GetComponent<TextMeshPro>().sortingOrder = node.GetComponent<OrderInLayerValueHolder>().GetOrderInLayer();
 
             text.GetComponent<MeshCollider>().enabled = false;
-            shape.GetComponent<MeshCollider>().enabled = false;
+            border.GetComponent<MeshCollider>().enabled = false;
 
             BoxCollider box = node.AddComponent<BoxCollider>();
-            box.size = GetBoxSize(shape);
+            box.size = GetBoxSize(border);
 
             node.AddComponent<MMNodeValueHolder>();            
         }
@@ -624,7 +625,9 @@ namespace Assets.SEE.Game.Drawable
             }
 
             GameObject border = GameDrawer.ReDrawLine(drawable, borderConf);
+            textConf.orderInLayer = order;
             GameObject text = GameTexter.ReWriteText(drawable, textConf);
+            text.GetComponent<OrderInLayerValueHolder>().SetOrderInLayer(0);
 
             border.transform.SetParent(createdNode.transform);
             text.transform.SetParent(createdNode.transform);

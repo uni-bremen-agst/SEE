@@ -133,7 +133,8 @@ namespace SEE.Controls.Actions.Drawable
                         }
                         if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj == null
                             && Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                            (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased)) &&
+                            (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject 
+                                || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased)) &&
                             GameFinder.hasDrawable(raycastHit.collider.gameObject))
                         {
                             if (oldSelectedObj != null)
@@ -154,9 +155,8 @@ namespace SEE.Controls.Actions.Drawable
 
                             selectedObj.AddComponent<Rigidbody>().isKinematic = true;
                             selectedObj.AddComponent<CollisionController>();
+                            selectedObj.AddOrGetComponent<BlinkEffect>();
 
-                            BlinkEffect effect = selectedObj.AddOrGetComponent<BlinkEffect>();
-                            effect.SetAllowedActionStateType(GetActionStateType());
                             oldScale = selectedObj.transform.localScale;
                             if (GameObject.Find("UI Canvas").GetComponent<ValueResetter>() == null)
                             {

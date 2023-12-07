@@ -50,6 +50,10 @@ namespace Assets.SEE.Game.Drawable
                 else
                 {
                     holder.SetOrderInLayer(order);
+                    if (obj.CompareTag(Tags.MindMapNode))
+                    {
+                        obj.GetComponentInChildren<TextMeshPro>().sortingOrder = order;
+                    }
                     MoveObjectZ(obj, order, useWorldPos);
                     if (obj.GetComponent<TextMeshPro>() != null)
                     {
@@ -86,6 +90,10 @@ namespace Assets.SEE.Game.Drawable
                 else
                 {
                     holder.SetOrderInLayer(order);
+                    if (obj.CompareTag(Tags.MindMapNode))
+                    {
+                        obj.GetComponentInChildren<TextMeshPro>().sortingOrder = order;
+                    }
                     MoveObjectZ(obj, order, useWorldPos);
                     if (obj.GetComponent<TextMeshPro>() != null)
                     {

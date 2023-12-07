@@ -308,8 +308,7 @@ namespace SEE.Controls.Actions.Drawable
 
                 }
 
-                BlinkEffect effect = selectedObj.AddOrGetComponent<BlinkEffect>();
-                effect.SetAllowedActionStateType(GetActionStateType());
+                selectedObj.AddOrGetComponent<BlinkEffect>();
 
                 if (GameObject.Find("UI Canvas").GetComponent<ValueResetter>() == null)
                 {

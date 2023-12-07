@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using SEE.Game.Drawable;
+using System.Collections;
 using UnityEngine;
 
 namespace Assets.SEE.Game.UI.Drawable
@@ -15,21 +16,28 @@ namespace Assets.SEE.Game.UI.Drawable
         private bool isInCollision = false;
 
         /// <summary>
-        /// Sets the isInCollision true if a collision enters.
+        /// Sets the isInCollision true if a collision occurs.
         /// </summary>
-        /// <param name="collision"></param>
-        private void OnTriggerEnter(Collider collision)
+        /// <param name="other">The object that causes the collision.</param>
+        private void OnTriggerEnter(Collider other)
         {
-            isInCollision = true;
+            if (GameFinder.GetHighestParent(gameObject).Equals(GameFinder.GetHighestParent(other.gameObject)))
+            {
+                isInCollision = true;
+            }
+            
         }
 
         /// <summary>
-        /// Sets the isInCollision false when the collision exists.
+        /// Sets the isInCollision false when the collision is over.
         /// </summary>
-        /// <param name="collision"></param>
-        private void OnTriggerExit(Collider collision)
+        /// <param name="other">The object that causes the collision.</param>
+        private void OnTriggerExit(Collider other)
         {
-            isInCollision = false;
+            if(GameFinder.GetHighestParent(gameObject).Equals(GameFinder.GetHighestParent(other.gameObject)))
+            {
+                isInCollision = false;
+            }
         }
 
         /// <summary>

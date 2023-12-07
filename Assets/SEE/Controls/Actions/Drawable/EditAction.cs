@@ -231,8 +231,7 @@ namespace SEE.Controls.Actions.Drawable
                             oldValueHolder = DrawableType.Get(selectedObj);
                             newValueHolder = DrawableType.Get(selectedObj);
 
-                            BlinkEffect effect = selectedObj.AddOrGetComponent<BlinkEffect>();
-                            effect.SetAllowedActionStateType(GetActionStateType());
+                            selectedObj.AddOrGetComponent<BlinkEffect>();
 
                             if (GameObject.Find("UI Canvas").GetComponent<ValueResetter>() == null)
                             {

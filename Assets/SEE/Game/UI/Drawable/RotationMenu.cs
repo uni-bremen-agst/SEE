@@ -4,9 +4,7 @@ using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace Assets.SEE.Game.UI.Drawable

@@ -314,6 +314,7 @@ namespace Assets.SEE.Game.UI.Drawable
             if (showEditMode)
             {
                 orderInLayer.SetActive(true);
+                GameFinder.FindChild(instance, "Layer").GetComponentInChildren<Slider>().interactable = true;
                 editText.SetActive(true);
             }
             else
@@ -341,6 +342,7 @@ namespace Assets.SEE.Game.UI.Drawable
             if (showEditMode)
             {
                 orderInLayer.SetActive(true);
+                GameFinder.FindChild(instance, "Layer").GetComponentInChildren<Slider>().interactable = true;
                 editText.SetActive(true);
             }
             else
@@ -415,6 +417,7 @@ namespace Assets.SEE.Game.UI.Drawable
                     ButtonManagerBasic returnBtn = obj.GetComponent<ButtonManagerBasic>();
                     returnBtn.clickEvent.RemoveAllListeners();
                     returnBtn.clickEvent.AddListener(returnCall);
+                    GameFinder.FindChild(instance, "Layer").GetComponentInChildren<Slider>().interactable = false;
                 }
 
                 fontColorBMB.clickEvent.AddListener(() =>

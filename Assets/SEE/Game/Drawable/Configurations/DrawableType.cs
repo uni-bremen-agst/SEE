@@ -49,7 +49,8 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// Restores the object to the given drawable type configuration.
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="type">The type to restore.</param>
+        /// <param name="drawable">The drawable on which the drawable type should be restored.</param>
         public static void Restore(DrawableType type, GameObject drawable)
         {
             switch(type)
@@ -79,8 +80,8 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// Get the prefix for the drawable type.
         /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
+        /// <param name="type">The type for which the prefix is needed.</param>
+        /// <returns>The determined prefix.</returns>
         public static string GetPrefix(DrawableType type)
         {
             switch (type)

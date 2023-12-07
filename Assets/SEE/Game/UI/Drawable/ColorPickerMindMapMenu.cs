@@ -4,6 +4,7 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Utils;
 using UnityEditor;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -53,6 +54,8 @@ namespace Assets.SEE.Game.UI.Drawable
                     } else
                     {
                         chosenColor = conf.borderConf.secondaryColor;
+                        /// For monochromatic lines, the secondary color is clear; 
+                        /// therefore, the primary color is taken instead.
                         if (conf.borderConf.colorKind == GameDrawer.ColorKind.Monochrome)
                         {
                             chosenColor = conf.borderConf.primaryColor;
@@ -60,6 +63,7 @@ namespace Assets.SEE.Game.UI.Drawable
                     }
                     gotColor = true;
                 });
+
                 ButtonManagerBasic text = GameFinder.FindChild(instance, "NodeText").GetComponent<ButtonManagerBasic>();
                 text.clickEvent.AddListener(() =>
                 {
@@ -74,6 +78,7 @@ namespace Assets.SEE.Game.UI.Drawable
                     gotColor = true;
                 });
 
+                /// Checks if the node has a parent. If not this area will be disabled.
                 GameObject branchLineButtonArea = GameFinder.FindChild(instance, "BranchLine");
                 if (conf.branchLineToParent != "")
                 {
@@ -87,6 +92,8 @@ namespace Assets.SEE.Game.UI.Drawable
                         else
                         {
                             chosenColor = conf.branchLineConf.secondaryColor;
+                            /// For monochromatic lines, the secondary color is clear; 
+                            /// therefore, the primary color is taken instead.
                             if (conf.branchLineConf.colorKind == GameDrawer.ColorKind.Monochrome)
                             {
                                 chosenColor = conf.branchLineConf.primaryColor;
@@ -97,6 +104,8 @@ namespace Assets.SEE.Game.UI.Drawable
                 }
                 else
                 {
+                    /// If the node has no parent, there is consequently no branch line to the parent.
+                    /// Therefore, in this case, the button will be disabled.
                     branchLineButtonArea.GetComponent<ButtonManagerBasic>().enabled = false;
                     branchLineButtonArea.GetComponent<Button>().interactable = false;
                 }

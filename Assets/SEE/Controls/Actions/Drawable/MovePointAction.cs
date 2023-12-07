@@ -131,9 +131,7 @@ namespace SEE.Controls.Actions.Drawable
                             selectedLine = raycastHit.collider.gameObject;
                             drawable = GameFinder.GetDrawable(selectedLine);
 
-                            BlinkEffect effect = selectedLine.AddOrGetComponent<BlinkEffect>();
-                            effect.SetAllowedActionStateType(GetActionStateType());
-                            //effect.Activate(selectedLine);
+                            selectedLine.AddOrGetComponent<BlinkEffect>();
 
                             LineRenderer lineRenderer = selectedLine.GetComponent<LineRenderer>();
                             Vector3[] positions = new Vector3[lineRenderer.positionCount];
@@ -175,10 +173,10 @@ namespace SEE.Controls.Actions.Drawable
                         /// Left click when the desired point has reached. Then the action will be complete in the next steps
                         if (Input.GetMouseButtonUp(0) && selectedLine.GetComponent<BlinkEffect>() == null)
                         {
-                            progressState = ProgressState.Finish; 
+                            progressState = ProgressState.Finish;
                             GameMoveRotator.MovePoint(selectedLine, Indices, newPointPosition);
                             new MovePointNetAction(drawable.name, drawableParentName, selectedLine.name, Indices, newPointPosition).Execute();
-                            
+
                         }
                         break;
                     case ProgressState.Finish:
@@ -190,6 +188,17 @@ namespace SEE.Controls.Actions.Drawable
                 return false;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Destroys the blink effect, if it is still active.
+        /// </summary>
+        public override void Stop()
+        {
+            if (selectedLine != null && selectedLine.GetComponent<BlinkEffect>() != null)
+            {
+                selectedLine.GetComponent<BlinkEffect>().Deactivate();
+            }
         }
 
         /// <summary>
