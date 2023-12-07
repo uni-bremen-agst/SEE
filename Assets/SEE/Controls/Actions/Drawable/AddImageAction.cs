@@ -111,7 +111,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 /// Block for the selection of the position and a query from which source the image should be loaded.
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
-                     Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
+                     Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     (GameFinder.hasDrawable(raycastHit.collider.gameObject) || raycastHit.collider.gameObject.CompareTag(Tags.Drawable))
                     && !ImageSourceMenu.IsOpen()
                     && (browser == null || (browser != null && !browser.IsOpen())) && 

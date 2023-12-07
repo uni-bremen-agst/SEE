@@ -1,5 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using SEE.Game;
+using System;
+using System.Collections.Generic;
+using System.Xml;
+using UnityEditor.VersionControl;
 using UnityEngine;
+using UnityEngine.InputSystem.HID;
 
 namespace Assets.SEE.Game.Drawable
 {
@@ -180,13 +185,26 @@ namespace Assets.SEE.Game.Drawable
         public static readonly string imagePath = drawablePath + "Image/";
 
         /// <summary>
-        /// The list of object names whose rotation is suitable for spawning/moving Sticky Notes. 
+        /// The list of object names or <see cref="Tags"/> whose rotation is suitable for spawning/moving Sticky Notes.
+        /// In the list, object names or <see cref="Tags"/> of suitable objects can be added.
+        /// Since the name cannot be uniquely determined for objects added during runtime, the solution with <see cref="Tags"/> is provided.
         /// In addition to these objects, objects with the tag 'Drawable' are also suitable. 
         /// The respective Sticky Note should then adopt its rotation.
         /// </summary>
         public static readonly List<string> SuitableObjectsForStickyNotes = new() { 
-            "Mirror"
+            "Mirror",
         };
+
+        /// <summary>
+        /// Checks if the given game object is a suitable object for the sticky note rotation.
+        /// </summary>
+        /// <param name="gameObject">The object to check.</param>
+        /// <returns>true, if the game object is suitable for the sticky note rotation.</returns>
+        public static bool IsASuitableObjectForStickyNote(GameObject gameObject)
+        {
+            return SuitableObjectsForStickyNotes.Contains(gameObject.name)
+                    || SuitableObjectsForStickyNotes.Contains(gameObject.tag);
+        }
 
         /// <summary>
         /// The direction's for moving. Will needed for sticky note menu.

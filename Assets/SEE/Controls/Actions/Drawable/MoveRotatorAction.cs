@@ -215,7 +215,7 @@ namespace SEE.Controls.Actions.Drawable
                     /// The mouse button must be released after selecting to start the chosen option.
                     case ProgressState.SelectObject:
                         if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
-                            && Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) && selectedObject == null &&
+                            && Raycasting.RaycastAnything(out RaycastHit raycastHit) && selectedObject == null &&
                             (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject || 
                                 (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased)) 
                             && GameFinder.hasDrawable(raycastHit.collider.gameObject))
@@ -286,7 +286,7 @@ namespace SEE.Controls.Actions.Drawable
                     /// There is a faster option for moving. It can be toggled by clicking the left Ctrl key down.
                     /// To end the move, the left mouse button must be pressed and released.
                     case ProgressState.Move:
-                        if (selectedObject.GetComponent<BlinkEffect>() != null && selectedObject.GetComponent<BlinkEffect>().GetLoopStatus())
+                        if (selectedObject.GetComponent<BlinkEffect>() != null)
                         {
                             GameObject drawable = GameFinder.GetDrawable(selectedObject);
                             string drawableParentName = GameFinder.GetDrawableParentName(drawable);
@@ -350,7 +350,7 @@ namespace SEE.Controls.Actions.Drawable
                     /// There is a faster option by holding down the left Ctrl key in addition to using the mouse wheel.
                     /// To end the rotation, the left mouse button must be pressed and released.
                     case ProgressState.Rotate:
-                        if (selectedObject.GetComponent<BlinkEffect>() != null && selectedObject.GetComponent<BlinkEffect>().GetLoopStatus())
+                        if (selectedObject.GetComponent<BlinkEffect>() != null)
                         {
                             GameObject drawable = GameFinder.GetDrawable(selectedObject);
                             string drawableParentName = GameFinder.GetDrawableParentName(drawable);

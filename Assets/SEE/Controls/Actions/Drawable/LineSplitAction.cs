@@ -75,7 +75,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// The line is split at the found points, and sublines are created, 
                 /// with their starting and ending points corresponding to the splitting point.
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !isActive &&
-                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
+                    Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     GameFinder.hasDrawable(raycastHit.collider.gameObject))
                 {
                     isActive = true;

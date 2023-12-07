@@ -46,6 +46,22 @@ namespace SEE.Controls.Actions.Drawable
         private bool isInAction = false;
 
         /// <summary>
+        /// Bool to identifiy if the action waits for user input of the
+        /// mind map color picker menu.
+        /// </summary>
+        private bool waitForHelperMenu = false;
+
+        /// <summary>
+        /// Bool to identify that the color picking from mind map node is finish.
+        /// </summary>
+        private bool finishChosingMMColor = false;
+
+        /// <summary>
+        /// Bool to identifiy if the picker picks a color for the second color.
+        /// </summary>
+        private bool pickForSecondColor = false;
+
+        /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.ColorPicker"/>.
         /// It pickes the chosen color of a drawable type object.
         /// </summary>
@@ -54,14 +70,13 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (!Raycasting.IsMouseOverGUI())
             {
-                bool pickForSecondColor = false;
-
                 /// Block for picking the (main) color of the object.
                 /// If left control is pressed the main color will be picked for the <see cref="ValueHolder.currentSecondaryColor"/>
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !isInAction &&
-                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
-                    GameFinder.hasDrawable(raycastHit.collider.gameObject) &&
-                    (raycastHit.collider.gameObject.CompareTag(Tags.Line) || raycastHit.collider.gameObject.CompareTag(Tags.DText)))
+                    Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
+                    (GameFinder.hasDrawable(raycastHit.collider.gameObject) ||
+                        raycastHit.collider.gameObject.CompareTag(Tags.Drawable) && 
+                        GameFinder.GetHighestParent(raycastHit.collider.gameObject).name.StartsWith(ValueHolder.StickyNotePrefix)))
                 {
                     isInAction = true;
                     GameObject hittedObject = raycastHit.collider.gameObject;
@@ -75,28 +90,28 @@ namespace SEE.Controls.Actions.Drawable
                         case Tags.DText:
                             pickedColor = hittedObject.GetComponent<TextMeshPro>().color;
                             break;
+                        case Tags.Image:
+                            ImageConf image = ImageConf.GetImageConf(hittedObject);
+                            pickedColor = image.imageColor;
+                            break;
+                        case Tags.MindMapNode:
+                            ColorPickerMindMapMenu.Enable(hittedObject, true);
+                            waitForHelperMenu = true;
+                            break;
+                        case Tags.Drawable:
+                            DrawableConfig config = DrawableConfigManager.GetDrawableConfig(hittedObject);
+                            pickedColor = config.Color;
+                            break;
                     }
-
-                    if (!ColorPickerMenu.GetSwitchStatus())//Input.GetKey(KeyCode.LeftControl))
-                    {
-                        ValueHolder.currentPrimaryColor = pickedColor;
-                        ColorPickerMenu.AssignPrimaryColor(pickedColor);
-                    }
-                    else
-                    {
-                        pickForSecondColor = true;
-                        ColorPickerMenu.AssignSecondaryColor(pickedColor);
-                        ValueHolder.currentSecondaryColor = pickedColor;
-                    }
-                    memento = new(oldChosenPrimaryColor, oldChosenSecondColor, pickedColor, pickForSecondColor);
                 }
 
                 /// Block for picking the second color of the object.
                 /// /// If left control is pressed the second color will be loaded as main color
                 if ((Input.GetMouseButtonDown(1) || Input.GetMouseButton(1)) && !isInAction &&
-                    Raycasting.RaycastAnythingBackface(out RaycastHit hit) &&
-                    GameFinder.hasDrawable(hit.collider.gameObject) &&
-                    (hit.collider.gameObject.CompareTag(Tags.Line) || hit.collider.gameObject.CompareTag(Tags.DText)))
+                    Raycasting.RaycastAnything(out RaycastHit hit) &&
+                    (GameFinder.hasDrawable(hit.collider.gameObject) ||
+                        hit.collider.gameObject.CompareTag(Tags.Drawable) &&
+                        GameFinder.GetHighestParent(hit.collider.gameObject).name.StartsWith(ValueHolder.StickyNotePrefix)))
                 {
                     isInAction = true;
                     GameObject hittedObject = hit.collider.gameObject;
@@ -114,13 +129,28 @@ namespace SEE.Controls.Actions.Drawable
                         case Tags.DText:
                             pickedColor = hittedObject.GetComponent<TextMeshPro>().outlineColor;
                             break;
+                        case Tags.Image:
+                            ImageConf image = ImageConf.GetImageConf(hittedObject);
+                            pickedColor = image.imageColor;
+                            break;
+                        case Tags.MindMapNode:
+                            ColorPickerMindMapMenu.Enable(hittedObject, false);
+                            waitForHelperMenu = true;
+                            break;
+                        case Tags.Drawable:
+                            DrawableConfig config = DrawableConfigManager.GetDrawableConfig(hittedObject);
+                            pickedColor = config.Color;
+                            break;
                     }
+                }
 
-
-                    if (!ColorPickerMenu.GetSwitchStatus())//Input.GetKey(KeyCode.LeftControl))
+                if (((Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1)) && isInAction && !waitForHelperMenu) ||
+                    finishChosingMMColor)
+                {
+                    if (!ColorPickerMenu.GetSwitchStatus())
                     {
-                        ColorPickerMenu.AssignPrimaryColor(pickedColor);
                         ValueHolder.currentPrimaryColor = pickedColor;
+                        ColorPickerMenu.AssignPrimaryColor(pickedColor);
                     }
                     else
                     {
@@ -129,13 +159,15 @@ namespace SEE.Controls.Actions.Drawable
                         ValueHolder.currentSecondaryColor = pickedColor;
                     }
                     memento = new(oldChosenPrimaryColor, oldChosenSecondColor, pickedColor, pickForSecondColor);
-                }
-
-                if ((Input.GetMouseButtonUp(0) || Input.GetMouseButtonUp(1)) && isInAction)
-                {
                     currentState = ReversibleAction.Progress.Completed;
                     return true;
                 }
+            }
+            if (waitForHelperMenu && ColorPickerMindMapMenu.TryGetColor(out Color color))
+            {
+                pickedColor = color;
+                waitForHelperMenu = false;
+                finishChosingMMColor = true;
             }
             return false;
         }
@@ -157,6 +189,14 @@ namespace SEE.Controls.Actions.Drawable
                 GameObject.Find("UI Canvas").AddComponent<ColorPickerMenuDisabler>();
                 ColorPickerMenu.Enable();
             }
+        }
+
+        /// <summary>
+        /// Destroys the mind map color picker menu on action stop.
+        /// </summary>
+        public override void Stop()
+        {
+            ColorPickerMindMapMenu.Disable();
         }
 
         /// <summary>
@@ -205,7 +245,9 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Undo();
             ValueHolder.currentPrimaryColor = memento.oldChosenPrimaryColor;
+            ColorPickerMenu.AssignPrimaryColor(ValueHolder.currentPrimaryColor);
             ValueHolder.currentSecondaryColor = memento.oldChosenSecondColor;
+            ColorPickerMenu.AssignSecondaryColor(ValueHolder.currentSecondaryColor);
         }
 
         /// <summary>
@@ -217,10 +259,12 @@ namespace SEE.Controls.Actions.Drawable
             if (!memento.pickForSecondColor)
             {
                 ValueHolder.currentPrimaryColor = memento.pickedColor;
+                ColorPickerMenu.AssignPrimaryColor(ValueHolder.currentPrimaryColor);
             }
             else
             {
                 ValueHolder.currentSecondaryColor = memento.pickedColor;
+                ColorPickerMenu.AssignSecondaryColor(ValueHolder.currentSecondaryColor);
             }
         }
 

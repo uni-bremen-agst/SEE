@@ -108,6 +108,18 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Query whether the given game object is part of a drawable.
+        /// It is checked whether the highest game object in the hierarchy of 
+        /// the given game object contains a drawable child object.
+        /// </summary>
+        /// <param name="component">The game object to be checked.</param>
+        /// <returns>true, if a drawable will be found. Otherwise false</returns>
+        public static bool IsPartOfADrawable(GameObject component)
+        {
+            return GetDrawable(component) != null;
+        }
+
+        /// <summary>
         /// Searches for a child with a specific tag.
         /// </summary>
         /// <param name="parent">The parent of the children.</param>

@@ -166,7 +166,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// For execution, no open file browser should exist.
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
                     && !clicked &&
-                    Raycasting.RaycastAnythingBackface(out RaycastHit hit) &&
+                    Raycasting.RaycastAnything(out RaycastHit hit) &&
                     (GameFinder.hasDrawable(hit.collider.gameObject) || hit.collider.gameObject.CompareTag(Tags.Drawable))
                     && (browser == null || (browser != null && !browser.IsOpen())))
                 {

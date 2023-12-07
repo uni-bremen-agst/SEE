@@ -33,7 +33,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 /// Increse block - it increses the order in layer of a game object on a drawable with a <see cref="OrderInLayerValueHolder"/> component.
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && !isInAction &&
-                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
+                    Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     GameFinder.hasDrawable(raycastHit.collider.gameObject) &&
                     raycastHit.collider.gameObject.GetComponent<OrderInLayerValueHolder>() != null)
                 {

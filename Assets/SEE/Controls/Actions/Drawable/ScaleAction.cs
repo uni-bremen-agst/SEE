@@ -132,7 +132,7 @@ namespace SEE.Controls.Actions.Drawable
                             mouseWasReleased = true;
                         }
                         if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) && selectedObj == null
-                            && Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
+                            && Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                             (oldSelectedObj == null || oldSelectedObj != raycastHit.collider.gameObject || (oldSelectedObj == raycastHit.collider.gameObject && mouseWasReleased)) &&
                             GameFinder.hasDrawable(raycastHit.collider.gameObject))
                         {
@@ -173,7 +173,7 @@ namespace SEE.Controls.Actions.Drawable
                     /// In this block, scaling is performed using the mouse wheel, and optionally, the left Ctrl key (faster). 
                     /// When the left mouse button is pressed and released, scaling is finish and it switches to the last progress state.
                     case ProgressState.Scale:
-                        if (selectedObj.GetComponent<BlinkEffect>() != null && selectedObj.GetComponent<BlinkEffect>().GetLoopStatus())
+                        if (selectedObj.GetComponent<BlinkEffect>() != null)
                         {
                             string drawableParentName = GameFinder.GetDrawableParentName(drawable);
                             float scaleFactor = 0f;

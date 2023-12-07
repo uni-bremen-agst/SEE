@@ -133,7 +133,7 @@ namespace SEE.Controls.Actions.Drawable
                     /// You can enter the text in it.
                     case ProgressState.GettingPosition:
                         if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
-                             Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
+                             Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                             (GameFinder.hasDrawable(raycastHit.collider.gameObject) || raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
                         {
                             drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?

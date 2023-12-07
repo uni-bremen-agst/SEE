@@ -124,7 +124,7 @@ namespace SEE.Controls.Actions.Drawable
                     /// The blinking effect is turned on to indicate which line has been selected.
                     case ProgressState.SelectLine:
                         if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
-                            && Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
+                            && Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                             GameFinder.hasDrawable(raycastHit.collider.gameObject) &&
                             raycastHit.collider.gameObject.CompareTag(Tags.Line))
                         {
@@ -155,7 +155,7 @@ namespace SEE.Controls.Actions.Drawable
                     /// With this block the user can move the point of the line to the desired point.
                     case ProgressState.MovePoint:
                         string drawableParentName = GameFinder.GetDrawableParentName(drawable);
-                        if (selectedLine.GetComponent<BlinkEffect>() != null && selectedLine.GetComponent<BlinkEffect>().GetLoopStatus())
+                        if (selectedLine.GetComponent<BlinkEffect>() != null)
                         {
                             if (Raycasting.RaycastAnything(out RaycastHit hit))
                             {

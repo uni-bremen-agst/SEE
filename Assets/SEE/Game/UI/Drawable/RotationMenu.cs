@@ -47,7 +47,6 @@ namespace Assets.SEE.Game.UI.Drawable
             {
                 RotationSliderController slider = instance.GetComponentInChildren<RotationSliderController>();
                 slider.AssignValue(selectedObject.transform.localEulerAngles.z);
-                ControlChildren(selectedObject);
             }
         }
 
@@ -95,10 +94,10 @@ namespace Assets.SEE.Game.UI.Drawable
                         foreach(KeyValuePair<GameObject, (Vector3, Vector3)> pair in oldRotations)
                         {
                             (Vector3 pos, Vector3 rot) = pair.Value;
-                            GameMoveRotator.SetRotate(pair.Key, rot.z, false);
-                            new RotatorNetAction(drawable.name, drawableParentName, pair.Key.name, rot.z, false).Execute();
                             GameMoveRotator.SetPosition(pair.Key, pos, false);
                             new MoveNetAction(drawable.name, drawableParentName, pair.Key.name, pos, false).Execute();
+                            GameMoveRotator.SetRotate(pair.Key, rot.z, false);
+                            new RotatorNetAction(drawable.name, drawableParentName, pair.Key.name, rot.z, false).Execute();
                         }
                     }
                 });

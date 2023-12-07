@@ -107,11 +107,6 @@ namespace Assets.SEE.Game.Drawable
             Destroy(this);
         }
 
-        public bool GetLoopStatus()
-        {
-            return loopOn;
-        }
-
         private void Start()
         {
             GameObject obj = this.gameObject;

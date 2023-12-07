@@ -60,7 +60,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 /// Block to get the drawable object to delete.
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
-                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
+                    Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     GameFinder.hasDrawable(raycastHit.collider.gameObject))
                 {
                     GameObject hittedObject = raycastHit.collider.gameObject;

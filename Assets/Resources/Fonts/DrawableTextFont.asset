@@ -118,12 +118,12 @@ Material:
     - _PerspectiveFilter: 0.875
     - _Reflectivity: 10
     - _ScaleRatioA: 0.60504204
-    - _ScaleRatioB: 0.13004999
+    - _ScaleRatioB: 0
     - _ScaleRatioC: 0
-    - _ScaleX: 1
-    - _ScaleY: 1
+    - _ScaleX: 100
+    - _ScaleY: 100
     - _ShaderFlags: 0
-    - _Sharpness: 0
+    - _Sharpness: 1
     - _Smoothness: 0.5
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -152,7 +152,7 @@ Material:
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _EnvMatrixRotation: {r: 0, g: 0, b: 0, a: 0}
     - _FaceColor: {r: 1, g: 1, b: 1, a: 1}
-    - _GlowColor: {r: 0, g: 1, b: 0, a: 0.5}
+    - _GlowColor: {r: 0.087086126, g: 0.9716981, b: 0.087086126, a: 0.5}
     - _MaskCoord: {r: 0, g: 0, b: 32767, a: 32767}
     - _OutlineColor: {r: 1, g: 1, b: 1, a: 1}
     - _PortalMax: {r: 10, g: 10, b: 0, a: 0}

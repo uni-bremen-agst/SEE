@@ -1,6 +1,7 @@
 ﻿using Assets.SEE.Game.Drawable;
 using Assets.SEE.Game.UI.Drawable;
 using HighlightPlus;
+using RTG;
 using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
@@ -8,8 +9,8 @@ using SEE.Game.UI.Notification;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
-using UnityEngine.InputSystem.HID;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -148,7 +149,8 @@ namespace SEE.Controls.Actions.Drawable
                     case Operation.None:
                         if (Input.GetMouseButtonDown(0))
                         {
-                            ShowNotification.Info("Select an operation", "First you need to select an operation from the menu.");
+                            ShowNotification.Info("Select an operation",
+                                "First you need to select an operation from the menu.");
                         }
                         break;
                     case Operation.Spawn:
@@ -178,14 +180,17 @@ namespace SEE.Controls.Actions.Drawable
                 inProgress = true;
                 stickyNote = GameStickyNoteManager.Spawn(raycastHit);
 
-                /// If the detected object is not drawable, it is necessary to choose the rotation for the sticky note.
-                /// Otherwise, it is not necessary, as the provided drawables already have the correct rotation.
+                /// If the detected object is a drawable or has one, or is part of a sticky note, 
+                /// or is listed in the suitable objects list by name or tag, 
+                /// it is not necessary to choose a rotation, as it can be inherited from the detected object. 
+                /// Otherwise, a desired rotation must be selected for the sticky note.
                 if (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                    GameFinder.hasDrawable(raycastHit.collider.gameObject)
-                    || ValueHolder.SuitableObjectsForStickyNotes.Contains(raycastHit.collider.gameObject.name))
+                GameFinder.hasDrawable(raycastHit.collider.gameObject)
+                || GameFinder.IsPartOfADrawable(raycastHit.collider.gameObject)
+                || ValueHolder.IsASuitableObjectForStickyNote(raycastHit.collider.gameObject))
                 {
                     finish = true;
-                    
+
                 }
                 else
                 {
@@ -207,7 +212,8 @@ namespace SEE.Controls.Actions.Drawable
             if (StickyNoteRotationMenu.TryGetFinish(out bool isRotationFinished))
             {
                 finish = isRotationFinished;
-            } else if (stickyNote != null && StickyNoteRotationMenu.IsYActive())
+            }
+            else if (stickyNote != null && StickyNoteRotationMenu.IsYActive())
             {
                 RotateByWheel(stickyNote, true);
             }
@@ -239,7 +245,7 @@ namespace SEE.Controls.Actions.Drawable
             if (Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit) && !inProgress &&
                 (raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ||
-                GameFinder.hasDrawable(raycastHit.collider.gameObject) || 
+                GameFinder.hasDrawable(raycastHit.collider.gameObject) ||
                 CheckIsPartOfStickyNote(raycastHit.collider.gameObject)))
             {
                 GameObject drawable = raycastHit.collider.gameObject.CompareTag(Tags.Drawable) ?
@@ -279,12 +285,20 @@ namespace SEE.Controls.Actions.Drawable
                 Raycasting.RaycastAnything(out RaycastHit hit))
             {
                 Vector3 eulerAngles = eulerAnglesBackup;
-                if (hit.collider.gameObject.CompareTag(Tags.Drawable) || 
-                    ValueHolder.SuitableObjectsForStickyNotes.Contains(hit.collider.gameObject.name))
+                if (hit.collider.gameObject.CompareTag(Tags.Drawable) ||
+                    GameFinder.hasDrawable(hit.collider.gameObject) ||
+                    GameFinder.IsPartOfADrawable(hit.collider.gameObject) ||
+                    ValueHolder.IsASuitableObjectForStickyNote(hit.collider.gameObject))
                 {
                     eulerAngles = hit.collider.gameObject.transform.eulerAngles;
                 }
                 Vector3 oldPos = stickyNoteHolder.transform.position;
+                if (GameFinder.hasDrawable(hit.collider.gameObject) || 
+                    CheckIsPartOfStickyNote(hit.collider.gameObject))
+                {
+                    GameObject drawable = GameFinder.GetDrawable(hit.collider.gameObject);
+                    hit.point = new Vector3(hit.point.x, hit.point.y, drawable.transform.position.z);
+                }
                 GameStickyNoteManager.Move(stickyNoteHolder, hit.point, eulerAngles);
                 Vector3 newPos = stickyNoteHolder.transform.position;
                 if (oldPos != newPos)
@@ -344,8 +358,8 @@ namespace SEE.Controls.Actions.Drawable
         /// <param name="spawnMode">If this method will be called of the spawn method..</param>
         private void MoveByKey(GameObject stickyNote, bool spawnMode)
         {
-            if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.UpArrow) 
-                || Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.PageUp) ||Input.GetKey(KeyCode.PageDown))
+            if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.UpArrow)
+                || Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.PageUp) || Input.GetKey(KeyCode.PageDown))
             {
                 ValueHolder.MoveDirection direction = GetDirection();
                 GameObject holder = GameFinder.GetHighestParent(stickyNote);
@@ -449,7 +463,8 @@ namespace SEE.Controls.Actions.Drawable
                         {
                             ShowNotification.Info("Wrong selection", "You don't selected a sticky note.");
                             return false;
-                        } else
+                        }
+                        else
                         {
                             stickyNote = null;
                             selectedAction = Operation.None;
@@ -489,11 +504,12 @@ namespace SEE.Controls.Actions.Drawable
             if (ScaleMenu.TryGetFinish(out bool isScaleFinished))
             {
                 finish = isScaleFinished;
-            } else if (ScaleMenu.IsActive())
+            }
+            else if (ScaleMenu.IsActive())
             {
                 ScaleByWheel();
             }
-            
+
 
             /// When the editing is finish completed the current state. 
             /// And save the scale and rotation in memento, because they could be changed with the menu's.
@@ -676,7 +692,7 @@ namespace SEE.Controls.Actions.Drawable
                     GameObject stickyNote = GameStickyNoteManager.Spawn(memento.originalConfig);
                     new StickyNoteSpawnNetAction(memento.originalConfig).Execute();
                     GameObject drawable = GameFinder.GetDrawable(stickyNote);
-                    foreach(DrawableType type in memento.originalConfig.GetAllDrawableTypes())
+                    foreach (DrawableType type in memento.originalConfig.GetAllDrawableTypes())
                     {
                         DrawableType.Restore(type, drawable);
                     }

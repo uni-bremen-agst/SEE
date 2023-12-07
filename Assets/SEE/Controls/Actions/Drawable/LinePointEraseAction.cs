@@ -76,7 +76,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// The line is split at the found points and the points will be removed. Sublines will be created, 
                 /// with their starting and ending points corresponding to the nearest point of the removed point.
                 if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)) &&
-                    Raycasting.RaycastAnythingBackface(out RaycastHit raycastHit) &&
+                    Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
                     GameFinder.hasDrawable(raycastHit.collider.gameObject))
                 {
                     GameObject hittedObject = raycastHit.collider.gameObject;
