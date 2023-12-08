@@ -60,12 +60,12 @@ namespace SEE.UI
             // instantiates the buttonToLabel dictionary
             buttonToLabel = new Dictionary<string, TextMeshProUGUI>();
             // instantiates the keyBindings dictionary
-            Dictionary<KeyCode, string> keyBindings = KeyBindings.GetBindings();
+            IDictionary<KeyCode, string> keyBindings = KeyBindings.GetBindings();
             // group the keyBindings by it scopes
             var groupedBindings = keyBindings.GroupBy(pair => KeyBindings.GetScope(pair.Value));
             // instantiates the SettingsMenu
             settingsMenuGameObject = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Canvas.transform, false);
-            Button exitButton = settingsMenuGameObject.transform.Find("SettingsPanel/ExitButton").gameObject.MustGetComponent<Button>();
+            Button exitButton = settingsMenuGameObject.transform.Find("ExitPanel/Buttons/Content/Exit").gameObject.MustGetComponent<Button>();
             // adds the ExitGame method to the button
             exitButton.onClick.AddListener(ExitGame);
             // displays the content
