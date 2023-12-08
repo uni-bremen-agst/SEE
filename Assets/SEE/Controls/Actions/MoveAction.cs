@@ -124,12 +124,21 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    UnmarkAsTarget();
+                    if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                    {
+                        UnmarkAsTarget();
+                    }
+
                     if (GrabbedGameObject.TryGetComponent(out InteractableObject interactableObject))
                     {
                         interactableObject.SetGrab(grab: false, isInitiator: true) ;
                     }
-                    ShowLabel.Off(GrabbedGameObject);
+
+                    if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                    {
+                        ShowLabel.Off(GrabbedGameObject);
+                    }
+
                     IsGrabbed = false;
                     // Note: We do not set grabbedObject to null because we may need its
                     // value later for Undo/Redo.
@@ -323,7 +332,7 @@ namespace SEE.Controls.Actions
             internal void Redo()
             {
                 MoveToLastUserRequestedPosition();
-                Reparent(newParent);
+                Reparent(newParent, GrabbedGameObject);
             }
 
             /// <summary>
@@ -338,14 +347,17 @@ namespace SEE.Controls.Actions
             /// game-object hierarchy afterwards.
             /// </summary>
             /// <param name="target">the target node of the re-parenting, i.e., the new parent</param>
-            internal void Reparent(GameObject target)
+            internal void Reparent(GameObject target, GameObject originalBigParent)
             {
                 // target must not be a descendant of grabbedObject
                 if (!IsDescendant(target, GrabbedGameObject))
                 {
                     PutOnAndFit(GrabbedGameObject, target, originalParent.gameObject, originalLocalScale);
-                    UnmarkAsTarget();
-                    MarkAsTarget(target.transform);
+                    if (SceneSettings.InputType != PlayerInputType.VRPlayer)
+                    {
+                        UnmarkAsTarget();
+                        MarkAsTarget(target.transform);
+                    }
 
                     newParent = target;
                     // The mapping is only possible if we are in a reflexion city
@@ -358,6 +370,8 @@ namespace SEE.Controls.Actions
                     {
                         GameNodeMoverSetParent(GrabbedGameObject, target);
                     }
+
+                    originalParent = originalBigParent.transform;
                 }
 
                 // True if node is a descendant of root in the underlying graph.
@@ -377,7 +391,11 @@ namespace SEE.Controls.Actions
             /// </summary>
             internal void UnReparent()
             {
-                UnmarkAsTarget();
+                if (SceneSettings.InputType != PlayerInputType.VRPlayer)
+                {
+                    UnmarkAsTarget();
+                }
+
                 if (GrabbedGameObject.transform.parent.gameObject != originalParent.gameObject)
                 {
                     if (withinReflexionCity)
@@ -517,6 +535,20 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                return MoveActionDesktop();
+            }
+            else if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            {
+                return MoveActionVR();
+            }
+
+            return false;
+        }
+
+        private bool MoveActionDesktop()
+        {
             if (UserIsGrabbing()) // start to grab the object or continue to move the grabbed object
             {
                 if (!grabbedObject.IsGrabbed)
@@ -562,16 +594,64 @@ namespace SEE.Controls.Actions
             return false;
         }
 
+
+        // FIXME: parts of this needs to be fixed in the future. TODO Doku (William)
+        private bool MoveActionVR()
+        {
+            if (VrGrabAction.IsGrabbed)
+            {
+                if (!grabbedObject.IsGrabbed)
+                {
+                    GameObject grabbedObj = VrGrabAction.GrabbedObject;
+
+                    if (grabbedObj.TryGetNode(out Node node) && !node.IsRoot())
+                    {
+                        grabbedObj.GetComponent<VrGrabAction>().Reparent = StartReparentProcess;
+                        grabbedObject.Grab(grabbedObj);
+                        // Remember the current distance from the pointing device to the grabbed object.
+                        //distanceToUser = Vector3.Distance(Raycasting.UserPointsTo().origin, grabbedObject.Position);
+                        //currentState = ReversibleAction.Progress.InProgress;
+                    }
+                }
+            }
+            else if (grabbedObject.IsGrabbed)
+            {
+                grabbedObject.UnGrab();
+                // Action is finished.
+                // currentState = ReversibleAction.Progress.Completed;
+                return true;
+            }
+
+            return false;
+        }
+
         /// <summary>
-        /// Returns true if the user is currently grabbing.
+        /// Is called from OnCollisionEnter() in <see cref="VrGrabAction"/>.
+        /// </summary>
+        /// <param name="target"></param>
+        public void StartReparentProcess(GameObject newBigParent, GameObject originalBigParent)
+        {
+            grabbedObject.Reparent(newBigParent, originalBigParent);
+        }
+
+        /// <summary>
+        /// Returns true if the user is currently grabbing in VR or Desktop mode.
         /// </summary>
         /// <returns>true if user is grabbing</returns>
         private static bool UserIsGrabbing()
         {
-            // Index of the left mouse button.
-            const int leftMouseButton = 0;
-            // FIXME: We need a VR interaction, too.
-            return Input.GetMouseButton(leftMouseButton);
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                // Index of the left mouse button.
+                const int leftMouseButton = 0;
+                // FIXME: We need a VR interaction, too.
+                return Input.GetMouseButton(leftMouseButton);
+            }
+            else if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            {
+                return VrGrabAction.IsGrabbed;
+            }
+            return false;
         }
 
         /// <summary>
@@ -592,7 +672,7 @@ namespace SEE.Controls.Actions
                     if (raycastHit.HasValue)
                     {
                         // The user is currently aiming at a node. The grabbed node is reparented onto this aimed node.
-                        grabbedObject.Reparent(raycastHit.Value.transform.gameObject);
+                        this.StartReparentProcess(raycastHit.Value.transform.gameObject, grabbedObject.Node.gameObject);
                     }
                     else
                     {

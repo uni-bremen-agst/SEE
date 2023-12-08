@@ -1,0 +1,759 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="Clones" edgeids="true">
+    <node id="N1">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>269</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>45</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>NodeCreator.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>NodeCreator.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>NodeCreator.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N2">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>5596</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>490</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.760543</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestActionHistory.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestActionHistory.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestActionHistory.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N3">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>507</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>79</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestActionStateType.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestActionStateType.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestActionStateType.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N4">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>208</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>26</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestCRDT.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestCRDT.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestCRDT.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N5">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>5282</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>738</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.138205</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestConfigIO.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestConfigIO.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestConfigIO.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N6">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>736</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>91</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestDashboard.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestDashboard.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestDashboard.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N7">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>6092</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>625</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.091924</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestGraph.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestGraph.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestGraph.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N8">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1216</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>166</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestGraphCloning.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestGraphCloning.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestGraphCloning.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N9">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>980</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>157</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestGraphIO.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestGraphIO.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestGraphIO.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N10">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>8359</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>736</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.472545</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestIncrementalReflexion.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestIncrementalReflexion.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestIncrementalReflexion.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N11">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1251</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>171</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestLCAFinder.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestLCAFinder.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestLCAFinder.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N12">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1884</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>283</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestLayoutIO.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestLayoutIO.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestLayoutIO.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N13">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>259</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>45</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestMedians.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestMedians.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestMedians.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N14">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>2324</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>341</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.469019</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestNonIncrementalReflexionAnalysis.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestNonIncrementalReflexionAnalysis.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestNonIncrementalReflexionAnalysis.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N15">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>432</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>71</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestRandomTrees.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestRandomTrees.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestRandomTrees.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N16">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1947</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>142</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.149974</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestRectanglePacker.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestRectanglePacker.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestRectanglePacker.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N17">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>1297</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>198</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestReflexionAnalysis.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestReflexionAnalysis.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestReflexionAnalysis.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N18">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>530</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>83</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestReflexionAnalysisStress.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestReflexionAnalysisStress.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestReflexionAnalysisStress.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N19">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>229</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>46</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestStringListSerializer.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>TestStringListSerializer.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestStringListSerializer.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string></string>
+      </attr>
+    </node>
+    <node id="N20">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>679</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>78</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestMenuEntry.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>UI/TestMenuEntry.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestMenuEntry.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>UI/</string>
+      </attr>
+    </node>
+    <node id="N21">
+      <type xlink:href="Directory"/>
+      <attr name="Source.Name">
+        <string>UI</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>UI</string>
+      </attr>
+    </node>
+    <node id="N22">
+      <type xlink:href="File"/>
+      <attr name="Metric.Number_of_Tokens">
+        <int>387</int>
+      </attr>
+      <attr name="Metric.LOC">
+        <int>48</int>
+      </attr>
+      <attr name="Metric.Clone_Rate">
+        <float>0.000000</float>
+      </attr>
+      <attr name="Source.Name">
+        <string>TestToggleMenuEntry.cs</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>UI/TestToggleMenuEntry.cs</string>
+      </attr>
+      <attr name="Source.File">
+        <string>TestToggleMenuEntry.cs</string>
+      </attr>
+      <attr name="Source.Path">
+        <string>UI/</string>
+      </attr>
+    </node>
+    <edge id="E1" from="N20" to="N21">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E2" from="N22" to="N21">
+      <type xlink:href="Enclosing"/>
+    </edge>
+    <edge id="E3" from="N2" to="N2">
+      <type xlink:href="Clone"/>
+      <attr name="Clone.Source.Start.Line">
+        <int>196</int>
+      </attr>
+      <attr name="Clone.Source.Start.Column">
+        <int>44</int>
+      </attr>
+      <attr name="Clone.Source.End.Line">
+        <int>201</int>
+      </attr>
+      <attr name="Clone.Source.End.Column">
+        <int>81</int>
+      </attr>
+      <attr name="Clone.Target.Start.Line">
+        <int>226</int>
+      </attr>
+      <attr name="Clone.Target.Start.Column">
+        <int>28</int>
+      </attr>
+      <attr name="Clone.Target.End.Line">
+        <int>230</int>
+      </attr>
+      <attr name="Clone.Target.End.Column">
+        <int>81</int>
+      </attr>
+      <attr name="Clone.Type">
+        <int>2</int>
+      </attr>
+      <attr name="Clone.Length">
+        <int>5</int>
+      </attr>
+      <attr name="Clone.Number_Of_Tokens">
+        <int>102</int>
+      </attr>
+      <attr name="Clone.Multiplicity">
+        <int>2146</int>
+      </attr>
+    </edge>
+    <edge id="E4" from="N5" to="N5">
+      <type xlink:href="Clone"/>
+      <attr name="Clone.Source.Start.Line">
+        <int>17</int>
+      </attr>
+      <attr name="Clone.Source.Start.Column">
+        <int>9</int>
+      </attr>
+      <attr name="Clone.Source.End.Line">
+        <int>40</int>
+      </attr>
+      <attr name="Clone.Source.End.Column">
+        <int>82</int>
+      </attr>
+      <attr name="Clone.Target.Start.Line">
+        <int>47</int>
+      </attr>
+      <attr name="Clone.Target.Start.Column">
+        <int>9</int>
+      </attr>
+      <attr name="Clone.Target.End.Line">
+        <int>70</int>
+      </attr>
+      <attr name="Clone.Target.End.Column">
+        <int>82</int>
+      </attr>
+      <attr name="Clone.Type">
+        <int>2</int>
+      </attr>
+      <attr name="Clone.Length">
+        <int>24</int>
+      </attr>
+      <attr name="Clone.Number_Of_Tokens">
+        <int>110</int>
+      </attr>
+      <attr name="Clone.Multiplicity">
+        <int>17</int>
+      </attr>
+    </edge>
+    <edge id="E5" from="N7" to="N7">
+      <type xlink:href="Clone"/>
+      <attr name="Clone.Source.Start.Line">
+        <int>356</int>
+      </attr>
+      <attr name="Clone.Source.Start.Column">
+        <int>26</int>
+      </attr>
+      <attr name="Clone.Source.End.Line">
+        <int>372</int>
+      </attr>
+      <attr name="Clone.Source.End.Column">
+        <int>41</int>
+      </attr>
+      <attr name="Clone.Target.Start.Line">
+        <int>378</int>
+      </attr>
+      <attr name="Clone.Target.Start.Column">
+        <int>27</int>
+      </attr>
+      <attr name="Clone.Target.End.Line">
+        <int>396</int>
+      </attr>
+      <attr name="Clone.Target.End.Column">
+        <int>42</int>
+      </attr>
+      <attr name="Clone.Type">
+        <int>2</int>
+      </attr>
+      <attr name="Clone.Length">
+        <int>17</int>
+      </attr>
+      <attr name="Clone.Number_Of_Tokens">
+        <int>109</int>
+      </attr>
+      <attr name="Clone.Multiplicity">
+        <int>5</int>
+      </attr>
+    </edge>
+    <edge id="E6" from="N10" to="N10">
+      <type xlink:href="Clone"/>
+      <attr name="Clone.Source.Start.Line">
+        <int>218</int>
+      </attr>
+      <attr name="Clone.Source.Start.Column">
+        <int>144</int>
+      </attr>
+      <attr name="Clone.Source.End.Line">
+        <int>248</int>
+      </attr>
+      <attr name="Clone.Source.End.Column">
+        <int>71</int>
+      </attr>
+      <attr name="Clone.Target.Start.Line">
+        <int>254</int>
+      </attr>
+      <attr name="Clone.Target.Start.Column">
+        <int>25</int>
+      </attr>
+      <attr name="Clone.Target.End.Line">
+        <int>285</int>
+      </attr>
+      <attr name="Clone.Target.End.Column">
+        <int>71</int>
+      </attr>
+      <attr name="Clone.Type">
+        <int>2</int>
+      </attr>
+      <attr name="Clone.Length">
+        <int>31</int>
+      </attr>
+      <attr name="Clone.Number_Of_Tokens">
+        <int>136</int>
+      </attr>
+      <attr name="Clone.Multiplicity">
+        <int>86</int>
+      </attr>
+    </edge>
+    <edge id="E7" from="N14" to="N14">
+      <type xlink:href="Clone"/>
+      <attr name="Clone.Source.Start.Line">
+        <int>273</int>
+      </attr>
+      <attr name="Clone.Source.Start.Column">
+        <int>13</int>
+      </attr>
+      <attr name="Clone.Source.End.Line">
+        <int>287</int>
+      </attr>
+      <attr name="Clone.Source.End.Column">
+        <int>9</int>
+      </attr>
+      <attr name="Clone.Target.Start.Line">
+        <int>446</int>
+      </attr>
+      <attr name="Clone.Target.Start.Column">
+        <int>13</int>
+      </attr>
+      <attr name="Clone.Target.End.Line">
+        <int>460</int>
+      </attr>
+      <attr name="Clone.Target.End.Column">
+        <int>9</int>
+      </attr>
+      <attr name="Clone.Type">
+        <int>2</int>
+      </attr>
+      <attr name="Clone.Length">
+        <int>15</int>
+      </attr>
+      <attr name="Clone.Number_Of_Tokens">
+        <int>119</int>
+      </attr>
+      <attr name="Clone.Multiplicity">
+        <int>13</int>
+      </attr>
+    </edge>
+    <edge id="E8" from="N16" to="N16">
+      <type xlink:href="Clone"/>
+      <attr name="Clone.Source.Start.Line">
+        <int>85</int>
+      </attr>
+      <attr name="Clone.Source.Start.Column">
+        <int>63</int>
+      </attr>
+      <attr name="Clone.Source.End.Line">
+        <int>95</int>
+      </attr>
+      <attr name="Clone.Source.End.Column">
+        <int>76</int>
+      </attr>
+      <attr name="Clone.Target.Start.Line">
+        <int>112</int>
+      </attr>
+      <attr name="Clone.Target.Start.Column">
+        <int>71</int>
+      </attr>
+      <attr name="Clone.Target.End.Line">
+        <int>122</int>
+      </attr>
+      <attr name="Clone.Target.End.Column">
+        <int>76</int>
+      </attr>
+      <attr name="Clone.Type">
+        <int>2</int>
+      </attr>
+      <attr name="Clone.Length">
+        <int>11</int>
+      </attr>
+      <attr name="Clone.Number_Of_Tokens">
+        <int>146</int>
+      </attr>
+      <attr name="Clone.Multiplicity">
+        <int>1</int>
+      </attr>
+    </edge>
+  </graph>
+</gxl>

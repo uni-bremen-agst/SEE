@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
+using Autohand;
 using CrazyMinnow.SALSA;
 using Dissonance;
 using Dissonance.Audio.Playback;
 using SEE.Controls;
+using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
 using Unity.Netcode;
@@ -297,6 +299,8 @@ namespace SEE.Game.Avatars
 
             GameObject rig = PrefabInstantiator.InstantiatePrefab(vrPlayerRigPrefab);
             rig.transform.position = gameObject.transform.position;
+            
+            gameObject.AddComponent<TestScript>();
             // FIXME: Only the server is allowed to spawn objects.
             //rig.AddComponent<NetworkObject>().Spawn();
             //rig.AddComponent<ClientNetworkTransform>();
@@ -312,6 +316,7 @@ namespace SEE.Game.Avatars
             VRIKActions.ReplaceAnimator(gameObject, animatorForVRIK);
 
             SetupVRIK();
+            SetupAutohandVRIK();
 
             PrepareLipTracker();
             InitializeVrikRemote();
@@ -326,7 +331,7 @@ namespace SEE.Game.Avatars
             /// </summary>
             void PrepareScene()
             {
-                const string groundName = "Ground";
+                const string groundName = "Floor";
 
                 GameObject ground = GameObject.Find(groundName);
                 if (ground == null)
@@ -379,6 +384,31 @@ namespace SEE.Game.Avatars
                 Assert.IsNotNull(vrIK.solver.leftArm.target);
                 vrIK.solver.rightArm.target = rig.transform.Find(vrPlayerRightHandForVRIK);
                 Assert.IsNotNull(vrIK.solver.rightArm.target);
+            }
+            
+            // Set up AutohandVRIK on the avatar.
+            void SetupAutohandVRIK()
+            {
+                AutoHandVRIK autoHandVRIK = gameObject.AddOrGetComponent<AutoHandVRIK>();
+
+                autoHandVRIK.rightTrackedController = rig.GetComponent<XRHandOffset>().rightOffsets[0];
+                Assert.IsNotNull(autoHandVRIK.rightTrackedController);
+                autoHandVRIK.leftTrackedController = rig.GetComponent<XRHandOffset>().leftOffsets[0];
+                Assert.IsNotNull(autoHandVRIK.leftTrackedController);
+
+                GameObject handPlayer = rig.transform.Find("HandPlayer").gameObject;
+                autoHandVRIK.rightHand = handPlayer.GetComponent<AutoHandPlayer>().handRight;
+                Assert.IsNotNull(autoHandVRIK.rightHand);
+                autoHandVRIK.leftHand = handPlayer.GetComponent<AutoHandPlayer>().handLeft;
+                Assert.IsNotNull(autoHandVRIK.rightHand);
+                
+                /*
+                autoHandVRIK.leftTrackedController = rig.transform.Find(XRCameraRigManager.LeftControllerName);
+                autoHandVRIK.leftHand.transform.parent = rig.transform.Find(vrPLayerLeftHandForVRIK);
+                
+                autoHandVRIK.rightTrackedController = rig.transform.Find(XRCameraRigManager.RightControllerName); //TODO: Find out usefulness
+                autoHandVRIK.rightHand.transform.parent = rig.transform.Find(vrPlayerRightHandForVRIK);
+                */
             }
 
             // Prepare HTC Facial Tracker

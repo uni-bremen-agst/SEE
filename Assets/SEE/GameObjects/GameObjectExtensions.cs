@@ -937,5 +937,20 @@ namespace SEE.GO
                 }
             }
         }
+
+        /// <summary>
+        /// Sets the layer of all children and children's children. Important: the gameobject/transform itself is also changed.
+        /// </summary>
+        /// <param name="transform">The target transform.</param>
+        /// <param name="layer">The layer to be set.</param>
+        /// <param name="includeInactive">Include or exclude inactive children.</param>
+        public static void SetAllChildLayer(Transform transform, int layer, bool includeInactive)
+        {
+            Transform[] children = transform.GetComponentsInChildren<Transform>(includeInactive: includeInactive);
+            foreach (Transform child in children)
+            {
+                child.gameObject.layer = layer;
+            }
+        }
     }
 }
