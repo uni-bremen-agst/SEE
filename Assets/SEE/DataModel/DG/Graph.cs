@@ -284,7 +284,8 @@ namespace SEE.DataModel.DG
         /// <see cref="RootToggle"/>. The given <paramref name="name"/> will be used for
         /// the source name and ID of the new root node.
         ///
-        /// If <paramref name="name"/> is null or empty, a unique ID will be used.
+        /// If <paramref name="name"/> is null or empty, the <see cref="Name"/> of the graph
+        /// concatenated with "#ROOT" will be used.
         /// If <paramref name="type"/> is null or empty, <see cref="Graph.UnknownType"/> will be used.
         /// </summary>
         /// <param name="root">the resulting (new or existing) root or null if there is no root</param>
@@ -296,15 +297,18 @@ namespace SEE.DataModel.DG
             List<Node> roots = GetRoots();
             if (roots.Count > 1)
             {
-                if (string.IsNullOrWhiteSpace(name))
+                string id = name;
+                string sourceName = name;
+                if (string.IsNullOrWhiteSpace(id))
                 {
-                    name = Guid.NewGuid().ToString();
+                    id = $"{Name}#ROOT";
+                    sourceName = $"{Name} (root)";
                 }
                 if (string.IsNullOrWhiteSpace(type))
                 {
-                    type = Graph.UnknownType;
+                    type = UnknownType;
                 }
-                root = new() { SourceName = name, ID = name, Type = type, ToggleAttributes = { RootToggle } };
+                root = new() { SourceName = sourceName, ID = id, Type = type, ToggleAttributes = { RootToggle } };
                 AddNode(root);
                 foreach (Node oldRoot in roots)
                 {
@@ -457,12 +461,34 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Removes the given element from the graph. If the element is a node,
+        /// it is removed using <see cref="RemoveNode(Node, bool)"/>; otherwise
+        /// it is removed using <see cref="RemoveEdge(Edge)"/>.
+        /// </summary>
+        /// <param name="element">element to be removed</param>
+        /// <exception cref="ArgumentException">if the element is neither a node nor an edge</exception>
+        public void RemoveElement(GraphElement element)
+        {
+            switch (element)
+            {
+                case Node node:
+                    RemoveNode(node);
+                    break;
+                case Edge edge:
+                    RemoveEdge(edge);
+                    break;
+                default:
+                    throw new ArgumentException($"Element {element} is neither a node nor an edge.");
+            }
+        }
+
+        /// <summary>
         /// Returns the names of all node types of this graph
         /// </summary>
         /// <returns>node types of this graph</returns>
         internal HashSet<string> AllNodeTypes()
         {
-            HashSet<string> result = new HashSet<string>();
+            HashSet<string> result = new();
             foreach (Node node in Nodes())
             {
                 result.Add(node.Type);

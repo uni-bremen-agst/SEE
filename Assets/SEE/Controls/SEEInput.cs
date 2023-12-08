@@ -6,7 +6,7 @@ namespace SEE.Controls
     /// <summary>
     /// Provides a logical abstraction of raw Unity inputs by the user.
     /// </summary>
-    internal static class SEEInput
+    public static class SEEInput
     {
         /// <summary>
         /// If true, all logical inputs that require keyboard interactions are enabled.
@@ -48,6 +48,24 @@ namespace SEE.Controls
         public static bool ToggleMenu()
         {
             return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleMenu);
+        }
+
+        /// <summary>
+        /// Turns on/off the settings menu.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleSettings()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleSettings);
+        }
+
+        /// <summary>
+        /// Turns on/off the browser.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        public static bool ToggleBrowser()
+        {
+            return KeyboardShortcutsEnabled && Input.GetKeyDown(KeyBindings.ToggleBrowser);
         }
 
         /// <summary>
@@ -276,16 +294,16 @@ namespace SEE.Controls
         #endregion
 
         //-----------------------------------------------------
-        #region Manipulating nodes
+        #region Context menu
         //-----------------------------------------------------
 
         /// <summary>
-        /// The user wants to scale a selected node.
+        /// True if the user wants to open the context menu.
         /// </summary>
-        /// <returns>true if the user requests this action</returns>
-        internal static bool Scale()
+        /// <returns>True if the user wants to open the context menu.</returns>
+        internal static bool OpenContextMenu()
         {
-            return Input.GetMouseButton(0);
+            return Input.GetMouseButtonUp(rightMouseButton) && !Raycasting.IsMouseOverGUI();
         }
 
         #endregion
@@ -614,7 +632,7 @@ namespace SEE.Controls
         /// <returns>true if the user selects a game object and <see cref="SelectionEnabled"/></returns>
         public static bool Select()
         {
-            return SelectionEnabled && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI();
+            return SelectionEnabled && Input.GetMouseButtonDown(leftMouseButton) && !Raycasting.IsMouseOverGUI();
         }
 
         #endregion

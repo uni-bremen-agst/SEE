@@ -790,7 +790,7 @@ namespace SEE.GO
         {
             if (gameObject.CompareTag(Tags.Edge) && gameObject.TryGetComponent(out EdgeRef edgeRef))
             {
-                return SceneQueries.RetrieveGameNode(edgeRef.SourceNodeID);
+                return GraphElementIDMap.Find(edgeRef.SourceNodeID, mustFindElement: true);
             }
             else
             {
@@ -811,7 +811,7 @@ namespace SEE.GO
         {
             if (gameObject.CompareTag(Tags.Edge) && gameObject.TryGetComponent(out EdgeRef edgeRef))
             {
-                return SceneQueries.RetrieveGameNode(edgeRef.SourceNodeID);
+                return GraphElementIDMap.Find(edgeRef.SourceNodeID, mustFindElement: true);
             }
             else
             {

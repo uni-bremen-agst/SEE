@@ -389,6 +389,11 @@ namespace SEE.Game.Operator
         protected override Tween[] BlinkAction(int count, float duration)
         {
             // If we're interrupting another blinking, we need to make sure the color still has the correct value.
+            if (material == null)
+            {
+                return new Tween[] { };
+            }
+
             material.color = Color.TargetValue;
 
             if (count != 0)
@@ -495,7 +500,12 @@ namespace SEE.Game.Operator
             labelStartLinePosition = null;
             labelEndLinePosition.KillAnimator();
             labelEndLinePosition = null;
-            Destroyer.Destroy(nodeLabel);
+            // NOTE: Calling Destroy(nodeLabel) will not lead to the nodeLabel being immediately destroyed.
+            //       Instead, it will be destroyed at the end of the frame. Thus, if PrepareLabel() is called
+            //       before the end of the frame, the nodeLabel will still be there and we will not create
+            //       a new one. This leads to the bug described in #660. To avoid this, we *disable* the nodeLabel
+            //       instead of destroying it, which happens immediately.
+            nodeLabel.SetActive(false);
             nodeLabel = null;
         }
 

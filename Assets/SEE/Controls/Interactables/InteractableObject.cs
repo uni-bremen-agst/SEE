@@ -83,7 +83,7 @@ namespace SEE.Controls
         private static readonly Dictionary<Graph, HashSet<InteractableObject>> graphToSelectedIOs = new();
 
         /// <summary>
-        /// The graph element, this interactable object is attached to.
+        /// The graph element this interactable object is attached to.
         /// </summary>
         public GraphElementRef GraphElemRef { get; private set; }
 

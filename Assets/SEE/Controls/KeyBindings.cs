@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -6,7 +7,7 @@ namespace SEE.Controls
     /// <summary>
     /// Defines the key codes for all interaction based on the keyboard in SEE.
     /// </summary>
-    internal static class KeyBindings
+    public static class KeyBindings
     {
         // IMPORTANT NOTES:
         // (1) Keep in mind that KeyCodes in Unity map directly to a
@@ -17,7 +18,7 @@ namespace SEE.Controls
         /// <summary>
         /// The registered keyboard shortcuts. The value is a help message on the shortcut.
         /// </summary>
-        private static readonly Dictionary<KeyCode, string> bindings = new Dictionary<KeyCode, string>();
+        private static readonly Dictionary<KeyCode, string> bindings = new();
 
         /// <summary>
         /// Categories for the keyboard shortcuts.
@@ -59,19 +60,52 @@ namespace SEE.Controls
             }
             return keyCode;
         }
-
+        /// <summary>
+        /// Returns the scope of given key-binding description <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">the key-binding description from which to extract the scope</param>
+        /// <returns>the scope</returns>
+        private static string GetScope(string value)
+        {
+            // Extract the scope part from the string value.
+            int startIndex = value.IndexOf("[") + 1;
+            int endIndex = value.IndexOf("]");
+            return value[startIndex..endIndex];
+        }
         /// <summary>
         /// Prints the current key bindings to the debugging console along with their
         /// help message.
         /// </summary>
         internal static void PrintBindings()
         {
-            System.Text.StringBuilder sb = new System.Text.StringBuilder("Key Bindings:\n");
+            System.Text.StringBuilder sb = new("Key Bindings:\n");
             foreach (var binding in bindings)
             {
                 sb.Append($"Key {binding.Key}: {binding.Value}\n");
             }
             Debug.Log(sb.ToString());
+        }
+
+        /// <summary>
+        /// Returns a string of the current key bindings along with their help message.
+        /// </summary>
+        internal static string GetBindingsText()
+        {
+            var groupedBindings = bindings.GroupBy(pair => GetScope(pair.Value));
+            System.Text.StringBuilder sb = new();
+            foreach (var group in groupedBindings)
+            {
+                // Display the scope
+                sb.Append("\n\n\n" + new string(' ', 10) + $"—{group.Key}—\n\n\n" + new string('-', 105) + "\n");
+
+                foreach (var binding in group)
+                {
+                    int index = binding.Value.IndexOf(']')+1;
+                    // Display individual binding details
+                    sb.Append($"Key {binding.Key}:\n\n {binding.Value.Substring(index)}\n" + new string('-', 105));
+                }
+            }
+            return sb.ToString();
         }
 
         //-----------------------------------------------------
@@ -100,6 +134,16 @@ namespace SEE.Controls
         /// Turns on/off the player-action menu.
         /// </summary>
         internal static readonly KeyCode ToggleMenu = Register(KeyCode.Space, Scope.Always, "Turns on/off the player-action menu.");
+
+        /// <summary>
+        /// Turns on/off the settings menu.
+        /// </summary>
+        internal static readonly KeyCode ToggleSettings = Register(KeyCode.Pause, Scope.Always, "Turns on/off the settings menu.");
+
+        /// <summary>
+        /// Turns on/off the browser.
+        /// </summary>
+        internal static readonly KeyCode ToggleBrowser = Register(KeyCode.F4, Scope.Always, "Turns on/off the browser.");
 
         /// <summary>
         /// Opens the search menu.
@@ -276,7 +320,7 @@ namespace SEE.Controls
         /// <summary>
         /// Toggles auto play of the animation.
         /// </summary>
-        internal static readonly KeyCode ToggleAutoPlay = Register(KeyCode.Pause, Scope.Animation, "Toggles auto play of the animation.");
+        internal static readonly KeyCode ToggleAutoPlay = Register(KeyCode.F9, Scope.Animation, "Toggles auto play of the animation.");
         /// <summary>
         /// Double animation speed.
         /// </summary>
