@@ -2,7 +2,7 @@ REM Must be executed in an Axivion command shell
 
 set PROJECT=CodeFacts
 set JAVAFILES=files.txt
-set JACOCO=C:\Program Files\jacoco\lib
+"set JACOCO=C:\Program Files\jacoco\lib"
 
 REM Determine the Java source files to be analyzed.
 dir /b/s *.java > %JAVAFILES%
