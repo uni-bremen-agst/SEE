@@ -1,14 +1,7 @@
-﻿using SEE.Controls.Actions;
-using SEE.Game;
-using SEE.GO;
-using SEE.Utils;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
-using TMPro;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.UI;
 
 namespace SEE.Game.Drawable.ActionHelpers
 {
@@ -55,11 +48,34 @@ namespace SEE.Game.Drawable.ActionHelpers
             Vector3[] positions = new Vector3[renderer.positionCount];
             renderer.GetPositions(positions);
             Vector3[] transformedPositions = new Vector3[positions.Length];
-            Array.Copy(sourceArray: positions, destinationArray: transformedPositions, length: positions.Length);
+            Array.Copy(sourceArray: positions, destinationArray: transformedPositions, 
+                length: positions.Length);
             node.transform.TransformPoints(transformedPositions);
 
-            List<int> Indices = NearestPoints.GetNearestIndices(transformedPositions, point);
+            List<int> Indices = GetNearestIndices(transformedPositions, point);
             return transformedPositions[Indices[0]];
+        }
+
+        /// <summary>
+        /// Calculates the nearest points of a line to a given point.
+        /// </summary>
+        /// <param name="line">The line for which points are being sought.</param>
+        /// <param name="point">The point on that the nearest points should be found.</param>
+        /// <param name="positionsList">The lines positions as list.</param>
+        /// <param name="matchedIndices">The founded indices as list.</param>
+        public static void GetNearestPoints(GameObject line, Vector3 point, 
+            out List<Vector3> positionsList, out List<int> matchedIndices)
+        {
+            LineRenderer lineRenderer = line.GetComponent<LineRenderer>();
+            Vector3[] positions = new Vector3[lineRenderer.positionCount];
+            lineRenderer.GetPositions(positions);
+            positionsList = positions.ToList();
+
+            Vector3[] transformedPositions = new Vector3[positions.Length];
+            Array.Copy(sourceArray: positions, destinationArray: transformedPositions, 
+                length: positions.Length);
+            line.transform.TransformPoints(transformedPositions);
+            matchedIndices = GetNearestIndices(transformedPositions, point);
         }
     }
 }

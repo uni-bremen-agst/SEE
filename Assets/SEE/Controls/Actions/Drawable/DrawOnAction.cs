@@ -58,6 +58,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The state
         /// </summary>
         private bool drawing = false;
+
         /// <summary>
         /// Represents that drawing has been finished.
         /// It will be needed to ensure, that completes this action.

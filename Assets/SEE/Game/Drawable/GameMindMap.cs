@@ -2,7 +2,6 @@
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
-using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,6 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using static Assets.SEE.Game.Drawable.GameDrawer;
-using static RTG.Object2ObjectSnap;
 
 namespace Assets.SEE.Game.Drawable
 {

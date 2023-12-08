@@ -1,14 +1,13 @@
 ﻿using Assets.SEE.Game.Drawable;
-using SEE.Net.Actions.Drawable;
 using SEE.Game;
+using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
+using SEE.Game.Drawable.Configurations;
 using SEE.GO;
+using SEE.Net.Actions.Drawable;
 using SEE.Utils;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using SEE.Game.Drawable.ActionHelpers;
-using SEE.Game.Drawable;
-using SEE.Game.Drawable.Configurations;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -59,7 +58,8 @@ namespace SEE.Controls.Actions.Drawable
             /// <param name="line">the selected line</param>
             /// <param name="drawable">The drawable on that the line is placed.</param>
             /// <param name="id">the id of the selected line</param>
-            /// <param name="Indices">The Indices of the founded nearest position. It can be more then one, because points can overlap.</param>
+            /// <param name="Indices">The Indices of the founded nearest position. 
+            /// It can be more then one, because points can overlap.</param>
             /// <param name="oldPointPosition">The old position of the selected points</param>
             /// <param name="newPointPosition">The new position for the selected points</param>
             public Memento(GameObject line, GameObject drawable, string id, List<int> Indices,
@@ -120,74 +120,90 @@ namespace SEE.Controls.Actions.Drawable
             {
                 switch (progressState)
                 {
-                    /// This block selects a line and searches for the nearest point based on the mouse position at the moment of the click. 
-                    /// The blinking effect is turned on to indicate which line has been selected.
+                    /// Selects a line and searches the nearest point(s).
                     case ProgressState.SelectLine:
-                        if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
-                            && Raycasting.RaycastAnything(out RaycastHit raycastHit) &&
-                            GameFinder.hasDrawable(raycastHit.collider.gameObject) &&
-                            raycastHit.collider.gameObject.CompareTag(Tags.Line))
-                        {
-                            selectedLine = raycastHit.collider.gameObject;
-                            drawable = GameFinder.GetDrawable(selectedLine);
-
-                            selectedLine.AddOrGetComponent<BlinkEffect>();
-
-                            LineRenderer lineRenderer = selectedLine.GetComponent<LineRenderer>();
-                            Vector3[] positions = new Vector3[lineRenderer.positionCount];
-                            lineRenderer.GetPositions(positions);
-
-                            Vector3[] transformedPositions = new Vector3[positions.Length];
-                            Array.Copy(sourceArray: positions, destinationArray: transformedPositions, length: positions.Length);
-                            selectedLine.transform.TransformPoints(transformedPositions);
-                            Indices = NearestPoints.GetNearestIndices(transformedPositions, raycastHit.point);
-
-                            oldPointPosition = positions[Indices[0]];
-                        }
-                        if (Input.GetMouseButtonUp(0) && selectedLine != null)
-                        {
-                            progressState = ProgressState.MovePoint;
-                        }
+                        SelectLine();
                         break;
 
                     /// With this block the user can move the point of the line to the desired point.
                     case ProgressState.MovePoint:
-                        string drawableParentName = GameFinder.GetDrawableParentName(drawable);
-                        if (selectedLine.GetComponent<BlinkEffect>() != null)
-                        {
-                            if (Raycasting.RaycastAnything(out RaycastHit hit))
-                            {
-                                if (hit.collider.gameObject.CompareTag(Tags.Drawable) || GameFinder.hasDrawable(hit.collider.gameObject))
-                                {
-                                    newPointPosition = selectedLine.transform.InverseTransformPoint(hit.point);
-                                    GameMoveRotator.MovePoint(selectedLine, Indices, newPointPosition);
-                                    new MovePointNetAction(drawable.name, drawableParentName, selectedLine.name, Indices, newPointPosition).Execute();
-                                }
-                            }
-
-                            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)))
-                            {
-                                selectedLine.GetComponent<BlinkEffect>().Deactivate();
-                            }
-                        }
-                        /// Left click when the desired point has reached. Then the action will be complete in the next steps
-                        if (Input.GetMouseButtonUp(0) && selectedLine.GetComponent<BlinkEffect>() == null)
-                        {
-                            progressState = ProgressState.Finish;
-                            GameMoveRotator.MovePoint(selectedLine, Indices, newPointPosition);
-                            new MovePointNetAction(drawable.name, drawableParentName, selectedLine.name, Indices, newPointPosition).Execute();
-
-                        }
+                        MovePoint();
                         break;
+
+                    /// Ends the action, creates a memento, and finalizes the progress.
                     case ProgressState.Finish:
-                        memento = new Memento(selectedLine, GameFinder.GetDrawable(selectedLine), selectedLine.name,
-                                Indices, oldPointPosition, newPointPosition);
+                        memento = new Memento(selectedLine, GameFinder.GetDrawable(selectedLine), 
+                            selectedLine.name, Indices, oldPointPosition, newPointPosition);
                         currentState = ReversibleAction.Progress.Completed;
                         return true;
                 }
                 return false;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Allows the user to select a line, and based on the mouse position 
+        /// at the moment of the click, it searches for the nearest point on the line. 
+        /// Additionally, the blink effect is activated to illustrate which line has been chosen.
+        /// </summary>
+        private void SelectLine()
+        {
+            if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
+                && Raycasting.RaycastAnything(out RaycastHit raycastHit) 
+                && GameFinder.hasDrawable(raycastHit.collider.gameObject) 
+                && raycastHit.collider.gameObject.CompareTag(Tags.Line))
+            {
+                selectedLine = raycastHit.collider.gameObject;
+                drawable = GameFinder.GetDrawable(selectedLine);
+
+                selectedLine.AddOrGetComponent<BlinkEffect>();
+                NearestPoints.GetNearestPoints(selectedLine, raycastHit.point,
+                    out List<Vector3> positionsList, out List<int> matchedIndices);
+                Indices = matchedIndices;
+                oldPointPosition = positionsList[Indices[0]];
+            }
+            if (Input.GetMouseButtonUp(0) && selectedLine != null)
+            {
+                progressState = ProgressState.MovePoint;
+            }
+        }
+
+        /// <summary>
+        /// Moves the selected points to the mouse cursor position.
+        /// </summary>
+        public void MovePoint()
+        {
+            string drawableParentName = GameFinder.GetDrawableParentName(drawable);
+            if (selectedLine.GetComponent<BlinkEffect>() != null)
+            {
+                if (Raycasting.RaycastAnything(out RaycastHit hit))
+                {
+                    if (hit.collider.gameObject.CompareTag(Tags.Drawable) 
+                        || GameFinder.hasDrawable(hit.collider.gameObject))
+                    {
+                        newPointPosition = selectedLine.transform.InverseTransformPoint(hit.point);
+                        GameMoveRotator.MovePoint(selectedLine, Indices, newPointPosition);
+                        new MovePointNetAction(drawable.name, drawableParentName, selectedLine.name, 
+                            Indices, newPointPosition).Execute();
+                    }
+                }
+
+                if ((Input.GetMouseButtonDown(0) || Input.GetMouseButton(0)))
+                {
+                    selectedLine.GetComponent<BlinkEffect>().Deactivate();
+                }
+            }
+            /// Left click when the desired point has reached. 
+            /// Then the action will be complete in the next steps
+            if (Input.GetMouseButtonUp(0) && selectedLine.GetComponent<BlinkEffect>() == null)
+            {
+                progressState = ProgressState.Finish;
+                GameMoveRotator.MovePoint(selectedLine, Indices, newPointPosition);
+                new MovePointNetAction(drawable.name, drawableParentName, selectedLine.name, Indices, 
+                    newPointPosition).Execute();
+
+            }
         }
 
         /// <summary>
@@ -215,7 +231,8 @@ namespace SEE.Controls.Actions.Drawable
             if (memento.line != null)
             {
                 GameMoveRotator.MovePoint(memento.line, memento.Indices, memento.oldPointPosition);
-                new MovePointNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.line.name, memento.Indices, memento.oldPointPosition).Execute();
+                new MovePointNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.line.name, 
+                    memento.Indices, memento.oldPointPosition).Execute();
             }
         }
 
@@ -232,7 +249,8 @@ namespace SEE.Controls.Actions.Drawable
             if (memento.line != null)
             {
                 GameMoveRotator.MovePoint(memento.line, memento.Indices, memento.newPointPosition);
-                new MovePointNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.line.name, memento.Indices, memento.newPointPosition).Execute();
+                new MovePointNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.line.name, 
+                    memento.Indices, memento.newPointPosition).Execute();
             }
         }
 

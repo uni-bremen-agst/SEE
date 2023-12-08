@@ -80,6 +80,7 @@ namespace Assets.SEE.Game.Drawable
                 CreateImageFile(image, fileData, Path.GetFileName(imageFilePath), out string filePath);
 
                 Texture2D texture = new Texture2D(2, 2);
+                texture.anisoLevel = 5;
                 texture.LoadImage(fileData);
                 i.sprite = TextureToSprite(texture);
             }
@@ -87,10 +88,10 @@ namespace Assets.SEE.Game.Drawable
             {
                 image.AddComponent<ImageValueHolder>().SetFileData(data);
                 Texture2D texture = new Texture2D(2, 2);
+                texture.anisoLevel = 5;
                 texture.LoadImage(data);
                 i.sprite = TextureToSprite(texture);
             }
-
             BoxCollider collider = image.AddComponent<BoxCollider>();
             collider.size = new Vector3(1, 1, 0.01f);
 

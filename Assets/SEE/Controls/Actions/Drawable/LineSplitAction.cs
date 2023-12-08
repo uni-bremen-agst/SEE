@@ -1,21 +1,18 @@
 using Assets.SEE.Game.Drawable;
-using SEE.Net.Actions.Drawable;
 using SEE.Game;
-using SEE.Net.Actions;
-using SEE.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable;
 using SEE.Game.UI.Notification;
+using SEE.Net.Actions.Drawable;
+using SEE.Utils;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Controls.Actions.Drawable
 {
     /// <summary>
-    /// This action allows to split a line.
+    /// This action allows the user to split a line.
     /// </summary>
     class LineSplitAction : AbstractPlayerAction
     {
@@ -29,7 +26,8 @@ namespace SEE.Controls.Actions.Drawable
         private Memento memento;
 
         /// <summary>
-        /// This struct can store all the information needed to revert or repeat a <see cref="LineSplitAction"/>.
+        /// This struct can store all the information needed to 
+        /// revert or repeat a <see cref="LineSplitAction"/>.
         /// </summary>
         private struct Memento
         {
@@ -83,25 +81,21 @@ namespace SEE.Controls.Actions.Drawable
 
                     if (hittedObject.CompareTag(Tags.Line))
                     {
-                        LineRenderer lineRenderer = hittedObject.GetComponent<LineRenderer>();
-                        Vector3[] positions = new Vector3[lineRenderer.positionCount];
-                        lineRenderer.GetPositions(positions);
-                        List<Vector3> positionsList = positions.ToList();
                         LineConf originLine = LineConf.GetLine(hittedObject);
-
-                        Vector3[] transformedPositions = new Vector3[positions.Length];
-                        Array.Copy(sourceArray: positions, destinationArray: transformedPositions, length: positions.Length);
-                        hittedObject.transform.TransformPoints(transformedPositions);
                         List<LineConf> lines = new();
-                        List<int> matchedIndices = NearestPoints.GetNearestIndices(transformedPositions, raycastHit.point);
-                        GameLineSplit.Split(GameFinder.GetDrawable(hittedObject), originLine, matchedIndices, positionsList, lines, false);
+                        NearestPoints.GetNearestPoints(hittedObject, raycastHit.point, 
+                            out List<Vector3> positionsList, out List<int> matchedIndices);
+                        GameLineSplit.Split(GameFinder.GetDrawable(hittedObject), originLine, 
+                            matchedIndices, positionsList, lines, false);
                         if (lines.Count > 1)
                         {
-                            ShowNotification.Info("Line splitted", "The original line was successfully splitted in " + lines.Count + " lines");
+                            ShowNotification.Info("Line splitted", 
+                                "The original line was successfully splitted in " + lines.Count + " lines");
                         }
 
                         memento = new Memento(hittedObject, GameFinder.GetDrawable(hittedObject), lines);
-                        new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.originalLine.id).Execute();
+                        new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                            memento.originalLine.id).Execute();
                         Destroyer.Destroy(hittedObject);
                     }
                 }

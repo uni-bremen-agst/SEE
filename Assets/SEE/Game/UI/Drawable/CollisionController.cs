@@ -1,5 +1,4 @@
 ﻿using SEE.Game.Drawable;
-using System.Collections;
 using UnityEngine;
 
 namespace Assets.SEE.Game.UI.Drawable
@@ -21,7 +20,8 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <param name="other">The object that causes the collision.</param>
         private void OnTriggerEnter(Collider other)
         {
-            if (GameFinder.GetHighestParent(gameObject).Equals(GameFinder.GetHighestParent(other.gameObject)))
+            if (GameFinder.GetHighestParent(gameObject).
+                Equals(GameFinder.GetHighestParent(other.gameObject)))
             {
                 isInCollision = true;
             }
@@ -34,7 +34,8 @@ namespace Assets.SEE.Game.UI.Drawable
         /// <param name="other">The object that causes the collision.</param>
         private void OnTriggerExit(Collider other)
         {
-            if(GameFinder.GetHighestParent(gameObject).Equals(GameFinder.GetHighestParent(other.gameObject)))
+            if(GameFinder.GetHighestParent(gameObject).
+                Equals(GameFinder.GetHighestParent(other.gameObject)))
             {
                 isInCollision = false;
             }

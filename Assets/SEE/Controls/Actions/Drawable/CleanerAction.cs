@@ -1,25 +1,29 @@
 ﻿using Assets.SEE.Game.Drawable;
 using SEE.Game;
+using SEE.Game.Drawable;
+using SEE.Game.Drawable.Configurations;
+using SEE.Game.UI.Notification;
 using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using SEE.Game.Drawable.Configurations;
-using System.Linq;
-using SEE.Game.Drawable;
-using SEE.Game.UI.Notification;
 
 namespace SEE.Controls.Actions.Drawable
 {
+    /// <summary>
+    /// This class provides an action to clean a whole drawable.
+    /// </summary>
     public class CleanerAction : AbstractPlayerAction
     {
         /// <summary>
-        /// Saves all the information needed to revert or repeat this action on one drawable type.
+        /// Saves all the information needed to revert or repeat 
+        /// this action on one drawable type.
         /// </summary>
         private Memento memento;
 
         /// <summary>
-        /// This class can store all the information needed to revert or repeat a <see cref="CleanerAction"/>.
+        /// This class can store all the information needed to 
+        /// revert or repeat a <see cref="CleanerAction"/>.
         /// </summary>
         private struct Memento
         {
@@ -39,7 +43,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// This method manages the player's interaction with the mode <see cref="ActionStateType.Cleaner"/>.
+        /// This method manages the player's interaction with the action <see cref="ActionStateType.Cleaner"/>.
         /// It cleans a complete drawable. In other words: it's deletes all drawable types that are on a selected drawable.
         /// </summary>
         /// <returns>Whether this Action is finished</returns>
@@ -74,7 +78,8 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (GameFinder.GetAttachedObjectsObject(drawable) != null)
             {
-                List<DrawableType> allDrawableTypes = DrawableConfigManager.GetDrawableConfig(drawable).GetAllDrawableTypes();
+                List<DrawableType> allDrawableTypes = DrawableConfigManager.GetDrawableConfig(drawable).
+                    GetAllDrawableTypes();
                 if (allDrawableTypes.Count == 0)
                 {
                     return false;
@@ -83,7 +88,8 @@ namespace SEE.Controls.Actions.Drawable
                 foreach (DrawableType type in allDrawableTypes)
                 {
                     GameObject child = GameFinder.FindChild(drawable, type.id);
-                    new EraseNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), child.name).Execute();
+                    new EraseNetAction(drawable.name, GameFinder.GetDrawableParentName(drawable), 
+                        child.name).Execute();
                     Destroyer.Destroy(child);
                 }
 

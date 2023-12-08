@@ -1,17 +1,18 @@
 using Assets.SEE.Game.Drawable;
-using SEE.Net.Actions.Drawable;
 using SEE.Game;
-using SEE.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
-using SEE.Game.Drawable;
+using SEE.Net.Actions.Drawable;
+using SEE.Utils;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Controls.Actions.Drawable
 {
+    /// <summary>
+    /// This class provides an action to erase only some points of an line.
+    /// </summary>
     class LinePointEraseAction : AbstractPlayerAction
     {
         /// <summary>
@@ -30,7 +31,8 @@ namespace SEE.Controls.Actions.Drawable
         private Memento memento;
 
         /// <summary>
-        /// This class can store all the information needed to revert or repeat a <see cref="LinePointEraseAction"/>.
+        /// This class can store all the information needed to 
+        /// revert or repeat a <see cref="LinePointEraseAction"/>.
         /// </summary>
         private class Memento
         {
@@ -63,7 +65,8 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.LinePointErase"/>.
-        /// Specifically: Allows the user to remove one or more points of a line. In one action run it can be remove more points of different lines.
+        /// Specifically: Allows the user to remove one or more points of a line. 
+        ///               In one action run it can be remove more points of different lines.
         /// </summary>
         /// <returns>Whether this Action is finished</returns>
         public override bool Update()
@@ -84,22 +87,18 @@ namespace SEE.Controls.Actions.Drawable
 
                     if (hittedObject.CompareTag(Tags.Line))
                     {
-                        LineRenderer lineRenderer = hittedObject.GetComponent<LineRenderer>();
-                        Vector3[] positions = new Vector3[lineRenderer.positionCount];
-                        lineRenderer.GetPositions(positions);
-                        List<Vector3> positionsList = positions.ToList();
                         LineConf originLine = LineConf.GetLine(hittedObject);
-
-                        Vector3[] transformedPositions = new Vector3[positions.Length];
-                        Array.Copy(sourceArray: positions, destinationArray: transformedPositions, length: positions.Length);
-                        hittedObject.transform.TransformPoints(transformedPositions);
                         List<LineConf> lines = new();
-                        List<int> matchedIndices = NearestPoints.GetNearestIndices(transformedPositions, raycastHit.point);
-                        GameLineSplit.Split(GameFinder.GetDrawable(hittedObject), originLine, matchedIndices, positionsList, lines, true);
+                        NearestPoints.GetNearestPoints(hittedObject, raycastHit.point, 
+                            out List<Vector3> positionsList, out List<int> matchedIndices);
+
+                        GameLineSplit.Split(GameFinder.GetDrawable(hittedObject), originLine, 
+                            matchedIndices, positionsList, lines, true);
 
                         memento = new Memento(hittedObject, GameFinder.GetDrawable(hittedObject), lines);
                         mementoList.Add(memento);
-                        new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, memento.originalLine.id).Execute();
+                        new EraseNetAction(memento.drawable.ID, memento.drawable.ParentID, 
+                            memento.originalLine.id).Execute();
                         Destroyer.Destroy(hittedObject);
                     }
                 }
@@ -109,7 +108,6 @@ namespace SEE.Controls.Actions.Drawable
                     currentState = ReversibleAction.Progress.Completed;
                     return true;
                 }
-
                 return false;
             }
             return false;

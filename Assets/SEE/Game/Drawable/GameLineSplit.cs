@@ -51,7 +51,7 @@ namespace Assets.SEE.Game.Drawable
                 {
                     TryReDraw(drawable, originLine, list.ToArray(), lines);
                 }
-                if (lines.Count == 1)
+                if (lines.Count == 1 && !removeMatchedIndex)
                 {
                     ShowNotification.Warn("Can't split", "The line can't split on start/end point.\nThe line was redrawn nonetheless.");
                 }
