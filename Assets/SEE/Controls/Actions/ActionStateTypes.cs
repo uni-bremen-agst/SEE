@@ -1,7 +1,6 @@
 ﻿using SEE.Utils;
 using UnityEngine;
 using SEE.Controls.Actions.HolisticMetrics;
-using Assets.SEE.Controls.Actions;
 
 namespace SEE.Controls.Actions
 {
