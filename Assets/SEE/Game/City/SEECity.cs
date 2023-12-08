@@ -41,6 +41,12 @@ namespace SEE.Game.City
         public FilePath CSVPath = new();
 
         /// <summary>
+        /// The path to the XLM file containing the additional metric values within (JaCoCo)Test-Report.
+        /// </summary>
+        [SerializeField, ShowInInspector, Tooltip("Path of metric XLM file"), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        public FilePath XMLPath = new();
+
+        /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are
         /// managed here.
         /// We do not want to serialize it using Unity or Odin because both frameworks are
@@ -518,11 +524,17 @@ namespace SEE.Game.City
         /// </summary>
         private const string csvPathLabel = "CSVPath";
 
+        /// <summary>
+        /// Label of attribute <see cref="XMLPath"/> in the configuration file.
+        /// </summary>
+        private const string xmlPathLabel = "XMLPath";
+
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
             GXLPath.Save(writer, gxlPathLabel);
             CSVPath.Save(writer, csvPathLabel);
+            XMLPath.Save(writer, xmlPathLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
@@ -530,6 +542,7 @@ namespace SEE.Game.City
             base.Restore(attributes);
             GXLPath.Restore(attributes, gxlPathLabel);
             CSVPath.Restore(attributes, csvPathLabel);
+            XMLPath.Restore(attributes, xmlPathLabel);
         }
     }
 }

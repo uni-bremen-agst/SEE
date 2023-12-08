@@ -107,11 +107,6 @@ namespace SEE.Controls.Actions
                   Color.black, "Materials/ModernUIPack/Document",
                   ShowCodeAction.CreateReversibleAction);
 
-            ShowCoverage =
-              new("Show Coverage", "Display the code-coverage of a node.",
-                  Color.black, "Materials/ModernUIPack/Document", // TODO Find a suitable Icon
-                  ShowCoverageAction.CreateReversibleAction);
-
             Draw =
               new("Draw", "Draw a line",
                   Color.magenta.Darker(), "Materials/ModernUIPack/Pencil",
@@ -186,7 +181,6 @@ namespace SEE.Controls.Actions
         public readonly static ActionStateType ScaleNode;
         public readonly static ActionStateType Delete;
         public readonly static ActionStateType ShowCode;
-        public readonly static ActionStateType ShowCoverage;
         public readonly static ActionStateType Draw;
         public readonly static ActionStateType AcceptDivergence;
 

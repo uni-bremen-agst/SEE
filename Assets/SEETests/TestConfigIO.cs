@@ -488,6 +488,7 @@ namespace SEE.Utils
             AbstractSEECityAttributesAreEqual(expected, actual);
             AreEqual(expected.GXLPath, actual.GXLPath);
             AreEqual(expected.CSVPath, actual.CSVPath);
+            AreEqual(expected.XMLPath, actual.XMLPath);
         }
 
         /// <summary>
@@ -697,6 +698,7 @@ namespace SEE.Utils
             WipeOutAbstractSEECityAttributes(city);
             city.GXLPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.gxl");
             city.CSVPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.csv");
+            city.XMLPath.Set("C:/MyAbsoluteDirectory/MyAbsoluteFile.xml");
         }
 
         /// <summary>
