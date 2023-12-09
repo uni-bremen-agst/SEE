@@ -495,6 +495,12 @@ namespace SEE.DataModel.DG
         internal HashSet<string> AllEdgeTypes() => Edges().Select(e => e.Type).ToHashSet();
 
         /// <summary>
+        /// Returns the names of all element types of this graph
+        /// </summary>
+        /// <returns>element types of this graph</returns>
+        internal HashSet<string> AllElementTypes() => Elements().Select(e => e.Type).ToHashSet();
+
+        /// <summary>
         /// The number of nodes of the graph.
         /// </summary>
         public int NodeCount => nodes.Count;

@@ -265,7 +265,6 @@ namespace SEE.UI.Window.TreeWindow
             {
                 string text = node.ToShortString();
                 string id = ElementId(node, inGroup);
-                Color[] gradient = null;
                 if (inGroup != null)
                 {
                     // Not actually the number of direct children, but this doesn't matter, as we only
@@ -277,10 +276,13 @@ namespace SEE.UI.Window.TreeWindow
                         // TODO: In this case, are italics fine, or should we color the item gray?
                         text = $"<i>{text}</i>";
                     }
-                    text = $"{text} [{children}]";
+                    if (children > 0)
+                    {
+                        text = $"{text} [{children}]";
+                    }
                 }
                 AddItem(id, children > 0, text, Icons.Node, nodeGameObject, node,
-                        gradient, collapseItem: item => CollapseNode(node, item, inGroup),
+                        collapseItem: item => CollapseNode(node, item, inGroup),
                         expandItem: (item, order) => ExpandNode(node, item, orderTree: order, inGroup));
             }
             else

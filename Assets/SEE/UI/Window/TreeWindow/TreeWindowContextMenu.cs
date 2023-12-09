@@ -349,7 +349,9 @@ namespace SEE.UI.Window.TreeWindow
                                                                         .ToDictionary(keySelector: x => x,
                                                                                       elementSelector: ReflexionStateToGroup),
                                                                     element => element is Edge edge ? edge.State() : null)),
-                // TODO: Other groups? Maybe grouping by type would be a good idea?
+                GroupActionFor("Type",
+                               new TreeWindowGroupAssigment<string>(Searcher.Graph.AllElementTypes().ToDictionary(x => x, TypeToGroup), element => element.Type)),
+                // TODO: Any other useful groups?
             };
             ContextMenu.ClearEntries();
             ContextMenu.AddEntries(entries);
@@ -386,6 +388,11 @@ namespace SEE.UI.Window.TreeWindow
                 };
                 (Color start, Color end) = ReflexionVisualization.GetEdgeGradient(state ?? State.Undefined);
                 return new TreeWindowGroup(text, icon, start, end);
+            }
+
+            TreeWindowGroup TypeToGroup(string type)
+            {
+                return new TreeWindowGroup(type, Icons.Info, Color.white, Color.white.Darker());
             }
         }
 
