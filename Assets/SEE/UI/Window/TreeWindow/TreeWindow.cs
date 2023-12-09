@@ -54,6 +54,11 @@ namespace SEE.UI.Window.TreeWindow
         private TreeWindowContextMenu ContextMenu;
 
         /// <summary>
+        /// The grouper that is used to group the elements in the tree window.
+        /// </summary>
+        private TreeWindowGrouper Grouper;
+
+        /// <summary>
         /// The subscription to the graph observable.
         /// </summary>
         private IDisposable subscription;
@@ -61,6 +66,7 @@ namespace SEE.UI.Window.TreeWindow
         protected override void Start()
         {
             Searcher = new GraphSearch(Graph);
+            Grouper = new TreeWindowGrouper(Searcher.Filter, Graph);
             subscription = Graph.Subscribe(this);
             base.Start();
         }
@@ -71,28 +77,53 @@ namespace SEE.UI.Window.TreeWindow
         }
 
         /// <summary>
+        /// Returns the roots for the tree view.
+        /// </summary>
+        /// <param name="inGroup">The group to which the roots should belong.</param>
+        /// <returns>The roots for the tree view.</returns>
+        /// <remarks>
+        /// The roots for the tree view may differ from the roots of the graph, such as when the graph is grouped.
+        /// </remarks>
+        private IList<Node> GetRoots(TreeWindowGroup inGroup = null)
+        {
+            return WithHiddenChildren(Graph.GetRoots(), inGroup).ToList();
+        }
+
+        /// <summary>
         /// Adds the roots of the graph to the tree view.
         /// It may take up to a frame to add and reorder all items, hence this method is asynchronous.
         /// </summary>
         private async UniTask AddRoots()
         {
-            // We will traverse the graph and add each node to the tree view.
-            IList<Node> roots = WithHiddenChildren(Graph.GetRoots()).ToList();
-
-            if (roots.Count == 0)
+            if (Grouper.IsActive)
             {
-                ShowNotification.Warn("Empty graph", "Graph has no roots. TreeView will be empty.");
-                return;
+                // Instead of the roots, we should add the categories as the first level.
+                foreach (TreeWindowGroup group in Grouper.AllGroups)
+                {
+                    if (Grouper.MembersInGroup(group) > 0)
+                    {
+                        AddGroup(group);
+                    }
+                }
             }
+            else
+            {
+                IList<Node> roots = GetRoots();
+                if (roots.Count == 0)
+                {
+                    ShowNotification.Warn("Empty graph", "Graph has no roots. TreeView will be empty.");
+                    return;
+                }
 
-            foreach (Node root in roots)
-            {
-                AddNode(root);
-            }
-            await UniTask.Yield();
-            foreach (Node root in roots)
-            {
-                OrderTree(root);
+                foreach (Node root in roots)
+                {
+                    AddNode(root);
+                }
+                await UniTask.Yield();
+                foreach (Node root in roots)
+                {
+                    OrderTree(root);
+                }
             }
         }
 
@@ -152,8 +183,7 @@ namespace SEE.UI.Window.TreeWindow
                 case GraphElementTypeEvent:
                 case HierarchyEvent:
                 case NodeEvent:
-                    ClearTree();
-                    AddRoots().Forget();
+                    Rebuild();
                     break;
             }
         }

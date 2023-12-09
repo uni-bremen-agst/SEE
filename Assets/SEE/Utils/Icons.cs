@@ -19,7 +19,6 @@ namespace SEE.Utils
         public const char EmptyCheckbox = '\uF0C8';
         public const char CheckedCheckbox = '\uF14A';
         public const char MinusCheckbox = '\uF146';
-        public const char DoubleCheckmark = '\uF560';
         public const char Checkmark = '\uF00C';
         public const char Trash = '\uF1F8';
         public const char Info = '\uF05A';
@@ -35,5 +34,11 @@ namespace SEE.Utils
         public const char SortAlphabeticalDown = '\uF15D';
         public const char SortNumericUp = '\uF163';
         public const char SortNumericDown = '\uF162';
+        public const char EmptyRadio = '\uF111';
+        public const char CheckedRadio = '\uF192';
+        public const char CircleMinus = '\uF056';
+        public const char CircleCheckmark = '\uF058';
+        public const char CircleQuestionMark = '\uF059';
+        public const char CircleExclamationMark = '\uF06A';
     }
 }

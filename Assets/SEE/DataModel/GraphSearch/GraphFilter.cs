@@ -7,7 +7,7 @@ namespace SEE.DataModel.GraphSearch
     /// <summary>
     /// A configurable filter for graph elements, mainly intended for use with <see cref="GraphSearch"/>.
     /// </summary>
-    public class GraphFilter : IGraphModifier
+    public record GraphFilter : IGraphModifier
     {
         // if empty, include all. otherwise, *at least one* must be present.
         /// <summary>

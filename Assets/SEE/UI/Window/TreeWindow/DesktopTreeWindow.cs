@@ -16,6 +16,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using ArgumentException = System.ArgumentException;
+using Edge = SEE.DataModel.DG.Edge;
 using Node = SEE.DataModel.DG.Node;
 
 namespace SEE.UI.Window.TreeWindow
@@ -75,25 +77,55 @@ namespace SEE.UI.Window.TreeWindow
         private ButtonManagerBasic SortButton;
 
         /// <summary>
-        /// Orders the tree below the given <paramref name="orderBelow"/> node according to the graph hierarchy.
-        /// This needs to be called whenever the tree is expanded.
+        /// Orders the tree below the given <paramref name="orderBelow"/> group according to the graph hierarchy.
         /// </summary>
-        /// <param name="orderBelow">The node below which the tree should be ordered.</param>
-        private void OrderTree(Node orderBelow)
+        /// <param name="orderBelow">The group below which the tree should be ordered.</param>
+        private void OrderTree(TreeWindowGroup orderBelow)
         {
-            Transform nodeItem = items.Find(CleanupID(orderBelow.ID));
-            if (nodeItem == null)
+            Transform groupItem = items.Find(CleanupID(orderBelow.Text));
+            if (groupItem == null)
             {
                 return;
             }
 
+            int groupIndex = groupItem.GetSiblingIndex() + 1;
+            foreach (Node node in GetRoots(orderBelow))
+            {
+                // The groups are always at the top level of the tree window.
+                // Thus, we put the root nodes (indented by one level) directly below the group.
+                items.Find(ElementId(node, orderBelow)).SetSiblingIndex(groupIndex);
+                // The next root should be added below the last one, which is why we use the current index.
+                groupIndex = OrderTree(node, 1, orderBelow) ?? groupIndex;
+            }
+        }
+
+        /// <summary>
+        /// Orders the tree below the given <paramref name="orderBelow"/> node according to the graph hierarchy.
+        /// This needs to be called whenever the tree is expanded.
+        /// </summary>
+        /// <param name="orderBelow">The node below which the tree should be ordered.</param>
+        /// <param name="nodeLevel">The level of the given <paramref name="orderBelow"/> node.</param>
+        /// <param name="inGroup">The group in which <paramref name="orderBelow"/> is contained, if any.</param>
+        /// <returns>The index in the hierarchy of the last node handled by this method.
+        /// If no nodes were ordered, null is returned.</returns>
+        private int? OrderTree(Node orderBelow, int? nodeLevel = null, TreeWindowGroup inGroup = null)
+        {
+            Transform nodeItem = items.Find(ElementId(orderBelow, inGroup));
+            if (nodeItem == null)
+            {
+                return null;
+            }
+
             // We determine the node level based on the indent of the foreground.
-            int nodeLevel = Mathf.RoundToInt(((RectTransform)nodeItem.Find("Foreground")).offsetMin.x) / indentShift;
+            if (!nodeLevel.HasValue)
+            {
+                nodeLevel = Mathf.RoundToInt(((RectTransform)nodeItem.Find("Foreground")).offsetMin.x) / indentShift;
+            }
             int index = nodeItem.GetSiblingIndex();
 
-            OrderTreeRecursive(orderBelow, nodeLevel);
+            OrderTreeRecursive(orderBelow, nodeLevel.Value);
 
-            return;
+            return index;
 
             // Orders the item with the given id to the current index and increments the index.
             void OrderItemHere(string id, int level)
@@ -112,17 +144,22 @@ namespace SEE.UI.Window.TreeWindow
             // Recurses over the tree in pre-order and assigns indices to each node.
             void OrderTreeRecursive(Node node, int level)
             {
-                string id = CleanupID(node.ID);
+                string id = ElementId(node, inGroup);
                 OrderItemHere(id, level);
                 if (expandedItems.Contains(id))
                 {
-                    IList<Node> children = Searcher.Sorter.Apply(WithHiddenChildren(node.Children())).ToList();
+                    IEnumerable<Node> children = Searcher.Sorter.Apply(WithHiddenChildren(node.Children(), inGroup));
+                    // When grouping is active, we sort by the count of group elements in this node.
+                    if (Grouper.IsActive)
+                    {
+                        children = children.OrderByDescending(x => Grouper.DescendantsInGroup(x, inGroup));
+                    }
                     foreach (Node child in children)
                     {
                         OrderTreeRecursive(child, level + 1);
                     }
 
-                    foreach ((List<Edge> edges, string edgesType) in RelevantEdges(node))
+                    foreach ((List<Edge> edges, string edgesType) in RelevantEdges(node, inGroup))
                     {
                         HandleEdges($"{id}#{edgesType}", edges, level + 1);
                     }
@@ -147,24 +184,110 @@ namespace SEE.UI.Window.TreeWindow
         }
 
         /// <summary>
+        /// Returns the TreeWindow ID of the given <paramref name="element"/> in the given <paramref name="group"/>.
+        /// </summary>
+        /// <param name="element">The element whose ID shall be returned.</param>
+        /// <param name="group">The group in which the element is contained, if any.</param>
+        /// <returns>The TreeWindow ID of the given <paramref name="element"/> in the given <paramref name="group"/>.</returns>
+        private static string ElementId(GraphElement element, TreeWindowGroup group)
+        {
+            string id = CleanupID(element.ID);
+            if (group != null)
+            {
+                // If it belongs to a group, we will need to append the group name, otherwise the ID will not be unique,
+                // as the element may be used repeatedly across multiple groups.
+                id = $"{id}#{CleanupID(group.Text)}";
+            }
+            return id;
+        }
+
+        /// <summary>
+        /// Adds the given <paramref name="group"/> to the bottom of the tree window.
+        /// </summary>
+        /// <param name="group">The group to be added.</param>
+        private void AddGroup(TreeWindowGroup group)
+        {
+            AddItem(CleanupID(group.Text), true, $"{group.Text} [{Grouper.MembersInGroup(group)}]",
+                    group.IconGlyph, gradient: group.Gradient,
+                    collapseItem: CollapseGroup, expandItem: ExpandGroup);
+            if (expandedItems.Contains(CleanupID(group.Text)))
+            {
+                ExpandGroup(items.Find(CleanupID(group.Text))?.gameObject, order: false);
+            }
+            return;
+
+            void CollapseGroup(GameObject item)
+            {
+                CollapseItem(item);
+                foreach (GraphElement element in GetRoots(group))
+                {
+                    RemoveItem(ElementId(element, group), element,
+                               x => x is Node node ? GetChildItems(node, group) : Enumerable.Empty<(string, Node)>());
+                }
+            }
+
+            void ExpandGroup(GameObject item, bool order)
+            {
+                ExpandItem(item);
+                foreach (Node element in GetRoots(group))
+                {
+                    AddNode(element, group);
+                }
+                if (order)
+                {
+                    OrderTree(group);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Whether the given <paramref name="element"/> shall be displayed in the tree window.
+        /// </summary>
+        /// <param name="element">The element to be checked.</param>
+        /// <param name="inGroup">The group in which the element is contained, if any.</param>
+        /// <returns>Whether the given <paramref name="element"/> shall be displayed in the tree window.</returns>
+        private bool ShouldBeDisplayed(GraphElement element, TreeWindowGroup inGroup = null)
+        {
+            return (inGroup != null && Grouper.IsRelevantFor(element, inGroup)) || (inGroup == null && Searcher.Filter.Includes(element));
+        }
+
+        /// <summary>
         /// Adds the given <paramref name="node"/> to the bottom of the tree window.
         /// </summary>
         /// <param name="node">The node to be added.</param>
-        private void AddNode(Node node)
+        /// <param name="inGroup">The group in which the node is contained, if any.</param>
+        private void AddNode(Node node, TreeWindowGroup inGroup = null)
         {
             GameObject nodeGameObject = GraphElementIDMap.Find(node.ID);
-            int children = node.NumberOfChildren() + Mathf.Min(node.Outgoings.Count, 1) + Mathf.Min(node.Incomings.Count, 1);
+            int children = node.NumberOfChildren() + node.Edges.Count;
 
-            if (Searcher.Filter.Includes(node))
+            if (ShouldBeDisplayed(node, inGroup))
             {
-                AddItem(CleanupID(node.ID), children, node.ToShortString(), Icons.Node, nodeGameObject, node,
-                        item => CollapseNode(node, item), (item, order) => ExpandNode(node, item, orderTree: order));
+                string text = node.ToShortString();
+                string id = ElementId(node, inGroup);
+                Color[] gradient = null;
+                if (inGroup != null)
+                {
+                    // Not actually the number of direct children, but this doesn't matter, as we only
+                    // need it for the text and to check whether there are any children at all.
+                    children = Grouper.DescendantsInGroup(node, inGroup);
+                    if (Grouper.GetGroupFor(node) != inGroup)
+                    {
+                        // This node is only included because it has relevant descendants.
+                        // TODO: In this case, are italics fine, or should we color the item gray?
+                        text = $"<i>{text}</i>";
+                    }
+                    text = $"{text} [{children}]";
+                }
+                AddItem(id, children > 0, text, Icons.Node, nodeGameObject, node,
+                        gradient, collapseItem: item => CollapseNode(node, item, inGroup),
+                        expandItem: (item, order) => ExpandNode(node, item, orderTree: order, inGroup));
             }
             else
             {
                 // The node itself may not be included, but its children (or edges) could be.
                 // Thus, we assume this invisible node to be expanded by default and add its children.
-                ExpandNode(node, null);
+                ExpandNode(node, null, inGroup: inGroup);
             }
         }
 
@@ -172,19 +295,21 @@ namespace SEE.UI.Window.TreeWindow
         /// Adds the given item to the tree window.
         /// </summary>
         /// <param name="id">The ID of the item to be added.</param>
-        /// <param name="children">The number of children of the item to be added.</param>
+        /// <param name="hasChildren">Whether the item has children.</param>
         /// <param name="text">The text of the item to be added.</param>
         /// <param name="icon">The icon of the item to be added, given as a unicode character.</param>
         /// <param name="representedGameObject">The game object of the element represented by the item. May be null.</param>
         /// <param name="representedGraphElement">The graph element represented by the item. May be null.</param>
+        /// <param name="gradient">The gradient to be used for the item's background. May be null.</param>
         /// <param name="collapseItem">A function that collapses the item.
-        /// It takes the item that was collapsed as an argument.</param>
+        /// It takes the item that was collapsed as an argument. May be null.</param>
         /// <param name="expandItem">A function that expands the item.
         /// It takes the item that was expanded and a boolean indicating whether the
-        /// tree should be ordered after expanding the item as arguments.</param>
-        private void AddItem(string id, int children, string text, char icon,
-                             GameObject representedGameObject, GraphElement representedGraphElement,
-                             Action<GameObject> collapseItem, Action<GameObject, bool> expandItem)
+        /// tree should be ordered after expanding the item as arguments. May be null.</param>
+        private void AddItem(string id, bool hasChildren, string text, char icon,
+                             GameObject representedGameObject = null, GraphElement representedGraphElement = null,
+                             Color[] gradient = null,
+                             Action<GameObject> collapseItem = null, Action<GameObject, bool> expandItem = null)
         {
             GameObject item = PrefabInstantiator.InstantiatePrefab(treeItemPrefab, items, false);
             Transform background = item.transform.Find("Background");
@@ -203,11 +328,11 @@ namespace SEE.UI.Window.TreeWindow
             //       has an identical name, except for all slashes being replaced by backslashes.
             //       I hope this is unlikely enough to not be a problem for now.
             item.name = id;
-            if (children <= 0)
+            if (!hasChildren)
             {
                 expandIcon.SetActive(false);
             }
-            else if (expandedItems.Contains(id))
+            else if (expandedItems.Contains(id) && expandItem != null)
             {
                 // If this item was previously expanded, we need to expand it again.
                 // The tree should not be reordered after this – this should only happen at the end of the expansion,
@@ -222,8 +347,7 @@ namespace SEE.UI.Window.TreeWindow
             // Colors the item according to its game object.
             void ColorItem()
             {
-                Color[] gradient;
-                if (representedGameObject != null)
+                if (gradient == null && representedGameObject != null)
                 {
                     if (representedGameObject.IsNode())
                     {
@@ -241,7 +365,7 @@ namespace SEE.UI.Window.TreeWindow
                         throw new ArgumentException("Item must be either a node or an edge.");
                     }
                 }
-                else
+                else if (gradient == null)
                 {
                     gradient = new[] { Color.gray, Color.gray.Darker() };
                 }
@@ -279,12 +403,12 @@ namespace SEE.UI.Window.TreeWindow
                             }
 
                             // We want all applicable actions for the element, except ones where the element
-                            // element is shown in the TreeView, since we are already in the TreeView.
+                            // element is shown in the TreeWindow, since we are already in the TreeWindow.
                             IEnumerable<PopupMenuAction> actions = ContextMenuAction
                                                                    .GetApplicableOptions(representedGraphElement,
                                                                                          representedGameObject)
-                                                                   .Where(x => !x.Name.Contains("TreeView"));
-                            actions = actions.Append(new PopupMenuAction("Hide in TreeView", () =>
+                                                                   .Where(x => !x.Name.Contains("TreeWindow"));
+                            actions = actions.Append(new PopupMenuAction("Hide in TreeWindow", () =>
                             {
                                 Searcher.Filter.ExcludeElements.Add(representedGraphElement);
                                 Rebuild();
@@ -313,10 +437,13 @@ namespace SEE.UI.Window.TreeWindow
         /// which are not included in the current filter.
         /// </summary>
         /// <param name="nodes">The nodes to be filtered.</param>
+        /// <param name="inGroup">The group in which the nodes are contained, if any.</param>
         /// <returns>The filtered nodes with any hidden transitive children.</returns>
-        private IEnumerable<Node> WithHiddenChildren(IList<Node> nodes)
+        private IEnumerable<Node> WithHiddenChildren(IList<Node> nodes, TreeWindowGroup inGroup)
         {
-            return nodes.Where(Searcher.Filter.Includes).Concat(nodes.Where(x => !Searcher.Filter.Includes(x)).SelectMany(x => WithHiddenChildren(x.Children())));
+            return nodes.Where(x => ShouldBeDisplayed(x, inGroup))
+                        .Concat(nodes.Where(x => !ShouldBeDisplayed(x, inGroup))
+                                     .SelectMany(x => WithHiddenChildren(x.Children(), inGroup)));
         }
 
         /// <summary>
@@ -324,36 +451,43 @@ namespace SEE.UI.Window.TreeWindow
         /// transitively including all hidden children of those nodes.
         /// </summary>
         /// <param name="nodes">The nodes to be filtered.</param>
+        /// <param name="inGroup">The group in which the nodes are contained, if any.</param>
         /// <returns>The transitive hidden children of the given nodes.</returns>
-        private IEnumerable<Node> HiddenChildren(IEnumerable<Node> nodes)
+        private IEnumerable<Node> HiddenChildren(IEnumerable<Node> nodes, TreeWindowGroup inGroup)
         {
-            return nodes.Where(x => !Searcher.Filter.Includes(x)).SelectMany(x => HiddenChildren(x.Children()).Append(x));
+            return nodes.Where(x => !ShouldBeDisplayed(x, inGroup)).SelectMany(x => HiddenChildren(x.Children(), inGroup).Append(x));
         }
 
         /// <summary>
         /// Removes the given <paramref name="node"/>'s children from the tree window.
         /// </summary>
         /// <param name="node">The node to be removed.</param>
-        private void RemoveNodeChildren(Node node)
+        /// <param name="inGroup">The group in which the node is contained, if any.</param>
+        private void RemoveNodeChildren(Node node, TreeWindowGroup inGroup = null)
         {
-            foreach ((string childID, Node child) in GetChildItems(node))
+            foreach ((string childID, Node child) in GetChildItems(node, inGroup))
             {
-                RemoveItem(childID, child, GetChildItems);
+                RemoveItem(childID, child, x => GetChildItems(x, inGroup));
             }
-            return;
+        }
 
-            IEnumerable<(string ID, Node child)> GetChildItems(Node n)
+        /// <summary>
+        /// Returns the child items of the given <paramref name="node"/> along with their ID.
+        /// </summary>
+        /// <param name="node">The node whose child items are requested.</param>
+        /// <param name="inGroup">The group in which the node is contained, if any.</param>
+        /// <returns>The child items of the given <paramref name="node"/> along with their ID.</returns>
+        private IEnumerable<(string ID, Node child)> GetChildItems(Node node, TreeWindowGroup inGroup = null)
+        {
+            string cleanId = ElementId(node, inGroup);
+            IEnumerable<(string, Node)> children = WithHiddenChildren(node.Children(), inGroup).Select(x => (ElementId(x, inGroup), x));
+            foreach ((List<Edge> edges, string edgesType) in RelevantEdges(node, inGroup))
             {
-                string cleanId = CleanupID(n.ID);
-                IEnumerable<(string, Node)> children = WithHiddenChildren(n.Children()).Select(x => (CleanupID(x.ID), x));
-                foreach ((List<Edge> edges, string edgesType) in RelevantEdges(n))
-                {
-                    // We need to remove the "Outgoing" and "Incoming" buttons if they exist, along with their children.
-                    children = children.Append((cleanId + "#" + edgesType, null))
-                                       .Concat(edges.Select<Edge, (string, Node)>(x => ($"{cleanId}#{edgesType}#{CleanupID(x.ID)}", null)));
-                }
-                return children;
+                // The "Outgoing" and "Incoming" buttons if they exist, along with their children, belong here too.
+                children = children.Append((cleanId + "#" + edgesType, null))
+                                   .Concat(edges.Select<Edge, (string, Node)>(x => ($"{cleanId}#{edgesType}#{CleanupID(x.ID)}", null)));
             }
+            return children;
         }
 
         /// <summary>
@@ -364,7 +498,8 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="initial">The initial item whose children will be removed.</param>
         /// <param name="getChildItems">A function that returns the children, along with their ID, of an item.</param>
         /// <typeparam name="T">The type of the item.</typeparam>
-        private void RemoveItem<T>(string id, T initial, Func<T, IEnumerable<(string ID, T child)>> getChildItems)
+        /// <typeparam name="V">The type of the children of the item.</typeparam>
+        private void RemoveItem<T, V>(string id, T initial, Func<T, IEnumerable<(string ID, V child)>> getChildItems) where V : T
         {
             GameObject item = items.Find(id)?.gameObject;
             if (item == null)
@@ -387,7 +522,7 @@ namespace SEE.UI.Window.TreeWindow
         /// Removes the item with the given <paramref name="id"/> from the tree window.
         /// </summary>
         /// <param name="id">The ID of the item to be removed.</param>
-        private void RemoveItem(string id) => RemoveItem<object>(id, null, null);
+        private void RemoveItem(string id) => RemoveItem<object, object>(id, null, null);
 
         /// <summary>
         /// Expands the given <paramref name="item"/>.
@@ -424,23 +559,25 @@ namespace SEE.UI.Window.TreeWindow
         /// have at least one edge.
         /// </summary>
         /// <param name="node">The node whose edges are requested.</param>
+        /// <param name="inGroup">The group in which the node is contained, if any.</param>
         /// <returns>The edges of the node, grouped by their type.</returns>
-        private IEnumerable<(List<Edge> edges, string edgesType)> RelevantEdges(Node node)
+        private IEnumerable<(List<Edge> edges, string edgesType)> RelevantEdges(Node node, TreeWindowGroup inGroup = null)
         {
             List<Edge> outgoings = Searcher.Filter.Apply(node.Outgoings).ToList();
             List<Edge> incomings = Searcher.Filter.Apply(node.Incomings).ToList();
             // We need to lift edges of any hidden children upwards to the first visible parent, which is
             // this node. We then need to filter them again, since they may have been hidden by the filter.
-            List<Node> hiddenChildren = HiddenChildren(node.Children()).ToList();
+            List<Node> hiddenChildren = HiddenChildren(node.Children(), inGroup).ToList();
             List<Edge> liftedOutgoings = Searcher.Filter.Apply(hiddenChildren.SelectMany(x => x.Outgoings)).ToList();
             List<Edge> liftedIncomings = Searcher.Filter.Apply(hiddenChildren.SelectMany(x => x.Incomings)).ToList();
             return new[]
-            {
-                (outgoings, "Outgoing"),
-                (incomings, "Incoming"),
-                (liftedOutgoings, "Lifted Outgoing"),
-                (liftedIncomings, "Lifted Incoming")
-            }.Where(x => x.Item1.Count > 0);
+                {
+                    (outgoings, "Outgoing"),
+                    (incomings, "Incoming"),
+                    (liftedOutgoings, "Lifted Outgoing"),
+                    (liftedIncomings, "Lifted Incoming")
+                }.Select(x => inGroup == null ? x : (x.Item1.Where(y => Grouper.IsRelevantFor(y, inGroup)).ToList(), x.Item2))
+                 .Where(x => x.Item1.Count > 0);
         }
 
         /// <summary>
@@ -452,25 +589,26 @@ namespace SEE.UI.Window.TreeWindow
         /// (i.e., no item actually exists in the TreeWindow)
         /// only the children of the node will be added, not its connected edges.</param>
         /// <param name="orderTree">Whether to order the tree after expanding the node.</param>
-        private void ExpandNode(Node node, GameObject item, bool orderTree = false)
+        /// <param name="inGroup">The group in which the node is contained, if any.</param>
+        private void ExpandNode(Node node, GameObject item, bool orderTree = false, TreeWindowGroup inGroup = null)
         {
             foreach (Node child in node.Children())
             {
-                AddNode(child);
+                AddNode(child, inGroup);
             }
 
             if (item != null)
             {
                 ExpandItem(item);
 
-                foreach ((List<Edge> edges, string edgesType) in RelevantEdges(node))
+                foreach ((List<Edge> edges, string edgesType) in RelevantEdges(node, inGroup))
                 {
                     AddEdgeButton(edges, edgesType);
                 }
 
                 if (orderTree)
                 {
-                    OrderTree(node);
+                    OrderTree(node, inGroup: inGroup);
                 }
             }
             return;
@@ -485,39 +623,44 @@ namespace SEE.UI.Window.TreeWindow
                     "Lifted Outgoing" => Icons.LiftedOutgoingEdge,
                     _ => Icons.QuestionMark
                 };
-                string cleanedId = CleanupID(node.ID);
+                string cleanedId = ElementId(node, inGroup);
                 string id = $"{cleanedId}#{edgesType}";
                 // Note that an edge may appear multiple times in the tree view,
                 // hence we make its ID dependent on the node it is connected to,
                 // and whether it is an incoming or outgoing edge (to cover self-loops).
-                AddItem(id, edges.Count, $"{edgesType} Edges", icon,
-                        representedGameObject: null, representedGraphElement: null,
-                        collapsedItem =>
+                AddItem(id, edges.Count > 0, $"{edgesType} Edges", icon,
+                        collapseItem: collapsedItem =>
                         {
                             CollapseItem(collapsedItem);
                             foreach (Edge edge in edges)
                             {
                                 RemoveItem($"{id}#{CleanupID(edge.ID)}");
                             }
-                        }, (expandedItem, order) =>
+                        },
+                        expandItem: (expandedItem, order) =>
                         {
                             ExpandItem(expandedItem);
                             AddEdges(id, edges);
                             if (order)
                             {
-                                OrderTree(node);
+                                OrderTree(node, inGroup: inGroup);
                             }
                         });
             }
+        }
 
-            void AddEdges(string id, IEnumerable<Edge> edges)
+        /// <summary>
+        /// Adds the given <paramref name="edges"/> to the tree window.
+        /// </summary>
+        /// <param name="id">The ID of the TreeWindow item to which the edges belong.</param>
+        /// <param name="edges">The edges to be added.</param>
+        private void AddEdges(string id, IEnumerable<Edge> edges)
+        {
+            foreach (Edge edge in edges)
             {
-                foreach (Edge edge in edges)
-                {
-                    GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
-                    string title = edge.ToShortString();
-                    AddItem($"{id}#{CleanupID(edge.ID)}", 0, title, Icons.Edge, edgeObject, edge, null, null);
-                }
+                GameObject edgeObject = GraphElementIDMap.Find(edge.ID);
+                string title = edge.ToShortString();
+                AddItem($"{id}#{CleanupID(edge.ID)}", false, title, Icons.Edge, edgeObject, edge);
             }
         }
 
@@ -527,10 +670,11 @@ namespace SEE.UI.Window.TreeWindow
         /// </summary>
         /// <param name="node">The node represented by the item.</param>
         /// <param name="item">The item to be collapsed.</param>
-        private void CollapseNode(Node node, GameObject item)
+        /// <param name="inGroup">The group in which the node is contained, if any.</param>
+        private void CollapseNode(Node node, GameObject item, TreeWindowGroup inGroup = null)
         {
             CollapseItem(item);
-            RemoveNodeChildren(node);
+            RemoveNodeChildren(node, inGroup);
         }
 
         /// <summary>
@@ -551,8 +695,8 @@ namespace SEE.UI.Window.TreeWindow
             {
                 GameObject nodeGameObject = GraphElementIDMap.Find(node.ID, mustFindElement: true);
                 AddItem(CleanupID(node.ID),
-                        0, node.ToShortString(), Icons.Node, nodeGameObject, node,
-                        null, (_, _) => RevealElement(node).Forget());
+                        false, node.ToShortString(), Icons.Node, nodeGameObject, node,
+                        expandItem: (_, _) => RevealElement(node).Forget());
             }
 
             items.position = items.position.WithXYZ(y: 0);
@@ -568,16 +712,17 @@ namespace SEE.UI.Window.TreeWindow
         /// <param name="viaSource">Whether to make the source or target node of the edge visible.</param>
         public async UniTaskVoid RevealElement(GraphElement element, bool viaSource = false)
         {
+            TreeWindowGroup group = Grouper?.GetGroupFor(element);
             if (SearchField == null)
             {
                 // We need to wait until the window is initialized.
                 // This case may occur when the method is called from the outside.
                 await UniTask.WaitUntil(() => SearchField != null);
             }
-            if (!Searcher.Filter.Includes(element))
+            if (!ShouldBeDisplayed(element) || (group == null && Grouper != null && Grouper.IsActive))
             {
                 ShowNotification.Warn("Element filtered out",
-                                      "Element is not included in the current filter and thus can't be shown.");
+                                      "Element is not included in the current filter or group and thus can't be shown.");
                 return;
             }
             SearchField.onValueChanged.RemoveListener(SearchFor);
@@ -592,13 +737,13 @@ namespace SEE.UI.Window.TreeWindow
                 Edge edge => viaSource ? edge.Source : edge.Target,
                 _ => throw new ArgumentOutOfRangeException(nameof(element))
             };
-            string transformID = CleanupID(current.ID);
+            string transformID = ElementId(current, group);
             if (element is Edge)
             {
                 expandedItems.Add(transformID);
                 transformID += viaSource ? "#Outgoing" : "#Incoming";
                 expandedItems.Add(transformID);
-                transformID += $"#{CleanupID(element.ID)}";
+                transformID += $"#{ElementId(element, group)}";
             }
 
             // We need to find a path from the root to the node, which we do by working our way up the hierarchy.
@@ -606,7 +751,13 @@ namespace SEE.UI.Window.TreeWindow
             while (current.Parent != null)
             {
                 current = current.Parent;
-                expandedItems.Add(CleanupID(current.ID));
+                expandedItems.Add(ElementId(current, group));
+            }
+
+            // Finally, if the element is in a group, we need to expand the group.
+            if (group != null)
+            {
+                expandedItems.Add(CleanupID(group.Text));
             }
 
             // We need to wait until the transform actually exists, hence the await.
@@ -652,10 +803,12 @@ namespace SEE.UI.Window.TreeWindow
 
             FilterButton = root.Find("Search/Filter").gameObject.MustGetComponent<ButtonManagerBasic>();
             SortButton = root.Find("Search/Sort").gameObject.MustGetComponent<ButtonManagerBasic>();
+            GroupButton = root.Find("Search/Group").gameObject.MustGetComponent<ButtonManagerBasic>();
             PopupMenu.PopupMenu popupMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
-            ContextMenu = new TreeWindowContextMenu(popupMenu, Searcher, Rebuild, FilterButton, SortButton);
+            ContextMenu = new TreeWindowContextMenu(popupMenu, Searcher, Grouper, Rebuild,
+                                                    FilterButton, SortButton, GroupButton);
 
-            AddRoots().Forget();
+            Rebuild();
         }
 
         /// <summary>
@@ -664,6 +817,7 @@ namespace SEE.UI.Window.TreeWindow
         private void Rebuild()
         {
             ClearTree();
+            Grouper?.RebuildCounts();
             AddRoots().Forget();
         }
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
@@ -7,12 +8,33 @@ namespace SEE.DataModel.GraphSearch
     /// <summary>
     /// A configurable sorter for graph elements, mainly intended for use with <see cref="GraphSearch"/>.
     /// </summary>
-    public class GraphSorter: IGraphModifier
+    public class GraphSorter : IGraphModifier
     {
         /// <summary>
         /// The attributes to sort by along with whether to sort descending, in the order of precedence.
         /// </summary>
-        public readonly List<(string attribute, bool descending)> SortAttributes = new();
+        private readonly List<(string Name, Func<GraphElement, object> GetKey, bool Descending)> SortAttributes = new();
+
+        /// <summary>
+        /// Add an attribute to sort by.
+        /// </summary>
+        /// <param name="attributeName">The name of the attribute to sort by.</param>
+        /// <param name="getAttribute">A function that returns the value to sort by for the given element.</param>
+        /// <param name="descending">Whether to sort descending.</param>
+        public void AddSortAttribute(string attributeName, Func<GraphElement, object> getAttribute, bool descending)
+        {
+            SortAttributes.Add((attributeName, getAttribute, descending));
+        }
+
+        /// <summary>
+        /// Removes the sort attribute with the given name.
+        /// If there are multiple attributes with the given name, all of them are removed.
+        /// </summary>
+        /// <param name="attributeName">The name of the attribute to remove.</param>
+        public void RemoveSortAttribute(string attributeName)
+        {
+            SortAttributes.RemoveAll(a => a.Name == attributeName);
+        }
 
         public IEnumerable<T> Apply<T>(IEnumerable<T> elements) where T : GraphElement
         {
@@ -23,34 +45,32 @@ namespace SEE.DataModel.GraphSearch
                 : SortAttributes.Aggregate(elements.OrderBy(_ => 0),
                                            (current, sortAttribute) =>
                                            {
-                                              (string attribute, bool descending) = sortAttribute;
-                                              return descending
-                                                ? current.ThenByDescending(e => GetElementKey(e, attribute))
-                                                : current.ThenBy(e => GetElementKey(e, attribute));
+                                               (_, Func<GraphElement, object> GetKey, bool Descending) = sortAttribute;
+                                               return Descending
+                                                   ? current.ThenByDescending(x => GetKey(x))
+                                                   : current.ThenBy(x => GetKey(x));
                                            });
-
-            object GetElementKey(T element, string attribute)
-            {
-                return element.TryGetAny(attribute, out object value) ? value : null;
-            }
         }
 
         /// <summary>
         /// Whether the given attribute is sorted descending.
         /// Note that this returns null if the attribute is not sorted at all.
         /// </summary>
-        /// <param name="attribute">The attribute to check.</param>
+        /// <param name="attributeName">The attribute to check.</param>
         /// <returns>Whether the attribute is sorted descending, or null if it is not sorted at all.</returns>
-        public bool? IsAttributeDescending(string attribute)
+        /// <remarks>
+        /// If there is more than one attribute with the given name, the first one is returned.
+        /// </remarks>
+        public bool? IsAttributeDescending(string attributeName)
         {
-            (string attribute, bool descending) result = SortAttributes.FirstOrDefault(a => a.attribute == attribute);
+            (string, Func<GraphElement, object>, bool Descending) result = SortAttributes.FirstOrDefault(a => a.Name == attributeName);
             if (result == default)
             {
                 return null;
             }
             else
             {
-                return result.descending;
+                return result.Descending;
             }
         }
 

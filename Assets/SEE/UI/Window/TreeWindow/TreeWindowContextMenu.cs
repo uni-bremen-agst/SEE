@@ -4,9 +4,13 @@ using System.Linq;
 using Michsky.UI.ModernUIPack;
 using SEE.DataModel.DG;
 using SEE.DataModel.GraphSearch;
+using SEE.Game.City;
+using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.PopupMenu;
 using SEE.Utils;
 using UnityEngine;
+using ArgumentOutOfRangeException = System.ArgumentOutOfRangeException;
+using State = SEE.Tools.ReflexionAnalysis.State;
 
 namespace SEE.UI.Window.TreeWindow
 {
@@ -27,6 +31,11 @@ namespace SEE.UI.Window.TreeWindow
         private readonly GraphSearch Searcher;
 
         /// <summary>
+        /// The grouper that is used to group the elements in the tree window.
+        /// </summary>
+        private readonly TreeWindowGrouper Grouper;
+
+        /// <summary>
         /// The function to call to rebuild the tree window.
         /// </summary>
         private readonly Action Rebuild;
@@ -42,26 +51,38 @@ namespace SEE.UI.Window.TreeWindow
         private readonly ButtonManagerBasic SortButton;
 
         /// <summary>
+        /// The button that opens the group menu.
+        /// </summary>
+        private readonly ButtonManagerBasic GroupButton;
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="contextMenu">The context menu that this class manages.</param>
         /// <param name="searcher">The graph search associated with the tree window.</param>
+        /// <param name="grouper">The grouper that is used to group the elements in the tree window.</param>
         /// <param name="rebuild">The function to call to rebuild the tree window.</param>
         /// <param name="filterButton">The button that opens the filter menu.</param>
         /// <param name="sortButton">The button that opens the sort menu.</param>
-        public TreeWindowContextMenu(PopupMenu.PopupMenu contextMenu, GraphSearch searcher, Action rebuild,
-                                     ButtonManagerBasic filterButton, ButtonManagerBasic sortButton)
+        /// <param name="groupButton">The button that opens the group menu.</param>
+        public TreeWindowContextMenu(PopupMenu.PopupMenu contextMenu, GraphSearch searcher, TreeWindowGrouper grouper,
+                                     Action rebuild, ButtonManagerBasic filterButton, ButtonManagerBasic sortButton,
+                                     ButtonManagerBasic groupButton)
         {
             ContextMenu = contextMenu;
             Searcher = searcher;
+            Grouper = grouper;
             Rebuild = rebuild;
             FilterButton = filterButton;
             SortButton = sortButton;
+            GroupButton = groupButton;
 
             ResetFilter();
             ResetSort();
+            ResetGrouping();
             FilterButton.clickEvent.AddListener(ShowFilterMenu);
             SortButton.clickEvent.AddListener(ShowSortMenu);
+            GroupButton.clickEvent.AddListener(ShowGroupMenu);
         }
 
         /// <summary>
@@ -74,7 +95,7 @@ namespace SEE.UI.Window.TreeWindow
         /// <summary>
         /// Displays the filter menu.
         /// </summary>
-        public void ShowFilterMenu()
+        private void ShowFilterMenu()
         {
             UpdateFilterMenuEntries();
             ContextMenu.ShowWith(position: FilterButton.transform.position);
@@ -91,7 +112,6 @@ namespace SEE.UI.Window.TreeWindow
             // Don't include common toggles in node/edge toggles.
             nodeToggles.ExceptWith(commonToggles);
             edgeToggles.ExceptWith(commonToggles);
-            // TODO: Allow filtering by node type.
 
             List<PopupMenuEntry> entries = new()
             {
@@ -198,7 +218,7 @@ namespace SEE.UI.Window.TreeWindow
         /// <summary>
         /// Displays the sort menu.
         /// </summary>
-        public void ShowSortMenu()
+        private void ShowSortMenu()
         {
             UpdateSortMenuEntries();
             ContextMenu.ShowWith(position: SortButton.transform.position);
@@ -219,38 +239,49 @@ namespace SEE.UI.Window.TreeWindow
                 }, Icons.ArrowRotateLeft, CloseAfterClick: false)
             };
 
-            // TODO: Add all attributes, or only pre-selected common ones?
-            entries.AddRange(Searcher.Graph.AllNumericAttributes().Select(attribute => SortActionFor(attribute, numeric: true)));
-            entries.AddRange(Searcher.Graph.AllStringAttributes().Select(attribute => SortActionFor(attribute, numeric: false)));
+            if (Grouper.IsActive)
+            {
+                entries.Add(new PopupMenuHeading("Grouping is active!"));
+                entries.Add(new PopupMenuHeading("Items ordered by group count."));
+            }
+
+            // TODO: Any other attributes we want to sort by? Or should we just include all attributes?
+            entries.Add(SortActionFor("Source Name", x => x is Node node ? node.SourceName : null, false));
+            entries.Add(SortActionFor("Source Line", x => x.SourceLine(), true));
+            entries.Add(SortActionFor("Filename", x => x.Filename(), false));
+            entries.Add(SortActionFor("Type", x => x.Type, false));
 
             ContextMenu.ClearEntries();
             ContextMenu.AddEntries(entries);
         }
 
         /// <summary>
-        /// Returns the sort action for the given <paramref name="attribute"/>.
+        /// Returns the sort action for the given <paramref name="name"/> and <paramref name="key"/>.
         /// </summary>
-        /// <param name="attribute">The attribute to create a sort action for.</param>
-        /// <param name="numeric">Whether the attribute name is for a numeric attribute.</param>
-        /// <returns>The sort action for the given <paramref name="attribute"/>.</returns>
-        private PopupMenuAction SortActionFor(string attribute, bool numeric)
+        /// <param name="name">The name of the sort attribute.</param>
+        /// <param name="key">The key to sort by.</param>
+        /// <param name="numeric">Whether this is for a numeric attribute.</param>
+        /// <returns>The sort action for the given <paramref name="key"/>.</returns>
+        private PopupMenuAction SortActionFor(string name, Func<GraphElement, object> key, bool numeric)
         {
-            return new PopupMenuAction(attribute, ToggleSortAction,
-                                       SortIcon(numeric, Searcher.Sorter.IsAttributeDescending(attribute)),
+            return new PopupMenuAction(name, ToggleSortAction,
+                                       SortIcon(numeric, Searcher.Sorter.IsAttributeDescending(name)),
                                        CloseAfterClick: false);
 
             void ToggleSortAction()
             {
                 // Switch from ascending->descending->none->ascending.
-                switch (Searcher.Sorter.IsAttributeDescending(attribute))
+                switch (Searcher.Sorter.IsAttributeDescending(name))
                 {
-                    case null: Searcher.Sorter.SortAttributes.Add((attribute, false));
+                    case null:
+                        Searcher.Sorter.AddSortAttribute(name, key, false);
                         break;
                     case false:
-                        Searcher.Sorter.SortAttributes.Remove((attribute, false));
-                        Searcher.Sorter.SortAttributes.Add((attribute, true));
+                        Searcher.Sorter.RemoveSortAttribute(name);
+                        Searcher.Sorter.AddSortAttribute(name, key, true);
                         break;
-                    default: Searcher.Sorter.SortAttributes.Remove((attribute, true));
+                    default:
+                        Searcher.Sorter.RemoveSortAttribute(name);
                         break;
                 }
                 UpdateSortMenuEntries();
@@ -283,7 +314,94 @@ namespace SEE.UI.Window.TreeWindow
         private void ResetSort()
         {
             Searcher.Sorter.Reset();
-            Searcher.Sorter.SortAttributes.Add((Node.SourceNameAttribute, false));
+            Searcher.Sorter.AddSortAttribute("Source Name", x => x is Node node ? node.SourceName : null, false);
+        }
+
+        #endregion
+
+        #region Group menu
+
+        /// <summary>
+        /// Displays the group menu.
+        /// </summary>
+        private void ShowGroupMenu()
+        {
+            UpdateGroupMenuEntries();
+            ContextMenu.ShowWith(position: GroupButton.transform.position);
+        }
+
+        /// <summary>
+        /// Updates the group menu entries.
+        /// </summary>
+        private void UpdateGroupMenuEntries()
+        {
+            ISet<TreeWindowGroup> currentGroups = Grouper.AllGroups.ToHashSet();
+            List<PopupMenuEntry> entries = new()
+            {
+                new PopupMenuAction("None", () =>
+                {
+                    ResetGrouping();
+                    Rebuild();
+                    UpdateGroupMenuEntries();
+                }, Radio(!Grouper.IsActive), CloseAfterClick: true),
+                GroupActionFor("Reflexion State",
+                               new TreeWindowGroupAssigment<State?>(Enum.GetValues(typeof(State)).Cast<State?>()
+                                                                        .ToDictionary(keySelector: x => x,
+                                                                                      elementSelector: ReflexionStateToGroup),
+                                                                    element => element is Edge edge ? edge.State() : null)),
+                // TODO: Other groups? Maybe grouping by type would be a good idea?
+            };
+            ContextMenu.ClearEntries();
+            ContextMenu.AddEntries(entries);
+            return;
+
+            // Returns the group action for the given <paramref name="name"/> and <paramref name="assignment"/>.
+            PopupMenuAction GroupActionFor(string name, ITreeWindowGroupAssigment assignment)
+            {
+                return new PopupMenuAction(name, () =>
+                                           {
+                                               Grouper.Assignment = assignment;
+                                               Rebuild();
+                                               UpdateGroupMenuEntries();
+                                           }, Radio(currentGroups.SetEquals(assignment.AllGroups)),
+                                           CloseAfterClick: true);
+            }
+
+            // Returns the group for the given <paramref name="state"/>.
+            TreeWindowGroup ReflexionStateToGroup(State? state)
+            {
+                (string text, char icon) = state switch
+                {
+                    State.Divergent => ("Divergent", Icons.CircleExclamationMark),
+                    State.Absent => ("Absent", Icons.CircleMinus),
+                    State.Allowed => ("Allowed", Icons.CircleCheckmark),
+                    State.Convergent => ("Convergent", Icons.CircleCheckmark),
+                    State.ImplicitlyAllowed => ("Implicitly allowed", Icons.CircleCheckmark),
+                    State.AllowedAbsent => ("Allowed absent", Icons.CircleCheckmark),
+                    State.Specified => ("Specified", Icons.CircleQuestionMark),
+                    State.Unmapped => ("Unmapped", Icons.CircleQuestionMark),
+                    State.Undefined => ("Undefined", Icons.QuestionMark),
+                    null => ("Unknown", Icons.QuestionMark),
+                    _ => throw new ArgumentOutOfRangeException(nameof(state), state, null)
+                };
+                (Color start, Color end) = ReflexionVisualization.GetEdgeGradient(state ?? State.Undefined);
+                return new TreeWindowGroup(text, icon, start, end);
+            }
+        }
+
+        /// <summary>
+        /// Returns a radio button icon for the given <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">Whether the radio button is checked.</param>
+        /// <returns>A radio button icon for the given <paramref name="value"/>.</returns>
+        private static char Radio(bool value) => value ? Icons.CheckedRadio : Icons.EmptyRadio;
+
+        /// <summary>
+        /// Resets the grouping to its default state.
+        /// </summary>
+        private void ResetGrouping()
+        {
+            Grouper.Reset();
         }
 
         #endregion
