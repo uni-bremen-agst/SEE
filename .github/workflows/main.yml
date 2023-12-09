@@ -71,14 +71,17 @@ jobs:
     steps:
       - name: Collect bad patterns
         run: |
-          if [ -n "$GITHUB_BASE_REF" ] && ! PATTERNS=$(curl -H 'Accept: application/vnd.github.v3.diff' -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -f 'https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}' | ./GitScripts/check_for_bad_patterns.py); then
-            DELIMITER=7MApgggGyx6C0
-            echo "PATTERNS<<$DELIMITER" >> $GITHUB_ENV
-            echo "$PATTERNS" >> $GITHUB_ENV
-            echo "$DELIMITER" >> $GITHUB_ENV
-          else
-            echo "PATTERNS=none" >> $GITHUB_ENV
+          if [ -n "$GITHUB_BASE_REF" ]; then
+            PATTERNS=$(curl -H 'Accept: application/vnd.github.v3.diff' -H 'Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' -f 'https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}' | ./GitScripts/check_for_bad_patterns.py)
+            if [ "$PATTERNS" != "[]" ]; then
+              DELIMITER=7MApgggGyx6C0
+              echo "PATTERNS<<$DELIMITER" >> $GITHUB_ENV
+              echo "$PATTERNS" >> $GITHUB_ENV
+              echo "$DELIMITER" >> $GITHUB_ENV
+              exit 0
+            fi
           fi
+          echo "PATTERNS=none" >> $GITHUB_ENV
       - uses: actions/github-script@v6
         name: Check for bad patterns
         with:
