@@ -245,7 +245,7 @@ namespace SEE.UI.Window.TreeWindow
                 entries.Add(new PopupMenuHeading("Items ordered by group count."));
             }
 
-            // TODO: Any other attributes we want to sort by? Or should we just include all attributes?
+            // TODO: Any other attributes we want to sort by? Or should we just include all attributes in the future?
             entries.Add(SortActionFor("Source Name", x => x is Node node ? node.SourceName : null, false));
             entries.Add(SortActionFor("Source Line", x => x.SourceLine(), true));
             entries.Add(SortActionFor("Filename", x => x.Filename(), false));

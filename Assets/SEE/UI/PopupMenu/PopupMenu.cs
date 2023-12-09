@@ -90,7 +90,7 @@ namespace SEE.UI.PopupMenu
             // We hide the menu by default.
             Menu.gameObject.SetActive(false);
 
-            // TODO: Make this scrollable once it gets too big.
+            // TODO (#679): Make this scrollable once it gets too big.
         }
 
         /// <summary>
