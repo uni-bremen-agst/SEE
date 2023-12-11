@@ -62,7 +62,7 @@ namespace SEE.UI
             // instantiates the keyBindings dictionary
             IDictionary<KeyCode, string> keyBindings = KeyBindings.GetBindings();
             // group the keyBindings by it scopes
-            var groupedBindings = keyBindings.GroupBy(pair => KeyBindings.GetScope(pair.Value));
+            var groupedBindings = keyBindings.GroupBy(pair => KeyBindings.GetCategory(pair.Value));
             // instantiates the SettingsMenu
             settingsMenuGameObject = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Canvas.transform, false);
             Button exitButton = settingsMenuGameObject.transform.Find("ExitPanel/Buttons/Content/Exit").gameObject.MustGetComponent<Button>();
@@ -170,7 +170,7 @@ namespace SEE.UI
         /// <summary>
         /// Terminates the application (exits the game).
         /// </summary>
-        private void ExitGame()
+        private static void ExitGame()
         {
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
