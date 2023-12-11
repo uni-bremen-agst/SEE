@@ -1,4 +1,5 @@
 ﻿using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -20,30 +21,36 @@ namespace SEE.Controls
         /// forward.
         /// </summary>
         public static bool KeyboardShortcutsEnabled { set; get; } = true;
+
+        /// <summary>
+        /// A mapping of binding names onto their corresponding <see cref="KeyCode"/>.
+        /// </summary>
+        [Obsolete]
         private static readonly IDictionary<string, KeyCode> bindings = BindingNamesAndKeys();
 
         /// <summary>
         /// Updates the bindings.
         /// </summary>
+        [Obsolete]
         public static void UpdateBindings()
         {
-            SEEInput.bindings.Clear();
-            foreach (string button in KeyBindings.GetBindingNames())
+            bindings.Clear();
+            foreach (string binding in KeyBindings.GetBindingNames())
             {
-                bindings[button] = KeyBindings.GetBindings().FirstOrDefault(x => x.Value.Contains(button)).Key;
+                bindings[binding] = KeyBindings.GetBindings().FirstOrDefault(x => x.Value.Contains(binding)).Key;
             }
         }
 
         /// <summary>
         /// Returns a dictionary with the binding names and keys.
-        /// <returns>the dictionary</returns>
         /// </summary>
+        /// <returns>the dictionary</returns>
         private static IDictionary<string, KeyCode> BindingNamesAndKeys()
         {
             Dictionary<string, KeyCode> namesAndKeys = new();
-            foreach (string button in KeyBindings.GetBindingNames())
+            foreach (string binding in KeyBindings.GetBindingNames())
             {
-                namesAndKeys[button] = KeyBindings.GetBindings().FirstOrDefault(x => x.Value.Contains(button)).Key;
+                namesAndKeys[binding] = KeyBindings.GetBindings().FirstOrDefault(x => x.Value.Contains(binding)).Key;
             }
             return namesAndKeys;
         }
@@ -58,7 +65,9 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Help()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.HelpBinding]);
+            return KeyboardShortcutsEnabled
+                && (KeyBindings.IsRequested(KeyBindings.KeyAction.Help)
+                   || Input.GetKeyDown(bindings[KeyBindings.HelpBinding]));
         }
 
         /// <summary>
@@ -67,7 +76,9 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ToggleVoiceInput()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.ToggleVoiceInputBinding]);
+            return KeyboardShortcutsEnabled
+                && (KeyBindings.IsRequested(KeyBindings.KeyAction.ToggleVoiceInput)
+                    || Input.GetKeyDown(bindings[KeyBindings.ToggleVoiceInputBinding]));
         }
 
         /// <summary>
@@ -76,7 +87,10 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ToggleMenu()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.ToggleMenuBinding]);
+            return KeyboardShortcutsEnabled
+                && (KeyBindings.IsRequested(KeyBindings.KeyAction.ToggleMenu)
+                    || Input.GetKeyDown(bindings[KeyBindings.ToggleMenuBinding]));
+
         }
 
         /// <summary>
