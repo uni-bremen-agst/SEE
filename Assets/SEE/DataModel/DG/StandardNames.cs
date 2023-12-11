@@ -19,11 +19,21 @@
         IssuesTotal
     }
 
+
     /// <summary>
     /// Provides an extension <see cref="Name(NumericAttributeNames)"/> for <see cref="NumericAttributeNames"/>.
     /// </summary>
     public static class AttributeNamesExtensions
     {
+        public const string InstructionMissed = "Metric.InstructionMissed";
+        public const string InstructionCovered = "Metric.InstructionCovered";
+        public const string LineMissed = "Metric.LineMissed";
+        public const string LineCovered = "Metric.LineCovered";
+        public const string ComplexityMissed = "Metric.ComplexityMissed";
+        public const string ComplexityCovered = "Metric.ComplexityCovered";
+        public const string MethodMissed = "Metric.MethodMissed";
+        public const string MethodCovered = "Metric.MethodCovered";
+
         /// <summary>
         /// Name of the given <paramref name="numericAttributeName"/>.
         /// </summary>
