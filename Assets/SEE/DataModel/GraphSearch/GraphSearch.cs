@@ -39,6 +39,9 @@ namespace SEE.DataModel.GraphSearch
         /// </summary>
         public GraphSorter Sorter { get; } = new();
 
+        /// <summary>
+        /// Returns all graph modifiers that shall be applied to the search results.
+        /// </summary>
         private IEnumerable<IGraphModifier> Modifiers => new IGraphModifier[] { Filter, Sorter };
 
         /// <summary>

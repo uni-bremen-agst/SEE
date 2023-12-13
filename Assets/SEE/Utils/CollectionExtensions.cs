@@ -4,6 +4,9 @@ using FuzzySharp.Utils;
 
 namespace SEE.Utils
 {
+    /// <summary>
+    /// Contains utility extension methods for collections and enumerables.
+    /// </summary>
     public static class CollectionExtensions
     {
         /// <summary>

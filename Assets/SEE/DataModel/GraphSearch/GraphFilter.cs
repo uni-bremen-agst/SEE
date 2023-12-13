@@ -9,7 +9,6 @@ namespace SEE.DataModel.GraphSearch
     /// </summary>
     public record GraphFilter : IGraphModifier
     {
-        // if empty, include all. otherwise, *at least one* must be present.
         /// <summary>
         /// A set of toggle attributes of which at least one must be present in a graph element for it to be included.
         /// </summary>

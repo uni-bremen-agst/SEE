@@ -74,7 +74,6 @@ namespace SEE.DataModel.GraphSearch
             }
         }
 
-
         public bool IsActive() => SortAttributes.Count > 0;
 
         public void Reset() => SortAttributes.Clear();
