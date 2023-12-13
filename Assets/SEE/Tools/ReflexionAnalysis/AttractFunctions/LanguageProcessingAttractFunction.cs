@@ -14,6 +14,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
     public abstract class LanguageProcessingAttractFunction : AttractFunction
     {
+        private Dictionary<string, Document> cachedStandardTerms = new Dictionary<string, Document>();
+
         public TokenLanguage TargetLanguage { get; set; }
 
         protected LanguageProcessingAttractFunction(ReflexionGraph reflexionGraph, 
@@ -87,8 +89,19 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             return;
         }
 
+        protected void ClearTermCache()
+        {
+            this.cachedStandardTerms.Clear();
+        }
+
         protected void AddStandardTerms(Node node, Document document)
         {
+            if(cachedStandardTerms.ContainsKey(node.ID))
+            {
+                document.AddWords(cachedStandardTerms[node.ID]);
+                return;
+            }
+            
             string codeRegion = NodeRegionReader.ReadRegion(node);
 
             IList<SEEToken> tokens = SEEToken.FromString(codeRegion, TargetLanguage);
@@ -99,8 +112,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             foreach (SEEToken token in tokens)
             {
                 if (token.TokenType == SEEToken.Type.Comment ||
-                   token.TokenType == SEEToken.Type.Identifier ||
-                   token.TokenType == SEEToken.Type.StringLiteral)
+                   token.TokenType == SEEToken.Type.Identifier )
+                   //|| token.TokenType == SEEToken.Type.StringLiteral)
                 {
                     words.Add(token.Text);
                 }
@@ -117,6 +130,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             words = words.Where(x => x.Length > 3).Select(x => x.ToLower()).ToList();
 
             document.AddWords(words);
+            Document cachedDocument = new Document();
+            cachedDocument.AddWords(words);
+            cachedStandardTerms.Add(node.ID, cachedDocument);
         }
 
         private List<string> Split(string word, Func<char[], int, bool> splitFunction, bool keepCharAtSplit)

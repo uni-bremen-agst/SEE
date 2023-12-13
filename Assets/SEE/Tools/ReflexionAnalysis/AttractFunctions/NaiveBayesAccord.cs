@@ -148,6 +148,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                                              symbols: symbols);
 
             NaiveBayesLearning naiveBayesLearning = new NaiveBayesLearning() { Model = classifier };
+            naiveBayesLearning.Options.InnerOption.UseLaplaceRule = true;
             int[][] inputJagged = inputs.ToJagged();
             classifier = naiveBayesLearning.Learn(inputJagged, outputs);
         }

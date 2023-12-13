@@ -273,24 +273,22 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         private void UpdateRecommendations()
         {
-            List<Node> candidates = GetCandidates();
+            List<Node> unmappedCandidates = GetCandidates().Where(c => reflexionGraph.MapsTo(c) == null).ToList();
             List<Node> clusters = GetCluster();
 
             double maxAttractionValue = double.MinValue;
 
             recommendations.Clear();
             mappingPairs.Clear();
-            Debug.Log($"Calculate attraction values... candidates.Count={candidates.Count} clusters.Count={clusters.Count}");
+            Debug.Log($"Calculate attraction values... candidates.Count={unmappedCandidates.Count} clusters.Count={clusters.Count}");
 
             foreach (Node cluster in clusters)
             {
-                foreach (Node candidate in candidates)
-                {
-                    // Skip already mapped nodes
-                    if (reflexionGraph.MapsTo(candidate) != null) continue;
-                    
+                foreach (Node candidate in unmappedCandidates)
+                {               
                     // Calculate the attraction value for current node and current cluster
                     double attractionValue = AttractFunction.GetAttractionValue(candidate, cluster);
+                    // Debug.Log($"Candidate {candidate.ID} attracted to cluster {cluster.ID} with attraction value {attractionValue}");
 
                     // Keep track of all attractions for statistical purposes
                     MappingPair mappingPair = new MappingPair(candidate: candidate, cluster: cluster, attractionValue: attractionValue);

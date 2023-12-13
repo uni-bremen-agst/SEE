@@ -54,12 +54,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
         public override double GetAttractionValue(Node candidate, Node cluster)
         {
-            Document docStandardTerms = new Document();
+            Document doc = new Document();
 
             if (this.useStandardTerms)
             {
-                this.AddStandardTerms(candidate, docStandardTerms);
-                this.AddWordsOfAscendants(candidate, docStandardTerms);
+                this.AddStandardTerms(candidate, doc);
+                this.AddWordsOfAscendants(candidate, doc);
             }
 
             Dictionary<string, Document> docCdaTerms = new Dictionary<string, Document>();
@@ -78,9 +78,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             //}
 
-            Document document = new Document(docStandardTerms);
-            document.AddWords(docCdaTerms[cluster.ID]);
-            double attraction = naiveBayes.ProbabilityForClass(cluster.ID, docStandardTerms);
+            Document document = new Document(doc);
+            doc.AddWords(docCdaTerms[cluster.ID]);
+            double attraction = naiveBayes.ProbabilityForClass(cluster.ID, doc);
 
             // remove cda terms from naiveBayes classifier
             //foreach (string clusterID in docCdaTerms.Keys)

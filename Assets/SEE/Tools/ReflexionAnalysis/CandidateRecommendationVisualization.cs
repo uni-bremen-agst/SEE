@@ -1,10 +1,10 @@
-﻿using SEE.DataModel;
+﻿using Cysharp.Threading.Tasks;
+using SEE.DataModel;
 using SEE.DataModel.DG;
-using SEE.Game.City;
-using SEE.Game;
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.UI.Window;
 using SEE.UI.Window.TreeWindow;
 using SEE.Utils;
 using SEE.Utils.Paths;
@@ -16,10 +16,6 @@ using System.Linq;
 using UnityEngine;
 using static Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions.AttractFunction;
 using static Assets.SEE.Tools.ReflexionAnalysis.CandidateRecommendation;
-using Cysharp.Threading.Tasks;
-using SEE.Controls;
-using SEE.UI.Window;
-using System.Threading.Tasks;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis
 {
@@ -40,8 +36,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         private Queue<ChangeEvent> changeEventQueue = new Queue<ChangeEvent>();
 
-        private bool ProcessingEvents { get; set; }
+        private object reflexionGraphLockObject = new object();
 
+        private bool ProcessingEvents { get; set; }
 
         // TODO: 
         private readonly IDictionary<string, TreeWindow> treeWindows = new Dictionary<string, TreeWindow>();
@@ -117,48 +114,52 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             if (!ProcessingEvents && value is EdgeEvent edgeEvent && edgeEvent.Affected == ReflexionSubgraphs.Mapping)
             {
                 ProcessEvents().Forget();
+                TriggerBlinkAnimation().Forget();
             }
         }
         #endregion
 
+        public async UniTaskVoid TriggerBlinkAnimation()
+        {
+            Dictionary<Node, HashSet<MappingPair>> recommendations = await this.GetRecommendations();
+            await UniTask.SwitchToMainThread();
+            List<NodeOperator> nodeOperators = new List<NodeOperator>();
+            foreach (Node cluster in recommendations.Keys)
+            {
+                NodeOperator nodeOperator;
+
+                nodeOperator = cluster.GameObject().AddOrGetComponent<NodeOperator>();
+                nodeOperators.Add(nodeOperator);
+
+                foreach (MappingPair mappingPair in CandidateRecommendation.Recommendations[cluster])
+                {
+                    nodeOperators.Add(mappingPair.Candidate.GameObject().AddOrGetComponent<NodeOperator>());
+                }
+            }
+
+            if (!ProcessingEvents)
+            {
+                // blink effect
+                // TODO: Distinction between different hypothesized entities is required
+                if (blinkEffectCoroutine != null) StopCoroutine(blinkEffectCoroutine);
+                blinkEffectCoroutine = StartCoroutine(StartBlinkEffect(nodeOperators));
+            }
+        } 
+
         public async UniTask ProcessEvents()
         {
             ProcessingEvents = true;
-            List<NodeOperator> nodeOperators = new List<NodeOperator>();
             await UniTask.RunOnThreadPool(() =>
             {
-                while (changeEventQueue.Count > 0)
+                lock (reflexionGraphLockObject)
                 {
-                    CandidateRecommendation.OnNext(changeEventQueue.Dequeue());
-                }
-
-                ProcessingEvents = false;
-
-            }).ContinueWith(async () => 
-            {
-                await UniTask.SwitchToMainThread();
-
-                foreach (Node cluster in CandidateRecommendation.Recommendations.Keys)
-                {
-                    NodeOperator nodeOperator;
-
-                    nodeOperator = cluster.GameObject().AddOrGetComponent<NodeOperator>();
-                    nodeOperators.Add(nodeOperator);
-
-                    foreach (MappingPair mappingPair in CandidateRecommendation.Recommendations[cluster])
+                    while (changeEventQueue.Count > 0)
                     {
-                        nodeOperators.Add(mappingPair.Candidate.GameObject().AddOrGetComponent<NodeOperator>());
+                        CandidateRecommendation.OnNext(changeEventQueue.Dequeue());
                     }
                 }
-
-                if (!ProcessingEvents)
-                {
-                    // blink effect
-                    // TODO: Distinction between different hypothesized entities is required
-                    if (blinkEffectCoroutine != null) StopCoroutine(blinkEffectCoroutine);
-                    blinkEffectCoroutine = StartCoroutine(StartBlinkEffect(nodeOperators));
-                }
-            });
+                ProcessingEvents = false;
+            }); 
         }
 
         #region Buttons
@@ -189,14 +190,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         }
 
         [Button(ButtonSizes.Small)]
-        public void GenerateArtificialInitialMapping()
+        public void GenerateArticialInitialMapping()
         {
             Dictionary<Node, HashSet<Node>> initialMapping = CandidateRecommendation.Statistics.GenerateArtificialInitialMapping(0.5, 593946);
             foreach (Node cluster in initialMapping.Keys)
             {
                 foreach (Node candidate in initialMapping[cluster])
                 {
-                    StartCoroutine(MapRecommendation(candidate, cluster));
+                    Debug.Log($"Artificial initial mapping {candidate.ID} --> {cluster.ID}");
+
+                    // TODO: Wrap automatic mapping action?
+                    MapRecommendation(candidate, cluster).Forget();
                 }
             }
         }
@@ -207,16 +211,36 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             Debug.Log(CandidateRecommendation.AttractFunction.DumpTrainingData());
         }
 
+        public async UniTask<Dictionary<Node, HashSet<MappingPair>>> GetRecommendations() 
+        {
+            await UniTask.WaitWhile(() => ProcessingEvents);
+            return new Dictionary<Node, HashSet<MappingPair>>(CandidateRecommendation.Recommendations);
+        }
+
+        [Button(ButtonSizes.Small)]
+        public void AutomaticallyMapEntitiesCommand()
+        {
+            AutomaticallyMapEntities().Forget();
+        }
+
+        [Button(ButtonSizes.Small)]
+        public void ShowRecommendation()
+        {
+            TriggerBlinkAnimation().Forget();
+        }
+
         /// <summary>
         /// 
         /// </summary>
-        [Button(ButtonSizes.Small)]
-        public void AutomaticallyMapEntities()
+        public async UniTaskVoid AutomaticallyMapEntities()
         {
+            Dictionary<Node, HashSet<MappingPair>> recommendations = await this.GetRecommendations();
             // While next recommendation still exists
-            while(CandidateRecommendation.Recommendations.Count != 0)
+            
+            while (recommendations.Count != 0)
             {
                 MappingPair chosenMappingPair;
+                // TODO: wrap recommendations within own class?
                 if(CandidateRecommendation.IsRecommendationDefinite())
                 {
                     chosenMappingPair = CandidateRecommendation.GetDefiniteRecommendation();
@@ -225,11 +249,19 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 else
                 {
                     chosenMappingPair = CandidateRecommendation.Recommendations[CandidateRecommendation.Recommendations.Keys.First<Node>()].FirstOrDefault<MappingPair>();
+
                     // TODO: handle ambigous mapping steps
                     Debug.Log("Warning: Ambigous recommendation.");
                 }
-                StartCoroutine(MapRecommendation(chosenMappingPair.Candidate, chosenMappingPair.Cluster));
+                
+                Debug.Log($"Chosen Mapping Pair {chosenMappingPair.CandidateID} --> {chosenMappingPair.CandidateID}");
+
+                // TODO: Wrap automatic mapping action?
+                MapRecommendation(chosenMappingPair.Candidate, chosenMappingPair.Cluster).Forget();
+
+                recommendations = await this.GetRecommendations();
             }
+            Debug.Log("Automatic Mapping stopped.");
         }
         #endregion
 
@@ -242,11 +274,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             nodeOperators.ForEach((n) => n.Blink(10, 2));
         }
 
-        private IEnumerator MapRecommendation(Node candidate, Node cluster)
+        private async UniTask MapRecommendation(Node candidate, Node cluster)
         {
-            // TODO: Implement as Commando to visualize mapping/ Trigger Animation.
-            CandidateRecommendation.ReflexionGraph.AddToMapping(candidate, cluster);
-            yield return new WaitForSeconds(0.3f);
+            await UniTask.WaitWhile(() => ProcessingEvents);
+            await UniTask.SwitchToMainThread();
+            lock (reflexionGraphLockObject)
+            {
+                // TODO: Implement as Commando to visualize mapping/ Trigger Animation.
+                CandidateRecommendation.ReflexionGraph.AddToMapping(candidate, cluster); 
+            }
         }
     }
 }
