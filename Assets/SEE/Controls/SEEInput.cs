@@ -146,7 +146,7 @@ namespace SEE.Controls
             // Ctrl keys are not available when running the game in the editor
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
-               return !KeyboardShortcutsEnabled && KeyBindings.IsRequested(bindings["Undo"]);
+               return !KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.CodeWindowUndo);
             }
             else
             {
@@ -154,7 +154,7 @@ namespace SEE.Controls
             }
 #else
             // Ctrl keys replaced with KeyBindings.CodeWindowUndo in the editor
-            return KeyBindings.IsDown(KeyBindings.KeyAction.CodeWindowUndo) && !KeyboardShortcutsEnabled;
+            return !KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.CodeWindowUndo);
 #endif
         }
 
@@ -168,12 +168,12 @@ namespace SEE.Controls
             // Ctrl keys are not available when running the game in the editor
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
-                return !KeyboardShortcutsEnabled && KeyBindings.IsRequested(bindings["Redo"]);
+                return !KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.CodeWindowRedo);
             }
             return false;
 #else
             //ctrl keys replaced with KeyBindings.CodeWindowUndo in the editor
-            return KeyBindings.IsDown(KeyBindings.KeyAction.CodeWindowRedo) && !KeyboardShortcutsEnabled;
+            return !KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.CodeWindowRedo);
 #endif
         }
 
@@ -187,7 +187,7 @@ namespace SEE.Controls
             // Ctrl keys are not available when running the game in the editor
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
-                return !KeyboardShortcutsEnabled && KeyBindings.IsRequested(KeyCode.S);
+                return !KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.CodeWindowSave);
             }
             else
             {
@@ -195,7 +195,7 @@ namespace SEE.Controls
             }
 #else
             // ctrl keys replaced with KeyBindings.CodeWindowSave in the editor
-            return KeyBindings.IsDown(KeyBindings.KeyAction.CodeWindowSave) && !KeyboardShortcutsEnabled;
+            return !KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.CodeWindowSave);
 #endif
         }
 
@@ -209,12 +209,12 @@ namespace SEE.Controls
            // Ctrl keys are not available when running the game in the editor
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
-                return !KeyboardShortcutsEnabled && KeyBindings.IsRequested(KeyCode.R);
+                return !KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.RefreshSyntaxHighlighting);
             }
             return false;
 #else
             // ctrl keys replaced with KeyBindings.RefreshSyntaxHighlighting in the editor
-            return KeyBindings.IsDown(KeyBindings.KeyAction.RefreshSyntaxHighlighting) && !KeyboardShortcutsEnabled;
+            return !KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.RefreshSyntaxHighlighting);
 #endif
         }
 
