@@ -9,7 +9,7 @@ namespace SEE.Controls
     /// </summary>
     internal static partial class KeyBindings
     {
-        // TODO: We need to be able to save and load the bindings since a
+        // TODO (#682): We need to be able to save and load the bindings since a
         // user can change them.
 
         // IMPORTANT NOTES:
