@@ -273,7 +273,6 @@ namespace SEE.UI.Window.TreeWindow
                     if (Grouper.GetGroupFor(node) != inGroup)
                     {
                         // This node is only included because it has relevant descendants.
-                        // TODO: In this case, are italics fine, or should we color the item gray?
                         text = $"<i>{text}</i>";
                     }
                     if (children > 0)

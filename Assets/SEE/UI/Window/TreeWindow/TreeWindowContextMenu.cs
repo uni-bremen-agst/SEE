@@ -245,7 +245,8 @@ namespace SEE.UI.Window.TreeWindow
                 entries.Add(new PopupMenuHeading("Items ordered by group count."));
             }
 
-            // TODO: Any other attributes we want to sort by? Or should we just include all attributes in the future?
+            // These are the attributes we want to sort by for the time being. We might want to include
+            // all other attributes in the future, in which case the following code needs to be adapted.
             entries.Add(SortActionFor("Source Name", x => x is Node node ? node.SourceName : null, false));
             entries.Add(SortActionFor("Source Line", x => x.SourceLine(), true));
             entries.Add(SortActionFor("Filename", x => x.Filename(), false));
@@ -344,6 +345,8 @@ namespace SEE.UI.Window.TreeWindow
                     Rebuild();
                     UpdateGroupMenuEntries();
                 }, Radio(!Grouper.IsActive), CloseAfterClick: true),
+                // Here we define the criteria by which a user can group. If new grouping criteria
+                // arise in the future, they need to be added here.
                 GroupActionFor("Reflexion State",
                                new TreeWindowGroupAssigment<State?>(Enum.GetValues(typeof(State)).Cast<State?>()
                                                                         .ToDictionary(keySelector: x => x,
@@ -351,7 +354,6 @@ namespace SEE.UI.Window.TreeWindow
                                                                     element => element is Edge edge ? edge.State() : null)),
                 GroupActionFor("Type",
                                new TreeWindowGroupAssigment<string>(Searcher.Graph.AllElementTypes().ToDictionary(x => x, TypeToGroup), element => element.Type)),
-                // TODO: Any other useful groups?
             };
             ContextMenu.ClearEntries();
             ContextMenu.AddEntries(entries);
