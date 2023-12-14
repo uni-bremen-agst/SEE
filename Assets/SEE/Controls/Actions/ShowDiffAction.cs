@@ -8,11 +8,28 @@ using UnityEngine;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Evolution;
+using Sirenix.Utilities;
+using SEE.Layout;
+using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
     public class ShowDiffAction : AbstractPlayerAction
     {
+        private static SEEBranchCity seeBranchCity = new();
+
+        /// <summary>
+        /// The manager of the game objects created for the city.
+        /// This attribute will be set in the setter of the attribute CityEvolution because it
+        /// depends upon the graphRenderer, which in turn depends upon the city, which is set by
+        /// this setter.
+        /// </summary>
+        private ObjectManager objectManager;
+
+        private Graph loadedGraph;
+
+        private Graph nextGraph;
+
         /// <summary>
         /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
         /// </summary>
@@ -77,10 +94,13 @@ namespace SEE.Controls.Actions
                     return false;
                 }
 
-                
-           
+                loadedGraph = seeBranchCity.LoadedGraph;
+                nextGraph = seeBranchCity.NextGraph;
 
+                currentCity = new LaidOutGraph(loadedGraph, null, null);
+                nextCity = new LaidOutGraph(nextGraph, null, null);
 
+                CalcDiffGraph(currentCity, nextCity);
             }
 
             return false;
@@ -92,7 +112,7 @@ namespace SEE.Controls.Actions
         //Open Window
         }
 
-        void ShowDiffGraph(LaidOutGraph current, LaidOutGraph next) {
+        void CalcDiffGraph(LaidOutGraph current, LaidOutGraph next) {
             Graph oldGraph = current?.Graph;
             Graph newGraph = next?.Graph;
 
@@ -119,6 +139,82 @@ namespace SEE.Controls.Actions
                           out equalEdges);
 
         }
+
+        private void DeleteDiffGraph()
+        {
+            int deletedGraphElements = removedNodes.Count + removedEdges.Count;
+            if (deletedGraphElements > 0)
+            {
+                // Remove those edges.
+                removedEdges.ForEach(edge =>
+                {
+                    objectManager.RemoveEdge(edge, out GameObject gameObjectEdge);
+                    Destroyer.Destroy(gameObjectEdge);
+                });
+
+                // Remove those nodes.
+                removedNodes.ForEach(node =>
+                {
+                    objectManager.RemoveNode(node, out GameObject gameObjectNode);
+                    Destroyer.Destroy(gameObjectNode);
+                });
+            }
+        }
+
+        private void MoveDiffGraph(LaidOutGraph next)
+        {
+
+        }
+
+        private void AdjustExistingGraph()
+        {
+            // Even the equal nodes need adjustments because the layout could have
+            // changed their dimensions. The treemap layout, for instance, may do that.
+            int changedElements = equalNodes.Count + changedNodes.Count;
+            if (changedElements > 0)
+            {
+                //equalNodes.ForEach(AdjustExistingNode);
+                //changedNodes.ForEach(AdjustExistingNode);
+            }
+        }
+
+        private void AddNewNodes()
+        {
+            addedNodes.ForEach(AddNode);
+        }
+
+        private void AddNode(Node node)
+        {
+            Assert.IsNotNull(node);
+            ILayoutNode layoutNode = NextLayoutToBeShown[node.ID];
+            // The game node representing the graphNode if there is any; null if there is none
+            Node formerGraphNode = objectManager.GetNode(node, out GameObject gameNode);
+            Assert.IsTrue(gameNode.HasNodeRef());
+            // Assert.IsNull(formerGraphNode);
+            if (formerGraphNode != null)
+            {
+                Debug.LogError($"A graph node for {formerGraphNode.ID} was expected not to exist.\n");
+            }
+
+            Add(gameNode, layoutNode);
+
+            void Add(GameObject gameNode, ILayoutNode layoutNode)
+            {
+                // A new node has no layout applied to it yet.
+                Vector3 initialPosition = layoutNode.CenterPosition;
+                gameNode.transform.position = initialPosition;
+
+                gameNode.SetAbsoluteScale(layoutNode.AbsoluteScale, animate: false);
+
+                // The node is new. Hence, it has no parent yet. It must be contained
+                // in a code city though; otherwise the NodeOperator would not work.
+                //gameNode.transform.SetParent(gameObject.transform);
+
+
+
+            }
+        }
+
 
         /// <summary>
         /// Set of added nodes from the current to the next graph.
@@ -171,6 +267,14 @@ namespace SEE.Controls.Actions
         /// current graph that has the same ID).
         /// </summary>
         private ISet<Edge> equalEdges;
+
+        /// <summary>
+        /// The layout of <see cref="nextCity"/>. The layout is a mapping of the graph
+        /// nodes' IDs onto their <see cref="ILayoutNode"/>.
+        /// </summary>
+        private Dictionary<string, ILayoutNode> NextLayoutToBeShown => nextCity?.Layout;
+
     }
 
 }
+
