@@ -108,7 +108,7 @@ namespace SEE.UI
                             // check if the key is already bound to another binding, if not, then re-assign the key
                             if (KeyBindings.SetBindingForKey(bindingToRebind, key))
                             {
-                                // FIXME: We need to open a modal dialog and ask the user
+                                // TODO (#683): We need to open a modal dialog and ask the user
                                 // whether he/she really wants to change the binding.
                                 shortNameOfBindingToLabel[bindingToRebind.Name].text = key.ToString();
                             }
