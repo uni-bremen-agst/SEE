@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.DataModel.GraphSearch;
 
 namespace SEE.DataModel.DG
 {
     /// <summary>
-    /// Provides extensions to <see cref="Graph"/>.
+    /// Provides extensions to <see cref="Graph"/> and related classes.
     /// </summary>
     public static class GraphExtensions
     {
@@ -124,6 +125,19 @@ namespace SEE.DataModel.DG
                 }
             });
             return new AttributeDiff(floatAttributes, intAttributes, stringAttributes, toggleAttributes);
+        }
+
+        /// <summary>
+        /// Applies all <paramref name="modifiers"/> to the given <paramref name="elements"/>.
+        /// </summary>
+        /// <param name="modifiers">graph modifiers to apply to the graph elements</param>
+        /// <param name="elements">the graph elements to modify</param>
+        /// <typeparam name="T">the type of the graph elements</typeparam>
+        /// <returns>the modified graph elements</returns>
+        public static IEnumerable<T> ApplyAll<T>(this IEnumerable<IGraphModifier> modifiers, IEnumerable<T> elements)
+            where T : GraphElement
+        {
+            return modifiers.Aggregate(elements, (current, modifier) => modifier.Apply(current));
         }
     }
 }

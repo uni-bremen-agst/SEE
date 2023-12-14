@@ -588,16 +588,13 @@ namespace SEE.Controls.Actions
                 if (Raycasting.RaycastLowestNode(out RaycastHit? raycastHit, out Node _, grabbedObject.Node))
                 {
                     // Note: the root node can never be grabbed. See above.
+                    // We need to undo the reparenting of the grabbed node if it is
+                    // currently reparented onto another node.
+                    grabbedObject.UnReparent();
                     if (raycastHit.HasValue)
                     {
                         // The user is currently aiming at a node. The grabbed node is reparented onto this aimed node.
                         grabbedObject.Reparent(raycastHit.Value.transform.gameObject);
-                    }
-                    else
-                    {
-                        // The user is currently not aiming at a node. The reparenting
-                        // of the grabbed must be reverted.
-                        grabbedObject.UnReparent();
                     }
                 }
             }
