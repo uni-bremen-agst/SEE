@@ -1,7 +1,4 @@
 ﻿using SEE.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -22,39 +19,6 @@ namespace SEE.Controls
         /// </summary>
         public static bool KeyboardShortcutsEnabled { set; get; } = true;
 
-        /// <summary>
-        /// A mapping of binding names onto their corresponding <see cref="KeyCode"/>.
-        /// </summary>
-        [Obsolete]
-        private static readonly IDictionary<string, KeyCode> bindings = BindingNamesAndKeys();
-
-        /// <summary>
-        /// Updates the bindings.
-        /// </summary>
-        [Obsolete]
-        public static void UpdateBindings()
-        {
-            bindings.Clear();
-            foreach (string binding in KeyBindings.GetBindingNames())
-            {
-                bindings[binding] = KeyBindings.GetBindings().FirstOrDefault(x => x.Value.Contains(binding)).Key;
-            }
-        }
-
-        /// <summary>
-        /// Returns a dictionary with the binding names and keys.
-        /// </summary>
-        /// <returns>the dictionary</returns>
-        private static IDictionary<string, KeyCode> BindingNamesAndKeys()
-        {
-            Dictionary<string, KeyCode> namesAndKeys = new();
-            foreach (string binding in KeyBindings.GetBindingNames())
-            {
-                namesAndKeys[binding] = KeyBindings.GetBindings().FirstOrDefault(x => x.Value.Contains(binding)).Key;
-            }
-            return namesAndKeys;
-        }
-
         //-----------------------------------------------------
         #region General key bindings
         //-----------------------------------------------------
@@ -66,8 +30,7 @@ namespace SEE.Controls
         public static bool Help()
         {
             return KeyboardShortcutsEnabled
-                && (KeyBindings.IsRequested(KeyBindings.KeyAction.Help)
-                   || Input.GetKeyDown(bindings[KeyBindings.HelpBinding]));
+                && KeyBindings.IsDown(KeyBindings.KeyAction.Help);
         }
 
         /// <summary>
@@ -77,8 +40,7 @@ namespace SEE.Controls
         public static bool ToggleVoiceInput()
         {
             return KeyboardShortcutsEnabled
-                && (KeyBindings.IsRequested(KeyBindings.KeyAction.ToggleVoiceInput)
-                    || Input.GetKeyDown(bindings[KeyBindings.ToggleVoiceInputBinding]));
+                && KeyBindings.IsDown(KeyBindings.KeyAction.ToggleVoiceInput);
         }
 
         /// <summary>
@@ -88,9 +50,7 @@ namespace SEE.Controls
         public static bool ToggleMenu()
         {
             return KeyboardShortcutsEnabled
-                && (KeyBindings.IsRequested(KeyBindings.KeyAction.ToggleMenu)
-                    || Input.GetKeyDown(bindings[KeyBindings.ToggleMenuBinding]));
-
+                && KeyBindings.IsDown(KeyBindings.KeyAction.ToggleMenu);
         }
 
         /// <summary>
@@ -99,7 +59,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ToggleSettings()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.ToggleSettingsBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.ToggleSettings);
         }
 
         /// <summary>
@@ -108,7 +68,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ToggleBrowser()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.ToggleBrowserBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.ToggleBrowser);
         }
 
         /// <summary>
@@ -117,7 +77,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         internal static bool ToggleSearch()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.ToggleSettingsBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.ToggleSettings);
         }
 
         /// <summary>
@@ -145,7 +105,7 @@ namespace SEE.Controls
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
 #endif
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.UndoBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.Undo);
 #if UNITY_EDITOR == false
             }
             else
@@ -166,7 +126,7 @@ namespace SEE.Controls
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
 #endif
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.RedoBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.Redo);
 #if UNITY_EDITOR == false
             }
             else
@@ -186,7 +146,7 @@ namespace SEE.Controls
             // Ctrl keys are not available when running the game in the editor
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
-               return !KeyboardShortcutsEnabled && Input.GetKeyDown(bindings["Undo"]);
+               return !KeyboardShortcutsEnabled && KeyBindings.IsRequested(bindings["Undo"]);
             }
             else
             {
@@ -194,7 +154,7 @@ namespace SEE.Controls
             }
 #else
             // Ctrl keys replaced with KeyBindings.CodeWindowUndo in the editor
-            return Input.GetKeyDown(bindings[KeyBindings.CodeWindowUndoBinding]) && !KeyboardShortcutsEnabled;
+            return KeyBindings.IsDown(KeyBindings.KeyAction.CodeWindowUndo) && !KeyboardShortcutsEnabled;
 #endif
         }
 
@@ -208,12 +168,12 @@ namespace SEE.Controls
             // Ctrl keys are not available when running the game in the editor
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
-                return !KeyboardShortcutsEnabled && Input.GetKeyDown(bindings["Redo"]);
+                return !KeyboardShortcutsEnabled && KeyBindings.IsRequested(bindings["Redo"]);
             }
             return false;
 #else
             //ctrl keys replaced with KeyBindings.CodeWindowUndo in the editor
-            return Input.GetKeyDown(bindings[KeyBindings.CodeWindowRedoBinding]) && !KeyboardShortcutsEnabled;
+            return KeyBindings.IsDown(KeyBindings.KeyAction.CodeWindowRedo) && !KeyboardShortcutsEnabled;
 #endif
         }
 
@@ -227,7 +187,7 @@ namespace SEE.Controls
             // Ctrl keys are not available when running the game in the editor
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
-                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.S);
+                return !KeyboardShortcutsEnabled && KeyBindings.IsRequested(KeyCode.S);
             }
             else
             {
@@ -235,7 +195,7 @@ namespace SEE.Controls
             }
 #else
             // ctrl keys replaced with KeyBindings.CodeWindowSave in the editor
-            return Input.GetKeyDown(bindings[KeyBindings.CodeWindowSaveBinding]) && !KeyboardShortcutsEnabled;
+            return KeyBindings.IsDown(KeyBindings.KeyAction.CodeWindowSave) && !KeyboardShortcutsEnabled;
 #endif
         }
 
@@ -249,12 +209,12 @@ namespace SEE.Controls
            // Ctrl keys are not available when running the game in the editor
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
             {
-                return !KeyboardShortcutsEnabled && Input.GetKeyDown(KeyCode.R);
+                return !KeyboardShortcutsEnabled && KeyBindings.IsRequested(KeyCode.R);
             }
             return false;
 #else
             // ctrl keys replaced with KeyBindings.RefreshSyntaxHighlighting in the editor
-            return Input.GetKeyDown(bindings[KeyBindings.RefreshSyntaxHighlightingBinding]) && !KeyboardShortcutsEnabled;
+            return KeyBindings.IsDown(KeyBindings.KeyAction.RefreshSyntaxHighlighting) && !KeyboardShortcutsEnabled;
 #endif
         }
 
@@ -265,7 +225,7 @@ namespace SEE.Controls
         /// <returns>true if the user wants to toggle the run-time configuration menu</returns>
         internal static bool ToggleConfigMenu()
         {
-            return KeyboardShortcutsEnabled & Input.GetKeyDown(bindings[KeyBindings.ConfigMenuBinding]);
+            return KeyboardShortcutsEnabled & KeyBindings.IsDown(KeyBindings.KeyAction.ConfigMenu);
         }
 
         /// <summary>
@@ -274,7 +234,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         internal static bool ToggleEdges()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.ToggleEdgesBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.ToggleEdges);
         }
 
         /// <summary>
@@ -283,7 +243,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         internal static bool ToggleTreeView()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.TreeViewBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.TreeView);
         }
 
         #endregion
@@ -298,7 +258,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool SavePathPosition()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.SavePathPositionBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.SavePathPosition);
         }
 
         /// <summary>
@@ -307,7 +267,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool TogglePathPlaying()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.TogglePathPlayingBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.TogglePathPlaying);
         }
 
         #endregion
@@ -322,7 +282,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ToggleMetricCharts()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.ToggleChartsBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.ToggleCharts);
         }
 
         /// <summary>
@@ -331,7 +291,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ToggleMetricHoveringSelection()
         {
-            return KeyboardShortcutsEnabled && Input.GetKey(bindings[KeyBindings.ToggleMetricHoveringSelectionBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.ToggleMetricHoveringSelection);
         }
 
         #endregion
@@ -361,7 +321,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Unselect()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.UnselectBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.Unselect);
         }
 
         /// <summary>
@@ -370,7 +330,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ToggleCameraLock()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.ToggleCameraLockBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.ToggleCameraLock);
         }
 
         /// <summary>
@@ -379,7 +339,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Cancel()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.CancelBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.Cancel);
         }
 
         /// <summary>
@@ -388,7 +348,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Reset()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.ResetBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.Reset);
         }
 
         /// <summary>
@@ -397,7 +357,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ZoomInto()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.ZoomIntoBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.ZoomInto);
         }
 
         /// <summary>
@@ -407,7 +367,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Snap()
         {
-            return KeyboardShortcutsEnabled && Input.GetKey(bindings[KeyBindings.SnapBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyBindings.KeyAction.Snap);
         }
 
         /// <summary>
@@ -416,7 +376,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         internal static bool DragHovered()
         {
-            return KeyboardShortcutsEnabled && Input.GetKey(bindings[KeyBindings.DragHoveredBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyBindings.KeyAction.DragHovered);
         }
 
         /// <summary>
@@ -440,7 +400,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool BoostCameraSpeed()
         {
-            return KeyboardShortcutsEnabled && Input.GetKey(bindings[KeyBindings.BoostCameraSpeedBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyBindings.KeyAction.BoostCameraSpeed);
         }
         /// <summary>
         /// Move camera (player) forward.
@@ -448,7 +408,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool MoveForward()
         {
-            return KeyboardShortcutsEnabled && Input.GetKey(bindings[KeyBindings.MoveForwardBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyBindings.KeyAction.MoveForward);
         }
         /// <summary>
         /// Move camera (player) backward.
@@ -456,7 +416,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool MoveBackward()
         {
-            return KeyboardShortcutsEnabled && Input.GetKey(bindings[KeyBindings.MoveBackwardBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyBindings.KeyAction.MoveBackward);
         }
         /// <summary>
         /// Move camera (player) to the right.
@@ -464,7 +424,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool MoveRight()
         {
-            return KeyboardShortcutsEnabled && Input.GetKey(bindings[KeyBindings.MoveRightBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyBindings.KeyAction.MoveRight);
         }
         /// <summary>
         /// Move camera (player) to the left.
@@ -472,7 +432,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool MoveLeft()
         {
-            return KeyboardShortcutsEnabled && Input.GetKey(bindings[KeyBindings.MoveLeftBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyBindings.KeyAction.MoveLeft);
         }
         /// <summary>
         /// Move camera (player) up.
@@ -480,7 +440,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool MoveUp()
         {
-            return KeyboardShortcutsEnabled && Input.GetKey(bindings[KeyBindings.MoveUpBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyBindings.KeyAction.MoveUp);
         }
         /// <summary>
         /// Move camera (player) down.
@@ -488,7 +448,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool MoveDown()
         {
-            return KeyboardShortcutsEnabled && Input.GetKey(bindings[KeyBindings.MoveDownBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyBindings.KeyAction.MoveDown);
         }
 
         /// <summary>
@@ -522,7 +482,7 @@ namespace SEE.Controls
         /// <returns>true if the user wishes to point</returns>
         public static bool TogglePointing()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.PointingBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.Pointing);
         }
 
         #endregion
@@ -537,7 +497,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool SetMarker()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.SetMarkerBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.SetMarker);
         }
         /// <summary>
         /// Deletes a marker.
@@ -545,7 +505,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool DeleteMarker()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.DeleteMarkerBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.DeleteMarker);
         }
         /// <summary>
         /// Toggles between between the two canvases for the animation and selection of a revision.
@@ -553,7 +513,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ToggleEvolutionCanvases()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.ToggleEvolutionCanvasesBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.ToggleEvolutionCanvases);
         }
 
         #endregion
@@ -568,7 +528,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Previous()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.PreviousBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.Previous);
         }
         /// <summary>
         /// The next revision is to be shown.
@@ -576,7 +536,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Next()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.NextBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.Next);
         }
         /// <summary>
         /// Toggles auto play of the animation.
@@ -584,7 +544,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ToggleAutoPlay()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.ToggleAutoPlayBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.ToggleAutoPlay);
         }
 
         /// <summary>
@@ -593,7 +553,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ToggleExecutionOrder()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.ToggleExecutionOrderBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.ToggleExecutionOrder);
         }
 
         /// <summary>
@@ -602,7 +562,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool FirstStatement()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.FirstStatementBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.FirstStatement);
         }
 
         /// <summary>
@@ -611,7 +571,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool IncreaseAnimationSpeed()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.IncreaseAnimationSpeedBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.IncreaseAnimationSpeed);
         }
 
         /// <summary>
@@ -620,7 +580,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool DecreaseAnimationSpeed()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.DecreaseAnimationSpeedBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.DecreaseAnimationSpeed);
         }
 
         #endregion
@@ -635,7 +595,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ExecuteToBreakpoint()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.ExecuteToBreakpointBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.ExecuteToBreakpoint);
         }
 
         #endregion
@@ -650,7 +610,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ShowWindowMenu()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.ShowWindowMenuBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.ShowWindowMenu);
         }
 
         #endregion
@@ -690,7 +650,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool OpenTextChat()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.OpenTextChatBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.ToggleTextChat);
         }
 
         #endregion
@@ -705,7 +665,7 @@ namespace SEE.Controls
         /// <returns>True if the user wants to close all notifications.</returns>
         public static bool CloseAllNotifications()
         {
-            return KeyboardShortcutsEnabled && Input.GetKey(bindings[KeyBindings.CloseNotificationsBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.CloseNotifications);
         }
 
         #endregion
@@ -717,7 +677,7 @@ namespace SEE.Controls
         /// <returns>True if the user wants to turn the FaceCam on or off.</returns>
         internal static bool ToggleFaceCam()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.ToggleFaceCamBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.ToggleFaceCam);
         }
 
         /// <summary>
@@ -726,7 +686,7 @@ namespace SEE.Controls
         /// <returns>True if the user wants to switch the position of the FaceCam.</returns>
         internal static bool ToggleFaceCamPosition()
         {
-            return KeyboardShortcutsEnabled && Input.GetKeyDown(bindings[KeyBindings.ToggleFaceCamPositionBinding]);
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyBindings.KeyAction.ToggleFaceCamPosition);
         }
 
         #endregion

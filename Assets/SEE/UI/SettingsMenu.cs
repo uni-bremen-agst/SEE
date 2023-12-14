@@ -7,6 +7,7 @@ using SEE.GO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.UI.Notification;
 
 namespace SEE.UI
 {
@@ -36,65 +37,53 @@ namespace SEE.UI
         private GameObject settingsMenuGameObject;
 
         /// <summary>
-        /// The game object instantiated for the <see cref="ScrollPrefab"/>.
+        /// A mapping of the short name of key binding onto the label of the button that allows to
+        /// change the binding. This dictionary is used to update the label if the key binding
+        /// was changed by the user.
         /// </summary>
-        private GameObject scrollView;
+        Dictionary<string, TextMeshProUGUI> shortNameOfBindingToLabel;
 
         /// <summary>
-        /// The game object instantiated for the <see cref="KeyBindingContent"/>.
-        /// </summary>
-        private GameObject keyBindingContent;
-
-        /// <summary>
-        /// This dictionary is used, to update the key button labels,
-        /// when the key for a binding gets changed.
-        /// </summary>
-        Dictionary<string, TextMeshProUGUI> buttonToLabel;
-
-        /// <summary>
-        /// Sets the <see cref="KeyBindingContent"/> and adds the onClick event <see cref="ExitGame"/> to the ExitButton.
+        /// Sets the <see cref="KeyBindingContent"/> and adds the onClick event
+        /// <see cref="ExitGame"/> to the ExitButton.
         /// </summary>
         protected override void StartDesktop()
         {
-            string[] buttonNames = KeyBindings.GetBindingNames();
-            // instantiates the buttonToLabel dictionary
-            buttonToLabel = new Dictionary<string, TextMeshProUGUI>();
-            // instantiates the keyBindings dictionary
-            IDictionary<KeyCode, string> keyBindings = KeyBindings.GetBindings();
-            // group the keyBindings by it scopes
-            var groupedBindings = keyBindings.GroupBy(pair => KeyBindings.GetCategory(pair.Value));
             // instantiates the SettingsMenu
             settingsMenuGameObject = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Canvas.transform, false);
-            Button exitButton = settingsMenuGameObject.transform.Find("ExitPanel/Buttons/Content/Exit").gameObject.MustGetComponent<Button>();
-            // adds the ExitGame method to the button
-            exitButton.onClick.AddListener(ExitGame);
-            // displays the content
-            foreach (var group in groupedBindings)
+            // adds the ExitGame method to the exit button
+            settingsMenuGameObject.transform.Find("ExitPanel/Buttons/Content/Exit").gameObject.MustGetComponent<Button>()
+                .onClick.AddListener(ExitGame);
+
+            shortNameOfBindingToLabel = new Dictionary<string, TextMeshProUGUI>();
+
+            // Displays all bindings grouped by their category.
+            foreach (IGrouping<KeyBindings.KeyActionCategory, KeyValuePair<KeyBindings.KeyAction, KeyBindings.KeyActionDescriptor>> group
+                in KeyBindings.AllBindings().GroupBy(binding => binding.Value.Category))
             {
-                // displays the scope
-                scrollView = PrefabInstantiator.InstantiatePrefab(ScrollPrefab, Canvas.transform, false).transform.gameObject;
+                // Creates a list of keybinding descriptions for the given category.
+                GameObject scrollView = PrefabInstantiator.InstantiatePrefab(ScrollPrefab, Canvas.transform, false).transform.gameObject;
                 scrollView.transform.SetParent(settingsMenuGameObject.transform.Find("KeybindingsPanel/KeybindingsText/Viewport/Content"));
                 // set the titles of the scrollViews to the scopes
                 TextMeshProUGUI groupTitle = scrollView.transform.Find("Group").gameObject.MustGetComponent<TextMeshProUGUI>();
                 groupTitle.text = $"{group.Key}";
-                // displays the scrollview for each scope, with its bindings and keys
+
                 foreach (var binding in group)
                 {
-                    keyBindingContent = PrefabInstantiator.InstantiatePrefab(KeyBindingContent, Canvas.transform, false).transform.gameObject;
+                    GameObject keyBindingContent = PrefabInstantiator.InstantiatePrefab(KeyBindingContent, Canvas.transform, false).transform.gameObject;
                     keyBindingContent.transform.SetParent(scrollView.transform.Find("Scroll View/Viewport/Content"));
 
-                    // set the text to the bindingName
+                    // set the text to the short name of the binding
                     TextMeshProUGUI bindingText = keyBindingContent.transform.Find("Binding").gameObject.MustGetComponent<TextMeshProUGUI>();
-                    string bindingName = binding.Value.Substring(0, binding.Value.IndexOf("[")).ToString();
-                    bindingText.text = bindingName;
-
+                    // The short name of the binding.
+                    bindingText.text = binding.Value.Name;
                     // set the label of the key button
                     TextMeshProUGUI key = keyBindingContent.transform.Find("Key/Text (TMP)").gameObject.MustGetComponent<TextMeshProUGUI>();
-                    key.text = KeyBindings.GetKeyNameForBinding(bindingName);
-                    // add the label to the dictionary
-                    buttonToLabel[bindingName] = key;
-                    // add the actionlistener, to be able to change the key of a binding
-                    keyBindingContent.transform.Find("Key").gameObject.MustGetComponent<Button>().onClick.AddListener( () => { StartRebindFor(bindingName); });
+                    // The name of the key code bound.
+                    key.text = binding.Value.KeyCode.ToString();
+                    shortNameOfBindingToLabel[binding.Value.Name] = key;
+                    // add the actionlistener to be able to change the key code of a binding.
+                    keyBindingContent.transform.Find("Key").gameObject.MustGetComponent<Button>().onClick.AddListener(() => { StartRebindFor(binding.Value); });
                 }
             }
         }
@@ -112,23 +101,27 @@ namespace SEE.UI
                 // the next button, that gets pressed, will be the new keyBind.
                 if (Input.anyKeyDown)
                 {
-                    // get the key that was pressed.
                     foreach (KeyCode key in Enum.GetValues(typeof(KeyCode)))
                     {
-                        // rebind the key
-                        if (Input.GetKeyDown(key))
+                        if (Input.GetKeyDown(key) && KeyBindings.AssignableKeyCode(key))
                         {
-                            // check if the key is already bound to another binding, if not, then update the key
+                            // check if the key is already bound to another binding, if not, then re-assign the key
                             if (KeyBindings.SetBindingForKey(bindingToRebind, key))
                             {
-                                // update the label of the button of the key
-                                buttonToLabel[bindingToRebind].text = key.ToString();
+                                // FIXME: We need to open a modal dialog and ask the user
+                                // whether he/she really wants to change the binding.
+                                shortNameOfBindingToLabel[bindingToRebind.Name].text = key.ToString();
                             }
                             else
                             {
-                                string exceptionText = $"Cannot register key {key} for {bindingToRebind}\n Key {key} already bound to {KeyBindings.GetBindings()[key]}\n";
-                                settingsMenuGameObject.transform.Find("KeybindingsPanel/Exception/ExceptionText").gameObject.MustGetComponent<TextMeshProUGUI>().text = exceptionText;
-                                settingsMenuGameObject.transform.Find("KeybindingsPanel/Exception").gameObject.SetActive(true);
+                                string message = string.Empty;
+                                if (KeyBindings.TryGetKeyAction(key, out KeyBindings.KeyAction action))
+                                {
+                                    message = $"\n Key {key} already bound to {action}.";
+                                }
+                                ShowNotification.Error
+                                    ("Key code already bound",
+                                    $"Cannot register key {key} for {bindingToRebind}.{message}\n");
                             }
                             bindingToRebind = null;
                             SEEInput.KeyboardShortcutsEnabled = true;
@@ -157,12 +150,12 @@ namespace SEE.UI
         /// <summary>
         /// The keyBinding which gets updated.
         /// </summary>
-        private string bindingToRebind = null;
+        private KeyBindings.KeyActionDescriptor bindingToRebind = null;
 
         /// <summary>
         /// Sets the <see cref="bindingToRebind"/>.
         /// </summary>
-        private void StartRebindFor(string binding)
+        private void StartRebindFor(KeyBindings.KeyActionDescriptor binding)
         {
             bindingToRebind = binding;
         }
