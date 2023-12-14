@@ -6,6 +6,7 @@ using SEE.GO;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SEE.UI.PopupMenu
 {
@@ -30,15 +31,20 @@ namespace SEE.UI.PopupMenu
         private CanvasGroup MenuCanvasGroup;
 
         /// <summary>
-        /// The transform under which the actions are listed.
+        /// The transform under which the entries are listed.
         /// </summary>
-        private RectTransform ActionList;
+        private RectTransform EntryList;
 
         /// <summary>
-        /// A queue of actions that were added before the menu was started.
-        /// These actions will be added to the menu once it is started.
+        /// The content size fitter of the popup menu.
         /// </summary>
-        private readonly Queue<PopupMenuAction> ActionsBeforeStart = new();
+        private ContentSizeFitter contentSizeFitter;
+
+        /// <summary>
+        /// A queue of entries that were added before the menu was started.
+        /// These entries will be added to the menu once it is started.
+        /// </summary>
+        private readonly Queue<PopupMenuEntry> EntriesBeforeStart = new();
 
         /// <summary>
         /// Whether the menu should currently be shown.
@@ -59,76 +65,123 @@ namespace SEE.UI.PopupMenu
         {
             // Instantiate the menu.
             Menu = (RectTransform)PrefabInstantiator.InstantiatePrefab(MenuPrefabPath, Canvas.transform, false).transform;
+            contentSizeFitter = Menu.gameObject.MustGetComponent<ContentSizeFitter>();
             MenuCanvasGroup = Menu.gameObject.MustGetComponent<CanvasGroup>();
-            ActionList = (RectTransform)Menu.Find("Action List");
+            EntryList = (RectTransform)Menu.Find("Action List");
 
             // The menu should be hidden when the user moves the mouse away from it.
             PointerHelper pointerHelper = Menu.gameObject.MustGetComponent<PointerHelper>();
-            pointerHelper.ExitEvent.AddListener(_ => HideMenu().Forget());
-
-            // We add all actions that were added before the menu was started.
-            while (ActionsBeforeStart.Count > 0)
+            pointerHelper.ExitEvent.AddListener(x =>
             {
-                AddAction(ActionsBeforeStart.Dequeue());
-            }
+                // If the mouse is not moving, this may indicate that the trigger has just been
+                // menu entries being rebuilt instead of the mouse moving outside of the menu.
+                if (x.IsPointerMoving())
+                {
+                    HideMenu().Forget();
+                }
+            });
 
-            // FIXME (#632): On the first appearance of the menu, it lacks a background.
+            // We add all entries that were added before the menu was started.
+            while (EntriesBeforeStart.Count > 0)
+            {
+                AddEntry(EntriesBeforeStart.Dequeue());
+            }
 
             // We hide the menu by default.
             Menu.gameObject.SetActive(false);
+
+            // TODO (#679): Make this scrollable once it gets too big.
+        }
+
+        /// <summary>
+        /// Adds a new <paramref name="entry"/> to the menu.
+        /// </summary>
+        /// <param name="entry">The entry to be added.</param>
+        public void AddEntry(PopupMenuEntry entry)
+        {
+            if (Menu is null)
+            {
+                EntriesBeforeStart.Enqueue(entry);
+                return;
+            }
+
+            switch (entry)
+            {
+                case PopupMenuAction action:
+                    AddAction(action);
+                    break;
+                case PopupMenuHeading heading:
+                    AddHeading(heading);
+                    break;
+                default:
+                    throw new System.ArgumentException($"Unknown entry type: {entry.GetType()}");
+            }
+
+            // TODO (#668): Respect priority
         }
 
         /// <summary>
         /// Adds a new <paramref name="action"/> to the menu.
         /// </summary>
         /// <param name="action">The action to be added.</param>
-        public void AddAction(PopupMenuAction action)
+        private void AddAction(PopupMenuAction action)
         {
-            if (Menu is null)
-            {
-                ActionsBeforeStart.Enqueue(action);
-                return;
-            }
-
-            // TODO (#668): Respect priority
-            GameObject actionItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuButton", ActionList, false);
+            GameObject actionItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuButton", EntryList, false);
             ButtonManagerBasic button = actionItem.MustGetComponent<ButtonManagerBasic>();
             button.buttonText = action.Name;
-            button.clickEvent.AddListener(() =>
-            {
-                action.Action();
-                HideMenu().Forget();
-            });
+
+            button.clickEvent.AddListener(OnClick);
             if (action.IconGlyph != default)
             {
                 actionItem.transform.Find("Icon").gameObject.MustGetComponent<TextMeshProUGUI>().text = action.IconGlyph.ToString();
             }
-        }
+            return;
 
-        /// <summary>
-        /// Adds all given <paramref name="actions"/> to the menu.
-        /// </summary>
-        /// <param name="actions">The actions to be added.</param>
-        public void AddActions(IEnumerable<PopupMenuAction> actions)
-        {
-            foreach (PopupMenuAction action in actions)
+            void OnClick()
             {
-                AddAction(action);
+                action.Action();
+                if (action.CloseAfterClick)
+                {
+                    HideMenu().Forget();
+                }
             }
         }
 
         /// <summary>
-        /// Removes all actions from the menu.
+        /// Adds a new <paramref name="heading"/> to the menu.
         /// </summary>
-        public void ClearActions()
+        /// <param name="heading">The heading to be added.</param>
+        private void AddHeading(PopupMenuHeading heading)
+        {
+            GameObject headingItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuHeading", EntryList, false);
+            TextMeshProUGUI text = headingItem.MustGetComponent<TextMeshProUGUI>();
+            text.text = heading.Text;
+        }
+
+        /// <summary>
+        /// Adds all given <paramref name="entries"/> to the menu.
+        /// </summary>
+        /// <param name="entries">The entries to be added.</param>
+        public void AddEntries(IEnumerable<PopupMenuEntry> entries)
+        {
+            foreach (PopupMenuEntry entry in entries)
+            {
+                AddEntry(entry);
+            }
+        }
+
+        /// <summary>
+        /// Removes all entries from the menu.
+        /// </summary>
+        public void ClearEntries()
         {
             if (Menu is null)
             {
-                ActionsBeforeStart.Clear();
+                EntriesBeforeStart.Clear();
                 return;
             }
 
-            foreach (Transform child in ActionList)
+            foreach (Transform child in EntryList)
             {
                 Destroyer.Destroy(child.gameObject);
             }
@@ -162,11 +215,17 @@ namespace SEE.UI.PopupMenu
         /// Activates the menu and fades it in.
         /// This asynchronous method will return once the menu is fully shown.
         /// </summary>
-        public async UniTaskVoid ShowMenu()
+        public async UniTask ShowMenu()
         {
             ShouldShowMenu = true;
             Menu.gameObject.SetActive(true);
             Menu.localScale = Vector3.zero;
+            // This may seem stupid, but unfortunately, due to a Unity bug,
+            // this appears to be the only way to make the content size fitter update.
+            // See https://forum.unity.com/threads/content-size-fitter-refresh-problem.498536/
+            contentSizeFitter.enabled = false;
+            await UniTask.WaitForEndOfFrame();
+            contentSizeFitter.enabled = true;
             await UniTask.WhenAll(Menu.DOScale(1, AnimationDuration).AsyncWaitForCompletion().AsUniTask(),
                                   MenuCanvasGroup.DOFade(1, AnimationDuration / 2).AsyncWaitForCompletion().AsUniTask());
         }
@@ -175,7 +234,7 @@ namespace SEE.UI.PopupMenu
         /// Hides the menu and fades it out.
         /// This asynchronous method will return once the menu is fully hidden and deactivated.
         /// </summary>
-        public async UniTaskVoid HideMenu()
+        public async UniTask HideMenu()
         {
             ShouldShowMenu = false;
             // We use a fade effect rather than DOScale because it looks better.
@@ -184,6 +243,28 @@ namespace SEE.UI.PopupMenu
             {
                 Menu.gameObject.SetActive(false);
             }
+        }
+
+        /// <summary>
+        /// Convenience method that shows the menu with the given <paramref name="entries"/>
+        /// at the given <paramref name="position"/>.
+        /// </summary>
+        /// <param name="entries">The entries to be shown in the menu.
+        /// If null, entries will not be modified.</param>
+        /// <param name="position">The position at which the menu should be shown.
+        /// If null, menu will not be moved.</param>
+        public void ShowWith(IEnumerable<PopupMenuEntry> entries = null, Vector2? position = null)
+        {
+            if (entries != null)
+            {
+                ClearEntries();
+                AddEntries(entries);
+            }
+            if (position.HasValue)
+            {
+                MoveTo(position.Value);
+            }
+            ShowMenu().Forget();
         }
     }
 }

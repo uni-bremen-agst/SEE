@@ -483,18 +483,22 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Returns the names of all node types of this graph
+        /// Returns the names of all node types of this graph.
         /// </summary>
         /// <returns>node types of this graph</returns>
-        internal HashSet<string> AllNodeTypes()
-        {
-            HashSet<string> result = new();
-            foreach (Node node in Nodes())
-            {
-                result.Add(node.Type);
-            }
-            return result;
-        }
+        internal HashSet<string> AllNodeTypes() => Nodes().Select(n => n.Type).ToHashSet();
+
+        /// <summary>
+        /// Returns the names of all edge types of this graph.
+        /// </summary>
+        /// <returns>edge types of this graph</returns>
+        internal HashSet<string> AllEdgeTypes() => Edges().Select(e => e.Type).ToHashSet();
+
+        /// <summary>
+        /// Returns the names of all element types of this graph.
+        /// </summary>
+        /// <returns>element types of this graph</returns>
+        internal HashSet<string> AllElementTypes() => Elements().Select(e => e.Type).ToHashSet();
 
         /// <summary>
         /// The number of nodes of the graph.
