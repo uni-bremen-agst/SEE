@@ -36,6 +36,9 @@ namespace SEE.DataModel.GraphSearch
             SortAttributes.RemoveAll(a => a.Name == attributeName);
         }
 
+        /// <summary>
+        /// Implements <see cref="IGraphModifier.Apply{T}(IEnumerable{T})"/>.
+        /// </summary>
         public IEnumerable<T> Apply<T>(IEnumerable<T> elements) where T : GraphElement
         {
             return SortAttributes.Count == 0
@@ -74,8 +77,14 @@ namespace SEE.DataModel.GraphSearch
             }
         }
 
+        /// <summary>
+        /// Implements <see cref="IGraphModifier.IsActive"/>.
+        /// </summary>
         public bool IsActive() => SortAttributes.Count > 0;
 
+        /// <summary>
+        /// Implements <see cref="IGraphModifier.Reset"/>.
+        /// </summary>
         public void Reset() => SortAttributes.Clear();
     }
 }

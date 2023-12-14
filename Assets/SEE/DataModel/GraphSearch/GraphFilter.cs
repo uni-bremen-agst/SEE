@@ -64,9 +64,15 @@ namespace SEE.DataModel.GraphSearch
             return elements.Where(Includes);
         }
 
+        /// <summary>
+        /// Implements <see cref="IGraphModifier.IsActive"/>.
+        /// </summary>
         public bool IsActive() => !IncludeNodes || !IncludeEdges
             || IncludeToggleAttributes.Count > 0 || ExcludeToggleAttributes.Count > 0 || ExcludeElements.Count > 0;
 
+        /// <summary>
+        /// Implements <see cref="IGraphModifier.Reset"/>.
+        /// </summary>
         public void Reset()
         {
             IncludeToggleAttributes.Clear();
